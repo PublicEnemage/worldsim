@@ -1,6 +1,6 @@
 # CLAUDE.md — WorldSim Project Context
 
-## What This Project Is
+## What This Project Is:
 
 This is an open-source geopolitical-economic simulation platform designed to
 level the playing field between sophisticated financial and political actors
