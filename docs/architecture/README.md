@@ -82,6 +82,9 @@ Or use the VS Code Mermaid Preview extension, which renders `.mmd` files inline.
 | File | ADR | What it shows |
 |---|---|---|
 | `ADR-001-class-diagram.mmd` | ADR-001 | Simulation core data model: SimulationEntity, SimulationState, Event, Relationship, SimulationModule |
+| `ADR-001-flowchart-mutable-state-problem.mmd` | ADR-001 | Why mutable state creates non-determinism; how immutable state + events solves it |
+| `ADR-001-sequence-timestep-cycle.mmd` | ADR-001 | Full timestep cycle: engine calls modules, collects Events, applies deltas to State[T+1] |
+| `ADR-001-flowchart-event-propagation.mmd` | ADR-001 | How a single Event propagates through the relationship graph with attenuation across hops |
 
 *This table is updated when diagrams are added. New diagrams added without
 updating this table will be flagged in pull request review.*
