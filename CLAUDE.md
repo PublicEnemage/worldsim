@@ -532,6 +532,74 @@ blindspots, dual-use position, and challenge/correction process.
 
 ---
 
+## Governance
+
+### Current State
+
+WorldSim is currently developed and maintained by a single Engineering Lead
+(@PublicEnemage) who holds full repository authority — merge rights, exception
+approval, architectural decisions, and infrastructure access.
+
+This is a governance gap, and it is acknowledged as one. The compliance
+framework in `docs/COMPLIANCE.md`, the CODEOWNERS file, and the Socratic Agent
+partially compensate: the compliance workflow creates an audit trail, CODEOWNERS
+establishes routing structure, and the Socratic Agent surfaces reasoning that
+might otherwise go unexamined. But none of these substitute for genuine
+separation of duties. An exception approved by the same person who introduced
+the deviation is not independent review — it is documented self-approval.
+
+The audit trail must reflect reality. Any compliance exception approved during
+the single-principal phase must explicitly note the limitation in the exception
+record itself. Exceptions must not imply a separation of duties that does not
+exist.
+
+### Intended Governance Progression
+
+**Stage 1 — Immediate (current milestone)**
+Branch protection on `main` requiring at least one approving review before
+merge. CODEOWNERS file in place. The single-principal limitation is documented
+and declared rather than hidden.
+
+**Stage 2 — Second governance account**
+A second GitHub account with merge authority and exception approval capability
+for the paths in CODEOWNERS that require it (simulation engine core, docs,
+.github). This account may be a trusted collaborator or a secondary maintainer
+account. Once this is in place, the audit trail has genuine independence for
+Major and Critical exception approvals.
+
+**Stage 3 — First external domain reviewer**
+When the first complete simulation module (Macroeconomic or Geopolitical)
+is implemented and published, recruit at least one external domain reviewer
+with expertise in the relevant field — a development economist, a sovereign
+debt specialist, or a comparable domain expert. This reviewer has no
+implementation authority but has review authority over the methodology
+documented in ADRs and the human cost ledger outputs.
+
+**Stage 4 — Technical Steering Committee**
+When the first institutional user engages with WorldSim — a finance ministry,
+a civil society organization, a research institution — convene a Technical
+Steering Committee with representation from: the Engineering Lead, at least
+one domain expert, and at least one representative of the user community.
+The TSC has authority over policy positions (documented in `docs/POLICY.md`),
+the economic methodology positions, and the dual-use framework.
+
+### Audit Trail Integrity Rule
+
+No compliance exception may be self-approved during the single-principal phase
+without the following statement appearing verbatim in the exception record:
+
+> *"This exception was approved by the same individual who holds full
+> repository authority. No independent review is available at this governance
+> stage. See CLAUDE.md § Governance for the documented plan to address this
+> limitation."*
+
+This requirement exists so that the audit trail, when reviewed by future
+contributors or institutional users, accurately represents the governance
+conditions under which exceptions were made — rather than implying an
+independence that did not exist.
+
+---
+
 ## The North Star
 
 The tool's positions are declared, not hidden. Transparency about what we claim and do not claim is as important as the quality of what we build. A user who cannot understand and challenge our methodology cannot genuinely use our tool — they can only depend on it. Dependency is not leveling.

@@ -1,0 +1,59 @@
+# CODEOWNERS — WorldSim
+#
+# Pre-contributor phase governance note
+# ──────────────────────────────────────
+# WorldSim is currently developed by a single Engineering Lead (@PublicEnemage).
+# All ownership rules below resolve to the same individual. This is a known
+# governance gap — genuine separation of duties requires at least two principals
+# with distinct merge and exception authorities.
+#
+# This file exists now, before external contributors join, for two reasons:
+#
+# 1. Structural habit. CODEOWNERS enforces review routing once a second
+#    principal exists. Establishing the patterns now means the machinery
+#    is in place when it matters, rather than retrofitted under deadline
+#    pressure at the moment a contributor submits a PR to the simulation
+#    engine core.
+#
+# 2. Tooling readiness. GitHub uses CODEOWNERS to populate PR review
+#    requirements, branch protection rules, and the code review audit trail.
+#    These mechanisms take effect immediately when a second owner is added
+#    to a path — but only if the file and the branch protection rules referencing
+#    it already exist.
+#
+# The governance gap is documented in CLAUDE.md § Governance and addressed
+# through the intended governance progression described there. Self-approved
+# exceptions during the single-principal phase are required to document the
+# limitation explicitly in the exception record.
+#
+# When a second principal joins:
+# 1. Add them to the specific paths that match their domain (simulation engine,
+#    data standards, infrastructure, etc.)
+# 2. Enable "Require review from Code Owners" in branch protection for main
+# 3. Update CLAUDE.md § Governance to reflect the actual separation achieved
+#
+# ─────────────────────────────────────────────────────────────────────────────
+
+# Global default — all files not matched by a more specific rule
+* @PublicEnemage
+
+# docs/ — standards, ADRs, compliance, and policy documents
+# Changes to these files define what the codebase must do; they require
+# the same explicit review as the code itself.
+/docs/ @PublicEnemage
+
+# Simulation engine core — highest architectural sensitivity
+# models.py is ADR-001 made concrete. Changes here ripple to every module
+# that will ever be written. Interface changes require an ADR update in
+# the same PR.
+/backend/app/simulation/engine/ @PublicEnemage
+
+# Project constitution
+# CLAUDE.md governs every agent session and every architectural decision.
+# Any change requires Engineering Lead review regardless of who proposes it.
+/CLAUDE.md @PublicEnemage
+
+# Workflow and governance configuration
+# GitHub Actions, issue templates, labels, and branch protection config.
+# Changes here affect CI integrity and the compliance audit trail.
+/.github/ @PublicEnemage
