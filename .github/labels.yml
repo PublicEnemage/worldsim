@@ -21,3 +21,34 @@
 - name: "compliance:deferred"
   color: "6E7681"
   description: "Compliance disposition: finding valid, remediation scheduled with target date"
+
+# Status labels
+- name: "status:known-gap"
+  color: "6E40C9"
+  description: "Acknowledged deficiency with documented plan to resolve"
+
+- name: "status:parking-lot"
+  color: "C0C0C0"
+  description: "Idea captured, not yet evaluated for prioritization"
+
+- name: "status:deferred"
+  color: "4A4A4A"
+  description: "Evaluated and deliberately deferred with documented rationale"
+
+# Horizon labels
+- name: "horizon:immediate"
+  color: "1A7F37"
+  description: "Current milestone scope"
+
+- name: "horizon:near-term"
+  color: "2EA043"
+  description: "Next 2-3 milestones"
+
+- name: "horizon:long-term"
+  color: "7CC878"
+  description: "Future, no committed timeline"
+
+# Review labels
+- name: "review:periodic"
+  color: "FBCA04"
+  description: "Must be revisited on a scheduled basis"
