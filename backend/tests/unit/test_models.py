@@ -122,7 +122,7 @@ class TestResolutionLevel:
 
     def test_levels_are_ordered(self):
         levels = list(ResolutionLevel)
-        values = [l.value for l in levels]
+        values = [level.value for level in levels]
         assert values == sorted(values)
 
 

@@ -30,12 +30,12 @@ jobs:
       - name: Run integration tests
         run: |
           cd backend
-          pytest tests/integration -v
+          pytest tests/integration -v || [ $? -eq 5 ]
 
       - name: Run backtesting suite
         run: |
           cd backend
-          pytest tests/backtesting -v
+          pytest tests/backtesting -v || [ $? -eq 5 ]
 
   lint:
     runs-on: ubuntu-latest
