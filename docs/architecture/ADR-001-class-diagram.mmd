@@ -1,0 +1,109 @@
+classDiagram
+    class SimulationEntity {
+        +id: str
+        +entity_type: str
+        +attributes: Dict[str, float]
+        +metadata: Dict[str, Any]
+        +parent_id: Optional[str]
+        +geometry: Optional[Geometry]
+        +get_attribute(key, default) float
+        +set_attribute(key, value) None
+        +apply_delta(key, delta) None
+    }
+
+    class SimulationState {
+        +timestep: datetime
+        +resolution: ResolutionConfig
+        +entities: Dict[str, SimulationEntity]
+        +relationships: List[Relationship]
+        +events: List[Event]
+        +scenario_config: ScenarioConfig
+        +get_entity(entity_id) SimulationEntity
+        +get_relationships_from(entity_id) List[Relationship]
+        +get_relationships_to(entity_id) List[Relationship]
+        +get_events_for_entity(entity_id) List[Event]
+    }
+
+    class SimulationModule {
+        <<abstract>>
+        +compute(entity, state, timestep) List[Event]
+        +get_subscribed_events() List[str]
+    }
+
+    class Event {
+        +event_id: str
+        +source_entity_id: str
+        +event_type: str
+        +affected_attributes: Dict[str, float]
+        +propagation_rules: List[PropagationRule]
+        +timestep_originated: datetime
+        +framework: MeasurementFramework
+        +metadata: Dict[str, Any]
+    }
+
+    class Relationship {
+        +source_id: str
+        +target_id: str
+        +relationship_type: str
+        +weight: float
+        +attributes: Dict[str, float]
+    }
+
+    class MeasurementFramework {
+        <<enumeration>>
+        FINANCIAL
+        HUMAN_DEVELOPMENT
+        ECOLOGICAL
+        GOVERNANCE
+    }
+
+    class ResolutionConfig {
+        +global_level: ResolutionLevel
+        +entity_overrides: Dict[str, ResolutionLevel]
+        +level_for(entity_id) ResolutionLevel
+    }
+
+    class ResolutionLevel {
+        <<enumeration>>
+        NATION_STATE = 1
+        SUBNATIONAL = 2
+        URBAN_RURAL = 3
+        DEMOGRAPHIC_COHORT = 4
+        INSTITUTIONAL = 5
+        INDIVIDUAL = 6
+    }
+
+    class PropagationRule {
+        +relationship_type: str
+        +attenuation_factor: float
+        +max_hops: int
+    }
+
+    class ScenarioConfig {
+        +scenario_id: str
+        +name: str
+        +description: str
+        +start_date: datetime
+        +end_date: datetime
+        +initial_overrides: Dict
+        +framework_weights: Dict
+    }
+
+    class Geometry {
+        +geometry_type: str
+        +coordinates: Any
+        +crs: str
+    }
+
+    SimulationState "1" --> "*" SimulationEntity : contains
+    SimulationState "1" --> "*" Relationship : contains
+    SimulationState "1" --> "*" Event : contains
+    SimulationState --> ResolutionConfig : uses
+    SimulationState --> ScenarioConfig : uses
+    SimulationModule --> SimulationState : reads (immutable)
+    SimulationModule --> SimulationEntity : reads
+    SimulationModule ..> Event : produces
+    Event --> MeasurementFramework : tagged with
+    Event "1" --> "*" PropagationRule : propagates via
+    SimulationEntity --> Geometry : optional spatial ref
+    ResolutionConfig --> ResolutionLevel : applies

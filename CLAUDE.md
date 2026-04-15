@@ -486,6 +486,52 @@ produced it.
 
 ---
 
+## Standards and Conventions
+
+Every Claude Code session — regardless of which agent is active — operates
+under these standards without being reminded. Reading them is part of session
+initialization, not something that happens when a human asks.
+
+**`docs/CODING_STANDARDS.md`**
+Python code style (Ruff configuration, type hints, Google-style docstrings),
+naming conventions, testing requirements (unit, integration, backtesting),
+diagram standards (Mermaid, mandatory per ADR), commit message format
+(Conventional Commits), ADR requirements, and agent team workflow standards.
+Key contracts: Decimal not float for all monetary arithmetic, no bare except,
+every public method has a test, human cost ledger outputs tested explicitly.
+
+**`docs/DATA_STANDARDS.md`**
+Encoding (UTF-8 everywhere, conversion first), language (English canonical,
+translation keys only in simulation layer), datetime (UTC storage, ISO 8601,
+IANA timezones), calendar support architecture (CalendarService, Gregorian +
+Islamic Hijri + Solar Hijri + Hebrew + Ethiopian), fiscal year registry,
+seasonal data standards (SeasonalContext, hemisphere-aware, FAO crop calendar),
+units and measurements (Quantity type, Decimal, canonical units, dimensional
+safety), currency standards (MonetaryValue type, constant 2015 USD canonical,
+PPP vs. market rate assignment, exchange rate regime awareness), data quality
+tier system (five tiers with documented confidence impact), data lineage
+tracking, backtesting integrity (vintage dating required), and political and
+territorial nomenclature (ISO 3166-1 alpha-3, disputed territory framework,
+specific positions on Taiwan/Palestine/Kosovo/Western Sahara/Crimea).
+
+**`docs/CONTRIBUTING.md`**
+Development environment setup, architecture understanding requirements before
+contributing (CLAUDE.md + ADR-001 + CODING_STANDARDS.md), agent team workflow,
+contribution workflow (branch naming, PR format, review process), standards
+compliance requirements, human cost ledger requirement, adding data sources,
+adding simulation modules, adding backtesting cases, multilingual contribution
+process, and code of conduct.
+
+**`docs/POLICY.md`**
+WorldSim's public policy transparency statement: governing philosophy,
+territorial and nomenclature positions with rationale, data source selection
+philosophy, economic methodology positions (constant 2015 USD, PPP vs. market
+rates), what the simulation claims and does not claim, human cost ledger
+methodology and known limitations, backtesting integrity position, declared
+blindspots, dual-use position, and challenge/correction process.
+
+---
+
 ## The North Star
 
 When in doubt about any decision — architectural, feature priority,
