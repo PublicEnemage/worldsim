@@ -1,0 +1,23 @@
+# WorldSim GitHub Label Definitions
+# Apply with: gh label create --force or a labels sync action
+# Format: name, color (hex without #), description
+
+- name: "compliance:critical"
+  color: "B60205"
+  description: "Compliance finding: produces wrong outputs without a visible error signal"
+
+- name: "compliance:major"
+  color: "E4820B"
+  description: "Compliance finding: violates architectural contract, affects correctness over time"
+
+- name: "compliance:minor"
+  color: "FBCA04"
+  description: "Compliance finding: style or documentation violation, no correctness impact"
+
+- name: "compliance:exception"
+  color: "0075CA"
+  description: "Compliance disposition: deviation acknowledged and accepted with documented rationale"
+
+- name: "compliance:deferred"
+  color: "6E7681"
+  description: "Compliance disposition: finding valid, remediation scheduled with target date"
