@@ -534,6 +534,8 @@ blindspots, dual-use position, and challenge/correction process.
 
 ## The North Star
 
+The tool's positions are declared, not hidden. Transparency about what we claim and do not claim is as important as the quality of what we build. A user who cannot understand and challenge our methodology cannot genuinely use our tool — they can only depend on it. Dependency is not leveling.
+
 When in doubt about any decision — architectural, feature priority,
 scope, presentation — return to this:
 
