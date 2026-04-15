@@ -1,0 +1,30 @@
+flowchart TD
+    MOD["FiscalModule.compute(BOL, State[T], T)\nreturns Event"]
+
+    EVT["Event\n────────────────────────\nsource_entity_id: BOL\nevent_type: shock\naffected_attributes:\n  debt_gdp_ratio: +0.15\nPropagationRule:\n  relationship_type: trade\n  attenuation_factor: 0.4\n  max_hops: 2\nframework: FINANCIAL"]
+
+    MOD --> EVT
+
+    EVT --> APPLY0["Apply to source entity\nBOL: debt_gdp_ratio +0.15"]
+
+    APPLY0 --> HOP1{"Hop 1\nFind outbound 'trade'\nrelationships from BOL"}
+
+    HOP1 -->|"BOL→BRA  weight=0.30"| BRA["Apply to BRA\n+0.15 × 0.4 × 0.30 = +0.018\ndebt_gdp_ratio +0.018"]
+    HOP1 -->|"BOL→ARG  weight=0.20"| ARG["Apply to ARG\n+0.15 × 0.4 × 0.20 = +0.012\ndebt_gdp_ratio +0.012"]
+    HOP1 -->|"BOL→PER  weight=0.15"| PER["Apply to PER\n+0.15 × 0.4 × 0.15 = +0.009\ndebt_gdp_ratio +0.009"]
+
+    BRA --> HOP2{"Hop 2\nFind outbound 'trade'\nrelationships from BRA, ARG, PER\nhops_so_far = 1 < max_hops=2"}
+
+    HOP2 -->|"BRA→URY  weight=0.50"| URY["Apply to URY\n+0.018 × 0.4 × 0.50 = +0.0036\ndebt_gdp_ratio +0.0036"]
+    HOP2 -->|"ARG→URY  weight=0.40"| URY2["Apply to URY (additive)\n+0.012 × 0.4 × 0.40 = +0.0019\ndebt_gdp_ratio +0.0019"]
+
+    URY --> STOP{"hops_so_far = 2 = max_hops\nStop"}
+    URY2 --> STOP
+    ARG --> STOP
+    PER --> STOP
+
+    STOP --> COLLECT["Engine collects all attribute deltas\nacross all entities for this timestep\napplies them to State[T+1]"]
+
+    style EVT fill:#f0f4ff,stroke:#4a6fa5
+    style COLLECT fill:#f0fff4,stroke:#2d6a4f
+    style STOP fill:#fff3f0,stroke:#c0392b

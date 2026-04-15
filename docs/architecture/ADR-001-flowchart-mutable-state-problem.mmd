@@ -1,0 +1,50 @@
+flowchart TD
+    subgraph BAD["❌  Mutable State — Result Depends on Execution Order"]
+        direction TB
+
+        S0["State at timestep T\ngdp_growth = 0.0\nexport_volume = 100"]
+
+        subgraph OA["Order A: Fiscal → Trade"]
+            direction TB
+            FA["FiscalModule\nreads  gdp_growth = 0.0\nwrites gdp_growth = −0.02"]
+            TA["TradeModule\nreads  gdp_growth = −0.02\n⚠ sees Fiscal's write\nwrites export_volume = 85"]
+        end
+
+        subgraph OB["Order B: Trade → Fiscal"]
+            direction TB
+            TB_["TradeModule\nreads  gdp_growth = 0.0\n✓ Fiscal hasn't run\nwrites export_volume = 92"]
+            FB["FiscalModule\nreads  gdp_growth = 0.0\nwrites gdp_growth = −0.02"]
+        end
+
+        S0 --> OA
+        S0 --> OB
+
+        RA["Result A\ngdp_growth=−0.02  export_volume=85"]
+        RB["Result B\ngdp_growth=−0.02  export_volume=92"]
+
+        OA --> RA
+        OB --> RB
+
+        PROB["Same starting state.\nDifferent outputs.\nBacktesting is meaningless.\nParallel execution is unsafe.\nReplay is impossible."]
+        RA -.-> PROB
+        RB -.-> PROB
+    end
+
+    subgraph GOOD["✅  Immutable State — Order Independent"]
+        direction TB
+
+        S1["State[T]  ← read-only snapshot\ngdp_growth = 0.0\nexport_volume = 100"]
+
+        FM2["FiscalModule\nreads  gdp_growth = 0.0\nreturns  Event: gdp_growth Δ −0.02"]
+        TM2["TradeModule\nreads  gdp_growth = 0.0\nreturns  Event: export_volume Δ −8"]
+
+        ENG["Engine\ncollects all Events after every module runs\napplies deltas to produce State[T+1]"]
+
+        RC["State[T+1]\ngdp_growth=−0.02  export_volume=92\nIdentical regardless of module execution order"]
+
+        S1 --> FM2
+        S1 --> TM2
+        FM2 --> ENG
+        TM2 --> ENG
+        ENG --> RC
+    end

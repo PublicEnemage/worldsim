@@ -1,0 +1,31 @@
+sequenceDiagram
+    participant Engine
+    participant FiscalModule
+    participant TradeModule
+    participant StateT  as State[T]  (read-only)
+    participant StateT1 as State[T+1]
+
+    Note over Engine: Timestep T begins
+    Engine ->> StateT: read entities, relationships
+
+    loop for each entity (e.g. BOL, GRC, THA …)
+        Engine ->>+ FiscalModule: compute(entity, State[T], T)
+        FiscalModule ->> StateT: get_attribute("gdp_growth")
+        FiscalModule ->> StateT: get_relationships_from(entity.id)
+        FiscalModule -->>- Engine: [Event: gdp_growth Δ−0.02, framework=FINANCIAL]
+
+        Engine ->>+ TradeModule: compute(entity, State[T], T)
+        TradeModule ->> StateT: get_attribute("export_volume")
+        TradeModule ->> StateT: get_relationships_to(entity.id)
+        TradeModule -->>- Engine: [Event: export_volume Δ−8, framework=FINANCIAL]
+
+        Note over StateT: State[T] untouched throughout
+    end
+
+    Note over Engine: All modules have run for all entities
+    Engine ->> Engine: collect every Event returned this timestep
+    Engine ->> StateT1: apply all event deltas → new attribute values
+    Engine ->> StateT1: propagate events along relationships (see propagation diagram)
+
+    Note over StateT: Archived — available for backtesting replay
+    Note over StateT1: Becomes the read-only State[T+1] for next tick
