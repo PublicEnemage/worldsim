@@ -11,6 +11,7 @@ from app.simulation.engine.models import (
     SimulationModule,
     SimulationState,
 )
+from app.simulation.engine.propagation import propagate
 
 __all__ = [
     "Event",
@@ -24,4 +25,5 @@ __all__ = [
     "SimulationEntity",
     "SimulationModule",
     "SimulationState",
+    "propagate",
 ]

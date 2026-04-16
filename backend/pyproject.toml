@@ -17,6 +17,10 @@ select = [
     "SIM",  # flake8-simplify
     "TCH",  # flake8-type-checking
 ]
+ignore = [
+    "ANN101",  # missing type for self — removed in ruff >=0.2.0; ignored for older ruff compat
+    "ANN102",  # missing type for cls  — removed in ruff >=0.2.0; ignored for older ruff compat
+]
 
 [tool.ruff.lint.per-file-ignores]
 "tests/**/*.py" = ["S101"]  # allow assert in tests
