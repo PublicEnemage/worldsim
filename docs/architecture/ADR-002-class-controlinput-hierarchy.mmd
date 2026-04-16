@@ -1,0 +1,145 @@
+classDiagram
+    class InputSource {
+        <<enumeration>>
+        UI
+        API
+        CLI
+        BULK_FEED
+        SCENARIO_SCRIPT
+        CONTINGENT_TRIGGER
+    }
+
+    class ControlInput {
+        <<abstract>>
+        +input_id: str
+        +actor_id: str
+        +actor_role: str
+        +target_entity: str
+        +effective_date: datetime
+        +justification: str
+        +source: InputSource
+        +timestamp: datetime
+        +propagation_rules: list[PropagationRule]
+        +to_events(timestep) list[Event]*
+    }
+
+    class MonetaryPolicyInput {
+        +instrument: MonetaryInstrument
+        +value: Decimal
+        +duration_periods: int
+        +to_events(timestep) list[Event]
+    }
+
+    class FiscalPolicyInput {
+        +instrument: FiscalInstrument
+        +sector: str
+        +value: Decimal
+        +duration_years: int
+        +to_events(timestep) list[Event]
+    }
+
+    class TradePolicyInput {
+        +instrument: TradeInstrument
+        +source_entity: str
+        +affected_sector: str
+        +value: Decimal
+        +retaliation_modeled: bool
+        +to_events(timestep) list[Event]
+    }
+
+    class EmergencyPolicyInput {
+        +instrument: EmergencyInstrument
+        +parameters: dict
+        +expected_duration: int
+        +to_events(timestep) list[Event]
+    }
+
+    class StructuralPolicyInput {
+        +instrument: StructuralInstrument
+        +affected_sector: str
+        +parameters: dict
+        +implementation_years: int
+        +to_events(timestep) list[Event]
+    }
+
+    class ContingentInput {
+        +contingent_id: str
+        +condition: StateCondition
+        +input: ControlInput
+        +cooldown_periods: int
+        +documented_rationale: str
+        +empirical_basis: str
+    }
+
+    class StateCondition {
+        +entity_id: str
+        +attribute: str
+        +operator: ComparisonOperator
+        +threshold: float
+        +is_met(state) bool
+    }
+
+    class ComparisonOperator {
+        <<enumeration>>
+        LT
+        GT
+        LTE
+        GTE
+        EQ
+    }
+
+    class InputOrchestrator {
+        <<abstract>>
+        +inject(control_input, session_id) list[Event]*
+        +advance_timestep(state, modules, inputs) SimulationState*
+        +check_contingents(state) list[ControlInput]*
+    }
+
+    class ScenarioRunner {
+        +initial_state: SimulationState
+        +scheduled_inputs: list[tuple]
+        +modules: list[SimulationModule]
+        +n_steps: int
+        +audit_log: AuditLog
+        +session_id: str
+        +run() list[SimulationState]
+        +inject(control_input, session_id) list[Event]
+        +advance_timestep(state, modules, inputs) SimulationState
+        +check_contingents(state) list[ControlInput]
+    }
+
+    class ControlInputAuditRecord {
+        +record_id: str
+        +scenario_id: str
+        +session_id: str
+        +timestep: datetime
+        +input_type: str
+        +source: InputSource
+        +actor_id: str
+        +actor_role: str
+        +justification: str
+        +raw_input: dict
+        +translated_events: list[str]
+        +timestamp: datetime
+    }
+
+    class AuditLog {
+        +records: list[ControlInputAuditRecord]
+        +append(record) None
+        +get_records_for_session(session_id) list
+        +get_records_for_timestep(timestep) list
+    }
+
+    ControlInput <|-- MonetaryPolicyInput
+    ControlInput <|-- FiscalPolicyInput
+    ControlInput <|-- TradePolicyInput
+    ControlInput <|-- EmergencyPolicyInput
+    ControlInput <|-- StructuralPolicyInput
+    ContingentInput --> StateCondition : condition
+    ContingentInput --> ControlInput : wraps
+    StateCondition --> ComparisonOperator : uses
+    InputOrchestrator <|-- ScenarioRunner
+    ScenarioRunner --> AuditLog : writes to
+    AuditLog "1" --> "*" ControlInputAuditRecord : stores
+    ControlInput --> InputSource : source
+    ControlInput ..> Event : produces via to_events()

@@ -1,0 +1,48 @@
+sequenceDiagram
+    autonumber
+    participant Caller
+    participant Runner as ScenarioRunner
+    participant Orchestrator as InputOrchestrator
+    participant Audit as AuditLog
+    participant Module as SimulationModule(s)
+    participant Engine as propagate()
+    participant State as SimulationState
+
+    Caller->>Runner: run()
+    loop For each timestep 0..n_steps-1
+
+        Note over Runner: Collect scheduled inputs for this step
+        Runner->>Runner: scheduled_inputs_this_step = inputs at step[i]
+
+        Note over Runner: Check contingent triggers against current state
+        Runner->>Runner: check_contingents(current_state)
+        Runner-->>Runner: contingent_inputs (conditions met, cooldown expired)
+
+        Note over Orchestrator: Inject exogenous inputs → Events
+        loop For each ControlInput (scheduled + contingent)
+            Runner->>Orchestrator: inject(control_input, session_id)
+            Orchestrator->>Orchestrator: validate(control_input)
+            Orchestrator->>Orchestrator: control_input.to_events(timestep)
+            Orchestrator->>Audit: append(ControlInputAuditRecord)
+            Orchestrator-->>Runner: exogenous_events: list[Event]
+        end
+
+        Note over Module: Run endogenous modules → Events
+        loop For each (entity, module) pair
+            Runner->>Module: module.compute(entity, current_state, timestep)
+            Module-->>Runner: endogenous_events: list[Event]
+        end
+
+        Note over Engine: Propagate all events → State[T+1]
+        Runner->>Engine: propagate(current_state, all_events)
+        Engine->>State: _build_next_state(current_state, accumulated_deltas)
+        State-->>Engine: next_state: SimulationState
+        Engine-->>Runner: next_state
+
+        Runner->>Runner: advance timestep on next_state
+        Runner->>Runner: append next_state to history
+        Runner->>Runner: current_state = next_state
+
+    end
+
+    Runner-->>Caller: state_history: list[SimulationState]
