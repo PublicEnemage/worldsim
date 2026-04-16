@@ -15,11 +15,12 @@ on:
   milestone:
     types: [created]
 
+permissions:
+  issues: write  # required to create the exit checklist Issue and read milestone event payload
+
 jobs:
   create-exit-checklist:
     runs-on: ubuntu-latest
-    permissions:
-      issues: write
     steps:
       - uses: actions/checkout@v4
 
