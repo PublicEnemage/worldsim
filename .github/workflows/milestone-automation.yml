@@ -1,0 +1,81 @@
+name: Milestone Automation
+
+# Fires when a GitHub Milestone is created via the GitHub UI or API.
+# Creates the milestone exit checklist Issue automatically, assigns it to
+# @PublicEnemage, attaches it to the new milestone, and applies the
+# horizon:immediate label.
+#
+# The exit checklist template lives at docs/templates/milestone-exit-checklist.md.
+# This workflow interpolates MILESTONE_NUMBER and MILESTONE_NAME from the
+# milestone event payload before creating the Issue body.
+#
+# See docs/MILESTONE_RUNBOOK.md for the full milestone ceremony process.
+
+on:
+  milestone:
+    types: [created]
+
+jobs:
+  create-exit-checklist:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Extract milestone metadata
+        id: milestone
+        run: |
+          echo "number=${{ github.event.milestone.number }}" >> "$GITHUB_OUTPUT"
+          echo "title=${{ github.event.milestone.title }}" >> "$GITHUB_OUTPUT"
+
+      - name: Build exit checklist body from template
+        id: build-body
+        run: |
+          MILESTONE_NUMBER="${{ steps.milestone.outputs.number }}"
+          MILESTONE_NAME="${{ steps.milestone.outputs.title }}"
+          NEXT_NUMBER=$((MILESTONE_NUMBER + 1))
+
+          # Interpolate placeholders in the template
+          BODY=$(sed \
+            -e "s/MILESTONE_NUMBER/${MILESTONE_NUMBER}/g" \
+            -e "s/MILESTONE_NAME/${MILESTONE_NAME}/g" \
+            -e "s/MILESTONE_NUMBER+1/${NEXT_NUMBER}/g" \
+            docs/templates/milestone-exit-checklist.md)
+
+          # Write to temp file to avoid shell quoting issues with the body
+          echo "$BODY" > /tmp/checklist-body.md
+          echo "body_file=/tmp/checklist-body.md" >> "$GITHUB_OUTPUT"
+
+      - name: Create exit checklist Issue
+        id: create-issue
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          ISSUE_URL=$(gh issue create \
+            --title "Milestone ${{ steps.milestone.outputs.number }} Exit Checklist — blocks milestone closure" \
+            --body-file "${{ steps.build-body.outputs.body_file }}" \
+            --assignee "@me" \
+            --label "horizon:immediate" \
+            --milestone "${{ steps.milestone.outputs.number }}")
+          echo "issue_url=${ISSUE_URL}" >> "$GITHUB_OUTPUT"
+          echo "Created exit checklist: ${ISSUE_URL}"
+
+      - name: Post automation notice on Issue
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh issue comment "${{ steps.create-issue.outputs.issue_url }}" \
+            --body "$(cat <<'EOF'
+          🤖 **Auto-created by milestone automation workflow**
+
+          This exit checklist was automatically created when Milestone ${{ steps.milestone.outputs.number }} was opened. It was generated from the template at \`docs/templates/milestone-exit-checklist.md\`.
+
+          **Before closing this Issue:**
+          - Every checkbox must be checked
+          - Unchecked items require a comment on this Issue with documented rationale
+          - The compliance scan registry (\`docs/compliance/scan-registry.md\`) must contain a Milestone-exit entry referencing this Issue
+
+          See [docs/MILESTONE_RUNBOOK.md](../blob/main/docs/MILESTONE_RUNBOOK.md) for the complete milestone closure ceremony.
+          EOF
+          )"
