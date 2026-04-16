@@ -125,6 +125,34 @@ Performed when all exit checklist items are confirmed green.
 
 ---
 
+Milestone Governance Review Cadence:
+
+1. Architecture Review (against current standards)
+   — Finds implementation gaps and reveals standards gaps
+   — Produces: ARCH-REVIEW-NNN, GitHub Issues
+
+2. Finding Disposition
+   — Engineering Lead classifies each finding:
+     a. Implementation gap → fix architecture
+     b. Standards gap revealed by architecture → input to Step 3
+     c. Genuine design question → ADR required
+
+3. Standards and Policy Review (informed by Step 2)
+   — Reviews standards against real implementation experience
+   — Grounded in specific cases from Step 2, not abstractions
+   — Produces: STD-REVIEW-NNN, updated standards documents
+
+4. Standards Delta Review
+   — Quick check: do the Phase 1 architecture fixes still hold
+     against the Phase 3 updated standards?
+   — Usually yes. Occasionally reveals a fix needs refinement.
+
+Cadence: Once per milestone, in this sequence.
+Exception: A significant new module or policy position may
+trigger an out-of-cycle review at any phase independently.
+
+---
+
 ## Milestone Definition Table
 
 The five WorldSim milestones, their themes, entry criteria, and exit criteria.
