@@ -55,3 +55,62 @@ jobs:
           cd backend
           ruff check .
           mypy app/
+
+  # Preventive compliance control — catches the class of violations documented
+  # in CF-001 before they accumulate into milestone-level findings. This job
+  # complements but does not replace the milestone-exit compliance review
+  # recorded in docs/compliance/scan-registry.md. Automated checks cover only
+  # machine-detectable violations; semantic and architectural compliance still
+  # requires human review at milestone boundaries.
+  compliance-scan:
+    runs-on: ubuntu-latest
+    needs: lint
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install tools
+        run: pip install ruff
+
+      - name: Check for bare except clauses (E722)
+        run: |
+          cd backend
+          ruff check --select E722 .
+
+      - name: Check for ambiguous variable names (E741)
+        run: |
+          cd backend
+          ruff check --select E741 .
+
+      - name: Check for legacy typing imports
+        run: |
+          # Dict, List, Optional, Tuple, Set from typing should use Python 3.10+
+          # built-in generics: dict, list, T | None, tuple, set
+          if grep -rn "from typing import.*\(Dict\|List\|Optional\|Tuple\|Set\)" backend/app/; then
+            echo ""
+            echo "ERROR: Legacy typing imports found in backend/app/."
+            echo "Use Python 3.10+ built-in generics instead:"
+            echo "  Dict[K, V]  → dict[K, V]"
+            echo "  List[T]     → list[T]"
+            echo "  Optional[T] → T | None"
+            echo "  Tuple[...]  → tuple[...]"
+            echo "  Set[T]      → set[T]"
+            exit 1
+          fi
+          echo "No legacy typing imports found."
+
+      - name: Warn on monetary float literals (COMPLIANCE-WARN)
+        run: |
+          # Scans backend/app/simulation/ for float literals adjacent to monetary
+          # terminology. Emits COMPLIANCE-WARN lines but does not fail the build —
+          # determining whether a float is performing monetary arithmetic (violation)
+          # or is a dimensionless ratio or propagation weight (correct) requires
+          # human judgment. Review COMPLIANCE-WARN output before merging.
+          cd backend
+          python scripts/compliance_scan.py --scope simulation-engine 2>&1 | \
+            grep "COMPLIANCE-WARN" || echo "No monetary float warnings found."
+          exit 0

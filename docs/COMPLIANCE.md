@@ -408,6 +408,10 @@ CI enforces the rules that can be machine-checked:
 - mypy reports type errors
 - pytest reports test failures
 - The backtesting suite reports fidelity regressions
+- The `compliance-scan` CI job (`.github/workflows/ci.yml`) runs on every PR
+  and catches bare `except` clauses, ambiguous variable names, legacy typing
+  imports, and emits `COMPLIANCE-WARN` for float literals adjacent to monetary
+  terminology
 
 CI failures are not compliance findings — they are build failures that block
 merge. The compliance workflow handles deviations that CI cannot detect:
@@ -417,3 +421,44 @@ in backtesting seed data, semantic misuse of types that passes static analysis.
 
 The compliance workflow is not a substitute for CI. It is the human judgment
 layer that catches what automated analysis cannot.
+
+---
+
+## Compliance Scan Registry
+
+Every compliance scan — automated or manual — that surfaces findings is
+recorded in `docs/compliance/scan-registry.md`. The registry provides:
+
+- An audit trail of when scans ran and what they covered
+- Trend tracking across milestones (findings increasing or decreasing?)
+- Gap detection — modules that have never been scanned are visible absences
+
+**A milestone exit checklist cannot be signed off until a Milestone-exit scan
+entry exists in the registry for that milestone.** The exit checklist explicitly
+references the scan ID. A milestone that closes without a registry entry closed
+without verifying its compliance posture.
+
+The manual compliance scan script (`backend/scripts/compliance_scan.py`) is the
+tool used for milestone-exit reviews and quarterly audits. Run it with:
+
+```bash
+python scripts/compliance_scan.py --scope full
+```
+
+---
+
+## Milestone Exit Checklist
+
+Every milestone has an exit checklist Issue generated automatically when the
+milestone is created in GitHub (via `.github/workflows/milestone-automation.yml`).
+The template is at `docs/templates/milestone-exit-checklist.md`.
+
+The exit checklist is the compliance workflow's integration point with the
+milestone lifecycle:
+
+- All Critical findings must be remediated or exceptioned before the checklist closes
+- All Major findings must be remediated or exceptioned with review dates
+- All Minor findings must have open Issues with labels
+- The compliance scan registry must have a Milestone-exit entry
+
+See `docs/MILESTONE_RUNBOOK.md` for the complete milestone closure ceremony.
