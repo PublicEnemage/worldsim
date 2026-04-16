@@ -60,7 +60,8 @@ from app.simulation.orchestration import (
 SCENARIO_ID = "USA-TARIFF-2025-DEMO"
 START_DATE = datetime(2025, 1, 1)
 N_STEPS = 10
-TIMESTEP_DELTA = timedelta(days=365)
+# No explicit TIMESTEP_DELTA — ScenarioRunner defaults to calendar-year
+# arithmetic, which advances by exactly one year and handles leap years.
 
 # Tariff shock parameters (see scenario specification for calibration notes)
 # value = 0.25 represents a 25% tariff rate imposed at the source entity.
@@ -350,7 +351,7 @@ def main() -> None:
         scheduled_inputs=[(1, tariff_input)],
         modules=[],  # No domain modules yet — Milestone 1
         n_steps=N_STEPS,
-        timestep_delta=TIMESTEP_DELTA,
+        # No timestep_delta — use calendar-year arithmetic (handles leap years)
         session_id="demo-session-001",
     )
 

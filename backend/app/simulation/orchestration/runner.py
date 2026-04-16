@@ -16,7 +16,7 @@ from __future__ import annotations
 import dataclasses
 import uuid
 from abc import ABC, abstractmethod
-from datetime import timedelta
+from datetime import datetime, timedelta  # noqa: TCH003 — used at runtime in _advance_timestep
 from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
@@ -27,9 +27,6 @@ if TYPE_CHECKING:
         ContingentInput,
         ControlInput,
     )
-
-# One calendar year — the default timestep delta for annual simulations.
-_DEFAULT_TIMESTEP_DELTA = timedelta(days=365)
 
 
 # ---------------------------------------------------------------------------
@@ -161,8 +158,11 @@ class ScenarioRunner(InputOrchestrator):
                 None means no contingent triggers.
             session_id: Session identifier for audit records. If None,
                 a UUID is generated.
-            timestep_delta: Time advance per step. Defaults to 365 days
-                (one calendar year).
+            timestep_delta: Time advance per step as a fixed timedelta. Pass
+                None (the default) to use calendar-year arithmetic, which
+                advances by exactly one year on the calendar regardless of
+                whether leap years fall in the path. Pass an explicit timedelta
+                for sub-annual or non-standard timestep intervals.
         """
         from app.simulation.orchestration.audit import AuditLog as _AuditLog
 
@@ -175,9 +175,8 @@ class ScenarioRunner(InputOrchestrator):
             contingent_inputs if contingent_inputs is not None else []
         )
         self._session_id = session_id if session_id is not None else str(uuid.uuid4())
-        self._timestep_delta = (
-            timestep_delta if timestep_delta is not None else _DEFAULT_TIMESTEP_DELTA
-        )
+        # None means "use calendar-year arithmetic"; see _advance_timestep().
+        self._timestep_delta: timedelta | None = timestep_delta
         # contingent_id -> remaining cooldown periods (0 means ready to fire)
         self._cooldown_remaining: dict[str, int] = {}
 
@@ -309,7 +308,7 @@ class ScenarioRunner(InputOrchestrator):
         next_state = propagate(current_state, all_events)
         return dataclasses.replace(
             next_state,
-            timestep=current_state.timestep + self._timestep_delta,
+            timestep=_advance_timestep(current_state.timestep, self._timestep_delta),
         )
 
     def check_contingents(self, state: SimulationState) -> list[ControlInput]:
@@ -358,6 +357,37 @@ class ScenarioRunner(InputOrchestrator):
 # ---------------------------------------------------------------------------
 # Private helpers
 # ---------------------------------------------------------------------------
+
+
+def _advance_timestep(current: datetime, delta: timedelta | None) -> datetime:
+    """Compute the next timestep, handling leap years correctly.
+
+    When delta is None (the default for annual simulations), advances by
+    exactly one calendar year using date arithmetic. This correctly handles
+    leap years: 2027-01-01 + 1 year = 2028-01-01, and 2028-01-01 + 1 year
+    = 2029-01-01, with no day-count drift.
+
+    The timedelta(days=365) approach fails at leap-year boundaries: adding
+    365 days to 2028-01-01 (a leap year has 366 days) lands on 2028-12-31,
+    causing two consecutive steps to display the same year.
+
+    When delta is an explicit timedelta, it is used as-is. This supports
+    sub-annual timesteps (monthly, weekly) where fixed day counts are correct.
+
+    Args:
+        current: The current timestep.
+        delta: Fixed timedelta to add, or None to advance by one calendar year.
+
+    Returns:
+        Next timestep.
+    """
+    if delta is not None:
+        return current + delta
+    try:
+        return current.replace(year=current.year + 1)
+    except ValueError:
+        # Feb 29 in a leap year advancing to a non-leap year → Feb 28
+        return current.replace(year=current.year + 1, day=28)
 
 
 def _serialise_input(control_input: ControlInput) -> dict[str, Any]:
