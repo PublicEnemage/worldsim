@@ -30,6 +30,8 @@ without verifying its compliance posture.
 | Scan ID | Date | Trigger | Scope | Findings Summary | Issues Created | Status |
 |---|---|---|---|---|---|---|
 | SCAN-001 | 2026-04-15 | Manual | ADR-001 initial implementation: `backend/app/simulation/engine/models.py`, `backend/tests/unit/test_models.py` checked against `CODING_STANDARDS.md` and `DATA_STANDARDS.md` | 2 Major (1 Exception #9, 1 Remediate #10), 5 Minor open (F03/F04 #11, F05 #12, F06 #13, F08 #14), 1 Minor resolved in PR #1 (F07) | #9, #10, #11, #12, #13, #14 | Open-findings |
+| SCAN-002 | 2026-04-16 | Manual | Full architecture review: ADR-001, ADR-002, `CLAUDE.md`, `docs/scenarios/module-capability-registry.md` — all 9 Domain Intelligence Council agents in CHALLENGE mode via ARCH-REVIEW-001 | 24 blindspots: 6 immediate, 9 near-term, 8 long-term; ADR-001 and ADR-002 moved to UNDER-REVIEW; four deferred ADRs (#38–#41) opened for ADR-003 through ADR-006 | #22–#36, #38–#41 | Open-findings |
+| SCAN-003 | 2026-04-17 | Manual | Full standards and policy review: `CODING_STANDARDS.md`, `DATA_STANDARDS.md`, `POLICY.md`, `CONTRIBUTING.md`, `CLAUDE.md` Domain Intelligence Council section — all 9 council agents (Track 1) and QA, Architect, Security agents (Track 2) via STD-REVIEW-001 | 32 findings: 5 CONVERGENT (SA-01–SA-05), 14 COMPATIBLE (SA-06–SA-23), 1 CONFLICT C-1 (disposed Option A — scenario tag boundary adopted; Option B deferred to #53), 2 DEPENDENCY; 10 immediate issues created; ADR-001 and ADR-002 Validity Context sections added | #42–#51, #53 | Open-findings |
 
 ---
 
