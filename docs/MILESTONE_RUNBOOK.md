@@ -184,6 +184,174 @@ review artifact.
 
 ---
 
+## Architecture License Framework
+
+Every ADR carries a license status that tracks whether its design decisions
+were made against standards that are still in force. An ADR is architectural
+debt when the standards it was written against have since changed — it may
+describe a valid implementation path that now violates a standard that didn't
+exist when it was written.
+
+### License States
+
+**CURRENT** — The ADR was written against standards that remain in force. It
+was reviewed at the most recent architecture review cycle. No renewal trigger
+has fired. Implementation agents may write code against this ADR and may
+write new dependent ADRs.
+
+**UNDER-REVIEW** — The standards the ADR was written against have been updated,
+or a renewal trigger has fired. Work under this ADR continues without
+interruption — implementation is not blocked. However, no new ADR may be
+written as a dependent of an UNDER-REVIEW ADR until the review is complete and
+the license is renewed to CURRENT. The period of UNDER-REVIEW must not exceed
+one milestone.
+
+**SUPERSEDED** — A newer ADR replaces this one on the same architectural
+question. The old ADR remains in `docs/adr/` as a historical record with a
+forward reference to its replacement. Superseded ADRs may not be the basis for
+new implementation. Their historical record value is preserved.
+
+**REVOKED** — The ADR is no longer valid and the architecture it describes must
+not be implemented, extended, or used as the basis for dependent ADRs. REVOKED
+status is the drop-everything-and-fix-now case. An open GitHub Issue must
+document the revocation reason and the remediation path before REVOKED status
+is assigned. Existing implementation based on a REVOKED ADR must be remediated
+within the current milestone.
+
+### Renewal Triggers
+
+Each ADR specifies, in its Validity Context section, the standards changes that
+would fire a renewal trigger and move the ADR from CURRENT to UNDER-REVIEW.
+Renewal triggers are specific and stated up front — general phrases like
+"any relevant standard change" are not acceptable. A trigger must name the
+specific standard (e.g., `DATA_STANDARDS.md § Units and Measurements`) and
+the type of change that would invalidate the ADR's assumptions.
+
+When any standards document is amended, the Engineering Lead reviews all
+CURRENT ADRs whose Validity Context lists a matching renewal trigger and
+moves affected ADRs to UNDER-REVIEW.
+
+### License Period
+
+The default license period is one milestone. An ADR reviewed at milestone
+close is re-licensed for the next milestone. As the architecture stabilizes
+and individual ADRs are reviewed across multiple milestones without change,
+the Engineering Lead may extend the license period — documented in the ADR's
+Validity Context — to two or three milestones. This reduces review overhead
+for stable, well-validated decisions.
+
+### The Dependency Rule
+
+**No new ADR may be written as a dependent of an UNDER-REVIEW ADR.**
+
+A dependent ADR builds on the design decisions of its parent. If the parent's
+design decisions are under review, the dependent inherits that uncertainty.
+Writing a dependent ADR during a parent's review period locks the dependent
+to potentially-changing assumptions before the parent review is complete.
+
+The practical consequence: if an Architecture Review moves ADR-001 to
+UNDER-REVIEW pending a standards update, any ADR that references ADR-001's
+data model (e.g., an ADR defining how the Macroeconomic Module uses
+`SimulationEntity.attributes`) must wait until ADR-001 is renewed to CURRENT
+before it can be finalized and accepted. Draft work may proceed, but no ADR
+may reach Accepted status while its parent is UNDER-REVIEW.
+
+---
+
+## Standards and Policy Review SOP
+
+The Standards and Policy Review is the four-phase process for updating
+`docs/CODING_STANDARDS.md`, `docs/DATA_STANDARDS.md`, `docs/POLICY.md`, and
+related governance documents. It runs once per milestone, after the
+Architecture Review and Finding Disposition phases of the Governance Review
+Cadence.
+
+Every standards amendment is traceable to a specific finding from Phase 1 or
+Phase 2 of this SOP. No standards revision without a concrete case to anchor it.
+
+**Phase 1 — Domain Council Review**
+
+Activate all Domain Intelligence Council members in CHALLENGE mode against
+the full standards suite (`CODING_STANDARDS.md`, `DATA_STANDARDS.MD`,
+`POLICY.md`, `CONTRIBUTING.md`) and the Domain Intelligence Council section of
+`CLAUDE.md`. Seed the review with findings from the Architecture Review's
+Finding Disposition phase that were classified as standards gaps.
+
+Each council member produces Track 1 findings covering:
+- Gaps where their framework's concerns are unaddressed in current standards
+- Inconsistencies between standards documents
+- Policy positions that are incomplete or require updating
+- Value dimensions in their council profile that have not been encoded in
+  formal standards
+
+Produces: Track 1 findings, one section per council member.
+
+**Phase 2 — Technical Agent Review**
+
+Activate QA Agent, Architect Agent, and Security and Review Agent, informed by
+Track 1 findings before beginning. Each agent reviews the full standards suite
+from their operational perspective.
+
+**QA Agent** asks: how do I write a test for this? Every standard that cannot be
+operationalized into a test is flagged for either a clearer operational
+definition or reclassification as a principle rather than a standard.
+
+**Architect Agent** reviews for: ambiguity where two standards together require
+an arbitrary implementer choice the standard should have specified, missing
+boundary conditions, and architectural contradictions.
+
+**Security and Review Agent** reviews for: standards that create security
+vulnerabilities, information exposure risks in provenance requirements,
+legal exposure in territorial positions for deployment jurisdictions, and
+weakening of the dual-use protection framework.
+
+Produces: Track 2 findings, one section per technical agent.
+
+**Phase 3 — Cross-Track Reconciliation**
+
+Activate QA Agent and Architect Agent to review all Track 1 findings.
+Activate Development Economist, Chief Methodologist, and Political Economist
+as a representative council sample to review all Track 2 findings.
+
+Each finding receives one of four reconciliation statuses:
+
+- **COMPATIBLE** — consistent with the other track's findings; can be
+  implemented as written without modification
+- **CONVERGENT** — addresses the same gap as a finding in the other track;
+  a single unified amendment satisfies both
+- **CONFLICT** — contradicts a finding in the other track; the specific
+  contradiction is documented precisely and flagged for Engineering Lead
+  decision; no attempt is made to resolve it
+- **DEPENDENCY** — assumes an amendment from the other track has already been
+  made; the sequencing dependency is documented explicitly
+
+GitHub Issues are created only for COMPATIBLE and CONVERGENT findings.
+CONFLICT findings are documented in the review report but not converted to
+Issues until the Engineering Lead has dispositioned them in Phase 4.
+
+Produces: `STD-REVIEW-NNN` reconciliation table in
+`docs/standards/reviews/STD-REVIEW-NNN-milestone-N.md`.
+
+**Phase 4 — Engineering Lead Synthesis**
+
+The Engineering Lead:
+1. Reviews all CONFLICT findings and makes a disposition decision for each:
+   accept Track 1, accept Track 2, or propose a third path
+2. Approves amendment instructions for all COMPATIBLE, CONVERGENT, and
+   resolved CONFLICT findings
+3. Updates affected ADR license statuses in Validity Context sections
+4. Produces a final synthesis note on the STD-REVIEW issue
+
+**Merge Gate**
+
+No standards amendment reaches `main` until all four phases are complete:
+- All CONFLICT findings have been dispositioned by the Engineering Lead
+- Cross-track reconciliation is complete (all findings annotated)
+- Affected ADR Validity Context sections updated with new license status
+- The milestone exit checklist Standards License Audit section is checked
+
+---
+
 ## Milestone Definition Table
 
 The five WorldSim milestones, their themes, entry criteria, and exit criteria.

@@ -80,6 +80,32 @@ as a comment on this Issue.
 
 ---
 
+## Standards License Audit
+
+For each ADR active in this milestone, the Engineering Lead confirms its
+license status before the milestone closes. An ADR whose license status is
+not CURRENT at milestone close requires documented rationale.
+
+- [ ] ADR-001 (Simulation Core Data Model) — license status confirmed CURRENT,
+      OR rationale documented below for why milestone closes with UNDER-REVIEW.
+- [ ] ADR-002 (Input Orchestration Layer) — license status confirmed CURRENT,
+      OR rationale documented below for why milestone closes with UNDER-REVIEW.
+- [ ] All ADRs introduced during Milestone MILESTONE_NUMBER — license status
+      confirmed CURRENT at the standards version in effect at milestone close.
+- [ ] No UNDER-REVIEW ADR has a dependent ADR that reached Accepted status
+      during this milestone (the dependency rule was not violated).
+- [ ] If any UNDER-REVIEW ADR exists at milestone close: a GitHub Issue is open
+      documenting the standards update required for renewal, with a target
+      resolution date no later than the midpoint of Milestone MILESTONE_NUMBER+1.
+
+**UNDER-REVIEW rationale** (complete if any ADR is not CURRENT at close):
+
+> *(Engineering Lead documents here why closure proceeds without renewal,
+> including the specific standards amendment pending, the open Issue tracking
+> it, and the risk assessment for proceeding with UNDER-REVIEW status.)*
+
+---
+
 ## Engineering Lead Sign-off
 
 - [ ] Socratic Agent TEST session completed on Milestone MILESTONE_NUMBER architecture.

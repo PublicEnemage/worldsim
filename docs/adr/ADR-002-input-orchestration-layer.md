@@ -3,6 +3,26 @@
 ## Status
 Accepted
 
+## Validity Context
+
+**Standards Version:** 2026-04-15 (date standards documents were established)
+**Valid Until:** Milestone 2 completion
+**License Status:** UNDER-REVIEW — pending STD-REVIEW-001 completion
+
+**Renewal Triggers** — any of the following fires the CURRENT → UNDER-REVIEW
+transition:
+- `ControlInput` type taxonomy changes in `CODING_STANDARDS.md` or any ADR
+  amendment (e.g., new capital flow or geopolitical input types added)
+- Audit trail schema requirement changes (e.g., `DATA_STANDARDS.md` adds
+  data-lineage requirements that must be carried by `ControlInputAuditRecord`)
+- Uncertainty quantification standard additions to `DATA_STANDARDS.md` that
+  affect how events carry uncertainty (e.g., events required to carry
+  confidence intervals alongside affected_attribute deltas)
+- Multi-framework tagging requirements added to `CODING_STANDARDS.md` that
+  affect event structure (e.g., requiring events to carry both a primary
+  `MeasurementFramework` tag and secondary framework tags for cross-framework
+  effects)
+
 ## Date
 2026-04-16
 

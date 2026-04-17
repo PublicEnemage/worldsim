@@ -3,6 +3,23 @@
 ## Status
 Accepted
 
+## Validity Context
+
+**Standards Version:** 2026-04-15 (date standards documents were established)
+**Valid Until:** Milestone 2 completion
+**License Status:** UNDER-REVIEW — pending STD-REVIEW-001 completion
+
+**Renewal Triggers** — any of the following fires the CURRENT → UNDER-REVIEW
+transition:
+- `MeasurementFramework` taxonomy modified in any standards document
+- Data model unit standard changes in `DATA_STANDARDS.md` that affect
+  attribute store design (e.g., stock vs. flow distinction added to `Quantity`)
+- Backtesting integrity rules changed in ways that affect state representation
+  (e.g., requiring state snapshots to carry data-lineage metadata)
+- Stock vs. flow variable distinction added to `DATA_STANDARDS.md §
+  Units and Measurements` in ways that require structural changes to
+  `SimulationEntity.attributes`
+
 ## Date
 2026-04-14
 
