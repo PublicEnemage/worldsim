@@ -7,7 +7,13 @@ Accepted
 
 **Standards Version:** 2026-04-15 (date standards documents were established)
 **Valid Until:** Milestone 2 completion
-**License Status:** UNDER-REVIEW — pending STD-REVIEW-001 completion
+**License Status:** CURRENT
+
+**Last Reviewed:** 2026-04-17 — STD-REVIEW-001 completed. All renewal triggers
+checked; none fired. STD-REVIEW-001 created issues tracking standards amendments
+(#42–#51) but did not apply amendments to standards documents. The standards
+documents as they stand did not change in ways that activate any trigger below.
+Next scheduled review at Milestone 2 completion.
 
 **Renewal Triggers** — any of the following fires the CURRENT → UNDER-REVIEW
 transition:
