@@ -125,31 +125,62 @@ Performed when all exit checklist items are confirmed green.
 
 ---
 
-Milestone Governance Review Cadence:
+## Milestone Governance Review Cadence
 
-1. Architecture Review (against current standards)
-   — Finds implementation gaps and reveals standards gaps
-   — Produces: ARCH-REVIEW-NNN, GitHub Issues
+Performed once per milestone, in the sequence below. Each phase is grounded
+in the output of the previous one — the review cycle moves from concrete
+observations to standards revision, not the other way around.
 
-2. Finding Disposition
-   — Engineering Lead classifies each finding:
-     a. Implementation gap → fix architecture
-     b. Standards gap revealed by architecture → input to Step 3
-     c. Genuine design question → ADR required
+**Phase 1 — Architecture Review** (against current standards)
 
-3. Standards and Policy Review (informed by Step 2)
-   — Reviews standards against real implementation experience
-   — Grounded in specific cases from Step 2, not abstractions
-   — Produces: STD-REVIEW-NNN, updated standards documents
+Run the Architecture Review Facilitator (`Architecture Review: FULL`) against
+all ADRs, CLAUDE.md, and the module capability registry for the current
+milestone. Findings are implementation gaps (architecture does not meet
+standards) and standards gaps (architecture reveals the standards were
+underspecified or wrong).
 
-4. Standards Delta Review
-   — Quick check: do the Phase 1 architecture fixes still hold
-     against the Phase 3 updated standards?
-   — Usually yes. Occasionally reveals a fix needs refinement.
+Produces: `ARCH-REVIEW-NNN` in `docs/architecture/reviews/`, GitHub Issues
+for all immediate and near-term findings.
 
-Cadence: Once per milestone, in this sequence.
-Exception: A significant new module or policy position may
-trigger an out-of-cycle review at any phase independently.
+**Phase 2 — Finding Disposition**
+
+The Engineering Lead classifies each finding from Phase 1:
+
+- **Implementation gap** — fix the architecture; the standard is correct
+- **Standards gap revealed by architecture** — forward to Phase 3 as a
+  concrete case; the standard needs revision
+- **Genuine design question** — an ADR is required before resolution
+
+This classification determines what goes into Phase 3. Phase 3 is grounded
+in specific cases from Phase 2, not in abstractions.
+
+**Phase 3 — Standards and Policy Review** (informed by Phase 2)
+
+Review `docs/CODING_STANDARDS.md`, `docs/DATA_STANDARDS.md`, and
+`docs/POLICY.md` against the real implementation experience of the milestone.
+Each standards update is traceable to a specific finding from Phase 2 —
+no standards revision without a concrete case to anchor it.
+
+Produces: `STD-REVIEW-NNN` in `docs/architecture/reviews/`, updated
+standards documents, updated `docs/POLICY.md` where policy positions
+are affected.
+
+**Phase 4 — Standards Delta Review**
+
+A quick check: do the Phase 1 architecture fixes still hold against the
+Phase 3 updated standards? Usually yes. Occasionally a Phase 3 standards
+change reveals that a Phase 1 fix needs refinement. If so, open a new Issue
+— do not reopen the Phase 1 finding.
+
+Produces: a brief comment on the ARCH-REVIEW Issue confirming delta review
+complete, or a new Issue if refinement is needed.
+
+**Cadence:** Once per milestone, in this sequence. Begin Phase 1 after the
+milestone closure ceremony is complete.
+
+**Exception:** A significant new module or policy position may trigger an
+out-of-cycle review at any phase independently. Document the trigger in the
+review artifact.
 
 ---
 
