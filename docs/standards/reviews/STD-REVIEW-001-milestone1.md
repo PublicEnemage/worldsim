@@ -7,7 +7,7 @@ all technical agents (Track 2), with cross-track reconciliation
 of `CLAUDE.md`
 **Seeded with:** Standards gaps identified from ARCH-REVIEW-001 Finding Disposition
 **Date:** 2026-04-16
-**Status:** Phase 3 Complete — Phase 4 (Engineering Lead Synthesis) pending
+**Status:** Phase 4 Complete — CONFLICT C-1 disposed 2026-04-17 (Option A)
 **PR:** See STD-REVIEW-001 PR for full diff
 
 ---
@@ -713,18 +713,35 @@ The Engineering Lead must choose and document the rationale.
 | SA-19 | T1-F11 (COMPATIBLE) | `DATA_STANDARDS.md` | Add social capital and community resilience measurement standards |
 | SA-20 | T1-F12 (COMPATIBLE) | `CONTRIBUTING.md` | Add community-level representation requirement |
 
-### Pending Engineering Lead Disposition (CONFLICT)
+### Engineering Lead Disposition — CONFLICT C-1 (Phase 4 Complete)
 
-| ID | Conflict | Decision Required |
+**Date:** 2026-04-17
+**Decision:** Option A — scenario tag boundary adopted.
+
+The Investment Agent's requirement (T1-F14) for opportunity cost assessment is
+accepted in scope-limited form: opportunity cost framing is permitted within
+development scenarios where both options under comparison are within the
+simulation's scope. Comparative outputs that reconstruct a vulnerability
+ranking across sovereign actors (Security Agent's concern) are addressed by
+a scenario tag boundary: any scenario configured as a comparative
+multi-country vulnerability analysis must carry a `DUAL_USE_REVIEW_REQUIRED`
+tag, which gates output visibility at the API layer.
+
+Option B — role-based output visibility with institutional credential
+verification — is the longer-term architecture required to operationalize this
+boundary at scale. Deferred to ADR-007 (issue #53), which must be accepted
+before the Milestone 2 public API is designed.
+
+| ID | Conflict | Disposition |
 |---|---|---|
-| C-1 | Opportunity cost assessment requirement vs. dual-use aggregation risk (T1-F14) | Engineering Lead must choose: accept Track 1, accept Track 2, or scope opportunity cost to development scenarios only |
+| C-1 | Opportunity cost assessment vs. dual-use aggregation risk (T1-F14) | **Option A adopted** — scenario tag boundary (`DUAL_USE_REVIEW_REQUIRED`); role-based access control deferred to ADR-007 (#53) |
 
 ---
 
 ## Recommended GitHub Issues
 
 Issues below have been created for all COMPATIBLE and CONVERGENT immediate
-findings. CONFLICT C-1 is not issued — awaiting Engineering Lead Phase 4 disposition.
+findings, plus the C-1 disposition consequence.
 
 ### Immediate Issues Created
 
@@ -740,3 +757,4 @@ findings. CONFLICT C-1 is not issued — awaiting Engineering Lead Phase 4 dispo
 | #49 | Monte Carlo standard: distribution assumptions and minimum sample size (COMPATIBLE T1-F19) | SA-17 |
 | #50 | Territorial position validation in data pipeline tests (COMPATIBLE T2-F3) | SA-18 |
 | #51 | Define float-to-Decimal boundary at simulation attribute store (COMPATIBLE T2-F6) | SA-19 |
+| #53 | Information Access Architecture — role-based output visibility and institutional credential verification (C-1 disposition, Option B deferred) | ADR-007 parking lot |
