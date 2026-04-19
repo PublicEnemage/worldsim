@@ -9,7 +9,7 @@
 | **Standards under review** | `CODING_STANDARDS.md` § "Monetary Arithmetic", `DATA_STANDARDS.md` § "Units and Measurements" and § "Currency and Monetary Value Standards" |
 | **Linked issues** | #51 (Quantity type system, Option C), #58 (MonetaryPolicyInput split — depends on SCR-001) |
 | **Reviewers** | QA Agent, Architect Agent, Chief Methodologist, Development Economist, Intergenerational Advocate |
-| **Status** | Complete — pending Engineering Lead disposition |
+| **Status** | Complete — Engineering Lead disposition recorded 2026-04-19 |
 
 ---
 
@@ -944,50 +944,89 @@ Tracked for resolution at implementation phase or in the ADR renewal period.
 
 ## Engineering Lead Disposition
 
-*To be completed after Engineering Lead review of this document.*
+**Recorded:** 2026-04-19
+**Status:** All BLOCKING findings disposed. Implementation may proceed.
 
-Options for each BLOCKING finding:
+---
 
-**QA-1** (CI enforcement): Approve standard on condition that a companion
-implementation issue for the compliance scan update is created and must close
-before any module implementing the new attribute store merges.
+**QA-1** (#65 — CI enforcement gap):
+Approved on condition. Issue #65 must close before any module implementing
+`dict[str, Quantity]` attribute stores merges to main. QA-1 is not a gate
+on adopting the standard — it is a gate on implementation.
 
-**ARCH-1 and ARCH-2** (ADR renewal): Accept that both ADRs must be moved to
-UNDER-REVIEW as part of the implementation PR — not a gate on the standards
-change, but a gate on any implementation building on it. The standard can be
-adopted; implementation is the gate.
+**ARCH-1** (#66 — ADR-001 UNDER-REVIEW):
+Accepted. ADR-001 transitions CURRENT → UNDER-REVIEW as part of the
+implementation PR. No implementation building on `dict[str, Quantity]`
+attribute stores may merge until ADR-001 completes its UNDER-REVIEW renewal.
 
-**CM-1** (Lower-of-two rationale): Approve standard with addition of explicit
-conservative-policy language to the rule. No design change needed — documentation
-addition only.
+**ARCH-2** (#67 — ADR-002 UNDER-REVIEW):
+Accepted. ADR-002 transitions CURRENT → UNDER-REVIEW as part of the
+implementation PR. No implementation using `dict[str, Quantity]` Event deltas
+may merge until ADR-002 completes its UNDER-REVIEW renewal.
 
-**IA-1** (Time-horizon degradation): Two options:
-- **Option A:** Adopt the lower-of-two rule for Milestone 2 as stated, with
-  an explicit "Known Limitation" note that time-horizon degradation is not
-  yet implemented and will be added in Milestone 3 alongside the scenario
-  engine (which is the first milestone producing forward projections at scale).
-- **Option B:** Add the time-horizon degradation rule to Draft A/B now, accepting
-  that it is more complex but catching the problem before projections are built.
+**CM-1** (#68 — lower-of-two bias documentation):
+Accepted. The following text must appear verbatim in both the
+CODING_STANDARDS.md implementation (Draft A) and the DATA_STANDARDS.md
+Confidence Tier Propagation subsection (Draft B):
+
+> *"The lower-of-two rule is a deliberately conservative policy approximation,
+> not a statistical formula. It systematically overstates uncertainty when
+> inputs are independent and mutually corroborating. This is the intended
+> behavior: in a tool informing sovereign policy decisions, overstatement of
+> uncertainty is the preferred failure mode over understatement.
+> Code comments and documentation must not describe this rule as a statistical
+> derivation. Where genuine statistical propagation of probability distributions
+> is required (e.g., Monte Carlo uncertainty quantification), use the appropriate
+> statistical method instead — this rule governs the `confidence_tier` integer
+> field only."*
+
+**IA-1** (#69 — time-horizon confidence degradation): **Option A.**
+
+Accept the lower-of-two rule for current implementation with an explicit Known
+Limitation note in both standards documents. Time-horizon degradation is deferred
+to Milestone 3 as **required scope**, not optional backlog.
+
+**Rationale:** Option B requires specifying degradation thresholds (year
+horizons, tier floor values) against a timestep architecture and HCL output
+structure that does not yet exist. Milestone 2 does not produce forward
+projections at scale — that is Milestone 3. The gap is real but not
+load-bearing until Milestone 4 HCL outputs. Specifying degradation thresholds
+now would bind an unbuilt architecture to rules that cannot be validated.
+
+**Required Known Limitation text** — must appear in both standards documents
+alongside the confidence tier propagation rule:
+
+> *"**Known Limitation:** This rule does not account for projection horizon.
+> A 30-year forward projection derived from a Tier 1 historical observation
+> retains Tier 1 confidence under this rule, which overstates reliability for
+> long-horizon projections. Time-horizon confidence degradation (automatic tier
+> downgrade based on projection distance from `observation_date`) is required
+> Milestone 3 scope, to be implemented when the scenario engine first produces
+> forward projections at scale. Until that implementation, modules producing
+> forward projections must include in their output metadata the note:
+> 'Confidence tier does not account for projection horizon.'"*
+
+Issue #69 reassigned to Milestone 3.
 
 ---
 
 ## Consequential Actions
 
-Upon Engineering Lead approval (with any disposition decisions recorded above):
-
-1. **Create GitHub Issues** for each BLOCKING finding (links to this document)
-2. **Move ADR-001 and ADR-002 to UNDER-REVIEW** (License Status field update +
-   Last Reviewed note) in a separate commit on the implementation branch
-3. **Update Draft A and Draft B** with any changes from the disposition
-4. **Open implementation PR** modifying `CODING_STANDARDS.md` and
-   `DATA_STANDARDS.md` per the approved drafts
-5. **Create companion compliance-scan update issue** (QA-1) — must close
-   before any module implementing `dict[str, Quantity]` can merge
-6. **Update scan registry** with SCR-001 entry after implementation merges
+1. **Standards implementation PR** — modify `CODING_STANDARDS.md` and
+   `DATA_STANDARDS.md` per Draft A and Draft B, including the CM-1 and IA-1
+   Known Limitation texts verbatim
+2. **ADR transitions** — move ADR-001 and ADR-002 CURRENT → UNDER-REVIEW in
+   the same implementation PR; record which triggers fired
+3. **Issue #69** — reassign to Milestone 3 milestone; status: required scope
+4. **Issue #65** — must close before any module implementing `dict[str, Quantity]`
+   attribute stores merges
+5. **Scan registry** — add SCR-001 entry after implementation PR merges
 
 ---
 
 *Compiled by Engineering Lead session (Claude Sonnet 4.6), 2026-04-17.*
+*Engineering Lead disposition recorded 2026-04-19.*
 *This document is the output of the Material Standards Change Review Sequence
 per `docs/MILESTONE_RUNBOOK.md`. No standards documents have been modified.
-No code has been implemented. This review is complete; disposition is pending.*
+No code has been implemented. Disposition is complete; implementation is gated
+on ADR-001 and ADR-002 transitioning UNDER-REVIEW.*
