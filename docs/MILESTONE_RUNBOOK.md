@@ -352,6 +352,162 @@ No standards amendment reaches `main` until all four phases are complete:
 
 ---
 
+## Material Standards Change Definition
+
+A standards change is **material** if a compliant implementation written before
+the change would become non-compliant after it. The test is simple: take a
+module or data structure that fully satisfies the current standard. Apply the
+proposed change. Is it still compliant? If no, the change is material.
+
+Examples of material changes:
+- Adding a required field to a data type that existing implementations omit
+- Changing a unit convention (e.g., switching canonical currency from constant
+  2015 USD to constant 2020 USD) in a way that makes existing stored values
+  wrong
+- Adding a test requirement that existing modules do not yet satisfy
+- Narrowing a type (e.g., `float` → `Decimal` for monetary values) where
+  existing code uses the broader type
+
+Examples of non-material changes (no review required):
+- Correcting a typo or grammatical error that does not alter the rule
+- Adding a cross-reference or example that clarifies existing language without
+  changing it
+- Adding a new optional field with a documented default
+- Adding a new section that covers a domain not previously addressed, where
+  no existing implementation is affected
+
+**All material changes require the full review sequence defined below.**
+Non-material changes may be made directly with a brief PR description
+explaining why the change is non-material. If there is any doubt about
+whether a change is material, treat it as material.
+
+---
+
+## Material Standards Change Review Sequence
+
+This sequence applies to any material change to `CODING_STANDARDS.md`,
+`DATA_STANDARDS.md`, `POLICY.md`, or `CONTRIBUTING.md`. It is lighter than
+the full STD-REVIEW process — targeted at the specific change rather than
+the full standards suite — but it is not optional for material changes.
+
+**Steps 3 and 4 must complete before Step 6.** Implementation against a
+standard that has not cleared technical and domain review is not permitted.
+This sequencing is the primary safeguard against standards changes that are
+internally consistent but wrong for the domain or untestable in practice.
+
+### Step 1 — Engineering Lead identifies need
+
+The Engineering Lead documents the proposed change in a GitHub Issue:
+- What rule is being added, modified, or removed
+- Why the change is needed (concrete case that motivated it, traceable to
+  a compliance finding, an ARCH-REVIEW finding, or a specific implementation gap)
+- Which standards documents are affected
+- Preliminary assessment of materiality
+
+### Step 2 — Draft language prepared
+
+The Engineering Lead or Architect Agent drafts the specific amendment text —
+the exact words that will appear in the standards document. The draft is
+posted as a comment on the Issue from Step 1. Vague intent is not sufficient;
+the draft must be precise enough that a QA Agent can write a test for it.
+
+### Step 3 — Technical Agent Review
+
+QA Agent and Architect Agent review the draft language independently:
+
+**QA Agent asks:** Can I write a test for this? If the rule cannot be
+operationalized into a test that can pass or fail, the draft needs a clearer
+operational definition or must be reclassified as a principle rather than a
+standard. The QA Agent proposes the test(s) that would verify compliance.
+
+**Architect Agent asks:** Is this consistent with existing standards and ADRs?
+Does it introduce ambiguity at any boundary? Are there edge cases the draft
+does not address that implementers will face?
+
+Both agents post their findings as comments on the Issue. This step is
+complete when both agents have posted and the Engineering Lead has read
+their findings.
+
+### Step 4 — Domain Council Spot Review
+
+Two or three Domain Intelligence Council members whose frameworks are directly
+affected by the proposed change review it in CHALLENGE mode. The Engineering
+Lead selects the relevant agents based on the domain of the change:
+
+- Monetary arithmetic changes → Chief Methodologist, Investment Agent
+- Human development indicator standards → Development Economist, Intergenerational Advocate
+- Governance indicator changes → Political Economist
+- Ecological measurement changes → Ecological Economist
+- Data provenance or access changes → Geopolitical Analyst, Security lens
+
+The full council review is **not required** for every material standards change.
+Targeted spot review of the directly affected frameworks is sufficient for
+changes that are material but not sweeping. A sweeping change — one that
+affects all four measurement frameworks, alters the fundamental data model,
+or changes a cross-cutting rule applied by every module — requires the full
+STD-REVIEW process as defined in the Standards and Policy Review SOP above.
+
+When in doubt whether a change is sweeping: if more than three council members'
+frameworks are materially affected, treat it as sweeping and run the full process.
+
+### Step 5 — Engineering Lead disposition
+
+The Engineering Lead reviews findings from Steps 3 and 4 and makes one of
+three decisions:
+
+- **Approve as drafted** — no significant concerns raised; proceed to Step 6
+- **Approve with modifications** — findings require adjustments to the draft;
+  post the revised text as a follow-up comment on the Issue before proceeding
+- **Reject** — the proposed change has problems that cannot be resolved with
+  minor modifications; document the reason and close the Issue
+
+### Step 6 — Implementation against reviewed standards
+
+Once Steps 3 and 4 are complete and the Engineering Lead has approved (Step 5),
+implementation may proceed. PRs implementing the standards change include:
+- The updated standards document text
+- New or updated tests verifying compliance with the new rule
+- Any CODING_STANDARDS.md docstring or annotation updates required
+
+### Step 7 — Compliance scan
+
+After the implementing PR merges, run a targeted compliance scan against any
+existing code affected by the change. Record the scan in
+`docs/compliance/scan-registry.md` with trigger type `Manual` and scope
+limited to the affected modules. Findings follow the standard compliance
+finding Issue process.
+
+### Step 8 — ADR impact review against renewal triggers
+
+For each CURRENT ADR, check whether the standards change fires any renewal
+trigger listed in that ADR's Validity Context section. This check is the
+Engineering Lead's responsibility and must be completed within the same
+milestone as the standards change.
+
+If a trigger fires: move the affected ADR(s) from CURRENT to UNDER-REVIEW
+and open a GitHub Issue documenting the specific trigger and the review
+required. The UNDER-REVIEW period must not exceed one milestone.
+
+If no trigger fires: document the negative check result as a comment on the
+standards change Issue. "Checked ADR-001 and ADR-002 renewal triggers —
+no triggers fire" is sufficient. The check must be recorded; silence is
+not evidence of a check.
+
+### Step 9 — ADR license renewals
+
+If any ADR was moved to UNDER-REVIEW in Step 8, complete the review and
+renew to CURRENT before the milestone closes. If the review cannot be
+completed within the milestone, document the UNDER-REVIEW rationale in the
+milestone exit checklist per the Standards License Audit section.
+
+### Step 10 — Scan registry update
+
+Update `docs/compliance/scan-registry.md` to reflect the completed review
+sequence. The entry should reference the Issue from Step 1 and note the
+final compliance posture of affected modules.
+
+---
+
 ## Milestone Definition Table
 
 The five WorldSim milestones, their themes, entry criteria, and exit criteria.
