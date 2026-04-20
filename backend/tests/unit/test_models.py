@@ -1,11 +1,16 @@
 """
-Unit tests for simulation core data model — ADR-001.
+Unit tests for simulation core data model — ADR-001, Amendment 1.
 
 Tests cover: SimulationEntity, Relationship, Event, SimulationState,
 MeasurementFramework, ResolutionConfig, ScenarioConfig, PropagationRule,
 Geometry, and the SimulationModule abstract interface.
+
+Amendment 1 (SCR-001): attributes are dict[str, Quantity]; tests updated
+to use get_attribute_value() for numeric comparisons and Quantity constructors
+for attribute initialisation.
 """
 from datetime import datetime
+from decimal import Decimal
 
 import pytest
 
@@ -22,10 +27,26 @@ from app.simulation.engine.models import (
     SimulationModule,
     SimulationState,
 )
+from app.simulation.engine.quantity import Quantity, VariableType
 
 # ---------------------------------------------------------------------------
 # Fixtures
 # ---------------------------------------------------------------------------
+
+def _q(
+    value: float,
+    variable_type: VariableType = VariableType.RATIO,
+    unit: str = "dimensionless",
+    confidence_tier: int = 1,
+) -> Quantity:
+    """Convenience helper: wrap a float as a Quantity for test fixtures."""
+    return Quantity(
+        value=Decimal(str(value)),
+        unit=unit,
+        variable_type=variable_type,
+        confidence_tier=confidence_tier,
+    )
+
 
 def make_entity(
     id: str = "BOL",
@@ -86,7 +107,7 @@ def make_event(
         event_id=event_id,
         source_entity_id=source_entity_id,
         event_type=event_type,
-        affected_attributes=affected_attributes or {"gdp_growth": -0.02},
+        affected_attributes=affected_attributes or {"gdp_growth": _q(-0.02)},
         propagation_rules=propagation_rules or [],
         timestep_originated=timestep or datetime(2020, 1, 1),
         framework=framework,
@@ -184,39 +205,70 @@ class TestSimulationEntity:
         assert entity.parent_id is None
         assert entity.geometry is None
 
-    def test_get_attribute_returns_value(self) -> None:
-        entity = make_entity(attributes={"gdp": 44.2e9})
-        assert entity.get_attribute("gdp") == pytest.approx(44.2e9)
+    def test_get_attribute_value_returns_decimal(self) -> None:
+        entity = make_entity(attributes={"gdp": _q(44.2e9, VariableType.FLOW, "USD_2015")})
+        assert entity.get_attribute_value("gdp") == pytest.approx(44.2e9)
 
-    def test_get_attribute_returns_default_for_missing_key(self) -> None:
-        entity = make_entity(attributes={})
-        assert entity.get_attribute("nonexistent") == 0.0
-        assert entity.get_attribute("nonexistent", default=99.0) == 99.0
+    def test_get_attribute_returns_quantity(self) -> None:
+        q = _q(44.2e9, VariableType.FLOW)
+        entity = make_entity(attributes={"gdp": q})
+        assert entity.get_attribute("gdp") == q
 
-    def test_set_attribute_stores_value(self) -> None:
+    def test_get_attribute_returns_none_for_missing_key(self) -> None:
         entity = make_entity(attributes={})
-        entity.set_attribute("inflation", 0.08)
-        assert entity.attributes["inflation"] == pytest.approx(0.08)
+        assert entity.get_attribute("nonexistent") is None
+
+    def test_get_attribute_value_returns_default_for_missing_key(self) -> None:
+        entity = make_entity(attributes={})
+        assert entity.get_attribute_value("nonexistent") == Decimal("0")
+        assert entity.get_attribute_value("nonexistent", default=Decimal("99")) == Decimal("99")
+
+    def test_set_attribute_stores_quantity(self) -> None:
+        entity = make_entity(attributes={})
+        q = _q(0.08)
+        entity.set_attribute("inflation", q)
+        assert entity.attributes["inflation"] == q
 
     def test_set_attribute_overwrites_existing(self) -> None:
-        entity = make_entity(attributes={"inflation": 0.05})
-        entity.set_attribute("inflation", 0.12)
-        assert entity.attributes["inflation"] == pytest.approx(0.12)
+        entity = make_entity(attributes={"inflation": _q(0.05)})
+        q_new = _q(0.12)
+        entity.set_attribute("inflation", q_new)
+        assert float(entity.get_attribute_value("inflation")) == pytest.approx(0.12)
 
-    def test_apply_delta_adds_to_existing(self) -> None:
-        entity = make_entity(attributes={"debt_gdp_ratio": 0.60})
-        entity.apply_delta("debt_gdp_ratio", 0.10)
-        assert entity.attributes["debt_gdp_ratio"] == pytest.approx(0.70)
+    def test_apply_delta_flow_adds_to_existing(self) -> None:
+        entity = make_entity(attributes={"debt_gdp_ratio": _q(0.60)})
+        entity.apply_delta("debt_gdp_ratio", _q(0.10))
+        assert float(entity.get_attribute_value("debt_gdp_ratio")) == pytest.approx(0.70)
 
-    def test_apply_delta_initialises_missing_key_at_zero(self) -> None:
+    def test_apply_delta_flow_initialises_missing_key(self) -> None:
         entity = make_entity(attributes={})
-        entity.apply_delta("reserves", 5.0e9)
-        assert entity.attributes["reserves"] == pytest.approx(5.0e9)
+        entity.apply_delta("reserves", _q(5.0e9, VariableType.FLOW))
+        assert float(entity.get_attribute_value("reserves")) == pytest.approx(5.0e9)
 
-    def test_apply_delta_negative(self) -> None:
-        entity = make_entity(attributes={"reserves": 10.0e9})
-        entity.apply_delta("reserves", -3.0e9)
-        assert entity.attributes["reserves"] == pytest.approx(7.0e9)
+    def test_apply_delta_flow_negative(self) -> None:
+        entity = make_entity(attributes={"reserves": _q(10.0e9, VariableType.FLOW)})
+        entity.apply_delta("reserves", _q(-3.0e9, VariableType.FLOW))
+        assert float(entity.get_attribute_value("reserves")) == pytest.approx(7.0e9)
+
+    def test_apply_delta_stock_replaces_existing(self) -> None:
+        entity = make_entity(
+            attributes={"fx_reserves": _q(8.0e9, VariableType.STOCK)}
+        )
+        entity.apply_delta("fx_reserves", _q(5.0e9, VariableType.STOCK))
+        assert float(entity.get_attribute_value("fx_reserves")) == pytest.approx(5.0e9)
+
+    def test_apply_delta_stock_initialises_from_delta_value(self) -> None:
+        entity = make_entity(attributes={})
+        entity.apply_delta("fx_reserves", _q(5.0e9, VariableType.STOCK))
+        assert float(entity.get_attribute_value("fx_reserves")) == pytest.approx(5.0e9)
+
+    def test_apply_delta_propagates_confidence_tier(self) -> None:
+        entity = make_entity(
+            attributes={"gdp_growth": _q(0.03, confidence_tier=1)}
+        )
+        entity.apply_delta("gdp_growth", _q(-0.01, confidence_tier=3))
+        result_tier = entity.get_attribute("gdp_growth").confidence_tier  # type: ignore[union-attr]
+        assert result_tier == 3  # lower-of-two: max(1, 3) = 3 (tier 3 = lower quality wins)
 
     def test_parent_id_for_subnational_entity(self) -> None:
         region = make_entity(
@@ -235,11 +287,11 @@ class TestSimulationEntity:
             metadata={},
             geometry=geom,
         )
-        assert entity.geometry.geometry_type == "Point"
+        assert entity.geometry.geometry_type == "Point"  # type: ignore[union-attr]
 
     def test_metadata_is_separate_from_attributes(self) -> None:
         entity = make_entity(
-            attributes={"gdp": 1.0},
+            attributes={"gdp": _q(1.0)},
             metadata={"name": "Bolivia", "iso_a3": "BOL"},
         )
         assert "name" not in entity.attributes
@@ -332,10 +384,16 @@ class TestEvent:
         evt = make_event(framework=MeasurementFramework.HUMAN_DEVELOPMENT)
         assert evt.framework == MeasurementFramework.HUMAN_DEVELOPMENT
 
-    def test_affected_attributes(self) -> None:
-        evt = make_event(affected_attributes={"gdp_growth": -0.05, "unemployment": 0.02})
-        assert evt.affected_attributes["gdp_growth"] == pytest.approx(-0.05)
-        assert evt.affected_attributes["unemployment"] == pytest.approx(0.02)
+    def test_affected_attributes_are_quantity(self) -> None:
+        evt = make_event(
+            affected_attributes={
+                "gdp_growth": _q(-0.05),
+                "unemployment": _q(0.02),
+            }
+        )
+        assert isinstance(evt.affected_attributes["gdp_growth"], Quantity)
+        assert evt.affected_attributes["gdp_growth"].value == pytest.approx(Decimal("-0.05"))
+        assert evt.affected_attributes["unemployment"].value == pytest.approx(Decimal("0.02"))
 
     def test_propagation_rules_stored(self) -> None:
         rule = PropagationRule(relationship_type="trade", attenuation_factor=0.4)
@@ -399,8 +457,8 @@ class TestScenarioConfig:
 
 class TestSimulationState:
     def _make_populated_state(self) -> SimulationState:
-        bol = make_entity("BOL", "country", {"gdp": 44e9})
-        bra = make_entity("BRA", "country", {"gdp": 2.2e12})
+        bol = make_entity("BOL", "country", {"gdp": _q(44e9, VariableType.FLOW, "USD_2015")})
+        bra = make_entity("BRA", "country", {"gdp": _q(2.2e12, VariableType.FLOW, "USD_2015")})
 
         rel_bol_bra = Relationship("BOL", "BRA", "trade", 0.3)
         rel_bra_bol = Relationship("BRA", "BOL", "trade", 0.1)

@@ -9,7 +9,7 @@ This is a living document. It is updated whenever a new module is implemented
 or an existing module's capabilities change. The registry is dated so that
 readers can assess whether it reflects the current codebase.
 
-**Last updated:** 2026-04-16
+**Last updated:** 2026-04-19 (Amendment 1 — SCR-001 Quantity type system)
 **Current milestone:** Milestone 1 — Simulation Core
 
 ---
@@ -19,20 +19,28 @@ readers can assess whether it reflects the current codebase.
 ### Entity State Representation
 
 The simulation can represent any entity (country, institution, region) as a
-collection of named float attributes. Attributes are initialised from seed
-data and can be updated by events.
+collection of named `Quantity` attributes (SCR-001 / ADR-001 Amendment 1).
+Each attribute carries a value, unit, variable type, confidence tier, and
+optional provenance fields.
 
 **Can model:**
-- Any numerical indicator that can be expressed as a float
+- Any numerical indicator expressible as a `Quantity` (Decimal value + unit +
+  variable_type + confidence_tier)
+- STOCK variables (level at a point in time — reserves, debt outstanding)
+- FLOW variables (period changes — GDP, exports, deficit)
+- RATIO variables (dimensionless fractions — debt/GDP, inflation rate)
+- DIMENSIONLESS variables (indexes and scores — HDI, capability indexes)
 - Entity metadata (name, ISO codes, etc.) stored separately from simulation
   attributes
 - Hierarchical entity relationships (parent_id field)
 - Basic spatial reference (geometry field, PostGIS integration in Milestone 2)
+- Confidence tier tracking: `confidence_tier` 1–5 on every attribute,
+  propagated via the lower-of-two rule (max tier number)
 
 **Cannot currently model:**
-- Attribute-level metadata (units, measurement framework tag, uncertainty range)
 - Categorical attributes (regime type, currency peg status)
 - Time series within an entity (only current-period state is held)
+- Confidence tier degradation by projection horizon (IA-1 — Milestone 3 scope)
 
 ### Bilateral Relationships
 
@@ -52,18 +60,23 @@ of entities.
 - Relationship attributes beyond weight (e.g. tariff rate, debt maturity profile)
 - Relationship-level metadata (data source, vintage date)
 
-### Event Propagation (ADR-001)
+### Event Propagation (ADR-001, Amendment 1)
 
-The simulation can propagate attribute deltas through the relationship graph.
+The simulation can propagate typed `Quantity` attribute deltas through the
+relationship graph (SCR-001). All event deltas are `Quantity` instances carrying
+`variable_type`, `confidence_tier`, and optional provenance fields.
 
 **Can model:**
-- Hop-by-hop attenuation: delta × attenuation_factor × edge.weight per hop
+- Hop-by-hop attenuation: `delta.value × attenuation_factor × edge.weight` per hop
 - Compound attenuation across multiple hops
 - Additive accumulation from multiple propagation paths to the same entity
+  (FLOW, RATIO, DIMENSIONLESS variable types)
+- STOCK delta semantics: STOCK deltas replace the existing value (no accumulation)
 - Multiple propagation rules per event (different relationship types, different
   attenuation factors)
 - Events that propagate along specific relationship types only
 - Max_hops limiting propagation depth
+- Confidence tier propagation: lower-of-two rule (max tier) through accumulation
 
 **Cannot currently model:**
 - Non-linear propagation (threshold effects, saturation)
@@ -77,8 +90,9 @@ The simulation can accept exogenous control inputs through the orchestration
 layer.
 
 **Can model:**
-- Five input types: MonetaryPolicyInput, FiscalPolicyInput, TradePolicyInput,
-  EmergencyPolicyInput, StructuralPolicyInput
+- Six input types: MonetaryRateInput, MonetaryVolumeInput, FiscalPolicyInput,
+  TradePolicyInput, EmergencyPolicyInput, StructuralPolicyInput (SCR-001:
+  former MonetaryPolicyInput split into MonetaryRateInput and MonetaryVolumeInput)
 - Scheduled inputs at specific timesteps
 - Contingent inputs triggered by attribute threshold conditions
 - Cooldown periods preventing repeated triggering

@@ -1,17 +1,25 @@
 """
-Simulation core data model — ADR-001.
+Simulation core data model — ADR-001, Amendment 1.
 
 All entities, relationships, events, and measurement structures that the
 simulation engine operates on. This module has no database or framework
 dependencies — it is pure Python so the simulation layer can be tested
 and reasoned about independently of infrastructure.
+
+Amendment 1 (SCR-001): SimulationEntity.attributes changed from
+dict[str, float] to dict[str, Quantity]. Event.affected_attributes
+changed from dict[str, float] to dict[str, Quantity]. See ADR-001
+Amendment 1 for the full renewal record.
 """
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
+from decimal import Decimal
 from enum import Enum
 from typing import TYPE_CHECKING, Any
+
+from app.simulation.engine.quantity import Quantity, VariableType
 
 if TYPE_CHECKING:
     from datetime import datetime
@@ -126,32 +134,79 @@ class SimulationEntity:
     The event propagation engine operates uniformly on all entity types —
     entity_type drives module selection, not branching in the engine itself.
 
-    attributes holds current simulation state variables as floats.
+    attributes holds current simulation state variables as Quantity instances.
+    Every attribute value carries its unit, variable type, confidence tier,
+    and provenance. Use get_attribute() to retrieve the typed Quantity;
+    use get_attribute_value() for numeric comparisons.
+
     metadata holds non-simulation data (display names, ISO codes, etc.)
     that does not participate in calculations.
+
+    Amendment 1 (SCR-001): attributes changed from dict[str, float] to
+    dict[str, Quantity].
     """
     id: str
-    entity_type: str                      # 'country', 'region', 'institution'
-    attributes: dict[str, float]          # current state variables
-    metadata: dict[str, Any]             # non-simulation data
+    entity_type: str                       # 'country', 'region', 'institution'
+    attributes: dict[str, Quantity]        # current state variables
+    metadata: dict[str, Any]              # non-simulation data
     parent_id: str | None = None      # enclosing entity for hierarchical resolution
     geometry: Geometry | None = None  # spatial reference, populated in Milestone 2
 
-    def get_attribute(self, key: str, default: float = 0.0) -> float:
-        """Return an attribute value, or default if not present."""
-        return self.attributes.get(key, default)
+    def get_attribute(self, key: str) -> Quantity | None:
+        """Return an attribute Quantity, or None if not present.
 
-    def set_attribute(self, key: str, value: float) -> None:
-        """Set an attribute to an absolute value."""
+        Use get_attribute_value() for numeric comparison operations.
+        """
+        return self.attributes.get(key)
+
+    def get_attribute_value(self, key: str, default: Decimal = Decimal("0")) -> Decimal:
+        """Return the numeric value of an attribute, or default if not present.
+
+        Preferred for numeric comparisons (StateCondition.is_met, test assertions).
+        Returns Decimal, which is comparable to float via standard Python
+        arithmetic and pytest.approx.
+        """
+        q = self.attributes.get(key)
+        if q is None:
+            return default
+        return q.value
+
+    def set_attribute(self, key: str, value: Quantity) -> None:
+        """Set an attribute to an absolute Quantity value."""
         self.attributes[key] = value
 
-    def apply_delta(self, key: str, delta: float) -> None:
-        """Apply an additive change to an attribute.
+    def apply_delta(self, key: str, delta: Quantity) -> None:
+        """Apply a change to an attribute.
 
-        Initialises the attribute to 0.0 before applying delta if the
-        key is not yet present, rather than raising KeyError.
+        For STOCK variables: replaces the current value with delta
+        (delta carries the new absolute level, not an additive change).
+
+        For FLOW, RATIO, DIMENSIONLESS variables: adds delta.value to the
+        existing attribute value. Initialises the attribute from the delta
+        if the key is not yet present.
+
+        Args:
+            key: Attribute key to update.
+            delta: The Quantity delta to apply. For STOCK, this is the new
+                absolute value. For FLOW/RATIO/DIMENSIONLESS, this is the
+                additive increment.
         """
-        self.attributes[key] = self.attributes.get(key, 0.0) + delta
+        if delta.variable_type == VariableType.STOCK:
+            self.attributes[key] = delta
+        else:
+            existing = self.attributes.get(key)
+            if existing is None:
+                self.attributes[key] = delta
+            else:
+                self.attributes[key] = Quantity(
+                    value=existing.value + delta.value,
+                    unit=existing.unit,
+                    variable_type=existing.variable_type,
+                    measurement_framework=existing.measurement_framework,
+                    observation_date=existing.observation_date or delta.observation_date,
+                    source_id=existing.source_id,
+                    confidence_tier=max(existing.confidence_tier, delta.confidence_tier),
+                )
 
 
 @dataclass
@@ -161,12 +216,18 @@ class Relationship:
     Relationships are the edges in the simulation graph. weight encodes
     how strongly events originating at source_id affect target_id when
     they propagate along this edge.
+
+    weight is a dimensionless propagation coefficient; it intentionally
+    remains float (NumPy-compatible for matrix operations on relationship
+    weight graphs). See ARCH-4 in SCR-001 for the rationale.
+    attributes uses dict[str, Any] to accommodate mixed relationship data
+    (Quantity values and float propagation coefficients).
     """
     source_id: str
     target_id: str
     relationship_type: str               # 'trade', 'debt', 'alliance', 'currency'
     weight: float                        # propagation strength, in [0.0, 1.0]
-    attributes: dict[str, float] = field(default_factory=dict)
+    attributes: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass
@@ -174,19 +235,22 @@ class Event:
     """An event that propagates through the simulation graph each timestep.
 
     Events are the mechanism by which modules communicate state changes.
-    affected_attributes maps attribute keys to delta values — additive
-    changes to be applied to any entity that receives this event.
+    affected_attributes maps attribute keys to Quantity delta values —
+    typed changes to be applied to any entity that receives this event.
 
     propagation_rules determine how far and along which relationship
     types the event travels beyond the source entity.
 
     framework tags which measurement dimension this event belongs to,
     enabling parallel accounting without conversion between frameworks.
+
+    Amendment 1 (SCR-001): affected_attributes changed from dict[str, float]
+    to dict[str, Quantity].
     """
     event_id: str
     source_entity_id: str
-    event_type: str                          # 'policy_change', 'shock', 'threshold_crossed'
-    affected_attributes: dict[str, float]    # attribute key -> delta
+    event_type: str                           # 'policy_change', 'shock', 'threshold_crossed'
+    affected_attributes: dict[str, Quantity]  # attribute key -> Quantity delta
     propagation_rules: list[PropagationRule]
     timestep_originated: datetime
     framework: MeasurementFramework = MeasurementFramework.FINANCIAL

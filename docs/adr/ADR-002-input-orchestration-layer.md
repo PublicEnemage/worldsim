@@ -9,11 +9,10 @@ Accepted
 **Valid Until:** Milestone 2 completion
 **License Status:** CURRENT
 
-**Last Reviewed:** 2026-04-17 — STD-REVIEW-001 completed. All renewal triggers
-checked; none fired. STD-REVIEW-001 created issues tracking standards amendments
-(#42–#51) but did not apply amendments to standards documents. The standards
-documents as they stand did not change in ways that activate any trigger below.
-Next scheduled review at Milestone 2 completion.
+**Last Reviewed:** 2026-04-19 — Amendment 1 (SCR-001) applied. See Amendment 1
+section below. License Status renewed to CURRENT after implementation verified
+by 210 passing tests and SCAN-004 (0 violations). Next scheduled review at
+Milestone 2 completion.
 
 **Renewal Triggers** — any of the following fires the CURRENT → UNDER-REVIEW
 transition:
@@ -380,3 +379,49 @@ them to the propagation engine.
 ADR-003 will address the PostGIS spatial data model and database schema
 (originally planned as ADR-002 in the ADR-001 footer — scope shifted when
 the orchestration layer proved foundational for Milestone 1).
+
+---
+
+## Amendment 1 — SCR-001: MonetaryInput Split and Quantity Adoption
+
+**Date:** 2026-04-19
+**Closes:** #58 (MonetaryPolicyInput split — Option C)
+**Implemented in:** PR closing #51, #58, #65–#68
+
+### What Changed
+
+`MonetaryInstrument` split into two enums:
+- `MonetaryRateInstrument` — POLICY_RATE, RESERVE_REQUIREMENT
+- `MonetaryVolumeInstrument` — ASSET_PURCHASE, EXCHANGE_RATE_INTERVENTION
+
+`MonetaryPolicyInput` split into two dataclasses:
+- `MonetaryRateInput(ControlInput)` — `value: Decimal`; produces a RATIO
+  `Quantity` delta (dimensionless rate change)
+- `MonetaryVolumeInput(ControlInput)` — `value: MonetaryValue`; produces a
+  `MonetaryValue` delta (typed monetary amount with currency, price basis,
+  and exchange rate type)
+
+**Rationale for the split:** Monetary rate instruments (policy rate, reserve
+requirement) are dimensionless ratios. Monetary volume instruments (asset
+purchases, FX interventions) are monetary amounts requiring a currency code,
+price basis, and exchange rate type. Conflating them in a single class with
+`value: Decimal` forced a type-unsafe conversion at `to_events()` time and
+prevented the propagation engine from applying correct `variable_type` semantics.
+
+All `to_events()` implementations for all `ControlInput` subclasses now produce
+`affected_attributes: dict[str, Quantity]` (SCR-001 alignment). Event deltas
+carry `variable_type`, `confidence_tier`, and `measurement_framework` from the
+control input's semantics.
+
+`StateCondition.is_met()` uses `entity.get_attribute_value(key) -> Decimal` then
+`float()` for threshold comparison, avoiding direct float-on-entity-attribute
+assignment.
+
+### Audit Record Impact
+
+`ControlInputAuditRecord.input_type` now records `"MonetaryRateInput"` or
+`"MonetaryVolumeInput"` where it previously recorded `"MonetaryPolicyInput"`.
+Existing audit logs produced before this amendment that reference
+`"MonetaryPolicyInput"` remain valid historical records; replay of those logs
+requires mapping the old name to the appropriate new subclass based on the
+`instrument` field value.

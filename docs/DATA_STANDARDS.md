@@ -378,13 +378,20 @@ All physical and economic measurements in the simulation are represented as
 `Quantity`. Never raw `float`, never raw `Decimal` without a unit.
 
 ```python
-@dataclass
+class VariableType(Enum):
+    STOCK = "stock"           # level at a point in time (reserves, debt outstanding)
+    FLOW = "flow"             # change over a period (GDP, exports, deficit)
+    RATIO = "ratio"           # dimensionless fraction derived from other quantities
+    DIMENSIONLESS = "dimensionless"  # index or score not reducible to a ratio
+
+@dataclass(kw_only=True)
 class Quantity:
     value: Decimal             # never float
     unit: Unit
+    variable_type: VariableType  # required; see VariableType enum above
     observation_date: date
     source_registry_id: str    # must be registered in SourceRegistry
-    confidence_tier: int       # 1-5, see Data Quality Tier System
+    confidence_tier: int       # 1–5, see Data Quality Tier System
 
     def convert_to(self, target_unit: Unit) -> "Quantity":
         """Convert to target unit. Raises UnitError if dimensions incompatible."""
@@ -394,6 +401,47 @@ class Quantity:
             )
         ...
 ```
+
+#### Confidence Tier Propagation
+
+When a calculation derives a new `Quantity` from existing `Quantity` inputs,
+the output `confidence_tier` is the **maximum** of all input tier numbers
+(higher number = lower confidence quality; the output inherits the worst-quality
+input's tier).
+
+```
+confidence_tier(output) = max(confidence_tier(input₁), confidence_tier(input₂), ...)
+```
+
+This is a deliberately conservative policy approximation, not a statistical
+formula. Its properties:
+
+- **Monotone non-decreasing**: derived quantities cannot be more confident
+  than their least confident input.
+- **Known direction bias**: it overstates uncertainty when inputs are
+  independent and mutually corroborating. This is documented and accepted.
+  Code comments must not describe it as a statistical rule.
+- **Not a statistical formula**: it governs the `confidence_tier` integer field
+  only. Where genuine statistical propagation of probability distributions is
+  required (e.g., Monte Carlo quantification), use the appropriate statistical
+  method instead.
+
+The rule applies to all arithmetic derivations: ratios, sums, differences,
+products. It does not apply to:
+- Pure unit conversions of a single `Quantity` (no new uncertainty introduced)
+- Currency conversions where the exchange rate carries its own `confidence_tier`
+  (apply the rule to the exchange rate `Quantity` and the input monetary `Quantity`)
+
+All functions that derive `Quantity` outputs from `Quantity` inputs must
+explicitly compute and pass `confidence_tier=max(...)` — no implicit defaulting.
+
+**Known Limitation (IA-1):** This rule does not account for projection horizon.
+A 30-year forward projection derived from a Tier 1 historical observation retains
+Tier 1 confidence under this rule, which overstates reliability for long-horizon
+projections. Time-horizon confidence degradation is Milestone 3 scope.
+Until that implementation, modules producing forward projections must include in
+their output metadata the note: *"Confidence tier does not account for projection
+horizon."*
 
 ### The `Unit` Type
 
@@ -536,28 +584,47 @@ values.
 
 All monetary measurements use `MonetaryValue`. Never raw numbers for money.
 
+`MonetaryValue` is a `Quantity` subclass. All `Quantity` rules — including
+`variable_type`, `confidence_tier`, and `source_registry_id` requirements —
+apply to monetary values.
+
 ```python
-@dataclass
-class MonetaryValue:
-    amount: Decimal                  # never float
+@dataclass(kw_only=True)
+class MonetaryValue(Quantity):
+    """A Quantity that is specifically a monetary amount.
+
+    Inherits from Quantity: value, unit, variable_type, observation_date,
+    source_registry_id, confidence_tier.
+
+    The inherited 'value' field is the monetary amount (replaces the former
+    'amount' field). The inherited 'unit' field carries the canonical storage
+    unit (USD_2015) or the source currency unit before conversion at ingestion.
+    'currency_code' is the ISO 4217 code of the source currency; it is
+    redundant with 'unit' for canonical values but required at ingestion before
+    conversion so the pipeline can construct the correct Unit.
+    """
     currency_code: str               # ISO 4217, e.g. "USD", "EUR", "GHS"
-    observation_date: date
     price_basis: PriceBasis
     exchange_rate_type: ExchangeRateType
-    source_registry_id: str
-    confidence_tier: int             # 1-5
 
 class PriceBasis(Enum):
     NOMINAL = "nominal"              # current prices at observation date
-    CONSTANT = "constant"           # real terms; base_year required
-    PPP = "ppp"                     # PPP-adjusted; base_year required
+    CONSTANT = "constant"           # real terms; base_year encoded in unit
+    PPP = "ppp"                     # PPP-adjusted; base_year encoded in unit
 
 class ExchangeRateType(Enum):
     OFFICIAL = "official"
     PARALLEL = "parallel"           # black market / unofficial rate
     PPP = "ppp"
-    FIXED = "fixed"                 # pegged rate, document peg terms
+    FIXED = "fixed"                 # pegged rate; document peg terms in metadata
 ```
+
+**Note on the `amount` → `value` rename:** The former standalone `amount` field
+is removed. Access the monetary amount via the inherited `value` field from
+`Quantity`. Code using `monetary_value.amount` must be updated to `monetary_value.value`.
+
+**Cross-reference:** `CODING_STANDARDS.md § Monetary and Quantity Standards`
+governs usage rules. This section governs the type contract.
 
 ### Canonical Internal Currency: Constant 2015 USD
 

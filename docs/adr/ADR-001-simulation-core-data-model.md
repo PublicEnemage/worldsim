@@ -9,11 +9,10 @@ Accepted
 **Valid Until:** Milestone 2 completion
 **License Status:** CURRENT
 
-**Last Reviewed:** 2026-04-17 — STD-REVIEW-001 completed. All renewal triggers
-checked; none fired. STD-REVIEW-001 created issues tracking standards amendments
-(#42–#51) but did not apply amendments to standards documents. The standards
-documents as they stand did not change in ways that activate any trigger below.
-Next scheduled review at Milestone 2 completion.
+**Last Reviewed:** 2026-04-19 — Amendment 1 (SCR-001) applied. See Amendment 1
+section below. License Status renewed to CURRENT after implementation verified
+by 210 passing tests and SCAN-004 (0 violations). Next scheduled review at
+Milestone 2 completion.
 
 **Renewal Triggers** — any of the following fires the CURRENT → UNDER-REVIEW
 transition:
@@ -173,3 +172,62 @@ Architecture supports adding this layer later at Level 6.
 
 ## Next ADR
 ADR-002 will address the database schema and PostGIS spatial data model.
+
+---
+
+## Amendment 1 — SCR-001: Quantity Type System
+
+**Date:** 2026-04-19
+**Closes:** #51 (Quantity type system), #65 (variable_type enforcement),
+#66 (confidence_tier propagation), #67 (MonetaryValue as Quantity subclass),
+#68 (ingestion pipeline requirements)
+**Implemented in:** PR closing #51, #58, #65–#68
+
+### What Changed
+
+`SimulationEntity.attributes` changed from `dict[str, float]` to
+`dict[str, Quantity]`. `Event.affected_attributes` changed from
+`dict[str, float]` to `dict[str, Quantity]`.
+
+The `Quantity` type now carries:
+- `value: Decimal` — numeric amount, never float
+- `unit: str` — canonical unit string
+- `variable_type: VariableType` — new required field (STOCK, FLOW, RATIO, DIMENSIONLESS)
+- `confidence_tier: int` — data quality tier 1–5
+- `measurement_framework`, `observation_date`, `source_id` — optional provenance fields
+
+`MonetaryValue` is now a `Quantity` subclass, adding `currency_code`,
+`price_basis`, and `exchange_rate_type`. The former `amount` field is replaced
+by the inherited `value` field.
+
+`propagate_confidence(*quantities) -> int` is the canonical function for
+computing output `confidence_tier` from input quantities. It uses the
+lower-of-two rule: `max(q.confidence_tier for q in quantities)` — the highest
+tier number (= lowest confidence quality) wins.
+
+`SimulationEntity.get_attribute(key) -> Quantity | None` and
+`get_attribute_value(key, default=Decimal("0")) -> Decimal` replace the former
+`get_attribute(key, default)` float accessor.
+
+`apply_delta(key, delta: Quantity)` semantics: STOCK delta replaces the
+existing value; FLOW/RATIO/DIMENSIONLESS deltas accumulate additively.
+
+`Relationship.attributes` remains `dict[str, Any]` — relationship metadata is
+mixed-type (ARCH-4 disposition from SCR-001, approved by Engineering Lead).
+
+### Known Limitations at Amendment Time
+
+**IA-1:** Confidence tier does not degrade with projection horizon. A 30-year
+forward projection retains the tier of its historical input. Time-horizon
+degradation is Milestone 3 scope.
+
+**CM-1:** The lower-of-two rule overstates uncertainty when inputs are
+independent and mutually corroborating. This is accepted — overstatement
+is the preferred failure mode for a sovereign policy tool.
+
+### Renewal Triggers Added
+
+In addition to original triggers, this amendment adds:
+- `VariableType` enum values modified (STOCK/FLOW/RATIO/DIMENSIONLESS)
+- `propagate_confidence` rule changed to anything other than lower-of-two
+- `Quantity` field contract broken (required fields removed or type changed)

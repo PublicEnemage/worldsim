@@ -1,5 +1,5 @@
 """
-Unit tests for the Input Orchestration Layer — ADR-002.
+Unit tests for the Input Orchestration Layer — ADR-002, Amendment 1.
 
 Covers:
 - ScenarioRunner advances state correctly across multiple timesteps
@@ -28,6 +28,7 @@ from app.simulation.engine.models import (
     SimulationModule,
     SimulationState,
 )
+from app.simulation.engine.quantity import Quantity, VariableType
 from app.simulation.orchestration import (
     AuditLog,
     ComparisonOperator,
@@ -37,8 +38,8 @@ from app.simulation.orchestration import (
     FiscalInstrument,
     FiscalPolicyInput,
     InputSource,
-    MonetaryInstrument,
-    MonetaryPolicyInput,
+    MonetaryRateInput,
+    MonetaryRateInstrument,
     ScenarioRunner,
     StateCondition,
     StructuralInstrument,
@@ -55,11 +56,19 @@ _BASE_DATE = datetime(2025, 1, 1)
 _STEP_DELTA = timedelta(days=365)
 
 
+def _q(value: float, variable_type: VariableType = VariableType.RATIO) -> Quantity:
+    return Quantity(
+        value=Decimal(str(value)),
+        unit="dimensionless",
+        variable_type=variable_type,
+    )
+
+
 def _entity(entity_id: str, **attributes: float) -> SimulationEntity:
     return SimulationEntity(
         id=entity_id,
         entity_type="country",
-        attributes=dict(attributes),
+        attributes={k: _q(v) for k, v in attributes.items()},
         metadata={},
     )
 
@@ -91,10 +100,10 @@ def _state(
 
 def _monetary_input(
     target: str = "USA",
-    instrument: MonetaryInstrument = MonetaryInstrument.POLICY_RATE,
+    instrument: MonetaryRateInstrument = MonetaryRateInstrument.POLICY_RATE,
     value: Decimal = Decimal("0.005"),
-) -> MonetaryPolicyInput:
-    return MonetaryPolicyInput(
+) -> MonetaryRateInput:
+    return MonetaryRateInput(
         target_entity=target,
         instrument=instrument,
         value=value,
@@ -214,7 +223,7 @@ class _ConstantDeltaModule(SimulationModule):
                 event_id=f"module-{entity.id}-{timestep.isoformat()}",
                 source_entity_id=entity.id,
                 event_type="module_delta",
-                affected_attributes={self._attribute: self._delta},
+                affected_attributes={self._attribute: _q(self._delta)},
                 propagation_rules=[],
                 timestep_originated=timestep,
             )
@@ -273,7 +282,8 @@ class TestScenarioRunnerAdvances:
             n_steps=3,
         )
         history = runner.run()
-        assert history[3].entities["USA"].get_attribute("counter") == pytest.approx(3.0)
+        counter = float(history[3].entities["USA"].get_attribute_value("counter"))
+        assert counter == pytest.approx(3.0)
 
     def test_scheduled_input_fires_at_correct_step(self) -> None:
         tariff = _trade_input()
@@ -287,8 +297,8 @@ class TestScenarioRunnerAdvances:
         )
         history = runner.run()
         # Step 2 fires the tariff; USA receives trade_tariff_rate delta
-        val_step1 = history[1].entities["USA"].get_attribute("trade_tariff_rate_goods")
-        val_step2 = history[2].entities["USA"].get_attribute("trade_tariff_rate_goods")
+        val_step1 = float(history[1].entities["USA"].get_attribute_value("trade_tariff_rate_goods"))
+        val_step2 = float(history[2].entities["USA"].get_attribute_value("trade_tariff_rate_goods"))
         assert val_step1 == pytest.approx(0.0)
         assert val_step2 == pytest.approx(0.25)
 
@@ -312,17 +322,17 @@ class TestScenarioRunnerAdvances:
         )
         runner.run()
         # Original state must be unchanged
-        assert initial.entities["USA"].get_attribute("gdp_growth") == pytest.approx(
+        assert float(initial.entities["USA"].get_attribute_value("gdp_growth")) == pytest.approx(
             0.02
         )
 
 
 # ---------------------------------------------------------------------------
-# MonetaryPolicyInput translation
+# MonetaryRateInput translation
 # ---------------------------------------------------------------------------
 
 
-class TestMonetaryPolicyInputToEvents:
+class TestMonetaryRateInputToEvents:
     def test_produces_single_event(self) -> None:
         inp = _monetary_input()
         events = inp.to_events(_BASE_DATE)
@@ -333,9 +343,9 @@ class TestMonetaryPolicyInputToEvents:
         assert events[0].source_entity_id == "BOL"
 
     def test_event_type_matches_instrument(self) -> None:
-        inp = MonetaryPolicyInput(
+        inp = MonetaryRateInput(
             target_entity="USA",
-            instrument=MonetaryInstrument.RESERVE_REQUIREMENT,
+            instrument=MonetaryRateInstrument.RESERVE_REQUIREMENT,
             value=Decimal("0.02"),
             effective_date=_BASE_DATE,
             timestamp=_BASE_DATE,
@@ -345,11 +355,11 @@ class TestMonetaryPolicyInputToEvents:
 
     def test_affected_attributes_contains_instrument_value(self) -> None:
         inp = _monetary_input(
-            instrument=MonetaryInstrument.POLICY_RATE, value=Decimal("0.005")
+            instrument=MonetaryRateInstrument.POLICY_RATE, value=Decimal("0.005")
         )
         events = inp.to_events(_BASE_DATE)
         assert "policy_rate" in events[0].affected_attributes
-        assert events[0].affected_attributes["policy_rate"] == pytest.approx(0.005)
+        assert float(events[0].affected_attributes["policy_rate"].value) == pytest.approx(0.005)
 
     def test_event_framework_is_financial(self) -> None:
         events = _monetary_input().to_events(_BASE_DATE)
@@ -370,7 +380,7 @@ class TestMonetaryPolicyInputToEvents:
     def test_negative_value_produces_negative_delta(self) -> None:
         inp = _monetary_input(value=Decimal("-0.005"))
         events = inp.to_events(_BASE_DATE)
-        assert events[0].affected_attributes["policy_rate"] == pytest.approx(-0.005)
+        assert float(events[0].affected_attributes["policy_rate"].value) == pytest.approx(-0.005)
 
 
 # ---------------------------------------------------------------------------
@@ -409,7 +419,7 @@ class TestFiscalPolicyInputToEvents:
     def test_value_in_affected_attributes(self) -> None:
         events = _fiscal_input(value=Decimal("0.05")).to_events(_BASE_DATE)
         val = next(iter(events[0].affected_attributes.values()))
-        assert val == pytest.approx(0.05)
+        assert float(val.value) == pytest.approx(0.05)
 
 
 # ---------------------------------------------------------------------------
@@ -440,8 +450,8 @@ class TestTradePolicyInputToEvents:
         events = _trade_input(value=Decimal("0.25"), retaliation=True).to_events(
             _BASE_DATE
         )
-        primary_val = events[0].affected_attributes["trade_tariff_rate_goods"]
-        retaliation_val = events[1].affected_attributes["trade_tariff_rate_goods"]
+        primary_val = float(events[0].affected_attributes["trade_tariff_rate_goods"].value)
+        retaliation_val = float(events[1].affected_attributes["trade_tariff_rate_goods"].value)
         assert retaliation_val == pytest.approx(-primary_val)
 
     def test_sector_qualified_attribute_key(self) -> None:
@@ -481,7 +491,7 @@ class TestEmergencyPolicyInputToEvents:
 
     def test_magnitude_from_parameters(self) -> None:
         events = _emergency_input(magnitude=0.5).to_events(_BASE_DATE)
-        assert events[0].affected_attributes["capital_controls"] == pytest.approx(0.5)
+        assert float(events[0].affected_attributes["capital_controls"].value) == pytest.approx(0.5)
 
     def test_default_magnitude_is_one(self) -> None:
         inp = EmergencyPolicyInput(
@@ -492,7 +502,7 @@ class TestEmergencyPolicyInputToEvents:
             timestamp=_BASE_DATE,
         )
         events = inp.to_events(_BASE_DATE)
-        assert events[0].affected_attributes["bank_holiday"] == pytest.approx(1.0)
+        assert float(events[0].affected_attributes["bank_holiday"].value) == pytest.approx(1.0)
 
     def test_event_framework_is_governance(self) -> None:
         events = _emergency_input().to_events(_BASE_DATE)
@@ -514,7 +524,7 @@ class TestStructuralPolicyInputToEvents:
 
     def test_magnitude_from_parameters(self) -> None:
         events = _structural_input(magnitude=2.0).to_events(_BASE_DATE)
-        assert events[0].affected_attributes["privatization"] == pytest.approx(2.0)
+        assert float(events[0].affected_attributes["privatization"].value) == pytest.approx(2.0)
 
     def test_event_framework_is_governance(self) -> None:
         events = _structural_input().to_events(_BASE_DATE)
@@ -553,7 +563,7 @@ class TestAuditLog:
             audit_log=log,
         )
         runner.run()
-        assert log.records[0].input_type == "MonetaryPolicyInput"
+        assert log.records[0].input_type == "MonetaryRateInput"
 
     def test_audit_record_captures_actor_fields(self) -> None:
         log = AuditLog()
@@ -754,7 +764,7 @@ class TestContingentInputFiring:
         )
         history = runner.run()
         # capital_controls fires on GRC; it should appear in state after step 1
-        val = history[1].entities["GRC"].get_attribute("capital_controls")
+        val = float(history[1].entities["GRC"].get_attribute_value("capital_controls"))
         assert val == pytest.approx(1.0)
 
     def test_contingent_does_not_fire_when_condition_not_met(self) -> None:
@@ -776,7 +786,7 @@ class TestContingentInputFiring:
             initial_attributes={"reserves": 5.0},  # above threshold
         )
         history = runner.run()
-        val = history[3].entities["GRC"].get_attribute("capital_controls")
+        val = float(history[3].entities["GRC"].get_attribute_value("capital_controls"))
         assert val == pytest.approx(0.0)
 
     def test_contingent_respects_cooldown_period(self) -> None:
@@ -802,7 +812,7 @@ class TestContingentInputFiring:
         # Sequence: fires step 1 (cooldown set→2, decrements→1), skips step 2
         # (decrements→0), fires step 3, skips step 4, fires step 5.
         # Fires: steps 1, 3, 5 → 3 firings → total = 3.0
-        val = history[5].entities["GRC"].get_attribute("capital_controls")
+        val = float(history[5].entities["GRC"].get_attribute_value("capital_controls"))
         assert val == pytest.approx(3.0)
 
     def test_contingent_source_set_to_contingent_trigger(self) -> None:
@@ -870,8 +880,8 @@ class TestScenarioReplay:
 
         history_a = _make_runner().run()
         history_b = _make_runner().run()
-        val_a = history_a[2].entities["USA"].get_attribute("policy_rate")
-        val_b = history_b[2].entities["USA"].get_attribute("policy_rate")
+        val_a = float(history_a[2].entities["USA"].get_attribute_value("policy_rate"))
+        val_b = float(history_b[2].entities["USA"].get_attribute_value("policy_rate"))
         assert val_a == pytest.approx(val_b)
 
     def test_retaliation_events_both_appear_in_translated_events(self) -> None:

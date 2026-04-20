@@ -161,24 +161,117 @@ except ExchangeRateNotFoundError as exc:
 Custom exception types live in `backend/app/exceptions.py`. Every module that
 can produce distinct failure modes defines its own exception subclass.
 
-### Monetary Arithmetic: `Decimal`, Never `float`
+### Monetary and Quantity Standards
+
+#### Why `Quantity`, Not Raw Numbers
+
+Every physical and economic measurement in the simulation is a `Quantity`
+(defined in `DATA_STANDARDS.md §Units and Measurements`). Never raw `float`,
+never raw `Decimal` without a unit. This applies to entity attributes, event
+deltas, module outputs, and ingestion pipeline outputs.
+
+**Rationale.** Float arithmetic accumulates error silently. A raw `Decimal`
+carries a number but discards the unit, the provenance, the observation date,
+and the confidence tier that give the number meaning. A `Quantity` makes unit
+errors loud and immediate (conversion raises `UnitError` when dimensions are
+incompatible), carries every value back to a registered source, and propagates
+confidence through every derived computation. A finance minister whose scenario
+analysis rests on a silent unit error deserves better than we can deliver with
+raw numbers.
+
+The Mars Climate Orbiter was lost to an imperial/metric unit mismatch that
+produced plausible-looking wrong values for nine months. WorldSim simulations
+may inform decisions about whether a country should accept an IMF program.
+The bar for correctness is the same.
+
+#### Attribute Store: `dict[str, Quantity]`
+
+`SimulationEntity.attributes` holds `Quantity` values, not floats:
+
+```python
+# Correct
+attributes: dict[str, Quantity] = {
+    "gdp": Quantity(
+        value=Decimal("44e9"),
+        unit="USD_2015",
+        observation_date=date(2023, 1, 1),
+        source_id="WB_WDI_GDP_2024",
+        confidence_tier=1,
+        variable_type=VariableType.FLOW,
+    ),
+    "debt_gdp_ratio": Quantity(
+        value=Decimal("1.46"),
+        unit="dimensionless",
+        observation_date=date(2023, 1, 1),
+        source_id="IMF_WEO_2024",
+        confidence_tier=1,
+        variable_type=VariableType.RATIO,
+    ),
+}
+
+# Forbidden — loses units, provenance, confidence, and variable type
+attributes: dict[str, float] = {"gdp": 44e9, "debt_gdp_ratio": 1.46}
+```
+
+Event `affected_attributes` follows the same rule: `dict[str, Quantity]`, not
+`dict[str, float]`. The delta carried by an Event is a `Quantity` — it has
+units, a confidence tier, and a variable type that the propagation engine
+uses to apply the delta correctly.
+
+#### The `variable_type` Field
+
+Every `Quantity` carries a `variable_type`. The propagation engine uses this
+to determine how the value behaves across timesteps:
+
+```python
+class VariableType(Enum):
+    STOCK = "stock"
+    # Measures a level at a point in time.
+    # Examples: foreign exchange reserves, debt outstanding, population.
+    # Propagation behavior: inherits previous period value if no event changes it.
+
+    FLOW = "flow"
+    # Measures change or activity over a period.
+    # Examples: GDP, exports, fiscal deficit, tax revenue.
+    # Propagation behavior: resets each period; must be produced by a module or input.
+
+    RATIO = "ratio"
+    # Dimensionless fraction derived from other quantities.
+    # Examples: debt/GDP, reserve coverage months, inflation rate.
+    # Propagation behavior: recomputed from inputs each period; not stored independently.
+
+    DIMENSIONLESS = "dimensionless"
+    # Index or score with no natural unit — not a ratio of two quantities.
+    # Examples: HDI, Freedom House score, V-Dem indicators, capability indexes.
+    # Propagation behavior: update rule defined by the module that owns the variable.
+```
+
+Misclassifying a FLOW as a STOCK causes it to accumulate across periods
+where it should reset. Misclassifying a STOCK as a FLOW loses the carried
+balance between periods. These are simulation correctness failures, not
+warnings.
+
+**Classification reference:**
+
+| Variable | Correct type | Common error and consequence |
+|---|---|---|
+| GDP | FLOW | STOCK — accumulates, producing nonsense multi-period totals |
+| Exports | FLOW | STOCK |
+| Fiscal deficit | FLOW | STOCK |
+| Foreign exchange reserves | STOCK | FLOW — reserve level lost between periods |
+| Debt outstanding | STOCK | FLOW |
+| Population | STOCK | FLOW |
+| Debt/GDP ratio | RATIO | STOCK — recomputing is not stored; storing creates staleness |
+| Inflation rate | RATIO | FLOW |
+| Reserve coverage (months of imports) | RATIO | STOCK |
+| HDI | DIMENSIONLESS | RATIO — HDI is not a fraction of two commensurable quantities |
+| Freedom House score | DIMENSIONLESS | RATIO |
+| V-Dem indicators | DIMENSIONLESS | RATIO |
+| Capability indexes (HCL outputs) | DIMENSIONLESS | RATIO |
+
+#### Monetary Arithmetic: `Decimal`, Never `float`
 
 All monetary arithmetic uses Python's `decimal.Decimal`. Never `float`.
-
-**Rationale.** Float arithmetic is approximate by design. `0.1 + 0.2` in
-float is `0.30000000000000004`. In a single calculation this error is
-negligible. In a simulation that compounds interest, applies multipliers,
-converts currencies, aggregates across cohorts, and runs for fifty annual
-timesteps, float rounding errors accumulate across thousands of operations
-and produce outputs that look plausible but are wrong. The error is invisible —
-there is no flag, no warning, no signal — only a result that differs from the
-correct answer by an amount too small to trigger alarm but large enough to
-matter in a fiscal sustainability assessment.
-
-The Mars Climate Orbiter was lost because of an imperial/metric unit error
-that produced plausible-looking wrong values. WorldSim simulations may inform
-decisions about whether a country should accept an IMF program. The bar for
-correctness is the same.
 
 ```python
 from decimal import Decimal, getcontext
@@ -187,17 +280,115 @@ from decimal import Decimal, getcontext
 getcontext().prec = 28
 
 # Correct
-debt_gdp_ratio = Decimal("1.46")
 interest_payment = principal * Decimal("0.025")
 
 # Forbidden — float monetary arithmetic
-debt_gdp_ratio = 1.46
 interest_payment = principal * 0.025
 ```
 
-The `MonetaryValue` and `Quantity` types defined in `DATA_STANDARDS.md` enforce
-this at the type level. Do not bypass them with raw `Decimal` arithmetic except
-inside those types' own implementations.
+`float` is prohibited in `backend/app/`. The CI compliance scan enforces this.
+The one permitted exception is intermediate mathematical computation in NumPy
+operations on dimensionless propagation weights (e.g., relationship weight
+matrices). These must be explicitly commented and must not touch `Quantity`
+or `MonetaryValue` values directly.
+
+#### `MonetaryValue` as a `Quantity` Subclass
+
+`MonetaryValue` (defined in `DATA_STANDARDS.md §Currency and Monetary Value
+Standards`) is a `Quantity` subclass. All `Quantity` rules — including
+`variable_type`, `confidence_tier`, and `source_id` requirements —
+apply to monetary values.
+
+```python
+# Correct — MonetaryValue is a Quantity, inherits all required fields
+export_revenue = MonetaryValue(
+    value=Decimal("1.2e9"),     # 'value' is the inherited Quantity field
+    unit="USD_2015",            # canonical internal unit
+    currency_code="GHS",        # source currency at ingestion (converted on write)
+    price_basis="constant",
+    exchange_rate_type="ppp",
+    observation_date=date(2023, 1, 1),
+    source_id="WB_WDI_BX_2024",
+    confidence_tier=1,
+    variable_type=VariableType.FLOW,  # export revenue is a period flow
+)
+
+# Forbidden — bypassing MonetaryValue with raw Decimal
+export_revenue = Decimal("1.2e9")
+```
+
+Do not bypass `MonetaryValue` with raw `Decimal` arithmetic except inside the
+`Quantity` and `MonetaryValue` types' own implementations.
+
+#### `confidence_tier` Propagation
+
+When a calculation derives a new `Quantity` from two or more `Quantity` inputs,
+the output `confidence_tier` is the **maximum** of all input tier numbers (higher
+tier number = lower confidence quality; the output inherits the worst-quality
+input's tier).
+
+```python
+# Correct — lower-of-two rule applied (max tier = worst confidence wins)
+def compute_debt_service_ratio(
+    total_debt: Quantity,
+    export_revenue: Quantity,
+) -> Quantity:
+    return Quantity(
+        value=total_debt.value / export_revenue.value,
+        unit="dimensionless",
+        variable_type=VariableType.RATIO,
+        confidence_tier=max(total_debt.confidence_tier, export_revenue.confidence_tier),
+    )
+
+# Forbidden — tier not propagated, output silently appears as Tier 1
+def compute_debt_service_ratio(debt: Decimal, revenue: Decimal) -> Decimal:
+    return debt / revenue
+```
+
+**Rationale.** A derived output is never more trustworthy than its least
+trustworthy input. The lower-of-two rule is a deliberately conservative policy
+approximation, not a statistical formula. It systematically overstates
+uncertainty when inputs are independent and mutually corroborating — this is the
+intended failure mode for sovereign policy tools.
+
+**Known Limitation (IA-1):** This rule does not account for projection horizon.
+A 30-year forward projection derived from a Tier 1 historical observation
+retains Tier 1 confidence under this rule, which overstates reliability for
+long-horizon projections. Time-horizon confidence degradation is Milestone 3
+scope. Until then, modules producing forward projections must include in their
+output metadata the note: *"Confidence tier does not account for projection
+horizon."*
+
+#### Ingestion Pipeline Requirements
+
+Every value entering the simulation through an ingestion pipeline must, at
+the ingestion boundary:
+
+1. Have a registered `source_id` in the `SourceRegistry` before the pipeline
+   writes any data
+2. Carry an explicit `confidence_tier` assigned from the Data Quality Tier
+   System in `DATA_STANDARDS.md` — no defaulting permitted
+3. Carry an explicit `variable_type` — no defaulting to `DIMENSIONLESS`
+4. Be wrapped in a `Quantity` (or `MonetaryValue`) — no raw numbers after
+   the ingestion boundary
+
+The ingestion boundary is the single point at which raw source data becomes
+a `Quantity`. After that boundary, no code in `backend/app/` introduces bare
+floats or bare `Decimal` values as attribute values.
+
+#### Usage Table
+
+| Context | Correct | Forbidden |
+|---|---|---|
+| Entity attribute store | `dict[str, Quantity]` | `dict[str, float]`, `dict[str, Decimal]` |
+| Monetary attribute | `MonetaryValue` (Quantity subclass) | `Decimal`, `float` |
+| Dimensionless rate/ratio | `Quantity(variable_type=RATIO)` | bare `Decimal` as attribute |
+| Capability/index | `Quantity(variable_type=DIMENSIONLESS)` | bare `float` or `Decimal` |
+| Intermediate arithmetic | `Decimal` (temporary, in-function) | `float` (anywhere in backend/app/) |
+| NumPy propagation weight | `float` (with explicit comment) | `Decimal` (NumPy incompatible) |
+| Confidence propagation | `max(tier_a, tier_b)` | Assigning a fixed tier to derived output |
+| Module output | `list[Event]` with `Quantity` deltas | `list[Event]` with float deltas |
+| Event delta | `Quantity` with matching `variable_type` | `float` delta |
 
 ---
 
@@ -429,11 +620,12 @@ classDiagram
     class SimulationEntity {
         +id: str
         +entity_type: str
-        +attributes: Dict[str, float]
-        +metadata: Dict[str, Any]
-        +parent_id: Optional[str]
-        +geometry: Optional[Geometry]
-        +get_attribute(key, default) float
+        +attributes: dict[str, Quantity]
+        +metadata: dict[str, Any]
+        +parent_id: str | None
+        +geometry: Geometry | None
+        +get_attribute(key) Quantity | None
+        +get_attribute_value(key, default) Decimal
         +set_attribute(key, value) None
         +apply_delta(key, delta) None
     }
@@ -441,28 +633,28 @@ classDiagram
     class SimulationState {
         +timestep: datetime
         +resolution: ResolutionConfig
-        +entities: Dict[str, SimulationEntity]
-        +relationships: List[Relationship]
-        +events: List[Event]
+        +entities: dict[str, SimulationEntity]
+        +relationships: list[Relationship]
+        +events: list[Event]
         +scenario_config: ScenarioConfig
         +get_entity(entity_id) SimulationEntity
-        +get_relationships_from(entity_id) List[Relationship]
-        +get_relationships_to(entity_id) List[Relationship]
-        +get_events_for_entity(entity_id) List[Event]
+        +get_relationships_from(entity_id) list[Relationship]
+        +get_relationships_to(entity_id) list[Relationship]
+        +get_events_for_entity(entity_id) list[Event]
     }
 
     class SimulationModule {
         <<abstract>>
-        +compute(entity, state, timestep) List[Event]
-        +get_subscribed_events() List[str]
+        +compute(entity, state, timestep) list[Event]
+        +get_subscribed_events() list[str]
     }
 
     class Event {
         +event_id: str
         +source_entity_id: str
         +event_type: str
-        +affected_attributes: Dict[str, float]
-        +propagation_rules: List[PropagationRule]
+        +affected_attributes: dict[str, Quantity]
+        +propagation_rules: list[PropagationRule]
         +timestep_originated: datetime
         +framework: MeasurementFramework
     }
@@ -472,7 +664,7 @@ classDiagram
         +target_id: str
         +relationship_type: str
         +weight: float
-        +attributes: Dict[str, float]
+        +attributes: dict[str, Any]
     }
 
     SimulationState "1" --> "*" SimulationEntity : contains

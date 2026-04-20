@@ -207,6 +207,53 @@ def check_monetary_float_literals(scope_paths: list[Path], result: ScanResult) -
                 )
 
 
+def check_dict_str_float_attributes(scope_paths: list[Path], result: ScanResult) -> None:
+    """Check that no attributes field uses dict[str, float] or dict[str, Any].
+
+    SCR-001 / QA-1: SimulationEntity.attributes and Event.affected_attributes
+    must be typed as dict[str, Quantity], not dict[str, float] or dict[str, Any].
+    The Quantity type carries unit, variable_type, and confidence_tier — a raw
+    float discards all three and makes the state contract unenforceable.
+
+    This check flags any annotation of the form:
+        attributes: dict[str, float]
+        attributes: dict[str, Any]
+        affected_attributes: dict[str, float]
+        affected_attributes: dict[str, Any]
+    in simulation engine and orchestration modules. Test fixtures using helpers
+    that internally produce Quantity values are not flagged.
+    """
+    result.record_check("dict-str-float-attributes (QA-1 / SCR-001)")
+    python_files = _collect_python_files(scope_paths)
+    # Only scan app/ source — test helpers intentionally use float wrappers
+    app_files = [p for p in python_files if "tests" not in str(p)]
+    float_pattern = re.compile(
+        r"\battributes\s*:\s*dict\[str,\s*float\]"
+        r"|\baffected_attributes\s*:\s*dict\[str,\s*float\]"
+    )
+    any_pattern = re.compile(
+        r"\battributes\s*:\s*dict\[str,\s*Any\]"
+        r"|\baffected_attributes\s*:\s*dict\[str,\s*Any\]"
+    )
+    for path in app_files:
+        content = path.read_text(encoding="utf-8")
+        for lineno, line in enumerate(content.splitlines(), start=1):
+            if float_pattern.search(line):
+                result.add_violation(
+                    "QA-1",
+                    f"{path.relative_to(BACKEND_ROOT)}:{lineno}",
+                    "attributes field uses dict[str, float] — "
+                    "must be dict[str, Quantity] (SCR-001)",
+                )
+            elif any_pattern.search(line):
+                result.add_warning(
+                    "QA-1",
+                    f"{path.relative_to(BACKEND_ROOT)}:{lineno}",
+                    "attributes field uses dict[str, Any] — "
+                    "verify whether dict[str, Quantity] is appropriate (ARCH-4 / SCR-001)",
+                )
+
+
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
@@ -258,11 +305,12 @@ def main() -> None:
     check_ambiguous_variable_names(existing_paths, result)
     check_legacy_typing_imports(existing_paths, result)
 
-    # Monetary float check only applies to app/simulation — not tests
+    # QA-1: dict[str, float] attributes check — simulation engine and orchestration only
     if args.scope in ("full", "simulation-engine"):
-        simulation_paths = [p for p in existing_paths if "simulation" in str(p)]
-        if simulation_paths:
-            check_monetary_float_literals(simulation_paths, result)
+        simulation_scan_paths = [SIMULATION_ROOT] if SIMULATION_ROOT.exists() else []
+        if simulation_scan_paths:
+            check_dict_str_float_attributes(simulation_scan_paths, result)
+            check_monetary_float_literals(simulation_scan_paths, result)
 
     result.print_report()
     sys.exit(1 if result.has_violations else 0)
