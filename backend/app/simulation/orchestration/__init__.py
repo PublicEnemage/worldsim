@@ -1,5 +1,5 @@
 """
-Input Orchestration Layer — ADR-002.
+Input Orchestration Layer — ADR-002, Amendment 1.
 
 Single entry point for all exogenous control inputs into the simulation.
 Module-generated events are endogenous (computed from internal logic).
@@ -10,6 +10,11 @@ The distinction is enforced architecturally: every exogenous input passes
 through InputOrchestrator.inject(), which validates, translates, and records
 it before it reaches the propagation engine. Scenarios are reproducible by
 replaying their audit logs.
+
+Amendment 1 (SCR-001 / ADR-002 Amendment 1):
+MonetaryInstrument split into MonetaryRateInstrument and
+MonetaryVolumeInstrument. MonetaryPolicyInput split into
+MonetaryRateInput and MonetaryVolumeInput.
 """
 
 from app.simulation.orchestration.audit import AuditLog, ControlInputAuditRecord
@@ -22,8 +27,10 @@ from app.simulation.orchestration.inputs import (
     FiscalInstrument,
     FiscalPolicyInput,
     InputSource,
-    MonetaryInstrument,
-    MonetaryPolicyInput,
+    MonetaryRateInput,
+    MonetaryRateInstrument,
+    MonetaryVolumeInput,
+    MonetaryVolumeInstrument,
     StateCondition,
     StructuralInstrument,
     StructuralPolicyInput,
@@ -39,9 +46,12 @@ __all__ = [
     # Inputs — base
     "ControlInput",
     "InputSource",
-    # Inputs — monetary
-    "MonetaryInstrument",
-    "MonetaryPolicyInput",
+    # Inputs — monetary (rate)
+    "MonetaryRateInstrument",
+    "MonetaryRateInput",
+    # Inputs — monetary (volume)
+    "MonetaryVolumeInstrument",
+    "MonetaryVolumeInput",
     # Inputs — fiscal
     "FiscalInstrument",
     "FiscalPolicyInput",

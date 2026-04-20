@@ -1,5 +1,5 @@
 """
-Event propagation engine — ADR-001.
+Event propagation engine — ADR-001, Amendment 1.
 
 Implements the graph traversal that applies Events to SimulationState[T]
 and produces SimulationState[T+1]. This module owns state transitions.
@@ -11,13 +11,23 @@ Architecture contracts (ADR-001):
 - Propagation follows PropagationRules hop-by-hop along relationship edges
   of the specified type, attenuating by (attenuation_factor * edge.weight)
   at each hop. Attenuation compounds across hops.
-- Deltas accumulate additively: multiple events and multiple propagation
-  paths to the same entity are summed before being applied.
+- Deltas accumulate additively (by value): multiple events and multiple
+  propagation paths to the same entity are summed before being applied.
+  confidence_tier uses the lower-of-two rule across accumulated inputs.
+- STOCK variable deltas replace the current attribute value; FLOW, RATIO,
+  and DIMENSIONLESS deltas accumulate additively on the existing value.
 - Deltas for entity_ids not present in state.entities are silently dropped.
   A relationship may reference an entity outside the active resolution scope.
+
+Amendment 1 (SCR-001): _DeltaAccumulator and all delta arithmetic updated
+from dict[str, float] to dict[str, Quantity]. Attenuation scales
+Quantity.value using Decimal arithmetic; confidence_tier propagates via
+the lower-of-two rule. _build_next_state applies STOCK/FLOW semantics.
 """
 
 from __future__ import annotations
+
+from decimal import Decimal
 
 from app.simulation.engine.models import (
     Event,
@@ -25,13 +35,14 @@ from app.simulation.engine.models import (
     SimulationEntity,
     SimulationState,
 )
+from app.simulation.engine.quantity import Quantity, VariableType
 
 # ---------------------------------------------------------------------------
 # Public API
 # ---------------------------------------------------------------------------
 
-# Accumulator maps entity_id -> {attribute_key -> total_delta}
-_DeltaAccumulator = dict[str, dict[str, float]]
+# Accumulator maps entity_id -> {attribute_key -> accumulated_delta Quantity}
+_DeltaAccumulator = dict[str, dict[str, Quantity]]
 
 
 def propagate(state: SimulationState, events: list[Event]) -> SimulationState:
@@ -91,7 +102,7 @@ def _apply_event(
 
 def _propagate_rule(
     state: SimulationState,
-    base_delta: dict[str, float],
+    base_delta: dict[str, Quantity],
     source_entity_id: str,
     rule: PropagationRule,
     accumulator: _DeltaAccumulator,
@@ -114,10 +125,10 @@ def _propagate_rule(
         accumulator: Mutable accumulator updated in place.
     """
     # frontier: (entity_id, delta_carried_from_previous_hop)
-    frontier: list[tuple[str, dict[str, float]]] = [(source_entity_id, base_delta)]
+    frontier: list[tuple[str, dict[str, Quantity]]] = [(source_entity_id, base_delta)]
 
     for _ in range(rule.max_hops):
-        next_frontier: list[tuple[str, dict[str, float]]] = []
+        next_frontier: list[tuple[str, dict[str, Quantity]]] = []
 
         for entity_id, current_delta in frontier:
             for rel in state.get_relationships_from(entity_id):
@@ -138,48 +149,91 @@ def _propagate_rule(
 
 
 def _attenuate(
-    delta: dict[str, float],
+    delta: dict[str, Quantity],
     attenuation_factor: float,
     relationship_weight: float,
-) -> dict[str, float]:
+) -> dict[str, Quantity]:
     """Scale a delta by one hop's attenuation.
 
     The combined scale is attenuation_factor * relationship_weight. For a
     delta of 0.15, attenuation_factor 0.4, and weight 0.30, the result is
     0.15 * 0.4 * 0.30 = 0.018, matching the diagram in ADR-001.
 
+    attenuation_factor and relationship_weight are dimensionless propagation
+    coefficients — they use float arithmetic (NumPy-compatible) as permitted
+    by CODING_STANDARDS.md. They are converted to Decimal before scaling
+    Quantity.value so that the resulting value remains Decimal-exact.
+
+    confidence_tier is preserved through attenuation: the tier reflects the
+    source data quality, not the propagation path length.
+
     Args:
-        delta: Attribute deltas from the sending entity at this hop.
+        delta: Attribute Quantity deltas from the sending entity at this hop.
         attenuation_factor: Rule-level per-hop decay (in [0.0, 1.0]).
         relationship_weight: Edge-level coupling strength (in [0.0, 1.0]).
 
     Returns:
-        New dict with each delta value scaled by attenuation_factor * weight.
+        New dict with each Quantity's value scaled by attenuation_factor * weight.
     """
-    scale = attenuation_factor * relationship_weight
-    return {k: v * scale for k, v in delta.items()}
+    # float * float is intentional here: propagation weights are dimensionless
+    # coefficients, not monetary values. Converting to Decimal preserves
+    # Quantity.value precision through the scale operation.
+    scale = Decimal(str(attenuation_factor * relationship_weight))
+    return {
+        k: Quantity(
+            value=q.value * scale,
+            unit=q.unit,
+            variable_type=q.variable_type,
+            measurement_framework=q.measurement_framework,
+            observation_date=q.observation_date,
+            source_id=q.source_id,
+            confidence_tier=q.confidence_tier,
+        )
+        for k, q in delta.items()
+    }
 
 
 def _accumulate(
     accumulator: _DeltaAccumulator,
     entity_id: str,
-    deltas: dict[str, float],
+    deltas: dict[str, Quantity],
 ) -> None:
-    """Add deltas to the accumulator for one entity.
+    """Add Quantity deltas to the accumulator for one entity.
 
-    Multiple calls for the same entity sum their contributions. This is the
-    mechanism by which converging propagation paths accumulate correctly.
+    For each attribute key:
+    - If this is the first contribution: store the Quantity directly.
+    - If a prior contribution exists: sum the values and apply the
+      lower-of-two rule to confidence_tier.
+
+    Multiple calls for the same entity accumulate contributions additively.
+    This is the mechanism by which converging propagation paths accumulate.
+
+    confidence_tier lower-of-two rule: the accumulated tier is the minimum
+    of all contributing tiers. This is a conservative policy approximation,
+    not a statistical formula — see propagate_confidence() docstring.
 
     Args:
         accumulator: Mutable accumulator mapping entity_id to attr deltas.
         entity_id: The entity receiving this delta contribution.
-        deltas: Attribute key -> delta value to add.
+        deltas: Attribute key -> Quantity delta to add.
     """
     if entity_id not in accumulator:
         accumulator[entity_id] = {}
     entity_deltas = accumulator[entity_id]
     for key, delta in deltas.items():
-        entity_deltas[key] = entity_deltas.get(key, 0.0) + delta
+        if key in entity_deltas:
+            existing = entity_deltas[key]
+            entity_deltas[key] = Quantity(
+                value=existing.value + delta.value,
+                unit=existing.unit,
+                variable_type=existing.variable_type,
+                measurement_framework=existing.measurement_framework,
+                observation_date=existing.observation_date,
+                source_id=existing.source_id,
+                confidence_tier=max(existing.confidence_tier, delta.confidence_tier),
+            )
+        else:
+            entity_deltas[key] = delta
 
 
 # ---------------------------------------------------------------------------
@@ -194,9 +248,17 @@ def _build_next_state(
     """Construct State[T+1] by applying accumulated deltas to fresh entity copies.
 
     Every entity in state.entities receives a new attributes dict. Entities
-    with accumulated deltas have those deltas applied via addition. Entities
-    with no deltas are copied with their attributes unchanged. Accumulated
-    deltas for entity_ids absent from state.entities are dropped.
+    with accumulated deltas have those deltas applied according to the
+    variable_type of each Quantity delta:
+
+    - STOCK: the accumulated delta replaces the current attribute value.
+      (The delta carries the new absolute level, not an additive increment.)
+    - FLOW, RATIO, DIMENSIONLESS: the delta value is added to the existing
+      attribute value. If the attribute does not yet exist, the delta becomes
+      the initial value (equivalent to 0 + delta).
+
+    Entities with no deltas are copied with their attributes unchanged.
+    Accumulated deltas for entity_ids absent from state.entities are dropped.
 
     Args:
         state: State[T] — read only, never mutated.
@@ -208,11 +270,30 @@ def _build_next_state(
     new_entities: dict[str, SimulationEntity] = {}
 
     for entity_id, entity in state.entities.items():
-        new_attrs = dict(entity.attributes)
+        new_attrs: dict[str, Quantity] = dict(entity.attributes)
 
         if entity_id in accumulator:
             for key, delta in accumulator[entity_id].items():
-                new_attrs[key] = new_attrs.get(key, 0.0) + delta
+                if delta.variable_type == VariableType.STOCK:
+                    # Absolute replacement: delta IS the new value
+                    new_attrs[key] = delta
+                else:
+                    # Additive accumulation for FLOW, RATIO, DIMENSIONLESS
+                    existing = new_attrs.get(key)
+                    if existing is None:
+                        new_attrs[key] = delta
+                    else:
+                        new_attrs[key] = Quantity(
+                            value=existing.value + delta.value,
+                            unit=existing.unit,
+                            variable_type=existing.variable_type,
+                            measurement_framework=existing.measurement_framework,
+                            observation_date=existing.observation_date or delta.observation_date,
+                            source_id=existing.source_id,
+                            confidence_tier=max(
+                                existing.confidence_tier, delta.confidence_tier
+                            ),
+                        )
 
         new_entities[entity_id] = SimulationEntity(
             id=entity.id,

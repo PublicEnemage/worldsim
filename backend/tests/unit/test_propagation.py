@@ -1,5 +1,5 @@
 """
-Unit tests for the event propagation engine — ADR-001.
+Unit tests for the event propagation engine — ADR-001, Amendment 1.
 
 Tests cover: source-entity application, hop-by-hop graph traversal,
 attenuation arithmetic, additive delta accumulation across events and
@@ -9,9 +9,16 @@ relationship types), and multiple propagation rules per event.
 
 The numeric scenario in TestPropagateFullDiagramScenario directly
 reproduces the example in docs/architecture/ADR-001-flowchart-event-propagation.mmd.
+
+Amendment 1 (SCR-001): All float attributes and deltas are now Quantity
+instances. Test helpers wrap float values via _q(). Assertions use
+get_attribute_value() to extract Decimal for numeric comparison.
+All Quantity deltas default to VariableType.RATIO so propagation
+semantics (additive accumulation) are preserved for existing test cases.
 """
 
 from datetime import datetime
+from decimal import Decimal
 
 import pytest
 
@@ -26,17 +33,37 @@ from app.simulation.engine.models import (
     SimulationState,
 )
 from app.simulation.engine.propagation import propagate
+from app.simulation.engine.quantity import Quantity, VariableType
 
 # ---------------------------------------------------------------------------
 # Fixtures
 # ---------------------------------------------------------------------------
 
 
+def _q(
+    value: float,
+    variable_type: VariableType = VariableType.RATIO,
+    confidence_tier: int = 1,
+) -> Quantity:
+    """Convenience helper: wrap a float as a RATIO Quantity for test fixtures.
+
+    All test attributes default to RATIO so propagation applies additive
+    accumulation semantics, consistent with the pre-Amendment 1 float behavior.
+    Use an explicit variable_type to test STOCK/FLOW/DIMENSIONLESS semantics.
+    """
+    return Quantity(
+        value=Decimal(str(value)),
+        unit="dimensionless",
+        variable_type=variable_type,
+        confidence_tier=confidence_tier,
+    )
+
+
 def _entity(entity_id: str, **attrs: float) -> SimulationEntity:
     return SimulationEntity(
         id=entity_id,
         entity_type="country",
-        attributes=dict(attrs),
+        attributes={k: _q(v) for k, v in attrs.items()},
         metadata={"name": entity_id},
     )
 
@@ -70,7 +97,7 @@ def _event(
         event_id="evt-1",
         source_entity_id=source,
         event_type="shock",
-        affected_attributes=attrs,
+        affected_attributes={k: _q(v) for k, v in attrs.items()},
         propagation_rules=rules or [],
         timestep_originated=datetime(2020, 1, 1),
         framework=MeasurementFramework.FINANCIAL,
@@ -103,6 +130,11 @@ def _rel(
     )
 
 
+def _gav(state: SimulationState, entity_id: str, attr: str) -> float:
+    """get_attribute_value shorthand for test assertions; returns float for pytest.approx."""
+    return float(state.entities[entity_id].get_attribute_value(attr))
+
+
 # ---------------------------------------------------------------------------
 # Empty events
 # ---------------------------------------------------------------------------
@@ -117,9 +149,8 @@ class TestPropagateEmptyEvents:
     def test_empty_events_preserves_all_entity_attributes(self) -> None:
         state = _state({"BOL": _entity("BOL", gdp=100.0, debt_gdp_ratio=0.60)})
         result = propagate(state, [])
-        assert result.entities["BOL"].attributes == pytest.approx(
-            {"gdp": 100.0, "debt_gdp_ratio": 0.60}
-        )
+        assert _gav(result, "BOL", "gdp") == pytest.approx(100.0)
+        assert _gav(result, "BOL", "debt_gdp_ratio") == pytest.approx(0.60)
 
     def test_empty_events_preserves_multiple_entities(self) -> None:
         state = _state({
@@ -127,8 +158,8 @@ class TestPropagateEmptyEvents:
             "BRA": _entity("BRA", gdp=2200.0),
         })
         result = propagate(state, [])
-        assert result.entities["BOL"].get_attribute("gdp") == pytest.approx(44.0)
-        assert result.entities["BRA"].get_attribute("gdp") == pytest.approx(2200.0)
+        assert _gav(result, "BOL", "gdp") == pytest.approx(44.0)
+        assert _gav(result, "BRA", "gdp") == pytest.approx(2200.0)
 
     def test_empty_events_state_t_not_mutated(self) -> None:
         state = _state({"BOL": _entity("BOL", gdp=100.0)})
@@ -147,19 +178,19 @@ class TestPropagateSourceOnly:
         state = _state({"BOL": _entity("BOL", debt_gdp_ratio=0.50)})
         event = _event("BOL", {"debt_gdp_ratio": 0.15})
         result = propagate(state, [event])
-        assert result.entities["BOL"].get_attribute("debt_gdp_ratio") == pytest.approx(0.65)
+        assert _gav(result, "BOL", "debt_gdp_ratio") == pytest.approx(0.65)
 
     def test_source_event_initialises_missing_attribute_from_zero(self) -> None:
         state = _state({"BOL": _entity("BOL")})
         event = _event("BOL", {"reserves": 5.0e9})
         result = propagate(state, [event])
-        assert result.entities["BOL"].get_attribute("reserves") == pytest.approx(5.0e9)
+        assert _gav(result, "BOL", "reserves") == pytest.approx(5.0e9)
 
     def test_source_event_negative_delta_subtracts(self) -> None:
         state = _state({"BOL": _entity("BOL", gdp_growth=0.03)})
         event = _event("BOL", {"gdp_growth": -0.05})
         result = propagate(state, [event])
-        assert result.entities["BOL"].get_attribute("gdp_growth") == pytest.approx(-0.02)
+        assert _gav(result, "BOL", "gdp_growth") == pytest.approx(-0.02)
 
     def test_non_source_entities_unchanged_when_no_rules(self) -> None:
         state = _state({
@@ -168,7 +199,7 @@ class TestPropagateSourceOnly:
         })
         event = _event("BOL", {"gdp": -10.0})
         result = propagate(state, [event])
-        assert result.entities["BRA"].get_attribute("gdp") == pytest.approx(2200.0)
+        assert _gav(result, "BRA", "gdp") == pytest.approx(2200.0)
 
     def test_source_not_in_state_entities_produces_unchanged_state(self) -> None:
         # The event's source entity is not tracked in this state. The delta
@@ -177,7 +208,7 @@ class TestPropagateSourceOnly:
         state = _state({"BRA": _entity("BRA", gdp=2200.0)})
         event = _event("BOL", {"debt_gdp_ratio": 0.15})
         result = propagate(state, [event])
-        assert result.entities["BRA"].get_attribute("gdp") == pytest.approx(2200.0)
+        assert _gav(result, "BRA", "gdp") == pytest.approx(2200.0)
         assert "BOL" not in result.entities
 
 
@@ -199,8 +230,8 @@ class TestPropagateOneHop:
         result = propagate(state, [event])
         # BOL: +0.15 (full)
         # BRA: +0.15 * 0.4 * 0.30 = +0.018
-        assert result.entities["BOL"].get_attribute("debt_gdp_ratio") == pytest.approx(0.65)
-        assert result.entities["BRA"].get_attribute("debt_gdp_ratio") == pytest.approx(0.818)
+        assert _gav(result, "BOL", "debt_gdp_ratio") == pytest.approx(0.65)
+        assert _gav(result, "BRA", "debt_gdp_ratio") == pytest.approx(0.818)
 
     def test_only_matching_relationship_type_propagates(self) -> None:
         state = _state(
@@ -218,9 +249,9 @@ class TestPropagateOneHop:
         result = propagate(state, [event])
         # BRA receives trade propagation
         expected_bra = pytest.approx(0.02 + (-0.02 * 0.5 * 1.0))
-        assert result.entities["BRA"].get_attribute("gdp_growth") == expected_bra
+        assert _gav(result, "BRA", "gdp_growth") == expected_bra
         # IMF has a debt relationship, not trade — unchanged
-        assert result.entities["IMF"].get_attribute("gdp_growth") == pytest.approx(0.00)
+        assert _gav(result, "IMF", "gdp_growth") == pytest.approx(0.00)
 
     def test_multiple_direct_neighbors_all_receive_proportional_delta(self) -> None:
         state = _state(
@@ -238,15 +269,9 @@ class TestPropagateOneHop:
         )
         event = _event("BOL", {"debt_gdp_ratio": 0.15}, rules=[_rule("trade", 0.4, 1)])
         result = propagate(state, [event])
-        assert result.entities["BRA"].get_attribute("debt_gdp_ratio") == pytest.approx(
-            0.15 * 0.4 * 0.30
-        )
-        assert result.entities["ARG"].get_attribute("debt_gdp_ratio") == pytest.approx(
-            0.15 * 0.4 * 0.20
-        )
-        assert result.entities["PER"].get_attribute("debt_gdp_ratio") == pytest.approx(
-            0.15 * 0.4 * 0.15
-        )
+        assert _gav(result, "BRA", "debt_gdp_ratio") == pytest.approx(0.15 * 0.4 * 0.30)
+        assert _gav(result, "ARG", "debt_gdp_ratio") == pytest.approx(0.15 * 0.4 * 0.20)
+        assert _gav(result, "PER", "debt_gdp_ratio") == pytest.approx(0.15 * 0.4 * 0.15)
 
     def test_max_hops_one_does_not_reach_second_degree_neighbors(self) -> None:
         state = _state(
@@ -263,8 +288,8 @@ class TestPropagateOneHop:
         event = _event("BOL", {"gdp_growth": -0.02}, rules=[_rule("trade", 0.5, max_hops=1)])
         result = propagate(state, [event])
         # BRA receives hop-1 delta; URY is hop-2 and should not be reached
-        assert result.entities["BRA"].get_attribute("gdp_growth") != pytest.approx(0.0)
-        assert result.entities["URY"].get_attribute("gdp_growth") == pytest.approx(0.0)
+        assert _gav(result, "BRA", "gdp_growth") != pytest.approx(0.0)
+        assert _gav(result, "URY", "gdp_growth") == pytest.approx(0.0)
 
 
 # ---------------------------------------------------------------------------
@@ -317,25 +342,25 @@ class TestPropagateFullDiagramScenario:
         state = self._build_state()
         event = _event("BOL", {"debt_gdp_ratio": 0.15}, rules=[_rule("trade", 0.4, 2)])
         result = propagate(state, [event])
-        assert result.entities["BOL"].get_attribute("debt_gdp_ratio") == pytest.approx(0.15)
+        assert _gav(result, "BOL", "debt_gdp_ratio") == pytest.approx(0.15)
 
     def test_brazil_receives_hop_one_delta(self) -> None:
         state = self._build_state()
         event = _event("BOL", {"debt_gdp_ratio": 0.15}, rules=[_rule("trade", 0.4, 2)])
         result = propagate(state, [event])
-        assert result.entities["BRA"].get_attribute("debt_gdp_ratio") == pytest.approx(0.018)
+        assert _gav(result, "BRA", "debt_gdp_ratio") == pytest.approx(0.018)
 
     def test_argentina_receives_hop_one_delta(self) -> None:
         state = self._build_state()
         event = _event("BOL", {"debt_gdp_ratio": 0.15}, rules=[_rule("trade", 0.4, 2)])
         result = propagate(state, [event])
-        assert result.entities["ARG"].get_attribute("debt_gdp_ratio") == pytest.approx(0.012)
+        assert _gav(result, "ARG", "debt_gdp_ratio") == pytest.approx(0.012)
 
     def test_peru_receives_hop_one_delta(self) -> None:
         state = self._build_state()
         event = _event("BOL", {"debt_gdp_ratio": 0.15}, rules=[_rule("trade", 0.4, 2)])
         result = propagate(state, [event])
-        assert result.entities["PER"].get_attribute("debt_gdp_ratio") == pytest.approx(0.009)
+        assert _gav(result, "PER", "debt_gdp_ratio") == pytest.approx(0.009)
 
     def test_uruguay_receives_additive_hop_two_delta_from_both_paths(self) -> None:
         state = self._build_state()
@@ -344,17 +369,17 @@ class TestPropagateFullDiagramScenario:
         ury_from_bra = 0.018 * 0.4 * 0.50   # 0.0036
         ury_from_arg = 0.012 * 0.4 * 0.40   # 0.00192
         expected_ury = ury_from_bra + ury_from_arg  # 0.00552
-        assert result.entities["URY"].get_attribute("debt_gdp_ratio") == pytest.approx(expected_ury)
+        assert _gav(result, "URY", "debt_gdp_ratio") == pytest.approx(expected_ury)
 
     def test_all_five_entities_correct_simultaneously(self) -> None:
         state = self._build_state()
         event = _event("BOL", {"debt_gdp_ratio": 0.15}, rules=[_rule("trade", 0.4, 2)])
         result = propagate(state, [event])
-        assert result.entities["BOL"].get_attribute("debt_gdp_ratio") == pytest.approx(0.15)
-        assert result.entities["BRA"].get_attribute("debt_gdp_ratio") == pytest.approx(0.018)
-        assert result.entities["ARG"].get_attribute("debt_gdp_ratio") == pytest.approx(0.012)
-        assert result.entities["PER"].get_attribute("debt_gdp_ratio") == pytest.approx(0.009)
-        assert result.entities["URY"].get_attribute("debt_gdp_ratio") == pytest.approx(0.00552)
+        assert _gav(result, "BOL", "debt_gdp_ratio") == pytest.approx(0.15)
+        assert _gav(result, "BRA", "debt_gdp_ratio") == pytest.approx(0.018)
+        assert _gav(result, "ARG", "debt_gdp_ratio") == pytest.approx(0.012)
+        assert _gav(result, "PER", "debt_gdp_ratio") == pytest.approx(0.009)
+        assert _gav(result, "URY", "debt_gdp_ratio") == pytest.approx(0.00552)
 
 
 # ---------------------------------------------------------------------------
@@ -370,7 +395,7 @@ class TestPropagateAdditive:
             _event("BOL", {"debt_gdp_ratio": 0.05}),
         ]
         result = propagate(state, events)
-        assert result.entities["BOL"].get_attribute("debt_gdp_ratio") == pytest.approx(0.65)
+        assert _gav(result, "BOL", "debt_gdp_ratio") == pytest.approx(0.65)
 
     def test_two_events_on_different_attributes_both_applied(self) -> None:
         state = _state({"BOL": _entity("BOL", gdp_growth=0.03, debt_gdp_ratio=0.50)})
@@ -379,8 +404,8 @@ class TestPropagateAdditive:
             _event("BOL", {"debt_gdp_ratio": 0.15}),
         ]
         result = propagate(state, events)
-        assert result.entities["BOL"].get_attribute("gdp_growth") == pytest.approx(0.01)
-        assert result.entities["BOL"].get_attribute("debt_gdp_ratio") == pytest.approx(0.65)
+        assert _gav(result, "BOL", "gdp_growth") == pytest.approx(0.01)
+        assert _gav(result, "BOL", "debt_gdp_ratio") == pytest.approx(0.65)
 
     def test_two_events_accumulate_across_different_source_entities(self) -> None:
         state = _state({
@@ -403,7 +428,7 @@ class TestPropagateAdditive:
         ]
         result = propagate(state, events)
         # URY receives -0.01 from BOL and -0.01 from BRA
-        assert result.entities["URY"].get_attribute("gdp_growth") == pytest.approx(0.00)
+        assert _gav(result, "URY", "gdp_growth") == pytest.approx(0.00)
 
     def test_propagated_and_direct_deltas_accumulate_on_same_entity(self) -> None:
         # BOL both directly produces an event AND receives a propagated delta
@@ -420,7 +445,92 @@ class TestPropagateAdditive:
         ]
         result = propagate(state, events)
         # BOL direct: +0.10; BOL from BRA propagation: +0.20 * 1.0 * 0.5 = +0.10
-        assert result.entities["BOL"].get_attribute("debt_gdp_ratio") == pytest.approx(0.20)
+        assert _gav(result, "BOL", "debt_gdp_ratio") == pytest.approx(0.20)
+
+
+# ---------------------------------------------------------------------------
+# Confidence tier propagation through attenuation and accumulation
+# ---------------------------------------------------------------------------
+
+
+class TestPropagateConfidenceTier:
+    def test_attenuation_preserves_confidence_tier(self) -> None:
+        # Attenuation scales value but does not change tier
+        state = _state(
+            entities={"BOL": _entity("BOL"), "BRA": _entity("BRA")},
+            relationships=[_rel("BOL", "BRA", "trade", weight=0.5)],
+        )
+        event = Event(
+            event_id="evt-1",
+            source_entity_id="BOL",
+            event_type="shock",
+            affected_attributes={"gdp_growth": _q(-0.02, confidence_tier=2)},
+            propagation_rules=[_rule("trade", 0.4, 1)],
+            timestep_originated=datetime(2020, 1, 1),
+            framework=MeasurementFramework.FINANCIAL,
+        )
+        result = propagate(state, [event])
+        bra_tier = result.entities["BRA"].get_attribute("gdp_growth").confidence_tier  # type: ignore[union-attr]
+        assert bra_tier == 2  # preserved through attenuation
+
+    def test_accumulation_applies_lower_of_two_to_confidence_tier(self) -> None:
+        # Two events on the same attribute: lower tier wins
+        state = _state({"BOL": _entity("BOL")})
+        events = [
+            Event(
+                event_id="e1",
+                source_entity_id="BOL",
+                event_type="shock",
+                affected_attributes={"gdp_growth": _q(0.01, confidence_tier=1)},
+                propagation_rules=[],
+                timestep_originated=datetime(2020, 1, 1),
+                framework=MeasurementFramework.FINANCIAL,
+            ),
+            Event(
+                event_id="e2",
+                source_entity_id="BOL",
+                event_type="shock",
+                affected_attributes={"gdp_growth": _q(0.01, confidence_tier=4)},
+                propagation_rules=[],
+                timestep_originated=datetime(2020, 1, 1),
+                framework=MeasurementFramework.FINANCIAL,
+            ),
+        ]
+        result = propagate(state, events)
+        tier = result.entities["BOL"].get_attribute("gdp_growth").confidence_tier  # type: ignore[union-attr]
+        assert tier == 4  # lower-of-two: min(1, 4) = 4
+
+
+# ---------------------------------------------------------------------------
+# STOCK variable replacement semantics
+# ---------------------------------------------------------------------------
+
+
+class TestPropagateStockSemantics:
+    def test_stock_delta_replaces_existing_value(self) -> None:
+        # A STOCK event sets the attribute to the delta value, not adds
+        state = _state({"BOL": _entity("BOL", fx_reserves=8.0e9)})
+        # Override the entity's attribute to STOCK type
+        state.entities["BOL"].attributes["fx_reserves"] = _q(
+            8.0e9, VariableType.STOCK
+        )
+        event = Event(
+            event_id="evt-1",
+            source_entity_id="BOL",
+            event_type="reserves_update",
+            affected_attributes={
+                "fx_reserves": Quantity(
+                    value=Decimal("5000000000"),
+                    unit="dimensionless",
+                    variable_type=VariableType.STOCK,
+                )
+            },
+            propagation_rules=[],
+            timestep_originated=datetime(2020, 1, 1),
+            framework=MeasurementFramework.FINANCIAL,
+        )
+        result = propagate(state, [event])
+        assert _gav(result, "BOL", "fx_reserves") == pytest.approx(5.0e9)
 
 
 # ---------------------------------------------------------------------------
@@ -478,8 +588,8 @@ class TestPropagateEdgeCases:
         )
         event = _event("BOL", {"gdp_growth": -0.02}, rules=[_rule("trade", 0.5, max_hops=0)])
         result = propagate(state, [event])
-        assert result.entities["BOL"].get_attribute("gdp_growth") == pytest.approx(-0.02)
-        assert result.entities["BRA"].get_attribute("gdp_growth") == pytest.approx(0.0)
+        assert _gav(result, "BOL", "gdp_growth") == pytest.approx(-0.02)
+        assert _gav(result, "BRA", "gdp_growth") == pytest.approx(0.0)
 
     def test_zero_attenuation_factor_produces_zero_propagated_delta(self) -> None:
         state = _state(
@@ -491,8 +601,8 @@ class TestPropagateEdgeCases:
         )
         result = propagate(state, [event])
         # Source still receives full delta; propagated delta is zero
-        assert result.entities["BOL"].get_attribute("gdp_growth") == pytest.approx(-0.02)
-        assert result.entities["BRA"].get_attribute("gdp_growth") == pytest.approx(0.0)
+        assert _gav(result, "BOL", "gdp_growth") == pytest.approx(-0.02)
+        assert _gav(result, "BRA", "gdp_growth") == pytest.approx(0.0)
 
     def test_full_attenuation_factor_preserves_delta(self) -> None:
         state = _state(
@@ -503,7 +613,7 @@ class TestPropagateEdgeCases:
             "BOL", {"gdp_growth": -0.02}, rules=[_rule("trade", attenuation_factor=1.0, max_hops=1)]
         )
         result = propagate(state, [event])
-        assert result.entities["BRA"].get_attribute("gdp_growth") == pytest.approx(-0.02)
+        assert _gav(result, "BRA", "gdp_growth") == pytest.approx(-0.02)
 
     def test_zero_relationship_weight_produces_zero_propagated_delta(self) -> None:
         state = _state(
@@ -512,7 +622,7 @@ class TestPropagateEdgeCases:
         )
         event = _event("BOL", {"gdp_growth": -0.02}, rules=[_rule("trade", 0.5, 1)])
         result = propagate(state, [event])
-        assert result.entities["BRA"].get_attribute("gdp_growth") == pytest.approx(0.0)
+        assert _gav(result, "BRA", "gdp_growth") == pytest.approx(0.0)
 
     def test_relationship_target_not_in_state_delta_dropped(self) -> None:
         # BRA appears as a relationship target but is not in state.entities.
@@ -524,14 +634,14 @@ class TestPropagateEdgeCases:
         event = _event("BOL", {"gdp_growth": -0.02}, rules=[_rule("trade", 1.0, 1)])
         result = propagate(state, [event])
         assert "BRA" not in result.entities
-        assert result.entities["BOL"].get_attribute("gdp_growth") == pytest.approx(-0.02)
+        assert _gav(result, "BOL", "gdp_growth") == pytest.approx(-0.02)
 
     def test_no_relationships_in_state_only_source_affected(self) -> None:
         state = _state({"BOL": _entity("BOL"), "BRA": _entity("BRA")})
         event = _event("BOL", {"debt_gdp_ratio": 0.15}, rules=[_rule("trade", 0.4, 2)])
         result = propagate(state, [event])
-        assert result.entities["BOL"].get_attribute("debt_gdp_ratio") == pytest.approx(0.15)
-        assert result.entities["BRA"].get_attribute("debt_gdp_ratio") == pytest.approx(0.0)
+        assert _gav(result, "BOL", "debt_gdp_ratio") == pytest.approx(0.15)
+        assert _gav(result, "BRA", "debt_gdp_ratio") == pytest.approx(0.0)
 
     def test_wrong_relationship_type_not_traversed(self) -> None:
         state = _state(
@@ -541,7 +651,7 @@ class TestPropagateEdgeCases:
         # Rule specifies 'trade' but only 'debt' relationship exists
         event = _event("BOL", {"debt_gdp_ratio": 0.15}, rules=[_rule("trade", 0.4, 1)])
         result = propagate(state, [event])
-        assert result.entities["IMF"].get_attribute("debt_gdp_ratio") == pytest.approx(0.0)
+        assert _gav(result, "IMF", "debt_gdp_ratio") == pytest.approx(0.0)
 
     def test_multiple_attribute_delta_propagates_all_attributes(self) -> None:
         state = _state(
@@ -554,8 +664,8 @@ class TestPropagateEdgeCases:
             rules=[_rule("trade", 0.5, 1)],
         )
         result = propagate(state, [event])
-        assert result.entities["BRA"].get_attribute("gdp_growth") == pytest.approx(-0.01)
-        assert result.entities["BRA"].get_attribute("inflation") == pytest.approx(0.025)
+        assert _gav(result, "BRA", "gdp_growth") == pytest.approx(-0.01)
+        assert _gav(result, "BRA", "inflation") == pytest.approx(0.025)
 
 
 # ---------------------------------------------------------------------------
@@ -585,12 +695,8 @@ class TestPropagateMultipleRules:
             ],
         )
         result = propagate(state, [event])
-        assert result.entities["BRA"].get_attribute("gdp_growth") == pytest.approx(
-            -0.02 * 0.5 * 1.0
-        )
-        assert result.entities["IMF"].get_attribute("gdp_growth") == pytest.approx(
-            -0.02 * 0.8 * 1.0
-        )
+        assert _gav(result, "BRA", "gdp_growth") == pytest.approx(-0.02 * 0.5 * 1.0)
+        assert _gav(result, "IMF", "gdp_growth") == pytest.approx(-0.02 * 0.8 * 1.0)
 
     def test_two_rules_same_type_different_attenuation_accumulate(self) -> None:
         # Two propagation rules of the same type on the same event is unusual
@@ -609,7 +715,7 @@ class TestPropagateMultipleRules:
         )
         result = propagate(state, [event])
         expected = (-0.02 * 0.5 * 1.0) + (-0.02 * 0.3 * 1.0)
-        assert result.entities["BRA"].get_attribute("gdp_growth") == pytest.approx(expected)
+        assert _gav(result, "BRA", "gdp_growth") == pytest.approx(expected)
 
 
 # ---------------------------------------------------------------------------

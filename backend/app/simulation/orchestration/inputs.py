@@ -1,5 +1,5 @@
 """
-Control input types for the Input Orchestration Layer — ADR-002.
+Control input types for the Input Orchestration Layer — ADR-002, Amendment 1.
 
 ControlInput is the abstract base class for all exogenous inputs injected
 into the simulation. Each concrete subclass represents one category of
@@ -10,6 +10,15 @@ The endogenous/exogenous distinction is architecturally enforced here:
 module-generated events flow through SimulationModule.compute(); all
 human-authorised policy decisions flow through ControlInput subclasses
 and the InputOrchestrator.inject() method.
+
+Amendment 1 (SCR-001 / ADR-002 Amendment 1):
+- MonetaryPolicyInput replaced by MonetaryRateInput (rate instruments:
+  POLICY_RATE, RESERVE_REQUIREMENT) and MonetaryVolumeInput (volume
+  instruments: ASSET_PURCHASE, EXCHANGE_RATE_INTERVENTION).
+- MonetaryInstrument split into MonetaryRateInstrument and
+  MonetaryVolumeInstrument correspondingly.
+- All to_events() implementations produce Quantity deltas in
+  affected_attributes (dict[str, Quantity]), not float deltas.
 """
 
 from __future__ import annotations
@@ -20,6 +29,8 @@ from dataclasses import dataclass, field
 from decimal import Decimal
 from enum import Enum
 from typing import TYPE_CHECKING, Any
+
+from app.simulation.engine.quantity import MonetaryValue, Quantity, VariableType
 
 if TYPE_CHECKING:
     from datetime import datetime
@@ -47,11 +58,26 @@ class InputSource(Enum):
     CONTINGENT_TRIGGER = "contingent_trigger"
 
 
-class MonetaryInstrument(Enum):
-    """Monetary policy instruments available to a central bank."""
+class MonetaryRateInstrument(Enum):
+    """Rate-based monetary policy instruments.
+
+    These instruments adjust dimensionless rates or fractions. value is
+    always a Decimal fraction (e.g. 0.005 for a 50 basis point change).
+    Use MonetaryRateInput to carry these.
+    """
 
     POLICY_RATE = "policy_rate"
     RESERVE_REQUIREMENT = "reserve_requirement"
+
+
+class MonetaryVolumeInstrument(Enum):
+    """Volume-based monetary policy instruments.
+
+    These instruments specify a monetary volume (an asset purchase amount
+    or intervention size). value is a MonetaryValue in canonical units.
+    Use MonetaryVolumeInput to carry these.
+    """
+
     ASSET_PURCHASE = "asset_purchase"
     EXCHANGE_RATE_INTERVENTION = "exchange_rate_intervention"
 
@@ -180,33 +206,92 @@ class ControlInput(ABC):
 
 
 @dataclass(kw_only=True)
-class MonetaryPolicyInput(ControlInput):
-    """A central bank monetary policy action.
+class MonetaryRateInput(ControlInput):
+    """A central bank rate-based monetary policy action.
 
-    Represents a discrete change to a monetary instrument. value is in the
-    instrument's natural units: a rate change as a fraction (0.005 for 50bp),
-    a reserve requirement change as a fraction of deposits, an asset purchase
-    volume in canonical currency units (constant 2015 USD).
+    Applies to instruments that adjust dimensionless rates or fractions:
+    POLICY_RATE and RESERVE_REQUIREMENT. value is the change as a Decimal
+    fraction (e.g. Decimal("0.005") for a 50 basis point increase).
+
+    The generated Event delta is a RATIO Quantity — the rate change is
+    dimensionless and accumulates additively on the target attribute.
 
     Attributes:
-        instrument: The monetary instrument being adjusted.
-        value: Magnitude and direction of the change. Decimal for
-            precision — feeds directly into simulation arithmetic.
+        instrument: The rate instrument being adjusted.
+        value: Magnitude and direction of the change as a Decimal fraction.
         duration_periods: Timesteps this input remains in force.
     """
 
-    instrument: MonetaryInstrument = MonetaryInstrument.POLICY_RATE
+    instrument: MonetaryRateInstrument = MonetaryRateInstrument.POLICY_RATE
     value: Decimal = Decimal("0")
     duration_periods: int = 1
 
     def to_events(self, timestep: datetime) -> list[Event]:
-        """Translate to a monetary policy Event targeting the source entity.
+        """Translate to a monetary rate Event targeting the source entity.
 
         Args:
             timestep: Simulation timestep at which this input fires.
 
         Returns:
-            Single-element list containing the monetary policy Event.
+            Single-element list containing the monetary rate Event.
+        """
+        from app.simulation.engine.models import Event, MeasurementFramework
+
+        delta = Quantity(
+            value=self.value,
+            unit="dimensionless",
+            variable_type=VariableType.RATIO,
+            measurement_framework=MeasurementFramework.FINANCIAL,
+            confidence_tier=1,
+        )
+        return [
+            Event(
+                event_id=f"{self.input_id}-monetary-0",
+                source_entity_id=self.target_entity,
+                event_type=f"monetary_policy_{self.instrument.value}",
+                affected_attributes={self.instrument.value: delta},
+                propagation_rules=self.propagation_rules,
+                timestep_originated=timestep,
+                framework=MeasurementFramework.FINANCIAL,
+                metadata={
+                    "control_input_id": self.input_id,
+                    "actor_id": self.actor_id,
+                    "duration_periods": self.duration_periods,
+                },
+            )
+        ]
+
+
+@dataclass(kw_only=True)
+class MonetaryVolumeInput(ControlInput):
+    """A central bank volume-based monetary policy action.
+
+    Applies to instruments that specify a monetary volume:
+    ASSET_PURCHASE and EXCHANGE_RATE_INTERVENTION. value is a MonetaryValue
+    in canonical units (constant 2015 USD).
+
+    The generated Event delta carries the MonetaryValue directly as the
+    Quantity delta — MonetaryValue is a Quantity subclass and carries full
+    provenance metadata.
+
+    Attributes:
+        instrument: The volume instrument being adjusted.
+        value: Monetary volume of the action as a MonetaryValue.
+        duration_periods: Timesteps this input remains in force.
+    """
+
+    instrument: MonetaryVolumeInstrument = MonetaryVolumeInstrument.ASSET_PURCHASE
+    value: MonetaryValue = field(default=None)  # type: ignore[assignment]
+    duration_periods: int = 1
+
+    def to_events(self, timestep: datetime) -> list[Event]:
+        """Translate to a monetary volume Event targeting the source entity.
+
+        Args:
+            timestep: Simulation timestep at which this input fires.
+
+        Returns:
+            Single-element list containing the monetary volume Event.
         """
         from app.simulation.engine.models import Event, MeasurementFramework
 
@@ -215,7 +300,7 @@ class MonetaryPolicyInput(ControlInput):
                 event_id=f"{self.input_id}-monetary-0",
                 source_entity_id=self.target_entity,
                 event_type=f"monetary_policy_{self.instrument.value}",
-                affected_attributes={self.instrument.value: float(self.value)},
+                affected_attributes={self.instrument.value: self.value},
                 propagation_rules=self.propagation_rules,
                 timestep_originated=timestep,
                 framework=MeasurementFramework.FINANCIAL,
@@ -268,12 +353,19 @@ class FiscalPolicyInput(ControlInput):
             if self.sector
             else f"fiscal_{self.instrument.value}"
         )
+        delta = Quantity(
+            value=self.value,
+            unit="dimensionless",
+            variable_type=VariableType.FLOW,
+            measurement_framework=MeasurementFramework.FINANCIAL,
+            confidence_tier=1,
+        )
         return [
             Event(
                 event_id=f"{self.input_id}-fiscal-0",
                 source_entity_id=self.target_entity,
                 event_type=f"fiscal_policy_{self.instrument.value}",
-                affected_attributes={attribute_key: float(self.value)},
+                affected_attributes={attribute_key: delta},
                 propagation_rules=self.propagation_rules,
                 timestep_originated=timestep,
                 framework=MeasurementFramework.FINANCIAL,
@@ -335,12 +427,19 @@ class TradePolicyInput(ControlInput):
             if self.affected_sector
             else f"trade_{self.instrument.value}"
         )
+        primary_delta = Quantity(
+            value=self.value,
+            unit="dimensionless",
+            variable_type=VariableType.RATIO,
+            measurement_framework=MeasurementFramework.FINANCIAL,
+            confidence_tier=1,
+        )
         events: list[Event] = [
             Event(
                 event_id=f"{self.input_id}-trade-0",
                 source_entity_id=self.source_entity,
                 event_type=f"trade_policy_{self.instrument.value}",
-                affected_attributes={attribute_key: float(self.value)},
+                affected_attributes={attribute_key: primary_delta},
                 propagation_rules=self.propagation_rules,
                 timestep_originated=timestep,
                 framework=MeasurementFramework.FINANCIAL,
@@ -354,12 +453,19 @@ class TradePolicyInput(ControlInput):
             )
         ]
         if self.retaliation_modeled:
+            retaliation_delta = Quantity(
+                value=-self.value,
+                unit="dimensionless",
+                variable_type=VariableType.RATIO,
+                measurement_framework=MeasurementFramework.FINANCIAL,
+                confidence_tier=1,
+            )
             events.append(
                 Event(
                     event_id=f"{self.input_id}-trade-retaliation-0",
                     source_entity_id=self.target_entity,
                     event_type=f"trade_policy_{self.instrument.value}_retaliation",
-                    affected_attributes={attribute_key: float(-self.value)},
+                    affected_attributes={attribute_key: retaliation_delta},
                     propagation_rules=self.propagation_rules,
                     timestep_originated=timestep,
                     framework=MeasurementFramework.FINANCIAL,
@@ -407,16 +513,20 @@ class EmergencyPolicyInput(ControlInput):
         """
         from app.simulation.engine.models import Event, MeasurementFramework
 
+        magnitude = self.parameters.get("magnitude", 1.0)
+        delta = Quantity(
+            value=Decimal(str(magnitude)),
+            unit="dimensionless",
+            variable_type=VariableType.DIMENSIONLESS,
+            measurement_framework=MeasurementFramework.GOVERNANCE,
+            confidence_tier=1,
+        )
         return [
             Event(
                 event_id=f"{self.input_id}-emergency-0",
                 source_entity_id=self.target_entity,
                 event_type=f"emergency_policy_{self.instrument.value}",
-                affected_attributes={
-                    self.instrument.value: float(
-                        self.parameters.get("magnitude", 1.0)
-                    )
-                },
+                affected_attributes={self.instrument.value: delta},
                 propagation_rules=self.propagation_rules,
                 timestep_originated=timestep,
                 framework=MeasurementFramework.GOVERNANCE,
@@ -464,16 +574,20 @@ class StructuralPolicyInput(ControlInput):
         """
         from app.simulation.engine.models import Event, MeasurementFramework
 
+        magnitude = self.parameters.get("magnitude", 1.0)
+        delta = Quantity(
+            value=Decimal(str(magnitude)),
+            unit="dimensionless",
+            variable_type=VariableType.DIMENSIONLESS,
+            measurement_framework=MeasurementFramework.GOVERNANCE,
+            confidence_tier=1,
+        )
         return [
             Event(
                 event_id=f"{self.input_id}-structural-0",
                 source_entity_id=self.target_entity,
                 event_type=f"structural_policy_{self.instrument.value}",
-                affected_attributes={
-                    self.instrument.value: float(
-                        self.parameters.get("magnitude", 1.0)
-                    )
-                },
+                affected_attributes={self.instrument.value: delta},
                 propagation_rules=self.propagation_rules,
                 timestep_originated=timestep,
                 framework=MeasurementFramework.GOVERNANCE,
@@ -506,7 +620,7 @@ class StateCondition:
         entity_id: Entity whose attribute is monitored.
         attribute: Attribute key to compare against the threshold.
         operator: Comparison direction.
-        threshold: Value to compare against.
+        threshold: Value to compare against (float for StateCondition interface).
     """
 
     entity_id: str
@@ -522,6 +636,9 @@ class StateCondition:
         rather than raising, because the entity may be outside the active
         resolution scope.
 
+        Uses get_attribute_value() to obtain the Decimal attribute value,
+        then converts to float for comparison against self.threshold.
+
         Args:
             state: Simulation state to evaluate the condition against.
 
@@ -531,7 +648,7 @@ class StateCondition:
         entity = state.get_entity(self.entity_id)
         if entity is None:
             return False
-        current_value = entity.get_attribute(self.attribute)
+        current_value = float(entity.get_attribute_value(self.attribute))
         results: dict[ComparisonOperator, bool] = {
             ComparisonOperator.LT: current_value < self.threshold,
             ComparisonOperator.GT: current_value > self.threshold,
