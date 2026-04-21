@@ -34,3 +34,14 @@ python_version = "3.12"
 strict = true
 warn_return_any = true
 warn_unused_configs = true
+
+[[tool.mypy.overrides]]
+# geoalchemy2 ships no py.typed or stubs; ignore at the import boundary.
+module = "geoalchemy2.*"
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+# asyncpg 0.30 ships no inline stubs; asyncpg-stubs is a separate package
+# not pinned in requirements. Ignore until stubs are added.
+module = "asyncpg.*"
+ignore_missing_imports = true
