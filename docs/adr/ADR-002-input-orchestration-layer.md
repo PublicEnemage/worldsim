@@ -6,13 +6,19 @@ Accepted
 ## Validity Context
 
 **Standards Version:** 2026-04-15 (date standards documents were established)
-**Valid Until:** Milestone 2 completion
+**Valid Until:** Milestone 3 completion
 **License Status:** CURRENT
 
-**Last Reviewed:** 2026-04-19 — Amendment 1 (SCR-001) applied. See Amendment 1
-section below. License Status renewed to CURRENT after implementation verified
-by 210 passing tests and SCAN-004 (0 violations). Next scheduled review at
-Milestone 2 completion.
+**Last Reviewed:** 2026-04-21 — Milestone 2 exit review. No renewal triggers
+fired during Milestone 2. License Status confirmed CURRENT. No changes to
+`ControlInput` type taxonomy, audit trail schema requirements, or
+`MeasurementFramework` tagging requirements occurred during this milestone.
+License renewed for Milestone 3. Next scheduled review at Milestone 3
+completion.
+
+**Previously reviewed:** 2026-04-19 — Amendment 1 (SCR-001) applied. See
+Amendment 1 section below. License Status renewed to CURRENT after
+implementation verified by 210 passing tests and SCAN-004 (0 violations).
 
 **Renewal Triggers** — any of the following fires the CURRENT → UNDER-REVIEW
 transition:
