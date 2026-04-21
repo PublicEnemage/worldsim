@@ -769,7 +769,10 @@ Activation: `Architecture Review: FULL — [scope description]` or
 - Country entity data model with Level 1 attributes
 - Basic event propagation graph
 - Annual timestep engine
-- Seed database with real country data (World Bank)
+- Real country data verified through `scripts/demo_scenario.py` using IMF WEO
+  Oct 2024, World Bank WDI 2024, World Bank WGI 2023, and UN Comtrade 2023
+  (a persistent database seed loader requires PostGIS infrastructure and is
+  Milestone 2 scope)
 - No UI — verify simulation logic through tests and CLI output
 
 **Milestone 2 — Geospatial Foundation**
