@@ -9,7 +9,7 @@ This is a living document. It is updated whenever a new module is implemented
 or an existing module's capabilities change. The registry is dated so that
 readers can assess whether it reflects the current codebase.
 
-**Last updated:** 2026-04-20 (Amendment 2 — ADR-003 PostGIS schema foundation)
+**Last updated:** 2026-04-21 (Amendment 3 — ADR-003 MapLibre GL frontend)
 **Current milestone:** Milestone 2 — Geospatial Foundation
 
 ---
@@ -43,6 +43,14 @@ optional provenance fields.
   POLYGON→MULTIPOLYGON promotion, cache-first GeoJSON fetch, source registry check
 - Confidence tier tracking: `confidence_tier` 1–5 on every attribute,
   propagated via the lower-of-two rule (max tier number)
+
+- MapLibre GL React frontend available at http://localhost:5173 in development,
+  consuming `GET /api/v1/choropleth/{attr}` and `GET /api/v1/attributes/available`.
+  Renders country polygons colored by simulation attribute values in a five-step
+  blue choropleth. Hover popup surfaces attribute value, confidence tier, and
+  territorial position notes for disputed entities. Attribute selector populated
+  from available attributes endpoint. Default attribute: `ne_pop_est`.
+  Docker Compose service: `frontend` (node:20-slim, port 5173).
 
 **Cannot currently model:**
 - Categorical attributes (regime type, currency peg status)

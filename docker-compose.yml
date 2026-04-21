@@ -1,3 +1,11 @@
+# WorldSim three-service local development stack
+#
+# Quickstart:
+#   1. docker compose up
+#   2. docker compose exec api alembic upgrade head
+#   3. docker compose exec api python -m app.db.seed.natural_earth_loader
+#   4. open http://localhost:5173
+
 services:
   db:
     image: postgis/postgis:16-3.4
@@ -28,6 +36,18 @@ services:
     volumes:
       - ./backend:/app
     command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+
+  frontend:
+    image: node:20-slim
+    working_dir: /app
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    ports:
+      - "5173:5173"
+    command: sh -c "npm install && npm run dev -- --host 0.0.0.0"
+    depends_on:
+      - api
 
 volumes:
   worldsim_pgdata:
