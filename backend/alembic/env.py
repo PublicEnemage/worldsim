@@ -32,13 +32,13 @@ config = context.config
 # This keeps credentials out of alembic.ini and version control.
 _db_url = os.environ.get("DATABASE_URL")
 if _db_url:
-    # Alembic needs a sync psycopg2 URL; strip async scheme if present.
-    _sync_url = _db_url
-    for prefix in ("postgresql+asyncpg://", "postgres+asyncpg://"):
+    # Normalise to postgresql+asyncpg:// — required by async_engine_from_config.
+    _async_url = _db_url
+    for prefix in ("postgresql://", "postgres://"):
         if _db_url.startswith(prefix):
-            _sync_url = _db_url.replace(prefix, "postgresql://", 1)
+            _async_url = _db_url.replace(prefix, "postgresql+asyncpg://", 1)
             break
-    config.set_main_option("sqlalchemy.url", _sync_url)
+    config.set_main_option("sqlalchemy.url", _async_url)
 
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
