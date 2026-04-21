@@ -28,10 +28,18 @@ from sqlalchemy.ext.asyncio import (
 
 
 def _async_url(url: str) -> str:
-    """Normalise a postgresql:// URL to the postgresql+asyncpg:// scheme."""
+    """Normalise to postgresql+asyncpg:// — required by SQLAlchemy async engine."""
     for prefix in ("postgresql://", "postgres://"):
         if url.startswith(prefix):
             return url.replace(prefix, "postgresql+asyncpg://", 1)
+    return url
+
+
+def _plain_url(url: str) -> str:
+    """Normalise to plain postgresql:// — required by asyncpg directly."""
+    for prefix in ("postgresql+asyncpg://", "postgres+asyncpg://"):
+        if url.startswith(prefix):
+            return url.replace(prefix, "postgresql://", 1)
     return url
 
 
@@ -86,7 +94,7 @@ async def create_asyncpg_pool() -> None:
             "DATABASE_URL environment variable is not set. "
             "Set it to a PostgreSQL connection URL before starting the application."
         )
-    _asyncpg_pool = await asyncpg.create_pool(_DATABASE_URL, min_size=2, max_size=10)
+    _asyncpg_pool = await asyncpg.create_pool(_plain_url(_DATABASE_URL), min_size=2, max_size=10)
 
 
 async def close_asyncpg_pool() -> None:

@@ -3,7 +3,7 @@ import AttributeSelector from "./components/AttributeSelector";
 import ChoroplethMap from "./components/ChoroplethMap";
 import "./App.css";
 
-const DEFAULT_ATTRIBUTE = "ne_pop_est";
+const DEFAULT_ATTRIBUTE = "population_total";
 
 export default function App() {
   const [attributeName, setAttributeName] = useState(DEFAULT_ATTRIBUTE);
