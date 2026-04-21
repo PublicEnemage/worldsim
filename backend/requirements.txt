@@ -7,6 +7,8 @@ sqlalchemy==2.0.36
 asyncpg==0.30.0
 geoalchemy2==0.15.2
 psycopg2-binary==2.9.10
+alembic==1.14.0
+shapely==2.0.6
 
 # Simulation
 numpy==2.1.3

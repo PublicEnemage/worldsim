@@ -9,8 +9,8 @@ This is a living document. It is updated whenever a new module is implemented
 or an existing module's capabilities change. The registry is dated so that
 readers can assess whether it reflects the current codebase.
 
-**Last updated:** 2026-04-19 (Amendment 1 — SCR-001 Quantity type system)
-**Current milestone:** Milestone 1 — Simulation Core
+**Last updated:** 2026-04-20 (Amendment 2 — ADR-003 PostGIS schema foundation)
+**Current milestone:** Milestone 2 — Geospatial Foundation
 
 ---
 
@@ -33,7 +33,14 @@ optional provenance fields.
 - Entity metadata (name, ISO codes, etc.) stored separately from simulation
   attributes
 - Hierarchical entity relationships (parent_id field)
-- Basic spatial reference (geometry field, PostGIS integration in Milestone 2)
+- Basic spatial reference (geometry field — MULTIPOLYGON SRID 4326, PostGIS schema live in Milestone 2)
+- PostGIS persistence: 5-table schema (`simulation_entities`, `relationships`,
+  `territorial_designations`, `source_registry`, `control_input_audit_log`) via
+  Alembic migration `126eb2fd0afd` — ADR-003 Decision 1
+- Territorial validation hard gate (TerritorialValidator) enforces all 5 POLICY.md
+  positions before any INSERT: TWN, PSE, XKX, ESH, CRIMEA
+- Natural Earth 110m boundary loader: 10 Level 1 attributes from NE properties,
+  POLYGON→MULTIPOLYGON promotion, cache-first GeoJSON fetch, source registry check
 - Confidence tier tracking: `confidence_tier` 1–5 on every attribute,
   propagated via the lower-of-two rule (max tier number)
 
