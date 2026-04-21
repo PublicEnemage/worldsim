@@ -1,27 +1,44 @@
 # ADR-003: Geospatial Foundation — PostGIS, FastAPI, MapLibre
 
 ## Status
-DRAFT
+Accepted
 
 ## Validity Context
 
-**Standards Version:** 2026-04-20
+**Standards Version:** 2026-04-21
 **Valid Until:** Milestone 3 completion
-**License Status:** DRAFT — not yet active
+**License Status:** CURRENT
+
+**Last Reviewed:** 2026-04-21 — Milestone 2 exit review. All four decisions
+fully implemented and verified. License Status set to CURRENT. Implementation
+evidence:
+- Decision 1 (PostGIS schema): Alembic migration `126eb2fd0afd` live. Five-table
+  schema (`simulation_entities`, `relationships`, `territorial_designations`,
+  `source_registry`, `control_input_audit_log`) verified by SCAN-005.
+- Decision 2 (FastAPI layer): Six endpoints serving country data via asyncpg
+  direct queries. CORS all-origins for M2 dev scope. Verified by SCAN-006
+  (251 unit tests passing, 16 integration tests skip gracefully without DB).
+- Decision 3 (MapLibre GL): Choropleth rendering at http://localhost:5173.
+  177 Natural Earth countries loaded. Float prohibition enforced end-to-end —
+  `attribute_value: string` in TypeScript, `["to-number", ...]` only in
+  MapLibre paint expression. Verified by SCAN-007 (TypeScript build clean).
+- Decision 4 (TerritorialValidator): Hard gate enforcing all five POLICY.md
+  positions (TWN, PSE, XKX, ESH, CRIMEA) before any INSERT. 30/30 unit tests
+  passing.
+No renewal triggers fired at milestone close. Next scheduled review at
+Milestone 3 completion.
 
 **Renewal Triggers** — any of the following fires the CURRENT → UNDER-REVIEW
 transition:
-- `Quantity` serialization contract changes in `DATA_STANDARDS.md` or ADR-001
-  that affect the wire format (e.g., new required fields on the Quantity JSON
-  envelope)
-- Territorial framework (`TerritorialDesignation`, `DisputeStatus`) modified in
-  `DATA_STANDARDS.md` in ways that require schema migration
-- `SimulationEntity` geometry field type changes in ADR-001 (e.g., multi-geometry
-  or 3D geometry support added)
-- FastAPI authentication model introduced (currently deferred to Milestone 3);
-  any authenticated endpoint added to this layer triggers renewal
-- Tile serving approach changes from GeoJSON-over-REST to MVT (requires
-  endpoint contract revision)
+- GeoJSON-over-REST serving approach replaced by MVT tile serving (requires
+  endpoint contract revision and MapLibre source type change)
+- PostGIS schema changes that add new entity relationship types beyond the
+  current five-table schema (e.g., subnational entity hierarchy tables,
+  scenario snapshot tables requiring geometry versioning)
+- FastAPI authentication layer introduced (ADR-007 scope); any authenticated
+  endpoint added to this layer triggers renewal
+- CORS policy changed from all-origins development scope to a restricted
+  origin allowlist (production deployment precondition)
 
 ## Date
 2026-04-20
