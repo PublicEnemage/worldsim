@@ -13,13 +13,18 @@ Example: postgresql://worldsim:password@localhost:5432/worldsim
 from __future__ import annotations
 
 import os
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from collections.abc import AsyncGenerator
 
 import asyncpg
-from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
+from sqlalchemy.ext.asyncio import (
+    AsyncEngine,
+    AsyncSession,
+    async_sessionmaker,
+    create_async_engine,
+)
 
 
 def _async_url(url: str) -> str:
@@ -33,7 +38,7 @@ def _async_url(url: str) -> str:
 _DATABASE_URL: str = os.environ.get("DATABASE_URL", "")
 
 
-def _get_engine() -> Any:
+def _get_engine() -> AsyncEngine:
     """Return the SQLAlchemy async engine, creating it on first call.
 
     Deferred to avoid a module-level failure when DATABASE_URL is absent

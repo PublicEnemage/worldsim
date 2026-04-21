@@ -15,10 +15,14 @@ Tests cover:
 from __future__ import annotations
 
 import os
-from typing import Any
+from typing import TYPE_CHECKING
 
+import httpx
 import pytest
 import pytest_asyncio
+
+if TYPE_CHECKING:
+    from collections.abc import AsyncGenerator
 
 from app.main import app
 
@@ -37,18 +41,13 @@ def _require_db() -> None:
 # ---------------------------------------------------------------------------
 
 @pytest_asyncio.fixture()
-async def client() -> Any:
+async def client() -> AsyncGenerator[httpx.AsyncClient, None]:
     """httpx AsyncClient with ASGITransport pointing at the FastAPI app.
 
     Requires DATABASE_URL. The lifespan context manager initialises the
     asyncpg pool on startup and closes it on teardown.
     """
     _require_db()
-    try:
-        import httpx
-    except ImportError:
-        pytest.skip("httpx not installed")
-
     async with httpx.AsyncClient(
         transport=httpx.ASGITransport(app=app),
         base_url="http://test",
@@ -61,7 +60,7 @@ async def client() -> Any:
 # ---------------------------------------------------------------------------
 
 @pytest.mark.asyncio
-async def test_health_returns_ok(client: Any) -> None:
+async def test_health_returns_ok(client: httpx.AsyncClient) -> None:
     response = await client.get("/api/v1/health/")
     assert response.status_code == 200
     body = response.json()
@@ -75,7 +74,7 @@ async def test_health_returns_ok(client: Any) -> None:
 # ---------------------------------------------------------------------------
 
 @pytest.mark.asyncio
-async def test_countries_list_returns_summaries(client: Any) -> None:
+async def test_countries_list_returns_summaries(client: httpx.AsyncClient) -> None:
     response = await client.get("/api/v1/countries")
     assert response.status_code == 200
     countries = response.json()
@@ -88,7 +87,7 @@ async def test_countries_list_returns_summaries(client: Any) -> None:
 
 
 @pytest.mark.asyncio
-async def test_countries_list_no_geometry_field(client: Any) -> None:
+async def test_countries_list_no_geometry_field(client: httpx.AsyncClient) -> None:
     response = await client.get("/api/v1/countries")
     assert response.status_code == 200
     for country in response.json():
@@ -96,7 +95,7 @@ async def test_countries_list_no_geometry_field(client: Any) -> None:
 
 
 @pytest.mark.asyncio
-async def test_countries_list_no_attributes_field(client: Any) -> None:
+async def test_countries_list_no_attributes_field(client: httpx.AsyncClient) -> None:
     response = await client.get("/api/v1/countries")
     assert response.status_code == 200
     for country in response.json():
@@ -108,7 +107,7 @@ async def test_countries_list_no_attributes_field(client: Any) -> None:
 # ---------------------------------------------------------------------------
 
 @pytest.mark.asyncio
-async def test_country_detail_usa(client: Any) -> None:
+async def test_country_detail_usa(client: httpx.AsyncClient) -> None:
     response = await client.get("/api/v1/countries/USA")
     if response.status_code == 404:
         pytest.skip("USA not in database — run NE loader first")
@@ -120,7 +119,7 @@ async def test_country_detail_usa(client: Any) -> None:
 
 
 @pytest.mark.asyncio
-async def test_country_detail_attributes_value_is_str(client: Any) -> None:
+async def test_country_detail_attributes_value_is_str(client: httpx.AsyncClient) -> None:
     response = await client.get("/api/v1/countries/USA")
     if response.status_code == 404:
         pytest.skip("USA not in database — run NE loader first")
@@ -133,7 +132,7 @@ async def test_country_detail_attributes_value_is_str(client: Any) -> None:
 
 
 @pytest.mark.asyncio
-async def test_country_detail_not_found(client: Any) -> None:
+async def test_country_detail_not_found(client: httpx.AsyncClient) -> None:
     response = await client.get("/api/v1/countries/ZZZZZZ")
     assert response.status_code == 404
 
@@ -143,7 +142,7 @@ async def test_country_detail_not_found(client: Any) -> None:
 # ---------------------------------------------------------------------------
 
 @pytest.mark.asyncio
-async def test_country_geometry_is_geojson_feature(client: Any) -> None:
+async def test_country_geometry_is_geojson_feature(client: httpx.AsyncClient) -> None:
     response = await client.get("/api/v1/countries/DEU/geometry")
     if response.status_code == 404:
         pytest.skip("DEU not in database — run NE loader first")
@@ -158,7 +157,7 @@ async def test_country_geometry_is_geojson_feature(client: Any) -> None:
 
 
 @pytest.mark.asyncio
-async def test_country_geometry_has_no_attributes(client: Any) -> None:
+async def test_country_geometry_has_no_attributes(client: httpx.AsyncClient) -> None:
     response = await client.get("/api/v1/countries/DEU/geometry")
     if response.status_code == 404:
         pytest.skip("DEU not in database — run NE loader first")
@@ -172,7 +171,7 @@ async def test_country_geometry_has_no_attributes(client: Any) -> None:
 # ---------------------------------------------------------------------------
 
 @pytest.mark.asyncio
-async def test_country_attributes_only(client: Any) -> None:
+async def test_country_attributes_only(client: httpx.AsyncClient) -> None:
     response = await client.get("/api/v1/countries/BRA/attributes")
     if response.status_code == 404:
         pytest.skip("BRA not in database — run NE loader first")
@@ -190,7 +189,7 @@ async def test_country_attributes_only(client: Any) -> None:
 # ---------------------------------------------------------------------------
 
 @pytest.mark.asyncio
-async def test_choropleth_returns_feature_collection(client: Any) -> None:
+async def test_choropleth_returns_feature_collection(client: httpx.AsyncClient) -> None:
     response = await client.get("/api/v1/choropleth/gdp_usd_millions")
     if response.status_code == 404:
         pytest.skip("gdp_usd_millions not in database — run NE loader first")
@@ -201,7 +200,7 @@ async def test_choropleth_returns_feature_collection(client: Any) -> None:
 
 
 @pytest.mark.asyncio
-async def test_choropleth_attribute_value_is_str(client: Any) -> None:
+async def test_choropleth_attribute_value_is_str(client: httpx.AsyncClient) -> None:
     response = await client.get("/api/v1/choropleth/gdp_usd_millions")
     if response.status_code == 404:
         pytest.skip("gdp_usd_millions not in database — run NE loader first")
@@ -215,7 +214,7 @@ async def test_choropleth_attribute_value_is_str(client: Any) -> None:
 
 
 @pytest.mark.asyncio
-async def test_choropleth_features_have_geometry(client: Any) -> None:
+async def test_choropleth_features_have_geometry(client: httpx.AsyncClient) -> None:
     response = await client.get("/api/v1/choropleth/gdp_usd_millions")
     if response.status_code == 404:
         pytest.skip("gdp_usd_millions not in database — run NE loader first")
@@ -226,7 +225,7 @@ async def test_choropleth_features_have_geometry(client: Any) -> None:
 
 
 @pytest.mark.asyncio
-async def test_choropleth_territorial_note_fields_present(client: Any) -> None:
+async def test_choropleth_territorial_note_fields_present(client: httpx.AsyncClient) -> None:
     response = await client.get("/api/v1/choropleth/gdp_usd_millions")
     if response.status_code == 404:
         pytest.skip("gdp_usd_millions not in database — run NE loader first")
@@ -238,7 +237,7 @@ async def test_choropleth_territorial_note_fields_present(client: Any) -> None:
 
 
 @pytest.mark.asyncio
-async def test_choropleth_unknown_attribute_returns_404(client: Any) -> None:
+async def test_choropleth_unknown_attribute_returns_404(client: httpx.AsyncClient) -> None:
     response = await client.get("/api/v1/choropleth/does_not_exist_xyz")
     assert response.status_code == 404
     assert "does_not_exist_xyz" in response.json()["detail"]
@@ -249,7 +248,7 @@ async def test_choropleth_unknown_attribute_returns_404(client: Any) -> None:
 # ---------------------------------------------------------------------------
 
 @pytest.mark.asyncio
-async def test_available_attributes_returns_list(client: Any) -> None:
+async def test_available_attributes_returns_list(client: httpx.AsyncClient) -> None:
     response = await client.get("/api/v1/attributes/available")
     assert response.status_code == 200
     attrs = response.json()
