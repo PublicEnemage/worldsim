@@ -1,13 +1,16 @@
 # ADR-004: Scenario Engine — Configuration, Execution, Backtesting, Time Controls, Comparative Output
 
 ## Status
-DRAFT
+Accepted
 
 ## Validity Context
 
 **Standards Version:** 2026-04-21
 **Valid Until:** Milestone 4 completion
-**License Status:** DRAFT
+**License Status:** CURRENT
+
+**Engineering Lead accepted 2026-04-21.** Architecture decisions reviewed and
+approved. Implementation may proceed.
 
 **Renewal Triggers** — any of the following fires the CURRENT → UNDER-REVIEW
 transition:
