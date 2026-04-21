@@ -13,7 +13,7 @@ Example: postgresql://worldsim:password@localhost:5432/worldsim
 from __future__ import annotations
 
 import os
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
     from collections.abc import AsyncGenerator
@@ -32,25 +32,29 @@ def _async_url(url: str) -> str:
 
 _DATABASE_URL: str = os.environ.get("DATABASE_URL", "")
 
-# SQLAlchemy async engine — used by Alembic and ORM sessions.
-# pool_pre_ping verifies connections before use; protects against stale
-# connections after a PostGIS restart.
-engine = create_async_engine(
-    _async_url(_DATABASE_URL),
-    pool_pre_ping=True,
-    echo=False,
-)
 
-AsyncSessionLocal: async_sessionmaker[AsyncSession] = async_sessionmaker(
-    engine,
-    class_=AsyncSession,
-    expire_on_commit=False,
-)
+def _get_engine() -> Any:
+    """Return the SQLAlchemy async engine, creating it on first call.
+
+    Deferred to avoid a module-level failure when DATABASE_URL is absent
+    (e.g., during test collection without a database configured).
+    """
+    url = _async_url(_DATABASE_URL)
+    if not url:
+        raise RuntimeError(
+            "DATABASE_URL environment variable is not set. "
+            "Set it before importing the database connection module."
+        )
+    return create_async_engine(url, pool_pre_ping=True, echo=False)
+
+
+def _get_session_factory() -> async_sessionmaker[AsyncSession]:
+    return async_sessionmaker(_get_engine(), class_=AsyncSession, expire_on_commit=False)
 
 
 async def get_async_session() -> AsyncGenerator[AsyncSession, None]:
     """Yield a SQLAlchemy async session; roll back on exception, close on exit."""
-    async with AsyncSessionLocal() as session:
+    async with _get_session_factory()() as session:
         try:
             yield session
         except Exception:
