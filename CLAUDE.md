@@ -360,6 +360,24 @@ Write feature code against contracts produced by the Architect Agent.
 May run in parallel for independent features. Always work against a
 GitHub Issue. Always produce tests alongside code.
 
+**Pre-PR Checklist (Implementation Agent)**
+Before opening any PR for a new feature, architecture change, or standards
+modification, the Implementation Agent must:
+
+1. Verify a GitHub Issue exists that describes the work. If no issue exists,
+   create one before opening the PR. The issue must be assigned to the current
+   milestone and labeled horizon:immediate.
+2. Reference the issue in the PR description using 'Closes #N' so the issue
+   closes automatically on merge.
+3. Add the issue to the WorldSim Development Board project and set its status
+   to In Review when the PR opens.
+
+Exempt from issue requirement: purely mechanical commits such as lint fixes,
+import reordering, noqa suppressions, compliance scan registry updates, and
+dependency patches. These must be part of a PR that references a parent issue
+or ADR but do not require their own issue. The PR description must include a
+one-line explanation of why no separate issue was needed.
+
 **QA Agent**
 Writes tests, runs backtesting validation suites, reports failures.
 Backtesting runs are part of CI — regressions in historical fidelity
