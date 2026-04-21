@@ -34,20 +34,19 @@ with POLYGON geometry are promoted before INSERT.
 """
 from __future__ import annotations
 
+import asyncio
 import json
 import logging
 from datetime import date
 from decimal import Decimal
 from pathlib import Path
-from typing import TYPE_CHECKING, Any
+from typing import Any
 
+import asyncpg
 import httpx
 
 from app.db.territorial_validator import TerritorialValidator
 from app.simulation.engine.quantity import VariableType
-
-if TYPE_CHECKING:
-    import asyncpg
 
 logger = logging.getLogger(__name__)
 
@@ -347,3 +346,29 @@ async def load_natural_earth_boundaries(
         "Natural Earth 110m load complete: %d entities inserted/updated", inserted
     )
     return inserted
+
+
+if __name__ == "__main__":
+    import logging as _logging
+    import sys
+
+    _logging.basicConfig(level=_logging.INFO, format="%(levelname)s %(message)s")
+
+    async def _main() -> None:
+        import os as _os  # noqa: PLC0415
+        db_url = _os.environ.get("DATABASE_URL", "")
+        # asyncpg requires plain postgresql:// — strip SQLAlchemy +asyncpg scheme
+        for _prefix in ("postgresql+asyncpg://", "postgres+asyncpg://"):
+            if db_url.startswith(_prefix):
+                db_url = db_url.replace(_prefix, "postgresql://", 1)
+                break
+        if not db_url:
+            sys.exit("DATABASE_URL is not set")
+        conn = await asyncpg.connect(db_url)
+        try:
+            count = await load_natural_earth_boundaries(conn, skip_source_check=True)
+            print(f"Loaded {count} entities.")
+        finally:
+            await conn.close()
+
+    asyncio.run(_main())
