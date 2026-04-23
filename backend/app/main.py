@@ -20,6 +20,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.countries import router as countries_router
 from app.api.health import router as health_router
+from app.api.scenarios import router as scenarios_router
 from app.db.connection import close_asyncpg_pool, create_asyncpg_pool
 
 
@@ -37,20 +38,21 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
 
 app = FastAPI(
     title="WorldSim API",
-    version="0.2.0",
+    version="0.3.0",
     description=(
-        "Geopolitical-economic simulation platform — Milestone 2 API. "
-        "Serves country entity data and choropleth attribute data for MapLibre GL."
+        "Geopolitical-economic simulation platform — Milestone 3 API. "
+        "Serves country entity data, choropleth attribute data, and scenario "
+        "configuration for MapLibre GL."
     ),
     lifespan=lifespan,
 )
 
-# KNOWN LIMITATION: all origins permitted for Milestone 2 development.
-# Production CORS policy is ADR-007 scope (Milestone 3+).
+# KNOWN LIMITATION: all origins permitted for Milestone 3 development.
+# Production CORS policy is ADR-007 scope (post-Milestone 3).
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
-    allow_methods=["GET"],
+    allow_methods=["GET", "POST", "DELETE"],
     allow_headers=["*"],
 )
 
@@ -58,3 +60,4 @@ _API_PREFIX = "/api/v1"
 
 app.include_router(health_router, prefix=_API_PREFIX)
 app.include_router(countries_router, prefix=_API_PREFIX)
+app.include_router(scenarios_router, prefix=_API_PREFIX)
