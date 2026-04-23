@@ -33,6 +33,7 @@ from sqlalchemy import (
     Numeric,
     String,
     Text,
+    UniqueConstraint,
     func,
 )
 from sqlalchemy.dialects.postgresql import JSONB
@@ -289,11 +290,115 @@ class AuditLogRecord(Base):
     )
 
 
+class Scenario(Base):
+    """A scenario configuration record — ADR-004 Decision 1.
+
+    The `configuration` JSONB column stores the ScenarioConfigSchema:
+    entity IDs in scope, initial attribute overrides, n_steps, timestep_label.
+    Status lifecycle: pending → running → completed | failed.
+    """
+
+    __tablename__ = "scenarios"
+
+    scenario_id: Mapped[str] = mapped_column(Text, primary_key=True)
+    name: Mapped[str] = mapped_column(Text, nullable=False)
+    description: Mapped[str | None] = mapped_column(Text, nullable=True)
+    status: Mapped[str] = mapped_column(Text, nullable=False, server_default="pending")
+    configuration: Mapped[dict[str, Any]] = mapped_column(JSONB, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, server_default=func.now()
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, server_default=func.now()
+    )
+    version: Mapped[int] = mapped_column(Integer, nullable=False, server_default="1")
+
+    scheduled_inputs: Mapped[list[ScenarioScheduledInput]] = relationship(
+        "ScenarioScheduledInput", back_populates="scenario", cascade="all, delete-orphan"
+    )
+    snapshots: Mapped[list[ScenarioStateSnapshot]] = relationship(
+        "ScenarioStateSnapshot", back_populates="scenario", cascade="all, delete-orphan"
+    )
+
+    __table_args__ = (
+        CheckConstraint(
+            "status IN ('pending', 'running', 'completed', 'failed')",
+            name="ck_scenarios_status",
+        ),
+        Index("idx_scenarios_status", "status"),
+    )
+
+
+class ScenarioScheduledInput(Base):
+    """A ControlInput record bound to a specific step of a scenario.
+
+    `input_type` is the ControlInput subclass name (e.g. 'FiscalPolicyInput').
+    `input_data` is the full serialised ControlInput matching the
+    control_input_audit_log.raw_input format from ADR-002.
+    """
+
+    __tablename__ = "scenario_scheduled_inputs"
+
+    id: Mapped[str] = mapped_column(Text, primary_key=True)
+    scenario_id: Mapped[str] = mapped_column(
+        Text, ForeignKey("scenarios.scenario_id", ondelete="CASCADE"), nullable=False
+    )
+    step: Mapped[int] = mapped_column(Integer, nullable=False)
+    input_type: Mapped[str] = mapped_column(Text, nullable=False)
+    input_data: Mapped[dict[str, Any]] = mapped_column(JSONB, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, server_default=func.now()
+    )
+
+    scenario: Mapped[Scenario] = relationship("Scenario", back_populates="scheduled_inputs")
+
+    __table_args__ = (
+        Index("idx_ssi_scenario_step", "scenario_id", "step"),
+    )
+
+
+class ScenarioStateSnapshot(Base):
+    """Simulation state snapshot at a specific step of a scenario.
+
+    `state_data` stores Dict[entity_id → Dict[attr_key → Quantity-as-dict]]
+    in the same JSONB envelope format as simulation_entities.attributes.
+    Quantity values are str(Decimal) — float prohibition preserved end-to-end.
+
+    `ia1_disclosure` is NOT NULL with no server default — the application must
+    provide the IA-1 Known Limitation text explicitly. DB-level enforcement
+    prevents omission.
+    """
+
+    __tablename__ = "scenario_state_snapshots"
+
+    id: Mapped[str] = mapped_column(Text, primary_key=True)
+    scenario_id: Mapped[str] = mapped_column(
+        Text, ForeignKey("scenarios.scenario_id", ondelete="CASCADE"), nullable=False
+    )
+    step: Mapped[int] = mapped_column(Integer, nullable=False)
+    timestep: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    state_data: Mapped[dict[str, Any]] = mapped_column(JSONB, nullable=False)
+    ia1_disclosure: Mapped[str] = mapped_column(Text, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, server_default=func.now()
+    )
+
+    scenario: Mapped[Scenario] = relationship("Scenario", back_populates="snapshots")
+
+    __table_args__ = (
+        UniqueConstraint("scenario_id", "step", name="uq_snapshots_scenario_step"),
+        Index("idx_sss_scenario_step", "scenario_id", "step"),
+    )
+
+
 # Expose all models so Alembic env.py can discover them via Base.metadata.
 __all__ = [
     "Base",
     "Entity",
     "Relationship",
+    "Scenario",
+    "ScenarioScheduledInput",
+    "ScenarioStateSnapshot",
     "TerritorialDesignation",
     "SourceRegistration",
     "AuditLogRecord",

@@ -131,3 +131,74 @@ class HealthResponse(BaseModel):
     status: str
     version: str
     db: str
+
+
+# ---------------------------------------------------------------------------
+# Scenario schemas — ADR-004 Decision 1
+# ---------------------------------------------------------------------------
+
+
+class ScenarioConfigSchema(BaseModel):
+    """Scenario configuration payload.
+
+    `entities` — list of entity_ids in scope for this scenario run.
+    `initial_attributes` — optional per-entity attribute overrides at step 0.
+    `n_steps` — number of simulation timesteps to execute (1–100).
+    `timestep_label` — human-readable timestep unit label.
+    """
+
+    model_config = ConfigDict(from_attributes=True)
+
+    entities: list[str]
+    initial_attributes: dict[str, dict[str, QuantitySchema]] = {}
+    n_steps: int
+    timestep_label: str = "annual"
+
+
+class ScheduledInputSchema(BaseModel):
+    """A ControlInput record bound to a specific simulation step."""
+
+    model_config = ConfigDict(from_attributes=True)
+
+    step: int
+    input_type: str
+    input_data: dict[str, Any]
+
+
+class ScenarioCreateRequest(BaseModel):
+    """Request body for POST /scenarios."""
+
+    model_config = ConfigDict(from_attributes=True)
+
+    name: str
+    description: str | None = None
+    configuration: ScenarioConfigSchema
+    scheduled_inputs: list[ScheduledInputSchema] = []
+
+
+class ScenarioResponse(BaseModel):
+    """Scenario summary — list and create responses."""
+
+    model_config = ConfigDict(from_attributes=True)
+
+    scenario_id: str
+    name: str
+    description: str | None
+    status: str
+    version: int
+    created_at: str
+
+
+class ScenarioDetailResponse(BaseModel):
+    """Full scenario record including configuration and scheduled inputs."""
+
+    model_config = ConfigDict(from_attributes=True)
+
+    scenario_id: str
+    name: str
+    description: str | None
+    status: str
+    version: int
+    created_at: str
+    configuration: ScenarioConfigSchema
+    scheduled_inputs: list[ScheduledInputSchema]
