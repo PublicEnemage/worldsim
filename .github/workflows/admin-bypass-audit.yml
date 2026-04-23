@@ -1,0 +1,59 @@
+name: Admin Bypass Audit
+
+on:
+  pull_request:
+    types: [closed]
+
+permissions:
+  issues: write
+  pull-requests: read
+
+jobs:
+  audit:
+    if: ${{ github.event.pull_request.merged == true }}
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - name: Check for independent approving reviews
+        id: check_reviews
+        env:
+          PR_AUTHOR: ${{ github.event.pull_request.user.login }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          REVIEWS=$(gh api "repos/${{ github.repository }}/pulls/${PR_NUMBER}/reviews")
+          INDEPENDENT=$(echo "$REVIEWS" | python3 -c "
+          import json, sys, os
+          reviews = json.load(sys.stdin)
+          author = os.environ['PR_AUTHOR']
+          count = sum(1 for r in reviews if r['state'] == 'APPROVED' and r['user']['login'] != author)
+          print(count)
+          ")
+          echo "independent_approvals=${INDEPENDENT}" >> "$GITHUB_OUTPUT"
+
+      - name: Post bypass comment to Issue #6
+        if: ${{ steps.check_reviews.outputs.independent_approvals == '0' }}
+        env:
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          ACTOR: ${{ github.actor }}
+          TIMESTAMP: ${{ github.event.pull_request.merged_at }}
+        run: |
+          python3 -c "
+          import os
+          body = (
+              'Admin bypass merge recorded. '
+              'PR #' + os.environ['PR_NUMBER'] + ' \u2014 ' + os.environ['PR_TITLE'] + ' \u2014 '
+              'merged by ' + os.environ['ACTOR'] + ' on ' + os.environ['TIMESTAMP'] + '. '
+              'Zero independent approvals. '
+              'Merged under single-principal conditions per CLAUDE.md \u00a7Governance. '
+              'References: Issue #3 (governance gap), Issue #6 (bypass log). '
+              'Risk: [Engineering Lead must manually edit this comment to add risk assessment '
+              '\u2014 Low/Medium/High and one sentence rationale].'
+          )
+          with open('/tmp/bypass_comment.txt', 'w') as f:
+              f.write(body)
+          "
+          gh issue comment 6 \
+            --repo "${{ github.repository }}" \
+            --body-file /tmp/bypass_comment.txt
