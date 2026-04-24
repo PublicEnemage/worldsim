@@ -521,6 +521,39 @@ Use the backtesting issue template when opening a GitHub Issue for a new case.
 
 ---
 
+## Testing Patterns
+
+### Session-scoped asyncio fixtures with asyncpg
+
+Tests that share an asyncpg connection pool across multiple async test
+functions must declare `loop_scope="session"` in three places:
+
+1. **The pool lifecycle fixture in `conftest.py`** — use
+   `@pytest_asyncio.fixture(scope="session", loop_scope="session")` and
+   make the fixture `async`. Using `asyncio.run()` in a sync fixture creates
+   a temporary event loop that is immediately closed after pool creation,
+   leaving every pool connection bound to a dead loop.
+
+2. **The client fixture that uses the pool** — use
+   `@pytest_asyncio.fixture(loop_scope="session")`.
+
+3. **The test module's `pytestmark`** — include
+   `pytest.mark.asyncio(loop_scope="session")` to apply session-loop scope
+   to every async test function in the module:
+   ```python
+   pytestmark = [pytest.mark.backtesting, pytest.mark.asyncio(loop_scope="session")]
+   ```
+   Individual `@pytest.mark.asyncio` decorators on each test function are
+   then redundant and can be removed — `pytestmark` covers them in strict mode.
+
+If any of the three is missing, asyncpg will raise
+`RuntimeError: Future attached to a different loop` or
+`InterfaceError: cannot perform operation: another operation is in progress`
+because pool connections are bound to the event loop in which they were created.
+See commits `6c35cab` and `89e2caa` for the full diagnostic and fix record.
+
+---
+
 ## Multilingual Contributions
 
 Translation contributions are critically important to the mission. A tool that
