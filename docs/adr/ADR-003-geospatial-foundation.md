@@ -6,27 +6,22 @@ Accepted
 ## Validity Context
 
 **Standards Version:** 2026-04-21
-**Valid Until:** Milestone 3 completion
+**Valid Until:** Milestone 4 completion
 **License Status:** CURRENT
 
-**Last Reviewed:** 2026-04-21 — Milestone 2 exit review. All four decisions
-fully implemented and verified. License Status set to CURRENT. Implementation
-evidence:
-- Decision 1 (PostGIS schema): Alembic migration `126eb2fd0afd` live. Five-table
-  schema (`simulation_entities`, `relationships`, `territorial_designations`,
-  `source_registry`, `control_input_audit_log`) verified by SCAN-005.
-- Decision 2 (FastAPI layer): Six endpoints serving country data via asyncpg
-  direct queries. CORS all-origins for M2 dev scope. Verified by SCAN-006
-  (251 unit tests passing, 16 integration tests skip gracefully without DB).
-- Decision 3 (MapLibre GL): Choropleth rendering at http://localhost:5173.
-  177 Natural Earth countries loaded. Float prohibition enforced end-to-end —
-  `attribute_value: string` in TypeScript, `["to-number", ...]` only in
-  MapLibre paint expression. Verified by SCAN-007 (TypeScript build clean).
-- Decision 4 (TerritorialValidator): Hard gate enforcing all five POLICY.md
-  positions (TWN, PSE, XKX, ESH, CRIMEA) before any INSERT. 30/30 unit tests
-  passing.
-No renewal triggers fired at milestone close. Next scheduled review at
-Milestone 3 completion.
+**Last Reviewed:** 2026-04-24 — Milestone 3 exit review. No renewal triggers
+fired during Milestone 3. License Status confirmed CURRENT. No changes to
+the GeoJSON-over-REST serving approach, PostGIS schema, CORS policy, or
+TerritorialValidator gate occurred during this milestone. License renewed for
+Milestone 4. Next scheduled review at Milestone 4 completion.
+
+**Previously reviewed:** 2026-04-21 — Milestone 2 exit review. All four
+decisions fully implemented and verified. License Status set to CURRENT.
+Implementation evidence: Decision 1 (PostGIS schema): Alembic migration
+`126eb2fd0afd` live, five-table schema verified by SCAN-005. Decision 2
+(FastAPI layer): six endpoints, SCAN-006 (251 unit tests). Decision 3
+(MapLibre GL): 177 countries, float prohibition end-to-end, SCAN-007 clean.
+Decision 4 (TerritorialValidator): 30/30 unit tests passing.
 
 **Renewal Triggers** — any of the following fires the CURRENT → UNDER-REVIEW
 transition:

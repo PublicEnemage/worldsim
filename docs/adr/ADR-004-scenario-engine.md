@@ -12,6 +12,16 @@ Accepted
 **Engineering Lead accepted 2026-04-21.** Architecture decisions reviewed and
 approved. Implementation may proceed.
 
+**Last Reviewed:** 2026-04-24 — Milestone 3 exit review. No renewal triggers
+fired during Milestone 3. License Status confirmed CURRENT. All five decisions
+implemented and verified by SCAN-013 (comparative scenario output, 0
+violations) and SCAN-014 (M3 exit gate, 59 files, 0 violations). The
+engine_version gap (engine_version is a declaration, not a verifiable pointer
+— see Known Limitation under Decision 1 Amendment) is tracked in Issue #139
+as a documented known limitation; it does not constitute a renewal trigger at
+this stage because the verifiable pointer mechanism is M4 scope. Next
+scheduled review at Milestone 4 completion.
+
 **Renewal Triggers** — any of the following fires the CURRENT → UNDER-REVIEW
 transition:
 - Scenario storage format changed (JSONB ControlInput serialisation format
