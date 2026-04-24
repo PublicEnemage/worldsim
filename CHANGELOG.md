@@ -5,6 +5,123 @@ closure ceremony defined in `docs/MILESTONE_RUNBOOK.md`.
 
 ---
 
+## v0.3.0 — Milestone 3: Scenario Engine (2026-04-24)
+
+### Delivered
+
+**Scenario Configuration (ADR-004 Decision 1)**
+- Three new database tables via Alembic migration: `scenarios`
+  (configuration JSONB, status, engine_version), `scenario_state_snapshots`
+  (step-indexed state JSONB, `ia1_disclosure` NOT NULL enforced at DB level),
+  `scenario_tombstones` (deleted scenario config + scheduled_inputs JSONB for
+  reconstruction from first principles)
+- Four API endpoints: `POST /scenarios`, `GET /scenarios/{id}`,
+  `GET /scenarios/{id}/snapshots`, `DELETE /scenarios/{id}`
+- `ScenarioConfig` Pydantic schema with full validation; `AdvanceResponse`
+  and `SnapshotResponse` schemas with float prohibition enforced end-to-end
+
+**Simulation Execution Layer (ADR-004 Decision 2)**
+- `WebScenarioRunner` — async scenario executor wiring `SimulationStateRepository`
+  (read/write `SimulationState` from DB) and `ScenarioSnapshotRepository`
+  (write step snapshots with SA-09 envelope format)
+- `SimulationStateRepository` builds `SimulationState` from PostGIS entities
+  with GRC entity required for backtesting fixture
+- `ScenarioSnapshotRepository` persists `state_data` as JSONB with
+  `_envelope_version: "1"` and `value: str` (float prohibition)
+- SA-11 determinism guarantee: same configuration + same scheduled inputs +
+  same engine version → identical snapshot outputs
+
+**Greece 2010–2012 Backtesting Fixture (ADR-004 Decision 3)**
+- `tests/backtesting/test_greece_2010_2012.py` — four tests marked `backtesting`;
+  enforced in CI as a build gate (a failure here is a build failure)
+- `DIRECTION_ONLY` fidelity thresholds: gdp_growth negative at steps 1–3;
+  unemployment rising step 1 → step 3
+- `fidelity_report.py` — structured fidelity report printed to CI logs on
+  every backtesting run
+- `greece_2010_2012_actuals.py` — historical actuals fixture with IA-1
+  and parameter calibration disclosures
+- `natural_earth_loader.py` seed script runs in CI before backtesting suite
+  to ensure GRC entity exists
+- Session-scoped asyncpg pool lifecycle fix: `loop_scope="session"` on
+  lifecycle fixture, client fixture, and `pytestmark` — prevents
+  "Future attached to a different loop" errors (commits `6c35cab`, `89e2caa`)
+
+**Time Acceleration Controls (ADR-004 Decision 4)**
+- `POST /scenarios/{id}/advance` — advances scenario by configurable steps;
+  returns `AdvanceResponse` with `steps_completed`, `final_status`, and
+  `snapshots` array
+- Step-aware choropleth: `GET /choropleth/{attribute}` accepts optional
+  `scenario_id` and `step` query parameters; geometry from
+  `simulation_entities` (stable), attribute values from
+  `scenario_state_snapshots` (step-specific); 422 if only one of the pair
+  provided
+
+**Comparative Scenario Output (ADR-004 Decision 5)**
+- `GET /scenarios/compare` — returns `CompareResponse` with per-entity,
+  per-attribute `DeltaRecord` (value_a, value_b, delta, direction,
+  confidence_tier); registered before `/{scenario_id}` to avoid FastAPI path
+  collision
+- `GET /choropleth/{attribute}/delta` — delta choropleth endpoint joining
+  geometry with Decimal delta computation; returns `GeoJSONFeatureCollection`
+  with `delta_direction` and both base values
+- `DeltaChoropleth.tsx` — diverging colour scale (crimson → white → navy);
+  percentile-based step computation for negative and positive halves
+  separately; legend overlay; hover popup with delta direction icon
+- `DeltaRecord` and `CompareResponse` Pydantic schemas; 12 unit tests and
+  10 integration tests
+
+**Scenario Tombstones (ADR-004 Decision 1)**
+- `DELETE /scenarios/{id}` writes a tombstone capturing name, configuration
+  JSONB, scheduled_inputs JSONB, engine_version, and original_created_at
+  before deleting the scenario; enables reconstruction from first principles
+  under the SA-11 determinism guarantee
+- Snapshots are derived data and are not tombstoned — they are reproducible
+  from the tombstone given the same engine version
+
+**CI and Governance**
+- `ci-failure-notify.yml` — GitHub Actions workflow notifying on CI failures
+- `admin-bypass-audit.yml` — GitHub Actions workflow auditing branch
+  protection bypasses
+- ADR-004 Known Limitation (engine_version gap): `engine_version` is a
+  semantic version string declaration, not a verifiable pointer; no
+  block-on-mismatch control exists at M3; conservative posture is to block
+  unconditionally on mismatch; tracked in Issue #139 for M4 resolution
+
+### Deferred
+
+- **Issues #69** — `ia1_disclosure` compliance exception: time-horizon
+  confidence degradation not yet applied to projected attributes; compliance
+  exception documented; moved to Milestone 4
+- **Issues #86, #87, #91, #92** — human cost indicators and time-horizon
+  degradation; moved to Milestone 4
+- **Issues #22, #23, #24, #26** — uncertainty quantification, distribution
+  selection, correlation structure modelling, and related standards work;
+  moved to Milestone 4
+- Standards documentation cluster (SA-02 through SA-17 subset, Issues #42
+  #43 #46 #47 #49) — moved to Milestone 4 with scope update incorporating
+  Whatsonyourmind external contributor corrections to Issue #49
+
+### Compliance Posture
+
+- SCAN-009 — Scenario configuration: **Clean** (0 violations)
+- SCAN-010 — SimulationStateRepository and snapshot layer: **Clean**
+  (0 violations)
+- SCAN-011 — WebScenarioRunner execution layer: **Clean** (0 violations)
+- SCAN-012 — Greece backtesting fixture: **Clean** (0 violations)
+- SCAN-013 — Comparative scenario output: **Clean** (0 violations)
+- SCAN-014 — Milestone 3 exit gate: **Clean** (59 files, 0 violations,
+  2 pre-accepted warnings — ARCH-4 `Relationship.attributes: dict[str, Any]`
+  and `Relationship.weight: float` propagation coefficient)
+- Open compliance exception: **Issue #69** — `ia1_disclosure` time-horizon
+  degradation; exception documented with single-principal governance
+  acknowledgement per CLAUDE.md §Governance
+- Open architectural gap: **Issue #139** — `engine_version` is a declaration,
+  not a verifiable pointer; documented as Known Limitation in ADR-004
+- ADR license status at milestone close: ADR-001 CURRENT, ADR-002 CURRENT,
+  ADR-003 CURRENT, ADR-004 CURRENT (all renewed to Milestone 4)
+
+---
+
 ## v0.2.0 — Milestone 2: Geospatial Foundation (2026-04-21)
 
 ### Delivered
