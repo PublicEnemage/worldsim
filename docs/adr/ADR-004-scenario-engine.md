@@ -141,6 +141,51 @@ The audit store requirement is an application-layer addition to the DELETE endpo
 
 **CONFLICT C-1 is resolved.** No further Engineering Lead action required on this conflict.
 
+#### Known Limitation — engine_version is a Declaration, Not a Verifiable Pointer (2026-04-24)
+
+The reconstruction guarantee in the tombstone design rests on SA-11 determinism: same
+configuration + same scheduled inputs + same engine version → identical output. This
+guarantee has a boundary condition that is not yet enforced.
+
+**The gap:** `engine_version` is currently stored as a semantic version string
+(`"0.3.0"`) hardcoded in `app/api/scenarios.py`. This is a *declaration* — it records
+what version was claimed at deletion time, but provides no mechanism to:
+
+1. Verify that the string corresponds to a specific, retrievable engine artifact.
+2. Instantiate that engine version at reconstruction time if it differs from the
+   current deployed version.
+3. Block or flag a reconstruction attempt when the tombstone version and the live
+   engine version do not match.
+
+**Why this matters at Milestone 4:** M4 will recalibrate propagation coefficients and
+add new simulation modules (Human Cost Ledger). A tombstone written under M3
+(`engine_version = "0.3.0"`) reconstructed against the M4 engine will produce
+different outputs than the user originally saw. The reconstruction guarantee silently
+fails — no error is raised, but the outputs are not reproducible.
+
+**The conservative control posture:** Block reconstruction unconditionally when tombstone
+`engine_version` does not match the live engine version. Do not warn and proceed — the
+system has no visibility into how reconstructed outputs are used downstream, so a
+permissive response cannot be made safe by intent declaration. A logged exception
+override mechanism should exist for explicit audit use cases, but the default must be
+a hard block.
+
+**The two-layer fix required (tracked in Issue #[TBD]):**
+
+1. Replace the semantic version string with a git commit hash (or store both). A commit
+   hash is a precise, retrievable pointer that unambiguously identifies the engine state.
+   A semantic version string requires an external convention to resolve to a specific
+   artifact.
+
+2. Build the artifact convention: version-tagged Docker images or a git-pinned
+   deployment mechanism that allows a specific engine version to be instantiated on
+   demand for reconstruction. The tombstone already has the right shape; the resolution
+   mechanism does not yet exist.
+
+**Status:** Open architectural gap. Tracked in Issue #139.
+The tombstone remains sound as an audit record; the reconstruction guarantee is
+accurate for same-version use and undeclared for cross-version use.
+
 ---
 
 #### Database Schema
