@@ -270,7 +270,9 @@ class WebScenarioRunner:
                 modules=[],
                 scheduled_inputs=step_inputs,
             )
-            await snap_repo.write_snapshot(conn, scenario_id, next_step, new_state.timestep, new_state)
+            await snap_repo.write_snapshot(
+                conn, scenario_id, next_step, new_state.timestep, new_state
+            )
 
             steps_remaining = config.n_steps - next_step
             is_complete = steps_remaining == 0

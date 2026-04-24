@@ -11,8 +11,12 @@ Covers:
 from __future__ import annotations
 
 import os
+from typing import TYPE_CHECKING
 
 import pytest
+
+if TYPE_CHECKING:
+    from collections.abc import AsyncGenerator
 
 DATABASE_URL = os.environ.get("DATABASE_URL")
 pytestmark = pytest.mark.integration
@@ -26,16 +30,21 @@ from httpx import AsyncClient  # noqa: E402
 
 from app.main import app  # noqa: E402
 
+_CFG = (
+    '{"entities": [], "n_steps": 1, '
+    '"timestep_label": "annual", "initial_attributes": {}}'
+)
+
 
 @pytest.fixture()
-async def db_conn():
+async def db_conn() -> AsyncGenerator[asyncpg.Connection, None]:
     conn = await asyncpg.connect(DATABASE_URL)
     yield conn
     await conn.close()
 
 
 @pytest.fixture()
-async def client():
+async def client() -> AsyncGenerator[AsyncClient, None]:
     async with AsyncClient(app=app, base_url="http://test") as c:
         yield c
 
@@ -52,7 +61,10 @@ async def test_advance_nonexistent_scenario_returns_404(client: AsyncClient) -> 
 
 
 @pytest.mark.asyncio
-async def test_advance_completed_scenario_returns_409(client: AsyncClient, db_conn: asyncpg.Connection) -> None:
+async def test_advance_completed_scenario_returns_409(
+    client: AsyncClient,
+    db_conn: asyncpg.Connection,
+) -> None:
     import json
     import uuid
 
@@ -63,7 +75,10 @@ async def test_advance_completed_scenario_returns_409(client: AsyncClient, db_co
         VALUES ($1, 'Completed Test', 'completed', $2, 1)
         """,
         sid,
-        json.dumps({"entities": [], "n_steps": 1, "timestep_label": "annual", "initial_attributes": {}}),
+        json.dumps({
+            "entities": [], "n_steps": 1,
+            "timestep_label": "annual", "initial_attributes": {},
+        }),
     )
     try:
         res = await client.post(f"/api/v1/scenarios/{sid}/advance")
@@ -90,7 +105,10 @@ async def test_choropleth_scenario_id_without_step_returns_422(client: AsyncClie
 
 
 @pytest.mark.asyncio
-async def test_choropleth_snapshot_missing_step_returns_404(client: AsyncClient, db_conn: asyncpg.Connection) -> None:
+async def test_choropleth_snapshot_missing_step_returns_404(
+    client: AsyncClient,
+    db_conn: asyncpg.Connection,
+) -> None:
     import json
     import uuid
 
@@ -101,7 +119,10 @@ async def test_choropleth_snapshot_missing_step_returns_404(client: AsyncClient,
         VALUES ($1, 'Snap Test', 'pending', $2, 1)
         """,
         sid,
-        json.dumps({"entities": [], "n_steps": 1, "timestep_label": "annual", "initial_attributes": {}}),
+        json.dumps({
+            "entities": [], "n_steps": 1,
+            "timestep_label": "annual", "initial_attributes": {},
+        }),
     )
     try:
         res = await client.get(f"/api/v1/choropleth/gdp_growth?scenario_id={sid}&step=99")

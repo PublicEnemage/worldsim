@@ -360,7 +360,10 @@ async def _choropleth_from_snapshot(
     if not entity_ids_with_attr:
         raise HTTPException(
             status_code=404,
-            detail=f"No entities in scenario '{scenario_id}' step {step} have attribute '{attribute_key}'.",
+            detail=(
+                f"No entities in scenario '{scenario_id}' step {step} "
+                f"have attribute '{attribute_key}'."
+            ),
         )
 
     rows = await conn.fetch(

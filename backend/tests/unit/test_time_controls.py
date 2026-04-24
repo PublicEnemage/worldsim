@@ -11,8 +11,7 @@ from __future__ import annotations
 import pytest
 
 from app.schemas import AdvanceResponse
-from app.simulation.web_scenario_runner import StepSummary
-
+from app.simulation.web_scenario_runner import StepSummary  # noqa: TCH001
 
 # ---------------------------------------------------------------------------
 # AdvanceResponse schema
@@ -108,7 +107,10 @@ async def test_run_single_step_raises_on_completed() -> None:
             "scenario_id": "s1",
             "name": "Test",
             "status": "completed",
-            "configuration": '{"entities": ["GRC"], "n_steps": 3, "timestep_label": "annual", "initial_attributes": {}}',
+            "configuration": (
+                '{"entities": ["GRC"], "n_steps": 3, '
+                '"timestep_label": "annual", "initial_attributes": {}}'
+            ),
         }
     )
 
