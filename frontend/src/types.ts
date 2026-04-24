@@ -32,3 +32,11 @@ export interface GeoJSONFeatureCollection {
   type: "FeatureCollection";
   features: GeoJSONFeature[];
 }
+
+export interface AdvanceResponse {
+  scenario_id: string;
+  step_executed: number;
+  steps_remaining: number;
+  final_status: string;
+  is_complete: boolean;
+}

@@ -13,6 +13,8 @@ const MAP_STYLE = "https://demotiles.maplibre.org/style.json";
 interface Props {
   attributeName: string;
   title: string;
+  scenarioId?: string | null;
+  currentStep?: number | null;
 }
 
 function computeSteps(features: GeoJSONFeatureCollection["features"]): number[] {
@@ -27,7 +29,7 @@ function computeSteps(features: GeoJSONFeatureCollection["features"]): number[] 
   return [pct(0), pct(25), pct(50), pct(75), pct(100)];
 }
 
-export default function ChoroplethMap({ attributeName, title }: Props) {
+export default function ChoroplethMap({ attributeName, title, scenarioId, currentStep }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<maplibregl.Map | null>(null);
   const popupRef = useRef<maplibregl.Popup | null>(null);
@@ -61,7 +63,11 @@ export default function ChoroplethMap({ attributeName, title }: Props) {
     setError(null);
 
     const load = async () => {
-      const res = await fetch(`${API_BASE}/choropleth/${attributeName}`);
+      let url = `${API_BASE}/choropleth/${attributeName}`;
+      if (scenarioId != null && currentStep != null) {
+        url += `?scenario_id=${encodeURIComponent(scenarioId)}&step=${currentStep}`;
+      }
+      const res = await fetch(url);
       if (res.status === 404) {
         setError(`No data available for attribute "${attributeName}".`);
         return;
@@ -157,7 +163,7 @@ export default function ChoroplethMap({ attributeName, title }: Props) {
     load().catch(() => {
       setError(`Failed to fetch data for "${attributeName}".`);
     });
-  }, [attributeName, title]);
+  }, [attributeName, title, scenarioId, currentStep]);
 
   return (
     <div style={{ position: "relative", width: "100%", height: "100%" }}>

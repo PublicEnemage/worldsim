@@ -1,11 +1,13 @@
-"""Scenario endpoints — ADR-004 Decisions 1 and 2.
+"""Scenario endpoints — ADR-004 Decisions 1, 2, and 4.
 
-Six endpoints covering scenario configuration lifecycle and execution:
-  POST   /scenarios                        — create scenario (status: pending)
-  GET    /scenarios                        — list all scenarios (created_at desc)
-  GET    /scenarios/{scenario_id}          — full detail with scheduled inputs
-  DELETE /scenarios/{scenario_id}          — tombstone + cascade delete, returns 204
-  POST   /scenarios/{scenario_id}/run     — execute pending scenario to completion
+Seven endpoints covering scenario configuration lifecycle and execution:
+  POST   /scenarios                           — create scenario (status: pending)
+  GET    /scenarios                           — list all scenarios (created_at desc)
+  GET    /scenarios/{scenario_id}             — full detail with scheduled inputs
+  DELETE /scenarios/{scenario_id}             — tombstone + cascade delete, returns 204
+  POST   /scenarios/{scenario_id}/run         — execute pending scenario to completion
+  POST   /scenarios/{scenario_id}/advance     — advance one step (ADR-004 Decision 4)
+  GET    /scenarios/{scenario_id}/snapshots   — list all snapshots (ADR-004 Decision 3)
 
 Validation runs at creation time (structural) — entity existence check,
 n_steps bounds, step index bounds, non-empty name. Semantic validation
@@ -30,6 +32,7 @@ from fastapi import APIRouter, Depends, HTTPException, Response
 
 from app.api.deps import get_db  # noqa: TCH001 — used as Depends(get_db) at runtime
 from app.schemas import (
+    AdvanceResponse,
     RunSummaryResponse,
     ScenarioConfigSchema,
     ScenarioCreateRequest,
@@ -375,6 +378,48 @@ async def run_scenario(
         steps_executed=summary.steps_executed,
         final_status=summary.final_status,
         duration_seconds=summary.duration_seconds,
+    )
+
+
+# ---------------------------------------------------------------------------
+# POST /scenarios/{scenario_id}/advance — ADR-004 Decision 4
+# ---------------------------------------------------------------------------
+
+
+@router.post("/scenarios/{scenario_id}/advance", response_model=AdvanceResponse)
+async def advance_scenario(
+    scenario_id: str,
+    conn: Annotated[asyncpg.Connection, Depends(get_db)],
+) -> AdvanceResponse:
+    """Advance a scenario by exactly one simulation step.
+
+    Executes the next pending step, writes a snapshot, and returns the step
+    index and remaining steps. Returns 404 if scenario not found, 409 if
+    already completed. ADR-004 Decision 4 — step-by-step advance pattern.
+    """
+    status_row = await conn.fetchrow(
+        "SELECT status FROM scenarios WHERE scenario_id = $1",
+        scenario_id,
+    )
+    if status_row is None:
+        raise HTTPException(
+            status_code=404, detail=f"Scenario '{scenario_id}' not found."
+        )
+    if status_row["status"] == "completed":
+        raise HTTPException(
+            status_code=409,
+            detail=f"Scenario '{scenario_id}' is already completed. Cannot advance further.",
+        )
+
+    from app.simulation.web_scenario_runner import WebScenarioRunner  # noqa: PLC0415
+
+    summary = await WebScenarioRunner().run_single_step(conn, scenario_id)
+    return AdvanceResponse(
+        scenario_id=summary.scenario_id,
+        step_executed=summary.step_executed,
+        steps_remaining=summary.steps_remaining,
+        final_status=summary.final_status,
+        is_complete=summary.is_complete,
     )
 
 
