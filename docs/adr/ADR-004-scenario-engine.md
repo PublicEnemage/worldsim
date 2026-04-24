@@ -106,11 +106,25 @@ Rationale:
    can be deleted without destroying the execution record of what it did.
 
 2. Before the CASCADE executes, the `DELETE /scenarios/{id}` endpoint must write a
-   deletion record to an audit store capturing: `scenario_id`, `name`, SHA-256 of
-   `configuration` JSONB, `created_at`, and `deleted_at`. This preserves a durable
+   deletion record to an audit store capturing: `scenario_id`, `name`, full
+   `configuration` JSONB, full `scheduled_inputs` JSONB array (all rows from
+   `scenario_scheduled_inputs` serialised in step order), `engine_version` (the
+   WorldSim API version string at time of deletion), `created_at` (original scenario
+   creation timestamp), `deleted_at`, and `deleted_by`. This preserves a complete
    tombstone even after all child rows are cascade-deleted. The deletion record must
    be written in the same transaction as the DELETE — if the transaction rolls back,
-   the deletion record is also rolled back.
+   the tombstone write is also rolled back.
+
+   Because SA-11 (Issue #126) requires that every scenario implementation is
+   deterministic — same configuration, same initial state, same engine version
+   produces identical output — state snapshots are *derived data*. They can be
+   regenerated from configuration plus scheduled inputs plus source entity data.
+   The tombstone therefore contains everything needed for full reconstruction: load
+   source entity data at `base_date` from `simulation_entities`, read tombstone
+   `configuration` and `scheduled_inputs`, run through the `engine_version` recorded
+   in the tombstone, and identical output is produced. State snapshots are a
+   performance cache of this derivation, not the primary record. Deleting them does
+   not destroy information that cannot be recovered.
 
 3. `POLICY.md §Scenario Data Retention` (SA-06, Issue #121) must declare:
    `scenario_scheduled_inputs` is scenario configuration data. It is retained for the
