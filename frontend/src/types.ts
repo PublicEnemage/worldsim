@@ -40,3 +40,31 @@ export interface AdvanceResponse {
   final_status: string;
   is_complete: boolean;
 }
+
+export interface DeltaRecord {
+  value_a: string;
+  value_b: string;
+  delta: string;
+  direction: "increase" | "decrease" | "unchanged";
+  confidence_tier: number;
+}
+
+export interface CompareResponse {
+  scenario_a_id: string;
+  scenario_b_id: string;
+  step_a: number;
+  step_b: number;
+  deltas: Record<string, Record<string, DeltaRecord>>;
+}
+
+export interface DeltaChoroplethFeatureProperties {
+  entity_id: string;
+  name: string;
+  attribute_value: string; // str(delta) — Decimal as string
+  value_a: string;
+  value_b: string;
+  delta_direction: "increase" | "decrease" | "unchanged";
+  confidence_tier: number;
+  has_territorial_note: boolean;
+  territorial_note: string | null;
+}

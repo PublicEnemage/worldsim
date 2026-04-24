@@ -236,3 +236,41 @@ class AdvanceResponse(BaseModel):
     steps_remaining: int
     final_status: str
     is_complete: bool
+
+
+# ---------------------------------------------------------------------------
+# Comparative scenario schemas — ADR-004 Decision 5
+# ---------------------------------------------------------------------------
+
+
+class DeltaRecord(BaseModel):
+    """Delta between the same attribute across two scenario snapshots.
+
+    `delta` = str(Decimal(value_b) - Decimal(value_a)).
+    `direction` is 'increase', 'decrease', or 'unchanged'.
+    `confidence_tier` is max(tier_a, tier_b) — lower-of-two rule.
+    """
+
+    model_config = ConfigDict(from_attributes=True)
+
+    value_a: str
+    value_b: str
+    delta: str
+    direction: str
+    confidence_tier: int
+
+
+class CompareResponse(BaseModel):
+    """Comparative output across two scenario final snapshots — ADR-004 Decision 5.
+
+    `deltas` maps entity_id → attribute_key → DeltaRecord.
+    Only entities and attributes present in both snapshots are included.
+    """
+
+    model_config = ConfigDict(from_attributes=True)
+
+    scenario_a_id: str
+    scenario_b_id: str
+    step_a: int
+    step_b: int
+    deltas: dict[str, dict[str, DeltaRecord]]
