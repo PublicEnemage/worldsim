@@ -32,10 +32,68 @@ jobs:
           cd backend
           pytest tests/integration -v || [ $? -eq 5 ]
 
-      - name: Run backtesting suite
+      - name: Run backtesting suite (skip without DATABASE_URL)
         run: |
           cd backend
           pytest tests/backtesting -v || [ $? -eq 5 ]
+
+  # ---------------------------------------------------------------------------
+  # Backtesting job — Greece 2010–2012 fidelity gate (ADR-004 Decision 3)
+  #
+  # Requires a live PostGIS database with seeded simulation_entities.
+  # The GRC entity must exist — run natural_earth_loader before pytest.
+  # A failure in this job is a build failure; it is the Milestone 3 exit
+  # gate for the backtesting criterion (Issue #61, Issue #112).
+  # ---------------------------------------------------------------------------
+  backtesting:
+    runs-on: ubuntu-latest
+    needs: test-backend
+
+    services:
+      postgres:
+        image: postgis/postgis:16-3.4
+        env:
+          POSTGRES_USER: worldsim
+          POSTGRES_PASSWORD: worldsim
+          POSTGRES_DB: worldsim
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      DATABASE_URL: postgresql://worldsim:worldsim@localhost:5432/worldsim
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: |
+          cd backend
+          pip install -r requirements.txt
+
+      - name: Run Alembic migrations
+        run: |
+          cd backend
+          alembic upgrade head
+
+      - name: Seed Natural Earth data (creates GRC entity required by backtesting)
+        run: |
+          cd backend
+          python -m app.db.seed.natural_earth_loader
+
+      - name: Run Greece 2010–2012 backtesting suite
+        run: |
+          cd backend
+          pytest -m backtesting --tb=short -v
 
   lint:
     runs-on: ubuntu-latest

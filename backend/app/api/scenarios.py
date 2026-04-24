@@ -36,6 +36,7 @@ from app.schemas import (
     ScenarioDetailResponse,
     ScenarioResponse,
     ScheduledInputSchema,
+    SnapshotRecord,
 )
 
 # Engine version for tombstone records — must match app version in main.py.
@@ -375,3 +376,53 @@ async def run_scenario(
         final_status=summary.final_status,
         duration_seconds=summary.duration_seconds,
     )
+
+
+# ---------------------------------------------------------------------------
+# GET /scenarios/{scenario_id}/snapshots — ADR-004 Decision 3
+# ---------------------------------------------------------------------------
+
+
+@router.get("/scenarios/{scenario_id}/snapshots", response_model=list[SnapshotRecord])
+async def list_snapshots(
+    scenario_id: str,
+    conn: Annotated[asyncpg.Connection, Depends(get_db)],
+) -> list[SnapshotRecord]:
+    """Return all snapshots for a scenario ordered by step ascending.
+
+    Used by the backtesting test to evaluate fidelity thresholds against
+    each simulated timestep's state_data. ADR-004 Decision 3.
+    """
+    scenario_row = await conn.fetchrow(
+        "SELECT scenario_id FROM scenarios WHERE scenario_id = $1",
+        scenario_id,
+    )
+    if scenario_row is None:
+        raise HTTPException(
+            status_code=404, detail=f"Scenario '{scenario_id}' not found."
+        )
+
+    rows = await conn.fetch(
+        """
+        SELECT scenario_id, step, timestep, state_data
+        FROM scenario_state_snapshots
+        WHERE scenario_id = $1
+        ORDER BY step ASC
+        """,
+        scenario_id,
+    )
+
+    result = []
+    for row in rows:
+        state_raw = row["state_data"]
+        if isinstance(state_raw, str):
+            state_raw = json.loads(state_raw)
+        timestep = row["timestep"]
+        timestep_str = timestep.isoformat() if hasattr(timestep, "isoformat") else str(timestep)
+        result.append(SnapshotRecord(
+            scenario_id=row["scenario_id"],
+            step=row["step"],
+            timestep=timestep_str,
+            state_data=state_raw if isinstance(state_raw, dict) else {},
+        ))
+    return result
