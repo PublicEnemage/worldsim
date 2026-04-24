@@ -88,7 +88,14 @@ class ResolutionConfig:
     entity_overrides: dict[str, ResolutionLevel] = field(default_factory=dict)
 
     def level_for(self, entity_id: str) -> ResolutionLevel:
-        """Return the effective resolution level for an entity."""
+        """Return the effective resolution level for an entity.
+
+        Args:
+            entity_id: The entity to look up.
+
+        Returns:
+            Entity-specific override if one is set, otherwise global_level.
+        """
         return self.entity_overrides.get(entity_id, self.global_level)
 
 
@@ -155,7 +162,12 @@ class SimulationEntity:
     def get_attribute(self, key: str) -> Quantity | None:
         """Return an attribute Quantity, or None if not present.
 
-        Use get_attribute_value() for numeric comparison operations.
+        Args:
+            key: Attribute key to look up.
+
+        Returns:
+            Quantity for the key, or None if the key is absent.
+            Use get_attribute_value() for numeric comparison operations.
         """
         return self.attributes.get(key)
 
@@ -172,7 +184,12 @@ class SimulationEntity:
         return q.value
 
     def set_attribute(self, key: str, value: Quantity) -> None:
-        """Set an attribute to an absolute Quantity value."""
+        """Set an attribute to an absolute Quantity value.
+
+        Args:
+            key: Attribute key to set.
+            value: Quantity to store; replaces any existing value for the key.
+        """
         self.attributes[key] = value
 
     def apply_delta(self, key: str, delta: Quantity) -> None:
