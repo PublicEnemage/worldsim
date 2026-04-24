@@ -1,0 +1,79 @@
+name: CI Failure Notify
+
+on:
+  workflow_run:
+    workflows: ["CI"]
+    types: [completed]
+
+jobs:
+  notify:
+    if: ${{ github.event.workflow_run.conclusion == 'failure' }}
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+
+    steps:
+      - name: Post failure comment to associated PR
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RUN_ID: ${{ github.event.workflow_run.id }}
+          RUN_URL: ${{ github.event.workflow_run.html_url }}
+          REPO: ${{ github.repository }}
+        run: |
+          # Find the PR number from the workflow run's pull_requests list.
+          # This is populated for same-repo PRs; empty for push-to-branch runs.
+          PR_NUMBER=$(gh api "repos/${REPO}/actions/runs/${RUN_ID}" \
+            --jq '.pull_requests[0].number // empty')
+
+          if [ -z "$PR_NUMBER" ]; then
+            echo "No PR associated with run ${RUN_ID} — skipping notification."
+            exit 0
+          fi
+
+          echo "Posting failure comment to PR #${PR_NUMBER}"
+
+          # Collect names of failed jobs.
+          FAILED_JOBS=$(gh api "repos/${REPO}/actions/runs/${RUN_ID}/jobs" \
+            --jq '[.jobs[] | select(.conclusion == "failure") | "- \(.name)"] | join("\n")')
+
+          # Get the ID of the first failed job for log extraction.
+          FIRST_FAILED_JOB_ID=$(gh api "repos/${REPO}/actions/runs/${RUN_ID}/jobs" \
+            --jq '[.jobs[] | select(.conclusion == "failure")] | .[0].id // empty')
+
+          # Extract the first recognisable error line from the job log.
+          # gh api follows the redirect that the logs endpoint returns.
+          ERROR_LINE=""
+          if [ -n "$FIRST_FAILED_JOB_ID" ] && [ "$FIRST_FAILED_JOB_ID" != "null" ]; then
+            ERROR_LINE=$(gh api "repos/${REPO}/actions/jobs/${FIRST_FAILED_JOB_ID}/logs" \
+              2>/dev/null \
+              | grep -vE '^\s*##\[' \
+              | grep -iE '\berror\b|\bfailed\b|\bException\b' \
+              | head -1 \
+              || true)
+          fi
+
+          # Build the comment body.
+          BODY="## CI Failed
+
+**Workflow run:** ${RUN_URL}
+
+**Failed jobs:**
+${FAILED_JOBS:-"(none detected)"}"
+
+          if [ -n "$ERROR_LINE" ]; then
+            BODY="${BODY}
+
+**First error line:**
+\`\`\`
+${ERROR_LINE}
+\`\`\`"
+          fi
+
+          BODY="${BODY}
+
+**Suggested Claude Code prompt:**
+\`\`\`
+CI failed on PR #${PR_NUMBER}. Investigate and fix: gh run view ${RUN_ID} --repo PublicEnemage/worldsim --log | grep -A5 error
+\`\`\`"
+
+          gh issue comment "$PR_NUMBER" --repo "$REPO" --body "$BODY"
