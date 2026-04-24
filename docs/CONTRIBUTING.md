@@ -136,6 +136,15 @@ npm install
 npm run dev                        # starts development server
 ```
 
+> **Docker users:** After merging a PR that changes frontend files, restart
+> the frontend container to pick up the new files:
+> ```bash
+> docker compose restart frontend
+> ```
+> Vite HMR only catches edits to files it is already watching — it does not
+> detect files that appeared or changed during a `git merge` or `git pull`.
+> Without a restart, the browser will continue serving the pre-merge bundle.
+
 ### Step 7: Launching Claude Code
 
 WorldSim uses Claude Code agents for AI-assisted development. When you open
