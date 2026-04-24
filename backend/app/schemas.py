@@ -213,3 +213,14 @@ class RunSummaryResponse(BaseModel):
     steps_executed: int
     final_status: str
     duration_seconds: float
+
+
+class SnapshotRecord(BaseModel):
+    """One step snapshot from scenario_state_snapshots — ADR-004 Decision 3."""
+
+    model_config = ConfigDict(from_attributes=True)
+
+    scenario_id: str
+    step: int
+    timestep: str
+    state_data: dict[str, Any]
