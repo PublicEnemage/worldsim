@@ -46,7 +46,7 @@ from app.main import app
 
 _DATABASE_URL = os.environ.get("DATABASE_URL", "")
 
-pytestmark = pytest.mark.backtesting
+pytestmark = [pytest.mark.backtesting, pytest.mark.asyncio(loop_scope="session")]
 
 
 def _require_db() -> None:
@@ -54,7 +54,7 @@ def _require_db() -> None:
         pytest.skip("DATABASE_URL not set — skipping Greece backtesting test")
 
 
-@pytest_asyncio.fixture()
+@pytest_asyncio.fixture(loop_scope="session")
 async def client() -> AsyncGenerator[httpx.AsyncClient, None]:
     _require_db()
     async with httpx.AsyncClient(
@@ -107,7 +107,6 @@ async def _create_and_run_scenario(
 # ---------------------------------------------------------------------------
 
 
-@pytest.mark.asyncio
 async def test_greece_2010_2012_direction_only_fidelity(
     client: httpx.AsyncClient,
 ) -> None:
@@ -177,7 +176,6 @@ async def test_greece_2010_2012_direction_only_fidelity(
 # ---------------------------------------------------------------------------
 
 
-@pytest.mark.asyncio
 async def test_greece_scenario_creates_correct_number_of_snapshots(
     client: httpx.AsyncClient,
 ) -> None:
@@ -193,7 +191,6 @@ async def test_greece_scenario_creates_correct_number_of_snapshots(
         await client.delete(f"/api/v1/scenarios/{scenario_id}")
 
 
-@pytest.mark.asyncio
 async def test_greece_snapshot_state_data_includes_gdp_growth(
     client: httpx.AsyncClient,
 ) -> None:
@@ -217,7 +214,6 @@ async def test_greece_snapshot_state_data_includes_gdp_growth(
         await client.delete(f"/api/v1/scenarios/{scenario_id}")
 
 
-@pytest.mark.asyncio
 async def test_greece_run_sets_status_completed(
     client: httpx.AsyncClient,
 ) -> None:
