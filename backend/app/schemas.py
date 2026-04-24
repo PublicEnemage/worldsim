@@ -224,3 +224,15 @@ class SnapshotRecord(BaseModel):
     step: int
     timestep: str
     state_data: dict[str, Any]
+
+
+class AdvanceResponse(BaseModel):
+    """Response from POST /scenarios/{id}/advance — ADR-004 Decision 4."""
+
+    model_config = ConfigDict(from_attributes=True)
+
+    scenario_id: str
+    step_executed: int
+    steps_remaining: int
+    final_status: str
+    is_complete: bool
