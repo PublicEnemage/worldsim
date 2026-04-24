@@ -84,6 +84,51 @@ and frontend component contracts.
 
 ### Decision 1: Scenario Configuration
 
+#### Amendment — CONFLICT C-1 Disposition (2026-04-23)
+
+**STD-REVIEW-002 CONFLICT C-1** raised by the Security Agent: `DELETE /scenarios/{id}`
+CASCADE-deletes `scenario_scheduled_inputs` and `scenario_state_snapshots`, which the
+Security Agent characterised as audit trail destruction. The QA Agent proposed a soft
+delete pattern with a `DELETED` status transition. The Architect Agent noted that soft
+delete requires an ADR amendment to this decision.
+
+**Engineering Lead ruling:** Export-before-delete is excluded. Archiving must be a
+separate explicit user action (`POST /scenarios/{id}/archive`). DELETE must only delete.
+
+**Disposition: Option B — hard DELETE preserved with pre-delete log requirement.**
+
+Rationale:
+
+1. `scenario_scheduled_inputs` is *configuration data*, not execution audit data.
+   The authoritative execution audit trail is `control_input_audit_log` (ADR-002),
+   which records every `ControlInput` that actually fired. This table uses a plain-text
+   `scenario_id` reference (no FK), so it survives scenario deletion intact. A scenario
+   can be deleted without destroying the execution record of what it did.
+
+2. Before the CASCADE executes, the `DELETE /scenarios/{id}` endpoint must write a
+   deletion record to an audit store capturing: `scenario_id`, `name`, SHA-256 of
+   `configuration` JSONB, `created_at`, and `deleted_at`. This preserves a durable
+   tombstone even after all child rows are cascade-deleted. The deletion record must
+   be written in the same transaction as the DELETE — if the transaction rolls back,
+   the deletion record is also rolled back.
+
+3. `POLICY.md §Scenario Data Retention` (SA-06, Issue #121) must declare:
+   `scenario_scheduled_inputs` is scenario configuration data. It is retained for the
+   lifetime of the scenario and deleted with it. `control_input_audit_log` is the
+   authoritative execution record and is not cascade-deleted.
+
+4. `POST /scenarios/{id}/archive` (soft delete marker, 30-day retention) is deferred
+   to **Milestone 4**. It is not a Milestone 3 requirement. When it is added, it will
+   amend this decision at that time.
+
+**No change to the cascade schema.** The `ON DELETE CASCADE` constraints on
+`scenario_scheduled_inputs` and `scenario_state_snapshots` are correct and remain.
+The audit store requirement is an application-layer addition to the DELETE endpoint.
+
+**CONFLICT C-1 is resolved.** No further Engineering Lead action required on this conflict.
+
+---
+
 #### Database Schema
 
 A scenario is a first-class database record. Three new tables are introduced
