@@ -34,7 +34,7 @@ export default function AttributeSelector({ onChange }: Props) {
   return (
     <select
       onChange={(e) => onChange(e.target.value)}
-      style={{ fontSize: 14, padding: "4px 8px", borderRadius: 4 }}
+      style={{ fontSize: 14, padding: "4px 8px", borderRadius: 4, maxWidth: 260 }}
     >
       {attributes.map((a) => (
         <option key={a.attribute_key} value={a.attribute_key}>
