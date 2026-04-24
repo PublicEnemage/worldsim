@@ -1,17 +1,23 @@
-"""Scenario endpoints — ADR-004 Decision 1.
+"""Scenario endpoints — ADR-004 Decisions 1 and 2.
 
-Four endpoints covering scenario configuration lifecycle:
-  POST   /scenarios                — create scenario (status: pending)
-  GET    /scenarios                — list all scenarios (created_at desc)
-  GET    /scenarios/{scenario_id}  — full detail with scheduled inputs
-  DELETE /scenarios/{scenario_id}  — delete + cascade, returns 204
+Six endpoints covering scenario configuration lifecycle and execution:
+  POST   /scenarios                        — create scenario (status: pending)
+  GET    /scenarios                        — list all scenarios (created_at desc)
+  GET    /scenarios/{scenario_id}          — full detail with scheduled inputs
+  DELETE /scenarios/{scenario_id}          — tombstone + cascade delete, returns 204
+  POST   /scenarios/{scenario_id}/run     — execute pending scenario to completion
 
 Validation runs at creation time (structural) — entity existence check,
 n_steps bounds, step index bounds, non-empty name. Semantic validation
-of ControlInput payloads is deferred to execution (Issue #111).
+of ControlInput payloads runs at execution time (Issue #111).
 
 All queries use asyncpg directly per ADR-003 Decision 2. Schema management
 uses SQLAlchemy ORM via Alembic.
+
+DELETE writes a tombstone to scenario_deleted_tombstones before the CASCADE
+executes (ADR-004 Decision 1 Amendment, CONFLICT C-1 disposition). The tombstone
+captures full configuration JSONB and scheduled_inputs so the scenario output can
+be reconstructed from first principles (SA-11 determinism).
 """
 from __future__ import annotations
 
@@ -24,12 +30,16 @@ from fastapi import APIRouter, Depends, HTTPException, Response
 
 from app.api.deps import get_db  # noqa: TCH001 — used as Depends(get_db) at runtime
 from app.schemas import (
+    RunSummaryResponse,
     ScenarioConfigSchema,
     ScenarioCreateRequest,
     ScenarioDetailResponse,
     ScenarioResponse,
     ScheduledInputSchema,
 )
+
+# Engine version for tombstone records — must match app version in main.py.
+_ENGINE_VERSION = "0.3.0"
 
 router = APIRouter(tags=["scenarios"])
 
@@ -252,12 +262,116 @@ async def delete_scenario(
     scenario_id: str,
     conn: Annotated[asyncpg.Connection, Depends(get_db)],
 ) -> Response:
-    """Delete a scenario and all cascaded rows. Returns 204 No Content."""
-    result = await conn.execute(
-        "DELETE FROM scenarios WHERE scenario_id = $1",
+    """Delete a scenario and all cascaded rows. Returns 204 No Content.
+
+    Writes a tombstone to scenario_deleted_tombstones before the CASCADE
+    executes. Tombstone and DELETE are in one transaction — atomic.
+    ADR-004 Decision 1 Amendment (CONFLICT C-1 disposition).
+    """
+    async with conn.transaction():
+        row = await conn.fetchrow(
+            """
+            SELECT scenario_id, name, configuration, created_at
+            FROM scenarios
+            WHERE scenario_id = $1
+            """,
+            scenario_id,
+        )
+        if row is None:
+            raise HTTPException(
+                status_code=404, detail=f"Scenario '{scenario_id}' not found."
+            )
+
+        cfg_raw = row["configuration"]
+        if isinstance(cfg_raw, str):
+            cfg_raw = json.loads(cfg_raw)
+
+        input_rows = await conn.fetch(
+            """
+            SELECT step, input_type, input_data
+            FROM scenario_scheduled_inputs
+            WHERE scenario_id = $1
+            ORDER BY step, created_at
+            """,
+            scenario_id,
+        )
+        scheduled_inputs_snap = [
+            {
+                "step": r["step"],
+                "input_type": r["input_type"],
+                "input_data": (
+                    r["input_data"]
+                    if isinstance(r["input_data"], dict)
+                    else json.loads(r["input_data"])
+                ),
+            }
+            for r in input_rows
+        ]
+
+        await conn.execute(
+            """
+            INSERT INTO scenario_deleted_tombstones
+                (scenario_id, name, configuration, scheduled_inputs,
+                 engine_version, original_created_at, deleted_at, deleted_by)
+            VALUES ($1, $2, $3, $4, $5, $6, NOW(), $7)
+            """,
+            scenario_id,
+            row["name"],
+            json.dumps(cfg_raw),
+            json.dumps(scheduled_inputs_snap),
+            _ENGINE_VERSION,
+            row["created_at"],
+            "api",
+        )
+
+        await conn.execute(
+            "DELETE FROM scenarios WHERE scenario_id = $1",
+            scenario_id,
+        )
+
+    return Response(status_code=204)
+
+
+# ---------------------------------------------------------------------------
+# POST /scenarios/{scenario_id}/run
+# ---------------------------------------------------------------------------
+
+
+@router.post("/scenarios/{scenario_id}/run", response_model=RunSummaryResponse)
+async def run_scenario(
+    scenario_id: str,
+    conn: Annotated[asyncpg.Connection, Depends(get_db)],
+) -> RunSummaryResponse:
+    """Execute a pending scenario to completion.
+
+    Validates that the scenario exists and is in 'pending' status.
+    Returns 404 if not found, 409 if status is not pending.
+    Delegates execution to WebScenarioRunner (ADR-004 Decision 2).
+    Status transitions: pending → running → completed | failed.
+    """
+    status_row = await conn.fetchrow(
+        "SELECT status FROM scenarios WHERE scenario_id = $1",
         scenario_id,
     )
-    # asyncpg returns 'DELETE N' — N=0 means row didn't exist
-    if result == "DELETE 0":
-        raise HTTPException(status_code=404, detail=f"Scenario '{scenario_id}' not found.")
-    return Response(status_code=204)
+    if status_row is None:
+        raise HTTPException(
+            status_code=404, detail=f"Scenario '{scenario_id}' not found."
+        )
+    if status_row["status"] != "pending":
+        raise HTTPException(
+            status_code=409,
+            detail=(
+                f"Scenario is in '{status_row['status']}' status. "
+                "Only scenarios in 'pending' status can be run."
+            ),
+        )
+
+    from app.simulation.web_scenario_runner import WebScenarioRunner  # noqa: PLC0415
+
+    summary = await WebScenarioRunner().run(conn, scenario_id)
+    return RunSummaryResponse(
+        scenario_id=summary.scenario_id,
+        steps_executed=summary.steps_executed,
+        final_status=summary.final_status,
+        duration_seconds=summary.duration_seconds,
+    )

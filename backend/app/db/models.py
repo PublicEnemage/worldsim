@@ -391,12 +391,43 @@ class ScenarioStateSnapshot(Base):
     )
 
 
+class ScenarioDeletedTombstone(Base):
+    """Tombstone record written before CASCADE delete of a scenario.
+
+    ADR-004 Decision 1 Amendment (CONFLICT C-1 disposition): preserves full
+    configuration JSONB and scheduled_inputs JSONB so scenario output can be
+    reconstructed from first principles (SA-11 determinism + source entity data
+    + matching engine_version).
+
+    Written in the same transaction as the DELETE so tombstone and deletion
+    are atomic — both commit or both roll back.
+    """
+
+    __tablename__ = "scenario_deleted_tombstones"
+
+    scenario_id: Mapped[str] = mapped_column(Text, primary_key=True)
+    name: Mapped[str] = mapped_column(Text, nullable=False)
+    configuration: Mapped[dict[str, Any]] = mapped_column(JSONB, nullable=False)
+    scheduled_inputs: Mapped[list[Any]] = mapped_column(JSONB, nullable=False)
+    engine_version: Mapped[str] = mapped_column(Text, nullable=False)
+    original_created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False
+    )
+    deleted_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, server_default=func.now()
+    )
+    deleted_by: Mapped[str] = mapped_column(Text, nullable=False)
+
+    __table_args__ = (Index("idx_tombstones_deleted_at", "deleted_at"),)
+
+
 # Expose all models so Alembic env.py can discover them via Base.metadata.
 __all__ = [
     "Base",
     "Entity",
     "Relationship",
     "Scenario",
+    "ScenarioDeletedTombstone",
     "ScenarioScheduledInput",
     "ScenarioStateSnapshot",
     "TerritorialDesignation",
