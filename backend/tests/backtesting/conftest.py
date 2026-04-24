@@ -6,26 +6,28 @@ This conftest fills that gap: it calls create_asyncpg_pool() once at session
 start and close_asyncpg_pool() at session end, matching the behaviour of the
 production lifespan handler in app/main.py.
 
-asyncpg 0.30 pools are not bound to the event loop in which they were created.
-Connections acquired by function-scoped test loops work correctly against a
-pool initialised in a separate asyncio.run() call. Issue #136.
+The fixture is async with loop_scope="session" so the pool is created in the
+same event loop that test functions run in. The original sync implementation
+(asyncio.run()) created the pool in a temporary loop that was immediately
+closed — asyncpg's eager min_size connections were then bound to that closed
+loop, causing "Future attached to a different loop" errors at test run time.
 """
 from __future__ import annotations
 
-import asyncio
 import os
 from typing import TYPE_CHECKING
 
 import pytest
+import pytest_asyncio
 
 if TYPE_CHECKING:
-    from collections.abc import Generator
+    from collections.abc import AsyncGenerator
 
 _DATABASE_URL = os.environ.get("DATABASE_URL", "")
 
 
-@pytest.fixture(scope="session", autouse=True)
-def _asyncpg_pool_lifecycle() -> Generator[None, None, None]:
+@pytest_asyncio.fixture(scope="session", loop_scope="session", autouse=True)
+async def _asyncpg_pool_lifecycle() -> AsyncGenerator[None, None]:
     """Initialize the asyncpg pool before the backtesting session.
 
     Skips the entire session when DATABASE_URL is not set, so backtesting
@@ -33,10 +35,10 @@ def _asyncpg_pool_lifecycle() -> Generator[None, None, None]:
     """
     if not _DATABASE_URL:
         pytest.skip("DATABASE_URL not set — skipping backtesting session")
-        return  # unreachable; satisfies type checker
+        return
 
     from app.db.connection import close_asyncpg_pool, create_asyncpg_pool
 
-    asyncio.run(create_asyncpg_pool())
+    await create_asyncpg_pool()
     yield
-    asyncio.run(close_asyncpg_pool())
+    await close_asyncpg_pool()
