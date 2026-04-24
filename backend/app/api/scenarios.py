@@ -1,8 +1,9 @@
-"""Scenario endpoints — ADR-004 Decisions 1, 2, and 4.
+"""Scenario endpoints — ADR-004 Decisions 1, 2, 4, and 5.
 
-Seven endpoints covering scenario configuration lifecycle and execution:
+Eight endpoints covering scenario configuration lifecycle and execution:
   POST   /scenarios                           — create scenario (status: pending)
   GET    /scenarios                           — list all scenarios (created_at desc)
+  GET    /scenarios/compare                   — delta between two final snapshots (ADR-004 D5)
   GET    /scenarios/{scenario_id}             — full detail with scheduled inputs
   DELETE /scenarios/{scenario_id}             — tombstone + cascade delete, returns 204
   POST   /scenarios/{scenario_id}/run         — execute pending scenario to completion
@@ -33,6 +34,8 @@ from fastapi import APIRouter, Depends, HTTPException, Response
 from app.api.deps import get_db  # noqa: TCH001 — used as Depends(get_db) at runtime
 from app.schemas import (
     AdvanceResponse,
+    CompareResponse,
+    DeltaRecord,
     RunSummaryResponse,
     ScenarioConfigSchema,
     ScenarioCreateRequest,
@@ -220,6 +223,129 @@ async def list_scenarios(
         """
     )
     return [_row_to_response(dict(row)) for row in rows]
+
+
+# ---------------------------------------------------------------------------
+# GET /scenarios/compare — ADR-004 Decision 5
+# ---------------------------------------------------------------------------
+
+
+def _compute_delta(value_a: str, value_b: str, tier_a: int, tier_b: int) -> DeltaRecord:
+    from decimal import Decimal  # noqa: PLC0415
+
+    dec_a = Decimal(value_a)
+    dec_b = Decimal(value_b)
+    delta = dec_b - dec_a
+    if delta > 0:
+        direction = "increase"
+    elif delta < 0:
+        direction = "decrease"
+    else:
+        direction = "unchanged"
+    return DeltaRecord(
+        value_a=value_a,
+        value_b=value_b,
+        delta=str(delta),
+        direction=direction,
+        confidence_tier=max(tier_a, tier_b),
+    )
+
+
+@router.get("/scenarios/compare", response_model=CompareResponse)
+async def compare_scenarios(
+    conn: Annotated[asyncpg.Connection, Depends(get_db)],
+    scenario_a: str,
+    scenario_b: str,
+    attr: str | None = None,
+) -> CompareResponse:
+    """Return attribute deltas between two scenarios at their final steps.
+
+    Computes delta = value_b - value_a for each shared entity and attribute.
+    Only entities and attributes present in both final snapshots are included.
+    Filter to a single attribute with `attr`. ADR-004 Decision 5.
+
+    Returns 404 if either scenario is not found.
+    Returns 409 if either scenario has no snapshots yet.
+    """
+    for sid in (scenario_a, scenario_b):
+        row = await conn.fetchrow(
+            "SELECT scenario_id FROM scenarios WHERE scenario_id = $1", sid
+        )
+        if row is None:
+            raise HTTPException(
+                status_code=404, detail=f"Scenario '{sid}' not found."
+            )
+
+    snap_a = await conn.fetchrow(
+        "SELECT step, state_data FROM scenario_state_snapshots "
+        "WHERE scenario_id = $1 ORDER BY step DESC LIMIT 1",
+        scenario_a,
+    )
+    snap_b = await conn.fetchrow(
+        "SELECT step, state_data FROM scenario_state_snapshots "
+        "WHERE scenario_id = $1 ORDER BY step DESC LIMIT 1",
+        scenario_b,
+    )
+
+    if snap_a is None:
+        raise HTTPException(
+            status_code=409,
+            detail=f"Scenario '{scenario_a}' has no snapshots. Run it first.",
+        )
+    if snap_b is None:
+        raise HTTPException(
+            status_code=409,
+            detail=f"Scenario '{scenario_b}' has no snapshots. Run it first.",
+        )
+
+    state_a: dict[str, Any] = snap_a["state_data"]
+    state_b: dict[str, Any] = snap_b["state_data"]
+    if isinstance(state_a, str):
+        state_a = json.loads(state_a)
+    if isinstance(state_b, str):
+        state_b = json.loads(state_b)
+
+    shared_entities = set(state_a) & set(state_b)
+    deltas: dict[str, dict[str, DeltaRecord]] = {}
+
+    for eid in sorted(shared_entities):
+        attrs_a: dict[str, Any] = state_a[eid]
+        attrs_b: dict[str, Any] = state_b[eid]
+        if not isinstance(attrs_a, dict) or not isinstance(attrs_b, dict):
+            continue
+
+        shared_attrs = set(attrs_a) & set(attrs_b)
+        if attr is not None:
+            shared_attrs = shared_attrs & {attr}
+
+        entity_deltas: dict[str, DeltaRecord] = {}
+        for key in sorted(shared_attrs):
+            a_env = attrs_a[key]
+            b_env = attrs_b[key]
+            if not isinstance(a_env, dict) or not isinstance(b_env, dict):
+                continue
+            val_a = str(a_env.get("value", ""))
+            val_b = str(b_env.get("value", ""))
+            try:
+                entity_deltas[key] = _compute_delta(
+                    val_a,
+                    val_b,
+                    int(a_env.get("confidence_tier", 5)),
+                    int(b_env.get("confidence_tier", 5)),
+                )
+            except Exception:  # noqa: BLE001 S112
+                continue
+
+        if entity_deltas:
+            deltas[eid] = entity_deltas
+
+    return CompareResponse(
+        scenario_a_id=scenario_a,
+        scenario_b_id=scenario_b,
+        step_a=snap_a["step"],
+        step_b=snap_b["step"],
+        deltas=deltas,
+    )
 
 
 # ---------------------------------------------------------------------------

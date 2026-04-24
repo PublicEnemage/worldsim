@@ -1,12 +1,13 @@
 """Country endpoints — ADR-003 Decision 2.
 
-Six endpoints covering the full country data surface for Milestone 2:
-  GET /countries                    — summary list (no geometry, no attributes)
-  GET /countries/{entity_id}        — full detail with attributes
-  GET /countries/{entity_id}/geometry — GeoJSON Feature
+Seven endpoints covering the full country data surface for Milestone 2–3:
+  GET /countries                        — summary list (no geometry, no attributes)
+  GET /countries/{entity_id}            — full detail with attributes
+  GET /countries/{entity_id}/geometry   — GeoJSON Feature
   GET /countries/{entity_id}/attributes — attributes only
-  GET /choropleth/{attribute_key}   — primary MapLibre endpoint
-  GET /attributes/available         — attribute key discovery
+  GET /choropleth/{attribute_key}       — primary MapLibre endpoint
+  GET /choropleth/{attribute_key}/delta — diverging delta choropleth (ADR-004 Decision 5)
+  GET /attributes/available             — attribute key discovery
 
 All queries use asyncpg directly per ADR-003 Decision 2. The choropleth query
 joins geometry and attribute data in a single PostGIS round-trip.
@@ -415,6 +416,155 @@ async def _choropleth_from_snapshot(
                     "variable_type": str(attr_data.get("variable_type", "")),
                     "confidence_tier": int(attr_data.get("confidence_tier", 5)),
                     "observation_date": attr_data.get("observation_date"),
+                    "has_territorial_note": territorial_note is not None,
+                    "territorial_note": territorial_note,
+                },
+            )
+        )
+
+    return GeoJSONFeatureCollection(features=features)
+
+
+# ---------------------------------------------------------------------------
+# GET /choropleth/{attribute_key}/delta — ADR-004 Decision 5
+# ---------------------------------------------------------------------------
+
+
+@router.get("/choropleth/{attribute_key}/delta", response_model=GeoJSONFeatureCollection)
+async def choropleth_delta(
+    attribute_key: str,
+    conn: Annotated[asyncpg.Connection, Depends(get_db)],
+    scenario_a: str,
+    scenario_b: str,
+) -> GeoJSONFeatureCollection:
+    """Return a diverging-value GeoJSON FeatureCollection for delta choropleth.
+
+    `attribute_value` is str(Decimal(value_b) - Decimal(value_a)).
+    `delta_direction` is 'increase', 'decrease', or 'unchanged'.
+    `confidence_tier` is max(tier_a, tier_b) — lower-of-two rule.
+
+    Returns 404 if either scenario snapshot is missing or no entities share
+    the attribute. Returns 422 if scenario_a or scenario_b is absent.
+    """
+    from decimal import Decimal  # noqa: PLC0415
+
+    snap_a = await conn.fetchrow(
+        "SELECT step, state_data FROM scenario_state_snapshots "
+        "WHERE scenario_id = $1 ORDER BY step DESC LIMIT 1",
+        scenario_a,
+    )
+    snap_b = await conn.fetchrow(
+        "SELECT step, state_data FROM scenario_state_snapshots "
+        "WHERE scenario_id = $1 ORDER BY step DESC LIMIT 1",
+        scenario_b,
+    )
+
+    if snap_a is None:
+        raise HTTPException(
+            status_code=404,
+            detail=f"No snapshots for scenario '{scenario_a}'.",
+        )
+    if snap_b is None:
+        raise HTTPException(
+            status_code=404,
+            detail=f"No snapshots for scenario '{scenario_b}'.",
+        )
+
+    state_a: dict[str, Any] = snap_a["state_data"]
+    state_b: dict[str, Any] = snap_b["state_data"]
+    if isinstance(state_a, str):
+        state_a = json.loads(state_a)
+    if isinstance(state_b, str):
+        state_b = json.loads(state_b)
+
+    entity_ids = [
+        eid for eid in set(state_a) & set(state_b)
+        if isinstance(state_a.get(eid), dict)
+        and isinstance(state_b.get(eid), dict)
+        and attribute_key in state_a[eid]
+        and attribute_key in state_b[eid]
+    ]
+
+    if not entity_ids:
+        raise HTTPException(
+            status_code=404,
+            detail=(
+                f"No entities share attribute '{attribute_key}' "
+                f"in both scenario snapshots."
+            ),
+        )
+
+    rows = await conn.fetch(
+        """
+        SELECT
+            e.entity_id,
+            e.entity_type,
+            e.metadata,
+            ST_AsGeoJSON(e.geometry) AS geometry_json,
+            td.display_note AS territorial_note
+        FROM simulation_entities e
+        LEFT JOIN territorial_designations td
+            ON td.entity_id = e.entity_id
+            AND td.effective_date = (
+                SELECT MAX(effective_date)
+                FROM territorial_designations
+                WHERE entity_id = e.entity_id
+            )
+        WHERE e.entity_id = ANY($1::text[])
+        ORDER BY e.entity_id
+        """,
+        entity_ids,
+    )
+
+    features: list[GeoJSONFeature] = []
+    for row in rows:
+        if not row["geometry_json"]:
+            continue
+
+        md = row["metadata"] or {}
+        if isinstance(md, str):
+            md = json.loads(md)
+
+        a_env = state_a.get(row["entity_id"], {}).get(attribute_key, {})
+        b_env = state_b.get(row["entity_id"], {}).get(attribute_key, {})
+        if not isinstance(a_env, dict) or not isinstance(b_env, dict):
+            continue
+
+        val_a_str = str(a_env.get("value", ""))
+        val_b_str = str(b_env.get("value", ""))
+        try:
+            dec_a = Decimal(val_a_str)
+            dec_b = Decimal(val_b_str)
+            delta = dec_b - dec_a
+        except Exception:  # noqa: BLE001 S112
+            continue
+
+        if delta > 0:
+            direction = "increase"
+        elif delta < 0:
+            direction = "decrease"
+        else:
+            direction = "unchanged"
+
+        tier = max(
+            int(a_env.get("confidence_tier", 5)),
+            int(b_env.get("confidence_tier", 5)),
+        )
+        territorial_note = row["territorial_note"]
+
+        features.append(
+            GeoJSONFeature(
+                geometry=json.loads(row["geometry_json"]),
+                properties={
+                    "entity_id": row["entity_id"],
+                    "entity_type": row["entity_type"],
+                    "name": _extract_name(md),
+                    "attribute_key": attribute_key,
+                    "attribute_value": str(delta),
+                    "value_a": val_a_str,
+                    "value_b": val_b_str,
+                    "delta_direction": direction,
+                    "confidence_tier": tier,
                     "has_territorial_note": territorial_note is not None,
                     "territorial_note": territorial_note,
                 },
