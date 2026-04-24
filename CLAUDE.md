@@ -895,6 +895,14 @@ rates), what the simulation claims and does not claim, human cost ledger
 methodology and known limitations, backtesting integrity position, declared
 blindspots, dual-use position, and challenge/correction process.
 
+**Compliance scan registry (`docs/compliance/scan-registry.md`)**
+SCAN entries must always be appended at the end of the scan registry table.
+Never insert a new entry mid-table. After adding a new entry, verify that the
+table reads in ascending SCAN number order before committing. This rule exists
+because mid-table insertions (via str_replace or Edit tool anchoring on an
+existing row) have caused ordering inversions twice — Issue #133 documents the
+recurring pattern.
+
 ---
 
 ## Governance
