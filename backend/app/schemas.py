@@ -202,3 +202,14 @@ class ScenarioDetailResponse(BaseModel):
     created_at: str
     configuration: ScenarioConfigSchema
     scheduled_inputs: list[ScheduledInputSchema]
+
+
+class RunSummaryResponse(BaseModel):
+    """Response from POST /scenarios/{id}/run — ADR-004 Decision 2."""
+
+    model_config = ConfigDict(from_attributes=True)
+
+    scenario_id: str
+    steps_executed: int
+    final_status: str
+    duration_seconds: float
