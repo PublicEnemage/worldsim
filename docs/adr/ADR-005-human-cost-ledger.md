@@ -1,13 +1,23 @@
 # ADR-005: Human Cost Ledger — Cohort Data Model, Multi-Framework Output, MDA Thresholds, Radar Dashboard, Backtesting Integration
 
 ## Status
-DRAFT
+Accepted
 
 ## Validity Context
 
 **Standards Version:** 2026-04-15 (date standards documents were established)
 **Valid Until:** Milestone 4 completion
-**License Status:** DRAFT — no implementation may proceed until status transitions to Accepted.
+**License Status:** CURRENT
+
+**Last Reviewed:** 2026-04-24 — Engineering Lead accepted at M4 boundary. ADR-005
+reviewed alongside ARCH-REVIEW-003 (Milestone 3 blindspot inventory). No renewal
+triggers fired at acceptance — all five decisions are new architecture with no
+prior implementation. ARCH-REVIEW-003 immediate findings BI3-I-01 and BI3-I-02
+are addressed structurally by ADR-005 Decision 1 (`MultiFrameworkOutput.ia1_disclosure`
+required constructor argument) and Decision 2 (envelope version increment policy
+required before M4 module wiring). Implementation agents must not begin any Decision
+implementation until ARCH-REVIEW-003 Issues #144 and #145 are resolved. License
+Status: CURRENT. Next scheduled review at Milestone 4 completion.
 
 **Renewal Triggers** — any of the following fires the ACCEPTED → UNDER-REVIEW transition when Accepted:
 - `MeasurementFramework` taxonomy modified in any standards document or ADR amendment (adds, removes, or renames a framework value)
