@@ -32,8 +32,10 @@ from app.simulation.engine.quantity import Quantity, VariableType
 from app.simulation.orchestration.runner import ScenarioRunner
 from app.simulation.repositories.quantity_serde import (
     IA1_CANONICAL_PHRASE,
+    STATE_DATA_ENVELOPE_VERSION,
     quantity_from_jsonb,
     quantity_to_jsonb_envelope,
+    validate_ia1_disclosure,
 )
 from app.simulation.repositories.snapshot_repository import ScenarioSnapshotRepository
 from app.simulation.web_scenario_runner import RunSummary, WebScenarioRunner
@@ -423,7 +425,166 @@ async def test_snapshot_write_serializes_state_data_as_json() -> None:
     state_data_arg = call_args[5]  # args[0]=sql, [5]=state_data ($5)
     # Must be a JSON string (JSONB via json.dumps)
     parsed = json.loads(state_data_arg)
+    # Top-level state_data envelope metadata (v2)
+    assert parsed["_envelope_version"] == STATE_DATA_ENVELOPE_VERSION
+    assert parsed["_modules_active"] == []
+    # Per-entity, per-quantity SA-09 envelope still at version "1"
     assert "GRC" in parsed
     assert "gdp_growth" in parsed["GRC"]
     assert parsed["GRC"]["gdp_growth"]["_envelope_version"] == "1"
     assert isinstance(parsed["GRC"]["gdp_growth"]["value"], str)
+
+
+# ---------------------------------------------------------------------------
+# Issue #144: ia1_disclosure semantic validation
+# ---------------------------------------------------------------------------
+
+
+def test_validate_ia1_disclosure_rejects_empty_string() -> None:
+    """Issue #144: empty string must be rejected — NOT NULL is not enough."""
+    with pytest.raises(ValueError, match="non-empty"):
+        validate_ia1_disclosure("")
+
+
+def test_validate_ia1_disclosure_rejects_whitespace_only() -> None:
+    """Issue #144: whitespace-only string must be rejected."""
+    for ws in ("   ", "\t", "\n", "  \t\n  "):
+        with pytest.raises(ValueError, match="non-empty"):
+            validate_ia1_disclosure(ws)
+
+
+def test_validate_ia1_disclosure_accepts_valid_text() -> None:
+    """Issue #144: IA1_CANONICAL_PHRASE and any substantive string must pass."""
+    result = validate_ia1_disclosure(IA1_CANONICAL_PHRASE)
+    assert result == IA1_CANONICAL_PHRASE
+
+    short_valid = "Time-horizon degradation not applied — see DATA_STANDARDS.md IA-1."
+    assert validate_ia1_disclosure(short_valid) == short_valid
+
+
+# ---------------------------------------------------------------------------
+# Issue #145: state_data envelope v2 with _modules_active
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.asyncio
+async def test_snapshot_state_data_has_envelope_version_2() -> None:
+    """Issue #145: top-level state_data _envelope_version must be '2'."""
+    conn = MagicMock()
+    conn.execute = AsyncMock(return_value="INSERT 1")
+
+    state = _make_state()
+    repo = ScenarioSnapshotRepository()
+    await repo.write_snapshot(conn, "s-1", 0, datetime(2010, 1, 1, tzinfo=UTC), state)
+
+    parsed = json.loads(conn.execute.call_args.args[5])
+    assert parsed["_envelope_version"] == "2", (
+        f"Expected state_data _envelope_version '2', got {parsed.get('_envelope_version')!r}"
+    )
+
+
+@pytest.mark.asyncio
+async def test_snapshot_state_data_has_modules_active_empty_list_for_m3() -> None:
+    """Issue #145: M3 snapshots (no modules) must carry _modules_active: []."""
+    conn = MagicMock()
+    conn.execute = AsyncMock(return_value="INSERT 1")
+
+    state = _make_state()
+    repo = ScenarioSnapshotRepository()
+    await repo.write_snapshot(conn, "s-1", 0, datetime(2010, 1, 1, tzinfo=UTC), state)
+
+    parsed = json.loads(conn.execute.call_args.args[5])
+    assert "_modules_active" in parsed
+    assert parsed["_modules_active"] == []
+    assert isinstance(parsed["_modules_active"], list)
+
+
+@pytest.mark.asyncio
+async def test_snapshot_state_data_modules_active_populated_when_passed() -> None:
+    """Issue #145: modules_active param is reflected in state_data envelope."""
+    conn = MagicMock()
+    conn.execute = AsyncMock(return_value="INSERT 1")
+
+    state = _make_state()
+    repo = ScenarioSnapshotRepository()
+    await repo.write_snapshot(
+        conn, "s-1", 1, datetime(2011, 1, 1, tzinfo=UTC), state,
+        modules_active=["DemographicModule", "MacroeconomicModule"],
+    )
+
+    parsed = json.loads(conn.execute.call_args.args[5])
+    assert parsed["_modules_active"] == ["DemographicModule", "MacroeconomicModule"]
+
+
+@pytest.mark.asyncio
+async def test_snapshot_quantity_envelope_still_readable_inside_v2_state_data() -> None:
+    """Issue #145: per-quantity SA-09 envelope is still readable inside v2 state_data."""
+    conn = MagicMock()
+    conn.execute = AsyncMock(return_value="INSERT 1")
+
+    state = _make_state()
+    repo = ScenarioSnapshotRepository()
+    await repo.write_snapshot(conn, "s-1", 0, datetime(2010, 1, 1, tzinfo=UTC), state)
+
+    parsed = json.loads(conn.execute.call_args.args[5])
+    qty_envelope = parsed["GRC"]["gdp_growth"]
+    # Per-quantity SA-09 envelope version unchanged
+    assert qty_envelope["_envelope_version"] == "1"
+    # quantity_from_jsonb must still deserialize correctly
+    restored = quantity_from_jsonb(qty_envelope)
+    from decimal import Decimal  # noqa: PLC0415
+    assert restored.value == Decimal("-0.054")
+
+
+# ---------------------------------------------------------------------------
+# Issue #146: modules_active field on SnapshotRecord
+# ---------------------------------------------------------------------------
+
+
+def test_snapshot_record_has_modules_active_field() -> None:
+    """Issue #146: SnapshotRecord must expose modules_active, default empty list."""
+    from app.schemas import SnapshotRecord  # noqa: PLC0415
+
+    record = SnapshotRecord(
+        scenario_id="s-1",
+        step=0,
+        timestep="2010-01-01T00:00:00",
+        state_data={},
+    )
+    assert hasattr(record, "modules_active")
+    assert record.modules_active == []
+
+
+def test_snapshot_record_modules_active_from_state_data_envelope() -> None:
+    """Issue #146: modules_active is populated from _modules_active in state_data."""
+    from app.schemas import SnapshotRecord  # noqa: PLC0415
+
+    record = SnapshotRecord(
+        scenario_id="s-1",
+        step=1,
+        timestep="2011-01-01T00:00:00",
+        state_data={"_envelope_version": "2", "_modules_active": ["DemographicModule"]},
+        modules_active=["DemographicModule"],
+    )
+    assert record.modules_active == ["DemographicModule"]
+
+
+def test_snapshot_record_m3_snapshot_has_empty_modules_active() -> None:
+    """Issue #146: M3 snapshot state_data with empty _modules_active → [] on record."""
+    from app.schemas import SnapshotRecord  # noqa: PLC0415
+
+    # Simulate what list_snapshots builds from a real M3 DB row
+    state_data = {
+        "_envelope_version": "2",
+        "_modules_active": [],
+        "GRC": {"gdp_growth": {"_envelope_version": "1", "value": "-0.054"}},
+    }
+    modules_active: list[str] = state_data.get("_modules_active", [])  # type: ignore[assignment]
+    record = SnapshotRecord(
+        scenario_id="s-1",
+        step=0,
+        timestep="2010-01-01T00:00:00",
+        state_data=state_data,
+        modules_active=modules_active,
+    )
+    assert record.modules_active == []

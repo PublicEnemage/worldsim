@@ -12,7 +12,15 @@ SA-09 compliance: all Quantity values use the canonical envelope format
 
 IA-1 compliance: every snapshot row carries IA1_CANONICAL_PHRASE verbatim
 in ia1_disclosure. The column is NOT NULL with no server default — the DB
-enforces this; application code cannot omit it.
+enforces this; application code cannot omit it. validate_ia1_disclosure() is
+called at write time to guard against empty or whitespace-only strings that
+would satisfy NOT NULL but provide no disclosure value (ARCH-REVIEW-003
+BI3-I-01, Issue #144).
+
+Envelope v2: state_data JSONB carries top-level _envelope_version = "2" and
+_modules_active = [] (empty for M3; populated when M4 domain modules are active).
+This allows API consumers to detect snapshot schema generation without content-
+level parsing. See ARCH-REVIEW-003 BI3-I-02 and Issue #145.
 """
 from __future__ import annotations
 
@@ -24,7 +32,9 @@ import asyncpg  # noqa: TCH002 — used in method signatures at runtime
 
 from app.simulation.repositories.quantity_serde import (
     IA1_CANONICAL_PHRASE,
+    STATE_DATA_ENVELOPE_VERSION,
     quantity_to_jsonb_envelope,
+    validate_ia1_disclosure,
 )
 
 if TYPE_CHECKING:
@@ -48,6 +58,7 @@ class ScenarioSnapshotRepository:
         step: int,
         timestep: datetime,
         state: SimulationState,
+        modules_active: list[str] | None = None,
     ) -> None:
         """Serialize SimulationState and insert a snapshot row.
 
@@ -57,8 +68,13 @@ class ScenarioSnapshotRepository:
             step: Step index (0 = initial state).
             timestep: Simulation time for this step.
             state: Full SimulationState at this step.
+            modules_active: Names of domain modules that contributed to this
+                snapshot. Empty list for M3 (no domain modules implemented).
+                Populated in M4+ when DemographicModule and others are active.
         """
-        state_data = _serialize_state(state)
+        disclosure = IA1_CANONICAL_PHRASE
+        validate_ia1_disclosure(disclosure)
+        state_data = _serialize_state(state, modules_active or [])
 
         await conn.execute(
             """
@@ -72,7 +88,7 @@ class ScenarioSnapshotRepository:
             step,
             timestep,
             json.dumps(state_data),
-            IA1_CANONICAL_PHRASE,
+            disclosure,
         )
 
 
@@ -81,16 +97,28 @@ class ScenarioSnapshotRepository:
 # ---------------------------------------------------------------------------
 
 
-def _serialize_state(state: SimulationState) -> dict[str, dict[str, object]]:
-    """Serialize a SimulationState to the JSONB envelope format.
+def _serialize_state(
+    state: SimulationState,
+    modules_active: list[str],
+) -> dict[str, object]:
+    """Serialize a SimulationState to the v2 state_data JSONB envelope format.
 
-    Returns Dict[entity_id → Dict[attr_key → envelope_dict]] where each
-    envelope_dict follows the SA-09 Quantity JSONB Envelope Format.
+    Top-level keys:
+      _envelope_version — STATE_DATA_ENVELOPE_VERSION ("2")
+      _modules_active   — list of domain module names that contributed
+      <entity_id>       — dict[attr_key → SA-09 Quantity envelope]
+
+    Metadata keys use underscore prefix to distinguish them from entity IDs.
+    The compare endpoint iterates entity IDs and skips non-dict values, so
+    metadata keys are invisible to existing comparison logic.
     """
-    return {
-        entity_id: {
+    data: dict[str, object] = {
+        "_envelope_version": STATE_DATA_ENVELOPE_VERSION,
+        "_modules_active": modules_active,
+    }
+    for entity_id, entity in state.entities.items():
+        data[entity_id] = {
             attr_key: quantity_to_jsonb_envelope(qty)
             for attr_key, qty in entity.attributes.items()
         }
-        for entity_id, entity in state.entities.items()
-    }
+    return data
