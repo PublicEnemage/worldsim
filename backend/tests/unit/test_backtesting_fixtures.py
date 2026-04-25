@@ -53,15 +53,23 @@ def test_actuals_gdp_2012_matches_imf_weo() -> None:
 
 
 def test_actuals_unemployment_2010() -> None:
-    assert ACTUALS.unemployment_rate_2010 == Decimal("0.126")
+    """Eurostat LFS Q1 2010 — 12.7% (updated from IMF WEO in Issue #149)."""
+    assert ACTUALS.unemployment_rate_2010 == Decimal("0.127")
 
 
 def test_actuals_unemployment_2011() -> None:
-    assert ACTUALS.unemployment_rate_2011 == Decimal("0.178")
+    """Eurostat LFS Q1 2011 — 14.9%."""
+    assert ACTUALS.unemployment_rate_2011 == Decimal("0.149")
 
 
 def test_actuals_unemployment_2012() -> None:
-    assert ACTUALS.unemployment_rate_2012 == Decimal("0.244")
+    """Eurostat LFS Q1 2012 — 24.5%."""
+    assert ACTUALS.unemployment_rate_2012 == Decimal("0.245")
+
+
+def test_actuals_unemployment_2013() -> None:
+    """Eurostat LFS Q1 2013 — 27.5% (step 3 extrapolation within fixture window)."""
+    assert ACTUALS.unemployment_rate_2013 == Decimal("0.275")
 
 
 def test_actuals_all_gdp_values_are_negative() -> None:
@@ -71,10 +79,11 @@ def test_actuals_all_gdp_values_are_negative() -> None:
     assert ACTUALS.gdp_growth_2012 < Decimal("0")
 
 
-def test_actuals_unemployment_rises_2010_to_2012() -> None:
-    """Historical unemployment rose monotonically 2010→2011→2012."""
+def test_actuals_unemployment_rises_2010_to_2013() -> None:
+    """Historical unemployment rose monotonically 2010→2011→2012→2013 (Eurostat LFS Q1)."""
     assert ACTUALS.unemployment_rate_2010 < ACTUALS.unemployment_rate_2011
     assert ACTUALS.unemployment_rate_2011 < ACTUALS.unemployment_rate_2012
+    assert ACTUALS.unemployment_rate_2012 < ACTUALS.unemployment_rate_2013
 
 
 def test_actuals_is_frozen_dataclass() -> None:
@@ -92,8 +101,9 @@ def test_thresholds_gdp_direction_correct_is_true() -> None:
     assert THRESHOLDS.gdp_direction_correct is True
 
 
-def test_thresholds_unemployment_direction_correct_is_true() -> None:
-    assert THRESHOLDS.unemployment_direction_correct is True
+def test_thresholds_unemployment_direction_step0_to_step3_is_true() -> None:
+    """Threshold renamed from unemployment_direction_correct — Issue #149."""
+    assert THRESHOLDS.unemployment_direction_step0_to_step3 is True
 
 
 def test_thresholds_is_frozen_dataclass() -> None:
@@ -196,6 +206,60 @@ def test_build_greece_scenario_initial_gdp_growth_is_string() -> None:
     gdp = scenario.configuration.initial_attributes["GRC"]["gdp_growth"]
     assert gdp.value == "-0.054"
     assert isinstance(gdp.value, str)
+
+
+def test_build_greece_scenario_has_four_initial_attributes() -> None:
+    """Initial state must have 4 attributes after Issue #149 WDI seed."""
+    scenario = build_greece_scenario()
+    grc_attrs = scenario.configuration.initial_attributes["GRC"]
+    assert len(grc_attrs) == 4
+    expected_keys = {
+        "gdp_growth",
+        "unemployment_rate",
+        "health_expenditure_pct_gdp",
+        "net_enrollment_secondary",
+    }
+    assert set(grc_attrs.keys()) == expected_keys
+
+
+def test_build_greece_scenario_initial_unemployment_rate() -> None:
+    """Eurostat LFS Q1 2010 — 12.7% (Issue #149)."""
+    scenario = build_greece_scenario()
+    unemp = scenario.configuration.initial_attributes["GRC"]["unemployment_rate"]
+    assert unemp.value == "0.127"
+    assert unemp.source_registry_id == "EUROSTAT_LFS_2010"
+    assert unemp.measurement_framework == "human_development"
+    assert unemp.confidence_tier == 2
+
+
+def test_build_greece_scenario_initial_health_expenditure() -> None:
+    """World Bank WDI 2010 — 9.5% of GDP (Issue #149)."""
+    scenario = build_greece_scenario()
+    health = scenario.configuration.initial_attributes["GRC"]["health_expenditure_pct_gdp"]
+    assert health.value == "0.095"
+    assert health.source_registry_id == "WDI_2010"
+    assert health.measurement_framework == "human_development"
+    assert health.confidence_tier == 2
+
+
+def test_build_greece_scenario_initial_net_enrollment_secondary() -> None:
+    """World Bank WDI 2010 — 99.1% net enrollment (Issue #149)."""
+    scenario = build_greece_scenario()
+    enroll = scenario.configuration.initial_attributes["GRC"]["net_enrollment_secondary"]
+    assert enroll.value == "0.991"
+    assert enroll.source_registry_id == "WDI_2010"
+    assert enroll.measurement_framework == "human_development"
+    assert enroll.confidence_tier == 2
+
+
+def test_build_greece_scenario_human_dev_attributes_use_human_development_framework() -> None:
+    """All three WDI-seeded attributes must use measurement_framework=human_development."""
+    scenario = build_greece_scenario()
+    grc = scenario.configuration.initial_attributes["GRC"]
+    for key in ("unemployment_rate", "health_expenditure_pct_gdp", "net_enrollment_secondary"):
+        assert grc[key].measurement_framework == "human_development", (
+            f"{key}.measurement_framework must be 'human_development'"
+        )
 
 
 def test_build_greece_scenario_scheduled_inputs_have_valid_steps() -> None:
