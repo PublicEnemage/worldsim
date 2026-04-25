@@ -984,6 +984,127 @@ independence that did not exist.
 
 ---
 
+## Canonical Artifact Locations
+
+Every document type produced by agents has a canonical directory and naming
+convention. **Before creating any document that has prior instances of the
+same type, an agent must first locate the existing instances using `find` or
+`grep` and confirm the new document follows the same directory and naming
+convention.** Creating a document in the wrong directory (e.g. `docs/reviews/`
+instead of `docs/standards/reviews/`) silently breaks the discoverability of
+the artifact type and cannot be caught by CI.
+
+| Artifact type | Directory | Naming convention | Update policy |
+|---|---|---|---|
+| Architecture Reviews | `docs/architecture/reviews/` | `ARCH-REVIEW-NNN-milestoneN.md` | New file per review |
+| Standards Reviews | `docs/standards/reviews/` | `STD-REVIEW-NNN-milestoneN.md` | New file per review |
+| Compliance Scan Registry | `docs/compliance/scan-registry.md` | Single file — append SCAN entries only | Append only; never create a new file; never insert mid-table |
+| Architecture Decision Records | `docs/adr/` | `ADR-NNN-short-name.md` | New file per decision |
+| Module Capability Registry | `docs/scenarios/module-capability-registry.md` | Single file | Updated in place with each milestone |
+
+### Pre-creation checklist for documents
+
+Before writing a new review, ADR, or registry entry:
+
+1. Run `find docs/ -name "ARCH-REVIEW*"` (or the equivalent pattern for the
+   document type) to locate existing instances.
+2. Confirm the target directory matches where existing instances live — not
+   where it seems like they should live.
+3. Confirm the filename follows the naming convention of existing instances
+   exactly (prefix, separator style, milestone label).
+4. Only then create the file.
+
+This check takes ten seconds. The STD-REVIEW-003 incident (placed in
+`docs/reviews/` instead of `docs/standards/reviews/`) is the canonical
+example of what this rule prevents.
+
+---
+
+## GitHub Label Reference
+
+The following labels exist in the WorldSim repository. Use only these labels
+when filing issues or pull requests. **Do not invent new labels.** If a
+required label is missing from this list, use the closest existing label and
+add a comment to the issue explaining which label would be more precise and
+why. File a note in the PR description if a label gap is blocking correct
+categorisation — do not silently use a mismatched label.
+
+### Workflow / Priority Labels
+
+| Label | Description | When to use |
+|---|---|---|
+| `horizon:immediate` | Current milestone scope | Work that must complete before current milestone closes |
+| `horizon:near-term` | Next 2–3 milestones | Real work, committed timeline, not now |
+| `horizon:long-term` | Future, no committed timeline | Architectural vision; no implementation scheduled |
+
+**Choosing between horizon labels:** If the work blocks current milestone
+exit criteria → `horizon:immediate`. If it affects design decisions for the
+next 2–3 milestones but is not a current blocker → `horizon:near-term`.
+If it is important but has no path to implementation in the foreseeable
+roadmap → `horizon:long-term`.
+
+### Issue Type Labels
+
+| Label | Description | When to use |
+|---|---|---|
+| `bug` | Something isn't working | Incorrect behaviour, broken output, test failure |
+| `enhancement` | New feature or request | New capability, new module, new endpoint |
+| `documentation` | Improvements or additions to documentation | CLAUDE.md, ADRs, standards docs, CONTRIBUTING.md, standards reviews |
+| `question` | Further information is requested | Design question, clarification needed before implementation can begin |
+| `good first issue` | Good for newcomers | Well-scoped, low-risk, does not require deep architecture knowledge |
+| `help wanted` | Extra attention is needed | Requires domain expertise, second opinion, or is stalled |
+
+**`bug` vs `enhancement`:** If the code does something it was never supposed
+to do, or fails to do something it was explicitly designed to do → `bug`.
+If the code works as designed but the design needs to be extended → `enhancement`.
+
+**`documentation` vs `enhancement`:** If the deliverable is a document (ADR,
+standards amendment, review, CLAUDE.md update) → `documentation`. If the
+deliverable is code + a document (e.g. a new module with an ADR) → `enhancement`.
+Do not use `documentation` for issues whose primary deliverable is code.
+
+### Compliance Labels
+
+These labels are used exclusively on compliance scan findings. They are not
+general-purpose severity labels.
+
+| Label | Description | When to use |
+|---|---|---|
+| `compliance:critical` | Produces wrong outputs without a visible error signal | Silent correctness failures; data corruption; misleading outputs presented as valid |
+| `compliance:major` | Must resolve within current milestone | Compliance deviation that affects the current milestone's exit criteria |
+| `compliance:minor` | Address in normal course of development | Style violations, documentation gaps, non-blocking deviations |
+| `compliance:exception` | Deviation documented and approved | Self-approved exception per CLAUDE.md §Governance; exception record must exist |
+| `compliance:deferred` | Remediation scheduled but not yet started | Known gap with a filed issue and milestone assignment |
+
+**Do not use compliance labels on non-compliance issues.** A bug is not
+`compliance:critical` unless it specifically produces a silent incorrect
+output that a user cannot detect without reading source code.
+
+### Status Labels
+
+| Label | Description | When to use |
+|---|---|---|
+| `status:known-gap` | Acknowledged deficiency with documented plan to resolve | Architecture limitations accepted in a review (ARCH-REVIEW, STD-REVIEW) with an issue filed |
+| `status:parking-lot` | Idea captured, not yet evaluated | Triage outcome: real but not yet assessed for priority or milestone |
+| `status:deferred` | Deliberately deferred with documented rationale | Triage outcome: evaluated, assigned to a future milestone, not being worked now |
+| `review:periodic` | Must be revisited on a scheduled basis | Items that expire or become stale without re-review (e.g. compliance exceptions, deferred decisions) |
+
+### Labels that do not exist and must not be invented
+
+The following labels have been requested or used in error in past sessions.
+They do not exist. Use the mapping below instead:
+
+| Requested label | Use instead | Notes |
+|---|---|---|
+| `standards` | `documentation` | Standards review issues are documentation work |
+| `architecture` | `enhancement` or `documentation` | ADRs → `documentation`; new modules → `enhancement` |
+| `backtesting` | `enhancement` | Backtesting fixture work is an enhancement |
+| `security` | `compliance:critical` or `compliance:major` | Security findings are compliance findings |
+| `performance` | `enhancement` | No dedicated performance label exists |
+| `milestone:N` | Use the GitHub milestone assignment | Do not encode milestone in a label |
+
+---
+
 ## The North Star
 
 The tool's positions are declared, not hidden. Transparency about what we claim and do not claim is as important as the quality of what we build. A user who cannot understand and challenge our methodology cannot genuinely use our tool — they can only depend on it. Dependency is not leveling.
