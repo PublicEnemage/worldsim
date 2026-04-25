@@ -438,10 +438,9 @@ explicitly compute and pass `confidence_tier=max(...)` — no implicit defaultin
 **Known Limitation (IA-1):** This rule does not account for projection horizon.
 A 30-year forward projection derived from a Tier 1 historical observation retains
 Tier 1 confidence under this rule, which overstates reliability for long-horizon
-projections. Time-horizon confidence degradation is Milestone 3 scope.
-Until that implementation, modules producing forward projections must include in
-their output metadata the note: *"Confidence tier does not account for projection
-horizon."*
+projections. See the formal definition, canonical disclosure text, and remediation
+plan in **Known Limitation IA-1: Projection Horizon Confidence** at the end of
+this document (Issue #69, Milestone 4).
 
 ### The `Unit` Type
 
@@ -1119,3 +1118,72 @@ ours to take. Where standards are silent or disputed, we document our choice
 and the rationale explicitly. This principle is the rationale for every specific
 decision in this section and is stated here explicitly so that no individual
 choice appears arbitrary.
+
+---
+
+## Known Limitations
+
+This section documents formally acknowledged limitations in WorldSim's data
+standards and confidence tier system. Each limitation has a canonical
+identifier, a disclosure text hardcoded in the relevant modules, and a
+remediation plan tracked in GitHub.
+
+---
+
+### Known Limitation IA-1: Projection Horizon Confidence
+
+**What the limitation is**
+
+`confidence_tier` does not degrade with projection horizon distance. A
+`Quantity` derived from a Tier 1 historical observation retains Tier 1
+confidence regardless of how far forward in time it is projected. A 30-year
+forward projection carries the same confidence tier as the historical
+observation it was derived from, which overstates reliability for long-horizon
+projections.
+
+**Why it exists**
+
+Time-horizon confidence degradation requires a calibration infrastructure —
+specifically, a mapping from (horizon distance, variable type, model lineage)
+to a tier penalty — that has not yet been implemented. Until that
+infrastructure exists, applying automatic degradation would introduce
+arbitrary penalties with no empirical basis, which would be worse than the
+current known limitation. The limitation is therefore documented and disclosed
+rather than patched with an uncalibrated heuristic.
+
+**Canonical disclosure text**
+
+The following string is defined as `IA1_CANONICAL_PHRASE` in
+`backend/app/simulation/repositories/quantity_serde.py`. This exact text
+must appear verbatim in every `ia1_disclosure` field. It must not be
+paraphrased or abbreviated:
+
+```
+Forward projections carry inherited confidence tier without time-horizon
+degradation. Confidence tiers reflect data quality at observation date, not
+projection reliability. See DATA_STANDARDS.md Known Limitation IA-1.
+```
+
+`validate_ia1_disclosure()` in `quantity_serde.py` enforces that
+`ia1_disclosure` is non-empty and non-whitespace at every snapshot write
+path. The database `NOT NULL` constraint prevents NULL. Unit tests assert
+that `IA1_CANONICAL_PHRASE` appears verbatim in snapshot output.
+
+**Where it appears**
+
+- `scenario_state_snapshots.ia1_disclosure` — populated on every snapshot
+  write by the scenario runner. Present in all M3 and later scenario outputs.
+- `MultiFrameworkOutput.ia1_disclosure` (Milestone 4) — required
+  non-nullable constructor argument on every `MultiFrameworkOutput` instance
+  per ADR-005 Decision 2. Carries the same canonical phrase.
+
+**Remediation plan**
+
+Issue #69, Milestone 4. Implement time-horizon confidence degradation as a
+calibration table keyed by `(horizon_steps, variable_type)`. When implemented,
+forward projection `confidence_tier` will be computed as
+`max(source_tier, horizon_penalty_tier)`, where `horizon_penalty_tier` is
+drawn from the calibration table. `IA1_CANONICAL_PHRASE` will be retired and
+replaced by output that reflects actual calibrated confidence. The
+`ia1_disclosure` field will remain but its content will shift from a blanket
+limitation notice to a calibration provenance statement.
