@@ -621,6 +621,85 @@ rationale for the current decision documented in the response.
 
 ---
 
+## Common Development Issues
+
+### Scenarios panel shows error / API returns 500 on `/api/v1/scenarios`
+
+**Symptom:** Clicking the Scenarios panel arrow in the browser shows an error
+message. Directly calling `curl http://localhost:8000/api/v1/scenarios` returns
+`Internal Server Error`. API logs show:
+
+```
+asyncpg.exceptions.UndefinedTableError: relation "scenarios" does not exist
+```
+
+**Cause:** The database schema is missing one or more Alembic migrations.
+Docker Compose starts the API container with `uvicorn` directly — it does not
+run `alembic upgrade head` on startup. If you started the containers against
+an existing database that predates the M3 scenario tables, or if a new
+migration was merged after your containers were last built, the `scenarios`,
+`scenario_state_snapshots`, and `scenario_deleted_tombstones` tables will not
+exist.
+
+**Fix:**
+
+```bash
+docker compose exec api alembic upgrade head
+```
+
+Then verify:
+
+```bash
+curl http://localhost:8000/api/v1/scenarios
+# Should return [] (empty list), not an error
+```
+
+**When this recurs:** Run `alembic upgrade head` any time you pull a commit
+that includes a new file under `backend/alembic/versions/`. You can check
+which migrations are pending without applying them:
+
+```bash
+docker compose exec api alembic current    # shows current DB revision
+docker compose exec api alembic history    # shows full migration chain
+```
+
+---
+
+### Frontend does not reflect latest code after `git pull`
+
+**Symptom:** You pulled new frontend changes but the browser still shows the
+old UI. Hard-refreshing does not help.
+
+**Cause:** Vite's Hot Module Replacement only watches files it was already
+serving when the container started. Files added or changed by `git pull` are
+not picked up automatically.
+
+**Fix:**
+
+```bash
+docker compose restart frontend
+```
+
+---
+
+### Natural Earth loader not run — choropleth is empty or GRC entity missing
+
+**Symptom:** The choropleth map is blank, or a backtesting run fails with
+`EntityNotFound: GRC`. The `simulation_entities` table is empty.
+
+**Cause:** The Natural Earth boundary loader seed script has not been run
+against this database.
+
+**Fix:**
+
+```bash
+docker compose exec api python scripts/natural_earth_loader.py
+```
+
+The loader is idempotent — safe to run multiple times.
+
+---
+
 ## Getting Help
 
 **GitHub Issues** — bugs and feature requests, using the provided templates.
