@@ -776,14 +776,14 @@ Activation: `Architecture Review: FULL — [scope description]` or
 
 ## What We Are Building First
 
-**Milestone 0 — Foundation (Current)**
+**Milestone 0 — Foundation (Complete)**
 - Repository structure established
 - CLAUDE.md in place
 - Technology stack installed and verified
 - First Architecture Decision Record written: simulation core data model
 - CI/CD pipeline skeleton in GitHub Actions
 
-**Milestone 1 — Simulation Core**
+**Milestone 1 — Simulation Core (Complete — v0.1.0)**
 - Country entity data model with Level 1 attributes
 - Basic event propagation graph
 - Annual timestep engine
@@ -792,24 +792,35 @@ Activation: `Architecture Review: FULL — [scope description]` or
   (a persistent database seed loader requires PostGIS infrastructure and is
   Milestone 2 scope)
 - No UI — verify simulation logic through tests and CLI output
+- ADR-001 (simulation core data model) and ADR-002 (input orchestration): CURRENT
 
-**Milestone 2 — Geospatial Foundation**
+**Milestone 2 — Geospatial Foundation (Complete — v0.2.0)**
 - PostGIS database with country boundary GeoJSON (Natural Earth)
 - FastAPI layer serving country data
 - MapLibre GL frontend rendering one variable as choropleth
 - The map works. One variable. No scenarios yet.
+- ADR-003 (geospatial foundation): CURRENT
 
-**Milestone 3 — Scenario Engine**
-- User-defined scenario configuration
-- Time acceleration controls
-- Comparative scenario output
-- First backtesting run against a documented historical case
+**Milestone 3 — Scenario Engine (Complete — v0.3.0)**
+- User-defined scenario configuration with ScenarioPanel UI
+- Time acceleration controls (POST /advance)
+- Comparative scenario output (GET /compare, DeltaChoropleth)
+- Greece 2010–2012 backtesting fixture passing DIRECTION_ONLY thresholds in CI
+- Scenario selector UI: users can create scenarios, advance step by step,
+  and see the choropleth update live in the browser
+- ADR-004 (scenario engine) and ADR-005 (human cost ledger): CURRENT
+- Standards reviews STD-REVIEW-001, STD-REVIEW-002, STD-REVIEW-003 complete
 
-**Milestone 4 — Human Cost Ledger**
+**Milestone 4 — Human Cost Ledger (Current)**
 - Cohort-level demographic module
-- Multi-currency measurement output
+- Multi-framework measurement output (financial, human development,
+  ecological, governance)
 - Minimum Descent Altitude threshold system
 - Radar chart dashboard displaying all dimensions simultaneously
+- M4 hard gates from STD-REVIEW-003: measurement_framework tagging rule in
+  CODING_STANDARDS.md (Issue #171), academic literature citation format in
+  DATA_STANDARDS.md (Issue #172), Known Limitation IA-1 section in
+  DATA_STANDARDS.md before first M4 projection output (Issue #174)
 
 Each milestone is a vertical slice — working software at every stage,
 not infrastructure waiting for features.
