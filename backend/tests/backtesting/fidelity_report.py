@@ -61,9 +61,9 @@ def format_fidelity_report(
         3: getattr(actuals, "gdp_growth_2012", None),
     }
     actual_unemp = {
-        1: getattr(actuals, "unemployment_rate_2010", None),
-        2: getattr(actuals, "unemployment_rate_2011", None),
-        3: getattr(actuals, "unemployment_rate_2012", None),
+        1: getattr(actuals, "unemployment_rate_2011", None),
+        2: getattr(actuals, "unemployment_rate_2012", None),
+        3: getattr(actuals, "unemployment_rate_2013", None),
     }
 
     for step_num in sorted(step_labels.keys()):

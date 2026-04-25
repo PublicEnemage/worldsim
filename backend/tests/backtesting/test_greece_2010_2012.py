@@ -117,8 +117,10 @@ async def test_greece_2010_2012_direction_only_fidelity(
         Rationale: ACTUALS show -5.4%, -8.9%, -6.6%. Simulation must predict
         contraction, not growth. This is a DIRECTION_ONLY check — the
         simulation need not match the magnitude.
-      - unemployment_rate at step 3 must exceed step 1 value if attribute
-        exists in the simulation output (DIRECTION_ONLY: rising unemployment).
+      - unemployment_rate at step 3 must exceed the initial (step 0) value.
+        Initial state is empirically grounded: EUROSTAT_LFS_2010 Q1 2010 = 12.7%.
+        This replaces the previous step1→step3 check which was vacuous when no
+        initial unemployment was seeded (Issue #149, resolved).
 
     KNOWN LIMITATION: Parameter calibration tier system not yet implemented
     (Issue #44). Magnitude accuracy is not evaluated in M3.
@@ -140,11 +142,16 @@ async def test_greece_2010_2012_direction_only_fidelity(
                 val = _extract_gdp_value(snap)
                 thresholds_met[key] = val is not None and val < Decimal("0")
 
-        # DIRECTION_ONLY: unemployment rising (step 3 > step 1) if attribute present
-        unemp_step1 = _extract_unemployment_value(snapshots_by_step.get(1, {}))
+        # DIRECTION_ONLY: unemployment at step 3 must exceed step 0 (initial state).
+        # Step 0 initial value is empirically grounded at 12.7% (EUROSTAT_LFS_2010,
+        # Issue #149). Both steps must be present in simulation output for this
+        # threshold to be evaluated — if either is absent, threshold is skipped.
+        unemp_step0 = _extract_unemployment_value(snapshots_by_step.get(0, {}))
         unemp_step3 = _extract_unemployment_value(snapshots_by_step.get(3, {}))
-        if unemp_step1 is not None and unemp_step3 is not None:
-            thresholds_met["unemployment_rising_step1_to_step3"] = unemp_step3 > unemp_step1
+        if unemp_step0 is not None and unemp_step3 is not None:
+            thresholds_met["unemployment_direction_step0_to_step3"] = (
+                unemp_step3 > unemp_step0
+            )
 
         # Print fidelity report to stdout (appears in CI logs on every run)
         report = format_fidelity_report(
