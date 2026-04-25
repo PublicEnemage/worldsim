@@ -41,3 +41,238 @@ body,
   flex: 1;
   overflow: hidden;
 }
+
+/* Scenario toggle button in header */
+.scenario-toggle-btn {
+  padding: 4px 10px;
+  font-size: 13px;
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 4px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.scenario-toggle-btn:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.scenario-toggle-btn--open {
+  background: rgba(255, 255, 255, 0.25);
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+/* Scenario panel */
+.scenario-panel {
+  background: #122a45;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  flex-shrink: 0;
+  max-height: 260px;
+  overflow-y: auto;
+}
+
+.scenario-panel-inner {
+  display: flex;
+  gap: 0;
+  padding: 12px 20px;
+  min-height: 100px;
+}
+
+.scenario-panel-section {
+  flex: 1;
+  min-width: 0;
+  color: #d0dce8;
+  font-size: 13px;
+}
+
+.scenario-panel-section--create {
+  flex: 0 0 280px;
+  border-left: 1px solid rgba(255, 255, 255, 0.1);
+  padding-left: 20px;
+  margin-left: 16px;
+}
+
+.scenario-panel-section-title {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #8aa8c4;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.scenario-panel-refresh {
+  background: none;
+  border: none;
+  color: #8aa8c4;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 0 2px;
+  line-height: 1;
+}
+
+.scenario-panel-refresh:hover {
+  color: #d0dce8;
+}
+
+.scenario-panel-empty {
+  color: #5a7a95;
+  font-style: italic;
+  font-size: 12px;
+}
+
+.scenario-panel-error {
+  color: #f87171;
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+.scenario-panel-success {
+  color: #6ee7b7;
+  font-size: 12px;
+  margin-top: 6px;
+}
+
+/* Scenario list rows */
+.scenario-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 180px;
+  overflow-y: auto;
+}
+
+.scenario-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 5px 8px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.04);
+  gap: 8px;
+}
+
+.scenario-row--primary {
+  background: rgba(59, 130, 246, 0.2);
+  border: 1px solid rgba(59, 130, 246, 0.35);
+}
+
+.scenario-row--second {
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.scenario-row-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  flex: 1;
+}
+
+.scenario-row-name {
+  font-size: 13px;
+  color: #e2eaf2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.scenario-row-status {
+  font-size: 11px;
+  padding: 1px 6px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
+.scenario-row-status--pending { background: rgba(251, 191, 36, 0.2); color: #fbbf24; }
+.scenario-row-status--running { background: rgba(59, 130, 246, 0.2); color: #60a5fa; }
+.scenario-row-status--completed { background: rgba(16, 185, 129, 0.2); color: #34d399; }
+.scenario-row-status--failed { background: rgba(239, 68, 68, 0.2); color: #f87171; }
+
+.scenario-row-actions {
+  display: flex;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+/* Scenario buttons */
+.scenario-btn {
+  padding: 3px 9px;
+  font-size: 12px;
+  background: rgba(255, 255, 255, 0.1);
+  color: #d0dce8;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.scenario-btn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.scenario-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.scenario-btn--active {
+  background: rgba(59, 130, 246, 0.35);
+  border-color: rgba(59, 130, 246, 0.6);
+  color: #93c5fd;
+}
+
+.scenario-btn--compare.scenario-btn--active {
+  background: rgba(16, 185, 129, 0.25);
+  border-color: rgba(16, 185, 129, 0.5);
+  color: #6ee7b7;
+}
+
+/* Create form */
+.scenario-create-form {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+
+.scenario-create-input {
+  flex: 1;
+  padding: 4px 8px;
+  font-size: 13px;
+  background: rgba(255, 255, 255, 0.08);
+  color: #e2eaf2;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
+  outline: none;
+  min-width: 0;
+}
+
+.scenario-create-input::placeholder {
+  color: #5a7a95;
+}
+
+.scenario-create-input:focus {
+  border-color: rgba(59, 130, 246, 0.6);
+}
+
+.scenario-btn--create {
+  background: rgba(59, 130, 246, 0.3);
+  border-color: rgba(59, 130, 246, 0.5);
+  color: #93c5fd;
+  flex-shrink: 0;
+}
+
+.scenario-btn--create:hover:not(:disabled) {
+  background: rgba(59, 130, 246, 0.45);
+}
+
+.scenario-create-hint {
+  font-size: 11px;
+  color: #4a6a85;
+  margin-top: 4px;
+}
