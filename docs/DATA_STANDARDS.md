@@ -951,6 +951,76 @@ Minimum registry entries required at Milestone 1:
 - UN Population Division demographic data
 - Natural Earth country boundary data (Milestone 2 prerequisite)
 
+### Academic Literature Citation Format
+
+Academic literature sources — used as the empirical basis for model parameters
+such as `CohortElasticity` entries (ADR-005 Decision 1) — must be registered in
+the source registry with `source_type` set to `ACADEMIC_LITERATURE`. The
+dataset-oriented `SourceRegistration` schema in `§Data Provenance Requirements`
+does not apply: academic literature has no `dataset_name`, `coverage_start`,
+`coverage_end`, or `coverage_countries`. Use the schema below instead.
+
+```python
+@dataclass
+class AcademicLiteratureRegistration:
+    source_id: str              # unique, stable identifier — see naming rule below
+    source_type: str = "ACADEMIC_LITERATURE"  # discriminator; must be this exact value
+    authors: list[str]          # surnames and initials, e.g. ["Autor, D.", "Dorn, D."]
+    title: str                  # full title of the paper, book, or book chapter
+    journal_or_publisher: str   # journal name or book publisher
+    year: int                   # publication year
+    doi_or_url: str             # DOI preferred (doi:10.xxxx/...); stable URL required
+    methodology_note: str       # what specific finding or parameter estimate this
+                                # source provides and how it is used in the simulation
+```
+
+**Example — correctly registered academic literature source for a `CohortElasticity`:**
+
+```python
+AcademicLiteratureRegistration(
+    source_id="CHETTY_FRIEDMAN_SAEZ_2014_EITC_INCIDENCE",
+    source_type="ACADEMIC_LITERATURE",
+    authors=["Chetty, R.", "Friedman, J.", "Saez, E."],
+    title=(
+        "Using Differences in Knowledge Across Neighborhoods to Uncover "
+        "the Impacts of the EITC on Earnings"
+    ),
+    journal_or_publisher="American Economic Review",
+    year=2014,
+    doi_or_url="doi:10.1257/aer.104.9.2683",
+    methodology_note=(
+        "Table 4, column (3): income elasticity estimate for Q1–Q2 households "
+        "under fiscal transfer policy changes. Used as the elasticity value for "
+        "CohortElasticity(event_type='fiscal_transfer_change', "
+        "income_quintile=Q1, attribute_key='disposable_income')."
+    ),
+)
+```
+
+**Registration rules for academic literature sources:**
+
+1. **`source_id` format:** Use `SURNAME_YEAR_KEYWORD` — e.g.,
+   `ATKINSON_1970_DISTRIBUTION`, `DEATON_1997_ANALYSIS`. For multi-author works use
+   the first author's surname only. Never use a running number or a generic label.
+   The `source_id` must be stable across codebase changes — it appears in
+   `CohortElasticity.source_registry_id` fields throughout the elasticity registry.
+
+2. **`doi_or_url`:** DOI is strongly preferred. A journal landing page URL is
+   acceptable only when no DOI exists. URLs to PDFs, preprint servers, or
+   institutional repositories are not acceptable as the primary reference.
+
+3. **`methodology_note` specificity requirement:** The note must identify precisely
+   which table, figure, or regression coefficient was used as the parameter value
+   and how it maps to the simulation variable. *"Provides elasticity estimates"* is
+   not sufficient. *"Table 4, column (3), coefficient on log household income for
+   Q1 households, used as `CohortElasticity.elasticity` for
+   `event_type='fiscal_transfer_change'`"* is sufficient.
+
+4. **Confidence tier for academic literature:** Defaults to **Tier 3** (research
+   estimates). Tier 2 may be assigned only for systematic reviews or meta-analyses
+   with documented pooling methodology across multiple primary sources; the
+   justification must appear in `methodology_note`.
+
 ---
 
 ## Political and Territorial Nomenclature Standards
