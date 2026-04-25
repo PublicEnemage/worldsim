@@ -308,14 +308,17 @@ in production currently references a non-existent document section.
 
 ## Engineering Lead Dispositions
 
-*To be recorded at time of STD-REVIEW-003 review.*
+*Recorded: 2026-04-25*
 
-*Single-principal governance limitation applies — see CLAUDE.md §Governance.*
+*Single-principal governance limitation applies — see CLAUDE.md §Governance.
+This review was approved by the same individual who holds full repository
+authority. No independent review is available at this governance stage. See
+CLAUDE.md §Governance for the documented plan to address this limitation.*
 
-| Gap | Disposition |
-|---|---|
-| Gap 1 (#171) | |
-| Gap 2 (#172) | |
-| Gap 3 (#173) | |
-| Gap 4 (#174) | |
-| Gap 5 (#160) | |
+| Gap | ID | Disposition |
+|---|---|---|
+| Gap 1 — measurement_framework tagging enforcement (#171) | SR3-I-01 | **ACCEPTED** — measurement_framework tagging rule must be added to CODING_STANDARDS.md before DemographicModule implementation begins |
+| Gap 2 — academic literature citation format (#172) | SR3-I-02 | **ACCEPTED** — academic literature citation format must be added to DATA_STANDARDS.md before CohortElasticity registry is populated |
+| Gap 3 — MDA threshold tier upgrade criteria (#173) | SR3-N-03 | **ACCEPTED** — MDA calibration evidence criteria and docs/methodology/mda-calibration.md must exist before any Tier 3 threshold is upgraded to Tier 2 in M4 |
+| Gap 4 — Known Limitation IA-1 section (#174) | SR3-I-04 | **ACCEPTED** — Known Limitation IA-1 section must be written in DATA_STANDARDS.md before any M4 projection output is committed — this is a hard gate |
+| Gap 5 — Fidelity report statistical power statement format (#160) | SR3-N-05 | **ACCEPTED** — noted as amendment to Issue #160; no separate sequencing gate required |
