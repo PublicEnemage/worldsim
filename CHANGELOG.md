@@ -13,7 +13,7 @@ closure ceremony defined in `docs/MILESTONE_RUNBOOK.md`.
 - Three new database tables via Alembic migration: `scenarios`
   (configuration JSONB, status, engine_version), `scenario_state_snapshots`
   (step-indexed state JSONB, `ia1_disclosure` NOT NULL enforced at DB level),
-  `scenario_tombstones` (deleted scenario config + scheduled_inputs JSONB for
+  `scenario_deleted_tombstones` (deleted scenario config + scheduled_inputs JSONB for
   reconstruction from first principles)
 - Four API endpoints: `POST /scenarios`, `GET /scenarios/{id}`,
   `GET /scenarios/{id}/snapshots`, `DELETE /scenarios/{id}`
