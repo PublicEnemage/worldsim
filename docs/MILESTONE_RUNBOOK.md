@@ -98,15 +98,24 @@ Performed when all exit checklist items are confirmed green.
    The scan was run against all new code in the milestone. Findings from the scan are
    either remediated or tracked as open Issues with appropriate labels.
 
-3. **Socratic Agent TEST session completed.** The Engineering Lead has demonstrated
+3. **Frontend smoke test completed (milestones with frontend deliverables).** Before
+   closing a milestone, manually verify in the browser that every frontend feature
+   delivered in the milestone is reachable from the UI. Specifically: can a user access
+   and operate each new UI component without developer console errors? Backend-only
+   verification of API endpoints is insufficient for milestones that include frontend
+   deliverables. Document what was tested and confirm it works as a comment on the exit
+   checklist Issue. Milestones with no frontend deliverables may skip this step with a
+   one-line note confirming that no UI changes were made.
+
+4. **Socratic Agent TEST session completed.** The Engineering Lead has demonstrated
    genuine understanding of the milestone's architectural contributions. This is not
    a formality — it is the checkpoint that ensures the codebase remains governable.
 
-4. **Release tag created.** Tag the merge commit with semantic versioning:
+5. **Release tag created.** Tag the merge commit with semantic versioning:
    `v0.N.0` for Milestones 0 through 4 (pre-release). Tag message includes a brief
    description of what the milestone delivered.
 
-5. **Changelog entry written.** Append a milestone summary to `CHANGELOG.md` (create
+6. **Changelog entry written.** Append a milestone summary to `CHANGELOG.md` (create
    if this is the first milestone). Format:
    ```
    ## v0.N.0 — Milestone N: Theme Name (YYYY-MM-DD)
@@ -118,7 +127,7 @@ Performed when all exit checklist items are confirmed green.
    - [one-line summary of open finding count by severity]
    ```
 
-6. **Next milestone creation ceremony triggered.** Unless this is the final milestone,
+7. **Next milestone creation ceremony triggered.** Unless this is the final milestone,
    immediately initiate the creation ceremony for Milestone N+1. Do not leave a gap
    between milestones — the gap is where work loses coherence and Issues accumulate
    without context.
