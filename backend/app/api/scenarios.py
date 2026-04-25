@@ -3,7 +3,7 @@
 Eight endpoints covering scenario configuration lifecycle and execution:
   POST   /scenarios                           — create scenario (status: pending)
   GET    /scenarios                           — list all scenarios (created_at desc)
-  GET    /scenarios/compare                   — delta between two final snapshots (ADR-004 D5)
+  GET    /scenarios/compare                   — snapshot delta; optional step alignment (ADR-004 D5)
   GET    /scenarios/{scenario_id}             — full detail with scheduled inputs
   DELETE /scenarios/{scenario_id}             — tombstone + cascade delete, returns 204
   POST   /scenarios/{scenario_id}/run         — execute pending scenario to completion
@@ -257,15 +257,22 @@ async def compare_scenarios(
     scenario_a: str,
     scenario_b: str,
     attr: str | None = None,
+    step: int | None = None,
 ) -> CompareResponse:
-    """Return attribute deltas between two scenarios at their final steps.
+    """Return attribute deltas between two scenarios.
 
     Computes delta = value_b - value_a for each shared entity and attribute.
-    Only entities and attributes present in both final snapshots are included.
+    Only entities and attributes present in both snapshots are included.
     Filter to a single attribute with `attr`. ADR-004 Decision 5.
 
+    `step` — when provided, both scenarios must have a snapshot at exactly
+    that step. Returns 404 identifying which scenario is missing the step.
+    When omitted, compares the final (highest-step) snapshot of each scenario.
+
     Returns 404 if either scenario is not found.
-    Returns 409 if either scenario has no snapshots yet.
+    Returns 404 if `step` is provided and either scenario has no snapshot at
+    that step (with a message identifying the missing scenario).
+    Returns 409 if `step` is omitted and either scenario has no snapshots yet.
     """
     for sid in (scenario_a, scenario_b):
         row = await conn.fetchrow(
@@ -276,27 +283,56 @@ async def compare_scenarios(
                 status_code=404, detail=f"Scenario '{sid}' not found."
             )
 
-    snap_a = await conn.fetchrow(
-        "SELECT step, state_data FROM scenario_state_snapshots "
-        "WHERE scenario_id = $1 ORDER BY step DESC LIMIT 1",
-        scenario_a,
-    )
-    snap_b = await conn.fetchrow(
-        "SELECT step, state_data FROM scenario_state_snapshots "
-        "WHERE scenario_id = $1 ORDER BY step DESC LIMIT 1",
-        scenario_b,
-    )
-
-    if snap_a is None:
-        raise HTTPException(
-            status_code=409,
-            detail=f"Scenario '{scenario_a}' has no snapshots. Run it first.",
+    if step is not None:
+        snap_a = await conn.fetchrow(
+            "SELECT step, state_data FROM scenario_state_snapshots "
+            "WHERE scenario_id = $1 AND step = $2",
+            scenario_a,
+            step,
         )
-    if snap_b is None:
-        raise HTTPException(
-            status_code=409,
-            detail=f"Scenario '{scenario_b}' has no snapshots. Run it first.",
+        if snap_a is None:
+            raise HTTPException(
+                status_code=404,
+                detail=(
+                    f"Scenario '{scenario_a}' has no snapshot at step {step}. "
+                    "Advance the scenario to this step before comparing."
+                ),
+            )
+        snap_b = await conn.fetchrow(
+            "SELECT step, state_data FROM scenario_state_snapshots "
+            "WHERE scenario_id = $1 AND step = $2",
+            scenario_b,
+            step,
         )
+        if snap_b is None:
+            raise HTTPException(
+                status_code=404,
+                detail=(
+                    f"Scenario '{scenario_b}' has no snapshot at step {step}. "
+                    "Advance the scenario to this step before comparing."
+                ),
+            )
+    else:
+        snap_a = await conn.fetchrow(
+            "SELECT step, state_data FROM scenario_state_snapshots "
+            "WHERE scenario_id = $1 ORDER BY step DESC LIMIT 1",
+            scenario_a,
+        )
+        snap_b = await conn.fetchrow(
+            "SELECT step, state_data FROM scenario_state_snapshots "
+            "WHERE scenario_id = $1 ORDER BY step DESC LIMIT 1",
+            scenario_b,
+        )
+        if snap_a is None:
+            raise HTTPException(
+                status_code=409,
+                detail=f"Scenario '{scenario_a}' has no snapshots. Run it first.",
+            )
+        if snap_b is None:
+            raise HTTPException(
+                status_code=409,
+                detail=f"Scenario '{scenario_b}' has no snapshots. Run it first.",
+            )
 
     state_a: dict[str, Any] = snap_a["state_data"]
     state_b: dict[str, Any] = snap_b["state_data"]
