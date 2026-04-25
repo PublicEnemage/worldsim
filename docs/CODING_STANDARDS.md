@@ -359,6 +359,63 @@ scope. Until then, modules producing forward projections must include in their
 output metadata the note: *"Confidence tier does not account for projection
 horizon."*
 
+#### `measurement_framework` Tagging (M4+ Requirement)
+
+Every `Quantity` produced by a domain module at Milestone 4 and later must
+carry an explicit `measurement_framework` tag from the `MeasurementFramework`
+enum. This rule is mandated by ADR-005 Decision 2 and enforced by the CI
+compliance scan (Issue #171, SR3-I-01).
+
+```python
+from app.simulation.engine.models import MeasurementFramework
+
+# Correct — M4+ module output carries explicit framework tag
+life_expectancy = Quantity(
+    value=Decimal("74.3"),
+    unit="years",
+    variable_type=VariableType.STOCK,
+    confidence_tier=2,
+    observation_date=date(2023, 1, 1),
+    source_id="WHO_GHO_LE_2023",
+    measurement_framework=MeasurementFramework.HUMAN_DEVELOPMENT,
+)
+
+# Forbidden — omitting measurement_framework in new M4+ module code
+life_expectancy = Quantity(
+    value=Decimal("74.3"),
+    unit="years",
+    variable_type=VariableType.STOCK,
+    confidence_tier=2,
+    observation_date=date(2023, 1, 1),
+    source_id="WHO_GHO_LE_2023",
+    # measurement_framework omitted — forbidden in new module code
+)
+```
+
+**The four framework values and their scope:**
+
+| Framework | `MeasurementFramework` value | Owned by |
+|---|---|---|
+| Financial accounts | `FINANCIAL` | Macroeconomic Module, Trade Module, Capital Flow Module |
+| Human development | `HUMAN_DEVELOPMENT` | Demographic Module, Health Module (Sen capability approach) |
+| Ecological accounts | `ECOLOGICAL` | Climate Module, Natural Capital Module |
+| Governance quality | `GOVERNANCE` | Institutional Cognition Module, Geopolitical Module |
+
+**Backward-compatibility rule:** Attributes produced by M1–M3 code that
+predate this requirement are permitted to carry `measurement_framework=None`.
+The `MultiFrameworkOutput` aggregation layer (ADR-005 Decision 2) classifies
+untagged attributes as `FINANCIAL` at query time. This default exists solely
+to avoid migrating M1–M3 historical attribute data — it must not be relied on
+for any new code written at M4 or later.
+
+**Compliance scan enforcement:** The CI compliance scan must flag any
+`Quantity(...)` or `Quantity(` construction in `backend/app/simulation/modules/`
+and `backend/app/simulation/engine/` where `measurement_framework` is absent
+from the call or explicitly set to `None`. Ingestion seeders
+(`backend/app/simulation/loaders/`) and test fixtures
+(`backend/tests/fixtures/`) are exempt — they may carry `measurement_framework=None`
+for historical seed data that predates this requirement.
+
 #### Ingestion Pipeline Requirements
 
 Every value entering the simulation through an ingestion pipeline must, at
@@ -371,6 +428,8 @@ the ingestion boundary:
 3. Carry an explicit `variable_type` — no defaulting to `DIMENSIONLESS`
 4. Be wrapped in a `Quantity` (or `MonetaryValue`) — no raw numbers after
    the ingestion boundary
+5. Carry an explicit `measurement_framework` if the value will be consumed by
+   M4+ module code — seeders backfilling historical data may use `None`
 
 The ingestion boundary is the single point at which raw source data becomes
 a `Quantity`. After that boundary, no code in `backend/app/` introduces bare
@@ -387,6 +446,7 @@ floats or bare `Decimal` values as attribute values.
 | Intermediate arithmetic | `Decimal` (temporary, in-function) | `float` (anywhere in backend/app/) |
 | NumPy propagation weight | `float` (with explicit comment) | `Decimal` (NumPy incompatible) |
 | Confidence propagation | `max(tier_a, tier_b)` | Assigning a fixed tier to derived output |
+| Module output (M4+) | `Quantity` with explicit `measurement_framework` | `Quantity` with `measurement_framework=None` |
 | Module output | `list[Event]` with `Quantity` deltas | `list[Event]` with float deltas |
 | Event delta | `Quantity` with matching `variable_type` | `float` delta |
 
