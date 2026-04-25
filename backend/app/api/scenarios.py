@@ -625,7 +625,7 @@ async def list_snapshots(
         if isinstance(state_raw, str):
             state_raw = json.loads(state_raw)
         state_dict: dict[str, Any] = state_raw if isinstance(state_raw, dict) else {}
-        modules_active: list[str] = state_dict.get("_modules_active", [])  # type: ignore[assignment]
+        modules_active: list[str] = state_dict.get("_modules_active", [])
         if not isinstance(modules_active, list):
             modules_active = []
         timestep = row["timestep"]
