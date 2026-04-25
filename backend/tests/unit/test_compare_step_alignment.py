@@ -14,7 +14,6 @@ import json
 from unittest.mock import AsyncMock
 
 import pytest
-
 from fastapi import HTTPException
 
 from app.api.scenarios import compare_scenarios
