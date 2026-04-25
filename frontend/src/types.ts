@@ -57,6 +57,27 @@ export interface CompareResponse {
   deltas: Record<string, Record<string, DeltaRecord>>;
 }
 
+export interface ScenarioResponse {
+  scenario_id: string;
+  name: string;
+  description: string | null;
+  status: string;
+  version: number;
+  created_at: string;
+}
+
+export interface ScenarioConfigSchema {
+  entities: string[];
+  initial_attributes: Record<string, unknown>;
+  n_steps: number;
+  timestep_label: string;
+}
+
+export interface ScenarioDetailResponse extends ScenarioResponse {
+  configuration: ScenarioConfigSchema;
+  scheduled_inputs: unknown[];
+}
+
 export interface DeltaChoroplethFeatureProperties {
   entity_id: string;
   name: string;
