@@ -14,6 +14,11 @@ for all fields: value (Decimal precision), unit, variable_type (enum), confidenc
 
 IA1_CANONICAL_PHRASE is the exact text required in every ia1_disclosure field on
 scenario_state_snapshots. Unit tests must assert this phrase appears verbatim.
+
+STATE_DATA_ENVELOPE_VERSION tracks the schema version of the scenario_state_snapshots
+state_data JSONB top-level envelope (distinct from the per-Quantity _envelope_version).
+Increment this constant when M4+ modules add structural fields to state_data that
+change interpretation of snapshot contents. Version "2" adds _modules_active.
 """
 from __future__ import annotations
 
@@ -36,11 +41,38 @@ IA1_CANONICAL_PHRASE: str = (
     "projection reliability. See DATA_STANDARDS.md Known Limitation IA-1."
 )
 
+
+def validate_ia1_disclosure(text: str) -> str:
+    """Validate that an ia1_disclosure string is non-empty and non-whitespace.
+
+    Raises ValueError if text is empty or whitespace-only. Returns text
+    unchanged on success. Call at every snapshot write path — the NOT NULL DB
+    constraint prevents NULL but cannot reject an empty or placeholder string.
+    See ARCH-REVIEW-003 BI3-I-01 and Issue #144.
+    """
+    if not text or not text.strip():
+        raise ValueError(
+            "ia1_disclosure must be a non-empty, non-whitespace string. "
+            "Use IA1_CANONICAL_PHRASE or a substantive disclosure text. "
+            "See DATA_STANDARDS.md Known Limitation IA-1."
+        )
+    return text
+
+
 # ---------------------------------------------------------------------------
-# SA-09 envelope format
+# SA-09 per-Quantity envelope format
 # ---------------------------------------------------------------------------
 
 _ENVELOPE_VERSION = "1"
+
+# ---------------------------------------------------------------------------
+# State-data envelope version — scenario_state_snapshots.state_data top level
+# ---------------------------------------------------------------------------
+
+# "2" adds _modules_active list to the top-level state_data envelope.
+# Increment when M4+ modules add structural fields that change snapshot
+# interpretation. See ARCH-REVIEW-003 BI3-I-02 and Issue #145.
+STATE_DATA_ENVELOPE_VERSION = "2"
 
 
 def quantity_to_jsonb_envelope(q: Quantity) -> dict[str, Any]:

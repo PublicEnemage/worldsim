@@ -216,7 +216,12 @@ class RunSummaryResponse(BaseModel):
 
 
 class SnapshotRecord(BaseModel):
-    """One step snapshot from scenario_state_snapshots — ADR-004 Decision 3."""
+    """One step snapshot from scenario_state_snapshots — ADR-004 Decision 3.
+
+    `modules_active` lists the domain modules that contributed to this snapshot.
+    Empty list for all M3 snapshots (no domain modules implemented). Populated
+    in M4+ from the `_modules_active` key in state_data. See Issue #145, #146.
+    """
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -224,6 +229,7 @@ class SnapshotRecord(BaseModel):
     step: int
     timestep: str
     state_data: dict[str, Any]
+    modules_active: list[str] = []
 
 
 class AdvanceResponse(BaseModel):

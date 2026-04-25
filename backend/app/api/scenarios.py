@@ -588,12 +588,17 @@ async def list_snapshots(
         state_raw = row["state_data"]
         if isinstance(state_raw, str):
             state_raw = json.loads(state_raw)
+        state_dict: dict[str, Any] = state_raw if isinstance(state_raw, dict) else {}
+        modules_active: list[str] = state_dict.get("_modules_active", [])  # type: ignore[assignment]
+        if not isinstance(modules_active, list):
+            modules_active = []
         timestep = row["timestep"]
         timestep_str = timestep.isoformat() if hasattr(timestep, "isoformat") else str(timestep)
         result.append(SnapshotRecord(
             scenario_id=row["scenario_id"],
             step=row["step"],
             timestep=timestep_str,
-            state_data=state_raw if isinstance(state_raw, dict) else {},
+            state_data=state_dict,
+            modules_active=modules_active,
         ))
     return result
