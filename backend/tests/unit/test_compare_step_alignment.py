@@ -14,9 +14,9 @@ import json
 from unittest.mock import AsyncMock
 
 import pytest
+from fastapi import HTTPException
 
 from app.api.scenarios import compare_scenarios
-from fastapi import HTTPException
 
 # ---------------------------------------------------------------------------
 # Fixtures
@@ -45,7 +45,7 @@ def _snap(step: int) -> dict:
     return {"step": step, "state_data": json.dumps(_STATE)}
 
 
-def _make_conn(*side_effects) -> AsyncMock:
+def _make_conn(*side_effects: object) -> AsyncMock:
     conn = AsyncMock()
     conn.fetchrow = AsyncMock(side_effect=list(side_effects))
     return conn
