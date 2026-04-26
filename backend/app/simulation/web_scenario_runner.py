@@ -54,7 +54,7 @@ from app.simulation.repositories.state_repository import (
 if TYPE_CHECKING:
     from datetime import datetime
 
-    from app.simulation.engine.models import SimulationState
+    from app.simulation.engine.models import SimulationModule, SimulationState
     from app.simulation.orchestration.inputs import ControlInput
 
 # `datetime` and `SimulationState` above are annotation-only (PEP 563).
@@ -264,7 +264,9 @@ class WebScenarioRunner:
             step_inputs = inputs_by_step.get(next_step, [])
 
             demo_module = _build_demographic_module(config)
-            active_modules = [demo_module] if demo_module is not None else []
+            active_modules: list[SimulationModule] = (
+                [demo_module] if demo_module is not None else []
+            )
 
             runner = ScenarioRunner(
                 initial_state=current_state,
@@ -355,7 +357,9 @@ class WebScenarioRunner:
 
         # Execute n_steps using ScenarioRunner
         demo_module = _build_demographic_module(config)
-        active_modules = [demo_module] if demo_module is not None else []
+        active_modules: list[SimulationModule] = (
+            [demo_module] if demo_module is not None else []
+        )
 
         runner = ScenarioRunner(
             initial_state=initial_state,
