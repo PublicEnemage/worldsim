@@ -7,8 +7,47 @@ on:
     branches: [ main ]
 
 jobs:
+  # ---------------------------------------------------------------------------
+  # Path filter — always runs, gates all downstream jobs.
+  #
+  # Uses dorny/paths-filter@v3 to detect which file groups changed.
+  # Downstream jobs read the filter outputs via needs.changes.outputs.*
+  # and include an `if:` condition so they are skipped entirely on
+  # documentation-only commits (no PostGIS service spin-up, no pip install).
+  #
+  # Filter groups:
+  #   backend     — any file under backend/ (triggers lint, test-backend,
+  #                 compliance-scan)
+  #   frontend    — any file under frontend/ (triggers lint, test-backend,
+  #                 compliance-scan)
+  #   backtesting — backend/tests/backtesting/** or backend/tests/fixtures/**
+  #                 (triggers the full PostGIS backtesting job only when the
+  #                 files that affect fidelity thresholds actually change)
+  # ---------------------------------------------------------------------------
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      backend: ${{ steps.filter.outputs.backend }}
+      frontend: ${{ steps.filter.outputs.frontend }}
+      backtesting: ${{ steps.filter.outputs.backtesting }}
+    steps:
+      - uses: actions/checkout@v6
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            backend:
+              - 'backend/**'
+            frontend:
+              - 'frontend/**'
+            backtesting:
+              - 'backend/tests/backtesting/**'
+              - 'backend/tests/fixtures/**'
+
   test-backend:
     runs-on: ubuntu-latest
+    needs: changes
+    if: needs.changes.outputs.backend == 'true' || needs.changes.outputs.frontend == 'true'
     steps:
       - uses: actions/checkout@v6
 
@@ -44,10 +83,18 @@ jobs:
   # The GRC entity must exist — run natural_earth_loader before pytest.
   # A failure in this job is a build failure; it is the Milestone 3 exit
   # gate for the backtesting criterion (Issue #61, Issue #112).
+  #
+  # Only runs when backend/tests/backtesting/ or backend/tests/fixtures/
+  # files change — these are the files that directly encode fidelity
+  # thresholds. Changes to backend/app/ alone do not re-trigger this job
+  # because test-backend already runs the backtesting suite without a live
+  # DB (graceful skip when DATABASE_URL is absent). The full PostGIS run
+  # is reserved for when the thresholds or fixture data themselves change.
   # ---------------------------------------------------------------------------
   backtesting:
     runs-on: ubuntu-latest
-    needs: test-backend
+    needs: [changes, test-backend]
+    if: needs.changes.outputs.backtesting == 'true'
 
     services:
       postgres:
@@ -97,6 +144,8 @@ jobs:
 
   lint:
     runs-on: ubuntu-latest
+    needs: changes
+    if: needs.changes.outputs.backend == 'true' || needs.changes.outputs.frontend == 'true'
     steps:
       - uses: actions/checkout@v6
 
@@ -124,7 +173,8 @@ jobs:
   # requires human review at milestone boundaries.
   compliance-scan:
     runs-on: ubuntu-latest
-    needs: lint
+    needs: [changes, lint]
+    if: needs.changes.outputs.backend == 'true' || needs.changes.outputs.frontend == 'true'
     steps:
       - uses: actions/checkout@v6
 
