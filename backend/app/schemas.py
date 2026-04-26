@@ -9,9 +9,10 @@ from __future__ import annotations
 
 from datetime import date
 from decimal import Decimal
+from enum import Enum
 from typing import Any
 
-from pydantic import BaseModel, ConfigDict, field_serializer
+from pydantic import BaseModel, ConfigDict, field_serializer, field_validator
 
 
 class QuantitySchema(BaseModel):
@@ -280,3 +281,84 @@ class CompareResponse(BaseModel):
     step_a: int
     step_b: int
     deltas: dict[str, dict[str, DeltaRecord]]
+
+
+# ---------------------------------------------------------------------------
+# Human Cost Ledger schemas — ADR-005 Decisions 2 and 3
+# ---------------------------------------------------------------------------
+
+
+class MDASeverity(str, Enum):
+    """Minimum Descent Altitude alert severity — ADR-005 Decision 3."""
+
+    WARNING = "WARNING"
+    CRITICAL = "CRITICAL"
+    TERMINAL = "TERMINAL"
+
+
+class MDAAlert(BaseModel):
+    """A single MDA threshold breach or approach — ADR-005 Decision 3.
+
+    floor_value, current_value, and approach_pct_remaining are strings
+    (Decimal serialized as str) — consistent with the float prohibition
+    throughout the API layer (ADR-003 Decision 2).
+    """
+
+    model_config = ConfigDict(from_attributes=True)
+
+    mda_id: str
+    entity_id: str
+    indicator_key: str
+    severity: MDASeverity
+    floor_value: str
+    current_value: str
+    approach_pct_remaining: str
+    consecutive_breach_steps: int
+
+
+class FrameworkOutput(BaseModel):
+    """One measurement framework's indicators and composite score for an entity.
+
+    composite_score is a Decimal-as-string (0.0–1.0 percentile rank) or None
+    when the module producing this framework's indicators is not yet
+    implemented. note is populated when composite_score is None.
+    mda_alerts is empty pending ADR-005 Decision 3 (MDAChecker) implementation.
+    ADR-005 Decision 2.
+    """
+
+    model_config = ConfigDict(from_attributes=True)
+
+    framework: str
+    entity_id: str
+    timestep: str
+    indicators: dict[str, QuantitySchema]
+    composite_score: str | None
+    mda_alerts: list[MDAAlert]
+    has_below_floor_indicator: bool
+    note: str | None
+
+
+class MultiFrameworkOutput(BaseModel):
+    """Multi-framework measurement output for one entity at one step.
+
+    All four MeasurementFramework values are present in outputs; unimplemented
+    frameworks carry composite_score=None and a note field. ia1_disclosure is
+    required with no default — validated non-empty by validate_ia1_disclosure.
+    ADR-005 Decision 2.
+    """
+
+    model_config = ConfigDict(from_attributes=True)
+
+    entity_id: str
+    entity_name: str
+    timestep: str
+    scenario_id: str
+    step_index: int
+    outputs: dict[str, FrameworkOutput]
+    ia1_disclosure: str
+
+    @field_validator("ia1_disclosure")
+    @classmethod
+    def _check_ia1_disclosure(cls, v: str) -> str:
+        from app.simulation.repositories.quantity_serde import validate_ia1_disclosure
+        return validate_ia1_disclosure(v)

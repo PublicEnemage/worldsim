@@ -1,14 +1,15 @@
-"""Scenario endpoints — ADR-004 Decisions 1, 2, 4, and 5.
+"""Scenario endpoints — ADR-004 Decisions 1, 2, 4, and 5; ADR-005 Decision 2.
 
-Eight endpoints covering scenario configuration lifecycle and execution:
-  POST   /scenarios                           — create scenario (status: pending)
-  GET    /scenarios                           — list all scenarios (created_at desc)
-  GET    /scenarios/compare                   — snapshot delta; optional step alignment (ADR-004 D5)
-  GET    /scenarios/{scenario_id}             — full detail with scheduled inputs
-  DELETE /scenarios/{scenario_id}             — tombstone + cascade delete, returns 204
-  POST   /scenarios/{scenario_id}/run         — execute pending scenario to completion
-  POST   /scenarios/{scenario_id}/advance     — advance one step (ADR-004 Decision 4)
-  GET    /scenarios/{scenario_id}/snapshots   — list all snapshots (ADR-004 Decision 3)
+Nine endpoints covering scenario configuration lifecycle, execution, and HCL output:
+  POST   /scenarios                                        — create scenario (status: pending)
+  GET    /scenarios                                        — list all scenarios (created_at desc)
+  GET    /scenarios/compare         — snapshot delta; optional step alignment (ADR-004 D5)
+  GET    /scenarios/{scenario_id}                          — full detail with scheduled inputs
+  DELETE /scenarios/{scenario_id}                          — tombstone + cascade delete, returns 204
+  POST   /scenarios/{scenario_id}/run                      — execute pending scenario to completion
+  POST   /scenarios/{scenario_id}/advance                  — advance one step (ADR-004 Decision 4)
+  GET    /scenarios/{scenario_id}/snapshots                — list all snapshots (ADR-004 Decision 3)
+  GET    /scenarios/{scenario_id}/measurement-output — HCL output (ADR-005 Decision 2)
 
 Validation runs at creation time (structural) — entity existence check,
 n_steps bounds, step index bounds, non-empty name. Semantic validation
@@ -24,8 +25,10 @@ be reconstructed from first principles (SA-11 determinism).
 """
 from __future__ import annotations
 
+import contextlib
 import json
 import uuid
+from decimal import Decimal
 from typing import Annotated, Any
 
 import asyncpg  # noqa: TCH002 — used in Annotated[] resolved at runtime by FastAPI
@@ -36,6 +39,9 @@ from app.schemas import (
     AdvanceResponse,
     CompareResponse,
     DeltaRecord,
+    FrameworkOutput,
+    MultiFrameworkOutput,
+    QuantitySchema,
     RunSummaryResponse,
     ScenarioConfigSchema,
     ScenarioCreateRequest,
@@ -44,6 +50,7 @@ from app.schemas import (
     ScheduledInputSchema,
     SnapshotRecord,
 )
+from app.simulation.repositories.quantity_serde import IA1_CANONICAL_PHRASE
 
 # Engine version for tombstone records — must match app version in main.py.
 _ENGINE_VERSION = "0.3.0"
@@ -638,3 +645,189 @@ async def list_snapshots(
             modules_active=modules_active,
         ))
     return result
+
+
+# ---------------------------------------------------------------------------
+# GET /scenarios/{scenario_id}/measurement-output — ADR-005 Decision 2
+# ---------------------------------------------------------------------------
+
+_UNIMPLEMENTED_FRAMEWORKS = {"ecological", "governance"}
+_UNIMPLEMENTED_NOTES = {
+    "ecological": "Ecological module not yet implemented — see module-capability-registry.md",
+    "governance": "Governance module not yet implemented — see module-capability-registry.md",
+}
+_ALL_FRAMEWORKS = ["financial", "human_development", "ecological", "governance"]
+
+
+def _parse_entity_attrs(
+    state_dict: dict[str, Any],
+) -> dict[str, dict[str, QuantitySchema]]:
+    """Extract and parse all entity attribute dicts from a state_data snapshot.
+
+    Skips metadata keys (underscore-prefixed) and non-dict values.
+    Returns entity_id → {attr_key → QuantitySchema}.
+    """
+    result: dict[str, dict[str, QuantitySchema]] = {}
+    for key, val in state_dict.items():
+        if key.startswith("_") or not isinstance(val, dict):
+            continue
+        parsed: dict[str, QuantitySchema] = {}
+        for attr_key, envelope in val.items():
+            if isinstance(envelope, dict):
+                with contextlib.suppress(Exception):
+                    parsed[attr_key] = QuantitySchema.from_jsonb(envelope)
+        result[key] = parsed
+    return result
+
+
+def _compute_composite_score(
+    entity_indicators: dict[str, QuantitySchema],
+    all_entity_attrs: dict[str, dict[str, QuantitySchema]],
+    framework: str,
+) -> str | None:
+    """Mean percentile rank of entity indicators across all entities at this step.
+
+    For each indicator, ranks the entity's value among all entities carrying
+    that indicator in this framework. Returns str(Decimal) rounded to 4 decimal
+    places, or None if no numeric indicators exist for this framework.
+    ADR-005 Decision 2 §Composite score normalization.
+    """
+    if not entity_indicators:
+        return None
+
+    percentile_ranks: list[Decimal] = []
+    for attr_key, target_qty in entity_indicators.items():
+        try:
+            target_val = Decimal(target_qty.value)
+        except Exception:  # noqa: BLE001, S112
+            continue
+
+        all_vals: list[Decimal] = []
+        for other_attrs in all_entity_attrs.values():
+            qty = other_attrs.get(attr_key)
+            if qty is not None and (qty.measurement_framework or "financial") == framework:
+                with contextlib.suppress(Exception):
+                    all_vals.append(Decimal(qty.value))
+
+        if not all_vals:
+            continue
+
+        rank = Decimal(sum(1 for v in all_vals if v <= target_val)) / Decimal(len(all_vals))
+        percentile_ranks.append(rank)
+
+    if not percentile_ranks:
+        return None
+
+    score = sum(percentile_ranks) / Decimal(len(percentile_ranks))
+    return str(score.quantize(Decimal("0.0001")))
+
+
+@router.get(
+    "/scenarios/{scenario_id}/measurement-output",
+    response_model=MultiFrameworkOutput,
+)
+async def get_measurement_output(
+    scenario_id: str,
+    entity_id: str,
+    step: int,
+    conn: Annotated[asyncpg.Connection, Depends(get_db)],
+) -> MultiFrameworkOutput:
+    """Multi-framework measurement output for one entity at a given step.
+
+    Groups the entity's attributes by measurement_framework tag. Attributes
+    with no tag are classified as FINANCIAL (M1–M3 backward-compatibility rule,
+    CODING_STANDARDS.md §measurement_framework Tagging). Composite scores are
+    percentile-based across all entities present in the snapshot. ECOLOGICAL and
+    GOVERNANCE return composite_score=null with a note until those modules are
+    implemented. ia1_disclosure is always IA1_CANONICAL_PHRASE. ADR-005 Decision 2.
+
+    Query params:
+        step      — snapshot step index (required)
+        entity_id — ISO 3166-1 alpha-3 entity identifier (required)
+    """
+    scenario_row = await conn.fetchrow(
+        "SELECT scenario_id FROM scenarios WHERE scenario_id = $1",
+        scenario_id,
+    )
+    if scenario_row is None:
+        raise HTTPException(status_code=404, detail=f"Scenario '{scenario_id}' not found.")
+
+    snap_row = await conn.fetchrow(
+        """
+        SELECT scenario_id, step, timestep, state_data
+        FROM scenario_state_snapshots
+        WHERE scenario_id = $1 AND step = $2
+        """,
+        scenario_id,
+        step,
+    )
+    if snap_row is None:
+        raise HTTPException(
+            status_code=404,
+            detail=f"No snapshot at step {step} for scenario '{scenario_id}'.",
+        )
+
+    state_raw = snap_row["state_data"]
+    if isinstance(state_raw, str):
+        state_raw = json.loads(state_raw)
+    state_dict: dict[str, Any] = state_raw if isinstance(state_raw, dict) else {}
+
+    if entity_id not in state_dict:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Entity '{entity_id}' not found in snapshot at step {step}.",
+        )
+
+    entity_row = await conn.fetchrow(
+        "SELECT name FROM simulation_entities WHERE entity_id = $1",
+        entity_id,
+    )
+    entity_name: str = entity_row["name"] if entity_row else entity_id
+
+    timestep = snap_row["timestep"]
+    timestep_str: str = timestep.isoformat() if hasattr(timestep, "isoformat") else str(timestep)
+
+    all_entity_attrs = _parse_entity_attrs(state_dict)
+    target_attrs = all_entity_attrs.get(entity_id, {})
+
+    outputs: dict[str, FrameworkOutput] = {}
+    for fw in _ALL_FRAMEWORKS:
+        if fw in _UNIMPLEMENTED_FRAMEWORKS:
+            outputs[fw] = FrameworkOutput(
+                framework=fw,
+                entity_id=entity_id,
+                timestep=timestep_str,
+                indicators={},
+                composite_score=None,
+                mda_alerts=[],
+                has_below_floor_indicator=False,
+                note=_UNIMPLEMENTED_NOTES[fw],
+            )
+            continue
+
+        indicators = {
+            k: v
+            for k, v in target_attrs.items()
+            if (v.measurement_framework or "financial") == fw
+        }
+        composite = _compute_composite_score(indicators, all_entity_attrs, fw)
+        outputs[fw] = FrameworkOutput(
+            framework=fw,
+            entity_id=entity_id,
+            timestep=timestep_str,
+            indicators=indicators,
+            composite_score=composite,
+            mda_alerts=[],  # MDA deferred to ADR-005 Decision 3
+            has_below_floor_indicator=False,
+            note=None,
+        )
+
+    return MultiFrameworkOutput(
+        entity_id=entity_id,
+        entity_name=entity_name,
+        timestep=timestep_str,
+        scenario_id=scenario_id,
+        step_index=step,
+        outputs=outputs,
+        ia1_disclosure=IA1_CANONICAL_PHRASE,
+    )
