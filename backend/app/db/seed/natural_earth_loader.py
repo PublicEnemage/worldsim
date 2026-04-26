@@ -111,8 +111,9 @@ def _build_attributes(props: dict[str, Any]) -> dict[str, Any]:
             "measurement_framework": None,
         }
 
-    # 1. Population total (STOCK — level at a point in time)
+    # 1. Population total (STOCK — level at a point in time) — human_development framework
     if (pop := _qty(props.get("POP_EST"), "persons", VariableType.STOCK)):
+        pop["measurement_framework"] = "human_development"
         attrs["population_total"] = pop
 
     # 2. GDP in USD millions (FLOW — period measure; NE vintage is ~2019)

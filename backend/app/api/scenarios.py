@@ -800,11 +800,9 @@ async def get_measurement_output(
         "SELECT metadata FROM simulation_entities WHERE entity_id = $1",
         entity_id,
     )
-    entity_name: str = (
-        (entity_row["metadata"] or {}).get("name", entity_id)
-        if entity_row
-        else entity_id
-    )
+    metadata_str = entity_row["metadata"] if entity_row else None
+    metadata_dict = json.loads(metadata_str) if metadata_str else {}
+    entity_name: str = metadata_dict.get("name_en") or metadata_dict.get("name", entity_id)
 
     timestep = snap_row["timestep"]
     timestep_str: str = timestep.isoformat() if hasattr(timestep, "isoformat") else str(timestep)
