@@ -15,6 +15,7 @@ interface Props {
   title: string;
   scenarioId?: string | null;
   currentStep?: number | null;
+  onEntityClick?: (entityId: string) => void;
 }
 
 function computeSteps(features: GeoJSONFeatureCollection["features"]): number[] {
@@ -29,11 +30,15 @@ function computeSteps(features: GeoJSONFeatureCollection["features"]): number[] 
   return [pct(0), pct(25), pct(50), pct(75), pct(100)];
 }
 
-export default function ChoroplethMap({ attributeName, title, scenarioId, currentStep }: Props) {
+export default function ChoroplethMap({ attributeName, title, scenarioId, currentStep, onEntityClick }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<maplibregl.Map | null>(null);
   const popupRef = useRef<maplibregl.Popup | null>(null);
+  const onEntityClickRef = useRef(onEntityClick);
   const [error, setError] = useState<string | null>(null);
+
+  // Keep ref current so the map click handler always calls the latest prop
+  onEntityClickRef.current = onEntityClick;
 
   // Initialise the map once
   useEffect(() => {
@@ -150,6 +155,13 @@ export default function ChoroplethMap({ attributeName, title, scenarioId, curren
         map.on("mouseleave", FILL_LAYER_ID, () => {
           map.getCanvas().style.cursor = "";
           popup.remove();
+        });
+
+        // Country click — fire onEntityClick if wired (ref avoids stale closure)
+        map.on("click", FILL_LAYER_ID, (e) => {
+          if (!e.features?.length || !onEntityClickRef.current) return;
+          const props = e.features[0].properties as ChoroplethFeatureProperties;
+          onEntityClickRef.current(props.entity_id);
         });
       };
 
