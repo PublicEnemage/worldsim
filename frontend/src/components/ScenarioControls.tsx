@@ -7,13 +7,15 @@ interface Props {
   scenarioId: string;
   totalSteps: number;
   onStepChange: (step: number, isComplete: boolean) => void;
+  initialStep?: number;
+  initialComplete?: boolean;
 }
 
-export default function ScenarioControls({ scenarioId, totalSteps, onStepChange }: Props) {
-  const [currentStep, setCurrentStep] = useState(0);
+export default function ScenarioControls({ scenarioId, totalSteps, onStepChange, initialStep = 0, initialComplete = false }: Props) {
+  const [currentStep, setCurrentStep] = useState(initialStep);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [isComplete, setIsComplete] = useState(false);
+  const [isComplete, setIsComplete] = useState(initialComplete);
 
   const advance = async () => {
     if (isComplete || loading) return;

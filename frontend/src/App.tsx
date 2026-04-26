@@ -18,6 +18,7 @@ export default function App() {
   const [selectedScenarioName, setSelectedScenarioName] = useState<string | null>(null);
   const [selectedScenarioSteps, setSelectedScenarioSteps] = useState<number>(3);
   const [currentStep, setCurrentStep] = useState<number | null>(null);
+  const [isAlreadyComplete, setIsAlreadyComplete] = useState(false);
   const [compareMode, setCompareMode] = useState(false);
   const [secondScenarioId, setSecondScenarioId] = useState<string | null>(null);
   const [panelOpen, setPanelOpen] = useState(false);
@@ -34,6 +35,7 @@ export default function App() {
     setSelectedScenarioName(name);
     setSelectedScenarioSteps(totalSteps);
     setCurrentStep(null);
+    setIsAlreadyComplete(false);
     setSelectedEntityId(null);
   };
 
@@ -54,8 +56,10 @@ export default function App() {
         if (cancelled || !detail) return;
         if (detail.status === "completed") {
           setCurrentStep(detail.configuration.n_steps);
+          setIsAlreadyComplete(true);
         } else {
           setCurrentStep(null);
+          setIsAlreadyComplete(false);
         }
       })
       .catch(() => {
@@ -97,9 +101,12 @@ export default function App() {
               </span>
             )}
             <ScenarioControls
+              key={`${selectedScenarioId}-${String(isAlreadyComplete)}`}
               scenarioId={selectedScenarioId}
               totalSteps={selectedScenarioSteps}
               onStepChange={handleStepChange}
+              initialStep={currentStep ?? 0}
+              initialComplete={isAlreadyComplete}
             />
           </div>
         )}
