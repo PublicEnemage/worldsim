@@ -1,11 +1,14 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import AttributeSelector from "./components/AttributeSelector";
 import ChoroplethMap from "./components/ChoroplethMap";
 import DeltaChoropleth from "./components/DeltaChoropleth";
 import EntityDetailDrawer from "./components/EntityDetailDrawer";
 import ScenarioControls from "./components/ScenarioControls";
 import ScenarioPanel from "./components/ScenarioPanel";
+import type { ScenarioDetailResponse } from "./types";
 import "./App.css";
+
+const API_BASE = "http://localhost:8000/api/v1";
 
 const DEFAULT_ATTRIBUTE = "population_total";
 
@@ -37,6 +40,32 @@ export default function App() {
   const handleEntityClick = (entityId: string) => {
     setSelectedEntityId(entityId);
   };
+
+  // When a scenario is selected, check if it's already completed and fast-forward
+  // currentStep to its final step — ScenarioControls won't emit onStepChange for
+  // a scenario that was completed before this session.
+  useEffect(() => {
+    if (!selectedScenarioId) return;
+
+    let cancelled = false;
+    fetch(`${API_BASE}/scenarios/${encodeURIComponent(selectedScenarioId)}`)
+      .then((res) => (res.ok ? (res.json() as Promise<ScenarioDetailResponse>) : null))
+      .then((detail) => {
+        if (cancelled || !detail) return;
+        if (detail.status === "completed") {
+          setCurrentStep(detail.configuration.n_steps);
+        } else {
+          setCurrentStep(null);
+        }
+      })
+      .catch(() => {
+        // Non-fatal — currentStep stays at whatever handleSelectScenario set
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [selectedScenarioId]);
 
   const showDelta = compareMode && selectedScenarioId !== null && secondScenarioId !== null;
 
