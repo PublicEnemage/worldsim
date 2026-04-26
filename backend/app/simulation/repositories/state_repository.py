@@ -13,7 +13,7 @@ Follows the asyncpg direct-query pattern from ADR-003 Decision 2.
 from __future__ import annotations
 
 import json
-from datetime import UTC, datetime
+from datetime import datetime, timezone
 from typing import Any
 
 import asyncpg  # noqa: TCH002 — used in method signatures at runtime
@@ -141,4 +141,4 @@ def _default_timestep() -> datetime:
     A fixed sentinel ensures SA-11 determinism: two runs with the same config
     and no explicit date always start from the same timestep.
     """
-    return datetime(2000, 1, 1, tzinfo=UTC)
+    return datetime(2000, 1, 1, tzinfo=timezone.utc)  # noqa: UP017

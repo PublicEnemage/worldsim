@@ -154,6 +154,7 @@ class ScenarioConfigSchema(BaseModel):
     initial_attributes: dict[str, dict[str, QuantitySchema]] = {}
     n_steps: int
     timestep_label: str = "annual"
+    modules_config: dict[str, Any] = {}
 
 
 class ScheduledInputSchema(BaseModel):

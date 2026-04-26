@@ -6,7 +6,7 @@ and can be tracked across milestones.
 """
 from __future__ import annotations
 
-from datetime import UTC, datetime
+from datetime import datetime, timezone
 from decimal import Decimal
 from typing import Any
 
@@ -35,7 +35,7 @@ def format_fidelity_report(
     Returns:
         Multi-line string suitable for print() or sys.stdout.write().
     """
-    now = datetime.now(UTC).isoformat()
+    now = datetime.now(timezone.utc).isoformat()  # noqa: UP017
     lines: list[str] = [
         "=" * 72,
         "WORLDSIM BACKTESTING FIDELITY REPORT",

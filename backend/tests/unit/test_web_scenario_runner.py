@@ -14,7 +14,7 @@ AsyncMock to simulate asyncpg behaviour.
 from __future__ import annotations
 
 import json
-from datetime import UTC, date, datetime
+from datetime import date, datetime, timezone
 from decimal import Decimal
 from typing import Any
 from unittest.mock import AsyncMock, MagicMock
@@ -83,8 +83,10 @@ def _make_entity(
 def _make_state(entities: dict[str, SimulationEntity] | None = None) -> SimulationState:
     if entities is None:
         entities = {"GRC": _make_entity()}
+    ts = datetime(2010, 1, 1, tzinfo=timezone.utc)  # noqa: UP017
+    end = datetime(2012, 1, 1, tzinfo=timezone.utc)  # noqa: UP017
     return SimulationState(
-        timestep=datetime(2010, 1, 1, tzinfo=UTC),
+        timestep=ts,
         resolution=ResolutionConfig(),
         entities=entities,
         relationships=[],
@@ -93,8 +95,8 @@ def _make_state(entities: dict[str, SimulationEntity] | None = None) -> Simulati
             scenario_id="test-id",
             name="Test Scenario",
             description="",
-            start_date=datetime(2010, 1, 1, tzinfo=UTC),
-            end_date=datetime(2012, 1, 1, tzinfo=UTC),
+            start_date=ts,
+            end_date=end,
         ),
     )
 
@@ -394,9 +396,8 @@ async def test_snapshot_write_includes_ia1_disclosure() -> None:
 
     state = _make_state()
     repo = ScenarioSnapshotRepository()
-    await repo.write_snapshot(
-        conn, "scenario-1", 0, datetime(2010, 1, 1, tzinfo=UTC), state
-    )
+    ts = datetime(2010, 1, 1, tzinfo=timezone.utc)  # noqa: UP017
+    await repo.write_snapshot(conn, "scenario-1", 0, ts, state)
 
     call_args = conn.execute.call_args
     # args[0]=sql, [1]=id, [2]=scenario_id, [3]=step, [4]=timestep,
@@ -417,9 +418,8 @@ async def test_snapshot_write_serializes_state_data_as_json() -> None:
 
     state = _make_state()
     repo = ScenarioSnapshotRepository()
-    await repo.write_snapshot(
-        conn, "scenario-1", 1, datetime(2011, 1, 1, tzinfo=UTC), state
-    )
+    ts = datetime(2011, 1, 1, tzinfo=timezone.utc)  # noqa: UP017
+    await repo.write_snapshot(conn, "scenario-1", 1, ts, state)
 
     call_args = conn.execute.call_args.args
     state_data_arg = call_args[5]  # args[0]=sql, [5]=state_data ($5)
@@ -475,7 +475,8 @@ async def test_snapshot_state_data_has_envelope_version_2() -> None:
 
     state = _make_state()
     repo = ScenarioSnapshotRepository()
-    await repo.write_snapshot(conn, "s-1", 0, datetime(2010, 1, 1, tzinfo=UTC), state)
+    ts = datetime(2010, 1, 1, tzinfo=timezone.utc)  # noqa: UP017
+    await repo.write_snapshot(conn, "s-1", 0, ts, state)
 
     parsed = json.loads(conn.execute.call_args.args[5])
     assert parsed["_envelope_version"] == "2", (
@@ -491,7 +492,8 @@ async def test_snapshot_state_data_has_modules_active_empty_list_for_m3() -> Non
 
     state = _make_state()
     repo = ScenarioSnapshotRepository()
-    await repo.write_snapshot(conn, "s-1", 0, datetime(2010, 1, 1, tzinfo=UTC), state)
+    ts = datetime(2010, 1, 1, tzinfo=timezone.utc)  # noqa: UP017
+    await repo.write_snapshot(conn, "s-1", 0, ts, state)
 
     parsed = json.loads(conn.execute.call_args.args[5])
     assert "_modules_active" in parsed
@@ -507,8 +509,9 @@ async def test_snapshot_state_data_modules_active_populated_when_passed() -> Non
 
     state = _make_state()
     repo = ScenarioSnapshotRepository()
+    ts = datetime(2011, 1, 1, tzinfo=timezone.utc)  # noqa: UP017
     await repo.write_snapshot(
-        conn, "s-1", 1, datetime(2011, 1, 1, tzinfo=UTC), state,
+        conn, "s-1", 1, ts, state,
         modules_active=["DemographicModule", "MacroeconomicModule"],
     )
 
@@ -524,7 +527,8 @@ async def test_snapshot_quantity_envelope_still_readable_inside_v2_state_data() 
 
     state = _make_state()
     repo = ScenarioSnapshotRepository()
-    await repo.write_snapshot(conn, "s-1", 0, datetime(2010, 1, 1, tzinfo=UTC), state)
+    ts = datetime(2010, 1, 1, tzinfo=timezone.utc)  # noqa: UP017
+    await repo.write_snapshot(conn, "s-1", 0, ts, state)
 
     parsed = json.loads(conn.execute.call_args.args[5])
     qty_envelope = parsed["GRC"]["gdp_growth"]
