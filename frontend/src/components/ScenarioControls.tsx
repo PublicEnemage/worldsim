@@ -18,9 +18,11 @@ export default function ScenarioControls({ scenarioId, totalSteps, onStepChange,
   const [isComplete, setIsComplete] = useState(initialComplete);
 
   useEffect(() => {
-    setCurrentStep(initialStep);
-    setIsComplete(initialComplete);
-  }, [initialStep, initialComplete]);
+    if (initialComplete) {
+      setCurrentStep(initialStep);
+      setIsComplete(true);
+    }
+  }, [initialComplete]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const advance = async () => {
     if (isComplete || loading) return;
