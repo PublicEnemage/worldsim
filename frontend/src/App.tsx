@@ -57,9 +57,6 @@ export default function App() {
         if (detail.status === "completed") {
           setCurrentStep(detail.configuration.n_steps);
           setIsAlreadyComplete(true);
-        } else {
-          setCurrentStep(null);
-          setIsAlreadyComplete(false);
         }
       })
       .catch(() => {
