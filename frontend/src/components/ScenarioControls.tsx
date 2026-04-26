@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import type { AdvanceResponse } from "../types";
 
 const API_BASE = "http://localhost:8000/api/v1";
@@ -16,6 +16,11 @@ export default function ScenarioControls({ scenarioId, totalSteps, onStepChange,
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isComplete, setIsComplete] = useState(initialComplete);
+
+  useEffect(() => {
+    setCurrentStep(initialStep);
+    setIsComplete(initialComplete);
+  }, [initialStep, initialComplete]);
 
   const advance = async () => {
     if (isComplete || loading) return;

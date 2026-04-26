@@ -98,7 +98,6 @@ export default function App() {
               </span>
             )}
             <ScenarioControls
-              key={`${selectedScenarioId}-${String(isAlreadyComplete)}`}
               scenarioId={selectedScenarioId}
               totalSteps={selectedScenarioSteps}
               onStepChange={handleStepChange}
