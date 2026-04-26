@@ -2,6 +2,7 @@ import { useState } from "react";
 import AttributeSelector from "./components/AttributeSelector";
 import ChoroplethMap from "./components/ChoroplethMap";
 import DeltaChoropleth from "./components/DeltaChoropleth";
+import EntityDetailDrawer from "./components/EntityDetailDrawer";
 import ScenarioControls from "./components/ScenarioControls";
 import ScenarioPanel from "./components/ScenarioPanel";
 import "./App.css";
@@ -17,6 +18,7 @@ export default function App() {
   const [compareMode, setCompareMode] = useState(false);
   const [secondScenarioId, setSecondScenarioId] = useState<string | null>(null);
   const [panelOpen, setPanelOpen] = useState(false);
+  const [selectedEntityId, setSelectedEntityId] = useState<string | null>(null);
 
   const handleStepChange = (step: number, _isComplete: boolean) => {
     setCurrentStep(step);
@@ -27,6 +29,11 @@ export default function App() {
     setSelectedScenarioName(name);
     setSelectedScenarioSteps(totalSteps);
     setCurrentStep(null);
+    setSelectedEntityId(null);
+  };
+
+  const handleEntityClick = (entityId: string) => {
+    setSelectedEntityId(entityId);
   };
 
   const showDelta = compareMode && selectedScenarioId !== null && secondScenarioId !== null;
@@ -76,7 +83,7 @@ export default function App() {
         />
       )}
 
-      <main className="app-main">
+      <main className="app-main" style={{ position: "relative" }}>
         {showDelta ? (
           <DeltaChoropleth
             scenarioAId={selectedScenarioId}
@@ -90,6 +97,16 @@ export default function App() {
             title={attributeName}
             scenarioId={selectedScenarioId}
             currentStep={currentStep}
+            onEntityClick={selectedScenarioId ? handleEntityClick : undefined}
+          />
+        )}
+
+        {selectedEntityId && selectedScenarioId && (
+          <EntityDetailDrawer
+            scenarioId={selectedScenarioId}
+            entityId={selectedEntityId}
+            step={currentStep}
+            onClose={() => setSelectedEntityId(null)}
           />
         )}
       </main>

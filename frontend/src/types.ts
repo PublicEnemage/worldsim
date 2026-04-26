@@ -89,3 +89,57 @@ export interface DeltaChoroplethFeatureProperties {
   has_territorial_note: boolean;
   territorial_note: string | null;
 }
+
+// ---------------------------------------------------------------------------
+// Multi-framework measurement output — ADR-005 Decision 2 / Decision 4
+// ---------------------------------------------------------------------------
+
+export type MDASeverity = "WARNING" | "CRITICAL" | "TERMINAL";
+
+export interface MDAAlert {
+  mda_id: string;
+  entity_id: string;
+  indicator_key: string;
+  severity: MDASeverity;
+  floor_value: string;       // Decimal as string
+  current_value: string;     // Decimal as string
+  approach_pct_remaining: string; // Decimal as string; negative when breached
+  consecutive_breach_steps: number;
+}
+
+export interface FrameworkOutput {
+  framework: string;
+  composite_score: string | null; // Decimal as string, or null if unimplemented
+  indicators: Record<string, QuantitySchema | Record<string, QuantitySchema>>; // flat or nested per cohort
+  mda_alerts: MDAAlert[];
+  has_below_floor_indicator: boolean;
+  note: string | null;
+}
+
+export interface MultiFrameworkOutput {
+  entity_id: string;
+  entity_name: string;
+  timestep: string;
+  scenario_id: string;
+  step_index: number;
+  outputs: Record<string, FrameworkOutput>;
+  ia1_disclosure: string;
+}
+
+// ADR-005 Decision 4 — radar chart data shapes
+
+export interface RadarAxisDatum {
+  framework: string;
+  label: string;
+  composite_score: number;   // 0.0–1.0; unimplemented → 0
+  is_implemented: boolean;
+  has_critical_breach: boolean;
+  breach_count: number;
+}
+
+export interface FrameworkWeights {
+  financial: number;
+  human_development: number;
+  ecological: number;
+  governance: number;
+}
