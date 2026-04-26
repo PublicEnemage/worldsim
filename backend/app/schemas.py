@@ -296,6 +296,37 @@ class MDASeverity(str, Enum):
     TERMINAL = "TERMINAL"
 
 
+class MDAThresholdRecord(BaseModel):
+    """One row from the mda_thresholds table — ADR-005 Decision 3.
+
+    floor_value and approach_pct are NUMERIC in the database; they are
+    serialized as str here to maintain the float prohibition (ADR-003 Decision 2).
+    The field_validator coerces Decimal/float DB values to str on construction.
+    """
+
+    model_config = ConfigDict(from_attributes=True)
+
+    mda_id: str
+    indicator_key: str
+    entity_scope: str
+    measurement_framework: str
+    floor_value: str
+    floor_unit: str
+    approach_pct: str
+    severity_at_breach: str
+    description: str
+    historical_basis: str
+    recovery_horizon_years: int | None = None
+    irreversibility_note: str
+
+    @field_validator("floor_value", "approach_pct", mode="before")
+    @classmethod
+    def _coerce_numeric(cls, v: object) -> str:
+        if isinstance(v, int | float | Decimal):
+            return str(Decimal(str(v)))
+        return str(v)
+
+
 class MDAAlert(BaseModel):
     """A single MDA threshold breach or approach — ADR-005 Decision 3.
 

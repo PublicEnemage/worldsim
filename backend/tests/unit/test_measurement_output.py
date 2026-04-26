@@ -75,12 +75,13 @@ _STATE = {
 }
 
 
-def _snap_row(state: dict | None = None) -> dict:
+def _snap_row(state: dict | None = None, events_snapshot: list | None = None) -> dict:
     return {
         "scenario_id": "scen-1",
         "step": 1,
         "timestep": "2011-01-01",
         "state_data": json.dumps(state or _STATE),
+        "events_snapshot": events_snapshot,  # None for pre-M4 snapshots
     }
 
 
