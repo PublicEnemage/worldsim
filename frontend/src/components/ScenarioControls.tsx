@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import type { AdvanceResponse } from "../types";
 
 const API_BASE = "http://localhost:8000/api/v1";
@@ -7,22 +7,13 @@ interface Props {
   scenarioId: string;
   totalSteps: number;
   onStepChange: (step: number, isComplete: boolean) => void;
-  initialStep?: number;
-  initialComplete?: boolean;
 }
 
-export default function ScenarioControls({ scenarioId, totalSteps, onStepChange, initialStep = 0, initialComplete = false }: Props) {
-  const [currentStep, setCurrentStep] = useState(initialStep);
+export default function ScenarioControls({ scenarioId, totalSteps, onStepChange }: Props) {
+  const [currentStep, setCurrentStep] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [isComplete, setIsComplete] = useState(initialComplete);
-
-  useEffect(() => {
-    if (initialComplete) {
-      setCurrentStep(initialStep);
-      setIsComplete(true);
-    }
-  }, [initialComplete]); // eslint-disable-line react-hooks/exhaustive-deps
+  const [isComplete, setIsComplete] = useState(false);
 
   const advance = async () => {
     if (isComplete || loading) return;
