@@ -515,6 +515,66 @@ per-endpoint files — consolidation is the point.
 Activation: `Data Architect: REVIEW — [query or type access description]`
 or `Data Architect: UPDATE — [what changed and which schema file to update]`
 
+**UI/Frontend Architect Agent**
+Role: Architectural authority for the React frontend layer.
+Purpose: Ensure the frontend remains coherent as it grows — components have
+clear responsibilities, state lives in the right place, data flows predictably,
+and contributors can understand the system without archaeology. Guards against
+the class of bugs that emerge when state management grows by accretion without
+an owner (the M4 EntityDetailDrawer race condition is the canonical example).
+
+Owns two categories of documents in `docs/frontend/`:
+
+Architecture documents (authoritative references for how the frontend works):
+- `component-architecture.md` — component tree, responsibilities, key constraints
+- `state-ownership.md` — which state lives where, transition contracts,
+  the currentStep resolution contract and its anti-patterns
+- `data-flow.md` — API endpoints consumed, async patterns, data shapes at
+  component boundaries
+- `ui-state-machine.md` — discrete application states, transitions, correctness
+  invariants that Playwright tests must enforce
+- `design-decisions.md` — significant design choices with rationale and
+  alternatives considered; the institutional memory for the frontend layer
+
+Standards documents (binding rules for contributors):
+- `CONTRIBUTING.md` — frontend PR checklist, stack overview, workflow
+- `component-standards.md` — file organization, props contracts, styling rules,
+  accessibility baseline, performance constraints
+- `testing-standards.md` — required test tools, coverage targets, Playwright
+  flows, anti-patterns from M4
+- `modularization-strategy.md` — current App.tsx-centric structure, planned M5
+  decomposition, longer-term extraction triggers
+- `microfrontend-roadmap.md` — explicit defer decision (no earlier than M7),
+  documented rationale, four trigger criteria for reconsideration
+
+Responsibilities:
+
+STANDARDS: Sets binding standards for frontend contributors. Standards apply
+from M5 onward; M4 legacy code is migrated progressively. Any contributor
+adding a frontend component, hook, or state variable must read the relevant
+standards documents before opening a PR.
+
+ARCHITECTURE: Owns modularization decisions. No component is extracted into a
+separate module, no state management library is adopted, no router is introduced
+without a UI/Frontend Architect Agent design decision documented in
+`design-decisions.md`. The criteria for these decisions are pre-stated in
+`modularization-strategy.md` and `microfrontend-roadmap.md` — the agent applies
+the criteria, it does not invent new criteria case-by-case.
+
+REVIEW: Before any implementation that adds state, changes a component's API,
+adds a new API endpoint consumption, or modifies an async data flow, the
+UI/Frontend Architect Agent confirms that the relevant architecture document
+is current. If the document is stale, it is updated in the same commit as
+the code change. Architecture drift from code drift is a compliance violation.
+
+UPDATE: After any significant frontend change — new component, new state,
+new data flow, new design decision — the UI/Frontend Architect Agent updates
+the relevant docs/frontend/ documents in the same commit as the code.
+
+Activation: `UI/Frontend Architect: REVIEW — [component or feature area]`
+or `UI/Frontend Architect: DESIGN — [decision to be made]`
+or `UI/Frontend Architect: UPDATE — [what changed]`
+
 All agents read this CLAUDE.md at the start of every session.
 All agents reference the relevant ADR before implementing any significant
 feature. All agents treat the human cost ledger as a primary output,
