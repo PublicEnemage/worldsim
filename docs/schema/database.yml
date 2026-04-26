@@ -1,0 +1,828 @@
+# WorldSim PostgreSQL Schema Registry
+#
+# Authoritative source of truth for all public-schema tables.
+# Generated from live database introspection 2026-04-26 (PostgreSQL 15, PostGIS).
+# Any agent writing a SQL query or accessing a JSONB key MUST read this file first.
+#
+# Tiger/topology schemas are PostGIS system tables — not documented here.
+# spatial_ref_sys is a PostGIS system table — not documented here.
+# alembic_version is a migration system table — not documented here.
+
+---
+schema_version: "1.0"
+captured: "2026-04-26"
+database: worldsim
+tables:
+
+  # ---------------------------------------------------------------------------
+  # simulation_entities
+  # ---------------------------------------------------------------------------
+  simulation_entities:
+    description: >
+      All simulation entities: countries, subnational regions, demographic
+      cohorts, and institutions. The foundational table — every other table
+      ultimately references this one. Country rows are seeded by
+      natural_earth_loader.py from NE 110m admin-0 GeoJSON. Cohort rows
+      are injected in-memory by WebScenarioRunner and are NOT persisted here.
+    columns:
+      entity_id:
+        type: varchar
+        nullable: false
+        description: >
+          Primary identifier. For countries: ISO 3166-1 alpha-3 code (e.g. "GRC").
+          For cohorts (in-memory only): "{country_iso3}:CHT:{quintile}-{age_band}-{sector}"
+          e.g. "GRC:CHT:1-25-54-FORMAL". For institutions: free-form slug.
+      entity_type:
+        type: varchar
+        nullable: false
+        values: ["country", "region", "institution", "cohort"]
+        description: Drives module selection in the engine.
+      parent_id:
+        type: varchar
+        nullable: true
+        description: >
+          Self-referential FK to entity_id. Used for hierarchical resolution:
+          a subnational region's parent_id is its country entity_id.
+      geometry:
+        type: "geometry(MultiPolygon,4326)"
+        nullable: true
+        description: >
+          Country boundary in WGS-84. POLYGON features are promoted to
+          MULTIPOLYGON on insert. NULL for non-spatial entities. GiST-indexed.
+      attributes:
+        type: jsonb
+        nullable: false
+        default: "{}"
+        description: >
+          Simulation state variables as Quantity envelopes.
+          Each key is an attribute_key (snake_case); each value is a
+          Quantity envelope object (see quantity_envelope below).
+          GIN-indexed for containment queries.
+        key_structure:
+          "{attribute_key}":
+            value:
+              type: string
+              description: Decimal serialised as string. Never float. e.g. "10716322"
+            unit:
+              type: string
+              description: >
+                Canonical unit string from DATA_STANDARDS.md.
+                Examples: "persons", "USD_millions_current", "dimensionless",
+                "USD_2015", "ratio", "months", "index".
+            variable_type:
+              type: string
+              values: ["stock", "flow", "ratio", "dimensionless"]
+              description: Temporal semantics; drives propagation engine delta application.
+            confidence_tier:
+              type: integer
+              range: [1, 5]
+              description: >
+                Data quality tier per DATA_STANDARDS.md. 1=highest, 5=lowest.
+                Tier propagation uses max() of all contributing tiers (lower-of-two rule).
+            observation_date:
+              type: string
+              format: "YYYY-MM-DD"
+              nullable: true
+              description: Date of the underlying historical observation.
+            source_registry_id:
+              type: string
+              nullable: true
+              description: FK into source_registry.source_id. e.g. "NE_110M_2024".
+            measurement_framework:
+              type: string
+              nullable: true
+              values: ["financial", "human_development", "ecological", "governance", null]
+              description: >
+                Accounting dimension. null treated as "financial" in the
+                measurement-output endpoint (M1-M3 backward-compat rule).
+                population_total is "human_development". Most NE attributes are null.
+            _envelope_version:
+              type: string
+              description: >
+                Set to "1" in simulation state snapshots (state_data JSONB).
+                Not present in simulation_entities.attributes (seeded without version).
+                Present only in scenario_state_snapshots.state_data envelopes.
+        seeded_attributes:
+          population_total:
+            unit: "persons"
+            variable_type: "stock"
+            measurement_framework: "human_development"
+            source: "NE_110M_2024"
+          gdp_usd_millions:
+            unit: "USD_millions_current"
+            variable_type: "flow"
+            measurement_framework: null  # defaults to "financial"
+            source: "NE_110M_2024"
+          pop_rank:
+            unit: "dimensionless"
+            variable_type: "dimensionless"
+            measurement_framework: null
+          economy_tier:
+            unit: "dimensionless"
+            variable_type: "dimensionless"
+            measurement_framework: null
+            description: "NE ECONOMY field first digit; 1=G7, 2=Developed nonG7, etc."
+          income_group:
+            unit: "dimensionless"
+            variable_type: "dimensionless"
+            measurement_framework: null
+            description: "NE INCOME_GRP field first digit; 1=High OECD, etc."
+          map_color_group:
+            unit: "dimensionless"
+            variable_type: "dimensionless"
+            measurement_framework: null
+      metadata:
+        type: jsonb
+        nullable: false
+        default: "{}"
+        description: >
+          Non-simulation display data. Does NOT participate in calculations.
+          asyncpg returns this as a JSON string — callers must json.loads() it.
+          The entity name is at key "name_en" (not "name").
+        country_key_structure:
+          iso_a2:
+            type: string
+            example: "GR"
+            description: ISO 3166-1 alpha-2 code.
+          iso_a3:
+            type: string
+            example: "GRC"
+            description: ISO 3166-1 alpha-3 code (same as entity_id for countries).
+          name_en:
+            type: string
+            example: "Greece"
+            description: >
+              English display name. THIS IS THE KEY FOR ENTITY NAME LOOKUP.
+              Do NOT use "name" — that key does not exist. Use name_en.
+          name_long:
+            type: string
+            example: "Greece"
+          name_key:
+            type: string
+            example: "country.GRC.name"
+            description: i18n translation key (reserved for future use).
+          continent:
+            type: string
+            example: "Europe"
+          subregion:
+            type: string
+            example: "Southern Europe"
+          un_region:
+            type: string
+            example: "Europe"
+          economy_label:
+            type: string
+            example: "2. Developed region: nonG7"
+          income_group_label:
+            type: string
+            example: "1. High income: OECD"
+          ne_source:
+            type: string
+            example: "NE_110M_2024"
+      created_at:
+        type: "timestamp with time zone"
+        nullable: false
+        default: now()
+      updated_at:
+        type: "timestamp with time zone"
+        nullable: false
+        default: now()
+    indexes:
+      simulation_entities_pkey: {type: btree, columns: [entity_id], unique: true}
+      idx_entities_attributes_gin: {type: gin, columns: [attributes]}
+      idx_entities_geometry: {type: gist, columns: [geometry]}
+      idx_entities_parent_id: {type: btree, columns: [parent_id], partial: "WHERE parent_id IS NOT NULL"}
+      idx_entities_type: {type: btree, columns: [entity_type]}
+    foreign_keys:
+      fk_entities_parent: {column: parent_id, references: "simulation_entities(entity_id)"}
+    referenced_by:
+      - "relationships.source_id"
+      - "relationships.target_id"
+      - "territorial_designations.entity_id"
+
+  # ---------------------------------------------------------------------------
+  # scenarios
+  # ---------------------------------------------------------------------------
+  scenarios:
+    description: >
+      One row per scenario. Status transitions: pending → running → completed|failed.
+      Cascade-deletes scenario_scheduled_inputs and scenario_state_snapshots.
+    columns:
+      scenario_id:
+        type: text
+        nullable: false
+        default: "gen_random_uuid()::text"
+        description: UUID4 as text string.
+      name:
+        type: text
+        nullable: false
+        description: User-supplied display name. Must be non-empty (API validates).
+      description:
+        type: text
+        nullable: true
+      status:
+        type: text
+        nullable: false
+        default: "pending"
+        values: ["pending", "running", "completed", "failed"]
+        description: Enforced by CHECK constraint ck_scenarios_status.
+      configuration:
+        type: jsonb
+        nullable: false
+        description: ScenarioConfigSchema serialised. See key_structure below.
+        key_structure:
+          entities:
+            type: array
+            items: string
+            description: List of entity_id values to include. e.g. ["GRC"]
+          n_steps:
+            type: integer
+            range: [1, 100]
+            description: Total number of simulation steps.
+          timestep_label:
+            type: string
+            example: "annual"
+            description: Human label for the timestep unit. Not parsed by the engine.
+          initial_attributes:
+            type: object
+            description: >
+              Optional per-entity attribute overrides at step 0.
+              Schema: {entity_id: {attr_key: value}}. Usually {}.
+          modules_config:
+            type: object
+            description: >
+              Module activation flags. Keys are module names; values are
+              module-specific config. e.g. {"demographic": {"enabled": true,
+              "cohort_resolution_entity_ids": ["GRC"]}}.
+              Usually {} (no extra modules active).
+          scheduled_inputs:
+            type: array
+            description: >
+              Only present in ScenarioCreateRequest — not stored in configuration JSONB.
+              Stored separately in scenario_scheduled_inputs.
+      created_at:
+        type: "timestamp with time zone"
+        nullable: false
+        default: now()
+      updated_at:
+        type: "timestamp with time zone"
+        nullable: false
+        default: now()
+      version:
+        type: integer
+        nullable: false
+        default: 1
+    indexes:
+      scenarios_pkey: {type: btree, columns: [scenario_id], unique: true}
+      idx_scenarios_status: {type: btree, columns: [status]}
+    check_constraints:
+      ck_scenarios_status: "status = ANY (ARRAY['pending','running','completed','failed'])"
+    referenced_by:
+      - "scenario_scheduled_inputs.scenario_id (CASCADE)"
+      - "scenario_state_snapshots.scenario_id (CASCADE)"
+
+  # ---------------------------------------------------------------------------
+  # scenario_scheduled_inputs
+  # ---------------------------------------------------------------------------
+  scenario_scheduled_inputs:
+    description: >
+      ControlInput events scheduled to fire at a specific step.
+      Injected into the simulation at run time by WebScenarioRunner.
+    columns:
+      id:
+        type: text
+        nullable: false
+        default: "gen_random_uuid()::text"
+      scenario_id:
+        type: text
+        nullable: false
+        description: FK → scenarios.scenario_id (CASCADE DELETE).
+      step:
+        type: integer
+        nullable: false
+        description: Zero-based step index when this input fires. Must be in [0, n_steps-1].
+      input_type:
+        type: text
+        nullable: false
+        description: ControlInput type tag. e.g. "fiscal_adjustment", "tariff_change".
+      input_data:
+        type: jsonb
+        nullable: false
+        description: >
+          ControlInput payload. Schema is input_type-specific.
+          asyncpg may return as string — callers must json.loads() if isinstance str.
+      created_at:
+        type: "timestamp with time zone"
+        nullable: false
+        default: now()
+    indexes:
+      scenario_scheduled_inputs_pkey: {type: btree, columns: [id], unique: true}
+      idx_ssi_scenario_step: {type: btree, columns: [scenario_id, step]}
+    foreign_keys:
+      scenario_scheduled_inputs_scenario_id_fkey:
+        column: scenario_id
+        references: "scenarios(scenario_id)"
+        on_delete: CASCADE
+
+  # ---------------------------------------------------------------------------
+  # scenario_state_snapshots
+  # ---------------------------------------------------------------------------
+  scenario_state_snapshots:
+    description: >
+      One row per (scenario, step). Written by SnapshotRepository.write_snapshot()
+      after each step executes. Step 0 is the initial state before any advance.
+      Unique constraint on (scenario_id, step) — one snapshot per step.
+    columns:
+      id:
+        type: text
+        nullable: false
+        default: "gen_random_uuid()::text"
+      scenario_id:
+        type: text
+        nullable: false
+        description: FK → scenarios.scenario_id (CASCADE DELETE).
+      step:
+        type: integer
+        nullable: false
+        description: Zero-based step index. 0=initial, 1=after first advance, etc.
+      timestep:
+        type: "timestamp with time zone"
+        nullable: false
+        description: >
+          Simulation calendar time at this step (not wall clock).
+          Base is 2000-01-01 UTC; each annual step adds one year.
+      state_data:
+        type: jsonb
+        nullable: false
+        description: >
+          Complete simulation state at this step, serialised as a flat dict.
+          Top-level keys are entity_id strings plus underscore-prefixed metadata keys.
+          Each entity_id value is a dict of attribute_key → Quantity envelope.
+          Quantity envelopes in state_data include _envelope_version: "1".
+        key_structure:
+          _envelope_version:
+            type: string
+            value: "2"
+            description: >
+              State data envelope version. "2" since SCAN-015.
+              Used by snapshot_repository to detect and handle format migrations.
+          _modules_active:
+            type: array
+            items: string
+            description: >
+              List of module class names active during this step's execution.
+              e.g. ["DemographicModule"]. Empty list for pre-M4 snapshots.
+          "{entity_id}":
+            type: object
+            description: >
+              Per-entity attribute state. Keys are attribute names; values are
+              Quantity envelopes (same structure as simulation_entities.attributes
+              but always include _envelope_version: "1").
+      ia1_disclosure:
+        type: text
+        nullable: false
+        description: >
+          IA-1 canonical disclosure phrase as stored at snapshot time.
+          Must match IA1_CANONICAL_PHRASE from quantity_serde.py.
+          Validated by validate_ia1_disclosure() on write.
+      events_snapshot:
+        type: jsonb
+        nullable: true
+        description: >
+          MDA breach events generated during this step's execution.
+          NULL for pre-M4 snapshots (no MDA system). When present, contains
+          a JSON array of MDA event objects serialised by alerts_to_events_snapshot().
+          Consumed by alerts_from_events_snapshot() in get_measurement_output.
+        event_object_structure:
+          mda_id: {type: string, description: "FK into mda_thresholds.mda_id"}
+          entity_id: {type: string}
+          indicator_key: {type: string}
+          severity: {type: string, values: ["WARNING", "CRITICAL", "TERMINAL"]}
+          floor_value: {type: string, description: "Decimal as string"}
+          current_value: {type: string, description: "Decimal as string"}
+          approach_pct_remaining: {type: string, description: "Decimal as string; negative when breached"}
+          consecutive_breach_steps: {type: integer}
+      created_at:
+        type: "timestamp with time zone"
+        nullable: false
+        default: now()
+    indexes:
+      scenario_state_snapshots_pkey: {type: btree, columns: [id], unique: true}
+      idx_sss_scenario_step: {type: btree, columns: [scenario_id, step]}
+      uq_snapshots_scenario_step: {type: btree, columns: [scenario_id, step], unique: true}
+    foreign_keys:
+      scenario_state_snapshots_scenario_id_fkey:
+        column: scenario_id
+        references: "scenarios(scenario_id)"
+        on_delete: CASCADE
+
+  # ---------------------------------------------------------------------------
+  # scenario_deleted_tombstones
+  # ---------------------------------------------------------------------------
+  scenario_deleted_tombstones:
+    description: >
+      Written atomically with DELETE FROM scenarios in a single transaction.
+      Preserves full configuration so deleted scenario outputs can be
+      reconstructed. ADR-004 Decision 1 Amendment (CONFLICT C-1 disposition).
+    columns:
+      scenario_id:
+        type: text
+        nullable: false
+        description: The deleted scenario's UUID. PK — cannot delete the same scenario twice.
+      name:
+        type: text
+        nullable: false
+      configuration:
+        type: jsonb
+        nullable: false
+        description: Full ScenarioConfigSchema at time of deletion.
+      scheduled_inputs:
+        type: jsonb
+        nullable: false
+        description: >
+          Array snapshot of scenario_scheduled_inputs rows at deletion time.
+          Schema: [{step, input_type, input_data}].
+      engine_version:
+        type: text
+        nullable: false
+        description: Engine version string at deletion time. e.g. "0.3.0".
+      original_created_at:
+        type: "timestamp with time zone"
+        nullable: false
+        description: The scenarios.created_at value before deletion.
+      deleted_at:
+        type: "timestamp with time zone"
+        nullable: false
+        default: now()
+      deleted_by:
+        type: text
+        nullable: false
+        description: Actor identifier. Currently always "api".
+    indexes:
+      scenario_deleted_tombstones_pkey: {type: btree, columns: [scenario_id], unique: true}
+      idx_tombstones_deleted_at: {type: btree, columns: [deleted_at]}
+
+  # ---------------------------------------------------------------------------
+  # mda_thresholds
+  # ---------------------------------------------------------------------------
+  mda_thresholds:
+    description: >
+      Minimum Descent Altitude thresholds — ADR-005 Decision 3.
+      Seeded by Alembic migration e9f3b2c5a1d7. Five rows at M4 close.
+      Loaded into memory by WebScenarioRunner._load_mda_thresholds() before
+      each scenario execution. MDAChecker.check() evaluates each entity's
+      indicators against applicable thresholds at every step.
+    columns:
+      mda_id:
+        type: text
+        nullable: false
+        description: Stable identifier. Naming convention: "MDA-{FRAMEWORK}-{INDICATOR}".
+      indicator_key:
+        type: text
+        nullable: false
+        description: Attribute key to evaluate. Must match an entity's attribute keys.
+      entity_scope:
+        type: text
+        nullable: false
+        default: "all"
+        description: >
+          Glob-style entity filter. "all" matches any entity.
+          Cohort-targeted scopes use wildcard patterns:
+          "*:CHT:1-*-*" matches quintile-1 cohorts of any country.
+          "*:CHT:*-0-14-*" matches child age-band cohorts.
+      measurement_framework:
+        type: text
+        nullable: false
+        values: ["financial", "human_development", "ecological", "governance"]
+      floor_value:
+        type: numeric
+        nullable: false
+        description: Breach threshold. Alert fires when indicator falls below this value.
+      floor_unit:
+        type: text
+        nullable: false
+      approach_pct:
+        type: numeric
+        nullable: false
+        default: 0.10
+        description: Warning zone — percentage of floor_value at which WARNING fires.
+      severity_at_breach:
+        type: text
+        nullable: false
+        values: ["WARNING", "CRITICAL", "TERMINAL"]
+      description:
+        type: text
+        nullable: false
+      historical_basis:
+        type: text
+        nullable: false
+        description: Citation for the threshold floor value.
+      recovery_horizon_years:
+        type: integer
+        nullable: true
+        description: Estimated years to recover from breach. NULL if no estimate.
+      irreversibility_note:
+        type: text
+        nullable: false
+      created_at:
+        type: "timestamp with time zone"
+        nullable: false
+        default: now()
+      updated_at:
+        type: "timestamp with time zone"
+        nullable: false
+        default: now()
+    indexes:
+      mda_thresholds_pkey: {type: btree, columns: [mda_id], unique: true}
+      idx_mda_framework: {type: btree, columns: [measurement_framework]}
+      idx_mda_indicator: {type: btree, columns: [indicator_key]}
+    seeded_rows:
+      MDA-HD-POVERTY-Q1:
+        indicator_key: poverty_headcount_ratio
+        entity_scope: "*:CHT:1-*-*"
+        measurement_framework: human_development
+        floor_value: "0.40"
+        severity_at_breach: CRITICAL
+      MDA-HD-HEALTH-CHILD:
+        indicator_key: health_index
+        entity_scope: "*:CHT:*-0-14-*"
+        measurement_framework: human_development
+        floor_value: "0.30"
+        severity_at_breach: CRITICAL
+      MDA-FIN-RESERVES:
+        indicator_key: reserve_coverage_months
+        entity_scope: all
+        measurement_framework: financial
+        floor_value: "2.5"
+        severity_at_breach: CRITICAL
+      MDA-FIN-DEBT-GDP:
+        indicator_key: debt_gdp_ratio
+        entity_scope: all
+        measurement_framework: financial
+        floor_value: "1.20"
+        severity_at_breach: CRITICAL
+      MDA-HD-FOOD:
+        indicator_key: food_insecurity_rate
+        entity_scope: all
+        measurement_framework: human_development
+        floor_value: "0.35"
+        severity_at_breach: CRITICAL
+
+  # ---------------------------------------------------------------------------
+  # relationships
+  # ---------------------------------------------------------------------------
+  relationships:
+    description: >
+      Directed edges in the simulation graph. Relationships carry how strongly
+      events propagate from source to target. Not currently populated for
+      single-entity scenarios; used by the propagation engine when multiple
+      entities are present. weight is float (not Decimal) — ARCH-4 exception
+      documented in SCR-001 (NumPy matrix operation compatibility).
+    columns:
+      relationship_id:
+        type: varchar
+        nullable: false
+      source_id:
+        type: varchar
+        nullable: false
+        description: FK → simulation_entities.entity_id.
+      target_id:
+        type: varchar
+        nullable: false
+        description: FK → simulation_entities.entity_id.
+      relationship_type:
+        type: varchar
+        nullable: false
+        values: ["trade", "debt", "alliance", "currency"]
+        description: Drives PropagationRule routing in the engine.
+      weight:
+        type: numeric
+        nullable: false
+        description: >
+          Propagation strength coefficient in [0.0, 1.0].
+          Stored as numeric in DB; loaded as float in the Python Relationship model
+          for NumPy matrix compatibility (ARCH-4 exception, SCR-001).
+      attributes:
+        type: jsonb
+        nullable: false
+        default: "{}"
+        description: Mixed relationship metadata. dict[str, Any] — not typed Quantity.
+      created_at:
+        type: "timestamp with time zone"
+        nullable: false
+        default: now()
+    indexes:
+      relationships_pkey: {type: btree, columns: [relationship_id], unique: true}
+      idx_relationships_source: {type: btree, columns: [source_id]}
+      idx_relationships_target: {type: btree, columns: [target_id]}
+      idx_relationships_type: {type: btree, columns: [relationship_type]}
+    foreign_keys:
+      fk_relationships_source: {column: source_id, references: "simulation_entities(entity_id)"}
+      fk_relationships_target: {column: target_id, references: "simulation_entities(entity_id)"}
+
+  # ---------------------------------------------------------------------------
+  # territorial_designations
+  # ---------------------------------------------------------------------------
+  territorial_designations:
+    description: >
+      Territorial dispute records for entities whose sovereignty is contested.
+      PK is (entity_id, effective_date) to allow temporal snapshots.
+      Populated by TerritorialValidator for entities with POLICY.md positions:
+      Taiwan (TWN), Palestine (PSE), Kosovo (XKX), Western Sahara (ESH), Crimea.
+    columns:
+      entity_id:
+        type: varchar
+        nullable: false
+        description: FK → simulation_entities.entity_id.
+      de_facto_admin:
+        type: varchar
+        nullable: false
+        description: Entity currently exercising administrative control.
+      de_jure_claimants:
+        type: "varchar[]"
+        nullable: false
+        description: Array of entity_ids asserting legal sovereignty.
+      dispute_status:
+        type: varchar
+        nullable: false
+        values: ["contested", "disputed", "claimed"]
+      effective_date:
+        type: date
+        nullable: false
+        description: Date from which this territorial designation applies.
+      source:
+        type: text
+        nullable: false
+        description: Citation for the designation.
+      display_note:
+        type: text
+        nullable: false
+        description: Human-readable note shown in UI hover popups.
+      created_at:
+        type: "timestamp with time zone"
+        nullable: false
+        default: now()
+    indexes:
+      territorial_designations_pkey:
+        type: btree
+        columns: [entity_id, effective_date]
+        unique: true
+    foreign_keys:
+      fk_territorial_entity: {column: entity_id, references: "simulation_entities(entity_id)"}
+
+  # ---------------------------------------------------------------------------
+  # source_registry
+  # ---------------------------------------------------------------------------
+  source_registry:
+    description: >
+      Data source provenance registry. Every data source ingested into the
+      simulation must be registered here before its data is loaded.
+      source_registry_id in attribute envelopes is a FK into this table.
+    columns:
+      source_id:
+        type: varchar
+        nullable: false
+        description: Stable identifier. e.g. "NE_110M_2024", "IMF_WEO_2024".
+      name:
+        type: text
+        nullable: false
+      provider:
+        type: text
+        nullable: false
+      dataset_name:
+        type: text
+        nullable: false
+      version:
+        type: text
+        nullable: false
+      permanent_url:
+        type: text
+        nullable: false
+      access_date:
+        type: date
+        nullable: false
+      license:
+        type: text
+        nullable: false
+      coverage_start:
+        type: date
+        nullable: false
+      coverage_end:
+        type: date
+        nullable: true
+        description: NULL for ongoing datasets.
+      coverage_countries:
+        type: "varchar[]"
+        nullable: false
+        default: "{}"
+        description: ISO 3166-1 alpha-3 codes. Empty array means global coverage.
+      quality_tier:
+        type: integer
+        nullable: false
+        range: [1, 5]
+        description: Data quality tier per DATA_STANDARDS.md.
+      simulation_variables:
+        type: "varchar[]"
+        nullable: false
+        default: "{}"
+        description: Attribute keys this source contributes to.
+      known_limitations:
+        type: text
+        nullable: false
+        default: ""
+      created_at:
+        type: "timestamp with time zone"
+        nullable: false
+        default: now()
+    indexes:
+      source_registry_pkey: {type: btree, columns: [source_id], unique: true}
+    check_constraints:
+      ck_source_quality_tier: "quality_tier >= 1 AND quality_tier <= 5"
+
+  # ---------------------------------------------------------------------------
+  # control_input_audit_log
+  # ---------------------------------------------------------------------------
+  control_input_audit_log:
+    description: >
+      Immutable audit trail for all ControlInput events injected into scenarios.
+      Written by the orchestration layer (ADR-002). Never updated — append only.
+    columns:
+      record_id:
+        type: varchar
+        nullable: false
+      scenario_id:
+        type: varchar
+        nullable: false
+      session_id:
+        type: varchar
+        nullable: false
+      timestep:
+        type: "timestamp with time zone"
+        nullable: false
+        description: Simulation calendar time (not wall clock) when input was applied.
+      input_type:
+        type: varchar
+        nullable: false
+      source:
+        type: varchar
+        nullable: false
+        description: Origin of the input — "user", "api", "scenario_config".
+      actor_id:
+        type: varchar
+        nullable: false
+      actor_role:
+        type: varchar
+        nullable: false
+      justification:
+        type: text
+        nullable: false
+      raw_input:
+        type: jsonb
+        nullable: false
+        description: Full ControlInput payload as received.
+      translated_events:
+        type: "varchar[]"
+        nullable: false
+        default: "{}"
+        description: Event IDs generated from this input.
+      wall_clock_time:
+        type: "timestamp with time zone"
+        nullable: false
+        default: now()
+    indexes:
+      control_input_audit_log_pkey: {type: btree, columns: [record_id], unique: true}
+      idx_audit_scenario_timestep: {type: btree, columns: [scenario_id, timestep]}
+
+# ---------------------------------------------------------------------------
+# Critical cross-table notes for query authors
+# ---------------------------------------------------------------------------
+query_notes:
+  - name: "metadata.name_en not metadata.name"
+    description: >
+      The entity display name is stored at metadata->>'name_en'.
+      There is NO 'name' key in simulation_entities.metadata.
+      asyncpg returns metadata as a JSON string — always json.loads() before .get().
+      Correct: json.loads(row['metadata']).get('name_en', entity_id)
+
+  - name: "state_data is flat, not nested under 'entities'"
+    description: >
+      scenario_state_snapshots.state_data top-level keys are entity_id strings
+      directly — NOT nested under an 'entities' key. Access as state_data->'GRC',
+      not state_data->'entities'->'GRC'.
+
+  - name: "events_snapshot is NULL for pre-M4 snapshots"
+    description: >
+      scenarios created before the MDA system (migration e9f3b2c5a1d7) will have
+      events_snapshot = NULL. Always check for NULL before processing.
+
+  - name: "Decimal prohibition at all boundaries"
+    description: >
+      All numeric attribute values are stored as strings in JSONB (value: "10716322").
+      Never cast to float — always Decimal(str(raw_value)) when doing arithmetic.
+
+  - name: "configuration.scheduled_inputs does not exist in DB"
+    description: >
+      ScenarioCreateRequest has a scheduled_inputs field but it is NOT stored in
+      scenarios.configuration. It is stored in scenario_scheduled_inputs rows.
+      scenarios.configuration only has: entities, n_steps, timestep_label,
+      initial_attributes, modules_config.

@@ -472,6 +472,49 @@ statement that no action is needed today.
 Activation: "PM Agent: BRIEF", "PM Agent: TRIAGE — [issue or finding]",
 "PM Agent: HORIZON", "PM Agent: FOCUS — [question or context]"
 
+**Data Architect Agent**
+Role: Schema registry owner and JSONB contract enforcer.
+Purpose: Ensure that every agent accessing the database or simulation state
+types is operating against the correct, current schema — not stale mental
+models, hallucinated column names, or undocumented JSONB key structures.
+Guards against the class of silent bugs where code queries the right table
+but the wrong key and returns null without error.
+
+Responsibilities:
+
+SCHEMA: Own and maintain the schema registry at `docs/schema/`. Three
+authoritative files:
+- `docs/schema/database.yml` — all PostgreSQL tables, columns, types,
+  JSONB key structures, indexes, FK relationships, and critical query notes.
+- `docs/schema/api_contracts.yml` — all FastAPI endpoints: method, path,
+  request body, response body, status codes, and DB reads/writes.
+- `docs/schema/simulation_state.yml` — all Python simulation layer types:
+  dataclasses, enums, abstract classes, serialisation contracts.
+
+When any table column is added, removed, or renamed; when any JSONB key
+structure changes; when any API endpoint is added or its contract changes;
+when any simulation type is amended — the Data Architect Agent updates the
+relevant schema file in the same commit as the code change. Schema drift
+from code drift is a compliance violation.
+
+REVIEW: Before any implementation that writes a SQL query, reads a JSONB
+key, calls an API endpoint, or instantiates a simulation type, the Data
+Architect Agent is activated to confirm the schema contract. The activation
+is a reading exercise, not a gate: read the relevant section of the schema
+file, confirm the column names, JSONB keys, and type shapes, and proceed.
+The cost of a 30-second schema read is lower than the cost of a silent
+null-return bug.
+
+NAMING: Schema registry files use the naming convention:
+`docs/schema/{layer}.yml` where layer is `database`, `api_contracts`, or
+`simulation_state`. These three files are the complete registry. New files
+are added only when a genuinely new layer is introduced (e.g.
+`infrastructure.yml` for AWS CDK contracts). Do not create per-table or
+per-endpoint files — consolidation is the point.
+
+Activation: `Data Architect: REVIEW — [query or type access description]`
+or `Data Architect: UPDATE — [what changed and which schema file to update]`
+
 All agents read this CLAUDE.md at the start of every session.
 All agents reference the relevant ADR before implementing any significant
 feature. All agents treat the human cost ledger as a primary output,
@@ -1019,6 +1062,24 @@ table reads in ascending SCAN number order before committing. This rule exists
 because mid-table insertions (via str_replace or Edit tool anchoring on an
 existing row) have caused ordering inversions twice — Issue #133 documents the
 recurring pattern.
+
+**Schema registry (`docs/schema/`)**
+Any agent writing a SQL query, reading a JSONB key, calling an API endpoint,
+or instantiating a simulation type MUST first read the relevant schema file:
+
+- Writing SQL or reading JSONB → read `docs/schema/database.yml` first.
+  Verify column names, types, nullability, and JSONB key structure before
+  writing the query. The `name_en` / `name` incident and the asyncpg JSONB
+  string / dict incident are the canonical examples of what this prevents.
+- Calling or implementing an API endpoint → read `docs/schema/api_contracts.yml`
+  first. Verify request shape, response shape, and status codes.
+- Writing simulation engine code or accessing Quantity fields → read
+  `docs/schema/simulation_state.yml` first. Verify field names, types,
+  and serialisation contracts (quantity_to_jsonb / quantity_from_jsonb).
+
+Schema reads are mandatory pre-implementation steps, not optional references.
+When schema files are out of date with the code, update them in the same
+commit as the code change — schema drift is a compliance violation.
 
 ---
 

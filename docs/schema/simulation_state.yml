@@ -1,0 +1,476 @@
+# WorldSim Simulation State Type Registry
+#
+# Authoritative documentation for the Python simulation layer types as they
+# exist in backend/app/simulation/engine/. These are pure Python dataclasses —
+# no database or FastAPI dependencies. Any agent writing simulation code or
+# reading/writing state snapshots MUST read this file first.
+#
+# Source files:
+#   backend/app/simulation/engine/quantity.py     — Quantity, VariableType, MonetaryValue
+#   backend/app/simulation/engine/models.py       — SimulationEntity, SimulationState,
+#                                                   Event, Relationship, SimulationModule
+#   backend/app/simulation/repositories/quantity_serde.py — serialisation contracts
+
+---
+schema_version: "1.0"
+captured: "2026-04-26"
+
+# ---------------------------------------------------------------------------
+# VariableType
+# ---------------------------------------------------------------------------
+VariableType:
+  type: enum
+  module: app.simulation.engine.quantity
+  description: >
+    Classifies simulation state variables by temporal semantics.
+    The propagation engine uses this to determine how deltas are applied.
+    Misclassification produces silent accumulation errors in multi-step runs.
+  values:
+    STOCK:
+      value: "stock"
+      description: >
+        Level at a point in time. Examples: foreign exchange reserves, debt
+        outstanding, population. apply_delta REPLACES the current value with
+        the new absolute level (not additive).
+    FLOW:
+      value: "flow"
+      description: >
+        Change over a period. Examples: GDP, exports, fiscal deficit.
+        apply_delta ACCUMULATES additively within a timestep.
+    RATIO:
+      value: "ratio"
+      description: >
+        Dimensionless fraction derived from other quantities.
+        Examples: debt/GDP, inflation rate, reserve coverage months.
+        apply_delta ACCUMULATES additively.
+    DIMENSIONLESS:
+      value: "dimensionless"
+      description: >
+        Index or score with no natural unit — not a ratio of two commensurable
+        quantities. Examples: HDI, Freedom House score, V-Dem indicators,
+        HCL capability indexes. apply_delta ACCUMULATES additively.
+        The classification describes storage behaviour, not significance.
+        A capability index is DIMENSIONLESS and a primary output with equal
+        display weight to financial indicators.
+
+# ---------------------------------------------------------------------------
+# MeasurementFramework
+# ---------------------------------------------------------------------------
+MeasurementFramework:
+  type: enum
+  module: app.simulation.engine.models
+  description: >
+    Parallel accounting units. No conversion rates exist between frameworks.
+    Outputs displayed simultaneously. A single aggregate score hiding a
+    catastrophic failure in one dimension is architecturally prohibited.
+    In JSONB storage (database), this is stored as a lowercase string matching
+    the enum value.
+  values:
+    FINANCIAL:
+      value: "financial"
+      db_string: "financial"
+    HUMAN_DEVELOPMENT:
+      value: "human_development"
+      db_string: "human_development"
+    ECOLOGICAL:
+      value: "ecological"
+      db_string: "ecological"
+    GOVERNANCE:
+      value: "governance"
+      db_string: "governance"
+  backward_compat_rule: >
+    Attributes with measurement_framework=None (null in JSONB) are classified
+    as FINANCIAL by the measurement-output endpoint. This is the M1-M3
+    backward-compatibility rule — all seeded NE attributes except population_total
+    carry null and fall into the financial bucket. population_total is explicitly
+    tagged "human_development".
+
+# ---------------------------------------------------------------------------
+# Quantity
+# ---------------------------------------------------------------------------
+Quantity:
+  type: dataclass
+  module: app.simulation.engine.quantity
+  kw_only: true
+  description: >
+    A typed, attributed measurement carrying value, unit, and provenance.
+    Every simulation state variable is a Quantity. Never raw float or Decimal
+    without unit and provenance. kw_only=True required for MonetaryValue
+    inheritance ordering.
+  fields:
+    value:
+      type: Decimal
+      description: >
+        The numerical amount. ALWAYS Decimal, never float. Decimal(str(raw))
+        is the correct conversion from any external numeric source.
+    unit:
+      type: str
+      description: >
+        Canonical unit string from DATA_STANDARDS.md.
+        Examples: "USD_2015", "persons", "dimensionless", "ratio", "months",
+        "USD_millions_current", "index", "km2".
+    variable_type:
+      type: VariableType
+      description: STOCK | FLOW | RATIO | DIMENSIONLESS
+    measurement_framework:
+      type: "MeasurementFramework | None"
+      default: null
+      description: >
+        Which accounting dimension. None for cross-framework quantities.
+        population_total carries HUMAN_DEVELOPMENT.
+    observation_date:
+      type: "date | None"
+      default: null
+    source_id:
+      type: "str | None"
+      default: null
+      description: Maps to source_registry.source_id.
+    confidence_tier:
+      type: int
+      default: 1
+      range: [1, 5]
+      description: >
+        Data quality tier per DATA_STANDARDS.md. 1=highest, 5=lowest.
+        Tier propagation: max() of all contributing tiers (lower-of-two rule).
+        DO NOT use the default 1 for ingested data — set explicitly at ingestion.
+  methods:
+    propagate_confidence:
+      signature: "propagate_confidence(*quantities: Quantity) -> int"
+      description: >
+        Returns max(confidence_tier) across all input quantities.
+        Conservative by design — overstates uncertainty, never understates.
+        This is an integer field rule, NOT a statistical formula.
+        For Monte Carlo uncertainty propagation, use the appropriate
+        statistical method.
+
+# ---------------------------------------------------------------------------
+# MonetaryValue
+# ---------------------------------------------------------------------------
+MonetaryValue:
+  type: dataclass
+  module: app.simulation.engine.quantity
+  inherits: Quantity
+  description: >
+    A Quantity that is specifically a monetary amount. Adds currency provenance
+    fields. The inherited 'value' field holds the monetary amount as Decimal.
+    The inherited 'unit' field carries the canonical storage unit (e.g. "USD_2015")
+    or the source currency before conversion at ingestion.
+  additional_fields:
+    currency_code:
+      type: str
+      default: ""
+      description: "ISO 4217 source currency. e.g. 'USD', 'EUR', 'GHS'"
+    price_basis:
+      type: str
+      default: ""
+      values: ["nominal", "constant", "ppp"]
+    exchange_rate_type:
+      type: str
+      default: ""
+      values: ["official", "parallel", "ppp", "fixed"]
+
+# ---------------------------------------------------------------------------
+# SimulationEntity
+# ---------------------------------------------------------------------------
+SimulationEntity:
+  type: dataclass
+  module: app.simulation.engine.models
+  description: >
+    Base for all entities in the simulation graph: countries, subnational
+    regions, demographic cohorts, and institutions. The propagation engine
+    operates uniformly on all entity types — entity_type drives module
+    selection, not engine branching.
+  fields:
+    id:
+      type: str
+      description: >
+        Unique identifier. For countries: ISO 3166-1 alpha-3 (e.g. "GRC").
+        For cohorts: "{country_iso3}:CHT:{quintile}-{age_band}-{sector}"
+        e.g. "GRC:CHT:1-25-54-FORMAL". Cohort entities are injected
+        in-memory by WebScenarioRunner — NOT persisted to simulation_entities.
+    entity_type:
+      type: str
+      description: "Drives module selection. Values: 'country', 'region', 'institution', 'cohort'"
+    attributes:
+      type: "dict[str, Quantity]"
+      description: >
+        Current simulation state variables as Quantity instances.
+        Keys are attribute_key strings (snake_case).
+        Loaded from simulation_entities.attributes JSONB by state_repository.py
+        via quantity_from_jsonb(). Written to scenario_state_snapshots.state_data
+        via quantity_to_jsonb().
+        Amendment 1 (SCR-001): changed from dict[str, float] to dict[str, Quantity].
+    metadata:
+      type: "dict[str, Any]"
+      description: >
+        Non-simulation data (display names, ISO codes). Does NOT participate
+        in calculations. For countries this includes name_en, iso_a2, iso_a3,
+        continent, subregion, un_region, economy_label, income_group_label.
+    parent_id:
+      type: "str | None"
+      default: null
+      description: For hierarchical resolution (subnational entities).
+    geometry:
+      type: "Geometry | None"
+      default: null
+      description: Spatial reference. Populated from DB in Milestone 2+.
+  key_methods:
+    get_attribute:
+      signature: "(key: str) -> Quantity | None"
+      description: Return attribute Quantity or None if absent.
+    get_attribute_value:
+      signature: "(key: str, default: Decimal = Decimal('0')) -> Decimal"
+      description: >
+        Return numeric value for comparison. Preferred over get_attribute()
+        for arithmetic and test assertions.
+    set_attribute:
+      signature: "(key: str, value: Quantity) -> None"
+      description: Replace an attribute with an absolute Quantity value.
+    apply_delta:
+      signature: "(key: str, delta: Quantity) -> None"
+      description: >
+        STOCK: replaces current value with delta (delta carries new absolute level).
+        FLOW/RATIO/DIMENSIONLESS: accumulates delta.value onto existing value.
+        Initialises from delta if key absent. Propagates confidence_tier via max().
+
+# ---------------------------------------------------------------------------
+# Relationship
+# ---------------------------------------------------------------------------
+Relationship:
+  type: dataclass
+  module: app.simulation.engine.models
+  description: >
+    Directed edge in the simulation graph. weight encodes how strongly
+    events propagate from source to target along this edge.
+  fields:
+    source_id:
+      type: str
+      description: "FK to SimulationEntity.id"
+    target_id:
+      type: str
+      description: "FK to SimulationEntity.id"
+    relationship_type:
+      type: str
+      values: ["trade", "debt", "alliance", "currency"]
+    weight:
+      type: float
+      description: >
+        Propagation strength coefficient in [0.0, 1.0]. Float (not Decimal)
+        for NumPy matrix operation compatibility. ARCH-4 exception, SCR-001.
+    attributes:
+      type: "dict[str, Any]"
+      default: {}
+      description: "Mixed relationship metadata. Not typed Quantity — ARCH-4 exception."
+
+# ---------------------------------------------------------------------------
+# Event
+# ---------------------------------------------------------------------------
+Event:
+  type: dataclass
+  module: app.simulation.engine.models
+  description: >
+    An event that propagates through the simulation graph each timestep.
+    Modules communicate state changes via Events — they must NOT mutate
+    SimulationState directly. The engine collects all module-returned Events
+    and applies them to produce the next state.
+    Amendment 1 (SCR-001): affected_attributes changed from dict[str, float]
+    to dict[str, Quantity].
+  fields:
+    event_id:
+      type: str
+      description: Unique identifier for this event instance.
+    source_entity_id:
+      type: str
+      description: Entity that originated this event.
+    event_type:
+      type: str
+      description: >
+        Semantic type tag. Examples: "policy_change", "shock",
+        "threshold_crossed", "fiscal_event".
+        DemographicModule listens for "fiscal_event" via get_subscribed_events().
+    affected_attributes:
+      type: "dict[str, Quantity]"
+      description: >
+        Attribute key → Quantity delta. Applied to any entity that receives
+        this event via entity.apply_delta(key, delta).
+    propagation_rules:
+      type: "list[PropagationRule]"
+      description: Determines which relationship types carry this event and how far.
+    timestep_originated:
+      type: datetime
+      description: Simulation calendar time when this event was generated.
+    framework:
+      type: MeasurementFramework
+      default: MeasurementFramework.FINANCIAL
+      description: Which accounting dimension this event belongs to.
+    metadata:
+      type: "dict[str, Any]"
+      default: {}
+
+# ---------------------------------------------------------------------------
+# PropagationRule
+# ---------------------------------------------------------------------------
+PropagationRule:
+  type: dataclass
+  module: app.simulation.engine.models
+  fields:
+    relationship_type:
+      type: str
+      description: Which edge types carry this event.
+    attenuation_factor:
+      type: float
+      description: "Effect multiplier per hop. 0.0=no propagation, 1.0=no attenuation."
+    max_hops:
+      type: int
+      default: 1
+
+# ---------------------------------------------------------------------------
+# SimulationState
+# ---------------------------------------------------------------------------
+SimulationState:
+  type: dataclass
+  module: app.simulation.engine.models
+  description: >
+    Complete state of the simulation at a single timestep. Passed read-only
+    to every module on each tick. Modules must return Events — never mutate
+    state directly. Written to scenario_state_snapshots by SnapshotRepository.
+  fields:
+    timestep:
+      type: datetime
+      description: >
+        Current simulation calendar time (UTC). Base is 2000-01-01 UTC;
+        each annual step adds one year. NOT wall clock time.
+    resolution:
+      type: ResolutionConfig
+      description: Which resolution levels are active globally and per entity.
+    entities:
+      type: "dict[str, SimulationEntity]"
+      description: >
+        All entities in scope for this simulation run. Keys are entity_id strings.
+        Includes both country entities (from DB) and cohort entities (injected
+        in-memory by WebScenarioRunner._inject_cohort_entities() if DemographicModule active).
+        When serialised to state_data JSONB, this is FLATTENED — entity_id is a
+        top-level key, NOT nested under "entities".
+    relationships:
+      type: "list[Relationship]"
+      description: Currently empty for single-entity scenarios. Populated from DB.
+    events:
+      type: "list[Event]"
+      description: >
+        Events from the PREVIOUS step. Modules read state.events to react to
+        prior-step signals (one-step lag design). This is a deliberate
+        architectural choice: DemographicModule reads fiscal events from
+        state.events (prior step) because demographic effects appear with delay.
+    scenario_config:
+      type: ScenarioConfig
+      description: Immutable scenario configuration.
+  key_methods:
+    get_entity: "(entity_id: str) -> SimulationEntity | None"
+    get_relationships_from: "(entity_id: str) -> list[Relationship]"
+    get_relationships_to: "(entity_id: str) -> list[Relationship]"
+    get_events_for_entity: "(entity_id: str) -> list[Event]"
+
+# ---------------------------------------------------------------------------
+# ScenarioConfig
+# ---------------------------------------------------------------------------
+ScenarioConfig:
+  type: dataclass
+  module: app.simulation.engine.models
+  description: Immutable configuration for a simulation scenario run.
+  fields:
+    scenario_id: {type: str}
+    name: {type: str}
+    description: {type: str}
+    start_date: {type: datetime}
+    end_date: {type: datetime}
+    initial_overrides:
+      type: "dict[str, dict[str, float]]"
+      default: {}
+      description: "entity_id → {attr_key → override_value}"
+    framework_weights:
+      type: "dict[str, float]"
+      default: {}
+      description: "User-defined weights across measurement frameworks. Sum to 1.0 by convention."
+    metadata:
+      type: "dict[str, Any]"
+      default: {}
+
+# ---------------------------------------------------------------------------
+# SimulationModule (abstract base)
+# ---------------------------------------------------------------------------
+SimulationModule:
+  type: "abstract class"
+  module: app.simulation.engine.models
+  description: >
+    Abstract base class for all simulation modules. Modules register with
+    the engine at startup; the engine calls compute() for each entity each
+    timestep and collects returned Events for propagation.
+  contract:
+    - "Modules MUST NOT mutate SimulationState"
+    - "All state changes are expressed as returned Events"
+    - "compute() is called once per entity per timestep"
+  abstract_methods:
+    compute:
+      signature: "(entity: SimulationEntity, state: SimulationState, timestep: datetime) -> list[Event]"
+      description: Return Events to propagate this timestep; return [] if no changes.
+    get_subscribed_events:
+      signature: "() -> list[str]"
+      description: >
+        Return event types this module reacts to. The engine routes incoming
+        events to matching modules. Return [] if module generates events from
+        its own equations (not from incoming events).
+
+# ---------------------------------------------------------------------------
+# DemographicModule (M4 concrete implementation)
+# ---------------------------------------------------------------------------
+DemographicModule:
+  type: class
+  module: app.simulation.modules.demographic.module
+  inherits: SimulationModule
+  description: >
+    ADR-005 Decision 1. Applies elasticities from ELASTICITY_REGISTRY to
+    country-level cohort entities. Reads prior-step events from state.events
+    (one-step lag) because demographic effects appear with delay.
+    Activated per entity when modules_config.demographic.enabled is true and
+    the entity_id appears in cohort_resolution_entity_ids.
+  subscribed_events: ["fiscal_event"]
+  cohort_entity_id_format: "{country_iso3}:CHT:{quintile}-{age_band}-{sector}"
+  cohort_entity_id_example: "GRC:CHT:1-25-54-FORMAL"
+  note: >
+    Cohort entities are injected by WebScenarioRunner._inject_cohort_entities()
+    into the in-memory SimulationState before step 0. They are NOT written to
+    simulation_entities in the database. They ARE serialised into
+    scenario_state_snapshots.state_data as regular entity entries.
+
+# ---------------------------------------------------------------------------
+# Quantity JSONB serialisation contract
+# ---------------------------------------------------------------------------
+quantity_serde:
+  description: >
+    Serialisation contract between Python Quantity objects and JSONB storage.
+    Implemented in backend/app/simulation/repositories/quantity_serde.py.
+    Any code reading or writing Quantity envelopes from/to JSONB must use
+    quantity_from_jsonb() and quantity_to_jsonb() — do NOT hand-craft envelopes.
+  quantity_to_jsonb:
+    output_keys:
+      value: "str(quantity.value)  — Decimal serialised as string"
+      unit: "quantity.unit"
+      variable_type: "quantity.variable_type.value  — e.g. 'stock'"
+      confidence_tier: "int"
+      observation_date: "date.isoformat() or null"
+      source_registry_id: "str or null"
+      measurement_framework: "enum.value string or null  — e.g. 'human_development'"
+      _envelope_version: "'1'  — always set in simulation layer output"
+  quantity_from_jsonb:
+    input_handling:
+      value: "Decimal(str(raw_value))  — handles int, float, str, Decimal inputs"
+      variable_type: "VariableType(raw_string)"
+      measurement_framework: "MeasurementFramework(raw_string) if present, else None"
+      confidence_tier: "int(raw) — required field"
+  ia1_disclosure:
+    constant_name: IA1_CANONICAL_PHRASE
+    description: >
+      Fixed disclosure phrase included with every MultiFrameworkOutput.
+      Validated on write by validate_ia1_disclosure() — raises ValueError
+      if the phrase is absent, truncated, or modified. Never hard-code
+      the phrase in application code — always import IA1_CANONICAL_PHRASE.

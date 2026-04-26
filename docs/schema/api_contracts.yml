@@ -1,0 +1,479 @@
+# WorldSim API Contracts Registry
+#
+# Authoritative documentation for every HTTP endpoint exposed by the FastAPI backend.
+# Base URL: http://localhost:8000/api/v1  (configurable via API_BASE in frontend)
+# All timestamps: ISO 8601 UTC. All numeric values: Decimal serialised as string.
+# Schema version corresponds to docs/schema/database.yml schema_version.
+#
+# Any agent adding or modifying an endpoint MUST update this file.
+
+---
+schema_version: "1.0"
+captured: "2026-04-26"
+base_path: "/api/v1"
+
+endpoints:
+
+  # ---------------------------------------------------------------------------
+  # Health
+  # ---------------------------------------------------------------------------
+  - method: GET
+    path: /health
+    summary: Liveness probe
+    auth: none
+    query_params: []
+    response:
+      status: 200
+      body:
+        status: {type: string, example: "ok"}
+        version: {type: string, example: "0.3.0"}
+
+  # ---------------------------------------------------------------------------
+  # Countries
+  # ---------------------------------------------------------------------------
+  - method: GET
+    path: /countries
+    summary: List all country entities with display metadata and Level-1 attributes
+    auth: none
+    query_params: []
+    response:
+      status: 200
+      body:
+        type: array
+        items:
+          entity_id: {type: string, example: "GRC"}
+          iso_a2: {type: string, example: "GR"}
+          iso_a3: {type: string, example: "GRC"}
+          name_en: {type: string, example: "Greece"}
+          continent: {type: string}
+          subregion: {type: string}
+          un_region: {type: string}
+          attributes:
+            type: object
+            description: >
+              dict[attribute_key, QuantitySchema]. See database.yml quantity envelope.
+    db_reads: [simulation_entities]
+
+  - method: GET
+    path: "/countries/{entity_id}"
+    summary: Full detail for one country
+    auth: none
+    path_params:
+      entity_id: {type: string, example: "GRC", description: "ISO 3166-1 alpha-3"}
+    response:
+      status: 200
+      body:
+        entity_id: {type: string}
+        iso_a2: {type: string}
+        iso_a3: {type: string}
+        name_en: {type: string}
+        continent: {type: string}
+        subregion: {type: string}
+        un_region: {type: string}
+        attributes: {type: object, description: "dict[attribute_key, QuantitySchema]"}
+        has_territorial_note: {type: boolean}
+        territorial_note: {type: "string|null"}
+      status_404: "Entity not found"
+    db_reads: [simulation_entities, territorial_designations]
+
+  - method: GET
+    path: "/countries/{entity_id}/geometry"
+    summary: GeoJSON geometry for one country
+    auth: none
+    path_params:
+      entity_id: {type: string, example: "GRC"}
+    response:
+      status: 200
+      body:
+        type: {type: string, value: "Feature"}
+        geometry: {type: object, description: "GeoJSON MultiPolygon"}
+        properties:
+          entity_id: {type: string}
+          name_en: {type: string}
+      status_404: "Entity not found or geometry null"
+    db_reads: [simulation_entities]
+
+  - method: GET
+    path: "/countries/{entity_id}/attributes"
+    summary: All Quantity attributes for one country
+    auth: none
+    path_params:
+      entity_id: {type: string}
+    response:
+      status: 200
+      body:
+        type: object
+        description: "dict[attribute_key, QuantitySchema]"
+      status_404: "Entity not found"
+    db_reads: [simulation_entities]
+
+  - method: GET
+    path: "/choropleth/{attribute_key}"
+    summary: >
+      GeoJSON FeatureCollection for choropleth rendering. Returns baseline values
+      from simulation_entities when no scenario_id is given; snapshot values when
+      scenario_id+step are given.
+    auth: none
+    path_params:
+      attribute_key: {type: string, example: "population_total"}
+    query_params:
+      - name: scenario_id
+        type: string
+        required: false
+        description: >
+          When present, must be paired with step. Returns values from the
+          snapshot at that step rather than the seeded baseline.
+      - name: step
+        type: integer
+        required: false
+        description: Step index to read from scenario_state_snapshots. Required if scenario_id given.
+    response:
+      status: 200
+      body:
+        type: {type: string, value: "FeatureCollection"}
+        features:
+          type: array
+          items:
+            type: {type: string, value: "Feature"}
+            geometry: {type: object, description: "GeoJSON MultiPolygon"}
+            properties:
+              entity_id: {type: string}
+              name: {type: string, description: "Display name from metadata.name_en"}
+              attribute_value: {type: string, description: "Decimal as string"}
+              confidence_tier: {type: integer}
+              has_territorial_note: {type: boolean}
+              territorial_note: {type: "string|null"}
+      status_404: "attribute_key not found in any entity"
+    db_reads: [simulation_entities, territorial_designations, scenario_state_snapshots]
+    notes:
+      - "attribute_value is always a string — use to-number in MapLibre paint expressions"
+
+  - method: GET
+    path: "/choropleth/{attribute_key}/delta"
+    summary: GeoJSON FeatureCollection showing per-entity delta between two scenarios
+    auth: none
+    path_params:
+      attribute_key: {type: string}
+    query_params:
+      - name: scenario_a
+        type: string
+        required: true
+      - name: scenario_b
+        type: string
+        required: true
+      - name: step
+        type: integer
+        required: false
+        description: If omitted, uses latest snapshot for each scenario.
+    response:
+      status: 200
+      body:
+        type: {type: string, value: "FeatureCollection"}
+        features:
+          type: array
+          items:
+            properties:
+              entity_id: {type: string}
+              name: {type: string}
+              attribute_value: {type: string, description: "str(delta) — Decimal as string"}
+              value_a: {type: string}
+              value_b: {type: string}
+              delta_direction: {type: string, values: ["increase", "decrease", "unchanged"]}
+              confidence_tier: {type: integer}
+              has_territorial_note: {type: boolean}
+              territorial_note: {type: "string|null"}
+    db_reads: [scenario_state_snapshots, simulation_entities, territorial_designations]
+
+  - method: GET
+    path: /attributes/available
+    summary: List all attribute keys present in the seeded entity set with unit and type
+    auth: none
+    query_params: []
+    response:
+      status: 200
+      body:
+        type: array
+        items:
+          attribute_key: {type: string}
+          unit: {type: string}
+          variable_type: {type: string}
+    db_reads: [simulation_entities]
+
+  # ---------------------------------------------------------------------------
+  # Scenarios
+  # ---------------------------------------------------------------------------
+  - method: POST
+    path: /scenarios
+    summary: Create a new scenario in pending status
+    auth: none
+    request_body:
+      name: {type: string, required: true, description: "Non-empty. Validated server-side."}
+      description: {type: "string|null", required: false}
+      configuration:
+        entities: {type: "string[]", required: true, description: "entity_id values; validated to exist"}
+        n_steps: {type: integer, required: true, range: [1, 100]}
+        timestep_label: {type: string, required: true, example: "annual"}
+        initial_attributes: {type: object, required: false, default: {}}
+        modules_config: {type: object, required: false, default: {}}
+      scheduled_inputs:
+        type: array
+        required: false
+        default: []
+        items:
+          step: {type: integer, description: "Must be in [0, n_steps-1]"}
+          input_type: {type: string}
+          input_data: {type: object}
+    response:
+      status: 201
+      body:
+        scenario_id: {type: string, description: "UUID4 as text"}
+        name: {type: string}
+        description: {type: "string|null"}
+        status: {type: string, value: "pending"}
+        version: {type: integer, value: 1}
+        created_at: {type: string, format: "ISO 8601"}
+      status_422: "Validation error — empty name, n_steps out of range, invalid step indices, unknown entity_ids"
+    db_writes: [scenarios, scenario_scheduled_inputs]
+
+  - method: GET
+    path: /scenarios
+    summary: List all scenarios ordered by created_at descending
+    auth: none
+    query_params: []
+    response:
+      status: 200
+      body:
+        type: array
+        items:
+          scenario_id: {type: string}
+          name: {type: string}
+          description: {type: "string|null"}
+          status: {type: string, values: ["pending", "running", "completed", "failed"]}
+          version: {type: integer}
+          created_at: {type: string}
+    db_reads: [scenarios]
+
+  - method: GET
+    path: /scenarios/compare
+    summary: >
+      Attribute deltas between two scenarios. delta = value_b - value_a.
+      Must appear before /scenarios/{scenario_id} in router registration (FastAPI path ordering).
+    auth: none
+    query_params:
+      - name: scenario_a
+        type: string
+        required: true
+      - name: scenario_b
+        type: string
+        required: true
+      - name: attr
+        type: string
+        required: false
+        description: Filter to a single attribute key.
+      - name: step
+        type: integer
+        required: false
+        description: >
+          If provided, both scenarios must have a snapshot at this exact step.
+          If omitted, uses the latest snapshot for each scenario.
+    response:
+      status: 200
+      body:
+        scenario_a_id: {type: string}
+        scenario_b_id: {type: string}
+        step_a: {type: integer}
+        step_b: {type: integer}
+        deltas:
+          type: object
+          description: "dict[entity_id, dict[attribute_key, DeltaRecord]]"
+          delta_record:
+            value_a: {type: string, description: "Decimal as string"}
+            value_b: {type: string, description: "Decimal as string"}
+            delta: {type: string, description: "Decimal as string; negative for decrease"}
+            direction: {type: string, values: ["increase", "decrease", "unchanged"]}
+            confidence_tier: {type: integer, description: "max() of both tiers"}
+      status_404: "scenario_a or scenario_b not found; or step not found for a scenario"
+      status_409: "step omitted and one or both scenarios have no snapshots yet"
+    db_reads: [scenarios, scenario_state_snapshots]
+
+  - method: GET
+    path: "/scenarios/{scenario_id}"
+    summary: Full scenario detail including configuration and scheduled inputs
+    auth: none
+    path_params:
+      scenario_id: {type: string}
+    response:
+      status: 200
+      body:
+        scenario_id: {type: string}
+        name: {type: string}
+        description: {type: "string|null"}
+        status: {type: string}
+        version: {type: integer}
+        created_at: {type: string}
+        configuration:
+          entities: {type: "string[]"}
+          n_steps: {type: integer}
+          timestep_label: {type: string}
+          initial_attributes: {type: object}
+          modules_config: {type: object}
+        scheduled_inputs:
+          type: array
+          items:
+            step: {type: integer}
+            input_type: {type: string}
+            input_data: {type: object}
+      status_404: "Scenario not found"
+    db_reads: [scenarios, scenario_scheduled_inputs]
+
+  - method: DELETE
+    path: "/scenarios/{scenario_id}"
+    summary: >
+      Delete scenario and all cascaded rows. Writes tombstone atomically before DELETE.
+      ADR-004 Decision 1 Amendment.
+    auth: none
+    path_params:
+      scenario_id: {type: string}
+    response:
+      status: 204
+      body: null
+      status_404: "Scenario not found"
+    db_writes: [scenario_deleted_tombstones]
+    db_deletes: [scenarios]  # cascades to scenario_scheduled_inputs, scenario_state_snapshots
+
+  - method: POST
+    path: "/scenarios/{scenario_id}/run"
+    summary: >
+      Execute a pending scenario to completion in one call.
+      Blocks until all steps are complete. For step-by-step control use /advance.
+    auth: none
+    path_params:
+      scenario_id: {type: string}
+    response:
+      status: 200
+      body:
+        scenario_id: {type: string}
+        steps_executed: {type: integer}
+        final_status: {type: string, values: ["completed", "failed"]}
+        duration_seconds: {type: number}
+      status_404: "Scenario not found"
+      status_409: "Scenario is not in pending status"
+    db_reads: [scenarios, simulation_entities, mda_thresholds]
+    db_writes: [scenario_state_snapshots, scenarios]
+
+  - method: POST
+    path: "/scenarios/{scenario_id}/advance"
+    summary: >
+      Advance a scenario by exactly one simulation step. Returns the step
+      index executed and whether the scenario is now complete. ADR-004 Decision 4.
+    auth: none
+    path_params:
+      scenario_id: {type: string}
+    response:
+      status: 200
+      body:
+        scenario_id: {type: string}
+        step_executed: {type: integer, description: "1-based; first advance returns 1"}
+        steps_remaining: {type: integer}
+        final_status: {type: string, values: ["running", "completed"]}
+        is_complete: {type: boolean}
+      status_404: "Scenario not found"
+      status_409: "Scenario is already completed"
+    db_reads: [scenarios, scenario_state_snapshots, simulation_entities, mda_thresholds]
+    db_writes: [scenario_state_snapshots, scenarios]
+    notes:
+      - "step_executed is 1-indexed — the first advance returns step_executed=1"
+      - "snapshots are written for steps 0 (initial) through n_steps"
+
+  - method: GET
+    path: "/scenarios/{scenario_id}/snapshots"
+    summary: List all snapshots for a scenario ordered by step ascending. Used by backtesting.
+    auth: none
+    path_params:
+      scenario_id: {type: string}
+    response:
+      status: 200
+      body:
+        type: array
+        items:
+          scenario_id: {type: string}
+          step: {type: integer}
+          timestep: {type: string, format: "ISO 8601"}
+          state_data:
+            type: object
+            description: >
+              Full state_data JSONB. Top-level keys: entity_id strings +
+              _envelope_version + _modules_active. See database.yml state_data.
+          modules_active: {type: "string[]"}
+      status_404: "Scenario not found"
+    db_reads: [scenarios, scenario_state_snapshots]
+
+  - method: GET
+    path: "/scenarios/{scenario_id}/measurement-output"
+    summary: >
+      Multi-framework measurement output for one entity at one step.
+      ADR-005 Decision 2. Groups entity attributes by measurement_framework tag.
+      Untagged attributes default to "financial". ECOLOGICAL and GOVERNANCE
+      return composite_score=null with a note until those modules are implemented.
+    auth: none
+    path_params:
+      scenario_id: {type: string}
+    query_params:
+      - name: entity_id
+        type: string
+        required: true
+        description: "ISO 3166-1 alpha-3 or cohort entity_id"
+      - name: step
+        type: integer
+        required: true
+        description: "Snapshot step index; must have a snapshot at this step"
+    response:
+      status: 200
+      body:
+        entity_id: {type: string}
+        entity_name:
+          type: string
+          description: >
+            Display name from simulation_entities.metadata->>'name_en'.
+            Falls back to entity_id if metadata absent or name_en key missing.
+        timestep: {type: string, format: "ISO 8601"}
+        scenario_id: {type: string}
+        step_index: {type: integer}
+        outputs:
+          type: object
+          description: "dict[framework, FrameworkOutput]. Always has keys: financial, human_development, ecological, governance."
+          framework_output:
+            framework: {type: string}
+            composite_score:
+              type: "string|null"
+              description: >
+                Decimal as string. Mean percentile rank across entities at this step.
+                null for unimplemented frameworks (ecological, governance at M4).
+            indicators:
+              type: object
+              description: "dict[attribute_key, QuantitySchema] — attributes tagged to this framework"
+            mda_alerts:
+              type: array
+              description: "MDA threshold breaches for this entity+framework at this step"
+              items:
+                mda_id: {type: string}
+                entity_id: {type: string}
+                indicator_key: {type: string}
+                severity: {type: string, values: ["WARNING", "CRITICAL", "TERMINAL"]}
+                floor_value: {type: string, description: "Decimal as string"}
+                current_value: {type: string, description: "Decimal as string"}
+                approach_pct_remaining: {type: string, description: "Negative when breached"}
+                consecutive_breach_steps: {type: integer}
+            has_below_floor_indicator: {type: boolean}
+            note: {type: "string|null", description: "Non-null for unimplemented frameworks"}
+        ia1_disclosure:
+          type: string
+          description: >
+            IA-1 canonical disclosure phrase. Always non-empty.
+            Must not be null, empty, or truncated — validated on write.
+      status_404: "Scenario not found; or no snapshot at step; or entity not in snapshot"
+    db_reads: [scenarios, scenario_state_snapshots, simulation_entities, mda_thresholds]
+    notes:
+      - "composite_score computation: mean percentile rank across all entities in the snapshot for each indicator"
+      - "financial framework includes all untagged attributes (backward-compat rule)"
+      - "ecological and governance always return composite_score=null at M4"
