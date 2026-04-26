@@ -28,6 +28,8 @@ import asyncpg  # noqa: TCH002 — used in method signatures at runtime
 
 from app.schemas import MDAThresholdRecord, ScenarioConfigSchema
 from app.simulation.mda_checker import MDAChecker, alerts_to_events_snapshot
+from app.simulation.modules.demographic.cohort import generate_cohort_specs
+from app.simulation.modules.demographic.module import DemographicModule
 from app.simulation.orchestration.inputs import (
     EmergencyInstrument,
     EmergencyPolicyInput,
@@ -221,6 +223,7 @@ class WebScenarioRunner:
                 conn, config.entities, scenario_id, row["name"], base_timestep,
             )
             _apply_initial_overrides(current_state, config)
+            _inject_cohort_entities(current_state, config)
             await snap_repo.write_snapshot(conn, scenario_id, 0, base_timestep, current_state)
             current_step = 0
 
@@ -260,15 +263,18 @@ class WebScenarioRunner:
             inputs_by_step = await _load_scheduled_inputs(conn, scenario_id, config.entities)
             step_inputs = inputs_by_step.get(next_step, [])
 
+            demo_module = _build_demographic_module(config)
+            active_modules = [demo_module] if demo_module is not None else []
+
             runner = ScenarioRunner(
                 initial_state=current_state,
                 scheduled_inputs=[],
-                modules=[],
+                modules=active_modules,
                 n_steps=config.n_steps,
             )
             new_state = runner.advance_timestep(
                 current_state=current_state,
-                modules=[],
+                modules=active_modules,
                 scheduled_inputs=step_inputs,
             )
 
@@ -335,6 +341,9 @@ class WebScenarioRunner:
         # Apply initial_attributes overrides from scenario config
         _apply_initial_overrides(initial_state, config)
 
+        # Inject cohort entities if demographic resolution is configured.
+        _inject_cohort_entities(initial_state, config)
+
         # Load scheduled inputs grouped by step
         inputs_by_step = await _load_scheduled_inputs(conn, scenario_id, config.entities)
 
@@ -345,10 +354,13 @@ class WebScenarioRunner:
         await snap_repo.write_snapshot(conn, scenario_id, 0, base_timestep, initial_state)
 
         # Execute n_steps using ScenarioRunner
+        demo_module = _build_demographic_module(config)
+        active_modules = [demo_module] if demo_module is not None else []
+
         runner = ScenarioRunner(
             initial_state=initial_state,
             scheduled_inputs=[],
-            modules=[],
+            modules=active_modules,
             n_steps=config.n_steps,
         )
 
@@ -360,7 +372,7 @@ class WebScenarioRunner:
             step_inputs = inputs_by_step.get(step_num, [])
             current_state = runner.advance_timestep(
                 current_state=current_state,
-                modules=[],
+                modules=active_modules,
                 scheduled_inputs=step_inputs,
             )
             alerts = checker.check(current_state, prior_breach_events, thresholds)
@@ -403,6 +415,42 @@ def _apply_initial_overrides(
             continue
         for attr_key, qty_schema in attr_overrides.items():
             entity.set_attribute(attr_key, quantity_from_schema(qty_schema))
+
+
+def _inject_cohort_entities(
+    state: SimulationState,
+    config: ScenarioConfigSchema,
+) -> None:
+    """Add cohort SimulationEntity instances for countries in modules_config.demographic."""
+    from app.simulation.engine.models import SimulationEntity
+
+    demo_cfg: dict[str, Any] = config.modules_config.get("demographic", {})
+    if not demo_cfg.get("enabled"):
+        return
+    resolution_ids: list[str] = demo_cfg.get("cohort_resolution_entity_ids", [])
+    specs = generate_cohort_specs()
+    for country_id in resolution_ids:
+        if country_id not in state.entities:
+            continue
+        for spec in specs:
+            cohort_id = spec.entity_id(country_id)
+            if cohort_id not in state.entities:
+                state.entities[cohort_id] = SimulationEntity(
+                    id=cohort_id,
+                    entity_type="cohort",
+                    attributes={},
+                    metadata={"parent_id": country_id},
+                )
+
+
+def _build_demographic_module(config: ScenarioConfigSchema) -> DemographicModule | None:
+    """Return a configured DemographicModule if demographic resolution is active."""
+    demo_cfg: dict[str, Any] = config.modules_config.get("demographic", {})
+    if not demo_cfg.get("enabled"):
+        return None
+    return DemographicModule(
+        cohort_resolution_entity_ids=demo_cfg.get("cohort_resolution_entity_ids"),
+    )
 
 
 async def _load_scheduled_inputs(
