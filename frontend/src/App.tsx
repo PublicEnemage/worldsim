@@ -21,6 +21,8 @@ export default function App() {
   const [selectedEntityId, setSelectedEntityId] = useState<string | null>(null);
 
   const handleStepChange = (step: number, _isComplete: boolean) => {
+    // Always set — never reset to null on completion so EntityDetailDrawer
+    // continues showing data at the final step after the scenario is done.
     setCurrentStep(step);
   };
 

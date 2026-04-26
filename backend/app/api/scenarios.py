@@ -797,10 +797,14 @@ async def get_measurement_output(
         )
 
     entity_row = await conn.fetchrow(
-        "SELECT name FROM simulation_entities WHERE entity_id = $1",
+        "SELECT metadata FROM simulation_entities WHERE entity_id = $1",
         entity_id,
     )
-    entity_name: str = entity_row["name"] if entity_row else entity_id
+    entity_name: str = (
+        (entity_row["metadata"] or {}).get("name", entity_id)
+        if entity_row
+        else entity_id
+    )
 
     timestep = snap_row["timestep"]
     timestep_str: str = timestep.isoformat() if hasattr(timestep, "isoformat") else str(timestep)
