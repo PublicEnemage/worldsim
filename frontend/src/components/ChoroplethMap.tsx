@@ -134,7 +134,8 @@ export default function ChoroplethMap({ attributeName, title, scenarioId, curren
 
         map.on("mousemove", FILL_LAYER_ID, (e) => {
           if (!e.features?.length) return;
-          map.getCanvas().style.cursor = "pointer";
+          // Only show pointer cursor when click will do something
+          map.getCanvas().style.cursor = onEntityClickRef.current ? "pointer" : "";
 
           const props = e.features[0].properties as ChoroplethFeatureProperties;
           const noteHtml = props.has_territorial_note && props.territorial_note

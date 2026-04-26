@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useMultiFrameworkOutput } from "../hooks/useMultiFrameworkOutput";
 import RadarChart from "./RadarChart";
 import FrameworkPanel from "./FrameworkPanel";
@@ -43,7 +43,16 @@ export default function EntityDetailDrawer({ scenarioId, entityId, step, onClose
   const [weights, setWeights] = useState<FrameworkWeights>(loadWeights);
   const [selectedFramework, setSelectedFramework] = useState<string>("financial");
 
-  const { data, loading, error } = useMultiFrameworkOutput(scenarioId, entityId, step);
+  // Track the last non-null step so the drawer keeps showing data after scenario completes.
+  // currentStep becomes null only at scenario creation time; once steps have been advanced
+  // it stays at the last advanced value — but guard against hypothetical future resets.
+  const lastStepRef = useRef<number | null>(null);
+  if (step !== null) {
+    lastStepRef.current = step;
+  }
+  const effectiveStep = step ?? lastStepRef.current;
+
+  const { data, loading, error } = useMultiFrameworkOutput(scenarioId, entityId, effectiveStep);
 
   // Persist weights to localStorage whenever they change
   useEffect(() => {
@@ -152,13 +161,13 @@ export default function EntityDetailDrawer({ scenarioId, entityId, step, onClose
               marginBottom: 12,
             }}
           >
-            {step === null
+            {effectiveStep === null
               ? "Advance the scenario at least one step to load measurement output."
               : `Error: ${error}`}
           </div>
         )}
 
-        {step === null && !loading && !error && (
+        {effectiveStep === null && !loading && !error && (
           <div style={{ color: "#888", fontSize: 13, padding: "8px 0" }}>
             Advance the scenario at least one step to view measurement output.
           </div>
