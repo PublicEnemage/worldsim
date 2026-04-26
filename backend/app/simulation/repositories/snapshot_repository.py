@@ -59,6 +59,7 @@ class ScenarioSnapshotRepository:
         timestep: datetime,
         state: SimulationState,
         modules_active: list[str] | None = None,
+        events_snapshot: list[dict[str, object]] | None = None,
     ) -> None:
         """Serialize SimulationState and insert a snapshot row.
 
@@ -71,16 +72,19 @@ class ScenarioSnapshotRepository:
             modules_active: Names of domain modules that contributed to this
                 snapshot. Empty list for M3 (no domain modules implemented).
                 Populated in M4+ when DemographicModule and others are active.
+            events_snapshot: MDA breach events for this step from MDAChecker.
+                None (stored as SQL NULL) when no breaches occurred or at step 0.
         """
         disclosure = IA1_CANONICAL_PHRASE
         validate_ia1_disclosure(disclosure)
         state_data = _serialize_state(state, modules_active or [])
+        events_json = json.dumps(events_snapshot) if events_snapshot is not None else None
 
         await conn.execute(
             """
             INSERT INTO scenario_state_snapshots
-                (id, scenario_id, step, timestep, state_data, ia1_disclosure)
-            VALUES ($1, $2, $3, $4, $5, $6)
+                (id, scenario_id, step, timestep, state_data, ia1_disclosure, events_snapshot)
+            VALUES ($1, $2, $3, $4, $5, $6, $7)
             ON CONFLICT (scenario_id, step) DO NOTHING
             """,
             str(uuid.uuid4()),
@@ -89,6 +93,7 @@ class ScenarioSnapshotRepository:
             timestep,
             json.dumps(state_data),
             disclosure,
+            events_json,
         )
 
 

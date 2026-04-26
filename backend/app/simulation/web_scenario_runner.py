@@ -26,7 +26,8 @@ from typing import TYPE_CHECKING, Any
 
 import asyncpg  # noqa: TCH002 — used in method signatures at runtime
 
-from app.schemas import ScenarioConfigSchema
+from app.schemas import MDAThresholdRecord, ScenarioConfigSchema
+from app.simulation.mda_checker import MDAChecker, alerts_to_events_snapshot
 from app.simulation.orchestration.inputs import (
     EmergencyInstrument,
     EmergencyPolicyInput,
@@ -270,8 +271,15 @@ class WebScenarioRunner:
                 modules=[],
                 scheduled_inputs=step_inputs,
             )
+
+            thresholds = await _load_mda_thresholds(conn)
+            prior_breach_events = await _load_prior_breach_events(conn, scenario_id, current_step)
+            alerts = MDAChecker().check(new_state, prior_breach_events, thresholds)
+            events_snap = alerts_to_events_snapshot(alerts, next_step) or None
+
             await snap_repo.write_snapshot(
-                conn, scenario_id, next_step, new_state.timestep, new_state
+                conn, scenario_id, next_step, new_state.timestep, new_state,
+                events_snapshot=events_snap,
             )
 
             steps_remaining = config.n_steps - next_step
@@ -330,7 +338,10 @@ class WebScenarioRunner:
         # Load scheduled inputs grouped by step
         inputs_by_step = await _load_scheduled_inputs(conn, scenario_id, config.entities)
 
-        # Write step-0 snapshot (initial state)
+        # Load MDA thresholds once for the full run.
+        thresholds = await _load_mda_thresholds(conn)
+
+        # Write step-0 snapshot (initial state, no breach detection at step 0).
         await snap_repo.write_snapshot(conn, scenario_id, 0, base_timestep, initial_state)
 
         # Execute n_steps using ScenarioRunner
@@ -341,7 +352,10 @@ class WebScenarioRunner:
             n_steps=config.n_steps,
         )
 
+        checker = MDAChecker()
         current_state = initial_state
+        prior_breach_events: list[dict[str, object]] = []
+
         for step_num in range(1, config.n_steps + 1):
             step_inputs = inputs_by_step.get(step_num, [])
             current_state = runner.advance_timestep(
@@ -349,9 +363,13 @@ class WebScenarioRunner:
                 modules=[],
                 scheduled_inputs=step_inputs,
             )
+            alerts = checker.check(current_state, prior_breach_events, thresholds)
+            events_snap = alerts_to_events_snapshot(alerts, step_num) or None
             await snap_repo.write_snapshot(
-                conn, scenario_id, step_num, current_state.timestep, current_state
+                conn, scenario_id, step_num, current_state.timestep, current_state,
+                events_snapshot=events_snap,
             )
+            prior_breach_events = events_snap or []
 
         # SA-04: running → completed
         async with conn.transaction():
@@ -481,6 +499,56 @@ def _deserialize_control_input(
         "Supported: FiscalPolicyInput, EmergencyPolicyInput, TradePolicyInput, "
         "MonetaryRateInput, StructuralPolicyInput."
     )
+
+
+async def _load_mda_thresholds(
+    conn: asyncpg.Connection,
+) -> list[MDAThresholdRecord]:
+    """Load all active MDA threshold records from mda_thresholds table.
+
+    Returns an empty list if the table does not yet exist (pre-migration).
+    This guard allows unit tests that don't run Alembic migrations to still
+    exercise the runner without error.
+    """
+    try:
+        rows = await conn.fetch(
+            """
+            SELECT mda_id, indicator_key, entity_scope, measurement_framework,
+                   floor_value, floor_unit, approach_pct, severity_at_breach,
+                   description, historical_basis, recovery_horizon_years,
+                   irreversibility_note
+            FROM mda_thresholds
+            """
+        )
+    except Exception:  # noqa: BLE001
+        return []
+    return [MDAThresholdRecord(**dict(row)) for row in rows]
+
+
+async def _load_prior_breach_events(
+    conn: asyncpg.Connection,
+    scenario_id: str,
+    prior_step: int,
+) -> list[dict[str, object]]:
+    """Load events_snapshot from the prior step's snapshot row.
+
+    Returns empty list when the prior snapshot has no breach events or when
+    events_snapshot is NULL (all pre-M4 snapshots, or step 0).
+    """
+    if prior_step < 0:
+        return []
+    row = await conn.fetchrow(
+        "SELECT events_snapshot FROM scenario_state_snapshots "
+        "WHERE scenario_id = $1 AND step = $2",
+        scenario_id,
+        prior_step,
+    )
+    if row is None or row["events_snapshot"] is None:
+        return []
+    raw = row["events_snapshot"]
+    if isinstance(raw, str):
+        raw = json.loads(raw)
+    return list(raw) if isinstance(raw, list) else []
 
 
 async def _reconstruct_state_from_snapshot(

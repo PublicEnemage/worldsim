@@ -40,6 +40,7 @@ from app.schemas import (
     CompareResponse,
     DeltaRecord,
     FrameworkOutput,
+    MDAAlert,
     MultiFrameworkOutput,
     QuantitySchema,
     RunSummaryResponse,
@@ -50,6 +51,7 @@ from app.schemas import (
     ScheduledInputSchema,
     SnapshotRecord,
 )
+from app.simulation.mda_checker import alerts_from_events_snapshot
 from app.simulation.repositories.quantity_serde import IA1_CANONICAL_PHRASE
 
 # Engine version for tombstone records — must match app version in main.py.
@@ -722,6 +724,22 @@ def _compute_composite_score(
     return str(score.quantize(Decimal("0.0001")))
 
 
+def _alert_matches_framework(
+    alert: MDAAlert,
+    framework: str,
+    target_attrs: dict[str, QuantitySchema],
+) -> bool:
+    """Return True if the alert's indicator belongs to the given framework.
+
+    Looks up the indicator_key in target_attrs to find its measurement_framework
+    tag. Untagged indicators fall into 'financial' per the backward-compatibility
+    rule in CODING_STANDARDS.md §measurement_framework Tagging.
+    """
+    qty = target_attrs.get(alert.indicator_key)
+    indicator_fw = (qty.measurement_framework or "financial") if qty is not None else "financial"
+    return indicator_fw == framework
+
+
 @router.get(
     "/scenarios/{scenario_id}/measurement-output",
     response_model=MultiFrameworkOutput,
@@ -754,7 +772,7 @@ async def get_measurement_output(
 
     snap_row = await conn.fetchrow(
         """
-        SELECT scenario_id, step, timestep, state_data
+        SELECT scenario_id, step, timestep, state_data, events_snapshot
         FROM scenario_state_snapshots
         WHERE scenario_id = $1 AND step = $2
         """,
@@ -787,11 +805,28 @@ async def get_measurement_output(
     timestep = snap_row["timestep"]
     timestep_str: str = timestep.isoformat() if hasattr(timestep, "isoformat") else str(timestep)
 
+    # Load MDA alerts from events_snapshot. Empty list for pre-M4 snapshots (events_snapshot=NULL).
+    raw_events = snap_row["events_snapshot"]
+    if raw_events is None:
+        all_mda_alerts = []
+    else:
+        if isinstance(raw_events, str):
+            raw_events = json.loads(raw_events)
+        all_mda_alerts = alerts_from_events_snapshot(
+            list(raw_events) if isinstance(raw_events, list) else [],
+            entity_id=entity_id,
+        )
+
     all_entity_attrs = _parse_entity_attrs(state_dict)
     target_attrs = all_entity_attrs.get(entity_id, {})
 
     outputs: dict[str, FrameworkOutput] = {}
     for fw in _ALL_FRAMEWORKS:
+        fw_alerts = [a for a in all_mda_alerts if _alert_matches_framework(a, fw, target_attrs)]
+        has_below_floor = any(
+            a.consecutive_breach_steps >= 1 for a in fw_alerts
+        )
+
         if fw in _UNIMPLEMENTED_FRAMEWORKS:
             outputs[fw] = FrameworkOutput(
                 framework=fw,
@@ -799,8 +834,8 @@ async def get_measurement_output(
                 timestep=timestep_str,
                 indicators={},
                 composite_score=None,
-                mda_alerts=[],
-                has_below_floor_indicator=False,
+                mda_alerts=fw_alerts,
+                has_below_floor_indicator=has_below_floor,
                 note=_UNIMPLEMENTED_NOTES[fw],
             )
             continue
@@ -817,8 +852,8 @@ async def get_measurement_output(
             timestep=timestep_str,
             indicators=indicators,
             composite_score=composite,
-            mda_alerts=[],  # MDA deferred to ADR-005 Decision 3
-            has_below_floor_indicator=False,
+            mda_alerts=fw_alerts,
+            has_below_floor_indicator=has_below_floor,
             note=None,
         )
 
