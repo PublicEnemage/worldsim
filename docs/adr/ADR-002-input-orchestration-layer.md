@@ -6,15 +6,23 @@ Accepted
 ## Validity Context
 
 **Standards Version:** 2026-04-15 (date standards documents were established)
-**Valid Until:** Milestone 4 completion
+**Valid Until:** Milestone 5 completion
 **License Status:** CURRENT
 
-**Last Reviewed:** 2026-04-24 — Milestone 3 exit review. No renewal triggers
+**Last Reviewed:** 2026-04-26 — Milestone 4 exit review. No renewal triggers
+fired during Milestone 4. License Status confirmed CURRENT. No changes to
+`ControlInput` type taxonomy, audit trail schema requirements, or
+`MeasurementFramework` tagging requirements occurred during this milestone.
+The `modules_config` field added to `ScenarioConfigSchema` (DemographicModule
+wire-up) is a backward-compatible extension — existing orchestration contracts
+are unaffected. License renewed for Milestone 5. Next scheduled review at
+Milestone 5 completion.
+
+**Previously reviewed:** 2026-04-24 — Milestone 3 exit review. No renewal triggers
 fired during Milestone 3. License Status confirmed CURRENT. No changes to
 `ControlInput` type taxonomy, audit trail schema requirements, or
 `MeasurementFramework` tagging requirements occurred during this milestone.
-License renewed for Milestone 4. Next scheduled review at Milestone 4
-completion.
+License renewed for Milestone 4.
 
 **Previously reviewed:** 2026-04-21 — Milestone 2 exit review. No renewal
 triggers fired. License Status confirmed CURRENT. \

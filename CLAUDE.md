@@ -811,19 +811,125 @@ Activation: `Architecture Review: FULL — [scope description]` or
 - ADR-004 (scenario engine) and ADR-005 (human cost ledger): CURRENT
 - Standards reviews STD-REVIEW-001, STD-REVIEW-002, STD-REVIEW-003 complete
 
-**Milestone 4 — Human Cost Ledger (Current)**
-- Cohort-level demographic module
+**Milestone 4 — Human Cost Ledger (Complete — v0.4.0)**
+- Cohort-level demographic module (DemographicModule, CohortSpec, CohortElasticity)
 - Multi-framework measurement output (financial, human development,
-  ecological, governance)
-- Minimum Descent Altitude threshold system
+  ecological, governance) — GET /scenarios/{id}/measurement-output
+- Minimum Descent Altitude threshold system (MDAChecker, events_snapshot)
 - Radar chart dashboard displaying all dimensions simultaneously
+  (EntityDetailDrawer, RadarChart, FrameworkPanel, MDAAlertPanel)
+- API smoke test 30/30 PASS confirmed 2026-04-26
 - M4 hard gates from STD-REVIEW-003: measurement_framework tagging rule in
   CODING_STANDARDS.md (Issue #171), academic literature citation format in
   DATA_STANDARDS.md (Issue #172), Known Limitation IA-1 section in
   DATA_STANDARDS.md before first M4 projection output (Issue #174)
+- ADR-001 through ADR-005: CURRENT (renewed 2026-04-26)
+- SCAN-018: Clean — 68 files, 0 violations, 2 pre-accepted warnings
+
+**Milestone 5 — Calibration and Uncertainty (Current)**
+- Distribution outputs replacing point estimates — every simulation output
+  becomes a distribution with quantified uncertainty bounds
+- Uncertainty propagation through the feedback graph across timesteps
+- Historical calibration against Greece 2010–2012 and at least one
+  additional country case at MAGNITUDE_WITHIN_20PCT threshold
+- Playwright integration test suite covering the full scenario advance
+  and EntityDetailDrawer flow (required by M4 retrospective — see
+  Milestone Retrospective Process below)
+- Macroeconomic Module initial implementation (GDP, inflation, fiscal
+  balance with regime-dependent multipliers)
+- ADR-006 (uncertainty quantification and distribution outputs): required
+  before implementation begins
 
 Each milestone is a vertical slice — working software at every stage,
 not infrastructure waiting for features.
+
+---
+
+## Milestone Roadmap — M5 through M8
+
+This roadmap records committed scope and explicit dependencies between
+milestones. It is not a feature backlog — each entry is a vertical slice
+that must be demonstrably working at milestone close.
+
+**Milestone 5 — Calibration and Uncertainty**
+Core deliverable: Simulation outputs become distributions, not point
+estimates. Users see uncertainty explicitly.
+
+Scope:
+- Distribution parameterization for all simulation outputs (mean, std,
+  confidence interval, confidence tier propagation)
+- Uncertainty propagation through the feedback graph
+- Macroeconomic Module initial implementation (GDP, inflation, fiscal
+  balance, fiscal multipliers with regime detection)
+- Historical calibration: Greece 2010–2012 at MAGNITUDE_WITHIN_20PCT
+  threshold; one additional country case selected at M5 start
+- Playwright integration test suite (M4 retrospective requirement — blocks
+  M5 exit; no milestone closes without integration test coverage of the
+  full user flow)
+- ADR-006 required before implementation begins
+
+Dependencies: ADR-001 (Quantity type must accommodate distributions),
+ADR-005 (composite scores become distribution-aware)
+
+**Milestone 6 — Backtesting Coverage Expansion**
+Core deliverable: Backtesting suite covers at least five historical cases
+with documented fidelity thresholds per case.
+
+Scope:
+- Five historical cases minimum: Greece 2010–2012 (existing),
+  Argentina 2001–2002, Thailand 1997, Lebanon 2019–2020, and one
+  additional case chosen by Engineering Lead at M6 start
+- MAGNITUDE_WITHIN_20PCT threshold enforced in CI for all five cases
+- Backtesting fidelity dashboard visible in the UI (pass/fail per case,
+  per module, per indicator)
+- Ecological Module initial implementation (climate forcing integration
+  from pre-computed ERA5 reanalysis data)
+- Governance Module initial implementation (institutional quality indices,
+  press freedom, policy-reality divergence)
+
+Dependencies: Milestone 5 (Macroeconomic Module must exist before
+multi-module backtesting is meaningful), ADR-005 ecological/governance
+framework implementations
+
+**Milestone 7 — Ecological and Governance Frameworks**
+Core deliverable: Ecological and governance composite scores become
+non-null. The radar chart shows all four dimensions with real data.
+
+Scope:
+- Ecological Module complete: planetary boundary proximity, agricultural
+  stress, water stress by watershed, natural capital depletion rate
+- Governance Module complete: Institutional Cognitive Integrity Index,
+  policy-reality divergence tracking, ghost flight detection
+- All four radar chart axes showing real composite scores for any
+  scenario with sufficient data
+- Coffin Corner indicator implemented: Policy Maneuver Margin composite
+  tracking remaining degrees of freedom
+- MDA threshold system extended to ecological and governance indicators
+
+Dependencies: Milestone 6 (backtesting infrastructure must exist to
+validate ecological and governance modules), ADR-005 Decisions 5 and 6
+(ecological and governance module contracts — to be written at M7 entry)
+
+**Milestone 8 — Methodology Publication and External Validation**
+Core deliverable: The simulation's methodology is publicly documented
+and validated by at least one external domain reviewer.
+
+Scope:
+- Methodology paper: full documentation of every model relationship,
+  every assumption, every calibration decision, and every known limitation
+- External domain review: at least one development economist or sovereign
+  debt specialist reviews the methodology and signs off on the human
+  development framework implementation
+- docs/POLICY.md updated to reflect all methodology positions taken
+  through M7, with the external reviewer's name and affiliation
+- Technical Steering Committee formation initiated (first institutional
+  user engagement sought)
+- Public launch preparation: README, CONTRIBUTING.md, and POLICY.md
+  written for external contributors, not just internal agents
+
+Dependencies: Milestones 5–7 (methodology cannot be published before
+the core modules are implemented and validated); external reviewer
+recruited no later than M7 midpoint
 
 ---
 
@@ -1102,6 +1208,75 @@ They do not exist. Use the mapping below instead:
 | `security` | `compliance:critical` or `compliance:major` | Security findings are compliance findings |
 | `performance` | `enhancement` | No dedicated performance label exists |
 | `milestone:N` | Use the GitHub milestone assignment | Do not encode milestone in a label |
+
+---
+
+## Milestone Retrospective Process
+
+Every milestone exit ceremony must include a retrospective. The retrospective
+is not optional and is not a formality. It is an epistemic discipline — the
+same discipline that makes backtesting the primary signal for model improvement
+applies here to the development process itself.
+
+### What the Retrospective Covers
+
+Every retrospective addresses three questions, in writing, as a comment on
+the exit checklist Issue:
+
+**1. What defects evaded the test suite?**
+Name every bug that was caught by manual testing, user report, or visual
+inspection rather than by an automated test. For each: what was the defect,
+how was it caught, and at what point in development would a test have caught
+it earlier?
+
+**2. What process gaps caused them?**
+For each defect that evaded testing: what test did not exist that would have
+caught it? Was the gap a missing test type (unit, integration, end-to-end),
+a missing coverage area, or a test-after rather than test-before discipline
+failure? Name the gap specifically — not "we need more tests" but "we had
+no Playwright test for the scenario advance → drawer open flow."
+
+**3. What testing improvements are required before the next milestone begins?**
+Specific, named deliverables — not intentions. Each improvement is a blocking
+requirement for the next milestone exit, not a suggestion. If a testing gap
+was identified, the next milestone exit checklist must include a checkbox
+confirming the gap was closed.
+
+### The M4 Radar Chart Drawer Incident — Canonical Reference
+
+The Milestone 4 radar chart EntityDetailDrawer bug is the canonical example
+of what this retrospective process is designed to prevent recurring.
+
+**What happened:** The `EntityDetailDrawer` showed a placeholder message
+("advance the scenario at least one step") after a scenario had been fully
+advanced to completion. The bug required 10+ debugging iterations across
+multiple commits. Several attempted fixes (initialStep/initialComplete props,
+useEffect syncing, key-based remounting) introduced new regressions before
+the correct simple fix was found: `step={currentStep ?? selectedScenarioSteps}`.
+
+**Root causes:**
+- No Playwright or browser integration tests existed. The async state
+  management race between `App.tsx`, `ScenarioControls`, and
+  `EntityDetailDrawer` was invisible to the test suite.
+- The API smoke test was written after visual failures were observed, not
+  before implementation. The `name` vs `name_en` metadata key bug and the
+  `human_development composite_score = null` issue would have been caught
+  before any manual browser testing if the smoke test had existed first.
+- `currentStep` state management across the async `useEffect` fetch boundary
+  was not covered by any test. The race between fetch resolution and
+  `handleStepChange` calls was only discoverable through manual browser
+  testing with console.log instrumentation.
+
+**Required before Milestone 5 begins (hard gate):**
+A Playwright integration test suite covering at minimum:
+- Create scenario → advance to completion → click entity → drawer shows
+  measurement output (not placeholder)
+- Select a previously-completed scenario → drawer shows measurement output
+  immediately without advance clicks
+- Advance partially → click entity → drawer shows output at current step
+
+This is a blocking requirement for M5 exit, not a recommendation.
+The M5 exit checklist will include an explicit checkbox for this.
 
 ---
 

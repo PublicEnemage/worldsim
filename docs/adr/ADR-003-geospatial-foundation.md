@@ -6,14 +6,25 @@ Accepted
 ## Validity Context
 
 **Standards Version:** 2026-04-21
-**Valid Until:** Milestone 4 completion
+**Valid Until:** Milestone 5 completion
 **License Status:** CURRENT
 
-**Last Reviewed:** 2026-04-24 — Milestone 3 exit review. No renewal triggers
+**Last Reviewed:** 2026-04-26 — Milestone 4 exit review. No renewal triggers
+fired during Milestone 4. License Status confirmed CURRENT. No changes to
+GeoJSON-over-REST serving approach, PostGIS schema, CORS policy, or
+TerritorialValidator gate. The M4 measurement-output endpoint (`GET
+/scenarios/{id}/measurement-output`) is a new endpoint that does not alter
+any existing geospatial contract. The `population_total` framework tag fix
+(SQL `jsonb_set` migration + `natural_earth_loader.py` update) is a data
+correction within the existing attribute JSONB envelope format — envelope
+structure unchanged. License renewed for Milestone 5. Next scheduled review
+at Milestone 5 completion.
+
+**Previously reviewed:** 2026-04-24 — Milestone 3 exit review. No renewal triggers
 fired during Milestone 3. License Status confirmed CURRENT. No changes to
 the GeoJSON-over-REST serving approach, PostGIS schema, CORS policy, or
 TerritorialValidator gate occurred during this milestone. License renewed for
-Milestone 4. Next scheduled review at Milestone 4 completion.
+Milestone 4.
 
 **Previously reviewed:** 2026-04-21 — Milestone 2 exit review. All four
 decisions fully implemented and verified. License Status set to CURRENT.

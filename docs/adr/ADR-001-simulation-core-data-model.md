@@ -6,14 +6,24 @@ Accepted
 ## Validity Context
 
 **Standards Version:** 2026-04-15 (date standards documents were established)
-**Valid Until:** Milestone 4 completion
+**Valid Until:** Milestone 5 completion
 **License Status:** CURRENT
 
-**Last Reviewed:** 2026-04-24 — Milestone 3 exit review. No renewal triggers
+**Last Reviewed:** 2026-04-26 — Milestone 4 exit review. No renewal triggers
+fired during Milestone 4. License Status confirmed CURRENT. No changes to
+`MeasurementFramework` taxonomy, `DATA_STANDARDS.md §Units and Measurements`,
+or backtesting integrity rules that affect state representation. The M4
+DemographicModule adds cohort entities to `SimulationState` but does not
+alter `SimulationEntity.attributes` structure — the CohortSpec identity
+encoding (colon-delimited string) is additive and does not constitute a
+structural change to the attribute store. License renewed for Milestone 5.
+Next scheduled review at Milestone 5 completion.
+
+**Previously reviewed:** 2026-04-24 — Milestone 3 exit review. No renewal triggers
 fired during Milestone 3. License Status confirmed CURRENT. No standards
 amendments to `DATA_STANDARDS.md §Units and Measurements` or
 `MeasurementFramework` taxonomy occurred during this milestone. License
-renewed for Milestone 4. Next scheduled review at Milestone 4 completion.
+renewed for Milestone 4.
 
 **Previously reviewed:** 2026-04-21 — Milestone 2 exit review. No renewal
 triggers fired. License Status confirmed CURRENT. \

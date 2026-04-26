@@ -6,18 +6,27 @@ Accepted
 ## Validity Context
 
 **Standards Version:** 2026-04-15 (date standards documents were established)
-**Valid Until:** Milestone 4 completion
+**Valid Until:** Milestone 5 completion
 **License Status:** CURRENT
 
-**Last Reviewed:** 2026-04-24 — Engineering Lead accepted at M4 boundary. ADR-005
-reviewed alongside ARCH-REVIEW-003 (Milestone 3 blindspot inventory). No renewal
-triggers fired at acceptance — all five decisions are new architecture with no
-prior implementation. ARCH-REVIEW-003 immediate findings BI3-I-01 and BI3-I-02
-are addressed structurally by ADR-005 Decision 1 (`MultiFrameworkOutput.ia1_disclosure`
-required constructor argument) and Decision 2 (envelope version increment policy
-required before M4 module wiring). Implementation agents must not begin any Decision
-implementation until ARCH-REVIEW-003 Issues #144 and #145 are resolved. License
-Status: CURRENT. Next scheduled review at Milestone 4 completion.
+**Last Reviewed:** 2026-04-26 — Milestone 4 exit review. All four ADR-005
+decisions implemented and verified: Decision 1 (DemographicModule, PR #183),
+Decision 2 (MultiFrameworkOutput API, PR #177), Decision 3 (MDA threshold
+system, PR #181), Decision 4 (radar chart dashboard, PR #185). No renewal
+triggers fired during implementation. `MeasurementFramework` taxonomy unchanged;
+`CohortSpec` segmentation axes unchanged (three axes: IncomeQuintile ×5,
+AgeBand ×5, EmploymentSector ×4 = 100 cohorts); `MDASeverity` enum unchanged.
+API smoke test 30/30 PASS. Manual smoke test passed. License renewed for
+Milestone 5. The M5 extension points flagged in this ADR (additional cohort
+axes, backtesting integration for HCL outputs, snapshot performance at scale,
+viewport synchronization) remain as documented deferred items. Next scheduled
+review at Milestone 5 completion.
+
+**Previously reviewed:** 2026-04-24 — Engineering Lead accepted at M4 boundary.
+ADR-005 reviewed alongside ARCH-REVIEW-003. All five decisions defined as new
+architecture; no renewal triggers fired at acceptance. License Status set to
+CURRENT. ARCH-REVIEW-003 findings BI3-I-01 and BI3-I-02 addressed structurally
+by Decision 1 and Decision 2.
 
 **Renewal Triggers** — any of the following fires the ACCEPTED → UNDER-REVIEW transition when Accepted:
 - `MeasurementFramework` taxonomy modified in any standards document or ADR amendment (adds, removes, or renames a framework value)

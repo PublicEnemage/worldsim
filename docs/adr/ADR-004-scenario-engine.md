@@ -6,21 +6,28 @@ Accepted
 ## Validity Context
 
 **Standards Version:** 2026-04-21
-**Valid Until:** Milestone 4 completion
+**Valid Until:** Milestone 5 completion
 **License Status:** CURRENT
 
 **Engineering Lead accepted 2026-04-21.** Architecture decisions reviewed and
 approved. Implementation may proceed.
 
-**Last Reviewed:** 2026-04-24 — Milestone 3 exit review. No renewal triggers
+**Last Reviewed:** 2026-04-26 — Milestone 4 exit review. No renewal triggers
+fired during Milestone 4. License Status confirmed CURRENT. The `modules_config`
+field on `ScenarioConfigSchema` (ADR-004 Decision 2 extension for DemographicModule
+activation) is a backward-compatible additive change — existing snapshot format,
+advance protocol, and backtesting contracts are unaffected. The `events_snapshot`
+JSONB column added to `scenario_state_snapshots` (MDA threshold system) is additive
+— snapshot v2 envelope format from SCAN-015 accommodates it. engine_version gap
+(Issue #139) remains a documented known limitation; verifiable pointer mechanism
+deferred to Milestone 5. License renewed for Milestone 5. Next scheduled review
+at Milestone 5 completion.
+
+**Previously reviewed:** 2026-04-24 — Milestone 3 exit review. No renewal triggers
 fired during Milestone 3. License Status confirmed CURRENT. All five decisions
 implemented and verified by SCAN-013 (comparative scenario output, 0
-violations) and SCAN-014 (M3 exit gate, 59 files, 0 violations). The
-engine_version gap (engine_version is a declaration, not a verifiable pointer
-— see Known Limitation under Decision 1 Amendment) is tracked in Issue #139
-as a documented known limitation; it does not constitute a renewal trigger at
-this stage because the verifiable pointer mechanism is M4 scope. Next
-scheduled review at Milestone 4 completion.
+violations) and SCAN-014 (M3 exit gate, 59 files, 0 violations). engine_version
+gap tracked in Issue #139 as documented known limitation.
 
 **Renewal Triggers** — any of the following fires the CURRENT → UNDER-REVIEW
 transition:
