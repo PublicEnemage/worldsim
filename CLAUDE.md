@@ -68,9 +68,8 @@ progression, community contribution pathways.
 
 ### Core Metaphor: The Flight Simulator
 
-The tool is explicitly designed around aviation's approach to high-stakes
-decision-making under uncertainty. Key concepts from aviation that shape both
-the simulation engine and the user interface:
+The tool is designed around aviation's approach to high-stakes decision-making
+under uncertainty. The primary instrument framework:
 
 **Situational Awareness (Endsley's Three Levels)**
 - Level 1 Perception: What are current indicator states?
@@ -80,82 +79,38 @@ the simulation engine and the user interface:
 The tool is primarily a Level 2 and Level 3 instrument. Data display is the
 minimum. Pattern recognition and trajectory projection are the mission.
 
-**Failure Mode Architecture**
-Three distinct failure modes from aviation map to sovereign governance failures
-and must be explicitly modeled:
+### Failure Mode Architecture
 
-*The Spin (Compounding Feedback with Narrow Recovery Window)*
-Self-sustaining deterioration where standard responses accelerate the problem.
-Historical analogs: sovereign debt spirals, hyperinflation cascades, ethnic
-conflict autorotation. The simulation tracks recovery envelope — how much
-fiscal space, reserve capacity, political capital, and time remains for the
-recovery maneuver. When the recovery envelope closes, the simulation flags it
-explicitly.
+Six failure modes from aviation map to sovereign governance failures and are
+explicitly modeled:
 
-*Coffin Corner (Convergence of Constraints)*
-The operating envelope narrows through individually rational decisions until
-no policy response is available that doesn't cross a binding constraint.
-The simulation tracks Policy Maneuver Margin continuously — a composite of
-remaining policy degrees of freedom. Displayed as a primary indicator with
-trend vector. Historical analogs: Thailand 1997, Greece 2010, Lebanon 2019.
+**The Spin** — Self-sustaining deterioration where standard responses accelerate
+the problem. Diagnostic: Recovery Envelope (remaining fiscal space, reserves,
+political capital, time before the corrective maneuver window closes).
 
-*Hypoxia (Impaired Judgment Without Awareness of Impairment)*
-The instrument that does the detecting and responding is itself compromised.
-Modeled through an Institutional Cognitive Integrity Index — composite of
-press freedom, leadership insularity, technocratic independence, dissent
-tolerance, and policy-reality divergence. Degrades policy response
-effectiveness in the simulation. Historical analogs: Soviet planning apparatus
-1980s, regulatory capture pre-2008 financial crisis.
+**Coffin Corner** — The operating envelope narrows through individually rational
+decisions until no policy response avoids a binding constraint. Diagnostic:
+Policy Maneuver Margin (composite of remaining policy degrees of freedom),
+displayed as a primary indicator with trend vector.
 
-**Backside of the Power Curve (Counterintuitive Control Response)**
-Regime-dependent relationships where the sign of the effect inverts beyond a
-threshold. The simulation models these explicitly — not single functions but
-regime-dependent functions with bifurcation points. Examples: fiscal
-multiplier inversion under depressed conditions, currency defense effectiveness
-reversal as reserves deplete, security dilemma escalation beyond a threshold.
+**Hypoxia** — The decision instrument itself is compromised without awareness
+of impairment. Diagnostic: Institutional Cognitive Integrity Index (press
+freedom, leadership insularity, technocratic independence, dissent tolerance,
+policy-reality divergence).
 
-**Get-There-Itis (Commitment Overriding Situational Assessment)**
-The simulation monitors for policy trajectory commitment escalation — when
-continued adherence to a plan shows signs of sunk cost reasoning rather than
-genuine ongoing assessment. The clean-slate question is surfaced explicitly:
-if encountering these conditions today with no prior commitment, would this
-path be chosen?
+**Backside of the Power Curve** — Regime-dependent relationships where the sign
+of the effect inverts beyond a threshold: fiscal multiplier inversion under
+depressed conditions, currency defense reversal as reserves deplete, security
+dilemma escalation beyond a threshold.
 
-**The CB Cloud (Asymmetric Visibility)**
-Decision-makers see policy from the trailing edge — the reasoning, intention,
-carefully considered tradeoffs. Affected populations see it from the leading
-edge — the consequences. The human cost ledger is the weather radar that shows
-the leading edge structure to those flying from behind.
+**Get-There-Itis** — Commitment escalation overriding situational assessment.
+The clean-slate question is surfaced explicitly: if encountering these conditions
+today with no prior commitment, would this path be chosen?
 
----
-
-## Architecture Decisions
-
-### Technology Stack
-
-**Backend Simulation Engine**
-- Python (FastAPI) — scientific ecosystem for simulation mathematics
-- NumPy, Pandas for numerical computation
-- NetworkX for dependency graph modeling
-- xarray for climate/geospatial time-series data (NetCDF format)
-
-**Database**
-- PostgreSQL with PostGIS extension — spatially-aware data storage
-- Redis — real-time simulation state during active runs
-
-**Frontend**
-- React with MapLibre GL — map as hero element
-- The map is not decorative. It is the primary interface.
-
-**Infrastructure**
-- AWS (ECS for long-running simulations, Lambda for request-scoped)
-- AWS CDK for infrastructure as code — committed to the same repo
-- GitHub Actions for CI/CD
-
-**Development**
-- Claude Code for AI-assisted development with agent team workflow
-- All tasks managed through GitHub Issues and GitHub Projects
-- Everything lives in GitHub — code, tasks, documentation, CI/CD
+**The CB Cloud** — Asymmetric visibility: decision-makers see policy from the
+trailing edge (intent, tradeoffs); affected populations see it from the leading
+edge (consequences). The human cost ledger is the weather radar for the leading
+edge.
 
 ### Simulation Architecture
 
@@ -174,72 +129,36 @@ theory of the world.
 - Level 5: Key institutional actors (central bank, finance ministry, military)
 - Level 6: Individual archetypes (future / Agent-Based Modeling territory)
 
-Resolution is configurable per simulation run. Start with Level 1 globally.
-Activate higher resolution for specific regions when the question demands it.
+Resolution is configurable per simulation run.
 
 **Adaptive Temporal Resolution**
-Default: annual or monthly timesteps for structural dynamics.
-Auto-switch to finer resolution when crisis threshold is detected in a
-subsystem. A currency crisis runs at daily resolution while the rest of
-the world continues at monthly. Reverts when crisis resolves.
+Default: annual or monthly timesteps for structural dynamics. Auto-switches to
+finer resolution when a crisis threshold is detected in a subsystem — a currency
+crisis runs at daily resolution while the rest of the world continues at monthly.
 
 **Variable Resolution Simulation**
-"Run this scenario at Level 1 globally, Level 2 for Middle East, Level 3
-for Saudi Arabia specifically." This is a first-class architectural feature,
-not a future enhancement.
+"Run this scenario at Level 1 globally, Level 2 for Middle East, Level 3 for
+Saudi Arabia specifically." This is a first-class architectural feature.
 
 ### Key Simulation Modules
 
 Each module is a discrete component with defined interfaces to the event
 propagation system. Modules plug into the core graph — they do not replace it.
 
-**Geopolitical Module**
-Alliance relationships, territorial disputes, military capability indices,
-diplomatic channel quality, information environment integrity.
+| Module | Domain scope | Status |
+|---|---|---|
+| Geopolitical | Alliance relationships, territorial disputes, military capability, diplomatic channels | Planned |
+| Macroeconomic | GDP, inflation, fiscal balance, debt, monetary policy, regime-dependent multipliers | M5 scope |
+| Trade and Currency | Bilateral trade flows, tariffs, exchange rates, reserve composition, current account | Planned |
+| Monetary System | Reserve currency dynamics, SWIFT/CIPS membership, sovereign debt holdings matrix | Planned |
+| Capital Flow | FDI, portfolio flows, profit repatriation, illicit financial flows | Planned |
+| National Asset Registry | Public asset inventory, foreign ownership (HHI) by sector, Sovereign Resilience Floor | Planned |
+| Demographic and Health | Population by cohort, health capacity, migration, education attainment | M4 (partial) |
+| Climate | Climate forcing (IPCC SSP/RCP), agricultural stress, water stress, extreme events | Planned |
+| Financial Warfare | Currency attack vulnerability, sanctions exposure, attack surface composite | Planned |
+| Institutional Cognition | Institutional Cognitive Integrity Index, policy-reality divergence, ghost flight | M7 scope |
 
-**Macroeconomic Module**
-GDP, growth rate, inflation, interest rates, fiscal balance, debt levels
-and structure, monetary policy rules, fiscal multipliers (regime-dependent).
-
-**Trade and Currency Module**
-Bilateral trade flows, tariff schedules, trade agreement membership,
-exchange rate dynamics, reserve currency composition, current account.
-
-**Monetary System Module**
-Global reserve currency basket dynamics, payment network membership
-(SWIFT/CIPS), sovereign debt holdings matrix, currency confidence indices,
-petrodollar and de-dollarization dynamics.
-
-**Capital Flow Module**
-Foreign direct investment by sector and source country, portfolio flows,
-profit repatriation, transfer pricing gap estimates, illicit financial flows.
-
-**National Asset Registry**
-Public asset inventory by sector, foreign ownership percentage and
-concentration (HHI) by sector, sovereign resilience floor thresholds,
-privatization history and trajectory, reversibility assessment.
-
-**Demographic and Health Module**
-Population by cohort, birth and mortality rates, doctor-to-population ratio,
-health system capacity, migration flows, urbanization rate, education
-attainment by cohort.
-
-**Climate Module**
-Climate forcing from IPCC scenario data (SSP/RCP), El Niño/La Niña ENSO
-forcing, agricultural stress indices, water stress by watershed, extreme
-event frequency and intensity, infrastructure destruction probability.
-Consumes pre-computed climate time series — does not do climate science.
-Data sources: ERA5 reanalysis, NOAA, UK Met Office, Copernicus.
-
-**Financial Warfare Module**
-Currency attack vulnerability index, sanctions exposure, SWIFT dependency,
-cyber infrastructure vulnerability, information environment manipulation
-susceptibility. Attack surface composite scoring. Defense protocol library.
-
-**Institutional Cognition Module**
-Institutional Cognitive Integrity Index, policy-reality divergence tracking,
-ghost flight detection (institution executing last programmed heading while
-no longer genuinely responsive to environment).
+Full capability status: `docs/scenarios/module-capability-registry.md`
 
 ### Multi-Currency Measurement
 
@@ -255,10 +174,9 @@ The dashboard displays all simultaneously. A radar chart shows the full
 multi-dimensional profile. Deformation in any dimension is visible regardless
 of performance in others.
 
-User-defined weighting is supported — different users legitimately weight
-dimensions differently. But threshold alerts fire regardless of user weighting
-when any dimension crosses below a critical floor. No aggregate score can
-hide a catastrophic failure in a single dimension.
+User-defined weighting is supported. But threshold alerts fire regardless of
+user weighting when any dimension crosses below a critical floor. No aggregate
+score can hide a catastrophic failure in a single dimension.
 
 **Minimum Descent Altitudes**
 Hard floors below which the simulation flags terrain — levels below which
@@ -270,78 +188,22 @@ The simulation does not recommend pathways that cross below them.
 
 ## Key Use Cases
 
-### IMF/World Bank Loan Evaluation
-A country on the cusp of accepting or declining a loan evaluates the full
-conditionality package across a distribution of plausible futures. Not
-"can we service this debt under the base case" but "across the full scenario
-envelope, including plausible bad cases, what is the distribution of outcomes
-for both the macroeconomic position and the human cost ledger."
-
-Conditionality decomposition: which terms are mathematically load-bearing
-for debt sustainability and which are not? Which combinations create coffin
-corner configurations? What does the Policy Maneuver Margin look like under
-the proposed program over its duration?
-
-### Privatization Sovereign Resilience Assessment
-Evaluating asset sales under fiscal duress against the Sovereign Resilience
-Floor. Foreign ownership percentage and concentration (HHI) by strategic
-sector. The low water mark — the point below which the country has put the
-crown jewels on a firesale and crossed into sovereignty-impairing territory.
-Buyback trajectory under recovery scenarios.
-
-### Financial Attack Detection and Defense
-Continuous monitoring of Currency Attack Vulnerability Index and composite
-attack surface indicators. Early warning signatures calibrated against
-documented historical cases. Emergency defense protocol library — the
-sovereign equivalent of engine-out emergency landing procedures.
-
-### Scenario Exploration and Geopolitical Stress Testing
-User-defined scenarios with configurable variables, time acceleration,
-and comparative analysis. The Hormuz closure. Saudi petrodollar relaxation.
-De-dollarization tipping point dynamics. Sovereign debt as financial weapon.
-
-### Backtesting and Historical Calibration
-Run the simulation forward from historical baselines with injected known
-events. Compare outputs to historical record. Surface variables that were
-present, measurable, and consequential but were ignored in real-time
-decision-making. The Eureka function: not predicting the future but exposing
-the structure of the past.
-
-### Emergency Procedure Generation
-Country-specific, terrain-aware emergency procedures for anticipated failure
-modes. The sovereign equivalent of engine-out landing options and emergency
-descent profiles. Pre-computed when cognitive capacity is full. Available
-when the emergency makes computation impossible.
+- **IMF/World Bank Loan Evaluation** — Evaluate conditionality packages across scenario distributions; decompose which terms are mathematically load-bearing for debt sustainability; track Policy Maneuver Margin over program duration.
+- **Privatization Sovereign Resilience Assessment** — Evaluate asset sales against the Sovereign Resilience Floor; track foreign ownership concentration (HHI) by strategic sector; assess buyback trajectory under recovery scenarios.
+- **Financial Attack Detection and Defense** — Monitor Currency Attack Vulnerability Index; match signatures against documented historical cases; emergency defense protocol library.
+- **Scenario Exploration and Geopolitical Stress Testing** — User-defined scenarios with time acceleration and comparative output. Hormuz closure, petrodollar relaxation, de-dollarization tipping point dynamics.
+- **Backtesting and Historical Calibration** — Run forward from historical baselines with injected known events; surface variables that were present, measurable, and consequential but ignored in real-time. The Eureka function: structure of the past, not prediction of the future.
+- **Emergency Procedure Generation** — Country-specific, terrain-aware emergency procedures pre-computed when cognitive capacity is full; available when the emergency makes computation impossible.
 
 ---
 
 ## Data Sources
 
-**Economic and Financial**
-- World Bank Open Data — GDP, health, education, poverty (historical)
-- IMF Balance of Payments Statistics
-- BIS International Banking Statistics
-- UNCTAD FDI database
-- Tax Justice Network illicit flow estimates
+Approved sources by category: `docs/data-sources/approved-sources.md`
 
-**Geopolitical and Governance**
-- V-Dem (Varieties of Democracy) — institutional quality indicators
-- Freedom House — press freedom, political rights
-- Transparency International — corruption perception
-- GDELT Project — coded global events since 1979
-- Uppsala Conflict Data Program — armed conflict database
-
-**Climate and Physical**
-- ERA5 Reanalysis (Copernicus) — historical climate 1940-present
-- NOAA Climate Data Online
-- UK Met Office HadCRUT
-- IPCC Scenario Data (SSP/RCP) — future climate projections
-- FAO AQUASTAT — water resources data
-
-**Demographic and Health**
-- UN Population Division — historical and projected demographics
-- WHO Global Health Observatory
-- Our World in Data — aggregated cross-domain datasets
+All sources must be registered in `source_registry` before their data is
+loaded. Data quality tiers, provenance requirements, and backtesting integrity
+rules: `docs/DATA_STANDARDS.md`.
 
 ---
 
@@ -353,7 +215,7 @@ roles and operate against GitHub Issues as their task source.
 **Architect Agent**
 Produces system design documents, Architecture Decision Records (ADRs),
 and API contracts before implementation begins. No code is written for a
-significant feature without an ADR. Lives in `/docs/adr/`.
+significant feature without an ADR. Lives in `docs/adr/`.
 
 **Implementation Agents**
 Write feature code against contracts produced by the Architect Agent.
@@ -391,7 +253,6 @@ or financial attack surface modeling for dual-use concerns.
 **DevOps Agent**
 Manages CDK infrastructure, GitHub Actions pipeline configuration,
 environment consistency.
-
 
 **Socratic Agent**
 Role: Architecture teacher and comprehension validator.
@@ -473,103 +334,29 @@ Activation: "PM Agent: BRIEF", "PM Agent: TRIAGE — [issue or finding]",
 "PM Agent: HORIZON", "PM Agent: FOCUS — [question or context]"
 
 **Data Architect Agent**
-Role: Schema registry owner and JSONB contract enforcer.
-Purpose: Ensure that every agent accessing the database or simulation state
-types is operating against the correct, current schema — not stale mental
-models, hallucinated column names, or undocumented JSONB key structures.
-Guards against the class of silent bugs where code queries the right table
-but the wrong key and returns null without error.
+Role: Schema registry owner and JSONB contract enforcer. Guards against the
+class of silent bugs where code queries the right table but the wrong key and
+returns null without error.
 
-Responsibilities:
-
-SCHEMA: Own and maintain the schema registry at `docs/schema/`. Three
-authoritative files:
-- `docs/schema/database.yml` — all PostgreSQL tables, columns, types,
-  JSONB key structures, indexes, FK relationships, and critical query notes.
-- `docs/schema/api_contracts.yml` — all FastAPI endpoints: method, path,
-  request body, response body, status codes, and DB reads/writes.
-- `docs/schema/simulation_state.yml` — all Python simulation layer types:
-  dataclasses, enums, abstract classes, serialisation contracts.
-
-When any table column is added, removed, or renamed; when any JSONB key
-structure changes; when any API endpoint is added or its contract changes;
-when any simulation type is amended — the Data Architect Agent updates the
-relevant schema file in the same commit as the code change. Schema drift
-from code drift is a compliance violation.
-
-REVIEW: Before any implementation that writes a SQL query, reads a JSONB
-key, calls an API endpoint, or instantiates a simulation type, the Data
-Architect Agent is activated to confirm the schema contract. The activation
-is a reading exercise, not a gate: read the relevant section of the schema
-file, confirm the column names, JSONB keys, and type shapes, and proceed.
-The cost of a 30-second schema read is lower than the cost of a silent
-null-return bug.
-
-NAMING: Schema registry files use the naming convention:
-`docs/schema/{layer}.yml` where layer is `database`, `api_contracts`, or
-`simulation_state`. These three files are the complete registry. New files
-are added only when a genuinely new layer is introduced (e.g.
-`infrastructure.yml` for AWS CDK contracts). Do not create per-table or
-per-endpoint files — consolidation is the point.
+Owns and maintains `docs/schema/` (three authoritative files: `database.yml`,
+`api_contracts.yml`, `simulation_state.yml`). Updates the relevant schema file
+in the same commit as any code change that alters a table column, JSONB key
+structure, API endpoint, or simulation type. Schema drift from code drift is a
+compliance violation.
 
 Activation: `Data Architect: REVIEW — [query or type access description]`
 or `Data Architect: UPDATE — [what changed and which schema file to update]`
 
 **UI/Frontend Architect Agent**
-Role: Architectural authority for the React frontend layer.
-Purpose: Ensure the frontend remains coherent as it grows — components have
-clear responsibilities, state lives in the right place, data flows predictably,
-and contributors can understand the system without archaeology. Guards against
+Role: Architectural authority for the React frontend layer. Guards against
 the class of bugs that emerge when state management grows by accretion without
 an owner (the M4 EntityDetailDrawer race condition is the canonical example).
 
-Owns two categories of documents in `docs/frontend/`:
-
-Architecture documents (authoritative references for how the frontend works):
-- `component-architecture.md` — component tree, responsibilities, key constraints
-- `state-ownership.md` — which state lives where, transition contracts,
-  the currentStep resolution contract and its anti-patterns
-- `data-flow.md` — API endpoints consumed, async patterns, data shapes at
-  component boundaries
-- `ui-state-machine.md` — discrete application states, transitions, correctness
-  invariants that Playwright tests must enforce
-- `design-decisions.md` — significant design choices with rationale and
-  alternatives considered; the institutional memory for the frontend layer
-
-Standards documents (binding rules for contributors):
-- `CONTRIBUTING.md` — frontend PR checklist, stack overview, workflow
-- `component-standards.md` — file organization, props contracts, styling rules,
-  accessibility baseline, performance constraints
-- `testing-standards.md` — required test tools, coverage targets, Playwright
-  flows, anti-patterns from M4
-- `modularization-strategy.md` — current App.tsx-centric structure, planned M5
-  decomposition, longer-term extraction triggers
-- `microfrontend-roadmap.md` — explicit defer decision (no earlier than M7),
-  documented rationale, four trigger criteria for reconsideration
-
-Responsibilities:
-
-STANDARDS: Sets binding standards for frontend contributors. Standards apply
-from M5 onward; M4 legacy code is migrated progressively. Any contributor
-adding a frontend component, hook, or state variable must read the relevant
-standards documents before opening a PR.
-
-ARCHITECTURE: Owns modularization decisions. No component is extracted into a
-separate module, no state management library is adopted, no router is introduced
-without a UI/Frontend Architect Agent design decision documented in
-`design-decisions.md`. The criteria for these decisions are pre-stated in
-`modularization-strategy.md` and `microfrontend-roadmap.md` — the agent applies
-the criteria, it does not invent new criteria case-by-case.
-
-REVIEW: Before any implementation that adds state, changes a component's API,
-adds a new API endpoint consumption, or modifies an async data flow, the
-UI/Frontend Architect Agent confirms that the relevant architecture document
-is current. If the document is stale, it is updated in the same commit as
-the code change. Architecture drift from code drift is a compliance violation.
-
-UPDATE: After any significant frontend change — new component, new state,
-new data flow, new design decision — the UI/Frontend Architect Agent updates
-the relevant docs/frontend/ documents in the same commit as the code.
+Owns `docs/frontend/` (five architecture documents + five standards documents).
+Sets binding standards from M5 onward. No component extraction, state library
+adoption, or router introduction without a design decision in `design-decisions.md`.
+Updates frontend docs in the same commit as any architectural change — architecture
+drift from code drift is a compliance violation.
 
 Activation: `UI/Frontend Architect: REVIEW — [component or feature area]`
 or `UI/Frontend Architect: DESIGN — [decision to be made]`
@@ -584,350 +371,42 @@ never an afterthought.
 
 ## Domain Intelligence Council
 
-The Domain Intelligence Council is a panel of nine domain intelligence agents,
-each speaking for one measurement framework or cross-cutting analytical
-perspective. Council agents do not synthesise across frameworks — their role
-is to surface what their framework reveals and where the frameworks are in
-tension. That tension is the most important output of any council review.
-
-### Governing Principle
+A panel of nine domain intelligence agents, each speaking for one measurement
+framework or cross-cutting analytical perspective. Council agents do not
+synthesise across frameworks — their role is to surface what their framework
+reveals and where frameworks are in tension. Where all frameworks agree:
+higher confidence. Where they conflict: the result most requiring human judgment.
 
 The simulation architecture refuses to convert between measurement frameworks
-because that conversion embeds a political choice about whose interests matter
-more. The council exists to make the competing interests explicit and visible,
-not to adjudicate between them. That adjudication is a human decision —
+because that conversion embeds a political choice. The council makes competing
+interests explicit and visible. That adjudication is a human decision —
 specifically, the decision of the people who will live with the consequences.
 
-A result that all council frameworks agree on is more trustworthy. A result
-where financial sustainability and human development point in opposite
-directions is the result that most needs to be seen clearly. The council's
-job is to make that structure visible, not to collapse it into a recommendation.
-
-### Multi-Agent Scenario Review Protocol
-
-Before any significant simulation result is presented as meaningful, at least
-three domain intelligence agents should be activated to review it from their
-respective frameworks. The output of a council review is not a recommendation.
-It is a structured presentation of what each framework reveals and where the
-frameworks are in tension.
-
-Activation pattern: `[Agent Name]: [SCENARIO|CHALLENGE|VALIDATE] — [topic]`
-
-- **SCENARIO**: Describe what this framework predicts will happen and why.
-- **CHALLENGE**: Identify what this framework finds most concerning or most
-  likely to be wrong in the current simulation output or design assumption.
-- **VALIDATE**: Assess whether the simulation's output is consistent with
-  what this framework's empirical record would predict.
-
-### The Nine Council Agents
-
----
-
-**Development Economist Agent**
-Speaks for the human development framework.
-
-Profile: Grounded in Amartya Sen's capability approach, UNDP HDI methodology,
-and the empirical literature on what structural adjustment programs actually
-produced in terms of health, education, and poverty outcomes. Familiar with
-the distributional evidence from IMF conditionality programs, World Bank
-structural adjustment, and trade liberalisation shocks. Knows which cohorts
-bear the costs of macro stabilisation (rural populations, informal workers,
-women, children) and how capability losses compound across generations.
-
-Primary question: What happens to real people's capabilities across income
-cohorts? Not "does GDP grow" but "do the people at the bottom of the
-distribution have more or less capacity to lead flourishing lives?"
-
-Activation: `Development Economist: [SCENARIO|CHALLENGE|VALIDATE] — [topic]`
-
----
-
-**Political Economist Agent**
-Speaks for the governance framework.
-
-Profile: Understands political economy constraints, elite capture, democratic
-and authoritarian responses to economic stress, and the difference between
-technically optimal and politically feasible. Grounded in comparative political
-economy, public choice theory, and the historical record of when IMF programs
-succeeded and failed based on political legitimacy rather than technical design.
-Knows that a program that cannot survive an election has a shorter half-life
-than the adjustment it is trying to achieve.
-
-Primary question: Who has power here, how is it exercised, and what is actually
-achievable given that political reality? A technically correct policy that
-destroys the government implementing it is not a solution.
-
-Activation: `Political Economist: [SCENARIO|CHALLENGE|VALIDATE] — [topic]`
-
----
-
-**Ecological Economist Agent**
-Speaks for the ecological framework.
-
-Profile: Natural capital accounting, ecosystem services valuation, the
-distributional consequences of ecological degradation, and planetary boundary
-analysis. Grounded in the work of Daly, Costanza, and Raworth on steady-state
-economics and doughnut economics. Understands that GDP growth that liquidates
-natural capital is not wealth creation — it is wealth consumption booked as
-income. Knows which populations are most exposed to ecological degradation
-(coastal communities, agricultural smallholders, indigenous communities
-dependent on forest resources).
-
-Primary question: What is the natural capital balance sheet behind these
-economic flows, and who bears the ecological cost? A country that improves
-its debt-to-GDP ratio by liquidating its forests has not improved its position.
-
-Activation: `Ecological Economist: [SCENARIO|CHALLENGE|VALIDATE] — [topic]`
-
----
-
-**Geopolitical and Security Analyst Agent**
-Speaks for coercive dynamics that cut across all frameworks.
-
-Profile: Financial warfare, sanctions effects, debt leverage, the deliberate
-use of economic instruments for strategic ends, and balance of power dynamics.
-Familiar with the mechanics of sovereign debt as a geopolitical instrument,
-the structure of IMF programs in Cold War and post-Cold War contexts, the
-SWIFT exclusion playbook, and the literature on economic coercion. Sees
-every economic relationship as also a power relationship.
-
-Primary question: Who has leverage over whom, through what mechanisms, and
-how does that constrain the feasible policy space? A finance minister
-negotiating with the IMF is also negotiating with the geopolitical interests
-that fund the IMF. That context is not separate from the economics.
-
-Activation: `Geopolitical Analyst: [SCENARIO|CHALLENGE|VALIDATE] — [topic]`
-
----
-
-**Intergenerational Equity Advocate Agent**
-Speaks for future generations.
-
-Profile: Long-run natural capital accounting, human capital depletion,
-the mathematics of discounting and its systematic injustice to future people,
-and the analysis of irreversible thresholds. Grounded in the literature on
-intergenerational equity in fiscal policy (Auerbach generational accounts),
-environmental ethics, and climate economics. Acutely aware that decisions
-made under acute fiscal pressure systematically underinvest in children,
-education, and infrastructure because the costs of that underinvestment
-appear in decades, not quarters.
-
-Primary question: What are we leaving behind, and who will bear the consequences
-of decisions made today? A debt restructuring that saves the current generation's
-consumption at the cost of the next generation's education system has not solved
-the problem — it has transferred it forward in time to people with no voice.
-
-Activation: `Intergenerational Advocate: [SCENARIO|CHALLENGE|VALIDATE] — [topic]`
-
----
-
-**Community and Cultural Resilience Agent**
-Speaks for social fabric, traditional practices, community cohesion, and ways
-of life that resist monetisation.
-
-Profile: The anthropology and sociology of economic disruption, what rapid
-structural adjustment did to traditional communities, how social trust collapses
-and rebuilds, and how cultural continuity contributes to resilience in ways
-that GDP accounts cannot capture. Familiar with the research on social capital
-erosion following austerity programs (Stuckler and Basu on the body economic),
-the specific vulnerabilities of indigenous communities to trade liberalisation
-in agriculture and resource extraction, and the long timescales over which
-social fabric reconstruction occurs after it is broken.
-
-Primary question: What happens to the social fabric and to the cultural
-continuity of communities affected by these policies? A trade liberalisation
-that destroys the quinoa farmer's market while improving aggregate agricultural
-GDP has not improved anything for the quinoa farmer's community.
-
-Activation: `Community Resilience: [SCENARIO|CHALLENGE|VALIDATE] — [topic]`
-
----
-
-**Investment and Capital Formation Agent**
-Speaks for private capital, long-term investment, and growth opportunity.
-
-Profile: Experienced in frontier market private equity, development finance
-institutions, blended finance structures, and sovereign wealth fund strategy.
-Understands that risk-averse, harm-prevention-focused analysis can
-systematically undervalue the opportunity cost of inaction and the
-transformative potential of well-structured private investment. Knows the
-history of successful public-private partnerships in infrastructure,
-agriculture, and financial sector development in emerging markets. Familiar
-with IFC, MIGA, DFI blended finance instruments and how public de-risking can
-crowd in private capital at acceptable terms. Explicitly guards against
-groupthink toward excessive caution.
-
-Operates in three modes that must all be consulted:
-
-RISK-AVERSE: Capital preservation, ESG constraints, development finance
-institution lens.
-
-RISK-TOLERANT: Frontier market private equity lens, asymmetric return
-seeking, longer time horizons.
-
-CATALYTIC: What public de-risking instruments would attract private capital
-at acceptable terms, and what would those instruments cost the sovereign.
-
-Primary question: Where are the latent investment opportunities in this
-situation, what conditions would make them accessible to private capital, and
-what is the opportunity cost of the scenarios that foreclose them?
-
-Activation: `Investment Agent: [SCENARIO|CHALLENGE|VALIDATE] [RISK-AVERSE|RISK-TOLERANT|CATALYTIC] — [topic]`
-
----
-
-**Social Dynamics and Behavioral Economics Agent**
-Speaks for public sentiment, collective behavior, and the gap between rational
-actor models and actual human responses to economic change.
-
-Profile: Grounded in behavioral economics (Kahneman, Thaler), the sociology
-of economic crisis, political psychology of austerity, and the dynamics of
-information cascades and misinformation. Understands that populations do not
-respond to economic change as rational actors — loss aversion, present bias,
-anchor effects, and social proof all shape how policy is received and whether
-it survives. Knows the history of how information environments (including
-WhatsApp networks in Lebanon 2019, SMS cascades in bank runs) can accelerate
-crises faster than any official response. Models social legitimacy as a state
-variable that depletes under perceived unfairness and rebuilds slowly under
-demonstrated competence.
-
-Primary question: What does public sentiment look like across population
-segments, how is it likely to respond to these policy changes, and where are
-the social dynamics that could override technically correct control inputs
-through political backlash, social frenzies, or legitimacy collapse?
-
-Activation: `Social Dynamics: [SCENARIO|CHALLENGE|VALIDATE] — [topic]`
-
----
-
-**Chief Methodologist Agent**
-Speaks for statistical integrity, uncertainty quantification, and the
-mathematical honesty of the simulation's outputs.
-
-Profile: Quantitative social scientist with expertise in econometrics,
-statistical modeling, time series analysis, and the specific failure modes of
-economic models under stress (fat tails, correlation spikes, structural breaks,
-regime changes). Owns the standards for distribution selection, uncertainty
-quantification, correlation structure modeling, and model validation
-thresholds. Explicitly authorized to flag when a simulation output is being
-presented with more confidence than the methodology supports — this flag must
-be visible to users. Knows that normal distributions systematically
-underestimate crisis probability, that correlations between normally
-independent variables spike toward 1 under stress, and that models calibrated
-on peacetime data fail precisely when they are most needed.
-
-Primary question: Are we using the right statistical framework for this
-phenomenon, are the uncertainty bounds honest, and is this output being
-presented with appropriate epistemic humility?
-
-Activation: `Chief Methodologist: [SCENARIO|CHALLENGE|VALIDATE] — [topic]`
-
----
-
-### Operational Agents
-
-Operational agents coordinate across the Domain Intelligence Council and
-translate council outputs into development action. They do not speak for a
-measurement framework — they ensure the council functions effectively and
-that what the council finds missing gets built.
-
----
-
-**Council Orchestrator and Roadmap Owner**
-
-Operates in two modes:
-
-ORCHESTRATE: Activates each Domain Intelligence Council member when a new
-scenario runs, compiles their perspectives into a structured Council Briefing
-document, explicitly flags the key tensions between frameworks (where they
-agree = higher confidence signal, where they conflict = requires human
-judgment), and ensures no framework perspective has been omitted before
-results are presented. Never resolves tensions — only surfaces them with
-clarity.
-
-ROADMAP: Translates council inputs and user needs into development priorities,
-maps identified gaps in council reviews onto the technical milestone roadmap,
-proposes new GitHub Issues for capability gaps identified by council members,
-and ensures the development roadmap reflects the full spectrum of what the
-council needs to do its work. The person best positioned to define what should
-be built next is the person who has just heard what every domain perspective
-found missing.
-
-Activation: `Council Orchestrator: ORCHESTRATE — [scenario name]` or
-`Council Orchestrator: ROADMAP — [gap or need identified]`
-
----
-
-**Architecture Review Facilitator**
-
-Activated specifically for structured architecture reviews where all council
-members review the simulation architecture from their perspective. Facilitates
-the review by: activating each council member with the CHALLENGE activation
-mode against the current architecture documentation (ADRs, module capability
-registry, CLAUDE.md), compiling their architectural blindspot findings into a
-structured Architecture Review Report saved to `docs/architecture/reviews/`,
-converting identified blindspots into GitHub Issues with appropriate labels,
-and producing a summary that distinguishes between blindspots that affect
-current Milestone 1 scope (immediate), blindspots that affect Milestone 2-3
-design decisions (near-term), and blindspots that are long-term architectural
-considerations.
-
-Activation: `Architecture Review: FULL — [scope description]` or
-`Architecture Review: TARGETED — [specific module or concern]`
+**Activation pattern:** `[Agent Name]: [SCENARIO|CHALLENGE|VALIDATE] — [topic]`
+Full agent profiles and operational agent definitions: `docs/agents/domain-intelligence-council.md`
+
+| Agent | Speaks for | Activation |
+|---|---|---|
+| Development Economist | Human development; Sen capability; HDI; distributional effects on cohorts | `Development Economist:` |
+| Political Economist | Governance; political feasibility; elite capture; democratic legitimacy | `Political Economist:` |
+| Ecological Economist | Natural capital; planetary boundaries; ecological cost distribution | `Ecological Economist:` |
+| Geopolitical Analyst | Coercive dynamics; financial warfare; sanctions; debt leverage | `Geopolitical Analyst:` |
+| Intergenerational Advocate | Future generations; irreversible thresholds; discounting injustice | `Intergenerational Advocate:` |
+| Community Resilience | Social fabric; traditional practices; community cohesion | `Community Resilience:` |
+| Investment Agent | Private capital; growth opportunity; RISK-AVERSE / RISK-TOLERANT / CATALYTIC | `Investment Agent: [mode]` |
+| Social Dynamics | Public sentiment; collective behavior; legitimacy cascades | `Social Dynamics:` |
+| Chief Methodologist | Statistical integrity; uncertainty quantification; distributional honesty | `Chief Methodologist:` |
+
+**Operational agents:**
+- **Council Orchestrator** — `Council Orchestrator: ORCHESTRATE — [scenario]` or `Council Orchestrator: ROADMAP — [gap]`
+- **Architecture Review Facilitator** — `Architecture Review: FULL — [scope]` or `Architecture Review: TARGETED — [module]`
 
 ---
 
 ## What We Are Building First
 
-**Milestone 0 — Foundation (Complete)**
-- Repository structure established
-- CLAUDE.md in place
-- Technology stack installed and verified
-- First Architecture Decision Record written: simulation core data model
-- CI/CD pipeline skeleton in GitHub Actions
-
-**Milestone 1 — Simulation Core (Complete — v0.1.0)**
-- Country entity data model with Level 1 attributes
-- Basic event propagation graph
-- Annual timestep engine
-- Real country data verified through `scripts/demo_scenario.py` using IMF WEO
-  Oct 2024, World Bank WDI 2024, World Bank WGI 2023, and UN Comtrade 2023
-  (a persistent database seed loader requires PostGIS infrastructure and is
-  Milestone 2 scope)
-- No UI — verify simulation logic through tests and CLI output
-- ADR-001 (simulation core data model) and ADR-002 (input orchestration): CURRENT
-
-**Milestone 2 — Geospatial Foundation (Complete — v0.2.0)**
-- PostGIS database with country boundary GeoJSON (Natural Earth)
-- FastAPI layer serving country data
-- MapLibre GL frontend rendering one variable as choropleth
-- The map works. One variable. No scenarios yet.
-- ADR-003 (geospatial foundation): CURRENT
-
-**Milestone 3 — Scenario Engine (Complete — v0.3.0)**
-- User-defined scenario configuration with ScenarioPanel UI
-- Time acceleration controls (POST /advance)
-- Comparative scenario output (GET /compare, DeltaChoropleth)
-- Greece 2010–2012 backtesting fixture passing DIRECTION_ONLY thresholds in CI
-- Scenario selector UI: users can create scenarios, advance step by step,
-  and see the choropleth update live in the browser
-- ADR-004 (scenario engine) and ADR-005 (human cost ledger): CURRENT
-- Standards reviews STD-REVIEW-001, STD-REVIEW-002, STD-REVIEW-003 complete
-
-**Milestone 4 — Human Cost Ledger (Complete — v0.4.0)**
-- Cohort-level demographic module (DemographicModule, CohortSpec, CohortElasticity)
-- Multi-framework measurement output (financial, human development,
-  ecological, governance) — GET /scenarios/{id}/measurement-output
-- Minimum Descent Altitude threshold system (MDAChecker, events_snapshot)
-- Radar chart dashboard displaying all dimensions simultaneously
-  (EntityDetailDrawer, RadarChart, FrameworkPanel, MDAAlertPanel)
-- API smoke test 30/30 PASS confirmed 2026-04-26
-- M4 hard gates from STD-REVIEW-003: measurement_framework tagging rule in
-  CODING_STANDARDS.md (Issue #171), academic literature citation format in
-  DATA_STANDARDS.md (Issue #172), Known Limitation IA-1 section in
-  DATA_STANDARDS.md before first M4 projection output (Issue #174)
-- ADR-001 through ADR-005: CURRENT (renewed 2026-04-26)
-- SCAN-018: Clean — 68 files, 0 violations, 2 pre-accepted warnings
+M0–M4 complete (v0.1.0–v0.4.0). ADRs 001–005 current. See GitHub Releases
+for full delivery history.
 
 **Milestone 5 — Calibration and Uncertainty (Current)**
 - Distribution outputs replacing point estimates — every simulation output
@@ -936,8 +415,7 @@ Activation: `Architecture Review: FULL — [scope description]` or
 - Historical calibration against Greece 2010–2012 and at least one
   additional country case at MAGNITUDE_WITHIN_20PCT threshold
 - Playwright integration test suite covering the full scenario advance
-  and EntityDetailDrawer flow (required by M4 retrospective — see
-  Milestone Retrospective Process below)
+  and EntityDetailDrawer flow (required by M4 retrospective — hard gate)
 - Macroeconomic Module initial implementation (GDP, inflation, fiscal
   balance with regime-dependent multipliers)
 - ADR-006 (uncertainty quantification and distribution outputs): required
@@ -948,13 +426,9 @@ not infrastructure waiting for features.
 
 ---
 
-## Milestone Roadmap — M5 through M8
+## Milestone Roadmap
 
-This roadmap records committed scope and explicit dependencies between
-milestones. It is not a feature backlog — each entry is a vertical slice
-that must be demonstrably working at milestone close.
-
-**Milestone 5 — Calibration and Uncertainty**
+**Milestone 5 — Calibration and Uncertainty (Current)**
 Core deliverable: Simulation outputs become distributions, not point
 estimates. Users see uncertainty explicitly.
 
@@ -974,65 +448,10 @@ Scope:
 Dependencies: ADR-001 (Quantity type must accommodate distributions),
 ADR-005 (composite scores become distribution-aware)
 
-**Milestone 6 — Backtesting Coverage Expansion**
-Core deliverable: Backtesting suite covers at least five historical cases
-with documented fidelity thresholds per case.
-
-Scope:
-- Five historical cases minimum: Greece 2010–2012 (existing),
-  Argentina 2001–2002, Thailand 1997, Lebanon 2019–2020, and one
-  additional case chosen by Engineering Lead at M6 start
-- MAGNITUDE_WITHIN_20PCT threshold enforced in CI for all five cases
-- Backtesting fidelity dashboard visible in the UI (pass/fail per case,
-  per module, per indicator)
-- Ecological Module initial implementation (climate forcing integration
-  from pre-computed ERA5 reanalysis data)
-- Governance Module initial implementation (institutional quality indices,
-  press freedom, policy-reality divergence)
-
-Dependencies: Milestone 5 (Macroeconomic Module must exist before
-multi-module backtesting is meaningful), ADR-005 ecological/governance
-framework implementations
-
-**Milestone 7 — Ecological and Governance Frameworks**
-Core deliverable: Ecological and governance composite scores become
-non-null. The radar chart shows all four dimensions with real data.
-
-Scope:
-- Ecological Module complete: planetary boundary proximity, agricultural
-  stress, water stress by watershed, natural capital depletion rate
-- Governance Module complete: Institutional Cognitive Integrity Index,
-  policy-reality divergence tracking, ghost flight detection
-- All four radar chart axes showing real composite scores for any
-  scenario with sufficient data
-- Coffin Corner indicator implemented: Policy Maneuver Margin composite
-  tracking remaining degrees of freedom
-- MDA threshold system extended to ecological and governance indicators
-
-Dependencies: Milestone 6 (backtesting infrastructure must exist to
-validate ecological and governance modules), ADR-005 Decisions 5 and 6
-(ecological and governance module contracts — to be written at M7 entry)
-
-**Milestone 8 — Methodology Publication and External Validation**
-Core deliverable: The simulation's methodology is publicly documented
-and validated by at least one external domain reviewer.
-
-Scope:
-- Methodology paper: full documentation of every model relationship,
-  every assumption, every calibration decision, and every known limitation
-- External domain review: at least one development economist or sovereign
-  debt specialist reviews the methodology and signs off on the human
-  development framework implementation
-- docs/POLICY.md updated to reflect all methodology positions taken
-  through M7, with the external reviewer's name and affiliation
-- Technical Steering Committee formation initiated (first institutional
-  user engagement sought)
-- Public launch preparation: README, CONTRIBUTING.md, and POLICY.md
-  written for external contributors, not just internal agents
-
-Dependencies: Milestones 5–7 (methodology cannot be published before
-the core modules are implemented and validated); external reviewer
-recruited no later than M7 midpoint
+**M6 through M8:** `docs/roadmap/milestone-roadmap-m6-m8.md`
+- M6: Backtesting coverage expansion (five historical cases, Ecological and Governance Modules initial)
+- M7: Ecological and Governance Frameworks complete; all four radar axes live
+- M8: Methodology publication and external validation; Technical Steering Committee
 
 ---
 
@@ -1078,50 +497,32 @@ under these standards without being reminded. Reading them is part of session
 initialization, not something that happens when a human asks.
 
 **`docs/CODING_STANDARDS.md`**
-Python code style (Ruff configuration, type hints, Google-style docstrings),
-naming conventions, testing requirements (unit, integration, backtesting),
-diagram standards (Mermaid, mandatory per ADR), commit message format
-(Conventional Commits), ADR requirements, and agent team workflow standards.
-Key contracts: Decimal not float for all monetary arithmetic, no bare except,
-every public method has a test, human cost ledger outputs tested explicitly.
+Python style, testing requirements, ADR standards, commit format (Conventional
+Commits), diagram standards (Mermaid, mandatory per ADR). Key contracts:
+`Decimal` not `float` for all monetary arithmetic; every public method has a
+test; human cost ledger outputs tested explicitly.
 
 **`docs/DATA_STANDARDS.md`**
-Encoding (UTF-8 everywhere, conversion first), language (English canonical,
-translation keys only in simulation layer), datetime (UTC storage, ISO 8601,
-IANA timezones), calendar support architecture (CalendarService, Gregorian +
-Islamic Hijri + Solar Hijri + Hebrew + Ethiopian), fiscal year registry,
-seasonal data standards (SeasonalContext, hemisphere-aware, FAO crop calendar),
-units and measurements (Quantity type, Decimal, canonical units, dimensional
-safety), currency standards (MonetaryValue type, constant 2015 USD canonical,
-PPP vs. market rate assignment, exchange rate regime awareness), data quality
-tier system (five tiers with documented confidence impact), data lineage
-tracking, backtesting integrity (vintage dating required), and political and
-territorial nomenclature (ISO 3166-1 alpha-3, disputed territory framework,
-specific positions on Taiwan/Palestine/Kosovo/Western Sahara/Crimea).
+Data encoding, calendar support, units, currency standards, quality tier system,
+data lineage, backtesting integrity. Key contracts: ISO 3166-1 alpha-3 entity
+IDs; declared positions on Taiwan/Palestine/Kosovo/Western Sahara/Crimea;
+vintage dating required for all backtesting inputs.
 
 **`docs/CONTRIBUTING.md`**
-Development environment setup, architecture understanding requirements before
-contributing (CLAUDE.md + ADR-001 + CODING_STANDARDS.md), agent team workflow,
-contribution workflow (branch naming, PR format, review process), standards
-compliance requirements, human cost ledger requirement, adding data sources,
-adding simulation modules, adding backtesting cases, multilingual contribution
-process, and code of conduct.
+Development setup, agent workflow, PR format, review process. Key contract:
+read CLAUDE.md + ADR-001 + CODING_STANDARDS.md before first contribution.
 
 **`docs/POLICY.md`**
-WorldSim's public policy transparency statement: governing philosophy,
-territorial and nomenclature positions with rationale, data source selection
-philosophy, economic methodology positions (constant 2015 USD, PPP vs. market
-rates), what the simulation claims and does not claim, human cost ledger
-methodology and known limitations, backtesting integrity position, declared
-blindspots, dual-use position, and challenge/correction process.
+Public methodology transparency: territorial positions with rationale, what
+the simulation claims and does not claim, dual-use position, challenge/correction
+process.
 
 **Compliance scan registry (`docs/compliance/scan-registry.md`)**
 SCAN entries must always be appended at the end of the scan registry table.
 Never insert a new entry mid-table. After adding a new entry, verify that the
 table reads in ascending SCAN number order before committing. This rule exists
-because mid-table insertions (via str_replace or Edit tool anchoring on an
-existing row) have caused ordering inversions twice — Issue #133 documents the
-recurring pattern.
+because mid-table insertions have caused ordering inversions twice — Issue #133
+documents the recurring pattern.
 
 **Schema registry (`docs/schema/`)**
 Any agent writing a SQL query, reading a JSONB key, calling an API endpoint,
@@ -1166,33 +567,12 @@ exist.
 
 ### Intended Governance Progression
 
-**Stage 1 — Immediate (current milestone)**
-Branch protection on `main` requiring at least one approving review before
-merge. CODEOWNERS file in place. The single-principal limitation is documented
-and declared rather than hidden.
-
-**Stage 2 — Second governance account**
-A second GitHub account with merge authority and exception approval capability
-for the paths in CODEOWNERS that require it (simulation engine core, docs,
-.github). This account may be a trusted collaborator or a secondary maintainer
-account. Once this is in place, the audit trail has genuine independence for
-Major and Critical exception approvals.
-
-**Stage 3 — First external domain reviewer**
-When the first complete simulation module (Macroeconomic or Geopolitical)
-is implemented and published, recruit at least one external domain reviewer
-with expertise in the relevant field — a development economist, a sovereign
-debt specialist, or a comparable domain expert. This reviewer has no
-implementation authority but has review authority over the methodology
-documented in ADRs and the human cost ledger outputs.
-
-**Stage 4 — Technical Steering Committee**
-When the first institutional user engages with WorldSim — a finance ministry,
-a civil society organization, a research institution — convene a Technical
-Steering Committee with representation from: the Engineering Lead, at least
-one domain expert, and at least one representative of the user community.
-The TSC has authority over policy positions (documented in `docs/POLICY.md`),
-the economic methodology positions, and the dual-use framework.
+| Stage | Trigger | What changes |
+|---|---|---|
+| 1 — Immediate | Current milestone | Branch protection on `main`; CODEOWNERS in place; single-principal limitation declared |
+| 2 — Second governance account | On demand | Second GitHub account with merge and exception-approval authority for engine core, docs, `.github` |
+| 3 — First external domain reviewer | First complete module published | Domain expert with review authority over methodology; no implementation authority |
+| 4 — Technical Steering Committee | First institutional user engagement | TSC authority over policy positions, methodology, and dual-use framework |
 
 ### Audit Trail Integrity Rule
 
@@ -1249,77 +629,12 @@ example of what this rule prevents.
 
 ## GitHub Label Reference
 
-The following labels exist in the WorldSim repository. Use only these labels
-when filing issues or pull requests. **Do not invent new labels.** If a
-required label is missing from this list, use the closest existing label and
-add a comment to the issue explaining which label would be more precise and
-why. File a note in the PR description if a label gap is blocking correct
-categorisation — do not silently use a mismatched label.
-
-### Workflow / Priority Labels
-
-| Label | Description | When to use |
-|---|---|---|
-| `horizon:immediate` | Current milestone scope | Work that must complete before current milestone closes |
-| `horizon:near-term` | Next 2–3 milestones | Real work, committed timeline, not now |
-| `horizon:long-term` | Future, no committed timeline | Architectural vision; no implementation scheduled |
-
-**Choosing between horizon labels:** If the work blocks current milestone
-exit criteria → `horizon:immediate`. If it affects design decisions for the
-next 2–3 milestones but is not a current blocker → `horizon:near-term`.
-If it is important but has no path to implementation in the foreseeable
-roadmap → `horizon:long-term`.
-
-### Issue Type Labels
-
-| Label | Description | When to use |
-|---|---|---|
-| `bug` | Something isn't working | Incorrect behaviour, broken output, test failure |
-| `enhancement` | New feature or request | New capability, new module, new endpoint |
-| `documentation` | Improvements or additions to documentation | CLAUDE.md, ADRs, standards docs, CONTRIBUTING.md, standards reviews |
-| `question` | Further information is requested | Design question, clarification needed before implementation can begin |
-| `good first issue` | Good for newcomers | Well-scoped, low-risk, does not require deep architecture knowledge |
-| `help wanted` | Extra attention is needed | Requires domain expertise, second opinion, or is stalled |
-
-**`bug` vs `enhancement`:** If the code does something it was never supposed
-to do, or fails to do something it was explicitly designed to do → `bug`.
-If the code works as designed but the design needs to be extended → `enhancement`.
-
-**`documentation` vs `enhancement`:** If the deliverable is a document (ADR,
-standards amendment, review, CLAUDE.md update) → `documentation`. If the
-deliverable is code + a document (e.g. a new module with an ADR) → `enhancement`.
-Do not use `documentation` for issues whose primary deliverable is code.
-
-### Compliance Labels
-
-These labels are used exclusively on compliance scan findings. They are not
-general-purpose severity labels.
-
-| Label | Description | When to use |
-|---|---|---|
-| `compliance:critical` | Produces wrong outputs without a visible error signal | Silent correctness failures; data corruption; misleading outputs presented as valid |
-| `compliance:major` | Must resolve within current milestone | Compliance deviation that affects the current milestone's exit criteria |
-| `compliance:minor` | Address in normal course of development | Style violations, documentation gaps, non-blocking deviations |
-| `compliance:exception` | Deviation documented and approved | Self-approved exception per CLAUDE.md §Governance; exception record must exist |
-| `compliance:deferred` | Remediation scheduled but not yet started | Known gap with a filed issue and milestone assignment |
-
-**Do not use compliance labels on non-compliance issues.** A bug is not
-`compliance:critical` unless it specifically produces a silent incorrect
-output that a user cannot detect without reading source code.
-
-### Status Labels
-
-| Label | Description | When to use |
-|---|---|---|
-| `status:known-gap` | Acknowledged deficiency with documented plan to resolve | Architecture limitations accepted in a review (ARCH-REVIEW, STD-REVIEW) with an issue filed |
-| `status:parking-lot` | Idea captured, not yet evaluated | Triage outcome: real but not yet assessed for priority or milestone |
-| `status:deferred` | Deliberately deferred with documented rationale | Triage outcome: evaluated, assigned to a future milestone, not being worked now |
-| `review:periodic` | Must be revisited on a scheduled basis | Items that expire or become stale without re-review (e.g. compliance exceptions, deferred decisions) |
+Use only the labels defined in `docs/labels.md`. **Do not invent new labels.**
+If a required label is missing, use the closest existing label, add a comment
+explaining which label would be more precise, and note the gap in the PR
+description.
 
 ### Labels that do not exist and must not be invented
-
-The following labels have been requested or used in error in past sessions.
-They do not exist. Use the mapping below instead:
 
 | Requested label | Use instead | Notes |
 |---|---|---|
@@ -1365,30 +680,16 @@ confirming the gap was closed.
 
 ### The M4 Radar Chart Drawer Incident — Canonical Reference
 
-The Milestone 4 radar chart EntityDetailDrawer bug is the canonical example
-of what this retrospective process is designed to prevent recurring.
+The M4 `EntityDetailDrawer` bug (showing placeholder after scenario completion;
+required 10+ debugging iterations; resolved by `step={currentStep ?? selectedScenarioSteps}`)
+demonstrated that async state management races are invisible without integration
+tests. A Playwright test covering create → advance → click entity → drawer shows
+data would have caught it immediately.
 
-**What happened:** The `EntityDetailDrawer` showed a placeholder message
-("advance the scenario at least one step") after a scenario had been fully
-advanced to completion. The bug required 10+ debugging iterations across
-multiple commits. Several attempted fixes (initialStep/initialComplete props,
-useEffect syncing, key-based remounting) introduced new regressions before
-the correct simple fix was found: `step={currentStep ?? selectedScenarioSteps}`.
+Full incident analysis, root causes, and required anti-patterns:
+`docs/frontend/testing-standards.md §Anti-Patterns from M4` and `design-decisions.md DD-004`.
 
-**Root causes:**
-- No Playwright or browser integration tests existed. The async state
-  management race between `App.tsx`, `ScenarioControls`, and
-  `EntityDetailDrawer` was invisible to the test suite.
-- The API smoke test was written after visual failures were observed, not
-  before implementation. The `name` vs `name_en` metadata key bug and the
-  `human_development composite_score = null` issue would have been caught
-  before any manual browser testing if the smoke test had existed first.
-- `currentStep` state management across the async `useEffect` fetch boundary
-  was not covered by any test. The race between fetch resolution and
-  `handleStepChange` calls was only discoverable through manual browser
-  testing with console.log instrumentation.
-
-**Required before Milestone 5 begins (hard gate):**
+**Required before Milestone 5 exit (hard gate):**
 A Playwright integration test suite covering at minimum:
 - Create scenario → advance to completion → click entity → drawer shows
   measurement output (not placeholder)
