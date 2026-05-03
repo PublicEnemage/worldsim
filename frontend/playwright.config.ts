@@ -4,7 +4,7 @@ export default defineConfig({
   testDir: "./tests/e2e",
   timeout: 30_000,
   // HTML report always generated; never auto-opens (required for CI / Docker).
-  // List reporter provides per-test lines in GitHub Actions log output.
+  // List reporter provides per-test stdout lines in GitHub Actions log output.
   reporter: [["html", { open: "never" }], ["list"]],
   use: {
     baseURL: "http://localhost:5173",
