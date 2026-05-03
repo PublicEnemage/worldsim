@@ -223,7 +223,13 @@ jobs:
           cache-dependency-path: frontend/package-lock.json
 
       - name: Install frontend dependencies
-        run: cd frontend && npm ci
+        run: |
+          # The Docker Compose frontend container creates ./frontend/node_modules
+          # as root (anonymous volume initialisation on Linux bind mounts).
+          # Remove it so npm ci can write as the runner user.  The container's
+          # own node_modules lives in the anonymous Docker volume and is unaffected.
+          sudo rm -rf frontend/node_modules
+          cd frontend && npm ci
 
       - name: Install Playwright Chromium and system dependencies
         run: cd frontend && npx playwright install chromium --with-deps
