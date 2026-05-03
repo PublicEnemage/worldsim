@@ -68,28 +68,28 @@ def _make_state(
     )
 
 
-def _fiscal_spending_event(
+def _gdp_growth_event(
     source_entity_id: str,
     magnitude: Decimal,
     timestep: datetime | None = None,
 ) -> object:
-    """Build a fiscal_spending_change Event with the given magnitude."""
+    """Build a gdp_growth_change Event (emitted by MacroeconomicModule)."""
     from app.simulation.engine.models import Event, MeasurementFramework
     from app.simulation.engine.quantity import Quantity, VariableType
 
     ts = timestep or datetime(2010, 1, 1, tzinfo=timezone.utc)  # noqa: UP017
     qty = Quantity(
         value=magnitude,
-        unit="dimensionless",
+        unit="ratio",
         variable_type=VariableType.RATIO,
         measurement_framework=MeasurementFramework.FINANCIAL,
-        confidence_tier=1,
+        confidence_tier=2,
     )
     return Event(
-        event_id="test-fiscal-event",
+        event_id="test-gdp-event",
         source_entity_id=source_entity_id,
-        event_type="fiscal_spending_change",
-        affected_attributes={"fiscal_spending_change": qty},
+        event_type="gdp_growth_change",
+        affected_attributes={"gdp_growth": qty},
         propagation_rules=[],
         timestep_originated=ts,
         framework=MeasurementFramework.FINANCIAL,
@@ -146,10 +146,10 @@ def test_compute_skips_inactive_country() -> None:
 
 
 def test_compute_no_active_ids_treats_all_countries_as_active() -> None:
-    # fiscal_spending_change on GRC with no active_ids restriction.
+    # gdp_growth_change on GRC with no active_ids restriction.
     magnitude = Decimal("-0.05")
-    fiscal_event = _fiscal_spending_event("GRC", magnitude)
-    state = _make_state("GRC", entity_type="country", prior_events=[fiscal_event])
+    gdp_event = _gdp_growth_event("GRC", magnitude)
+    state = _make_state("GRC", entity_type="country", prior_events=[gdp_event])
     module = DemographicModule()  # no restriction
     ts = datetime(2011, 1, 1, tzinfo=timezone.utc)  # noqa: UP017
     entity = state.entities["GRC"]
@@ -159,14 +159,14 @@ def test_compute_no_active_ids_treats_all_countries_as_active() -> None:
 
 
 # ---------------------------------------------------------------------------
-# Test: FiscalPolicyInput event triggers cohort delta
+# Test: gdp_growth_change event triggers cohort delta (ADR-006 Decision 10)
 # ---------------------------------------------------------------------------
 
 
-def test_fiscal_spending_change_triggers_cohort_delta() -> None:
+def test_gdp_growth_change_triggers_cohort_delta() -> None:
     magnitude = Decimal("-0.05")
-    fiscal_event = _fiscal_spending_event("GRC", magnitude)
-    state = _make_state("GRC", entity_type="country", prior_events=[fiscal_event])
+    gdp_event = _gdp_growth_event("GRC", magnitude)
+    state = _make_state("GRC", entity_type="country", prior_events=[gdp_event])
     module = DemographicModule(cohort_resolution_entity_ids=["GRC"])
     ts = datetime(2011, 1, 1, tzinfo=timezone.utc)  # noqa: UP017
     entity = state.entities["GRC"]
@@ -180,8 +180,8 @@ def test_fiscal_spending_change_triggers_cohort_delta() -> None:
 
 def test_elasticity_delta_is_decimal_not_float() -> None:
     magnitude = Decimal("-0.05")
-    fiscal_event = _fiscal_spending_event("GRC", magnitude)
-    state = _make_state("GRC", entity_type="country", prior_events=[fiscal_event])
+    gdp_event = _gdp_growth_event("GRC", magnitude)
+    state = _make_state("GRC", entity_type="country", prior_events=[gdp_event])
     module = DemographicModule(cohort_resolution_entity_ids=["GRC"])
     ts = datetime(2011, 1, 1, tzinfo=timezone.utc)  # noqa: UP017
     entity = state.entities["GRC"]
@@ -193,23 +193,22 @@ def test_elasticity_delta_is_decimal_not_float() -> None:
             assert not isinstance(qty.value, float)
 
 
-def test_delta_sign_is_negative_for_spending_cut() -> None:
-    # Spending cut (negative magnitude) × negative elasticity = positive delta → wait,
-    # elasticity is already signed: when spending drops (negative magnitude),
-    # poverty rises → delta should be positive (poverty_headcount_ratio increases).
-    magnitude = Decimal("-1.0")  # 1pp spending cut
-    fiscal_event = _fiscal_spending_event("GRC", magnitude)
-    state = _make_state("GRC", entity_type="country", prior_events=[fiscal_event])
+def test_delta_sign_positive_for_gdp_contraction() -> None:
+    # GDP contraction (negative magnitude) × negative elasticity → positive delta
+    # (poverty_headcount_ratio increases when GDP falls).
+    magnitude = Decimal("-1.0")  # 1pp GDP contraction
+    gdp_event = _gdp_growth_event("GRC", magnitude)
+    state = _make_state("GRC", entity_type="country", prior_events=[gdp_event])
     module = DemographicModule(cohort_resolution_entity_ids=["GRC"])
     ts = datetime(2011, 1, 1, tzinfo=timezone.utc)  # noqa: UP017
     entity = state.entities["GRC"]
     events = module.compute(entity, state, ts)
     assert len(events) > 0
-    # All deltas should be positive (poverty rises when spending is cut)
+    # All deltas should be positive (poverty rises when GDP contracts)
     for event in events:
         for qty in event.affected_attributes.values():
             assert qty.value > Decimal("0"), (
-                f"Expected positive poverty delta for spending cut, got {qty.value}"
+                f"Expected positive poverty delta for GDP contraction, got {qty.value}"
             )
 
 

@@ -40,59 +40,61 @@ class CohortElasticity:
 
 
 ELASTICITY_REGISTRY: list[CohortElasticity] = [
-    # Fiscal spending cuts raise poverty headcount for Q1 informal workers.
-    # Lustig (2017) estimates a ~15pp poverty rate response per 1pp spending cut
-    # for the bottom quintile in emerging-market fiscal consolidation episodes.
+    # GDP contraction raises poverty headcount for Q1 informal workers.
+    # Elasticity calibrated from Lustig (2017) via MacroeconomicModule chain:
+    # fiscal spending cut → GDP contraction (regime multiplier 1.5 in recession)
+    # → poverty headcount response. Per unit gdp_growth_change: ~0.10 poverty pp
+    # per pp GDP contraction for Q1 informal in consolidation episodes.
     CohortElasticity(
-        event_type="fiscal_spending_change",
+        event_type="gdp_growth_change",
         cohort_spec=CohortSpec(
             IncomeQuintile.Q1,
-            AgeBand.AGE_25_54,
-            EmploymentSector.INFORMAL,
-        ),
-        attribute_key="poverty_headcount_ratio",
-        elasticity=Decimal("-0.15"),
-        source=(
-            "Lustig (2017): The Impact of Fiscal Policy on Inequality and Poverty"
-            " in Latin America. IMF Working Paper WP/17/55."
-        ),
-        source_registry_id="ACADEMIC_LITERATURE_LUSTIG_2017_FISCAL_POVERTY",
-        confidence_tier=3,
-    ),
-    # Q2 informal workers face smaller but significant poverty exposure.
-    # Ball et al. (2013) document distributional effects of consolidation across
-    # 17 OECD countries: Q2 effect roughly 2/3 of Q1 effect.
-    CohortElasticity(
-        event_type="fiscal_spending_change",
-        cohort_spec=CohortSpec(
-            IncomeQuintile.Q2,
             AgeBand.AGE_25_54,
             EmploymentSector.INFORMAL,
         ),
         attribute_key="poverty_headcount_ratio",
         elasticity=Decimal("-0.10"),
         source=(
+            "Lustig (2017): The Impact of Fiscal Policy on Inequality and Poverty"
+            " in Latin America. IMF Working Paper WP/17/55."
+            " Recalibrated for gdp_growth_change units via MacroeconomicModule"
+            " recession multiplier (ADR-006 Decision 10)."
+        ),
+        source_registry_id="ACADEMIC_LITERATURE_LUSTIG_2017_FISCAL_POVERTY",
+        confidence_tier=3,
+    ),
+    # Q2 informal workers: ~2/3 of Q1 effect per Ball et al. (2013).
+    CohortElasticity(
+        event_type="gdp_growth_change",
+        cohort_spec=CohortSpec(
+            IncomeQuintile.Q2,
+            AgeBand.AGE_25_54,
+            EmploymentSector.INFORMAL,
+        ),
+        attribute_key="poverty_headcount_ratio",
+        elasticity=Decimal("-0.067"),
+        source=(
             "Ball, Furceri, Leigh, Loungani (2013): The Distributional Effects"
             " of Fiscal Consolidation. IMF Working Paper WP/13/151."
+            " Recalibrated for gdp_growth_change units (ADR-006 Decision 10)."
         ),
         source_registry_id="ACADEMIC_LITERATURE_BALL_2013_FISCAL_CONSOLIDATION",
         confidence_tier=3,
     ),
-    # Agricultural sector Q1 cohorts: subsistence exposure amplifies poverty
-    # response to fiscal cuts that reduce rural subsidies and extension services.
-    # IMF (2014) finds agricultural cohort poverty response ~80% of informal rate.
+    # Agricultural Q1 cohorts: subsistence amplification ~80% of informal rate.
     CohortElasticity(
-        event_type="fiscal_spending_change",
+        event_type="gdp_growth_change",
         cohort_spec=CohortSpec(
             IncomeQuintile.Q1,
             AgeBand.AGE_25_54,
             EmploymentSector.AGRICULTURE,
         ),
         attribute_key="poverty_headcount_ratio",
-        elasticity=Decimal("-0.12"),
+        elasticity=Decimal("-0.08"),
         source=(
             "IMF (2014): Fiscal Policy and Income Inequality."
             " IMF Policy Paper, January 2014."
+            " Recalibrated for gdp_growth_change units (ADR-006 Decision 10)."
         ),
         source_registry_id="ACADEMIC_LITERATURE_IMF_2014_FISCAL_INEQUALITY",
         confidence_tier=3,

@@ -27,8 +27,6 @@ if TYPE_CHECKING:
     from datetime import datetime
 
 _SUBSCRIBED_EVENTS = frozenset({
-    "fiscal_spending_change",
-    "fiscal_tax_change",
     "gdp_growth_change",
     "imf_program_acceptance",
     "capital_controls_imposition",

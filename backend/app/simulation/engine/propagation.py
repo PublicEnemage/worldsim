@@ -52,19 +52,26 @@ def propagate(state: SimulationState, events: list[Event]) -> SimulationState:
     graph traversals, then applies them in a single pass to construct the next
     state. State[T] is never modified.
 
+    The current step's events are stored in State[T+1].events so that modules
+    at step T+1 can react to them via the one-step lag design (state.events
+    carries the previous step's events — the deliberate architectural choice
+    documented in simulation_state.yml).
+
     Args:
         state: Current simulation state (State[T]). Treated as read-only.
         events: Events produced by simulation modules this timestep.
 
     Returns:
-        New SimulationState (State[T+1]) with all event deltas applied.
+        New SimulationState (State[T+1]) with all event deltas applied and
+        State[T+1].events set to the current step's events for one-step-lag
+        consumption by modules in the following step.
     """
     accumulator: _DeltaAccumulator = {}
 
     for event in events:
         _apply_event(state, event, accumulator)
 
-    return _build_next_state(state, accumulator)
+    return _build_next_state(state, accumulator, events)
 
 
 # ---------------------------------------------------------------------------
@@ -244,6 +251,7 @@ def _accumulate(
 def _build_next_state(
     state: SimulationState,
     accumulator: _DeltaAccumulator,
+    events: list[Event] | None = None,
 ) -> SimulationState:
     """Construct State[T+1] by applying accumulated deltas to fresh entity copies.
 
@@ -309,6 +317,6 @@ def _build_next_state(
         resolution=state.resolution,
         entities=new_entities,
         relationships=state.relationships,
-        events=state.events,
+        events=events if events is not None else state.events,
         scenario_config=state.scenario_config,
     )

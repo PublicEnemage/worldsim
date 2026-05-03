@@ -285,9 +285,18 @@ Event:
     event_type:
       type: str
       description: >
-        Semantic type tag. Examples: "policy_change", "shock",
-        "threshold_crossed", "fiscal_event".
-        DemographicModule listens for "fiscal_event" via get_subscribed_events().
+        Semantic type tag. Known values include:
+        "fiscal_policy_spending_change" — from FiscalPolicyInput SPENDING_CHANGE.
+        "fiscal_policy_tax_rate_change" — from FiscalPolicyInput TAX_RATE_CHANGE.
+        "gdp_growth_change" — emitted by MacroeconomicModule; carries gdp_growth,
+          fiscal_balance_pct_gdp, and inflation_rate Quantity deltas. Consumed by
+          DemographicModule via one-step lag.
+        "regime_change" — emitted by MacroeconomicModule on multiplier regime
+          transition (standard/depressed/zlb). Empty affected_attributes; metadata
+          carries regime_previous, regime_new, trigger_attribute, trigger_value,
+          threshold.
+        "demographic_cohort_delta" — from DemographicModule; targets cohort entities.
+        "policy_change", "shock", "threshold_crossed" — generic categories.
     affected_attributes:
       type: "dict[str, Quantity]"
       description: >
@@ -433,7 +442,7 @@ DemographicModule:
     (one-step lag) because demographic effects appear with delay.
     Activated per entity when modules_config.demographic.enabled is true and
     the entity_id appears in cohort_resolution_entity_ids.
-  subscribed_events: ["fiscal_event"]
+  subscribed_events: ["gdp_growth_change", "imf_program_acceptance", "capital_controls_imposition", "emergency_declaration"]
   cohort_entity_id_format: "{country_iso3}:CHT:{quintile}-{age_band}-{sector}"
   cohort_entity_id_example: "GRC:CHT:1-25-54-FORMAL"
   note: >
@@ -441,6 +450,37 @@ DemographicModule:
     into the in-memory SimulationState before step 0. They are NOT written to
     simulation_entities in the database. They ARE serialised into
     scenario_state_snapshots.state_data as regular entity entries.
+    M5 (ADR-006 Decision 10): legacy fiscal_spending_change and fiscal_tax_change
+    subscriptions removed. DemographicModule now depends exclusively on
+    gdp_growth_change events from MacroeconomicModule.
+
+# ---------------------------------------------------------------------------
+# MacroeconomicModule (M5 concrete implementation)
+# ---------------------------------------------------------------------------
+MacroeconomicModule:
+  type: class
+  module: app.simulation.modules.macroeconomic.module
+  inherits: SimulationModule
+  description: >
+    ADR-006 Decisions 8 and 10. Processes fiscal and monetary policy events
+    on country entities (one-step lag). Applies regime-dependent fiscal
+    multipliers and emits gdp_growth_change and regime_change events.
+    Always active for country entities — returns [] when no relevant
+    prior-step events exist.
+  subscribed_events: ["fiscal_policy_spending_change", "fiscal_policy_tax_rate_change", "monetary_policy_policy_rate"]
+  emitted_events:
+    gdp_growth_change:
+      affected_attributes:
+        gdp_growth: "Quantity(RATIO) — delta applied to entity gdp_growth"
+        fiscal_balance_pct_gdp: "Quantity(RATIO) — delta; absent when zero"
+        inflation_rate: "Quantity(RATIO) — delta; absent when zero"
+    regime_change:
+      affected_attributes: "{} — empty; state transition only"
+      metadata_keys: "regime_previous, regime_new, trigger_attribute, trigger_value, threshold"
+  regime_thresholds:
+    standard: "gdp_growth >= 0, multiplier 0.5"
+    depressed: "-0.03 <= gdp_growth < 0, multiplier 1.5"
+    zlb: "gdp_growth < -0.03, multiplier 2.0"
 
 # ---------------------------------------------------------------------------
 # Quantity JSONB serialisation contract
