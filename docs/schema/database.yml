@@ -9,8 +9,8 @@
 # alembic_version is a migration system table — not documented here.
 
 ---
-schema_version: "1.0"
-captured: "2026-04-26"
+schema_version: "1.1"
+captured: "2026-05-03"
 database: worldsim
 tables:
 
@@ -738,6 +738,99 @@ tables:
       source_registry_pkey: {type: btree, columns: [source_id], unique: true}
     check_constraints:
       ck_source_quality_tier: "quality_tier >= 1 AND quality_tier <= 5"
+
+  # ---------------------------------------------------------------------------
+  # backtesting_thresholds
+  # ---------------------------------------------------------------------------
+  backtesting_thresholds:
+    description: >
+      Fidelity thresholds for registered backtesting cases. Each row defines
+      one pass/fail criterion for a specific attribute at a specific simulation
+      step. Three threshold types: DIRECTION_ONLY (sign check only),
+      MAGNITUDE (|sim - actual| ≤ tolerance), DISTRIBUTION_COMBINED (mean
+      within tolerance AND actual inside CI — ADR-006 Decision 11 / Issue #194).
+      Evaluation logic: app.simulation.backtesting.threshold_types.
+      Migration: b5d3f7a2c8e1.
+    columns:
+      threshold_id:
+        type: text
+        nullable: false
+        default: "gen_random_uuid()::text"
+        description: Stable identifier. PK.
+      case_id:
+        type: text
+        nullable: false
+        description: Backtesting case. e.g. "GREECE_2010_2012", "ARGENTINA_2001_2002".
+      threshold_name:
+        type: text
+        nullable: false
+        description: >
+          Unique within case. e.g. "gdp_growth_step1_negative".
+          Unique constraint on (case_id, threshold_name).
+      threshold_type:
+        type: text
+        nullable: false
+        values: ["DIRECTION_ONLY", "MAGNITUDE", "DISTRIBUTION_COMBINED"]
+        description: Enforced by CHECK constraint ck_backtesting_threshold_type.
+      attribute_key:
+        type: text
+        nullable: false
+        description: Simulation attribute key. e.g. "gdp_growth".
+      entity_id:
+        type: text
+        nullable: false
+        description: Simulation entity this threshold applies to. e.g. "GRC".
+      step:
+        type: integer
+        nullable: false
+        description: Zero-based simulation step index.
+      expected_direction:
+        type: text
+        nullable: true
+        values: ["negative", "positive", null]
+        description: >
+          DIRECTION_ONLY only. 'negative' means simulated value must be < 0.
+          NULL for MAGNITUDE and DISTRIBUTION_COMBINED.
+      expected_value:
+        type: numeric
+        nullable: true
+        description: >
+          Historical actual. Required for MAGNITUDE and DISTRIBUTION_COMBINED.
+          NULL for DIRECTION_ONLY.
+      tolerance_pct:
+        type: numeric
+        nullable: true
+        description: >
+          Fraction tolerance for MAGNITUDE and DISTRIBUTION_COMBINED.
+          e.g. 0.20 = 20%. NULL for DIRECTION_ONLY.
+      ci_coverage:
+        type: numeric
+        nullable: true
+        description: >
+          DISTRIBUTION_COMBINED only. Required CI coverage fraction (e.g. 0.80
+          = 80th-percentile CI). Caller must supply sim_ci_lower/upper bounds
+          at this coverage level to evaluate_distribution_combined().
+          NULL for DIRECTION_ONLY and MAGNITUDE.
+      description:
+        type: text
+        nullable: false
+        default: ""
+      source:
+        type: text
+        nullable: false
+        default: ""
+        description: Citation for expected_value (historical data source).
+      created_at:
+        type: "timestamp with time zone"
+        nullable: false
+        default: now()
+    indexes:
+      backtesting_thresholds_pkey: {type: btree, columns: [threshold_id], unique: true}
+      idx_backtesting_case_id: {type: btree, columns: [case_id]}
+      idx_backtesting_type: {type: btree, columns: [threshold_type]}
+      uq_backtesting_case_threshold: {type: btree, columns: [case_id, threshold_name], unique: true}
+    check_constraints:
+      ck_backtesting_threshold_type: "threshold_type IN ('DIRECTION_ONLY', 'MAGNITUDE', 'DISTRIBUTION_COMBINED')"
 
   # ---------------------------------------------------------------------------
   # control_input_audit_log
