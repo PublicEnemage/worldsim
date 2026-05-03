@@ -447,9 +447,8 @@ for full delivery history.
 
 **Milestone 6 — Backtesting Coverage Expansion (Current)**
 - Five historical backtesting cases with DIRECTION_ONLY and MAGNITUDE thresholds
-- Ecological and Governance Modules initial implementation
 - Backtesting fidelity dashboard surfacing case-by-case pass/fail in the UI
-- ADR-006 distribution output infrastructure extended to Ecological framework
+- MAGNITUDE threshold calibration against historical outturns
 
 Each milestone is a vertical slice — working software at every stage,
 not infrastructure waiting for features.
@@ -483,9 +482,36 @@ Scope:
 - Governance Module initial implementation (institutional quality indicators)
 - Backtesting fidelity dashboard in the UI
 
-**M7 through M8:** `docs/roadmap/milestone-roadmap-m6-m8.md`
-- M7: Ecological and Governance Frameworks complete; all four radar axes live
-- M8: Methodology publication and external validation; Technical Steering Committee
+**Milestone 7 — Technical Foundation**
+Core deliverable: Resolve P0 deferred technical debt before Ecological and
+Governance Modules require a clean foundation.
+
+Exit criteria:
+- P0 deferred items resolved (datetime.utcnow() deprecations, engine_version
+  gap #139 resolved or formally deferred with ADR entry)
+- Compliance scan clean at milestone exit
+- All issues from M5/M6 deferred-to-M7 list triaged and closed or re-scoped
+
+**Milestone 8 — Ecological and Governance Frameworks**
+Core deliverable: All four radar axes live; ecological and governance
+composite scores non-null for the first time.
+
+Scope:
+- Ecological Module complete (planetary boundaries, natural capital depletion)
+- Governance Module complete (institutional quality, political freedom, rule of law)
+- All four radar chart axes live with real data
+- ADR-005 reviewed and extended for Ecological/Governance framework coverage
+
+**Milestone 9 — Methodology Publication**
+Core deliverable: Methodology publication and external validation;
+Technical Steering Committee formation.
+
+Scope:
+- Methodology publication and external validation
+- Technical Steering Committee formation
+- External contributor infrastructure
+
+Full roadmap: `docs/roadmap/milestone-roadmap-m6-m8.md`
 
 ---
 
