@@ -13,24 +13,25 @@ from typing import Any
 
 def format_fidelity_report(
     scenario_name: str,
-    actuals: Any,  # noqa: ANN401 — accepts GreeceActuals or any actuals dataclass
+    actuals: Any,  # noqa: ANN401 — accepts any actuals dataclass
     snapshots: list[dict[str, Any]],
     thresholds_met: dict[str, bool],
     ia1_disclosure: str,
     parameter_calibration_disclosure: str,
+    entity_id: str = "GRC",
 ) -> str:
     """Return a formatted fidelity report string for CI log output.
 
     Args:
         scenario_name: Human-readable name of the backtesting scenario.
-        actuals: GreeceActuals dataclass (or any object with historical values).
+        actuals: Historical actuals dataclass (any object with gdp_growth_* attrs).
         snapshots: List of snapshot dicts from GET /scenarios/{id}/snapshots.
             Each dict has 'step', 'timestep', and 'state_data'.
         thresholds_met: Dict mapping threshold_name → bool for each checked
             threshold. All thresholds are reported regardless of result.
         ia1_disclosure: Canonical IA-1 text from quantity_serde.
-        parameter_calibration_disclosure: PARAMETER_CALIBRATION_DISCLOSURE
-            text from greece_2010_2012_actuals.
+        parameter_calibration_disclosure: Calibration limitation text.
+        entity_id: ISO 3166-1 alpha-3 entity to read from snapshots. Default "GRC".
 
     Returns:
         Multi-line string suitable for print() or sys.stdout.write().
@@ -54,44 +55,28 @@ def format_fidelity_report(
 
     snapshots_by_step = {s["step"]: s for s in snapshots}
 
-    step_labels = {1: "2010→2011", 2: "2011→2012", 3: "2012→2013"}
-    actual_gdp = {
-        1: getattr(actuals, "gdp_growth_2010", None),
-        2: getattr(actuals, "gdp_growth_2011", None),
-        3: getattr(actuals, "gdp_growth_2012", None),
-    }
-    actual_unemp = {
-        1: getattr(actuals, "unemployment_rate_2011", None),
-        2: getattr(actuals, "unemployment_rate_2012", None),
-        3: getattr(actuals, "unemployment_rate_2013", None),
-    }
+    # Determine step range from snapshots (exclude step 0 / initial state)
+    sim_steps = sorted(k for k in snapshots_by_step if k > 0)
 
-    for step_num in sorted(step_labels.keys()):
-        label = step_labels[step_num]
+    for step_num in sim_steps:
         snap = snapshots_by_step.get(step_num)
-        lines.append(f"\nStep {step_num} ({label}):")
+        lines.append(f"\nStep {step_num}:")
 
         if snap is None:
             lines.append("  [no snapshot at this step]")
             continue
 
         state_data = snap.get("state_data", {})
-        grc_attrs = state_data.get("GRC", {})
+        entity_attrs = state_data.get(entity_id, {})
 
-        gdp_envelope = grc_attrs.get("gdp_growth", {})
+        gdp_envelope = entity_attrs.get("gdp_growth", {})
         sim_gdp = gdp_envelope.get("value", "N/A")
-        act_gdp = actual_gdp.get(step_num)
-        lines.append(
-            f"  gdp_growth   simulated={sim_gdp:>10}   actual={str(act_gdp):>10}"
-        )
+        lines.append(f"  gdp_growth   simulated={sim_gdp:>10}")
 
-        unemp_envelope = grc_attrs.get("unemployment_rate", {})
+        unemp_envelope = entity_attrs.get("unemployment_rate", {})
         if unemp_envelope:
             sim_unemp = unemp_envelope.get("value", "N/A")
-            act_unemp = actual_unemp.get(step_num)
-            lines.append(
-                f"  unemployment simulated={sim_unemp:>10}   actual={str(act_unemp):>10}"
-            )
+            lines.append(f"  unemployment simulated={sim_unemp:>10}")
 
     lines += [
         "",
@@ -124,19 +109,23 @@ def format_fidelity_report(
     return "\n".join(lines)
 
 
-def _extract_gdp_value(snapshot: dict[str, Any]) -> Decimal | None:
-    """Extract the GRC gdp_growth Decimal value from a snapshot dict."""
+def _extract_gdp_value(
+    snapshot: dict[str, Any], entity_id: str = "GRC"
+) -> Decimal | None:
+    """Extract the gdp_growth Decimal value for entity_id from a snapshot dict."""
     try:
-        val = snapshot["state_data"]["GRC"]["gdp_growth"]["value"]
+        val = snapshot["state_data"][entity_id]["gdp_growth"]["value"]
         return Decimal(str(val))
     except (KeyError, TypeError, ValueError):
         return None
 
 
-def _extract_unemployment_value(snapshot: dict[str, Any]) -> Decimal | None:
-    """Extract the GRC unemployment_rate Decimal value from a snapshot dict."""
+def _extract_unemployment_value(
+    snapshot: dict[str, Any], entity_id: str = "GRC"
+) -> Decimal | None:
+    """Extract the unemployment_rate Decimal value for entity_id from a snapshot dict."""
     try:
-        val = snapshot["state_data"]["GRC"]["unemployment_rate"]["value"]
+        val = snapshot["state_data"][entity_id]["unemployment_rate"]["value"]
         return Decimal(str(val))
     except (KeyError, TypeError, ValueError):
         return None
