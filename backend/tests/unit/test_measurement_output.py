@@ -85,6 +85,11 @@ def _snap_row(state: dict | None = None, events_snapshot: list | None = None) ->
     }
 
 
+def _entity_row(name: str = "Greece") -> dict:
+    """Mock row for SELECT metadata FROM simulation_entities (commit b93ac3d format)."""
+    return {"metadata": json.dumps({"name_en": name})}
+
+
 def _make_conn(*side_effects: dict[str, object] | None) -> AsyncMock:
     conn = AsyncMock()
     conn.fetchrow = AsyncMock(side_effect=list(side_effects))
@@ -169,7 +174,7 @@ async def test_financial_framework_groups_financial_tagged_attributes() -> None:
     conn = _make_conn(
         {"scenario_id": "scen-1"},  # scenario exists
         _snap_row(),                 # snapshot at step 1
-        {"name": "Greece"},          # entity name lookup
+        _entity_row(),               # entity name lookup
     )
     result = await get_measurement_output(
         scenario_id="scen-1", entity_id="GRC", step=1, conn=conn
@@ -185,7 +190,7 @@ async def test_untagged_attributes_classified_as_financial() -> None:
     conn = _make_conn(
         {"scenario_id": "scen-1"},
         _snap_row(),
-        {"name": "Greece"},
+        _entity_row(),
     )
     result = await get_measurement_output(
         scenario_id="scen-1", entity_id="GRC", step=1, conn=conn
@@ -201,7 +206,7 @@ async def test_ecological_returns_null_composite_score_with_note() -> None:
     conn = _make_conn(
         {"scenario_id": "scen-1"},
         _snap_row(),
-        {"name": "Greece"},
+        _entity_row(),
     )
     result = await get_measurement_output(
         scenario_id="scen-1", entity_id="GRC", step=1, conn=conn
@@ -217,7 +222,7 @@ async def test_governance_returns_null_composite_score_with_note() -> None:
     conn = _make_conn(
         {"scenario_id": "scen-1"},
         _snap_row(),
-        {"name": "Greece"},
+        _entity_row(),
     )
     result = await get_measurement_output(
         scenario_id="scen-1", entity_id="GRC", step=1, conn=conn
@@ -233,7 +238,7 @@ async def test_composite_score_is_string_not_float() -> None:
     conn = _make_conn(
         {"scenario_id": "scen-1"},
         _snap_row(),
-        {"name": "Greece"},
+        _entity_row(),
     )
     result = await get_measurement_output(
         scenario_id="scen-1", entity_id="GRC", step=1, conn=conn
@@ -251,7 +256,7 @@ async def test_all_four_frameworks_present_in_response() -> None:
     conn = _make_conn(
         {"scenario_id": "scen-1"},
         _snap_row(),
-        {"name": "Greece"},
+        _entity_row(),
     )
     result = await get_measurement_output(
         scenario_id="scen-1", entity_id="GRC", step=1, conn=conn
@@ -266,7 +271,7 @@ async def test_ia1_disclosure_is_canonical_phrase() -> None:
     conn = _make_conn(
         {"scenario_id": "scen-1"},
         _snap_row(),
-        {"name": "Greece"},
+        _entity_row(),
     )
     result = await get_measurement_output(
         scenario_id="scen-1", entity_id="GRC", step=1, conn=conn
