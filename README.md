@@ -3,7 +3,7 @@
 [![CI](https://github.com/PublicEnemage/worldsim/actions/workflows/ci.yml/badge.svg)](https://github.com/PublicEnemage/worldsim/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Python 3.12](https://img.shields.io/badge/python-3.12-blue.svg)](https://www.python.org/downloads/release/python-3120/)
-[![Release](https://img.shields.io/badge/release-v0.4.0%20M4%20complete-green)](https://github.com/PublicEnemage/worldsim/releases/tag/v0.4.0)
+[![Release](https://img.shields.io/badge/release-v0.5.0%20M5%20complete-green)](https://github.com/PublicEnemage/worldsim/releases/tag/v0.5.0)
 
 **An open-source geopolitical-economic simulation platform for governments and
 vulnerable actors navigating high-stakes decisions under uncertainty.**
@@ -47,18 +47,20 @@ not show.
 **The simulation is a structured reasoning tool, not a prediction engine.** It
 is designed to produce distributions, not point estimates — outputs carry
 confidence tiers, uncertainty bounds are quantified and displayed, and the
-model's blindspots are documented and visible. Full distribution outputs across
-all simulation outputs are in progress (Milestone 5).
+model's blindspots are documented and visible. MacroeconomicModule with
+regime-dependent fiscal multipliers and a second backtesting case
+(Argentina 2001–2002) shipped in Milestone 5; full distribution propagation
+across all outputs is Milestone 6 scope.
 
 **This tool is in active pre-release development.** The working software
-described below reflects Milestone 4. It is not yet usable for consequential
+described below reflects Milestone 5. It is not yet usable for consequential
 analysis.
 
 ---
 
 ## What's Built
 
-The working system at Milestone 4:
+The working system at Milestone 5:
 
 - **Simulation engine** — Event-driven graph in Python. The `Quantity` type
   system tracks `value: Decimal`, unit, variable type (STOCK/FLOW/RATIO/
@@ -66,23 +68,37 @@ The working system at Milestone 4:
   date, and source provenance. Events propagate through the relationship graph
   with hop-by-hop confidence tier attenuation.
 
+- **MacroeconomicModule** — GDP, fiscal balance, and inflation with
+  regime-dependent fiscal multipliers: standard multiplier (0.8) in healthy
+  conditions; elevated multiplier (1.5) in depressed regimes (unemployment
+  above 15%). Processes FiscalPolicyInput, MonetaryRateInput, and
+  EmergencyPolicyInput events. Validated against the Argentina 2001-2002
+  backtesting case.
+
 - **Database** — PostgreSQL/PostGIS with 177 country entities loaded from
   Natural Earth 110m boundary data, 10 attributes per entity. Five declared
   territorial positions (Taiwan, Palestine, Kosovo, Western Sahara, Crimea)
   are enforced by a hard-gate validator on every database INSERT.
+  `backtesting_thresholds` table holds DIRECTION_ONLY, MAGNITUDE, and
+  DISTRIBUTION_COMBINED fidelity thresholds for each historical case.
 
-- **Backend API** — FastAPI with 15 endpoints. Float prohibition enforced
+- **Backend API** — FastAPI with 16 endpoints. Float prohibition enforced
   end-to-end: `Quantity.value` is always `Decimal` in Python and `str` at
-  the API boundary.
+  the API boundary. Measurement-output endpoint surfaces a
+  `single_entity_warning` flag when composite score is not meaningful.
 
 - **Scenario engine** — Create scenarios, advance step by step, compare two
   scenarios via delta choropleth. Scenario deletion writes a tombstone record
   enabling reconstruction from first principles under the determinism guarantee.
 
-- **Backtesting fixture** — Greece 2010–2012: an annual forward simulation
-  from the 2010 baseline with fiscal adjustment ControlInputs, validated
-  against documented historical outcomes. Runs in CI as a build gate — a
-  backtesting regression is a build failure.
+- **Backtesting fixtures** — Two validated historical cases:
+  - *Greece 2010–2012*: fiscal adjustment under the IMF/EU program;
+    DIRECTION_ONLY GDP contraction thresholds
+  - *Argentina 2001–2002*: Zero Deficit Plan spending cut and sovereign
+    default; DIRECTION_ONLY GDP contraction thresholds at both steps
+  Both run in CI as a build gate — a backtesting regression is a build failure.
+  DISTRIBUTION_COMBINED threshold infrastructure is in place for magnitude
+  calibration in Milestone 6.
 
 - **Human Cost Ledger** — Multi-framework measurement output across financial,
   human development, ecological, and governance dimensions simultaneously, with
@@ -90,13 +106,14 @@ The working system at Milestone 4:
   threshold system fires WARNING/CRITICAL/TERMINAL alerts when indicators cross
   hard floors. Demographic cohort model produces indicators by income quintile,
   age band, and employment sector. Note: ecological and governance composite
-  scores are null at M4 — modules are planned for M6–M7; these axes render
+  scores are null at M5 — modules are planned for M6–M7; these axes render
   with a ⊘ indicator in the dashboard.
 
 - **Frontend** — React + MapLibre GL choropleth map; scenario panel and step
   controls; EntityDetailDrawer with a four-axis radar chart, MDA alert panel,
   and per-framework indicator tables with collapsible cohort breakdowns; delta
-  choropleth for side-by-side scenario comparison.
+  choropleth for side-by-side scenario comparison. Playwright integration test
+  suite (3/3) covers the full create→advance→drawer flow.
 
 ---
 
@@ -111,7 +128,8 @@ The working system at Milestone 4:
 | M2 — Geospatial Foundation | ✅ Complete | v0.2.0 | PostGIS schema, 177-entity seed, FastAPI layer, MapLibre GL choropleth |
 | M3 — Scenario Engine | ✅ Complete | v0.3.0 | Scenario create/advance/compare, Greece 2010–2012 backtesting fixture, tombstones |
 | M4 — Human Cost Ledger | ✅ Complete | [v0.4.0](https://github.com/PublicEnemage/worldsim/releases/tag/v0.4.0) | DemographicModule, MDA threshold system, radar chart dashboard, schema registry |
-| M5 — Calibration and Uncertainty | 🔧 In progress | — | Distribution outputs, Macroeconomic Module, Playwright test suite, ADR-006 |
+| M5 — Calibration and Uncertainty | ✅ Complete | [v0.5.0](https://github.com/PublicEnemage/worldsim/releases/tag/v0.5.0) | MacroeconomicModule, Argentina backtesting, DISTRIBUTION_COMBINED thresholds, Playwright suite |
+| M6 — Backtesting Coverage Expansion | 🔧 In progress | — | Five historical cases, Ecological Module initial, Governance Module initial |
 
 Full milestone history: [`CHANGELOG.md`](CHANGELOG.md). Live issue tracker:
 [GitHub Milestones](https://github.com/PublicEnemage/worldsim/milestones).
@@ -132,13 +150,14 @@ to the macroeconomic indicators. They are never cut for velocity, never treated
 as optional annotations on the real results.
 
 **Backtesting as epistemic discipline.** Every model relationship is validated
-against historical cases before being trusted for forward projection. Greece
-2010–2012 is the first implemented case, selected for the quality of its
-historical data record and the IMF's own documented multiplier estimation error
-(assumed ~0.5; empirical ~1.5). The gap between model prediction and historical
-outcome is not a failure — it is the primary signal for improvement. Additional
-cases (Argentina 2001–2002, Thailand 1997, Lebanon 2019–2020) are planned for
-Milestone 6.
+against historical cases before being trusted for forward projection. Two cases
+are implemented: Greece 2010–2012 (fiscal multiplier estimation error — IMF
+assumed ~0.5, empirical ~1.5) and Argentina 2001–2002 (Zero Deficit Plan
+pro-cyclical austerity and sovereign default). Both run DIRECTION_ONLY fidelity
+thresholds in CI; DISTRIBUTION_COMBINED magnitude calibration is Milestone 6
+scope. The gap between model prediction and historical outcome is not a failure
+— it is the primary signal for improvement. Additional cases (Thailand 1997,
+Lebanon 2019–2020) are planned for Milestone 6.
 
 **No false precision.** Outputs are designed to be distributions over scenarios
 conditional on stated assumptions, not point forecasts about the future.
