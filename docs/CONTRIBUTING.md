@@ -582,6 +582,113 @@ at the presentation boundary. See DATA_STANDARDS.md.
 
 ---
 
+## Equitable Build Process
+
+WorldSim is a tool designed to correct power asymmetries between vulnerable
+actors and well-resourced institutions. Its development infrastructure must
+not reproduce those asymmetries. A contributor in Nairobi or La Paz, working
+on an eight-year-old laptop with a slow connection, must be able to run the
+full test suite and contribute meaningfully.
+
+This principle has four concrete requirements:
+
+### 1. CI pipeline targets the GitHub Actions free tier
+
+Every CI job must run on the standard GitHub Actions free-tier Ubuntu runner:
+2 cores, 7GB RAM. Jobs that exceed this must document the constraint
+explicitly in `.github/workflows/ci.yml` (as a comment on the job) and
+provide a fallback path that runs within the free tier.
+
+The current `playwright-e2e` job runs on the standard 2-core runner and
+requires approximately 15–20 minutes end-to-end including Docker image builds.
+This is within acceptable limits for free-tier minutes.
+
+If a future job (e.g., a Monte Carlo ensemble backtesting run) requires more
+memory or compute than the free tier provides, it must:
+- Be clearly labeled `# Requires: >7GB RAM — NOT free-tier compatible`
+- Be gated behind a manual trigger (`workflow_dispatch`) rather than running
+  on every push
+- Have a documented lightweight alternative that runs within the free tier
+
+### 2. Local development requires no more than 8GB RAM
+
+The full Docker Compose stack (`db` + `api` + `frontend`) consumes
+approximately 1.5–2GB RAM at runtime. This fits within an 8GB machine with
+normal OS overhead (~2GB), leaving headroom for the editor and terminal.
+
+If a future module or service increases the stack beyond 3GB at runtime, a
+**lightweight development profile** must be documented before that module
+merges. The profile must specify which services to run and which to mock.
+
+### 3. Test suites use only open-licensed data
+
+No test — unit, integration, backtesting, or E2E — may require:
+- Proprietary datasets or paid data subscriptions
+- Licensed commercial software
+- API keys or authentication tokens (other than the local database)
+
+All backtesting fixtures use data from open sources:
+- **IMF WEO**: publicly downloadable archives, no login required
+- **World Bank WDI**: open access via API and bulk download
+- **Natural Earth**: CC0 public domain boundary data
+
+Any new backtesting case added to `backend/tests/backtesting/` must cite
+the specific open-licensed source for every data point in its fixture file.
+A fixture that depends on a paywalled source is a compliance violation.
+
+### 4. Playwright E2E can run without the full Docker Compose stack
+
+The CI `playwright-e2e` job uses the full three-service Docker Compose stack
+(`db` + `api` + `frontend`) because it runs in a clean environment with no
+pre-installed dependencies. Contributors running tests locally do not need the
+full stack.
+
+**Lightweight local path** (requires only Docker for PostGIS):
+
+```bash
+# Terminal 1 — start only the database (PostGIS, ~300MB RAM)
+docker compose up -d db
+
+# Terminal 2 — run the API directly with Python (no Docker build)
+cd backend
+pip install -r requirements.txt
+export DATABASE_URL=postgresql://worldsim:worldsim@localhost:5432/worldsim
+alembic upgrade head
+python -m app.db.seed.natural_earth_loader
+uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+
+# Terminal 3 — run the Vite dev server directly
+cd frontend
+npm install
+npm run dev
+
+# Terminal 4 — run Playwright
+cd frontend
+npx playwright install chromium --with-deps  # first time only
+npx playwright test
+```
+
+This approach avoids building the API Docker image (~4 min) and the
+frontend container's `npm install` (~5 min), reducing local E2E test
+startup from ~10 minutes to ~1 minute.
+
+**Fully offline path** (no Docker required): A mock-API fixture approach
+using MSW (Mock Service Worker) is planned for a future milestone. This will
+allow the Playwright tests to run without any backend by intercepting API
+calls with recorded fixture responses. When implemented, it will be
+documented here and enabled with a `PLAYWRIGHT_MOCK_API=true` environment
+variable. Until then, the lightweight local path above is the recommended
+approach for contributors without Docker.
+
+**Constraint**: The `window.__worldsim_selectEntity` test seam is only
+available when the Vite dev server runs in development mode
+(`import.meta.env.DEV = true`). Both the local and Docker paths use the
+Vite dev server, so the test seam is always available. The built
+(`npm run build`) frontend does not expose the seam — Playwright tests
+must not be run against the production build.
+
+---
+
 ## Code of Conduct
 
 WorldSim exists to level an asymmetric playing field. Contributors are expected

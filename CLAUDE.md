@@ -515,6 +515,20 @@ a Bolivian agricultural economist, and a Lebanese finance ministry
 official. Documented. Accessible. Not assuming the context that
 produced it.
 
+**Equitable Build Process.**
+WorldSim's build, test, and development infrastructure must be accessible
+to contributors who do not have access to high-end hardware or expensive
+CI resources. A tool designed to level the playing field for vulnerable
+actors must not reproduce the resource asymmetry it is designed to counter
+in its own development infrastructure. The CI pipeline targets the GitHub
+Actions free-tier runner (2-core, 7GB RAM, Ubuntu). Local development must
+be possible on a machine with 8GB RAM. Test suites must not require
+proprietary data, paid APIs, or licensed software to pass — all test
+fixtures use open-licensed data. The Playwright E2E suite must have a
+documented path to run without the full Docker Compose stack so that
+contributors on modest hardware can run the complete test suite locally.
+See `docs/CONTRIBUTING.md §Equitable Build Process`.
+
 ---
 
 ## Standards and Conventions
