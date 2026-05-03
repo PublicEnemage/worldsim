@@ -76,6 +76,10 @@ def _validate_create_request(req: ScenarioCreateRequest) -> None:
     if n < 1 or n > 100:
         errors.append(f"n_steps must be between 1 and 100 (got {n}).")
 
+    # Step semantics: the engine advances n times producing states at steps 0..n.
+    # Inputs at step k are injected during the advance from step k-1 → step k.
+    # Step 0 (initial state) and step n (last advance) are both valid injection
+    # points, so the valid range is [0, n] inclusive — NOT [0, n-1].
     invalid_steps = [
         si.step
         for si in req.scheduled_inputs
