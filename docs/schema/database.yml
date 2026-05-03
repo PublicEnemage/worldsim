@@ -803,6 +803,14 @@ query_notes:
       There is NO 'name' key in simulation_entities.metadata.
       asyncpg returns metadata as a JSON string — always json.loads() before .get().
       Correct: json.loads(row['metadata']).get('name_en', entity_id)
+    test_mock_shape: >
+      AsyncMock stubs for "SELECT metadata FROM simulation_entities WHERE entity_id = $1"
+      must return {"metadata": json.dumps({"name_en": "Greece"})} — NOT {"name": "Greece"}
+      and NOT {"name_en": "Greece"}.  The metadata column is a JSON string, not a dict.
+      When the entity is absent, return None (triggers the entity_id fallback).
+      Canonical helper used in tests/unit/test_measurement_output.py:
+        def _entity_row(name="Greece"):
+            return {"metadata": json.dumps({"name_en": name})}
 
   - name: "state_data is flat, not nested under 'entities'"
     description: >
