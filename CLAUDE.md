@@ -240,6 +240,16 @@ dependency patches. These must be part of a PR that references a parent issue
 or ADR but do not require their own issue. The PR description must include a
 one-line explanation of why no separate issue was needed.
 
+**Issue Closure Rule (all agents)**
+Every commit that resolves a tracked issue must close that issue in the same
+session using `gh issue close N --comment "..."` with a one-sentence summary
+of what was done and the commit SHA. For direct-to-main commits this replaces
+the PR `Closes #N` mechanism — there is no automatic closure without a PR, so
+the explicit `gh issue close` call is mandatory. An issue that is not explicitly
+closed remains open in the tracker regardless of whether the work is done in
+the codebase. The PM Agent reads the tracker — if the tracker is wrong, the
+BRIEF is wrong.
+
 **QA Agent**
 Writes tests, runs backtesting validation suites, reports failures.
 Backtesting runs are part of CI — regressions in historical fidelity
