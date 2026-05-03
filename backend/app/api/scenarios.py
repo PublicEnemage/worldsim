@@ -79,11 +79,11 @@ def _validate_create_request(req: ScenarioCreateRequest) -> None:
     invalid_steps = [
         si.step
         for si in req.scheduled_inputs
-        if si.step < 0 or si.step > n - 1
+        if si.step < 0 or si.step > n
     ]
     if invalid_steps:
         errors.append(
-            f"scheduled_inputs contain steps outside valid range 0–{n - 1}: "
+            f"scheduled_inputs contain steps outside valid range 0–{n}: "
             f"{sorted(set(invalid_steps))}."
         )
 

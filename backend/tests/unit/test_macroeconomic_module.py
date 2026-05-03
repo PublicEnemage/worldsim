@@ -24,10 +24,8 @@ Coverage:
 """
 from __future__ import annotations
 
+from datetime import UTC, datetime
 from decimal import Decimal
-from datetime import datetime, timezone
-
-import pytest
 
 from app.simulation.engine.models import (
     Event,
@@ -44,7 +42,7 @@ from app.simulation.modules.macroeconomic.module import (
     _detect_regime,
 )
 
-_TS = datetime(2010, 1, 1, tzinfo=timezone.utc)
+_TS = datetime(2010, 1, 1, tzinfo=UTC)
 
 
 # ---------------------------------------------------------------------------
@@ -376,7 +374,7 @@ def test_gdp_growth_value_is_decimal_not_float() -> None:
 
 
 def test_regime_change_event_emitted_standard_to_depressed() -> None:
-    # GDP starts at 0 (standard). Spending cut of -0.03 * 0.5 = -0.015 → new GDP = -0.015 (depressed).
+    # Spending cut -0.03 × standard multiplier 0.5 → gdp_delta = -0.015 → GDP = -0.015 (depressed).
     state = _make_state(
         gdp_growth="0",
         prior_events=[_fiscal_spending_event("GRC", "-0.03")],

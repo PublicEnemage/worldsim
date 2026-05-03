@@ -233,7 +233,7 @@ def test_build_argentina_scenario_scheduled_input_values_are_strings() -> None:
 
 
 def test_build_argentina_scenario_scheduled_steps_in_valid_range() -> None:
-    """All scheduled input steps must be within [0, n_steps - 1]."""
+    """All scheduled input steps must be within [0, n_steps]."""
     scenario = build_argentina_scenario()
     n = scenario.configuration.n_steps
     for si in scenario.scheduled_inputs:
