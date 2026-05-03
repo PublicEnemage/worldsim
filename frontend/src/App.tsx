@@ -41,6 +41,15 @@ export default function App() {
     setSelectedEntityId(entityId);
   };
 
+  // Playwright E2E test seam — DEV mode only, eliminated from production builds.
+  // Exposes entity-selection handler so tests can open the drawer without clicking
+  // on the WebGL canvas (unreliable in headless Chromium at map zoom levels).
+  useEffect(() => {
+    if (!import.meta.env.DEV) return;
+    (window as unknown as Record<string, unknown>).__worldsim_selectEntity = (id: string) =>
+      setSelectedEntityId(id);
+  }, [setSelectedEntityId]);
+
   // When a scenario is selected, check if it's already completed and fast-forward
   // currentStep to its final step — ScenarioControls won't emit onStepChange for
   // a scenario that was completed before this session.
