@@ -450,6 +450,95 @@ floats or bare `Decimal` values as attribute values.
 | Module output | `list[Event]` with `Quantity` deltas | `list[Event]` with float deltas |
 | Event delta | `Quantity` with matching `variable_type` | `float` delta |
 
+#### Distribution Output Standards (M5+)
+
+##### Rule 1 — No distribution fields in the propagation envelope
+
+Distribution fields (`ci_lower`, `ci_upper`, `ci_coverage`, `is_pre_calibration`,
+`clipped_lower`, `clipped_upper`) must NOT be added to the `Quantity` type or
+to `quantity_to_jsonb` / `quantity_from_jsonb`. These fields are computed at
+query time by the `BandingEngine` and are absent from all stored snapshots.
+
+```python
+# Forbidden — distribution fields in the snapshot envelope
+def quantity_to_jsonb(q: Quantity) -> dict:
+    return {
+        "_envelope_version": "1",
+        "value": str(q.value),
+        "ci_lower": str(q.ci_lower),   # FORBIDDEN: distribution in snapshot
+        "ci_upper": str(q.ci_upper),   # FORBIDDEN
+        ...
+    }
+
+# Correct — snapshot envelope carries only point-estimate fields
+def quantity_to_jsonb(q: Quantity) -> dict:
+    return {
+        "_envelope_version": "1",
+        "value": str(q.value),
+        "unit": q.unit,
+        "confidence_tier": q.confidence_tier,
+        ...  # no ci_lower, ci_upper, ci_coverage here
+    }
+```
+
+The `_envelope_version` field on stored Quantity objects advances from `"1"`
+to `"2"` only for the `QuantitySchema` output type returned by
+`get_measurement_output` — never for the stored snapshot format.
+
+##### Rule 2 — `BAND_SCHEDULE` and `TIER_MULTIPLIERS` as declared constants
+
+Band widths are contractual parameters. Declare them as named module-level
+`SCREAMING_SNAKE_CASE` constants in `banding_engine.py`:
+
+```python
+# Correct — contractual parameters as named constants
+BAND_SCHEDULE: dict[int, Decimal] = {
+    1:   Decimal("0.10"),   # 1-year horizon: ±10%
+    2:   Decimal("0.20"),   # 2-year horizon: ±20%
+    5:   Decimal("0.35"),   # 3–5 year horizon: ±35%
+    999: Decimal("0.50"),   # >5 year horizon: ±50%
+}
+
+TIER_MULTIPLIERS: dict[int, Decimal] = {
+    1: Decimal("1.0"),
+    2: Decimal("1.2"),
+    3: Decimal("1.5"),
+    4: Decimal("2.0"),
+    5: Decimal("3.0"),
+}
+
+# Forbidden — magic-number band widths inline
+half_width = abs(point_estimate) * Decimal("0.35") * Decimal("1.5")  # FORBIDDEN
+```
+
+If a band width changes, it must change in `BAND_SCHEDULE` or
+`TIER_MULTIPLIERS` — one place, visible to reviewers. See
+`DATA_STANDARDS.md §Epistemic Band Labeling Standards` for the canonical
+values.
+
+##### Rule 3 — BandingEngine is the single source of band computation
+
+All epistemic band computation must go through `BandingEngine.compute_band()`.
+Inline band arithmetic elsewhere in `backend/app/` is forbidden, even if the
+formula appears equivalent. The `BandingEngine` enforces boundary clipping,
+tier multiplier application, and the `is_pre_calibration` label as a unit —
+bypassing any one of these produces an incorrectly labeled output.
+
+```python
+# Correct — all band computation through BandingEngine
+banded = banding_engine.compute_band(
+    point_estimate=q.value,
+    confidence_tier=q.confidence_tier,
+    horizon_steps=horizon,
+    lower_bound=Decimal("0"),
+    upper_bound=Decimal("1"),
+)
+
+# Forbidden — band computation outside BandingEngine
+ci_lower = q.value * Decimal("0.65")   # FORBIDDEN: bypasses clipping and multipliers
+ci_upper = q.value * Decimal("1.35")   # FORBIDDEN
+```
+
 ---
 
 ## Naming Conventions
@@ -619,6 +708,41 @@ def test_austerity_shock_human_cost_scales_with_shock_magnitude():
 ```
 
 The human cost ledger is never a footnote. Its test coverage reflects this.
+
+---
+
+## User-Facing Alert Text Standards
+
+### MDA Alert Language: Declarative Finding, Not Warning Alarm
+
+The canonical user cites MDA alerts as evidence in a negotiation. The alert
+is a finding she presents — not a warning about her own proposed path. Alert
+text must reflect this.
+
+```python
+# Correct — declarative finding language
+f"{indicator_name} crosses {severity} threshold at step {step_index}."
+f"{indicator_name} is at {current_value} against a floor of {floor_value} "
+f"at step {step_index} — {severity} threshold crossed."
+
+# Forbidden — warning-alarm framing
+f"WARNING: {indicator_name} is approaching a dangerous level."
+f"ALERT: {indicator_name} may breach its floor."
+f"CRITICAL: {indicator_name} is at risk."
+```
+
+The severity enum value (`WARNING` / `CRITICAL` / `TERMINAL`) is for triage
+color-coding and visual weight. It must not appear as a prose prefix in
+human-readable alert text. Alert prose states what happened and when.
+
+Any function, method, or template that generates MDA alert display text
+must be reviewed against this standard before merging. Backend alert
+generation (Python) and frontend rendering (TypeScript/React) are both
+in scope.
+
+**Source:** `docs/ux/north-star.md §Resolved Design Question 3 — Professional
+Framing of the Human Cost Ledger`. Any revision to the framing in that
+document must be reflected here in the same commit.
 
 ---
 

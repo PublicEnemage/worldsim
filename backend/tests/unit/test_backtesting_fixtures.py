@@ -129,9 +129,9 @@ def test_ia1_disclosure_matches_canonical_phrase() -> None:
 
 
 def test_ia1_disclosure_contains_required_terms() -> None:
-    assert "confidence tier" in IA1_DISCLOSURE.lower()
-    assert "DATA_STANDARDS.md" in IA1_DISCLOSURE
-    assert "IA-1" in IA1_DISCLOSURE
+    assert "pre-calibration" in IA1_DISCLOSURE.lower()
+    assert "uncertainty" in IA1_DISCLOSURE.lower()
+    assert "not predictions" in IA1_DISCLOSURE.lower()
 
 
 # ---------------------------------------------------------------------------

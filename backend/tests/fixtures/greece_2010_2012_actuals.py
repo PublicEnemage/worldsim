@@ -25,9 +25,14 @@ from decimal import Decimal
 # ---------------------------------------------------------------------------
 
 IA1_DISCLOSURE: str = (
-    "Forward projections carry inherited confidence tier without time-horizon "
-    "degradation. Confidence tiers reflect data quality at observation date, not "
-    "projection reliability. See DATA_STANDARDS.md Known Limitation IA-1."
+    "This simulation produces distributions using pre-calibration uncertainty "
+    "bands. Intervals shown are NOT confidence intervals derived from calibrated "
+    "parameter distributions — they are conservative defaults that widen with "
+    "projection horizon and data quality. Bands will be revised when "
+    "MAGNITUDE_WITHIN_20PCT validation exists for at least two independent "
+    "historical cases. All outputs should be interpreted as structured reasoning "
+    "tools, not predictions. Verify against current data before consequential "
+    "use."
 )
 
 PARAMETER_CALIBRATION_DISCLOSURE: str = (

@@ -301,12 +301,12 @@ def test_envelope_observation_date_is_iso_string_or_none() -> None:
 
 
 def test_ia1_canonical_phrase_not_empty() -> None:
-    """SA-01: IA1_CANONICAL_PHRASE must be non-empty and contain required terms."""
+    """SA-01: IA1_CANONICAL_PHRASE must be non-empty and contain M5 required terms."""
     assert IA1_CANONICAL_PHRASE
     assert len(IA1_CANONICAL_PHRASE) > 30
-    assert "confidence tier" in IA1_CANONICAL_PHRASE.lower()
-    assert "IA-1" in IA1_CANONICAL_PHRASE
-    assert "DATA_STANDARDS.md" in IA1_CANONICAL_PHRASE
+    assert "pre-calibration" in IA1_CANONICAL_PHRASE.lower()
+    assert "uncertainty" in IA1_CANONICAL_PHRASE.lower()
+    assert "not predictions" in IA1_CANONICAL_PHRASE.lower()
 
 
 def test_ia1_canonical_phrase_contains_projection_warning() -> None:

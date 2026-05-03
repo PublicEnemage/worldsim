@@ -1191,6 +1191,120 @@ choice appears arbitrary.
 
 ---
 
+## Epistemic Band Labeling Standards (M5+)
+
+M5 adds epistemic banding to all simulation outputs via the `BandingEngine`.
+Every API response that includes distribution fields must conform to this
+standard. See ADR-006 Decision 1 for the architectural rationale.
+
+### Band Schedule and Tier Multipliers
+
+The `BandingEngine` applies a two-table schedule to produce the 80% confidence
+interval from a point estimate, `confidence_tier`, and `horizon_steps`:
+
+**Band schedule (base half-width as ± percentage of |point estimate|):**
+
+| Horizon (annual steps from baseline) | Base half-width |
+|---|---|
+| 1 year | ±10% |
+| 2 years | ±20% |
+| 3–5 years | ±35% |
+| > 5 years | ±50% |
+
+**Confidence tier multiplier:**
+
+| Confidence tier | Band multiplier | Rationale |
+|---|---|---|
+| 1 (highest data quality) | 1.0× | No additional widening — Tier 1 source |
+| 2 | 1.2× | Minor estimation uncertainty |
+| 3 | 1.5× | Derived or estimated parameters |
+| 4 | 2.0× | Low-quality or reconstructed data |
+| 5 (lowest data quality) | 3.0× | Speculative or proxy estimates |
+
+A Tier 3 attribute at a 3-year horizon carries ±35% × 1.5 = ±52.5%.
+This is intentionally wide. Understating uncertainty is the wrong failure
+mode for a sovereign policy tool.
+
+### Required Fields on Every Banded Output
+
+Every `QuantitySchema` entry with `_envelope_version: "2"` must carry:
+
+| Field | Type | M5 value |
+|---|---|---|
+| `ci_lower` | `str` (string-serialized Decimal) | Lower bound of 80% interval |
+| `ci_upper` | `str` (string-serialized Decimal) | Upper bound of 80% interval |
+| `ci_coverage` | `float` | `0.80` throughout M5 |
+| `is_pre_calibration` | `bool` | `True` throughout M5 |
+| `clipped_lower` | `bool` | `True` if natural lower boundary applied |
+| `clipped_upper` | `bool` | `True` if natural upper boundary applied |
+
+`is_pre_calibration` becomes `False` when MAGNITUDE_WITHIN_20PCT validation
+is achieved for at least two independent historical cases. Until then every
+banded output carries `True` — there are no exceptions.
+
+### Data Quality vs. Model Uncertainty — Mandatory Separation
+
+`confidence_tier` and distribution width are categorically different and
+must never be conflated:
+
+- **`confidence_tier`** is a data quality signal — how well we know the
+  historical or observed value. It originates from the source data (IMF WEO
+  Tier 1; estimated parameters Tier 3). It is a property of the *observation*.
+- **`ci_lower` / `ci_upper` / `ci_coverage`** are model uncertainty signals —
+  how uncertain the simulation is about the projected value given the model's
+  equations and calibration state. They are computed by the `BandingEngine`
+  at query time. They are properties of the *projection*.
+
+A Tier 1 observation with wide uncertainty bounds (highly reliable data,
+uncertain model) and a Tier 3 observation with narrow bounds (poor data,
+well-constrained model) must be rendered differently. Any design that
+encodes distribution width *as* a confidence tier, or reads `confidence_tier`
+as a proxy for interval width, produces outputs that users cannot correctly
+interpret. See ARCH-REVIEW-004 Blindspot 1-A for the canonical failure mode.
+
+### BandingEngine Is the Sole Source
+
+All epistemic bands in API responses must be computed by the `BandingEngine`.
+Inline band arithmetic outside `BandingEngine` is prohibited — it bypasses
+boundary clipping, tier multiplier application, and the `is_pre_calibration`
+label as a unit. See `CODING_STANDARDS.md §Distribution Output Standards (M5+)`.
+
+### Attribute Boundary Classification
+
+Every attribute processed by the `BandingEngine` must be classified by its
+natural domain. This classification is declared by the module introducing
+the attribute.
+
+| Attribute class | Natural lower | Natural upper | Examples |
+|---|---|---|---|
+| Bounded proportion | 0 | 1 | `poverty_headcount_ratio`, `employment_rate`, `food_insecurity_rate` |
+| Non-negative stock | 0 | None | `gdp_level_usd`, `fx_reserves`, `population_total` |
+| Non-negative ratio (unbounded upper) | 0 | None | `debt_gdp_ratio`, `reserve_coverage_months` |
+| Signed flow / rate | None | None | `gdp_growth_rate`, `fiscal_balance_pct_gdp`, `inflation_rate` |
+| Bounded index | Declared minimum | Declared maximum | `capability_index` [0, 1], Freedom House [1, 7] |
+
+Undeclared bounds are treated as `(None, None)` — signed flow. This is the
+wrong default for proportions and stocks. Every new attribute introduced by
+a module must declare its bounds in its attribute specification.
+
+### Note Field Format for Boundary Pile-Up Disclosure
+
+When the `BandingEngine` clips a band (`clipped_lower: True` or
+`clipped_upper: True`), the affected `QuantitySchema` entry carries this
+exact `note` text:
+
+```
+"Uncertainty band clipped at natural boundary ({lower|upper}). "
+"Probability mass at boundary represents probability of extreme values "
+"in that direction."
+```
+
+Substitute `lower` or `upper` as appropriate. Variations that say "truncated"
+or that omit the probability interpretation are prohibited — they understate
+what boundary pile-up means to the analyst reading the output.
+
+---
+
 ## Known Limitations
 
 This section documents formally acknowledged limitations in WorldSim's data
@@ -1229,9 +1343,14 @@ must appear verbatim in every `ia1_disclosure` field. It must not be
 paraphrased or abbreviated:
 
 ```
-Forward projections carry inherited confidence tier without time-horizon
-degradation. Confidence tiers reflect data quality at observation date, not
-projection reliability. See DATA_STANDARDS.md Known Limitation IA-1.
+This simulation produces distributions using pre-calibration uncertainty
+bands. Intervals shown are NOT confidence intervals derived from calibrated
+parameter distributions — they are conservative defaults that widen with
+projection horizon and data quality. Bands will be revised when
+MAGNITUDE_WITHIN_20PCT validation exists for at least two independent
+historical cases. All outputs should be interpreted as structured reasoning
+tools, not predictions. Verify against current data before consequential
+use.
 ```
 
 `validate_ia1_disclosure()` in `quantity_serde.py` enforces that

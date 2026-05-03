@@ -146,3 +146,79 @@ them earlier:
 3. **No test for re-selecting a completed scenario.** The second Playwright
    flow above (re-select → drawer shows immediately) was the exact regression.
    It is now a required test.
+
+---
+
+## Phase 3–4: Distribution Visualization Acceptance Criteria (M5 / M6)
+
+Per ADR-006 Decision 12, a second Playwright layer is required once distribution
+visualization components are implemented. These three criteria are the binding
+acceptance tests, each derived from a user-observable outcome defined in
+`docs/ux/north-star.md §Distribution Visualization Acceptance Criteria`.
+
+The Phase 3–4 suite is **not** a blocking gate for M5 exit. It **becomes** a
+blocking gate for the first PR that merges distribution rendering to
+`EntityDetailDrawer`, `RadarChart`, or `FrameworkPanel`. It must be written
+before that PR is opened, not after.
+
+---
+
+### Criterion 1 — Distribution alert fires before the mean crosses the floor
+
+> Given a scenario advanced to a horizon where an indicator's 80% CI lower
+> bound is below its MDA floor and the point estimate is within 1.5× the
+> floor, when the user opens the entity drawer, then the MDA alert panel
+> shows the indicator with an alert labeled as distribution-source, and this
+> alert is visually distinguishable from a point-estimate alert — even if no
+> point-estimate alert has fired.
+
+**Playwright assertion:** `MDAAlertPanel` renders an element with
+`data-alert-source="distribution"` for the indicator. The element is
+distinguishable (e.g., different border or label) from a
+`data-alert-source="point_estimate"` element. The criterion passes only
+if no point-estimate alert has fired for the same indicator at the same step.
+
+---
+
+### Criterion 2 — Pre-calibration disclosure is non-suppressible
+
+> Given any scenario at any step with distribution bands visible, when the
+> entity drawer shows measurement output, then the `ia1_disclosure` text is
+> visible and contains the word "pre-calibration," and no user interaction
+> (weight adjustment, framework tab change, or scroll to top of drawer)
+> makes it disappear from the rendered DOM.
+
+**Playwright assertion:** After each interaction sequence, assert
+`page.getByText(/pre-calibration/)` is attached to the DOM with
+`toBeAttached()`. The test must cover: initial load, framework tab switch,
+scroll to top, and (if implemented) weight adjustment toggle.
+
+---
+
+### Criterion 3 — Band width is proportional to projection horizon
+
+> Given scenario A advanced 1 step and scenario B advanced 3 steps, when
+> the user views the same indicator in both scenarios with uncertainty bands
+> visible, then the rendered band for scenario B is visually wider than for
+> scenario A, and each band display shows the declared coverage level (80%)
+> and the `is_pre_calibration` flag.
+
+**Playwright assertion:** The rendered band width for the 3-step scenario is
+greater than for the 1-step scenario on the same indicator. Use
+`data-band-width` attributes or accessible size attributes for reliable
+assertion — do not rely on pixel measurement alone. Each band element must
+contain text matching `/80%/` and the `is_pre_calibration: true` label.
+
+---
+
+### Implementation Sequencing Requirement
+
+Per ARCH-REVIEW-004 Domain 5 Blindspot 5-D, the required implementation order is:
+
+1. Phase 1–2 Playwright tests (point-estimate UI) — must pass before any M5 distribution rendering begins
+2. TypeScript type updates for distribution sibling fields (no rendering change)
+3. Distribution rendering components added behind `uncertaintyVisible = false` default
+4. Phase 3–4 Playwright tests authored and passing before any distribution rendering PR merges
+
+Reversing steps 3 and 4 produces flaky tests against a richer UI and makes
+the Phase 1–2 tests harder to maintain. Step 1 was completed in Issue #190.
