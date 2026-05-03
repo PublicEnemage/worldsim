@@ -442,21 +442,14 @@ Full agent profiles and operational agent definitions: `docs/agents/domain-intel
 
 ## What We Are Building First
 
-M0–M4 complete (v0.1.0–v0.4.0). ADRs 001–005 current. See GitHub Releases
+M0–M5 complete (v0.1.0–v0.5.0). ADRs 001–006 current. See GitHub Releases
 for full delivery history.
 
-**Milestone 5 — Calibration and Uncertainty (Current)**
-- Distribution outputs replacing point estimates — every simulation output
-  becomes a distribution with quantified uncertainty bounds
-- Uncertainty propagation through the feedback graph across timesteps
-- Historical calibration against Greece 2010–2012 and at least one
-  additional country case at MAGNITUDE_WITHIN_20PCT threshold
-- Playwright integration test suite covering the full scenario advance
-  and EntityDetailDrawer flow (required by M4 retrospective — hard gate)
-- Macroeconomic Module initial implementation (GDP, inflation, fiscal
-  balance with regime-dependent multipliers)
-- ADR-006 (uncertainty quantification and distribution outputs): required
-  before implementation begins
+**Milestone 6 — Backtesting Coverage Expansion (Current)**
+- Five historical backtesting cases with DIRECTION_ONLY and MAGNITUDE thresholds
+- Ecological and Governance Modules initial implementation
+- Backtesting fidelity dashboard surfacing case-by-case pass/fail in the UI
+- ADR-006 distribution output infrastructure extended to Ecological framework
 
 Each milestone is a vertical slice — working software at every stage,
 not infrastructure waiting for features.
@@ -465,28 +458,32 @@ not infrastructure waiting for features.
 
 ## Milestone Roadmap
 
-**Milestone 5 — Calibration and Uncertainty (Current)**
-Core deliverable: Simulation outputs become distributions, not point
-estimates. Users see uncertainty explicitly.
+**Milestone 5 — Calibration and Uncertainty (Complete — v0.5.0)**
+Core deliverable: Simulation outputs as distributions; MacroeconomicModule
+with regime-dependent multipliers; Argentina 2001-2002 second backtesting
+case; DISTRIBUTION_COMBINED threshold infrastructure.
+
+Delivered:
+- MacroeconomicModule with fiscal multiplier regime detection (Issue #191)
+- ADR-006 accepted; uncertainty quantification architecture defined
+- Playwright integration test suite 3/3 PASS (M4 retrospective hard gate)
+- Argentina 2001-2002 DIRECTION_ONLY backtesting fixture (Issue #192)
+- DISTRIBUTION_COMBINED + MAGNITUDE threshold types (Issue #194)
+- Single-entity composite score warning in measurement-output (Issue #193)
+- STD-REVIEW-004 gap closures (Issues #195–#200)
+
+**Milestone 6 — Backtesting Coverage Expansion (Current)**
+Core deliverable: Five historical cases at calibrated fidelity thresholds;
+Ecological and Governance Modules initial implementation.
 
 Scope:
-- Distribution parameterization for all simulation outputs (mean, std,
-  confidence interval, confidence tier propagation)
-- Uncertainty propagation through the feedback graph
-- Macroeconomic Module initial implementation (GDP, inflation, fiscal
-  balance, fiscal multipliers with regime detection)
-- Historical calibration: Greece 2010–2012 at MAGNITUDE_WITHIN_20PCT
-  threshold; one additional country case selected at M5 start
-- Playwright integration test suite (M4 retrospective requirement — blocks
-  M5 exit; no milestone closes without integration test coverage of the
-  full user flow)
-- ADR-006 required before implementation begins
+- Three additional backtesting cases (five total including Greece and Argentina)
+- MAGNITUDE threshold calibration against historical outturns
+- Ecological Module initial implementation (planetary boundary proximity)
+- Governance Module initial implementation (institutional quality indicators)
+- Backtesting fidelity dashboard in the UI
 
-Dependencies: ADR-001 (Quantity type must accommodate distributions),
-ADR-005 (composite scores become distribution-aware)
-
-**M6 through M8:** `docs/roadmap/milestone-roadmap-m6-m8.md`
-- M6: Backtesting coverage expansion (five historical cases, Ecological and Governance Modules initial)
+**M7 through M8:** `docs/roadmap/milestone-roadmap-m6-m8.md`
 - M7: Ecological and Governance Frameworks complete; all four radar axes live
 - M8: Methodology publication and external validation; Technical Steering Committee
 

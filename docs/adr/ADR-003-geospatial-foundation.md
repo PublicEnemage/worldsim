@@ -6,10 +6,19 @@ Accepted
 ## Validity Context
 
 **Standards Version:** 2026-04-21
-**Valid Until:** Milestone 5 completion
+**Valid Until:** Milestone 6 completion
 **License Status:** CURRENT
 
-**Last Reviewed:** 2026-04-26 — Milestone 4 exit review. No renewal triggers
+**Last Reviewed:** 2026-05-03 — Milestone 5 exit review. No renewal triggers
+fired during Milestone 5. License Status confirmed CURRENT. No changes to
+GeoJSON-over-REST serving approach, PostGIS schema, CORS policy, or
+TerritorialValidator gate. M5 additions (backtesting_thresholds table,
+MacroeconomicModule, measurement-output single_entity_warning) are purely
+backend computation additions that do not alter any geospatial contract.
+License renewed for Milestone 6. Next scheduled review at Milestone 6
+completion.
+
+**Previously reviewed:** 2026-04-26 — Milestone 4 exit review. No renewal triggers
 fired during Milestone 4. License Status confirmed CURRENT. No changes to
 GeoJSON-over-REST serving approach, PostGIS schema, CORS policy, or
 TerritorialValidator gate. The M4 measurement-output endpoint (`GET
@@ -17,8 +26,7 @@ TerritorialValidator gate. The M4 measurement-output endpoint (`GET
 any existing geospatial contract. The `population_total` framework tag fix
 (SQL `jsonb_set` migration + `natural_earth_loader.py` update) is a data
 correction within the existing attribute JSONB envelope format — envelope
-structure unchanged. License renewed for Milestone 5. Next scheduled review
-at Milestone 5 completion.
+structure unchanged. License renewed for Milestone 5.
 
 **Previously reviewed:** 2026-04-24 — Milestone 3 exit review. No renewal triggers
 fired during Milestone 3. License Status confirmed CURRENT. No changes to

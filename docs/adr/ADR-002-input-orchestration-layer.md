@@ -6,17 +6,26 @@ Accepted
 ## Validity Context
 
 **Standards Version:** 2026-04-15 (date standards documents were established)
-**Valid Until:** Milestone 5 completion
+**Valid Until:** Milestone 6 completion
 **License Status:** CURRENT
 
-**Last Reviewed:** 2026-04-26 — Milestone 4 exit review. No renewal triggers
+**Last Reviewed:** 2026-05-03 — Milestone 5 exit review. No renewal triggers
+fired during Milestone 5. License Status confirmed CURRENT. No changes to
+`ControlInput` type taxonomy, audit trail schema requirements, or
+`MeasurementFramework` tagging requirements occurred during this milestone.
+The Argentina 2001-2002 fixture (Issue #192) introduces `imf_program_acceptance`
+and `default_declaration` instruments in scheduled inputs — these are
+data-layer extensions within the existing `EmergencyPolicyInput` and
+`FiscalPolicyInput` types, additive and backward-compatible. License renewed
+for Milestone 6. Next scheduled review at Milestone 6 completion.
+
+**Previously reviewed:** 2026-04-26 — Milestone 4 exit review. No renewal triggers
 fired during Milestone 4. License Status confirmed CURRENT. No changes to
 `ControlInput` type taxonomy, audit trail schema requirements, or
 `MeasurementFramework` tagging requirements occurred during this milestone.
 The `modules_config` field added to `ScenarioConfigSchema` (DemographicModule
 wire-up) is a backward-compatible extension — existing orchestration contracts
-are unaffected. License renewed for Milestone 5. Next scheduled review at
-Milestone 5 completion.
+are unaffected. License renewed for Milestone 5.
 
 **Previously reviewed:** 2026-04-24 — Milestone 3 exit review. No renewal triggers
 fired during Milestone 3. License Status confirmed CURRENT. No changes to

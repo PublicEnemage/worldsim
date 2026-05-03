@@ -6,10 +6,22 @@ Accepted
 ## Validity Context
 
 **Standards Version:** 2026-04-15 (date standards documents were established)
-**Valid Until:** Milestone 5 completion
+**Valid Until:** Milestone 6 completion
 **License Status:** CURRENT
 
-**Last Reviewed:** 2026-04-26 — Milestone 4 exit review. All four ADR-005
+**Last Reviewed:** 2026-05-03 — Milestone 5 exit review. No renewal triggers
+fired during Milestone 5. License Status confirmed CURRENT. `MeasurementFramework`
+taxonomy unchanged; `CohortSpec` segmentation axes unchanged; `MDASeverity` enum
+unchanged. The `single_entity_warning: bool = False` field added to
+`MultiFrameworkOutput` (Issue #193) is an additive, backward-compatible change
+that surfaces a pre-existing invariant (composite_score is null when only one
+entity is present) — no framework taxonomy or normalization methodology was
+altered. The Argentina 2001-2002 backtesting case uses the ARG entity with
+`financial` and `human_development` frameworks, confirming the existing
+measurement framework is entity-neutral. License renewed for Milestone 6.
+Next scheduled review at Milestone 6 completion.
+
+**Previously reviewed:** 2026-04-26 — Milestone 4 exit review. All four ADR-005
 decisions implemented and verified: Decision 1 (DemographicModule, PR #183),
 Decision 2 (MultiFrameworkOutput API, PR #177), Decision 3 (MDA threshold
 system, PR #181), Decision 4 (radar chart dashboard, PR #185). No renewal
@@ -19,8 +31,7 @@ AgeBand ×5, EmploymentSector ×4 = 100 cohorts); `MDASeverity` enum unchanged.
 API smoke test 30/30 PASS. Manual smoke test passed. License renewed for
 Milestone 5. The M5 extension points flagged in this ADR (additional cohort
 axes, backtesting integration for HCL outputs, snapshot performance at scale,
-viewport synchronization) remain as documented deferred items. Next scheduled
-review at Milestone 5 completion.
+viewport synchronization) remain as documented deferred items.
 
 **Previously reviewed:** 2026-04-24 — Engineering Lead accepted at M4 boundary.
 ADR-005 reviewed alongside ARCH-REVIEW-003. All five decisions defined as new

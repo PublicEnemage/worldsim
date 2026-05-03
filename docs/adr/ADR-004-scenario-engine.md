@@ -6,13 +6,28 @@ Accepted
 ## Validity Context
 
 **Standards Version:** 2026-04-21
-**Valid Until:** Milestone 5 completion
+**Valid Until:** Milestone 6 completion
 **License Status:** CURRENT
 
 **Engineering Lead accepted 2026-04-21.** Architecture decisions reviewed and
 approved. Implementation may proceed.
 
-**Last Reviewed:** 2026-04-26 — Milestone 4 exit review. No renewal triggers
+**Last Reviewed:** 2026-05-03 — Milestone 5 exit review. **Renewal trigger
+fired** — threshold_type enum extended (Issue #194). The M5 `backtesting_thresholds`
+table (migration `b5d3f7a2c8e1`) introduces `threshold_type CHECK IN
+('DIRECTION_ONLY', 'MAGNITUDE', 'DISTRIBUTION_COMBINED')` — the threshold_type
+enum anticipated by ADR-004 Decision 4 has been formally instantiated in the
+database with the three types the decision described. Review confirms all
+ADR-004 decisions remain sound: the new threshold types implement the
+evaluation logic that Decision 4 specified as required for historical
+calibration; no scenario replay format, advance protocol, or snapshot
+contract was altered. DIRECTION_ONLY and DISTRIBUTION_COMBINED infrastructure
+confirmed operational; MAGNITUDE threshold calibration deferred per
+PARAMETER_CALIBRATION_DISCLOSURE. engine_version gap (Issue #139) remains a
+documented known limitation. License renewed for Milestone 6. Next scheduled
+review at Milestone 6 completion.
+
+**Previously reviewed:** 2026-04-26 — Milestone 4 exit review. No renewal triggers
 fired during Milestone 4. License Status confirmed CURRENT. The `modules_config`
 field on `ScenarioConfigSchema` (ADR-004 Decision 2 extension for DemographicModule
 activation) is a backward-compatible additive change — existing snapshot format,
@@ -20,8 +35,7 @@ advance protocol, and backtesting contracts are unaffected. The `events_snapshot
 JSONB column added to `scenario_state_snapshots` (MDA threshold system) is additive
 — snapshot v2 envelope format from SCAN-015 accommodates it. engine_version gap
 (Issue #139) remains a documented known limitation; verifiable pointer mechanism
-deferred to Milestone 5. License renewed for Milestone 5. Next scheduled review
-at Milestone 5 completion.
+deferred to Milestone 5. License renewed for Milestone 5.
 
 **Previously reviewed:** 2026-04-24 — Milestone 3 exit review. No renewal triggers
 fired during Milestone 3. License Status confirmed CURRENT. All five decisions
