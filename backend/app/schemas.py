@@ -352,10 +352,11 @@ class FrameworkOutput(BaseModel):
     """One measurement framework's indicators and composite score for an entity.
 
     composite_score is a Decimal-as-string (0.0–1.0 percentile rank) or None
-    when the module producing this framework's indicators is not yet
-    implemented. note is populated when composite_score is None.
+    when the module producing this framework's indicators is not yet implemented,
+    or when the scenario has only one entity (percentile rank is meaningless with
+    a population of one). note is populated when composite_score is None.
     mda_alerts is empty pending ADR-005 Decision 3 (MDAChecker) implementation.
-    ADR-005 Decision 2.
+    ADR-005 Decision 2. Issue #193.
     """
 
     model_config = ConfigDict(from_attributes=True)
@@ -376,7 +377,9 @@ class MultiFrameworkOutput(BaseModel):
     All four MeasurementFramework values are present in outputs; unimplemented
     frameworks carry composite_score=None and a note field. ia1_disclosure is
     required with no default — validated non-empty by validate_ia1_disclosure.
-    ADR-005 Decision 2.
+    single_entity_warning is True when the snapshot contains exactly one entity —
+    composite_score is null in that case because percentile rank requires at least
+    two entities for comparison. ADR-005 Decision 2. Issue #193.
     """
 
     model_config = ConfigDict(from_attributes=True)
@@ -388,6 +391,7 @@ class MultiFrameworkOutput(BaseModel):
     step_index: int
     outputs: dict[str, FrameworkOutput]
     ia1_disclosure: str
+    single_entity_warning: bool = False
 
     @field_validator("ia1_disclosure")
     @classmethod

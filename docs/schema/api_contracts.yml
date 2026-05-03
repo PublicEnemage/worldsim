@@ -471,9 +471,19 @@ endpoints:
           description: >
             IA-1 canonical disclosure phrase. Always non-empty.
             Must not be null, empty, or truncated — validated on write.
+        single_entity_warning:
+          type: boolean
+          default: false
+          description: >
+            True when the snapshot contains exactly one entity. In that case,
+            composite_score is null for all implemented frameworks because
+            percentile rank is meaningless with a population of one.
+            composite_score being 1.0 for a single entity conveys no information
+            — this flag prevents silent misinterpretation. Issue #193.
       status_404: "Scenario not found; or no snapshot at step; or entity not in snapshot"
     db_reads: [scenarios, scenario_state_snapshots, simulation_entities, mda_thresholds]
     notes:
       - "composite_score computation: mean percentile rank across all entities in the snapshot for each indicator"
       - "financial framework includes all untagged attributes (backward-compat rule)"
       - "ecological and governance always return composite_score=null at M4"
+      - "composite_score is also null when single_entity_warning=true — percentile rank requires ≥2 entities"

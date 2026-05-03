@@ -1,4 +1,4 @@
-"""Unit tests for MultiFrameworkOutput schemas and GET /measurement-output — Issue #176.
+"""Unit tests for MultiFrameworkOutput schemas and GET /measurement-output — Issue #176, #193.
 
 Covers:
   - MultiFrameworkOutput rejects empty ia1_disclosure
@@ -8,6 +8,8 @@ Covers:
   - ECOLOGICAL returns composite_score=None with note field
   - GOVERNANCE returns composite_score=None with note field
   - composite_score is serialized as a string, not a float
+  - Single-entity scenario: composite_score=None, single_entity_warning=True (Issue #193)
+  - Multi-entity scenario: composite_score non-null, single_entity_warning=False (Issue #193)
 
 All tests run without a database connection using AsyncMock.
 ADR-005 Decision 2.
@@ -319,3 +321,121 @@ async def test_entity_name_falls_back_to_entity_id_when_not_in_db() -> None:
         scenario_id="scen-1", entity_id="GRC", step=1, conn=conn
     )
     assert result.entity_name == "GRC"
+
+
+# ---------------------------------------------------------------------------
+# Single-entity composite score warning — Issue #193
+# ---------------------------------------------------------------------------
+
+_SINGLE_ENTITY_STATE = {
+    "_envelope_version": "2",
+    "_modules_active": [],
+    "GRC": {
+        "gdp_growth": _GRC_FINANCIAL_ATTR,
+        "unemployment_rate": _GRC_UNTAGGED_ATTR,
+    },
+}
+
+
+@pytest.mark.asyncio
+async def test_single_entity_composite_score_is_null() -> None:
+    """Single-entity snapshot: composite_score must be None for all implemented frameworks."""
+    conn = _make_conn(
+        {"scenario_id": "scen-1"},
+        _snap_row(state=_SINGLE_ENTITY_STATE),
+        _entity_row(),
+    )
+    result = await get_measurement_output(
+        scenario_id="scen-1", entity_id="GRC", step=1, conn=conn
+    )
+    assert result.outputs["financial"].composite_score is None
+    assert result.outputs["human_development"].composite_score is None
+
+
+@pytest.mark.asyncio
+async def test_single_entity_warning_is_true() -> None:
+    """Single-entity snapshot: single_entity_warning must be True."""
+    conn = _make_conn(
+        {"scenario_id": "scen-1"},
+        _snap_row(state=_SINGLE_ENTITY_STATE),
+        _entity_row(),
+    )
+    result = await get_measurement_output(
+        scenario_id="scen-1", entity_id="GRC", step=1, conn=conn
+    )
+    assert result.single_entity_warning is True
+
+
+@pytest.mark.asyncio
+async def test_single_entity_note_on_implemented_frameworks() -> None:
+    """Single-entity: implemented frameworks carry the single-entity note."""
+    conn = _make_conn(
+        {"scenario_id": "scen-1"},
+        _snap_row(state=_SINGLE_ENTITY_STATE),
+        _entity_row(),
+    )
+    result = await get_measurement_output(
+        scenario_id="scen-1", entity_id="GRC", step=1, conn=conn
+    )
+    financial_note = result.outputs["financial"].note
+    assert financial_note is not None
+    assert "not meaningful" in financial_note
+    assert "single-entity" in financial_note
+
+
+@pytest.mark.asyncio
+async def test_single_entity_unimplemented_frameworks_keep_their_note() -> None:
+    """Single-entity: ecological/governance keep the 'not yet implemented' note."""
+    conn = _make_conn(
+        {"scenario_id": "scen-1"},
+        _snap_row(state=_SINGLE_ENTITY_STATE),
+        _entity_row(),
+    )
+    result = await get_measurement_output(
+        scenario_id="scen-1", entity_id="GRC", step=1, conn=conn
+    )
+    assert "not yet implemented" in result.outputs["ecological"].note
+    assert "not yet implemented" in result.outputs["governance"].note
+
+
+@pytest.mark.asyncio
+async def test_multi_entity_single_entity_warning_is_false() -> None:
+    """Multi-entity snapshot: single_entity_warning must be False."""
+    conn = _make_conn(
+        {"scenario_id": "scen-1"},
+        _snap_row(),   # _STATE has GRC + USA
+        _entity_row(),
+    )
+    result = await get_measurement_output(
+        scenario_id="scen-1", entity_id="GRC", step=1, conn=conn
+    )
+    assert result.single_entity_warning is False
+
+
+@pytest.mark.asyncio
+async def test_multi_entity_composite_score_is_not_null() -> None:
+    """Multi-entity snapshot: financial composite_score must be a non-null string."""
+    conn = _make_conn(
+        {"scenario_id": "scen-1"},
+        _snap_row(),   # _STATE has GRC + USA
+        _entity_row(),
+    )
+    result = await get_measurement_output(
+        scenario_id="scen-1", entity_id="GRC", step=1, conn=conn
+    )
+    assert result.outputs["financial"].composite_score is not None
+    assert isinstance(result.outputs["financial"].composite_score, str)
+
+
+def test_multiframework_output_default_single_entity_warning_is_false() -> None:
+    """single_entity_warning defaults to False so existing callers without it stay valid."""
+    obj = MultiFrameworkOutput(
+        entity_id="GRC",
+        entity_name="Greece",
+        timestep="2011-01-01",
+        scenario_id="scen-1",
+        step_index=1,
+        outputs={},
+        ia1_disclosure=IA1_CANONICAL_PHRASE,
+    )
+    assert obj.single_entity_warning is False

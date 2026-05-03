@@ -659,6 +659,10 @@ _UNIMPLEMENTED_NOTES = {
     "governance": "Governance module not yet implemented — see module-capability-registry.md",
 }
 _ALL_FRAMEWORKS = ["financial", "human_development", "ecological", "governance"]
+_SINGLE_ENTITY_NOTE = (
+    "Composite score not meaningful in single-entity scenarios — "
+    "percentile rank requires at least two entities for comparison."
+)
 
 
 def _parse_entity_attrs(
@@ -821,6 +825,7 @@ async def get_measurement_output(
 
     all_entity_attrs = _parse_entity_attrs(state_dict)
     target_attrs = all_entity_attrs.get(entity_id, {})
+    is_single_entity = len(all_entity_attrs) == 1
 
     outputs: dict[str, FrameworkOutput] = {}
     for fw in _ALL_FRAMEWORKS:
@@ -847,7 +852,12 @@ async def get_measurement_output(
             for k, v in target_attrs.items()
             if (v.measurement_framework or "financial") == fw
         }
-        composite = _compute_composite_score(indicators, all_entity_attrs, fw)
+        if is_single_entity:
+            composite = None
+            note: str | None = _SINGLE_ENTITY_NOTE
+        else:
+            composite = _compute_composite_score(indicators, all_entity_attrs, fw)
+            note = None
         outputs[fw] = FrameworkOutput(
             framework=fw,
             entity_id=entity_id,
@@ -856,7 +866,7 @@ async def get_measurement_output(
             composite_score=composite,
             mda_alerts=fw_alerts,
             has_below_floor_indicator=has_below_floor,
-            note=None,
+            note=note,
         )
 
     return MultiFrameworkOutput(
@@ -867,4 +877,5 @@ async def get_measurement_output(
         step_index=step,
         outputs=outputs,
         ia1_disclosure=IA1_CANONICAL_PHRASE,
+        single_entity_warning=is_single_entity,
     )
