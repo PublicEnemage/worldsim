@@ -9,6 +9,12 @@ Accepted
 **Valid Until:** Milestone 6 completion
 **License Status:** CURRENT
 
+**Amendment 1 applied:** 2026-05-03 — Ecological Module M6 implementation
+scope. Data sources for planetary boundary indicators added to
+`docs/data-sources/approved-sources.md`. Ecological composite score scoped to
+percentile rank with mandatory API note for M6; boundary-normalized scoring
+deferred to M8. See Amendment 1 section at end of document.
+
 **Last Reviewed:** 2026-05-03 — Milestone 5 exit review. No renewal triggers
 fired during Milestone 5. License Status confirmed CURRENT. `MeasurementFramework`
 taxonomy unchanged; `CohortSpec` segmentation axes unchanged; `MDASeverity` enum
@@ -1148,3 +1154,159 @@ analysis, and monetary transmission mechanics. ADR-006 upgrades the
 `DemographicModule` elasticity subscriptions from FiscalPolicyInput-only to include
 `gdp_growth_change` events produced by the Macroeconomic Module, closing the gap
 documented in the Negative consequences above.
+
+---
+
+## Amendment 1 — M6 Pre-Implementation Scope: Ecological Module Data Sources and Composite Score Scoping
+
+**Date:** 2026-05-03
+**Closes:** #120 (SA-05 ecological data sources skeleton)
+**Context:** Pre-implementation assessment for Issues #204 (EcologicalModule)
+and #205 (GovernanceModule), conducted before M6 implementation begins.
+Assessment identified two gaps requiring amendment and four items confirmed
+requiring no amendment.
+
+---
+
+### Confirmations — No Amendment Required
+
+**Q1 — SimulationModule interface compatibility:**
+The two-method interface (`compute(entity, state, timestep) -> list[Event]`
+and `get_subscribed_events() -> list[str]`) at
+`backend/app/simulation/engine/models.py:318` accommodates both
+`EcologicalModule` and `GovernanceModule` without modification. Both modules
+subscribe to events and compute per-entity per-timestep via the same contract
+as `MacroeconomicModule` and `DemographicModule`. No new interface methods are
+required at M6 minimum viable scope.
+
+**Q2 — Governance data sources:**
+V-Dem (Varieties of Democracy), Freedom House, and Transparency International
+— the three primary sources for M6 minimum viable governance indicators
+(rule-of-law index, institutional independence score) — are already listed in
+`docs/data-sources/approved-sources.md §Geopolitical and Governance`. No
+amendment to the approved sources list is required for `GovernanceModule`.
+
+**Q3 — variable_type coverage:**
+All M6 minimum viable indicators for both modules map cleanly to the four
+existing `VariableType` values: `STOCK` (CO2 concentration level), `FLOW`
+(annual CO2 emissions, depletion rates), `RATIO` (land-use pressure, boundary
+proximity fractions), `DIMENSIONLESS` (rule-of-law index, institutional
+independence score, composite governance indicators). No new `VariableType`
+values are required.
+
+**Q4 — Governance composite score normalization:**
+Cross-entity percentile rank is methodologically valid for governance
+indicators. Rule-of-law index and institutional independence score are
+country-level measures where ranking relative to other entities is meaningful
+— the percentile tells the user where a country sits in the global
+distribution of governance quality. Decision 2 percentile methodology applies
+without modification to `GovernanceModule`.
+
+---
+
+### Amendment A — Ecological Data Sources
+
+Four ecological data sources added to `docs/data-sources/approved-sources.md`
+under a new **Ecological** section. Summary:
+
+| Source | License | Supports |
+|---|---|---|
+| NASA/NOAA Mauna Loa CO2 Measurements | Public domain | `co2_concentration_ppm` (STOCK) |
+| Stockholm Resilience Centre Planetary Boundary Calibrations | CC BY 4.0 | `planetary_boundary_proximity` ratio denominator |
+| FAO Global Forest Resources Assessment | CC BY-NC-SA 3.0 IGO | `land_use_pressure_index` (RATIO) |
+| Global Carbon Project CO2 Budget Data | CC BY 4.0 | `co2_trajectory` (FLOW) |
+
+All four sources must be registered in `source_registry` before
+`EcologicalModule` writes any `Quantity` with a `source_registry_id`.
+
+**Issue #120 disposition:** This amendment adds the planetary boundary
+calibration source (Stockholm Resilience Centre), CO2 measurement source
+(NASA/NOAA), forest data source (FAO GFR), and emissions attribution source
+(Global Carbon Project) to `approved-sources.md`, satisfying Issue #120's
+requirement to name authoritative sources for ecological indicators. Confidence
+tier defaults are captured in Amendment B below. Issue #120 is closed by this
+amendment.
+
+---
+
+### Amendment B — Ecological Module M6 Composite Score Scoping
+
+#### The problem
+
+ADR-005 Decision 2 defines composite scores as the mean percentile rank of an
+entity's framework indicators across all country-type entities in the current
+simulation state. For financial and human development indicators, cross-entity
+percentile comparison is methodologically sound. For planetary boundary
+indicators, this methodology is a category error: a planetary boundary is an
+absolute physical threshold (e.g., 350 ppm CO2 pre-industrial for the climate
+boundary), not a relative ranking criterion. If all 177 entities have CO2
+trajectories above the boundary, percentile scores produce a stable
+distribution while every entity is in an unsafe operating space.
+
+#### Decision — Option 3: Scoped M6 exception with mandatory disclosure
+
+`EcologicalModule` M6 uses the existing percentile rank methodology for
+composite score computation, identical to the financial and human development
+frameworks. This is a deliberate, bounded decision — not a default or an
+oversight.
+
+The following `FrameworkOutput.note` value **MUST** appear in every API
+response where `measurement_framework == "ecological"`, regardless of whether
+the composite score is null or non-null:
+
+> *"Ecological composite score uses cross-entity percentile rank at M6 scope.
+> Planetary boundary absolute normalization is methodologically preferred and
+> is deferred to M8 when the full indicator set is defined."*
+
+This note is not optional text. It is a mandatory disclosure, equivalent in
+status to `ia1_disclosure` on `MultiFrameworkOutput`. Any code path that
+returns an ecological `FrameworkOutput` without this note is non-compliant
+with this amendment.
+
+#### Why Option 3 over the alternatives
+
+**Option 1 rejected — boundary-normalized scoring
+(`1 - current_value / boundary_value`):** Requires knowing the full indicator
+set before the normalization formula can be validated against all nine
+planetary boundary domains. At M6 scope, only two pilot indicators are
+defined. Premature normalization design risks revision when the remaining
+boundaries are added at M8.
+
+**Option 2 rejected — dual output (percentile + boundary proximity):** Adding
+a `relative_rank` field to `FrameworkOutput` modifies the API wire format and
+potentially fires the ADR-005 renewal trigger for "Radar chart normalization
+methodology changed." The `note` field approach achieves the same epistemic
+honesty without schema changes.
+
+**Option 3 accepted:** Uses the `note` field (already present in
+`FrameworkOutput` per Decision 2) to surface the limitation at the API layer;
+defers the normalization decision to M8 when it can be designed for the full
+nine-boundary suite; fires no renewal triggers.
+
+#### Confidence tier defaults for M6 ecological indicators
+
+| Indicator | Source | Default confidence_tier | Rationale |
+|---|---|---|---|
+| `co2_concentration_ppm` | NASA/NOAA Mauna Loa | 1 | Direct continuous measurement series |
+| `co2_trajectory` | Global Carbon Project | 2 | Peer-reviewed annual budget, some attribution uncertainty |
+| `land_use_pressure_index` | FAO GFR + SRC boundary | 3 | 5-year FRA data requires annual interpolation |
+| `planetary_boundary_proximity` | SRC + module calculation | 3 | Boundary value Tier 2; proximity calculation adds one tier |
+
+#### M8 obligation
+
+An ADR-005 Amendment 2 addressing planetary boundary absolute normalization is
+a **blocking prerequisite** for M8 Ecological Module completion. This
+amendment explicitly names that obligation. An M8 exit that delivers ecological
+composite scores without an amendment addressing normalization methodology is
+non-compliant with this scoping decision.
+
+---
+
+### Renewal Triggers — No New Triggers Added
+
+This amendment adds no new renewal triggers. The following existing trigger
+remains the M8 gating condition for Amendment 2:
+
+- *"Radar chart normalization methodology changed from percentile-based
+  cross-entity ranking to an alternative"* — this trigger fires when Amendment
+  2 introduces boundary-normalized scoring for the ecological framework at M8.
