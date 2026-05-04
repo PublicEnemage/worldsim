@@ -9,6 +9,12 @@ Accepted
 **Valid Until:** Milestone 6 completion
 **License Status:** CURRENT
 
+**Amendment 2 applied:** 2026-05-04 — DemographicModule subscription contract
+corrected. `fiscal_spending_change` and `fiscal_tax_change` removed from
+subscribed events (M5, commit 495d1ee, ADR-006 constraint E1); elasticity
+registry recalibrated to GDP units. Decision 1 body updated in-place.
+See Amendment 2 section at end of document.
+
 **Amendment 1 applied:** 2026-05-03 — Ecological Module M6 implementation
 scope. Data sources for planetary boundary indicators added to
 `docs/data-sources/approved-sources.md`. Ecological composite score scoped to
@@ -230,20 +236,30 @@ backtesting calibration upgrades it.
 
 The `DemographicModule` is a `SimulationModule` (ADR-001 interface) that:
 
-1. **Subscribes to** events of type `fiscal_spending_change`, `fiscal_tax_change`,
-   `gdp_growth_change`, `imf_program_acceptance`, `capital_controls_imposition`, and
-   `emergency_declaration`. These event types are produced by `FiscalPolicyInput`,
-   `EmergencyPolicyInput`, and (when implemented) the Macroeconomic Module.
+1. **Subscribes to** events of type `gdp_growth_change`, `imf_program_acceptance`,
+   `capital_controls_imposition`, and `emergency_declaration`. Direct fiscal event
+   subscriptions (`fiscal_spending_change`, `fiscal_tax_change`) were removed in M5 —
+   see Amendment 2. All fiscal policy effects now reach cohorts exclusively through
+   the GDP channel: `FiscalPolicyInput` → `MacroeconomicModule` → `gdp_growth_change`
+   → `DemographicModule`.
 
 2. **Each timestep**, applies an elasticity matrix to translate country-level event
    deltas into cohort-level attribute changes. The elasticity encodes the empirical
-   relationship: "when government spending falls by 1% of GDP in Greece, the Q1 cohort's
+   relationship: "when GDP falls by 1% in Greece, the Q1 cohort's
    `poverty_headcount_ratio` rises by approximately X percentage points."
 
 3. **Returns** `Event` objects targeting cohort entities with `affected_attributes`
    specifying the Quantity delta per affected cohort attribute, carrying the same
    `confidence_tier` as the underlying elasticity estimate (Tier 3 minimum until
    calibrated).
+
+**Module dependency (enforced from M7):** `DemographicModule` requires
+`MacroeconomicModule` to be active whenever cohort resolution is enabled. A
+scenario that activates cohort resolution without `MacroeconomicModule` will
+produce silently empty cohort outputs from fiscal policy — no exception, no
+warning, no change in the Human Cost Ledger. Issue #211 (M7 Technical
+Foundation) tracks adding a `SimulationConfigurationError` at startup to
+enforce this dependency explicitly.
 
 **Elasticity matrix structure:**
 
@@ -255,7 +271,7 @@ class CohortElasticity:
     Encodes: when event_type fires on the parent country entity, this cohort's
     attribute_key changes by (event_magnitude * elasticity).
     """
-    event_type: str           # e.g., "fiscal_spending_change"
+    event_type: str           # e.g., "gdp_growth_change"
     cohort_spec: CohortSpec   # which cohort
     attribute_key: str        # which cohort attribute changes
     elasticity: Decimal       # delta per unit of country-level event magnitude
@@ -1310,3 +1326,71 @@ remains the M8 gating condition for Amendment 2:
 - *"Radar chart normalization methodology changed from percentile-based
   cross-entity ranking to an alternative"* — this trigger fires when Amendment
   2 introduces boundary-normalized scoring for the ecological framework at M8.
+
+---
+
+## Amendment 2 — M5 DemographicModule Subscription Contract: Fiscal Events Removed, GDP Channel Only
+
+**Date:** 2026-05-04
+**References:** Issue #191 (MacroeconomicModule), commit 495d1ee, ADR-006
+constraint E1, Issue #211 (startup validation gap — M7 Technical Foundation)
+
+### What Changed
+
+During M5 implementation of `MacroeconomicModule` (Issue #191), `DemographicModule`
+was refactored per ADR-006 constraint E1:
+
+1. `fiscal_spending_change` and `fiscal_tax_change` removed from
+   `_SUBSCRIBED_EVENTS` (`backend/app/simulation/modules/demographic/module.py:29`)
+2. Elasticity registry recalibrated from fiscal units ("per 1% of GDP spending
+   cut") to GDP units ("per 1% GDP contraction")
+
+**Previous subscribed events:** `fiscal_spending_change`, `fiscal_tax_change`,
+`gdp_growth_change`, `imf_program_acceptance`, `capital_controls_imposition`,
+`emergency_declaration`
+
+**Current subscribed events:** `gdp_growth_change`, `imf_program_acceptance`,
+`capital_controls_imposition`, `emergency_declaration`
+
+**Previous elasticity framing:** "when government spending falls by 1% of GDP
+in Greece, the Q1 cohort's `poverty_headcount_ratio` rises by approximately X
+percentage points."
+
+**Current elasticity framing:** "when GDP falls by 1% in Greece, the Q1
+cohort's `poverty_headcount_ratio` rises by approximately X percentage points."
+
+Decision 1 body updated in-place to reflect current behavior. The previous
+text is preserved above for audit purposes.
+
+### Why This Change Was Made
+
+The GDP channel is economically correct. Fiscal changes affect cohorts through
+their effect on the real economy — employment, incomes, firm payrolls — not
+directly. Routing through `gdp_growth_change` embeds the regime-dependent
+multiplier in the full chain: the same 5% spending cut produces a 2.5% GDP
+contraction in standard conditions (multiplier 0.5) and a 10% contraction in
+ZLB conditions (multiplier 2.0). `DemographicModule` receives the amplified
+GDP signal, not the raw fiscal impulse. Human cost outcomes are now
+regime-sensitive end-to-end.
+
+The previous direct fiscal subscriptions were a temporary workaround pending
+`MacroeconomicModule` implementation. ADR-006 constraint E1 required their
+removal when the GDP channel became available.
+
+### Implicit Dependency Created
+
+This change creates an implicit hard dependency: `DemographicModule` requires
+`MacroeconomicModule` to be active when cohort resolution is enabled. If
+`MacroeconomicModule` is absent, no `gdp_growth_change` events are emitted,
+`DemographicModule` receives no fiscal signal, and the Human Cost Ledger
+shows silently empty cohort outputs. No exception is raised.
+
+Issue #211 (M7 Technical Foundation) tracks adding a
+`SimulationConfigurationError` at `WebScenarioRunner` startup to enforce this
+dependency explicitly. Until #211 is resolved, this dependency is documented
+here and in `docs/scenarios/module-capability-registry.md` as an invariant
+that scenario authors must observe.
+
+### Renewal Triggers — No New Triggers Added
+
+This amendment adds no new renewal triggers.
