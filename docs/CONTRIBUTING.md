@@ -338,6 +338,47 @@ test(backtesting): add Greece 2010-2012 Coffin Corner case
 
 ---
 
+## Pre-PR Checklist
+
+Before opening any pull request, confirm each item below. These are gates,
+not suggestions — a PR that skips any item will be returned.
+
+**1. Compliance scan passes:**
+```bash
+cd backend
+ruff check app/ && ruff format app/ --check && mypy app/
+```
+All three must exit clean. Fix failures before opening the PR.
+
+**2. Cross-ADR impact checked:**
+Does this commit change behavior documented in a *different* ADR from the one
+it implements? If yes, identify which ADR and which section. That ADR must be
+updated in the same commit — not as a follow-up.
+
+Ask: "What other ADR documents the module, interface, or contract I just
+changed?" Common cases:
+- A commit implementing an ADR-006 constraint changes a module whose
+  subscription list is documented in ADR-005 → ADR-005 must be updated.
+- A commit changing a `Quantity` field documented in ADR-001 affects
+  serialization described in ADR-003 → ADR-003 must be updated.
+
+The ADR-005 Amendment 2 incident is the canonical reference for what skipping
+this check costs: a module's subscription contract drifted for a full
+milestone before a Socratic TEST surfaced it.
+
+**3. Tests pass (including backtesting suite):**
+```bash
+pytest tests/unit -v
+pytest tests/backtesting/ -v
+```
+A backtesting regression is a blocker. It cannot be quietly accepted.
+
+**4. Issue governance complete** (see CLAUDE.md §Pre-PR Checklist for full
+requirements): issue exists, referenced with `Closes #N`, added to the
+Development Board.
+
+---
+
 ## Standards Compliance
 
 All contributions must comply with `CODING_STANDARDS.md` and `DATA_STANDARDS.md`.

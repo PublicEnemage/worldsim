@@ -58,6 +58,16 @@ by Decision 1 and Decision 2.
 - Radar chart normalization methodology changed from percentile-based cross-entity ranking to an alternative
 - Case registration protocol file structure changed (fixture naming convention, required dataclasses, or `@pytest.mark.backtesting` marking changed)
 - `Quantity.measurement_framework` contract changed from optional to mandatory (forces migration of all historical attribute data in `simulation_entities.attributes`)
+- `DemographicModule._SUBSCRIBED_EVENTS` changed — any addition or removal from the subscribed events list requires this ADR to be updated in the same commit (see Amendment 2 for why this trigger was absent at M5 and the drift it caused)
+- Elasticity registry unit basis changed — if elasticity entries shift from GDP units to fiscal units or any other unit basis, Decision 1 body and the elasticity description must be updated in the same commit
+
+**General principle for module behavioral contracts:** Any module whose
+behavioral contract (subscription list, output event types, elasticity unit
+basis) is specified in this ADR must have explicit renewal triggers covering
+those contracts. Changes to a module's subscription list or output contract
+require a same-commit ADR update — not a follow-up. The ADR-005 Amendment 2
+root cause (fiscal subscription removal in M5 not reflected in ADR until M6
+Socratic TEST) is the canonical example of what this principle prevents.
 
 ## Date
 2026-04-24

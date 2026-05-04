@@ -233,6 +233,11 @@ modification, the Implementation Agent must:
    closes automatically on merge.
 3. Add the issue to the WorldSim Development Board project and set its status
    to In Review when the PR opens.
+4. Cross-ADR impact: Does this commit change behavior documented in a different
+   ADR? If yes, identify which ADR and which section. That ADR must be updated
+   in the same commit — not as a follow-up. (Example: a commit implementing an
+   ADR-006 constraint that changes a module's subscription list documented in
+   ADR-005 must update ADR-005 Decision 1 in the same commit.)
 
 Exempt from issue requirement: purely mechanical commits such as lint fixes,
 import reordering, noqa suppressions, compliance scan registry updates, and
