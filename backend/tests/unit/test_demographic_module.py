@@ -274,7 +274,6 @@ def test_elasticity_registry_source_registry_ids_follow_convention() -> None:
 
 
 def test_all_emitted_events_have_framework_tag() -> None:
-    from app.simulation.engine.models import MeasurementFramework
     gdp_event = _gdp_growth_event("GRC", Decimal("-0.02"))
     state = _make_state("GRC", entity_type="country", prior_events=[gdp_event])
     module = DemographicModule(cohort_resolution_entity_ids=["GRC"])
