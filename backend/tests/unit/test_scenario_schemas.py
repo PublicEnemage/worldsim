@@ -223,3 +223,45 @@ def test_scenario_detail_response_with_inputs() -> None:
     )
     assert len(detail.scheduled_inputs) == 1
     assert detail.scheduled_inputs[0].input_type == "FiscalPolicyInput"
+
+
+# ---------------------------------------------------------------------------
+# effective_tier — horizon degradation (Issue #69)
+# ---------------------------------------------------------------------------
+
+from app.api.scenarios import effective_tier  # noqa: E402
+
+
+def test_effective_tier_step_zero_no_degradation() -> None:
+    assert effective_tier(1, 0) == 1
+
+
+def test_effective_tier_step_4_no_degradation() -> None:
+    # floor(4/5) = 0 — degradation only starts at step 5
+    assert effective_tier(1, 4) == 1
+
+
+def test_effective_tier_step_5_degrades_by_one() -> None:
+    assert effective_tier(1, 5) == 2
+
+
+def test_effective_tier_step_10_degrades_by_two() -> None:
+    assert effective_tier(1, 10) == 3
+
+
+def test_effective_tier_higher_source_step_5() -> None:
+    assert effective_tier(3, 5) == 4
+
+
+def test_effective_tier_capped_at_5() -> None:
+    assert effective_tier(5, 100) == 5
+
+
+def test_effective_tier_cap_prevents_exceeding_5() -> None:
+    # tier 4 + floor(10/5)=2 would be 6 without cap
+    assert effective_tier(4, 10) == 5
+
+
+def test_effective_tier_boundary_step_9() -> None:
+    # floor(9/5) = 1 — one degradation step
+    assert effective_tier(1, 9) == 2

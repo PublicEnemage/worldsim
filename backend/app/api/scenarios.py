@@ -29,6 +29,7 @@ import contextlib
 import json
 import uuid
 from decimal import Decimal
+from math import floor
 from typing import Annotated, Any
 
 import asyncpg  # noqa: TCH002 — used in Annotated[] resolved at runtime by FastAPI
@@ -113,6 +114,28 @@ async def _validate_entities_exist(
             status_code=422,
             detail=f"Entity IDs not found in simulation_entities: {missing}.",
         )
+
+
+# ---------------------------------------------------------------------------
+# Horizon degradation — Issue #69
+# ---------------------------------------------------------------------------
+
+
+def effective_tier(source_tier: int, horizon_steps: int) -> int:
+    """Return confidence tier degraded by projection horizon.
+
+    Tier degrades by 1 for every 5 projection steps, capped at Tier 5.
+    Applied at the output layer (get_measurement_output) so stored snapshots
+    are not mutated — distribution fields stay at the output layer per ADR-006.
+
+    Args:
+        source_tier:   Original confidence_tier from the stored Quantity (1–5).
+        horizon_steps: Step index of the snapshot being queried (0 = baseline).
+
+    Returns:
+        Effective tier in range [source_tier, 5].
+    """
+    return min(5, source_tier + floor(horizon_steps / 5))
 
 
 # ---------------------------------------------------------------------------
@@ -852,7 +875,7 @@ async def get_measurement_output(
             continue
 
         indicators = {
-            k: v
+            k: v.model_copy(update={"confidence_tier": effective_tier(v.confidence_tier, step)})
             for k, v in target_attrs.items()
             if (v.measurement_framework or "financial") == fw
         }

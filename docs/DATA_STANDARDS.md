@@ -1316,24 +1316,46 @@ remediation plan tracked in GitHub.
 
 ### Known Limitation IA-1: Projection Horizon Confidence
 
-**What the limitation is**
+**Current status (updated Issue #69, 2026-05-05)**
 
-`confidence_tier` does not degrade with projection horizon distance. A
-`Quantity` derived from a Tier 1 historical observation retains Tier 1
-confidence regardless of how far forward in time it is projected. A 30-year
-forward projection carries the same confidence tier as the historical
-observation it was derived from, which overstates reliability for long-horizon
+A linear horizon-degradation rule is implemented at the output layer in
+`get_measurement_output` (`backend/app/api/scenarios.py`). The stored
+`confidence_tier` in snapshots is not mutated — degradation is applied only
+when building `QuantitySchema` outputs for the measurement-output API response.
+
+**Degradation rule**
+
+```python
+effective_tier(source_tier, horizon_steps) = min(5, source_tier + floor(horizon_steps / 5))
+```
+
+Tier degrades by 1 for every 5 projection steps, capped at Tier 5. Examples:
+
+| source_tier | horizon_steps | effective_tier |
+|---|---|---|
+| 1 | 0 | 1 |
+| 1 | 5 | 2 |
+| 1 | 10 | 3 |
+| 3 | 5 | 4 |
+| 5 | any | 5 |
+
+**Remaining limitation**
+
+The degradation rate (1 tier per 5 steps) is a conservative heuristic, not an
+empirically calibrated value. Full calibration requires a mapping from
+`(horizon_steps, variable_type, model_lineage)` to a tier penalty drawn from
+backtesting fidelity data. That infrastructure is deferred to a future
+milestone. Until it exists, the `IA1_CANONICAL_PHRASE` disclosure remains in
+place.
+
+**What the original limitation was**
+
+`confidence_tier` did not degrade with projection horizon distance. A
+`Quantity` derived from a Tier 1 historical observation retained Tier 1
+confidence regardless of how far forward in time it was projected. A 30-year
+forward projection carried the same confidence tier as the historical
+observation it was derived from, which overstated reliability for long-horizon
 projections.
-
-**Why it exists**
-
-Time-horizon confidence degradation requires a calibration infrastructure —
-specifically, a mapping from (horizon distance, variable type, model lineage)
-to a tier penalty — that has not yet been implemented. Until that
-infrastructure exists, applying automatic degradation would introduce
-arbitrary penalties with no empirical basis, which would be worse than the
-current known limitation. The limitation is therefore documented and disclosed
-rather than patched with an uncalibrated heuristic.
 
 **Canonical disclosure text**
 
@@ -1366,13 +1388,11 @@ that `IA1_CANONICAL_PHRASE` appears verbatim in snapshot output.
   non-nullable constructor argument on every `MultiFrameworkOutput` instance
   per ADR-005 Decision 2. Carries the same canonical phrase.
 
-**Remediation plan**
+**Future calibration plan**
 
-Issue #69, Milestone 4. Implement time-horizon confidence degradation as a
-calibration table keyed by `(horizon_steps, variable_type)`. When implemented,
-forward projection `confidence_tier` will be computed as
-`max(source_tier, horizon_penalty_tier)`, where `horizon_penalty_tier` is
-drawn from the calibration table. `IA1_CANONICAL_PHRASE` will be retired and
-replaced by output that reflects actual calibrated confidence. The
-`ia1_disclosure` field will remain but its content will shift from a blanket
-limitation notice to a calibration provenance statement.
+Full calibration will implement `horizon_penalty_tier` as a table keyed by
+`(horizon_steps, variable_type)` drawn from backtesting fidelity data.
+`IA1_CANONICAL_PHRASE` will be retired and replaced by output that reflects
+actual calibrated confidence. The `ia1_disclosure` field will remain but its
+content will shift from a blanket limitation notice to a calibration
+provenance statement.
