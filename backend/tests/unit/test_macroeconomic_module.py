@@ -197,6 +197,7 @@ def test_unrelated_event_type_ignored() -> None:
         affected_attributes={},
         propagation_rules=[],
         timestep_originated=_TS,
+        framework=MeasurementFramework.FINANCIAL,
     )
     state = _make_state(prior_events=[event])
     assert module.compute(state.entities["GRC"], state, _TS) == []
@@ -473,3 +474,40 @@ def test_get_subscribed_events_includes_fiscal_tax() -> None:
 def test_get_subscribed_events_includes_monetary_rate() -> None:
     module = MacroeconomicModule()
     assert "monetary_policy_policy_rate" in module.get_subscribed_events()
+
+
+# ---------------------------------------------------------------------------
+# MeasurementFramework tagging (Issue #42)
+# ---------------------------------------------------------------------------
+
+
+def test_all_emitted_events_have_framework_tag() -> None:
+    state = _make_state(
+        gdp_growth="0",
+        prior_events=[_fiscal_spending_event("GRC", "-0.03")],
+    )
+    module = MacroeconomicModule()
+    events = module.compute(state.entities["GRC"], state, _TS)
+    assert all(e.framework is not None for e in events)
+
+
+def test_gdp_growth_change_event_tagged_financial() -> None:
+    state = _make_state(
+        gdp_growth="0",
+        prior_events=[_fiscal_spending_event("GRC", "-0.03")],
+    )
+    module = MacroeconomicModule()
+    events = module.compute(state.entities["GRC"], state, _TS)
+    gdp_event = next(e for e in events if e.event_type == "gdp_growth_change")
+    assert gdp_event.framework == MeasurementFramework.FINANCIAL
+
+
+def test_regime_change_event_tagged_financial() -> None:
+    state = _make_state(
+        gdp_growth="0",
+        prior_events=[_fiscal_spending_event("GRC", "-0.03")],
+    )
+    module = MacroeconomicModule()
+    events = module.compute(state.entities["GRC"], state, _TS)
+    regime_event = next(e for e in events if e.event_type == "regime_change")
+    assert regime_event.framework == MeasurementFramework.FINANCIAL

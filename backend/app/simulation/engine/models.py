@@ -270,7 +270,7 @@ class Event:
     affected_attributes: dict[str, Quantity]  # attribute key -> Quantity delta
     propagation_rules: list[PropagationRule]
     timestep_originated: datetime
-    framework: MeasurementFramework = MeasurementFramework.FINANCIAL
+    framework: MeasurementFramework
     metadata: dict[str, Any] = field(default_factory=dict)
 
 

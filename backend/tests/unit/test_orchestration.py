@@ -226,6 +226,7 @@ class _ConstantDeltaModule(SimulationModule):
                 affected_attributes={self._attribute: _q(self._delta)},
                 propagation_rules=[],
                 timestep_originated=timestep,
+                framework=MeasurementFramework.FINANCIAL,
             )
         ]
 

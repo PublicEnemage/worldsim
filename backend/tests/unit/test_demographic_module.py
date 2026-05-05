@@ -266,3 +266,29 @@ def test_elasticity_registry_source_registry_ids_follow_convention() -> None:
         assert row.source_registry_id.startswith("ACADEMIC_LITERATURE_"), (
             f"{row.source_registry_id} does not follow ACADEMIC_LITERATURE_* convention"
         )
+
+
+# ---------------------------------------------------------------------------
+# MeasurementFramework tagging (Issue #42)
+# ---------------------------------------------------------------------------
+
+
+def test_all_emitted_events_have_framework_tag() -> None:
+    from app.simulation.engine.models import MeasurementFramework
+    gdp_event = _gdp_growth_event("GRC", Decimal("-0.02"))
+    state = _make_state("GRC", entity_type="country", prior_events=[gdp_event])
+    module = DemographicModule(cohort_resolution_entity_ids=["GRC"])
+    ts = datetime(2011, 1, 1, tzinfo=timezone.utc)  # noqa: UP017
+    events = module.compute(state.entities["GRC"], state, ts)
+    assert len(events) > 0
+    assert all(e.framework is not None for e in events)
+
+
+def test_demographic_events_tagged_human_development() -> None:
+    from app.simulation.engine.models import MeasurementFramework
+    gdp_event = _gdp_growth_event("GRC", Decimal("-0.02"))
+    state = _make_state("GRC", entity_type="country", prior_events=[gdp_event])
+    module = DemographicModule(cohort_resolution_entity_ids=["GRC"])
+    ts = datetime(2011, 1, 1, tzinfo=timezone.utc)  # noqa: UP017
+    events = module.compute(state.entities["GRC"], state, ts)
+    assert all(e.framework == MeasurementFramework.HUMAN_DEVELOPMENT for e in events)
