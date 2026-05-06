@@ -145,20 +145,7 @@ Saudi Arabia specifically." This is a first-class architectural feature.
 Each module is a discrete component with defined interfaces to the event
 propagation system. Modules plug into the core graph — they do not replace it.
 
-| Module | Domain scope | Status |
-|---|---|---|
-| Geopolitical | Alliance relationships, territorial disputes, military capability, diplomatic channels | Planned |
-| Macroeconomic | GDP, inflation, fiscal balance, debt, monetary policy, regime-dependent multipliers | M5 scope |
-| Trade and Currency | Bilateral trade flows, tariffs, exchange rates, reserve composition, current account | Planned |
-| Monetary System | Reserve currency dynamics, SWIFT/CIPS membership, sovereign debt holdings matrix | Planned |
-| Capital Flow | FDI, portfolio flows, profit repatriation, illicit financial flows | Planned |
-| National Asset Registry | Public asset inventory, foreign ownership (HHI) by sector, Sovereign Resilience Floor | Planned |
-| Demographic and Health | Population by cohort, health capacity, migration, education attainment | M4 (partial) |
-| Climate | Climate forcing (IPCC SSP/RCP), agricultural stress, water stress, extreme events | Planned |
-| Financial Warfare | Currency attack vulnerability, sanctions exposure, attack surface composite | Planned |
-| Institutional Cognition | Institutional Cognitive Integrity Index, policy-reality divergence, ghost flight | M7 scope |
-
-Full capability status: `docs/scenarios/module-capability-registry.md`
+Full capability status and per-module status: `docs/scenarios/module-capability-registry.md`
 
 ### Multi-Currency Measurement
 
@@ -343,44 +330,20 @@ Milestone work rather than the most recently discovered work. Guards against
 scope drift, cognitive overload from open issue accumulation, and the
 gravitational pull of interesting new problems away from committed deliverables.
 
-Responsibilities:
+BRIEF: Structured session-start brief — committed milestone work, blockers
+requiring Engineering Lead decision (max 3), decisions due today (max 3),
+everything else filed, one recommended next action.
 
-BRIEF: At session start, produce a structured brief in this exact format:
+TRIAGE: One verdict per new issue or finding — BLOCKING NOW / THIS MILESTONE /
+NEXT MILESTONE / PARKING LOT / WONTFIX. No elaboration unless asked.
 
-  COMMITTED THIS MILESTONE — work that must complete before milestone closure,
-    drawn from the current Milestone's exit checklist Issue.
-  BLOCKING — items requiring Engineering Lead decision before implementation
-    can proceed. Maximum three; if more exist, the most consequential three
-    only. Each item states what is blocked and what decision unblocks it.
-  YOUR DECISIONS TODAY — maximum three decisions, in priority order. These
-    are the only items that belong in the Engineering Lead's cognitive
-    foreground today.
-  EVERYTHING ELSE — filed and tracked. Not the Engineering Lead's problem
-    today. Named but not elaborated.
-  RECOMMENDED NEXT ACTION — one thing, one sentence, no qualifications.
+HORIZON: Open-issue audit against current and upcoming Milestone definitions —
+surfaces scope creep, orphaned issues, and committed work at risk.
 
-TRIAGE: When a new GitHub Issue or finding surfaces, assess it on two axes —
-urgency (does it block current committed work?) and importance (does it affect
-Milestone scope, architectural correctness, or compliance?). Return one verdict:
-  BLOCKING NOW — requires Engineering Lead decision before the session continues.
-  THIS MILESTONE — legitimate current Milestone scope; file and schedule.
-  NEXT MILESTONE — real but not now; file with milestone assignment.
-  PARKING LOT — not yet evaluated; file with status:parking-lot label.
-  WONTFIX — outside project scope; close with rationale.
-One verdict per triage. No elaboration unless asked.
+FOCUS: One action and one reason. No list. No context.
 
-HORIZON: On request, review all open issues against current and upcoming
-Milestone definitions. Surface: scope creep (issues added to current Milestone
-without an explicit scope decision), orphaned issues (no milestone assignment),
-and committed work at risk (current Milestone issues with no clear path to
-closure before the exit checklist can be checked).
-
-FOCUS: On request, return one action and why it is the most important.
-No list. No context. One action and one reason.
-
-Tone: Direct and short. The PM Agent exists to reduce cognitive load, not add
-to it. Every response ends with either a clear next action or an explicit
-statement that no action is needed today.
+Tone: Direct and short. Every response ends with a clear next action or an
+explicit statement that no action is needed today.
 
 Activation: "PM Agent: BRIEF", "PM Agent: TRIAGE — [issue or finding]",
 "PM Agent: HORIZON", "PM Agent: FOCUS — [question or context]"
@@ -474,14 +437,7 @@ decisions into technical architecture. The UX Designer is upstream of
 implementation — no significant frontend capability is built without a
 documented user journey or information hierarchy decision from this agent.
 
-Owns:
-- `docs/ux/north-star.md` — canonical user description, primary use cases,
-  and the experience goals that all frontend decisions must serve
-- `docs/ux/user-journeys.md` — documented user journeys for each primary
-  use case, with explicit entry/exit states and decision points
-- `docs/ux/information-hierarchy.md` — what information a user needs first,
-  second, and last; what must never be buried; what the eye should land on
-  when the screen loads
+Owns `docs/ux/north-star.md`, `user-journeys.md`, and `information-hierarchy.md` (full ownership detail restored at M6 activation).
 
 Relationship to UI/Frontend Architect Agent: UX Designer defines the
 experience; Frontend Architect owns the technical implementation of that
@@ -555,16 +511,8 @@ not infrastructure waiting for features.
 **Milestone 5 — Calibration and Uncertainty (Complete — v0.5.0)**
 Core deliverable: Simulation outputs as distributions; MacroeconomicModule
 with regime-dependent multipliers; Argentina 2001-2002 second backtesting
-case; DISTRIBUTION_COMBINED threshold infrastructure.
-
-Delivered:
-- MacroeconomicModule with fiscal multiplier regime detection (Issue #191)
-- ADR-006 accepted; uncertainty quantification architecture defined
-- Playwright integration test suite 3/3 PASS (M4 retrospective hard gate)
-- Argentina 2001-2002 DIRECTION_ONLY backtesting fixture (Issue #192)
-- DISTRIBUTION_COMBINED + MAGNITUDE threshold types (Issue #194)
-- Single-entity composite score warning in measurement-output (Issue #193)
-- STD-REVIEW-004 gap closures (Issues #195–#200)
+case; DISTRIBUTION_COMBINED threshold infrastructure. See GitHub Releases for
+full delivery record.
 
 **Milestone 6 — Backtesting Coverage Expansion (Current)**
 Core deliverable: Five historical cases at calibrated fidelity thresholds;
@@ -662,13 +610,9 @@ contributors on modest hardware can run the complete test suite locally.
    infrastructure. Performance work that enables a finance ministry analyst
    on a four-core laptop to run analyses that previously required expensive
    compute is treated as first-class feature development, not optional
-   optimization. The sparse matrix propagation refactor (ADR-007, M7
-   Technical Foundation) is an expression of this principle: replacing
-   iterative event processing with scipy.sparse matrix multiplication makes
-   Monte Carlo ensemble runs accessible on modest hardware rather than
-   requiring a compute cluster. Any future performance decision that trades
-   accessibility for raw throughput must document the tradeoff explicitly
-   and demonstrate that the resource-constrained user is not disadvantaged.
+   optimization. Any future performance decision that trades accessibility
+   for raw throughput must document the tradeoff explicitly and demonstrate
+   that the resource-constrained user is not disadvantaged.
 
 See `docs/CONTRIBUTING.md §Equitable Build Process` for the full numbered
 requirements and implementation guidance.
@@ -865,25 +809,8 @@ confirming the gap was closed.
 
 ### The M4 Radar Chart Drawer Incident — Canonical Reference
 
-The M4 `EntityDetailDrawer` bug (showing placeholder after scenario completion;
-required 10+ debugging iterations; resolved by `step={currentStep ?? selectedScenarioSteps}`)
-demonstrated that async state management races are invisible without integration
-tests. A Playwright test covering create → advance → click entity → drawer shows
-data would have caught it immediately.
+Canonical incident record: `docs/frontend/testing-standards.md §Anti-Patterns from M4` and `design-decisions.md DD-004`.
 
-Full incident analysis, root causes, and required anti-patterns:
-`docs/frontend/testing-standards.md §Anti-Patterns from M4` and `design-decisions.md DD-004`.
-
-**Required before Milestone 5 exit (hard gate):**
-A Playwright integration test suite covering at minimum:
-- Create scenario → advance to completion → click entity → drawer shows
-  measurement output (not placeholder)
-- Select a previously-completed scenario → drawer shows measurement output
-  immediately without advance clicks
-- Advance partially → click entity → drawer shows output at current step
-
-This is a blocking requirement for M5 exit, not a recommendation.
-The M5 exit checklist will include an explicit checkbox for this.
 
 ---
 
