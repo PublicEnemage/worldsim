@@ -212,6 +212,43 @@ rules: `docs/DATA_STANDARDS.md`.
 Development uses a multi-agent Claude Code workflow. Agents have defined
 roles and operate against GitHub Issues as their task source.
 
+**Engineering Lead (Human)**
+Final decision authority on all architectural choices, mission alignment, and
+milestone governance. The Engineering Lead is the human-in-the-loop that the
+governance process is designed to surface decisions to, not bypass.
+
+Specific responsibilities:
+
+1. Final decision on all ADR option selections — agents propose, Engineering
+   Lead accepts or rejects.
+2. Mission alignment guardian — ensures technical decisions serve the canonical
+   user (the debt restructuring specialist at a finance ministry) and the
+   Equitable Build Process principle.
+3. Milestone exit authority — no milestone closes without Engineering Lead
+   sign-off on the exit checklist.
+4. Agent instantiation decisions — which agents to activate, when to commission
+   a new agent role.
+5. Escalation point — when agents disagree, when a recommendation requires
+   judgment beyond pattern-matching, or when the right answer requires breaking
+   from established process.
+
+What the Engineering Lead does not do: routine implementation prompts that
+follow a clear ADR contract, issue closure and tracking hygiene, compliance
+scan execution, test suite runs. These are delegated to agents.
+
+The boundary is judgment vs. process. Decisions that require weighing mission
+alignment, epistemic sequencing, or tradeoffs between competing principles
+require the Engineering Lead. Decisions that follow clearly from an accepted
+ADR or a documented standard do not.
+
+Note: the desire to step back into a pure steering role is understandable as
+the project matures. The path there is not creating an Engineering Lead agent
+— it is ensuring agents are specified well enough to need human input only for
+genuine judgment calls. Revisit the Engineering Lead scope at M9 entry, after
+the methodology publication milestone, when there is empirical data on which
+decisions actually required human judgment versus which the agents handled
+autonomously.
+
 **Architect Agent**
 Produces system design documents, Architecture Decision Records (ADRs),
 and API contracts before implementation begins. No code is written for a
