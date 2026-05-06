@@ -565,7 +565,23 @@ proprietary data, paid APIs, or licensed software to pass — all test
 fixtures use open-licensed data. The Playwright E2E suite must have a
 documented path to run without the full Docker Compose stack so that
 contributors on modest hardware can run the complete test suite locally.
-See `docs/CONTRIBUTING.md §Equitable Build Process`.
+
+5. Computational efficiency is an equity requirement. The simulation engine
+   must be optimized for the hardware that resource-constrained users and
+   contributors actually have — not for well-resourced institutional
+   infrastructure. Performance work that enables a finance ministry analyst
+   on a four-core laptop to run analyses that previously required expensive
+   compute is treated as first-class feature development, not optional
+   optimization. The sparse matrix propagation refactor (ADR-007, M7
+   Technical Foundation) is an expression of this principle: replacing
+   iterative event processing with scipy.sparse matrix multiplication makes
+   Monte Carlo ensemble runs accessible on modest hardware rather than
+   requiring a compute cluster. Any future performance decision that trades
+   accessibility for raw throughput must document the tradeoff explicitly
+   and demonstrate that the resource-constrained user is not disadvantaged.
+
+See `docs/CONTRIBUTING.md §Equitable Build Process` for the full numbered
+requirements and implementation guidance.
 
 ---
 
