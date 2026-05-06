@@ -296,6 +296,9 @@ Event:
           carries regime_previous, regime_new, trigger_attribute, trigger_value,
           threshold.
         "demographic_cohort_delta" — from DemographicModule; targets cohort entities.
+        "governance_indicator_update" — emitted by GovernanceModule (ADR-005
+          Decision 6); carries governance indicator Quantity deltas with
+          framework=GOVERNANCE. Consumed by MDAChecker for threshold evaluation.
         "policy_change", "shock", "threshold_crossed" — generic categories.
     affected_attributes:
       type: "dict[str, Quantity]"
@@ -481,6 +484,59 @@ MacroeconomicModule:
     standard: "gdp_growth >= 0, multiplier 0.5"
     depressed: "-0.03 <= gdp_growth < 0, multiplier 1.5"
     zlb: "gdp_growth < -0.03, multiplier 2.0"
+
+# ---------------------------------------------------------------------------
+# GovernanceModule (M6 concrete implementation — ADR-005 Decision 6)
+# ---------------------------------------------------------------------------
+GovernanceModule:
+  type: class
+  module: app.simulation.modules.governance.module
+  inherits: SimulationModule
+  description: >
+    ADR-005 Decision 6. Processes macro, fiscal, and political events on
+    country entities (one-step lag). Updates governance indicator keys and
+    emits governance_indicator_update events. Active for country entities
+    when events match _SUBSCRIBED_EVENTS; returns [] otherwise.
+    Implicit dependency on MacroeconomicModule for gdp_growth_change events.
+  subscribed_events:
+    - "gdp_growth_change"
+    - "fiscal_policy_spending_change"
+    - "imf_program_acceptance"
+    - "emergency_declaration"
+  emitted_events:
+    governance_indicator_update:
+      framework: "MeasurementFramework.GOVERNANCE"
+      affected_attributes:
+        press_freedom_index: >
+          Quantity(DIMENSIONLESS) — delta to RSF press freedom score (0–100,
+          higher = more free). confidence_tier: 3 (expert survey).
+        rule_of_law_percentile: >
+          Quantity(DIMENSIONLESS) — delta to WGI rule of law percentile (0–100).
+          confidence_tier: 2 (derived official statistics).
+        corruption_perception_index: >
+          Quantity(DIMENSIONLESS) — delta to TI CPI score (0–100, higher = less
+          corrupt). confidence_tier: 3 (expert survey).
+        democratic_quality_score: >
+          Quantity(DIMENSIONLESS) — delta to V-Dem Liberal Democracy Index
+          (0.0–1.0). confidence_tier: 2 (derived official statistics).
+        technocratic_independence: >
+          Quantity(DIMENSIONLESS) — delta to derived composite (0.0–1.0).
+          confidence_tier: 3 (pending methodology ADR). Quantity.note field
+          REQUIRED: "Derived composite — methodology ADR pending; not for
+          production use without ADR acceptance."
+      metadata_keys: "indicator_key, entity_id, source_registry_id"
+  notes:
+    - >
+      GovernanceModule subscribes to gdp_growth_change, which only fires when
+      MacroeconomicModule is active. If MacroeconomicModule is disabled,
+      GovernanceModule silently receives no gdp_growth_change events — same
+      silent failure mode documented in ADR-005 Amendment 2. Explicit
+      enforcement tracked in Issue #211 (M7).
+    - >
+      MDA threshold breaches on governance indicators are detected by
+      MDAChecker (not GovernanceModule). MDAChecker emits event_type="mda_breach"
+      with metadata["mda_id"] when indicators cross mda_thresholds entries
+      (ADR-005 Decision 3).
 
 # ---------------------------------------------------------------------------
 # Quantity JSONB serialisation contract

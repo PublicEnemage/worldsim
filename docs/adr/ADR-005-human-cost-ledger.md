@@ -9,6 +9,11 @@ Accepted
 **Valid Until:** Milestone 6 completion
 **License Status:** CURRENT
 
+**Decision 6 applied:** 2026-05-06 — GovernanceModule behavioral contract defined.
+Subscription list, indicator keys with confidence tier defaults, output event
+contract, and implicit MacroeconomicModule dependency documented. Renewal trigger
+added. See Decision 6 section at end of document.
+
 **Amendment 2 applied:** 2026-05-04 — DemographicModule subscription contract
 corrected. `fiscal_spending_change` and `fiscal_tax_change` removed from
 subscribed events (M5, commit 495d1ee, ADR-006 constraint E1); elasticity
@@ -59,6 +64,7 @@ by Decision 1 and Decision 2.
 - Case registration protocol file structure changed (fixture naming convention, required dataclasses, or `@pytest.mark.backtesting` marking changed)
 - `Quantity.measurement_framework` contract changed from optional to mandatory (forces migration of all historical attribute data in `simulation_entities.attributes`)
 - `DemographicModule._SUBSCRIBED_EVENTS` changed — any addition or removal from the subscribed events list requires this ADR to be updated in the same commit (see Amendment 2 for why this trigger was absent at M5 and the drift it caused)
+- `GovernanceModule._SUBSCRIBED_EVENTS` changed — any addition or removal requires Decision 6 to be updated in the same commit; the same drift risk that produced Amendment 2 applies here
 - Elasticity registry unit basis changed — if elasticity entries shift from GDP units to fiscal units or any other unit basis, Decision 1 body and the elasticity description must be updated in the same commit
 
 **General principle for module behavioral contracts:** Any module whose
@@ -946,6 +952,135 @@ case in `backtesting_cases` and its thresholds in `backtesting_thresholds`. The
 migration runs exactly once per environment — it is the authoritative registration, not
 application startup code or fixture setup. The migration file is named
 `{alembic_hash}_{case_id}_registration.py`.
+
+---
+
+## Decision 6: GovernanceModule Behavioral Contract
+
+### Module overview
+
+`GovernanceModule` is a `SimulationModule` (ADR-001 interface) that:
+
+1. **Subscribes to** events from prior steps: GDP and fiscal signals from
+   `MacroeconomicModule`, IMF program acceptance, and emergency declarations.
+
+2. **Each timestep**, reads each country entity's current governance indicator
+   values from entity attributes and applies event-driven deltas (via an
+   elasticity registry analogous to `DemographicModule`) to produce updated
+   governance indicator quantities.
+
+3. **Returns** `Event` objects with `event_type="governance_indicator_update"`,
+   `framework=MeasurementFramework.GOVERNANCE`, and `affected_attributes`
+   containing the governance indicator `Quantity` deltas for the timestep.
+
+The module lives at `backend/app/simulation/modules/governance/` following the
+established package pattern: `module.py`, `indicators.py`, `elasticities.py`.
+
+### Subscribed events
+
+```python
+_SUBSCRIBED_EVENTS = frozenset({
+    "gdp_growth_change",
+    "fiscal_policy_spending_change",
+    "imf_program_acceptance",
+    "emergency_declaration",
+})
+```
+
+**Rationale per event type:**
+
+- `gdp_growth_change` — Economic deterioration measurably correlates with
+  institutional quality erosion over multi-year horizons (V-Dem time series vs.
+  GDP data). The GDP channel embeds regime-dependent multipliers from
+  `MacroeconomicModule`, making governance outcomes regime-sensitive end-to-end.
+
+- `fiscal_policy_spending_change` — Fiscal cuts reduce public sector institutional
+  capacity. Statistical agency independence, judicial system funding, and press
+  freedom correlate with public expenditure on institutional infrastructure.
+
+- `imf_program_acceptance` — IMF programs include governance conditionality
+  clauses (anti-corruption benchmarks, statistical reform, judicial independence
+  targets). Acceptance is a discrete governance signal with both positive and
+  negative historical precedent depending on program design.
+
+- `emergency_declaration` — Emergency powers concentrations reduce press freedom
+  and democratic quality scores (V-Dem empirical finding across multiple cases).
+
+### Governance indicator keys produced
+
+All five indicators defined in `DATA_STANDARDS.md §Governance Framework Indicator
+Standards` are within the full behavioral contract of this module. M6 minimum
+viable scope requires at least `rule_of_law_percentile` and
+`democratic_quality_score`.
+
+| Attribute key | `variable_type` | `measurement_framework` | Default `confidence_tier` | Source basis |
+|---|---|---|---|---|
+| `press_freedom_index` | DIMENSIONLESS | GOVERNANCE | 3 | RSF (expert survey, Tier 3) |
+| `rule_of_law_percentile` | DIMENSIONLESS | GOVERNANCE | 2 | WGI (derived official statistics, Tier 2) |
+| `corruption_perception_index` | DIMENSIONLESS | GOVERNANCE | 3 | TI CPI (expert survey, Tier 3) |
+| `democratic_quality_score` | DIMENSIONLESS | GOVERNANCE | 2 | V-Dem (derived official statistics, Tier 2) |
+| `technocratic_independence` | DIMENSIONLESS | GOVERNANCE | 3 | Derived composite; pending methodology ADR |
+
+`technocratic_independence` requires the mandatory `note` field: *"Derived
+composite; methodology ADR pending — see DATA_STANDARDS.md §Governance Framework
+Indicator Standards."* Any `Quantity` for this indicator without this note is
+non-compliant with Issue #48.
+
+All governance indicators use `variable_type=VariableType.DIMENSIONLESS` — they are
+index scores, not ratios of commensurable quantities. The `confidence_tier` default
+above applies when no event-specific tier override is present; event-driven tier
+propagation uses `max()` of all contributing quantities per the standard rule.
+
+### Output event contract
+
+```python
+Event(
+    event_id=f"gov-{entity.id}-{timestep.isoformat()}",
+    source_entity_id=entity.id,
+    event_type="governance_indicator_update",
+    affected_attributes={
+        "rule_of_law_percentile": Quantity(..., measurement_framework=MeasurementFramework.GOVERNANCE),
+        "democratic_quality_score": Quantity(..., measurement_framework=MeasurementFramework.GOVERNANCE),
+        # additional indicators as implemented
+    },
+    propagation_rules=[],
+    timestep_originated=timestep,
+    framework=MeasurementFramework.GOVERNANCE,
+)
+```
+
+`event_type` is `"governance_indicator_update"` — distinct from `"mda_breach"` events
+emitted by `MDAChecker` when governance thresholds are crossed. The module emits
+indicator updates; the `MDAChecker` independently detects whether those updates
+cross registered `mda_thresholds` entries and fires `mda_breach` events, consistent
+with ADR-005 Decision 3 architecture.
+
+### Implicit module dependency
+
+`GovernanceModule` subscribes to `gdp_growth_change`, which is only emitted when
+`MacroeconomicModule` is active. If `MacroeconomicModule` is absent, no
+GDP-mediated governance effects are computed — silently, without error. This is
+the same implicit dependency as `DemographicModule` (Amendment 2). Issue #211
+(M7 Technical Foundation) tracks adding a `SimulationConfigurationError` at
+`WebScenarioRunner` startup to enforce this dependency explicitly. Until #211 is
+resolved, this dependency is documented here and in
+`docs/scenarios/module-capability-registry.md` as an invariant that scenario
+authors must observe.
+
+### Governance composite score
+
+`MultiFrameworkOutput` (Decision 2) currently returns `composite_score: null` for
+the GOVERNANCE framework. Once `GovernanceModule` is wired into `WebScenarioRunner`
+and produces governance indicator `Quantity` values on country entities, the
+measurement-output endpoint will compute the GOVERNANCE composite score by the
+same cross-entity percentile rank methodology as FINANCIAL and HUMAN_DEVELOPMENT
+frameworks (Decision 2, confirmed applicable in ADR-005 Amendment 1 Q4).
+
+### Renewal trigger (added by Decision 6)
+
+`GovernanceModule._SUBSCRIBED_EVENTS` — any addition or removal from the subscribed
+events list requires this Decision 6 section to be updated in the same commit. This
+trigger is listed in the Validity Context §Renewal Triggers above.
 
 ---
 
