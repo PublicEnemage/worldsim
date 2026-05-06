@@ -30,6 +30,7 @@ from app.schemas import MDAThresholdRecord, ScenarioConfigSchema
 from app.simulation.mda_checker import MDAChecker, alerts_to_events_snapshot
 from app.simulation.modules.demographic.cohort import generate_cohort_specs
 from app.simulation.modules.demographic.module import DemographicModule
+from app.simulation.modules.governance.module import GovernanceModule
 from app.simulation.modules.macroeconomic.module import MacroeconomicModule
 from app.simulation.orchestration.inputs import (
     EmergencyInstrument,
@@ -446,13 +447,16 @@ def _build_active_modules(config: ScenarioConfigSchema) -> list[SimulationModule
     """Return the ordered list of active modules for this scenario run.
 
     MacroeconomicModule is always active (it only acts on country entities and
-    returns [] when no relevant prior-step events exist). DemographicModule is
-    conditionally active based on modules_config.demographic.enabled.
+    returns [] when no relevant prior-step events exist). DemographicModule and
+    GovernanceModule are conditionally active based on modules_config.
     """
     modules: list[SimulationModule] = [MacroeconomicModule()]
     demo = _build_demographic_module(config)
     if demo is not None:
         modules.append(demo)
+    gov = _build_governance_module(config)
+    if gov is not None:
+        modules.append(gov)
     return modules
 
 
@@ -464,6 +468,14 @@ def _build_demographic_module(config: ScenarioConfigSchema) -> DemographicModule
     return DemographicModule(
         cohort_resolution_entity_ids=demo_cfg.get("cohort_resolution_entity_ids"),
     )
+
+
+def _build_governance_module(config: ScenarioConfigSchema) -> GovernanceModule | None:
+    """Return a GovernanceModule if governance resolution is active."""
+    gov_cfg: dict[str, Any] = config.modules_config.get("governance", {})
+    if not gov_cfg.get("enabled"):
+        return None
+    return GovernanceModule()
 
 
 async def _load_scheduled_inputs(
