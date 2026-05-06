@@ -183,6 +183,39 @@ with statistical agencies. WorldSim's response is:
    country or period is based on data we know to be questionable, the user
    sees this. No false precision.
 
+### Governance Indicator Source Selection
+
+Governance indicators are among the most politically contested data in the
+simulation. What counts as "good governance," "press freedom," or "rule of law"
+reflects assumptions that different governments and actors will dispute. WorldSim's
+position: we use sources selected for methodological transparency, not for the
+political conclusions their rankings tend to support.
+
+**The specific choices:**
+
+- **Democratic quality:** V-Dem Liberal Democracy Index (University of Gothenburg)
+  rather than Freedom House. V-Dem provides a continuous 0–1 score with published
+  inter-rater reliability methodology. Freedom House produces categorical ratings
+  from an advocacy organization whose geopolitical assumptions have been questioned.
+  A continuous index from an academic institution is more suitable for quantitative
+  simulation and less susceptible to perception of political loading.
+
+- **Rule of law:** World Bank Worldwide Governance Indicators. Broad coverage
+  (200+ economies), consistent methodology, Tier 2 data quality. The WGI also uses
+  expert perception surveys, which is a known limitation shared across all governance
+  indicators — it measures perceptions, not directly observed outcomes.
+
+- **Corruption:** Transparency International Corruption Perceptions Index. The most
+  widely cited index; perception-based (a known limitation disclosed in outputs).
+
+Any of these source choices can be challenged through the Challenge and Correction
+Process below. A successful challenge requires demonstrating that an alternative
+source is methodologically superior for quantitative simulation use — not that it
+produces rankings more favorable to a particular country or position.
+
+The full source selection rationale and confidence tier assignments are documented
+in `DATA_STANDARDS.md §Governance Framework Indicator Standards`.
+
 ### The Tier System
 
 WorldSim classifies data on a five-tier quality scale (detailed in

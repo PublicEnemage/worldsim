@@ -725,6 +725,30 @@ not the subject under test.
 
 **Source:** Issue #42, STD-REVIEW-001 SA-01.
 
+### Governance Alert Event Type
+
+`GOVERNANCE_ALERT` is the named event type for governance indicator threshold
+breaches. It is produced by the `MDAChecker` (ADR-005 Decision 3) when a
+`GovernanceModule`-emitted indicator crosses a threshold registered in the
+`mda_thresholds` table — not by the module itself. This keeps alert detection
+in the existing MDA architecture.
+
+Requirements for events carrying governance alert semantics:
+
+- `event_type`: `"mda_breach"` (standard MDA breach type; `"governance_alert"`
+  appears in `metadata["mda_id"]` to identify the specific governance threshold)
+- `framework`: `MeasurementFramework.GOVERNANCE`
+- `affected_attributes`: contains the breaching indicator as a `Quantity`
+- `metadata`: includes `"mda_id"`, `"indicator_key"`, `"threshold_value"`, and
+  `"severity"` keys
+
+Governance alert thresholds and their calibration basis are defined in
+`DATA_STANDARDS.md §Governance Framework Indicator Standards §Governance Alert
+Thresholds`. Do not hardcode threshold values in the module — read from the
+`mda_thresholds` table at runtime.
+
+**Source:** Issue #48, DATA_STANDARDS.md §Governance Framework Indicator Standards.
+
 ### Human Cost Ledger Testing
 
 Any code path that affects simulation outputs must include explicit tests

@@ -1305,6 +1305,105 @@ what boundary pile-up means to the analyst reading the output.
 
 ---
 
+## Governance Framework Indicator Standards
+
+The GOVERNANCE measurement framework is politically sensitive: what counts as
+"good governance" is contested. Every source selection decision must be
+transparent and defensible. This section defines the authoritative indicator
+set, their canonical sources, and the rationale for each source choice.
+
+### Required Governance Indicators
+
+| Indicator | Canonical Source | Update Frequency | Range | Variable Type |
+|---|---|---|---|---|
+| `press_freedom_index` | RSF World Press Freedom Index | Annual | 0–100; higher = more free | DIMENSIONLESS |
+| `rule_of_law_percentile` | World Bank Worldwide Governance Indicators (WGI) | Annual | Percentile 0–100 | DIMENSIONLESS |
+| `corruption_perception_index` | Transparency International CPI | Annual | 0–100; higher = less corrupt | DIMENSIONLESS |
+| `democratic_quality_score` | V-Dem Liberal Democracy Index | Annual | 0.0–1.0 | DIMENSIONLESS |
+| `technocratic_independence` | Derived composite (see NOTE) | Annual | 0.0–1.0 | DIMENSIONLESS |
+
+All governance indicators use `variable_type=VariableType.DIMENSIONLESS` (index
+scores, not ratios of commensurable quantities) and require
+`measurement_framework=MeasurementFramework.GOVERNANCE`.
+
+**NOTE on `technocratic_independence`:** No single authoritative source covers
+this indicator. It is a derived composite of:
+
+- Central bank independence rating (Dincer-Eichengreen index, academic literature)
+- Judicial independence score (V-Dem judicial independence index)
+- Statistical agency independence assessment (Paris21 NSDS framework indicators)
+
+The derivation methodology — weighting scheme, update rule, aggregation logic —
+must be documented in a dedicated ADR before `technocratic_independence` is used
+in production simulation runs. Until that ADR is accepted, this indicator carries
+`confidence_tier=3` and a mandatory `note`: *"Derived composite; methodology ADR
+pending — see DATA_STANDARDS.md §Governance Framework Indicator Standards."*
+Any code that writes `technocratic_independence` without this note is non-compliant.
+Calibration tier: C (Expert Prior).
+
+### Governance Alert Thresholds
+
+Governance indicators trigger `GOVERNANCE_ALERT` events at the following absolute
+thresholds. Threshold confidence is Tier 3 (calibrated from published research;
+not yet validated against backtesting runs). All M6 governance thresholds are
+DIRECTION_ONLY — MAGNITUDE thresholds require backtesting fidelity data from at
+least two independent historical cases before they may be set.
+
+| Indicator | Threshold | Basis |
+|---|---|---|
+| `press_freedom_index` | < 40 | RSF classification: "Difficult situation" |
+| `rule_of_law_percentile` | < 25 | IMF structural fragility literature |
+| `democratic_quality_score` | < 0.25 | V-Dem threshold for electoral autocracy |
+
+`GOVERNANCE_ALERT` events carry `measurement_framework=MeasurementFramework.GOVERNANCE`
+and are registered as MDA thresholds in the `mda_thresholds` table (ADR-005 Decision 3).
+The GovernanceModule emits governance indicator `Quantity` values; the `MDAChecker`
+detects threshold breaches and fires `mda_breach` events, consistent with the
+existing MDA architecture. Thresholds are read from the database at runtime —
+they must not be hardcoded in the module.
+
+### Source Selection Rationale
+
+Governance indicator source selection is politically sensitive. The rationale
+below is mandatory methodology disclosure, visible to users.
+
+**`democratic_quality_score` — V-Dem Liberal Democracy Index preferred over
+Freedom House Freedom in the World:**
+
+1. **Continuous index.** V-Dem produces a continuous 0.0–1.0 score. Freedom House
+   produces categorical ratings (Free / Partly Free / Not Free) that conceal
+   within-category variation. A simulation tracking democratic degradation over
+   time cannot distinguish between "Partly Free" in 2010 and "Partly Free" in 2018
+   using categorical ratings.
+2. **Documented inter-rater reliability.** V-Dem uses an aggregated expert survey
+   methodology with published inter-rater reliability statistics. Freedom House's
+   methodology is less transparent.
+3. **Academic institution.** V-Dem is published by the University of Gothenburg.
+   Freedom House is an advocacy organization whose ratings have been questioned for
+   perceived geopolitical bias. An academic source reduces ideological loading in
+   the simulation's governance assessments.
+
+Neither source is neutral. Both embed assumptions. V-Dem's methodology is more
+transparent and its outputs more suitable for quantitative simulation.
+
+**`rule_of_law_percentile` — World Bank WGI preferred over regional alternatives:**
+
+The World Bank Worldwide Governance Indicators cover 200+ economies using a
+consistent methodology, enabling cross-country comparison across all backtesting
+countries. Regional alternatives (Bertelsmann Transformation Index, Mo Ibrahim
+Index for Africa) provide within-region granularity but do not cover the full
+entity set. WGI is Tier 2 (derived official statistics).
+
+**`corruption_perception_index` — Transparency International CPI:**
+
+The TI CPI is the most widely used corruption perception index (Tier 3 — expert
+survey methodology). Its perception-based nature is a known limitation: it measures
+how corrupt a country appears to business elites and analysts, not the actual
+volume of corrupt transactions. This limitation is disclosed in simulation output
+notes for any scenario where `corruption_perception_index` is a key driver.
+
+---
+
 ## Known Limitations
 
 This section documents formally acknowledged limitations in WorldSim's data
