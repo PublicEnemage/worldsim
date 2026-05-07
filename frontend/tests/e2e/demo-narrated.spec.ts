@@ -28,7 +28,7 @@
  * ─────────────────────────────────────────────────────────────────────────────
  */
 
-import { spawnSync } from "child_process";
+import { spawn } from "child_process";
 import * as path from "path";
 import { fileURLToPath } from "url";
 import { test, expect } from "@playwright/test";
@@ -37,8 +37,16 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const SPEAK_SCRIPT = path.resolve(__dirname, "../../../scripts/speak.sh");
 
-function speak(text: string): void {
-  spawnSync("bash", [SPEAK_SCRIPT, text], { stdio: "inherit" });
+// Async so the Node.js event loop stays live during TTS — Playwright's CDP
+// keepalive must not be blocked or the browser disconnects mid-narration.
+function speak(text: string): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const proc = spawn("bash", [SPEAK_SCRIPT, text], { stdio: "inherit" });
+    proc.on("close", (code) => {
+      code === 0 || code === null ? resolve() : reject(new Error(`speak.sh exited ${code}`));
+    });
+    proc.on("error", reject);
+  });
 }
 
 const DEMO_SCENARIO_NAME = `Greece 2010-2012 Demo — ${new Date().toISOString().slice(0, 10)}`;
@@ -63,7 +71,7 @@ test(
       { timeout: 15_000 },
     );
 
-    speak(
+    await speak(
       "This is the application's baseline view. The choropleth shows a simulation " +
       "attribute across entities — in this case, GDP growth rate from the most recent " +
       "completed scenario step. Each country is colored by its simulated value. " +
@@ -76,7 +84,7 @@ test(
     await page.getByRole("button", { name: /Scenarios/ }).click();
     await page.waitForTimeout(800);
 
-    speak(
+    await speak(
       "We're going to model Greece's 2010 to 2012 fiscal adjustment programme. " +
       "This is a historical case — we know what happened. In the simulation, we " +
       "inject the IMF programme conditions as scheduled inputs: the fiscal tightening, " +
@@ -105,7 +113,7 @@ test(
     const nextStepBtn = page.getByRole("button", { name: /Next Step/ });
     await expect(nextStepBtn).toBeVisible({ timeout: 10_000 });
 
-    speak(
+    await speak(
       "The scenario is now the active primary scenario. The step counter shows " +
       "zero of three steps completed. Each step corresponds to one programme year: " +
       "2010, 2011, 2012.",
@@ -117,7 +125,7 @@ test(
     await expect(page.getByText("Step 1 / 3")).toBeVisible({ timeout: 20_000 });
     await page.waitForTimeout(1_200);
 
-    speak(
+    await speak(
       "Step 1. Year 2010. The simulation applies the first year of fiscal tightening. " +
       "Watch the choropleth — Greece shifts as the contraction propagates through the " +
       "model's relationship graph.",
@@ -129,7 +137,7 @@ test(
     await expect(page.getByText("Step 2 / 3")).toBeVisible({ timeout: 20_000 });
     await page.waitForTimeout(1_200);
 
-    speak(
+    await speak(
       "Step 2. Year 2011. The fiscal contraction compounds. In the historical case, " +
       "Greece's GDP contracted negative 9.1 percent this year — deeper than 2010.",
     );
@@ -142,7 +150,7 @@ test(
     await expect(nextStepBtn).toBeDisabled();
     await page.waitForTimeout(1_200);
 
-    speak(
+    await speak(
       "Step 3. Year 2012. Programme complete. Three years of fiscal adjustment, " +
       "modeled across the full programme horizon. Now let's look inside.",
     );
@@ -167,7 +175,7 @@ test(
 
     await page.waitForTimeout(1_500);
 
-    speak(
+    await speak(
       "This panel is the primary analytical surface. What I want to draw your attention " +
       "to first is the top of the panel. These are the Minimum Descent Altitude alerts. " +
       "The terminology comes from aviation: an MDA is the altitude below which an aircraft " +
@@ -188,7 +196,7 @@ test(
 
     await page.waitForTimeout(2_000);
 
-    speak(
+    await speak(
       "Read this alert as a piece of evidence: Under this fiscal adjustment path, " +
       "this indicator crosses the critical threshold at programme year 3. " +
       "That sentence is specific enough to cite in a negotiation. It names an indicator, " +
@@ -209,7 +217,7 @@ test(
 
     await page.waitForTimeout(1_500);
 
-    speak(
+    await speak(
       "Below the alert panel is the radar chart — four axes, one for each measurement " +
       "framework the simulation tracks. Financial indicators: fiscal balance, GDP trajectory. " +
       "Human development: poverty headcount, health system capacity. " +
@@ -248,7 +256,7 @@ test(
 
     await page.waitForTimeout(1_500);
 
-    speak(
+    await speak(
       "This is the counter-proposal function. Once you have identified which terms produce " +
       "threshold crossings, you model an alternative — the same fiscal outcome, achieved " +
       "differently. The DeltaChoropleth shows you, geographically, where the two scenarios " +
