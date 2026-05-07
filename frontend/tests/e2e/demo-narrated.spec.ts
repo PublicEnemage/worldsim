@@ -49,8 +49,9 @@ function speak(text: string): Promise<void> {
   });
 }
 
-const DEMO_SCENARIO_NAME = `Greece 2010-2012 Demo — ${new Date().toISOString().slice(0, 10)}`;
-const COMPARE_SCENARIO_NAME = `Greece Alternative — ${new Date().toISOString().slice(0, 10)}`;
+const RUN_ID = Math.random().toString(36).slice(2, 8);
+const DEMO_SCENARIO_NAME = `Greece 2010-2012 Demo — ${new Date().toISOString().slice(0, 10)}-${RUN_ID}`;
+const COMPARE_SCENARIO_NAME = `Greece Alternative — ${new Date().toISOString().slice(0, 10)}-${RUN_ID}`;
 
 test(
   "Stakeholder demo walkthrough — narrated screen recording",
