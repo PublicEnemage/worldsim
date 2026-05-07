@@ -539,6 +539,70 @@ GovernanceModule:
       (ADR-005 Decision 3).
 
 # ---------------------------------------------------------------------------
+# EcologicalModule (M6 concrete implementation — ADR-005 Amendment 1)
+# ---------------------------------------------------------------------------
+EcologicalModule:
+  type: class
+  module: app.simulation.modules.ecological.module
+  inherits: SimulationModule
+  description: >
+    ADR-005 Amendment 1. Processes macro, fiscal, and emergency events on
+    country entities (one-step lag). Updates ecological indicator keys and
+    emits ecological_indicator_update events. Active for country entities
+    when events match _SUBSCRIBED_EVENTS; returns [] otherwise.
+    Implicit dependency on MacroeconomicModule for gdp_growth_change events.
+  subscribed_events:
+    - "gdp_growth_change"
+    - "fiscal_policy_spending_change"
+    - "emergency_declaration"
+  emitted_events:
+    ecological_indicator_update:
+      framework: "MeasurementFramework.ECOLOGICAL"
+      affected_attributes:
+        co2_concentration_ppm: >
+          Quantity(STOCK) — delta to country atmospheric CO2 contribution
+          (ppm units, country-level trajectory). confidence_tier: 1
+          (NASA/NOAA Mauna Loa direct measurement series — ADR-005 Amendment B).
+          Source: Global Carbon Project (Friedlingstein et al. 2023).
+        land_use_pressure_index: >
+          Quantity(RATIO) — delta to fraction of safe land-system boundary
+          consumed by the entity's land-use change trajectory (0.0–1.0+).
+          confidence_tier: 3 (FAO GFR 5-year data; annual interpolation
+          required — ADR-005 Amendment B). Source: FAO GFR 2020.
+      metadata_keys: "entity_id"
+  elasticity_registry:
+    gdp_growth_change → co2_concentration_ppm:
+      elasticity: "+0.5 ppm per 1pp GDP growth rate change"
+      sign_logic: >
+        GDP growth (positive magnitude) → CO2 increases (positive delta).
+        GDP contraction (negative magnitude) → CO2 decreases (negative delta).
+      source_registry_id: "ACADEMIC_LITERATURE_FRIEDLINGSTEIN_2023_CO2_GDP"
+    fiscal_policy_spending_change → land_use_pressure_index:
+      elasticity: "-0.1 RATIO units per unit fiscal change (fraction of GDP)"
+      sign_logic: >
+        Fiscal spending cut (negative magnitude) × negative elasticity →
+        land_use_pressure increases (positive delta). Mechanism: reduced
+        conservation budget → weakened enforcement → accelerated deforestation.
+      source_registry_id: "ACADEMIC_LITERATURE_FAO_GFR_2020_FISCAL_LAND_USE"
+  notes:
+    - >
+      EcologicalModule subscribes to gdp_growth_change, which only fires when
+      MacroeconomicModule is active. If MacroeconomicModule is disabled,
+      EcologicalModule silently receives no gdp_growth_change events — same
+      silent failure mode documented in ADR-005 Amendment 1. Explicit
+      enforcement tracked in Issue #211 (M7).
+    - >
+      ADR-005 Amendment B mandatory note: the ecological composite score in
+      MultiFrameworkOutput uses cross-entity percentile rank at M6 scope.
+      Planetary boundary absolute normalization is methodologically preferred
+      and is deferred to M8. This note appears on every ecological
+      FrameworkOutput via scenarios.py regardless of composite_score value.
+    - >
+      M8 obligation: full planetary boundary indicator set (planetary_boundary_proximity,
+      co2_trajectory, deforestation_rate) and boundary-normalized composite score
+      methodology (ADR-005 Amendment 1 §Amendment B M8 obligation).
+
+# ---------------------------------------------------------------------------
 # Quantity JSONB serialisation contract
 # ---------------------------------------------------------------------------
 quantity_serde:

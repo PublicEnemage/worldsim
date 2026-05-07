@@ -216,7 +216,9 @@ async def test_ecological_returns_null_composite_score_with_note() -> None:
     ecological = result.outputs["ecological"]
     assert ecological.composite_score is None
     assert ecological.note is not None
-    assert "not yet implemented" in ecological.note
+    # ADR-005 Amendment B: ecological note is the mandatory percentile-rank disclosure,
+    # not the "not yet implemented" note — ecological module shipped at M6.
+    assert "percentile rank" in ecological.note
 
 
 @pytest.mark.asyncio
@@ -385,7 +387,8 @@ async def test_single_entity_note_on_implemented_frameworks() -> None:
 
 @pytest.mark.asyncio
 async def test_single_entity_unimplemented_frameworks_keep_their_note() -> None:
-    """Single-entity: ecological/governance keep the 'not yet implemented' note."""
+    """Single-entity: ecological gets the mandatory ADR-005 Amendment B note;
+    governance (still unimplemented) keeps the 'not yet implemented' note."""
     conn = _make_conn(
         {"scenario_id": "scen-1"},
         _snap_row(state=_SINGLE_ENTITY_STATE),
@@ -394,7 +397,9 @@ async def test_single_entity_unimplemented_frameworks_keep_their_note() -> None:
     result = await get_measurement_output(
         scenario_id="scen-1", entity_id="GRC", step=1, conn=conn
     )
-    assert "not yet implemented" in result.outputs["ecological"].note
+    # Ecological module shipped at M6: mandatory percentile-rank disclosure (ADR-005 Amendment B).
+    assert "percentile rank" in result.outputs["ecological"].note
+    # Governance module still unimplemented at M6.
     assert "not yet implemented" in result.outputs["governance"].note
 
 

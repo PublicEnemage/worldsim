@@ -680,11 +680,20 @@ async def list_snapshots(
 # GET /scenarios/{scenario_id}/measurement-output — ADR-005 Decision 2
 # ---------------------------------------------------------------------------
 
-_UNIMPLEMENTED_FRAMEWORKS = {"ecological", "governance"}
+_UNIMPLEMENTED_FRAMEWORKS = {"governance"}
 _UNIMPLEMENTED_NOTES = {
-    "ecological": "Ecological module not yet implemented — see module-capability-registry.md",
     "governance": "Governance module not yet implemented — see module-capability-registry.md",
 }
+# ADR-005 Amendment B mandatory note — must appear on every ecological FrameworkOutput
+# regardless of whether composite_score is null or non-null. Non-compliance is an
+# ADR violation. Planetary boundary absolute normalization is the methodologically
+# correct approach; percentile rank is the M6 scoped exception pending M8 full
+# indicator set.
+_ECOLOGICAL_MANDATORY_NOTE = (
+    "Ecological composite score uses cross-entity percentile rank at M6 scope. "
+    "Planetary boundary absolute normalization is methodologically preferred and "
+    "is deferred to M8 when the full indicator set is defined."
+)
 _ALL_FRAMEWORKS = ["financial", "human_development", "ecological", "governance"]
 _SINGLE_ENTITY_NOTE = (
     "Composite score not meaningful in single-entity scenarios — "
@@ -881,9 +890,14 @@ async def get_measurement_output(
         }
         if is_single_entity:
             composite = None
-            note: str | None = _SINGLE_ENTITY_NOTE
         else:
             composite = _compute_composite_score(indicators, all_entity_attrs, fw)
+        # ADR-005 Amendment B: ecological note is mandatory regardless of composite_score.
+        if fw == "ecological":
+            note: str | None = _ECOLOGICAL_MANDATORY_NOTE
+        elif is_single_entity:
+            note = _SINGLE_ENTITY_NOTE
+        else:
             note = None
         outputs[fw] = FrameworkOutput(
             framework=fw,

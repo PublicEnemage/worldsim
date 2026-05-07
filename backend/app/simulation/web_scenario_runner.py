@@ -30,6 +30,7 @@ from app.schemas import MDAThresholdRecord, ScenarioConfigSchema
 from app.simulation.mda_checker import MDAChecker, alerts_to_events_snapshot
 from app.simulation.modules.demographic.cohort import generate_cohort_specs
 from app.simulation.modules.demographic.module import DemographicModule
+from app.simulation.modules.ecological.module import EcologicalModule
 from app.simulation.modules.governance.module import GovernanceModule
 from app.simulation.modules.macroeconomic.module import MacroeconomicModule
 from app.simulation.orchestration.inputs import (
@@ -447,8 +448,9 @@ def _build_active_modules(config: ScenarioConfigSchema) -> list[SimulationModule
     """Return the ordered list of active modules for this scenario run.
 
     MacroeconomicModule is always active (it only acts on country entities and
-    returns [] when no relevant prior-step events exist). DemographicModule and
-    GovernanceModule are conditionally active based on modules_config.
+    returns [] when no relevant prior-step events exist). DemographicModule,
+    GovernanceModule, and EcologicalModule are conditionally active based on
+    modules_config.
     """
     modules: list[SimulationModule] = [MacroeconomicModule()]
     demo = _build_demographic_module(config)
@@ -457,6 +459,9 @@ def _build_active_modules(config: ScenarioConfigSchema) -> list[SimulationModule
     gov = _build_governance_module(config)
     if gov is not None:
         modules.append(gov)
+    eco = _build_ecological_module(config)
+    if eco is not None:
+        modules.append(eco)
     return modules
 
 
@@ -476,6 +481,14 @@ def _build_governance_module(config: ScenarioConfigSchema) -> GovernanceModule |
     if not gov_cfg.get("enabled"):
         return None
     return GovernanceModule()
+
+
+def _build_ecological_module(config: ScenarioConfigSchema) -> EcologicalModule | None:
+    """Return an EcologicalModule if ecological resolution is active."""
+    eco_cfg: dict[str, Any] = config.modules_config.get("ecological", {})
+    if not eco_cfg.get("enabled"):
+        return None
+    return EcologicalModule()
 
 
 async def _load_scheduled_inputs(
