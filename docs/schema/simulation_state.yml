@@ -232,6 +232,26 @@ SimulationEntity:
         STOCK: replaces current value with delta (delta carries new absolute level).
         FLOW/RATIO/DIMENSIONLESS: accumulates delta.value onto existing value.
         Initialises from delta if key absent. Propagates confidence_tier via max().
+  constructor_example: |
+    # Correct — all four required fields; metadata holds the display name:
+    SimulationEntity(
+        id="GRC",
+        entity_type="country",      # 'country' | 'region' | 'institution' | 'cohort'
+        attributes={},              # dict[str, Quantity]
+        metadata={"name_en": "Greece"},
+    )
+    # WRONG — there is NO top-level 'name' field on SimulationEntity.
+    # SimulationEntity(id="GRC", name="Greece", ...)  # TypeError
+    # Display names live in metadata["name_en"], not a class attribute.
+  test_mock_shape: >
+    Unit-test helpers that construct SimulationEntity must NOT pass name=.
+    The class has no 'name' attribute — passing it raises TypeError immediately.
+    Correct pattern (from tests/unit/test_governance_module.py and test_ecological_module.py):
+      SimulationEntity(id=entity_id, entity_type=entity_type, attributes={}, metadata={})
+    For tests that need a display name:
+      SimulationEntity(id="GRC", entity_type="country", attributes={}, metadata={"name_en": "Greece"})
+    Root incident: test_ecological_module.py used name="..." on first write, causing
+    18 test failures. Fixed in commit cd8582d. Canonical pattern: governance module tests.
 
 # ---------------------------------------------------------------------------
 # Relationship
