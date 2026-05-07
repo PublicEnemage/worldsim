@@ -30,8 +30,11 @@
 
 import { spawnSync } from "child_process";
 import * as path from "path";
+import { fileURLToPath } from "url";
 import { test, expect } from "@playwright/test";
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 const SPEAK_SCRIPT = path.resolve(__dirname, "../../../scripts/speak.sh");
 
 function speak(text: string): void {
