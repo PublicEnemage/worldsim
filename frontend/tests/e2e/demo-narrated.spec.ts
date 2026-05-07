@@ -190,9 +190,7 @@ test(
 
     // ── STEP 8: MDA alert panel called out ───────────────────────────────────
 
-    const mdaSection = page.getByText(
-      /MDA Threshold Breaches|No active MDA threshold breaches/,
-    );
+    const mdaSection = page.getByRole("heading", { name: "MDA Threshold Breaches" });
     await expect(mdaSection).toBeVisible({ timeout: 10_000 });
 
     await page.waitForTimeout(2_000);
