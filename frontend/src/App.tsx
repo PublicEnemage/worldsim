@@ -3,6 +3,7 @@ import AttributeSelector from "./components/AttributeSelector";
 import ChoroplethMap from "./components/ChoroplethMap";
 import DeltaChoropleth from "./components/DeltaChoropleth";
 import EntityDetailDrawer from "./components/EntityDetailDrawer";
+import FidelityDashboard from "./components/FidelityDashboard";
 import ScenarioControls from "./components/ScenarioControls";
 import ScenarioPanel from "./components/ScenarioPanel";
 import type { ScenarioDetailResponse } from "./types";
@@ -21,6 +22,7 @@ export default function App() {
   const [compareMode, setCompareMode] = useState(false);
   const [secondScenarioId, setSecondScenarioId] = useState<string | null>(null);
   const [panelOpen, setPanelOpen] = useState(false);
+  const [fidelityOpen, setFidelityOpen] = useState(false);
   const [selectedEntityId, setSelectedEntityId] = useState<string | null>(null);
 
   const handleStepChange = (step: number, _isComplete: boolean) => {
@@ -92,9 +94,16 @@ export default function App() {
         </label>
         <button
           className={`scenario-toggle-btn${panelOpen ? " scenario-toggle-btn--open" : ""}`}
-          onClick={() => setPanelOpen((v) => !v)}
+          onClick={() => { setPanelOpen((v) => !v); setFidelityOpen(false); }}
         >
           Scenarios {panelOpen ? "▲" : "▼"}
+        </button>
+        <button
+          className={`scenario-toggle-btn${fidelityOpen ? " scenario-toggle-btn--open" : ""}`}
+          onClick={() => { setFidelityOpen((v) => !v); setPanelOpen(false); }}
+          data-testid="fidelity-toggle"
+        >
+          Fidelity {fidelityOpen ? "▲" : "▼"}
         </button>
         {selectedScenarioId && (
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
@@ -120,6 +129,8 @@ export default function App() {
           onSelectSecondScenario={setSecondScenarioId}
         />
       )}
+
+      {fidelityOpen && <FidelityDashboard />}
 
       <main className="app-main" style={{ position: "relative" }}>
         {showDelta ? (
