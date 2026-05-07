@@ -16,7 +16,7 @@ from __future__ import annotations
 import dataclasses
 import uuid
 from abc import ABC, abstractmethod
-from datetime import datetime, timedelta, timezone  # noqa: TCH003 — used at runtime in _advance_timestep
+from datetime import UTC, datetime, timedelta  # noqa: TCH003 — used at runtime in _advance_timestep
 from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
@@ -238,7 +238,7 @@ class ScenarioRunner(InputOrchestrator):
         """
         from app.simulation.orchestration.audit import ControlInputAuditRecord
 
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         events = control_input.to_events(control_input.effective_date or now)
         record = ControlInputAuditRecord(
             record_id=str(uuid.uuid4()),
