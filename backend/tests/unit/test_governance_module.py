@@ -18,8 +18,7 @@ from datetime import datetime, timezone
 from decimal import Decimal
 
 from app.simulation.modules.governance.elasticities import GOVERNANCE_ELASTICITY_REGISTRY
-from app.simulation.modules.governance.module import GovernanceModule, _SUBSCRIBED_EVENTS
-
+from app.simulation.modules.governance.module import _SUBSCRIBED_EVENTS, GovernanceModule
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -225,7 +224,7 @@ def test_subscribed_events_constant_matches_decision_6() -> None:
         "imf_program_acceptance",
         "emergency_declaration",
     }
-    assert _SUBSCRIBED_EVENTS == expected
+    assert expected == _SUBSCRIBED_EVENTS
 
 
 # ---------------------------------------------------------------------------

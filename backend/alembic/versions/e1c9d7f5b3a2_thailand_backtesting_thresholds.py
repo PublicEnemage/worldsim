@@ -77,7 +77,7 @@ def upgrade() -> None:
             NULL,
             NULL,
             NULL,
-            'Thailand 1997 GDP contraction — DIRECTION_ONLY check. Currency peg abandonment and fiscal tightening onset.',
+            'Thailand 1997 GDP contraction — DIRECTION_ONLY. Currency peg abandonment, fiscal cut.',
             'IMF WEO October 1998 (1997 outturn -1.37%)'
         ),
         (
@@ -92,7 +92,7 @@ def upgrade() -> None:
             NULL,
             NULL,
             NULL,
-            'Thailand 1998 GDP contraction (deep) — DIRECTION_ONLY check. IMF program pro-cyclical austerity + balance-sheet recession.',
+            'Thailand 1998 GDP contraction — DIRECTION_ONLY. IMF austerity, balance-sheet.',
             'IMF WEO April 1999 (1998 outturn -10.51%)'
         )
         """

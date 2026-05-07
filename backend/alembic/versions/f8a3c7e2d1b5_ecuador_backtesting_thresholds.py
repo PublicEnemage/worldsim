@@ -78,7 +78,7 @@ def upgrade() -> None:
             NULL,
             NULL,
             NULL,
-            'Ecuador 1999 GDP contraction — DIRECTION_ONLY check. Banking system freeze and sucre collapse.',
+            'Ecuador 1999 GDP contraction — DIRECTION_ONLY. Banking system freeze, sucre collapse.',
             'IMF WEO October 1999 (1999 outturn -6.27%)'
         ),
         (
@@ -93,7 +93,7 @@ def upgrade() -> None:
             NULL,
             NULL,
             NULL,
-            'Ecuador 2000 GDP not deeper than 1999 — stabilization gate. Historical recovery (+2.8%) not asserted (M6 blind spot: dollarization + oil recovery channel not modeled).',
+            'Ecuador 2000 GDP not deeper than 1999 — stabilization gate (M6 blind spot).',
             'IMF WEO April 2001 (2000 outturn +2.80%)'
         )
         """

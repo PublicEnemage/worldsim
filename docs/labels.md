@@ -74,4 +74,5 @@ output that a user cannot detect without reading source code.
 | `status:known-gap` | Acknowledged deficiency with documented plan to resolve | Architecture limitations accepted in a review (ARCH-REVIEW, STD-REVIEW) with an issue filed |
 | `status:parking-lot` | Idea captured, not yet evaluated | Triage outcome: real but not yet assessed for priority or milestone |
 | `status:deferred` | Deliberately deferred with documented rationale | Triage outcome: evaluated, assigned to a future milestone, not being worked now |
+| `status:has-validation-requirement` | Issue has a pre-closure A/B or fidelity validation gate | Applied when an explicit comparison report or sign-off must be committed before the issue can close |
 | `review:periodic` | Must be revisited on a scheduled basis | Items that expire or become stale without re-review (e.g. compliance exceptions, deferred decisions) |

@@ -77,7 +77,7 @@ def upgrade() -> None:
             NULL,
             NULL,
             NULL,
-            'Lebanon 2019 GDP contraction — DIRECTION_ONLY check. Bank deposit freeze and fiscal collapse onset.',
+            'Lebanon 2019 GDP contraction — DIRECTION_ONLY. Bank deposit freeze, fiscal collapse.',
             'IMF WEO April 2020 (2019 outturn -6.92%)'
         ),
         (
@@ -92,7 +92,7 @@ def upgrade() -> None:
             NULL,
             NULL,
             NULL,
-            'Lebanon 2020 GDP contraction (catastrophic) — DIRECTION_ONLY check. Sovereign default + Beirut port explosion compound shock.',
+            'Lebanon 2020 GDP contraction — DIRECTION_ONLY. Sovereign default + Beirut explosion.',
             'IMF WEO April 2021 (2020 outturn -21.40%)'
         )
         """

@@ -264,12 +264,16 @@ async def test_argentina_2002_step2_magnitude_within_20pct(
             tolerance_pct=Decimal("0.20"),
         )
 
+        deviation_pct = (
+            abs((sim_gdp_step2 - ACTUALS.gdp_growth_2002) / ACTUALS.gdp_growth_2002) * 100
+        )
+
         print(
             f"\nARG step 2 MAGNITUDE check:\n"
             f"  Simulated:  {float(sim_gdp_step2)*100:.4f}%\n"
             f"  Actual:     {float(ACTUALS.gdp_growth_2002)*100:.1f}%\n"
             f"  Tolerance:  ±20% → band [{-0.1308:.4f}, {-0.0872:.4f}]\n"
-            f"  Deviation:  {abs((sim_gdp_step2 - ACTUALS.gdp_growth_2002) / ACTUALS.gdp_growth_2002) * 100:.2f}%\n"
+            f"  Deviation:  {deviation_pct:.2f}%\n"
             f"  Result:     {'PASS' if passed else 'FAIL'}\n"
             f"\n{MAGNITUDE_CALIBRATION_NOTE}"
         )
@@ -279,7 +283,7 @@ async def test_argentina_2002_step2_magnitude_within_20pct(
             f"Simulated GDP: {float(sim_gdp_step2)*100:.4f}%\n"
             f"Expected: {float(ACTUALS.gdp_growth_2002)*100:.1f}% ± 20% "
             f"→ band [−13.08%, −8.72%]\n"
-            f"Deviation: {abs((sim_gdp_step2 - ACTUALS.gdp_growth_2002) / ACTUALS.gdp_growth_2002) * 100:.2f}%\n"
+            f"Deviation: {deviation_pct:.2f}%\n"
             f"{MAGNITUDE_CALIBRATION_NOTE}"
         )
 

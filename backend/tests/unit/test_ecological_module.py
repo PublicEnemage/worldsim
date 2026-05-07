@@ -23,10 +23,8 @@ All tests run without a database connection.
 """
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from decimal import Decimal
-
-import pytest
 
 from app.simulation.engine.models import (
     Event,
@@ -41,10 +39,9 @@ from app.simulation.modules.ecological.elasticities import (
     ECOLOGICAL_ELASTICITY_REGISTRY,
 )
 from app.simulation.modules.ecological.module import (
-    EcologicalModule,
     _SUBSCRIBED_EVENTS,
+    EcologicalModule,
 )
-
 
 # ---------------------------------------------------------------------------
 # Fixtures
@@ -69,7 +66,7 @@ def _cohort_entity() -> SimulationEntity:
     )
 
 
-_TS = datetime(2010, 1, 1, tzinfo=timezone.utc)
+_TS = datetime(2010, 1, 1, tzinfo=UTC)
 
 
 def _make_state(events: list[Event] | None = None) -> SimulationState:
@@ -104,7 +101,7 @@ def _gdp_event(entity_id: str = "GRC", magnitude: str = "-0.025") -> Event:
             ),
         },
         propagation_rules=[],
-        timestep_originated=datetime(2010, 1, 1, tzinfo=timezone.utc),
+        timestep_originated=datetime(2010, 1, 1, tzinfo=UTC),
         framework=MeasurementFramework.FINANCIAL,
         metadata={},
     )
@@ -125,7 +122,7 @@ def _fiscal_event(entity_id: str = "GRC", magnitude: str = "-0.05") -> Event:
             ),
         },
         propagation_rules=[],
-        timestep_originated=datetime(2010, 1, 1, tzinfo=timezone.utc),
+        timestep_originated=datetime(2010, 1, 1, tzinfo=UTC),
         framework=MeasurementFramework.FINANCIAL,
         metadata={},
     )
@@ -146,13 +143,13 @@ def _emergency_event(entity_id: str = "GRC") -> Event:
             ),
         },
         propagation_rules=[],
-        timestep_originated=datetime(2010, 1, 1, tzinfo=timezone.utc),
+        timestep_originated=datetime(2010, 1, 1, tzinfo=UTC),
         framework=MeasurementFramework.FINANCIAL,
         metadata={},
     )
 
 
-TIMESTEP = datetime(2011, 1, 1, tzinfo=timezone.utc)
+TIMESTEP = datetime(2011, 1, 1, tzinfo=UTC)
 
 # ---------------------------------------------------------------------------
 # Non-country entity
@@ -405,7 +402,7 @@ def test_unknown_event_type_produces_no_output() -> None:
             ),
         },
         propagation_rules=[],
-        timestep_originated=datetime(2010, 1, 1, tzinfo=timezone.utc),
+        timestep_originated=datetime(2010, 1, 1, tzinfo=UTC),
         framework=MeasurementFramework.FINANCIAL,
         metadata={},
     )
@@ -457,7 +454,10 @@ def test_registry_confidence_tiers_are_valid() -> None:
 
 def test_registry_co2_entry_uses_tier_1() -> None:
     """co2_concentration_ppm entry must have confidence_tier=1 (NASA/NOAA direct measurement)."""
-    co2_rows = [r for r in ECOLOGICAL_ELASTICITY_REGISTRY if r.indicator_key == "co2_concentration_ppm"]
+    co2_rows = [
+        r for r in ECOLOGICAL_ELASTICITY_REGISTRY
+        if r.indicator_key == "co2_concentration_ppm"
+    ]
     assert co2_rows, "No co2_concentration_ppm entry in registry"
     for row in co2_rows:
         assert row.confidence_tier == 1, (
@@ -467,7 +467,10 @@ def test_registry_co2_entry_uses_tier_1() -> None:
 
 def test_registry_land_use_entry_uses_tier_3() -> None:
     """land_use_pressure_index entry must have confidence_tier=3 (FAO GFR 5-year data)."""
-    land_rows = [r for r in ECOLOGICAL_ELASTICITY_REGISTRY if r.indicator_key == "land_use_pressure_index"]
+    land_rows = [
+        r for r in ECOLOGICAL_ELASTICITY_REGISTRY
+        if r.indicator_key == "land_use_pressure_index"
+    ]
     assert land_rows, "No land_use_pressure_index entry in registry"
     for row in land_rows:
         assert row.confidence_tier == 3, (
