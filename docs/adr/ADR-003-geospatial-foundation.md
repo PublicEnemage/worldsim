@@ -6,17 +6,25 @@ Accepted
 ## Validity Context
 
 **Standards Version:** 2026-04-21
-**Valid Until:** Milestone 6 completion
+**Valid Until:** Milestone 7 — Technical Foundation
 **License Status:** CURRENT
 
-**Last Reviewed:** 2026-05-03 — Milestone 5 exit review. No renewal triggers
+**Last Reviewed:** 2026-05-07 — Milestone 6 exit review. No renewal triggers
+fired during Milestone 6. License Status confirmed CURRENT. No changes to
+GeoJSON-over-REST serving approach, PostGIS schema, CORS policy, or
+TerritorialValidator gate. M6 additions (EcologicalModule, GovernanceModule,
+three new backtesting migration files, FidelityDashboard) are backend
+computation and static frontend additions that do not alter any geospatial
+contract. License renewed for Milestone 7. Next scheduled review at
+Milestone 7 — Technical Foundation completion.
+
+**Previously reviewed:** 2026-05-03 — Milestone 5 exit review. No renewal triggers
 fired during Milestone 5. License Status confirmed CURRENT. No changes to
 GeoJSON-over-REST serving approach, PostGIS schema, CORS policy, or
 TerritorialValidator gate. M5 additions (backtesting_thresholds table,
 MacroeconomicModule, measurement-output single_entity_warning) are purely
 backend computation additions that do not alter any geospatial contract.
-License renewed for Milestone 6. Next scheduled review at Milestone 6
-completion.
+License renewed for Milestone 6.
 
 **Previously reviewed:** 2026-04-26 — Milestone 4 exit review. No renewal triggers
 fired during Milestone 4. License Status confirmed CURRENT. No changes to

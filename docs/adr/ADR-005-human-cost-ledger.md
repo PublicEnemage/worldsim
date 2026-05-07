@@ -6,7 +6,7 @@ Accepted
 ## Validity Context
 
 **Standards Version:** 2026-04-15 (date standards documents were established)
-**Valid Until:** Milestone 6 completion
+**Valid Until:** Milestone 7 — Technical Foundation
 **License Status:** CURRENT
 
 **Decision 6 applied:** 2026-05-06 — GovernanceModule behavioral contract defined.
@@ -26,7 +26,17 @@ scope. Data sources for planetary boundary indicators added to
 percentile rank with mandatory API note for M6; boundary-normalized scoring
 deferred to M8. See Amendment 1 section at end of document.
 
-**Last Reviewed:** 2026-05-03 — Milestone 5 exit review. No renewal triggers
+**Last Reviewed:** 2026-05-07 — Milestone 6 exit review. Decision 6
+(GovernanceModule) and Amendment 1 (EcologicalModule) were added to this ADR
+during M6 and implemented. Both modules operate within the existing
+`MeasurementFramework` taxonomy (ECOLOGICAL and GOVERNANCE are existing enum
+values) and produce outputs via the existing Quantity-delta Event contract.
+No framework taxonomy changes, no `CohortSpec` segmentation axis changes, no
+`MDASeverity` enum changes. The ADR remains sound as extended. License renewed
+for Milestone 7. Next scheduled review at Milestone 7 — Technical Foundation
+completion.
+
+**Previously reviewed:** 2026-05-03 — Milestone 5 exit review. No renewal triggers
 fired during Milestone 5. License Status confirmed CURRENT. `MeasurementFramework`
 taxonomy unchanged; `CohortSpec` segmentation axes unchanged; `MDASeverity` enum
 unchanged. The `single_entity_warning: bool = False` field added to
@@ -36,7 +46,6 @@ entity is present) — no framework taxonomy or normalization methodology was
 altered. The Argentina 2001-2002 backtesting case uses the ARG entity with
 `financial` and `human_development` frameworks, confirming the existing
 measurement framework is entity-neutral. License renewed for Milestone 6.
-Next scheduled review at Milestone 6 completion.
 
 **Previously reviewed:** 2026-04-26 — Milestone 4 exit review. All four ADR-005
 decisions implemented and verified: Decision 1 (DemographicModule, PR #183),

@@ -6,13 +6,24 @@ Accepted
 ## Validity Context
 
 **Standards Version:** 2026-04-21
-**Valid Until:** Milestone 6 completion
+**Valid Until:** Milestone 7 — Technical Foundation
 **License Status:** CURRENT
 
 **Engineering Lead accepted 2026-04-21.** Architecture decisions reviewed and
 approved. Implementation may proceed.
 
-**Last Reviewed:** 2026-05-03 — Milestone 5 exit review. **Renewal trigger
+**Last Reviewed:** 2026-05-07 — Milestone 6 exit review. No renewal triggers
+fired during Milestone 6. License Status confirmed CURRENT. New backtesting
+migration files (Lebanon, Thailand, Ecuador DIRECTION_ONLY; Greece and
+Argentina MAGNITUDE rows) are data-layer additions within the existing
+`backtesting_thresholds` table — no schema change, no enum extension, no
+alteration to scenario replay format, advance protocol, or snapshot contract.
+The first MAGNITUDE_WITHIN_20PCT pass (Argentina step 2, 3.2% deviation) is
+an evaluation result, not a schema change. engine_version gap (Issue #139)
+remains a documented known limitation. License renewed for Milestone 7. Next
+scheduled review at Milestone 7 — Technical Foundation completion.
+
+**Previously reviewed:** 2026-05-03 — Milestone 5 exit review. **Renewal trigger
 fired** — threshold_type enum extended (Issue #194). The M5 `backtesting_thresholds`
 table (migration `b5d3f7a2c8e1`) introduces `threshold_type CHECK IN
 ('DIRECTION_ONLY', 'MAGNITUDE', 'DISTRIBUTION_COMBINED')` — the threshold_type
@@ -24,8 +35,7 @@ calibration; no scenario replay format, advance protocol, or snapshot
 contract was altered. DIRECTION_ONLY and DISTRIBUTION_COMBINED infrastructure
 confirmed operational; MAGNITUDE threshold calibration deferred per
 PARAMETER_CALIBRATION_DISCLOSURE. engine_version gap (Issue #139) remains a
-documented known limitation. License renewed for Milestone 6. Next scheduled
-review at Milestone 6 completion.
+documented known limitation. License renewed for Milestone 6.
 
 **Previously reviewed:** 2026-04-26 — Milestone 4 exit review. No renewal triggers
 fired during Milestone 4. License Status confirmed CURRENT. The `modules_config`

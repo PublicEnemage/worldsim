@@ -6,10 +6,22 @@ Accepted
 ## Validity Context
 
 **Standards Version:** 2026-04-15 (date standards documents were established)
-**Valid Until:** Milestone 6 completion
+**Valid Until:** Milestone 7 — Technical Foundation
 **License Status:** CURRENT
 
-**Last Reviewed:** 2026-05-03 — Milestone 5 exit review. No renewal triggers
+**Last Reviewed:** 2026-05-07 — Milestone 6 exit review. No renewal triggers
+fired during Milestone 6. License Status confirmed CURRENT. EcologicalModule
+and GovernanceModule (new in M6) produce Quantity-delta Events within the
+existing `affected_attributes` contract and do not alter the `Quantity` type
+structure, `SimulationEntity.attributes` store design, or
+`propagate_confidence` lower-of-two rule. Three additional backtesting cases
+(Lebanon, Thailand, Ecuador) and the MAGNITUDE calibration rows use the
+existing initial_attributes wire format. FidelityDashboard is a static
+frontend component with no changes to simulation state representation.
+License renewed for Milestone 7. Next scheduled review at Milestone 7 —
+Technical Foundation completion.
+
+**Previously reviewed:** 2026-05-03 — Milestone 5 exit review. No renewal triggers
 fired during Milestone 5. License Status confirmed CURRENT. No changes to
 `MeasurementFramework` taxonomy, `DATA_STANDARDS.md §Units and Measurements`,
 or backtesting integrity rules that affect state representation. The M5
@@ -18,7 +30,7 @@ MacroeconomicModule adds `gdp_growth`, `unemployment_rate`, and
 `Quantity` type structure, `SimulationEntity.attributes` store design, or
 `propagate_confidence` lower-of-two rule. The Argentina 2001-2002 fixture
 (Issue #192) uses existing initial_attributes wire format. License renewed
-for Milestone 6. Next scheduled review at Milestone 6 completion.
+for Milestone 6.
 
 **Previously reviewed:** 2026-04-26 — Milestone 4 exit review. No renewal triggers
 fired during Milestone 4. License Status confirmed CURRENT. No changes to

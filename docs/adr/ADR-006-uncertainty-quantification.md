@@ -6,19 +6,34 @@ Accepted
 ## Validity Context
 
 **Standards Version:** 2026-04-15
-**Valid Until:** Milestone 6 completion
+**Valid Until:** Milestone 7 — Technical Foundation
 **License Status:** CURRENT
 
 **Engineering Lead accepted 2026-05-02.** Architecture decisions reviewed and
 approved. Implementation may proceed for M5 scope.
 
-**Last Reviewed:** 2026-05-02 — Initial acceptance at M5 entry. Chief
+**Last Reviewed:** 2026-05-07 — Milestone 6 exit review. **Monte Carlo upgrade
+trigger evaluated.** Trigger condition: MAGNITUDE_WITHIN_20PCT on both Greece
+2010–2012 AND Argentina 2001–2002. Result at M6 exit: **1 of 2 required cases
+achieved.** Argentina step 2 (2002): PASS — model −10.55% vs actual −10.9%,
+3.2% deviation, within ±20% band. Greece steps 2–3: deferred as structural
+gap — pure accumulation model with no mean-reversion channel produces 140–376%
+deviation; root cause documented in Issue #221, fix deferred to M7.
+**Trigger not met.** DISTRIBUTION_COMBINED threshold infrastructure and
+uncertainty band calibration upgrade deferred to M7. No other renewal triggers
+fired; pre-calibration band schedule, `confidence_tier` propagation rule, MDA
+composite alert parameters, `QuantitySchema` API envelope, and
+`backtesting_thresholds.threshold_type` enum unchanged. License renewed for
+Milestone 7. Next scheduled review at Milestone 7 — Technical Foundation
+completion, when Greece MAGNITUDE result is expected following Issue #221.
+
+**Previously reviewed:** 2026-05-02 — Initial acceptance at M5 entry. Chief
 Methodologist validation completed 2026-05-02, covering three decisions
 requiring methodological review before authoring: uncertainty propagation
 approach (Decision 1), MDA comparison semantics (Decision 5), and bounded
 attribute distribution family (Decision 3). Full Chief Methodologist review
 on record in the session preceding ADR authoring. License renewed for
-Milestone 6. Next scheduled review at Milestone 6 completion.
+Milestone 6.
 
 **Renewal Triggers** — any of the following fires the CURRENT → UNDER-REVIEW
 transition:

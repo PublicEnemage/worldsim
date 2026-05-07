@@ -6,10 +6,20 @@ Accepted
 ## Validity Context
 
 **Standards Version:** 2026-04-15 (date standards documents were established)
-**Valid Until:** Milestone 6 completion
+**Valid Until:** Milestone 7 — Technical Foundation
 **License Status:** CURRENT
 
-**Last Reviewed:** 2026-05-03 — Milestone 5 exit review. No renewal triggers
+**Last Reviewed:** 2026-05-07 — Milestone 6 exit review. No renewal triggers
+fired during Milestone 6. License Status confirmed CURRENT. No changes to
+`ControlInput` type taxonomy, audit trail schema requirements, or
+`MeasurementFramework` tagging requirements. Lebanon, Thailand, and Ecuador
+backtesting cases use existing `FiscalPolicyInput`, `MonetaryPolicyInput`, and
+`EmergencyPolicyInput` types — additive and backward-compatible. The
+FidelityDashboard is a static frontend component introducing no new input
+channels or audit obligations. License renewed for Milestone 7. Next
+scheduled review at Milestone 7 — Technical Foundation completion.
+
+**Previously reviewed:** 2026-05-03 — Milestone 5 exit review. No renewal triggers
 fired during Milestone 5. License Status confirmed CURRENT. No changes to
 `ControlInput` type taxonomy, audit trail schema requirements, or
 `MeasurementFramework` tagging requirements occurred during this milestone.
@@ -17,7 +27,7 @@ The Argentina 2001-2002 fixture (Issue #192) introduces `imf_program_acceptance`
 and `default_declaration` instruments in scheduled inputs — these are
 data-layer extensions within the existing `EmergencyPolicyInput` and
 `FiscalPolicyInput` types, additive and backward-compatible. License renewed
-for Milestone 6. Next scheduled review at Milestone 6 completion.
+for Milestone 6.
 
 **Previously reviewed:** 2026-04-26 — Milestone 4 exit review. No renewal triggers
 fired during Milestone 4. License Status confirmed CURRENT. No changes to
