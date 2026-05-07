@@ -188,15 +188,13 @@ export default function EntityDetailDrawer({ scenarioId, entityId, step, onClose
               />
             </section>
 
-            {/* MDA alerts */}
-            {allAlerts.length > 0 && (
-              <section style={{ marginBottom: 16 }}>
-                <h3 style={{ fontSize: 13, fontWeight: 600, margin: "0 0 8px", color: "#c00" }}>
-                  MDA Threshold Breaches
-                </h3>
-                <MDAAlertPanel alerts={allAlerts} />
-              </section>
-            )}
+            {/* MDA alerts — always rendered so the scanning surface is visible */}
+            <section style={{ marginBottom: 16 }}>
+              <h3 style={{ fontSize: 13, fontWeight: 600, margin: "0 0 8px", color: allAlerts.length > 0 ? "#c00" : "#333" }}>
+                MDA Threshold Breaches
+              </h3>
+              <MDAAlertPanel alerts={allAlerts} />
+            </section>
 
             {/* Framework indicator panels */}
             <section style={{ marginBottom: 16 }}>
