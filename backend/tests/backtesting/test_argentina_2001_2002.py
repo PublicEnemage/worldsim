@@ -1,23 +1,19 @@
-"""Argentina 2001–2002 backtesting test — Issue #192.
+"""Argentina 2001–2002 backtesting test — Issue #192, partial #208/#210.
 
-This is the second backtesting case alongside Greece 2010–2012.
-It validates DIRECTION_ONLY fidelity thresholds for the Argentina
-currency and sovereign debt crisis.
+Fidelity gates (see MAGNITUDE_CALIBRATION_NOTE in actuals fixture for full analysis):
 
-Fidelity gate: GDP contraction predicted at both simulation steps.
-  Step 1 (2001): fiscal austerity shock (Zero Deficit Plan) → GDP contracts.
-  Step 2 (2002): lagged macro effect of step 1 fiscal shock → deeper contraction.
+  DIRECTION_ONLY (migration c7e2a9f4d1b8):
+    Step 1 (2001): GDP contraction predicted. Model: −0.8% (initial seed).
+    Step 2 (2002): deeper GDP contraction predicted. Model: −10.55%.
 
-The GDP direction check is structurally correct regardless of magnitude
-calibration: a large pro-cyclical fiscal cut in a depressed economy must
-produce negative GDP growth per the MacroeconomicModule regime logic.
+  MAGNITUDE within 20% (migration a3d9e7c2f4b1, Issues #208/#210 partial):
+    Step 2 (2002): model −10.55% vs actual −10.9% → 3.2% deviation → PASSES.
+    Step 1 MAGNITUDE deferred to M7 Issue #222 (one-step lag structural gap).
+    Greece steps 2–3 MAGNITUDE deferred to M7 Issue #221 (mean-reversion gap).
 
 Test skips gracefully when DATABASE_URL is not set. The ARG entity must
 exist in simulation_entities — the natural_earth_loader seed must run
 before this test in CI (Argentina ISO 3166-1 alpha-3 = "ARG").
-
-Thresholds registered in backtesting_thresholds as case_id='ARGENTINA_2001_2002'
-(migration c7e2a9f4d1b8).
 """
 from __future__ import annotations
 
@@ -29,6 +25,7 @@ import httpx
 import pytest
 import pytest_asyncio
 
+from app.simulation.backtesting.threshold_types import evaluate_magnitude
 from tests.backtesting.fidelity_report import (
     _extract_gdp_value,
     format_fidelity_report,
@@ -36,6 +33,7 @@ from tests.backtesting.fidelity_report import (
 from tests.fixtures.argentina_2001_2002_actuals import (
     ACTUALS,
     IA1_DISCLOSURE,
+    MAGNITUDE_CALIBRATION_NOTE,
     PARAMETER_CALIBRATION_DISCLOSURE,
 )
 from tests.fixtures.argentina_2001_2002_scenario import build_argentina_scenario
@@ -217,5 +215,73 @@ async def test_argentina_run_sets_status_completed(
     try:
         detail = await client.get(f"/api/v1/scenarios/{scenario_id}")
         assert detail.json()["status"] == "completed"
+    finally:
+        await client.delete(f"/api/v1/scenarios/{scenario_id}")
+
+
+# ---------------------------------------------------------------------------
+# MAGNITUDE fidelity gate — Issues #208/#210 (partial scope)
+# ---------------------------------------------------------------------------
+
+
+async def test_argentina_2002_step2_magnitude_within_20pct(
+    client: httpx.AsyncClient,
+) -> None:
+    """Argentina step 2 (2002) MAGNITUDE gate — Issues #208/#210 partial scope.
+
+    Asserts that the simulated GDP growth at step 2 is within 20% of the
+    historical actual (−10.9%, IMF WEO April 2003).
+
+    Expected: model produces −10.55% via depressed-regime multiplier (1.5)
+    applied to the Zero Deficit Plan spending cut (−6.5% of GDP) on initial
+    gdp_growth of −0.8%. Deviation: 3.2% — well within the 20% tolerance.
+
+    Tolerance band: ±20% of |−0.109| = ±0.0218 → [−0.1308, −0.0872].
+
+    Registered in backtesting_thresholds as threshold_name='gdp_growth_step2_magnitude'
+    (migration a3d9e7c2f4b1).
+
+    Step 1 MAGNITUDE deferred to M7 Issue #222 (one-step lag structural gap).
+    Greece MAGNITUDE deferred to M7 Issue #221 (mean-reversion channel gap).
+    See MAGNITUDE_CALIBRATION_NOTE in argentina_2001_2002_actuals.py.
+    """
+    scenario_id, snapshots = await _create_and_run_scenario(client)
+
+    try:
+        snapshots_by_step = {s["step"]: s for s in snapshots}
+        snap_step2 = snapshots_by_step.get(2)
+
+        assert snap_step2 is not None, "Step 2 snapshot missing from Argentina run"
+
+        sim_gdp_step2 = _extract_gdp_value(snap_step2, entity_id="ARG")
+        assert sim_gdp_step2 is not None, (
+            "gdp_growth missing from ARG step 2 snapshot — cannot evaluate MAGNITUDE"
+        )
+
+        passed = evaluate_magnitude(
+            simulated_value=sim_gdp_step2,
+            expected_value=ACTUALS.gdp_growth_2002,   # Decimal("-0.109")
+            tolerance_pct=Decimal("0.20"),
+        )
+
+        print(
+            f"\nARG step 2 MAGNITUDE check:\n"
+            f"  Simulated:  {float(sim_gdp_step2)*100:.4f}%\n"
+            f"  Actual:     {float(ACTUALS.gdp_growth_2002)*100:.1f}%\n"
+            f"  Tolerance:  ±20% → band [{-0.1308:.4f}, {-0.0872:.4f}]\n"
+            f"  Deviation:  {abs((sim_gdp_step2 - ACTUALS.gdp_growth_2002) / ACTUALS.gdp_growth_2002) * 100:.2f}%\n"
+            f"  Result:     {'PASS' if passed else 'FAIL'}\n"
+            f"\n{MAGNITUDE_CALIBRATION_NOTE}"
+        )
+
+        assert passed, (
+            f"Argentina step 2 MAGNITUDE threshold FAILED.\n"
+            f"Simulated GDP: {float(sim_gdp_step2)*100:.4f}%\n"
+            f"Expected: {float(ACTUALS.gdp_growth_2002)*100:.1f}% ± 20% "
+            f"→ band [−13.08%, −8.72%]\n"
+            f"Deviation: {abs((sim_gdp_step2 - ACTUALS.gdp_growth_2002) / ACTUALS.gdp_growth_2002) * 100:.2f}%\n"
+            f"{MAGNITUDE_CALIBRATION_NOTE}"
+        )
+
     finally:
         await client.delete(f"/api/v1/scenarios/{scenario_id}")

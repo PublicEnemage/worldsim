@@ -15,9 +15,10 @@ Data provenance:
   (Ley 27.275 of 2016, Decreto 117/2016). Both sources comply with the
   open-licensed data requirement in CLAUDE.md §Equitable Build Process.
 
-DIRECTION_ONLY thresholds — same rationale as Greece (ADR-004 Decision 3):
-magnitude calibration is deferred until DISTRIBUTION_COMBINED thresholds
-(Issue #194 infrastructure) are populated with calibrated uncertainty bands.
+M6 MAGNITUDE status — partial implementation per feasibility assessment
+(migration a3d9e7c2f4b1, Issues #208/#210):
+  Step 2 achieves MAGNITUDE_WITHIN_20PCT. Steps 1, GRC 2, GRC 3 deferred to M7.
+  See MAGNITUDE_CALIBRATION_NOTE below.
 """
 from __future__ import annotations
 
@@ -29,11 +30,43 @@ from app.simulation.repositories.quantity_serde import IA1_CANONICAL_PHRASE
 IA1_DISCLOSURE: str = IA1_CANONICAL_PHRASE
 
 PARAMETER_CALIBRATION_DISCLOSURE: str = (
-    "Argentina 2001–2002 thresholds are DIRECTION_ONLY — magnitude accuracy "
-    "is not asserted. DISTRIBUTION_COMBINED thresholds require calibrated "
-    "parameter uncertainty bands; infrastructure is in place (Issue #194) but "
-    "calibration is deferred to a future milestone. "
-    "See DATA_STANDARDS.md Known Limitation."
+    "Argentina 2001–2002 partial MAGNITUDE calibration (M6, Issues #208/#210): "
+    "step 2 achieves MAGNITUDE_WITHIN_20PCT at 3.2% deviation (model −10.55% vs "
+    "actual −10.9%), seeded by migration a3d9e7c2f4b1. "
+    "Step 1 remains DIRECTION_ONLY — structural gap (one-step lag, Issue #222, M7). "
+    "Greece steps 2–3 remain DIRECTION_ONLY — structural gap (accumulation without "
+    "mean reversion, Issue #221, M7). "
+    "See MAGNITUDE_CALIBRATION_NOTE for full root-cause analysis."
+)
+
+MAGNITUDE_CALIBRATION_NOTE: str = (
+    "MAGNITUDE calibration status for Argentina 2001–2002 and Greece 2010–2012 "
+    "(feasibility assessment: commit a3d9e7c2f4b1 context, Issues #208/#210):\n"
+    "\n"
+    "PASSES — ARG step 2 (2002): model −10.55% vs actual −10.9% → 3.2% deviation.\n"
+    "  Mechanism: MacroeconomicModule depressed-regime multiplier (1.5) applied to\n"
+    "  Zero Deficit Plan spending cut (−6.5% of GDP) on initial gdp_growth of −0.8%.\n"
+    "  formula: gdp_delta = −0.065 × 1.5 = −0.0975; new = −0.008 + (−0.0975) = −0.1055.\n"
+    "  This is a structural coincidence of correctly-calibrated inputs — not overfitting.\n"
+    "  Tolerance band: ±20% of |−0.109| → [−0.1308, −0.0872]. Model at −0.1055 is inside.\n"
+    "\n"
+    "DEFERRED — ARG step 1 (2001): model −0.8% vs actual −4.4% → 82% deviation.\n"
+    "  Cause: one-step lag. Zero Deficit Plan fires as events at step 1 but\n"
+    "  MacroeconomicModule only processes prior-step events — at step 1 there are none.\n"
+    "  Model reports the initial seed (2000 recession baseline) while the actual 2001\n"
+    "  contraction reflects the contemporaneous real-world shock effect. Not fixable\n"
+    "  by parameter calibration. M7 Issue #222: Engineering Lead decision required\n"
+    "  (Option A: contemporaneous path; B: revised seeding; C: permanent DIRECTION_ONLY).\n"
+    "\n"
+    "DEFERRED — GRC step 2 (2011): model −21.4% vs actual −8.9% → 140% deviation.\n"
+    "DEFERRED — GRC step 3 (2012): model −31.4% vs actual −6.6% → 376% deviation.\n"
+    "  Cause: gdp_growth is a pure accumulation stock — it only moves when a fiscal\n"
+    "  event fires and never receives an endogenous recovery impulse. The Greek economy\n"
+    "  improved from −8.9% to −6.6% without a positive fiscal shock in the fixture.\n"
+    "  The model cannot reproduce improvement without a positive impulse. The required\n"
+    "  ZLB multiplier to match step 2 would be 0.22–0.66 — below the standard multiplier\n"
+    "  (0.5), contradicting the regime hierarchy. M7 Issue #221: mean-reversion channel\n"
+    "  in MacroeconomicModule required (Chief Methodologist + Chief Engineer joint ADR).\n"
 )
 
 
