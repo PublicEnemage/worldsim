@@ -48,6 +48,10 @@ test(
   "Stakeholder demo walkthrough — narrated screen recording",
   { tag: ["@demo"] },
   async ({ page }) => {
+    // TTS narration adds ~4 minutes of blocking speech on top of interactions.
+    // Override the 60 s config timeout for this test only.
+    test.setTimeout(15 * 60 * 1000);
+
     // ── STEP 1: Map loads ────────────────────────────────────────────────────
 
     await page.goto("/");
