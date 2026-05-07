@@ -40,18 +40,22 @@ export default function ScenarioPanel({
   useEffect(() => { void fetchScenarios(); }, [fetchScenarios]);
 
   const handleSelectPrimary = async (scenario: ScenarioResponse) => {
+    // Call immediately so parent's selectedScenarioId updates synchronously —
+    // prevents race when entity is selected right after clicking this button
+    // before the detail fetch resolves.
+    onSelectScenario(scenario.scenario_id, scenario.name, 3);
     try {
       const res = await fetch(
         `${API_BASE}/scenarios/${encodeURIComponent(scenario.scenario_id)}`
       );
       if (res.ok) {
         const detail = await res.json() as ScenarioDetailResponse;
-        onSelectScenario(scenario.scenario_id, scenario.name, detail.configuration.n_steps);
-      } else {
-        onSelectScenario(scenario.scenario_id, scenario.name, 3);
+        if (detail.configuration.n_steps !== 3) {
+          onSelectScenario(scenario.scenario_id, scenario.name, detail.configuration.n_steps);
+        }
       }
     } catch {
-      onSelectScenario(scenario.scenario_id, scenario.name, 3);
+      // Fallback 3 already set above.
     }
   };
 

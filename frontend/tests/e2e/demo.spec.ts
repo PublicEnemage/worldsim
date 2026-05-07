@@ -207,7 +207,7 @@ test(
 
     // Drawer must open and show measurement output — not the placeholder.
     await expect(page.getByLabel("Close drawer")).toBeVisible({ timeout: 20_000 });
-    await expect(page.getByText("Greece")).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByText("Greece", { exact: true })).toBeVisible({ timeout: 10_000 });
     await expect(
       page.getByText("Advance the scenario at least one step to view measurement output."),
     ).not.toBeVisible();
