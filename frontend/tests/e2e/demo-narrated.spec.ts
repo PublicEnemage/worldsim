@@ -68,9 +68,21 @@ test(
     await page.waitForFunction(
       () =>
         typeof (window as Record<string, unknown>).__worldsim_selectEntity ===
+        "function" &&
+        typeof (window as Record<string, unknown>).__worldsim_setAttributeName ===
         "function",
       { timeout: 15_000 },
     );
+
+    // Switch to gdp_growth before the first narration so the choropleth shows a
+    // continuous GDP attribute rather than the categorical economy_tier default.
+    // gdp_growth is a scenario attribute — not in the static /attributes/available
+    // list — so we use the test seam instead of page.selectOption().
+    await page.evaluate(() => {
+      (window as Record<string, (key: string) => void>).__worldsim_setAttributeName(
+        "gdp_growth",
+      );
+    });
 
     // Create the Greece scenario via API with the backtesting fixture inputs before
     // opening the scenarios panel — the panel fetches on mount, so it will already
