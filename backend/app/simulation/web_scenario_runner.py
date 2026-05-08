@@ -20,7 +20,7 @@ from __future__ import annotations
 
 import json
 import time
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from decimal import Decimal
 from typing import TYPE_CHECKING, Any
 
@@ -217,6 +217,9 @@ class WebScenarioRunner:
         )
 
         snap_repo = ScenarioSnapshotRepository()
+        # Load all scheduled inputs before reconstruction so they are available
+        # both for prior-step event restoration and for the next-step advance.
+        inputs_by_step = await _load_scheduled_inputs(conn, scenario_id, config.entities)
 
         if current_step < 0:
             # No snapshots — initialise step 0 then advance to step 1
@@ -247,6 +250,18 @@ class WebScenarioRunner:
             current_state = await _reconstruct_state_from_snapshot(
                 conn, scenario_id, row["name"], state_raw, snap_row["timestep"],
             )
+            # _reconstruct_state_from_snapshot always returns events=[].
+            # Restore the scheduled inputs that fired at current_step as synthetic
+            # prior events so MacroeconomicModule's one-step lag design sees them
+            # when advancing to the next step.  Endogenous module events are not
+            # yet persisted across advance() calls — tracked as a known gap.
+            prior_events = [
+                e
+                for inp in inputs_by_step.get(current_step, [])
+                for e in inp.to_events(current_state.timestep)
+            ]
+            if prior_events:
+                current_state = replace(current_state, events=prior_events)
 
         next_step = current_step + 1
         if next_step > config.n_steps:
@@ -263,7 +278,6 @@ class WebScenarioRunner:
             )
 
         try:
-            inputs_by_step = await _load_scheduled_inputs(conn, scenario_id, config.entities)
             step_inputs = inputs_by_step.get(next_step, [])
 
             active_modules: list[SimulationModule] = _build_active_modules(config)

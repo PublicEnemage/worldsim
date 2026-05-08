@@ -72,6 +72,76 @@ test(
       { timeout: 15_000 },
     );
 
+    // Create the Greece scenario via API with the backtesting fixture inputs before
+    // opening the scenarios panel — the panel fetches on mount, so it will already
+    // include this scenario when it opens in Step 2.
+    const createRes = await page.request.post("http://localhost:8000/api/v1/scenarios", {
+      data: {
+        name: DEMO_SCENARIO_NAME,
+        description: "Greece 2010-2012 IMF Program — stakeholder demo run",
+        configuration: {
+          entities: ["GRC"],
+          n_steps: 3,
+          timestep_label: "annual",
+          initial_attributes: {
+            GRC: {
+              gdp_growth: {
+                value: "-0.054", unit: "ratio", variable_type: "ratio",
+                confidence_tier: 3, observation_date: "2010-04-01",
+                source_registry_id: "IMF_WEO_APR2010", measurement_framework: "financial",
+              },
+              unemployment_rate: {
+                value: "0.127", unit: "ratio", variable_type: "ratio",
+                confidence_tier: 2, observation_date: "2010-07-01",
+                source_registry_id: "EUROSTAT_LFS_2010", measurement_framework: "human_development",
+              },
+              health_expenditure_pct_gdp: {
+                value: "0.095", unit: "ratio", variable_type: "ratio",
+                confidence_tier: 2, observation_date: "2011-12-01",
+                source_registry_id: "WDI_2010", measurement_framework: "human_development",
+              },
+              net_enrollment_secondary: {
+                value: "0.991", unit: "ratio", variable_type: "ratio",
+                confidence_tier: 2, observation_date: "2011-12-01",
+                source_registry_id: "WDI_2010", measurement_framework: "human_development",
+              },
+              // IMF CR10/110 — ~2.0 months coverage at programme entry, below MDA-FIN-RESERVES floor (2.5)
+              reserve_coverage_months: {
+                value: "2.0", unit: "months", variable_type: "ratio",
+                confidence_tier: 2, observation_date: "2010-05-01",
+                source_registry_id: "IMF_CR10_110", measurement_framework: "financial",
+              },
+            },
+          },
+        },
+        scheduled_inputs: [
+          // Step 1 (2010): IMF program acceptance — €110bn ESM/IMF program, May 2010
+          {
+            step: 1, input_type: "EmergencyPolicyInput",
+            input_data: { instrument: "imf_program_acceptance", target_entity: "GRC", expected_duration: 3, program_size_gdp_ratio: "0.48" },
+          },
+          // Step 1 (2010): Fiscal spending cuts — 2010 Memorandum primary cuts
+          {
+            step: 1, input_type: "FiscalPolicyInput",
+            input_data: { instrument: "spending_change", target_entity: "GRC", sector: "government", value: "-0.08", duration_years: 1 },
+          },
+          // Step 2 (2011): Second austerity package — June 2011 Medium-Term Fiscal Strategy
+          {
+            step: 2, input_type: "FiscalPolicyInput",
+            input_data: { instrument: "spending_change", target_entity: "GRC", sector: "government", value: "-0.05", duration_years: 1 },
+          },
+          // Step 2 (2011): Deficit target — Medium-Term Fiscal Strategy 2011–2015
+          {
+            step: 2, input_type: "FiscalPolicyInput",
+            input_data: { instrument: "deficit_target", target_entity: "GRC", sector: "", value: "-0.03", duration_years: 4 },
+          },
+        ],
+      },
+    });
+    if (!createRes.ok()) {
+      throw new Error(`Greece scenario creation failed: ${createRes.status()} — ${await createRes.text()}`);
+    }
+
     await speak(
       "This is the application's baseline view. The choropleth shows a simulation " +
       "attribute across entities — in this case, GDP growth rate from the most recent " +
@@ -95,15 +165,14 @@ test(
       "is important. It's the point of the backtesting discipline, which we'll come back to.",
     );
 
-    // ── STEP 3: Create and select the Greece scenario ────────────────────────
-
-    await page.locator('input[placeholder="Scenario name"]').fill(DEMO_SCENARIO_NAME);
-    await page.locator(".scenario-btn--create").click();
+    // ── STEP 3: Select the pre-created Greece scenario ───────────────────────
+    // Scenario was created via API in Step 1 with fixture scheduled inputs.
+    // The panel fetched the list on mount, so the row is already visible.
 
     const scenarioRow = page
       .locator(".scenario-row")
       .filter({ hasText: DEMO_SCENARIO_NAME });
-    await expect(scenarioRow).toBeVisible({ timeout: 20_000 });
+    await expect(scenarioRow).toBeVisible({ timeout: 10_000 });
 
     await scenarioRow.getByTitle("Select as primary scenario").click();
     await page.waitForTimeout(600);
