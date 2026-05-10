@@ -311,20 +311,70 @@ test(
     );
 
     // ── STEP 10: Enter compare mode ──────────────────────────────────────────
+    // Create and fully advance the comparison scenario via API before opening
+    // the panel — the panel fetches on mount so it will include the scenario.
+    // Using a lighter austerity path (-4% spending, no deficit target) to
+    // produce a visible delta on the choropleth.
 
     await page.getByLabel("Close drawer").click();
     await page.waitForTimeout(600);
 
+    const compareCreateRes = await page.request.post("http://localhost:8000/api/v1/scenarios", {
+      data: {
+        name: COMPARE_SCENARIO_NAME,
+        description: "Greece Alternative — lighter austerity path, stakeholder demo",
+        configuration: {
+          entities: ["GRC"],
+          n_steps: 3,
+          timestep_label: "annual",
+          start_date: "2010-01-01",
+          initial_attributes: {
+            GRC: {
+              gdp_growth: {
+                value: "-0.054", unit: "ratio", variable_type: "ratio",
+                confidence_tier: 3, observation_date: "2010-04-01",
+                source_registry_id: "IMF_WEO_APR2010", measurement_framework: "financial",
+              },
+              reserve_coverage_months: {
+                value: "2.0", unit: "months", variable_type: "ratio",
+                confidence_tier: 2, observation_date: "2010-05-01",
+                source_registry_id: "IMF_CR10_110", measurement_framework: "financial",
+              },
+            },
+          },
+        },
+        scheduled_inputs: [
+          // Alternative path: lighter first-year cut (-4% vs -8%) to demonstrate
+          // delta against the primary scenario on the choropleth.
+          {
+            step: 1, input_type: "FiscalPolicyInput",
+            input_data: { instrument: "spending_change", target_entity: "GRC", sector: "government", value: "-0.04", duration_years: 1 },
+          },
+        ],
+      },
+    });
+    if (!compareCreateRes.ok()) {
+      throw new Error(`Compare scenario creation failed: ${compareCreateRes.status()} — ${await compareCreateRes.text()}`);
+    }
+    const { id: compareScenarioId } = await compareCreateRes.json() as { id: string };
+
+    // Advance the comparison scenario 3 steps via API so delta data exists.
+    for (let s = 1; s <= 3; s++) {
+      const advRes = await page.request.post(
+        `http://localhost:8000/api/v1/scenarios/${encodeURIComponent(compareScenarioId)}/advance`,
+      );
+      if (!advRes.ok()) {
+        throw new Error(`Comparison advance step ${s} failed: ${advRes.status()} — ${await advRes.text()}`);
+      }
+    }
+
     await page.getByRole("button", { name: /Scenarios/ }).click();
     await page.waitForTimeout(600);
-
-    await page.locator('input[placeholder="Scenario name"]').fill(COMPARE_SCENARIO_NAME);
-    await page.locator(".scenario-btn--create").click();
 
     const compareRow = page
       .locator(".scenario-row")
       .filter({ hasText: COMPARE_SCENARIO_NAME });
-    await expect(compareRow).toBeVisible({ timeout: 20_000 });
+    await expect(compareRow).toBeVisible({ timeout: 10_000 });
 
     await compareRow.getByTitle("Select as comparison scenario").click();
     await page.waitForTimeout(600);
