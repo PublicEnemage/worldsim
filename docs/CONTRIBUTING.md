@@ -67,6 +67,31 @@ git checkout -b feat/your-feature-name
 
 ### Step 2: Python Environment
 
+**Python 3.12 is required.** The project uses `datetime.UTC` (introduced in
+3.11) and configures ruff with `target-version = "py312"` and mypy with
+`python_version = "3.12"`. Running tests under Python 3.10 or earlier produces
+`ImportError: cannot import name 'UTC' from 'datetime'` at collection time.
+The test suite will surface this immediately with a clear error message.
+
+`backend/.python-version` pins the directory to Python 3.12. If you use
+**pyenv**, it activates the correct interpreter automatically:
+
+```bash
+# One-time: install Python 3.12 via pyenv
+pyenv install 3.12.9          # or the latest 3.12.x patch
+cd backend                    # .python-version activates 3.12 automatically
+python --version              # should print Python 3.12.x
+```
+
+If you use **conda**:
+
+```bash
+conda create -n worldsim python=3.12
+conda activate worldsim
+```
+
+Then create the venv and install dependencies:
+
 ```bash
 cd backend
 python3.12 -m venv .venv
@@ -81,6 +106,7 @@ Verify the installation:
 
 ```bash
 python -c "import numpy, pandas, networkx, fastapi; print('Backend dependencies OK')"
+python -c "from datetime import UTC; print('Python 3.11+ confirmed')"
 ```
 
 ### Step 3: Database Setup (Milestone 2+)
