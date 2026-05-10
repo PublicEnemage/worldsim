@@ -209,7 +209,7 @@ def test_build_greece_scenario_initial_gdp_growth_is_string() -> None:
 
 
 def test_build_greece_scenario_has_five_initial_attributes() -> None:
-    """Initial state must have 5 attributes: 4 WDI seed (Issue #149) + reserve_coverage_months (IMF CR10/110)."""
+    """Greece fixture: 5 initial attributes — WDI ×4 (Issue #149) + reserve_coverage_months."""
     scenario = build_greece_scenario()
     grc_attrs = scenario.configuration.initial_attributes["GRC"]
     assert len(grc_attrs) == 5

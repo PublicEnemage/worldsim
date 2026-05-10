@@ -21,6 +21,8 @@ from __future__ import annotations
 import json
 import time
 from dataclasses import dataclass, replace
+from datetime import UTC
+from datetime import datetime as _datetime
 from decimal import Decimal
 from typing import TYPE_CHECKING, Any
 
@@ -54,8 +56,6 @@ from app.simulation.repositories.state_repository import (
     _default_timestep,
 )
 
-from datetime import datetime as _datetime, timezone as _timezone
-
 if TYPE_CHECKING:
     from datetime import datetime
 
@@ -70,14 +70,14 @@ if TYPE_CHECKING:
 _ENGINE_VERSION = "0.3.0"
 
 
-def _base_timestep(config: ScenarioConfigSchema) -> "_datetime":
+def _base_timestep(config: ScenarioConfigSchema) -> _datetime:
     """Return step-0 base datetime from config.start_date, or the 2000-01-01 default."""
     if config.start_date is not None:
         return _datetime(
             config.start_date.year,
             config.start_date.month,
             config.start_date.day,
-            tzinfo=_timezone.utc,
+            tzinfo=UTC,
         )
     return _default_timestep()
 
