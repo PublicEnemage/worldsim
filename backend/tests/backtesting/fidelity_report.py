@@ -19,6 +19,7 @@ def format_fidelity_report(
     ia1_disclosure: str,
     parameter_calibration_disclosure: str,
     entity_id: str = "GRC",
+    deferred_thresholds: dict[str, str] | None = None,
 ) -> str:
     """Return a formatted fidelity report string for CI log output.
 
@@ -96,10 +97,28 @@ def format_fidelity_report(
     lines += [
         "",
         f"Overall: {overall} ({sum(thresholds_met.values())}/{len(thresholds_met)} thresholds met)",
+    ]
+
+    if deferred_thresholds:
+        lines += [
+            "",
+            "-" * 72,
+            "DEFERRED THRESHOLDS (tracked, not blocking CI — Issue #87)",
+            "-" * 72,
+        ]
+        for threshold_name, reason in sorted(deferred_thresholds.items()):
+            lines.append(f"  [DEFERRED] {threshold_name}: {reason}")
+
+    lines += [
         "",
         "-" * 72,
         "KNOWN LIMITATIONS",
         "-" * 72,
+        "Statistical power: DIRECTION_ONLY is a sign check only. A model producing",
+        "GDP growth of -0.0001% passes identically to one producing -8.9%.",
+        "A 3-step case has a 1-in-8 (12.5%) null-model pass rate. A DIRECTION_ONLY",
+        "pass asserts directional plausibility only — not quantitative accuracy.",
+        "",
         f"IA-1: {ia1_disclosure}",
         "",
         f"Calibration: {parameter_calibration_disclosure}",
@@ -126,6 +145,17 @@ def _extract_unemployment_value(
     """Extract the unemployment_rate Decimal value for entity_id from a snapshot dict."""
     try:
         val = snapshot["state_data"][entity_id]["unemployment_rate"]["value"]
+        return Decimal(str(val))
+    except (KeyError, TypeError, ValueError):
+        return None
+
+
+def _extract_health_expenditure_value(
+    snapshot: dict[str, Any], entity_id: str = "GRC"
+) -> Decimal | None:
+    """Extract health_expenditure_pct_gdp Decimal value for entity_id from a snapshot."""
+    try:
+        val = snapshot["state_data"][entity_id]["health_expenditure_pct_gdp"]["value"]
         return Decimal(str(val))
     except (KeyError, TypeError, ValueError):
         return None

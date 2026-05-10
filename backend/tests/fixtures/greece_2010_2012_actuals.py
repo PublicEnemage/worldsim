@@ -10,10 +10,19 @@ Sources:
       unemployment_rate_2013  — Q1 2013 = 27.5% (within fixture window;
                                 labelled 2013 because step 3 projects the
                                 2012→2013 annual period)
+  - World Bank World Development Indicators (WDI 2013 release):
+      health_expenditure_pct_gdp_2010  — 9.5% (initial state seed)
+      health_expenditure_pct_gdp_2011  — 9.4% (slight decline; austerity begins)
+      health_expenditure_pct_gdp_2012  — 8.7% (accelerated cuts in second program)
 
 These actuals define the benchmark against which backtesting fidelity is
 measured. ADR-004 Decision 3: M3 ships DIRECTION_ONLY thresholds only.
 MAGNITUDE thresholds are deferred to Milestone 4 (Issue #44).
+
+HCL thresholds (Issue #87): unemployment_rate UP and health_expenditure_pct_gdp DOWN
+are defined in FidelityThresholds and tracked in the fidelity report. They are
+deferred from the blocking CI gate until an endogenous module updates these
+attributes (currently flat across steps — no module produces these as outputs).
 """
 from __future__ import annotations
 
@@ -71,6 +80,12 @@ class GreeceActuals:
     unemployment_rate_2012: Decimal = Decimal("0.245")
     unemployment_rate_2013: Decimal = Decimal("0.275")
 
+    # World Bank WDI 2013 release — health expenditure as % of GDP (Issue #87)
+    # Direction: DOWN during austerity program (spending cuts visible 2011→2012)
+    health_expenditure_pct_gdp_2010: Decimal = Decimal("0.095")
+    health_expenditure_pct_gdp_2011: Decimal = Decimal("0.094")
+    health_expenditure_pct_gdp_2012: Decimal = Decimal("0.087")
+
 
 ACTUALS = GreeceActuals()
 
@@ -81,16 +96,25 @@ ACTUALS = GreeceActuals()
 
 @dataclass(frozen=True)
 class FidelityThresholds:
-    """M3 DIRECTION_ONLY fidelity thresholds for Greece 2010–2012.
+    """DIRECTION_ONLY fidelity thresholds for Greece 2010–2012 (Issue #87).
 
-    DIRECTION_ONLY: asserts that the simulated value is negative (contracting)
-    for gdp_growth and positive (rising) for unemployment, matching the
-    documented historical direction. No magnitude accuracy is asserted.
+    DIRECTION_ONLY: asserts that the simulated value moves in the historically
+    documented direction. No magnitude accuracy is asserted.
 
-    unemployment_direction_step0_to_step3: asserts that unemployment at step 3
-    exceeds the empirically grounded initial value (step 0 = 12.7% from
-    EUROSTAT_LFS_2010). This replaces the vacuous step1→step3 check that
-    existed when no initial unemployment value was seeded (Issue #149).
+    Enforced thresholds (blocking CI gate):
+      gdp_direction_correct: gdp_growth is negative at steps 1–3 (contraction).
+      unemployment_direction_step0_to_step3: unemployment at step 3 exceeds the
+        empirically grounded initial value (12.7%, EUROSTAT_LFS_2010 Q1 2010).
+        Replaces the vacuous step1→step3 check from before Issue #149.
+
+    Deferred thresholds (tracked in fidelity report, not blocking CI — Issue #87):
+      unemployment_rising_step1_to_step2: step 2 unemployment > step 1.
+        Deferred: no endogenous module currently updates unemployment_rate.
+        Value stays flat; threshold would always fail. Re-enable when a module
+        produces unemployment_rate events.
+      health_expenditure_declining_step1_to_step2: step 2 health_expenditure_pct_gdp
+        < step 1. Deferred: same reason. Historical: 9.4% → 8.7% (WDI 2013).
+        Re-enable when a module produces health_expenditure_pct_gdp events.
 
     Threshold type rationale: parameter calibration tier system not yet
     implemented (Issue #44). MAGNITUDE thresholds require calibration tier A/B
@@ -99,6 +123,9 @@ class FidelityThresholds:
 
     gdp_direction_correct: bool = True
     unemployment_direction_step0_to_step3: bool = True
+    # HCL thresholds — defined but deferred (no endogenous module yet)
+    unemployment_rising_step1_to_step2: bool = False
+    health_expenditure_declining_step1_to_step2: bool = False
 
 
 THRESHOLDS = FidelityThresholds()
