@@ -27,6 +27,8 @@ from __future__ import annotations
 
 import contextlib
 import json
+import logging
+import subprocess
 import uuid
 from decimal import Decimal
 from math import floor
@@ -55,8 +57,95 @@ from app.schemas import (
 from app.simulation.mda_checker import alerts_from_events_snapshot
 from app.simulation.repositories.quantity_serde import IA1_CANONICAL_PHRASE
 
+_log = logging.getLogger(__name__)
+
 # Engine version for tombstone records — must match app version in main.py.
 _ENGINE_VERSION = "0.3.0"
+
+
+def _resolve_git_commit_hash() -> str:
+    """Return the current git commit SHA-1, or 'unknown' if unavailable.
+
+    Called once at module load time. Fails gracefully in environments where
+    git is not available (Docker runtime without .git directory, CI without
+    full checkout, unit test environments).
+    """
+    try:
+        result = subprocess.check_output(  # noqa: S603
+            ["git", "rev-parse", "HEAD"],  # noqa: S607
+            stderr=subprocess.DEVNULL,
+            timeout=3,
+        )
+        return result.decode().strip()
+    except Exception:  # noqa: BLE001
+        return "unknown"
+
+
+# Resolved once at import time. "unknown" when git is unavailable.
+_GIT_COMMIT_HASH: str = _resolve_git_commit_hash()
+
+
+def check_reconstruction_compatibility(
+    tombstone_engine_version: str,
+    tombstone_git_commit_hash: str | None,
+    *,
+    force_audit_override: bool = False,
+) -> None:
+    """Enforce engine version compatibility before any tombstone reconstruction.
+
+    Implements Issue #139 Layer 1: block reconstruction when the tombstone was
+    written by a different engine version than is currently deployed. The
+    reconstruction guarantee (ADR-004 Decision 1 Amendment, SA-11) is only valid
+    for same-version use — cross-version reconstruction silently produces different
+    outputs with no error under the old behaviour.
+
+    Comparison logic:
+      - Semantic version must match exactly.
+      - Git hash is compared only when both sides carry a real hash (neither is
+        None or "unknown"). A NULL tombstone hash (pre-migration tombstone) or an
+        "unknown" live hash (non-git environment) disables hash comparison and
+        falls back to semantic version comparison alone.
+
+    Args:
+        tombstone_engine_version: engine_version stored in the tombstone row.
+        tombstone_git_commit_hash: git_commit_hash stored in the tombstone row,
+            or None for tombstones written before migration c7f4a3e9d2b1.
+        force_audit_override: When True, log a WARNING instead of raising. Only
+            for explicit audit use cases where the caller accepts the discrepancy.
+
+    Raises:
+        HTTPException(409): when tombstone version does not match live engine and
+            force_audit_override is False.
+    """
+    version_match = tombstone_engine_version == _ENGINE_VERSION
+
+    # Hash comparison is meaningful only when both sides have a resolved hash.
+    both_hashes_known = (
+        tombstone_git_commit_hash is not None
+        and tombstone_git_commit_hash != "unknown"
+        and _GIT_COMMIT_HASH != "unknown"
+    )
+    hash_match = (not both_hashes_known) or (tombstone_git_commit_hash == _GIT_COMMIT_HASH)
+
+    if version_match and hash_match:
+        return
+
+    detail = (
+        f"Tombstone engine_version='{tombstone_engine_version}' "
+        f"(git_commit_hash={tombstone_git_commit_hash!r}) does not match "
+        f"live engine engine_version='{_ENGINE_VERSION}' "
+        f"(git_commit_hash={_GIT_COMMIT_HASH!r}). "
+        "Reconstruction against a different engine version may produce outputs "
+        "that differ from what the user originally saw (SA-11 determinism). "
+        "Pass force_audit_override=True only for explicit audit use cases where "
+        "the version discrepancy is understood and accepted."
+    )
+
+    if force_audit_override:
+        _log.warning("Audit override — reconstruction version mismatch: %s", detail)
+        return
+
+    raise HTTPException(status_code=409, detail=detail)
 
 router = APIRouter(tags=["scenarios"])
 
@@ -514,14 +603,16 @@ async def delete_scenario(
             """
             INSERT INTO scenario_deleted_tombstones
                 (scenario_id, name, configuration, scheduled_inputs,
-                 engine_version, original_created_at, deleted_at, deleted_by)
-            VALUES ($1, $2, $3, $4, $5, $6, NOW(), $7)
+                 engine_version, git_commit_hash,
+                 original_created_at, deleted_at, deleted_by)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, NOW(), $8)
             """,
             scenario_id,
             row["name"],
             json.dumps(cfg_raw),
             json.dumps(scheduled_inputs_snap),
             _ENGINE_VERSION,
+            _GIT_COMMIT_HASH,
             row["created_at"],
             "api",
         )
