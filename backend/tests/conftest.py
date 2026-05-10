@@ -13,7 +13,7 @@ import sys
 
 
 def pytest_configure(config: object) -> None:  # noqa: ARG001
-    if sys.version_info < (3, 11):
+    if sys.version_info < (3, 11):  # noqa: UP036 — intentional guard for misconfigured envs
         import pytest
         pytest.exit(
             f"\n\nPython 3.11+ is required — current interpreter is {sys.version}.\n"
