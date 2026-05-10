@@ -182,50 +182,47 @@ The audit store requirement is an application-layer addition to the DELETE endpo
 
 **CONFLICT C-1 is resolved.** No further Engineering Lead action required on this conflict.
 
-#### Known Limitation — engine_version is a Declaration, Not a Verifiable Pointer (2026-04-24)
+#### Known Limitation — engine_version is a Declaration, Not a Verifiable Pointer (2026-04-24; partially resolved 2026-05-10)
 
 The reconstruction guarantee in the tombstone design rests on SA-11 determinism: same
 configuration + same scheduled inputs + same engine version → identical output. This
-guarantee has a boundary condition that is not yet enforced.
+guarantee has a boundary condition that was not enforced at M4. Issue #139 tracks the
+two-layer fix; Layer 1 is resolved at M7 and Layer 2 is formally deferred to M9.
 
-**The gap:** `engine_version` is currently stored as a semantic version string
-(`"0.3.0"`) hardcoded in `app/api/scenarios.py`. This is a *declaration* — it records
-what version was claimed at deletion time, but provides no mechanism to:
+**The original gap:** `engine_version` was stored as a semantic version string only —
+a *declaration* without a mechanism to verify the string against a specific artifact,
+instantiate a prior engine version on demand, or block cross-version reconstruction.
 
-1. Verify that the string corresponds to a specific, retrievable engine artifact.
-2. Instantiate that engine version at reconstruction time if it differs from the
-   current deployed version.
-3. Block or flag a reconstruction attempt when the tombstone version and the live
-   engine version do not match.
+**Layer 1 — RESOLVED (2026-05-10, migration c7f4a3e9d2b1, Issue #139):**
 
-**Why this matters at Milestone 4:** M4 will recalibrate propagation coefficients and
-add new simulation modules (Human Cost Ledger). A tombstone written under M3
-(`engine_version = "0.3.0"`) reconstructed against the M4 engine will produce
-different outputs than the user originally saw. The reconstruction guarantee silently
-fails — no error is raised, but the outputs are not reproducible.
+`git_commit_hash TEXT` (nullable) added to `scenario_deleted_tombstones`. At tombstone
+write time, `_resolve_git_commit_hash()` (in `app/api/scenarios.py`) executes
+`git rev-parse HEAD` and stores the SHA-1 alongside the semantic version string. Fails
+gracefully to `"unknown"` in environments without git access (Docker runtime, CI
+shallow clone). The field is NULL for tombstones written before this migration.
 
-**The conservative control posture:** Block reconstruction unconditionally when tombstone
-`engine_version` does not match the live engine version. Do not warn and proceed — the
-system has no visibility into how reconstructed outputs are used downstream, so a
-permissive response cannot be made safe by intent declaration. A logged exception
-override mechanism should exist for explicit audit use cases, but the default must be
-a hard block.
+`check_reconstruction_compatibility(tombstone_engine_version, tombstone_git_commit_hash)`
+(in `app/api/scenarios.py`) enforces the conservative control posture required by Issue
+#139: raises `HTTPException(409)` when the tombstone's engine version or git hash does
+not match the live engine. Hash comparison is skipped when either side is NULL or
+`"unknown"`, falling back to semantic version comparison. A `force_audit_override=True`
+keyword argument logs a WARNING instead of raising, for explicit audit use cases. This
+function must be called by any future reconstruction endpoint before executing.
 
-**The two-layer fix required (tracked in Issue #[TBD]):**
+**Layer 2 — FORMALLY DEFERRED to Milestone 9:**
 
-1. Replace the semantic version string with a git commit hash (or store both). A commit
-   hash is a precise, retrievable pointer that unambiguously identifies the engine state.
-   A semantic version string requires an external convention to resolve to a specific
-   artifact.
+Building the artifact convention (version-tagged Docker images or a git-pinned
+deployment mechanism for on-demand engine instantiation) requires infrastructure that
+is out of scope for M7 and M8. The Milestone 9 scope (methodology publication and
+external contributor infrastructure) is the earliest point where the deployment
+mechanism and the reconstruction endpoint can be co-designed. The tombstone already has
+the right shape; the resolution mechanism does not yet exist. This deferral is the
+documented rationale required by the M7 exit checklist.
 
-2. Build the artifact convention: version-tagged Docker images or a git-pinned
-   deployment mechanism that allows a specific engine version to be instantiated on
-   demand for reconstruction. The tombstone already has the right shape; the resolution
-   mechanism does not yet exist.
-
-**Status:** Open architectural gap. Tracked in Issue #139.
-The tombstone remains sound as an audit record; the reconstruction guarantee is
-accurate for same-version use and undeclared for cross-version use.
+**Current status:** Layer 1 done. The tombstone is sound as an audit record and as a
+reconstruction input. `check_reconstruction_compatibility()` enforces the version guard
+at any future reconstruction call site. Layer 2 (on-demand engine instantiation) is
+deferred to M9 with this entry as the formal record.
 
 ---
 

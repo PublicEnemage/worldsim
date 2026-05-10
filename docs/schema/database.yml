@@ -445,7 +445,20 @@ tables:
       engine_version:
         type: text
         nullable: false
-        description: Engine version string at deletion time. e.g. "0.3.0".
+        description: >
+          Semantic version string at deletion time (e.g. "0.3.0"). Declaration only —
+          not a verifiable artifact pointer without git_commit_hash. Used by
+          check_reconstruction_compatibility() as the primary version comparison.
+      git_commit_hash:
+        type: text
+        nullable: true
+        description: >
+          Git SHA-1 of the engine at tombstone write time, or "unknown" if git was
+          unavailable at module load. NULL for tombstones written before migration
+          c7f4a3e9d2b1 (Issue #139 Layer 1). Provides a precise, unambiguous pointer
+          to the exact engine state. check_reconstruction_compatibility() uses this
+          for hash comparison when both sides carry a real hash; falls back to
+          semantic version comparison when either side is NULL or "unknown".
       original_created_at:
         type: "timestamp with time zone"
         nullable: false
