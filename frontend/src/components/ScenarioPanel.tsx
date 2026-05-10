@@ -8,6 +8,7 @@ interface Props {
   secondScenarioId: string | null;
   onSelectScenario: (id: string, name: string, totalSteps: number) => void;
   onSelectSecondScenario: (id: string) => void;
+  refreshKey?: number;
 }
 
 export default function ScenarioPanel({
@@ -15,6 +16,7 @@ export default function ScenarioPanel({
   secondScenarioId,
   onSelectScenario,
   onSelectSecondScenario,
+  refreshKey,
 }: Props) {
   const [scenarios, setScenarios] = useState<ScenarioResponse[]>([]);
   const [listError, setListError] = useState<string | null>(null);
@@ -37,7 +39,7 @@ export default function ScenarioPanel({
     }
   }, []);
 
-  useEffect(() => { void fetchScenarios(); }, [fetchScenarios]);
+  useEffect(() => { void fetchScenarios(); }, [fetchScenarios, refreshKey]);
 
   const handleSelectPrimary = async (scenario: ScenarioResponse) => {
     // Call immediately so parent's selectedScenarioId updates synchronously —

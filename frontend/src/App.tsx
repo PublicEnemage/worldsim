@@ -24,11 +24,14 @@ export default function App() {
   const [panelOpen, setPanelOpen] = useState(false);
   const [fidelityOpen, setFidelityOpen] = useState(false);
   const [selectedEntityId, setSelectedEntityId] = useState<string | null>(null);
+  // Incremented on every advance — ScenarioPanel watches this to refresh the list.
+  const [scenarioListVersion, setScenarioListVersion] = useState(0);
 
   const handleStepChange = (step: number, _isComplete: boolean) => {
     // Always set — never reset to null on completion so EntityDetailDrawer
     // continues showing data at the final step after the scenario is done.
     setCurrentStep(step);
+    setScenarioListVersion((v) => v + 1);
   };
 
   const handleSelectScenario = (id: string, name: string, totalSteps: number) => {
@@ -129,6 +132,7 @@ export default function App() {
           secondScenarioId={secondScenarioId}
           onSelectScenario={handleSelectScenario}
           onSelectSecondScenario={setSecondScenarioId}
+          refreshKey={scenarioListVersion}
         />
       )}
 
