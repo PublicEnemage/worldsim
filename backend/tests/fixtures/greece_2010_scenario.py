@@ -97,24 +97,42 @@ def build_greece_scenario() -> ScenarioCreateRequest:
         measurement_framework="human_development",
     )
 
+    # IMF Country Report 10/110 (May 2010) — Greece's effective import coverage
+    # at programme entry was approximately 2.0 months (central government
+    # liquidity position, pre-first-disbursement).  Below the MDA-FIN-RESERVES
+    # CRITICAL floor (2.5 months), producing a persistent CRITICAL alert from
+    # step 1 onward throughout the programme window.
+    initial_reserve_coverage_months = QuantitySchema(
+        value="2.0",
+        unit="months",
+        variable_type="ratio",
+        confidence_tier=2,
+        observation_date=date(2010, 5, 1),
+        source_registry_id="IMF_CR10_110",
+        measurement_framework="financial",
+    )
+
     return ScenarioCreateRequest(
         name="Greece 2010-2012 IMF Program Backtesting Fixture",
         description=(
             "Backtesting fixture for ADR-004 Decision 3, Issue #112. "
             "Reproduces the Greece 2010–2012 sovereign debt crisis and IMF/EU "
             "program conditionality to validate DIRECTION_ONLY fidelity thresholds. "
-            "Initial state: IMF WEO April 2010 + Eurostat LFS 2010 + WDI 2010."
+            "Initial state: IMF WEO April 2010 + Eurostat LFS 2010 + WDI 2010 "
+            "+ IMF CR10/110 (reserve_coverage_months)."
         ),
         configuration=ScenarioConfigSchema(
             entities=["GRC"],
             n_steps=3,
             timestep_label="annual",
+            start_date=date(2010, 1, 1),
             initial_attributes={
                 "GRC": {
                     "gdp_growth": initial_gdp_growth,
                     "unemployment_rate": initial_unemployment_rate,
                     "health_expenditure_pct_gdp": initial_health_expenditure,
                     "net_enrollment_secondary": initial_net_enrollment_secondary,
+                    "reserve_coverage_months": initial_reserve_coverage_months,
                 },
             },
         ),

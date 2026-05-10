@@ -11,7 +11,7 @@ import "./App.css";
 
 const API_BASE = "http://localhost:8000/api/v1";
 
-const DEFAULT_ATTRIBUTE = "population_total";
+const DEFAULT_ATTRIBUTE = "gdp_usd_millions";
 
 export default function App() {
   const [attributeName, setAttributeName] = useState(DEFAULT_ATTRIBUTE);
@@ -24,11 +24,14 @@ export default function App() {
   const [panelOpen, setPanelOpen] = useState(false);
   const [fidelityOpen, setFidelityOpen] = useState(false);
   const [selectedEntityId, setSelectedEntityId] = useState<string | null>(null);
+  // Incremented on every advance — ScenarioPanel watches this to refresh the list.
+  const [scenarioListVersion, setScenarioListVersion] = useState(0);
 
   const handleStepChange = (step: number, _isComplete: boolean) => {
     // Always set — never reset to null on completion so EntityDetailDrawer
     // continues showing data at the final step after the scenario is done.
     setCurrentStep(step);
+    setScenarioListVersion((v) => v + 1);
   };
 
   const handleSelectScenario = (id: string, name: string, totalSteps: number) => {
@@ -50,7 +53,9 @@ export default function App() {
     if (!import.meta.env.DEV) return;
     (window as unknown as Record<string, unknown>).__worldsim_selectEntity = (id: string) =>
       setSelectedEntityId(id);
-  }, [setSelectedEntityId]);
+    (window as unknown as Record<string, unknown>).__worldsim_setAttributeName = (key: string) =>
+      setAttributeName(key);
+  }, [setSelectedEntityId, setAttributeName]);
 
   // When a scenario is selected, check if it's already completed and fast-forward
   // currentStep to its final step — ScenarioControls won't emit onStepChange for
@@ -82,7 +87,7 @@ export default function App() {
     <div className="app">
       <header className="app-header">
         <h1 className="app-title">WorldSim</h1>
-        <AttributeSelector onChange={setAttributeName} />
+        <AttributeSelector value={attributeName} onChange={setAttributeName} />
         <label style={{ marginLeft: 4, fontSize: 13 }}>
           <input
             type="checkbox"
@@ -127,6 +132,7 @@ export default function App() {
           secondScenarioId={secondScenarioId}
           onSelectScenario={handleSelectScenario}
           onSelectSecondScenario={setSecondScenarioId}
+          refreshKey={scenarioListVersion}
         />
       )}
 

@@ -20,7 +20,7 @@ from __future__ import annotations
 
 import json
 import time
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from decimal import Decimal
 from typing import TYPE_CHECKING, Any
 
@@ -54,6 +54,8 @@ from app.simulation.repositories.state_repository import (
     _default_timestep,
 )
 
+from datetime import datetime as _datetime, timezone as _timezone
+
 if TYPE_CHECKING:
     from datetime import datetime
 
@@ -66,6 +68,18 @@ if TYPE_CHECKING:
 
 # Engine version recorded in tombstone records.
 _ENGINE_VERSION = "0.3.0"
+
+
+def _base_timestep(config: ScenarioConfigSchema) -> "_datetime":
+    """Return step-0 base datetime from config.start_date, or the 2000-01-01 default."""
+    if config.start_date is not None:
+        return _datetime(
+            config.start_date.year,
+            config.start_date.month,
+            config.start_date.day,
+            tzinfo=_timezone.utc,
+        )
+    return _default_timestep()
 
 # ---------------------------------------------------------------------------
 # Return type
@@ -217,10 +231,13 @@ class WebScenarioRunner:
         )
 
         snap_repo = ScenarioSnapshotRepository()
+        # Load all scheduled inputs before reconstruction so they are available
+        # both for prior-step event restoration and for the next-step advance.
+        inputs_by_step = await _load_scheduled_inputs(conn, scenario_id, config.entities)
 
         if current_step < 0:
             # No snapshots — initialise step 0 then advance to step 1
-            base_timestep = _default_timestep()
+            base_timestep = _base_timestep(config)
             state_repo = SimulationStateRepository()
             current_state = await state_repo.load_initial_state(
                 conn, config.entities, scenario_id, row["name"], base_timestep,
@@ -247,6 +264,18 @@ class WebScenarioRunner:
             current_state = await _reconstruct_state_from_snapshot(
                 conn, scenario_id, row["name"], state_raw, snap_row["timestep"],
             )
+            # _reconstruct_state_from_snapshot always returns events=[].
+            # Restore the scheduled inputs that fired at current_step as synthetic
+            # prior events so MacroeconomicModule's one-step lag design sees them
+            # when advancing to the next step.  Endogenous module events are not
+            # yet persisted across advance() calls — tracked as a known gap.
+            prior_events = [
+                e
+                for inp in inputs_by_step.get(current_step, [])
+                for e in inp.to_events(current_state.timestep)
+            ]
+            if prior_events:
+                current_state = replace(current_state, events=prior_events)
 
         next_step = current_step + 1
         if next_step > config.n_steps:
@@ -263,7 +292,6 @@ class WebScenarioRunner:
             )
 
         try:
-            inputs_by_step = await _load_scheduled_inputs(conn, scenario_id, config.entities)
             step_inputs = inputs_by_step.get(next_step, [])
 
             active_modules: list[SimulationModule] = _build_active_modules(config)
@@ -327,7 +355,7 @@ class WebScenarioRunner:
         t_start: float,
     ) -> RunSummary:
         """Inner execution: load state, run steps, write snapshots."""
-        base_timestep = _default_timestep()
+        base_timestep = _base_timestep(config)
         state_repo = SimulationStateRepository()
         snap_repo = ScenarioSnapshotRepository()
 

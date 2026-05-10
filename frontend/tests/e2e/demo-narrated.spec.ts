@@ -53,6 +53,38 @@ const RUN_ID = Math.random().toString(36).slice(2, 8);
 const DEMO_SCENARIO_NAME = `Greece 2010-2012 Demo — ${new Date().toISOString().slice(0, 10)}-${RUN_ID}`;
 const COMPARE_SCENARIO_NAME = `Greece Alternative — ${new Date().toISOString().slice(0, 10)}-${RUN_ID}`;
 
+// ── Pre-demo cleanup ─────────────────────────────────────────────────────────
+// Delete scenarios from previous demo runs so the panel opens clean.
+// Matches any scenario whose name starts with the demo prefixes but belongs
+// to a different RUN_ID. Uses Node's built-in fetch (Node 18+).
+test.beforeAll(async () => {
+  const API = "http://localhost:8000/api/v1";
+  let scenarios: Array<{ scenario_id: string; name: string }> = [];
+  try {
+    const res = await fetch(`${API}/scenarios`);
+    if (res.ok) scenarios = await res.json() as typeof scenarios;
+  } catch {
+    // Stack not running — test will fail later with a clearer error.
+    return;
+  }
+
+  const stale = scenarios.filter(
+    (s) =>
+      (s.name.startsWith("Greece 2010-2012 Demo") ||
+        s.name.startsWith("Greece Alternative")) &&
+      s.name !== DEMO_SCENARIO_NAME &&
+      s.name !== COMPARE_SCENARIO_NAME,
+  );
+
+  await Promise.all(
+    stale.map((s) =>
+      fetch(`${API}/scenarios/${encodeURIComponent(s.scenario_id)}`, {
+        method: "DELETE",
+      }),
+    ),
+  );
+});
+
 test(
   "Stakeholder demo walkthrough — narrated screen recording",
   { tag: ["@demo"] },
@@ -68,9 +100,92 @@ test(
     await page.waitForFunction(
       () =>
         typeof (window as Record<string, unknown>).__worldsim_selectEntity ===
+        "function" &&
+        typeof (window as Record<string, unknown>).__worldsim_setAttributeName ===
         "function",
       { timeout: 15_000 },
     );
+
+    // Switch to gdp_growth before the first narration so the choropleth shows a
+    // continuous GDP attribute rather than the categorical economy_tier default.
+    // gdp_growth is a scenario attribute — not in the static /attributes/available
+    // list — so we use the test seam instead of page.selectOption().
+    await page.evaluate(() => {
+      (window as Record<string, (key: string) => void>).__worldsim_setAttributeName(
+        "gdp_growth",
+      );
+    });
+
+    // Create the Greece scenario via API with the backtesting fixture inputs before
+    // opening the scenarios panel — the panel fetches on mount, so it will already
+    // include this scenario when it opens in Step 2.
+    const createRes = await page.request.post("http://localhost:8000/api/v1/scenarios", {
+      data: {
+        name: DEMO_SCENARIO_NAME,
+        description: "Greece 2010-2012 IMF Program — stakeholder demo run",
+        configuration: {
+          entities: ["GRC"],
+          n_steps: 3,
+          timestep_label: "annual",
+          start_date: "2010-01-01",
+          initial_attributes: {
+            GRC: {
+              gdp_growth: {
+                value: "-0.054", unit: "ratio", variable_type: "ratio",
+                confidence_tier: 3, observation_date: "2010-04-01",
+                source_registry_id: "IMF_WEO_APR2010", measurement_framework: "financial",
+              },
+              unemployment_rate: {
+                value: "0.127", unit: "ratio", variable_type: "ratio",
+                confidence_tier: 2, observation_date: "2010-07-01",
+                source_registry_id: "EUROSTAT_LFS_2010", measurement_framework: "human_development",
+              },
+              health_expenditure_pct_gdp: {
+                value: "0.095", unit: "ratio", variable_type: "ratio",
+                confidence_tier: 2, observation_date: "2011-12-01",
+                source_registry_id: "WDI_2010", measurement_framework: "human_development",
+              },
+              net_enrollment_secondary: {
+                value: "0.991", unit: "ratio", variable_type: "ratio",
+                confidence_tier: 2, observation_date: "2011-12-01",
+                source_registry_id: "WDI_2010", measurement_framework: "human_development",
+              },
+              // IMF CR10/110 — ~2.0 months coverage at programme entry, below MDA-FIN-RESERVES floor (2.5)
+              reserve_coverage_months: {
+                value: "2.0", unit: "months", variable_type: "ratio",
+                confidence_tier: 2, observation_date: "2010-05-01",
+                source_registry_id: "IMF_CR10_110", measurement_framework: "financial",
+              },
+            },
+          },
+        },
+        scheduled_inputs: [
+          // Step 1 (2010): IMF program acceptance — €110bn ESM/IMF program, May 2010
+          {
+            step: 1, input_type: "EmergencyPolicyInput",
+            input_data: { instrument: "imf_program_acceptance", target_entity: "GRC", expected_duration: 3, program_size_gdp_ratio: "0.48" },
+          },
+          // Step 1 (2010): Fiscal spending cuts — 2010 Memorandum primary cuts
+          {
+            step: 1, input_type: "FiscalPolicyInput",
+            input_data: { instrument: "spending_change", target_entity: "GRC", sector: "government", value: "-0.08", duration_years: 1 },
+          },
+          // Step 2 (2011): Second austerity package — June 2011 Medium-Term Fiscal Strategy
+          {
+            step: 2, input_type: "FiscalPolicyInput",
+            input_data: { instrument: "spending_change", target_entity: "GRC", sector: "government", value: "-0.05", duration_years: 1 },
+          },
+          // Step 2 (2011): Deficit target — Medium-Term Fiscal Strategy 2011–2015
+          {
+            step: 2, input_type: "FiscalPolicyInput",
+            input_data: { instrument: "deficit_target", target_entity: "GRC", sector: "", value: "-0.03", duration_years: 4 },
+          },
+        ],
+      },
+    });
+    if (!createRes.ok()) {
+      throw new Error(`Greece scenario creation failed: ${createRes.status()} — ${await createRes.text()}`);
+    }
 
     await speak(
       "This is the application's baseline view. The choropleth shows a simulation " +
@@ -95,18 +210,18 @@ test(
       "is important. It's the point of the backtesting discipline, which we'll come back to.",
     );
 
-    // ── STEP 3: Create and select the Greece scenario ────────────────────────
-
-    await page.locator('input[placeholder="Scenario name"]').fill(DEMO_SCENARIO_NAME);
-    await page.locator(".scenario-btn--create").click();
+    // ── STEP 3: Select the pre-created Greece scenario ───────────────────────
+    // Scenario was created via API in Step 1 with fixture scheduled inputs.
+    // The panel fetched the list on mount, so the row is already visible.
 
     const scenarioRow = page
       .locator(".scenario-row")
       .filter({ hasText: DEMO_SCENARIO_NAME });
-    await expect(scenarioRow).toBeVisible({ timeout: 20_000 });
+    await expect(scenarioRow).toBeVisible({ timeout: 10_000 });
 
     await scenarioRow.getByTitle("Select as primary scenario").click();
-    await page.waitForTimeout(600);
+    // Audience needs to read the ✓ Primary checkmark before the panel closes.
+    await page.waitForTimeout(1500);
 
     await page.getByRole("button", { name: /Scenarios/ }).click();
     await page.waitForTimeout(600);
@@ -229,20 +344,70 @@ test(
     );
 
     // ── STEP 10: Enter compare mode ──────────────────────────────────────────
+    // Create and fully advance the comparison scenario via API before opening
+    // the panel — the panel fetches on mount so it will include the scenario.
+    // Using a lighter austerity path (-4% spending, no deficit target) to
+    // produce a visible delta on the choropleth.
 
     await page.getByLabel("Close drawer").click();
     await page.waitForTimeout(600);
 
+    const compareCreateRes = await page.request.post("http://localhost:8000/api/v1/scenarios", {
+      data: {
+        name: COMPARE_SCENARIO_NAME,
+        description: "Greece Alternative — lighter austerity path, stakeholder demo",
+        configuration: {
+          entities: ["GRC"],
+          n_steps: 3,
+          timestep_label: "annual",
+          start_date: "2010-01-01",
+          initial_attributes: {
+            GRC: {
+              gdp_growth: {
+                value: "-0.054", unit: "ratio", variable_type: "ratio",
+                confidence_tier: 3, observation_date: "2010-04-01",
+                source_registry_id: "IMF_WEO_APR2010", measurement_framework: "financial",
+              },
+              reserve_coverage_months: {
+                value: "2.0", unit: "months", variable_type: "ratio",
+                confidence_tier: 2, observation_date: "2010-05-01",
+                source_registry_id: "IMF_CR10_110", measurement_framework: "financial",
+              },
+            },
+          },
+        },
+        scheduled_inputs: [
+          // Alternative path: lighter first-year cut (-4% vs -8%) to demonstrate
+          // delta against the primary scenario on the choropleth.
+          {
+            step: 1, input_type: "FiscalPolicyInput",
+            input_data: { instrument: "spending_change", target_entity: "GRC", sector: "government", value: "-0.04", duration_years: 1 },
+          },
+        ],
+      },
+    });
+    if (!compareCreateRes.ok()) {
+      throw new Error(`Compare scenario creation failed: ${compareCreateRes.status()} — ${await compareCreateRes.text()}`);
+    }
+    const { id: compareScenarioId } = await compareCreateRes.json() as { id: string };
+
+    // Advance the comparison scenario 3 steps via API so delta data exists.
+    for (let s = 1; s <= 3; s++) {
+      const advRes = await page.request.post(
+        `http://localhost:8000/api/v1/scenarios/${encodeURIComponent(compareScenarioId)}/advance`,
+      );
+      if (!advRes.ok()) {
+        throw new Error(`Comparison advance step ${s} failed: ${advRes.status()} — ${await advRes.text()}`);
+      }
+    }
+
     await page.getByRole("button", { name: /Scenarios/ }).click();
     await page.waitForTimeout(600);
-
-    await page.locator('input[placeholder="Scenario name"]').fill(COMPARE_SCENARIO_NAME);
-    await page.locator(".scenario-btn--create").click();
 
     const compareRow = page
       .locator(".scenario-row")
       .filter({ hasText: COMPARE_SCENARIO_NAME });
-    await expect(compareRow).toBeVisible({ timeout: 20_000 });
+    await expect(compareRow).toBeVisible({ timeout: 10_000 });
 
     await compareRow.getByTitle("Select as comparison scenario").click();
     await page.waitForTimeout(600);
