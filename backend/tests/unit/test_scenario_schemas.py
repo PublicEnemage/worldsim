@@ -7,9 +7,14 @@ Key invariants tested:
   - ScheduledInputSchema step index range
   - ScenarioConfigSchema defaults
   - ScenarioResponse and ScenarioDetailResponse field presence
+  - _validate_create_request step range boundary values (Issue #201)
 """
 from __future__ import annotations
 
+import pytest
+from fastapi import HTTPException
+
+from app.api.scenarios import _validate_create_request, effective_tier
 from app.schemas import (
     QuantitySchema,
     ScenarioConfigSchema,
@@ -229,7 +234,6 @@ def test_scenario_detail_response_with_inputs() -> None:
 # effective_tier — horizon degradation (Issue #69)
 # ---------------------------------------------------------------------------
 
-from app.api.scenarios import effective_tier  # noqa: E402
 
 
 def test_effective_tier_step_zero_no_degradation() -> None:
@@ -265,3 +269,127 @@ def test_effective_tier_cap_prevents_exceeding_5() -> None:
 def test_effective_tier_boundary_step_9() -> None:
     # floor(9/5) = 1 — one degradation step
     assert effective_tier(1, 9) == 2
+
+
+# ---------------------------------------------------------------------------
+# _validate_create_request — step range boundary tests (Issue #201)
+#
+# The valid range for scheduled_input step is [0, n_steps] inclusive.
+# Step k injects inputs during the advance from step k-1 → step k.
+# Step 0 = initial state; step n_steps = last advance.
+#
+# These tests guard against the off-by-one that was silently present before
+# commit 89a2c5e (step > n-1 → step > n). Greece never caught it because its
+# highest input step was n_steps - 1. Argentina's step == n_steps exposed it.
+# ---------------------------------------------------------------------------
+
+
+def _req(n_steps: int, steps: list[int]) -> ScenarioCreateRequest:
+    """Build a minimal ScenarioCreateRequest with the given step values."""
+    return ScenarioCreateRequest(
+        name="Boundary test",
+        configuration=ScenarioConfigSchema(entities=["GRC"], n_steps=n_steps),
+        scheduled_inputs=[
+            ScheduledInputSchema(
+                step=s,
+                input_type="FiscalPolicyInput",
+                input_data={"instrument": "spending_change", "value": "-0.05"},
+            )
+            for s in steps
+        ],
+    )
+
+
+def test_step_zero_is_accepted() -> None:
+    """step == 0 (initial state injection) must not raise."""
+    _validate_create_request(_req(n_steps=3, steps=[0]))
+
+
+def test_step_n_steps_is_accepted() -> None:
+    """step == n_steps (last advance injection) must not raise — regression for Issue #201."""
+    _validate_create_request(_req(n_steps=3, steps=[3]))
+
+
+def test_step_n_steps_minus_one_is_accepted() -> None:
+    """step == n_steps - 1 is squarely within range — always was accepted."""
+    _validate_create_request(_req(n_steps=3, steps=[2]))
+
+
+def test_step_n_steps_plus_one_is_rejected() -> None:
+    """step == n_steps + 1 is out of range — must raise 422."""
+    with pytest.raises(HTTPException) as exc_info:
+        _validate_create_request(_req(n_steps=3, steps=[4]))
+    assert exc_info.value.status_code == 422
+    assert "4" in str(exc_info.value.detail)
+
+
+def test_step_negative_one_is_rejected() -> None:
+    """step == -1 is below valid range — must raise 422."""
+    with pytest.raises(HTTPException) as exc_info:
+        _validate_create_request(_req(n_steps=3, steps=[-1]))
+    assert exc_info.value.status_code == 422
+    assert "-1" in str(exc_info.value.detail)
+
+
+def test_empty_scheduled_inputs_accepted() -> None:
+    """Empty scheduled_inputs with valid n_steps must not raise."""
+    _validate_create_request(_req(n_steps=5, steps=[]))
+
+
+def test_argentina_case_step_equals_n_steps_accepted() -> None:
+    """Regression: n_steps=2, step=2 — the Argentina fixture that exposed the bug."""
+    _validate_create_request(_req(n_steps=2, steps=[2]))
+
+
+def test_all_valid_steps_accepted() -> None:
+    """All steps in [0, n_steps] simultaneously must not raise."""
+    _validate_create_request(_req(n_steps=3, steps=[0, 1, 2, 3]))
+
+
+def test_mixed_valid_and_invalid_steps_rejected() -> None:
+    """When any step is out of range the whole request must be rejected (422)."""
+    with pytest.raises(HTTPException) as exc_info:
+        _validate_create_request(_req(n_steps=3, steps=[1, 4]))
+    assert exc_info.value.status_code == 422
+
+
+def test_invalid_step_error_lists_out_of_range_values() -> None:
+    """The 422 detail must include the out-of-range step values for diagnostics."""
+    with pytest.raises(HTTPException) as exc_info:
+        _validate_create_request(_req(n_steps=3, steps=[-1, 5]))
+    detail = str(exc_info.value.detail)
+    assert "-1" in detail
+    assert "5" in detail
+
+
+def test_empty_name_rejected() -> None:
+    """_validate_create_request rejects an empty or whitespace-only name."""
+    req = ScenarioCreateRequest(
+        name="   ",
+        configuration=ScenarioConfigSchema(entities=["GRC"], n_steps=3),
+    )
+    with pytest.raises(HTTPException) as exc_info:
+        _validate_create_request(req)
+    assert exc_info.value.status_code == 422
+
+
+def test_n_steps_zero_rejected() -> None:
+    """n_steps=0 is below the valid 1–100 range — must raise 422."""
+    req = ScenarioCreateRequest(
+        name="Test",
+        configuration=ScenarioConfigSchema(entities=["GRC"], n_steps=0),
+    )
+    with pytest.raises(HTTPException) as exc_info:
+        _validate_create_request(req)
+    assert exc_info.value.status_code == 422
+
+
+def test_n_steps_101_rejected() -> None:
+    """n_steps=101 is above the valid 1–100 range — must raise 422."""
+    req = ScenarioCreateRequest(
+        name="Test",
+        configuration=ScenarioConfigSchema(entities=["GRC"], n_steps=101),
+    )
+    with pytest.raises(HTTPException) as exc_info:
+        _validate_create_request(req)
+    assert exc_info.value.status_code == 422
