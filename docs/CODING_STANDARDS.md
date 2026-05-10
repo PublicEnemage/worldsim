@@ -161,6 +161,111 @@ except ExchangeRateNotFoundError as exc:
 Custom exception types live in `backend/app/exceptions.py`. Every module that
 can produce distinct failure modes defines its own exception subclass.
 
+### Defensive Programming
+
+The simulation engine processes untrusted inputs (exogenous events, relationship
+graph traversals, module outputs) that may arrive in unexpected combinations.
+Silent failures at collection points — drops, skips, or zero-effect returns with
+no observable signal — are the primary cause of debugging blind spots.
+
+**Rule 1 — Silent drops are never acceptable without a WARNING log.**
+Any code path that discards input (entity not found in state, no matching
+events, duplicate key, out-of-scope entity) must emit a `logger.warning()` with
+enough context to reconstruct what was dropped and why. The caller decides
+whether the condition is tolerable; the code's job is to report it.
+
+```python
+# Forbidden — silently loses the delta with no observable signal
+if entity_id not in state.entities:
+    continue  # drop
+
+# Correct — caller can filter on [SIM-INTEGRITY] prefix; delta is not lost
+if entity_id not in state.entities:
+    _log.warning(
+        "[SIM-INTEGRITY] Accumulated delta for entity_id=%r not in state.entities "
+        "— delta dropped. Check relationship scope configuration.",
+        entity_id,
+    )
+    continue
+```
+
+**Rule 2 — Early returns from `compute()` are not all equivalent.**
+A module returning `[]` may mean "no events this step" (expected) or
+"a structural dependency is missing" (unexpected). These have different
+operational significance:
+
+- `entity.entity_type` filter — **(a) correctly silent.** Non-country entities
+  are out of scope by design. No log required.
+- `prior_events` empty on a given step — **(b) log at DEBUG.** Expected when
+  no policy was applied this step, but useful signal for per-step trace.
+- Structural dependency absent (e.g., MacroeconomicModule never ran, so
+  `gdp_growth_change` never fires) — **(b) log at WARNING.** The module is
+  active but its upstream driver is absent. This is a configuration error, not
+  normal operation. See Issue #211 for enforcement.
+- Zero-net-effect after computing (e.g., spend and tax cancel) — **(a) correctly
+  silent.** The computation ran; the result is legitimately zero.
+
+```python
+# (b) — structural absence: WARNING
+if not prior_events and MacroeconomicModule not in active_modules:
+    _log.warning(
+        "[SIM-INTEGRITY] %s: no prior gdp_growth_change events for entity=%r "
+        "— MacroeconomicModule may be absent from active modules.",
+        type(self).__name__, entity.id,
+    )
+    return []
+
+# (b) — per-step absence: DEBUG
+if not prior_events:
+    _log.debug("%s: no subscribed events for entity=%r at step=%r", ...)
+    return []
+```
+
+**Rule 3 — Collection points check invariants before passing to the next stage.**
+The runner's `all_events` list, the propagation accumulator, and the snapshot
+repository are collection points. Each must check for conditions that would
+produce incorrect downstream behavior and warn before proceeding — not after.
+Invariants to check at each stage:
+
+| Collection point | Invariant | Action on violation |
+|---|---|---|
+| `runner.advance_timestep()` | Duplicate `event_id`s | `WARNING` before `propagate()` |
+| `propagation._build_next_state()` | Entity in accumulator absent from state | `WARNING` before drop |
+| `propagation._accumulate()` | Two STOCK events for same attribute | `WARNING` before summing |
+| Snapshot repository | Null `state_data` key | `WARNING` before persisting |
+
+**Rule 4 — Use the `[SIM-INTEGRITY]` prefix for simulation invariant violations.**
+Warning messages that indicate simulation integrity concerns use the stable prefix
+`[SIM-INTEGRITY]` so that log monitoring can filter on a single pattern:
+
+```python
+_log.warning("[SIM-INTEGRITY] <specific condition> — <what was dropped/skipped and why>")
+```
+
+Use `[SIM-INTEGRITY]` only for conditions that represent unexpected state
+in the simulation's own data flow (dropped deltas, missing entities, duplicate
+IDs, STOCK conflicts). Do not use it for external input validation errors or
+API-layer concerns.
+
+#### Warning Path Testing Requirement
+
+Every `[SIM-INTEGRITY]` warning path must have a test that:
+1. Sets up the specific condition that triggers the warning.
+2. Asserts the warning was emitted using pytest's `caplog` fixture.
+3. Asserts the simulation did not raise an exception (warning-level paths
+   must not halt execution).
+
+```python
+def test_dropped_delta_warning_fires(caplog: pytest.LogCaptureFixture) -> None:
+    # Set up: accumulator has delta for entity_id absent from state.entities
+    ...
+    with caplog.at_level(logging.WARNING, logger="app.simulation.engine.propagation"):
+        propagate(state, events)
+
+    assert any("[SIM-INTEGRITY]" in r.message for r in caplog.records)
+    # Simulation did not raise — verify by reaching this assertion
+```
+
 ### Monetary and Quantity Standards
 
 #### Why `Quantity`, Not Raw Numbers
