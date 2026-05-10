@@ -6,13 +6,27 @@ Accepted
 ## Validity Context
 
 **Standards Version:** 2026-04-15
-**Valid Until:** Milestone 7 — Technical Foundation
+**Valid Until:** Milestone 8 — Ecological and Governance Frameworks
 **License Status:** CURRENT
 
 **Engineering Lead accepted 2026-05-02.** Architecture decisions reviewed and
 approved. Implementation may proceed for M5 scope.
 
-**Last Reviewed:** 2026-05-07 — Milestone 6 exit review. **Monte Carlo upgrade
+**Last Reviewed:** 2026-05-10 — Milestone 7 exit review. **Monte Carlo upgrade
+trigger re-evaluated.** Trigger condition: MAGNITUDE_WITHIN_20PCT on both
+Greece 2010–2012 AND Argentina 2001–2002. Greece MAGNITUDE calibration (Issue
+#221) was not resolved during M7 — pure accumulation model structural gap
+deferred to M8. **Trigger not met.** No other renewal triggers fired;
+`confidence_tier` propagation rule, MDA composite alert parameters,
+`QuantitySchema` API envelope, `backtesting_thresholds.threshold_type` enum,
+`IA1_CANONICAL_PHRASE`, and distribution-banding architectural boundary all
+unchanged during M7. Defensive Programming section in `CODING_STANDARDS.md`
+and `[SIM-INTEGRITY]` logging additions are engine-internal with no effect on
+uncertainty quantification contracts. License renewed for Milestone 8. Next
+scheduled review at Milestone 8 — Ecological and Governance Frameworks
+completion, when Greece MAGNITUDE calibration is expected following Issue #221.
+
+**Previously reviewed:** 2026-05-07 — Milestone 6 exit review. **Monte Carlo upgrade
 trigger evaluated.** Trigger condition: MAGNITUDE_WITHIN_20PCT on both Greece
 2010–2012 AND Argentina 2001–2002. Result at M6 exit: **1 of 2 required cases
 achieved.** Argentina step 2 (2002): PASS — model −10.55% vs actual −10.9%,

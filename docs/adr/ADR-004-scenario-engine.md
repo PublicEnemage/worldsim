@@ -6,13 +6,26 @@ Accepted
 ## Validity Context
 
 **Standards Version:** 2026-04-21
-**Valid Until:** Milestone 7 — Technical Foundation
+**Valid Until:** Milestone 8 — Ecological and Governance Frameworks
 **License Status:** CURRENT
 
 **Engineering Lead accepted 2026-04-21.** Architecture decisions reviewed and
 approved. Implementation may proceed.
 
-**Last Reviewed:** 2026-05-07 — Milestone 6 exit review. No renewal triggers
+**Last Reviewed:** 2026-05-10 — Milestone 7 exit review. No renewal triggers
+fired during Milestone 7. License Status confirmed CURRENT. M7 delivered no
+changes to scenario storage format, backtesting threshold contract, advance
+protocol, or snapshot contract. HCL deferred thresholds added to the Greece
+fixture (Issue #87) use the existing `deferred_thresholds` param in
+`format_fidelity_report()` — no `backtesting_thresholds` table changes, no
+`threshold_type` enum extension, no scenario replay format alteration.
+`[SIM-INTEGRITY]` logging in `propagation.py` and `runner.py` (Issues #223,
+#243) is engine-internal and does not affect the scenario execution or
+backtesting API contract. engine_version gap (Issue #139) remains a
+documented known limitation. License renewed for Milestone 8. Next scheduled
+review at Milestone 8 — Ecological and Governance Frameworks completion.
+
+**Previously reviewed:** 2026-05-07 — Milestone 6 exit review. No renewal triggers
 fired during Milestone 6. License Status confirmed CURRENT. New backtesting
 migration files (Lebanon, Thailand, Ecuador DIRECTION_ONLY; Greece and
 Argentina MAGNITUDE rows) are data-layer additions within the existing
