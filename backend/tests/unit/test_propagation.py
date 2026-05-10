@@ -17,6 +17,7 @@ All Quantity deltas default to VariableType.RATIO so propagation
 semantics (additive accumulation) are preserved for existing test cases.
 """
 
+import logging
 from datetime import datetime
 from decimal import Decimal
 
@@ -34,6 +35,8 @@ from app.simulation.engine.models import (
 )
 from app.simulation.engine.propagation import propagate
 from app.simulation.engine.quantity import Quantity, VariableType
+
+_PROPAGATION_LOGGER = "app.simulation.engine.propagation"
 
 # ---------------------------------------------------------------------------
 # Fixtures
@@ -765,3 +768,163 @@ class TestPropagateStateStructure:
         })
         result = propagate(state, [_event("BOL", {"gdp": -1.0})])
         assert set(result.entities.keys()) == {"BOL", "BRA", "GRC"}
+
+
+# ---------------------------------------------------------------------------
+# [SIM-INTEGRITY] warning tests — Issue #243 and #244
+# ---------------------------------------------------------------------------
+
+
+class TestDroppedDeltaWarning:
+    """Issue #243 — propagation warns when accumulated delta targets absent entity."""
+
+    def test_warning_fires_for_absent_entity(
+        self, caplog: pytest.LogCaptureFixture
+    ) -> None:
+        """Delta targeting entity_id not in state.entities must emit [SIM-INTEGRITY] WARNING."""
+        # "BOL" is in the event but not in state.entities
+        state = _state({"BRA": _entity("BRA")})
+        event = _event("BOL", {"gdp": -0.05})
+        with caplog.at_level(logging.WARNING, logger=_PROPAGATION_LOGGER):
+            propagate(state, [event])
+        assert any(
+            "[SIM-INTEGRITY]" in r.message and "BOL" in r.message
+            for r in caplog.records
+            if r.levelno == logging.WARNING
+        ), (
+            "Expected [SIM-INTEGRITY] warning naming 'BOL'. "
+            f"Got: {[r.message for r in caplog.records]}"
+        )
+
+    def test_warning_names_the_missing_entity_id(
+        self, caplog: pytest.LogCaptureFixture
+    ) -> None:
+        """Warning message must contain the absent entity_id."""
+        state = _state({"BRA": _entity("BRA")})
+        with caplog.at_level(logging.WARNING, logger=_PROPAGATION_LOGGER):
+            propagate(state, [_event("GHOST_ENTITY", {"gdp": -0.1})])
+        messages = " ".join(
+            r.getMessage() for r in caplog.records if r.levelno == logging.WARNING
+        )
+        assert "GHOST_ENTITY" in messages
+
+    def test_simulation_continues_after_dropped_delta_warning(
+        self, caplog: pytest.LogCaptureFixture
+    ) -> None:
+        """Dropped delta must not raise — warning only, simulation continues."""
+        state = _state({"BRA": _entity("BRA", gdp=0.02)})
+        with caplog.at_level(logging.WARNING, logger=_PROPAGATION_LOGGER):
+            result = propagate(state, [_event("ABSENT", {"gdp": -0.05})])
+        # BRA unaffected; result has same entities
+        assert "BRA" in result.entities
+        assert float(result.entities["BRA"].get_attribute_value("gdp")) == pytest.approx(0.02)
+
+    def test_no_warning_when_entity_is_present(
+        self, caplog: pytest.LogCaptureFixture
+    ) -> None:
+        """No [SIM-INTEGRITY] warning when source entity exists in state."""
+        state = _state({"BOL": _entity("BOL", gdp=0.0)})
+        with caplog.at_level(logging.WARNING, logger=_PROPAGATION_LOGGER):
+            propagate(state, [_event("BOL", {"gdp": -0.05})])
+        sim_integrity_warnings = [
+            r for r in caplog.records
+            if r.levelno == logging.WARNING and "[SIM-INTEGRITY]" in r.message
+        ]
+        assert not sim_integrity_warnings
+
+
+class TestStockConflictWarning:
+    """Issue #244 — propagation warns when two STOCK events target the same attribute."""
+
+    def _stock_event(
+        self, source: str, attr: str, value: float, event_id: str = "evt-stock"
+    ) -> Event:
+        return Event(
+            event_id=event_id,
+            source_entity_id=source,
+            event_type="stock_update",
+            affected_attributes={attr: _q(value, variable_type=VariableType.STOCK)},
+            propagation_rules=[],
+            timestep_originated=datetime(2020, 1, 1),
+            framework=MeasurementFramework.FINANCIAL,
+        )
+
+    def test_warning_fires_for_stock_conflict(
+        self, caplog: pytest.LogCaptureFixture
+    ) -> None:
+        """Two STOCK events on same entity+attribute must emit [SIM-INTEGRITY] WARNING."""
+        state = _state({"GRC": _entity("GRC", debt_gdp=1.7)})
+        events = [
+            self._stock_event("GRC", "debt_gdp", 1.8, "evt-1"),
+            self._stock_event("GRC", "debt_gdp", 1.9, "evt-2"),
+        ]
+        with caplog.at_level(logging.WARNING, logger=_PROPAGATION_LOGGER):
+            propagate(state, events)
+        assert any(
+            "[SIM-INTEGRITY]" in r.message and "debt_gdp" in r.message
+            for r in caplog.records
+            if r.levelno == logging.WARNING
+        ), (
+            "Expected [SIM-INTEGRITY] STOCK conflict warning. "
+            f"Got: {[r.message for r in caplog.records]}"
+        )
+
+    def test_warning_names_attribute_and_entity(
+        self, caplog: pytest.LogCaptureFixture
+    ) -> None:
+        """STOCK conflict warning must name both entity_id and attribute key."""
+        state = _state({"GRC": _entity("GRC", reserves=50.0)})
+        events = [
+            self._stock_event("GRC", "reserves", 45.0, "evt-a"),
+            self._stock_event("GRC", "reserves", 40.0, "evt-b"),
+        ]
+        with caplog.at_level(logging.WARNING, logger=_PROPAGATION_LOGGER):
+            propagate(state, events)
+        messages = " ".join(
+            r.getMessage() for r in caplog.records if r.levelno == logging.WARNING
+        )
+        assert "GRC" in messages
+        assert "reserves" in messages
+
+    def test_simulation_continues_after_stock_conflict_warning(
+        self, caplog: pytest.LogCaptureFixture
+    ) -> None:
+        """STOCK conflict must not raise — warning only, simulation continues."""
+        state = _state({"GRC": _entity("GRC", debt_gdp=1.7)})
+        events = [
+            self._stock_event("GRC", "debt_gdp", 1.8, "evt-1"),
+            self._stock_event("GRC", "debt_gdp", 1.9, "evt-2"),
+        ]
+        with caplog.at_level(logging.WARNING, logger=_PROPAGATION_LOGGER):
+            result = propagate(state, events)
+        assert "GRC" in result.entities
+
+    def test_no_warning_for_single_stock_event(
+        self, caplog: pytest.LogCaptureFixture
+    ) -> None:
+        """A single STOCK event on an attribute must not trigger a STOCK conflict warning."""
+        state = _state({"GRC": _entity("GRC", debt_gdp=1.7)})
+        with caplog.at_level(logging.WARNING, logger=_PROPAGATION_LOGGER):
+            propagate(state, [self._stock_event("GRC", "debt_gdp", 1.8)])
+        stock_warnings = [
+            r for r in caplog.records
+            if r.levelno == logging.WARNING and "STOCK" in r.message
+        ]
+        assert not stock_warnings
+
+    def test_no_warning_for_ratio_conflict(
+        self, caplog: pytest.LogCaptureFixture
+    ) -> None:
+        """Two RATIO events on the same attribute are expected (additive) — no warning."""
+        state = _state({"GRC": _entity("GRC", gdp=0.0)})
+        events = [
+            _event("GRC", {"gdp": -0.05}),
+            _event("GRC", {"gdp": -0.03}),
+        ]
+        with caplog.at_level(logging.WARNING, logger=_PROPAGATION_LOGGER):
+            propagate(state, events)
+        stock_warnings = [
+            r for r in caplog.records
+            if r.levelno == logging.WARNING and "STOCK" in r.message
+        ]
+        assert not stock_warnings

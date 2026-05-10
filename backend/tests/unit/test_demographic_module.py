@@ -14,8 +14,13 @@ Coverage:
 """
 from __future__ import annotations
 
+import logging
 from datetime import datetime, timezone
 from decimal import Decimal
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    import pytest
 
 from app.simulation.modules.demographic.cohort import (
     AgeBand,
@@ -291,3 +296,25 @@ def test_demographic_events_tagged_human_development() -> None:
     ts = datetime(2011, 1, 1, tzinfo=timezone.utc)  # noqa: UP017
     events = module.compute(state.entities["GRC"], state, ts)
     assert all(e.framework == MeasurementFramework.HUMAN_DEVELOPMENT for e in events)
+
+
+# ---------------------------------------------------------------------------
+# DEBUG log on empty prior_events — Issue #245
+# ---------------------------------------------------------------------------
+
+
+def test_demographic_module_logs_debug_on_no_prior_events(caplog: pytest.LogCaptureFixture) -> None:
+    """DemographicModule must emit a DEBUG log when prior_events is empty (Issue #245)."""
+    ts = datetime(2011, 1, 1, tzinfo=timezone.utc)  # noqa: UP017
+    state = _make_state("GRC", entity_type="country", prior_events=[])
+    module = DemographicModule(cohort_resolution_entity_ids=["GRC"])
+    entity = state.entities["GRC"]
+    with caplog.at_level(logging.DEBUG, logger="app.simulation.modules.demographic.module"):
+        result = module.compute(entity, state, ts)
+
+    assert result == []
+    assert any(
+        "no subscribed events" in r.message and "GRC" in r.message
+        for r in caplog.records
+        if r.levelno == logging.DEBUG
+    ), f"Expected DEBUG log naming 'GRC'. Got: {[r.message for r in caplog.records]}"

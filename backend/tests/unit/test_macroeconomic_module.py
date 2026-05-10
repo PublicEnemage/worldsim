@@ -24,8 +24,13 @@ Coverage:
 """
 from __future__ import annotations
 
+import logging
 from datetime import UTC, datetime
 from decimal import Decimal
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    import pytest
 
 from app.simulation.engine.models import (
     Event,
@@ -511,3 +516,25 @@ def test_regime_change_event_tagged_financial() -> None:
     events = module.compute(state.entities["GRC"], state, _TS)
     regime_event = next(e for e in events if e.event_type == "regime_change")
     assert regime_event.framework == MeasurementFramework.FINANCIAL
+
+
+# ---------------------------------------------------------------------------
+# DEBUG log on empty prior_events — Issue #245
+# ---------------------------------------------------------------------------
+
+
+def test_macroeconomic_module_logs_debug_on_no_prior_events(
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    """MacroeconomicModule must emit a DEBUG log when prior_events is empty (Issue #245)."""
+    state = _make_state(entity_id="GRC", prior_events=[])
+    module = MacroeconomicModule()
+    with caplog.at_level(logging.DEBUG, logger="app.simulation.modules.macroeconomic.module"):
+        result = module.compute(state.entities["GRC"], state, _TS)
+
+    assert result == []
+    assert any(
+        "no subscribed events" in r.message and "GRC" in r.message
+        for r in caplog.records
+        if r.levelno == logging.DEBUG
+    ), f"Expected DEBUG log naming 'GRC'. Got: {[r.message for r in caplog.records]}"

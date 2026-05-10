@@ -17,6 +17,7 @@ the single GDP→demographic path.
 """
 from __future__ import annotations
 
+import logging
 from decimal import Decimal
 from typing import TYPE_CHECKING
 
@@ -31,6 +32,8 @@ from app.simulation.engine.quantity import Quantity, VariableType
 
 if TYPE_CHECKING:
     from datetime import datetime
+
+_log = logging.getLogger(__name__)
 
 # ---------------------------------------------------------------------------
 # Module constants (ADR-006 Decision 1 / Decision 8)
@@ -92,6 +95,12 @@ class MacroeconomicModule(SimulationModule):
             if e.source_entity_id == entity.id and e.event_type in _SUBSCRIBED_EVENTS
         ]
         if not prior_events:
+            _log.debug(
+                "%s: no subscribed events for entity_id=%r at timestep=%r — returning []",
+                type(self).__name__,
+                entity.id,
+                timestep,
+            )
             return []
 
         current_gdp_growth = entity.get_attribute_value("gdp_growth", Decimal("0"))

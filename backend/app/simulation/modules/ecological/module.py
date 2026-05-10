@@ -30,6 +30,7 @@ ecological effects are silently absent. Enforcement tracked in Issue #211 (M7).
 """
 from __future__ import annotations
 
+import logging
 from decimal import Decimal
 from typing import TYPE_CHECKING
 
@@ -45,6 +46,8 @@ from app.simulation.modules.ecological.elasticities import ECOLOGICAL_ELASTICITY
 
 if TYPE_CHECKING:
     from datetime import datetime
+
+_log = logging.getLogger(__name__)
 
 _SUBSCRIBED_EVENTS = frozenset({
     "gdp_growth_change",
@@ -84,6 +87,12 @@ class EcologicalModule(SimulationModule):
             if e.source_entity_id == entity.id and e.event_type in _SUBSCRIBED_EVENTS
         ]
         if not prior_events:
+            _log.debug(
+                "%s: no subscribed events for entity_id=%r at timestep=%r — returning []",
+                type(self).__name__,
+                entity.id,
+                timestep,
+            )
             return []
 
         # Accumulate deltas per indicator across all prior events.

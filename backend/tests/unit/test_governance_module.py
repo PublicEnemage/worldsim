@@ -14,8 +14,13 @@ Coverage:
 """
 from __future__ import annotations
 
+import logging
 from datetime import datetime, timezone
 from decimal import Decimal
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    import pytest
 
 from app.simulation.modules.governance.elasticities import GOVERNANCE_ELASTICITY_REGISTRY
 from app.simulation.modules.governance.module import _SUBSCRIBED_EVENTS, GovernanceModule
@@ -305,3 +310,25 @@ def test_registry_event_types_are_subscribed() -> None:
         assert row.event_type in _SUBSCRIBED_EVENTS, (
             f"Registry entry event_type '{row.event_type}' not in _SUBSCRIBED_EVENTS"
         )
+
+
+# ---------------------------------------------------------------------------
+# DEBUG log on empty prior_events — Issue #245
+# ---------------------------------------------------------------------------
+
+
+def test_governance_module_logs_debug_on_no_prior_events(caplog: pytest.LogCaptureFixture) -> None:
+    """GovernanceModule must emit a DEBUG log when prior_events is empty (Issue #245)."""
+    ts = datetime(2010, 1, 1, tzinfo=timezone.utc)  # noqa: UP017
+    state = _make_state("GRC", prior_events=[])
+    module = GovernanceModule()
+    entity = state.entities["GRC"]
+    with caplog.at_level(logging.DEBUG, logger="app.simulation.modules.governance.module"):
+        result = module.compute(entity, state, ts)
+
+    assert result == []
+    assert any(
+        "no subscribed events" in r.message and "GRC" in r.message
+        for r in caplog.records
+        if r.levelno == logging.DEBUG
+    ), f"Expected DEBUG log naming 'GRC'. Got: {[r.message for r in caplog.records]}"
