@@ -6,7 +6,7 @@ Accepted
 ## Validity Context
 
 **Standards Version:** 2026-04-15 (date standards documents were established)
-**Valid Until:** Milestone 7 — Technical Foundation
+**Valid Until:** Milestone 8 — Ecological and Governance Frameworks
 **License Status:** CURRENT
 
 **Decision 6 applied:** 2026-05-06 — GovernanceModule behavioral contract defined.
@@ -26,7 +26,19 @@ scope. Data sources for planetary boundary indicators added to
 percentile rank with mandatory API note for M6; boundary-normalized scoring
 deferred to M8. See Amendment 1 section at end of document.
 
-**Last Reviewed:** 2026-05-10 — Milestone 7 amendment (Issue #236). Decision 3
+**Last Reviewed:** 2026-05-10 — Milestone 7 exit review. No renewal triggers
+fired during Milestone 7. License Status confirmed CURRENT. M7 delivered no
+changes to `MeasurementFramework` taxonomy, `CohortSpec` segmentation axes,
+`MDASeverity` enum, or radar chart normalization methodology. DEBUG logs added
+to `DemographicModule`, `MacroeconomicModule`, `EcologicalModule`, and
+`GovernanceModule` `compute()` methods (Issues #244, #245) are engine-internal
+additions that do not alter module output contracts, subscription lists, or
+Quantity-delta Event structure. Defensive Programming section in
+`CODING_STANDARDS.md` (Issue #224) is a standards addition with no effect on
+HCL framework taxonomy. License renewed for Milestone 8. Next scheduled
+review at Milestone 8 — Ecological and Governance Frameworks completion.
+
+**Previously reviewed:** 2026-05-10 — Milestone 7 amendment (Issue #236). Decision 3
 Validity Context updated: `comparison_operator` column added to `mda_thresholds`
 table (migration b3c9f2d1a7e5). Three of five registered thresholds were silently
 broken — MDAChecker treated all thresholds as lower bounds, causing `MDA-FIN-DEBT-GDP`,

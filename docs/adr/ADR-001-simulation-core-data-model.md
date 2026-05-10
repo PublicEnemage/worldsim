@@ -6,10 +6,25 @@ Accepted
 ## Validity Context
 
 **Standards Version:** 2026-04-15 (date standards documents were established)
-**Valid Until:** Milestone 7 — Technical Foundation
+**Valid Until:** Milestone 8 — Ecological and Governance Frameworks
 **License Status:** CURRENT
 
-**Last Reviewed:** 2026-05-07 — Milestone 6 exit review. No renewal triggers
+**Last Reviewed:** 2026-05-10 — Milestone 7 exit review. No renewal triggers
+fired during Milestone 7. License Status confirmed CURRENT. M7 delivered:
+Defensive Programming section added to `CODING_STANDARDS.md` (Issue #224) —
+no changes to `MeasurementFramework` taxonomy, `DATA_STANDARDS.md §Units and
+Measurements`, or state representation contracts. `[SIM-INTEGRITY]` logging
+added to `propagation.py` and all four modules (Issues #243–#245) — engine-
+internal additions that do not alter the `Quantity` type structure,
+`SimulationEntity.attributes` store design, or `propagate_confidence`
+lower-of-two rule. `computeSteps()` collapsed-quantile fix (Issue #82) is a
+frontend rendering fix with no state representation changes. HCL deferred
+thresholds in Greece fixture (Issue #87) use the existing `deferred_thresholds`
+parameter — no backtesting integrity rule or schema change. License renewed
+for Milestone 8. Next scheduled review at Milestone 8 — Ecological and
+Governance Frameworks completion.
+
+**Previously reviewed:** 2026-05-07 — Milestone 6 exit review. No renewal triggers
 fired during Milestone 6. License Status confirmed CURRENT. EcologicalModule
 and GovernanceModule (new in M6) produce Quantity-delta Events within the
 existing `affected_attributes` contract and do not alter the `Quantity` type

@@ -6,10 +6,20 @@ Accepted
 ## Validity Context
 
 **Standards Version:** 2026-04-21
-**Valid Until:** Milestone 7 — Technical Foundation
+**Valid Until:** Milestone 8 — Ecological and Governance Frameworks
 **License Status:** CURRENT
 
-**Last Reviewed:** 2026-05-07 — Milestone 6 exit review. No renewal triggers
+**Last Reviewed:** 2026-05-10 — Milestone 7 exit review. No renewal triggers
+fired during Milestone 7. License Status confirmed CURRENT. M7 delivered no
+changes to GeoJSON-over-REST serving approach, PostGIS schema, CORS policy, or
+TerritorialValidator gate. The `computeSteps()` collapsed-quantile fix (Issue
+#82) is a client-side rendering improvement in `ChoroplethMap.tsx` that does
+not alter the choropleth API response format or GeoJSON contract. `[SIM-INTEGRITY]`
+logging additions are backend engine-internal changes with no impact on
+geospatial contracts. License renewed for Milestone 8. Next scheduled review
+at Milestone 8 — Ecological and Governance Frameworks completion.
+
+**Previously reviewed:** 2026-05-07 — Milestone 6 exit review. No renewal triggers
 fired during Milestone 6. License Status confirmed CURRENT. No changes to
 GeoJSON-over-REST serving approach, PostGIS schema, CORS policy, or
 TerritorialValidator gate. M6 additions (EcologicalModule, GovernanceModule,
