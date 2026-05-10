@@ -54,6 +54,8 @@ from app.simulation.repositories.state_repository import (
     _default_timestep,
 )
 
+from datetime import datetime as _datetime, timezone as _timezone
+
 if TYPE_CHECKING:
     from datetime import datetime
 
@@ -66,6 +68,18 @@ if TYPE_CHECKING:
 
 # Engine version recorded in tombstone records.
 _ENGINE_VERSION = "0.3.0"
+
+
+def _base_timestep(config: ScenarioConfigSchema) -> "_datetime":
+    """Return step-0 base datetime from config.start_date, or the 2000-01-01 default."""
+    if config.start_date is not None:
+        return _datetime(
+            config.start_date.year,
+            config.start_date.month,
+            config.start_date.day,
+            tzinfo=_timezone.utc,
+        )
+    return _default_timestep()
 
 # ---------------------------------------------------------------------------
 # Return type
@@ -223,7 +237,7 @@ class WebScenarioRunner:
 
         if current_step < 0:
             # No snapshots — initialise step 0 then advance to step 1
-            base_timestep = _default_timestep()
+            base_timestep = _base_timestep(config)
             state_repo = SimulationStateRepository()
             current_state = await state_repo.load_initial_state(
                 conn, config.entities, scenario_id, row["name"], base_timestep,
@@ -341,7 +355,7 @@ class WebScenarioRunner:
         t_start: float,
     ) -> RunSummary:
         """Inner execution: load state, run steps, write snapshots."""
-        base_timestep = _default_timestep()
+        base_timestep = _base_timestep(config)
         state_repo = SimulationStateRepository()
         snap_repo = ScenarioSnapshotRepository()
 

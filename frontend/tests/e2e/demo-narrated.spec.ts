@@ -95,6 +95,7 @@ test(
           entities: ["GRC"],
           n_steps: 3,
           timestep_label: "annual",
+          start_date: "2010-01-01",
           initial_attributes: {
             GRC: {
               gdp_growth: {

@@ -146,6 +146,10 @@ class ScenarioConfigSchema(BaseModel):
     `initial_attributes` — optional per-entity attribute overrides at step 0.
     `n_steps` — number of simulation timesteps to execute (1–100).
     `timestep_label` — human-readable timestep unit label.
+    `start_date` — optional calendar start date for step 0 (ISO 8601, e.g.
+        "2010-01-01"). When absent the runner defaults to 2000-01-01. Supply
+        this for historical backtesting scenarios so displayed step dates match
+        the historical period.
     """
 
     model_config = ConfigDict(from_attributes=True)
@@ -155,6 +159,7 @@ class ScenarioConfigSchema(BaseModel):
     n_steps: int
     timestep_label: str = "annual"
     modules_config: dict[str, Any] = {}
+    start_date: date | None = None
 
 
 class ScheduledInputSchema(BaseModel):

@@ -125,6 +125,7 @@ def build_greece_scenario() -> ScenarioCreateRequest:
             entities=["GRC"],
             n_steps=3,
             timestep_label="annual",
+            start_date=date(2010, 1, 1),
             initial_attributes={
                 "GRC": {
                     "gdp_growth": initial_gdp_growth,
