@@ -7,12 +7,22 @@ requirement: threshold alerts fire regardless of user weighting when any
 dimension crosses below a critical floor.
 
 Severity classification (ADR-005 Decision 3):
-  WARNING  — value is above floor_value but within approach_pct of it.
+  WARNING  — value is within approach_pct of floor_value but has not breached.
              approach_pct_remaining is positive; breach has not occurred.
-  CRITICAL — value is at or below floor_value for exactly one consecutive step.
-             The floor has been crossed; the intervention window is open.
-  TERMINAL — value is at or below floor_value for two or more consecutive steps.
+  CRITICAL — value has crossed floor_value for exactly one consecutive step.
+             The floor/ceiling has been crossed; the intervention window is open.
+  TERMINAL — value has crossed floor_value for two or more consecutive steps.
              The simulation flags explicitly: the recovery envelope may be closing.
+
+comparison_operator semantics (Issue #236):
+  "lte"  — lower-bound threshold; breach when current ≤ floor_value.
+            approach_pct_remaining = (current - floor) / floor
+            Positive = safe; zero/negative = breach.
+            Examples: reserve_coverage_months, health_index.
+  "gte"  — upper-bound threshold; breach when current ≥ floor_value.
+            approach_pct_remaining = (floor - current) / floor
+            Positive = safe; zero/negative = breach.
+            Examples: debt_gdp_ratio, poverty_headcount_ratio, food_insecurity_rate.
 
 Entity scope matching uses Python's fnmatch module. Scope 'all' is treated as '*'.
 
@@ -73,8 +83,12 @@ class MDAChecker:
                     continue
 
                 current = qty.value
-                # Positive → above floor (safe). Zero or negative → at/below floor (breach).
-                approach_pct_remaining = (current - floor) / floor
+                # Positive → safe side of floor/ceiling. Zero/negative → breach.
+                # "lte": breach when current ≤ floor; "gte": breach when current ≥ floor.
+                if threshold.comparison_operator == "gte":
+                    approach_pct_remaining = (floor - current) / floor
+                else:
+                    approach_pct_remaining = (current - floor) / floor
 
                 if approach_pct_remaining > approach_pct:
                     continue

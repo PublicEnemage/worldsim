@@ -26,7 +26,15 @@ scope. Data sources for planetary boundary indicators added to
 percentile rank with mandatory API note for M6; boundary-normalized scoring
 deferred to M8. See Amendment 1 section at end of document.
 
-**Last Reviewed:** 2026-05-07 — Milestone 6 exit review. Decision 6
+**Last Reviewed:** 2026-05-10 — Milestone 7 amendment (Issue #236). Decision 3
+Validity Context updated: `comparison_operator` column added to `mda_thresholds`
+table (migration b3c9f2d1a7e5). Three of five registered thresholds were silently
+broken — MDAChecker treated all thresholds as lower bounds, causing `MDA-FIN-DEBT-GDP`,
+`MDA-HD-POVERTY-Q1`, and `MDA-HD-FOOD` to never fire. The `comparison_operator` field
+("lte" | "gte") resolves this. `MDASeverity` enum unchanged; breach-detection consecutive-
+step logic unchanged. License renewed for remainder of Milestone 7.
+
+**Previously reviewed:** 2026-05-07 — Milestone 6 exit review. Decision 6
 (GovernanceModule) and Amendment 1 (EcologicalModule) were added to this ADR
 during M6 and implemented. Both modules operate within the existing
 `MeasurementFramework` taxonomy (ECOLOGICAL and GOVERNANCE are existing enum
@@ -548,6 +556,10 @@ CREATE TABLE mda_thresholds (
     approach_pct          NUMERIC NOT NULL DEFAULT 0.10,
         -- WARNING fires when current value is within approach_pct of floor
         -- e.g. 0.10 = warning fires when within 10% of the floor value
+    comparison_operator   TEXT NOT NULL DEFAULT 'lte',
+        -- 'lte': breach when current ≤ floor_value (lower-bound; reserve coverage, health index)
+        -- 'gte': breach when current ≥ floor_value (upper-bound; debt/GDP, poverty rate, food insecurity)
+        -- Added by migration b3c9f2d1a7e5 (Issue #236)
     severity_at_breach    TEXT NOT NULL,
         -- MDASeverity: WARNING | CRITICAL | TERMINAL
     description           TEXT NOT NULL,
@@ -584,13 +596,15 @@ class MDASeverity(str, Enum):
 
 **Minimum viable MDA seed set for M4 entry (seeded via Alembic data migration):**
 
-| MDA ID | Indicator key | Entity scope | Floor | Approach | Historical basis |
-|---|---|---|---|---|---|
-| `MDA-HD-POVERTY-Q1` | `poverty_headcount_ratio` | `*:CHT:1-*-*` | 0.40 | 15% | UNDP poverty trap literature; Stuckler/Basu on austerity |
-| `MDA-HD-HEALTH-CHILD` | `health_index` | `*:CHT:*-0-14-*` | 0.30 | 10% | WHO child mortality threshold; MDG/SDG floor definitions |
-| `MDA-FIN-RESERVES` | `reserve_coverage_months` | all | 2.5 | 20% | IMF Article IV conventional 3-month floor; Thailand 1997 |
-| `MDA-FIN-DEBT-GDP` | `debt_gdp_ratio` | all | 1.20 | 10% | IMF debt distress threshold literature; Greece 2010–2015 |
-| `MDA-HD-FOOD` | `food_insecurity_rate` | all | 0.35 | 15% | FAO food crisis threshold; WFP IPC Phase 3+ classification |
+`comparison_operator` column added by migration b3c9f2d1a7e5 (Issue #236 — M7).
+
+| MDA ID | Indicator key | Entity scope | Floor | Op | Approach | Historical basis |
+|---|---|---|---|---|---|---|
+| `MDA-HD-POVERTY-Q1` | `poverty_headcount_ratio` | `*:CHT:1-*-*` | 0.40 | gte | 15% | UNDP poverty trap literature; Stuckler/Basu on austerity |
+| `MDA-HD-HEALTH-CHILD` | `health_index` | `*:CHT:*-0-14-*` | 0.30 | lte | 10% | WHO child mortality threshold; MDG/SDG floor definitions |
+| `MDA-FIN-RESERVES` | `reserve_coverage_months` | all | 2.5 | lte | 20% | IMF Article IV conventional 3-month floor; Thailand 1997 |
+| `MDA-FIN-DEBT-GDP` | `debt_gdp_ratio` | all | 1.20 | gte | 10% | IMF debt distress threshold literature; Greece 2010–2015 |
+| `MDA-HD-FOOD` | `food_insecurity_rate` | all | 0.35 | gte | 15% | FAO food crisis threshold; WFP IPC Phase 3+ classification |
 
 These thresholds are Tier 3 confidence (calibrated from research literature, not yet
 against backtesting runs). When backtesting cases provide enough historical breach

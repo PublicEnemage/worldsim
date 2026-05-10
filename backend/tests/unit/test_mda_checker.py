@@ -16,6 +16,11 @@ Coverage:
   13. _build_prior_counts ignores non-mda_breach event types.
   14. approach_pct_remaining is negative (4 d.p.) when value is below floor.
   15. TERMINAL consecutive_breach_steps increments beyond 2 using prior count.
+  16. gte: no alert when safely below ceiling.
+  17. gte: WARNING when within approach_pct of ceiling from below.
+  18. gte: CRITICAL fires at or above ceiling.
+  19. gte: MDA-FIN-DEBT-GDP fires for Greece debt_gdp_ratio=1.483 (Issue #236).
+  20. gte: approach_pct_remaining is negative when above ceiling.
 """
 from __future__ import annotations
 
@@ -42,6 +47,7 @@ def _threshold(
     floor_value: str = "2.5",
     approach_pct: str = "0.20",
     measurement_framework: str = "financial",
+    comparison_operator: str = "lte",
 ) -> MDAThresholdRecord:
     return MDAThresholdRecord(
         mda_id=mda_id,
@@ -51,6 +57,7 @@ def _threshold(
         floor_value=floor_value,
         floor_unit="months",
         approach_pct=approach_pct,
+        comparison_operator=comparison_operator,
         severity_at_breach="CRITICAL",
         description="Test threshold.",
         historical_basis="Unit test.",
@@ -449,3 +456,149 @@ def test_terminal_increments_beyond_two() -> None:
     assert len(alerts) == 1
     assert alerts[0].severity == MDASeverity.TERMINAL
     assert alerts[0].consecutive_breach_steps == 4
+
+
+# ---------------------------------------------------------------------------
+# Tests: gte (upper-bound) comparison_operator — Issue #236
+# ---------------------------------------------------------------------------
+
+
+def test_gte_no_alert_when_safely_below_ceiling() -> None:
+    """debt_gdp_ratio=0.80 is safely below ceiling of 1.20 — no alert."""
+    state = _state_with_entity("GRC", {"debt_gdp_ratio": Decimal("0.80")})
+    threshold = _threshold(
+        indicator_key="debt_gdp_ratio",
+        floor_value="1.20",
+        approach_pct="0.10",
+        comparison_operator="gte",
+    )
+    alerts = MDAChecker().check(state, [], [threshold])
+    assert alerts == []
+
+
+def test_gte_warning_approaching_ceiling_from_below() -> None:
+    """debt_gdp_ratio=1.15 is within 10% of ceiling 1.20 — WARNING fires.
+
+    approach_pct_remaining = (1.20 - 1.15) / 1.20 = 0.0417 < 0.10.
+    """
+    state = _state_with_entity("GRC", {"debt_gdp_ratio": Decimal("1.15")})
+    threshold = _threshold(
+        indicator_key="debt_gdp_ratio",
+        floor_value="1.20",
+        approach_pct="0.10",
+        comparison_operator="gte",
+    )
+    alerts = MDAChecker().check(state, [], [threshold])
+    assert len(alerts) == 1
+    assert alerts[0].severity == MDASeverity.WARNING
+    assert Decimal(alerts[0].approach_pct_remaining) > Decimal("0")
+
+
+def test_gte_critical_at_or_above_ceiling() -> None:
+    """debt_gdp_ratio=1.483 (Greece 2010) is above ceiling 1.20 — CRITICAL fires."""
+    state = _state_with_entity("GRC", {"debt_gdp_ratio": Decimal("1.483")})
+    threshold = _threshold(
+        mda_id="MDA-FIN-DEBT-GDP",
+        indicator_key="debt_gdp_ratio",
+        floor_value="1.20",
+        approach_pct="0.10",
+        comparison_operator="gte",
+    )
+    alerts = MDAChecker().check(state, [], [threshold])
+    assert len(alerts) == 1
+    alert = alerts[0]
+    assert alert.severity == MDASeverity.CRITICAL
+    assert alert.consecutive_breach_steps == 1
+    assert Decimal(alert.approach_pct_remaining) < Decimal("0")
+
+
+def test_gte_debt_gdp_fires_for_greece_scenario() -> None:
+    """Regression: MDA-FIN-DEBT-GDP must fire for Greece debt_gdp_ratio=1.483 (Issue #236).
+
+    The original lte-only checker computed approach_pct_remaining = +0.236 and
+    silently exited. With comparison_operator='gte', approach_pct_remaining is
+    negative and CRITICAL fires correctly.
+    """
+    state = _state_with_entity("GRC", {"debt_gdp_ratio": Decimal("1.483")})
+    threshold = _threshold(
+        mda_id="MDA-FIN-DEBT-GDP",
+        indicator_key="debt_gdp_ratio",
+        floor_value="1.20",
+        approach_pct="0.10",
+        comparison_operator="gte",
+    )
+    alerts = MDAChecker().check(state, [], [threshold])
+    assert len(alerts) == 1
+    assert alerts[0].mda_id == "MDA-FIN-DEBT-GDP"
+    assert alerts[0].severity == MDASeverity.CRITICAL
+    # approach_pct_remaining = (1.20 - 1.483) / 1.20 = -0.2358...
+    assert Decimal(alerts[0].approach_pct_remaining) < Decimal("-0.20")
+
+
+def test_gte_approach_pct_remaining_precision() -> None:
+    """approach_pct_remaining is quantized to 4 d.p. for gte thresholds.
+
+    debt_gdp_ratio=1.30, ceiling=1.20 → (1.20 - 1.30) / 1.20 = -0.0833...
+    Stored as -0.0833 (4 d.p.).
+    """
+    state = _state_with_entity("GRC", {"debt_gdp_ratio": Decimal("1.30")})
+    threshold = _threshold(
+        indicator_key="debt_gdp_ratio",
+        floor_value="1.20",
+        approach_pct="0.10",
+        comparison_operator="gte",
+    )
+    alerts = MDAChecker().check(state, [], [threshold])
+    assert len(alerts) == 1
+    # -0.1 / 1.2 = -0.08333... → quantized to -0.0833
+    assert alerts[0].approach_pct_remaining == "-0.0833"
+
+
+def test_gte_poverty_q1_fires_above_threshold() -> None:
+    """MDA-HD-POVERTY-Q1 (gte): poverty_headcount_ratio=0.50 > 0.40 → CRITICAL."""
+    state = _state_with_entity(
+        "GRC:CHT:1-25-64-FORMAL",
+        {"poverty_headcount_ratio": Decimal("0.50")},
+    )
+    threshold = _threshold(
+        mda_id="MDA-HD-POVERTY-Q1",
+        indicator_key="poverty_headcount_ratio",
+        entity_scope="*:CHT:1-*-*",
+        floor_value="0.40",
+        approach_pct="0.15",
+        comparison_operator="gte",
+    )
+    alerts = MDAChecker().check(state, [], [threshold])
+    assert len(alerts) == 1
+    assert alerts[0].severity == MDASeverity.CRITICAL
+
+
+def test_lte_reserves_still_fires_correctly_alongside_gte() -> None:
+    """lte and gte thresholds can coexist — regression guard for Issue #236 fix."""
+    state = _state_with_entity(
+        "GRC",
+        {
+            "reserve_coverage_months": Decimal("2.0"),  # lte breach (below 2.5)
+            "debt_gdp_ratio": Decimal("1.483"),          # gte breach (above 1.20)
+        },
+    )
+    t_reserves = _threshold(
+        mda_id="MDA-FIN-RESERVES",
+        indicator_key="reserve_coverage_months",
+        floor_value="2.5",
+        approach_pct="0.20",
+        comparison_operator="lte",
+    )
+    t_debt = _threshold(
+        mda_id="MDA-FIN-DEBT-GDP",
+        indicator_key="debt_gdp_ratio",
+        floor_value="1.20",
+        approach_pct="0.10",
+        comparison_operator="gte",
+    )
+    alerts = MDAChecker().check(state, [], [t_reserves, t_debt])
+    assert len(alerts) == 2
+    mda_ids = {a.mda_id for a in alerts}
+    assert mda_ids == {"MDA-FIN-RESERVES", "MDA-FIN-DEBT-GDP"}
+    for alert in alerts:
+        assert alert.severity == MDASeverity.CRITICAL
