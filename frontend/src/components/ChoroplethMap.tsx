@@ -18,6 +18,14 @@ interface Props {
   onEntityClick?: (entityId: string) => void;
 }
 
+// computeSteps returns five breakpoints [p0, p25, p50, p75, p100] used as
+// MapLibre step-expression thresholds. MapLibre requires strictly ascending
+// thresholds — duplicate values (collapsed quantiles) produce broken rendering.
+//
+// Collapsed quantiles occur for small-range ordinal attributes like economy_tier
+// (1–7) or income_group (1–5) when many countries share the same tier value.
+// In that case we fall back to evenly-spaced breakpoints across [min, max] so
+// colour variation is always visible regardless of distribution shape.
 function computeSteps(features: GeoJSONFeatureCollection["features"]): number[] {
   const values = features
     .map((f) => parseFloat(f.properties.attribute_value))
@@ -26,8 +34,27 @@ function computeSteps(features: GeoJSONFeatureCollection["features"]): number[] 
 
   if (values.length === 0) return [0, 1, 2, 3, 4];
 
+  const min = values[0];
+  const max = values[values.length - 1];
+  const range = max - min;
+
+  // Degenerate case: all values identical — return a dummy span so the step
+  // expression stays valid; the single-colour result is correct.
+  if (range === 0) return [min, min + 1, min + 2, min + 3, min + 4];
+
   const pct = (p: number) => values[Math.floor((p / 100) * (values.length - 1))];
-  return [pct(0), pct(25), pct(50), pct(75), pct(100)];
+  const raw = [pct(0), pct(25), pct(50), pct(75), pct(100)];
+
+  // If quantiles are not strictly ascending (collapsed distribution), fall back
+  // to four equal-width intervals spanning [min, max]. This ensures each colour
+  // band covers a distinct portion of the value range.
+  const isStrictlyAscending = raw.every((v, i) => i === 0 || v > raw[i - 1]);
+  if (!isStrictlyAscending) {
+    const step = range / 4;
+    return [min, min + step, min + 2 * step, min + 3 * step, max];
+  }
+
+  return raw;
 }
 
 export default function ChoroplethMap({ attributeName, title, scenarioId, currentStep, onEntityClick }: Props) {
