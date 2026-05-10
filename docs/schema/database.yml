@@ -497,7 +497,10 @@ tables:
       floor_value:
         type: numeric
         nullable: false
-        description: Breach threshold. Alert fires when indicator falls below this value.
+        description: >
+          Breach threshold value. Direction of breach determined by comparison_operator:
+          "lte" → breach when indicator falls below this value;
+          "gte" → breach when indicator rises above this value.
       floor_unit:
         type: text
         nullable: false
@@ -506,6 +509,18 @@ tables:
         nullable: false
         default: 0.10
         description: Warning zone — percentage of floor_value at which WARNING fires.
+      comparison_operator:
+        type: text
+        nullable: false
+        default: "lte"
+        values: ["lte", "gte"]
+        description: >
+          Breach direction. "lte" = lower-bound threshold, breach when current ≤ floor_value
+          (safe when current > floor_value). "gte" = upper-bound threshold, breach when
+          current ≥ floor_value (safe when current < floor_value).
+          Added by migration b3c9f2d1a7e5 (Issue #236).
+          lte thresholds: reserve_coverage_months, health_index.
+          gte thresholds: debt_gdp_ratio, poverty_headcount_ratio, food_insecurity_rate.
       severity_at_breach:
         type: text
         nullable: false
@@ -542,30 +557,35 @@ tables:
         entity_scope: "*:CHT:1-*-*"
         measurement_framework: human_development
         floor_value: "0.40"
+        comparison_operator: gte
         severity_at_breach: CRITICAL
       MDA-HD-HEALTH-CHILD:
         indicator_key: health_index
         entity_scope: "*:CHT:*-0-14-*"
         measurement_framework: human_development
         floor_value: "0.30"
+        comparison_operator: lte
         severity_at_breach: CRITICAL
       MDA-FIN-RESERVES:
         indicator_key: reserve_coverage_months
         entity_scope: all
         measurement_framework: financial
         floor_value: "2.5"
+        comparison_operator: lte
         severity_at_breach: CRITICAL
       MDA-FIN-DEBT-GDP:
         indicator_key: debt_gdp_ratio
         entity_scope: all
         measurement_framework: financial
         floor_value: "1.20"
+        comparison_operator: gte
         severity_at_breach: CRITICAL
       MDA-HD-FOOD:
         indicator_key: food_insecurity_rate
         entity_scope: all
         measurement_framework: human_development
         floor_value: "0.35"
+        comparison_operator: gte
         severity_at_breach: CRITICAL
 
   # ---------------------------------------------------------------------------

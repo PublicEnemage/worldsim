@@ -319,6 +319,7 @@ class MDAThresholdRecord(BaseModel):
     floor_value: str
     floor_unit: str
     approach_pct: str
+    comparison_operator: str = "lte"
     severity_at_breach: str
     description: str
     historical_basis: str

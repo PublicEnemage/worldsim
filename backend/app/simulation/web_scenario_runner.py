@@ -628,9 +628,9 @@ async def _load_mda_thresholds(
         rows = await conn.fetch(
             """
             SELECT mda_id, indicator_key, entity_scope, measurement_framework,
-                   floor_value, floor_unit, approach_pct, severity_at_breach,
-                   description, historical_basis, recovery_horizon_years,
-                   irreversibility_note
+                   floor_value, floor_unit, approach_pct, comparison_operator,
+                   severity_at_breach, description, historical_basis,
+                   recovery_horizon_years, irreversibility_note
             FROM mda_thresholds
             """
         )
