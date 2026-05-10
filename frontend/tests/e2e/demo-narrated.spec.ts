@@ -53,6 +53,38 @@ const RUN_ID = Math.random().toString(36).slice(2, 8);
 const DEMO_SCENARIO_NAME = `Greece 2010-2012 Demo — ${new Date().toISOString().slice(0, 10)}-${RUN_ID}`;
 const COMPARE_SCENARIO_NAME = `Greece Alternative — ${new Date().toISOString().slice(0, 10)}-${RUN_ID}`;
 
+// ── Pre-demo cleanup ─────────────────────────────────────────────────────────
+// Delete scenarios from previous demo runs so the panel opens clean.
+// Matches any scenario whose name starts with the demo prefixes but belongs
+// to a different RUN_ID. Uses Node's built-in fetch (Node 18+).
+test.beforeAll(async () => {
+  const API = "http://localhost:8000/api/v1";
+  let scenarios: Array<{ scenario_id: string; name: string }> = [];
+  try {
+    const res = await fetch(`${API}/scenarios`);
+    if (res.ok) scenarios = await res.json() as typeof scenarios;
+  } catch {
+    // Stack not running — test will fail later with a clearer error.
+    return;
+  }
+
+  const stale = scenarios.filter(
+    (s) =>
+      (s.name.startsWith("Greece 2010-2012 Demo") ||
+        s.name.startsWith("Greece Alternative")) &&
+      s.name !== DEMO_SCENARIO_NAME &&
+      s.name !== COMPARE_SCENARIO_NAME,
+  );
+
+  await Promise.all(
+    stale.map((s) =>
+      fetch(`${API}/scenarios/${encodeURIComponent(s.scenario_id)}`, {
+        method: "DELETE",
+      }),
+    ),
+  );
+});
+
 test(
   "Stakeholder demo walkthrough — narrated screen recording",
   { tag: ["@demo"] },
@@ -188,7 +220,8 @@ test(
     await expect(scenarioRow).toBeVisible({ timeout: 10_000 });
 
     await scenarioRow.getByTitle("Select as primary scenario").click();
-    await page.waitForTimeout(600);
+    // Audience needs to read the ✓ Primary checkmark before the panel closes.
+    await page.waitForTimeout(1500);
 
     await page.getByRole("button", { name: /Scenarios/ }).click();
     await page.waitForTimeout(600);
