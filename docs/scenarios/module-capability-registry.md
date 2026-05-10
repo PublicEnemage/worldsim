@@ -9,8 +9,8 @@ This is a living document. It is updated whenever a new module is implemented
 or an existing module's capabilities change. The registry is dated so that
 readers can assess whether it reflects the current codebase.
 
-**Last updated:** 2026-04-24 (Amendment 4 — ADR-004 Scenario Engine)
-**Current milestone:** Milestone 3 — Scenario Engine
+**Last updated:** 2026-05-10 (Amendment 7 — M7 exit)
+**Current milestone:** Milestone 7 — Technical Foundation (M6 complete)
 
 ---
 
@@ -193,14 +193,14 @@ web-accessible scenario execution with snapshot storage and comparative output.
 
 **Cannot currently model:**
 
-- **Domain module contributions:** `WebScenarioRunner` in Milestone 3 executes
-  scenarios against an empty module list — no domain modules (Macroeconomic,
-  Trade, Demographic, Climate) are implemented. All scenario outputs reflect
-  first-round ControlInput propagation through static relationship weights
-  only. There are no endogenous dynamics, no multiplier effects, no feedback
-  loops. Every M3 snapshot carries `modules_active: []` (see Issue #145, #146).
-  **This is the most important limitation of M3 scenario outputs.** See
-  "Interpreting Results" for the full safe/unsafe conclusion list.
+- **Domain module contributions:** `WebScenarioRunner` since Milestone 4 wires
+  active domain modules. As of M6 exit, four modules are implemented:
+  `DemographicModule` (M4, ADR-005 Decision 1), `MacroeconomicModule` (M5,
+  regime-dependent multipliers), `EcologicalModule` (M6, initial — planetary
+  boundary proximity), `GovernanceModule` (M6, initial — institutional quality).
+  Snapshots carry `modules_active` in the v2 envelope (Issue #145). Endogenous
+  dynamics are now present; "Interpreting Results" details the remaining
+  limitations.
 
 - **Confidence tier degradation with projection horizon** — IA-1 compliance
   exception applies to all snapshot outputs (Issue #69, Issue #144)
@@ -238,65 +238,67 @@ Added in Milestone 3. Backtesting is a CI build gate — a failure in the
 backtesting suite is a build failure.
 
 **Can model:**
-- Greece 2010–2012 backtesting case (`tests/backtesting/test_greece_2010_2012.py`),
-  4 tests marked `backtesting`, enforced as CI build gate
-- DIRECTION_ONLY fidelity thresholds: gdp_growth negative at steps 1–3;
-  unemployment rising step 1 → step 3 (6 sign checks total)
+- Five historical backtesting cases, all enforced as CI build gate:
+  Greece 2010–2012, Argentina 2001–2002, Thailand 1997–2000,
+  Lebanon 2019–2020, Ecuador 1999–2000
+- DIRECTION_ONLY fidelity thresholds per case (sign checks on key indicators)
+- MAGNITUDE thresholds on Greece (gdp_growth step 3) and Argentina (step 2)
+  calibrated against historical outturns (Issues #208, #210)
 - `fidelity_report.py` — structured fidelity report printed to CI logs on
-  every backtesting run
-- `greece_2010_2012_actuals.py` — historical actuals fixture with IA-1 and
-  parameter calibration disclosures
-- `natural_earth_loader.py` seed script runs in CI before backtesting suite
-  to ensure GRC entity exists
-- Session-scoped asyncio lifecycle for asyncpg pool (three-place `loop_scope=
-  "session"` pattern — documented in `docs/CONTRIBUTING.md §Testing Patterns`)
+  every backtesting run; accepts `deferred_thresholds` dict for HCL indicators
+  not yet produced endogenously (Issue #87)
+- Deferred HCL thresholds in Greece fixture: `unemployment_rising_step1_to_step2`
+  and `health_expenditure_declining_step1_to_step2` computed and reported in
+  CI output; not a CI gate (no endogenous module produces these — Issue #87)
+- Actuals fixtures with IA-1 and parameter calibration disclosures for all five
+  cases
+- Session-scoped asyncio lifecycle for asyncpg pool (documented in
+  `docs/CONTRIBUTING.md §Testing Patterns`)
+- `FidelityDashboard.tsx` — React frontend component surfacing per-case
+  pass/fail status (M6, Issue #206)
 
 **Cannot currently model:**
 
-- **Magnitude validation** — DIRECTION_ONLY thresholds are sign checks only.
-  A model producing GDP growth of −0.01% passes identically to one producing
-  −8.9%. "Backtesting pass" means the model gets the sign right on 6 binary
-  tests. It does not mean the model is quantitatively accurate. See
-  ARCH-REVIEW-003 BI3-N-10 (Issue #160) for the required statistical power
-  statement to accompany all fidelity reports.
+- **Magnitude validation on three cases** — Argentina step 2 and Greece step 3
+  have MAGNITUDE thresholds; Lebanon, Thailand, and Ecuador remain DIRECTION_ONLY.
+  "Backtesting pass" on those cases means the model gets the sign right, not
+  that it is quantitatively accurate. See ARCH-REVIEW-003 BI3-N-10 (Issue #160)
+  for the required statistical power statement.
 
 - **Human development initial state** — the GRC entity initial state contains
-  no WDI-sourced human development attributes (unemployment stock, health
-  expenditure, net enrollment). The unemployment direction threshold tests
-  movement of an attribute with no empirically grounded initial value.
-  Issue #149 tracks the required WDI seed.
+  no WDI-sourced human development attributes. Issue #149 tracks the required
+  WDI seed.
 
 - **Machine-readable fidelity artifact** — fidelity report is printed text
   to stdout only; cross-run fidelity trending is not possible (Issue #154)
 
-- **Human development or ecological backtesting thresholds** — all current
-  thresholds are financial/macroeconomic indicators; no HCL or ecological
-  fidelity checks exist
+- **Endogenous HCL backtesting thresholds** — unemployment and health
+  expenditure thresholds are deferred (no module produces these endogenously);
+  tracked in `deferred_thresholds` param rather than CI gate (Issue #87)
 
 ---
 
-## What the Simulation Cannot Currently Model
+## Implemented Modules — Capability Summary
 
-The modules listed here are specified in CLAUDE.md and planned for future
-milestones. Until a module is implemented, its domain of effects cannot be
-modelled endogenously. Exogenous ControlInputs can inject point-in-time
-shocks as proxies, but the module's endogenous dynamics (multipliers, feedback
-loops, regime-switching behaviour) are absent.
+These modules have initial implementations as of M6 exit. Each has a
+`compute()` method, an elasticity registry, and unit tests. See the sections
+below for what each module can and cannot yet model.
 
-### Macroeconomic Module (Planned — Milestone X)
+### Macroeconomic Module (Implemented — Milestone 5)
+
+**Can model:**
+- Fiscal multiplier effect on GDP growth: regime-dependent (standard 0.5,
+  recession 1.5) — responds to `fiscal_policy_spending_change` events
+- Inflation dynamics: spending-driven inflation coefficient (`_SPENDING_INFLATION_COEFF`)
+  and interest-rate suppression (`_RATE_INFLATION_COEFF`)
+- Monetary policy rate change: responds to `monetary_policy_rate_change` events
 
 **Cannot currently model:**
-- GDP growth rate dynamics (fiscal multiplier, consumption function)
-- Inflation dynamics (Phillips curve, monetary transmission)
 - Debt sustainability analysis (debt service ratios, rollover risk)
-- Fiscal multiplier (including inversion in depressed demand regimes)
-- Interest rate dynamics and monetary transmission mechanism
 - Output gap and potential growth
-
-**Impact on scenario outputs:** Scenarios involving fiscal consolidation,
-monetary policy, or debt dynamics are missing their primary endogenous engine.
-ControlInput shocks can inject first-round effects but compounding dynamics
-and feedback loops are absent.
+- Interest rate transmission to investment
+- Regime detection is threshold-based (gdp_growth ≥ 0 = standard); does not
+  model transition dynamics between regimes
 
 ### Trade and Currency Module (Planned — Milestone X)
 
@@ -340,7 +342,46 @@ trade weights in response to policy changes.
 - Information environment integrity
 - Escalation and de-escalation dynamics
 
-### Climate Module (Planned — Milestone X)
+### Ecological Module (Implemented — Initial, Milestone 6)
+
+**Can model:**
+- CO₂ concentration trajectory response to GDP growth changes
+  (`gdp_growth_change` events via `co2_concentration_trajectory` elasticity)
+- Planetary boundary proximity response to fiscal spending changes
+  (`fiscal_policy_spending_change` events)
+- Elasticity registry with `ACADEMIC_LITERATURE_*` source provenance
+- `ecological` framework axis in `MultiFrameworkOutput` API response
+
+**Cannot currently model:**
+- Climate forcing from IPCC scenario data (full Climate Module planned M8)
+- Agricultural stress indices
+- Water stress and extreme event modelling
+- Climate-driven migration
+- Natural capital depletion rate as a separate tracked stock
+- Ecological attributes (agricultural productivity, water stress) remain absent
+  from `simulation_entities.attributes` initial state — see ARCH-REVIEW-003
+  BI3-L-01. Ecological scenarios have no empirically grounded initial conditions.
+
+### Governance Module (Implemented — Initial, Milestone 6)
+
+**Can model:**
+- Rule of law percentile response to GDP growth changes (`gdp_growth_change`
+  events — `rule_of_law_percentile` elasticity)
+- Democratic quality score response to IMF program acceptance
+  (`imf_program_acceptance` events)
+- Subscribes to: `gdp_growth_change`, `fiscal_policy_spending_change`,
+  `imf_program_acceptance`, `emergency_declaration` (ADR-005 Decision 6)
+- `governance` framework axis in `MultiFrameworkOutput` API response
+- All emitted quantities carry `MeasurementFramework.GOVERNANCE` tag
+
+**Cannot currently model:**
+- Institutional Cognitive Integrity Index (planned — M8)
+- Policy-reality divergence tracking
+- Ghost flight detection (institution executing outdated programming)
+- Press freedom and leadership insularity indices
+- Full governance composite score (partial elasticities only)
+
+### Climate Module (Planned — Milestone 8)
 
 **Cannot currently model:**
 - Climate forcing from IPCC scenario data
@@ -348,23 +389,29 @@ trade weights in response to policy changes.
 - Water stress and extreme event modelling
 - Climate-driven migration
 
-**Note:** Ecological attributes (agricultural productivity, water stress,
-carbon trajectory, deforestation rate) are entirely absent from
-`simulation_entities.attributes`. Ecological scenarios have no initial
-conditions to run from — see ARCH-REVIEW-003 BI3-L-01.
+**Note:** The initial Ecological Module (M6) covers CO₂ trajectory and
+planetary boundary proximity. Full climate dynamics remain planned for M8.
 
-### Demographic and Health Module (Planned — Milestone 4)
+### Demographic and Human Cost Module (Implemented — Milestone 4)
+
+**Can model:**
+- Poverty headcount ratio response to fiscal spending changes via
+  `fiscal_policy_spending_change` events (elasticity-based)
+- Cohort entities (`entity_type='cohort'`) with `parent_id` pointing to
+  country — ADR-005 Decision 1
+- MDA (Minimum Descent Altitude) breach detection across all frameworks
+  via `MDAChecker` (M4, extended M5)
+- Human Cost Ledger composite scores in `MultiFrameworkOutput` API response
+  (`human_development` framework axis)
+- MDA alerts surfaced in frontend `RadarChart.tsx` and `MDAAlertPanel.tsx`
 
 **Cannot currently model:**
-- Population dynamics and cohort modelling
-- Health system capacity and stress
+- Population dynamics beyond poverty headcount (no fertility/mortality model)
+- Health system capacity and stress (no health expenditure module)
 - Education attainment dynamics
 - Migration flows
-
-**Note:** ADR-005 (Accepted, 2026-04-24) specifies the cohort data model
-and Human Cost Ledger output for Milestone 4. Cohort entities will reuse the
-existing `simulation_entities` table with `entity_type='cohort'` and
-`parent_id` pointing to the country.
+- Intergenerational effects (annual timesteps; long-horizon consequences
+  of policy decisions are outside the modelled window)
 
 ### Financial Warfare Module (Planned — Milestone X)
 
@@ -385,72 +432,75 @@ existing `simulation_entities` table with `entity_type='cohort'` and
 
 ## Interpreting Results Given Current Limitations
 
-### What M3 scenario outputs represent
+### What M6/M7 scenario outputs represent
 
-**All M3 scenario outputs are ControlInput-propagation-only results.**
-`WebScenarioRunner` in Milestone 3 executes with an empty module list. No
-domain modules are active. Every attribute delta in every M3 snapshot originates
-from either (a) a directly injected ControlInput or (b) that input's propagation
-through static relationship weights. There are no endogenous dynamics.
+**Scenario outputs since M4 include endogenous module contributions.**
+`WebScenarioRunner` since M4 wires active domain modules: `DemographicModule`
+(M4), `MacroeconomicModule` (M5), `EcologicalModule` (M6, initial),
+`GovernanceModule` (M6, initial). Snapshots carry `modules_active` in the v2
+envelope — inspect this field to confirm which modules contributed to any
+given snapshot.
 
-This will change in Milestone 4 when domain modules (DemographicModule from
-ADR-005) are wired into `WebScenarioRunner`. M4 snapshots will contain
-endogenous module contributions that M3 snapshots do not. M3 and M4 snapshots
-will be structurally distinguishable via `_modules_active` envelope metadata
-once Issue #145 and #146 are implemented — until then, they are not.
+Remaining limitation: module contributions are elasticity-based approximations
+calibrated to academic literature. Multipliers are regime-dependent but static
+within each regime. Dynamic feedback loops, social response, and non-linear
+threshold effects are not yet modelled.
 
 ### Any scenario run against the current simulation is modelling:
 1. The first-round direct effect of the injected ControlInput on the source entity
 2. Propagation of that effect through static relationship edges
-3. Accumulation across multiple ControlInputs at each step (where present)
+3. Endogenous module responses: fiscal multiplier (Macroeconomic), poverty
+   headcount (Demographic), CO₂ trajectory and planetary boundary pressure
+   (Ecological), rule of law and democratic quality (Governance)
 4. Multi-step sequences of the above (via `POST /advance`)
 
 ### The simulation is NOT modelling:
-- Endogenous module responses to changed state
-- Dynamic relationship weight evolution
-- Multiplier and feedback loop effects
-- Regime-switching behaviour
+- Dynamic relationship weight evolution (weights set at scenario initialisation)
+- Non-linear threshold effects and regime transitions within a single module
 - Social response to policy inputs (strikes, electoral shifts, legitimacy collapse)
-- Any of the module domains listed above as absent
+- Bilateral trade flows, exchange rate dynamics, capital flows
+- Full climate forcing (only initial ecological proxies active)
+- Full governance composite (partial elasticities only)
 
 ### Safe conclusions from current simulation output:
-- Direction of multi-step propagation through scripted ControlInput sequences
-- Relative magnitude of first-round exposure across entities (which countries
-  are more or less connected to the shock source)
-- Structural network properties (which entities are hubs, which are peripheral)
-- Direction of change between two scenarios on a single attribute at a specific
-  step (from `GET /compare`)
+- Direction of multi-step propagation with active macroeconomic multipliers
+- Endogenous poverty and demographic responses to fiscal shocks (direction)
+- Initial ecological and governance indicator responses to macro shocks (direction)
+- Relative magnitude of first-round exposure across entities
+- Direction of change between two scenarios on a single attribute (from `GET /compare`)
 - Geographic distribution of scenario divergence (from `DeltaChoropleth`)
+- MDA breach detection across financial, human_development, ecological,
+  governance framework axes (with partial ecological/governance coverage)
 
 ### Conclusions that should not be drawn from current output:
-- Precise magnitudes (no calibrated multipliers or feedback loops)
-- Dynamic trajectories representing endogenous economic adjustment (only scripted
-  input sequences, not model-computed responses)
-- Policy optimisation (no endogenous response to simulate the counterfactual)
-- Crisis threshold predictions (no threshold dynamics in current engine)
-- Subnational or community-level impacts (Level 1 nation-state resolution only;
-  country averages conceal regional and community differentiation — see
-  ARCH-REVIEW-003 BI3-N-08)
-- Intergenerational effects (annual timesteps; long-horizon consequences of
-  policy decisions are outside the modelled window)
-- Confidence in projection magnitude (IA-1 compliance exception — all projection
-  outputs carry input data confidence tier regardless of projection distance)
+- Precise magnitudes — elasticities are calibrated approximations, not
+  verified causal estimates; backtesting confirms direction, not quantity
+- Policy optimisation — endogenous response is partial; social and political
+  feedback absent
+- Crisis threshold predictions — no threshold dynamics within current engine
+- Subnational or community-level impacts — Level 1 nation-state resolution
+  only; country averages conceal regional and community differentiation
+  (ARCH-REVIEW-003 BI3-N-08)
+- Intergenerational effects (annual timesteps; long-horizon consequences
+  outside modelled window)
 - Risk-adjusted scenario comparison (no variance or distributional output;
   `DeltaRecord.delta` is a point estimate only)
+- Full ecological or governance composite scores — both modules are initial
+  implementations with partial elasticity coverage
 
-### Known architectural gaps accepted by Engineering Lead (ARCH-REVIEW-003)
+### Known architectural gaps accepted by Engineering Lead
 
-These findings are tracked in GitHub Issues and will be addressed in Milestone 4.
-Council agents should not re-discover them as new findings:
+Resolved from ARCH-REVIEW-003 in M4–M6: ia1_disclosure validation (#144),
+snapshot envelope v2 with _modules_active (#145, #146), step-alignment
+validation on GET /compare (#150). Open gaps:
 
 | Finding | Status | Issue |
 |---|---|---|
-| `ia1_disclosure` NOT NULL but semantically void | ACCEPTED — M4 fix required before projection outputs | #144 |
-| Snapshot envelope has no migration path for M4 module additions | ACCEPTED — `_modules_active` metadata required before M4 wiring | #145 |
-| M3 snapshots carry no signal that domain modules are absent | ACCEPTED — `modules_active` in SnapshotResponse required | #146 |
-| Tombstone excludes entity state at scenario creation | ACCEPTED — SA-11 guarantee is incomplete until resolved | #147 |
-| Greece fixture has no WDI human development initial state | ACCEPTED — WDI seed required before Issue #142 begins | #149 |
-| `GET /compare` has no step-alignment validation | ACCEPTED — 422 required; silent misalignment is a correctness bug | #150 |
+| Tombstone excludes entity state at scenario creation | ACCEPTED — SA-11 guarantee incomplete | #147 |
+| Greece fixture has no WDI human development initial state | OPEN — WDI seed required | #149 |
+| Subnational resolution absent | OPEN — Level 1 only until M8+ | — |
+| Full ecological composite score | OPEN — initial module only | M8 |
+| Full governance composite score | OPEN — initial module only | M8 |
 
 This registry will be updated with each milestone. Domain Intelligence Council
 agents should re-read this registry before completing their scenario review
