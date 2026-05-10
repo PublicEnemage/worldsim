@@ -23,8 +23,13 @@ All tests run without a database connection.
 """
 from __future__ import annotations
 
+import logging
 from datetime import UTC, datetime
 from decimal import Decimal
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    import pytest
 
 from app.simulation.engine.models import (
     Event,
@@ -522,3 +527,45 @@ def test_ecological_not_in_unimplemented_frameworks() -> None:
         "'ecological' is still in _UNIMPLEMENTED_FRAMEWORKS — "
         "must be removed when EcologicalModule is wired in"
     )
+
+
+# ---------------------------------------------------------------------------
+# DEBUG log on empty prior_events — Issue #245
+# ---------------------------------------------------------------------------
+
+
+def test_ecological_module_logs_debug_on_no_prior_events(caplog: pytest.LogCaptureFixture) -> None:
+    """EcologicalModule must emit a DEBUG log when prior_events is empty (Issue #245)."""
+    from app.simulation.engine.models import ResolutionConfig, ScenarioConfig, SimulationState
+    from app.simulation.modules.ecological.module import EcologicalModule
+
+    entity = SimulationEntity(
+        id="GRC",
+        entity_type="country",
+        attributes={},
+        metadata={},
+    )
+    state = SimulationState(
+        timestep=datetime(2010, 1, 1, tzinfo=UTC),
+        resolution=ResolutionConfig(),
+        entities={"GRC": entity},
+        relationships=[],
+        events=[],  # no prior events
+        scenario_config=ScenarioConfig(
+            scenario_id="test",
+            name="Test",
+            description="",
+            start_date=datetime(2010, 1, 1, tzinfo=UTC),
+            end_date=datetime(2013, 1, 1, tzinfo=UTC),
+        ),
+    )
+    module = EcologicalModule()
+    with caplog.at_level(logging.DEBUG, logger="app.simulation.modules.ecological.module"):
+        result = module.compute(entity, state, datetime(2010, 1, 1, tzinfo=UTC))
+
+    assert result == []
+    assert any(
+        "no subscribed events" in r.message and "GRC" in r.message
+        for r in caplog.records
+        if r.levelno == logging.DEBUG
+    ), f"Expected DEBUG log naming 'GRC'. Got: {[r.message for r in caplog.records]}"

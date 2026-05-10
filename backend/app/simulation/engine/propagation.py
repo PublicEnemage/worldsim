@@ -16,8 +16,9 @@ Architecture contracts (ADR-001):
   confidence_tier uses the lower-of-two rule across accumulated inputs.
 - STOCK variable deltas replace the current attribute value; FLOW, RATIO,
   and DIMENSIONLESS deltas accumulate additively on the existing value.
-- Deltas for entity_ids not present in state.entities are silently dropped.
-  A relationship may reference an entity outside the active resolution scope.
+- Deltas for entity_ids not present in state.entities are dropped with a
+  [SIM-INTEGRITY] WARNING. A relationship may reference an entity outside the
+  active resolution scope; the warning makes this observable in CI logs.
 
 Amendment 1 (SCR-001): _DeltaAccumulator and all delta arithmetic updated
 from dict[str, float] to dict[str, Quantity]. Attenuation scales
@@ -27,6 +28,7 @@ the lower-of-two rule. _build_next_state applies STOCK/FLOW semantics.
 
 from __future__ import annotations
 
+import logging
 from decimal import Decimal
 
 from app.simulation.engine.models import (
@@ -36,6 +38,8 @@ from app.simulation.engine.models import (
     SimulationState,
 )
 from app.simulation.engine.quantity import Quantity, VariableType
+
+_log = logging.getLogger(__name__)
 
 # ---------------------------------------------------------------------------
 # Public API
@@ -229,6 +233,15 @@ def _accumulate(
     entity_deltas = accumulator[entity_id]
     for key, delta in deltas.items():
         if key in entity_deltas:
+            if delta.variable_type == VariableType.STOCK:
+                _log.warning(
+                    "[SIM-INTEGRITY] Two STOCK events for entity_id=%r attribute=%r "
+                    "in the same step — values will be summed, not replaced. "
+                    "STOCK semantics expect a single absolute-level event per "
+                    "attribute per step.",
+                    entity_id,
+                    key,
+                )
             existing = entity_deltas[key]
             entity_deltas[key] = Quantity(
                 value=existing.value + delta.value,
@@ -276,6 +289,15 @@ def _build_next_state(
         New SimulationState with updated entity attribute values.
     """
     new_entities: dict[str, SimulationEntity] = {}
+
+    for entity_id in accumulator:
+        if entity_id not in state.entities:
+            _log.warning(
+                "[SIM-INTEGRITY] Accumulated delta for entity_id=%r absent from "
+                "state.entities — delta dropped. Check relationship scope or "
+                "whether the entity was tombstoned.",
+                entity_id,
+            )
 
     for entity_id, entity in state.entities.items():
         new_attrs: dict[str, Quantity] = dict(entity.attributes)
