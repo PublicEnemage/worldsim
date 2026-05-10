@@ -18,6 +18,7 @@ import pytest
 
 from tests.backtesting.fidelity_report import (
     _extract_gdp_value,
+    _extract_health_expenditure_value,
     _extract_unemployment_value,
     format_fidelity_report,
 )
@@ -86,6 +87,28 @@ def test_actuals_unemployment_rises_2010_to_2013() -> None:
     assert ACTUALS.unemployment_rate_2012 < ACTUALS.unemployment_rate_2013
 
 
+def test_actuals_health_expenditure_2010() -> None:
+    """WDI 2013 release: health expenditure 2010 = 9.5% of GDP (Issue #87)."""
+    assert ACTUALS.health_expenditure_pct_gdp_2010 == Decimal("0.095")
+    assert isinstance(ACTUALS.health_expenditure_pct_gdp_2010, Decimal)
+
+
+def test_actuals_health_expenditure_2011() -> None:
+    """WDI 2013 release: health expenditure 2011 = 9.4% of GDP (Issue #87)."""
+    assert ACTUALS.health_expenditure_pct_gdp_2011 == Decimal("0.094")
+
+
+def test_actuals_health_expenditure_2012() -> None:
+    """WDI 2013 release: health expenditure 2012 = 8.7% of GDP (Issue #87)."""
+    assert ACTUALS.health_expenditure_pct_gdp_2012 == Decimal("0.087")
+
+
+def test_actuals_health_expenditure_declines_2010_to_2012() -> None:
+    """Historical health expenditure declined under austerity (WDI 2013)."""
+    assert ACTUALS.health_expenditure_pct_gdp_2010 > ACTUALS.health_expenditure_pct_gdp_2011
+    assert ACTUALS.health_expenditure_pct_gdp_2011 > ACTUALS.health_expenditure_pct_gdp_2012
+
+
 def test_actuals_is_frozen_dataclass() -> None:
     """GreeceActuals is immutable (frozen=True)."""
     with pytest.raises(AttributeError):
@@ -104,6 +127,16 @@ def test_thresholds_gdp_direction_correct_is_true() -> None:
 def test_thresholds_unemployment_direction_step0_to_step3_is_true() -> None:
     """Threshold renamed from unemployment_direction_correct — Issue #149."""
     assert THRESHOLDS.unemployment_direction_step0_to_step3 is True
+
+
+def test_thresholds_unemployment_rising_step1_to_step2_is_false() -> None:
+    """Deferred HCL threshold — no module produces unemployment_rate events (Issue #87)."""
+    assert THRESHOLDS.unemployment_rising_step1_to_step2 is False
+
+
+def test_thresholds_health_expenditure_declining_step1_to_step2_is_false() -> None:
+    """Deferred HCL threshold — no module produces health_expenditure_pct_gdp events (Issue #87)."""
+    assert THRESHOLDS.health_expenditure_declining_step1_to_step2 is False
 
 
 def test_thresholds_is_frozen_dataclass() -> None:
@@ -419,3 +452,47 @@ def test_extract_gdp_value_returns_none_when_missing() -> None:
 def test_extract_unemployment_value_returns_none_when_missing() -> None:
     snap = {"state_data": {"GRC": {"gdp_growth": {"value": "-0.054"}}}}
     assert _extract_unemployment_value(snap) is None
+
+
+def test_extract_health_expenditure_value_returns_decimal() -> None:
+    snap = {"state_data": {"GRC": {"health_expenditure_pct_gdp": {"value": "0.095"}}}}
+    result = _extract_health_expenditure_value(snap)
+    assert result == Decimal("0.095")
+    assert isinstance(result, Decimal)
+
+
+def test_extract_health_expenditure_value_returns_none_when_missing() -> None:
+    assert _extract_health_expenditure_value({}) is None
+    assert _extract_health_expenditure_value({"state_data": {"GRC": {}}}) is None
+
+
+def test_format_fidelity_report_deferred_thresholds_section() -> None:
+    """deferred_thresholds appear in a separate DEFERRED section, not THRESHOLD RESULTS."""
+    deferred = {
+        "unemployment_rising_step1_to_step2": "FAIL — no endogenous module (Issue #87)",
+    }
+    report = format_fidelity_report(
+        scenario_name="Test",
+        actuals=ACTUALS,
+        snapshots=_make_mock_snapshots(),
+        thresholds_met={"gdp_step1_negative": True},
+        ia1_disclosure=IA1_DISCLOSURE,
+        parameter_calibration_disclosure=PARAMETER_CALIBRATION_DISCLOSURE,
+        deferred_thresholds=deferred,
+    )
+    assert "DEFERRED THRESHOLDS" in report
+    assert "[DEFERRED] unemployment_rising_step1_to_step2" in report
+    assert "Issue #87" in report
+
+
+def test_format_fidelity_report_no_deferred_section_when_none() -> None:
+    """DEFERRED THRESHOLDS section is absent when deferred_thresholds is None."""
+    report = format_fidelity_report(
+        scenario_name="Test",
+        actuals=ACTUALS,
+        snapshots=_make_mock_snapshots(),
+        thresholds_met={"gdp_step1_negative": True},
+        ia1_disclosure=IA1_DISCLOSURE,
+        parameter_calibration_disclosure=PARAMETER_CALIBRATION_DISCLOSURE,
+    )
+    assert "DEFERRED THRESHOLDS" not in report

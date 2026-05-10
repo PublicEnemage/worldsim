@@ -14,10 +14,13 @@ this runner.
 from __future__ import annotations
 
 import dataclasses
+import logging
 import uuid
 from abc import ABC, abstractmethod
 from datetime import UTC, datetime, timedelta  # noqa: TCH003 — used at runtime in _advance_timestep
 from typing import TYPE_CHECKING, Any
+
+_log = logging.getLogger(__name__)
 
 if TYPE_CHECKING:
 
@@ -301,6 +304,22 @@ class ScenarioRunner(InputOrchestrator):
                     entity, current_state, current_state.timestep
                 )
                 all_events.extend(endogenous_events)
+
+        # Guard: warn on duplicate event_ids before propagation (Issue #223).
+        # Duplicates are not overwritten by the propagation accumulator — both
+        # deltas are applied, silently doubling the effect. Warning only: the
+        # simulation continues so the full pattern is observable.
+        seen_event_ids: set[str] = set()
+        for event in all_events:
+            if event.event_id in seen_event_ids:
+                _log.warning(
+                    "Duplicate event_id detected before propagation: %s "
+                    "(source_entity=%s, event_type=%s) — delta will be double-applied",
+                    event.event_id,
+                    event.source_entity_id,
+                    event.event_type,
+                )
+            seen_event_ids.add(event.event_id)
 
         # Propagate all events and advance the timestep
         next_state = propagate(current_state, all_events)

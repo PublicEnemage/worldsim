@@ -29,6 +29,8 @@ import pytest_asyncio
 
 from tests.backtesting.fidelity_report import (
     _extract_gdp_value,
+    _extract_health_expenditure_value,
+    _extract_unemployment_value,
     format_fidelity_report,
 )
 from tests.fixtures.greece_2010_2012_actuals import (
@@ -146,6 +148,28 @@ async def test_greece_2010_2012_direction_only_fidelity(
         # initial unemployment but the value stays flat across steps. Re-enable
         # this threshold when the Macroeconomic/Demographic module is implemented.
 
+        # HCL deferred thresholds — tracked in fidelity report, not blocking CI (Issue #87)
+        snap1 = snapshots_by_step.get(1)
+        snap2 = snapshots_by_step.get(2)
+        unemp1 = _extract_unemployment_value(snap1) if snap1 else None
+        unemp2 = _extract_unemployment_value(snap2) if snap2 else None
+        health1 = _extract_health_expenditure_value(snap1) if snap1 else None
+        health2 = _extract_health_expenditure_value(snap2) if snap2 else None
+
+        unemp_rising = (unemp1 is not None and unemp2 is not None and unemp2 > unemp1)
+        health_declining = (health1 is not None and health2 is not None and health2 < health1)
+
+        deferred_thresholds: dict[str, str] = {
+            "unemployment_rising_step1_to_step2": (
+                "PASS" if unemp_rising
+                else "FAIL — no endogenous module updates unemployment_rate (Issue #87)"
+            ),
+            "health_expenditure_declining_step1_to_step2": (
+                "PASS" if health_declining
+                else "FAIL — no endogenous module updates health_expenditure_pct_gdp (Issue #87)"
+            ),
+        }
+
         # Print fidelity report to stdout (appears in CI logs on every run)
         report = format_fidelity_report(
             scenario_name="Greece 2010-2012 IMF Program Backtesting Fixture",
@@ -154,6 +178,7 @@ async def test_greece_2010_2012_direction_only_fidelity(
             thresholds_met=thresholds_met,
             ia1_disclosure=IA1_DISCLOSURE,
             parameter_calibration_disclosure=PARAMETER_CALIBRATION_DISCLOSURE,
+            deferred_thresholds=deferred_thresholds,
         )
         print(f"\n{report}")
 
