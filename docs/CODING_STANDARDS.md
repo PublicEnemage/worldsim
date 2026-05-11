@@ -1317,3 +1317,60 @@ engineer genuinely understanding its architecture becomes ungovernable. The
 simulation decisions made here affect sovereign policy analysis. The engineering
 judgment required to make good decisions about that codebase cannot be
 outsourced to agents.
+
+---
+
+## Legibility North Star
+
+**The principle:**
+
+> Code in this codebase must be modifiable by an intermediate developer who
+> did not write it, without requiring access to the author's context. This is
+> the legibility standard. Every specific rule in this document is a mechanism
+> in service of this principle. When a proposed implementation satisfies a rule
+> but violates this principle, the principle takes precedence.
+
+**What this means in practice:**
+
+An intermediate developer is someone competent in Python and familiar with
+the domain (simulation, economics, geospatial data) but who has not been part
+of this project's development. They have access to the code, the ADRs, and
+the standards documents — but not to the conversations, sessions, or
+institutional memory that produced the code.
+
+If a function requires knowing why a design decision was made in order to
+modify it safely, that function fails the legibility standard regardless of
+whether it is technically correct. The constraint lives in the function, not
+in the reader's head.
+
+**The test:**
+
+For any non-trivial function, ask: could a competent developer who has never
+seen this codebase (a) understand what it does from reading it, (b) identify
+where a bug could hide, and (c) make a targeted change without accidentally
+breaking something else — all from the code alone? If the answer to any of
+these is "only with help," the function needs improvement.
+
+**Enforcement mechanisms:**
+
+- **Issue #257** — Blind code legibility audit: recurring at each milestone
+  exit. A fresh Claude instance with no WorldSim session history reviews
+  five nominated functions and scores them on the seven-question legibility
+  rubric (docs/process/blind-code-audit-prompt.md). Results logged at
+  docs/process/blind-audit-YYYY-MM-DD.md.
+- **Issue #258** — Intent blocks: a convention for annotating the non-obvious
+  *why* inside complex functions without polluting the code with implementation
+  narration.
+- **Issue #259** — Legibility dashboard: quantitative metrics (radon cc scores,
+  silent-failure surface, test-to-implementation ratio) surfaced in CI output
+  at each milestone exit, tracked against the M7 baseline in
+  docs/standards/legibility-baseline-m7.md.
+
+**Why this is a mission requirement, not a housekeeping rule:**
+
+WorldSim is designed to be used by finance ministries in countries that may
+not have the technical staff depth of the institutions they are negotiating
+against. If the codebase is only legible to its authors, it cannot be audited,
+challenged, or improved by the domain experts and independent reviewers whose
+trust the tool depends on. Legibility is not a code quality preference — it is
+a prerequisite for the tool's credibility.
