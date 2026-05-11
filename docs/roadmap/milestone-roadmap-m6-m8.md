@@ -1,9 +1,13 @@
-# Milestone Roadmap — M6 through M8
+# Milestone Roadmap — M6 through M13
 
 > Extracted from CLAUDE.md at M4 exit (2026-04-26). Updated at M7 exit
-> (2026-05-10) to correct M7 theme and cascade M8/M9. CLAUDE.md carries the
-> current milestone inline; this file carries the committed scope for
-> M6 through M9. GitHub Milestones carry the live issue lists.
+> (2026-05-10) to correct M7 theme and expand to M9–M13 sequence.
+> CLAUDE.md carries the current milestone inline; this file carries the
+> committed scope. GitHub Milestones carry the live issue lists.
+>
+> M9–M13 sequence approved 2026-05-11. Old M9 (Methodology Publication)
+> renumbered to M13 to make room for four intermediate milestones that
+> absorb ~77 issues that had accumulated without milestone assignment.
 
 ---
 
@@ -76,7 +80,92 @@ module contracts — reviewed at M8 entry)
 
 ---
 
-## Milestone 9 — Methodology Publication and External Validation
+## Milestone 9 — Standards Foundation
+
+**Core deliverable:** Canonical unit registry, field-level data certification,
+and legibility framework established. Methodological integrity gaps from
+STD-REVIEW-004 and ARCH-REVIEW-005 resolved before M10 engine work begins.
+
+**Scope:**
+- Canonical unit registry: replace `unit="dimensionless"` placeholders
+  with registered physical units (Issues #255, #256 gate)
+- Field-level certification chain: `source_registry.admission_status` field
+  per approved-sources.md; mandatory data admission tests (Issue #253)
+- WGI territorial conventions documented in DATA_STANDARDS.md (Issue #43 area)
+- Legibility baseline audit: all user-visible text meets analyst-comprehension
+  bar (Issue #255)
+- North Star legibility section added to CLAUDE.md (Issue #256)
+- Standards Review STD-REVIEW-004 gaps closed (Issues #255–#257)
+- Domain Intelligence Council blind stakeholder interviews completed (#235)
+- M7 orphan issues triaged and closed or formally re-scoped
+
+**Pre-implementation gates:** Issues #255, #256, #257, #235 must be resolved
+before M9 implementation begins.
+
+**Dependencies:** Milestone 8 (M9 standards work assumes M8 ecological and
+governance indicators are live — the unit registry must cover real indicators).
+
+---
+
+## Milestone 10 — Engine Integrity and Backtesting
+
+**Core deliverable:** Mean-reversion channels operational, Ecuador backtesting
+case added, sparse matrix propagation foundation in place, interpretability
+tooling suite available to contributors.
+
+**Scope:**
+- Mean-reversion channel (`trend_growth` seeded attribute, Issue #221)
+- Ecuador as second Monte Carlo scenario case
+- ADR-007 sparse matrix propagation implementation
+- Interpretability tooling: propagation trace, equivalence harness, matrix
+  visualizer, sparse profiler (Issue #216)
+- Engine version gap Issue #139 formally resolved (ADR entry or closed)
+- Decimal↔float precision boundary tests hardened
+
+**Dependencies:** Milestone 9 (unit registry and data certification must be
+clean before new backtesting cases are added).
+
+---
+
+## Milestone 11 — Political Economy and Conditionality
+
+**Core deliverable:** IMF conditionality modeling, political feasibility
+constraints, and elite capture dynamics available for scenario analysis.
+Debt sustainability module extended for multi-creditor scenarios.
+
+**Scope:**
+- Political Module: electoral calendar, coalition stability, legitimacy cascade
+- IMF conditionality impact modeling: policy-space constraint propagation
+- Elite capture indicators: concentration of institutional authority,
+  dissent tolerance, policy-reality divergence
+- Debt sustainability extension: multi-creditor, cross-default triggers
+- Fiscal Module: political feasibility constraint on spending paths
+
+**Dependencies:** Milestone 10 (engine integrity work must be complete
+before political economy feedback loops are added to the propagation graph).
+
+---
+
+## Milestone 12 — Analyst Tooling and External Sector
+
+**Core deliverable:** Trade and external sector module live; analyst tooling
+(propagation trace, export, comparison) polished; governance and branch
+protection established.
+
+**Scope:**
+- Trade Module: current account, trade balance, terms of trade dynamics
+- External sector: capital flows, FDI, remittance channel
+- Analyst tooling: scenario comparison, data export, backtesting dashboard
+  improvements
+- Governance: branch protection on `main`, second governance account (#3, #6)
+- Scenario comparison view: side-by-side multi-scenario radar
+
+**Dependencies:** Milestone 11 (political economy channels feed external
+sector dynamics — trade policy is a political decision).
+
+---
+
+## Milestone 13 — Methodology Publication and External Validation
 
 **Core deliverable:** The simulation's methodology is publicly documented
 and validated by at least one external domain reviewer.
@@ -88,12 +177,12 @@ and validated by at least one external domain reviewer.
   debt specialist reviews the methodology and signs off on the human
   development framework implementation
 - `docs/POLICY.md` updated to reflect all methodology positions taken
-  through M8, with the external reviewer's name and affiliation
+  through M12, with the external reviewer's name and affiliation
 - Technical Steering Committee formation initiated (first institutional
   user engagement sought)
 - Public launch preparation: README, CONTRIBUTING.md, and POLICY.md
   written for external contributors, not just internal agents
 
-**Dependencies:** Milestones 5–8 (methodology cannot be published before
+**Dependencies:** Milestones 5–12 (methodology cannot be published before
 the core modules are implemented and validated); external reviewer
-recruited no later than M8 midpoint
+recruited no later than M12 midpoint

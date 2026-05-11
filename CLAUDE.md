@@ -493,13 +493,15 @@ Full agent profiles and operational agent definitions: `docs/agents/domain-intel
 
 ## What We Are Building First
 
-M0–M5 complete (v0.1.0–v0.5.0). ADRs 001–006 current. See GitHub Releases
+M0–M7 complete (v0.1.0–v0.7.0). ADRs 001–006 current. See GitHub Releases
 for full delivery history.
 
-**Milestone 6 — Backtesting Coverage Expansion (Current)**
-- Five historical backtesting cases with DIRECTION_ONLY and MAGNITUDE thresholds
-- Backtesting fidelity dashboard surfacing case-by-case pass/fail in the UI
-- MAGNITUDE threshold calibration against historical outturns
+**Milestone 8 — Ecological and Governance Frameworks (Current)**
+- All four radar chart axes live with real data
+- Ecological Module complete; Governance Module complete
+- Coffin Corner / Policy Maneuver Margin Zone 1 indicator
+- MDA extended to ecological and governance indicators
+- End-of-milestone demo: all four radar axes simultaneously
 
 Each milestone is a vertical slice — working software at every stage,
 not infrastructure waiting for features.
@@ -508,34 +510,12 @@ not infrastructure waiting for features.
 
 ## Milestone Roadmap
 
-**Milestone 5 — Calibration and Uncertainty (Complete — v0.5.0)**
-Core deliverable: Simulation outputs as distributions; MacroeconomicModule
-with regime-dependent multipliers; Argentina 2001-2002 second backtesting
-case; DISTRIBUTION_COMBINED threshold infrastructure. See GitHub Releases for
-full delivery record.
+**Milestone 7 — Technical Foundation (Complete — v0.7.0)**
+Core deliverable: P0 technical debt resolved; compliance scan clean;
+defensive programming standards codified. See GitHub Releases for full
+delivery record.
 
-**Milestone 6 — Backtesting Coverage Expansion (Current)**
-Core deliverable: Five historical cases at calibrated fidelity thresholds;
-Ecological and Governance Modules initial implementation.
-
-Scope:
-- Three additional backtesting cases (five total including Greece and Argentina)
-- MAGNITUDE threshold calibration against historical outturns
-- Ecological Module initial implementation (planetary boundary proximity)
-- Governance Module initial implementation (institutional quality indicators)
-- Backtesting fidelity dashboard in the UI
-
-**Milestone 7 — Technical Foundation**
-Core deliverable: Resolve P0 deferred technical debt before Ecological and
-Governance Modules require a clean foundation.
-
-Exit criteria:
-- P0 deferred items resolved (datetime.utcnow() deprecations, engine_version
-  gap #139 resolved or formally deferred with ADR entry)
-- Compliance scan clean at milestone exit
-- All issues from M5/M6 deferred-to-M7 list triaged and closed or re-scoped
-
-**Milestone 8 — Ecological and Governance Frameworks**
+**Milestone 8 — Ecological and Governance Frameworks (Current)**
 Core deliverable: All four radar axes live; ecological and governance
 composite scores non-null for the first time.
 
@@ -543,16 +523,38 @@ Scope:
 - Ecological Module complete (planetary boundaries, natural capital depletion)
 - Governance Module complete (institutional quality, political freedom, rule of law)
 - All four radar chart axes live with real data
+- Coffin Corner indicator: Policy Maneuver Margin Zone 1 widget
+- MDA threshold system extended to ecological and governance indicators
 - ADR-005 reviewed and extended for Ecological/Governance framework coverage
+- End-of-milestone demo scenario (Greece 2010–2012 candidate)
 
-**Milestone 9 — Methodology Publication**
-Core deliverable: Methodology publication and external validation;
-Technical Steering Committee formation.
+**Milestone 9 — Standards Foundation**
+Core deliverable: Canonical unit registry, field-level data certification,
+and legibility framework. STD-REVIEW-004 gaps resolved.
 
 Scope:
-- Methodology publication and external validation
-- Technical Steering Committee formation
-- External contributor infrastructure
+- Canonical unit registry replacing `unit="dimensionless"` placeholders
+- Field-level certification chain and data admission tests
+- WGI territorial conventions documented
+- Legibility baseline audit and North Star legibility section
+- Domain Intelligence Council blind stakeholder interviews
+- M7 orphan issues triaged and closed
+
+**Milestone 10 — Engine Integrity and Backtesting**
+Core deliverable: Mean-reversion channels, Ecuador backtesting case,
+sparse matrix propagation foundation, interpretability tooling suite.
+
+**Milestone 11 — Political Economy and Conditionality**
+Core deliverable: IMF conditionality modeling, political feasibility
+constraints, elite capture dynamics, debt sustainability extension.
+
+**Milestone 12 — Analyst Tooling and External Sector**
+Core deliverable: Trade and external sector module; analyst tooling
+polished; branch protection and second governance account established.
+
+**Milestone 13 — Methodology Publication**
+Core deliverable: Methodology publication and external validation;
+Technical Steering Committee formation; public launch.
 
 Full roadmap: `docs/roadmap/milestone-roadmap-m6-m8.md`
 
