@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated:** 2026-05-17 (post-#309)
+**Last updated:** 2026-05-17 (post-#316/PR#321)
 **Current milestone:** M8 — Ecological and Governance Frameworks
 
 ---
@@ -15,7 +15,7 @@
 | Stream | Issues | Status | Gate |
 |---|---|---|---|
 | ADR-005 Amendment 3 | #218 ✅ | Merged ✅ (PR #309) — **M8 implementation unblocked** | None |
-| Greece fixture extension | #284 | Not started | Nothing — **activate Implementation Agent** |
+| Greece fixture extension | #284 ✅ | PR #321 open — feat/m8-greece-2015-extension | PR #321 merge |
 | EcologicalModule expansion | — | Not started | Nothing — **activate Implementation Agent** |
 | UI/UX issues | #265–268 | Not started | Nothing — **activate Frontend Architect** |
 | Demo scenario assembly | #269 | Not started | #284 + EcologicalModule |
@@ -28,11 +28,11 @@
 
 | PR | Title | Date |
 |---|---|---|
+| #321 | feat(backtesting): extend Greece fixture to 2015 — steps 4–6 (open — pending merge) | 2026-05-17 |
+| #311 | chore(state): SESSION_STATE.md update — PRs #307 and #309 merged, M8 unblocked | 2026-05-17 |
 | #310 | chore(state): SESSION_STATE.md update — ADR-005 Amendment 3 committed, PR #309 open | 2026-05-17 |
 | #309 | docs(adr): ADR-005 Amendment 3 — M8 Ecological Framework Completion | 2026-05-17 |
 | #308 | chore(state): SESSION_STATE.md update — PR #307 merged, Frontend Architect activated | 2026-05-17 |
-| #307 | docs(agents): activate Frontend Architect Agent and produce M8 component brief (#298) | 2026-05-17 |
-| #306 | chore(state): SESSION_STATE.md update — PR #305 merged | 2026-05-17 |
 
 ---
 
@@ -40,7 +40,7 @@
 
 | Issue | Title | Blocked by |
 |---|---|---|
-| #284 | Greece fixture extension to 2015 | Nothing — unblocked ✅ |
+| #284 | Greece fixture extension to 2015 | Closed ✅ — implemented via #316 / PR #321 |
 | #265 | Indicator display name mapping layer | Nothing — unblocked ✅ (brief: Area 3) |
 | #266 | Mandatory ecological note → Zone 3 expandable | Nothing — unblocked ✅ (brief: Area 4) |
 | #267 | Radar chart transition animation | Nothing — unblocked ✅ (brief: Area 5; requires Area 1 first) |
@@ -77,6 +77,7 @@
 
 | Decision | Rationale | Date |
 |---|---|---|
+| Greece fixture extended to 2015 (Issue #316) | Steps 4–6 added: GDP actuals, DIRECTION_ONLY thresholds, capital controls (step 6), ECOLOGICAL_COMPOSITE_DISCLOSURE per ADR-005 Amendment 3 Q1 disposition | 2026-05-17 |
 | ADR-005 Amendment 3 (Revision 2) accepted by EL | All 10 must-resolve panel findings + 5 Q dispositions incorporated; Revision 2 committed to ADR-005-human-cost-ledger.md via PR #309 | 2026-05-17 |
 | Frontend Architect Agent activated; M8 brief delivered with UX Designer sign-off | Five UI areas specified: null governance axis (cross-ADR type fix), PMM Zone 1C widget, display name registry, Zone 3A expandable, radar animation. All five unblocked with PR #309 merge | 2026-05-17 |
 | Intent block retrofit: no divergences found in five M7 functions | All five intent blocks consistent with implementations after scanning body post-write | 2026-05-16 |
