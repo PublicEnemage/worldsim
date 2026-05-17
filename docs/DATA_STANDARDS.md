@@ -1152,6 +1152,62 @@ These cases require special handling and may never be left to default behavior:
 - Ensure no World Bank or IMF aggregates silently include or exclude these
   without documentation
 
+### Source-Convention Conflict Resolution
+
+When a registered data source uses entity labels that encode territorial claims
+differing from WorldSim's declared positions, the source `SourceRegistration`
+entry must:
+
+1. **Document the specific label conflict** — identify which entity labels in the
+   source differ from WorldSim's ISO 3166-1 alpha-3 identifiers or declared
+   territorial positions.
+2. **Specify the resolution approach** — one of:
+   - `rename_at_load`: ISO 3166-1 alpha-3 substitution at the data loading boundary
+   - `provenance_note`: attach a provenance note to affected Quantities without
+     renaming (for cases where the source label carries analytical significance)
+   - `entity_exclusion`: exclude the entity from this source's data entirely
+3. **Require Data Architect Agent review** before that source is used in a
+   production simulation run.
+
+**The resolution must NOT be silent.** It must be:
+- Logged with a provenance note at load time (not applied invisibly in extraction code)
+- Documented in the `source_field_registry` entry for the affected field (Gap 2)
+
+#### WGI Territorial Convention — Taiwan
+
+The World Governance Indicators (WGI) dataset uses `"Taiwan, China"` as its
+entity label for TWN, encoding a contested territorial claim in a source identifier.
+
+This creates two problems:
+1. **Entity lookup failure:** A lookup for `"TWN"` (WorldSim ISO identifier) will
+   fail to match `"Taiwan, China"` without a resolution layer.
+2. **Political encoding conflict:** The label implies a sovereignty claim
+   inconsistent with WorldSim's declared Taiwan position (see `§High-Risk Specific
+   Cases — Taiwan (TWN)` above).
+
+**Resolution approach for WGI Taiwan data:** `rename_at_load` — rename to ISO
+3166-1 alpha-3 `"TWN"` at load time. The `source_field_registry` entry for every
+WGI field that includes Taiwan data must carry the following provenance note:
+
+> *"WGI label 'Taiwan, China' translated to TWN per ISO 3166-1 alpha-3 at load
+> time. WorldSim follows ISO 3166-1 for internal identifiers. This translation
+> does not constitute a political position on sovereignty. WorldSim's declared
+> Taiwan position: see DATA_STANDARDS.md §High-Risk Specific Cases — Taiwan (TWN)
+> and POLICY.md §Territorial Positions."*
+
+#### Governance Source Registration Requirement
+
+Any governance or geopolitical source registration must include a mandatory
+`territorial_convention_conflicts` field in its `SourceRegistration` entry. Sources
+with no conflicts record: `"No territorial convention conflicts identified."` Sources
+with conflicts document the conflict, the resolution approach, and require Data
+Architect Agent review before use in production simulation runs.
+
+This requirement applies to: WGI, Freedom House, V-Dem, RSF, Transparency
+International CPI, and any future governance indicator source.
+
+---
+
 ### Display Principle
 
 - Non-disputed cases: use the name the entity uses in its own official
@@ -1388,6 +1444,83 @@ exact `note` text:
 Substitute `lower` or `upper` as appropriate. Variations that say "truncated"
 or that omit the probability interpretation are prohibited — they understate
 what boundary pile-up means to the analyst reading the output.
+
+---
+
+## Field-Level Data Certification
+
+Source-level `SourceRegistration` certifies that a data source is approved and
+describes its coverage. It does not certify how individual fields within that
+source map to WorldSim's internal attribute space.
+
+This gap is the "naming-as-identity" failure class: `RL.EST` (WGI field name)
+and `rule_of_law_percentile` (WorldSim attribute) share a conceptual relationship,
+but the transformation between them — units, scaling, aggregation — is invisible
+to the system without explicit documentation. The inverse failure class ("reverse
+video") is two sources both having a field called "rule of law" that measure
+completely different things.
+
+### Certification Standard
+
+A source may not contribute data to a production simulation run unless all fields
+accessed from that source have a certified `source_field_registry` entry.
+
+A `source_field_registry` entry must document all of the following:
+
+| Field | Description |
+|---|---|
+| `source_id` | FK into the `SourceRegistration` or `LiteratureSourceRegistration` registry |
+| `source_field_identifier` | Exact field name in the source's own schema (e.g., `"RL.EST"` for WGI) |
+| `source_unit` | Unit of the field as published by the source (e.g., `"standard_normal_units"` for WGI RL.EST) |
+| `worldsim_attribute_key` | The WorldSim internal attribute this field maps to (e.g., `"rule_of_law_percentile"`) |
+| `worldsim_canonical_unit` | Must be drawn from `§Canonical Unit Registry` (e.g., `"percentile_0_100"`) |
+| `transformation_formula` | The exact formula or method used (e.g., `"percentile_rank_over_cross_section"`, `"linear_scale_to_0_100"`) |
+| `confidence_tier` | Tier assigned at the field level (may be stricter than source tier) |
+| `transformation_test_id` | Reference to a test that verifies the transformation on a known input/output pair from actual source data. Paper certification without a verification test is not sufficient. |
+| `data_architect_signoff_date` | Date of Data Architect Agent review and sign-off |
+
+### Chain of Custody Principle
+
+The three standards work together as a chain:
+
+1. **`§Canonical Unit Registry` (Gap 1)** — naming convention prevents mislabeling
+   at the Quantity construction layer
+2. **`§Field-Level Data Certification` (Gap 2)** — source-of-truth verification
+   that the transformation from source field to WorldSim attribute is documented
+   and tested
+3. **`§Source-Convention Conflict Resolution` (Gap 3, see §Territorial Positions
+   below)** — entity identity is resolved before field mapping, ensuring the
+   certified field mapping applies to the correct entity
+
+All three must be satisfied for a source field to be production-certified.
+
+### Dependent Field Documentation
+
+Where a field's meaning depends on the value of another field in the same record
+(e.g., record type determines column semantics), the dependency must be documented
+explicitly in the `source_field_registry` entry with the full resolution logic.
+
+This is mandatory for any source with record-type-dependent column semantics.
+WGI's `Estimate`, `StdErr`, `NumSrc`, `Rank`, `Lower`, `Upper` columns are
+all keyed by indicator code — any registry entry for a WGI field must document
+which indicator code selects the row.
+
+### M8 Certification Scope
+
+Any new source registered in M8 (WGI, Rockström planetary boundary data,
+expanded FAO data) must have draft `source_field_registry` entries for all
+fields accessed before those fields are used in module code.
+
+**Draft entries** require Engineering Lead acknowledgment.
+
+**Certified entries** require:
+1. Data Architect Agent review and sign-off date
+2. A passing `transformation_test_id` test — a test that verifies the transformation
+   on a known input/output pair from actual source data
+
+Full retroactive certification of all existing sources is M9 Standards Foundation
+scope (Issue #252). M8 new sources have no grace period — draft certification is
+required before first use in module code.
 
 ---
 
