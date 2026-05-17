@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated:** 2026-05-17 (post-#307)
+**Last updated:** 2026-05-17 (post-#309-open)
 **Current milestone:** M8 — Ecological and Governance Frameworks
 
 ---
@@ -14,13 +14,13 @@
 
 | Stream | Issues | Status | Gate |
 |---|---|---|---|
-| ADR-005 M8 amendment | #218 | Panel review complete (PR #303 ✅) — **EL disposition of 10 must-resolve findings required before Architect Agent revision** | **Critical path — blocks everything below** |
-| Intent block retrofit | #287 | Merged ✅ (PR #291) | None |
-| Greece fixture extension | #284 | Not started | ADR-005 (ecological axis) |
-| EcologicalModule expansion | — | Not started | ADR-005 |
-| UI/UX issues | #265–268 | Not started | ADR-005 dispatch architecture |
+| ADR-005 Amendment 3 | #218 ✅ | Revision 2 committed → **PR #309 open — EL merge unblocks all below** | PR #309 merge |
+| Greece fixture extension | #284 | Not started | PR #309 merge |
+| EcologicalModule expansion | — | Not started | PR #309 merge |
+| UI/UX issues | #265–268 | Not started | PR #309 merge (brief: frontend-m8-brief.md) |
 | Demo scenario assembly | #269 | Not started | #284 + EcologicalModule |
-| SESSION_STATE.md | — | Merged ✅ (PR #290, #292) | — |
+| Intent block retrofit | #287 | Merged ✅ (PR #291) | None |
+| Frontend Architect M8 brief | #298 ✅ | Merged ✅ (PR #307) | None |
 
 ---
 
@@ -28,11 +28,11 @@
 
 | PR | Title | Date |
 |---|---|---|
+| #309 | docs(adr): ADR-005 Amendment 3 — M8 Ecological Framework Completion (open — pending merge) | 2026-05-17 |
+| #308 | chore(state): SESSION_STATE.md update — PR #307 merged, Frontend Architect activated, #298 closed | 2026-05-17 |
 | #307 | docs(agents): activate Frontend Architect Agent and produce M8 component brief (#298) | 2026-05-17 |
+| #306 | chore(state): SESSION_STATE.md update — PR #305 merged | 2026-05-17 |
 | #305 | docs(process): agents.md — migrate all agent personas from CLAUDE.md (#297) | 2026-05-17 |
-| #303 | docs: ADR-005 Amendment 3 panel synthesis — four-agent review | 2026-05-17 |
-| #302 | chore(state): SESSION_STATE.md update — issues #297–#301 filed, ADR-005 draft produced | 2026-05-17 |
-| #295 | ci: auto-merge SESSION_STATE.md-only PRs | 2026-05-17 |
 
 ---
 
@@ -40,12 +40,11 @@
 
 | Issue | Title | Blocked by |
 |---|---|---|
-| #218 | ADR-005 M8 amendment (causal meta-map) | Nothing — activate Architect Agent |
-| #284 | Greece fixture extension to 2015 | ADR-005 |
-| #265 | Indicator display name mapping layer | ADR-005 (brief: frontend-m8-brief.md Area 3) |
-| #266 | Mandatory ecological note → Zone 3 expandable | ADR-005 (brief: frontend-m8-brief.md Area 4) |
-| #267 | Radar chart transition animation | ADR-005 (brief: frontend-m8-brief.md Area 5) |
-| #268 | Coffin Corner / PMM Zone 1 widget | ADR-005 (brief: frontend-m8-brief.md Area 2) |
+| #284 | Greece fixture extension to 2015 | PR #309 merge |
+| #265 | Indicator display name mapping layer | PR #309 merge (brief: frontend-m8-brief.md Area 3) |
+| #266 | Mandatory ecological note → Zone 3 expandable | PR #309 merge (brief: frontend-m8-brief.md Area 4) |
+| #267 | Radar chart transition animation | PR #309 merge (brief: frontend-m8-brief.md Area 5) |
+| #268 | Coffin Corner / PMM Zone 1 widget | PR #309 merge (brief: frontend-m8-brief.md Area 2) |
 | #269 | Demo scenario — Greece 2010–2015 | #284 + EcologicalModule |
 
 ---
@@ -70,9 +69,8 @@
 
 | Decision | Context | Status |
 |---|---|---|
-| ADR-005 M8 amendment — disposition of panel findings | Synthesis at `docs/architecture/adr-005-amendment3-panel-synthesis.md` (PR #303). 10 must-resolve items before Architect Agent revision; 12 should-resolve before implementation. See §ADR-005 Panel Findings below. | **Ready for EL disposition** |
+| PR #309 merge | ADR-005 Amendment 3 (Revision 2) committed. Merge unblocks all M8 implementation. | **Ready to merge** |
 | GovernanceModule promotion path | Deferred from M8 demo — five criteria not yet met — target M9 | Decided: deferred |
-| Agent roster expansion | #297 merged (PR #305); #298 merged (PR #307) — Frontend Architect active, M8 brief delivered; #299 and #300 unblocked | #297 ✅ #298 ✅ — #301 blocked on #299, #300 |
 
 ---
 
@@ -80,7 +78,8 @@
 
 | Decision | Rationale | Date |
 |---|---|---|
-| Frontend Architect Agent activated; M8 brief delivered with UX Designer sign-off | Five UI areas specified: null governance axis (cross-ADR type fix), PMM Zone 1C widget, display name registry, Zone 3A expandable, radar animation. #265–268 unblocked pending ADR-005 disposition | 2026-05-17 |
+| ADR-005 Amendment 3 (Revision 2) accepted by EL | All 10 must-resolve panel findings + 5 Q dispositions incorporated; Revision 2 committed to ADR-005-human-cost-ledger.md via PR #309 | 2026-05-17 |
+| Frontend Architect Agent activated; M8 brief delivered with UX Designer sign-off | Five UI areas specified: null governance axis (cross-ADR type fix), PMM Zone 1C widget, display name registry, Zone 3A expandable, radar animation. #265–268 unblocked pending PR #309 merge | 2026-05-17 |
 | Intent block retrofit: no divergences found in five M7 functions | All five intent blocks consistent with implementations after scanning body post-write | 2026-05-16 |
 | UX Agent ruling: Option B — three-axis demo, governance null, Greece 2015 | Three-axis + honest null axis is stronger for methodology reviewers than waiting for governance; 2015 extension required to show financial/human development divergence | 2026-05-16 |
 | GovernanceModule deferred from M8 demo | Five promotion criteria not met; null axis with "in validation" label is methodologically correct per information-hierarchy.md Zone 1B | 2026-05-16 |
@@ -94,28 +93,19 @@
 
 ## Architectural State — Key Facts for Session Continuity
 
-**ADR-005 M8 amendment — panel review complete (PR #303 merged). Draft at `origin/docs/adr-005-amendment3-draft`. Not yet committed to `ADR-005-human-cost-ledger.md`.**
+**ADR-005 Amendment 3 — committed to `docs/adr/ADR-005-human-cost-ledger.md` on branch `docs/adr-005-amendment3`. PR #309 open. Merge unblocks all M8 implementation.**
 
-Six decisions stand as drafted; panel identified revisions required before acceptance. EL disposition needed on:
+Six decisions accepted (Revision 2 — incorporates 10 must-resolve panel findings + 5 Q dispositions):
+- **M8-1:** Boundary proximity normalization — `min(v/b, 2.0)` for absolute-scale; `min(v, 2.0)` for pre-normalized; `_ECOLOGICAL_MANDATORY_NOTE_TEMPLATE` with `{n_indicators}` slot; `[0.0,2.0]` range cross-ADR obligation; effective-at-simulation-time query
+- **M8-2:** `_SINGLE_ENTITY_GUARD_EXEMPT_FRAMEWORKS: frozenset({"ecological"})` — ecological exempt from is_single_entity guard
+- **M8-3:** Three-branch dispatch; `_PERCENTILE_RANK_VALIDATED_FRAMEWORKS`; `[SIM-INTEGRITY]` WARNING for unregistered; `db_connection` + `scenario_timestep` added (breaking change — all callers update in same commit); `CompositeStrategy` TypeAlias
+- **M8-4:** Governance deferred to M9; all 5 criteria Not met; M9 amendment must audit for absolute thresholds before confirming percentile rank (supersedes Amendment 1 Q4)
+- **M8-5:** Null governance axis — dashed, `"—"`, `"in validation"`; `RadarAxisDatum.composite_score: number | null` TypeScript obligation same commit
+- **M8-6:** `planetary_boundary_co2_proximity` + `planetary_boundary_land_use_proximity`; land-use: `min(land_use_pressure_index, 2.0)` (no division — confirmed by code inspection); stock-not-delta path; `confidence_tier` Alembic migration; co2 = Tier 2, land-use = Tier 3
 
-**Must-resolve (10 items — blocks Architect Agent revision):**
-- M8-1: DB access call chain for boundary constants unspecified; `FrameworkOutput` schema range conflict `[0.0,1.0]` vs `[0.0,2.0]`; equal-weighting assumption undeclared; cap-at-2.0 discriminating-power loss undisclosed
-- M8-3: Silent fallback applies percentile rank to any unregistered future framework (category error risk); "signature unchanged" claim incompatible with strategy needing DB-fetched constants
-- M8-5: `RadarAxisDatum.composite_score: number` type cannot represent em dash `"—"` — cross-ADR same-commit update to Decision 4 interface required
-- M8-6: `land_use_pressure_index` dimensional ambiguity (double-normalization risk); delta vs. stock computation pattern (proximity needs `entity.attributes`, not event delta); boundary constants lack `confidence_tier` field
+**Draft file status:** `docs/architecture/adr-005-amendment3-draft.md` updated to ACCEPTED — historical record.
 
-**Q1–Q5 panel dispositions (unanimous unless noted):**
-- Q1: Use effective-at-simulation-time constants (4/4) — Greece fixture gets CO2-only ecological composite throughout
-- Q2: Per-entity mean, not intersection (4/4) — add contributing indicator count to note
-- Q3: M9 must re-examine governance for absolute threshold equivalents before confirming percentile rank (4/4)
-- Q4: Static string through M10 with lightweight dynamic indicator count, two renewal triggers (3/4 + modification)
-- Q5: ADR holds contract; design-decisions.md cross-references by decision number only (4/4)
-
-**Highest-risk decision: M8-3 (2/4 votes).** Two specification additions needed: (1) `_PERCENTILE_RANK_VALIDATED_FRAMEWORKS` frozenset + `[SIM-INTEGRITY]` WARNING for unvalidated fallback; (2) `context: dict[str, Any]` parameter to carry pre-fetched boundary constants through strategy dispatch.
-
-**Next step:** EL reviews synthesis, dispositions findings, then Architect Agent produces revised amendment draft.
-
-**Frontend Architect brief — M8 component architecture at `docs/architecture/frontend-m8-brief.md` (PR #307). UX Designer sign-off recorded. Five areas specified with dependency ordering: Area 1 (null governance type fix) must land before Area 5 (animation). Areas 2, 3, 4 can run in parallel. All five areas blocked on ADR-005 amendment acceptance.**
+**Frontend Architect brief — `docs/architecture/frontend-m8-brief.md` (PR #307). Area 1 (null governance type fix) must land before Area 5 (animation). Areas 2, 3, 4 parallel. All five blocked on PR #309 merge.**
 
 **Standards state:**
 - Canonical unit registry: in DATA_STANDARDS.md §Canonical Unit Registry (PR #282)
