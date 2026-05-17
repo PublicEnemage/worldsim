@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated:** 2026-05-17 (post-#295)
+**Last updated:** 2026-05-17 (post-#301)
 **Current milestone:** M8 — Ecological and Governance Frameworks
 
 ---
@@ -47,6 +47,8 @@
 | #267 | Radar chart transition animation | ADR-005 |
 | #268 | Coffin Corner / PMM Zone 1 widget | ADR-005 |
 | #269 | Demo scenario — Greece 2010–2015 | #284 + EcologicalModule |
+| #297 | CLAUDE.md carve-out — agents.md persona file | Nothing — **prerequisite for #298, #299, #300, #301** |
+| #298 | Frontend Architect Agent activation + M8 brief | #297 agents.md, ADR-005 amendment |
 
 ---
 
@@ -60,6 +62,9 @@
 | #233 | Screenshot artifact bundle | Demo scenario #269 |
 | #221 | Mean-reversion channel (Greece MAGNITUDE) | ADR-005 |
 | #222 | Contemporaneous processing path | ADR-005 |
+| #299 | Intent Block Author Agent — define in agents.md | #297 agents.md |
+| #300 | Data Quality Agent — define in agents.md (M9) | #297 agents.md |
+| #301 | agent-raci.md — RACI chart for all agents | #297, #298, #299, #300 |
 
 ---
 
@@ -67,9 +72,10 @@
 
 | Decision | Context | Status |
 |---|---|---|
-| ADR-005 M8 amendment disposition | After five-agent panel review (Data Architect, QA Lead, Ecological Economist, Chief Methodologist) | Awaiting Architect Agent draft |
+| ADR-005 M8 amendment disposition | After five-agent panel review (Data Architect, QA Lead, Ecological Economist, Chief Methodologist) | Awaiting Architect Agent draft — draft text produced this session |
 | GovernanceModule promotion path | Deferred from M8 demo — five criteria not yet met — target M9 | Decided: deferred |
 | SESSION_STATE.md adoption | This file — approve and merge | Done ✅ (PR #290, #292) |
+| Agent roster expansion | Five issues filed (#297–#301); #297 agents.md carve-out is horizon:immediate and must execute before any new agent personas are added to CLAUDE.md | Issues filed — awaiting execution |
 
 ---
 
@@ -90,7 +96,7 @@
 
 ## Architectural State — Key Facts for Session Continuity
 
-**ADR-005 M8 amendment scope (not yet drafted):**
+**ADR-005 M8 amendment scope (draft produced this session — awaiting panel review and EL disposition before commit):**
 - Decision 1: Boundary normalization formula `min(current_value / boundary_value, 2.0)` using `simulation_reference_constants`
 - Decision 2: `is_single_entity` guard exempt for ecological (boundary scores meaningful for single entity)
 - Decision 3: `_compute_composite_score()` strategy dispatch — routes ecological to boundary proximity, financial/human_development to percentile rank, governance registration point TBD
