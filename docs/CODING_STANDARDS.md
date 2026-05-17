@@ -1377,6 +1377,129 @@ a prerequisite for the tool's credibility.
 
 ---
 
+## Intent Blocks
+
+### Purpose
+
+An intent block is a structured comment block placed immediately above a non-trivial
+function. It documents what the function is *supposed to do* — written before reading
+the implementation — rather than describing what the code *does*. Divergences between
+the intent block and the implementation are findings, not errors to resolve by updating
+the intent block to match the code.
+
+This is the ratified format for Issue #258 (mandatory intent blocks) and the primary
+input to the spec-to-test gap check (Issue #286). Intent blocks not following this
+format are not parseable by the gap check script and do not satisfy the enforcement
+requirement. The first retrofit cohort is Issue #287 (five M7 blind audit functions).
+
+### Format
+
+```python
+# INTENT: [one sentence — what this function is supposed to do, written
+#          before reading the implementation]
+# PRECONDITIONS: [what must be true before this runs — caller guarantees,
+#                 state requirements, invariants assumed not verified]
+# POSTCONDITIONS: [what is guaranteed to be true after — outputs produced,
+#                  state changes made]
+# ERROR CASES: [inputs or states that produce incorrect, empty, or silent
+#               output — not exceptions, but wrong answers]
+# KNOWN LIMITATIONS: [what this function explicitly does not handle —
+#                     documented scope boundaries]
+def the_function(...):
+```
+
+The five field names are fixed. The delimiter is `: ` (colon + space). Continuation
+lines use `#` with leading spaces to align with the field text.
+
+### Field Definitions
+
+**INTENT** — One sentence. Written from the function signature, docstring, and test
+file — not from the implementation body. Answers: "What is this function contracted
+to produce for its caller?" Not "How does it produce it?"
+
+**PRECONDITIONS** — What the caller must guarantee before calling this function.
+State requirements, type invariants, ordering constraints, and assumptions that the
+function does not verify internally. A precondition violation produces undefined
+behavior — it is the caller's responsibility, not this function's.
+
+**POSTCONDITIONS** — What is guaranteed to be true when the function returns normally.
+Outputs produced, state mutations made, side effects with a defined contract. These
+are the properties a test can assert on.
+
+**ERROR CASES** — Inputs or states that produce incorrect, empty, or silent output
+without raising an exception. Not exception conditions — those belong in the docstring.
+ERROR CASES are the silent failure modes: the input that makes the function return `[]`
+when it should return results, the state that makes it return a stale value, the
+combination that causes a `[SIM-INTEGRITY]` WARNING and a data drop. These are the
+primary targets for the spec-to-test gap check (Issue #286).
+
+**KNOWN LIMITATIONS** — Explicit scope boundaries: what this function does not handle,
+does not validate, and does not claim to cover. A known limitation is not a bug — it is
+a documented boundary. A developer reading this field knows where the function's
+contract ends and the caller's responsibility begins.
+
+### Which Functions Require an Intent Block
+
+A function is **non-trivial** and requires an intent block if it meets any of:
+
+- More than one code path (any `if` branch, `for` loop, `try/except`)
+- Produces simulation outputs (returns `list[Event]`, modifies state, writes to DB)
+- Accesses external state (reads entity attributes, queries DB, calls a service)
+
+Trivial pure-transformation helpers with one code path do not require intent blocks.
+When in doubt, write one.
+
+### Independence Requirement
+
+Intent blocks authored as **retrofit** on existing functions must be written from:
+
+1. The function signature
+2. The existing docstring, if present
+3. The test file for that function
+
+The implementation body must **not** be read before the intent block is written.
+Confirm this in the PR description with the phrase: *"intent blocks authored without
+reading implementation body."*
+
+The independence requirement is not process theater. A developer who reads the
+implementation before writing the intent block describes what the code does rather
+than what it should do — and misses the divergences that are the primary output of
+the exercise. The divergence between intent and implementation is the signal worth
+finding. When a divergence is found, file it as an issue rather than correcting the
+intent block to match the code.
+
+For new functions, write the intent block before writing the implementation body.
+
+### Machine-Parseability
+
+The five field names (`INTENT`, `PRECONDITIONS`, `POSTCONDITIONS`, `ERROR CASES`,
+`KNOWN LIMITATIONS`) are fixed and must not be altered or abbreviated. The format
+`# FIELD_NAME: ` with a space after the colon is required for the gap check parser.
+
+The spec-to-test gap check (Issue #286) parses `PRECONDITIONS` and `ERROR CASES`
+fields across `backend/app/` and matches each claim against the test file for the
+enclosing module. A claim with no corresponding test is a gap entry in CI output.
+
+### Enforcement
+
+**New M8 PRs:** Intent blocks required on all new or modified non-trivial functions
+at PR submission. Reviewers must reject PRs that add non-trivial functions without
+intent blocks.
+
+**Retrofit scope:** Issue #287 is the first retrofit cohort — the five functions
+identified in the M7 blind code audit. Phasing for subsequent cohorts is tracked
+in Issue #258.
+
+**CI (Issue #286):** Spec-to-test gap check runs after the unit test suite.
+M8: warning only; gap count and coverage rate reported per module. M9: failure
+gate at a threshold set when the first cohort retrofit completes.
+
+**Legibility audit (Issue #257):** Intent blocks are reviewed during the recurring
+blind code audit. An intent block that describes what the code does rather than what
+it should do is a legibility finding, not a passing annotation.
+
+---
+
 ## Framework Promotion Protocol
 
 ### What Framework Promotion Is
