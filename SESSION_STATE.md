@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated:** 2026-05-17
+**Last updated:** 2026-05-17 (post-#293)
 **Current milestone:** M8 — Ecological and Governance Frameworks
 
 ---
@@ -28,6 +28,7 @@
 
 | PR | Title | Date |
 |---|---|---|
+| #293 | chore(state): SESSION_STATE.md update — PR #291 and #292 merged | 2026-05-17 |
 | #292 | chore(state): SESSION_STATE.md update — session 2 | 2026-05-17 |
 | #291 | chore(legibility): retrofit intent blocks on five M7 blind audit functions | 2026-05-17 |
 | #290 | docs(process): add SESSION_STATE.md and CLAUDE.md §Session Continuity | 2026-05-16 |
