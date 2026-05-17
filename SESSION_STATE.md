@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated:** 2026-05-16 (session 2)
+**Last updated:** 2026-05-17
 **Current milestone:** M8 — Ecological and Governance Frameworks
 
 ---
@@ -15,12 +15,12 @@
 | Stream | Issues | Status | Gate |
 |---|---|---|---|
 | ADR-005 M8 amendment | #218 | Not started — Architect Agent ready to activate | **Critical path — blocks everything below** |
-| Intent block retrofit | #287 | PR #291 open — awaiting merge | None |
+| Intent block retrofit | #287 | Merged ✅ (PR #291) | None |
 | Greece fixture extension | #284 | Not started | ADR-005 (ecological axis) |
 | EcologicalModule expansion | — | Not started | ADR-005 |
 | UI/UX issues | #265–268 | Not started | ADR-005 dispatch architecture |
 | Demo scenario assembly | #269 | Not started | #284 + EcologicalModule |
-| SESSION_STATE.md | — | In flight | — |
+| SESSION_STATE.md | — | Merged ✅ (PR #290, #292) | — |
 
 ---
 
@@ -28,12 +28,11 @@
 
 | PR | Title | Date |
 |---|---|---|
-| #291 | chore(legibility): retrofit intent blocks on five M7 blind audit functions | 2026-05-16 |
+| #292 | chore(state): SESSION_STATE.md update — session 2 | 2026-05-17 |
+| #291 | chore(legibility): retrofit intent blocks on five M7 blind audit functions | 2026-05-17 |
+| #290 | docs(process): add SESSION_STATE.md and CLAUDE.md §Session Continuity | 2026-05-16 |
 | #289 | fix(legibility): contextlib.suppress → [SIM-INTEGRITY] warning (#279); _accumulate() docstring (#280) | 2026-05-16 |
 | #288 | docs(standards): ratify intent block format — §Intent Blocks in CODING_STANDARDS.md | 2026-05-16 |
-| #283 | docs(process): disposition-review-standard — generative agent consultation before dispositions | 2026-05-16 |
-| #282 | docs(standards): STD-REVIEW-004 EL dispositions — all six gaps, three-agent panel informed | 2026-05-16 |
-| #281 | docs: M8 pre-implementation gates — legibility baseline, North Star standard, blind audit | 2026-05-11 |
 
 ---
 
@@ -57,7 +56,7 @@
 |---|---|---|
 | #258 | Mandatory intent blocks | #285 (merged ✅) |
 | #286 | Spec-to-test gap check script | #285 (merged ✅) |
-| #287 | Intent block retrofit — five M7 audit functions | #285 (merged ✅) — PR #291 open |
+| #287 | Intent block retrofit — five M7 audit functions | Merged ✅ PR #291 |
 | #233 | Screenshot artifact bundle | Demo scenario #269 |
 | #221 | Mean-reversion channel (Greece MAGNITUDE) | ADR-005 |
 | #222 | Contemporaneous processing path | ADR-005 |
@@ -70,7 +69,7 @@
 |---|---|---|
 | ADR-005 M8 amendment disposition | After five-agent panel review (Data Architect, QA Lead, Ecological Economist, Chief Methodologist) | Awaiting Architect Agent draft |
 | GovernanceModule promotion path | Deferred from M8 demo — five criteria not yet met — target M9 | Decided: deferred |
-| SESSION_STATE.md adoption | This file — approve and merge | In flight |
+| SESSION_STATE.md adoption | This file — approve and merge | Done ✅ (PR #290, #292) |
 
 ---
 
