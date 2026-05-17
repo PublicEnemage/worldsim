@@ -83,6 +83,27 @@ class EcologicalModule(SimulationModule):
     composite score methodology (ADR-005 Amendment 1 §Amendment B M8 obligation).
     """
 
+    # INTENT: Translate prior-step events for one country entity into ecological
+    #         indicator Quantity-delta Events using the elasticity registry.
+    # PRECONDITIONS: entity is a SimulationEntity with entity_type; state.events
+    #                contains the prior timestep's events (one-step lag design —
+    #                ecological effects of GDP and fiscal changes appear with a
+    #                structural delay); timestep is the current simulation step.
+    # POSTCONDITIONS: Returns a list of Events with framework=ECOLOGICAL and
+    #                 event_type='ecological_indicator_update'; returns [] for
+    #                 non-country entities or when no subscribed events are found
+    #                 in state.events for this entity. All Quantity values use
+    #                 Decimal arithmetic. A DEBUG log is emitted when prior_events
+    #                 is empty.
+    # ERROR CASES: Subscribed events with no matching elasticity registry entry
+    #              produce no output (silently ignored); magnitude extraction
+    #              failure for an event causes that event to be skipped.
+    # KNOWN LIMITATIONS: Ecological effects are computed via a linear elasticity
+    #                    approximation — non-linear threshold effects and
+    #                    irreversibility are not modelled. Only co2_concentration_ppm
+    #                    and land_use_pressure_index are produced at M6 scope;
+    #                    planetary boundary absolute normalization is deferred
+    #                    to M8 (ADR-005 Amendment B obligation).
     def compute(
         self,
         entity: SimulationEntity,

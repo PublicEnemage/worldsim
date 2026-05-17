@@ -85,6 +85,27 @@ def _resolve_git_commit_hash() -> str:
 _GIT_COMMIT_HASH: str = _resolve_git_commit_hash()
 
 
+# INTENT: Enforce engine version compatibility before tombstone reconstruction
+#         by comparing the tombstone's engine_version and git_commit_hash
+#         against the currently deployed engine.
+# PRECONDITIONS: tombstone_engine_version is the engine_version string stored
+#                in the tombstone row; tombstone_git_commit_hash is the
+#                git_commit_hash stored in the tombstone row, or None for
+#                pre-migration tombstones; force_audit_override is False by
+#                default (safe path).
+# POSTCONDITIONS: Returns None when tombstone is compatible with the live
+#                 engine; the caller may proceed with reconstruction. When
+#                 force_audit_override=True and a mismatch is detected, a
+#                 WARNING is logged and None is returned; no exception raised.
+# ERROR CASES: Version mismatch raises HTTPException(409) with both tombstone
+#              and live engine_version in the detail string. Hash mismatch
+#              (when both sides carry a resolved hash) raises HTTPException(409)
+#              with both hashes in the detail string.
+# KNOWN LIMITATIONS: NULL tombstone hash (pre-migration tombstone) or
+#                    "unknown" on either side disables hash comparison and
+#                    falls back to semantic version comparison alone — a hash
+#                    collision between different non-git builds cannot be
+#                    detected in this mode.
 def check_reconstruction_compatibility(
     tombstone_engine_version: str,
     tombstone_git_commit_hash: str | None,

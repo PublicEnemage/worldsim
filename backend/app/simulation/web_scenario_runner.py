@@ -668,6 +668,26 @@ async def _load_prior_breach_events(
     return list(raw) if isinstance(raw, list) else []
 
 
+# INTENT: Rebuild a SimulationState from a database snapshot row by fetching
+#         entity metadata and deserialising per-entity attribute envelopes.
+# PRECONDITIONS: conn is an open asyncpg connection; scenario_id and
+#                scenario_name identify a valid scenario; state_data is a
+#                dict mapping entity_id strings to attribute envelope dicts
+#                in SA-09 format; timestep is a timezone-aware datetime.
+# POSTCONDITIONS: Returns a SimulationState whose entities contain
+#                 deserialized Quantity attributes from the snapshot; entities
+#                 absent from simulation_entities are silently skipped;
+#                 malformed attribute envelopes emit a [SIM-INTEGRITY] WARNING
+#                 and are omitted from the reconstructed entity, preserving
+#                 valid attributes from the same entity.
+# ERROR CASES: An attribute envelope that triggers ValueError, KeyError, or
+#              decimal.InvalidOperation during deserialization is skipped with
+#              a [SIM-INTEGRITY] WARNING; the partial entity is still added
+#              with all successfully deserialized attributes.
+# KNOWN LIMITATIONS: Does not validate cross-entity relationship consistency;
+#                    entity_type and metadata come from the live database, not
+#                    the snapshot — divergence between live and snapshot entity
+#                    records is not detected.
 async def _reconstruct_state_from_snapshot(
     conn: asyncpg.Connection,
     scenario_id: str,
