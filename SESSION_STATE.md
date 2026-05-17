@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated:** 2026-05-16
+**Last updated:** 2026-05-16 (session 2)
 **Current milestone:** M8 — Ecological and Governance Frameworks
 
 ---
@@ -15,7 +15,7 @@
 | Stream | Issues | Status | Gate |
 |---|---|---|---|
 | ADR-005 M8 amendment | #218 | Not started — Architect Agent ready to activate | **Critical path — blocks everything below** |
-| Intent block retrofit | #287 | Unblocked | None |
+| Intent block retrofit | #287 | PR #291 open — awaiting merge | None |
 | Greece fixture extension | #284 | Not started | ADR-005 (ecological axis) |
 | EcologicalModule expansion | — | Not started | ADR-005 |
 | UI/UX issues | #265–268 | Not started | ADR-005 dispatch architecture |
@@ -28,6 +28,7 @@
 
 | PR | Title | Date |
 |---|---|---|
+| #291 | chore(legibility): retrofit intent blocks on five M7 blind audit functions | 2026-05-16 |
 | #289 | fix(legibility): contextlib.suppress → [SIM-INTEGRITY] warning (#279); _accumulate() docstring (#280) | 2026-05-16 |
 | #288 | docs(standards): ratify intent block format — §Intent Blocks in CODING_STANDARDS.md | 2026-05-16 |
 | #283 | docs(process): disposition-review-standard — generative agent consultation before dispositions | 2026-05-16 |
@@ -56,7 +57,7 @@
 |---|---|---|
 | #258 | Mandatory intent blocks | #285 (merged ✅) |
 | #286 | Spec-to-test gap check script | #285 (merged ✅) |
-| #287 | Intent block retrofit — five M7 audit functions | #285 (merged ✅) |
+| #287 | Intent block retrofit — five M7 audit functions | #285 (merged ✅) — PR #291 open |
 | #233 | Screenshot artifact bundle | Demo scenario #269 |
 | #221 | Mean-reversion channel (Greece MAGNITUDE) | ADR-005 |
 | #222 | Contemporaneous processing path | ADR-005 |
@@ -77,6 +78,7 @@
 
 | Decision | Rationale | Date |
 |---|---|---|
+| Intent block retrofit: no divergences found in five M7 functions | All five intent blocks consistent with implementations after scanning body post-write | 2026-05-16 |
 | UX Agent ruling: Option B — three-axis demo, governance null, Greece 2015 | Three-axis + honest null axis is stronger for methodology reviewers than waiting for governance; 2015 extension required to show financial/human development divergence | 2026-05-16 |
 | GovernanceModule deferred from M8 demo | Five promotion criteria not met; null axis with "in validation" label is methodologically correct per information-hierarchy.md Zone 1B | 2026-05-16 |
 | STD-REVIEW-004 all six gaps: ACCEPT | Three-agent panel (Data Architect, QA Lead, Architect) informed all dispositions; 10 substantive improvements over draft | 2026-05-16 |
