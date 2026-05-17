@@ -1,7 +1,8 @@
-"""Greece 2010–2012 backtesting test — ADR-004 Decision 3, Issue #112.
+"""Greece 2010–2015 backtesting test — ADR-004 Decision 3, Issue #112, Issue #316.
 
-This is the primary fidelity gate for Milestone 3. It creates and runs the
-Greece 2010–2012 IMF program scenario, retrieves the simulation snapshots, and
+This is the primary fidelity gate for Milestone 3 (steps 1–3) and the M8
+stabilization-period extension (steps 4–6). It creates and runs the Greece
+2010–2015 IMF program scenario, retrieves the simulation snapshots, and
 evaluates DIRECTION_ONLY fidelity thresholds against the historical actuals.
 
 A failure here is a build failure. The first time this test passes in CI is
@@ -35,6 +36,7 @@ from tests.backtesting.fidelity_report import (
 )
 from tests.fixtures.greece_2010_2012_actuals import (
     ACTUALS,
+    ECOLOGICAL_COMPOSITE_DISCLOSURE,
     IA1_DISCLOSURE,
     PARAMETER_CALIBRATION_DISCLOSURE,
 )
@@ -111,9 +113,9 @@ async def _create_and_run_scenario(
 async def test_greece_2010_2012_direction_only_fidelity(
     client: httpx.AsyncClient,
 ) -> None:
-    """Greece 2010–2012 DIRECTION_ONLY fidelity gate — ADR-004 Decision 3.
+    """Greece 2010–2015 DIRECTION_ONLY fidelity gate — ADR-004 Decision 3, Issue #316.
 
-    Thresholds checked:
+    Thresholds checked (steps 1–3, contraction period):
       - gdp_growth at steps 1, 2, 3 must be negative (contraction predicted).
         Rationale: ACTUALS show -5.4%, -8.9%, -6.6%. Simulation must predict
         contraction, not growth. This is a DIRECTION_ONLY check — the
@@ -123,8 +125,13 @@ async def test_greece_2010_2012_direction_only_fidelity(
         This replaces the previous step1→step3 check which was vacuous when no
         initial unemployment was seeded (Issue #149, resolved).
 
+    Thresholds checked (steps 4–6, stabilization period — Issue #316):
+      - gdp_growth at step 4 must be negative (-3.2%, 2013 continued contraction).
+      - gdp_growth at step 5 must be positive (+0.7%, 2014 brief recovery).
+      - gdp_growth at step 6 must be negative (-0.4%, 2015 capital controls).
+
     KNOWN LIMITATION: Parameter calibration tier system not yet implemented
-    (Issue #44). Magnitude accuracy is not evaluated in M3.
+    (Issue #44). Magnitude accuracy is not evaluated in M3/M8.
     """
     scenario_id, snapshots = await _create_and_run_scenario(client)
 
@@ -143,12 +150,26 @@ async def test_greece_2010_2012_direction_only_fidelity(
                 val = _extract_gdp_value(snap)
                 thresholds_met[key] = val is not None and val < Decimal("0")
 
+        # DIRECTION_ONLY steps 4–6: negative, positive, negative (Issue #316)
+        snap4 = snapshots_by_step.get(4)
+        val4 = _extract_gdp_value(snap4) if snap4 else None
+        thresholds_met["gdp_growth_step4_negative"] = val4 is not None and val4 < Decimal("0")
+
+        snap5 = snapshots_by_step.get(5)
+        val5 = _extract_gdp_value(snap5) if snap5 else None
+        thresholds_met["gdp_growth_step5_positive"] = val5 is not None and val5 > Decimal("0")
+
+        snap6 = snapshots_by_step.get(6)
+        val6 = _extract_gdp_value(snap6) if snap6 else None
+        thresholds_met["gdp_growth_step6_negative"] = val6 is not None and val6 < Decimal("0")
+
         # Unemployment direction threshold deferred: no endogenous module updates
         # unemployment_rate yet (module-capability-registry.md). The WDI seed sets
         # initial unemployment but the value stays flat across steps. Re-enable
         # this threshold when the Macroeconomic/Demographic module is implemented.
 
-        # HCL deferred thresholds — tracked in fidelity report, not blocking CI (Issue #87)
+        # HCL / unemployment deferred thresholds — tracked in fidelity report,
+        # not blocking CI (Issue #87)
         snap1 = snapshots_by_step.get(1)
         snap2 = snapshots_by_step.get(2)
         unemp1 = _extract_unemployment_value(snap1) if snap1 else None
@@ -159,6 +180,18 @@ async def test_greece_2010_2012_direction_only_fidelity(
         unemp_rising = (unemp1 is not None and unemp2 is not None and unemp2 > unemp1)
         health_declining = (health1 is not None and health2 is not None and health2 < health1)
 
+        # Steps 4–6 unemployment declining from 27.5% peak (deferred — same reason)
+        unemp4 = _extract_unemployment_value(snap4) if snap4 else None
+        unemp5 = _extract_unemployment_value(snap5) if snap5 else None
+        unemp6 = _extract_unemployment_value(snap6) if snap6 else None
+        unemp_declining_4_to_6 = (
+            unemp4 is not None
+            and unemp5 is not None
+            and unemp6 is not None
+            and unemp5 < unemp4
+            and unemp6 < unemp5
+        )
+
         deferred_thresholds: dict[str, str] = {
             "unemployment_rising_step1_to_step2": (
                 "PASS" if unemp_rising
@@ -168,11 +201,15 @@ async def test_greece_2010_2012_direction_only_fidelity(
                 "PASS" if health_declining
                 else "FAIL — no endogenous module updates health_expenditure_pct_gdp (Issue #87)"
             ),
+            "unemployment_declining_step4_to_step6": (
+                "PASS" if unemp_declining_4_to_6
+                else "FAIL — no endogenous module updates unemployment_rate (Issue #87)"
+            ),
         }
 
         # Print fidelity report to stdout (appears in CI logs on every run)
         report = format_fidelity_report(
-            scenario_name="Greece 2010-2012 IMF Program Backtesting Fixture",
+            scenario_name="Greece 2010-2015 IMF Program Backtesting Fixture",
             actuals=ACTUALS,
             snapshots=snapshots,
             thresholds_met=thresholds_met,
@@ -181,6 +218,7 @@ async def test_greece_2010_2012_direction_only_fidelity(
             deferred_thresholds=deferred_thresholds,
         )
         print(f"\n{report}")
+        print(f"\nECOLOGICAL: {ECOLOGICAL_COMPOSITE_DISCLOSURE}")
 
         # Assert all thresholds pass
         failed = [name for name, passed in thresholds_met.items() if not passed]
@@ -204,14 +242,14 @@ async def test_greece_2010_2012_direction_only_fidelity(
 async def test_greece_scenario_creates_correct_number_of_snapshots(
     client: httpx.AsyncClient,
 ) -> None:
-    """Greece scenario with n_steps=3 must produce 4 snapshots (steps 0–3)."""
+    """Greece scenario with n_steps=6 must produce 7 snapshots (steps 0–6)."""
     scenario_id, snapshots = await _create_and_run_scenario(client)
     try:
-        assert len(snapshots) == 4, (
-            f"Expected 4 snapshots (steps 0–3) for n_steps=3, got {len(snapshots)}"
+        assert len(snapshots) == 7, (
+            f"Expected 7 snapshots (steps 0–6) for n_steps=6, got {len(snapshots)}"
         )
         step_nums = sorted(s["step"] for s in snapshots)
-        assert step_nums == [0, 1, 2, 3]
+        assert step_nums == [0, 1, 2, 3, 4, 5, 6]
     finally:
         await client.delete(f"/api/v1/scenarios/{scenario_id}")
 
