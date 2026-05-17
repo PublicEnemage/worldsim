@@ -1,12 +1,13 @@
-"""Unit tests for Greece 2010–2012 backtesting fixtures.
+"""Unit tests for Greece 2010–2015 backtesting fixtures.
 
 Tests run without a database connection. Covers:
-  - GreeceActuals field values match documented historical data
-  - FidelityThresholds are set correctly
+  - GreeceActuals field values match documented historical data (2010–2015)
+  - FidelityThresholds are set correctly (including steps 4–6 extension)
   - build_greece_scenario() returns a valid ScenarioCreateRequest
   - All Quantity values in the fixture are strings (float prohibition)
   - IA1_DISCLOSURE is non-empty and matches canonical phrase
   - PARAMETER_CALIBRATION_DISCLOSURE is non-empty
+  - ECOLOGICAL_COMPOSITE_DISCLOSURE is non-empty and contains ADR-005 Q1 content
   - fidelity_report.format_fidelity_report() returns a non-empty string
     containing the required disclosure sections
 """
@@ -24,6 +25,7 @@ from tests.backtesting.fidelity_report import (
 )
 from tests.fixtures.greece_2010_2012_actuals import (
     ACTUALS,
+    ECOLOGICAL_COMPOSITE_DISCLOSURE,
     IA1_DISCLOSURE,
     PARAMETER_CALIBRATION_DISCLOSURE,
     THRESHOLDS,
@@ -69,8 +71,42 @@ def test_actuals_unemployment_2012() -> None:
 
 
 def test_actuals_unemployment_2013() -> None:
-    """Eurostat LFS Q1 2013 — 27.5% (step 3 extrapolation within fixture window)."""
+    """Eurostat LFS Q1 2013 — 27.5% (step 3 end-of-period; peak unemployment)."""
     assert ACTUALS.unemployment_rate_2013 == Decimal("0.275")
+
+
+def test_actuals_gdp_2013_matches_imf_weo() -> None:
+    """GDP growth 2013: IMF WEO Apr 2016 outturn -3.2% (step 4)."""
+    assert ACTUALS.gdp_growth_2013 == Decimal("-0.032")
+    assert isinstance(ACTUALS.gdp_growth_2013, Decimal)
+
+
+def test_actuals_gdp_2014_matches_imf_weo() -> None:
+    """GDP growth 2014: IMF WEO Apr 2016 outturn +0.7% (step 5, brief recovery)."""
+    assert ACTUALS.gdp_growth_2014 == Decimal("0.007")
+    assert isinstance(ACTUALS.gdp_growth_2014, Decimal)
+
+
+def test_actuals_gdp_2015_matches_imf_weo() -> None:
+    """GDP growth 2015: IMF WEO Apr 2016 outturn -0.4% (step 6, capital controls)."""
+    assert ACTUALS.gdp_growth_2015 == Decimal("-0.004")
+    assert isinstance(ACTUALS.gdp_growth_2015, Decimal)
+
+
+def test_actuals_unemployment_2014() -> None:
+    """Eurostat LFS Q1 2014 — 26.5% (declining from 27.5% peak)."""
+    assert ACTUALS.unemployment_rate_2014 == Decimal("0.265")
+
+
+def test_actuals_unemployment_2015() -> None:
+    """Eurostat LFS Q1 2015 — 25.0% (continued decline)."""
+    assert ACTUALS.unemployment_rate_2015 == Decimal("0.250")
+
+
+def test_actuals_primary_balance_2013() -> None:
+    """IMF CR 14/151 — primary balance +1.5% GDP in 2013 (first surplus)."""
+    assert ACTUALS.primary_balance_pct_gdp_2013 == Decimal("0.015")
+    assert isinstance(ACTUALS.primary_balance_pct_gdp_2013, Decimal)
 
 
 def test_actuals_all_gdp_values_are_negative() -> None:
@@ -85,6 +121,19 @@ def test_actuals_unemployment_rises_2010_to_2013() -> None:
     assert ACTUALS.unemployment_rate_2010 < ACTUALS.unemployment_rate_2011
     assert ACTUALS.unemployment_rate_2011 < ACTUALS.unemployment_rate_2012
     assert ACTUALS.unemployment_rate_2012 < ACTUALS.unemployment_rate_2013
+
+
+def test_actuals_unemployment_declines_2013_to_2015() -> None:
+    """Historical unemployment declined from 27.5% peak in 2013 through 2015."""
+    assert ACTUALS.unemployment_rate_2013 > ACTUALS.unemployment_rate_2014
+    assert ACTUALS.unemployment_rate_2014 > ACTUALS.unemployment_rate_2015
+
+
+def test_actuals_gdp_2014_is_only_positive_year() -> None:
+    """GDP growth 2014 is the only positive year in the 2010–2015 window."""
+    assert ACTUALS.gdp_growth_2014 > Decimal("0")
+    assert ACTUALS.gdp_growth_2013 < Decimal("0")
+    assert ACTUALS.gdp_growth_2015 < Decimal("0")
 
 
 def test_actuals_health_expenditure_2010() -> None:
@@ -139,6 +188,26 @@ def test_thresholds_health_expenditure_declining_step1_to_step2_is_false() -> No
     assert THRESHOLDS.health_expenditure_declining_step1_to_step2 is False
 
 
+def test_thresholds_gdp_direction_step4_negative_is_true() -> None:
+    """Blocking CI gate: GDP at step 4 (2013) must be negative (-3.2% outturn)."""
+    assert THRESHOLDS.gdp_direction_step4_negative is True
+
+
+def test_thresholds_gdp_direction_step5_positive_is_true() -> None:
+    """Blocking CI gate: GDP at step 5 (2014) must be positive (+0.7% outturn)."""
+    assert THRESHOLDS.gdp_direction_step5_positive is True
+
+
+def test_thresholds_gdp_direction_step6_negative_is_true() -> None:
+    """Blocking CI gate: GDP at step 6 (2015) must be negative (-0.4% outturn)."""
+    assert THRESHOLDS.gdp_direction_step6_negative is True
+
+
+def test_thresholds_unemployment_declining_step4_to_step6_is_false() -> None:
+    """Deferred threshold — no endogenous module updates unemployment_rate (Issue #87)."""
+    assert THRESHOLDS.unemployment_declining_step4_to_step6 is False
+
+
 def test_thresholds_is_frozen_dataclass() -> None:
     with pytest.raises(AttributeError):
         THRESHOLDS.gdp_direction_correct = False  # type: ignore[misc]
@@ -186,6 +255,33 @@ def test_parameter_calibration_disclosure_references_direction_only() -> None:
 
 
 # ---------------------------------------------------------------------------
+# ECOLOGICAL_COMPOSITE_DISCLOSURE
+# ---------------------------------------------------------------------------
+
+
+def test_ecological_composite_disclosure_is_non_empty() -> None:
+    assert ECOLOGICAL_COMPOSITE_DISCLOSURE
+    assert len(ECOLOGICAL_COMPOSITE_DISCLOSURE) > 30
+
+
+def test_ecological_composite_disclosure_contains_co2_boundary() -> None:
+    """ADR-005 Amendment 3 Q1 disposition: CO2 boundary active all six steps."""
+    assert "CO2 boundary" in ECOLOGICAL_COMPOSITE_DISCLOSURE
+    assert "2009-09-24" in ECOLOGICAL_COMPOSITE_DISCLOSURE
+
+
+def test_ecological_composite_disclosure_land_use_not_active() -> None:
+    """ADR-005 Amendment 3 Q1 disposition: land-use boundary post-dates scenario."""
+    assert "2023-09-13" in ECOLOGICAL_COMPOSITE_DISCLOSURE
+    assert "NOT active" in ECOLOGICAL_COMPOSITE_DISCLOSURE
+
+
+def test_ecological_composite_disclosure_co2_proximity_only() -> None:
+    """ADR-005 Amendment 3 Q1: ecological composite = CO2 proximity only."""
+    assert "CO2 proximity only" in ECOLOGICAL_COMPOSITE_DISCLOSURE
+
+
+# ---------------------------------------------------------------------------
 # build_greece_scenario()
 # ---------------------------------------------------------------------------
 
@@ -201,6 +297,7 @@ def test_build_greece_scenario_name_is_correct() -> None:
     scenario = build_greece_scenario()
     assert "Greece" in scenario.name
     assert "2010" in scenario.name
+    assert "2015" in scenario.name
 
 
 def test_build_greece_scenario_has_grc_entity() -> None:
@@ -208,9 +305,10 @@ def test_build_greece_scenario_has_grc_entity() -> None:
     assert "GRC" in scenario.configuration.entities
 
 
-def test_build_greece_scenario_n_steps_is_3() -> None:
+def test_build_greece_scenario_n_steps_is_6() -> None:
+    """Fixture extended from 3 to 6 steps for 2015 stabilization period (Issue #316)."""
     scenario = build_greece_scenario()
-    assert scenario.configuration.n_steps == 3
+    assert scenario.configuration.n_steps == 6
 
 
 def test_build_greece_scenario_timestep_label_is_annual() -> None:
@@ -297,13 +395,22 @@ def test_build_greece_scenario_human_dev_attributes_use_human_development_framew
 
 
 def test_build_greece_scenario_scheduled_inputs_have_valid_steps() -> None:
-    """All scheduled input steps must be within [0, n_steps - 1]."""
+    """All scheduled input steps must be within [0, n_steps]."""
     scenario = build_greece_scenario()
     n = scenario.configuration.n_steps
     for si in scenario.scheduled_inputs:
         assert 0 <= si.step <= n, (
             f"Scheduled input step {si.step} outside valid range [0, {n}]"
         )
+
+
+def test_build_greece_scenario_has_capital_controls_at_step6() -> None:
+    """Step 6 (2015) must include capital_controls emergency input (Issue #316)."""
+    scenario = build_greece_scenario()
+    step6_inputs = [si for si in scenario.scheduled_inputs if si.step == 6]
+    assert len(step6_inputs) == 1
+    assert step6_inputs[0].input_type == "EmergencyPolicyInput"
+    assert step6_inputs[0].input_data["instrument"] == "capital_controls"
 
 
 def test_build_greece_scenario_input_types_are_known() -> None:
