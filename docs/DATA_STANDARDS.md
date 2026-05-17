@@ -1191,6 +1191,92 @@ choice appears arbitrary.
 
 ---
 
+## Canonical Unit Registry
+
+The canonical unit registry establishes a controlled vocabulary for WorldSim's
+internal `Quantity.unit` strings. Without a controlled vocabulary, each new
+indicator added in M8 faces the same choice that produced `unit="dimensionless"`
+for `co2_concentration_ppm` — there is no authoritative answer, so the developer
+defaults to a placeholder. The Gimli Glider (1983) and Mars Climate Orbiter (1999)
+incidents are both architectural analogs to this failure mode: plausible-looking
+wrong values that survive testing and mislead users.
+
+### Tier 1 — Naming Convention Enforcement
+
+Any attribute key containing a unit-bearing suffix must NOT use
+`unit="dimensionless"`. The following suffixes signal that the attribute carries
+a specific unit, and a `"dimensionless"` unit string is therefore incorrect:
+
+| Suffix | Correct unit string |
+|---|---|
+| `_ppm` | `"ppm"` |
+| `_percent` | `"percent"` |
+| `_percentile` | `"percentile_0_100"` |
+| `_ratio` | `"ratio_0_1"` |
+| `_months` | `"months"` |
+| `_usd` | `"USD_millions_current"` or `"USD_2015"` |
+| `_kwh` | `"kwh"` |
+| `_tonnes` | `"tonnes"` |
+| `_km2` | `"km2"` |
+
+**Compliance scan rule:** Any `Quantity(...)` instantiation where the attribute
+key contains one of these suffixes and `unit="dimensionless"` is used must be
+flagged as a compliance violation. The compliance scan must enforce this Tier 1
+rule at milestone exit.
+
+### Tier 2 — Canonical Vocabulary
+
+The following unit strings are the complete controlled vocabulary for WorldSim
+internal attribute `Quantity` objects. No other unit string may be used without
+a documented compliance scan exception.
+
+| Unit string | Meaning | Typical indicators |
+|---|---|---|
+| `"ppm"` | Parts per million (atmospheric concentration) | `co2_concentration_ppm` |
+| `"ppm_annual_delta"` | Annual change in parts per million | CO2 trajectory deltas |
+| `"percentile_0_100"` | Percentile rank on 0–100 scale | `rule_of_law_percentile`, `corruption_perception_index` |
+| `"ratio_0_1"` | Dimensionless fraction, bounded 0–1 | `land_use_pressure_index`, `democratic_quality_score` |
+| `"dimensionless"` | Explicitly zero-dimensional — NOT a placeholder. Reserved for genuinely dimensionless quantities where the attribute key carries no unit-bearing suffix (e.g., `debt_gdp_ratio`). | `debt_gdp_ratio` |
+| `"USD_millions_current"` | Nominal USD millions at observation date | Nominal flow variables |
+| `"USD_2015"` | Constant 2015 USD (canonical internal monetary unit) | All stored monetary values |
+| `"months"` | Time duration in months | `reserve_coverage_months` |
+| `"percent"` | Percentage on 0–100 scale | Display-layer convention only; prefer `ratio_0_1` internally |
+| `"index"` | Composite index with documented construction methodology | `press_freedom_index`, `technocratic_independence` |
+
+**Correct usage of `"dimensionless"`:** `"dimensionless"` is semantically correct
+only when the attribute genuinely has no unit and the attribute name does not
+imply one. A ratio of two GDP quantities (same unit cancels) is dimensionless.
+A CO2 concentration in parts per million is not.
+
+### Tier 3 — Field-Level Certification Obligation (M9)
+
+The canonical unit registry establishes the target unit layer: a `Quantity`
+carrying a canonical unit string is correctly labeled. But a correct label is
+not the same as a verified transformation from source data.
+
+Field-level certification — documented source field → WorldSim attribute
+transformation with Data Architect Agent sign-off — is the source-of-truth layer
+that cannot be assumed from the label alone. See `§Field-Level Data Certification`
+(Gap 2) for the certification structure.
+
+Full retroactive certification of all existing sources is M9 Standards Foundation
+scope (Issue #252). M8 new sources (WGI, planetary boundary data) must have draft
+certification entries before their fields are used in module code.
+
+### Cross-reference to CODING_STANDARDS.md
+
+The runtime enforcement gate for canonical unit compliance lives at `Quantity`
+construction time, not only in the compliance scan. See
+`CODING_STANDARDS.md §Canonical Unit Registry cross-reference` for the runtime
+validation requirement. The compliance scan is a secondary enforcement layer.
+
+Every new M8 ecological and governance indicator must include a unit correctness
+test asserting `qty.unit == "<canonical_unit_string>"` explicitly. This is a
+mandatory test requirement — existing tests that assert `variable_type` but not
+`unit` are incomplete for M8 and later indicators.
+
+---
+
 ## Epistemic Band Labeling Standards (M5+)
 
 M5 adds epistemic banding to all simulation outputs via the `BandingEngine`.

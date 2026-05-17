@@ -248,6 +248,17 @@ def test_co2_uses_stock_variable_type() -> None:
     assert co2_qty.variable_type == VariableType.STOCK
 
 
+def test_co2_uses_canonical_ppm_unit() -> None:
+    """co2_concentration_ppm must use unit='ppm' (DATA_STANDARDS.md §Canonical Unit Registry)."""
+    module = EcologicalModule()
+    state = _make_state([_gdp_event()])
+    events = module.compute(_country_entity(), state, TIMESTEP)
+    co2_qty = events[0].affected_attributes["co2_concentration_ppm"]
+    assert co2_qty.unit == "ppm", (
+        f"co2_concentration_ppm must use unit='ppm', got {co2_qty.unit!r}"
+    )
+
+
 # ---------------------------------------------------------------------------
 # Fiscal spending → land_use_pressure_index
 # ---------------------------------------------------------------------------
@@ -292,6 +303,17 @@ def test_land_use_uses_ratio_variable_type() -> None:
     events = module.compute(_country_entity(), state, TIMESTEP)
     land_qty = events[0].affected_attributes["land_use_pressure_index"]
     assert land_qty.variable_type == VariableType.RATIO
+
+
+def test_land_use_uses_canonical_ratio_0_1_unit() -> None:
+    """land_use_pressure_index must use unit='ratio_0_1' (DATA_STANDARDS.md §Canonical Unit Registry)."""
+    module = EcologicalModule()
+    state = _make_state([_fiscal_event()])
+    events = module.compute(_country_entity(), state, TIMESTEP)
+    land_qty = events[0].affected_attributes["land_use_pressure_index"]
+    assert land_qty.unit == "ratio_0_1", (
+        f"land_use_pressure_index must use unit='ratio_0_1', got {land_qty.unit!r}"
+    )
 
 
 # ---------------------------------------------------------------------------

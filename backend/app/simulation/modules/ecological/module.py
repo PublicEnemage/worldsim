@@ -63,6 +63,16 @@ _INDICATOR_VARIABLE_TYPES: dict[str, VariableType] = {
     "land_use_pressure_index": VariableType.RATIO,
 }
 
+# Canonical unit strings per DATA_STANDARDS.md §Canonical Unit Registry (Gap 1).
+# co2_concentration_ppm: atmospheric concentration in parts per million.
+# land_use_pressure_index: fraction of planetary boundary threshold consumed (0–1).
+# Default "ratio_0_1" applies to any future ecological indicator not yet listed here.
+_INDICATOR_UNITS: dict[str, str] = {
+    "co2_concentration_ppm": "ppm",
+    "land_use_pressure_index": "ratio_0_1",
+}
+_DEFAULT_ECOLOGICAL_UNIT = "ratio_0_1"
+
 
 class EcologicalModule(SimulationModule):
     """Translates country-level events into ecological indicator deltas.
@@ -121,7 +131,7 @@ class EcologicalModule(SimulationModule):
         affected_attributes = {
             key: Quantity(
                 value=delta,
-                unit="dimensionless",
+                unit=_INDICATOR_UNITS.get(key, _DEFAULT_ECOLOGICAL_UNIT),
                 variable_type=_INDICATOR_VARIABLE_TYPES.get(key, VariableType.RATIO),
                 measurement_framework=MeasurementFramework.ECOLOGICAL,
                 confidence_tier=indicator_tiers[key],
