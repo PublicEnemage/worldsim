@@ -1374,3 +1374,103 @@ against. If the codebase is only legible to its authors, it cannot be audited,
 challenged, or improved by the domain experts and independent reviewers whose
 trust the tool depends on. Legibility is not a code quality preference — it is
 a prerequisite for the tool's credibility.
+
+---
+
+## Simulation Integrity Monitoring
+
+### Contract Definition
+
+Any log message reporting a simulation integrity anomaly — unexpected state,
+contract violation, data conflict, or structural warning that operators may need
+to investigate — must be prefixed with `[SIM-INTEGRITY]` followed by a single
+space. This is the complete monitoring contract.
+
+```python
+_log.warning("[SIM-INTEGRITY] <specific condition> — <what was dropped/skipped and why>")
+```
+
+Use `[SIM-INTEGRITY]` only for conditions that represent unexpected state in the
+simulation's own data flow: dropped deltas, missing entities, duplicate IDs, STOCK
+conflicts, data structure violations. Do not use it for external input validation
+errors or API-layer concerns.
+
+### Log Level
+
+`[SIM-INTEGRITY]` messages use `logging.WARNING`.
+
+- `ERROR` is reserved for exceptions that halt the simulation.
+- `DEBUG` is for diagnostic output.
+- `WARNING` + `[SIM-INTEGRITY]` is the band for anomalies that are observable,
+  continuable, and operator-relevant.
+
+### Monitoring Grep Pattern
+
+```bash
+grep '\[SIM-INTEGRITY\]' <log_output>
+```
+
+This is the canonical pattern for extracting all simulation integrity anomalies
+from a simulation run. Any alert pipeline or CI log check scanning for simulation
+anomalies must use this pattern. The monitoring contract's value depends entirely
+on the prefix being used consistently — one untagged anomaly breaks the pattern
+for that module.
+
+### Canonical Examples
+
+The three established hooks serve as canonical usage examples:
+
+1. **`propagation.py` — dropped delta for unknown entity_id:**
+   ```python
+   _log.warning(
+       "[SIM-INTEGRITY] Accumulated delta for entity_id=%r not in state.entities "
+       "— delta dropped. Check relationship scope configuration.",
+       entity_id,
+   )
+   ```
+
+2. **`propagation.py` — STOCK attribute conflict (two STOCK events for same attribute):**
+   ```python
+   _log.warning(
+       "[SIM-INTEGRITY] STOCK attribute %r has multiple events for entity_id=%r "
+       "— both deltas will be applied; check module output deduplication.",
+       attr_key, entity_id,
+   )
+   ```
+
+3. **`runner.py` — duplicate event_id before propagation:**
+   ```python
+   _log.warning(
+       "[SIM-INTEGRITY] Duplicate event_id detected before propagation: %s "
+       "(source_entity=%s, event_type=%s) — delta will be double-applied",
+       event.event_id, event.source_entity_id, event.event_type,
+   )
+   ```
+   Note: runner.py was brought into compliance with this contract in the Gap 6
+   commit (STD-REVIEW-004 — the original warning lacked the `[SIM-INTEGRITY]`
+   prefix).
+
+### New Anomaly Checklist (PR Review Requirement)
+
+Before merging any new module or propagation change, the implementing agent must
+answer for each early-return path and each silent-drop path in `compute()`:
+
+> "Is this path either (a) correct by design — entity type filter, non-country
+> entity — and documented as such? Or (b) annotated with a `[SIM-INTEGRITY]`
+> WARNING?"
+
+This checklist is a mandatory PR review item for all simulation engine and module
+changes. It is not a suggestion.
+
+### Canonical Unit Registry Cross-reference
+
+The runtime enforcement gate for canonical unit compliance (`DATA_STANDARDS.md
+§Canonical Unit Registry`) lives at `Quantity` construction time, not only in the
+compliance scan. A compliance-scan-only gate catches the violation at review time;
+a constructor-level guard or module-level validator catches it at the point of
+`Quantity` instantiation.
+
+The compliance scan is a secondary enforcement layer, not the primary one. The
+primary gate lives in `Quantity.__init__` or a module-level validator that checks
+the unit string against the canonical vocabulary before the `Quantity` is
+constructed.

@@ -313,7 +313,7 @@ class ScenarioRunner(InputOrchestrator):
         for event in all_events:
             if event.event_id in seen_event_ids:
                 _log.warning(
-                    "Duplicate event_id detected before propagation: %s "
+                    "[SIM-INTEGRITY] Duplicate event_id detected before propagation: %s "
                     "(source_entity=%s, event_type=%s) — delta will be double-applied",
                     event.event_id,
                     event.source_entity_id,
