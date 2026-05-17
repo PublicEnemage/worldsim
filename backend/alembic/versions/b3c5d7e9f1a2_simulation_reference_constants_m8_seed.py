@@ -24,6 +24,8 @@ Normalization formula (DATA_STANDARDS.md §Simulation Reference Constants):
 """
 from __future__ import annotations
 
+import datetime
+
 import sqlalchemy as sa
 
 from alembic import op
@@ -59,7 +61,7 @@ def upgrade() -> None:
                     "Nature, 461(7263), 472–475."
                 ),
                 "doi_or_url": "doi:10.1038/461472a",
-                "effective_from": "2009-09-24",
+                "effective_from": datetime.date(2009, 9, 24),
                 "effective_through": None,
                 "registered_by": "std-review-004-gap4",
             },
@@ -73,7 +75,7 @@ def upgrade() -> None:
                     "Science Advances, 9(37), eadh2458."
                 ),
                 "doi_or_url": "doi:10.1126/sciadv.adh2458",
-                "effective_from": "2023-09-13",
+                "effective_from": datetime.date(2023, 9, 13),
                 "effective_through": None,
                 "registered_by": "std-review-004-gap4",
             },
