@@ -18,6 +18,20 @@ exists, but whose government may make better decisions because it does.
 
 ---
 
+## Session Continuity
+
+Before beginning any task, read `SESSION_STATE.md` in the project root.
+It contains: current active work streams and their gates, recently merged
+PRs, pending Engineering Lead decisions, and key architectural facts for
+session continuity. It is updated at the end of every session.
+`CLAUDE.md` is the permanent constitution. `SESSION_STATE.md` is the
+current situation report. Both are required reading at session start.
+
+At the end of every session, updating `SESSION_STATE.md` is the last
+action before closing — not optional.
+
+---
+
 ## Guiding Principles
 
 These principles are not constraints imposed from outside. They are values
