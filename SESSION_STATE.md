@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated:** 2026-05-17 (post-#303)
+**Last updated:** 2026-05-17 (post-#305)
 **Current milestone:** M8 — Ecological and Governance Frameworks
 
 ---
@@ -28,10 +28,10 @@
 
 | PR | Title | Date |
 |---|---|---|
+| #305 | docs(process): agents.md — migrate all agent personas from CLAUDE.md (#297) | 2026-05-17 |
 | #303 | docs: ADR-005 Amendment 3 panel synthesis — four-agent review | 2026-05-17 |
 | #302 | chore(state): SESSION_STATE.md update — issues #297–#301 filed, ADR-005 draft produced | 2026-05-17 |
 | #295 | ci: auto-merge SESSION_STATE.md-only PRs | 2026-05-17 |
-| #294 | chore(state): SESSION_STATE.md update — PR #293 merged | 2026-05-17 |
 | #291 | chore(legibility): retrofit intent blocks on five M7 blind audit functions | 2026-05-17 |
 
 ---
@@ -47,8 +47,7 @@
 | #267 | Radar chart transition animation | ADR-005 |
 | #268 | Coffin Corner / PMM Zone 1 widget | ADR-005 |
 | #269 | Demo scenario — Greece 2010–2015 | #284 + EcologicalModule |
-| #297 | CLAUDE.md carve-out — agents.md persona file | Nothing — **prerequisite for #298, #299, #300, #301** |
-| #298 | Frontend Architect Agent activation + M8 brief | #297 agents.md, ADR-005 amendment |
+| #298 | Frontend Architect Agent activation + M8 brief | ADR-005 amendment |
 
 ---
 
@@ -62,9 +61,9 @@
 | #233 | Screenshot artifact bundle | Demo scenario #269 |
 | #221 | Mean-reversion channel (Greece MAGNITUDE) | ADR-005 |
 | #222 | Contemporaneous processing path | ADR-005 |
-| #299 | Intent Block Author Agent — define in agents.md | #297 agents.md |
-| #300 | Data Quality Agent — define in agents.md (M9) | #297 agents.md |
-| #301 | agent-raci.md — RACI chart for all agents | #297, #298, #299, #300 |
+| #299 | Intent Block Author Agent — define in agents.md | Nothing — unblocked ✅ |
+| #300 | Data Quality Agent — define in agents.md (M9) | Nothing — unblocked ✅ |
+| #301 | agent-raci.md — RACI chart for all agents | #298, #299, #300 |
 
 ---
 
@@ -74,7 +73,7 @@
 |---|---|---|
 | ADR-005 M8 amendment — disposition of panel findings | Synthesis at `docs/architecture/adr-005-amendment3-panel-synthesis.md` (PR #303). 10 must-resolve items before Architect Agent revision; 12 should-resolve before implementation. See §ADR-005 Panel Findings below. | **Ready for EL disposition** |
 | GovernanceModule promotion path | Deferred from M8 demo — five criteria not yet met — target M9 | Decided: deferred |
-| Agent roster expansion | Five issues filed (#297–#301); #297 agents.md carve-out is horizon:immediate and must execute before any new agent personas are added to CLAUDE.md | Issues filed — awaiting execution |
+| Agent roster expansion | #297 merged (PR #305); #298 (Frontend Architect) unblocked pending ADR-005; #299 and #300 unblocked | #297 done ✅ — #298 next |
 
 ---
 
