@@ -6,8 +6,32 @@ Accepted
 ## Validity Context
 
 **Standards Version:** 2026-04-15 (date standards documents were established)
-**Valid Until:** Milestone 8 — Ecological and Governance Frameworks
+**Valid Until:** Milestone 9 — Standards Foundation
 **License Status:** CURRENT
+
+**Amendment 3 applied:** 2026-05-17 — M8 Ecological Framework Completion.
+Six decisions (M8-1 through M8-6): boundary proximity normalization replacing
+percentile rank for ecological composite score (Decision M8-1); `is_single_entity`
+guard exemption for ecological framework (Decision M8-2); `_compute_composite_score()`
+strategy dispatch pattern with `_PERCENTILE_RANK_VALIDATED_FRAMEWORKS` frozenset
+and explicit `[SIM-INTEGRITY]` WARNING path for unregistered frameworks (Decision M8-3);
+GovernanceModule promotion deferred to M9 with mandatory per-indicator
+absolute-threshold audit obligation before confirming percentile rank (Decision M8-4);
+null governance axis rendering — dashed outline, `"—"` score, `"Governance — in
+validation"` label, TypeScript `number | null` type obligation (Decision M8-5);
+EcologicalModule indicator expansion with corrected dimensional semantics (no
+double-normalization for `land_use_pressure_index`), stock-not-delta computation
+path, and `confidence_tier` Alembic migration (Decision M8-6). Closes Issue #218.
+Four-agent panel review (PR #303) informed all six decisions. See Amendment 3
+section at end of document.
+
+**Last Reviewed:** 2026-05-17 — Amendment 3 acceptance. Renewal trigger fired:
+"Radar chart normalization methodology changed from percentile-based cross-entity
+ranking to an alternative" (Validity Context §Renewal Triggers). ADR transitioned
+ACCEPTED → UNDER-REVIEW on trigger fire; Engineering Lead acceptance of Amendment 3
+returns License Status to CURRENT. Four-agent panel review (PR #303 — Data Architect,
+QA Lead, Ecological Economist DIC, Chief Methodologist DIC) informed all six decisions.
+Next scheduled review at Milestone 9 — Standards Foundation completion.
 
 **Decision 6 applied:** 2026-05-06 — GovernanceModule behavioral contract defined.
 Subscription list, indicator keys with confidence tier defaults, output event
@@ -26,7 +50,7 @@ scope. Data sources for planetary boundary indicators added to
 percentile rank with mandatory API note for M6; boundary-normalized scoring
 deferred to M8. See Amendment 1 section at end of document.
 
-**Last Reviewed:** 2026-05-10 — Milestone 7 exit review. No renewal triggers
+**Previously reviewed:** 2026-05-10 — Milestone 7 exit review. No renewal triggers
 fired during Milestone 7. License Status confirmed CURRENT. M7 delivered no
 changes to `MeasurementFramework` taxonomy, `CohortSpec` segmentation axes,
 `MDASeverity` enum, or radar chart normalization methodology. DEBUG logs added
@@ -1574,3 +1598,903 @@ that scenario authors must observe.
 ### Renewal Triggers — No New Triggers Added
 
 This amendment adds no new renewal triggers.
+
+---
+
+## Amendment 3 — M8 Ecological Framework Completion: Boundary Normalization, Strategy Dispatch, and Governance Deferred Axis
+
+**Date:** 2026-05-17
+**Closes:** #218 (ADR-005 M8 amendment — blocking prerequisite for M8 Ecological Module completion)
+**Context:** Amendment 1 §Amendment B named this amendment explicitly as a blocking
+prerequisite for M8 Ecological Module completion:
+
+> *"An ADR-005 Amendment 2 addressing planetary boundary absolute normalization is a
+> blocking prerequisite for M8 Ecological Module completion. This amendment explicitly
+> names that obligation."*
+
+That obligation is satisfied here — renumbered Amendment 3 because Amendment 2
+(DemographicModule subscription contract) was interposed.
+
+This amendment fires the renewal trigger listed in the Validity Context §Renewal
+Triggers: *"Radar chart normalization methodology changed from percentile-based
+cross-entity ranking to an alternative."* The ACCEPTED → UNDER-REVIEW transition
+fires as of this amendment. The amendment itself constitutes the required review;
+Engineering Lead acceptance returns the ADR License Status to CURRENT.
+
+---
+
+### Confirmations — No Amendment Required
+
+**Q1 — EcologicalModule `SimulationModule` interface compatibility at M8:**
+EcologicalModule's `compute(entity, state, timestep) -> list[Event]` and
+`get_subscribed_events() -> list[str]` interface is unchanged at M8. The module
+subscribes to GDP and fiscal events from MacroeconomicModule and produces ecological
+indicator updates — this contract extends from M6 minimum viable scope without
+modification. No new interface methods are required.
+
+EcologicalModule at M8 remains an event consumer. Ecological state changes do not
+generate propagation events into financial or governance modules. This is a confirmed
+M8 scope boundary, not an oversight: the cross-domain ecological→financial propagation
+path (e.g., fisheries depletion below MSY threshold → export revenue event → fiscal
+event) requires backtesting validation before it can be a committed propagation path.
+It is a M10 Engine Integrity scope item. The Ecological Economist's blind interview
+finding (Issue #218 Council comment, docs/process/council-interview-2026-05-11.md
+§Theme 3) must be documented in the causal meta-map (ARCH-REVIEW-005 obligation)
+before M8 implementation is locked; it does not require an amendment here.
+
+**Q2 — `MeasurementFramework` taxonomy unchanged:**
+The four `MeasurementFramework` values (`FINANCIAL`, `HUMAN_DEVELOPMENT`, `ECOLOGICAL`,
+`GOVERNANCE`) remain unchanged. No new framework values are added by this amendment.
+The renewal trigger "MeasurementFramework taxonomy modified in any standards document
+or ADR amendment" does not fire.
+
+**Q3 — `mda_thresholds` schema extension:**
+The MDA threshold system requires no schema migration to accommodate ecological or
+governance MDA thresholds at M8. The `mda_thresholds` table supports any
+`indicator_key` and `comparison_operator` pair. New threshold seed data for
+`planetary_boundary_co2_proximity > 1.0` and `planetary_boundary_land_use_proximity
+> 1.0` must be added via a dedicated Alembic migration as part of the M8
+EcologicalModule implementation. GovernanceModule MDA thresholds are deferred with
+module promotion to M9.
+
+---
+
+### Decision M8-1: Ecological Composite Score — Boundary Normalization and Composite Strategy
+
+#### The problem
+
+Amendment 1 §Amendment B established that Decision 2's percentile-rank methodology
+is a category error for planetary boundary indicators: if all 177 entities in a
+simulation exceed CO2 planetary boundaries — which is the current empirical reality —
+percentile scores remain stable while every entity is in an unsafe operating space.
+Amendment B scoped this as a deliberate M6 exception with mandatory disclosure, and
+named the M8 obligation:
+
+> *"Planetary boundary absolute normalization is methodologically preferred and is
+> deferred to M8 when the full indicator set is defined."*
+
+The normalization formula must now be specified so that M8 implementation can proceed.
+
+#### Decision — Boundary proximity ratio with indicator-type-aware computation
+
+The ecological boundary proximity formula is:
+
+```
+boundary_score = min(current_value / boundary_value, 2.0)
+```
+
+where `boundary_value` is read from `simulation_reference_constants` using an
+effective-at-simulation-time date-range query (see §Implementation obligations,
+item 2). This formula applies to **absolute-scale indicators** (e.g.,
+`co2_concentration_ppm` in ppm, where the boundary constant 350 ppm is the divisor).
+
+**Pre-normalized indicators** — indicators whose raw value is already expressed as a
+fraction of the safe boundary threshold (range 0–1+, where 1.0 = boundary exactly
+reached) — do not require division. Their boundary proximity formula is:
+
+```
+boundary_score = min(indicator_value, 2.0)
+```
+
+The distinction between absolute-scale and pre-normalized indicators is a property
+of each indicator's `VariableType` and unit semantics, specified per indicator in
+Decision M8-6. The `_boundary_proximity_strategy()` function must dispatch to the
+correct sub-formula based on the indicator's registered type. Both sub-formulas
+produce a score on the same `[0.0, 2.0]` scale with identical semantics.
+
+**Score semantics (both formula variants):**
+- `< 1.0` — Entity operates within the safe operating space
+- `= 1.0` — Entity is exactly at the planetary boundary
+- `> 1.0` — Planetary boundary exceeded
+- `= 2.0` — Display ceiling: cap at double the safe boundary
+
+**Composite score aggregation:**
+The composite `ecological` score in `MultiFrameworkOutput` is the **unweighted
+arithmetic mean of all boundary proximity scores** for which an active boundary
+constant exists at simulation time for this entity and timestep. "Active at
+simulation time" means the `effective_from`/`effective_through` query (item 2 below)
+returns a result.
+
+**Modeling assumption — equal weighting:** The ecological composite is the unweighted
+arithmetic mean of all contributing boundary proximity scores. This is a deliberate
+simplification: no scientific basis for differential weighting of planetary boundary
+domains exists at M8 indicator count. This assumption must be explicitly re-evaluated
+when the active ecological indicator count exceeds five.
+
+Indicators for which no boundary constant is active at simulation time are excluded
+from the composite and must emit a `[SIM-INTEGRITY]` WARNING at computation time.
+The count of contributing indicators (N) is part of the mandatory note (see below).
+
+Boundary constant values are read from the `simulation_reference_constants` table
+(Alembic migrations `a2b4c6d8e0f1` + `b3c5d7e9f1a2`). The query must use the
+simulation timestep as the resolution date — not wall-clock date. Constants active
+at M8:
+
+| `constant_id` | Value | Unit | Source |
+|---|---|---|---|
+| `ECOLOGICAL_CO2_PLANETARY_BOUNDARY_PPM` | 350 | ppm | Rockström et al. 2009, *Nature* 461:472–475. doi:10.1038/461472a |
+| `ECOLOGICAL_LAND_USE_PLANETARY_BOUNDARY_RATIO` | 0.25 | ratio_0_1 | Richardson et al. 2023, *Science Advances* 9(37). doi:10.1126/sciadv.adh2458 |
+
+**Q1 disposition — temporal validity:** Boundary constant queries use the
+simulation timestep as the resolution date. For the Greece 2010–2015 backtesting
+fixture: the CO2 boundary (`effective_from = 2009-09-24`) is active throughout all
+six steps. The land-use boundary (`effective_from = 2023-09-13`) is NOT active for
+any step in the Greece fixture — it post-dates the entire scenario period. The
+ecological composite for Greece 2010–2015 is therefore **CO2 proximity only
+throughout all six steps.** This is not a gap; it is methodologically correct output
+per `DATA_STANDARDS.md §Backtesting Integrity`. The mandatory note discloses N for
+each timestep.
+
+#### Why this formula over the alternatives
+
+**Alternative 1 rejected — absolute difference (`current_value - boundary_value`):**
+Produces indicator-specific scales with no interpretable ceiling. The ratio form is
+unit-agnostic across boundary types.
+
+**Alternative 2 rejected — inverse proximity (`1 - current_value / boundary_value`):**
+Produces negative values above the boundary, misrepresenting severity. The accepted
+formula preserves monotonicity above the boundary while the cap prevents runaway values.
+
+**Alternative 3 rejected — retained percentile rank (existing M6 approach):**
+Confirmed category error in Amendment 1. Foreclosed.
+
+**Accepted formula rationale:** The ratio `current_value / boundary_value` is
+interpretable without ecological domain expertise: any score above 1.0 means the
+boundary is crossed. The cap at 2.0 creates a finite, comparable display range.
+This convention is idiomatic to the planetary boundary literature — Rockström et al.
+express boundary exceedance as a ratio of current state to the boundary value.
+
+#### Composite score range — cross-ADR schema obligation
+
+The ecological composite score is in the range `[0.0, 2.0]`, not the `[0.0, 1.0]`
+range of the percentile-rank methodology. This conflicts with the existing
+`FrameworkOutput.composite_score` docstring in `schemas.py` and the measurement-output
+endpoint specification in `docs/schema/api_contracts.yml`.
+
+**Cross-ADR same-commit obligation:** The M8 boundary strategy implementation PR
+must update:
+1. The `FrameworkOutput` docstring in `schemas.py` to state that `composite_score`
+   is in `[0.0, 1.0]` for percentile-rank frameworks (`financial`,
+   `human_development`) and `[0.0, 2.0]` for boundary-proximity frameworks
+   (`ecological`).
+2. The `docs/schema/api_contracts.yml` measurement-output endpoint entry to document
+   the framework-dependent range.
+
+Failure to update these in the same commit is a schema drift violation.
+
+#### Mandatory API note — supersedes Amendment 1 §Amendment B ecological note
+
+The Amendment 1 §Amendment B mandatory note is **superseded** by this amendment.
+
+The mandatory `FrameworkOutput.note` for `measurement_framework == "ecological"` is
+assembled from a template at computation time with one dynamic element, `n_indicators`:
+
+```python
+_ECOLOGICAL_MANDATORY_NOTE_TEMPLATE = (
+    "Ecological composite score: unweighted mean of {n_indicators} boundary "
+    "proximity score(s) active at simulation time (formula: "
+    "min(current_value / boundary_value, 2.0) for absolute-scale indicators; "
+    "min(indicator_value, 2.0) for pre-normalized boundary-relative indicators). "
+    "Score 1.0 = boundary exactly met; >1.0 = boundary exceeded; "
+    "cap 2.0 = display ceiling only — entities with score 2.0 may be operating "
+    "at any exceedance level ≥2× the safe boundary; simulation snapshots preserve "
+    "uncapped values for analytical use. "
+    "Composite range: [0.0, 2.0]. "
+    "Equal weighting applied across contributing indicators — valid at current "
+    "indicator count; must be re-evaluated when count exceeds five. "
+    "Source: simulation_reference_constants table (effective-at-simulation-time)."
+)
+```
+
+At computation time: `note = _ECOLOGICAL_MANDATORY_NOTE_TEMPLATE.format(n_indicators=n)`.
+
+The `n_indicators` value is the count of indicators that contributed a non-null
+boundary proximity score to the composite at this timestep. When N=1 for the Greece
+backtesting fixture (CO2 only, land-use boundary not yet effective), the note reads
+"mean of 1 boundary proximity score(s) active at simulation time."
+
+Any code path returning an ecological `FrameworkOutput` without a note populated
+from this template is non-compliant with this amendment. The `_ECOLOGICAL_MANDATORY_NOTE`
+string constant in `backend/app/api/scenarios.py` must be replaced with
+`_ECOLOGICAL_MANDATORY_NOTE_TEMPLATE` and all call sites updated to use `.format()`.
+
+#### Implementation obligations
+
+1. `_compute_composite_score()` in `backend/app/api/scenarios.py` must be refactored
+   to the strategy dispatch pattern (see Decision M8-3) before the boundary formula
+   is implemented. See Decision M8-3 for the complete revised function signature,
+   which adds `db_connection: asyncpg.Connection` and `scenario_timestep: datetime`
+   parameters. The boundary formula must not be implemented as an if/elif branch
+   alongside the percentile-rank path.
+
+2. **Effective-at-simulation-time query (Q1 disposition):** Boundary constants must
+   be fetched with a date-range query using the simulation timestep as the resolution
+   date:
+   ```sql
+   SELECT constant_id, value, confidence_tier
+   FROM simulation_reference_constants
+   WHERE constant_id = ANY($1)
+     AND effective_from <= $2
+     AND (effective_through IS NULL OR effective_through >= $2)
+   ```
+   where `$2` is the simulation timestep (`scenario_timestep: datetime`). The
+   query is executed in `_compute_composite_score()` before strategy dispatch and
+   the results are passed to `_boundary_proximity_strategy()` via the `context` dict
+   (see Decision M8-3 §Implementation obligations, item 5).
+
+   A constant that is present in the table but outside its `effective_from`/
+   `effective_through` window is treated as temporally unavailable: emit a
+   `[SIM-INTEGRITY]` WARNING including the `constant_id` and the simulation
+   timestep, and exclude the corresponding indicator from the composite. This is
+   distinct from a constant that is entirely absent from the table — both conditions
+   emit `[SIM-INTEGRITY]` WARNINGs but with different warning text.
+
+3. `_ECOLOGICAL_MANDATORY_NOTE` in `backend/app/api/scenarios.py` must be replaced
+   with `_ECOLOGICAL_MANDATORY_NOTE_TEMPLATE` (see above). All call sites must pass
+   `n_indicators` as a format argument. The old static string is a compliance artifact
+   from Amendment 1; retaining it after M8 implementation is a non-compliance.
+
+4. Indicators for which no boundary constant is active at the simulation timestep
+   must emit a `[SIM-INTEGRITY]` WARNING per `CODING_STANDARDS.md §Simulation
+   Integrity Monitoring`. The composite is computed from the remaining active
+   indicators; N in the mandatory note reflects only contributing indicators.
+
+5. **Cross-ADR schema obligation:** `FrameworkOutput` docstring in `schemas.py` and
+   the measurement-output endpoint in `docs/schema/api_contracts.yml` must both be
+   updated in the same commit as the boundary strategy implementation to document the
+   `[0.0, 2.0]` composite score range for ecological framework outputs.
+
+---
+
+### Decision M8-2: `is_single_entity` Guard — Ecological Framework Exemption
+
+#### The problem
+
+`_compute_composite_score()` contains an `is_single_entity` guard that suppresses
+composite scores in single-entity scenarios, attaching `_SINGLE_ENTITY_NOTE` to the
+`FrameworkOutput`. The guard exists because a percentile rank with one entity is
+numerically undefined.
+
+Boundary proximity normalization does not require multiple entities. CO2 at 421 ppm
+relative to the 350 ppm boundary yields boundary_score = 1.203 regardless of how
+many entities are present. The guard, applied uniformly, produces a false null
+ecological composite score in single-entity scenarios (e.g., the Greece 2010–2015
+demo fixture).
+
+#### Decision — Ecological framework exempt; financial and human_development retain guard
+
+| Framework | `is_single_entity` guard | Rationale |
+|---|---|---|
+| `financial` | Applies — composite score suppressed to null | Percentile rank undefined for single entity |
+| `human_development` | Applies — composite score suppressed to null | Percentile rank undefined for single entity |
+| `ecological` | **Exempt** — boundary proximity score computed and returned | Boundary ratio is entity-count-independent |
+| `governance` | Not reached at M8 — `_UNIMPLEMENTED_FRAMEWORKS` gate fires first | Guard interaction specified at M9 promotion; defaults to percentile-rank guard unless a Decision M9-N amendment exempts it |
+
+The `governance` row note reflects the actual code path at M8: governance never
+reaches the `is_single_entity` guard because `_UNIMPLEMENTED_FRAMEWORKS` returns
+null earlier. When governance is promoted at M9 (removing it from
+`_UNIMPLEMENTED_FRAMEWORKS`), the guard interaction must be specified in the M9
+amendment.
+
+**Single-entity ecological note content:** When `is_single_entity` is True and
+`framework == "ecological"`, the composite score is computed and the note field
+receives `_ECOLOGICAL_MANDATORY_NOTE_TEMPLATE.format(n_indicators=n)` — not
+`_SINGLE_ENTITY_NOTE`. The single-entity guard exemption does not alter note
+assignment for ecological outputs.
+
+#### Implementation obligations
+
+1. Replace the unconditional `is_single_entity` guard in `_compute_composite_score()`
+   with a check against a named constant `_SINGLE_ENTITY_GUARD_EXEMPT_FRAMEWORKS:
+   frozenset[str]`, initialized to `frozenset({"ecological"})`.
+
+2. `_SINGLE_ENTITY_NOTE` must not appear on ecological `FrameworkOutput`. The
+   ecological mandatory note template applies regardless of entity count.
+
+3. The exempt frameworks constant must be a module-level named constant (not an
+   inline literal) so that additions at M9 are visible in code review and trigger
+   the same-commit ADR amendment requirement (see §Renewal Triggers).
+
+4. **Test obligation:** The existing test `test_single_entity_composite_score_is_null()`
+   must be updated in the same commit to assert that `result.outputs["ecological"].composite_score
+   is not None` in a single-entity scenario with ecological indicator data and a
+   registered boundary constant active at the simulation timestep. A companion test
+   `test_single_entity_ecological_boundary_score_correct()` must assert the exact
+   Decimal boundary ratio, not just non-null.
+
+---
+
+### Decision M8-3: `_compute_composite_score()` — Strategy Dispatch Pattern
+
+#### The problem
+
+`_compute_composite_score()` currently applies the same percentile-rank calculation
+to all frameworks. The DISPATCH DESIGN NOTE embedded in the function's docstring
+(added during M7 STD-REVIEW-004) required:
+
+> *"The implementation must use a strategy dispatch pattern so that governance can
+> extend it without requiring a refactor. Design once for both, implement ecological
+> first. Both ecological and governance normalization strategies must be added in the
+> same ADR-005 M8 amendment commit — do not implement ecological strategy alone."*
+
+The strategy dispatch design and function signature must be fully specified before
+implementation proceeds.
+
+#### Decision — Framework-keyed callable map; validated fallback set; explicit DB context threading
+
+**Module-level constants:**
+
+```python
+_PERCENTILE_RANK_VALIDATED_FRAMEWORKS: frozenset[str] = frozenset({
+    "financial",
+    "human_development",
+})
+
+_COMPOSITE_STRATEGIES: dict[str, Callable[..., Decimal | None]] = {
+    "ecological": _boundary_proximity_strategy,
+    # governance: registered at M9 promotion in the same commit as
+    # _UNIMPLEMENTED_FRAMEWORKS removal. See ADR-005 Decision M8-4.
+    # Any addition here requires a same-commit ADR amendment update.
+}
+_DEFAULT_COMPOSITE_STRATEGY = _percentile_rank_strategy
+```
+
+**Updated `_compute_composite_score()` signature:**
+
+```python
+async def _compute_composite_score(
+    entity_indicators: list[EntityAttribute],
+    all_entity_attrs: list[EntityAttribute],
+    framework: str,
+    db_connection: asyncpg.Connection,
+    scenario_timestep: datetime,
+) -> Decimal | None:
+```
+
+The addition of `db_connection` and `scenario_timestep` parameters is a breaking
+change to the function signature. All callers — including `get_measurement_output`
+and any test fixtures that call `_compute_composite_score` directly — must be
+updated in the same commit. The original draft's claim that "existing callers require
+no modification" is withdrawn.
+
+**Context pre-population and dispatch logic:**
+
+```python
+    context: dict[str, Any] = {"scenario_timestep": scenario_timestep}
+
+    if framework in _COMPOSITE_STRATEGIES:
+        # Pre-fetch all context required by this strategy before dispatch.
+        # The strategy function must not make its own database calls.
+        if framework == "ecological":
+            context["boundary_constants"] = await _fetch_active_boundary_constants(
+                db_connection, scenario_timestep
+            )
+
+    if framework in _COMPOSITE_STRATEGIES:
+        strategy = _COMPOSITE_STRATEGIES[framework]
+    elif framework in _PERCENTILE_RANK_VALIDATED_FRAMEWORKS:
+        strategy = _DEFAULT_COMPOSITE_STRATEGY
+    else:
+        # Unrecognised framework — percentile rank may be a category error.
+        # Warn and continue rather than fail; this preserves output availability
+        # while surfacing the gap for investigation.
+        logger.warning(
+            "[SIM-INTEGRITY] Framework '%s' has no registered composite strategy "
+            "and is not in _PERCENTILE_RANK_VALIDATED_FRAMEWORKS; using percentile "
+            "rank as fallback. This may be a category error. "
+            "See ADR-005 Decision M8-3.",
+            framework,
+        )
+        strategy = _DEFAULT_COMPOSITE_STRATEGY
+
+    return strategy(entity_indicators, all_entity_attrs, framework, context)
+```
+
+`_fetch_active_boundary_constants()` executes the effective-at-simulation-time query
+specified in Decision M8-1 §Implementation obligations, item 2, and returns
+`dict[str, Decimal]` keyed by `constant_id`.
+
+**Strategy function signature (both strategies):**
+
+```python
+def _boundary_proximity_strategy(
+    entity_indicators: list[EntityAttribute],
+    all_entity_attrs: list[EntityAttribute],
+    framework: str,
+    context: dict[str, Any],
+) -> Decimal | None:
+    ...
+
+def _percentile_rank_strategy(
+    entity_indicators: list[EntityAttribute],
+    all_entity_attrs: list[EntityAttribute],
+    framework: str,
+    context: dict[str, Any],  # unused by this strategy; accepted for uniform signature
+) -> Decimal | None:
+    ...
+```
+
+Both strategies must accept the `context` parameter for signature uniformity, even
+though `_percentile_rank_strategy` does not use it. The callable type annotation is
+tightened from `Callable[..., Decimal | None]` to a named TypeAlias:
+
+```python
+CompositeStrategy: TypeAlias = Callable[
+    [list[EntityAttribute], list[EntityAttribute], str, dict[str, Any]],
+    Decimal | None,
+]
+```
+
+**`_PERCENTILE_RANK_VALIDATED_FRAMEWORKS` rationale:** `financial` and
+`human_development` are registered in this frozenset because their use of
+percentile rank has been explicitly reviewed and confirmed as methodologically
+valid (not merely inherited from default behavior). Any framework reaching
+the dispatch function that is neither in `_COMPOSITE_STRATEGIES` nor in
+`_PERCENTILE_RANK_VALIDATED_FRAMEWORKS` triggers a `[SIM-INTEGRITY]` WARNING,
+making silent category errors visible in logs before they surface in output.
+
+#### Why callable map over the alternatives
+
+**Alternative rejected — if/elif chain:**
+An if/elif chain makes the fallback behavior invisible: a reviewer cannot determine
+which frameworks use percentile rank without tracing all branches. The DISPATCH DESIGN
+NOTE prohibited this explicitly.
+
+**Alternative rejected — class hierarchy or Protocol:**
+Over-engineered for two to three strategy variants. A Protocol is appropriate when
+strategies carry state or when variant count exceeds four or five.
+
+**Alternative rejected — silent `dict.get()` fallback:**
+`_COMPOSITE_STRATEGIES.get(framework, _DEFAULT_COMPOSITE_STRATEGY)` was the original
+draft's dispatch. It silently applies percentile rank to any unregistered future
+framework — reproducing the category error that triggered this amendment. The
+three-branch dispatch with explicit validated-framework set is required.
+
+#### Implementation obligations
+
+1. Extract `_percentile_rank_strategy()` and `_boundary_proximity_strategy()` as
+   module-level callables with the four-parameter signature above. Both must be
+   implemented in the same commit — the DISPATCH DESIGN NOTE requirement stands.
+
+2. Both strategy functions must have intent blocks per `CODING_STANDARDS.md §Intent Blocks`.
+
+3. Define `_fetch_active_boundary_constants(db_connection, scenario_timestep) -> dict[str, Decimal]`
+   as an async helper that executes the effective-at-simulation-time query from
+   Decision M8-1 §Implementation obligations, item 2. This function is the single
+   point of contact between the composite score path and the database for boundary
+   constants.
+
+4. `_compute_composite_score()` is refactored to the three-branch dispatch pattern
+   shown above. All callers must be updated to pass `db_connection` and
+   `scenario_timestep` in the same commit.
+
+5. The `CompositeStrategy` TypeAlias must be defined before the `_COMPOSITE_STRATEGIES`
+   dict to enable type checking of dict entries and the callable type annotation on
+   `_DEFAULT_COMPOSITE_STRATEGY`.
+
+6. The comment above `_COMPOSITE_STRATEGIES` must name the M9 governance registration
+   obligation verbatim (see code example above).
+
+7. The comment above `_PERCENTILE_RANK_VALIDATED_FRAMEWORKS` must state:
+   "Frameworks listed here have been explicitly reviewed and confirmed as
+   methodologically appropriate for percentile-rank composite scoring. Any framework
+   NOT in this set and NOT in `_COMPOSITE_STRATEGIES` triggers a [SIM-INTEGRITY]
+   WARNING. See ADR-005 Decision M8-3."
+
+---
+
+### Decision M8-4: GovernanceModule Promotion — Deferred to M9
+
+#### The problem
+
+`GovernanceModule` is implemented but `"governance"` remains in
+`_UNIMPLEMENTED_FRAMEWORKS`. The M8 question is whether the five promotion criteria
+in `CODING_STANDARDS.md §Framework Promotion Protocol` are met.
+
+#### Assessment — Five criteria, zero met at M8 exit
+
+| Criterion | M8 Status | Blocking gap |
+|---|---|---|
+| 1. Backtesting threshold | Not met | No governance indicators in any backtesting fixture |
+| 2. ADR amendment accepted | **Not met — methodology TBD** | No governance normalization strategy has been specified. The dispatch infrastructure in Decision M8-3 is a prerequisite but does not constitute criterion 2 satisfaction. Criterion 2 is met only when a named governance normalization strategy is specified in an accepted ADR amendment and registered in `_COMPOSITE_STRATEGIES`. |
+| 3. Source field registry draft-certified | Not met | Governance indicators not yet draft-certified |
+| 4. `[SIM-INTEGRITY]` WARNING on unexpected null | Not met | Not implemented in GovernanceModule |
+| 5. Integration test asserting non-null governance score | Not met | No integration test exists |
+
+#### Decision — `"governance"` remains in `_UNIMPLEMENTED_FRAMEWORKS` at M8 exit; target M9
+
+GovernanceModule promotion is a named M9 Standards Foundation deliverable.
+
+All five criteria must be simultaneously met before `"governance"` is removed from
+`_UNIMPLEMENTED_FRAMEWORKS`. Criterion 2 requires an accepted M9 ADR amendment that
+specifies the governance normalization strategy — removal cannot precede the accepted
+amendment. An overeager implementor reading "Partially met" in earlier drafts may
+have assumed authorization to begin governance promotion work; that reading was
+incorrect. The status is **Not met** for all five criteria.
+
+#### M9 Governance Normalization Obligation (Q3 disposition)
+
+**The ADR-005 M9 amendment must re-examine whether any governance indicators have
+absolute threshold equivalents before confirming percentile rank as the governance
+normalization methodology.** The Amendment 1 Q4 percentile-rank confirmation is
+superseded by this obligation — it was written before the ecological boundary
+proximity methodology was fully developed and cannot be assumed to govern M9
+governance normalization without re-examination.
+
+The M9 amendment must:
+1. Audit each governance indicator for documented absolute threshold equivalents —
+   an externally-defined, peer-reviewed threshold below which the system enters a
+   documented failure regime, analogous to a planetary boundary constant. Examples
+   warranting examination: `democratic_quality_score` (V-Dem electoral autocracy
+   threshold), press freedom index floor classifications.
+2. Classify each indicator as boundary-normalizable or percentile-rank-appropriate.
+3. Specify composite aggregation for any mixed indicator set.
+
+Indicators confirmed to have no absolute threshold equivalent use percentile rank.
+Indicators with a defensible absolute threshold use boundary proximity normalization.
+This audit is mandatory and must be documented in the M9 amendment's
+"Alternatives Considered" section. The Amendment 1 Q4 confirmation remains operative
+as the default for indicators where the audit finds no absolute threshold — it is
+not silently discarded, but it is not extended to cover indicators the audit has not
+examined.
+
+#### No implementation obligation at M8
+
+No code changes to `_UNIMPLEMENTED_FRAMEWORKS` or governance strategy registration
+are required for M8.
+
+---
+
+### Decision M8-5: Null Governance Axis Rendering — Binding UX Ruling
+
+#### The problem
+
+When all four radar chart axes render simultaneously, the governance axis must
+communicate validation status rather than score magnitude. Two incorrect
+implementations are common:
+
+- **Zero-value render:** Renders the governance axis as a filled polygon segment at
+  0.0, implying governance score = 0.0. Misrepresents validation status as governance
+  failure — the worst possible diagnostic outcome.
+- **Absent axis:** Omits the axis entirely, breaking the four-axis simultaneous display
+  requirement.
+
+#### Decision — Dashed outline, "—" score, "Governance — in validation" label
+
+Binding UX ruling (Issue #218, 2026-05-16):
+
+| Element | Specification |
+|---|---|
+| Axis polygon segment | Dashed outline only; no fill; zero-area polygon segment |
+| Score display | `"—"` (em dash); not `"0.00"`, not blank, not `"N/A"` |
+| Axis label | `"Governance — in validation"` |
+| Hover tooltip | `"Governance composite score is in validation. Promotion criteria: 0 of 5 met at M8. Target: M9. See §Framework Promotion Protocol in CODING_STANDARDS.md."` |
+
+Zero-value rendering is prohibited. Any implementation that renders the governance
+axis as a non-null score — including 0.0 — before `"governance"` is removed from
+`_UNIMPLEMENTED_FRAMEWORKS` is non-compliant with this decision.
+
+The hover tooltip hardcodes "0 of 5 met at M8" — this text is accurate at M8 and will
+need to be updated when M9 promotion work begins satisfying criteria. The tooltip
+must be stored as a named constant `_GOVERNANCE_IN_VALIDATION_TOOLTIP` in
+`RadarChart.tsx` so that it is visible in code review when criteria counts change.
+
+#### Why this specification
+
+The `"—"` score and `"in validation"` label are precision instruments for a specific
+epistemic state: the module exists, the measurement framework is defined, the module
+is implemented but not yet certified for the API surface. Zero implies measurement
+and failure. Blank implies absence. Neither is true.
+
+#### TypeScript type obligation — cross-ADR same-commit requirement
+
+The existing `RadarAxisDatum.composite_score` field is typed as `number` in the
+frontend. A `number` type cannot represent the null state required by this decision —
+`null` is the correct value for an unimplemented framework's composite score, with
+the `"—"` em dash being a display transformation applied by the component, not a
+value stored in the type.
+
+**Cross-ADR same-commit obligation:** The M8-5 implementation PR must update
+`RadarAxisDatum.composite_score` from `number` to `number | null` in the same commit
+as the null governance axis rendering implementation. This type change also requires
+updating ADR-005 Decision 4's `RadarAxisDatum` interface specification in this ADR
+in the same commit, per the CLAUDE.md Pre-PR Checklist cross-ADR impact rule.
+
+The API returns `null` for `composite_score` when a framework is in
+`_UNIMPLEMENTED_FRAMEWORKS`. The `RadarChart.tsx` component renders `null` as `"—"`.
+The component must explicitly guard against rendering a null composite score as a
+filled polygon vertex at 0.0 — the component renders `null` as a dashed outline
+with no fill.
+
+Named constants required in `RadarChart.tsx`:
+- `_GOVERNANCE_IN_VALIDATION_LABEL: string = "Governance — in validation"`
+- `_GOVERNANCE_IN_VALIDATION_TOOLTIP: string = "Governance composite score is in validation. Promotion criteria: 0 of 5 met at M8. Target: M9. See §Framework Promotion Protocol in CODING_STANDARDS.md."`
+
+A unit test must assert these constants against the exact values specified here, so
+that text drift is caught without a full E2E run.
+
+#### Implementation obligation
+
+This ruling is binding for `RadarChart.tsx`. Any deviation requires an Engineering
+Lead decision recorded in `docs/frontend/design-decisions.md` before implementation
+proceeds. The `docs/frontend/design-decisions.md` entry for this decision must be
+created in the same commit as `RadarChart.tsx` changes, cross-referencing this
+decision as "See ADR-005 Decision M8-5" and adding only technical implementation
+detail (CSS properties, SVG stroke-dasharray values, Recharts configuration). The
+entry must include the sentence: "Rendering behavior for null vs. zero axes is fully
+specified in ADR-005 Decision M8-5; do not modify this entry without a corresponding
+ADR amendment."
+
+---
+
+### Decision M8-6: EcologicalModule M8 Indicator Expansion
+
+#### The problem
+
+Amendment 1 §Amendment B scoped EcologicalModule to two pilot indicators at M6
+(`co2_concentration_ppm`, `land_use_pressure_index`) using percentile-rank composite
+scoring. The boundary normalization formula adopted in Decision M8-1 requires
+indicator-specific computation — absolute-scale indicators use the division formula;
+pre-normalized indicators do not. This decision specifies which indicators are added
+at M8, their computation paths, and their boundary constant associations.
+
+#### Indicator dimensioning — critical prerequisite
+
+The two M6 pilot indicators have different dimensional semantics that determine
+which boundary proximity formula applies:
+
+**`co2_concentration_ppm`** — `VariableType.STOCK`, unit `ppm`. Absolute physical
+measurement: the atmospheric CO2 concentration at the entity's geographic location
+(approximated from global Mauna Loa measurements at M8). The boundary constant
+`ECOLOGICAL_CO2_PLANETARY_BOUNDARY_PPM = 350` (ppm) is the divisor. Formula:
+`min(co2_concentration_ppm / 350, 2.0)`.
+
+**`land_use_pressure_index`** — `VariableType.RATIO`, unit `ratio_0_1`. Pre-normalized
+boundary-relative fraction: the module docstring explicitly states "fraction of the
+safe land-system boundary consumed (0–1+)". A value of 1.0 means the boundary is
+exactly reached; a value of 1.3 means the boundary is exceeded by 30%. Because the
+indicator already encodes boundary proximity, **dividing by the boundary constant
+0.25 would be a double-normalization error** producing scores up to 4.0 when the
+indicator reads 1.0. The correct formula is `min(land_use_pressure_index, 2.0)` —
+no division.
+
+`ECOLOGICAL_LAND_USE_PLANETARY_BOUNDARY_RATIO = 0.25` is retained in
+`simulation_reference_constants` for informational and provenance purposes
+(it records the Richardson 2023 safe cropland threshold that the indicator was
+calibrated against), but it must not be used as a divisor in the proximity
+computation for `land_use_pressure_index`.
+
+#### Decision — Two boundary proximity indicators added at M8
+
+| Attribute key | `variable_type` | `measurement_framework` | Computation | Boundary constant role |
+|---|---|---|---|---|
+| `planetary_boundary_co2_proximity` | RATIO | ECOLOGICAL | `min(co2_concentration_ppm / 350, 2.0)` | `ECOLOGICAL_CO2_PLANETARY_BOUNDARY_PPM` — divisor |
+| `planetary_boundary_land_use_proximity` | RATIO | ECOLOGICAL | `min(land_use_pressure_index, 2.0)` | `ECOLOGICAL_LAND_USE_PLANETARY_BOUNDARY_RATIO` — provenance only; not a divisor |
+
+Both are **derived quantities** computed by `EcologicalModule.compute()` from
+existing attribute values. They are not sourced independently from external data.
+Their `source_registry_id` must reference the boundary constant source publication
+(Rockström 2009 or Richardson 2023) as registered in `source_registry`.
+
+The M6 pilot indicators (`co2_concentration_ppm`, `land_use_pressure_index`) are
+**not removed** at M8. They remain in the entity attribute store as the raw values
+from which proximity indicators are derived. The FrameworkPanel (Zone 3,
+information-hierarchy.md) displays both raw and derived indicators.
+
+#### Confidence tier defaults — revised
+
+Confidence tier propagation follows the lower-of-two (`max()` of tier numbers) rule:
+`derived_tier = max(source_data_tier, boundary_constant_tier)`.
+
+**Boundary constant confidence tiers** (new in Revision 2): `simulation_reference_constants`
+must carry a `confidence_tier` column (see §Implementation obligations, item 4).
+Tier assignments:
+- `ECOLOGICAL_CO2_PLANETARY_BOUNDARY_PPM`: Tier 2 — Rockström 2009 peer-reviewed
+  consensus boundary value; scientifically contested in subsequent literature
+  (some analyses suggest the boundary may be lower; atmospheric CO2 passed 350 ppm
+  in 1988 and has continued rising). The boundary represents a scientific judgment,
+  not a physical constant.
+- `ECOLOGICAL_LAND_USE_PLANETARY_BOUNDARY_RATIO`: Tier 2 — Richardson 2023 revision;
+  represents an update from prior estimates and carries higher uncertainty than the
+  CO2 boundary given data availability constraints for global land-system assessment.
+
+**Derived indicator confidence tiers:**
+
+| Indicator | Source data tier | Boundary constant tier | Derived tier (`max()`) | Rationale |
+|---|---|---|---|---|
+| `planetary_boundary_co2_proximity` | 1 (Mauna Loa direct measurement) | 2 | **Tier 2** | Boundary constant uncertainty dominates; 350 ppm is a scientific judgment, not a physical constant |
+| `planetary_boundary_land_use_proximity` | 3 (FAO GFR 5-year; annual interpolation) | 2 | **Tier 3** | Source data uncertainty dominates |
+
+Note: `planetary_boundary_co2_proximity` is revised from Tier 1 (original draft) to
+Tier 2 to reflect boundary constant uncertainty. `planetary_boundary_land_use_proximity`
+remains at Tier 3 because the source data tier (3) exceeds the boundary constant
+tier (2) under the max() rule.
+
+#### Computation path — stock values, not event deltas
+
+`EcologicalModule.compute()` currently reads `state.events` (prior-step event
+deltas) to produce indicator delta events. **Planetary boundary proximity requires
+the entity's current accumulated attribute value — the stock, not the delta.** A
+proximity score computed from a step delta would produce a monotonically-drifting
+score that represents the change in proximity each step, not the actual ratio of
+current state to the boundary. These are not the same quantity and the latter is
+wrong for proximity purposes.
+
+`EcologicalModule.compute()` must read `entity.attributes.get("co2_concentration_ppm")`
+and `entity.attributes.get("land_use_pressure_index")` from the entity's current
+attribute store — not from the event stream. The entity attributes dict holds
+accumulated stock values as `Quantity` objects. The `.value` field of each
+`Quantity` is the current stock value.
+
+This is architecturally different from the existing delta-computation pattern in
+the module. The existing `_extract_magnitude()` helper, which reads event magnitudes,
+is not applicable for proximity computation.
+
+#### Why derived proximity indicators rather than inline computation
+
+1. **Snapshot transparency:** `scenario_state_snapshots.entities_snapshot` contains
+   the proximity score alongside the raw indicator. A reviewer can verify the ratio
+   without re-running the formula.
+
+2. **MDA threshold system compatibility:** Registering `planetary_boundary_co2_proximity
+   > 1.0` as an MDA threshold requires the proximity score to be a persisted attribute.
+
+3. **Extensibility pattern:** New planetary boundary domains at M10+ follow the same
+   pattern: raw value persisted → proximity derived → boundary constant registered.
+
+#### Implementation obligations
+
+`EcologicalModule.compute()` at M8 must:
+
+1. Read `co2_concentration_ppm` and `land_use_pressure_index` from
+   `entity.attributes` (the current attribute store), not from `state.events`.
+   If a required base attribute is absent from `entity.attributes`, emit a
+   `[SIM-INTEGRITY]` WARNING and omit the corresponding derived indicator from the
+   step's event.
+
+2. Fetch boundary constants from `simulation_reference_constants` using the
+   effective-at-simulation-time query (see Decision M8-1, item 2) with
+   `timestep` as the resolution date. If a boundary constant is temporally
+   unavailable, emit a `[SIM-INTEGRITY]` WARNING and omit the corresponding
+   derived indicator.
+
+3. Compute proximity for each indicator using the correct formula for its
+   dimensional type:
+   - `co2_concentration_ppm` (STOCK, ppm): `min(value / Decimal("350"), Decimal("2.0"))`
+   - `land_use_pressure_index` (RATIO, pre-normalized): `min(value, Decimal("2.0"))`
+   All arithmetic uses `Decimal` throughout — no intermediate float conversion.
+
+4. **Alembic migration — `confidence_tier` column:** Add a `confidence_tier`
+   INTEGER NOT NULL column to `simulation_reference_constants` via a new Alembic
+   migration. Update the existing seed data migrations (`a2b4c6d8e0f1` + `b3c5d7e9f1a2`)
+   or add a follow-on migration that sets:
+   - `ECOLOGICAL_CO2_PLANETARY_BOUNDARY_PPM`: `confidence_tier = 2`
+   - `ECOLOGICAL_LAND_USE_PLANETARY_BOUNDARY_RATIO`: `confidence_tier = 2`
+   The `_fetch_active_boundary_constants()` query (Decision M8-3) must return
+   `confidence_tier` alongside `value`.
+
+5. Return `planetary_boundary_co2_proximity` and `planetary_boundary_land_use_proximity`
+   as `Quantity` values in the event's `affected_attributes`, with:
+   - `confidence_tier` = `max(source_indicator_tier, boundary_constant_tier)`
+   - `source_registry_id` referencing the boundary constant source publication
+     in `source_registry` (Rockström 2009 or Richardson 2023)
+
+6. **Alembic migration — MDA threshold seed data:** `boundary_score > 1.0` →
+   `MDASeverity.WARNING` for both indicators. The `entity_scope` for both entries
+   is `"all"` — any entity exceeding a planetary boundary is in an unsafe operating
+   space regardless of which entity it is.
+
+7. **Unit test obligation:** A unit test seeding a known `co2_concentration_ppm`
+   value on `entity.attributes`, running `EcologicalModule.compute()`, and asserting
+   the exact Decimal boundary ratio must exist before the M8 EcologicalModule PR
+   is merged. This test must cover: below boundary (score < 1.0), at boundary
+   exactly (score = 1.0), above boundary (score > 1.0), and at cap (score = 2.0).
+   This test catches the delta-vs-stock computation error described above.
+
+---
+
+### Deferred Items
+
+**Governance normalization methodology (M9):**
+The M9 GovernanceModule promotion amendment must conduct a per-indicator audit for
+absolute threshold equivalents before specifying the normalization strategy (see
+Decision M8-4 §M9 Governance Normalization Obligation). Amendment 1 Q4's
+percentile-rank confirmation remains operative as a default only for indicators where
+the M9 audit finds no absolute threshold equivalent. Governance normalization must
+not be implemented without an accepted ADR amendment. This item is explicitly deferred
+and not open for implementation-time interpretation.
+
+**Remaining planetary boundary domains (M10+):**
+Seven of the nine planetary boundary domains are not addressed at M8: biodiversity
+loss, freshwater use, biogeochemical flows (nitrogen/phosphorus), ocean acidification,
+stratospheric ozone, aerosol loading, and novel entities. Each requires approved data
+sources, a registered boundary constant with assigned `confidence_tier`, and confidence
+tier assessment before it can contribute to the ecological composite score. M8 active
+domains: CO2 concentration and land-system change only.
+
+**Ecological→financial cross-domain propagation (M10):**
+EcologicalModule at M8 remains an event consumer. The Ecological Economist's blind
+interview finding (Issue #218 Council comment) identifies this as the most dangerous
+invisible interaction in the model — fisheries depletion below MSY threshold generating
+export revenue events, which generate fiscal events. Confirmed M10 Engine Integrity
+scope item. The causal meta-map (ARCH-REVIEW-005 obligation, Issue #218) must document
+this limitation before M8 implementation is locked.
+
+**`source_field_registry` reference in M8-4 criterion 3:**
+The criterion 3 text references `source_field_registry`. This table name must be
+resolved against `docs/schema/database.yml` before the M9 promotion work begins —
+the term may map to a table under a different registered name. If the table does not
+exist in the schema registry, it must be added before criterion 3 can be assessed.
+This is a should-resolve item before M9 implementation, not a prerequisite for M8
+acceptance.
+
+---
+
+### Renewal Triggers
+
+**Trigger fired — radar chart normalization methodology changed:**
+The trigger documented in the Validity Context §Renewal Triggers fires with this
+amendment. The ACCEPTED → UNDER-REVIEW transition has occurred. Engineering Lead
+acceptance of this amendment returns the ADR to CURRENT.
+
+**New trigger — `_boundary_proximity_strategy()` computation:**
+Any change to the boundary proximity formula, the cap value (2.0), the
+`_fetch_active_boundary_constants()` query, or the indicator-type dispatch
+(absolute-scale vs. pre-normalized) requires this Decision M8-1 section to be
+updated in the same commit.
+
+**New trigger — `_SINGLE_ENTITY_GUARD_EXEMPT_FRAMEWORKS`:**
+Any addition to or removal from `_SINGLE_ENTITY_GUARD_EXEMPT_FRAMEWORKS` requires
+Decision M8-2 to be updated in the same commit.
+
+**New trigger — `_COMPOSITE_STRATEGIES` registration:**
+Any addition to `_COMPOSITE_STRATEGIES` (including governance registration at M9
+promotion) requires a same-commit update to the relevant Decision section of this ADR.
+The governance registration at M9 must update Decision M8-4's criterion 2 status from
+"Not met — methodology TBD" to "Met" and name the registered strategy.
+
+**New trigger — `_PERCENTILE_RANK_VALIDATED_FRAMEWORKS`:**
+Any addition to or removal from `_PERCENTILE_RANK_VALIDATED_FRAMEWORKS` requires a
+same-commit update to Decision M8-3 and must be accompanied by a rationale statement
+explaining why the framework's percentile rank methodology has been validated (or why
+a previously-validated framework is no longer considered methodologically appropriate
+for percentile rank). This trigger guards against silent expansion of the validated
+set without methodological review.
+
+**New trigger — mandatory note template and indicator count:**
+If the mandatory note template `_ECOLOGICAL_MANDATORY_NOTE_TEMPLATE` is updated to
+enumerate specific indicator domain names (rather than using the N={count} dynamic
+element), it must be converted to API-generated text sourced from
+`simulation_reference_constants` in the same commit. Enumerating domains in a static
+string is non-compliant from that point forward. The static template with dynamic
+N-count is valid through M10 under this constraint. This renewal trigger fires when
+the fourth planetary boundary domain is registered — at that point the note approach
+must be reviewed in the same commit as the fourth domain's addition.
+
+**New trigger — `simulation_reference_constants.confidence_tier` values:**
+Any change to the `confidence_tier` value for an existing boundary constant in
+`simulation_reference_constants` requires a same-commit update to the affected
+Decision M8-6 confidence tier table entry and the derived indicator confidence tier
+that depends on it. This trigger exists because boundary constant confidence tiers
+propagate to derived indicator tiers via the `max()` rule — a constant tier change
+silently changes indicator tier without this guard.
