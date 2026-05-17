@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated:** 2026-05-17 (post-#309-open)
+**Last updated:** 2026-05-17 (post-#309)
 **Current milestone:** M8 — Ecological and Governance Frameworks
 
 ---
@@ -14,10 +14,10 @@
 
 | Stream | Issues | Status | Gate |
 |---|---|---|---|
-| ADR-005 Amendment 3 | #218 ✅ | Revision 2 committed → **PR #309 open — EL merge unblocks all below** | PR #309 merge |
-| Greece fixture extension | #284 | Not started | PR #309 merge |
-| EcologicalModule expansion | — | Not started | PR #309 merge |
-| UI/UX issues | #265–268 | Not started | PR #309 merge (brief: frontend-m8-brief.md) |
+| ADR-005 Amendment 3 | #218 ✅ | Merged ✅ (PR #309) — **M8 implementation unblocked** | None |
+| Greece fixture extension | #284 | Not started | Nothing — **activate Implementation Agent** |
+| EcologicalModule expansion | — | Not started | Nothing — **activate Implementation Agent** |
+| UI/UX issues | #265–268 | Not started | Nothing — **activate Frontend Architect** |
 | Demo scenario assembly | #269 | Not started | #284 + EcologicalModule |
 | Intent block retrofit | #287 | Merged ✅ (PR #291) | None |
 | Frontend Architect M8 brief | #298 ✅ | Merged ✅ (PR #307) | None |
@@ -28,11 +28,11 @@
 
 | PR | Title | Date |
 |---|---|---|
-| #309 | docs(adr): ADR-005 Amendment 3 — M8 Ecological Framework Completion (open — pending merge) | 2026-05-17 |
-| #308 | chore(state): SESSION_STATE.md update — PR #307 merged, Frontend Architect activated, #298 closed | 2026-05-17 |
+| #310 | chore(state): SESSION_STATE.md update — ADR-005 Amendment 3 committed, PR #309 open | 2026-05-17 |
+| #309 | docs(adr): ADR-005 Amendment 3 — M8 Ecological Framework Completion | 2026-05-17 |
+| #308 | chore(state): SESSION_STATE.md update — PR #307 merged, Frontend Architect activated | 2026-05-17 |
 | #307 | docs(agents): activate Frontend Architect Agent and produce M8 component brief (#298) | 2026-05-17 |
 | #306 | chore(state): SESSION_STATE.md update — PR #305 merged | 2026-05-17 |
-| #305 | docs(process): agents.md — migrate all agent personas from CLAUDE.md (#297) | 2026-05-17 |
 
 ---
 
@@ -40,11 +40,11 @@
 
 | Issue | Title | Blocked by |
 |---|---|---|
-| #284 | Greece fixture extension to 2015 | PR #309 merge |
-| #265 | Indicator display name mapping layer | PR #309 merge (brief: frontend-m8-brief.md Area 3) |
-| #266 | Mandatory ecological note → Zone 3 expandable | PR #309 merge (brief: frontend-m8-brief.md Area 4) |
-| #267 | Radar chart transition animation | PR #309 merge (brief: frontend-m8-brief.md Area 5) |
-| #268 | Coffin Corner / PMM Zone 1 widget | PR #309 merge (brief: frontend-m8-brief.md Area 2) |
+| #284 | Greece fixture extension to 2015 | Nothing — unblocked ✅ |
+| #265 | Indicator display name mapping layer | Nothing — unblocked ✅ (brief: Area 3) |
+| #266 | Mandatory ecological note → Zone 3 expandable | Nothing — unblocked ✅ (brief: Area 4) |
+| #267 | Radar chart transition animation | Nothing — unblocked ✅ (brief: Area 5; requires Area 1 first) |
+| #268 | Coffin Corner / PMM Zone 1 widget | Nothing — unblocked ✅ (brief: Area 2) |
 | #269 | Demo scenario — Greece 2010–2015 | #284 + EcologicalModule |
 
 ---
@@ -57,8 +57,8 @@
 | #286 | Spec-to-test gap check script | #285 (merged ✅) |
 | #287 | Intent block retrofit — five M7 audit functions | Merged ✅ PR #291 |
 | #233 | Screenshot artifact bundle | Demo scenario #269 |
-| #221 | Mean-reversion channel (Greece MAGNITUDE) | ADR-005 |
-| #222 | Contemporaneous processing path | ADR-005 |
+| #221 | Mean-reversion channel (Greece MAGNITUDE) | Nothing — unblocked ✅ |
+| #222 | Contemporaneous processing path | Nothing — unblocked ✅ |
 | #299 | Intent Block Author Agent — define in agents.md | Nothing — unblocked ✅ |
 | #300 | Data Quality Agent — define in agents.md (M9) | Nothing — unblocked ✅ |
 | #301 | agent-raci.md — RACI chart for all agents | #299, #300 (not #298 — closed ✅) |
@@ -69,7 +69,6 @@
 
 | Decision | Context | Status |
 |---|---|---|
-| PR #309 merge | ADR-005 Amendment 3 (Revision 2) committed. Merge unblocks all M8 implementation. | **Ready to merge** |
 | GovernanceModule promotion path | Deferred from M8 demo — five criteria not yet met — target M9 | Decided: deferred |
 
 ---
@@ -79,7 +78,7 @@
 | Decision | Rationale | Date |
 |---|---|---|
 | ADR-005 Amendment 3 (Revision 2) accepted by EL | All 10 must-resolve panel findings + 5 Q dispositions incorporated; Revision 2 committed to ADR-005-human-cost-ledger.md via PR #309 | 2026-05-17 |
-| Frontend Architect Agent activated; M8 brief delivered with UX Designer sign-off | Five UI areas specified: null governance axis (cross-ADR type fix), PMM Zone 1C widget, display name registry, Zone 3A expandable, radar animation. #265–268 unblocked pending PR #309 merge | 2026-05-17 |
+| Frontend Architect Agent activated; M8 brief delivered with UX Designer sign-off | Five UI areas specified: null governance axis (cross-ADR type fix), PMM Zone 1C widget, display name registry, Zone 3A expandable, radar animation. All five unblocked with PR #309 merge | 2026-05-17 |
 | Intent block retrofit: no divergences found in five M7 functions | All five intent blocks consistent with implementations after scanning body post-write | 2026-05-16 |
 | UX Agent ruling: Option B — three-axis demo, governance null, Greece 2015 | Three-axis + honest null axis is stronger for methodology reviewers than waiting for governance; 2015 extension required to show financial/human development divergence | 2026-05-16 |
 | GovernanceModule deferred from M8 demo | Five promotion criteria not met; null axis with "in validation" label is methodologically correct per information-hierarchy.md Zone 1B | 2026-05-16 |
@@ -93,7 +92,7 @@
 
 ## Architectural State — Key Facts for Session Continuity
 
-**ADR-005 Amendment 3 — committed to `docs/adr/ADR-005-human-cost-ledger.md` on branch `docs/adr-005-amendment3`. PR #309 open. Merge unblocks all M8 implementation.**
+**ADR-005 Amendment 3 — merged ✅ (PR #309). Now live in `docs/adr/ADR-005-human-cost-ledger.md`. All M8 implementation unblocked.**
 
 Six decisions accepted (Revision 2 — incorporates 10 must-resolve panel findings + 5 Q dispositions):
 - **M8-1:** Boundary proximity normalization — `min(v/b, 2.0)` for absolute-scale; `min(v, 2.0)` for pre-normalized; `_ECOLOGICAL_MANDATORY_NOTE_TEMPLATE` with `{n_indicators}` slot; `[0.0,2.0]` range cross-ADR obligation; effective-at-simulation-time query
@@ -105,7 +104,7 @@ Six decisions accepted (Revision 2 — incorporates 10 must-resolve panel findin
 
 **Draft file status:** `docs/architecture/adr-005-amendment3-draft.md` updated to ACCEPTED — historical record.
 
-**Frontend Architect brief — `docs/architecture/frontend-m8-brief.md` (PR #307). Area 1 (null governance type fix) must land before Area 5 (animation). Areas 2, 3, 4 parallel. All five blocked on PR #309 merge.**
+**Frontend Architect brief — `docs/architecture/frontend-m8-brief.md` (PR #307 ✅). Area 1 (null governance type fix) must land before Area 5 (animation). Areas 2, 3, 4 can run in parallel with Area 1. All five areas now unblocked.**
 
 **Standards state:**
 - Canonical unit registry: in DATA_STANDARDS.md §Canonical Unit Registry (PR #282)
