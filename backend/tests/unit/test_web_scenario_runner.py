@@ -7,6 +7,9 @@ Tests cover:
   IA-1 disclosure: ia1_disclosure is always set and contains the canonical phrase
   quantity_to_jsonb_envelope: field types and _envelope_version
   quantity_from_schema: field type restoration (Decimal, int, date not string)
+  Issue #279: _reconstruct_state_from_snapshot deserialization failures emit
+              [SIM-INTEGRITY] WARNING with entity/attr context and skip the
+              bad attribute without dropping the entity.
 
 All tests run without a database connection. DB-dependent paths use MagicMock /
 AsyncMock to simulate asyncpg behaviour.
@@ -14,6 +17,7 @@ AsyncMock to simulate asyncpg behaviour.
 from __future__ import annotations
 
 import json
+import logging
 from datetime import date, datetime, timezone
 from decimal import Decimal
 from typing import Any
@@ -592,3 +596,108 @@ def test_snapshot_record_m3_snapshot_has_empty_modules_active() -> None:
         modules_active=modules_active,
     )
     assert record.modules_active == []
+
+
+# ---------------------------------------------------------------------------
+# Issue #279: _reconstruct_state_from_snapshot deserialization warning
+# ---------------------------------------------------------------------------
+
+_WSR_LOGGER = "app.simulation.web_scenario_runner"
+
+
+@pytest.mark.asyncio
+async def test_reconstruct_snapshot_warns_on_malformed_envelope(
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    """Issue #279: malformed envelope emits [SIM-INTEGRITY] WARNING naming entity and attr."""
+    from app.simulation.web_scenario_runner import _reconstruct_state_from_snapshot  # noqa: PLC0415
+
+    conn = MagicMock()
+    conn.fetch = AsyncMock(return_value=[
+        {"entity_id": "GRC", "entity_type": "country", "metadata": "{}"},
+    ])
+
+    # Envelope is missing required fields — QuantitySchema.from_jsonb fills defaults,
+    # then Decimal("") raises InvalidOperation. Caught as a deserialization failure.
+    bad_envelope = {"_envelope_version": "1"}  # missing 'value', 'unit', etc.
+    state_data = {"GRC": {"bad_attr": bad_envelope}}
+    ts = datetime(2010, 1, 1, tzinfo=timezone.utc)  # noqa: UP017
+
+    with caplog.at_level(logging.WARNING, logger=_WSR_LOGGER):
+        state = await _reconstruct_state_from_snapshot(conn, "scen-1", "Test", state_data, ts)
+
+    sim_integrity_warnings = [
+        r for r in caplog.records
+        if r.levelno == logging.WARNING and "[SIM-INTEGRITY]" in r.getMessage()
+    ]
+    assert sim_integrity_warnings, (
+        f"Expected [SIM-INTEGRITY] WARNING but got: {[r.getMessage() for r in caplog.records]}"
+    )
+    warning_text = " ".join(r.getMessage() for r in sim_integrity_warnings)
+    assert "GRC" in warning_text, f"Warning must name entity_id 'GRC'. Got: {warning_text!r}"
+    assert "bad_attr" in warning_text, (
+        f"Warning must name attribute 'bad_attr'. Got: {warning_text!r}"
+    )
+    # Entity is still created despite the failed attribute
+    assert "GRC" in state.entities
+
+
+@pytest.mark.asyncio
+async def test_reconstruct_snapshot_skips_bad_attr_preserves_good_attr(
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    """Issue #279: bad attr is skipped; valid attrs on the same entity are loaded."""
+    from app.simulation.repositories.quantity_serde import (
+        quantity_to_jsonb_envelope,  # noqa: PLC0415
+    )
+    from app.simulation.web_scenario_runner import _reconstruct_state_from_snapshot  # noqa: PLC0415
+
+    conn = MagicMock()
+    conn.fetch = AsyncMock(return_value=[
+        {"entity_id": "GRC", "entity_type": "country", "metadata": "{}"},
+    ])
+
+    good_qty = _make_quantity(value="-0.054", unit="ratio_0_1", variable_type=VariableType.RATIO)
+    good_envelope = quantity_to_jsonb_envelope(good_qty)
+    bad_envelope = {"_envelope_version": "1"}  # missing required fields → InvalidOperation
+
+    state_data = {"GRC": {"good_attr": good_envelope, "bad_attr": bad_envelope}}
+    ts = datetime(2010, 1, 1, tzinfo=timezone.utc)  # noqa: UP017
+
+    with caplog.at_level(logging.WARNING, logger=_WSR_LOGGER):
+        state = await _reconstruct_state_from_snapshot(conn, "scen-1", "Test", state_data, ts)
+
+    grc = state.entities["GRC"]
+    assert "good_attr" in grc.attributes, "Valid attribute must be loaded"
+    assert "bad_attr" not in grc.attributes, "Malformed attribute must be skipped"
+
+
+@pytest.mark.asyncio
+async def test_reconstruct_snapshot_no_warning_for_valid_envelopes(
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    """Issue #279: no [SIM-INTEGRITY] warning when all envelopes deserialize cleanly."""
+    from app.simulation.repositories.quantity_serde import (
+        quantity_to_jsonb_envelope,  # noqa: PLC0415
+    )
+    from app.simulation.web_scenario_runner import _reconstruct_state_from_snapshot  # noqa: PLC0415
+
+    conn = MagicMock()
+    conn.fetch = AsyncMock(return_value=[
+        {"entity_id": "GRC", "entity_type": "country", "metadata": "{}"},
+    ])
+
+    good_qty = _make_quantity(value="-0.054", unit="ratio_0_1", variable_type=VariableType.RATIO)
+    state_data = {"GRC": {"gdp_growth": quantity_to_jsonb_envelope(good_qty)}}
+    ts = datetime(2010, 1, 1, tzinfo=timezone.utc)  # noqa: UP017
+
+    with caplog.at_level(logging.WARNING, logger=_WSR_LOGGER):
+        await _reconstruct_state_from_snapshot(conn, "scen-1", "Test", state_data, ts)
+
+    sim_integrity_warnings = [
+        r for r in caplog.records
+        if r.levelno == logging.WARNING and "[SIM-INTEGRITY]" in r.getMessage()
+    ]
+    assert not sim_integrity_warnings, (
+        f"Unexpected [SIM-INTEGRITY] warnings: {[r.getMessage() for r in sim_integrity_warnings]}"
+    )

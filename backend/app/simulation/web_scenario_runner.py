@@ -19,11 +19,12 @@ timestep is derived from configuration; if absent, defaults to 2000-01-01 UTC.
 from __future__ import annotations
 
 import json
+import logging
 import time
 from dataclasses import dataclass, replace
 from datetime import UTC
 from datetime import datetime as _datetime
-from decimal import Decimal
+from decimal import Decimal, InvalidOperation
 from typing import TYPE_CHECKING, Any
 
 import asyncpg  # noqa: TCH002 — used in method signatures at runtime
@@ -65,6 +66,8 @@ if TYPE_CHECKING:
 # `datetime` and `SimulationState` above are annotation-only (PEP 563).
 # `_reconstruct_state_from_snapshot` imports engine models locally at runtime.
 
+
+_log = logging.getLogger(__name__)
 
 # Engine version recorded in tombstone records.
 _ENGINE_VERSION = "0.3.0"
@@ -703,12 +706,20 @@ async def _reconstruct_state_from_snapshot(
 
         attributes = {}
         if isinstance(attr_data, dict):
-            import contextlib  # noqa: PLC0415
-
             for attr_key, envelope in attr_data.items():
                 if isinstance(envelope, dict):
-                    with contextlib.suppress(ValueError, KeyError):
+                    try:
                         attributes[attr_key] = quantity_from_jsonb(envelope)
+                    except (ValueError, KeyError, InvalidOperation) as exc:
+                        _log.warning(
+                            "[SIM-INTEGRITY] Failed to deserialize attribute %r for "
+                            "entity_id=%r from snapshot — attribute skipped. "
+                            "envelope_keys=%r exc=%r",
+                            attr_key,
+                            entity_id,
+                            list(envelope.keys()),
+                            exc,
+                        )
 
         entities[entity_id] = SimulationEntity(
             id=entity_id,
