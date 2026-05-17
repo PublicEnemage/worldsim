@@ -1152,6 +1152,62 @@ These cases require special handling and may never be left to default behavior:
 - Ensure no World Bank or IMF aggregates silently include or exclude these
   without documentation
 
+### Source-Convention Conflict Resolution
+
+When a registered data source uses entity labels that encode territorial claims
+differing from WorldSim's declared positions, the source `SourceRegistration`
+entry must:
+
+1. **Document the specific label conflict** — identify which entity labels in the
+   source differ from WorldSim's ISO 3166-1 alpha-3 identifiers or declared
+   territorial positions.
+2. **Specify the resolution approach** — one of:
+   - `rename_at_load`: ISO 3166-1 alpha-3 substitution at the data loading boundary
+   - `provenance_note`: attach a provenance note to affected Quantities without
+     renaming (for cases where the source label carries analytical significance)
+   - `entity_exclusion`: exclude the entity from this source's data entirely
+3. **Require Data Architect Agent review** before that source is used in a
+   production simulation run.
+
+**The resolution must NOT be silent.** It must be:
+- Logged with a provenance note at load time (not applied invisibly in extraction code)
+- Documented in the `source_field_registry` entry for the affected field (Gap 2)
+
+#### WGI Territorial Convention — Taiwan
+
+The World Governance Indicators (WGI) dataset uses `"Taiwan, China"` as its
+entity label for TWN, encoding a contested territorial claim in a source identifier.
+
+This creates two problems:
+1. **Entity lookup failure:** A lookup for `"TWN"` (WorldSim ISO identifier) will
+   fail to match `"Taiwan, China"` without a resolution layer.
+2. **Political encoding conflict:** The label implies a sovereignty claim
+   inconsistent with WorldSim's declared Taiwan position (see `§High-Risk Specific
+   Cases — Taiwan (TWN)` above).
+
+**Resolution approach for WGI Taiwan data:** `rename_at_load` — rename to ISO
+3166-1 alpha-3 `"TWN"` at load time. The `source_field_registry` entry for every
+WGI field that includes Taiwan data must carry the following provenance note:
+
+> *"WGI label 'Taiwan, China' translated to TWN per ISO 3166-1 alpha-3 at load
+> time. WorldSim follows ISO 3166-1 for internal identifiers. This translation
+> does not constitute a political position on sovereignty. WorldSim's declared
+> Taiwan position: see DATA_STANDARDS.md §High-Risk Specific Cases — Taiwan (TWN)
+> and POLICY.md §Territorial Positions."*
+
+#### Governance Source Registration Requirement
+
+Any governance or geopolitical source registration must include a mandatory
+`territorial_convention_conflicts` field in its `SourceRegistration` entry. Sources
+with no conflicts record: `"No territorial convention conflicts identified."` Sources
+with conflicts document the conflict, the resolution approach, and require Data
+Architect Agent review before use in production simulation runs.
+
+This requirement applies to: WGI, Freedom House, V-Dem, RSF, Transparency
+International CPI, and any future governance indicator source.
+
+---
+
 ### Display Principle
 
 - Non-disputed cases: use the name the entity uses in its own official
@@ -1188,6 +1244,92 @@ ours to take. Where standards are silent or disputed, we document our choice
 and the rationale explicitly. This principle is the rationale for every specific
 decision in this section and is stated here explicitly so that no individual
 choice appears arbitrary.
+
+---
+
+## Canonical Unit Registry
+
+The canonical unit registry establishes a controlled vocabulary for WorldSim's
+internal `Quantity.unit` strings. Without a controlled vocabulary, each new
+indicator added in M8 faces the same choice that produced `unit="dimensionless"`
+for `co2_concentration_ppm` — there is no authoritative answer, so the developer
+defaults to a placeholder. The Gimli Glider (1983) and Mars Climate Orbiter (1999)
+incidents are both architectural analogs to this failure mode: plausible-looking
+wrong values that survive testing and mislead users.
+
+### Tier 1 — Naming Convention Enforcement
+
+Any attribute key containing a unit-bearing suffix must NOT use
+`unit="dimensionless"`. The following suffixes signal that the attribute carries
+a specific unit, and a `"dimensionless"` unit string is therefore incorrect:
+
+| Suffix | Correct unit string |
+|---|---|
+| `_ppm` | `"ppm"` |
+| `_percent` | `"percent"` |
+| `_percentile` | `"percentile_0_100"` |
+| `_ratio` | `"ratio_0_1"` |
+| `_months` | `"months"` |
+| `_usd` | `"USD_millions_current"` or `"USD_2015"` |
+| `_kwh` | `"kwh"` |
+| `_tonnes` | `"tonnes"` |
+| `_km2` | `"km2"` |
+
+**Compliance scan rule:** Any `Quantity(...)` instantiation where the attribute
+key contains one of these suffixes and `unit="dimensionless"` is used must be
+flagged as a compliance violation. The compliance scan must enforce this Tier 1
+rule at milestone exit.
+
+### Tier 2 — Canonical Vocabulary
+
+The following unit strings are the complete controlled vocabulary for WorldSim
+internal attribute `Quantity` objects. No other unit string may be used without
+a documented compliance scan exception.
+
+| Unit string | Meaning | Typical indicators |
+|---|---|---|
+| `"ppm"` | Parts per million (atmospheric concentration) | `co2_concentration_ppm` |
+| `"ppm_annual_delta"` | Annual change in parts per million | CO2 trajectory deltas |
+| `"percentile_0_100"` | Percentile rank on 0–100 scale | `rule_of_law_percentile`, `corruption_perception_index` |
+| `"ratio_0_1"` | Dimensionless fraction, bounded 0–1 | `land_use_pressure_index`, `democratic_quality_score` |
+| `"dimensionless"` | Explicitly zero-dimensional — NOT a placeholder. Reserved for genuinely dimensionless quantities where the attribute key carries no unit-bearing suffix (e.g., `debt_gdp_ratio`). | `debt_gdp_ratio` |
+| `"USD_millions_current"` | Nominal USD millions at observation date | Nominal flow variables |
+| `"USD_2015"` | Constant 2015 USD (canonical internal monetary unit) | All stored monetary values |
+| `"months"` | Time duration in months | `reserve_coverage_months` |
+| `"percent"` | Percentage on 0–100 scale | Display-layer convention only; prefer `ratio_0_1` internally |
+| `"index"` | Composite index with documented construction methodology | `press_freedom_index`, `technocratic_independence` |
+
+**Correct usage of `"dimensionless"`:** `"dimensionless"` is semantically correct
+only when the attribute genuinely has no unit and the attribute name does not
+imply one. A ratio of two GDP quantities (same unit cancels) is dimensionless.
+A CO2 concentration in parts per million is not.
+
+### Tier 3 — Field-Level Certification Obligation (M9)
+
+The canonical unit registry establishes the target unit layer: a `Quantity`
+carrying a canonical unit string is correctly labeled. But a correct label is
+not the same as a verified transformation from source data.
+
+Field-level certification — documented source field → WorldSim attribute
+transformation with Data Architect Agent sign-off — is the source-of-truth layer
+that cannot be assumed from the label alone. See `§Field-Level Data Certification`
+(Gap 2) for the certification structure.
+
+Full retroactive certification of all existing sources is M9 Standards Foundation
+scope (Issue #252). M8 new sources (WGI, planetary boundary data) must have draft
+certification entries before their fields are used in module code.
+
+### Cross-reference to CODING_STANDARDS.md
+
+The runtime enforcement gate for canonical unit compliance lives at `Quantity`
+construction time, not only in the compliance scan. See
+`CODING_STANDARDS.md §Canonical Unit Registry cross-reference` for the runtime
+validation requirement. The compliance scan is a secondary enforcement layer.
+
+Every new M8 ecological and governance indicator must include a unit correctness
+test asserting `qty.unit == "<canonical_unit_string>"` explicitly. This is a
+mandatory test requirement — existing tests that assert `variable_type` but not
+`unit` are incomplete for M8 and later indicators.
 
 ---
 
@@ -1302,6 +1444,201 @@ exact `note` text:
 Substitute `lower` or `upper` as appropriate. Variations that say "truncated"
 or that omit the probability interpretation are prohibited — they understate
 what boundary pile-up means to the analyst reading the output.
+
+---
+
+## Field-Level Data Certification
+
+Source-level `SourceRegistration` certifies that a data source is approved and
+describes its coverage. It does not certify how individual fields within that
+source map to WorldSim's internal attribute space.
+
+This gap is the "naming-as-identity" failure class: `RL.EST` (WGI field name)
+and `rule_of_law_percentile` (WorldSim attribute) share a conceptual relationship,
+but the transformation between them — units, scaling, aggregation — is invisible
+to the system without explicit documentation. The inverse failure class ("reverse
+video") is two sources both having a field called "rule of law" that measure
+completely different things.
+
+### Certification Standard
+
+A source may not contribute data to a production simulation run unless all fields
+accessed from that source have a certified `source_field_registry` entry.
+
+A `source_field_registry` entry must document all of the following:
+
+| Field | Description |
+|---|---|
+| `source_id` | FK into the `SourceRegistration` or `LiteratureSourceRegistration` registry |
+| `source_field_identifier` | Exact field name in the source's own schema (e.g., `"RL.EST"` for WGI) |
+| `source_unit` | Unit of the field as published by the source (e.g., `"standard_normal_units"` for WGI RL.EST) |
+| `worldsim_attribute_key` | The WorldSim internal attribute this field maps to (e.g., `"rule_of_law_percentile"`) |
+| `worldsim_canonical_unit` | Must be drawn from `§Canonical Unit Registry` (e.g., `"percentile_0_100"`) |
+| `transformation_formula` | The exact formula or method used (e.g., `"percentile_rank_over_cross_section"`, `"linear_scale_to_0_100"`) |
+| `confidence_tier` | Tier assigned at the field level (may be stricter than source tier) |
+| `transformation_test_id` | Reference to a test that verifies the transformation on a known input/output pair from actual source data. Paper certification without a verification test is not sufficient. |
+| `data_architect_signoff_date` | Date of Data Architect Agent review and sign-off |
+
+### Chain of Custody Principle
+
+The three standards work together as a chain:
+
+1. **`§Canonical Unit Registry` (Gap 1)** — naming convention prevents mislabeling
+   at the Quantity construction layer
+2. **`§Field-Level Data Certification` (Gap 2)** — source-of-truth verification
+   that the transformation from source field to WorldSim attribute is documented
+   and tested
+3. **`§Source-Convention Conflict Resolution` (Gap 3, see §Territorial Positions
+   below)** — entity identity is resolved before field mapping, ensuring the
+   certified field mapping applies to the correct entity
+
+All three must be satisfied for a source field to be production-certified.
+
+### Dependent Field Documentation
+
+Where a field's meaning depends on the value of another field in the same record
+(e.g., record type determines column semantics), the dependency must be documented
+explicitly in the `source_field_registry` entry with the full resolution logic.
+
+This is mandatory for any source with record-type-dependent column semantics.
+WGI's `Estimate`, `StdErr`, `NumSrc`, `Rank`, `Lower`, `Upper` columns are
+all keyed by indicator code — any registry entry for a WGI field must document
+which indicator code selects the row.
+
+### M8 Certification Scope
+
+Any new source registered in M8 (WGI, Rockström planetary boundary data,
+expanded FAO data) must have draft `source_field_registry` entries for all
+fields accessed before those fields are used in module code.
+
+**Draft entries** require Engineering Lead acknowledgment.
+
+**Certified entries** require:
+1. Data Architect Agent review and sign-off date
+2. A passing `transformation_test_id` test — a test that verifies the transformation
+   on a known input/output pair from actual source data
+
+Full retroactive certification of all existing sources is M9 Standards Foundation
+scope (Issue #252). M8 new sources have no grace period — draft certification is
+required before first use in module code.
+
+---
+
+## Simulation Reference Constants
+
+A simulation reference constant is a fixed numerical threshold or calibration
+value derived from scientific consensus or peer-reviewed literature that is not
+an empirical time-series observation. Planetary boundary thresholds are the
+canonical example. Reference constants are not datasets — they are model
+calibration constants whose authority derives from peer-reviewed science, not
+periodic data releases.
+
+### Definition
+
+Reference constants differ from ordinary source data in three ways:
+
+1. **Not time-series:** A planetary boundary threshold is a fixed scientific
+   consensus value, not a time-stamped observation. The 350 ppm CO2 safe
+   boundary (Rockström et al. 2009) does not change year to year; it changes
+   when scientific consensus is revised through a new landmark paper.
+2. **Access pattern:** Reference constants are accessed as single-value lookups
+   at normalization time, not as range queries on a time-series table.
+3. **Authority:** Authority derives from peer-reviewed science citation, not from
+   a data provider's periodic release.
+
+### Registration Format
+
+Reference constants are registered as `LiteratureSourceRegistration` entries
+(existing, from Issue #172 resolution) with source_type `"SIMULATION_REFERENCE_CONSTANT"`.
+The constant value, its canonical unit (from `§Canonical Unit Registry`), citation,
+and DOI are recorded alongside the standard literature registration fields.
+
+### Database Location — Dedicated Table
+
+Reference constants are stored in the `simulation_reference_constants` table.
+Their access pattern (single-value lookup at normalization time) is fundamentally
+different from time-series provenance tracking in `source_registry`. Mixing them
+in `source_registry` creates query complexity without benefit.
+
+Table schema:
+
+| Column | Type | Notes |
+|---|---|---|
+| `constant_id` | `TEXT PRIMARY KEY` | Naming convention: `{FRAMEWORK}_{INDICATOR}_{QUALIFIER}` — e.g., `ECOLOGICAL_CO2_PLANETARY_BOUNDARY_PPM` |
+| `constant_name` | `TEXT NOT NULL` | Human-readable name |
+| `value` | `NUMERIC NOT NULL` | The constant value |
+| `unit` | `TEXT NOT NULL` | Must be a canonical unit string from `§Canonical Unit Registry` |
+| `source_citation` | `TEXT NOT NULL` | Full bibliographic citation |
+| `doi_or_url` | `TEXT NOT NULL` | DOI preferred |
+| `effective_from` | `DATE NOT NULL` | When this value became the operative constant |
+| `effective_through` | `DATE` | NULL means currently in effect |
+| `registered_by` | `TEXT NOT NULL DEFAULT 'agent'` | Who registered this entry |
+| `registered_at` | `TIMESTAMPTZ NOT NULL DEFAULT now()` | When it was registered |
+
+A unique partial index on `(constant_id) WHERE effective_through IS NULL` enforces
+that only one value per constant is in effect at any time.
+
+### M8 Seed Constants
+
+The following planetary boundary reference constants are seeded from
+Rockström et al. 2009 / Richardson et al. 2023 with `effective_from = '2009-09-24'`
+(Rockström et al. publication date):
+
+| Constant ID | Value | Unit | Source |
+|---|---|---|---|
+| `ECOLOGICAL_CO2_PLANETARY_BOUNDARY_PPM` | 350 | `ppm` | Rockström et al. 2009, doi:10.1038/461472a |
+| `ECOLOGICAL_LAND_USE_PLANETARY_BOUNDARY_RATIO` | 0.25 | `ratio_0_1` | Richardson et al. 2023, doi:10.1126/sciadv.adh2458 |
+
+### Normalization Formula
+
+The M8 ecological composite score for any indicator with a planetary boundary
+reference constant is computed as:
+
+```
+boundary_score = min(current_value / boundary_value, 2.0)
+```
+
+Where:
+- `boundary_score > 1.0` — the planetary boundary has been crossed
+- `boundary_score = 1.0` — the boundary is exactly met
+- `boundary_score < 1.0` — within the safe operating space
+- Cap at `2.0` represents "double the safe boundary" as the display ceiling
+
+This formula is absolute normalization (entity value vs. physical threshold),
+not cross-entity percentile rank. A single entity's CO2 concentration relative
+to 350 ppm is physically meaningful regardless of how many entities are in the
+scenario — unlike percentile rank, which is meaningless with one entity.
+
+**Implication for `is_single_entity` guard:** Boundary-normalized ecological
+composite scores are exempt from the `is_single_entity` guard in
+`app/api/scenarios.py`. See `§is_single_entity guard interaction` in the
+ADR-005 M8 amendment for the full specification.
+
+### Update Governance
+
+When scientific consensus is revised (new Steffen et al. revision, new
+Richardson et al. update), insert a new row with the new `effective_from` date
+and set `effective_through` on the previous row to `effective_from - 1 day`.
+Never delete rows. Historical simulation runs are traceable to the constant
+version in effect at run time via the `effective_from` / `effective_through`
+date range.
+
+### `_compute_composite_score()` Dispatch Architecture
+
+Gaps 4 and 5 (ecological boundary normalization and governance normalization)
+are mechanically coupled at `_compute_composite_score()` in `app/api/scenarios.py`.
+That function currently runs the same percentile rank calculation for all frameworks,
+ignoring the `framework` parameter.
+
+Before implementing boundary normalization for ecological, the dispatch
+architecture must be designed to accommodate both ecological (boundary proximity)
+and governance (methodology TBD in ADR-005 M8 amendment) normalization paths.
+The design must use a strategy dispatch pattern that governance can extend without
+requiring a refactor when its normalization methodology is decided.
+
+See the dispatch design comment above `_compute_composite_score()` in
+`app/api/scenarios.py` (added in this Gap 4 commit) for the documented
+design decision.
 
 ---
 

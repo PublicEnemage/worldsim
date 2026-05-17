@@ -417,6 +417,56 @@ async def test_multi_entity_single_entity_warning_is_false() -> None:
     assert result.single_entity_warning is False
 
 
+# ---------------------------------------------------------------------------
+# Framework Promotion Protocol CI enforcement — CODING_STANDARDS.md §Framework Promotion Protocol
+# ---------------------------------------------------------------------------
+
+
+def test_governance_is_in_unimplemented_frameworks() -> None:
+    """CI enforcement: governance composite scores must be None while 'governance'
+    is in _UNIMPLEMENTED_FRAMEWORKS.
+
+    This test is the explicit, testable precondition for promotion. It will
+    PASS as long as governance is unimplemented (correct) and must be REMOVED
+    (not just disabled) when the companion integration test that satisfies
+    promotion criterion 5 is written and passes.
+
+    CODING_STANDARDS.md §Framework Promotion Protocol promotion criterion 5:
+    'The act of satisfying the companion integration test is the explicit,
+    testable precondition for the API surface change.'
+    """
+    from app.api.scenarios import _UNIMPLEMENTED_FRAMEWORKS
+    assert "governance" in _UNIMPLEMENTED_FRAMEWORKS, (
+        "governance was removed from _UNIMPLEMENTED_FRAMEWORKS without satisfying "
+        "all five promotion criteria in CODING_STANDARDS.md §Framework Promotion Protocol. "
+        "Remove this test only after the companion integration test passes."
+    )
+
+
+@pytest.mark.asyncio
+async def test_governance_composite_score_is_none_when_unimplemented() -> None:
+    """Governance composite_score must be None while governance is in _UNIMPLEMENTED_FRAMEWORKS.
+
+    Companion to test_governance_is_in_unimplemented_frameworks. If governance
+    is promoted, both this test and the guard test above must be updated together.
+    """
+    from app.api.scenarios import _UNIMPLEMENTED_FRAMEWORKS
+    if "governance" not in _UNIMPLEMENTED_FRAMEWORKS:
+        pytest.skip("governance has been promoted — update this test")
+
+    conn = _make_conn(
+        {"scenario_id": "scen-1"},
+        _snap_row(),
+        _entity_row(),
+    )
+    result = await get_measurement_output(
+        scenario_id="scen-1", entity_id="GRC", step=1, conn=conn
+    )
+    assert result.outputs["governance"].composite_score is None, (
+        "governance composite_score must be None while governance is unimplemented"
+    )
+
+
 @pytest.mark.asyncio
 async def test_multi_entity_composite_score_is_not_null() -> None:
     """Multi-entity snapshot: financial composite_score must be a non-null string."""

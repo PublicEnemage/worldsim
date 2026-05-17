@@ -33,6 +33,20 @@ if TYPE_CHECKING:
 
 _log = logging.getLogger(__name__)
 
+# Canonical unit strings per DATA_STANDARDS.md §Canonical Unit Registry (Gap 1).
+# Sources: WGI RL.EST → percentile_0_100; V-Dem LDI → ratio_0_1 (0–1 scale);
+# TI CPI → percentile_0_100; RSF index → index; derived composite → index.
+# Any future governance indicator not listed here falls back to "dimensionless"
+# (genuinely dimensionless, not a placeholder — document the rationale if used).
+_INDICATOR_UNITS: dict[str, str] = {
+    "rule_of_law_percentile": "percentile_0_100",
+    "democratic_quality_score": "ratio_0_1",
+    "corruption_perception_index": "percentile_0_100",
+    "press_freedom_index": "index",
+    "technocratic_independence": "index",
+}
+_DEFAULT_GOVERNANCE_UNIT = "dimensionless"
+
 _SUBSCRIBED_EVENTS = frozenset({
     "gdp_growth_change",
     "fiscal_policy_spending_change",
@@ -98,7 +112,7 @@ class GovernanceModule(SimulationModule):
         affected_attributes = {
             key: Quantity(
                 value=delta,
-                unit="dimensionless",
+                unit=_INDICATOR_UNITS.get(key, _DEFAULT_GOVERNANCE_UNIT),
                 variable_type=VariableType.DIMENSIONLESS,
                 measurement_framework=MeasurementFramework.GOVERNANCE,
                 confidence_tier=indicator_tiers[key],

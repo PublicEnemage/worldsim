@@ -824,6 +824,29 @@ def _compute_composite_score(
     that indicator in this framework. Returns str(Decimal) rounded to 4 decimal
     places, or None if no numeric indicators exist for this framework.
     ADR-005 Decision 2 §Composite score normalization.
+
+    DISPATCH DESIGN NOTE (STD-REVIEW-004 Gap 4 + Gap 5, Architect panel finding):
+    This function currently applies the same percentile-rank calculation to all
+    frameworks, ignoring the `framework` parameter. Gaps 4 and 5 both require this
+    function to branch on framework:
+      - ecological: boundary proximity normalization (value / planetary_boundary,
+        capped at 2.0) — DATA_STANDARDS.md §Simulation Reference Constants
+      - governance: normalization methodology TBD in ADR-005 M8 amendment
+
+    The implementation must use a strategy dispatch pattern so that governance
+    can extend it without requiring a refactor. Design before implementing either:
+    define a Protocol or callable map keyed by framework string, with the
+    percentile-rank strategy as the default/fallback. Both ecological and governance
+    normalization strategies must be added in the same ADR-005 M8 amendment commit
+    — do not implement ecological strategy alone.
+
+    is_single_entity guard interaction (QA Lead panel finding, Gap 4):
+    The is_single_entity guard below suppresses composite_score for single-entity
+    scenarios uniformly. Boundary-normalized ecological scores are physically
+    meaningful for a single entity (CO2 vs. 350 ppm boundary), unlike percentile
+    rank. The ADR-005 M8 amendment must specify which frameworks are exempt from
+    the guard. TODO: update the guard to check framework exemption list before
+    suppressing composite_score.
     """
     if not entity_indicators:
         return None

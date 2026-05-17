@@ -250,6 +250,37 @@ def test_elasticity_delta_is_decimal_not_float() -> None:
             assert not isinstance(qty.value, float)
 
 
+def test_rule_of_law_uses_canonical_percentile_0_100_unit() -> None:
+    """rule_of_law_percentile must use unit='percentile_0_100'.
+
+    WGI percentile rank 0–100; canonical unit per DATA_STANDARDS.md §Canonical Unit Registry.
+    """
+    gdp_ev = _gdp_event("GRC", Decimal("-0.05"))
+    state = _make_state("GRC", entity_type="country", prior_events=[gdp_ev])
+    module = GovernanceModule()
+    ts = datetime(2011, 1, 1, tzinfo=timezone.utc)  # noqa: UP017
+    events = module.compute(state.entities["GRC"], state, ts)
+    assert len(events) == 1
+    qty = events[0].affected_attributes["rule_of_law_percentile"]
+    assert qty.unit == "percentile_0_100", (
+        f"rule_of_law_percentile must use unit='percentile_0_100', got {qty.unit!r}"
+    )
+
+
+def test_democratic_quality_score_uses_canonical_ratio_0_1_unit() -> None:
+    """democratic_quality_score must use unit='ratio_0_1' (V-Dem LDI is 0–1 scale)."""
+    imf_ev = _imf_event("GRC")
+    state = _make_state("GRC", entity_type="country", prior_events=[imf_ev])
+    module = GovernanceModule()
+    ts = datetime(2011, 1, 1, tzinfo=timezone.utc)  # noqa: UP017
+    events = module.compute(state.entities["GRC"], state, ts)
+    assert len(events) == 1
+    qty = events[0].affected_attributes["democratic_quality_score"]
+    assert qty.unit == "ratio_0_1", (
+        f"democratic_quality_score must use unit='ratio_0_1', got {qty.unit!r}"
+    )
+
+
 def test_registry_elasticities_are_decimal() -> None:
     for row in GOVERNANCE_ELASTICITY_REGISTRY:
         assert isinstance(row.elasticity, Decimal), (
