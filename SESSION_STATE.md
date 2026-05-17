@@ -147,4 +147,5 @@ At the end of every Claude Code session, update this file:
 3. Add any new open issues to the appropriate horizon section
 4. Record any Engineering Lead decisions made
 5. Update ADR-005 amendment scope if decisions were made
-6. This update is the **last action** of every session before closing
+6. If a new agent was activated or defined this session, verify `docs/process/agents.md` is current before closing
+7. This update is the **last action** of every session before closing
