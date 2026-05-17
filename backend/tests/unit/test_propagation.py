@@ -477,7 +477,9 @@ class TestPropagateConfidenceTier:
         assert bra_tier == 2  # preserved through attenuation
 
     def test_accumulation_applies_lower_of_two_to_confidence_tier(self) -> None:
-        # Two events on the same attribute: lower tier wins
+        # Two events on the same attribute: worst confidence wins.
+        # "Lower-of-two" means lower confidence quality, which is the HIGHER
+        # tier number (tier 4 is worse than tier 1). Implementation uses max().
         state = _state({"BOL": _entity("BOL")})
         events = [
             Event(
@@ -501,7 +503,45 @@ class TestPropagateConfidenceTier:
         ]
         result = propagate(state, events)
         tier = result.entities["BOL"].get_attribute("gdp_growth").confidence_tier  # type: ignore[union-attr]
-        assert tier == 4  # lower-of-two: min(1, 4) = 4
+        assert tier == 4  # max(1, 4) = 4 — worst quality (highest tier number) wins
+
+    def test_confidence_tier_lower_of_two_uses_max_not_min(self) -> None:
+        """Issue #280: lower-of-two rule is max(tier_a, tier_b), not min().
+
+        Higher tier number = lower confidence quality. The accumulated tier
+        must be the maximum (worst) of all contributing tiers. If this test
+        fails it means the implementation was changed to min(), which would
+        silently make derived outputs appear higher-confidence than they are.
+        """
+        state = _state({"BOL": _entity("BOL")})
+        events = [
+            Event(
+                event_id="high-conf",
+                source_entity_id="BOL",
+                event_type="shock",
+                affected_attributes={"gdp_growth": _q(0.01, confidence_tier=1)},
+                propagation_rules=[],
+                timestep_originated=datetime(2020, 1, 1),
+                framework=MeasurementFramework.FINANCIAL,
+            ),
+            Event(
+                event_id="low-conf",
+                source_entity_id="BOL",
+                event_type="shock",
+                affected_attributes={"gdp_growth": _q(0.01, confidence_tier=5)},
+                propagation_rules=[],
+                timestep_originated=datetime(2020, 1, 1),
+                framework=MeasurementFramework.FINANCIAL,
+            ),
+        ]
+        result = propagate(state, events)
+        tier = result.entities["BOL"].get_attribute("gdp_growth").confidence_tier  # type: ignore[union-attr]
+        # Must be 5 (worst quality wins), not 1 (which would be min())
+        assert tier == 5, (
+            f"Expected tier 5 (max of 1 and 5 — worst confidence wins). Got {tier}. "
+            "The lower-of-two rule uses max(tier_a, tier_b), not min()."
+        )
+        assert tier != 1, "tier==1 would mean min() was used — that silently overstates confidence"
 
 
 # ---------------------------------------------------------------------------

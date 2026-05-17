@@ -219,9 +219,20 @@ def _accumulate(
     Multiple calls for the same entity accumulate contributions additively.
     This is the mechanism by which converging propagation paths accumulate.
 
-    confidence_tier lower-of-two rule: the accumulated tier is the minimum
-    of all contributing tiers. This is a conservative policy approximation,
-    not a statistical formula — see propagate_confidence() docstring.
+    confidence_tier lower-of-two rule: the accumulated tier is the **maximum**
+    of all contributing tier numbers. Higher tier number = lower confidence
+    quality; the output inherits the worst-quality input's tier. This is a
+    conservative policy approximation, not a statistical formula.
+
+    STOCK conflict (known interim behavior, pending M8 fix — Issue #280):
+    When two STOCK deltas target the same entity+attribute in one step, a
+    [SIM-INTEGRITY] WARNING is emitted and the values are **summed** rather
+    than the second replacing the first. STOCK semantics expect a single
+    absolute-level event per attribute per step; summing two absolute levels
+    is incorrect. The WARNING exists precisely because this state should not
+    occur — if it does, the emitting modules have a deduplication gap. The
+    summing behavior is an interim fallback to avoid silent data loss; it is
+    not the correct STOCK resolution and should not be relied on.
 
     Args:
         accumulator: Mutable accumulator mapping entity_id to attr deltas.
