@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated:** 2026-05-17 (post-#305)
+**Last updated:** 2026-05-17 (post-#307)
 **Current milestone:** M8 — Ecological and Governance Frameworks
 
 ---
@@ -28,11 +28,11 @@
 
 | PR | Title | Date |
 |---|---|---|
+| #307 | docs(agents): activate Frontend Architect Agent and produce M8 component brief (#298) | 2026-05-17 |
 | #305 | docs(process): agents.md — migrate all agent personas from CLAUDE.md (#297) | 2026-05-17 |
 | #303 | docs: ADR-005 Amendment 3 panel synthesis — four-agent review | 2026-05-17 |
 | #302 | chore(state): SESSION_STATE.md update — issues #297–#301 filed, ADR-005 draft produced | 2026-05-17 |
 | #295 | ci: auto-merge SESSION_STATE.md-only PRs | 2026-05-17 |
-| #291 | chore(legibility): retrofit intent blocks on five M7 blind audit functions | 2026-05-17 |
 
 ---
 
@@ -42,12 +42,11 @@
 |---|---|---|
 | #218 | ADR-005 M8 amendment (causal meta-map) | Nothing — activate Architect Agent |
 | #284 | Greece fixture extension to 2015 | ADR-005 |
-| #265 | Indicator display name mapping layer | ADR-005 |
-| #266 | Mandatory ecological note → Zone 3 expandable | ADR-005 |
-| #267 | Radar chart transition animation | ADR-005 |
-| #268 | Coffin Corner / PMM Zone 1 widget | ADR-005 |
+| #265 | Indicator display name mapping layer | ADR-005 (brief: frontend-m8-brief.md Area 3) |
+| #266 | Mandatory ecological note → Zone 3 expandable | ADR-005 (brief: frontend-m8-brief.md Area 4) |
+| #267 | Radar chart transition animation | ADR-005 (brief: frontend-m8-brief.md Area 5) |
+| #268 | Coffin Corner / PMM Zone 1 widget | ADR-005 (brief: frontend-m8-brief.md Area 2) |
 | #269 | Demo scenario — Greece 2010–2015 | #284 + EcologicalModule |
-| #298 | Frontend Architect Agent activation + M8 brief | ADR-005 amendment |
 
 ---
 
@@ -63,7 +62,7 @@
 | #222 | Contemporaneous processing path | ADR-005 |
 | #299 | Intent Block Author Agent — define in agents.md | Nothing — unblocked ✅ |
 | #300 | Data Quality Agent — define in agents.md (M9) | Nothing — unblocked ✅ |
-| #301 | agent-raci.md — RACI chart for all agents | #298, #299, #300 |
+| #301 | agent-raci.md — RACI chart for all agents | #299, #300 (not #298 — closed ✅) |
 
 ---
 
@@ -73,7 +72,7 @@
 |---|---|---|
 | ADR-005 M8 amendment — disposition of panel findings | Synthesis at `docs/architecture/adr-005-amendment3-panel-synthesis.md` (PR #303). 10 must-resolve items before Architect Agent revision; 12 should-resolve before implementation. See §ADR-005 Panel Findings below. | **Ready for EL disposition** |
 | GovernanceModule promotion path | Deferred from M8 demo — five criteria not yet met — target M9 | Decided: deferred |
-| Agent roster expansion | #297 merged (PR #305); #298 (Frontend Architect) unblocked pending ADR-005; #299 and #300 unblocked | #297 done ✅ — #298 next |
+| Agent roster expansion | #297 merged (PR #305); #298 merged (PR #307) — Frontend Architect active, M8 brief delivered; #299 and #300 unblocked | #297 ✅ #298 ✅ — #301 blocked on #299, #300 |
 
 ---
 
@@ -81,6 +80,7 @@
 
 | Decision | Rationale | Date |
 |---|---|---|
+| Frontend Architect Agent activated; M8 brief delivered with UX Designer sign-off | Five UI areas specified: null governance axis (cross-ADR type fix), PMM Zone 1C widget, display name registry, Zone 3A expandable, radar animation. #265–268 unblocked pending ADR-005 disposition | 2026-05-17 |
 | Intent block retrofit: no divergences found in five M7 functions | All five intent blocks consistent with implementations after scanning body post-write | 2026-05-16 |
 | UX Agent ruling: Option B — three-axis demo, governance null, Greece 2015 | Three-axis + honest null axis is stronger for methodology reviewers than waiting for governance; 2015 extension required to show financial/human development divergence | 2026-05-16 |
 | GovernanceModule deferred from M8 demo | Five promotion criteria not met; null axis with "in validation" label is methodologically correct per information-hierarchy.md Zone 1B | 2026-05-16 |
@@ -114,6 +114,8 @@ Six decisions stand as drafted; panel identified revisions required before accep
 **Highest-risk decision: M8-3 (2/4 votes).** Two specification additions needed: (1) `_PERCENTILE_RANK_VALIDATED_FRAMEWORKS` frozenset + `[SIM-INTEGRITY]` WARNING for unvalidated fallback; (2) `context: dict[str, Any]` parameter to carry pre-fetched boundary constants through strategy dispatch.
 
 **Next step:** EL reviews synthesis, dispositions findings, then Architect Agent produces revised amendment draft.
+
+**Frontend Architect brief — M8 component architecture at `docs/architecture/frontend-m8-brief.md` (PR #307). UX Designer sign-off recorded. Five areas specified with dependency ordering: Area 1 (null governance type fix) must land before Area 5 (animation). Areas 2, 3, 4 can run in parallel. All five areas blocked on ADR-005 amendment acceptance.**
 
 **Standards state:**
 - Canonical unit registry: in DATA_STANDARDS.md §Canonical Unit Registry (PR #282)
