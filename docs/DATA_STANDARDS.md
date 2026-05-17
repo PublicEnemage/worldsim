@@ -1391,6 +1391,124 @@ what boundary pile-up means to the analyst reading the output.
 
 ---
 
+## Simulation Reference Constants
+
+A simulation reference constant is a fixed numerical threshold or calibration
+value derived from scientific consensus or peer-reviewed literature that is not
+an empirical time-series observation. Planetary boundary thresholds are the
+canonical example. Reference constants are not datasets — they are model
+calibration constants whose authority derives from peer-reviewed science, not
+periodic data releases.
+
+### Definition
+
+Reference constants differ from ordinary source data in three ways:
+
+1. **Not time-series:** A planetary boundary threshold is a fixed scientific
+   consensus value, not a time-stamped observation. The 350 ppm CO2 safe
+   boundary (Rockström et al. 2009) does not change year to year; it changes
+   when scientific consensus is revised through a new landmark paper.
+2. **Access pattern:** Reference constants are accessed as single-value lookups
+   at normalization time, not as range queries on a time-series table.
+3. **Authority:** Authority derives from peer-reviewed science citation, not from
+   a data provider's periodic release.
+
+### Registration Format
+
+Reference constants are registered as `LiteratureSourceRegistration` entries
+(existing, from Issue #172 resolution) with source_type `"SIMULATION_REFERENCE_CONSTANT"`.
+The constant value, its canonical unit (from `§Canonical Unit Registry`), citation,
+and DOI are recorded alongside the standard literature registration fields.
+
+### Database Location — Dedicated Table
+
+Reference constants are stored in the `simulation_reference_constants` table.
+Their access pattern (single-value lookup at normalization time) is fundamentally
+different from time-series provenance tracking in `source_registry`. Mixing them
+in `source_registry` creates query complexity without benefit.
+
+Table schema:
+
+| Column | Type | Notes |
+|---|---|---|
+| `constant_id` | `TEXT PRIMARY KEY` | Naming convention: `{FRAMEWORK}_{INDICATOR}_{QUALIFIER}` — e.g., `ECOLOGICAL_CO2_PLANETARY_BOUNDARY_PPM` |
+| `constant_name` | `TEXT NOT NULL` | Human-readable name |
+| `value` | `NUMERIC NOT NULL` | The constant value |
+| `unit` | `TEXT NOT NULL` | Must be a canonical unit string from `§Canonical Unit Registry` |
+| `source_citation` | `TEXT NOT NULL` | Full bibliographic citation |
+| `doi_or_url` | `TEXT NOT NULL` | DOI preferred |
+| `effective_from` | `DATE NOT NULL` | When this value became the operative constant |
+| `effective_through` | `DATE` | NULL means currently in effect |
+| `registered_by` | `TEXT NOT NULL DEFAULT 'agent'` | Who registered this entry |
+| `registered_at` | `TIMESTAMPTZ NOT NULL DEFAULT now()` | When it was registered |
+
+A unique partial index on `(constant_id) WHERE effective_through IS NULL` enforces
+that only one value per constant is in effect at any time.
+
+### M8 Seed Constants
+
+The following planetary boundary reference constants are seeded from
+Rockström et al. 2009 / Richardson et al. 2023 with `effective_from = '2009-09-24'`
+(Rockström et al. publication date):
+
+| Constant ID | Value | Unit | Source |
+|---|---|---|---|
+| `ECOLOGICAL_CO2_PLANETARY_BOUNDARY_PPM` | 350 | `ppm` | Rockström et al. 2009, doi:10.1038/461472a |
+| `ECOLOGICAL_LAND_USE_PLANETARY_BOUNDARY_RATIO` | 0.25 | `ratio_0_1` | Richardson et al. 2023, doi:10.1126/sciadv.adh2458 |
+
+### Normalization Formula
+
+The M8 ecological composite score for any indicator with a planetary boundary
+reference constant is computed as:
+
+```
+boundary_score = min(current_value / boundary_value, 2.0)
+```
+
+Where:
+- `boundary_score > 1.0` — the planetary boundary has been crossed
+- `boundary_score = 1.0` — the boundary is exactly met
+- `boundary_score < 1.0` — within the safe operating space
+- Cap at `2.0` represents "double the safe boundary" as the display ceiling
+
+This formula is absolute normalization (entity value vs. physical threshold),
+not cross-entity percentile rank. A single entity's CO2 concentration relative
+to 350 ppm is physically meaningful regardless of how many entities are in the
+scenario — unlike percentile rank, which is meaningless with one entity.
+
+**Implication for `is_single_entity` guard:** Boundary-normalized ecological
+composite scores are exempt from the `is_single_entity` guard in
+`app/api/scenarios.py`. See `§is_single_entity guard interaction` in the
+ADR-005 M8 amendment for the full specification.
+
+### Update Governance
+
+When scientific consensus is revised (new Steffen et al. revision, new
+Richardson et al. update), insert a new row with the new `effective_from` date
+and set `effective_through` on the previous row to `effective_from - 1 day`.
+Never delete rows. Historical simulation runs are traceable to the constant
+version in effect at run time via the `effective_from` / `effective_through`
+date range.
+
+### `_compute_composite_score()` Dispatch Architecture
+
+Gaps 4 and 5 (ecological boundary normalization and governance normalization)
+are mechanically coupled at `_compute_composite_score()` in `app/api/scenarios.py`.
+That function currently runs the same percentile rank calculation for all frameworks,
+ignoring the `framework` parameter.
+
+Before implementing boundary normalization for ecological, the dispatch
+architecture must be designed to accommodate both ecological (boundary proximity)
+and governance (methodology TBD in ADR-005 M8 amendment) normalization paths.
+The design must use a strategy dispatch pattern that governance can extend without
+requiring a refactor when its normalization methodology is decided.
+
+See the dispatch design comment above `_compute_composite_score()` in
+`app/api/scenarios.py` (added in this Gap 4 commit) for the documented
+design decision.
+
+---
+
 ## Governance Framework Indicator Standards
 
 The GOVERNANCE measurement framework is politically sensitive: what counts as

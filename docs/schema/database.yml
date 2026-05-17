@@ -919,6 +919,92 @@ tables:
       control_input_audit_log_pkey: {type: btree, columns: [record_id], unique: true}
       idx_audit_scenario_timestep: {type: btree, columns: [scenario_id, timestep]}
 
+  # ---------------------------------------------------------------------------
+  # simulation_reference_constants
+  # ---------------------------------------------------------------------------
+  simulation_reference_constants:
+    description: >
+      Fixed scientific thresholds used as normalization denominators in framework
+      composite score computation. Planetary boundary values are the canonical
+      example. Reference constants are not time-series data — they are model
+      calibration constants whose authority derives from peer-reviewed science.
+      Access pattern: single-value lookup at normalization time keyed by constant_id
+      and effective date range. Added in migration a2b4c6d8e0f1 (STD-REVIEW-004 Gap 4).
+    columns:
+      constant_id:
+        type: text
+        nullable: false
+        description: >
+          Primary key. Naming convention: {FRAMEWORK}_{INDICATOR}_{QUALIFIER}.
+          Example: "ECOLOGICAL_CO2_PLANETARY_BOUNDARY_PPM".
+      constant_name:
+        type: text
+        nullable: false
+        description: Human-readable name for the constant.
+      value:
+        type: numeric
+        nullable: false
+        description: The constant value.
+      unit:
+        type: text
+        nullable: false
+        description: >
+          Canonical unit string from DATA_STANDARDS.md §Canonical Unit Registry.
+          Must be one of the controlled vocabulary strings — not an ad-hoc label.
+      source_citation:
+        type: text
+        nullable: false
+        description: Full bibliographic citation for the scientific source.
+      doi_or_url:
+        type: text
+        nullable: false
+        description: DOI preferred (doi:10.xxxx/...); stable URL required.
+      effective_from:
+        type: date
+        nullable: false
+        description: >
+          Date when this value became the operative constant. For Rockström et al.
+          2009: "2009-09-24" (Nature publication date).
+      effective_through:
+        type: date
+        nullable: true
+        description: >
+          Date when this value ceased to be operative. NULL = currently in effect.
+          When scientific consensus is revised, set this to new_effective_from - 1 day
+          and insert a new row. Never delete rows.
+      registered_by:
+        type: text
+        nullable: false
+        default: "agent"
+        description: Agent or process that registered this constant.
+      registered_at:
+        type: "timestamp with time zone"
+        nullable: false
+        default: now()
+        description: Wall-clock time when registered.
+    indexes:
+      simulation_reference_constants_pkey: {type: btree, columns: [constant_id], unique: true}
+      uix_simulation_reference_constants_active:
+        type: btree
+        columns: [constant_id]
+        unique: true
+        predicate: "effective_through IS NULL"
+        description: Enforces one active value per constant at any time.
+    query_notes:
+      - name: "Resolve active constant by constant_id"
+        description: >
+          SELECT value FROM simulation_reference_constants
+          WHERE constant_id = $1 AND effective_through IS NULL
+          This returns exactly one row due to the unique partial index.
+      - name: "Historical run resolution"
+        description: >
+          For historical backtesting runs, resolve the constant that was active
+          at the scenario run_date:
+          SELECT value FROM simulation_reference_constants
+          WHERE constant_id = $1
+            AND effective_from <= $run_date
+            AND (effective_through IS NULL OR effective_through >= $run_date)
+
 # ---------------------------------------------------------------------------
 # Critical cross-table notes for query authors
 # ---------------------------------------------------------------------------
