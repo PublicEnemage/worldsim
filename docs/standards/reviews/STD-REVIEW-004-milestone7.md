@@ -400,9 +400,114 @@ within two milestones.
 
 ## Engineering Lead Dispositions
 
-*To be recorded after Engineering Lead review.*
+**Date:** 2026-05-16
+**Disposition for all six gaps:** ACCEPT
 
-*Single-principal governance limitation applies — see CLAUDE.md §Governance.
-This review was produced at M7 exit and approved by the same individual who holds
-full repository authority. No independent review is available at this governance
-stage. See CLAUDE.md §Governance for the documented plan to address this limitation.*
+### Process
+
+A three-agent independent review panel (Data Architect, QA Lead, Architect)
+was convened before dispositions were recorded. Each agent received the six gap
+descriptions and three questions (primary concern per gap, highest-risk gap,
+ordering dependencies) independently — no draft dispositions were shared with
+any agent. Panel output informed all six dispositions.
+
+### Key Panel Findings Incorporated
+
+1. **Gap 1 → Gap 2 ordering is sequential, not parallel.** The canonical unit
+   vocabulary must exist before field mappings can be certified against it.
+   Implementation order enforced: Gap 1 committed first.
+
+2. **Gaps 2 and 3 are circularly dependent and ship in the same commit with
+   joint sign-off.** Gap 2 needs Gap 3's entity resolution before certifying
+   WGI field mappings; Gap 3 needs Gap 2's field registry structure for the
+   provenance note. Committed together per Architect panel finding.
+
+3. **`simulation_reference_constants` database table adopted** (Data Architect
+   recommendation). The fixture-file escape hatch in the original STD-REVIEW-004
+   Gap 4 description is closed. Reference constants have a fundamentally different
+   access pattern from time-series source data and must live in a dedicated table.
+
+4. **`transformation_test_id` field added to `source_field_registry` schema**
+   (QA Lead panel finding). Paper certification without a verification test is not
+   sufficient. Every certified field mapping must reference a passing test on a
+   known input/output pair from actual source data.
+
+5. **Unit correctness tests added as mandatory requirement** (QA Lead panel finding).
+   Tests asserting `variable_type` but not `unit` are incomplete for M8 indicators.
+   Every new ecological and governance indicator must assert `qty.unit == canonical_unit`.
+   Added to test_ecological_module.py and test_governance_module.py in this commit set.
+
+6. **`is_single_entity` guard scope interaction documented** (QA Lead panel finding).
+   Boundary-normalized ecological composite scores are physically meaningful for a
+   single entity (CO2 vs. 350 ppm boundary), unlike percentile rank. The ADR-005
+   M8 amendment must specify which frameworks are exempt from the guard. TODO
+   comment added in `scenarios.py` `_compute_composite_score()` dispatch note.
+
+7. **`_compute_composite_score()` dispatch architecture designed to accommodate both
+   ecological and governance normalization paths before either is implemented**
+   (Architect panel finding). Dispatch comment documents the strategy pattern
+   requirement — governance and ecological must be designed in parallel, not
+   ecological first with governance retrofitted. Neither Gap 4 nor Gap 5 implements
+   the strategy; both are documented as requiring the strategy design in ADR-005 M8.
+
+8. **runner.py `[SIM-INTEGRITY]` prefix verified and corrected** (Architect panel
+   finding confirmed by pre-work code inspection). The duplicate event_id warning at
+   runner.py line 315 was missing the `[SIM-INTEGRITY]` prefix. Fixed in Gap 6 commit.
+   Pre-work verification required: **prefix was ABSENT**. Code fix applied.
+
+9. **Runtime validation gate at `Quantity` construction time, not compliance-scan-only**
+   (QA Lead + Architect panel finding). CODING_STANDARDS.md §Simulation Integrity
+   Monitoring §Canonical Unit Registry cross-reference documents this requirement.
+
+10. **CI enforcement test added for Gap 5 promotion protocol** (QA Lead panel finding).
+    `test_governance_is_in_unimplemented_frameworks` and companion composite_score test
+    added to `test_measurement_output.py`. Promotion is the act of making the companion
+    integration test pass — it is not a documentation event.
+
+### Gap-by-Gap Dispositions
+
+| Gap | Severity | Amendment target | Disposition |
+|---|---|---|---|
+| 1 — Canonical unit registry | Immediate | DATA_STANDARDS.md | ACCEPT — §Canonical Unit Registry added; ecological and governance module unit violations fixed; unit correctness tests added |
+| 2 — Field-level data certification | Immediate | DATA_STANDARDS.md | ACCEPT — §Field-Level Data Certification added with transformation_test_id (QA Lead addition); committed with Gap 3 |
+| 3 — WGI territorial convention | Near-term | DATA_STANDARDS.md | ACCEPT — §Source-Convention Conflict Resolution added; WGI Taiwan provenance note verbatim specified; governance source registration requirement added; committed with Gap 2 |
+| 4 — Ecological composite normalization | Immediate | DATA_STANDARDS.md | ACCEPT — §Simulation Reference Constants added; dedicated table adopted; two Alembic migrations; normalization formula documented; dispatch design comment in scenarios.py |
+| 5 — `_UNIMPLEMENTED_FRAMEWORKS` promotion protocol | Near-term | CODING_STANDARDS.md | ACCEPT — §Framework Promotion Protocol added; CI enforcement tests added (QA Lead addition) |
+| 6 — `[SIM-INTEGRITY]` monitoring contract | Near-term | CODING_STANDARDS.md | ACCEPT — §Simulation Integrity Monitoring added; runner.py code fix applied |
+
+### EL Decision: Gap 2 vs. Gap 3 Ordering Conflict
+
+Data Architect recommended Gap 2 (certification infrastructure) before Gap 3.
+Architect recommended Gap 3 (territorial resolution) before Gap 2 for WGI.
+
+**Resolution:** The circular dependency is real — both agents were correct.
+The resolution is to commit Gaps 2 and 3 together in the same transaction,
+as they cannot be cleanly sequenced. Both amendments reference each other.
+Neither is complete without the other. This is the correct disposition for a
+genuine circular dependency — not a sequencing choice between them.
+
+### EL Decision: Highest-Risk Gap
+
+Data Architect: Gap 2 (certification infrastructure — the foundational layer
+that everything else depends on). QA Lead + Architect: Gap 4 (ecological
+normalization — ADR-005 Amendment B deferred obligation, misleading mandatory note).
+
+**Resolution:** Both risk frames are valid. M8 implementation priority treats
+Gap 4 as the most architecturally consequential (the ADR-005 Amendment B note
+becomes permanently misleading if M8 ships without it), while Gaps 1 and 2 are
+addressed first because they are prerequisites for Gap 4's certification chain.
+Implementation order: Gap 1 → Gap 4 → Gaps 2+3 → Gap 6 → Gap 5.
+
+### Single-Principal Governance Limitation
+
+*"This exception was approved by the same individual who holds full repository
+authority. No independent review is available at this governance stage. See
+CLAUDE.md §Governance for the documented plan to address this limitation."*
+
+The three-agent independent panel (Data Architect, QA Lead, Architect Agent) is
+the compensating control for this limitation on this specific decision. Agents
+were given the gap inventory without draft dispositions and produced independent
+assessments. Where all three agents agreed (Gap 1 → Gap 2 ordering, is_single_entity
+guard scope, runtime validation gate), confidence is higher. Where they disagreed
+(Gap 2 vs. Gap 3 ordering, highest-risk gap ranking), the Engineering Lead
+exercised judgment as documented above.
