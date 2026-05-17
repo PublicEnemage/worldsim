@@ -106,6 +106,23 @@ not CURRENT at milestone close requires documented rationale.
 
 ---
 
+## STD-REVIEW and ARCH-REVIEW Disposition Standard
+
+Before recording Engineering Lead dispositions on any STD-REVIEW or
+ARCH-REVIEW gap:
+
+- [ ] Independent agent panel activated per
+      `docs/process/disposition-review-standard.md`
+- [ ] Panel synthesis produced and reviewed
+- [ ] Disposition record references panel synthesis
+- [ ] Single-principal governance limitation acknowledged with
+      compensating control documented
+
+See `docs/process/disposition-review-standard.md` for the full protocol,
+severity thresholds, and disposition record requirements.
+
+---
+
 ## Engineering Lead Sign-off
 
 - [ ] Socratic Agent TEST session completed on Milestone MILESTONE_NUMBER architecture.
