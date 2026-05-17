@@ -18,6 +18,24 @@ interface Props {
   onEntityClick?: (entityId: string) => void;
 }
 
+// INTENT: Compute five breakpoints [p0, p25, p50, p75, p100] from feature
+//         attribute values for use as MapLibre step-expression thresholds.
+// PRECONDITIONS: features is an array of GeoJSON features whose
+//                properties.attribute_value can be parsed as a finite float;
+//                features may be empty or contain non-finite values which
+//                are filtered out before quantile computation.
+// POSTCONDITIONS: Returns a five-element number array that is strictly
+//                 ascending; the MapLibre step-expression invariant is always
+//                 satisfied. Returns a dummy ascending sequence when features
+//                 is empty or all values are identical.
+// ERROR CASES: Collapsed quantiles (non-strictly-ascending raw percentiles,
+//              common for ordinal attributes like economy_tier or income_group)
+//              produce an equal-width fallback spanning [min, max] — correct
+//              for rendering but does not preserve distribution density shape.
+// KNOWN LIMITATIONS: Falls back to equal-width intervals for ordinal
+//                    attributes where many countries share the same value —
+//                    colour bands reflect value range, not population density.
+//                    No unit test coverage; verified via Playwright E2E only.
 // computeSteps returns five breakpoints [p0, p25, p50, p75, p100] used as
 // MapLibre step-expression thresholds. MapLibre requires strictly ascending
 // thresholds — duplicate values (collapsed quantiles) produce broken rendering.

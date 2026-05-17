@@ -204,6 +204,28 @@ def _attenuate(
     }
 
 
+# INTENT: Add Quantity attribute deltas to the accumulator for one entity,
+#         summing values and applying the lower-of-two confidence-tier rule
+#         across multiple contributions to the same attribute.
+# PRECONDITIONS: accumulator is a mutable _DeltaAccumulator dict; entity_id
+#                is the target entity; deltas maps attribute keys to Quantity
+#                values whose variable_type is authoritative for STOCK/FLOW
+#                semantics in _build_next_state.
+# POSTCONDITIONS: For each attribute key in deltas: if no prior contribution
+#                 exists, the Quantity is stored directly; if a prior
+#                 contribution exists, values are summed and confidence_tier
+#                 is set to max(existing, incoming) — higher tier number
+#                 means lower confidence quality. accumulator is modified
+#                 in place; no return value.
+# ERROR CASES: Two STOCK deltas for the same entity+attribute in one step
+#              produce a summed value (incorrect STOCK semantics) and emit
+#              a [SIM-INTEGRITY] WARNING — this is silent data corruption,
+#              not an exception. The caller must prevent this state.
+# KNOWN LIMITATIONS: STOCK conflict summing is interim behavior pending an
+#                    M8 architectural fix (Issue #280). STOCK semantics expect
+#                    a single absolute-level event per attribute per step; the
+#                    summed result is incorrect and the WARNING exists to make
+#                    this observable. Do not rely on the summing behavior.
 def _accumulate(
     accumulator: _DeltaAccumulator,
     entity_id: str,
