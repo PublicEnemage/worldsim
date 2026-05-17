@@ -23,7 +23,7 @@ Schema:
   constant_id       — text PK, naming convention {FRAMEWORK}_{INDICATOR}_{QUALIFIER}
   constant_name     — human-readable name
   value             — NUMERIC, the constant value
-  unit              — text, must be from canonical unit vocabulary (DATA_STANDARDS.md §Canonical Unit Registry)
+  unit              — text, canonical unit from DATA_STANDARDS.md §Canonical Unit Registry
   source_citation   — full bibliographic citation
   doi_or_url        — DOI preferred
   effective_from    — date when this value became operative
@@ -36,9 +36,9 @@ that only one value per constant is active at any time.
 """
 from __future__ import annotations
 
-from alembic import op
 import sqlalchemy as sa
 
+from alembic import op
 
 revision = "a2b4c6d8e0f1"
 down_revision = "f8a3c7e2d1b5"

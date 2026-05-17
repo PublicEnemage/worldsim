@@ -24,9 +24,9 @@ Normalization formula (DATA_STANDARDS.md §Simulation Reference Constants):
 """
 from __future__ import annotations
 
-from alembic import op
 import sqlalchemy as sa
 
+from alembic import op
 
 revision = "b3c5d7e9f1a2"
 down_revision = "a2b4c6d8e0f1"
@@ -65,7 +65,7 @@ def upgrade() -> None:
             },
             {
                 "constant_id": "ECOLOGICAL_LAND_USE_PLANETARY_BOUNDARY_RATIO",
-                "constant_name": "Land-system change planetary boundary (fraction of safe threshold)",
+                "constant_name": "Land-system change planetary boundary (safe threshold fraction)",
                 "value": "0.25",
                 "unit": "ratio_0_1",
                 "source_citation": (

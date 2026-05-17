@@ -306,7 +306,10 @@ def test_land_use_uses_ratio_variable_type() -> None:
 
 
 def test_land_use_uses_canonical_ratio_0_1_unit() -> None:
-    """land_use_pressure_index must use unit='ratio_0_1' (DATA_STANDARDS.md §Canonical Unit Registry)."""
+    """land_use_pressure_index must use unit='ratio_0_1'.
+
+    Boundary fraction 0–1; ratio_0_1 per DATA_STANDARDS.md §Canonical Unit Registry Gap 1.
+    """
     module = EcologicalModule()
     state = _make_state([_fiscal_event()])
     events = module.compute(_country_entity(), state, TIMESTEP)

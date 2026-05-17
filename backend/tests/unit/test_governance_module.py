@@ -251,7 +251,10 @@ def test_elasticity_delta_is_decimal_not_float() -> None:
 
 
 def test_rule_of_law_uses_canonical_percentile_0_100_unit() -> None:
-    """rule_of_law_percentile must use unit='percentile_0_100' (DATA_STANDARDS.md §Canonical Unit Registry)."""
+    """rule_of_law_percentile must use unit='percentile_0_100'.
+
+    WGI percentile rank 0–100; canonical unit per DATA_STANDARDS.md §Canonical Unit Registry.
+    """
     gdp_ev = _gdp_event("GRC", Decimal("-0.05"))
     state = _make_state("GRC", entity_type="country", prior_events=[gdp_ev])
     module = GovernanceModule()
