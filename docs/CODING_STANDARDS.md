@@ -1377,6 +1377,82 @@ a prerequisite for the tool's credibility.
 
 ---
 
+## Framework Promotion Protocol
+
+### What Framework Promotion Is
+
+`_UNIMPLEMENTED_FRAMEWORKS` in `app/api/scenarios.py` is the mechanism by which
+incomplete modules are shielded from the API surface. When a module is promoted
+from "initial" to "complete," removing its framework string from this set exposes
+all previously hidden outputs — a material API surface change.
+
+Without a documented promotion protocol, two failure modes are possible:
+- **Premature promotion:** Module outputs are exposed before validation is complete,
+  before the composite score normalization methodology is decided, and before the
+  ADR-005 amendment is accepted.
+- **Indefinite deferral:** Completed work is never surfaced because no one declared
+  what "complete" means.
+
+### Promotion Criteria
+
+A framework string may be removed from `_UNIMPLEMENTED_FRAMEWORKS` only when ALL
+of the following criteria are simultaneously met:
+
+1. **Backtesting threshold:** At least one historical backtesting case passes
+   `DIRECTION_ONLY` thresholds for at least one indicator from this framework.
+
+2. **ADR amendment accepted:** The composite score normalization methodology is
+   documented in an accepted ADR amendment (not a draft, not a comment — an
+   accepted ADR in `docs/adr/`).
+
+3. **Source field registry draft-certified:** `source_field_registry` entries for
+   all indicators surfaced by this framework are at minimum draft-certified with
+   Engineering Lead acknowledgment (see `DATA_STANDARDS.md §Field-Level Data
+   Certification`).
+
+4. **`[SIM-INTEGRITY]` WARNING on unexpected null:** A `[SIM-INTEGRITY]` WARNING
+   is emitted when the module produces `composite_score=None` for a reason other
+   than single-entity scenario (see `§Simulation Integrity Monitoring` above).
+
+5. **Integration test passes:** At minimum one integration test asserts that
+   framework outputs are present and non-null in the API response when the module
+   is active with a known fixture. This test must exist and pass before promotion
+   is permitted.
+
+### ADR Amendment Trigger
+
+Promotion must be a named deliverable in the relevant ADR amendment — not an
+implementation-time judgment call by the implementing agent. The ADR amendment
+creates a second review gate on the promotion decision (Engineering Lead who
+accepts the amendment) separate from the implementing agent.
+
+### CI Enforcement
+
+A test in `tests/unit/test_measurement_output.py` asserts that governance composite
+scores are `None` when `"governance"` is in `_UNIMPLEMENTED_FRAMEWORKS`. The act of
+satisfying promotion criterion 5 (the companion integration test) is the explicit,
+testable precondition for the API surface change.
+
+Promotion is not a documentation event — it is the act of making the companion
+integration test pass after all other criteria are met.
+
+### Compliance Scan Requirement
+
+The compliance scan entry at the milestone that promotes a framework must:
+1. Record the promotion event explicitly
+2. Confirm all five promotion criteria were met (with evidence for each)
+3. Reference the accepted ADR amendment that named this deliverable
+
+### Reversion Protocol
+
+If post-promotion validation reveals a failure, the string may be re-added to
+`_UNIMPLEMENTED_FRAMEWORKS` as a documented rollback. The compliance scan must
+record the rollback event and root cause. The Engineering Lead must add a comment
+to the relevant ADR documenting the reversion and the condition required before
+the next promotion attempt.
+
+---
+
 ## Simulation Integrity Monitoring
 
 ### Contract Definition
