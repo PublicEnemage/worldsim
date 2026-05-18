@@ -195,7 +195,10 @@ async def test_greece_2010_2012_direction_only_fidelity(
         deferred_thresholds: dict[str, str] = {
             "gdp_growth_step5_positive": (
                 "PASS" if val5 is not None and val5 > Decimal("0")
-                else "FAIL — no endogenous recovery module; engine accumulates contraction (Issue #221)"
+                else (
+                    "FAIL — no endogenous recovery module; "
+                    "engine accumulates contraction (Issue #221)"
+                )
             ),
             "unemployment_rising_step1_to_step2": (
                 "PASS" if unemp_rising
