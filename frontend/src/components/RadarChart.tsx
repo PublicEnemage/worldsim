@@ -10,6 +10,12 @@ import {
 } from "recharts";
 import type { RadarAxisDatum, FrameworkWeights } from "../types";
 
+// ADR-005 Decision M8-5: named constants required by ADR — do not inline.
+// Text changes require a corresponding ADR amendment (see design-decisions.md DD-011).
+export const GOVERNANCE_IN_VALIDATION_LABEL = "Governance — in validation";
+export const GOVERNANCE_IN_VALIDATION_TOOLTIP =
+  "Governance composite score is in validation. Promotion criteria: 0 of 5 met at M8. Target: M9. See §Framework Promotion Protocol in CODING_STANDARDS.md.";
+
 interface Props {
   data: RadarAxisDatum[];
   weights: FrameworkWeights;
@@ -23,6 +29,17 @@ const FRAMEWORK_LABELS: Record<string, string> = {
   ecological: "Ecological",
   governance: "Governance",
 };
+
+// ADR-005 Decision M8-5: null composite_score → null final_score (Recharts gap,
+// no filled polygon vertex). 0.0 composite_score → 0.0 final_score (valid filled
+// vertex at zero). null and 0.0 are visually and semantically distinct.
+export function computeFinalScore(
+  composite_score: number | null,
+  weight: number,
+): number | null {
+  if (composite_score === null) return null;
+  return Math.min(1, composite_score * weight);
+}
 
 // Custom tick renders axis label with breach badge and grayed unimplemented state
 function CustomTick(props: {
@@ -42,7 +59,11 @@ function CustomTick(props: {
   const datum = data.find((d) => d.framework === framework);
   if (!datum) return null;
 
-  const label = FRAMEWORK_LABELS[framework] ?? framework;
+  // ADR-005 M8-5: null composite_score → validation label; 0.0 uses normal label
+  const isNullAxis = datum.composite_score === null;
+  const label = isNullAxis
+    ? GOVERNANCE_IN_VALIDATION_LABEL
+    : (FRAMEWORK_LABELS[framework] ?? framework);
   const implemented = datum.is_implemented;
   const breached = datum.has_critical_breach;
 
@@ -80,7 +101,7 @@ function CustomTick(props: {
   );
 }
 
-// Recharts custom dot: red for breached axes, gray for unimplemented
+// Recharts custom dot: red for breached axes, hollow for null, gray for unimplemented
 function CustomDot(props: {
   cx?: number;
   cy?: number;
@@ -89,6 +110,20 @@ function CustomDot(props: {
   const { cx = 0, cy = 0, payload } = props;
   if (!payload) return null;
 
+  // ADR-005 M8-5: null composite_score → hollow dashed dot at axis position
+  if (payload.composite_score === null) {
+    return (
+      <circle
+        cx={cx}
+        cy={cy}
+        r={4}
+        fill="none"
+        stroke="#aaa"
+        strokeWidth={1.5}
+        strokeDasharray="2 2"
+      />
+    );
+  }
   if (!payload.is_implemented) {
     return <circle cx={cx} cy={cy} r={3} fill="#ccc" stroke="#aaa" strokeWidth={1} />;
   }
@@ -101,21 +136,17 @@ function CustomDot(props: {
 export default function RadarChart({ data, weights, onWeightsChange, onAxisClick }: Props) {
   const [showSliders, setShowSliders] = useState(false);
 
-  // Apply weights to composite scores for visual emphasis only
-  const chartData = data.map((d) => ({
-    ...d,
-    display_score: Math.min(
-      1,
-      d.composite_score * (weights[d.framework as keyof FrameworkWeights] ?? 1),
-    ),
-    // Keep unimplemented at 0
-    final_score: d.is_implemented
-      ? Math.min(
-          1,
-          d.composite_score * (weights[d.framework as keyof FrameworkWeights] ?? 1),
-        )
-      : 0,
-  }));
+  // Apply weights to composite scores for visual emphasis only.
+  // ADR-005 M8-5: null composite_score → final_score: null (Recharts gap, no polygon
+  // vertex). 0.0 composite_score → final_score: 0 (valid polygon vertex at zero).
+  const chartData = data.map((d) => {
+    const weight = weights[d.framework as keyof FrameworkWeights] ?? 1;
+    const final_score = computeFinalScore(d.composite_score, weight);
+    return {
+      ...d,
+      final_score,
+    };
+  });
 
   const hasAnyBreach = data.some((d) => d.has_critical_breach);
 
@@ -176,9 +207,18 @@ export default function RadarChart({ data, weights, onWeightsChange, onAxisClick
             }}
           />
           <Tooltip
-            formatter={(value: unknown) => [
-              typeof value === "number" ? `${(value * 100).toFixed(0)}th pct` : String(value),
-            ]}
+            formatter={(value: unknown, name: unknown, item: unknown) => {
+              // ADR-005 M8-5: null composite_score → "—" em dash, not 0 or blank.
+              // GOVERNANCE_IN_VALIDATION_TOOLTIP shown for in-validation axes.
+              const payload = (item as { payload?: RadarAxisDatum } | undefined)?.payload;
+              if (payload?.composite_score === null) {
+                return [GOVERNANCE_IN_VALIDATION_TOOLTIP, "—"];
+              }
+              void name;
+              return [
+                typeof value === "number" ? `${(value * 100).toFixed(0)}%` : String(value),
+              ];
+            }}
             contentStyle={{ fontSize: 12 }}
           />
         </RechartsRadarChart>

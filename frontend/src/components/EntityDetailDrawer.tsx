@@ -78,7 +78,7 @@ export default function EntityDetailDrawer({ scenarioId, entityId, step, onClose
     return {
       framework: fw,
       label: FRAMEWORK_LABELS[fw],
-      composite_score: output?.composite_score != null ? parseFloat(output.composite_score) : 0,
+      composite_score: output?.composite_score != null ? parseFloat(output.composite_score) : null,
       is_implemented: output?.composite_score != null,
       has_critical_breach: criticalAlerts.length > 0,
       breach_count: criticalAlerts.length,

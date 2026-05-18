@@ -128,10 +128,13 @@ export interface MultiFrameworkOutput {
 
 // ADR-005 Decision 4 — radar chart data shapes
 
+// ADR-005 Decision M8-5: composite_score is number | null.
+// null = framework not yet certified for API surface (e.g. governance at M8).
+// 0.0 is a valid score — distinct from null. Do not conflate.
 export interface RadarAxisDatum {
   framework: string;
   label: string;
-  composite_score: number;   // 0.0–1.0; unimplemented → 0
+  composite_score: number | null;  // null = not yet implemented; 0.0–2.0 when active
   is_implemented: boolean;
   has_critical_breach: boolean;
   breach_count: number;
