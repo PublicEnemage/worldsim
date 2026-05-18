@@ -9,6 +9,7 @@ import {
   Tooltip,
 } from "recharts";
 import type { RadarAxisDatum, FrameworkWeights } from "../types";
+import { usePrefersReducedMotion } from "../hooks/usePrefersReducedMotion";
 
 // ADR-005 Decision M8-5: named constants required by ADR — do not inline.
 // Text changes require a corresponding ADR amendment (see design-decisions.md DD-011).
@@ -135,6 +136,14 @@ function CustomDot(props: {
 
 export default function RadarChart({ data, weights, onWeightsChange, onAxisClick }: Props) {
   const [showSliders, setShowSliders] = useState(false);
+  const prefersReducedMotion = usePrefersReducedMotion();
+
+  // Disable animation when any axis transitions from null (null → number interpolation
+  // is undefined in Recharts — guard against undefined polygon behavior).
+  // Animation is also disabled on initial load (Recharts default: isAnimationActive
+  // controls post-mount transitions only).
+  const hasNullAxis = data.some((d) => d.composite_score === null);
+  const animationActive = !prefersReducedMotion && !hasNullAxis;
 
   // Apply weights to composite scores for visual emphasis only.
   // ADR-005 M8-5: null composite_score → final_score: null (Recharts gap, no polygon
@@ -193,8 +202,10 @@ export default function RadarChart({ data, weights, onWeightsChange, onAxisClick
             stroke="#1a6eb5"
             fill="#1a6eb5"
             fillOpacity={0.25}
+            isAnimationActive={animationActive}
+            animationDuration={250}
+            animationEasing="ease-in-out"
             dot={(props) => {
-              // find matching datum
               const datum = data.find((d) => d.framework === props.payload?.framework);
               return (
                 <CustomDot
