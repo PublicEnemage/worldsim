@@ -10,7 +10,7 @@
 
 set -euo pipefail
 
-VOICE="Samantha"
+VOICE="Zoe (Enhanced)"
 RATE=175
 
 if [[ "${1:-}" == "--list-voices" ]]; then
