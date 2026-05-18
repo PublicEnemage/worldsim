@@ -1,34 +1,37 @@
 /**
- * WorldSim Stakeholder Demo — Screen-Recorded Narrated Walkthrough
+ * WorldSim Stakeholder Demo — Screen-Recorded Narrated Walkthrough (M8)
  *
- * This is the screen-recording variant of demo.spec.ts. Every page.pause()
- * has been replaced with a synchronous TTS call via scripts/speak.sh so the
- * demo runs end-to-end without human input, suitable for recording.
+ * M8 update: Greece 2010–2015, six steps. EcologicalModule live (CO2
+ * boundary proximity). Governance axis: dashed null, labeled "in validation".
+ * Five screenshots captured per UX Agent brief (Issue #233):
+ *   frame-a-step1-instrument.png  — Step 1, full Zone 1, thesis setup
+ *   frame-b-step3-collapse.png    — Step 3, Financial tab, max stress
+ *   frame-c-step5-divergence.png  — Step 5, HD tab, THESIS FRAME
+ *   frame-d-step3-evidence.png    — Step 3, MDA alert panel prominent
+ *   frame-e-step3-ecological.png  — Step 3, Ecological tab + note expanded
  *
  * ── RECORDING MODE ───────────────────────────────────────────────────────────
  *
  * Before recording:
  *   1. Start the full stack: docker compose up (or ./scripts/demo.sh --up)
  *   2. Ensure Natural Earth seed data is loaded.
- *   3. Pre-create the Greece 2010-2012 backtesting scenario via the API so
- *      the "create" step is demonstrating the UI, not waiting on a write.
- *   4. Open a screen recorder pointing at the browser window.
- *   5. Run: cd frontend && npx playwright test tests/e2e/demo-narrated.spec.ts \
+ *   3. Open a screen recorder pointing at the browser window.
+ *   4. Run: cd frontend && npx playwright test tests/e2e/demo-narrated.spec.ts \
  *              --config playwright.demo.config.ts --headed
- *   6. The browser opens, TTS narrates each step, and closes when complete.
+ *   5. The browser opens, TTS narrates each step, and closes when complete.
  *      Stop the screen recorder after the browser closes.
  *
- * TTS voice: macOS "Samantha" at 175 WPM (scripts/speak.sh).
- * On non-macOS, narration is printed to stdout instead of spoken — the test
- * still completes so Linux CI runners do not error on this file.
+ * TTS voice: macOS "Zoe (Enhanced)" at 175 WPM (scripts/speak.sh).
+ * On non-macOS, narration is printed to stdout instead of spoken.
  *
- * DO NOT include in CI test runs — requires a live stack. See demo.spec.ts
- * for the @demo tag used to filter this file from CI greps.
+ * DO NOT include in CI test runs — requires a live stack.
  *
+ * M6 archive: demo-narrated-m6.spec.ts
  * ─────────────────────────────────────────────────────────────────────────────
  */
 
 import { spawn } from "child_process";
+import * as fs from "fs";
 import * as path from "path";
 import { fileURLToPath } from "url";
 import { test, expect } from "@playwright/test";
@@ -36,9 +39,11 @@ import { test, expect } from "@playwright/test";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const SPEAK_SCRIPT = path.resolve(__dirname, "../../../scripts/speak.sh");
+const SCREENSHOT_DIR = path.resolve(__dirname, "../../../docs/demo/m8/screenshots/");
 
-// Async so the Node.js event loop stays live during TTS — Playwright's CDP
-// keepalive must not be blocked or the browser disconnects mid-narration.
+// Ensure screenshot directory exists (created by PR #334; guard against clean clones).
+fs.mkdirSync(SCREENSHOT_DIR, { recursive: true });
+
 function speak(text: string): Promise<void> {
   return new Promise((resolve, reject) => {
     const proc = spawn("bash", [SPEAK_SCRIPT, text], { stdio: "inherit" });
@@ -49,14 +54,16 @@ function speak(text: string): Promise<void> {
   });
 }
 
+function screenshotPath(filename: string): string {
+  return path.resolve(SCREENSHOT_DIR, filename);
+}
+
 const RUN_ID = Math.random().toString(36).slice(2, 8);
-const DEMO_SCENARIO_NAME = `Greece 2010-2012 Demo — ${new Date().toISOString().slice(0, 10)}-${RUN_ID}`;
+const DEMO_SCENARIO_NAME = `Greece 2010-2015 M8 Demo — ${new Date().toISOString().slice(0, 10)}-${RUN_ID}`;
 const COMPARE_SCENARIO_NAME = `Greece Alternative — ${new Date().toISOString().slice(0, 10)}-${RUN_ID}`;
 
 // ── Pre-demo cleanup ─────────────────────────────────────────────────────────
-// Delete scenarios from previous demo runs so the panel opens clean.
-// Matches any scenario whose name starts with the demo prefixes but belongs
-// to a different RUN_ID. Uses Node's built-in fetch (Node 18+).
+
 test.beforeAll(async () => {
   const API = "http://localhost:8000/api/v1";
   let scenarios: Array<{ scenario_id: string; name: string }> = [];
@@ -64,13 +71,13 @@ test.beforeAll(async () => {
     const res = await fetch(`${API}/scenarios`);
     if (res.ok) scenarios = await res.json() as typeof scenarios;
   } catch {
-    // Stack not running — test will fail later with a clearer error.
     return;
   }
 
   const stale = scenarios.filter(
     (s) =>
-      (s.name.startsWith("Greece 2010-2012 Demo") ||
+      (s.name.startsWith("Greece 2010-2015 M8 Demo") ||
+        s.name.startsWith("Greece 2010-2012 Demo") ||
         s.name.startsWith("Greece Alternative")) &&
       s.name !== DEMO_SCENARIO_NAME &&
       s.name !== COMPARE_SCENARIO_NAME,
@@ -86,12 +93,10 @@ test.beforeAll(async () => {
 });
 
 test(
-  "Stakeholder demo walkthrough — narrated screen recording",
+  "Stakeholder demo walkthrough — narrated screen recording (M8)",
   { tag: ["@demo"] },
   async ({ page }) => {
-    // TTS narration adds ~4 minutes of blocking speech on top of interactions.
-    // Override the 60 s config timeout for this test only.
-    test.setTimeout(15 * 60 * 1000);
+    test.setTimeout(20 * 60 * 1000);
 
     // ── STEP 1: Map loads ────────────────────────────────────────────────────
 
@@ -99,35 +104,28 @@ test(
 
     await page.waitForFunction(
       () =>
-        typeof (window as Record<string, unknown>).__worldsim_selectEntity ===
-        "function" &&
-        typeof (window as Record<string, unknown>).__worldsim_setAttributeName ===
-        "function",
+        typeof (window as Record<string, unknown>).__worldsim_selectEntity === "function" &&
+        typeof (window as Record<string, unknown>).__worldsim_setAttributeName === "function",
       { timeout: 15_000 },
     );
 
-    // Switch to gdp_growth before the first narration so the choropleth shows a
-    // continuous GDP attribute rather than the categorical economy_tier default.
-    // gdp_growth is a scenario attribute — not in the static /attributes/available
-    // list — so we use the test seam instead of page.selectOption().
     await page.evaluate(() => {
-      (window as Record<string, (key: string) => void>).__worldsim_setAttributeName(
-        "gdp_growth",
-      );
+      (window as Record<string, (key: string) => void>).__worldsim_setAttributeName("gdp_growth");
     });
 
-    // Create the Greece scenario via API with the backtesting fixture inputs before
-    // opening the scenarios panel — the panel fetches on mount, so it will already
-    // include this scenario when it opens in Step 2.
+    // Create the M8 Greece demo scenario via API before opening the panel.
+    // Matches build_greece_demo_scenario(): 6 steps, EcologicalModule enabled,
+    // CO2 seed (388.0 ppm NOAA MLO 2010), all eight programme scheduled inputs.
     const createRes = await page.request.post("http://localhost:8000/api/v1/scenarios", {
       data: {
         name: DEMO_SCENARIO_NAME,
-        description: "Greece 2010-2012 IMF Program — stakeholder demo run",
+        description: "Greece 2010-2015 IMF Program — M8 stakeholder demo run",
         configuration: {
           entities: ["GRC"],
-          n_steps: 3,
+          n_steps: 6,
           timestep_label: "annual",
           start_date: "2010-01-01",
+          modules_config: { ecological: { enabled: true } },
           initial_attributes: {
             GRC: {
               gdp_growth: {
@@ -150,48 +148,49 @@ test(
                 confidence_tier: 2, observation_date: "2011-12-01",
                 source_registry_id: "WDI_2010", measurement_framework: "human_development",
               },
-              // IMF CR10/110 — ~2.0 months coverage at programme entry, below MDA-FIN-RESERVES floor (2.5)
               reserve_coverage_months: {
                 value: "2.0", unit: "months", variable_type: "ratio",
                 confidence_tier: 2, observation_date: "2010-05-01",
                 source_registry_id: "IMF_CR10_110", measurement_framework: "financial",
               },
+              co2_concentration_ppm: {
+                value: "388.0", unit: "ppm", variable_type: "stock",
+                confidence_tier: 1, observation_date: "2010-01-01",
+                source_registry_id: "NOAA_MLO_2010", measurement_framework: "ecological",
+              },
             },
           },
         },
         scheduled_inputs: [
-          // Step 1 (2010): IMF program acceptance — €110bn ESM/IMF program, May 2010
-          {
-            step: 1, input_type: "EmergencyPolicyInput",
-            input_data: { instrument: "imf_program_acceptance", target_entity: "GRC", expected_duration: 3, program_size_gdp_ratio: "0.48" },
-          },
-          // Step 1 (2010): Fiscal spending cuts — 2010 Memorandum primary cuts
-          {
-            step: 1, input_type: "FiscalPolicyInput",
-            input_data: { instrument: "spending_change", target_entity: "GRC", sector: "government", value: "-0.08", duration_years: 1 },
-          },
-          // Step 2 (2011): Second austerity package — June 2011 Medium-Term Fiscal Strategy
-          {
-            step: 2, input_type: "FiscalPolicyInput",
-            input_data: { instrument: "spending_change", target_entity: "GRC", sector: "government", value: "-0.05", duration_years: 1 },
-          },
-          // Step 2 (2011): Deficit target — Medium-Term Fiscal Strategy 2011–2015
-          {
-            step: 2, input_type: "FiscalPolicyInput",
-            input_data: { instrument: "deficit_target", target_entity: "GRC", sector: "", value: "-0.03", duration_years: 4 },
-          },
+          { step: 1, input_type: "EmergencyPolicyInput",
+            input_data: { instrument: "imf_program_acceptance", target_entity: "GRC", expected_duration: 3, program_size_gdp_ratio: "0.48" } },
+          { step: 1, input_type: "FiscalPolicyInput",
+            input_data: { instrument: "spending_change", target_entity: "GRC", sector: "government", value: "-0.08", duration_years: 1 } },
+          { step: 2, input_type: "FiscalPolicyInput",
+            input_data: { instrument: "spending_change", target_entity: "GRC", sector: "government", value: "-0.05", duration_years: 1 } },
+          { step: 2, input_type: "FiscalPolicyInput",
+            input_data: { instrument: "deficit_target", target_entity: "GRC", sector: "", value: "-0.03", duration_years: 4 } },
+          { step: 3, input_type: "FiscalPolicyInput",
+            input_data: { instrument: "spending_change", target_entity: "GRC", sector: "government", value: "-0.04", duration_years: 1 } },
+          { step: 4, input_type: "FiscalPolicyInput",
+            input_data: { instrument: "spending_change", target_entity: "GRC", sector: "government", value: "-0.02", duration_years: 1 } },
+          { step: 4, input_type: "FiscalPolicyInput",
+            input_data: { instrument: "deficit_target", target_entity: "GRC", sector: "", value: "0.015", duration_years: 2 } },
+          { step: 5, input_type: "StructuralPolicyInput",
+            input_data: { instrument: "privatization", target_entity: "GRC", affected_sector: "public_assets", implementation_years: 3 } },
+          { step: 6, input_type: "EmergencyPolicyInput",
+            input_data: { instrument: "capital_controls", target_entity: "GRC", expected_duration: 2 } },
         ],
       },
     });
     if (!createRes.ok()) {
-      throw new Error(`Greece scenario creation failed: ${createRes.status()} — ${await createRes.text()}`);
+      throw new Error(`Greece M8 scenario creation failed: ${createRes.status()} — ${await createRes.text()}`);
     }
 
     await speak(
       "This is the application's baseline view. The choropleth shows a simulation " +
-      "attribute across entities — in this case, GDP growth rate from the most recent " +
-      "completed scenario step. Each country is colored by its simulated value. " +
-      "Click any country to open its analysis panel. " +
+      "attribute across entities — GDP growth rate from the most recent completed " +
+      "scenario step. Click any country to open its analysis panel. " +
       "What makes this different from a data visualization tool will become clear in a moment.",
     );
 
@@ -201,28 +200,19 @@ test(
     await page.waitForTimeout(800);
 
     await speak(
-      "We're going to model Greece's 2010 to 2012 fiscal adjustment programme. " +
-      "This is a historical case — we know what happened. In the simulation, we " +
-      "inject the IMF programme conditions as scheduled inputs: the fiscal tightening, " +
-      "the emergency declarations, the structural conditionality. Then we advance the " +
-      "scenario step by step and observe what the model produces. " +
-      "The reason we're starting with a historical case rather than a hypothetical " +
-      "is important. It's the point of the backtesting discipline, which we'll come back to.",
+      "We're going to model Greece's 2010 to 2015 fiscal adjustment programme — " +
+      "six years, from the IMF programme entry through the capital controls episode. " +
+      "This is a historical case. We inject the programme conditions as scheduled inputs: " +
+      "the fiscal tightening, the emergency declarations, the structural conditionality. " +
+      "Then we advance step by step and observe what the model produces.",
     );
 
-    // ── STEP 3: Select the pre-created Greece scenario ───────────────────────
-    // Scenario was created via API in Step 1 with fixture scheduled inputs.
-    // The panel fetched the list on mount, so the row is already visible.
+    // ── STEP 3: Select the pre-created M8 Greece scenario ───────────────────
 
-    const scenarioRow = page
-      .locator(".scenario-row")
-      .filter({ hasText: DEMO_SCENARIO_NAME });
+    const scenarioRow = page.locator(".scenario-row").filter({ hasText: DEMO_SCENARIO_NAME });
     await expect(scenarioRow).toBeVisible({ timeout: 10_000 });
-
     await scenarioRow.getByTitle("Select as primary scenario").click();
-    // Audience needs to read the ✓ Primary checkmark before the panel closes.
     await page.waitForTimeout(1500);
-
     await page.getByRole("button", { name: /Scenarios/ }).click();
     await page.waitForTimeout(600);
 
@@ -230,124 +220,199 @@ test(
     await expect(nextStepBtn).toBeVisible({ timeout: 10_000 });
 
     await speak(
-      "The scenario is now the active primary scenario. The step counter shows " +
-      "zero of three steps completed. Each step corresponds to one programme year: " +
-      "2010, 2011, 2012.",
+      "The scenario is active. The step counter shows zero of six steps completed. " +
+      "Each step is one programme year: 2010 through 2015.",
     );
 
-    // ── STEP 4: Advance to Step 1 ────────────────────────────────────────────
+    // ── STEP 4: Advance to Step 1 — Frame A ─────────────────────────────────
 
     await nextStepBtn.click();
-    await expect(page.getByText("Step 1 / 3")).toBeVisible({ timeout: 20_000 });
+    await expect(page.getByText("Step 1 / 6")).toBeVisible({ timeout: 20_000 });
     await page.waitForTimeout(1_200);
 
     await speak(
-      "Step 1. Year 2010. The simulation applies the first year of fiscal tightening. " +
-      "Watch the choropleth — Greece shifts as the contraction propagates through the " +
-      "model's relationship graph.",
+      "Step 1. Year 2010. The IMF programme begins — fiscal tightening applied. " +
+      "Watch Greece shift in the choropleth as the contraction propagates.",
     );
+
+    // Frame A: "The Instrument" — Step 1, all zones visible.
+    await page.evaluate(() => {
+      (window as Record<string, (id: string) => void>).__worldsim_selectEntity("GRC");
+    });
+    await expect(page.getByLabel("Close drawer")).toBeVisible({ timeout: 20_000 });
+    await expect(page.getByText("Multi-Framework Overview")).toBeVisible({ timeout: 30_000 });
+    await page.waitForTimeout(800); // radar animation settles (250ms + margin)
+    await page.screenshot({ path: screenshotPath("frame-a-step1-instrument.png") });
+    await page.getByLabel("Close drawer").click();
+    await page.waitForTimeout(600);
 
     // ── STEP 5: Advance to Step 2 ────────────────────────────────────────────
 
     await nextStepBtn.click();
-    await expect(page.getByText("Step 2 / 3")).toBeVisible({ timeout: 20_000 });
+    await expect(page.getByText("Step 2 / 6")).toBeVisible({ timeout: 20_000 });
     await page.waitForTimeout(1_200);
 
     await speak(
       "Step 2. Year 2011. The fiscal contraction compounds. In the historical case, " +
-      "Greece's GDP contracted negative 9.1 percent this year — deeper than 2010.",
+      "Greece's GDP contracted negative 8.9 percent this year.",
     );
 
-    // ── STEP 6: Advance to Step 3 ────────────────────────────────────────────
+    // ── STEP 6: Advance to Step 3 — Frames B, D, E ───────────────────────────
 
     await nextStepBtn.click();
-    await expect(page.getByText("Step 3 / 3")).toBeVisible({ timeout: 20_000 });
+    await expect(page.getByText("Step 3 / 6")).toBeVisible({ timeout: 20_000 });
+    await page.waitForTimeout(1_200);
+
+    await speak(
+      "Step 3. Year 2012. Third memorandum fiscal consolidation. Maximum stress across " +
+      "the programme so far. Let's open the analysis panel.",
+    );
+
+    await page.evaluate(() => {
+      (window as Record<string, (id: string) => void>).__worldsim_selectEntity("GRC");
+    });
+    await expect(page.getByLabel("Close drawer")).toBeVisible({ timeout: 20_000 });
+    await expect(page.getByText("Multi-Framework Overview")).toBeVisible({ timeout: 30_000 });
+    await page.waitForTimeout(800);
+
+    // Frame D: "The Evidence" — MDA alert panel prominent.
+    // Scroll drawer to top so alert panel fills the upper portion.
+    await page.evaluate(() => {
+      const panel = document.querySelector('[role="dialog"], [data-testid="entity-drawer"]') as HTMLElement | null;
+      if (panel) panel.scrollTop = 0;
+    });
+    await page.waitForTimeout(400);
+    await page.screenshot({ path: screenshotPath("frame-d-step3-evidence.png") });
+
+    // Frame B: "The Collapse" — Financial tab active.
+    const financialTab = page.getByRole("button", { name: /^Financial$/ });
+    await expect(financialTab).toBeVisible({ timeout: 5_000 });
+    await financialTab.click();
+    await page.waitForTimeout(500);
+    await page.screenshot({ path: screenshotPath("frame-b-step3-collapse.png") });
+
+    // Frame E: "The Planetary Dimension" — Ecological tab + note expanded.
+    const ecologicalTab = page.getByRole("button", { name: /^Ecological$/ });
+    await expect(ecologicalTab).toBeVisible({ timeout: 5_000 });
+    await ecologicalTab.click();
+    await page.waitForTimeout(500);
+    // Expand the ecological methodology note drawer (Zone 3A).
+    const noteToggle = page.getByText(/Methodology notes|boundary.*note|ⓘ/i).first();
+    const noteToggleVisible = await noteToggle.isVisible().catch(() => false);
+    if (noteToggleVisible) {
+      await noteToggle.click();
+      await page.waitForTimeout(500);
+    }
+    await page.screenshot({ path: screenshotPath("frame-e-step3-ecological.png") });
+
+    await speak(
+      "This panel is the primary analytical surface. Two things to notice. " +
+      "First, the top: Minimum Descent Altitude alerts — levels below which " +
+      "consequences become irreversible. What you are reading is not a model warning. " +
+      "It is a finding about where this path takes the population. " +
+      "Second: the ecological axis. As of Milestone 8, planetary boundary proximity " +
+      "is live — CO2 concentration tracked against the Rockström 2009 safe operating " +
+      "space boundary. This is the first time ecological data has appeared on this radar.",
+    );
+
+    await page.getByLabel("Close drawer").click();
+    await page.waitForTimeout(600);
+
+    // ── STEP 7: Advance to Step 4 ────────────────────────────────────────────
+
+    await nextStepBtn.click();
+    await expect(page.getByText("Step 4 / 6")).toBeVisible({ timeout: 20_000 });
+    await page.waitForTimeout(1_200);
+
+    await speak(
+      "Step 4. Year 2013. Primary surplus conditionality. Greece achieves its first " +
+      "primary surplus — plus 1.5 percent of GDP — but at significant human cost.",
+    );
+
+    // ── STEP 8: Advance to Step 5 — Frame C (thesis) ────────────────────────
+
+    await nextStepBtn.click();
+    await expect(page.getByText("Step 5 / 6")).toBeVisible({ timeout: 20_000 });
+    await page.waitForTimeout(1_200);
+
+    await speak(
+      "Step 5. Year 2014. This is the step that shows why WorldSim must exist.",
+    );
+
+    await page.evaluate(() => {
+      (window as Record<string, (id: string) => void>).__worldsim_selectEntity("GRC");
+    });
+    await expect(page.getByLabel("Close drawer")).toBeVisible({ timeout: 20_000 });
+    await expect(page.getByText("Multi-Framework Overview")).toBeVisible({ timeout: 30_000 });
+    await page.waitForTimeout(800);
+
+    // Frame C: "The Divergence" — HD tab active. THESIS FRAME.
+    const hdTab = page.getByRole("button", { name: /Human Development/ });
+    await expect(hdTab).toBeVisible({ timeout: 5_000 });
+    await hdTab.click();
+    await page.waitForTimeout(500);
+    await page.screenshot({ path: screenshotPath("frame-c-step5-divergence.png") });
+
+    await speak(
+      "Step 5 is 2014. In the historical record, Greece's GDP grew 0.7 percent — " +
+      "a financial recovery. But unemployment was still 26.5 percent. " +
+      "Look at the radar: the financial axis is extending as the model registers " +
+      "partial recovery. The human development axis remains near its most depressed point. " +
+      "This asymmetry is the WorldSim argument in a single image. " +
+      "Financial recovery and human recovery are not the same event. " +
+      "No single-axis measurement tool can show you both simultaneously.",
+    );
+
+    await page.getByLabel("Close drawer").click();
+    await page.waitForTimeout(600);
+
+    // ── STEP 9: Advance to Step 6 ────────────────────────────────────────────
+
+    await nextStepBtn.click();
+    await expect(page.getByText("Step 6 / 6")).toBeVisible({ timeout: 20_000 });
     await expect(page.getByText(/Complete/)).toBeVisible({ timeout: 10_000 });
     await expect(nextStepBtn).toBeDisabled();
     await page.waitForTimeout(1_200);
 
     await speak(
-      "Step 3. Year 2012. Programme complete. Three years of fiscal adjustment, " +
-      "modeled across the full programme horizon. Now let's look inside.",
+      "Step 6. Year 2015. Capital controls imposed, June 26th. Programme ends. " +
+      "Six years, fully modeled.",
     );
 
-    // ── STEP 7: Open entity drawer for Greece ────────────────────────────────
+    // ── STEP 10: Open drawer for MDA + radar narration ───────────────────────
 
     await page.evaluate(() => {
-      (window as Record<string, (id: string) => void>).__worldsim_selectEntity(
-        "GRC",
-      );
+      (window as Record<string, (id: string) => void>).__worldsim_selectEntity("GRC");
     });
-
     await expect(page.getByLabel("Close drawer")).toBeVisible({ timeout: 20_000 });
-    await expect(page.getByText("Greece", { exact: true })).toBeVisible({ timeout: 10_000 });
-    await expect(
-      page.getByText("Advance the scenario at least one step to view measurement output."),
-    ).not.toBeVisible();
-
-    await expect(page.getByText("Multi-Framework Overview")).toBeVisible({
-      timeout: 10_000,
-    });
-
+    await expect(page.getByText("Multi-Framework Overview")).toBeVisible({ timeout: 30_000 });
     await page.waitForTimeout(1_500);
 
     await speak(
-      "This panel is the primary analytical surface. What I want to draw your attention " +
-      "to first is the top of the panel. These are the Minimum Descent Altitude alerts. " +
-      "The terminology comes from aviation: an MDA is the altitude below which an aircraft " +
-      "cannot safely descend given the terrain. In this simulation, MDAs are human cost " +
-      "floors — levels below which consequences become irreversible, or where standard " +
-      "policy frameworks no longer provide protection. " +
-      "The alert fires when the simulation determines that an indicator has crossed one of " +
-      "those floors. What you are reading is not a warning about the model's own uncertainty. " +
-      "It is a finding about where the proposed path takes the population.",
+      "This is the primary analytical surface. The MDA alert panel at the top. " +
+      "These are the Minimum Descent Altitude alerts — " +
+      "aviation's term for levels below which an aircraft cannot safely descend given the terrain. " +
+      "In this simulation, MDAs are human cost floors. Read each alert as a piece of " +
+      "evidence: indicator, step, severity, cohort. That sentence is specific enough to " +
+      "cite in a negotiation.",
     );
-
-    // ── STEP 8: MDA alert panel called out ───────────────────────────────────
 
     const mdaSection = page.getByRole("heading", { name: "MDA Threshold Breaches" });
     await expect(mdaSection).toBeVisible({ timeout: 10_000 });
-
     await page.waitForTimeout(2_000);
 
     await speak(
-      "Read this alert as a piece of evidence: Under this fiscal adjustment path, " +
-      "this indicator crosses the critical threshold at programme year 3. " +
-      "That sentence is specific enough to cite in a negotiation. It names an indicator, " +
-      "a step, a severity level, and a population cohort. " +
-      "The finance ministry specialist is not being alarmed by the simulation. " +
-      "She is being handed a finding she can use.",
+      "The radar chart below. Four axes: financial, human development, ecological, governance. " +
+      "Financial and human development are live. " +
+      "Ecological is live as of Milestone 8 — CO2 planetary boundary proximity, " +
+      "boundary-normalized against 350 parts per million. " +
+      "Governance shows as a dashed axis, labeled 'Governance — in validation.' " +
+      "It renders honest null — not zero. " +
+      "Zero would imply governance failure. Null means the composite is not yet computed. " +
+      "The fourth axis will show scores when the GovernanceModule promotion criteria are met at M9.",
     );
 
-    // ── STEP 9: Radar chart called out ───────────────────────────────────────
-
-    await expect(page.getByText("Multi-Framework Overview")).toBeVisible();
-
-    await page.evaluate(() => {
-      const drawer = document.querySelector('[aria-label="Close drawer"]')
-        ?.closest('div[style*="position: absolute"]');
-      if (drawer) drawer.scrollTop = 0;
-    });
-
-    await page.waitForTimeout(1_500);
-
-    await speak(
-      "Below the alert panel is the radar chart — four axes, one for each measurement " +
-      "framework the simulation tracks. Financial indicators: fiscal balance, GDP trajectory. " +
-      "Human development: poverty headcount, health system capacity. " +
-      "Ecological: currently null — that module ships in Milestone 8. " +
-      "Governance: institutional quality indicators, now live as of this milestone. " +
-      "The radar chart tells you which dimensions are under stress, supporting the " +
-      "threshold scan the alert panel just completed. " +
-      "I will be honest about what is not on the screen yet: the ecological and governance " +
-      "axes are showing preliminary values. They will show composite scores in Milestone 8.",
-    );
-
-    // ── STEP 10: Enter compare mode ──────────────────────────────────────────
-    // Create and fully advance the comparison scenario via API before opening
-    // the panel — the panel fetches on mount so it will include the scenario.
-    // Using a lighter austerity path (-4% spending, no deficit target) to
-    // produce a visible delta on the choropleth.
+    // ── STEP 11: Enter compare mode ──────────────────────────────────────────
 
     await page.getByLabel("Close drawer").click();
     await page.waitForTimeout(600);
@@ -355,7 +420,7 @@ test(
     const compareCreateRes = await page.request.post("http://localhost:8000/api/v1/scenarios", {
       data: {
         name: COMPARE_SCENARIO_NAME,
-        description: "Greece Alternative — lighter austerity path, stakeholder demo",
+        description: "Greece Alternative — lighter austerity path, M8 stakeholder demo",
         configuration: {
           entities: ["GRC"],
           n_steps: 3,
@@ -377,38 +442,29 @@ test(
           },
         },
         scheduled_inputs: [
-          // Alternative path: lighter first-year cut (-4% vs -8%) to demonstrate
-          // delta against the primary scenario on the choropleth.
-          {
-            step: 1, input_type: "FiscalPolicyInput",
-            input_data: { instrument: "spending_change", target_entity: "GRC", sector: "government", value: "-0.04", duration_years: 1 },
-          },
+          { step: 1, input_type: "FiscalPolicyInput",
+            input_data: { instrument: "spending_change", target_entity: "GRC", sector: "government", value: "-0.04", duration_years: 1 } },
         ],
       },
     });
     if (!compareCreateRes.ok()) {
       throw new Error(`Compare scenario creation failed: ${compareCreateRes.status()} — ${await compareCreateRes.text()}`);
     }
-    const { id: compareScenarioId } = await compareCreateRes.json() as { id: string };
+    const { scenario_id: compareScenarioId } = await compareCreateRes.json() as { scenario_id: string };
 
-    // Advance the comparison scenario 3 steps via API so delta data exists.
-    for (let s = 1; s <= 3; s++) {
-      const advRes = await page.request.post(
-        `http://localhost:8000/api/v1/scenarios/${encodeURIComponent(compareScenarioId)}/advance`,
-      );
-      if (!advRes.ok()) {
-        throw new Error(`Comparison advance step ${s} failed: ${advRes.status()} — ${await advRes.text()}`);
-      }
+    // Run comparison scenario to completion via API.
+    const runRes = await page.request.post(
+      `http://localhost:8000/api/v1/scenarios/${encodeURIComponent(compareScenarioId)}/run`,
+    );
+    if (!runRes.ok()) {
+      throw new Error(`Comparison run failed: ${runRes.status()} — ${await runRes.text()}`);
     }
 
     await page.getByRole("button", { name: /Scenarios/ }).click();
     await page.waitForTimeout(600);
 
-    const compareRow = page
-      .locator(".scenario-row")
-      .filter({ hasText: COMPARE_SCENARIO_NAME });
+    const compareRow = page.locator(".scenario-row").filter({ hasText: COMPARE_SCENARIO_NAME });
     await expect(compareRow).toBeVisible({ timeout: 10_000 });
-
     await compareRow.getByTitle("Select as comparison scenario").click();
     await page.waitForTimeout(600);
 
@@ -416,20 +472,18 @@ test(
     await page.waitForTimeout(600);
 
     await page.getByText("Compare scenarios").click();
-    await page.waitForTimeout(800);
-
     await page.waitForTimeout(1_500);
 
     await speak(
-      "This is the counter-proposal function. Once you have identified which terms produce " +
-      "threshold crossings, you model an alternative — the same fiscal outcome, achieved " +
-      "differently. The DeltaChoropleth shows you, geographically, where the two scenarios " +
-      "diverge. The argument becomes: This path crosses the threshold. This alternative " +
-      "achieves the same primary fiscal objective and does not. Here is the evidence for both.",
+      "This is the counter-proposal function. You have identified which terms produce " +
+      "threshold crossings. Now you model an alternative — the same fiscal outcome, " +
+      "achieved differently. The DeltaChoropleth shows, geographically, where the two " +
+      "scenarios diverge. The argument becomes: this path crosses the threshold; " +
+      "this alternative achieves the same fiscal objective and does not. " +
+      "Here is the evidence for both.",
     );
 
-    // ── Demo complete ────────────────────────────────────────────────────────
-    // Section 3 (backtesting), Section 4 (roadmap), and Section 5 (North Star)
-    // are delivered verbally or via slides. See docs/demo/stakeholder-walkthrough.md.
+    // Sections 3–5 (backtesting, roadmap, North Star) delivered verbally.
+    // See docs/demo/m8/stakeholder-walkthrough.md.
   },
 );
