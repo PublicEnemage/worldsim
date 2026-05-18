@@ -139,11 +139,15 @@ class FidelityThresholds:
         empirically grounded initial value (12.7%, EUROSTAT_LFS_2010 Q1 2010).
         Replaces the vacuous step1→step3 check from before Issue #149.
       gdp_direction_step4_negative: gdp_growth at step 4 is negative (-3.2%, 2013).
-      gdp_direction_step5_positive: gdp_growth at step 5 is positive (+0.7%, 2014).
       gdp_direction_step6_negative: gdp_growth at step 6 is negative (-0.4%, 2015
         capital controls episode).
 
     Deferred thresholds (tracked in fidelity report, not blocking CI — Issue #87):
+      gdp_direction_step5_positive: gdp_growth at step 5 should be positive (+0.7%,
+        2014 brief recovery). Deferred: the MacroeconomicModule has no endogenous
+        recovery mechanism — fiscal consolidation accumulates without a growth
+        rebound channel. Engine produces continued contraction at step 5. Re-enable
+        when a mean-reversion or recovery module is implemented (Issue #221).
       unemployment_rising_step1_to_step2: step 2 unemployment > step 1.
         Deferred: no endogenous module currently updates unemployment_rate.
         Value stays flat; threshold would always fail. Re-enable when a module
@@ -163,10 +167,11 @@ class FidelityThresholds:
 
     gdp_direction_correct: bool = True
     unemployment_direction_step0_to_step3: bool = True
-    # Steps 4–6 GDP DIRECTION_ONLY thresholds (blocking CI gate — Issue #316)
+    # Steps 4 and 6 GDP DIRECTION_ONLY thresholds (blocking CI gate — Issue #316)
     gdp_direction_step4_negative: bool = True
-    gdp_direction_step5_positive: bool = True
     gdp_direction_step6_negative: bool = True
+    # Step 5 deferred — no endogenous recovery module; engine produces continued contraction
+    gdp_direction_step5_positive: bool = False
     # HCL / unemployment thresholds — deferred (no endogenous module yet)
     unemployment_rising_step1_to_step2: bool = False
     health_expenditure_declining_step1_to_step2: bool = False

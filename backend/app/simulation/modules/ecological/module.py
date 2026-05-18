@@ -260,10 +260,23 @@ class EcologicalModule(SimulationModule):
                     )
 
             for key, delta in indicator_deltas.items():
+                vtype = _INDICATOR_VARIABLE_TYPES.get(key, VariableType.RATIO)
+                if vtype == VariableType.STOCK:
+                    # STOCK propagation replaces the current value, so the event
+                    # must carry the new absolute level (current + elasticity change).
+                    current_qty = entity.attributes.get(key)
+                    current_val = (
+                        Decimal(str(current_qty.value))
+                        if current_qty is not None
+                        else Decimal("0")
+                    )
+                    emit_value = current_val + delta
+                else:
+                    emit_value = delta
                 affected_attributes[key] = Quantity(
-                    value=delta,
+                    value=emit_value,
                     unit=_INDICATOR_UNITS.get(key, _DEFAULT_ECOLOGICAL_UNIT),
-                    variable_type=_INDICATOR_VARIABLE_TYPES.get(key, VariableType.RATIO),
+                    variable_type=vtype,
                     measurement_framework=MeasurementFramework.ECOLOGICAL,
                     confidence_tier=indicator_tiers[key],
                 )
