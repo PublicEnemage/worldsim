@@ -3,6 +3,7 @@ import { useMultiFrameworkOutput } from "../hooks/useMultiFrameworkOutput";
 import RadarChart from "./RadarChart";
 import FrameworkPanel from "./FrameworkPanel";
 import MDAAlertPanel from "./MDAAlertPanel";
+import PMMLedger from "./PMMLedger";
 import type { MDAAlert, RadarAxisDatum, FrameworkWeights } from "../types";
 
 const WEIGHTS_KEY = "worldsim.frameworkWeights";
@@ -188,13 +189,18 @@ export default function EntityDetailDrawer({ scenarioId, entityId, step, onClose
               />
             </section>
 
-            {/* MDA alerts — always rendered so the scanning surface is visible */}
+            {/* Zone 1A: MDA alerts — always rendered so the scanning surface is visible */}
             <section style={{ marginBottom: 16 }}>
               <h3 style={{ fontSize: 13, fontWeight: 600, margin: "0 0 8px", color: allAlerts.length > 0 ? "#c00" : "#333" }}>
                 MDA Threshold Breaches
               </h3>
               <MDAAlertPanel alerts={allAlerts} />
             </section>
+
+            {/* Zone 1C: Policy Maneuver Margin — Coffin Corner indicator.
+                M8 render state: null score (backend computation pending).
+                Live score ships when backend PMM computation is complete. */}
+            <PMMLedger pmm_score={null} pmm_trend={null} />
 
             {/* Framework indicator panels */}
             <section style={{ marginBottom: 16 }}>
