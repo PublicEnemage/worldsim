@@ -1,6 +1,7 @@
 import { useState } from "react";
 import type { FrameworkOutput, QuantitySchema } from "../types";
 import { getIndicatorDisplayName } from "../lib/indicatorDisplayNames";
+import MethodologyNote from "./MethodologyNote";
 
 interface Props {
   framework: string;
@@ -98,7 +99,8 @@ export default function FrameworkPanel({ framework, output }: Props) {
 
       {open && (
         <div style={{ padding: "8px 10px" }}>
-          {output.note && (
+          {/* Non-ecological frameworks: render note inline */}
+          {output.note && framework !== "ecological" && (
             <p style={{ fontSize: 12, color: "#888", fontStyle: "italic", margin: "0 0 8px" }}>
               {output.note}
             </p>
@@ -129,6 +131,29 @@ export default function FrameworkPanel({ framework, output }: Props) {
                 })}
               </tbody>
             </table>
+          )}
+
+          {/* Ecological framework: Zone 3A expandable — ADR-005 Amendment 3 Area 4.
+              Note is accessible but requires a click; composite score (Zone 1B) remains
+              the primary output. Governance gets the same treatment at M9 promotion. */}
+          {framework === "ecological" && (
+            <MethodologyNote label="Ecological methodology note">
+              {output.note && (
+                <p style={{ margin: "0 0 6px" }}>{output.note}</p>
+              )}
+              <p style={{ margin: "0 0 4px" }}>
+                <strong>Normalization formula:</strong>{" "}
+                proximity = min(current_value / boundary_value, 2.0)
+              </p>
+              <p style={{ margin: "0 0 4px" }}>
+                Values above 1.0 indicate the planetary boundary has been exceeded.
+              </p>
+              <p style={{ margin: 0, color: "#a60" }}>
+                <strong>Discriminating-power limitation:</strong> The cap at 2.0 means all
+                values above twice the boundary threshold are indistinguishable. Severity
+                above 2× boundary is not captured.
+              </p>
+            </MethodologyNote>
           )}
         </div>
       )}
