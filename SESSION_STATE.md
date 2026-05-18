@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated:** 2026-05-18 (post-#321/#323/#324 all merged)
+**Last updated:** 2026-05-18 (post-PR #329 open — M8 frontend UX four issues)
 **Current milestone:** M8 — Ecological and Governance Frameworks
 
 ---
@@ -18,13 +18,18 @@
 | Greece fixture extension | #284 ✅ #316 ✅ | Merged ✅ (PR #321) | None |
 | EcologicalModule expansion | #312 ✅ #313 ✅ #314 ✅ | Merged ✅ (PR #324) | None |
 | UI/UX — Area 1 (null governance axis) | #315 ✅ | Merged ✅ (PR #323) | None |
-| UI/UX — Areas 2, 3, 4 | #268 #265 #266 | Not started | Nothing — unblocked ✅ |
-| UI/UX — Area 5 (radar animation) | #267 | Not started | Nothing — **unblocked ✅ (Area 1 merged)** |
+| UI/UX — Areas 2, 3, 4, 5 | #317 #318 #320 #319 | Open PR #329 — review required | UX Designer sign-off ✅ (brief 2026-05-17) |
 | Demo scenario assembly | #269 | Not started | Nothing — **unblocked ✅ (all prerequisites merged)** |
 | Intent block retrofit | #287 | Merged ✅ (PR #291) | None |
 | Frontend Architect M8 brief | #298 ✅ | Merged ✅ (PR #307) | None |
 
 ---
+
+## Open PRs
+
+| PR | Title | Date opened |
+|---|---|---|
+| #329 | feat(frontend): M8 UX — display names, ecological note expandable, PMM widget, radar animation | 2026-05-18 |
 
 ## Recently Merged PRs (last 5)
 
@@ -34,7 +39,7 @@
 | #323 | feat(frontend): null governance axis rendering — number\|null type, dashed render, ADR-005 M8-5 | 2026-05-18 |
 | #321 | feat(backtesting): extend Greece fixture to 2015 — steps 4–6 stabilization period | 2026-05-18 |
 | #325 | chore(state): SESSION_STATE.md update — M8 ecological backend PR #324 open | 2026-05-18 |
-| #322 | chore(state): SESSION_STATE.md update — Issue #316 implemented, PR #321 open | 2026-05-17 |
+| #327 | chore(state): SESSION_STATE.md update — PR #321 #323 #324 all merged | 2026-05-18 |
 
 ---
 
@@ -47,10 +52,10 @@
 | #312 | Alembic migrations — confidence_tier + MDA ecological thresholds | Closed ✅ — merged PR #324 |
 | #313 | _compute_composite_score() strategy dispatch refactor | Closed ✅ — merged PR #324 |
 | #314 | EcologicalModule M8 indicator expansion | Closed ✅ — merged PR #324 |
-| #265 | Indicator display name mapping layer | Nothing — unblocked ✅ (brief: Area 3) |
-| #266 | Mandatory ecological note → Zone 3 expandable | Nothing — unblocked ✅ (brief: Area 4) |
-| #267 | Radar chart transition animation | Nothing — **unblocked ✅** (Area 1 merged — Area 5 now clear) |
-| #268 | Coffin Corner / PMM Zone 1 widget | Nothing — unblocked ✅ (brief: Area 2) |
+| #317 | Indicator display name mapping layer | In PR #329 |
+| #318 | Mandatory ecological note → Zone 3 expandable | In PR #329 |
+| #319 | Radar chart transition animation | In PR #329 |
+| #320 | Coffin Corner / PMM Zone 1 widget | In PR #329 |
 | #269 | Demo scenario — Greece 2010–2015 | Nothing — **unblocked ✅** (Greece fixture + EcologicalModule both merged) |
 
 ---
@@ -83,6 +88,7 @@
 
 | Decision | Rationale | Date |
 |---|---|---|
+| M8 frontend UX four issues implemented (PR #329 open) | #317 display name registry + #318 ecological note → Zone 3A + #320 PMM Zone 1C widget (null placeholder M8) + #319 radar 250ms animation + prefers-reduced-motion guard + null-axis animation guard; tsc clean, 10/10 tests | 2026-05-18 |
 | Null governance axis merged (Issue #315, PR #323 ✅) | `RadarAxisDatum.composite_score: number \| null` live on main; null = dashed hollow dot; `GOVERNANCE_IN_VALIDATION_LABEL`/`TOOLTIP` constants + `computeFinalScore()` pure function; DD-011 sentinel in design-decisions.md; 10 Vitest tests; Area 5 (#267) now unblocked | 2026-05-18 |
 | M8 ecological backend merged (Issues #312–#314, PR #324 ✅) | Strategy dispatch, proximity indicators, migrations. land_use_pressure_index is pre-normalized (no division by 0.25). Ecological exempt from single-entity guard. Demo scenario (#269) now unblocked. | 2026-05-18 |
 | Greece fixture 2015 merged (Issue #316, PR #321 ✅) | Steps 4–6 actuals, DIRECTION_ONLY thresholds, capital controls, ECOLOGICAL_COMPOSITE_DISCLOSURE. Demo scenario (#269) now unblocked. | 2026-05-18 |
