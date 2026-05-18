@@ -109,10 +109,6 @@ test(
       { timeout: 15_000 },
     );
 
-    await page.evaluate(() => {
-      (window as Record<string, (key: string) => void>).__worldsim_setAttributeName("gdp_growth");
-    });
-
     // Create the M8 Greece demo scenario via API before opening the panel.
     // Matches build_greece_demo_scenario(): 6 steps, EcologicalModule enabled,
     // CO2 seed (388.0 ppm NOAA MLO 2010), all eight programme scheduled inputs.
@@ -230,6 +226,11 @@ test(
     await expect(page.getByText("Step 1 / 6")).toBeVisible({ timeout: 20_000 });
     await page.waitForTimeout(1_200);
 
+    // Switch choropleth to gdp_growth now that step 1 output exists.
+    await page.evaluate(() => {
+      (window as Record<string, (key: string) => void>).__worldsim_setAttributeName("gdp_growth");
+    });
+
     await speak(
       "Step 1. Year 2010. The IMF programme begins — fiscal tightening applied. " +
       "Watch Greece shift in the choropleth as the contraction propagates.",
@@ -324,10 +325,22 @@ test(
     await expect(page.getByText("Step 4 / 6")).toBeVisible({ timeout: 20_000 });
     await page.waitForTimeout(1_200);
 
+    // Open drawer at step 4: primary surplus is visible in the financial indicators.
+    await page.evaluate(() => {
+      (window as Record<string, (id: string) => void>).__worldsim_selectEntity("GRC");
+    });
+    await expect(page.getByLabel("Close drawer")).toBeVisible({ timeout: 20_000 });
+    await expect(page.getByText("Multi-Framework Overview")).toBeVisible({ timeout: 30_000 });
+    await page.waitForTimeout(800);
+
     await speak(
       "Step 4. Year 2013. Primary surplus conditionality. Greece achieves its first " +
-      "primary surplus — plus 1.5 percent of GDP — but at significant human cost.",
+      "primary surplus — plus 1.5 percent of GDP — but at significant human cost. " +
+      "Look at the radar: financial axis is recovering. Human development remains depressed.",
     );
+
+    await page.getByLabel("Close drawer").click();
+    await page.waitForTimeout(600);
 
     // ── STEP 8: Advance to Step 5 — Frame C (thesis) ────────────────────────
 
@@ -417,15 +430,20 @@ test(
     await page.getByLabel("Close drawer").click();
     await page.waitForTimeout(600);
 
+    // Comparison scenario: same 6-step span, same initial state, lighter fiscal path.
+    // Half the spending cuts — demonstrates that the fiscal target can be approached
+    // without crossing the MDA threshold. Must be n_steps: 6 to match the primary
+    // so the DeltaChoropleth has data at currentStep (6).
     const compareCreateRes = await page.request.post("http://localhost:8000/api/v1/scenarios", {
       data: {
         name: COMPARE_SCENARIO_NAME,
         description: "Greece Alternative — lighter austerity path, M8 stakeholder demo",
         configuration: {
           entities: ["GRC"],
-          n_steps: 3,
+          n_steps: 6,
           timestep_label: "annual",
           start_date: "2010-01-01",
+          modules_config: { ecological: { enabled: true } },
           initial_attributes: {
             GRC: {
               gdp_growth: {
@@ -433,10 +451,20 @@ test(
                 confidence_tier: 3, observation_date: "2010-04-01",
                 source_registry_id: "IMF_WEO_APR2010", measurement_framework: "financial",
               },
+              unemployment_rate: {
+                value: "0.127", unit: "ratio", variable_type: "ratio",
+                confidence_tier: 2, observation_date: "2010-07-01",
+                source_registry_id: "EUROSTAT_LFS_2010", measurement_framework: "human_development",
+              },
               reserve_coverage_months: {
                 value: "2.0", unit: "months", variable_type: "ratio",
                 confidence_tier: 2, observation_date: "2010-05-01",
                 source_registry_id: "IMF_CR10_110", measurement_framework: "financial",
+              },
+              co2_concentration_ppm: {
+                value: "388.0", unit: "ppm", variable_type: "stock",
+                confidence_tier: 1, observation_date: "2010-01-01",
+                source_registry_id: "NOAA_MLO_2010", measurement_framework: "ecological",
               },
             },
           },
@@ -444,6 +472,10 @@ test(
         scheduled_inputs: [
           { step: 1, input_type: "FiscalPolicyInput",
             input_data: { instrument: "spending_change", target_entity: "GRC", sector: "government", value: "-0.04", duration_years: 1 } },
+          { step: 2, input_type: "FiscalPolicyInput",
+            input_data: { instrument: "spending_change", target_entity: "GRC", sector: "government", value: "-0.025", duration_years: 1 } },
+          { step: 3, input_type: "FiscalPolicyInput",
+            input_data: { instrument: "spending_change", target_entity: "GRC", sector: "government", value: "-0.02", duration_years: 1 } },
         ],
       },
     });
@@ -472,7 +504,8 @@ test(
     await page.waitForTimeout(600);
 
     await page.getByText("Compare scenarios").click();
-    await page.waitForTimeout(1_500);
+    // Wait for DeltaChoropleth to fetch and render both scenarios at step 6.
+    await page.waitForTimeout(3_000);
 
     await speak(
       "This is the counter-proposal function. You have identified which terms produce " +
