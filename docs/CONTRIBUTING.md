@@ -115,6 +115,11 @@ PostGIS is not required for Milestone 1 (simulation engine only). Skip this
 step if working on simulation logic, skip to Step 4.
 
 ```bash
+# Build the API image first — required after a fresh clone or any Dockerfile change.
+# The codebase uses Python 3.12 syntax (PEP 695 type aliases); a stale image
+# built on an earlier Python version will fail to start with SyntaxError.
+docker compose build api
+
 # Start local services with Docker
 docker compose up -d db redis
 
