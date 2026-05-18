@@ -259,10 +259,15 @@ def build_greece_scenario() -> ScenarioCreateRequest:
 def build_greece_demo_scenario() -> ScenarioCreateRequest:
     """Build the Greece 2010–2015 M8 demo scenario with EcologicalModule enabled.
 
-    Wraps build_greece_scenario() with modules_config enabling the ecological
-    module so that planetary boundary proximity indicators are produced at each
-    step. Used by tests/backtesting/test_greece_m8_demo.py and
-    scripts/demo_greece_2010_2015.py.
+    Extends build_greece_scenario() with:
+      - modules_config enabling EcologicalModule (planetary boundary proximity)
+      - co2_concentration_ppm initial seed (388.0 ppm — Mauna Loa 2010 annual mean)
+
+    The CO2 seed is required so the EcologicalModule stock path can compute
+    boundary proximity at step 1 (before any GDP-driven delta arrives via the
+    one-step-lag delta path). Without it, co2_concentration_ppm is absent from
+    entity.attributes at step 1 and the stock path skips with [SIM-INTEGRITY]
+    WARNING. Source: NOAA_MLO_2010 (Mauna Loa Observatory, 388.0 ppm annual mean).
 
     The ecological composite score is the only non-null composite in this
     single-entity scenario — financial and human_development composites are null
@@ -272,8 +277,29 @@ def build_greece_demo_scenario() -> ScenarioCreateRequest:
     References: Issue #269; ADR-005 Amendment 3 Decisions M8-2/M8-3/M8-6.
     """
     base = build_greece_scenario()
+
+    # NOAA Mauna Loa Observatory 2010 annual mean: 388.0 ppm (confidence_tier=1).
+    # Provides the initial stock value for the EcologicalModule stock path so that
+    # planetary_boundary_co2_proximity is non-null at step 1.
+    initial_co2_concentration = QuantitySchema(
+        value="388.0",
+        unit="ppm",
+        variable_type="stock",
+        confidence_tier=1,
+        observation_date=date(2010, 1, 1),
+        source_registry_id="NOAA_MLO_2010",
+        measurement_framework="ecological",
+    )
+
+    updated_grc_attrs = {
+        **base.configuration.initial_attributes.get("GRC", {}),
+        "co2_concentration_ppm": initial_co2_concentration,
+    }
     demo_config = base.configuration.model_copy(
-        update={"modules_config": {"ecological": {"enabled": True}}}
+        update={
+            "modules_config": {"ecological": {"enabled": True}},
+            "initial_attributes": {"GRC": updated_grc_attrs},
+        }
     )
     return base.model_copy(update={
         "name": "Greece 2010-2015 M8 Demo — Multi-Framework Measurement",
@@ -285,7 +311,7 @@ def build_greece_demo_scenario() -> ScenarioCreateRequest:
             "(percentile rank requires ≥2 entities, Issue #193). "
             "Governance composite is null pending Milestone 9 promotion criteria. "
             "Initial state: IMF WEO April 2010 + Eurostat LFS 2010 + WDI 2010 "
-            "+ IMF CR10/110 (reserve_coverage_months)."
+            "+ IMF CR10/110 (reserve_coverage_months) + NOAA MLO 2010 (co2_concentration_ppm)."
         ),
         "configuration": demo_config,
     })

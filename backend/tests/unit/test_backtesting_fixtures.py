@@ -193,9 +193,9 @@ def test_thresholds_gdp_direction_step4_negative_is_true() -> None:
     assert THRESHOLDS.gdp_direction_step4_negative is True
 
 
-def test_thresholds_gdp_direction_step5_positive_is_true() -> None:
-    """Blocking CI gate: GDP at step 5 (2014) must be positive (+0.7% outturn)."""
-    assert THRESHOLDS.gdp_direction_step5_positive is True
+def test_thresholds_gdp_direction_step5_positive_is_false() -> None:
+    """Deferred threshold: step 5 GDP (+0.7% outturn) deferred until Issue #221 recovery module."""
+    assert THRESHOLDS.gdp_direction_step5_positive is False
 
 
 def test_thresholds_gdp_direction_step6_negative_is_true() -> None:

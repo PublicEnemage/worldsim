@@ -37,7 +37,6 @@ from __future__ import annotations
 import asyncio
 import os
 import sys
-from decimal import Decimal
 from typing import Any
 
 # Ensure backend root is on path when running as a script
@@ -127,7 +126,6 @@ def _print_main_table(outputs: list[dict[str, Any]]) -> None:
         fin = output["outputs"].get("financial", {})
         hd = output["outputs"].get("human_development", {})
         eco = output["outputs"].get("ecological", {})
-        gov = output["outputs"].get("governance", {})
 
         gdp_val = fin.get("indicators", {}).get("gdp_growth", {}).get("value")
         gdp_str = _format_percent(gdp_val)
@@ -200,7 +198,6 @@ def _print_divergence_narrative(outputs: list[dict[str, Any]]) -> None:
     print("-" * 64)
 
     for step in [3, 5, 6]:
-        year = {3: "2012", 5: "2014", 6: "2015"}.get(step, f"step{step}")
         if step not in outputs_by_step:
             continue
         output = outputs_by_step[step]
