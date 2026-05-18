@@ -4,6 +4,9 @@ Defines the scenario configuration for the Greece 2010–2015 backtesting run
 as a Python object. This fixture is consumed by the backtesting test in
 tests/backtesting/test_greece_2010_2012.py.
 
+Also exports build_greece_demo_scenario() for the M8 end-of-milestone demo
+(Issue #269), which enables EcologicalModule via modules_config.
+
 Design follows ADR-004 Decision 3. The ControlInput sequence approximates
 the documented historical program:
   - Step 1 (2010): IMF program acceptance + fiscal spending cuts
@@ -251,3 +254,38 @@ def build_greece_scenario() -> ScenarioCreateRequest:
             ),
         ],
     )
+
+
+def build_greece_demo_scenario() -> ScenarioCreateRequest:
+    """Build the Greece 2010–2015 M8 demo scenario with EcologicalModule enabled.
+
+    Wraps build_greece_scenario() with modules_config enabling the ecological
+    module so that planetary boundary proximity indicators are produced at each
+    step. Used by tests/backtesting/test_greece_m8_demo.py and
+    scripts/demo_greece_2010_2015.py.
+
+    The ecological composite score is the only non-null composite in this
+    single-entity scenario — financial and human_development composites are null
+    because percentile rank requires ≥2 entities (single_entity_warning=True,
+    Issue #193, ADR-005 Decision M8-2). Governance composite is null pending M9.
+
+    References: Issue #269; ADR-005 Amendment 3 Decisions M8-2/M8-3/M8-6.
+    """
+    base = build_greece_scenario()
+    demo_config = base.configuration.model_copy(
+        update={"modules_config": {"ecological": {"enabled": True}}}
+    )
+    return base.model_copy(update={
+        "name": "Greece 2010-2015 M8 Demo — Multi-Framework Measurement",
+        "description": (
+            "M8 end-of-milestone demo scenario (Issue #269). "
+            "EcologicalModule enabled — produces planetary boundary "
+            "proximity scores at all six steps. Financial and human_development "
+            "composite scores are null in this single-entity scenario "
+            "(percentile rank requires ≥2 entities, Issue #193). "
+            "Governance composite is null pending Milestone 9 promotion criteria. "
+            "Initial state: IMF WEO April 2010 + Eurostat LFS 2010 + WDI 2010 "
+            "+ IMF CR10/110 (reserve_coverage_months)."
+        ),
+        "configuration": demo_config,
+    })
