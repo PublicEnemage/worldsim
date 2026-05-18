@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated:** 2026-05-18 (post-#328/#329/#330 all merged — M8 feature-complete)
+**Last updated:** 2026-05-18 (post-#334 merged — demo prep structure, screenshot brief, standing process)
 **Current milestone:** M8 — Ecological and Governance Frameworks
 
 ---
@@ -31,11 +31,11 @@
 
 | PR | Title | Date |
 |---|---|---|
+| #334 | docs(demo): M8 demo preparation — milestone structure, screenshot brief, standing process | 2026-05-18 |
+| #331 | chore(state): SESSION_STATE.md update — M8 feature-complete post-#328/#329/#330 | 2026-05-18 |
 | #330 | chore(state): SESSION_STATE.md update — PR #329 open, M8 frontend UX four issues | 2026-05-18 |
 | #329 | feat(frontend): M8 UX — display names, ecological note expandable, PMM widget, radar animation | 2026-05-18 |
 | #328 | feat(demo): M8 demo scenario — Greece 2010–2015 multi-framework measurement (closes #269) | 2026-05-18 |
-| #327 | chore(state): SESSION_STATE.md update — PR #321 #323 #324 all merged | 2026-05-18 |
-| #324 | feat(backend): M8 ecological boundary normalization — dispatch refactor, indicator expansion, migrations | 2026-05-18 |
 
 ---
 
@@ -57,14 +57,13 @@ All Horizon:Immediate issues are now closed. M8 feature-complete.
 
 | Issue | Title | Blocked by |
 |---|---|---|
-| #233 | Screenshot artifact bundle | Nothing — **unblocked ✅** (#269 merged) |
+| #233 | Screenshot artifact bundle | Screenshot brief ✅ (docs/demo/m8/screenshot-brief.md) — capture + IR Agent run pending |
 | #221 | Mean-reversion channel (Greece step5 MAGNITUDE) | Nothing — unblocked ✅ |
 | #222 | Contemporaneous processing path | Nothing — unblocked ✅ |
 | #258 | Mandatory intent blocks | #285 (merged ✅) |
-| #286 | Spec-to-test gap check script | #285 (merged ✅) |
-| #299 | Intent Block Author Agent — define in agents.md | Nothing — unblocked ✅ |
-| #300 | Data Quality Agent — define in agents.md (M9) | Nothing — unblocked ✅ |
-| #301 | agent-raci.md — RACI chart for all agents | #299, #300 |
+| #332 | Docker image stale — Python 3.11 cached, Python 3.12 required | Nothing — `docker compose build api` fix |
+
+**Re-milestoned to M9** (removed from M8 board this session): #286 (intent_gap_check.py), #299 (Intent Block Author Agent), #300 (Data Quality Agent), #301 (agent-raci.md)
 
 ---
 
@@ -73,7 +72,7 @@ All Horizon:Immediate issues are now closed. M8 feature-complete.
 | Decision | Context | Status |
 |---|---|---|
 | GovernanceModule promotion path | Deferred from M8 demo — five criteria not yet met — target M9 | Decided: deferred |
-| M8 formal close / M9 kickoff | All Horizon:Immediate issues merged; #233 screenshot bundle and retrospective remain | Pending |
+| M8 formal close / M9 kickoff | #233 screenshot capture + IR Agent run + M8 retrospective remain; #209 exit checklist open | Pending |
 
 ---
 
@@ -81,6 +80,9 @@ All Horizon:Immediate issues are now closed. M8 feature-complete.
 
 | Decision | Rationale | Date |
 |---|---|---|
+| M8 milestone board cleanup (this session) | Exit checklists #261–#264 and #213 were systematically off-by-one milestone; corrected. #286/#299/#301 re-milestoned to M9; #217/#95 re-milestoned to M10. #142 closed (stale). | 2026-05-18 |
+| Demo preparation standard established (PR #334) | docs/process/demo-preparation-standard.md defines the biennial demo cadence. M6 artifacts archived to docs/demo/m6/. M8 screenshot brief (UX Agent) saved to docs/demo/m8/screenshot-brief.md. Thesis frame: Frame C, Step 5 (2014) — asymmetric radar. | 2026-05-18 |
+| Python 3.11/3.12 mismatch (Issue #332) | api container image stale (built on 3.11); Dockerfile already specifies 3.12. Temporary workaround: `type CompositeStrategy = Callable[...]` (PEP 695 plain assignment) applied to app/api/scenarios.py. Proper fix: `docker compose build api`. | 2026-05-18 |
 | EcologicalModule delta path bug fixed (PR #328) | For STOCK indicators, emit new absolute value (current + elasticity_delta) not the raw delta. The propagation engine replaces STOCK attributes — emitting the raw ~-0.08 elasticity value would overwrite the 388 ppm seed with a tiny negative, corrupting all subsequent proximity computations. | 2026-05-18 |
 | gdp_direction_step5_positive deferred to Issue #221 | MacroeconomicModule has no endogenous recovery mechanism; fiscal consolidation accumulates without rebound channel. Engine produces -0.434 at step 5 vs historical +0.007. Moved from blocking CI gate to deferred_thresholds. | 2026-05-18 |
 | co2_concentration_ppm seed (388 ppm, NOAA MLO 2010) required for demo scenario | Without seed, EcologicalModule stock path has no attribute at step 1 → null proximity. Added to build_greece_demo_scenario() initial_attributes. | 2026-05-18 |
@@ -125,6 +127,14 @@ All Horizon:Immediate issues are now closed. M8 feature-complete.
 - `computeFinalScore(composite_score: number | null, weight: number): number | null` exported pure function
 - Null axis: dashed hollow SVG circle (`strokeDasharray="2 2"`, `fill="none"`); Recharts polygon gap
 - DD-011 in `docs/frontend/design-decisions.md` with sentinel
+
+**Demo preparation standard — established ✅ (PR #334):**
+- `docs/process/demo-preparation-standard.md` — nine-step biennial demo cadence; reference cases M6 (#220) and M8 (#333)
+- `docs/demo/m6/` — M6 review and walkthrough archived
+- `docs/demo/m8/screenshot-brief.md` — UX Agent five-frame brief for Issue #233
+- Thesis frame: Frame C, Step 5 (2014) — asymmetric radar (financial partial recovery, HD depressed)
+- Presentation sequence: C → A → B → D → E (lead with thesis)
+- #233 remaining work: `demo.sh` update, Playwright spec, screenshot capture, IR Agent run
 
 **Standards state:**
 - Canonical unit registry: in DATA_STANDARDS.md §Canonical Unit Registry (PR #282)
