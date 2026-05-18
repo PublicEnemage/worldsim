@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated:** 2026-05-18 (post-#336 merged — Python 3.12 Docker fix, closes #332)
+**Last updated:** 2026-05-18 (PR #339 open — M8 demo script + Playwright spec + five screenshots, closes #233)
 **Current milestone:** M8 — Ecological and Governance Frameworks
 
 ---
@@ -31,11 +31,11 @@
 
 | PR | Title | Date |
 |---|---|---|
+| #339 | docs(demo): M8 demo — updated demo.sh, narrated spec, five screenshots captured (open, closes #233) | 2026-05-18 |
+| #338 | chore(demo): switch TTS voice to Zoe (Enhanced) | 2026-05-18 |
 | #336 | fix(dev): Python 3.12 Docker image rebuild — startup version guard, CONTRIBUTING docs | 2026-05-18 |
 | #335 | chore(state): SESSION_STATE.md update — PR #334 merged, demo prep standard, board cleanup | 2026-05-18 |
 | #334 | docs(demo): M8 demo preparation — milestone structure, screenshot brief, standing process | 2026-05-18 |
-| #333 | demo: M8 stakeholder demo preparation issue (closed by #334) | 2026-05-18 |
-| #331 | chore(state): SESSION_STATE.md update — M8 feature-complete post-#328/#329/#330 | 2026-05-18 |
 
 ---
 
@@ -57,7 +57,7 @@ All Horizon:Immediate issues are now closed. M8 feature-complete.
 
 | Issue | Title | Blocked by |
 |---|---|---|
-| #233 | Screenshot artifact bundle | Screenshot brief ✅ (docs/demo/m8/screenshot-brief.md) — capture + IR Agent run pending |
+| #233 | Screenshot artifact bundle | PR #339 open — five frames captured ✅; IR Agent run pending |
 | #221 | Mean-reversion channel (Greece step5 MAGNITUDE) | Nothing — unblocked ✅ |
 | #222 | Contemporaneous processing path | Nothing — unblocked ✅ |
 | #258 | Mandatory intent blocks | #285 (merged ✅) |
@@ -72,7 +72,7 @@ All Horizon:Immediate issues are now closed. M8 feature-complete.
 | Decision | Context | Status |
 |---|---|---|
 | GovernanceModule promotion path | Deferred from M8 demo — five criteria not yet met — target M9 | Decided: deferred |
-| M8 formal close / M9 kickoff | #233 screenshot capture + IR Agent run + M8 retrospective remain; #209 exit checklist open | Pending |
+| M8 formal close / M9 kickoff | PR #339 (screenshots) open; IR Agent run + M8 retrospective remain; #209 exit checklist open | Pending |
 
 ---
 
