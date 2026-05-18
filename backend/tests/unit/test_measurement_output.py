@@ -95,6 +95,9 @@ def _entity_row(name: str = "Greece") -> dict:
 def _make_conn(*side_effects: dict[str, object] | None) -> AsyncMock:
     conn = AsyncMock()
     conn.fetchrow = AsyncMock(side_effect=list(side_effects))
+    # conn.fetch is used by _fetch_active_boundary_constants for ecological composite score.
+    # Default empty list = no active boundary constants = ecological composite_score None.
+    conn.fetch = AsyncMock(return_value=[])
     return conn
 
 
@@ -214,11 +217,12 @@ async def test_ecological_returns_null_composite_score_with_note() -> None:
         scenario_id="scen-1", entity_id="GRC", step=1, conn=conn
     )
     ecological = result.outputs["ecological"]
+    # No proximity indicators in _STATE, no active boundary constants → composite None.
     assert ecological.composite_score is None
     assert ecological.note is not None
-    # ADR-005 Amendment B: ecological note is the mandatory percentile-rank disclosure,
-    # not the "not yet implemented" note — ecological module shipped at M6.
-    assert "percentile rank" in ecological.note
+    # ADR-005 Amendment 3 Decision M8-1: mandatory note references boundary proximity formula.
+    assert "boundary" in ecological.note
+    assert "Composite range: [0.0, 2.0]" in ecological.note
 
 
 @pytest.mark.asyncio
@@ -341,7 +345,11 @@ _SINGLE_ENTITY_STATE = {
 
 @pytest.mark.asyncio
 async def test_single_entity_composite_score_is_null() -> None:
-    """Single-entity snapshot: composite_score must be None for all implemented frameworks."""
+    """Single-entity: financial and human_development composite_score must be None.
+
+    Ecological is exempt from the single-entity guard (ADR-005 Amendment 3 Decision M8-2)
+    and is tested separately in test_ecological_exempt_from_single_entity_guard.
+    """
     conn = _make_conn(
         {"scenario_id": "scen-1"},
         _snap_row(state=_SINGLE_ENTITY_STATE),
@@ -397,9 +405,10 @@ async def test_single_entity_unimplemented_frameworks_keep_their_note() -> None:
     result = await get_measurement_output(
         scenario_id="scen-1", entity_id="GRC", step=1, conn=conn
     )
-    # Ecological module shipped at M6: mandatory percentile-rank disclosure (ADR-005 Amendment B).
-    assert "percentile rank" in result.outputs["ecological"].note
-    # Governance module still unimplemented at M6.
+    # ADR-005 Amendment 3 Decision M8-1: ecological always gets the mandatory boundary note.
+    assert "boundary" in result.outputs["ecological"].note
+    assert "Composite range: [0.0, 2.0]" in result.outputs["ecological"].note
+    # Governance module still unimplemented (deferred to M9 — Decision M8-4).
     assert "not yet implemented" in result.outputs["governance"].note
 
 
@@ -480,6 +489,117 @@ async def test_multi_entity_composite_score_is_not_null() -> None:
     )
     assert result.outputs["financial"].composite_score is not None
     assert isinstance(result.outputs["financial"].composite_score, str)
+
+
+# ---------------------------------------------------------------------------
+# ADR-005 Amendment 3 — strategy dispatch and ecological exemption
+# ---------------------------------------------------------------------------
+
+_ECOLOGICAL_ATTR = {
+    "_envelope_version": "1",
+    "value": "1.2",
+    "unit": "ratio_0_1",
+    "variable_type": "stock",
+    "confidence_tier": 2,
+    "observation_date": None,
+    "source_registry_id": "ECO_TEST",
+    "measurement_framework": "ecological",
+}
+
+_SINGLE_ENTITY_ECO_STATE = {
+    "_envelope_version": "2",
+    "_modules_active": [],
+    "GRC": {
+        "planetary_boundary_co2_proximity": _ECOLOGICAL_ATTR,
+    },
+}
+
+
+def test_ecological_exempt_frameworks_constant_exists() -> None:
+    """_SINGLE_ENTITY_GUARD_EXEMPT_FRAMEWORKS must exist and include ecological."""
+    from app.api.scenarios import _SINGLE_ENTITY_GUARD_EXEMPT_FRAMEWORKS
+    assert "ecological" in _SINGLE_ENTITY_GUARD_EXEMPT_FRAMEWORKS
+
+
+@pytest.mark.asyncio
+async def test_ecological_exempt_from_single_entity_guard() -> None:
+    """Single-entity snapshot: ecological composite_score is computed (not suppressed).
+
+    ADR-005 Amendment 3 Decision M8-2 — boundary proximity is physically meaningful
+    for a single entity. With active boundary constants (mocked), composite is non-null.
+    """
+    boundary_row = {"constant_id": "ECOLOGICAL_CO2_PLANETARY_BOUNDARY_PPM", "value": "350"}
+    conn = _make_conn(
+        {"scenario_id": "scen-1"},
+        _snap_row(state=_SINGLE_ENTITY_ECO_STATE),
+        _entity_row(),
+    )
+    # Override fetch to return an active boundary constant.
+    conn.fetch = AsyncMock(return_value=[boundary_row])
+
+    result = await get_measurement_output(
+        scenario_id="scen-1", entity_id="GRC", step=1, conn=conn
+    )
+    assert result.single_entity_warning is True
+    # Financial and human_development are still suppressed.
+    assert result.outputs["financial"].composite_score is None
+    assert result.outputs["human_development"].composite_score is None
+    # Ecological is exempt — composite_score computed from proximity value 1.2 → min(1.2, 2.0).
+    eco = result.outputs["ecological"]
+    assert eco.composite_score is not None
+    from decimal import Decimal
+    score = Decimal(eco.composite_score)
+    assert score == Decimal("1.2000")
+
+
+@pytest.mark.asyncio
+async def test_three_branch_dispatch_ecological_uses_boundary_strategy(
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    """Ecological framework must use the boundary proximity strategy, not percentile rank."""
+    import logging
+    boundary_row = {"constant_id": "ECOLOGICAL_CO2_PLANETARY_BOUNDARY_PPM", "value": "350"}
+    conn = _make_conn(
+        {"scenario_id": "scen-1"},
+        _snap_row(state=_SINGLE_ENTITY_ECO_STATE),
+        _entity_row(),
+    )
+    conn.fetch = AsyncMock(return_value=[boundary_row])
+
+    with caplog.at_level(logging.WARNING, logger="app.api.scenarios"):
+        result = await get_measurement_output(
+            scenario_id="scen-1", entity_id="GRC", step=1, conn=conn
+        )
+
+    # No [SIM-INTEGRITY] warning for ecological — it has a registered strategy.
+    sim_warnings = [r for r in caplog.records if "[SIM-INTEGRITY]" in r.message]
+    assert not any("ecological" in w.message for w in sim_warnings)
+    assert result.outputs["ecological"].composite_score is not None
+
+
+@pytest.mark.asyncio
+async def test_ecological_composite_null_when_no_active_boundary_constants(
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    """Ecological composite_score is None when no boundary constants are active.
+
+    conn.fetch returns [] (no constants seeded) — _boundary_proximity_strategy
+    cannot validate temporal availability and emits [SIM-INTEGRITY] WARNING per indicator.
+    """
+    import logging
+    conn = _make_conn(
+        {"scenario_id": "scen-1"},
+        _snap_row(state=_SINGLE_ENTITY_ECO_STATE),
+        _entity_row(),
+    )
+    conn.fetch = AsyncMock(return_value=[])  # no active constants
+
+    with caplog.at_level(logging.WARNING, logger="app.api.scenarios"):
+        result = await get_measurement_output(
+            scenario_id="scen-1", entity_id="GRC", step=1, conn=conn
+        )
+
+    assert result.outputs["ecological"].composite_score is None
 
 
 def test_multiframework_output_default_single_entity_warning_is_false() -> None:
