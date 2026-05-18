@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated:** 2026-05-18 (PR #339 open — M8 demo script + Playwright spec + five screenshots, closes #233)
+**Last updated:** 2026-05-18 (PR #340 merged — demo polish fixes + M8 IR Agent review filed)
 **Current milestone:** M8 — Ecological and Governance Frameworks
 
 ---
@@ -31,11 +31,11 @@
 
 | PR | Title | Date |
 |---|---|---|
-| #339 | docs(demo): M8 demo — updated demo.sh, narrated spec, five screenshots captured (open, closes #233) | 2026-05-18 |
+| #340 | fix(demo): three demo polish fixes + M8 IR Agent stakeholder review | 2026-05-18 |
+| #339 | docs(demo): M8 demo — updated demo.sh, narrated spec, five screenshots captured (closes #233) | 2026-05-18 |
 | #338 | chore(demo): switch TTS voice to Zoe (Enhanced) | 2026-05-18 |
 | #336 | fix(dev): Python 3.12 Docker image rebuild — startup version guard, CONTRIBUTING docs | 2026-05-18 |
 | #335 | chore(state): SESSION_STATE.md update — PR #334 merged, demo prep standard, board cleanup | 2026-05-18 |
-| #334 | docs(demo): M8 demo preparation — milestone structure, screenshot brief, standing process | 2026-05-18 |
 
 ---
 
@@ -57,7 +57,7 @@ All Horizon:Immediate issues are now closed. M8 feature-complete.
 
 | Issue | Title | Blocked by |
 |---|---|---|
-| #233 | Screenshot artifact bundle | PR #339 open — five frames captured ✅; IR Agent run pending |
+| #233 | Screenshot artifact bundle | Closed ✅ — merged PR #339 (five frames), PR #340 (polish + IR review) |
 | #221 | Mean-reversion channel (Greece step5 MAGNITUDE) | Nothing — unblocked ✅ |
 | #222 | Contemporaneous processing path | Nothing — unblocked ✅ |
 | #258 | Mandatory intent blocks | #285 (merged ✅) |
@@ -72,7 +72,7 @@ All Horizon:Immediate issues are now closed. M8 feature-complete.
 | Decision | Context | Status |
 |---|---|---|
 | GovernanceModule promotion path | Deferred from M8 demo — five criteria not yet met — target M9 | Decided: deferred |
-| M8 formal close / M9 kickoff | PR #339 (screenshots) open; IR Agent run + M8 retrospective remain; #209 exit checklist open | Pending |
+| M8 formal close / M9 kickoff | #233 closed ✅; IR review findings (DEMO-001–009) need GitHub issues + triage; walkthrough doc needs M8 update; M8 retrospective + #209 exit checklist remain | Pending |
 
 ---
 
@@ -80,6 +80,9 @@ All Horizon:Immediate issues are now closed. M8 feature-complete.
 
 | Decision | Rationale | Date |
 |---|---|---|
+| M8 IR Agent review completed (PR #340) | Nine findings (DEMO-001–009); 2 CRITICAL, 4 SIGNIFICANT, 3 MINOR. Root Cause B (drawer too narrow/dense) explains DEMO-002/003/005/006 simultaneously — highest-priority fix. docs/demo/m8/reviews/2026-05-18-v0.8.0-stakeholder-review.md. Issues not yet filed — triage pending. | 2026-05-18 |
+| docs/demo/stakeholder-walkthrough.md is M6-era (stale for M8) | IR Agent review used demo.sh presenter guide (correct). Root walkthrough doc still describes M8 as a future milestone. Needs M8 update before next demo review cycle. Candidate for docs/demo/m8/stakeholder-walkthrough.md. | 2026-05-18 |
+| M8 demo polish fixes merged (PR #340) | gdp_growth choropleth error fixed (switch after step 1); drawer opened at step 4 for primary surplus narration; compare scenario extended to 6 steps with matching initial_attributes so DeltaChoropleth has step 6 data. | 2026-05-18 |
 | M8 milestone board cleanup (this session) | Exit checklists #261–#264 and #213 were systematically off-by-one milestone; corrected. #286/#299/#301 re-milestoned to M9; #217/#95 re-milestoned to M10. #142 closed (stale). | 2026-05-18 |
 | Demo preparation standard established (PR #334) | docs/process/demo-preparation-standard.md defines the biennial demo cadence. M6 artifacts archived to docs/demo/m6/. M8 screenshot brief (UX Agent) saved to docs/demo/m8/screenshot-brief.md. Thesis frame: Frame C, Step 5 (2014) — asymmetric radar. | 2026-05-18 |
 | Python 3.12 Docker fix merged (PR #336, closes #332) | Rebuilt image on python:3.12-slim (confirmed 3.12.13 in container). Added `sys.version_info < (3, 12)` startup guard to app/main.py (# noqa: UP036 — ruff UP036 fires because target-version=py312, guard is operationally needed for stale images). Documented `docker compose build api` in CONTRIBUTING.md Step 3. | 2026-05-18 |
@@ -134,7 +137,9 @@ All Horizon:Immediate issues are now closed. M8 feature-complete.
 - `docs/demo/m8/screenshot-brief.md` — UX Agent five-frame brief for Issue #233
 - Thesis frame: Frame C, Step 5 (2014) — asymmetric radar (financial partial recovery, HD depressed)
 - Presentation sequence: C → A → B → D → E (lead with thesis)
-- #233 remaining work: `demo.sh` update, Playwright spec, screenshot capture, IR Agent run
+- #233 closed ✅ — demo.sh updated, spec rewritten (M8), five frames captured, IR Agent review filed
+- IR review: `docs/demo/m8/reviews/2026-05-18-v0.8.0-stakeholder-review.md` — 9 findings, issues TBF
+- `docs/demo/stakeholder-walkthrough.md` is M6-era — needs M8 update before next review cycle
 
 **Standards state:**
 - Canonical unit registry: in DATA_STANDARDS.md §Canonical Unit Registry (PR #282)
