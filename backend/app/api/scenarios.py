@@ -30,6 +30,8 @@ import json
 import logging
 import subprocess
 import uuid
+from collections.abc import Callable
+from datetime import datetime  # noqa: TCH003
 from decimal import Decimal
 from math import floor
 from typing import Annotated, Any
@@ -796,21 +798,44 @@ _UNIMPLEMENTED_FRAMEWORKS = {"governance"}
 _UNIMPLEMENTED_NOTES = {
     "governance": "Governance module not yet implemented — see module-capability-registry.md",
 }
-# ADR-005 Amendment B mandatory note — must appear on every ecological FrameworkOutput
-# regardless of whether composite_score is null or non-null. Non-compliance is an
-# ADR violation. Planetary boundary absolute normalization is the methodologically
-# correct approach; percentile rank is the M6 scoped exception pending M8 full
-# indicator set.
-_ECOLOGICAL_MANDATORY_NOTE = (
-    "Ecological composite score uses cross-entity percentile rank at M6 scope. "
-    "Planetary boundary absolute normalization is methodologically preferred and "
-    "is deferred to M8 when the full indicator set is defined."
+# ADR-005 Amendment 3 Decision M8-1 mandatory note template — must appear on every
+# ecological FrameworkOutput. {n_indicators} is the count of active *_proximity
+# indicators at query time. Non-compliance is an ADR violation.
+_ECOLOGICAL_MANDATORY_NOTE_TEMPLATE = (
+    "Ecological composite score: unweighted mean of {n_indicators} boundary "
+    "proximity score(s) active at simulation time (formula: "
+    "min(current_value / boundary_value, 2.0) for absolute-scale indicators; "
+    "min(indicator_value, 2.0) for pre-normalized boundary-relative indicators). "
+    "Score 1.0 = boundary exactly met; >1.0 = boundary exceeded; "
+    "cap 2.0 = display ceiling only — entities with score 2.0 may be operating "
+    "at any exceedance level ≥2× the safe boundary; simulation snapshots preserve "
+    "uncapped values for analytical use. "
+    "Composite range: [0.0, 2.0]. "
+    "Equal weighting applied across contributing indicators — valid at current "
+    "indicator count; must be re-evaluated when count exceeds five. "
+    "Source: simulation_reference_constants table (effective-at-simulation-time)."
 )
 _ALL_FRAMEWORKS = ["financial", "human_development", "ecological", "governance"]
 _SINGLE_ENTITY_NOTE = (
     "Composite score not meaningful in single-entity scenarios — "
     "percentile rank requires at least two entities for comparison."
 )
+# ADR-005 Amendment 3 Decision M8-2: ecological is exempt from is_single_entity guard
+# because boundary proximity is physically meaningful for a single entity.
+_SINGLE_ENTITY_GUARD_EXEMPT_FRAMEWORKS: frozenset[str] = frozenset({"ecological"})
+# ADR-005 Amendment 3 Decision M8-3: frameworks validated for percentile-rank composite.
+# Governance is absent (M9 deferred — Decision M8-4). Unregistered frameworks fall
+# through to percentile rank with a [SIM-INTEGRITY] WARNING.
+_PERCENTILE_RANK_VALIDATED_FRAMEWORKS: frozenset[str] = frozenset(
+    {"financial", "human_development"}
+)
+# Maps ecological proximity indicator keys → (boundary_constant_id, is_pre_normalized).
+# Proximity indicators are produced by EcologicalModule and accumulated in entity.attributes.
+# is_pre_normalized=True: formula is min(v, 2.0) — module already applied the boundary ratio.
+_ECOLOGICAL_INDICATOR_BOUNDARY_CONFIG: dict[str, tuple[str, bool]] = {
+    "planetary_boundary_co2_proximity": ("ECOLOGICAL_CO2_PLANETARY_BOUNDARY_PPM", True),
+    "planetary_boundary_land_use_proximity": ("ECOLOGICAL_LAND_USE_PLANETARY_BOUNDARY_RATIO", True),
+}
 
 
 def _parse_entity_attrs(
@@ -834,40 +859,48 @@ def _parse_entity_attrs(
     return result
 
 
-def _compute_composite_score(
+# ---------------------------------------------------------------------------
+# Composite score strategy dispatch — ADR-005 Amendment 3 Decision M8-3
+# ---------------------------------------------------------------------------
+
+# Callable signature: (entity_indicators, all_entity_attrs, framework, context) → Decimal | None
+type CompositeStrategy = Callable[
+    [dict[str, QuantitySchema], dict[str, dict[str, QuantitySchema]], str, dict[str, Any]],
+    Decimal | None,
+]
+
+
+async def _fetch_active_boundary_constants(
+    db_connection: asyncpg.Connection,
+    scenario_timestep: datetime | str,
+) -> dict[str, Decimal]:
+    """Return active boundary constants at simulation time from simulation_reference_constants.
+
+    Effective-at-simulation-time query per ADR-005 Amendment 3 Decision M8-6.
+    Returns constant_id → Decimal value for constants active at scenario_timestep.
+    """
+    rows = await db_connection.fetch(
+        """
+        SELECT constant_id, value
+        FROM simulation_reference_constants
+        WHERE effective_from <= $1
+          AND (effective_through IS NULL OR effective_through >= $1)
+        """,
+        scenario_timestep,
+    )
+    return {row["constant_id"]: Decimal(str(row["value"])) for row in rows}
+
+
+def _percentile_rank_strategy(
     entity_indicators: dict[str, QuantitySchema],
     all_entity_attrs: dict[str, dict[str, QuantitySchema]],
     framework: str,
-) -> str | None:
-    """Mean percentile rank of entity indicators across all entities at this step.
+    context: dict[str, Any],
+) -> Decimal | None:
+    """Mean percentile rank across all entities for each framework indicator.
 
-    For each indicator, ranks the entity's value among all entities carrying
-    that indicator in this framework. Returns str(Decimal) rounded to 4 decimal
-    places, or None if no numeric indicators exist for this framework.
-    ADR-005 Decision 2 §Composite score normalization.
-
-    DISPATCH DESIGN NOTE (STD-REVIEW-004 Gap 4 + Gap 5, Architect panel finding):
-    This function currently applies the same percentile-rank calculation to all
-    frameworks, ignoring the `framework` parameter. Gaps 4 and 5 both require this
-    function to branch on framework:
-      - ecological: boundary proximity normalization (value / planetary_boundary,
-        capped at 2.0) — DATA_STANDARDS.md §Simulation Reference Constants
-      - governance: normalization methodology TBD in ADR-005 M8 amendment
-
-    The implementation must use a strategy dispatch pattern so that governance
-    can extend it without requiring a refactor. Design before implementing either:
-    define a Protocol or callable map keyed by framework string, with the
-    percentile-rank strategy as the default/fallback. Both ecological and governance
-    normalization strategies must be added in the same ADR-005 M8 amendment commit
-    — do not implement ecological strategy alone.
-
-    is_single_entity guard interaction (QA Lead panel finding, Gap 4):
-    The is_single_entity guard below suppresses composite_score for single-entity
-    scenarios uniformly. Boundary-normalized ecological scores are physically
-    meaningful for a single entity (CO2 vs. 350 ppm boundary), unlike percentile
-    rank. The ADR-005 M8 amendment must specify which frameworks are exempt from
-    the guard. TODO: update the guard to check framework exemption list before
-    suppressing composite_score.
+    ADR-005 Decision 2 §Composite score normalization. Returns [0.0, 1.0] Decimal
+    or None when no numeric indicators are present.
     """
     if not entity_indicators:
         return None
@@ -896,7 +929,116 @@ def _compute_composite_score(
         return None
 
     score = sum(percentile_ranks) / Decimal(len(percentile_ranks))
-    return str(score.quantize(Decimal("0.0001")))
+    return score.quantize(Decimal("0.0001"))
+
+
+def _boundary_proximity_strategy(
+    entity_indicators: dict[str, QuantitySchema],
+    all_entity_attrs: dict[str, dict[str, QuantitySchema]],
+    framework: str,
+    context: dict[str, Any],
+) -> Decimal | None:
+    """Unweighted mean of boundary proximity scores for ecological indicators.
+
+    Reads context["boundary_constants"] (populated by _fetch_active_boundary_constants)
+    to verify temporal validity. Indicators not in _ECOLOGICAL_INDICATOR_BOUNDARY_CONFIG
+    are skipped. Missing or inactive boundary constants trigger [SIM-INTEGRITY] WARNING
+    and exclude that indicator from the composite. ADR-005 Amendment 3 Decision M8-3.
+    """
+    boundary_constants: dict[str, Decimal] = context.get("boundary_constants", {})
+    proximity_scores: list[Decimal] = []
+
+    for indicator_key, qty in entity_indicators.items():
+        config = _ECOLOGICAL_INDICATOR_BOUNDARY_CONFIG.get(indicator_key)
+        if config is None:
+            continue
+
+        boundary_constant_id, is_pre_normalized = config
+
+        if boundary_constant_id not in boundary_constants:
+            _log.warning(
+                "[SIM-INTEGRITY] Ecological boundary constant '%s' not active at simulation "
+                "time — indicator '%s' excluded from composite score. Verify that migration "
+                "c1a4e7f2d9b3 has run and simulation_reference_constants is seeded.",
+                boundary_constant_id,
+                indicator_key,
+            )
+            continue
+
+        try:
+            raw_val = Decimal(qty.value)
+        except Exception:  # noqa: BLE001, S112
+            continue
+
+        if is_pre_normalized:
+            score = min(raw_val, Decimal("2.0"))
+        else:
+            boundary_val = boundary_constants[boundary_constant_id]
+            if boundary_val == Decimal("0"):
+                _log.warning(
+                    "[SIM-INTEGRITY] Boundary constant '%s' has zero value — "
+                    "cannot compute proximity for '%s'. Skipping.",
+                    boundary_constant_id,
+                    indicator_key,
+                )
+                continue
+            score = min(raw_val / boundary_val, Decimal("2.0"))
+
+        proximity_scores.append(score)
+
+    if not proximity_scores:
+        return None
+
+    composite = sum(proximity_scores) / Decimal(len(proximity_scores))
+    return composite.quantize(Decimal("0.0001"))
+
+
+# Registered strategies keyed by framework string. M9 governance strategy is added
+# in ADR-005 Amendment 4 when GovernanceModule promotion criteria are met (Decision M8-4).
+_COMPOSITE_STRATEGIES: dict[str, CompositeStrategy] = {
+    "ecological": _boundary_proximity_strategy,
+}
+_DEFAULT_COMPOSITE_STRATEGY: CompositeStrategy = _percentile_rank_strategy
+
+
+async def _compute_composite_score(
+    entity_indicators: dict[str, QuantitySchema],
+    all_entity_attrs: dict[str, dict[str, QuantitySchema]],
+    framework: str,
+    db_connection: asyncpg.Connection,
+    scenario_timestep: datetime | str,
+) -> str | None:
+    """Framework-dispatched composite score. Returns str(Decimal) or None.
+
+    Three-branch dispatch per ADR-005 Amendment 3 Decision M8-3:
+      1. Registered strategy (_COMPOSITE_STRATEGIES) — e.g. ecological boundary proximity
+      2. Validated percentile-rank framework (_PERCENTILE_RANK_VALIDATED_FRAMEWORKS)
+      3. Unknown framework — [SIM-INTEGRITY] WARNING, falls back to percentile rank
+    """
+    context: dict[str, Any] = {}
+
+    if framework in _COMPOSITE_STRATEGIES:
+        if framework == "ecological":
+            context["boundary_constants"] = await _fetch_active_boundary_constants(
+                db_connection, scenario_timestep
+            )
+        strategy = _COMPOSITE_STRATEGIES[framework]
+    elif framework in _PERCENTILE_RANK_VALIDATED_FRAMEWORKS:
+        strategy = _DEFAULT_COMPOSITE_STRATEGY
+    else:
+        _log.warning(
+            "[SIM-INTEGRITY] Framework '%s' has no registered composite strategy "
+            "and is not in _PERCENTILE_RANK_VALIDATED_FRAMEWORKS — "
+            "falling back to percentile rank. Register a strategy or add to "
+            "_PERCENTILE_RANK_VALIDATED_FRAMEWORKS.",
+            framework,
+        )
+        strategy = _DEFAULT_COMPOSITE_STRATEGY
+
+    result = strategy(entity_indicators, all_entity_attrs, framework, context)
+    if result is None:
+        return None
+    return str(result)
 
 
 def _alert_matches_framework(
@@ -929,10 +1071,12 @@ async def get_measurement_output(
 
     Groups the entity's attributes by measurement_framework tag. Attributes
     with no tag are classified as FINANCIAL (M1–M3 backward-compatibility rule,
-    CODING_STANDARDS.md §measurement_framework Tagging). Composite scores are
-    percentile-based across all entities present in the snapshot. ECOLOGICAL and
-    GOVERNANCE return composite_score=null with a note until those modules are
-    implemented. ia1_disclosure is always IA1_CANONICAL_PHRASE. ADR-005 Decision 2.
+    CODING_STANDARDS.md §measurement_framework Tagging). Composite score dispatch
+    is framework-specific: ecological uses boundary proximity normalization [0.0, 2.0]
+    (ADR-005 Amendment 3 Decision M8-3); financial and human_development use mean
+    percentile rank [0.0, 1.0]; governance returns null (deferred to M9, Decision M8-4).
+    Ecological is exempt from the single-entity composite suppression guard (Decision M8-2).
+    ia1_disclosure is always IA1_CANONICAL_PHRASE. ADR-005 Decision 2, Amendment 3.
 
     Query params:
         step      — snapshot step index (required)
@@ -1023,13 +1167,20 @@ async def get_measurement_output(
             for k, v in target_attrs.items()
             if (v.measurement_framework or "financial") == fw
         }
-        if is_single_entity:
+        # ADR-005 Amendment 3 Decision M8-2: ecological exempt from single-entity guard.
+        if is_single_entity and fw not in _SINGLE_ENTITY_GUARD_EXEMPT_FRAMEWORKS:
             composite = None
         else:
-            composite = _compute_composite_score(indicators, all_entity_attrs, fw)
-        # ADR-005 Amendment B: ecological note is mandatory regardless of composite_score.
+            composite = await _compute_composite_score(
+                indicators, all_entity_attrs, fw, conn, timestep
+            )
+        # ADR-005 Amendment 3 Decision M8-1: ecological note is mandatory regardless of
+        # composite_score; {n_indicators} counts active *_proximity attributes.
         if fw == "ecological":
-            note: str | None = _ECOLOGICAL_MANDATORY_NOTE
+            n_indicators = sum(1 for k in indicators if k.endswith("_proximity"))
+            note: str | None = _ECOLOGICAL_MANDATORY_NOTE_TEMPLATE.format(
+                n_indicators=n_indicators
+            )
         elif is_single_entity:
             note = _SINGLE_ENTITY_NOTE
         else:

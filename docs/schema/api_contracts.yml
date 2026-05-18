@@ -414,9 +414,10 @@ endpoints:
     path: "/scenarios/{scenario_id}/measurement-output"
     summary: >
       Multi-framework measurement output for one entity at one step.
-      ADR-005 Decision 2. Groups entity attributes by measurement_framework tag.
-      Untagged attributes default to "financial". ECOLOGICAL and GOVERNANCE
-      return composite_score=null with a note until those modules are implemented.
+      ADR-005 Decision 2, Amendment 3. Groups entity attributes by measurement_framework tag.
+      Untagged attributes default to "financial". ECOLOGICAL uses boundary proximity
+      normalization [0.0, 2.0] (Decision M8-3). GOVERNANCE returns null (deferred M9,
+      Decision M8-4).
     auth: none
     path_params:
       scenario_id: {type: string}
@@ -449,8 +450,10 @@ endpoints:
             composite_score:
               type: "string|null"
               description: >
-                Decimal as string. Mean percentile rank across entities at this step.
-                null for unimplemented frameworks (ecological, governance at M4).
+                Decimal as string. Framework-dependent: [0.0, 1.0] percentile rank for
+                financial and human_development; [0.0, 2.0] boundary proximity for ecological
+                (1.0 = at boundary, cap 2.0 for display). null for governance (deferred M9)
+                and for financial/human_development in single-entity scenarios.
             indicators:
               type: object
               description: "dict[attribute_key, QuantitySchema] — attributes tagged to this framework"
@@ -477,15 +480,18 @@ endpoints:
           type: boolean
           default: false
           description: >
-            True when the snapshot contains exactly one entity. In that case,
-            composite_score is null for all implemented frameworks because
-            percentile rank is meaningless with a population of one.
-            composite_score being 1.0 for a single entity conveys no information
-            — this flag prevents silent misinterpretation. Issue #193.
+            True when the snapshot contains exactly one entity. composite_score is
+            null for financial and human_development (percentile rank is meaningless
+            with a population of one). Ecological is exempt — boundary proximity is
+            physically meaningful for a single entity (ADR-005 Amendment 3 Decision M8-2).
+            Issue #193.
       status_404: "Scenario not found; or no snapshot at step; or entity not in snapshot"
-    db_reads: [scenarios, scenario_state_snapshots, simulation_entities, mda_thresholds]
+    db_reads: [scenarios, scenario_state_snapshots, simulation_entities, mda_thresholds, simulation_reference_constants]
     notes:
-      - "composite_score computation: mean percentile rank across all entities in the snapshot for each indicator"
+      - "composite_score dispatch: ecological uses boundary proximity normalization (min(v/b,2.0) or min(v,2.0), capped at 2.0); financial and human_development use mean percentile rank. ADR-005 Amendment 3 Decision M8-3."
+      - "ecological composite_score range [0.0, 2.0]: 1.0 = at boundary; >1.0 = boundary exceeded; 2.0 = display cap only"
+      - "governance returns composite_score=null — GovernanceModule deferred to M9 (ADR-005 Amendment 3 Decision M8-4)"
+      - "ecological is exempt from single_entity_warning suppression — boundary proximity meaningful for single entity (Decision M8-2)"
       - "financial framework includes all untagged attributes (backward-compat rule)"
-      - "ecological and governance always return composite_score=null at M4"
-      - "composite_score is also null when single_entity_warning=true — percentile rank requires ≥2 entities"
+      - "composite_score is null when single_entity_warning=true for financial and human_development — percentile rank requires ≥2 entities"
+      - "db_reads includes simulation_reference_constants for ecological effective-at-simulation-time boundary constant query"

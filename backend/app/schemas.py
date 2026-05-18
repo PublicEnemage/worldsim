@@ -357,12 +357,14 @@ class MDAAlert(BaseModel):
 class FrameworkOutput(BaseModel):
     """One measurement framework's indicators and composite score for an entity.
 
-    composite_score is a Decimal-as-string (0.0–1.0 percentile rank) or None
-    when the module producing this framework's indicators is not yet implemented,
-    or when the scenario has only one entity (percentile rank is meaningless with
-    a population of one). note is populated when composite_score is None.
-    mda_alerts is empty pending ADR-005 Decision 3 (MDAChecker) implementation.
-    ADR-005 Decision 2. Issue #193.
+    composite_score is a Decimal-as-string or None. Range and computation are
+    framework-dependent: [0.0, 1.0] percentile rank for financial and human_development;
+    [0.0, 2.0] boundary proximity for ecological (1.0 = at boundary, cap 2.0 for display).
+    None for governance (deferred to M9) and for financial/human_development in
+    single-entity scenarios (percentile rank is meaningless with a population of one).
+    Ecological is exempt from the single-entity suppression — boundary proximity is
+    physically meaningful for a single entity. note is always populated for ecological.
+    ADR-005 Decision 2, Amendment 3 Decisions M8-1/M8-2/M8-3. Issue #193.
     """
 
     model_config = ConfigDict(from_attributes=True)
