@@ -1,5 +1,6 @@
 import { useState } from "react";
 import type { FrameworkOutput, QuantitySchema } from "../types";
+import { getIndicatorDisplayName } from "../lib/indicatorDisplayNames";
 
 interface Props {
   framework: string;
@@ -32,11 +33,11 @@ function TierBadge({ tier }: { tier: number }) {
   );
 }
 
-function IndicatorRow({ name, qty }: { name: string; qty: QuantitySchema }) {
+function IndicatorRow({ name, qty, framework }: { name: string; qty: QuantitySchema; framework: string }) {
   return (
     <tr>
-      <td style={{ padding: "3px 6px", fontFamily: "monospace", fontSize: 11, color: "#333" }}>
-        {name}
+      <td style={{ padding: "3px 6px", fontSize: 11, color: "#333" }}>
+        {getIndicatorDisplayName(framework, name)}
       </td>
       <td style={{ padding: "3px 6px", textAlign: "right", fontFamily: "monospace", fontSize: 11 }}>
         {qty.value}
@@ -120,12 +121,11 @@ export default function FrameworkPanel({ framework, output }: Props) {
               <tbody>
                 {Object.entries(output.indicators).map(([key, value]) => {
                   if (isCohortBlock(value)) {
-                    // Nested cohort block — render each indicator inside
                     return (
-                      <CohortBlock key={key} cohortId={key} indicators={value} />
+                      <CohortBlock key={key} cohortId={key} framework={framework} indicators={value} />
                     );
                   }
-                  return <IndicatorRow key={key} name={key} qty={value as QuantitySchema} />;
+                  return <IndicatorRow key={key} name={key} framework={framework} qty={value as QuantitySchema} />;
                 })}
               </tbody>
             </table>
@@ -138,9 +138,11 @@ export default function FrameworkPanel({ framework, output }: Props) {
 
 function CohortBlock({
   cohortId,
+  framework,
   indicators,
 }: {
   cohortId: string;
+  framework: string;
   indicators: Record<string, QuantitySchema>;
 }) {
   const [expanded, setExpanded] = useState(false);
@@ -161,8 +163,8 @@ function CohortBlock({
       {expanded &&
         Object.entries(indicators).map(([iKey, qty]) => (
           <tr key={iKey} style={{ background: "#fdfdfd" }}>
-            <td style={{ padding: "3px 6px 3px 20px", fontFamily: "monospace", fontSize: 11, color: "#444" }}>
-              {iKey}
+            <td style={{ padding: "3px 6px 3px 20px", fontSize: 11, color: "#444" }}>
+              {getIndicatorDisplayName(framework, iKey)}
             </td>
             <td style={{ padding: "3px 6px", textAlign: "right", fontFamily: "monospace", fontSize: 11 }}>
               {qty.value}
