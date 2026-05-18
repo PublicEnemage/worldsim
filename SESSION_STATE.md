@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated:** 2026-05-17 (post-#312/#313/#314/PR#324)
+**Last updated:** 2026-05-18 (post-#315/PR#323)
 **Current milestone:** M8 — Ecological and Governance Frameworks
 
 ---
@@ -15,9 +15,11 @@
 | Stream | Issues | Status | Gate |
 |---|---|---|---|
 | ADR-005 Amendment 3 | #218 ✅ | Merged ✅ (PR #309) — **M8 implementation unblocked** | None |
-| Greece fixture extension | #284 ✅ | PR #321 open — feat/m8-greece-2015-extension | PR #321 merge |
+| Greece fixture extension | #284 ✅ #316 ✅ | Merged ✅ (PR #321) | None |
 | EcologicalModule expansion | #312 ✅ #313 ✅ #314 ✅ | PR #324 open — feat/m8-ecological-backend | PR #324 merge |
-| UI/UX issues | #265–268 | Not started | Nothing — **activate Frontend Architect** |
+| UI/UX — Area 1 (null governance axis) | #315 | PR #323 open — feat/m8-null-governance-axis | PR #323 merge |
+| UI/UX — Areas 2, 3, 4 | #268 #265 #266 | Not started | Nothing — **activate Frontend Architect** |
+| UI/UX — Area 5 (radar animation) | #267 | Not started | #315 / PR #323 must merge first |
 | Demo scenario assembly | #269 | Not started | #284 + EcologicalModule |
 | Intent block retrofit | #287 | Merged ✅ (PR #291) | None |
 | Frontend Architect M8 brief | #298 ✅ | Merged ✅ (PR #307) | None |
@@ -28,8 +30,9 @@
 
 | PR | Title | Date |
 |---|---|---|
-| #324 | feat(backend): M8 ecological boundary normalization — dispatch refactor, migrations (open — pending merge) | 2026-05-17 |
-| #321 | feat(backtesting): extend Greece fixture to 2015 — steps 4–6 (open — pending merge) | 2026-05-17 |
+| #325 | chore(state): SESSION_STATE.md update — M8 ecological backend PR #324 open | 2026-05-18 |
+| #322 | chore(state): SESSION_STATE.md update — Issue #316 implemented, PR #321 open | 2026-05-17 |
+| #321 | feat(backtesting): extend Greece fixture to 2015 — steps 4–6 stabilization period | 2026-05-17 |
 | #311 | chore(state): SESSION_STATE.md update — PRs #307 and #309 merged, M8 unblocked | 2026-05-17 |
 | #310 | chore(state): SESSION_STATE.md update — ADR-005 Amendment 3 committed, PR #309 open | 2026-05-17 |
 | #309 | docs(adr): ADR-005 Amendment 3 — M8 Ecological Framework Completion | 2026-05-17 |
@@ -40,13 +43,14 @@
 
 | Issue | Title | Blocked by |
 |---|---|---|
+| #315 | Null governance axis — RadarAxisDatum.composite_score number\|null | PR #323 open ✅ |
 | #284 | Greece fixture extension to 2015 | Closed ✅ — implemented via #316 / PR #321 |
 | #312 | Alembic migrations — confidence_tier + MDA ecological thresholds | Closed ✅ — implemented in PR #324 |
 | #313 | _compute_composite_score() strategy dispatch refactor | Closed ✅ — implemented in PR #324 |
 | #314 | EcologicalModule M8 indicator expansion | Closed ✅ — implemented in PR #324 |
 | #265 | Indicator display name mapping layer | Nothing — unblocked ✅ (brief: Area 3) |
 | #266 | Mandatory ecological note → Zone 3 expandable | Nothing — unblocked ✅ (brief: Area 4) |
-| #267 | Radar chart transition animation | Nothing — unblocked ✅ (brief: Area 5; requires Area 1 first) |
+| #267 | Radar chart transition animation | Blocked — #315 / PR #323 must merge first (Area 5 after Area 1) |
 | #268 | Coffin Corner / PMM Zone 1 widget | Nothing — unblocked ✅ (brief: Area 2) |
 | #269 | Demo scenario — Greece 2010–2015 | #284 + EcologicalModule |
 
@@ -80,6 +84,7 @@
 
 | Decision | Rationale | Date |
 |---|---|---|
+| Null governance axis implemented (Issue #315, PR #323) | `RadarAxisDatum.composite_score: number \| null` (ADR-005 M8-5 cross-ADR obligation); null = not-yet-certified (dashed hollow dot), 0.0 = valid score (filled vertex); `GOVERNANCE_IN_VALIDATION_LABEL` + `GOVERNANCE_IN_VALIDATION_TOOLTIP` named constants; `computeFinalScore()` exported pure function; DD-011 sentinel sentence in design-decisions.md; 10 Vitest tests (constant drift guard + null/0.0 distinction); Vitest added as devDependency via `vitest/config` `defineConfig` | 2026-05-18 |
 | M8 ecological backend complete (Issues #312–#314) — PR #324 | Strategy dispatch, proximity indicators, migrations. land_use_pressure_index is pre-normalized (no division by 0.25). Ecological exempt from single-entity guard. Boundary constants temporally guarded in both module and scenarios.py. | 2026-05-17 |
 | Greece fixture extended to 2015 (Issue #316) | Steps 4–6 added: GDP actuals, DIRECTION_ONLY thresholds, capital controls (step 6), ECOLOGICAL_COMPOSITE_DISCLOSURE per ADR-005 Amendment 3 Q1 disposition | 2026-05-17 |
 | ADR-005 Amendment 3 (Revision 2) accepted by EL | All 10 must-resolve panel findings + 5 Q dispositions incorporated; Revision 2 committed to ADR-005-human-cost-ledger.md via PR #309 | 2026-05-17 |
@@ -112,12 +117,21 @@ Six decisions accepted (Revision 2 — incorporates 10 must-resolve panel findin
 - **M8-2:** `_SINGLE_ENTITY_GUARD_EXEMPT_FRAMEWORKS: frozenset({"ecological"})` — ecological exempt from is_single_entity guard
 - **M8-3:** Three-branch dispatch; `_PERCENTILE_RANK_VALIDATED_FRAMEWORKS`; `[SIM-INTEGRITY]` WARNING for unregistered; `db_connection` + `scenario_timestep` added (breaking change — all callers update in same commit); `CompositeStrategy` TypeAlias
 - **M8-4:** Governance deferred to M9; all 5 criteria Not met; M9 amendment must audit for absolute thresholds before confirming percentile rank (supersedes Amendment 1 Q4)
-- **M8-5:** Null governance axis — dashed, `"—"`, `"in validation"`; `RadarAxisDatum.composite_score: number | null` TypeScript obligation same commit
+- **M8-5:** Null governance axis — dashed, `"—"`, `"in validation"`; `RadarAxisDatum.composite_score: number | null` TypeScript obligation same commit ✅ **live in PR #323**
 - **M8-6:** `planetary_boundary_co2_proximity` + `planetary_boundary_land_use_proximity`; land-use: `min(land_use_pressure_index, 2.0)` (no division — confirmed by code inspection); stock-not-delta path; `confidence_tier` Alembic migration; co2 = Tier 2, land-use = Tier 3
 
 **Draft file status:** `docs/architecture/adr-005-amendment3-draft.md` updated to ACCEPTED — historical record.
 
-**Frontend Architect brief — `docs/architecture/frontend-m8-brief.md` (PR #307 ✅). Area 1 (null governance type fix) must land before Area 5 (animation). Areas 2, 3, 4 can run in parallel with Area 1. All five areas now unblocked.**
+**Frontend Architect brief — `docs/architecture/frontend-m8-brief.md` (PR #307 ✅). Area 1 (null governance type fix) in PR #323 — must merge before Area 5 (animation). Areas 2, 3, 4 unblocked in parallel.**
+
+**Frontend — null governance axis (Issue #315, PR #323):**
+- `RadarAxisDatum.composite_score: number | null` live in `frontend/src/types.ts`
+- `GOVERNANCE_IN_VALIDATION_LABEL` + `GOVERNANCE_IN_VALIDATION_TOOLTIP` exported constants in `RadarChart.tsx`
+- `computeFinalScore(composite_score: number | null, weight: number): number | null` exported pure function
+- Null axis: dashed hollow SVG circle (`strokeDasharray="2 2"`, `fill="none"`); Recharts polygon gap (not 0-vertex)
+- DD-011 in `docs/frontend/design-decisions.md` with sentinel: "do not modify this entry without a corresponding ADR amendment"
+- 10 Vitest unit tests: constant drift guards + null/0.0 distinction (ADR-level constraint); `npm test` 10/10
+- Vitest: `vitest/config` `defineConfig` required in `vite.config.ts` (not `vite`) — `test` block is Vitest-only extension
 
 **Standards state:**
 - Canonical unit registry: in DATA_STANDARDS.md §Canonical Unit Registry (PR #282)
