@@ -180,6 +180,33 @@ as a known fragility.
 
 ---
 
+## DD-011: Null Governance Axis Rendering — Dashed Outline, "—" Score
+
+**See ADR-005 Decision M8-5.** Rendering behavior for null vs. zero axes is fully
+specified in ADR-005 Decision M8-5; do not modify this entry without a corresponding
+ADR amendment.
+
+**Decision:** When `composite_score === null`, the governance radar axis renders as a
+dashed hollow dot with no filled polygon segment. The score displays `"—"`. The axis
+label shows `GOVERNANCE_IN_VALIDATION_LABEL` ("Governance — in validation"). The hover
+tooltip displays `GOVERNANCE_IN_VALIDATION_TOOLTIP`. When `composite_score === 0.0`, the
+axis renders as a normal filled polygon vertex at zero — distinct from null.
+
+**Implementation detail (CSS/SVG):**
+- Null dot: `<circle fill="none" stroke="#aaa" strokeWidth={1.5} strokeDasharray="2 2" />`
+- `final_score` in `chartData`: `null` for null composite_score (Recharts treats null as
+  a polygon gap, no vertex drawn). `0.0` for zero composite_score (vertex at center).
+- Tooltip formatter: `composite_score === null` → returns `GOVERNANCE_IN_VALIDATION_TOOLTIP`
+  with `"—"` as the name label.
+- Both named constants (`GOVERNANCE_IN_VALIDATION_LABEL`, `GOVERNANCE_IN_VALIDATION_TOOLTIP`)
+  are exported from `RadarChart.tsx` and tested in `__tests__/RadarChart.test.ts`.
+
+**Why:** ADR-005 M8-5 prohibits zero-value rendering for governance before promotion
+criteria are met. Zero implies governance failure; null implies not-yet-measured.
+The "—" + dashed treatment is the reference implementation from `information-hierarchy.md §1B`.
+
+---
+
 ## DD-010: Recharts for Radar Chart Over D3 or SVG-from-Scratch
 
 **Decision:** The radar chart uses Recharts `RechartsRadarChart` with custom
