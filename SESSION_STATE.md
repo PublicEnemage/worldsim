@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated:** 2026-05-17 (post-#316/PR#321)
+**Last updated:** 2026-05-17 (post-#312/#313/#314/PR#324)
 **Current milestone:** M8 — Ecological and Governance Frameworks
 
 ---
@@ -16,7 +16,7 @@
 |---|---|---|---|
 | ADR-005 Amendment 3 | #218 ✅ | Merged ✅ (PR #309) — **M8 implementation unblocked** | None |
 | Greece fixture extension | #284 ✅ | PR #321 open — feat/m8-greece-2015-extension | PR #321 merge |
-| EcologicalModule expansion | — | Not started | Nothing — **activate Implementation Agent** |
+| EcologicalModule expansion | #312 ✅ #313 ✅ #314 ✅ | PR #324 open — feat/m8-ecological-backend | PR #324 merge |
 | UI/UX issues | #265–268 | Not started | Nothing — **activate Frontend Architect** |
 | Demo scenario assembly | #269 | Not started | #284 + EcologicalModule |
 | Intent block retrofit | #287 | Merged ✅ (PR #291) | None |
@@ -28,11 +28,11 @@
 
 | PR | Title | Date |
 |---|---|---|
+| #324 | feat(backend): M8 ecological boundary normalization — dispatch refactor, migrations (open — pending merge) | 2026-05-17 |
 | #321 | feat(backtesting): extend Greece fixture to 2015 — steps 4–6 (open — pending merge) | 2026-05-17 |
 | #311 | chore(state): SESSION_STATE.md update — PRs #307 and #309 merged, M8 unblocked | 2026-05-17 |
 | #310 | chore(state): SESSION_STATE.md update — ADR-005 Amendment 3 committed, PR #309 open | 2026-05-17 |
 | #309 | docs(adr): ADR-005 Amendment 3 — M8 Ecological Framework Completion | 2026-05-17 |
-| #308 | chore(state): SESSION_STATE.md update — PR #307 merged, Frontend Architect activated | 2026-05-17 |
 
 ---
 
@@ -41,6 +41,9 @@
 | Issue | Title | Blocked by |
 |---|---|---|
 | #284 | Greece fixture extension to 2015 | Closed ✅ — implemented via #316 / PR #321 |
+| #312 | Alembic migrations — confidence_tier + MDA ecological thresholds | Closed ✅ — implemented in PR #324 |
+| #313 | _compute_composite_score() strategy dispatch refactor | Closed ✅ — implemented in PR #324 |
+| #314 | EcologicalModule M8 indicator expansion | Closed ✅ — implemented in PR #324 |
 | #265 | Indicator display name mapping layer | Nothing — unblocked ✅ (brief: Area 3) |
 | #266 | Mandatory ecological note → Zone 3 expandable | Nothing — unblocked ✅ (brief: Area 4) |
 | #267 | Radar chart transition animation | Nothing — unblocked ✅ (brief: Area 5; requires Area 1 first) |
@@ -77,6 +80,7 @@
 
 | Decision | Rationale | Date |
 |---|---|---|
+| M8 ecological backend complete (Issues #312–#314) — PR #324 | Strategy dispatch, proximity indicators, migrations. land_use_pressure_index is pre-normalized (no division by 0.25). Ecological exempt from single-entity guard. Boundary constants temporally guarded in both module and scenarios.py. | 2026-05-17 |
 | Greece fixture extended to 2015 (Issue #316) | Steps 4–6 added: GDP actuals, DIRECTION_ONLY thresholds, capital controls (step 6), ECOLOGICAL_COMPOSITE_DISCLOSURE per ADR-005 Amendment 3 Q1 disposition | 2026-05-17 |
 | ADR-005 Amendment 3 (Revision 2) accepted by EL | All 10 must-resolve panel findings + 5 Q dispositions incorporated; Revision 2 committed to ADR-005-human-cost-ledger.md via PR #309 | 2026-05-17 |
 | Frontend Architect Agent activated; M8 brief delivered with UX Designer sign-off | Five UI areas specified: null governance axis (cross-ADR type fix), PMM Zone 1C widget, display name registry, Zone 3A expandable, radar animation. All five unblocked with PR #309 merge | 2026-05-17 |
@@ -94,6 +98,14 @@
 ## Architectural State — Key Facts for Session Continuity
 
 **ADR-005 Amendment 3 — merged ✅ (PR #309). Now live in `docs/adr/ADR-005-human-cost-ledger.md`. All M8 implementation unblocked.**
+
+**M8 ecological backend — PR #324 open (feat/m8-ecological-backend). Implements Issues #312, #313, #314:**
+- `_compute_composite_score` now async with three-branch dispatch; ecological uses `_boundary_proximity_strategy`
+- `_ECOLOGICAL_MANDATORY_NOTE_TEMPLATE` with `{n_indicators}` slot (replaces static Amendment B note)
+- `_SINGLE_ENTITY_GUARD_EXEMPT_FRAMEWORKS = frozenset({"ecological"})` — ecological not suppressed for single-entity scenarios
+- Migrations: `c1a4e7f2d9b3` (confidence_tier), `d2b5f8a3e6c4` (ecological MDA thresholds)
+- EcologicalModule: stock-path proximity computation from `entity.attributes`; temporal guards per `effective_from`
+- `land_use_pressure_index` proximity uses `min(v, 2.0)` — no division by 0.25 (double-normalization prevention)
 
 Six decisions accepted (Revision 2 — incorporates 10 must-resolve panel findings + 5 Q dispositions):
 - **M8-1:** Boundary proximity normalization — `min(v/b, 2.0)` for absolute-scale; `min(v, 2.0)` for pre-normalized; `_ECOLOGICAL_MANDATORY_NOTE_TEMPLATE` with `{n_indicators}` slot; `[0.0,2.0]` range cross-ADR obligation; effective-at-simulation-time query
