@@ -11,7 +11,7 @@ from __future__ import annotations
 
 import sys
 
-if sys.version_info < (3, 12):
+if sys.version_info < (3, 12):  # noqa: UP036 — operational guard for stale Docker images
     raise RuntimeError(
         f"Python 3.12+ required; running {sys.version}. "
         "Rebuild the Docker image: docker compose build api"
