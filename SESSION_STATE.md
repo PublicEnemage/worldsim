@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated:** 2026-05-18 (PR #351 open — IR review issues #342–#350 filed, M8 walkthrough created)
+**Last updated:** 2026-05-18 (PRs #354/#355 merged — UX Design Thinking Agent added + M8 critique; PR #356 open — panel synthesis)
 **Current milestone:** M8 — Ecological and Governance Frameworks
 
 ---
@@ -31,12 +31,16 @@
 
 | PR | Title | Date |
 |---|---|---|
-| #351 | docs(demo): M8 IR review issues filed (#342–#350) + M8 stakeholder walkthrough | 2026-05-18 |
+| #356 | docs(ux): M8 interaction model critique — panel synthesis (UX Designer, Dev Economist, Chief Methodologist) | 2026-05-18 |
 
 ## Recently Merged PRs (last 5)
 
 | PR | Title | Date |
 |---|---|---|
+| #355 | docs(ux): M8 interaction model critique — UX Design Thinking Agent first activation (closes #353) | 2026-05-18 |
+| #354 | docs(process): add UX Design Thinking Agent to agents.md (closes #353) | 2026-05-18 |
+| #352 | chore(state): update SESSION_STATE.md — PR #351 open (IR issues #342–#350 + M8 walkthrough) | 2026-05-18 |
+| #351 | docs(demo): M8 IR review issues filed (#342–#350) + M8 stakeholder walkthrough | 2026-05-18 |
 | #340 | fix(demo): three demo polish fixes + M8 IR Agent stakeholder review | 2026-05-18 |
 | #339 | docs(demo): M8 demo — updated demo.sh, narrated spec, five screenshots captured (closes #233) | 2026-05-18 |
 | #338 | chore(demo): switch TTS voice to Zoe (Enhanced) | 2026-05-18 |
@@ -78,7 +82,7 @@ All Horizon:Immediate issues are now closed. M8 feature-complete.
 | Decision | Context | Status |
 |---|---|---|
 | GovernanceModule promotion path | Deferred from M8 demo — five criteria not yet met — target M9 | Decided: deferred |
-| M8 formal close / M9 kickoff | #233 closed ✅; IR review issues #342–#350 filed ✅; walkthrough M8 version created (PR #351) ✅; M8 retrospective + #209 exit checklist remain | Pending |
+| M8 formal close / M9 kickoff | #233 closed ✅; IR review issues #342–#350 filed ✅; walkthrough M8 version created (PR #351) ✅; UX Design Thinking Agent activated + critique filed (PR #355) ✅; panel synthesis PR #356 open ✅; north-star.md Primary Cognitive Task formulation EL decision pending; M8 retrospective + #209 exit checklist remain | Pending |
 
 ---
 
@@ -86,6 +90,8 @@ All Horizon:Immediate issues are now closed. M8 feature-complete.
 
 | Decision | Rationale | Date |
 |---|---|---|
+| M8 UX panel synthesis completed (PR #356) | Three-agent panel (UX Designer, Development Economist, Chief Methodologist) independently reviewed Design Thinking Agent M8 critique (PR #355). Nine cross-cutting concerns; three EL decisions required; four premises revised/rejected; six premises unanimously confirmed; six additive findings. Highest-priority EL decision: north-star.md Primary Cognitive Task formulation — load-bearing for all hierarchy changes. | 2026-05-18 |
+| UX Design Thinking Agent activated (PR #353/#354/#355) | Issue #353 filed; agent persona added to agents.md (PR #354); M8 critique produced at docs/ux/design-thinking/m8-interaction-model-critique.md (PR #355). Core diagnosis: WorldSim is a spatial comparison tool applied to a temporal problem; trajectory view should be Zone 1B primary instrument. | 2026-05-18 |
 | M8 DEMO issues filed (PR #351) | All nine IR findings filed as GitHub issues #342–#350; assigned to M8 milestone. Root Cause B (#343 DEMO-002) is highest-priority: resolves DEMO-002/003/005/006 simultaneously. IR review updated with issue numbers. | 2026-05-18 |
 | M8 stakeholder walkthrough created (PR #351) | docs/demo/m8/stakeholder-walkthrough.md — v0.8.0 presenter guide; six-step Greece narration; Honest Disclosures section; governance honest-null Q&A; root redirect updated. | 2026-05-18 |
 | M8 IR Agent review completed (PR #340) | Nine findings (DEMO-001–009); 2 CRITICAL, 4 SIGNIFICANT, 3 MINOR. Root Cause B (drawer too narrow/dense) explains DEMO-002/003/005/006 simultaneously — highest-priority fix. docs/demo/m8/reviews/2026-05-18-v0.8.0-stakeholder-review.md. | 2026-05-18 |
@@ -137,6 +143,14 @@ All Horizon:Immediate issues are now closed. M8 feature-complete.
 - `computeFinalScore(composite_score: number | null, weight: number): number | null` exported pure function
 - Null axis: dashed hollow SVG circle (`strokeDasharray="2 2"`, `fill="none"`); Recharts polygon gap
 - DD-011 in `docs/frontend/design-decisions.md` with sentinel
+
+**M8 UX Design Thinking critique + panel synthesis — complete (PRs #355, #356):**
+- Critique: `docs/ux/design-thinking/m8-interaction-model-critique.md` — six ranked premise changes targeting north-star.md, information-hierarchy.md, user-journeys.md
+- Core diagnosis: WorldSim is a spatial comparison tool (choropleth) applied to a temporal problem; programme trajectory view should be Zone 1B primary instrument
+- Synthesis: `docs/ux/design-thinking/m8-critique-panel-synthesis.md` — three-agent panel; nine cross-cutting concerns confirmed; three EL decisions required
+- Highest-priority EL decision: north-star.md §Primary Cognitive Task formulation (four competing positions; load-bearing for all hierarchy changes)
+- Additive finding (panel, not in critique): governance null on timeline must be absent line not zero line; fiscal equivalence gap in compare mode; MacroeconomicModule step 5 slope risk would display wrong trajectory at thesis frame
+- UX Design Thinking Agent persona: `docs/process/agents.md` — activation: `UX Design Thinking Agent: CRITIQUE — [scope]`
 
 **Demo preparation standard — established ✅ (PR #334):**
 - `docs/process/demo-preparation-standard.md` — nine-step biennial demo cadence; reference cases M6 (#220) and M8 (#333)
