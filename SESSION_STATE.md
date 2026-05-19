@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated:** 2026-05-18 (PR #340 merged — demo polish fixes + M8 IR Agent review filed)
+**Last updated:** 2026-05-18 (PR #351 open — IR review issues #342–#350 filed, M8 walkthrough created)
 **Current milestone:** M8 — Ecological and Governance Frameworks
 
 ---
@@ -26,6 +26,12 @@
 **M8 is feature-complete.** All eight work streams closed. Remaining open items are Near-Term horizon.
 
 ---
+
+## Open PRs
+
+| PR | Title | Date |
+|---|---|---|
+| #351 | docs(demo): M8 IR review issues filed (#342–#350) + M8 stakeholder walkthrough | 2026-05-18 |
 
 ## Recently Merged PRs (last 5)
 
@@ -72,7 +78,7 @@ All Horizon:Immediate issues are now closed. M8 feature-complete.
 | Decision | Context | Status |
 |---|---|---|
 | GovernanceModule promotion path | Deferred from M8 demo — five criteria not yet met — target M9 | Decided: deferred |
-| M8 formal close / M9 kickoff | #233 closed ✅; IR review findings (DEMO-001–009) need GitHub issues + triage; walkthrough doc needs M8 update; M8 retrospective + #209 exit checklist remain | Pending |
+| M8 formal close / M9 kickoff | #233 closed ✅; IR review issues #342–#350 filed ✅; walkthrough M8 version created (PR #351) ✅; M8 retrospective + #209 exit checklist remain | Pending |
 
 ---
 
@@ -80,8 +86,9 @@ All Horizon:Immediate issues are now closed. M8 feature-complete.
 
 | Decision | Rationale | Date |
 |---|---|---|
-| M8 IR Agent review completed (PR #340) | Nine findings (DEMO-001–009); 2 CRITICAL, 4 SIGNIFICANT, 3 MINOR. Root Cause B (drawer too narrow/dense) explains DEMO-002/003/005/006 simultaneously — highest-priority fix. docs/demo/m8/reviews/2026-05-18-v0.8.0-stakeholder-review.md. Issues not yet filed — triage pending. | 2026-05-18 |
-| docs/demo/stakeholder-walkthrough.md is M6-era (stale for M8) | IR Agent review used demo.sh presenter guide (correct). Root walkthrough doc still describes M8 as a future milestone. Needs M8 update before next demo review cycle. Candidate for docs/demo/m8/stakeholder-walkthrough.md. | 2026-05-18 |
+| M8 DEMO issues filed (PR #351) | All nine IR findings filed as GitHub issues #342–#350; assigned to M8 milestone. Root Cause B (#343 DEMO-002) is highest-priority: resolves DEMO-002/003/005/006 simultaneously. IR review updated with issue numbers. | 2026-05-18 |
+| M8 stakeholder walkthrough created (PR #351) | docs/demo/m8/stakeholder-walkthrough.md — v0.8.0 presenter guide; six-step Greece narration; Honest Disclosures section; governance honest-null Q&A; root redirect updated. | 2026-05-18 |
+| M8 IR Agent review completed (PR #340) | Nine findings (DEMO-001–009); 2 CRITICAL, 4 SIGNIFICANT, 3 MINOR. Root Cause B (drawer too narrow/dense) explains DEMO-002/003/005/006 simultaneously — highest-priority fix. docs/demo/m8/reviews/2026-05-18-v0.8.0-stakeholder-review.md. | 2026-05-18 |
 | M8 demo polish fixes merged (PR #340) | gdp_growth choropleth error fixed (switch after step 1); drawer opened at step 4 for primary surplus narration; compare scenario extended to 6 steps with matching initial_attributes so DeltaChoropleth has step 6 data. | 2026-05-18 |
 | M8 milestone board cleanup (this session) | Exit checklists #261–#264 and #213 were systematically off-by-one milestone; corrected. #286/#299/#301 re-milestoned to M9; #217/#95 re-milestoned to M10. #142 closed (stale). | 2026-05-18 |
 | Demo preparation standard established (PR #334) | docs/process/demo-preparation-standard.md defines the biennial demo cadence. M6 artifacts archived to docs/demo/m6/. M8 screenshot brief (UX Agent) saved to docs/demo/m8/screenshot-brief.md. Thesis frame: Frame C, Step 5 (2014) — asymmetric radar. | 2026-05-18 |
