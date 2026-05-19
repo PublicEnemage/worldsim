@@ -73,7 +73,7 @@ Twelve issues filed 2026-05-19. Must complete before M9 UX implementation begins
 | PR | Title | Date |
 |---|---|---|
 | #356 | docs(ux): M8 interaction model critique — panel synthesis (UX Designer, Dev Economist, Chief Methodologist) | 2026-05-18 |
-| TBD | chore(state): design foundation sequence — 12 issues #359–#370 filed | 2026-05-19 |
+| #371 | chore(state): design foundation sequence — 12 issues #359–#370 filed | 2026-05-19 |
 
 ## Recently Merged PRs (last 5)
 
