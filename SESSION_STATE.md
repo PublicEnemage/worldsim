@@ -5,8 +5,8 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated:** 2026-05-18 (PRs #354/#355 merged; PR #356 open — panel synthesis + UX first principles; Case B verdict: architecture rethink before M9)
-**Current milestone:** M8 — Ecological and Governance Frameworks
+**Last updated:** 2026-05-19 (12 design foundation issues filed #359–#370; design foundation sequence gates M9 UX implementation)
+**Current milestone:** M8 → M9 transition — design foundation sequence in progress
 
 ---
 
@@ -25,6 +25,47 @@
 
 **M8 is feature-complete.** All eight work streams closed. Remaining open items are Near-Term horizon.
 
+## Design Foundation Sequence — M9 Gate (Issues #359–#370)
+
+Twelve issues filed 2026-05-19. Must complete before M9 UX implementation begins.
+
+**Step 1 — Immediate (unblocked, runs first):**
+
+| Issue | Title | Milestone | Blocks |
+|---|---|---|---|
+| #359 | CLAUDE.md structural refactor | M9 | #360 #361 #362 #363 |
+| #370 | M8 formal close — retrospective, compliance scan, #209 | M8 | v0.8.0 tag, M9 kickoff |
+
+**Step 2 — Immediate (unblocked after #359):**
+
+| Issue | Title | Milestone | Blocks |
+|---|---|---|---|
+| #360 | Agent working agreements (15 agents) | M9 | #369 |
+| #361 | Synthetic data framework — Chief Methodologist + ADR | M9 | #362 |
+
+**Step 3 — Immediate (requires #359 + #360 + #361):**
+
+| Issue | Title | Milestone | Blocks |
+|---|---|---|---|
+| #362 | User persona document (5 personas, marquee cases) | M9 | #363 #367 |
+
+**Step 4 — Immediate (requires #359 + #362):**
+
+| Issue | Title | Milestone | Blocks |
+|---|---|---|---|
+| #363 | UX first-principles depth — close six gaps | M9 | #364 |
+
+**Step 5 — Near-Term (sequential from here):**
+
+| Issue | Title | Milestone | Blocks |
+|---|---|---|---|
+| #364 | EL decisions — north-star, viewport, comparison mode | M9 | #365 |
+| #365 | UX document updates (north-star, info-hierarchy, journeys) | M9 | #366 #368 |
+| #366 | Trajectory view ADR | M9 | M9 Frontend Architect brief |
+| #367 | Persona-anchored IR review re-run (Persona 2) | M9 | #368 |
+| #368 | DEMO issues re-triage #342–#350 | M9 | M9 DEMO sprint scope |
+| #369 | agent-raci.md — RACI chart for all 15 agents | M9 | Agent governance docs |
+
 ---
 
 ## Open PRs
@@ -32,6 +73,7 @@
 | PR | Title | Date |
 |---|---|---|
 | #356 | docs(ux): M8 interaction model critique — panel synthesis (UX Designer, Dev Economist, Chief Methodologist) | 2026-05-18 |
+| TBD | chore(state): design foundation sequence — 12 issues #359–#370 filed | 2026-05-19 |
 
 ## Recently Merged PRs (last 5)
 
@@ -82,8 +124,10 @@ All Horizon:Immediate issues are now closed. M8 feature-complete.
 | Decision | Context | Status |
 |---|---|---|
 | GovernanceModule promotion path | Deferred from M8 demo — five criteria not yet met — target M9 | Decided: deferred |
-| M8 formal close / M9 kickoff | #233 closed ✅; IR review issues #342–#350 filed ✅; walkthrough M8 version created (PR #351) ✅; UX Design Thinking Agent activated + critique filed (PR #355) ✅; panel synthesis + UX first principles PR #356 open ✅; M9 UX architecture decision pending (Case B verdict — rethink before M9 implementation); M8 retrospective + #209 exit checklist remain | Pending |
-| M9 UX architecture — Case B vs incremental | UX Design Thinking Agent first-principles review produced Case B verdict: architecture rethink required before M9. Root finding: choropleth in primary viewport, instruments in 25% drawer = inverted instrument/context relationship. Mode 3 active control cannot survive current architecture. Minimum rethink: three document premise changes (north-star, information-hierarchy, user-journeys) + reserved control plane layout zone. Highest-priority action: update information-hierarchy.md governing principle — primary viewport is instrument cluster, not choropleth. Decision: accept/reject Case B | Pending |
+| M8 formal close / M9 kickoff | Issue #370 filed — gate: retrospective + compliance scan + Socratic Agent TEST + #209 exit checklist | Pending — see #370 |
+| M9 UX architecture — EL Decision 1 (north-star formulation) | Five options incl. per-mode tasks (Mode 1: trajectory reconstruction; Mode 2: threshold-safe path construction; Mode 3: real-time steering). Load-bearing for all hierarchy changes. | Pending — see #364, gates after #363 |
+| M9 UX architecture — EL Decision 2 (viewport architecture) | Wrong question was Zone 1B vs 1C; correct question is primary viewport vs. drawer. Gates after #363 Gap 2. | Pending — see #364, gates after #363 |
+| M9 UX architecture — EL Decision 3 (comparison mode conditional) | Conditional (single→divergence timeline; multi→DeltaChoropleth) vs. supplemental. Mode 3 always temporal. | Pending — see #364, gates after #363 |
 
 ---
 
@@ -91,6 +135,7 @@ All Horizon:Immediate issues are now closed. M8 feature-complete.
 
 | Decision | Rationale | Date |
 |---|---|---|
+| Design foundation sequence filed — 12 issues #359–#370 | PM Agent: EXECUTE — all 12 design foundation issues filed in dependency order. Issues #359–#363 are Immediate horizon; #364–#369 are Near-Term; #370 (M8 formal close) is Immediate and runs in parallel. | 2026-05-19 |
 | UX first principles review completed — Case B verdict (PR #356) | docs/ux/design-thinking/worldsim-ux-architecture-first-principles.md. Root finding: current UI inverts instrument/context relationship (choropleth primary, instruments in drawer). Mode 3 active control requires instruments always visible — current architecture fails this. Case B: rethink warranted before M9. Minimum rethink = three document changes + reserved control plane zone. Five M9 governing premises produced. Highest-priority action: update information-hierarchy.md governing principle. Decision 2 (timeline zone assignment) reframed as wrong question — defer and address as viewport architecture question. | 2026-05-18 |
 | M8 UX panel synthesis completed (PR #356) | Three-agent panel (UX Designer, Development Economist, Chief Methodologist) independently reviewed Design Thinking Agent M8 critique (PR #355). Nine cross-cutting concerns; three EL decisions required; four premises revised/rejected; six premises unanimously confirmed; six additive findings. Highest-priority EL decision: north-star.md Primary Cognitive Task formulation — load-bearing for all hierarchy changes. | 2026-05-18 |
 | UX Design Thinking Agent activated (PR #353/#354/#355) | Issue #353 filed; agent persona added to agents.md (PR #354); M8 critique produced at docs/ux/design-thinking/m8-interaction-model-critique.md (PR #355). Core diagnosis: WorldSim is a spatial comparison tool applied to a temporal problem; trajectory view should be Zone 1B primary instrument. | 2026-05-18 |
