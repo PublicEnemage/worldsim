@@ -1,15 +1,12 @@
-# WorldSim Stakeholder Demonstration — Presenter Guide
-
-> **Current version:** [`docs/demo/m8/stakeholder-walkthrough.md`](m8/stakeholder-walkthrough.md) (v0.8.0, Milestone 8 — Ecological and Governance Frameworks)
-> **Previous version archived at:** [`docs/demo/m6/stakeholder-walkthrough.md`](m6/stakeholder-walkthrough.md) (v0.6.0, Milestone 6)
->
-> This file is the M6-era walkthrough, retained for archive reference. For the current presenter guide, use the M8 version linked above.
-
----
+# WorldSim Stakeholder Demonstration — Presenter Guide (v0.8.0 / Milestone 8)
 
 > UX Designer Agent — Journey: Stakeholder demonstration walkthrough.
 > Grounded in `docs/ux/north-star.md` §Resolved Design Questions and
 > `docs/ux/user-journeys.md`. Read both documents before adapting this guide.
+>
+> **Version:** v0.8.0 — Milestone 8 (Ecological and Governance Frameworks)
+> **Supersedes:** `docs/demo/m6/stakeholder-walkthrough.md` (v0.6.0)
+> **Scenario:** Greece 2010–2015 IMF programme — six steps
 >
 > Target audience for the demo: non-technical stakeholders and domain experts.
 > Not developers. Not data scientists.
@@ -19,6 +16,28 @@
 ---
 
 ## Presenter Briefing — Read Before the Room Fills
+
+### What Is New in Milestone 8
+
+This demo represents a qualitative advance over the M6 baseline. Three things
+are live for the first time:
+
+1. **Ecological composite score** — CO2 planetary boundary proximity,
+   boundary-normalized against 350 ppm (Rockström 2009). The ecological radar
+   axis is no longer null. Greece's carbon trajectory is now a first-class
+   measurement output.
+
+2. **Governance honest null** — The governance axis renders a dashed hollow
+   dot labeled "Governance — in validation." This is an explicit methodology
+   choice: the composite score does not yet meet the five promotion criteria,
+   so the tool does not display zero. Zero would imply governance failure.
+   Null means the composite is not yet computed. The distinction is the point.
+
+3. **Six-step scenario (2010–2015)** — The Greece scenario now covers the
+   full six-year programme, including the 2015 capital controls. The thesis
+   frame is Step 5 (2014): financial indicators show partial GDP recovery
+   while human development remains at crisis depth. This asymmetry is the
+   WorldSim argument.
 
 ### Who Is in the Room
 
@@ -64,36 +83,9 @@ Three things, in priority order:
    producing plausible-looking outputs.
 
 3. **The roadmap is coherent and sequenced correctly.** What exists today is
-   working software, not a prototype. What comes next (uncertainty
-   visualization, ecological and governance composite scores) follows directly
-   from the epistemic commitments already made. The trajectory is legible.
-
-### Honest Disclosure Required
-
-Do not oversell the current state. The following are honest statements that
-must be available if questions arise:
-
-- The simulation produces distributions, not predictions. Uncertainty bands
-  are currently pre-calibration — meaning they reflect a reasonable range
-  of model outcomes, not empirically calibrated confidence intervals. This
-  is disclosed in the interface and in the methodology documentation.
-
-- The ecological and governance composite scores are currently null in
-  scenario outputs. The modules exist (GovernanceModule ships in M6) but
-  the axes are not yet integrated into the radar chart display. These are
-  live scores in M8.
-
-- Fidelity thresholds at this milestone are DIRECTION_ONLY for all five
-  backtesting cases. The model gets the direction right. Magnitude
-  calibration is the next validation layer.
-
-- The canonical user is a finance ministry counterpart in a negotiation.
-  The tool is not designed for real-time trading, surveillance, or any
-  use case involving financial advantage over the actors it is designed
-  to assist.
-
-If any of these disclosures become a problem in the room, they are not problems
-with the tool — they are evidence that the tool's epistemic honesty is working.
+   working software at v0.8.0, not a prototype. Ecological composite scores
+   are live. Governance renders honest null rather than fabricated data. What
+   comes next follows directly from the epistemic commitments already made.
 
 ---
 
@@ -149,9 +141,11 @@ reads those consequences as evidence. Evidence is power.
 ### Setup
 
 The application should be running and the map loaded before the session starts.
-Do not demo a loading screen. The Greece 2010 backtesting scenario should be
-pre-created so that the "create scenario" step is demonstrating the interface,
-not waiting on a database write.
+Do not demo a loading screen. The scenario does not need to be pre-created —
+the creation step is part of the demonstration.
+
+Run `./scripts/demo.sh --run` to launch the stack and the Playwright walkthrough,
+or `./scripts/demo.sh` to start the stack and follow the guide manually.
 
 The sequence below is precise. Follow it exactly. Each step has a specific
 cognitive purpose for the audience.
@@ -161,18 +155,17 @@ cognitive purpose for the audience.
 ### Step 1 — The Map Loads
 
 **What the audience sees:** A world map. Countries rendered as polygons. A
-color gradient indicating an attribute value. The interface is familiar —
+color gradient indicating a simulation attribute. The interface is familiar —
 it looks like every geopolitical visualization tool they have seen.
 
 **What the presenter says:**
 
-> This is the application's baseline view. The choropleth shows a simulation
-> attribute across entities — in this case, GDP growth rate from the most
-> recent completed scenario step. Each country is colored by its simulated
-> value. Click any country to open its analysis panel.
->
-> What makes this different from a data visualization tool will become clear
-> in a moment.
+> This is the baseline view. Each country shows a simulation attribute across
+> entities. Click any country to open its analysis panel. What makes this
+> different from a data visualization tool will become clear in a moment.
+
+**Key M8 note:** The attribute selector switches to `gdp_growth` after Step 1
+completes, so the choropleth shows simulation output rather than seed data.
 
 **Cognitive purpose:** Orient. Establish that this is an interactive, not a
 static display. Avoid spending time here — the map is familiar territory and
@@ -180,168 +173,159 @@ earns nothing on its own.
 
 ---
 
-### Step 2 — Create the Greece 2010 Scenario
+### Step 2 — Create the Greece 2010–2015 M8 Demo Scenario
 
-**What the audience sees:** The scenario creation panel. Presenter selects
-entity "GRC", sets n_steps to 3, and confirms. The scenario appears in the
-scenario list with status "pending."
+**What the audience sees:** The scenario creation panel. Presenter enters
+"Greece 2010-2015 M8 Demo" and creates it. The scenario appears in the scenario
+list. The presenter selects it as the primary.
 
 **What the presenter says:**
 
-> We're going to model Greece's 2010–2012 fiscal adjustment programme. This is
-> a historical case — we know what happened. In the simulation, we'll inject
-> the IMF programme conditions as scheduled inputs: the fiscal tightening, the
-> emergency declarations, the structural conditionality. Then we advance the
-> scenario step by step and observe what the model produces.
+> We are modelling Greece's 2010–2015 IMF programme — six years of fiscal
+> conditionality. The programme conditions are the inputs. The simulation
+> produces the consequences. Each step here is one year.
 >
-> The reason we're starting with a historical case rather than a hypothetical
-> is important. It's the point of the backtesting discipline, which we'll come
-> back to.
+> The reason we are starting with a historical case is important — we know what
+> happened. The backtesting discipline, which we will return to, is how we
+> validate that the simulation captures real causal dynamics.
 
 **Cognitive purpose:** Establish that scenarios are structured, not arbitrary.
 Conditionality terms are the inputs. The simulation produces the consequences.
-The causal arrow is explicit.
 
 ---
 
-### Step 3 — Advance to Step 3
+### Step 3 — Advance Through Six Steps
 
-**What the audience sees:** The presenter clicks the Advance button three times
-(or uses the run button for the full scenario). The step counter increments:
-Step 1 / 3 → Step 2 / 3 → Step 3 / 3. The choropleth updates at each step.
-Greece shifts color.
+**What the audience sees:** The presenter clicks Next Step six times. The step
+counter increments: 1/6 → 2/6 → 3/6 → 4/6 → 5/6 → 6/6. The choropleth
+updates at each step.
 
 **What the presenter says:**
 
-> Each step here is one year. We're advancing through 2010, 2011, 2012 — the
-> three years of the initial programme. At each step, the simulation applies
-> the scheduled inputs and propagates their effects through the model's
-> relationship graph. You can see Greece shift in the choropleth as the
-> fiscal contraction accumulates across steps.
->
-> What the choropleth is showing is the point estimate — the central value of
-> the distribution. The full picture is in the entity panel.
+> Each step is one year. Watch Greece shift in the choropleth as the fiscal
+> contraction accumulates across steps. What the choropleth shows is the central
+> simulation value — the full analysis is in the entity panel.
 
 **Cognitive purpose:** Show time progression. Establish that the simulation
-runs sequentially through a programme horizon, not all at once. The choropleth
-update makes the progression visible.
+runs sequentially through a programme horizon. Make the step counter legible
+to the audience.
 
 ---
 
-### Step 4 — Click Greece, Drawer Opens
+### Step 4 — Click Greece — Drawer Opens (Step 4, Year 2013)
 
-**What the audience sees:** The EntityDetailDrawer slides open. The panel
-shows Greece's simulation state at Step 3. The MDA alert panel is at the top.
-Below it, the radar chart. Below that, framework-specific indicators with
-confidence tiers.
+**What the audience sees:** The EntityDetailDrawer slides open. This step is
+specifically chosen for Step 4 (2013) — the year of the third memorandum and
+the primary surplus conditionality target.
 
 **What the presenter says:**
 
-> This panel is the primary analytical surface. What I want to draw your
-> attention to first is the top of the panel.
+> This panel is the primary analytical surface. Step 4 is 2013 — the year the
+> programme required Greece to achieve a primary surplus for the first time.
+> What the simulation shows is not whether the surplus was achieved, but what
+> else happened in the same year. Watch the indicators below.
 
-**Pause. Let them read it.**
+**Pause. Let them read the MDA alert panel first.**
 
-> These are the Minimum Descent Altitude alerts. The terminology comes from
-> aviation: an MDA is the altitude below which an aircraft cannot safely
-> descend given the terrain. In this simulation, MDAs are human cost floors —
-> levels below which consequences become irreversible, or where standard policy
-> frameworks no longer provide protection.
+> These are the Minimum Descent Altitude alerts. In aviation, an MDA is the
+> floor below which an aircraft cannot safely descend given the terrain.
+> In this simulation, MDAs are human cost floors — levels below which
+> consequences become irreversible, or where standard policy frameworks no
+> longer provide protection.
 >
-> The alert fires when the simulation determines that an indicator has crossed
-> one of those floors. What you're reading is not a warning about the model's
-> own uncertainty. It is a finding about where the proposed path takes the
-> population.
+> What you are reading is not a warning about the model's uncertainty. It is
+> a finding about where this path takes the population.
 
-**Cognitive purpose:** Introduce the primary visual element (per north-star.md
-§Resolved Design Question 1: MDA alert panel is primary). The alert is the
+**Cognitive purpose:** Introduce the primary visual element. The alert is the
 first thing the canonical user reads. It must be the first thing the audience
-hears explained.
+hears explained. The 2013 step anchors the narration to a historical fact the
+domain economists in the room will recognize.
 
 ---
 
-### Step 5 — Call Out the MDA Alert Panel
+### Step 5 — MDA Alerts and Thesis Frame (Step 5, Year 2014)
 
-**What the audience sees:** The presenter highlights a specific alert —
-for example, a CRITICAL severity alert on unemployment or poverty headcount
-at step 3.
+**What the audience sees:** The presenter navigates to Step 5 (2014). The
+EntityDetailDrawer shows the asymmetric radar: financial axis extending from
+the Step 3 nadir, human development axis still near maximum compression.
 
 **What the presenter says:**
 
-> Read this alert as a piece of evidence: "Under this fiscal adjustment path,
-> [indicator] crosses the critical threshold at programme year 3. This affects
-> primarily [cohort]." That sentence is the analytical finding. It is specific
-> enough to cite in a negotiation. It names an indicator, a step, a severity
-> level, and a population cohort.
+> Step 5 is 2014. In the historical record, Greece's GDP grew 0.7 percent —
+> a financial recovery. But unemployment was still 26.5 percent.
 >
-> This is what 'capability analysis' means in practice. The finance ministry
-> specialist is not being alarmed by the simulation. She is being handed a
-> finding that she can use. Her argument at the negotiating table becomes:
-> "Under this path, poverty headcount crosses the critical threshold in year
-> three. In comparable historical cases — which we can show you — that level
-> of deterioration produced programme collapse. Here is the evidence."
+> Look at the radar: the financial axis is extending as the model registers
+> partial recovery. The human development axis remains near its most depressed
+> point. This asymmetry is the WorldSim argument in a single image.
 >
-> The simulation gives her the analytical standing to make that argument
-> specifically, not generally.
+> Financial recovery and human recovery are not the same event. No
+> single-axis measurement tool can show you both simultaneously.
 
-**Cognitive purpose:** Translate the UI into the use case. The audience
-understands negotiating contexts. Connect the visual output to the human
-situation it serves.
+**Call out a specific MDA alert:**
+
+> Read this alert as a piece of evidence: the indicator, the step at which
+> the threshold was crossed, the severity level, and the affected cohort.
+> That sentence is specific enough to cite in a negotiation. A finding you
+> can cite is a finding you can use.
+
+**Cognitive purpose:** The thesis frame is the M8 centrepiece. The asymmetric
+radar is not a secondary detail — it is the argument. The MDA alert grounds
+the radar in a specific, nameable consequence. Together they produce the
+negotiating posture: "Under this path, these thresholds were crossed. Here
+is the evidence."
 
 ---
 
-### Step 6 — Radar Chart as Secondary
+### Step 6 — Radar Chart (Ecological Live, Governance Honest Null)
 
-**What the audience sees:** The presenter scrolls down to the radar chart,
-which shows four axes: financial, human development, ecological, governance.
+**What the audience sees:** The presenter scrolls to the Multi-Framework
+Overview radar chart in the drawer. Three axes are live with data; one axis
+(Governance) renders as a dashed hollow dot.
 
 **What the presenter says:**
 
-> Below the alert panel is the radar chart — four axes, one for each
-> measurement framework the simulation tracks. Financial indicators: fiscal
-> balance, GDP trajectory. Human development: poverty headcount, health system
-> capacity. Ecological: currently null — that module ships in Milestone 8.
-> Governance: institutional quality indicators, now live as of this milestone.
+> Four axes: financial, human development, ecological, governance. Financial
+> and human development are live — those are the two contracted axes you saw
+> in the thesis frame.
 >
-> The radar chart tells you which dimensions are under stress, which supports
-> the threshold scan the alert panel just completed. If the financial axis
-> shows deterioration but the human development axis is flat, the programme
-> may be fiscally painful without being humanly catastrophic. If both collapse
-> simultaneously, the analysis changes.
+> Ecological is now live as of Milestone 8: CO2 planetary boundary proximity,
+> boundary-normalized against 350 ppm. A value above 1.0 means the boundary
+> is exceeded. This is a first-class measurement output — ecological
+> consequences are no longer a footnote.
 >
-> I'll be honest about what is not on the screen yet: the ecological and
-> governance axes are showing preliminary values. They will show composite
-> scores in M8. What you see now is the architecture for a four-framework
-> assessment, with two frameworks producing full composite outputs today.
+> Governance shows as a dashed axis, labeled 'Governance — in validation.'
+> It renders honest null — not zero. Zero would imply governance failure.
+> Null means the composite score is not yet computed to the standard required
+> for publication. The four-axis architecture is here. The fourth axis will
+> show composite scores when the promotion criteria are met at Milestone 9.
 
-**Cognitive purpose:** Show the radar chart as the framework overview (per
-north-star.md: secondary to the alert panel). Introduce the multi-currency
-measurement principle. Be transparent about what is null.
+**Cognitive purpose:** Introduce the multi-framework measurement principle.
+The ecological live score and the governance honest null are both M8 claims —
+one about capability, one about epistemic integrity. Both need to land as
+deliberate choices, not gaps.
 
 ---
 
-### Step 7 — Enter Compare Mode
+### Step 7 — Compare Mode
 
-**What the audience sees:** The presenter opens compare mode and selects a
-second scenario — either a pre-created alternative with softer conditionality
-terms, or a demonstration of the DeltaChoropleth showing divergence between
-the two.
+**What the audience sees:** The presenter creates a second scenario and
+activates compare mode. The DeltaChoropleth shows where the two paths diverge
+geographically.
 
 **What the presenter says:**
 
 > This is the counter-proposal function. Once you have identified which terms
 > produce threshold crossings, you model an alternative — the same fiscal
-> outcome, achieved differently. The DeltaChoropleth shows you, geographically,
-> where the two scenarios diverge. The entity drawer in compare mode lets you
-> read the divergence at the indicator level.
+> outcome, achieved differently. The DeltaChoropleth shows where the two
+> scenarios diverge.
 >
-> The argument becomes: "This path crosses the threshold. This alternative
-> path achieves the same primary fiscal objective and does not. Here is the
-> evidence for both."
+> The argument becomes: this path crosses the threshold. This alternative
+> achieves the same primary fiscal objective and does not. Here is the
+> evidence for both.
 
-**Cognitive purpose:** Complete the preparation journey (per user-journeys.md
-Journey A Step 6). The tool is not just a diagnostic — it produces the
-counter-proposal as an analytical output.
+**Cognitive purpose:** Complete the preparation journey. The tool is not only
+a diagnostic — it produces the counter-proposal as an analytical output. That
+is what closes the capability gap in a live negotiation.
 
 ---
 
@@ -461,93 +445,55 @@ counter-proposal as an analytical output.
 ## Section 4 — What Is Being Built (5 minutes)
 
 > The roadmap is best understood as a sequence of expanding analytical capability —
-> each milestone extending what can be seen, not filling in what was missing.
+> each milestone extending what can be seen.
 
-### Milestone 7 — Uncertainty Visualization
+### Milestone 6 and Milestone 7 — Foundation (Complete)
 
-> The simulation currently produces distributions with pre-calibration bands.
-> The bands are visible in the interface but not yet calibrated against
-> historical variance. Milestone 7 delivers the uncertainty visualization that
-> makes those bands meaningful: band widths proportional to projection horizon,
-> alert source distinction between distribution-triggered and point-estimate-
-> triggered findings, and the non-suppressible pre-calibration disclosure
-> integrated into the alert language.
+> Milestones 6 and 7 established the technical foundation: compliance
+> framework clean, legibility baseline measured and documented, the backtesting
+> suite covering five historical cases. These were not features — they were
+> discipline. A simulation that produces outputs without a clean bill of
+> methodological health is a tool that cannot be trusted in the setting it
+> is designed for.
+
+### Milestone 8 — Ecological and Governance Frameworks (Complete — Current Version)
+
+> Milestone 8 delivers what you have seen in this demonstration: the ecological
+> composite score live for the first time (CO2 planetary boundary proximity,
+> Rockström 2009 reference), the governance axis rendering honest null rather
+> than fabricated zero, and the Greece scenario extended to 2015 — six steps
+> covering the full programme duration including capital controls.
 >
-> What this changes in practice: a finance ministry specialist will be able to
-> say not just "the central estimate shows a year-3 breach" but "the
-> distribution places 80% probability mass below the threshold at year 3, even
-> accounting for model uncertainty." That is a materially stronger finding.
+> The four-axis radar chart is now a substantive instrument, not a placeholder.
+> Three axes carry live composite scores. The fourth will follow when its
+> promotion criteria are met.
 
-### Milestone 8 — Ecological and Governance Composite Scores
+### Milestone 9 — Standards Foundation (Next)
 
-> The radar chart currently has four axes. Two produce full composite outputs
-> today: financial and human development. Two are emerging: ecological and
-> governance.
->
-> Milestone 8 completes all four. The ecological module will surface planetary
-> boundary proximity, natural capital depletion, and agricultural stress indices
-> — dimensions that are systematically absent from IMF programme analysis but
-> that directly affect the long-term sustainability of fiscal consolidation
-> paths. A programme that achieves primary balance by reducing agricultural
-> investment in a climate-stressed agricultural economy is producing a different
-> risk profile than one that achieves the same balance through administrative
-> efficiency gains.
->
-> The governance module — which ships its first indicators this milestone —
-> will surface rule-of-law degradation and democratic quality erosion as
-> programme consequences. These are not peripheral concerns. An adjustment
-> programme that stabilizes fiscal accounts while undermining institutional
-> quality is producing a different trajectory than a programme that preserves
-> both. The four-axis radar chart makes that comparison visible.
->
-> Also in Milestone 8: the causal meta-map — a visualization of the causal
-> relationships the simulation is modeling, so that any user (or reviewer)
-> can inspect the assumption embedded in every output. The model's theory of
-> the world is not hidden in source code. It is displayed alongside the output.
+> Milestone 9 formalizes the Governance Module promotion path: five promotion
+> criteria, currently unmet, targeted for M9 delivery. The milestone also
+> covers the canonical unit registry, field-level data certification, WGI
+> source documentation, and the beginning of the methodology publication
+> preparation. When governance meets its promotion criteria, the fourth radar
+> axis moves from dashed null to a live composite score.
 
-### Milestone 9 — Methodology Publication and External Validation
+### Milestone 10 and Beyond
 
-> The final piece of the current roadmap is methodology publication and the
-> formation of a Technical Steering Committee. Every assumption the simulation
-> makes — every elasticity, every multiplier, every threshold value — will be
-> published with source citations and open to external challenge. Domain experts
-> in sovereign debt, ecological economics, and governance will review the
-> methodology and contribute to calibration.
+> Mean-reversion channels, magnitude calibration, political economy and
+> conditionality modeling, analyst tooling — each building on the validated
+> foundation. Milestone 13 targets methodology publication and Technical
+> Steering Committee formation: domain experts in sovereign debt, ecological
+> economics, and governance reviewing the methodology and contributing to
+> calibration.
 >
-> This is what 'open source as strategy' means in practice. The tool's
-> credibility does not rest on the authority of its producers. It rests on
-> the transparency of its methodology and the quality of its backtesting
-> evidence. Anyone can inspect, challenge, and improve the assumptions.
-> That is the standard the tool is designed to meet.
+> Frame this as expanding capability, not missing features. The capability
+> that exists today is the capability that has been validated. What comes
+> next is what the backtesting evidence and the epistemic commitments already
+> made require.
 
 ---
 
-## Section 5 — The North Star (1 minute)
-
-> I want to close with the reason this project exists, stated as plainly as
-> possible.
->
-> There is a quinoa farmer in Bolivia who will never know this tool exists.
-> He does not have internet access reliable enough to open a web application.
-> He does not speak the language the interface is written in. He has no idea
-> what an IMF programme is, or what a fiscal multiplier means, or why it
-> matters.
->
-> His government might know. If his government has a finance minister with
-> better analytical tools, that minister can negotiate better terms. Better
-> terms produce different fiscal paths. Different fiscal paths produce
-> different human consequences.
->
-> The quinoa farmer lives at the end of that chain. Every decision we make
-> about this tool — what to build first, what to be honest about, what not
-> to oversell — we make as if he is watching. Not because he is. But because
-> that framing is the right discipline.
->
-> Build it as if he does.
-
----
-
-## Section 6 — Q&A Preparation
+## Section 5 — Q&A Preparation
 
 ### "Why not use existing IMF tools? They already have analytical infrastructure."
 
@@ -577,8 +523,7 @@ counter-proposal as an analytical output.
 > The validation architecture is transparent by design. Every fidelity
 > threshold is registered in the database with its source citation. Every
 > backtesting test is in the public repository and runs in CI — a failure
-> is a build failure. The methodology will be published with source citations
-> and submitted to external domain expert review at Milestone 9.
+> is a build failure.
 >
 > What we cannot claim: that the model is calibrated to produce
 > quantitatively accurate magnitude estimates. That is the next validation
@@ -615,11 +560,85 @@ counter-proposal as an analytical output.
 > IMF World Economic Outlook, World Bank World Development Indicators, Natural
 > Earth boundary data. The methodology documentation will be available under
 > the same license as the software.
+
+### "Why is governance shown as dashed and labeled 'in validation'? Is that a bug?" *(M8-specific)*
+
+> No — it is a deliberate methodology decision. The governance composite score
+> has five promotion criteria that must be met before the tool publishes a score:
+> source certification, fidelity validation, territorial coverage threshold, blind
+> audit score, and domain expert review. All five are currently unmet.
 >
-> The Equitable Build Process principle embedded in the project's architecture
-> documents is not incidental. A tool designed to level the playing field for
-> resource-constrained actors must not reproduce the resource asymmetry it is
-> designed to counter in its own infrastructure requirements.
+> The alternative was to display zero, or to interpolate a value from partial
+> data. We chose not to. Zero implies governance failure. An interpolated value
+> implies precision we do not have. The dashed axis and the "in validation" label
+> tell the user exactly what the tool knows and does not know about this dimension.
+>
+> That epistemic honesty is not a concession — it is the methodology claim. A
+> tool that fabricates data to complete a display is a tool you cannot trust
+> with the findings you actually have. The fourth axis will show a composite
+> score when it has earned the right to show one.
+
+---
+
+## Section 6 — Honest Disclosures (available if asked)
+
+These statements must be available if questions arise. Do not proactively
+volunteer them in the main presentation unless a direct question requires it.
+Frame them as evidence that the tool's epistemic honesty is working.
+
+- **Distributions are pre-calibration.** Uncertainty bands reflect a reasonable
+  range of model outcomes, not empirically calibrated confidence intervals.
+  Disclosed in the interface and in the methodology documentation.
+
+- **Ecological composite score is CO2-only for Greece at M8.** The ecological
+  module covers CO2 planetary boundary proximity against the Rockström 2009
+  reference (350 ppm). Additional planetary boundary indicators (biodiversity,
+  nitrogen, water) are framework scope for future milestones.
+
+- **Governance composite score is null at M8.** Five promotion criteria not yet
+  met. The governance axis renders honest null — dashed, labeled "in validation"
+  — not zero. Composite score targeted for M9 delivery.
+
+- **GDP step 5 recovery is not reproduced.** The MacroeconomicModule has no
+  endogenous recovery mechanism. Historical step 5 shows +0.7% GDP growth
+  (partial recovery); the simulation produces a continued contraction at that
+  step. This is a documented blind spot tracked in Issue #221
+  (mean-reversion channel, M9 scope). The DIRECTION_ONLY fidelity threshold
+  for step 5 is deferred pending that fix.
+
+- **PMM Zone 1 widget is a placeholder at M8.** The Policy Maneuver Margin
+  indicator renders a null placeholder. Full composite widget is M9 scope.
+
+- **This tool is not for financial advantage or surveillance.** The canonical
+  user is a finance ministry counterpart in a negotiation. The tool does not
+  assist in executing financial attacks, identifying exploitable vulnerabilities
+  in adversaries, or any use case that amplifies power asymmetries against
+  vulnerable actors.
+
+---
+
+## Section 7 — The North Star (1 minute)
+
+> I want to close with the reason this project exists, stated as plainly as
+> possible.
+>
+> There is a quinoa farmer in Bolivia who will never know this tool exists.
+> He does not have internet access reliable enough to open a web application.
+> He does not speak the language the interface is written in. He has no idea
+> what an IMF programme is, or what a fiscal multiplier means, or why it
+> matters.
+>
+> His government might know. If his government has a finance minister with
+> better analytical tools, that minister can negotiate better terms. Better
+> terms produce different fiscal paths. Different fiscal paths produce
+> different human consequences.
+>
+> The quinoa farmer lives at the end of that chain. Every decision we make
+> about this tool — what to build first, what to be honest about, what not
+> to oversell — we make as if he is watching. Not because he is. But because
+> that framing is the right discipline.
+>
+> Build it as if he does.
 
 ---
 
@@ -627,13 +646,30 @@ counter-proposal as an analytical output.
 
 | Section | Content | Time |
 |---|---|---|
-| Presenter setup | Map loaded, Greece scenario pre-created | Before room fills |
+| Presenter setup | Stack running, map loaded | Before room fills |
 | Section 1 | Problem framing | 3 min |
-| Section 2 | Live application sequence (7 steps) | 5 min |
+| Section 2 | Live application (7 steps) | 5 min |
 | Section 3 | Backtesting credibility | 5 min |
 | Section 4 | Roadmap | 5 min |
-| Section 5 | North Star closing | 1 min |
+| Section 7 | North Star closing | 1 min |
 | Q&A | See prepared responses above | Remaining time |
 
 Total structured content: 19 minutes. Leave at least 10 minutes for Q&A.
 The Q&A is where domain economists will engage most seriously — do not compress it.
+
+---
+
+## Screenshot Reference (M8 Demo Frames)
+
+Captured: 2026-05-18. Located in `docs/demo/m8/screenshots/`.
+
+| Presentation order | File | Step | Drawer state | Caption |
+|---|---|---|---|---|
+| 1 — Thesis | `frame-c-step5-divergence.png` | 5 / 6 | Open — Human Development tab | 2014: financial partial recovery, human development at crisis depth — the asymmetry is the argument |
+| 2 — Instrument | `frame-a-step1-instrument.png` | 1 / 6 | Open — default view | Greece at IMF program entry: reserve coverage below the critical floor before the first package lands |
+| 3 — Collapse | `frame-b-step3-collapse.png` | 3 / 6 | Open — Financial tab | Three rounds of consolidation produce simultaneous deterioration across all live frameworks |
+| 4 — Evidence | `frame-d-step3-evidence.png` | 3 / 6 | Open — MDA panel | Threshold breaches rendered as structured evidence — specific enough to cite across a negotiating table |
+| 5 — Planetary | `frame-e-step3-ecological.png` | 3 / 6 | Open — Ecological tab | Milestone 8: planetary boundary proximity tracking live for the first time |
+
+See `docs/demo/m8/screenshot-brief.md` for the full UX Agent brief and frame-by-frame specifications.
+See `docs/demo/m8/reviews/2026-05-18-v0.8.0-stakeholder-review.md` for the IR Agent review of these frames.
