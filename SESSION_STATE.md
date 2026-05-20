@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated:** 2026-05-19 (M8 formal close complete — v0.8.0 tagged and released; Issue #209 closed; CHANGELOG updated; demo recording attached)
+**Last updated:** 2026-05-20 (M9 design foundation sequence: #360 agent working agreements ✅, #362 user personas ✅; PRs #383 #384 #385 open; founding document committed; Issue #370 still open)
 **Current milestone:** M9 — Standards Foundation
 
 ---
@@ -36,20 +36,20 @@ Twelve issues filed 2026-05-19. Must complete before M9 UX implementation begins
 | #359 | CLAUDE.md structural refactor | M9 | #360 #361 #362 #363 |
 | #370 | M8 formal close — retrospective, compliance scan, #209 | M8 | v0.8.0 tag, M9 kickoff |
 
-**Step 2 — Immediate (unblocked after #359):**
+**Step 2 — Immediate (unblocked after #359):** ✅ COMPLETE
 
 | Issue | Title | Milestone | Blocks |
 |---|---|---|---|
-| #360 | Agent working agreements (15 agents) | M9 | #369 |
-| #361 | Synthetic data framework — Chief Methodologist + ADR | M9 | #362 |
+| #360 ✅ | Agent working agreements (15 agents) | M9 | #369 |
+| #361 ✅ | Synthetic data framework — Chief Methodologist + ADR | M9 | #362 |
 
-**Step 3 — Immediate (requires #359 + #360 + #361):**
+**Step 3 — Immediate (requires #359 + #360 + #361):** ✅ COMPLETE
 
 | Issue | Title | Milestone | Blocks |
 |---|---|---|---|
-| #362 | User persona document (5 personas, marquee cases) | M9 | #363 #367 |
+| #362 ✅ | User persona document (5 personas, marquee cases) | M9 | #363 #367 |
 
-**Step 4 — Immediate (requires #359 + #362):**
+**Step 4 — Immediate (requires #359 + #362):** NOW UNBLOCKED
 
 | Issue | Title | Milestone | Blocks |
 |---|---|---|---|
@@ -76,6 +76,9 @@ Twelve issues filed 2026-05-19. Must complete before M9 UX implementation begins
 | #371 | chore(state): design foundation sequence — 12 issues #359–#370 filed | 2026-05-19 |
 | #372 | docs(claude): CLAUDE.md structural refactor — closes #359 | 2026-05-19 |
 | #373 | docs(adr): Chief Methodologist consultation — synthetic data framework (closes #361) | 2026-05-19 |
+| #383 | docs(vision): WorldSim founding document — synthesized from April-May 2026 founding conversations | 2026-05-20 |
+| #384 | docs(process): agent working agreements — all 15 agents (closes #360) | 2026-05-20 |
+| #385 | docs(ux): user persona document — five personas, entry state taxonomy, marquee cases (closes #362) | 2026-05-20 |
 
 ## Recently Merged PRs (last 5)
 
@@ -138,6 +141,11 @@ All Horizon:Immediate issues are now closed. M8 feature-complete.
 
 | Decision | Rationale | Date |
 |---|---|---|
+| Issue #362 implemented — user persona document | docs/ux/personas.md (1352 lines). Five personas (8 dimensions each): Programme Analyst, Finance Ministry Negotiator, Political Advisor, Academic Researcher, Institutional Decision-Maker. Six entry states with 60-sec opening screen requirements and failure conditions. Five primary marquee cases (European sovereign debt history) with testable exit criteria. Five secondary marquee cases (Argentina, Egypt, Sri Lanka, Ukraine, Zambia) with structural gap verdicts. Three tertiary use cases as ingredient specifications (Canadian steel tariffs, Hormuz closure, Kenya budget). Product scope statement. Synthetic data framework integrated for Cases E/TC-2/TC-3. Platform principle applied throughout. EL review required before canonical. PR #385. | 2026-05-20 |
+| Issue #360 implemented — 15 agent working agreements | docs/process/agents.md: 15 working agreements appended (one per agent) in each agent's own voice. Five sections: understanding of the mission, unique contribution, observable behavioral commitments, where the agent asks for help, where it offers help. PR #384. | 2026-05-20 |
+| Founding document committed | docs/vision/worldsim-founding-document.md created from April-May 2026 founding conversations (six parts: The Problem, The Analogy, The Principles, The Architecture, The Vision, Honest Limitations). CLAUDE.md §Founding Document reference added. PR #383. | 2026-05-20 |
+| Architect Agent consultation — simulation graph mental model | EL's BST mental model is approximately correct for the administrative hierarchy (parent_id) but the propagation medium is the relationship graph, not the hierarchy. Two-graph architecture: Graph 1 (parent_id = identity/scope); Graph 2 (relationships list with relationship_type = propagation medium). Events propagate along typed edges; no rollup. Each entity computes from events it receives. | 2026-05-20 |
+| Issue #370 (M8 formal close issue) — still open | Work is done (v0.8.0 released, retrospective complete) but the issue itself was not explicitly closed this session. Needs explicit close. | 2026-05-20 |
 | M8 formal close complete | All six exit gates satisfied; v0.8.0 tagged and released; Issue #209 closed; CHANGELOG updated; demo recording attached to GitHub release | 2026-05-19 |
 | Issue #361 Chief Methodologist consultation — synthetic data framework | docs/architecture/synthetic-data-consultation.md (41.5k chars, 560 lines). Five questions answered. Method hierarchy: Bayesian > MICE > Bootstrap > structural extrapolation > structural absence. Three-condition meaninglessness threshold. MDA tier table (full/advisory/exploratory/none). Anomaly detection requires TSC sign-off, opt-in, Mode 3 excluded, governance indicators excluded. ADR-007 outline produced. PR #373. | 2026-05-19 |
 | Issue #359 implemented — CLAUDE.md structural refactor | docs/architecture/simulation-framework.md created (7.7k chars); CLAUDE.md reduced to 28,375 chars; role-based mandatory reading table added; three new principle sections (Platform Principle, Synthetic Data, UX Architectural Commitments); three-mode architecture referenced. PR #372. | 2026-05-19 |
