@@ -20,7 +20,7 @@ exists, but whose government may make better decisions because it does.
 
 ## Session Continuity
 
-Before beginning any task, read these three files in order:
+Before beginning any task, read these files in order:
 1. `SESSION_STATE.md` — current work streams, open PRs, pending decisions
 2. `docs/process/agents.md` — agent roster, personas, activation protocols
 3. `CLAUDE.md` — permanent constitution, architecture, standards
@@ -31,6 +31,16 @@ for all agent personas. All three are required reading at session start.
 
 At the end of every session, updating `SESSION_STATE.md` is the last
 action before closing — not optional.
+
+### Role-based mandatory reading
+
+| Role | Additional required reading |
+|---|---|
+| All agents | `docs/architecture/simulation-framework.md` |
+| UX / Frontend | `docs/ux/north-star.md`, `docs/ux/information-hierarchy.md`, `docs/ux/user-journeys.md`, `docs/ux/personas.md` (when available), `docs/ux/design-thinking/worldsim-ux-architecture-first-principles.md` |
+| Data / Backend | `docs/DATA_STANDARDS.md`, `docs/schema/database.yml`, `docs/schema/simulation_state.yml` |
+| Architecture | Relevant ADR in `docs/adr/` |
+| Standards / Compliance | `docs/CODING_STANDARDS.md`, `docs/compliance/scan-registry.md` |
 
 ---
 
@@ -80,123 +90,113 @@ progression, community contribution pathways.
 
 ---
 
+## The Platform Principle
+
+WorldSim is situation-agnostic. The engine, measurement framework, instrument
+architecture, and UX are invariant across scenarios. Only data inputs change.
+There is no Greece mode, no tariff mode, no budget planning mode — one
+platform, different ingredients.
+
+Any proposal requiring scenario-specific modules rather than scenario-specific
+data inputs must document why the platform principle cannot be satisfied. The
+default answer is that it can: what looks like a mode requirement is almost
+always a data requirement.
+
+This principle is the primary constraint on M9 UX design. Instruments are
+designed for the platform, not for any scenario.
+
+---
+
+## Synthetic Data and the Data Inference Layer
+
+Data poverty is not a blocker. WorldSim generates synthetic data via
+statistical inference from comparable economies, regional distributions, and
+historical patterns when real data is unavailable or of insufficient quality.
+
+Operating rules:
+- Every synthetic output is flagged at indicator level — not at session or
+  scenario level
+- Mixed-mode outputs show per-indicator provenance
+- Synthetic data produces scenario bands (pessimistic/realistic/optimistic),
+  not point estimates
+- Synthetic estimates are always Tier 3 or lower in the confidence tier system
+- When uncertainty is so large the output is directionally meaningless, the
+  tool says so rather than generating an uninterpretable band
+
+This is what makes the democratization mission operationally real. A global
+south finance ministry with thin, delayed, or unreliable data can still use
+WorldSim — and the tool is honest about what it knows and what it inferred.
+
+Synthetic data framework ADR: forthcoming (Issue #361).
+Confidence tier system: `docs/DATA_STANDARDS.md §Confidence Tier System`.
+
+---
+
+## UX Architectural Commitments
+
+Five governing premises apply from M9 forward through Mode 3 introduction.
+These are architectural commitments, not design preferences. Any UX proposal
+that conflicts with them requires Engineering Lead sign-off.
+
+1. **The primary viewport is the instrument cluster.** Context (choropleth,
+   geographic view) is navigable. Instruments (trajectory view, PMM, MDA
+   alerts, four-framework current position) are always visible without opening
+   a drawer or navigating away.
+
+2. **Instruments are always visible; context is navigable.** No primary
+   instrument lives in a drawer, a tab, or behind a click. The four primary
+   flight instruments are present in the primary viewport at all times in all
+   three modes.
+
+3. **The step axis is the shared frame for all instruments.** All instruments
+   that show temporal data share a single step axis. This is the visual
+   contract that makes multi-framework trajectory comparison legible.
+
+4. **Each mode has its own primary cognitive task.** Mode 1 (Replay):
+   trajectory reconstruction. Mode 2 (Simulation): threshold-safe path
+   construction. Mode 3 (Active Control): real-time steering within human
+   cost constraints. Instrument layout serves the cognitive task of the active
+   mode.
+
+5. **The control plane layout zone is reserved before the control plane is
+   built.** Mode 3 requires a dedicated screen zone for control inputs. That
+   zone is reserved in the layout from M9 onward — not retrofitted when Mode 3
+   arrives.
+
+Full UX first-principles derivation and stress-testing:
+`docs/ux/design-thinking/worldsim-ux-architecture-first-principles.md`
+
+---
+
 ## The Simulation Framework
 
-### Core Metaphor: The Flight Simulator
+WorldSim is a flight simulator for national decision-making. The engine models
+sovereign governance through six aviation-derived failure modes (The Spin,
+Coffin Corner, Hypoxia, Backside of the Power Curve, Get-There-Itis, The CB
+Cloud), an event-driven feedback graph with configurable hierarchical resolution
+(nation → region → sector → demographic cohort), adaptive temporal resolution
+that auto-switches to daily during crisis events, and simultaneous multi-currency
+measurement across financial, human development, ecological, and governance
+units. Hard Minimum Descent Altitudes define irreversible thresholds that no
+recommended pathway may cross.
 
-The tool is designed around aviation's approach to high-stakes decision-making
-under uncertainty. The primary instrument framework:
+WorldSim operates in three interaction modes: Mode 1 (Replay), Mode 2
+(Simulation), Mode 3 (Active Control). Mode 3 is the north star for instrument
+design.
 
-**Situational Awareness (Endsley's Three Levels)**
-- Level 1 Perception: What are current indicator states?
-- Level 2 Comprehension: What does this pattern mean given current conditions?
-- Level 3 Projection: Where is this trajectory going if nothing changes?
-
-The tool is primarily a Level 2 and Level 3 instrument. Data display is the
-minimum. Pattern recognition and trajectory projection are the mission.
-
-### Failure Mode Architecture
-
-Six failure modes from aviation map to sovereign governance failures and are
-explicitly modeled:
-
-**The Spin** — Self-sustaining deterioration where standard responses accelerate
-the problem. Diagnostic: Recovery Envelope (remaining fiscal space, reserves,
-political capital, time before the corrective maneuver window closes).
-
-**Coffin Corner** — The operating envelope narrows through individually rational
-decisions until no policy response avoids a binding constraint. Diagnostic:
-Policy Maneuver Margin (composite of remaining policy degrees of freedom),
-displayed as a primary indicator with trend vector.
-
-**Hypoxia** — The decision instrument itself is compromised without awareness
-of impairment. Diagnostic: Institutional Cognitive Integrity Index (press
-freedom, leadership insularity, technocratic independence, dissent tolerance,
-policy-reality divergence).
-
-**Backside of the Power Curve** — Regime-dependent relationships where the sign
-of the effect inverts beyond a threshold: fiscal multiplier inversion under
-depressed conditions, currency defense reversal as reserves deplete, security
-dilemma escalation beyond a threshold.
-
-**Get-There-Itis** — Commitment escalation overriding situational assessment.
-The clean-slate question is surfaced explicitly: if encountering these conditions
-today with no prior commitment, would this path be chosen?
-
-**The CB Cloud** — Asymmetric visibility: decision-makers see policy from the
-trailing edge (intent, tradeoffs); affected populations see it from the leading
-edge (consequences). The human cost ledger is the weather radar for the leading
-edge.
-
-### Simulation Architecture
-
-**Event-Driven Core**
-The simulation engine is a graph of feedback loops, not a collection of
-separate calculators. At each timestep, events propagate through the graph.
-Modules update state. Updated state generates new events for the next
-timestep. The ordering and weighting of propagations encodes the model's
-theory of the world.
-
-**Hierarchical Resolution**
-- Level 1: Nation states (foundational, always active)
-- Level 2: Subnational regions (activated per scenario requirement)
-- Level 3: Urban/rural sector distinction within regions
-- Level 4: Demographic cohorts (income quintiles × age bands × employment sector)
-- Level 5: Key institutional actors (central bank, finance ministry, military)
-- Level 6: Individual archetypes (future / Agent-Based Modeling territory)
-
-Resolution is configurable per simulation run.
-
-**Adaptive Temporal Resolution**
-Default: annual or monthly timesteps for structural dynamics. Auto-switches to
-finer resolution when a crisis threshold is detected in a subsystem — a currency
-crisis runs at daily resolution while the rest of the world continues at monthly.
-
-**Variable Resolution Simulation**
-"Run this scenario at Level 1 globally, Level 2 for Middle East, Level 3 for
-Saudi Arabia specifically." This is a first-class architectural feature.
-
-### Key Simulation Modules
-
-Each module is a discrete component with defined interfaces to the event
-propagation system. Modules plug into the core graph — they do not replace it.
-
-Full capability status and per-module status: `docs/scenarios/module-capability-registry.md`
-
-### Multi-Currency Measurement
-
-The simulation produces outputs simultaneously in multiple accounting units.
-No master conversion rate between them. False aggregation is not acceptable.
-
-- Financial units: standard economic metrics
-- Human development units: Sen capability approach, HDI dimensions
-- Ecological units: planetary boundary proximity, natural capital depletion
-- Governance units: institutional quality, political freedom, rule of law
-
-The dashboard displays all simultaneously. A radar chart shows the full
-multi-dimensional profile. Deformation in any dimension is visible regardless
-of performance in others.
-
-User-defined weighting is supported. But threshold alerts fire regardless of
-user weighting when any dimension crosses below a critical floor. No aggregate
-score can hide a catastrophic failure in a single dimension.
-
-**Minimum Descent Altitudes**
-Hard floors below which the simulation flags terrain — levels below which
-normal policy frameworks no longer provide protection and damage becomes
-irreversible or generational. These are constraints, not suggestions.
-The simulation does not recommend pathways that cross below them.
+**Full detail:** `docs/architecture/simulation-framework.md`
 
 ---
 
 ## Key Use Cases
 
-- **IMF/World Bank Loan Evaluation** — Evaluate conditionality packages across scenario distributions; decompose which terms are mathematically load-bearing for debt sustainability; track Policy Maneuver Margin over program duration.
-- **Privatization Sovereign Resilience Assessment** — Evaluate asset sales against the Sovereign Resilience Floor; track foreign ownership concentration (HHI) by strategic sector; assess buyback trajectory under recovery scenarios.
-- **Financial Attack Detection and Defense** — Monitor Currency Attack Vulnerability Index; match signatures against documented historical cases; emergency defense protocol library.
-- **Scenario Exploration and Geopolitical Stress Testing** — User-defined scenarios with time acceleration and comparative output. Hormuz closure, petrodollar relaxation, de-dollarization tipping point dynamics.
-- **Backtesting and Historical Calibration** — Run forward from historical baselines with injected known events; surface variables that were present, measurable, and consequential but ignored in real-time. The Eureka function: structure of the past, not prediction of the future.
-- **Emergency Procedure Generation** — Country-specific, terrain-aware emergency procedures pre-computed when cognitive capacity is full; available when the emergency makes computation impossible.
+WorldSim targets six primary use cases: IMF/World Bank loan evaluation,
+privatization sovereign resilience assessment, financial attack detection and
+defense, scenario exploration and geopolitical stress testing, backtesting and
+historical calibration, and emergency procedure generation.
+
+**Persona-anchored acceptance tests for each use case:** `docs/ux/personas.md`
+**Full use case descriptions:** `docs/architecture/simulation-framework.md §Key Use Cases`
 
 ---
 
