@@ -127,7 +127,9 @@ This is what makes the democratization mission operationally real. A global
 south finance ministry with thin, delayed, or unreliable data can still use
 WorldSim — and the tool is honest about what it knows and what it inferred.
 
-Synthetic data framework ADR: forthcoming (Issue #361).
+Synthetic data framework: Chief Methodologist consultation complete (PR #373).
+Five-method hierarchy, three-condition meaninglessness threshold, MDA alert
+tier table. ADR-007 forthcoming.
 Confidence tier system: `docs/DATA_STANDARDS.md §Confidence Tier System`.
 
 ---
@@ -258,15 +260,17 @@ Detailed domain profiles: `docs/agents/domain-intelligence-council.md`
 
 ## What We Are Building First
 
-M0–M7 complete (v0.1.0–v0.7.0). ADRs 001–006 current. See GitHub Releases
-for full delivery history.
+M0–M8 complete (v0.1.0–v0.8.0). ADRs 001–006 current; ADR-007 forthcoming.
+See GitHub Releases for full delivery history.
 
-**Milestone 8 — Ecological and Governance Frameworks (Current)**
-- All four radar chart axes live with real data
-- Ecological Module complete; Governance Module complete
-- Coffin Corner / Policy Maneuver Margin Zone 1 indicator
-- MDA extended to ecological and governance indicators
-- End-of-milestone demo: all four radar axes simultaneously
+**Milestone 9 — Standards Foundation (Current)**
+- GovernanceModule promotion path (five criteria; target M9)
+- UX architecture rethink — Case B verdict executed; instrument cluster in
+  primary viewport; control plane zone reserved
+- User persona document (five personas, marquee acceptance cases)
+- Synthetic data framework ADR (ADR-007) — Chief Methodologist consultation
+  complete; formal ADR pending
+- Agent working agreements (15 agents; RACI chart)
 
 Each milestone is a vertical slice — working software at every stage,
 not infrastructure waiting for features.
@@ -280,30 +284,40 @@ Core deliverable: P0 technical debt resolved; compliance scan clean;
 defensive programming standards codified. See GitHub Releases for full
 delivery record.
 
-**Milestone 8 — Ecological and Governance Frameworks (Current)**
-Core deliverable: All four radar axes live; ecological and governance
-composite scores non-null for the first time.
+**Milestone 8 — Ecological and Governance Frameworks (Complete — v0.8.0)**
+Core deliverable: Three live radar axes for the first time; honest-null
+governance axis; Greece 2010–2015 six-step demo; Case B UX architecture verdict.
+
+Delivered:
+- EcologicalModule: CO2 boundary proximity (Rockström 2009 350 ppm); land-use
+  proximity; three-branch composite strategy dispatch; STOCK delta path contract
+- Governance: honest-null axis — dashed hollow dot, "Governance — in validation"
+  label, `computeFinalScore(null) → null` (GovernanceModule deferred to M9;
+  five promotion criteria not met at M8)
+- Greece 2010–2015: six-step fixture; step 5 (2014) thesis frame; CO2 seed
+  (NOAA MLO 388 ppm); ecological composite live from step 1
+- PMM Zone 1C placeholder widget (live computation deferred to M9)
+- MDA threshold system extended to ecological indicators
+- ADR-005 Amendment 3 (eight M8 decisions); SCAN-022 clean
+- Demo infrastructure: narrated Playwright spec; five thesis frames captured
+- UX Design Thinking: Case B verdict — instrument/context relationship inverted;
+  five M9 governing premises; three-mode architecture formalised
+- CLAUDE.md structural refactor; simulation-framework.md extracted
+- Synthetic data framework: Chief Methodologist consultation complete (PR #373)
+
+**Milestone 9 — Standards Foundation (Current)**
+Core deliverable: GovernanceModule promotion, UX architecture rethink executed,
+user personas, synthetic data framework ADR.
 
 Scope:
-- Ecological Module complete (planetary boundaries, natural capital depletion)
-- Governance Module complete (institutional quality, political freedom, rule of law)
-- All four radar chart axes live with real data
-- Coffin Corner indicator: Policy Maneuver Margin Zone 1 widget
-- MDA threshold system extended to ecological and governance indicators
-- ADR-005 reviewed and extended for Ecological/Governance framework coverage
-- End-of-milestone demo scenario (Greece 2010–2012 candidate)
-
-**Milestone 9 — Standards Foundation**
-Core deliverable: Canonical unit registry, field-level data certification,
-and legibility framework. STD-REVIEW-004 gaps resolved.
-
-Scope:
-- Canonical unit registry replacing `unit="dimensionless"` placeholders
-- Field-level certification chain and data admission tests
+- GovernanceModule promotion path (five criteria)
+- UX architecture rethink (Case B): instrument cluster in primary viewport;
+  control plane zone reserved; trajectory view as primary instrument
+- User persona document (five personas, marquee acceptance cases per use case)
+- Synthetic data framework ADR (ADR-007)
+- Agent working agreements and RACI chart (15 agents)
 - WGI territorial conventions documented
-- Legibility baseline audit and North Star legibility section
-- Domain Intelligence Council blind stakeholder interviews
-- M7 orphan issues triaged and closed
+- M8 DEMO issues #342–#350 re-triaged
 
 **Milestone 10 — Engine Integrity and Backtesting**
 Core deliverable: Mean-reversion channels, Ecuador backtesting case,
@@ -321,7 +335,7 @@ polished; branch protection and second governance account established.
 Core deliverable: Methodology publication and external validation;
 Technical Steering Committee formation; public launch.
 
-Full roadmap: `docs/roadmap/milestone-roadmap-m6-m8.md`
+Full roadmap: `docs/roadmap/milestone-roadmap-m6-m8.md` (M9+ roadmap pending update)
 
 ---
 

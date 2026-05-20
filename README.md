@@ -3,7 +3,7 @@
 [![CI](https://github.com/PublicEnemage/worldsim/actions/workflows/ci.yml/badge.svg)](https://github.com/PublicEnemage/worldsim/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Python 3.12](https://img.shields.io/badge/python-3.12-blue.svg)](https://www.python.org/downloads/release/python-3120/)
-[![Release](https://img.shields.io/badge/release-v0.5.0%20M5%20complete-green)](https://github.com/PublicEnemage/worldsim/releases/tag/v0.5.0)
+[![Release](https://img.shields.io/badge/release-v0.8.0%20M8%20complete-green)](https://github.com/PublicEnemage/worldsim/releases/tag/v0.8.0)
 
 **An open-source geopolitical-economic simulation platform for governments and
 vulnerable actors navigating high-stakes decisions under uncertainty.**
@@ -47,20 +47,19 @@ not show.
 **The simulation is a structured reasoning tool, not a prediction engine.** It
 is designed to produce distributions, not point estimates — outputs carry
 confidence tiers, uncertainty bounds are quantified and displayed, and the
-model's blindspots are documented and visible. MacroeconomicModule with
-regime-dependent fiscal multipliers and a second backtesting case
-(Argentina 2001–2002) shipped in Milestone 5; full distribution propagation
-across all outputs is Milestone 6 scope.
+model's blindspots are documented and visible. Three of four measurement
+framework axes are live at Milestone 8 (financial, human development,
+ecological); governance renders as an honest-null axis pending module certification.
 
 **This tool is in active pre-release development.** The working software
-described below reflects Milestone 5. It is not yet usable for consequential
+described below reflects Milestone 8. It is not yet usable for consequential
 analysis.
 
 ---
 
 ## What's Built
 
-The working system at Milestone 5:
+The working system at Milestone 8:
 
 - **Simulation engine** — Event-driven graph in Python. The `Quantity` type
   system tracks `value: Decimal`, unit, variable type (STOCK/FLOW/RATIO/
@@ -72,48 +71,59 @@ The working system at Milestone 5:
   regime-dependent fiscal multipliers: standard multiplier (0.8) in healthy
   conditions; elevated multiplier (1.5) in depressed regimes (unemployment
   above 15%). Processes FiscalPolicyInput, MonetaryRateInput, and
-  EmergencyPolicyInput events. Validated against the Argentina 2001-2002
-  backtesting case.
+  EmergencyPolicyInput events.
+
+- **EcologicalModule** — Planetary boundary proximity scoring live at M8.
+  CO2 concentration tracked against the Rockström 2009 350 ppm boundary
+  (confidence tier 2). Land-use pressure index tracked against the Richardson
+  2023 boundary. Composite score: unweighted mean of boundary proximity scores.
+  STOCK delta path emits new absolute levels (not raw deltas) — the propagation
+  engine replaces STOCK attributes.
 
 - **Database** — PostgreSQL/PostGIS with 177 country entities loaded from
-  Natural Earth 110m boundary data, 10 attributes per entity. Five declared
-  territorial positions (Taiwan, Palestine, Kosovo, Western Sahara, Crimea)
-  are enforced by a hard-gate validator on every database INSERT.
-  `backtesting_thresholds` table holds DIRECTION_ONLY, MAGNITUDE, and
-  DISTRIBUTION_COMBINED fidelity thresholds for each historical case.
+  Natural Earth 110m boundary data. Five declared territorial positions
+  (Taiwan, Palestine, Kosovo, Western Sahara, Crimea) are enforced by a
+  hard-gate validator on every database INSERT. `backtesting_thresholds`,
+  `simulation_reference_constants` (planetary boundary values with temporal
+  guards), and `scenario_deleted_tombstones` tables.
 
-- **Backend API** — FastAPI with 16 endpoints. Float prohibition enforced
-  end-to-end: `Quantity.value` is always `Decimal` in Python and `str` at
-  the API boundary. Measurement-output endpoint surfaces a
-  `single_entity_warning` flag when composite score is not meaningful.
+- **Backend API** — FastAPI. Float prohibition enforced end-to-end:
+  `Quantity.value` is always `Decimal` in Python and `str` at the API
+  boundary. Composite score computation via framework-dispatched strategy:
+  ecological uses boundary proximity; financial and human development use
+  percentile rank. Ecological is exempt from the single-entity guard
+  (boundary proximity is physically meaningful for one country).
 
 - **Scenario engine** — Create scenarios, advance step by step, compare two
   scenarios via delta choropleth. Scenario deletion writes a tombstone record
   enabling reconstruction from first principles under the determinism guarantee.
 
 - **Backtesting fixtures** — Two validated historical cases:
-  - *Greece 2010–2012*: fiscal adjustment under the IMF/EU program;
-    DIRECTION_ONLY GDP contraction thresholds
+  - *Greece 2010–2015*: six-step fixture; fiscal adjustment under the IMF/EU
+    program; CO2 ecological trajectory live from step 1 (NOAA MLO 388 ppm
+    seed); step 5 (2014) is the thesis frame — financial partial recovery,
+    human development depressed; DIRECTION_ONLY thresholds
   - *Argentina 2001–2002*: Zero Deficit Plan spending cut and sovereign
     default; DIRECTION_ONLY GDP contraction thresholds at both steps
   Both run in CI as a build gate — a backtesting regression is a build failure.
-  DISTRIBUTION_COMBINED threshold infrastructure is in place for magnitude
-  calibration in Milestone 6.
 
 - **Human Cost Ledger** — Multi-framework measurement output across financial,
   human development, ecological, and governance dimensions simultaneously, with
   equal visual weight to financial indicators. MDA (Minimum Descent Altitude)
   threshold system fires WARNING/CRITICAL/TERMINAL alerts when indicators cross
   hard floors. Demographic cohort model produces indicators by income quintile,
-  age band, and employment sector. Note: ecological and governance composite
-  scores are null at M5 — modules are planned for M6–M7; these axes render
-  with a ⊘ indicator in the dashboard.
+  age band, and employment sector. Governance composite score is honest-null
+  at M8 — the GovernanceModule is implemented but has not yet met its five
+  promotion criteria; it renders as a dashed axis labeled "Governance — in
+  validation" rather than showing zero (which would imply governance failure).
 
 - **Frontend** — React + MapLibre GL choropleth map; scenario panel and step
   controls; EntityDetailDrawer with a four-axis radar chart, MDA alert panel,
-  and per-framework indicator tables with collapsible cohort breakdowns; delta
-  choropleth for side-by-side scenario comparison. Playwright integration test
-  suite (3/3) covers the full create→advance→drawer flow.
+  and per-framework indicator tables. Zone 3A expandable ecological methodology
+  note. PMM (Policy Maneuver Margin) Zone 1C placeholder widget. Radar 250ms
+  animation with `prefers-reduced-motion` and null-axis guards. Delta
+  choropleth for side-by-side scenario comparison. Playwright E2E suite covers
+  the full create→advance→drawer flow.
 
 ---
 
@@ -129,7 +139,10 @@ The working system at Milestone 5:
 | M3 — Scenario Engine | ✅ Complete | v0.3.0 | Scenario create/advance/compare, Greece 2010–2012 backtesting fixture, tombstones |
 | M4 — Human Cost Ledger | ✅ Complete | [v0.4.0](https://github.com/PublicEnemage/worldsim/releases/tag/v0.4.0) | DemographicModule, MDA threshold system, radar chart dashboard, schema registry |
 | M5 — Calibration and Uncertainty | ✅ Complete | [v0.5.0](https://github.com/PublicEnemage/worldsim/releases/tag/v0.5.0) | MacroeconomicModule, Argentina backtesting, DISTRIBUTION_COMBINED thresholds, Playwright suite |
-| M6 — Backtesting Coverage Expansion | 🔧 In progress | — | Five historical cases, Ecological Module initial, Governance Module initial |
+| M6 — Backtesting Coverage Expansion | ✅ Complete | v0.6.0 | EcologicalModule initial, HumanDevelopmentModule, Greece 2010–2015 fixture extension |
+| M7 — Technical Foundation | ✅ Complete | v0.7.0 | P0 technical debt resolved; compliance scan clean; defensive programming standards |
+| M8 — Ecological and Governance Frameworks | ✅ Complete | [v0.8.0](https://github.com/PublicEnemage/worldsim/releases/tag/v0.8.0) | Three live radar axes; honest-null governance; Greece 2010–2015 demo; Case B UX verdict |
+| M9 — Standards Foundation | 🔧 In progress | — | GovernanceModule promotion, UX architecture rethink, user personas, ADR-007 |
 
 Full milestone history: [`CHANGELOG.md`](CHANGELOG.md). Live issue tracker:
 [GitHub Milestones](https://github.com/PublicEnemage/worldsim/milestones).
@@ -151,13 +164,13 @@ as optional annotations on the real results.
 
 **Backtesting as epistemic discipline.** Every model relationship is validated
 against historical cases before being trusted for forward projection. Two cases
-are implemented: Greece 2010–2012 (fiscal multiplier estimation error — IMF
-assumed ~0.5, empirical ~1.5) and Argentina 2001–2002 (Zero Deficit Plan
-pro-cyclical austerity and sovereign default). Both run DIRECTION_ONLY fidelity
-thresholds in CI; DISTRIBUTION_COMBINED magnitude calibration is Milestone 6
-scope. The gap between model prediction and historical outcome is not a failure
-— it is the primary signal for improvement. Additional cases (Thailand 1997,
-Lebanon 2019–2020) are planned for Milestone 6.
+are implemented: Greece 2010–2015 (fiscal multiplier estimation error — IMF
+assumed ~0.5, empirical ~1.5; extended to six steps at M8 with ecological CO2
+trajectory live) and Argentina 2001–2002 (Zero Deficit Plan pro-cyclical
+austerity and sovereign default). Both run DIRECTION_ONLY fidelity thresholds
+in CI. The gap between model prediction and historical outcome is not a failure
+— it is the primary signal for improvement. Mean-reversion channels and
+additional backtesting cases are Milestone 10 scope.
 
 **No false precision.** Outputs are designed to be distributions over scenarios
 conditional on stated assumptions, not point forecasts about the future.
@@ -245,10 +258,10 @@ standards at every milestone exit.
 
 ## Contributing
 
-External contribution infrastructure — documentation written for non-agent
-contributors, public methodology review, and Technical Steering Committee
-formation — is a Milestone 8 deliverable. **The project is not yet ready for
-general open-source contribution.**
+External contribution infrastructure — documentation for non-agent contributors,
+public methodology review, and Technical Steering Committee formation — is
+roadmapped for M9–M13. **The project is not yet ready for general open-source
+contribution.**
 
 What is valuable now:
 

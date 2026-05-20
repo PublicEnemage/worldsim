@@ -5,8 +5,8 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated:** 2026-05-19 (Issue #361 Chief Methodologist consultation complete — synthetic-data-consultation.md, five questions answered, ADR-007 outline produced)
-**Current milestone:** M8 → M9 transition — design foundation sequence in progress
+**Last updated:** 2026-05-19 (M8 formal close complete — v0.8.0 tagged and released; Issue #209 closed; CHANGELOG updated; demo recording attached)
+**Current milestone:** M9 — Standards Foundation
 
 ---
 
@@ -81,6 +81,7 @@ Twelve issues filed 2026-05-19. Must complete before M9 UX implementation begins
 
 | PR | Title | Date |
 |---|---|---|
+| v0.8.0 | GitHub Release — Milestone 8 formal close | 2026-05-19 |
 | #355 | docs(ux): M8 interaction model critique — UX Design Thinking Agent first activation (closes #353) | 2026-05-18 |
 | #354 | docs(process): add UX Design Thinking Agent to agents.md (closes #353) | 2026-05-18 |
 | #352 | chore(state): update SESSION_STATE.md — PR #351 open (IR issues #342–#350 + M8 walkthrough) | 2026-05-18 |
@@ -126,7 +127,7 @@ All Horizon:Immediate issues are now closed. M8 feature-complete.
 | Decision | Context | Status |
 |---|---|---|
 | GovernanceModule promotion path | Deferred from M8 demo — five criteria not yet met — target M9 | Decided: deferred |
-| M8 formal close / M9 kickoff | Issue #370 filed — gate: retrospective + compliance scan + Socratic Agent TEST + #209 exit checklist | Pending — see #370 |
+| M8 formal close / M9 kickoff | Issue #370 filed — gate: retrospective + compliance scan + Socratic Agent TEST + #209 exit checklist | Complete ✅ — v0.8.0 released, Issue #209 closed |
 | M9 UX architecture — EL Decision 1 (north-star formulation) | Five options incl. per-mode tasks (Mode 1: trajectory reconstruction; Mode 2: threshold-safe path construction; Mode 3: real-time steering). Load-bearing for all hierarchy changes. | Pending — see #364, gates after #363 |
 | M9 UX architecture — EL Decision 2 (viewport architecture) | Wrong question was Zone 1B vs 1C; correct question is primary viewport vs. drawer. Gates after #363 Gap 2. | Pending — see #364, gates after #363 |
 | M9 UX architecture — EL Decision 3 (comparison mode conditional) | Conditional (single→divergence timeline; multi→DeltaChoropleth) vs. supplemental. Mode 3 always temporal. | Pending — see #364, gates after #363 |
@@ -137,6 +138,7 @@ All Horizon:Immediate issues are now closed. M8 feature-complete.
 
 | Decision | Rationale | Date |
 |---|---|---|
+| M8 formal close complete | All six exit gates satisfied; v0.8.0 tagged and released; Issue #209 closed; CHANGELOG updated; demo recording attached to GitHub release | 2026-05-19 |
 | Issue #361 Chief Methodologist consultation — synthetic data framework | docs/architecture/synthetic-data-consultation.md (41.5k chars, 560 lines). Five questions answered. Method hierarchy: Bayesian > MICE > Bootstrap > structural extrapolation > structural absence. Three-condition meaninglessness threshold. MDA tier table (full/advisory/exploratory/none). Anomaly detection requires TSC sign-off, opt-in, Mode 3 excluded, governance indicators excluded. ADR-007 outline produced. PR #373. | 2026-05-19 |
 | Issue #359 implemented — CLAUDE.md structural refactor | docs/architecture/simulation-framework.md created (7.7k chars); CLAUDE.md reduced to 28,375 chars; role-based mandatory reading table added; three new principle sections (Platform Principle, Synthetic Data, UX Architectural Commitments); three-mode architecture referenced. PR #372. | 2026-05-19 |
 | Design foundation sequence filed — 12 issues #359–#370 | PM Agent: EXECUTE — all 12 design foundation issues filed in dependency order. Issues #359–#363 are Immediate horizon; #364–#369 are Near-Term; #370 (M8 formal close) is Immediate and runs in parallel. | 2026-05-19 |
