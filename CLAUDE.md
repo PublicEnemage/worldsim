@@ -18,6 +18,12 @@ exists, but whose government may make better decisions because it does.
 
 ---
 
+## Founding Document
+
+The reasoning behind every principle in this document is in `docs/vision/worldsim-founding-document.md`. Read it to understand the why beneath the what.
+
+---
+
 ## Session Continuity
 
 Before beginning any task, read these files in order:
