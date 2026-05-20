@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated:** 2026-05-19 (Issue #359 implemented — CLAUDE.md structural refactor, simulation-framework.md created, three new principle sections, role-based reading table)
+**Last updated:** 2026-05-19 (Issue #361 Chief Methodologist consultation complete — synthetic-data-consultation.md, five questions answered, ADR-007 outline produced)
 **Current milestone:** M8 → M9 transition — design foundation sequence in progress
 
 ---
@@ -136,6 +136,7 @@ All Horizon:Immediate issues are now closed. M8 feature-complete.
 
 | Decision | Rationale | Date |
 |---|---|---|
+| Issue #361 Chief Methodologist consultation — synthetic data framework | docs/architecture/synthetic-data-consultation.md (41.5k chars, 560 lines). Five questions answered. Method hierarchy: Bayesian > MICE > Bootstrap > structural extrapolation > structural absence. Three-condition meaninglessness threshold. MDA tier table (full/advisory/exploratory/none). Anomaly detection requires TSC sign-off, opt-in, Mode 3 excluded, governance indicators excluded. ADR-007 outline produced. PR TBD. | 2026-05-19 |
 | Issue #359 implemented — CLAUDE.md structural refactor | docs/architecture/simulation-framework.md created (7.7k chars); CLAUDE.md reduced to 28,375 chars; role-based mandatory reading table added; three new principle sections (Platform Principle, Synthetic Data, UX Architectural Commitments); three-mode architecture referenced. PR #372. | 2026-05-19 |
 | Design foundation sequence filed — 12 issues #359–#370 | PM Agent: EXECUTE — all 12 design foundation issues filed in dependency order. Issues #359–#363 are Immediate horizon; #364–#369 are Near-Term; #370 (M8 formal close) is Immediate and runs in parallel. | 2026-05-19 |
 | UX first principles review completed — Case B verdict (PR #356) | docs/ux/design-thinking/worldsim-ux-architecture-first-principles.md. Root finding: current UI inverts instrument/context relationship (choropleth primary, instruments in drawer). Mode 3 active control requires instruments always visible — current architecture fails this. Case B: rethink warranted before M9. Minimum rethink = three document changes + reserved control plane zone. Five M9 governing premises produced. Highest-priority action: update information-hierarchy.md governing principle. Decision 2 (timeline zone assignment) reframed as wrong question — defer and address as viewport architecture question. | 2026-05-18 |
