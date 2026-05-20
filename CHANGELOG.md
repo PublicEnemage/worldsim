@@ -5,6 +5,128 @@ closure ceremony defined in `docs/MILESTONE_RUNBOOK.md`.
 
 ---
 
+## v0.8.0 — Milestone 8: Ecological and Governance Frameworks (2026-05-19)
+
+### Summary
+
+Three live radar axes for the first time. Honest-null governance axis. Greece 2010–2015
+six-step scenario as the primary backtesting and demo fixture. Case B UX architecture
+verdict — rethink warranted before M9 implementation. Synthetic data framework
+consultation complete. CLAUDE.md structural refactor with satellite simulation-framework.md.
+
+### Delivered
+
+**EcologicalModule expansion (Issues #312, #313, #314 — PR #324)**
+- `_compute_composite_score()` three-branch strategy dispatch: ecological →
+  `_boundary_proximity_strategy` (boundary-normalized, absolute); financial/human_development
+  → validated percentile rank; unregistered → `[SIM-INTEGRITY]` WARNING + percentile rank fallback
+- Planetary boundary proximity indicators: `planetary_boundary_co2_proximity` (min(ppm/350, 2.0)),
+  `planetary_boundary_land_use_proximity` (min(index, 2.0) — no double-normalization per Decision M8-6)
+- `_SINGLE_ENTITY_GUARD_EXEMPT_FRAMEWORKS = frozenset({"ecological"})` — ecological exempt
+  because boundary proximity is physically meaningful for a single entity (Decision M8-2)
+- STOCK delta path contract: emit `current + elasticity_delta` (absolute level), not raw delta —
+  propagation engine replaces STOCK attributes; raw delta would corrupt all subsequent proximity
+  computations (PR #328 fix)
+- `simulation_reference_constants` table seeded: CO2 boundary 350 ppm (Rockström 2009),
+  land-use boundary 0.25 (Richardson 2023); temporal guards enforce effective_from dates
+- Migrations: `c1a4e7f2d9b3` (confidence_tier), `d2b5f8a3e6c4` (ecological MDA thresholds),
+  `b3c5d7e9f1a2` (reference constants seed)
+
+**ADR-005 Amendment 3 (Issue #218 — PR #309)**
+- Ecological Framework Completion: eight M8 decisions (M8-1 through M8-8)
+- Governs composite strategy dispatch, single-entity exemption, null axis rendering,
+  STOCK delta path contract, land-use double-normalization prevention
+
+**Greece fixture extension (Issues #284, #316 — PR #321)**
+- Steps 4–6 (2013–2015) actuals: capital controls, privatization, DIRECTION_ONLY thresholds
+- `ECOLOGICAL_COMPOSITE_DISCLOSURE` — honest disclosure of CO2-only composite for Greece
+  (land-use boundary constant effective 2023-09-13, post-dates scenario period)
+- CO2 seed: `co2_concentration_ppm = 388.0 ppm` (NOAA MLO 2010) in `initial_attributes`
+- `gdp_direction_step5_positive` moved to `deferred_thresholds` — mean-reversion channel
+  absent from MacroeconomicModule; deferred Issue #221 (M10)
+
+**Null governance axis (Issue #315 — PR #323)**
+- `RadarAxisDatum.composite_score: number | null` live on main
+- `GOVERNANCE_IN_VALIDATION_LABEL = "Governance — in validation"` (em dash — ADR-required constant)
+- `GOVERNANCE_IN_VALIDATION_TOOLTIP` — promotion criteria: 0 of 5 met at M8, target M9
+- `computeFinalScore(null, weight) → null` — honest null propagates to Recharts polygon gap
+- Null axis: dashed hollow SVG circle (`strokeDasharray="2 2"`, `fill="none"`); polygon vertex absent
+- Animation guard: `isAnimationActive = false` when any axis is null (undefined interpolation prevention)
+- DD-011 sentinel in `docs/frontend/design-decisions.md`
+- 10 Vitest tests
+
+**Frontend UX Areas 2–5 (Issues #317, #318, #319, #320 — PR #329)**
+- `INDICATOR_DISPLAY_NAMES` registry — human-readable labels for all M8 indicators
+- Zone 3A expandable ecological methodology note (`EcologicalNoteDrawer`)
+- PMM Zone 1C placeholder widget (`PolicyManoeuvreMeter`) — null at M8, live at M9
+- Radar 250ms CSS transition animation with `prefers-reduced-motion` guard
+
+**Demo scenario assembly (Issue #269 — PR #328)**
+- `build_greece_demo_scenario()` in `tests/fixtures/greece_2010_scenario.py`
+- Six steps, EcologicalModule enabled, eight scheduled programme inputs
+- 5 backtesting tests in `tests/backtesting/test_greece_m8_demo.py`
+- CLI demo: `backend/scripts/demo_greece_2010_2015.py`
+
+**Demo infrastructure (PRs #334, #338, #339, #340)**
+- `docs/process/demo-preparation-standard.md` — nine-step biennial demo cadence
+- `demo-narrated.spec.ts` — narrated Playwright spec, M8 rewrite; excluded from CI
+  via `@demo` tag and `grep: /^(?!.*@demo)/`; uses `playwright.demo.config.ts` for
+  `headless: false`, `slowMo: 800`, `--start-fullscreen` (screen-recording mode)
+- `__worldsim_selectEntity` / `__worldsim_setAttributeName` window globals — DEV-only
+  test seam in `App.tsx` (`import.meta.env.DEV` guard); bypasses WebGL canvas for
+  reliable entity selection in headless Chromium
+- Five screenshots captured: frames A–E per UX Agent brief (Issue #233)
+- TTS voice: macOS "Zoe (Enhanced)" at 175 WPM
+- Independent Review Agent: 9 findings (DEMO-001–009), 2 CRITICAL, 4 SIGNIFICANT, 3 MINOR;
+  issues #342–#350 filed; Root Cause B (drawer density) explains DEMO-002/003/005/006
+
+**UX Design Thinking work stream (PRs #354, #355, #356)**
+- UX Design Thinking Agent activated — first activation, persona added to `agents.md`
+- M8 critique: `docs/ux/design-thinking/m8-interaction-model-critique.md`
+  — core diagnosis: WorldSim is a spatial comparison tool applied to a temporal problem
+- Panel synthesis: three-agent panel (UX Designer, Development Economist, Chief Methodologist)
+  — nine cross-cutting concerns; three EL decisions required
+- First-principles derivation: `docs/ux/design-thinking/worldsim-ux-architecture-first-principles.md`
+  — **Case B verdict**: current UI inverts instrument/context relationship;
+  architecture rethink warranted before M9 implementation
+- Five M9 governing premises codified; control plane zone reserved in layout
+
+**CLAUDE.md structural refactor (Issue #359 — PR #372)**
+- `docs/architecture/simulation-framework.md` extracted (mandatory reading for all agents)
+- Platform Principle, Synthetic Data framework, UX Architectural Commitments added
+- Role-based mandatory reading table (UX, Data/Backend, Architecture, Standards/Compliance)
+- Three-mode architecture (Mode 1: Replay, Mode 2: Simulation, Mode 3: Active Control) formalised
+
+**Synthetic data framework (Issue #361 — PR #373)**
+- Chief Methodologist consultation: `docs/architecture/synthetic-data-consultation.md` (560 lines)
+- Five-method hierarchy: Bayesian > MICE > Bootstrap > structural extrapolation > structural absence
+- Three-condition meaninglessness threshold; MDA tier table (full/advisory/exploratory/none)
+- Anomaly detection: requires TSC sign-off, opt-in, Mode 3 excluded, governance indicators excluded
+- ADR-007 outline produced
+
+**M8 exit compliance (PR #380)**
+- SCAN-022: 0 violations across all M8 changes
+
+### Deferred to M9
+
+- GovernanceModule composite score — five promotion criteria not yet met (Decision M8-4);
+  null axis and validation label are the M8 resolution
+- PMM live computation — placeholder at M8; target M9
+- Mean-reversion channel — Issue #221; `gdp_direction_step5_positive` in `deferred_thresholds`
+- DEMO issues #342–#350 — re-milestoned to M9
+
+### Compliance Posture
+
+- SCAN-022 — Milestone 8 exit gate: **Clean** (0 violations)
+- ADR license status at milestone close: ADR-001 CURRENT, ADR-002 CURRENT, ADR-005 CURRENT
+  (Amendment 3 merged PR #309)
+- GovernanceModule deferred per Decision M8-4: exception recorded with single-principal
+  governance acknowledgement per CLAUDE.md §Governance
+- Known limitation: `gdp_direction_step5_positive` at step 5 — model produces −0.434 vs
+  historical +0.007; mean-reversion channel absent; deferred to M10 (Issue #221)
+
+---
+
 ## v0.3.0 — Milestone 3: Scenario Engine (2026-04-24)
 
 ### Delivered
