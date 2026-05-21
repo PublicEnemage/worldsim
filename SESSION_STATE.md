@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated:** 2026-05-21 (PR #390 merged — UX first-principles depth, closes #363; Issue #364 now unblocked; PRs #383 #384 #385 still awaiting merge)
+**Last updated:** 2026-05-21 (EL Decisions 1/2/3 recorded on #364 — closed; four gap issues #392–#395 filed; Issue #365 now unblocked; PRs #383 #384 #385 still awaiting merge)
 **Current milestone:** M9 — Standards Foundation
 
 ---
@@ -55,11 +55,11 @@ Twelve issues filed 2026-05-19. Must complete before M9 UX implementation begins
 |---|---|---|---|
 | #363 ✅ | UX first-principles depth — close six gaps | M9 | #364 |
 
-**Step 5 — Near-Term (sequential from here; #364 now unblocked):****
+**Step 5 — Near-Term (sequential from here; #365 now unblocked):**
 
 | Issue | Title | Milestone | Blocks |
 |---|---|---|---|
-| #364 | EL decisions — north-star, viewport, comparison mode | M9 | #365 |
+| #364 ✅ | EL decisions — north-star, viewport, comparison mode | M9 | #365 |
 | #365 | UX document updates (north-star, info-hierarchy, journeys) | M9 | #366 #368 |
 | #366 | Trajectory view ADR | M9 | M9 Frontend Architect brief |
 | #367 | Persona-anchored IR review re-run (Persona 2) | M9 | #368 |
@@ -80,6 +80,8 @@ Twelve issues filed 2026-05-19. Must complete before M9 UX implementation begins
 | #384 | docs(process): agent working agreements — all 15 agents (closes #360) | 2026-05-20 |
 | #385 | docs(ux): user persona document — five personas, entry state taxonomy, marquee cases (closes #362) | 2026-05-20 |
 | #388 ✅ | docs(ux): persona-grounded UX review — Case B and governing premises vs. five personas (closes #387) | 2026-05-21 — MERGED |
+| #390 ✅ | docs(ux): UX first-principles depth — six gaps closed, revised six premises (closes #363) | 2026-05-21 — MERGED |
+| #391 | chore(state): SESSION_STATE.md — PR #390 merged; Issue #363 closed; Issue #364 unblocked | 2026-05-21 |
 
 ## Recently Merged PRs (last 5)
 
@@ -134,9 +136,9 @@ All Horizon:Immediate issues are now closed. M8 feature-complete.
 |---|---|---|
 | GovernanceModule promotion path | Deferred from M8 demo — five criteria not yet met — target M9 | Decided: deferred |
 | M8 formal close / M9 kickoff | Issue #370 filed — gate: retrospective + compliance scan + Socratic Agent TEST + #209 exit checklist | Complete ✅ — v0.8.0 released, Issue #209 closed |
-| M9 UX architecture — EL Decision 1 (north-star formulation) | Five options incl. per-mode tasks (Mode 1: trajectory reconstruction; Mode 2: threshold-safe path construction; Mode 3: real-time steering). Load-bearing for all hierarchy changes. Revised six premises now available to inform decision. | Pending — see #364 (now unblocked) |
-| M9 UX architecture — EL Decision 2 (viewport architecture) | Correct question: primary viewport vs. drawer. Gap 2B (entity selector) and Gap 5 (mode transition) in PR #390 provide additional specification. | Pending — see #364 (now unblocked) |
-| M9 UX architecture — EL Decision 3 (comparison mode conditional) | Conditional (single→divergence timeline; multi→DeltaChoropleth) vs. supplemental. Mode 3 always temporal. Gap 4 (live A/B) and Gap 5 (mode-specific delta panel) now specified. | Pending — see #364 (now unblocked) |
+| M9 UX architecture — EL Decision 1 (north-star formulation) | Adopted: per-mode formulation. Mode 1: trajectory reconstruction AND historical pattern recognition. Mode 2: threshold-safe path construction. Mode 3: real-time steering within human cost constraints. All 13 marquee cases validated. | Complete ✅ — recorded on #364 (2026-05-21) |
+| M9 UX architecture — EL Decision 2 (viewport architecture) | Adopted: primary viewport is the instrument cluster. Zone 1B vs 1C superseded. EntityDetailDrawer demoted to detail/methodology surface. Entity selector is persistent header element. | Complete ✅ — recorded on #364 (2026-05-21) |
+| M9 UX architecture — EL Decision 3 (comparison mode conditional) | Adopted: conditional switch extended to all three modes. Single-entity Mode 2: divergence timeline. Multi-entity Mode 2: DeltaChoropleth. Mode 3: automatic live A/B (no invoke). DeltaChoropleth deprecated for single-entity and Mode 3. | Complete ✅ — recorded on #364 (2026-05-21) |
 
 ---
 
@@ -144,6 +146,7 @@ All Horizon:Immediate issues are now closed. M8 feature-complete.
 
 | Decision | Rationale | Date |
 |---|---|---|
+| EL Decisions 1/2/3 recorded — Issue #364 closed; Issue #365 unblocked; four gap issues filed | Decision 1 (north-star): per-mode formulation adopted — Mode 1: trajectory reconstruction AND historical pattern recognition; Mode 2: threshold-safe path construction; Mode 3: real-time steering within human cost constraints. All 13 marquee cases validated. Two M11 gaps correctly surfaced (Argentina/Ukraine political economy constraint); two engineering gaps filed (#393 Mode 1→2 transition, #394 multi-scenario comparison). Decision 2 (viewport): instrument cluster as primary viewport adopted; EntityDetailDrawer demoted to detail/methodology; entity selector as persistent header element. Decision 3 (comparison): conditional switch extended to Mode 3 — automatic live A/B with no invoke required; DeltaChoropleth deprecated for single-entity and Mode 3. Four gap issues: #392 (M11 political economy), #393 (Mode 1→2 transition), #394 (multi-scenario), #395 (step_event_label mandatory). Issue #364 closed. Issue #365 (UX document updates) now unblocked. | 2026-05-21 |
 | Issue #363 implemented — UX first-principles depth (PR #390 merged) | docs/ux/design-thinking/worldsim-ux-architecture-first-principles-depth.md. Six gaps closed. Gap 1A: Mode 3 walkthrough for Eleni (February 2012), 10-component Frontend Architect requirement table. Gap 1B: mandatory Mode 1 step axis annotation — three fixture fields (effective_from, step_event_label, step_significance); missing step_event_label on SIGNIFICANT steps is an incomplete fixture. Gap 2: three analogy breaks qualified (atomic simultaneous updates; entity selector always visible; Tier 4 instrument visual differentiation). Gap 3: blue/orange cross-layer visual system for policy inputs vs. exogenous shocks; causal attribution in alert text is the negotiating instrument. Gap 4: Mode 3 live A/B comparison is automatic — any control input creates the split; ghost baseline at 50% opacity with divergence fill region. Gap 5: mode transition design — persistent vs. mode-specific instruments; single modal confirmation only for unsaved state loss. Revised six governing premises: Premise 3 mandated with Mode 1 step annotation (most consequential); Premise 4 extended for multiple Mode 1 cognitive tasks; Premise 6 new (methodology as Zone 2 mandatory). Issue #364 unblocked. | 2026-05-21 |
 | Issue #387 implemented — persona-grounded UX review (PR #388) | docs/ux/design-thinking/persona-grounded-ux-review.md. Three activations: UX Design Thinking Agent (Q1–Q3), Development Economist (Eleni February 2012 walkthrough), Political Economist (Andreas Preparatory state). Key finding: Case B holds for all five personas architecturally; four specification extensions required. Most consequential: step axis annotation (calendar date + event label) is mandatory in Mode 1 — without it, Premises 3 optimizes for Personas 1 and 2 while Personas 3 and 5 cannot orient. Issue #363 must accompany Persona 2 Gap 1 walkthrough with parallel Mode 1 specification for Persona 3 pattern recognition. | 2026-05-21 |
 | Issue #362 implemented — user persona document | docs/ux/personas.md (1352 lines). Five personas (8 dimensions each): Programme Analyst, Finance Ministry Negotiator, Political Advisor, Academic Researcher, Institutional Decision-Maker. Six entry states with 60-sec opening screen requirements and failure conditions. Five primary marquee cases (European sovereign debt history) with testable exit criteria. Five secondary marquee cases (Argentina, Egypt, Sri Lanka, Ukraine, Zambia) with structural gap verdicts. Three tertiary use cases as ingredient specifications (Canadian steel tariffs, Hormuz closure, Kenya budget). Product scope statement. Synthetic data framework integrated for Cases E/TC-2/TC-3. Platform principle applied throughout. EL review required before canonical. PR #385. | 2026-05-20 |
