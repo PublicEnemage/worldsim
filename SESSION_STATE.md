@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated:** 2026-05-20 (M9 design foundation sequence: #360 agent working agreements ✅, #362 user personas ✅; PRs #383 #384 #385 open; founding document committed; Issue #370 still open)
+**Last updated:** 2026-05-21 (PR #388 merged — persona-grounded UX review; Issue #387 closed; Issue #363 now fully unblocked; PRs #383 #384 #385 still awaiting merge)
 **Current milestone:** M9 — Standards Foundation
 
 ---
@@ -49,7 +49,7 @@ Twelve issues filed 2026-05-19. Must complete before M9 UX implementation begins
 |---|---|---|---|
 | #362 ✅ | User persona document (5 personas, marquee cases) | M9 | #363 #367 |
 
-**Step 4 — Immediate (requires #359 + #362):** NOW UNBLOCKED
+**Step 4 — Immediate (requires #359 + #362):** NOW UNBLOCKED — persona-grounded review (PR #388) adds four specification requirements to inform this work
 
 | Issue | Title | Milestone | Blocks |
 |---|---|---|---|
@@ -79,11 +79,13 @@ Twelve issues filed 2026-05-19. Must complete before M9 UX implementation begins
 | #383 | docs(vision): WorldSim founding document — synthesized from April-May 2026 founding conversations | 2026-05-20 |
 | #384 | docs(process): agent working agreements — all 15 agents (closes #360) | 2026-05-20 |
 | #385 | docs(ux): user persona document — five personas, entry state taxonomy, marquee cases (closes #362) | 2026-05-20 |
+| #388 ✅ | docs(ux): persona-grounded UX review — Case B and governing premises vs. five personas (closes #387) | 2026-05-21 — MERGED |
 
 ## Recently Merged PRs (last 5)
 
 | PR | Title | Date |
 |---|---|---|
+| #388 | docs(ux): persona-grounded UX review — Case B and governing premises vs. five personas (closes #387) | 2026-05-21 |
 | v0.8.0 | GitHub Release — Milestone 8 formal close | 2026-05-19 |
 | #355 | docs(ux): M8 interaction model critique — UX Design Thinking Agent first activation (closes #353) | 2026-05-18 |
 | #354 | docs(process): add UX Design Thinking Agent to agents.md (closes #353) | 2026-05-18 |
@@ -141,6 +143,7 @@ All Horizon:Immediate issues are now closed. M8 feature-complete.
 
 | Decision | Rationale | Date |
 |---|---|---|
+| Issue #387 implemented — persona-grounded UX review (PR #388) | docs/ux/design-thinking/persona-grounded-ux-review.md. Three activations: UX Design Thinking Agent (Q1–Q3), Development Economist (Eleni February 2012 walkthrough), Political Economist (Andreas Preparatory state). Key finding: Case B holds for all five personas architecturally; four specification extensions required. Most consequential: step axis annotation (calendar date + event label) is mandatory in Mode 1 — without it, Premises 3 optimizes for Personas 1 and 2 while Personas 3 and 5 cannot orient. Issue #363 must accompany Persona 2 Gap 1 walkthrough with parallel Mode 1 specification for Persona 3 pattern recognition. | 2026-05-21 |
 | Issue #362 implemented — user persona document | docs/ux/personas.md (1352 lines). Five personas (8 dimensions each): Programme Analyst, Finance Ministry Negotiator, Political Advisor, Academic Researcher, Institutional Decision-Maker. Six entry states with 60-sec opening screen requirements and failure conditions. Five primary marquee cases (European sovereign debt history) with testable exit criteria. Five secondary marquee cases (Argentina, Egypt, Sri Lanka, Ukraine, Zambia) with structural gap verdicts. Three tertiary use cases as ingredient specifications (Canadian steel tariffs, Hormuz closure, Kenya budget). Product scope statement. Synthetic data framework integrated for Cases E/TC-2/TC-3. Platform principle applied throughout. EL review required before canonical. PR #385. | 2026-05-20 |
 | Issue #360 implemented — 15 agent working agreements | docs/process/agents.md: 15 working agreements appended (one per agent) in each agent's own voice. Five sections: understanding of the mission, unique contribution, observable behavioral commitments, where the agent asks for help, where it offers help. PR #384. | 2026-05-20 |
 | Founding document committed | docs/vision/worldsim-founding-document.md created from April-May 2026 founding conversations (six parts: The Problem, The Analogy, The Principles, The Architecture, The Vision, Honest Limitations). CLAUDE.md §Founding Document reference added. PR #383. | 2026-05-20 |
