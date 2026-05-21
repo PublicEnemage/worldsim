@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated:** 2026-05-21 (PR #388 merged — persona-grounded UX review; Issue #387 closed; Issue #363 now fully unblocked; PRs #383 #384 #385 still awaiting merge)
+**Last updated:** 2026-05-21 (PR #390 open — UX first-principles depth, closes #363; Issue #364 now unblocked; PRs #383 #384 #385 still awaiting merge)
 **Current milestone:** M9 — Standards Foundation
 
 ---
@@ -49,13 +49,13 @@ Twelve issues filed 2026-05-19. Must complete before M9 UX implementation begins
 |---|---|---|---|
 | #362 ✅ | User persona document (5 personas, marquee cases) | M9 | #363 #367 |
 
-**Step 4 — Immediate (requires #359 + #362):** NOW UNBLOCKED — persona-grounded review (PR #388) adds four specification requirements to inform this work
+**Step 4 — Immediate (requires #359 + #362):** ✅ COMPLETE — PR #390 open (closes #363)
 
 | Issue | Title | Milestone | Blocks |
 |---|---|---|---|
-| #363 | UX first-principles depth — close six gaps | M9 | #364 |
+| #363 ✅ | UX first-principles depth — close six gaps | M9 | #364 |
 
-**Step 5 — Near-Term (sequential from here):**
+**Step 5 — Near-Term (sequential from here; #364 now unblocked):****
 
 | Issue | Title | Milestone | Blocks |
 |---|---|---|---|
@@ -80,6 +80,7 @@ Twelve issues filed 2026-05-19. Must complete before M9 UX implementation begins
 | #384 | docs(process): agent working agreements — all 15 agents (closes #360) | 2026-05-20 |
 | #385 | docs(ux): user persona document — five personas, entry state taxonomy, marquee cases (closes #362) | 2026-05-20 |
 | #388 ✅ | docs(ux): persona-grounded UX review — Case B and governing premises vs. five personas (closes #387) | 2026-05-21 — MERGED |
+| #390 | docs(ux): UX first-principles depth — six gaps closed, revised six premises (closes #363) | 2026-05-21 |
 
 ## Recently Merged PRs (last 5)
 
@@ -143,6 +144,7 @@ All Horizon:Immediate issues are now closed. M8 feature-complete.
 
 | Decision | Rationale | Date |
 |---|---|---|
+| Issue #363 implemented — UX first-principles depth (PR #390) | docs/ux/design-thinking/worldsim-ux-architecture-first-principles-depth.md (1,197 lines). Six gaps closed to Frontend Architect precision. Gap 1A: 20-minute Mode 3 walkthrough for Eleni (February 2012) with 10-component requirement table. Gap 1B: mandatory Mode 1 step axis annotation — three fixture schema fields (effective_from, step_event_label, step_significance); a Mode 1 fixture missing step_event_label on SIGNIFICANT steps is incomplete. Gap 2: three structural breaks in the flight simulator analogy (step-based vs. continuous; multi-entity; epistemic qualification) and premise qualifications derived. Gap 3: blue/orange cross-layer visual system for policy inputs vs. exogenous shocks; causal attribution in alert text is the negotiating instrument. Gap 4: Mode 3 live A/B comparison is automatic — any control input creates the A/B split; ghost baseline curves at 50% opacity with divergence fill region. Gap 5: mode transition design — persistent vs. mode-specific instruments; explicit user action required; single modal confirmation only for unsaved state loss. Revised six governing premises: Premise 3 mandated with Mode 1 step annotation (most consequential change); Premise 4 extended to acknowledge multiple cognitive tasks within Mode 1; Premise 6 (new) — methodology as Zone 2 mandatory. Issue #364 now unblocked. | 2026-05-21 |
 | Issue #387 implemented — persona-grounded UX review (PR #388) | docs/ux/design-thinking/persona-grounded-ux-review.md. Three activations: UX Design Thinking Agent (Q1–Q3), Development Economist (Eleni February 2012 walkthrough), Political Economist (Andreas Preparatory state). Key finding: Case B holds for all five personas architecturally; four specification extensions required. Most consequential: step axis annotation (calendar date + event label) is mandatory in Mode 1 — without it, Premises 3 optimizes for Personas 1 and 2 while Personas 3 and 5 cannot orient. Issue #363 must accompany Persona 2 Gap 1 walkthrough with parallel Mode 1 specification for Persona 3 pattern recognition. | 2026-05-21 |
 | Issue #362 implemented — user persona document | docs/ux/personas.md (1352 lines). Five personas (8 dimensions each): Programme Analyst, Finance Ministry Negotiator, Political Advisor, Academic Researcher, Institutional Decision-Maker. Six entry states with 60-sec opening screen requirements and failure conditions. Five primary marquee cases (European sovereign debt history) with testable exit criteria. Five secondary marquee cases (Argentina, Egypt, Sri Lanka, Ukraine, Zambia) with structural gap verdicts. Three tertiary use cases as ingredient specifications (Canadian steel tariffs, Hormuz closure, Kenya budget). Product scope statement. Synthetic data framework integrated for Cases E/TC-2/TC-3. Platform principle applied throughout. EL review required before canonical. PR #385. | 2026-05-20 |
 | Issue #360 implemented — 15 agent working agreements | docs/process/agents.md: 15 working agreements appended (one per agent) in each agent's own voice. Five sections: understanding of the mission, unique contribution, observable behavioral commitments, where the agent asks for help, where it offers help. PR #384. | 2026-05-20 |
