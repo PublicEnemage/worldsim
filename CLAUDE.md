@@ -232,6 +232,45 @@ All agents reference the relevant ADR before implementing any significant
 feature. All agents treat the human cost ledger as a primary output,
 never an afterthought.
 
+### PM Agent — Session Commands
+
+**PM Agent: HORIZON**
+Open-issue audit against current and upcoming Milestone definitions — surfaces
+scope creep, orphaned issues, and committed work at risk. Sweep sequence:
+1. **Open-issue audit** — review all open issues against current milestone definitions; surface scope creep, orphaned issues, and committed work at risk.
+2. **Board health** — confirm zero open issues without milestone assignment, zero without a `horizon:` label.
+3. **ARCH** — Architecture Backlog priority review (see PM Agent: ARCH definition below).
+4. **TRIAGE** — one verdict per new finding surfaced during the sweep.
+
+End with a recommended next action. Full persona: `docs/process/agents.md §PM Agent`.
+
+**PM Agent: ARCH**
+Architecture Backlog priority review. Read `docs/architecture/backlog.md`,
+`docs/roadmap/worldsim-roadmap.md`, and `docs/process/agent-raci.md`. Then:
+1. For each ASSIGNED entry: confirm empirical evidence is available. If not, state
+   what evidence is required. If yes, confirm panel composition per `agent-raci.md`
+   and verify the implementing agent is named.
+2. For each ASSIGNED entry: list what is blocked until that ADR is accepted. Rank
+   by downstream impact on the current milestone.
+3. Scan open issues for architectural candidates missing from the backlog:
+   ```
+   gh issue list --repo PublicEnemage/worldsim --state open \
+     --json number,title,labels,milestone --limit 200 | python3 -c "
+   import json,sys
+   issues = json.load(sys.stdin)
+   candidates = [i for i in issues if any(kw in i['title'].lower()
+     for kw in ['adr','arch(','architecture:','arch:','decision record'])]
+   for i in candidates: print(f'#{i[\"number\"]} {i[\"title\"][:70]}')
+   "
+   ```
+   Flag any candidate not in the backlog as PENDING_NUMBER.
+4. Produce a priority table:
+   `| Rank | ADR | Evidence ready? | Implementing agent | Blocks | Action |`
+5. State the single recommended next action in one sentence.
+   End with: "Awaiting Engineering Lead decision before activating any ADR."
+
+This is a read-and-report task. Do not activate the Architect Agent. Do not begin drafting.
+
 ---
 
 ## Domain Intelligence Council
