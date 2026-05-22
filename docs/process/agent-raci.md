@@ -424,3 +424,32 @@ notified in every case.
 
 *See also: `docs/process/disposition-review-standard.md` for the RACI applied to the specific
 case of standards gap dispositions.*
+
+---
+
+## ADR Panel Composition
+
+When an ADR is being drafted, the Architect Agent derives the panel from this RACI chart.
+Any agent with R or C assignment for the relevant decision type is either included or
+their exclusion is documented with rationale.
+
+The implementing agent — the agent responsible for building what the ADR commits to —
+is always required regardless of panel size. This rule was established after ADR-008's
+panel was initially drafted without the Frontend Architect, who is the primary
+implementer of all frontend architecture decisions. See Issue #397 comment
+2026-05-22 for the correction record.
+
+Minimum panels by ADR type (derived from the RACI matrix above):
+
+| ADR type | RACI row | Required panel members |
+|---|---|---|
+| Frontend architecture | Row 1 (Architectural decisions) | Architect Agent (author), Frontend Architect Agent (C), Engineering Lead (A) |
+| Simulation engine | Row 1 (Architectural decisions) | Architect Agent (author), Chief Engineer Agent (C), Chief Methodologist (via DI — C), Engineering Lead (A) |
+| Data standards | Row 4 (Data / schema decisions) | Architect Agent (C), Chief Methodologist (via DI — C), Development Economist (domain validation), Engineering Lead (A) |
+| UX design | Row 2/3 (UX frame / component decisions) | Architect Agent (C), UX Designer Agent (R), Frontend Architect Agent (C), Engineering Lead (A) |
+| Cross-cutting | All relevant rows | Relevant R/C agents per RACI, Engineering Lead (A) |
+
+The Architect Agent authors the ADR — they are not a reviewer. The Engineering Lead
+holds A on all ADR decisions — their sign-off is always required.
+
+Full backlog and panel composition process: `docs/architecture/backlog.md`

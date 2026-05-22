@@ -297,6 +297,24 @@ suffices — no ADR required unless the fix reveals a design issue.
 
 ---
 
+## ADR Process
+
+All significant architectural decisions require an Architecture Decision Record
+before implementation begins. The process:
+
+1. File a GitHub issue describing the architectural question — no ADR number in the title
+2. The PM Agent HORIZON sweep reviews the Architecture Backlog for priority
+3. The Architect Agent claims the next available number from `docs/architecture/backlog.md`
+4. The Architect Agent consults `docs/process/agent-raci.md` to derive the panel
+5. The implementing agent must be in the panel — this is not optional
+6. The Architect Agent drafts the ADR; the panel reviews; the Engineering Lead signs off
+7. Status moves to ACCEPTED; the backlog entry is updated
+
+The Architecture Backlog (`docs/architecture/backlog.md`) is the authoritative
+source for ADR numbers and status. Do not assign ADR numbers informally.
+
+---
+
 ## Contribution Workflow
 
 ### Branch Naming
