@@ -1,0 +1,44 @@
+---
+title: ADR-008 WorldSim Viewport Zone Architecture
+---
+graph TD
+    subgraph PRIMARY_VIEWPORT["Primary Viewport (instrument cluster)"]
+        subgraph PERSISTENT_HEADER["Persistent Header (above all zones)"]
+            MODE_IND["Mode Indicator\n(MODE 1—REPLAY / MODE 2—SIMULATION / MODE 3—ACTIVE CONTROL)"]
+            ENTITY_SEL["Entity Selector\n(current entity name; toggle/dropdown in multi-entity scenarios)"]
+        end
+        subgraph ZONE1["Zone 1 — Primary (no interaction required)"]
+            Z1A["1A — Trajectory View\n(four composite score curves on shared step axis;\nMDA floor lines; event annotation in Mode 1;\nbaseline ghost curves in Mode 3)"]
+            Z1B["1B — MDA Alert Panel\n(top 1–3 alerts without scroll;\nseverity + indicator + step + cohort;\ncausal attribution in Mode 3)"]
+            Z1C["1C — PMM Widget\n(policy maneuver margin;\nmode-specific header label;\ntrend arrow updated per control input in Mode 3)"]
+            Z1D["1D — Four-Framework Current Position\n(financial / human development / ecological / governance\ncomposite scores at current step; atomic updates)"]
+        end
+        subgraph CONTROL_PLANE_ZONE["Control Plane Reserved Zone (adjacent to Zone 1)"]
+            CP_MODE1["Mode 1: EMPTY (reserved)"]
+            CP_MODE2["Mode 2: Scenario configuration surface"]
+            CP_MODE3["Mode 3: Policy instruments form (blue)\n+ Scenario shocks form (orange)\n+ Applied inputs/injected shocks history"]
+        end
+    end
+    subgraph NAVIGABLE_CONTEXT["Navigable Context (not primary viewport)"]
+        CHOROPLETH["Geographic Context View\n(choropleth — always navigable;\nnever primary viewport element)"]
+    end
+    subgraph ZONE2["Zone 2 — Secondary (one scroll or one click)"]
+        Z2A["2A — Radar Chart\n(four-dimensional deformation view;\nall four axes simultaneously)"]
+        Z2B["2B — Framework Panels\n(financial / human_development / ecological / governance\nindicator detail; confidence tier; cohort breakdown)"]
+        Z2C["2C — Distribution Bands (M5+)\n(uncertainty bands on individual indicators)"]
+    end
+    subgraph ZONE3["Zone 3 — Tertiary (deliberate navigation)"]
+        Z3A["3A — Methodology Notes and Mandatory Disclosures\n(ia1_disclosure; ecological note; data source citations)"]
+        Z3B["3B — Raw Indicator Tables"]
+        Z3C["3C — Backtesting Fidelity Dashboard"]
+    end
+    subgraph ENTITY_DETAIL_DRAWER["EntityDetailDrawer (detail and methodology surface)"]
+        DRAWER_DETAIL["Zone 2/3 expansion surface\n(indicator detail; cohort breakdowns; methodology notes)\nNo primary instrument lives here"]
+    end
+
+    PERSISTENT_HEADER --> ZONE1
+    ZONE1 --> CONTROL_PLANE_ZONE
+    ZONE1 --> ZONE2
+    ZONE2 --> ZONE3
+    ZONE2 --> ENTITY_DETAIL_DRAWER
+    CHOROPLETH -.-> ENTITY_DETAIL_DRAWER
