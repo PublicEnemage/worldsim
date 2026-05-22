@@ -84,6 +84,36 @@ significant feature without a referenced ADR does not merge.
 
 ---
 
+## Roadmap Update
+
+The roadmap document (`docs/roadmap/worldsim-roadmap.md`) is a mandatory update at every milestone close. This is part of the exit ceremony, not a separate activity.
+
+### When to update
+- **Always at milestone close:** Confirm the roadmap accurately reflects the next milestone's scope. If scope has changed, update with a dated rationale note.
+- **When a significant scope decision is made mid-milestone:** If an ADR acceptance, a new marquee case, or an EL decision materially changes a future milestone's shape, update the roadmap immediately — do not wait for milestone close.
+
+### How to update
+1. Read `docs/roadmap/worldsim-roadmap.md` in full
+2. Compare against current SESSION_STATE.md and any scope decisions made since the last revision
+3. Update the affected milestone section(s) with the specific change and a dated rationale note
+4. Update the revision header: `Last significant revision`, `Next mandatory review`, `Updated against`
+5. Commit on a branch, open PR, merge as part of the milestone exit PR or as a companion PR
+
+### What counts as a material change requiring immediate update
+- A milestone's core deliverable changes
+- A demo anchor moves to a different milestone
+- An issue is re-milestoned that affects the milestone's shape (not routine triage)
+- An ADR is accepted that changes the sequencing of future work
+
+### What does not require an immediate update
+- Routine issue triage within a milestone
+- Horizon label changes that don't affect milestone scope
+- New issues filed within existing milestone scope
+
+The roadmap is not silently overwritten. Every update includes a dated note explaining what changed and why. The change history is the accountability mechanism.
+
+---
+
 ## Milestone Closure Ceremony
 
 Performed when all exit checklist items are confirmed green.

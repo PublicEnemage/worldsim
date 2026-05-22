@@ -285,63 +285,17 @@ not infrastructure waiting for features.
 
 ## Milestone Roadmap
 
-**Milestone 7 — Technical Foundation (Complete — v0.7.0)**
-Core deliverable: P0 technical debt resolved; compliance scan clean;
-defensive programming standards codified. See GitHub Releases for full
-delivery record.
+M0–M8 complete (v0.1.0–v0.8.0). M9 current. See GitHub Releases for full delivery history.
 
-**Milestone 8 — Ecological and Governance Frameworks (Complete — v0.8.0)**
-Core deliverable: Three live radar axes for the first time; honest-null
-governance axis; Greece 2010–2015 six-step demo; Case B UX architecture verdict.
-
-Delivered:
-- EcologicalModule: CO2 boundary proximity (Rockström 2009 350 ppm); land-use
-  proximity; three-branch composite strategy dispatch; STOCK delta path contract
-- Governance: honest-null axis — dashed hollow dot, "Governance — in validation"
-  label, `computeFinalScore(null) → null` (GovernanceModule deferred to M9;
-  five promotion criteria not met at M8)
-- Greece 2010–2015: six-step fixture; step 5 (2014) thesis frame; CO2 seed
-  (NOAA MLO 388 ppm); ecological composite live from step 1
-- PMM Zone 1C placeholder widget (live computation deferred to M9)
-- MDA threshold system extended to ecological indicators
-- ADR-005 Amendment 3 (eight M8 decisions); SCAN-022 clean
-- Demo infrastructure: narrated Playwright spec; five thesis frames captured
-- UX Design Thinking: Case B verdict — instrument/context relationship inverted;
-  five M9 governing premises; three-mode architecture formalised
-- CLAUDE.md structural refactor; simulation-framework.md extracted
-- Synthetic data framework: Chief Methodologist consultation complete (PR #373)
+The full roadmap covering M9 through M13 — milestone deliverables, demo anchors, canonical users served, and the long-term resolution spectrum direction — is maintained at `docs/roadmap/worldsim-roadmap.md`. That document is the canonical reference. The summary below reflects current and next milestone only.
 
 **Milestone 9 — Standards Foundation (Current)**
-Core deliverable: GovernanceModule promotion, UX architecture rethink executed,
-user personas, synthetic data framework ADR.
+Core deliverable: UX design foundation, instrument cluster specification, agent working agreements, synthetic data framework, architecture backlog process.
 
-Scope:
-- GovernanceModule promotion path (five criteria)
-- UX architecture rethink (Case B): instrument cluster in primary viewport;
-  control plane zone reserved; trajectory view as primary instrument
-- User persona document (five personas, marquee acceptance cases per use case)
-- Synthetic data framework ADR (ADR-007)
-- Agent working agreements and RACI chart (15 agents)
-- WGI territorial conventions documented
-- M8 DEMO issues #342–#350 re-triaged
+**Milestone 10 — Engine Integrity and Instrument Delivery (Next)**
+Core deliverable: Instrument cluster redesign implemented, all four radar axes live, second country fixture. Demo 3.
 
-**Milestone 10 — Engine Integrity and Backtesting**
-Core deliverable: Mean-reversion channels, Ecuador backtesting case,
-sparse matrix propagation foundation, interpretability tooling suite.
-
-**Milestone 11 — Political Economy and Conditionality**
-Core deliverable: IMF conditionality modeling, political feasibility
-constraints, elite capture dynamics, debt sustainability extension.
-
-**Milestone 12 — Analyst Tooling and External Sector**
-Core deliverable: Trade and external sector module; analyst tooling
-polished; branch protection and second governance account established.
-
-**Milestone 13 — Methodology Publication**
-Core deliverable: Methodology publication and external validation;
-Technical Steering Committee formation; public launch.
-
-Full roadmap: `docs/roadmap/milestone-roadmap-m6-m8.md` (M9+ roadmap pending update)
+Full roadmap: `docs/roadmap/worldsim-roadmap.md`
 
 ---
 

@@ -1,3 +1,7 @@
+> **Archived:** This document covers the M6–M8 roadmap and is preserved as a historical record.
+> The current roadmap (M9–M13) is at `docs/roadmap/worldsim-roadmap.md`.
+> Last updated: 2026-05-22
+
 # Milestone Roadmap — M6 through M13
 
 > Extracted from CLAUDE.md at M4 exit (2026-04-26). Updated at M7 exit
