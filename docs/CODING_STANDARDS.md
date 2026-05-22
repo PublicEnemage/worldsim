@@ -1205,6 +1205,77 @@ eventually asks: "Why didn't you just use X?" Without it, the team relitigates
 rejected decisions. With it, the reasoning is durable across maintainer
 changes, session boundaries, and the passage of time.
 
+### Panel Review Is Mandatory for ADRs with a Named Panel
+
+Every ADR that names a review panel in its Validity Context must produce an
+ADR Panel Review document before the Engineering Lead accepts the ADR. The
+panel review is the formal record of the acceptance process.
+
+**Process:**
+
+1. **Architect Agent authors the ADR.** Status: Proposed. Panel named in
+   Validity Context. PR opened.
+
+2. **Each panel member reviews the ADR in the same session.** Reviewers are
+   activated per their working agreement (`docs/process/agents.md`). Each
+   reviewer produces findings classified by severity and ADR-change requirement.
+
+3. **Panel review document created** at `docs/adr/reviews/ADR-NNN-panel-review.md`.
+   The document captures: all findings, a disposition table, Architect Agent
+   disposition recommendations, FA Agent concurrence (if applicable), any
+   joint EL+UX rulings required, and an Engineering Lead decision block.
+
+4. **Architect Agent incorporates approved changes** into the ADR. The panel
+   review document's revision summary governs what changes. Findings
+   classified BRIEF are deferred to the implementing agent's brief — they do
+   not block ADR acceptance.
+
+5. **Engineering Lead accepts the ADR.** Status changes from Proposed →
+   Accepted. PR merged. Panel review document updated with EL decision record.
+
+**Panel Review Document Required Sections:**
+
+```markdown
+# ADR-NNN Panel Review
+
+## Panel
+Table: reviewer, role, sign-off status.
+
+## Findings Register
+Table: ID, source, severity, ADR change required?, status.
+
+## Full Finding Texts
+One subsection per reviewer. Finding text sufficient to stand alone
+without the session transcript.
+
+## Architect Agent Disposition Recommendations
+Disposition table (INCORPORATE / BRIEF / DEFER / LOG) with rationale
+per finding. Revision summary listing exact ADR changes if approved.
+
+## [Implementing Agent] Concurrence
+FA concurrence on findings relevant to implementation feasibility.
+
+## Pending Joint EL + UX Decisions
+Any binary rulings required from EL + UX Designer before FA brief begins.
+
+## Engineering Lead Decision Record
+Approval checkboxes per INCORPORATE item. EL sign-off line.
+```
+
+**Disposition categories:**
+
+| Category | Meaning |
+|---|---|
+| INCORPORATE | Change ADR text before EL acceptance |
+| BRIEF | Defer to implementing agent's brief; no ADR change needed |
+| DEFER | Defer to a named future ADR or document |
+| LOG | No action; finding recorded for institutional memory |
+
+The panel review document is a supplement to the ADR — it is not part of
+the ADR file itself. The ADR file records decisions; the panel review records
+the process by which those decisions were validated. Both are permanent
+artifacts. Do not merge the two.
+
 ---
 
 ## Agent Team Workflow Standards
