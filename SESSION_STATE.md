@@ -73,7 +73,6 @@ Twelve issues filed 2026-05-19. Must complete before M9 UX implementation begins
 | PR | Title | Date |
 |---|---|---|
 | #420 | docs(adr): ADR-010 accepted — EL decision recorded with rationale; ARCH-004 → ACCEPTED | 2026-05-22 |
-| #419 | docs(adr): ADR-010 — trajectory view component architecture (closes #366) | 2026-05-22 |
 | #417 | docs(process): ADR-008 panel review artifact and panel review process standard | 2026-05-22 |
 | #416 | docs(adr): ADR-008 — UX architecture: instrument cluster, viewport, and interaction model (closes #397) | 2026-05-22 |
 | #409 | docs(vision): WorldSim technical concepts — 18 architectural concepts with reasoning | 2026-05-22 |
@@ -95,6 +94,7 @@ Twelve issues filed 2026-05-19. Must complete before M9 UX implementation begins
 
 | PR | Title | Date |
 |---|---|---|
+| #419 | docs(adr): ADR-010 — trajectory view component architecture (closes #366) | 2026-05-22 |
 | #401 | docs(process): agent-raci.md — RACI chart for all 15 agents (closes #369, #301) | 2026-05-21 |
 | #399 | docs(ux): UX document updates — EL Decisions 1/2/3 (north-star, information-hierarchy, user-journeys) | 2026-05-21 |
 | #396 | chore(state): SESSION_STATE.md — EL Decisions 1/2/3 recorded; Issue #364 closed; Issues #392–#395 filed | 2026-05-21 |
@@ -160,10 +160,7 @@ All Horizon:Immediate issues are now closed. M8 feature-complete.
 
 | Decision | Rationale | Date |
 |---|---|---|
-<<<<<<< Updated upstream
-=======
 | ADR-010 drafted, panel-reviewed, and accepted | Architect Agent: EXECUTE. 10 decisions (Recharts SVG, GET /scenarios/{id}/trajectory endpoint, shared state atom, governance null rendering, composite-score-level MDA floors, Mode 1 step axis annotation, Mode 3 live A/B ghost curves and divergence fill, policy/shock markers, confidence tier visual, ADR-007-gated band infrastructure). 11 findings (4 INCORPORATE applied, 5 BRIEF, 1 LOG, 1 combined). EL approved all 4 INCORPORATE items with rationale recorded in `docs/adr/reviews/ADR-010-panel-review.md`. ADR-010 status: Accepted. M9 FA brief is unblocked. | 2026-05-22 |
->>>>>>> Stashed changes
 | ADR-008 accepted — PR open | All 6 INCORPORATE items applied to ADR-008. EL decision recorded in `docs/adr/reviews/ADR-008-panel-review.md`: all 6 approved; FA-C3 ruling = Option A (stacked forms, ~280px control plane zone). ADR-008 status: Accepted. ARCH-002 in backlog: ACCEPTED. Issue #397 closed. Five FA brief items (FA-C1–FA-C5) deferred to M9 FA brief — none reverse an ADR decision. | 2026-05-22 |
 | ADR-008 panel review artifact created — PR #417 | Full three-agent panel review completed and captured as `docs/adr/reviews/ADR-008-panel-review.md` (first instance of new artifact type). 12 findings registered: 4 from UX Designer (UX-F1–UX-F4), 5 from Frontend Architect (FA-C1–FA-C5), 3 from Chief Methodologist (CM-1–CM-3). Architect dispositions: 6 INCORPORATE, 3 BRIEF, 1 JOINT EL+UX RULING → BRIEF, 1 LOG, 1 BRIEF+Open Risks. FA concurrence recorded. EL decision record left blank for EL to complete. CLAUDE.md §Canonical Artifact Locations and CODING_STANDARDS.md §ADR Requirements updated to standardize panel review process for all future ADRs. | 2026-05-22 |
 | ADR-008 drafted — PR #416 | Architect Agent: EXECUTE activated. Read all required documents (backlog, agent-raci, Issue #364, first-principles-depth, north-star, information-hierarchy, user-journeys). 17 decisions covering viewport inversion, zone assignments, all three modes, blue/orange cross-layer visual system, confidence tier differentiation, Mode 1 step annotation (fixture CI gate), live A/B comparison (automatic), control plane reserved zone. Status: Proposed — pending four-member panel review (UX Designer, Frontend Architect, Chief Methodologist, Engineering Lead). | 2026-05-22 |
