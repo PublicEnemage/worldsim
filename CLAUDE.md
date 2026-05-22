@@ -232,6 +232,10 @@ All agents reference the relevant ADR before implementing any significant
 feature. All agents treat the human cost ledger as a primary output,
 never an afterthought.
 
+PM Agent commands (`BRIEF`, `TRIAGE`, `HORIZON`, `ARCH`, `FOCUS`, `EXECUTE`) and their
+full definitions, including the HORIZON sweep sequence and ARCH priority review
+protocol, are defined in `docs/process/agents.md §PM Agent`.
+
 ---
 
 ## Domain Intelligence Council

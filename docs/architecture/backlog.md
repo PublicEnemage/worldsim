@@ -54,3 +54,6 @@ the current session does not automatically take priority over an older pending e
 | ARCH-002 | #397 | UX architecture — instrument cluster, viewport, interaction model | 2026-05-21 | ASSIGNED — ADR-008 | 8 | M9 | Panel must include Frontend Architect per panel composition rule |
 | ARCH-003 | #217 | Simulation engine computation model — iterative vs. matrix | 2026-04-xx | ASSIGNED — ADR-009 | 9 | M11 | Do not author until M11 Phase 1 baseline benchmarks complete |
 | ARCH-004 | #366 | Trajectory view as primary instrument | 2026-05-21 | ASSIGNED — ADR-010 | 10 | M9 | Gates M9 Frontend Architect brief |
+| ARCH-005 | #222 | MacroeconomicModule contemporaneous processing path | 2026-05-22 | PENDING_NUMBER | — | M10 | Architectural change in M10 engine scope; evaluate at M10 kickoff whether ADR required before implementation |
+| ARCH-006 | #392 | Political economy constraint modeling | 2026-05-22 | PENDING_NUMBER | — | M11 | M11 scope; add before M11 kickoff ADR work begins |
+| ARCH-007 | #53 | Information Access Architecture — role-based output visibility | 2026-04-17 | PENDING_NUMBER | — | M12 | M12 scope; add before M12 ADR work begins |
