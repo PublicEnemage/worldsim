@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated:** 2026-05-21 (PR #399 merged — Issue #365 closed; three UX docs updated for EL Decisions 1/2/3; Issues #366 #368 unblocked; PRs #383 #384 #385 still awaiting merge)
+**Last updated:** 2026-05-21 (PR #401 open — agent-raci.md, closes #369 and #301; PR #399 merged — Issue #365 closed; Issues #366 #368 unblocked; PRs #383 #384 #385 still awaiting merge)
 **Current milestone:** M9 — Standards Foundation
 
 ---
@@ -64,7 +64,7 @@ Twelve issues filed 2026-05-19. Must complete before M9 UX implementation begins
 | #366 | Trajectory view ADR | M9 | M9 Frontend Architect brief |
 | #367 | Persona-anchored IR review re-run (Persona 2) | M9 | #368 |
 | #368 | DEMO issues re-triage #342–#350 | M9 | M9 DEMO sprint scope |
-| #369 | agent-raci.md — RACI chart for all 15 agents | M9 | Agent governance docs |
+| #369 ✅ | agent-raci.md — RACI chart for all 15 agents | M9 | Agent governance docs — PR #401 open |
 
 ---
 
@@ -85,6 +85,7 @@ Twelve issues filed 2026-05-19. Must complete before M9 UX implementation begins
 | #396 ✅ | chore(state): SESSION_STATE.md — EL Decisions 1/2/3 recorded; Issue #364 closed; Issues #392–#395 filed | 2026-05-21 — MERGED |
 | #399 ✅ | docs(ux): UX document updates — EL Decisions 1/2/3 (north-star, information-hierarchy, user-journeys) | 2026-05-21 — MERGED |
 | #400 | chore(state): SESSION_STATE.md — Issue #365 closed; PR #399 open | 2026-05-21 |
+| #401 | docs(process): agent-raci.md — RACI chart for all 15 agents (closes #369, #301) | 2026-05-21 |
 
 ## Recently Merged PRs (last 5)
 
