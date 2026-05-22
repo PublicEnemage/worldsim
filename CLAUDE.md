@@ -484,6 +484,7 @@ the artifact type and cannot be caught by CI.
 | Standards Reviews | `docs/standards/reviews/` | `STD-REVIEW-NNN-milestoneN.md` | New file per review |
 | Compliance Scan Registry | `docs/compliance/scan-registry.md` | Single file — append SCAN entries only | Append only; never create a new file; never insert mid-table |
 | Architecture Decision Records | `docs/adr/` | `ADR-NNN-short-name.md` | New file per decision |
+| ADR Panel Reviews | `docs/adr/reviews/` | `ADR-NNN-panel-review.md` | New file per ADR; one review per ADR number |
 | Module Capability Registry | `docs/scenarios/module-capability-registry.md` | Single file | Updated in place with each milestone |
 
 ### Pre-creation checklist for documents
