@@ -1,13 +1,13 @@
 # ADR-010: Trajectory View Component Architecture
 
 ## Status
-Proposed
+Accepted
 
 ## Validity Context
 
 **Standards Version:** 2026-05-22
 **Valid Until:** Milestone 10 — Engine Integrity and Instrument Delivery (Demo 3)
-**License Status:** PROPOSED — pending panel review
+**License Status:** ACCEPTED — 2026-05-22
 
 **Panel (required for acceptance):**
 - Frontend Architect Agent (C — implementing agent, required per panel composition rule)

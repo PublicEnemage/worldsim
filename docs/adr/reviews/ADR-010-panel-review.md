@@ -3,7 +3,7 @@
 > **Artifact type:** ADR Panel Review
 > **ADR:** ADR-010 — Trajectory View Component Architecture
 > **ADR file:** `docs/adr/ADR-010-trajectory-view.md`
-> **Status:** Disposition recommendations pending EL decision
+> **Status:** Accepted — EL decision recorded 2026-05-22
 > **Review date:** 2026-05-22
 > **Convention:** `docs/adr/reviews/ADR-NNN-panel-review.md`
 
@@ -16,7 +16,7 @@
 | Frontend Architect Agent | C — implementing agent (required per panel composition rule) | Conditional sign-off ✓ |
 | UX Designer Agent | C — Zone 1A component decisions | Conditional sign-off ✓ |
 | Chief Methodologist | C — confidence tier visual contracts, uncertainty band obligations | Conditional sign-off ✓ |
-| Engineering Lead | A — accountable on all ADR decisions | Pending |
+| Engineering Lead | A — accountable on all ADR decisions | Accepted ✓ (2026-05-22) |
 
 ---
 
@@ -207,24 +207,20 @@ completion (incorporated during review — pre-EL acceptance pass):
 
 ## Engineering Lead Decision Record
 
-*To be completed by the Engineering Lead.*
-
-**Review decision date:** ___________
+**Review decision date:** 2026-05-22
 
 **On the four INCORPORATE items (already applied to ADR text):**
 
 | Finding | Decision | Notes |
 |---|---|---|
-| FA-R3 (endpoint partial computation) | ☐ Approve ☐ Reject | |
-| FA-R4 + UD-R1 (color hex provisional + UX Designer authority) | ☐ Approve ☐ Reject | |
-| CM-R1 (band deferral placeholder) | ☐ Approve ☐ Reject | |
-| CM-R3 (composite-score floors only) | ☐ Approve ☐ Reject | |
+| FA-R3 (endpoint partial computation) | ☑ Approve | Dense array contract eliminates frontend null ambiguity. A null `composite_score` in a returned step has one meaning only: governance-in-validation. The alternative (sparse array with null = uncomputed) would require the frontend to distinguish two semantically different null values by position, which is brittle and untestable. Dense array is the correct contract. |
+| FA-R4 + UD-R1 (color hex provisional + UX Designer authority) | ☑ Approve | Separating criteria (Architect authority: distinguishable, CVD-accessible, sufficient contrast) from specific hex values (UX Designer authority) is correct RACI alignment. Provisional hex values allow the ADR to proceed without blocking on CVD validation. The UX Designer can revise the values after CVD simulation without triggering an ADR amendment — because the ADR commits to the criteria, not the specific values. This is the right boundary. |
+| CM-R1 (band deferral placeholder) | ☑ Approve | Silent deferrals violate the No False Precision principle. A Tier 3 curve without an uncertainty band is indistinguishable from a Tier 1 curve in the rendered view — a user expecting the band (because Zone 2B shows banded indicator values) receives no signal that the band is deferred, not absent for a methodological reason. The placeholder label `"(band rendering pending ADR-007)"` makes the deferral legible and consistent with the tool's epistemic transparency commitments. Disappears automatically when `ci_lower` becomes non-null; no removal step required. |
+| CM-R3 (composite-score floors only) | ☑ Approve | The trajectory view Y-axis is the composite score. MDA floor lines must operate on the same axis. Projecting indicator-level thresholds (e.g., `poverty_headcount < 0.40`) to a composite score floor value requires a mapping from indicator space to composite space — a mapping that implies false precision because many indicator combinations produce the same composite score. The projection is methodologically dishonest. Composite-score-level floors only; indicator-level threshold detail belongs in Zone 2B where the indicator-level axis is appropriate. |
 
 **ADR-010 final acceptance:**
 
-Once all INCORPORATE items are approved:
+☑ ADR-010 status changed from Proposed → Accepted
+☑ PR approved for merge
 
-☐ ADR-010 status changed from Proposed → Accepted
-☐ PR approved for merge
-
-**Engineering Lead sign-off:** ___________
+**Engineering Lead sign-off:** @PublicEnemage — 2026-05-22
