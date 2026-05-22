@@ -1,0 +1,73 @@
+---
+title: ADR-010 Trajectory View Component Architecture
+---
+graph TD
+    subgraph STATE["Shared Step State Atom (Decision 4)"]
+        SSA["ScenarioStepState\ncurrent_step · step_count\ntrajectory: TrajectoryResponse\nbaseline_trajectory: TrajectoryResponse|null\ncomputation_state: idle|computing|complete\nmode: MODE_1|MODE_2|MODE_3"]
+    end
+
+    subgraph API["Backend — Trajectory Data (Decision 2)"]
+        EP["GET /scenarios/{id}/trajectory\nTrajectoryResponse:\n  steps: TrajectoryStep[]\n  mda_floors: MDAFloor[]"]
+        BS["BandingEngine (ADR-006)\ncomputes ci_lower / ci_upper\nper step per framework\n(Tier 3-5 widths: ADR-007-gated)"]
+    end
+
+    subgraph TV["TrajectoryView Component (Decision 1 — Recharts ComposedChart)"]
+        subgraph CURVES["Primary Curve Layer — Decision 3"]
+            FIN["Line: Financial\nstroke=#2D6A8B\nconnectNulls=false"]
+            HD["Line: Human Development\nstroke=#C67C2E\nconnectNulls=false"]
+            ECO["Line: Ecological\nstroke=#3A7A4B\nconnectNulls=false"]
+            GOV["Line: Governance\nstroke=#5C4A8A\nconnectNulls=false\nnull→gap (Decision 5)"]
+        end
+
+        subgraph TIER["Confidence Tier Visual — Decision 10"]
+            T12["Tier 1-2: solid, opacity=1.0"]
+            T3["Tier 3: solid, opacity=0.75"]
+            T45["Tier 4-5: dashed='6 4', opacity=0.60\n+ badge in Legend"]
+        end
+
+        subgraph MDA_OVERLAY["MDA Floor Overlay — Decision 6"]
+            MFL["ReferenceLine per floor\nhorizontal, dashed='4 4'\nstroke=framework color @50%\nlabel: WARN|CRIT|TERM"]
+        end
+
+        subgraph AXIS["Step Axis — Decision 7"]
+            XAXIS_M1["Mode 1: Custom XAxis tick\nstep_index + effective_from + step_event_label\n(SIGNIFICANT: 3 fields; ROUTINE: 2 fields)"]
+            XAXIS_M23["Mode 2/3: Standard XAxis tick\nstep_index + projected_date"]
+        end
+
+        subgraph MODE3["Mode 3 Live A/B Layer — Decision 8"]
+            GHOST["Ghost Lines ×4\n(from baseline_trajectory)\nopacity=0.50, strokeWidth=1"]
+            ACTIVE["Active Lines ×4\n(from trajectory)\nopacity=1.0, strokeWidth=2"]
+            DFILL["Area: Divergence Fill ×4\nfill=framework color @5-10%\nappears when |active-baseline|>0.01"]
+        end
+
+        subgraph MARKERS["Policy / Shock Markers — Decision 9"]
+            PMARK["Blue filled dot ●\non affected curves at policy step\ncolor=#1A6BAF\ntooltip: ControlInput params"]
+            SMARK["Orange vertical ReferenceLine\nacross all curves at shock step\ncolor=#C45C00\nlabel: SHOCK type"]
+        end
+
+        subgraph BANDS["Uncertainty Band Layer — Decision 10 (ADR-007-gated)"]
+            BAREA["Area: ci_upper → ci_lower\nfillOpacity=0.08\ninactive until ADR-007 populates ci values"]
+        end
+    end
+
+    subgraph Z1SIBLINGS["Zone 1 Siblings (receive same shared state)"]
+        MDA_PANEL["1B — MDA Alert Panel"]
+        PMM["1C — PMM Widget"]
+        FFP["1D — Four-Framework Current Position"]
+    end
+
+    EP --> BS
+    BS --> SSA
+    EP --> SSA
+    SSA -- "trajectory data\ncurrent_step" --> TV
+    SSA -- "same state atom" --> MDA_PANEL
+    SSA -- "same state atom" --> PMM
+    SSA -- "same state atom" --> FFP
+
+    CURVES --> TIER
+    TIER --> TV
+    MDA_OVERLAY --> TV
+    AXIS --> TV
+    MODE3 --> TV
+    MARKERS --> TV
+    BANDS --> TV
