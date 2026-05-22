@@ -51,6 +51,6 @@ the current session does not automatically take priority over an older pending e
 | Entry | GitHub Issue | Title | Filed | Status | ADR # | Milestone | Notes |
 |---|---|---|---|---|---|---|---|
 | ARCH-001 | — | Synthetic data framework | 2026-05-19 | ASSIGNED — ADR-007 | 7 | M9 | CM consultation complete PR #373; formal ADR pending |
-| ARCH-002 | #397 | UX architecture — instrument cluster, viewport, interaction model | 2026-05-21 | ASSIGNED — ADR-008 | 8 | M9 | Panel must include Frontend Architect per panel composition rule |
+| ARCH-002 | #397 | UX architecture — instrument cluster, viewport, interaction model | 2026-05-21 | ACCEPTED — ADR-008 | 8 | M9 | Accepted 2026-05-22. Panel: UX Designer (conditional ✓), Frontend Architect (conditional ✓), Chief Methodologist (conditional ✓), Engineering Lead (accepted ✓). FA brief required before implementation. |
 | ARCH-003 | #217 | Simulation engine computation model — iterative vs. matrix | 2026-04-xx | ASSIGNED — ADR-009 | 9 | M11 | Do not author until M11 Phase 1 baseline benchmarks complete |
 | ARCH-004 | #366 | Trajectory view as primary instrument | 2026-05-21 | ASSIGNED — ADR-010 | 10 | M9 | Gates M9 Frontend Architect brief |
