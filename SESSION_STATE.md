@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated:** 2026-05-21 (Issue #365 closed — PR #399 opens UX document updates; three UX docs updated for EL Decisions 1/2/3; PRs #391 #396 merged; PRs #383 #384 #385 still awaiting merge)
+**Last updated:** 2026-05-21 (PR #401 merged — closes #369 #301 (agent-raci.md); PR #399 merged — closes #365; PRs #383 #384 #385 still awaiting merge)
 **Current milestone:** M9 — Standards Foundation
 
 ---
@@ -60,11 +60,11 @@ Twelve issues filed 2026-05-19. Must complete before M9 UX implementation begins
 | Issue | Title | Milestone | Blocks |
 |---|---|---|---|
 | #364 ✅ | EL decisions — north-star, viewport, comparison mode | M9 | #365 |
-| #365 ✅ | UX document updates (north-star, info-hierarchy, journeys) | M9 | #366 #368 — PR #399 open |
+| #365 ✅ | UX document updates (north-star, info-hierarchy, journeys) | M9 | #366 #368 — PR #399 merged ✅ |
 | #366 | Trajectory view ADR | M9 | M9 Frontend Architect brief |
 | #367 | Persona-anchored IR review re-run (Persona 2) | M9 | #368 |
 | #368 | DEMO issues re-triage #342–#350 | M9 | M9 DEMO sprint scope |
-| #369 | agent-raci.md — RACI chart for all 15 agents | M9 | Agent governance docs |
+| #369 ✅ | agent-raci.md — RACI chart for all 15 agents | M9 | Agent governance docs — PR #401 merged ✅ |
 
 ---
 
@@ -83,12 +83,14 @@ Twelve issues filed 2026-05-19. Must complete before M9 UX implementation begins
 | #390 ✅ | docs(ux): UX first-principles depth — six gaps closed, revised six premises (closes #363) | 2026-05-21 — MERGED |
 | #391 ✅ | chore(state): SESSION_STATE.md — PR #390 merged; Issue #363 closed; Issue #364 unblocked | 2026-05-21 — MERGED |
 | #396 ✅ | chore(state): SESSION_STATE.md — EL Decisions 1/2/3 recorded; Issue #364 closed; Issues #392–#395 filed | 2026-05-21 — MERGED |
-| #399 | docs(ux): UX document updates — EL Decisions 1/2/3 (north-star, information-hierarchy, user-journeys) | 2026-05-21 |
+| #399 ✅ | docs(ux): UX document updates — EL Decisions 1/2/3 (north-star, information-hierarchy, user-journeys) | 2026-05-21 — MERGED |
 
 ## Recently Merged PRs (last 5)
 
 | PR | Title | Date |
 |---|---|---|
+| #401 | docs(process): agent-raci.md — RACI chart for all 15 agents (closes #369, #301) | 2026-05-21 |
+| #399 | docs(ux): UX document updates — EL Decisions 1/2/3 (north-star, information-hierarchy, user-journeys) | 2026-05-21 |
 | #396 | chore(state): SESSION_STATE.md — EL Decisions 1/2/3 recorded; Issue #364 closed; Issues #392–#395 filed | 2026-05-21 |
 | #391 | chore(state): SESSION_STATE.md — PR #390 merged; Issue #363 closed; Issue #364 unblocked | 2026-05-21 |
 | #390 | docs(ux): UX first-principles depth — six gaps closed, revised six premises (closes #363) | 2026-05-21 |
