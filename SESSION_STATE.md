@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated:** 2026-05-21 (Issue #365 closed — PR #399 opens UX document updates; three UX docs updated for EL Decisions 1/2/3; PRs #391 #396 merged; PRs #383 #384 #385 still awaiting merge)
+**Last updated:** 2026-05-21 (PR #399 merged — Issue #365 closed; three UX docs updated for EL Decisions 1/2/3; Issues #366 #368 unblocked; PRs #383 #384 #385 still awaiting merge)
 **Current milestone:** M9 — Standards Foundation
 
 ---
@@ -55,12 +55,12 @@ Twelve issues filed 2026-05-19. Must complete before M9 UX implementation begins
 |---|---|---|---|
 | #363 ✅ | UX first-principles depth — close six gaps | M9 | #364 |
 
-**Step 5 — Near-Term (sequential from here; #365 now unblocked):**
+**Step 5 — Near-Term (sequential from here; #365 complete ✅; #366 #368 now unblocked):**
 
 | Issue | Title | Milestone | Blocks |
 |---|---|---|---|
 | #364 ✅ | EL decisions — north-star, viewport, comparison mode | M9 | #365 |
-| #365 ✅ | UX document updates (north-star, info-hierarchy, journeys) | M9 | #366 #368 — PR #399 open |
+| #365 ✅ | UX document updates (north-star, info-hierarchy, journeys) | M9 | #366 #368 — PR #399 merged ✅ |
 | #366 | Trajectory view ADR | M9 | M9 Frontend Architect brief |
 | #367 | Persona-anchored IR review re-run (Persona 2) | M9 | #368 |
 | #368 | DEMO issues re-triage #342–#350 | M9 | M9 DEMO sprint scope |
@@ -83,19 +83,18 @@ Twelve issues filed 2026-05-19. Must complete before M9 UX implementation begins
 | #390 ✅ | docs(ux): UX first-principles depth — six gaps closed, revised six premises (closes #363) | 2026-05-21 — MERGED |
 | #391 ✅ | chore(state): SESSION_STATE.md — PR #390 merged; Issue #363 closed; Issue #364 unblocked | 2026-05-21 — MERGED |
 | #396 ✅ | chore(state): SESSION_STATE.md — EL Decisions 1/2/3 recorded; Issue #364 closed; Issues #392–#395 filed | 2026-05-21 — MERGED |
-| #399 | docs(ux): UX document updates — EL Decisions 1/2/3 (north-star, information-hierarchy, user-journeys) | 2026-05-21 |
+| #399 ✅ | docs(ux): UX document updates — EL Decisions 1/2/3 (north-star, information-hierarchy, user-journeys) | 2026-05-21 — MERGED |
+| #400 | chore(state): SESSION_STATE.md — Issue #365 closed; PR #399 open | 2026-05-21 |
 
 ## Recently Merged PRs (last 5)
 
 | PR | Title | Date |
 |---|---|---|
+| #399 | docs(ux): UX document updates — EL Decisions 1/2/3 (north-star, information-hierarchy, user-journeys) | 2026-05-21 |
 | #396 | chore(state): SESSION_STATE.md — EL Decisions 1/2/3 recorded; Issue #364 closed; Issues #392–#395 filed | 2026-05-21 |
 | #391 | chore(state): SESSION_STATE.md — PR #390 merged; Issue #363 closed; Issue #364 unblocked | 2026-05-21 |
 | #390 | docs(ux): UX first-principles depth — six gaps closed, revised six premises (closes #363) | 2026-05-21 |
 | #388 | docs(ux): persona-grounded UX review — Case B and governing premises vs. five personas (closes #387) | 2026-05-21 |
-| v0.8.0 | GitHub Release — Milestone 8 formal close | 2026-05-19 |
-| #355 | docs(ux): M8 interaction model critique — UX Design Thinking Agent first activation (closes #353) | 2026-05-18 |
-| #354 | docs(process): add UX Design Thinking Agent to agents.md (closes #353) | 2026-05-18 |
 | #352 | chore(state): update SESSION_STATE.md — PR #351 open (IR issues #342–#350 + M8 walkthrough) | 2026-05-18 |
 | #351 | docs(demo): M8 IR review issues filed (#342–#350) + M8 stakeholder walkthrough | 2026-05-18 |
 | #340 | fix(demo): three demo polish fixes + M8 IR Agent stakeholder review | 2026-05-18 |
@@ -150,7 +149,6 @@ All Horizon:Immediate issues are now closed. M8 feature-complete.
 
 | Decision | Rationale | Date |
 |---|---|---|
-| Issue #365 closed — UX document updates PR #399 | north-star.md: §1 replaced with §Primary Cognitive Tasks by Mode (three per-mode formulations; M4-era 'threshold alarm detection' superseded); §2 extended to three modes; personas.md reference added. information-hierarchy.md: Governing Principle updated to per-mode framing; Zone 1 restructured — entity selector as persistent header, trajectory view as 1A primary, MDA alert panel 1B, PMM 1C, four-framework current position 1D; radar chart moved to Zone 2 (2A); EntityDetailDrawer demoted to detail/methodology surface; COMPARE_VIEW replaced with three-mode conditional (single-entity Mode 2: divergence timeline; multi-entity Mode 2: DeltaChoropleth; Mode 3: automatic live A/B); DeltaChoropleth deprecated for single-entity and Mode 3; Control Plane Reserved Zone section added; M9 hierarchy decisions table (8 decisions). user-journeys.md: Journey A Step 3 separated into advance (3a) and inspect (3b); Journey B Step 5 reframed as Mode 3 control input; Journey C (Mode 3 active control — Eleni February 2012) and Journey D (demonstrative entry state — Aicha Mbaye) added; dependency map extended to 15 rows across all four journeys and three modes. Issues #366 and #368 unblocked. | 2026-05-21 |
 | EL Decisions 1/2/3 recorded — Issue #364 closed; Issue #365 unblocked; four gap issues filed | Decision 1 (north-star): per-mode formulation adopted — Mode 1: trajectory reconstruction AND historical pattern recognition; Mode 2: threshold-safe path construction; Mode 3: real-time steering within human cost constraints. All 13 marquee cases validated. Two M11 gaps correctly surfaced (Argentina/Ukraine political economy constraint); two engineering gaps filed (#393 Mode 1→2 transition, #394 multi-scenario comparison). Decision 2 (viewport): instrument cluster as primary viewport adopted; EntityDetailDrawer demoted to detail/methodology; entity selector as persistent header element. Decision 3 (comparison): conditional switch extended to Mode 3 — automatic live A/B with no invoke required; DeltaChoropleth deprecated for single-entity and Mode 3. Four gap issues: #392 (M11 political economy), #393 (Mode 1→2 transition), #394 (multi-scenario), #395 (step_event_label mandatory). Issue #364 closed. Issue #365 (UX document updates) now unblocked. | 2026-05-21 |
 | Issue #363 implemented — UX first-principles depth (PR #390 merged) | docs/ux/design-thinking/worldsim-ux-architecture-first-principles-depth.md. Six gaps closed. Gap 1A: Mode 3 walkthrough for Eleni (February 2012), 10-component Frontend Architect requirement table. Gap 1B: mandatory Mode 1 step axis annotation — three fixture fields (effective_from, step_event_label, step_significance); missing step_event_label on SIGNIFICANT steps is an incomplete fixture. Gap 2: three analogy breaks qualified (atomic simultaneous updates; entity selector always visible; Tier 4 instrument visual differentiation). Gap 3: blue/orange cross-layer visual system for policy inputs vs. exogenous shocks; causal attribution in alert text is the negotiating instrument. Gap 4: Mode 3 live A/B comparison is automatic — any control input creates the split; ghost baseline at 50% opacity with divergence fill region. Gap 5: mode transition design — persistent vs. mode-specific instruments; single modal confirmation only for unsaved state loss. Revised six governing premises: Premise 3 mandated with Mode 1 step annotation (most consequential); Premise 4 extended for multiple Mode 1 cognitive tasks; Premise 6 new (methodology as Zone 2 mandatory). Issue #364 unblocked. | 2026-05-21 |
 | Issue #387 implemented — persona-grounded UX review (PR #388) | docs/ux/design-thinking/persona-grounded-ux-review.md. Three activations: UX Design Thinking Agent (Q1–Q3), Development Economist (Eleni February 2012 walkthrough), Political Economist (Andreas Preparatory state). Key finding: Case B holds for all five personas architecturally; four specification extensions required. Most consequential: step axis annotation (calendar date + event label) is mandatory in Mode 1 — without it, Premises 3 optimizes for Personas 1 and 2 while Personas 3 and 5 cannot orient. Issue #363 must accompany Persona 2 Gap 1 walkthrough with parallel Mode 1 specification for Persona 3 pattern recognition. | 2026-05-21 |
