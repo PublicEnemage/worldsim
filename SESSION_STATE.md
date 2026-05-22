@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated:** 2026-05-22 (docs/roadmap/worldsim-roadmap.md created — M9–M13 demo arc, milestone deliverables, resolution spectrum; CLAUDE.md §Milestone Roadmap compressed to pointer; MILESTONE_RUNBOOK.md §Roadmap Update added; milestone-roadmap-m6-m8.md archived; PR open)
+**Last updated:** 2026-05-22 (PR #408 merged — roadmap; PR #409 open — technical concepts document)
 **Current milestone:** M9 — Standards Foundation
 
 ---
@@ -72,6 +72,7 @@ Twelve issues filed 2026-05-19. Must complete before M9 UX implementation begins
 
 | PR | Title | Date |
 |---|---|---|
+| #409 | docs(vision): WorldSim technical concepts — 18 architectural concepts with reasoning | 2026-05-22 |
 | #408 | docs(roadmap): WorldSim roadmap M9–M13 with demo arc, long-term direction, and process integration | 2026-05-22 |
 | #356 | docs(ux): M8 interaction model critique — panel synthesis (UX Designer, Dev Economist, Chief Methodologist) | 2026-05-18 |
 | #371 | chore(state): design foundation sequence — 12 issues #359–#370 filed | 2026-05-19 |
