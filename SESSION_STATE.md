@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated:** 2026-05-22 (ADR-008 drafted — PR #416 open; panel review required before acceptance)
+**Last updated:** 2026-05-22 (ADR-008 panel review artifact created — PR #417 open; EL decisions pending before ADR-008 acceptance)
 **Current milestone:** M9 — Standards Foundation
 
 ---
@@ -72,6 +72,7 @@ Twelve issues filed 2026-05-19. Must complete before M9 UX implementation begins
 
 | PR | Title | Date |
 |---|---|---|
+| #417 | docs(process): ADR-008 panel review artifact and panel review process standard | 2026-05-22 |
 | #416 | docs(adr): ADR-008 — UX architecture: instrument cluster, viewport, and interaction model (closes #397) | 2026-05-22 |
 | #409 | docs(vision): WorldSim technical concepts — 18 architectural concepts with reasoning | 2026-05-22 |
 | #408 | docs(roadmap): WorldSim roadmap M9–M13 with demo arc, long-term direction, and process integration | 2026-05-22 |
@@ -143,7 +144,7 @@ All Horizon:Immediate issues are now closed. M8 feature-complete.
 
 | Decision | Context | Status |
 |---|---|---|
-| ADR-008 panel review | PR #416 open — Status: Proposed. Panel required: UX Designer, Frontend Architect (implementing agent), Chief Methodologist, Engineering Lead. ADR not mergeable until all four sign off. | Pending panel review |
+| ADR-008 panel review — EL decision record | PR #417 open. Panel review complete: all three agents (UX Designer, Frontend Architect, Chief Methodologist) have given conditional sign-off. Artifact: `docs/adr/reviews/ADR-008-panel-review.md`. EL must approve/reject 6 INCORPORATE items and make FA-C3 binary ruling (stacked ~280px vs. side-by-side ~560px control plane zone) before ADR-008 can be accepted. | Pending EL decisions |
 | GovernanceModule promotion path | Deferred from M8 demo — five criteria not yet met — target M9 | Decided: deferred |
 | M8 formal close / M9 kickoff | Issue #370 filed — gate: retrospective + compliance scan + Socratic Agent TEST + #209 exit checklist | Complete ✅ — v0.8.0 released, Issue #209 closed |
 | M9 UX architecture — EL Decision 1 (north-star formulation) | Adopted: per-mode formulation. Mode 1: trajectory reconstruction AND historical pattern recognition. Mode 2: threshold-safe path construction. Mode 3: real-time steering within human cost constraints. All 13 marquee cases validated. | Complete ✅ — recorded on #364 (2026-05-21) |
@@ -156,6 +157,7 @@ All Horizon:Immediate issues are now closed. M8 feature-complete.
 
 | Decision | Rationale | Date |
 |---|---|---|
+| ADR-008 panel review artifact created — PR #417 | Full three-agent panel review completed and captured as `docs/adr/reviews/ADR-008-panel-review.md` (first instance of new artifact type). 12 findings registered: 4 from UX Designer (UX-F1–UX-F4), 5 from Frontend Architect (FA-C1–FA-C5), 3 from Chief Methodologist (CM-1–CM-3). Architect dispositions: 6 INCORPORATE, 3 BRIEF, 1 JOINT EL+UX RULING → BRIEF, 1 LOG, 1 BRIEF+Open Risks. FA concurrence recorded. EL decision record left blank for EL to complete. CLAUDE.md §Canonical Artifact Locations and CODING_STANDARDS.md §ADR Requirements updated to standardize panel review process for all future ADRs. | 2026-05-22 |
 | ADR-008 drafted — PR #416 | Architect Agent: EXECUTE activated. Read all required documents (backlog, agent-raci, Issue #364, first-principles-depth, north-star, information-hierarchy, user-journeys). 17 decisions covering viewport inversion, zone assignments, all three modes, blue/orange cross-layer visual system, confidence tier differentiation, Mode 1 step annotation (fixture CI gate), live A/B comparison (automatic), control plane reserved zone. Status: Proposed — pending four-member panel review (UX Designer, Frontend Architect, Chief Methodologist, Engineering Lead). | 2026-05-22 |
 | RACI-grounded ADR panel composition rule — added to #405 scope | ADR-008 panel omitted Frontend Architect despite FA being C on all architectural decisions per agent-raci.md row 1. Root cause: panel copied from M8 critique panel (conceptual framing question) rather than derived from the RACI. Rule added to Issue #405 scope: before naming any ADR panel, consult agent-raci.md; any R or C agent must be included or exclusion documented. Implementing agent is always required. Minimum panels by ADR type: frontend ADR → Frontend Architect; engine ADR → Chief Engineer; data ADR → Chief Methodologist; UX ADR → UX Designer. ADR-008 (Issue #397) is the first application of the corrected rule — FA already added to that panel this session. | 2026-05-22 |
 | M12 renamed — "Active Control and External Sector" | Previous GitHub title "Analyst Tooling and External Sector" undersold Mode 3; roadmap doc used a third variant "Transformation and External Sector". Renamed to "Active Control and External Sector" — names the two user-facing deliverables (Mode 3 and the external sector module) without naming the matrix engine migration as the lead. GitHub milestone description field also confirmed stale. Milestone registry gap filed as #412 (M9, near-term). | 2026-05-22 |
