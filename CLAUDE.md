@@ -310,6 +310,13 @@ Architecture Decision Records document what was decided, why, and what
 alternatives were considered. They are the institutional memory that
 survives leadership changes — both human and AI session boundaries.
 
+The Architecture Decision Record Backlog (`docs/architecture/backlog.md`) is the
+single source of ADR number assignment. Before drafting any ADR, the Architect
+Agent must: (1) check the backlog for the next available number, (2) mark the
+entry ASSIGNED, (3) derive the panel composition from `docs/process/agent-raci.md`,
+and (4) confirm the implementing agent is included in the panel. ADR numbers must
+not appear in issue titles or documents before they are assigned from the backlog.
+
 **Tests are not optional.**
 The backtesting infrastructure is the most important test suite.
 Unit and integration tests are table stakes. A feature is not done
