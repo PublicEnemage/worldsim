@@ -3,8 +3,8 @@
 > Owned by the UX Designer Agent. This document is the authoritative source
 > for who we are building for, what they are trying to do, and what the
 > experience must make possible. All frontend decisions are evaluated against
-> it. Last updated: 2026-05-02 (open questions resolved; user journeys in
-> `docs/ux/user-journeys.md`).
+> it. Last updated: 2026-05-21 (EL Decisions 1/2/3 — per-mode cognitive tasks,
+> viewport architecture, comparison mode conditional; closes Issue #365).
 
 ---
 
@@ -24,6 +24,11 @@ signal in minutes, not hours.
 They are operating under cognitive load. There are people in the room,
 a document on the table, and a clock running. The tool must work for
 them in that context, not in a calm research environment.
+
+Five personas — from finance ministry specialist to academic economist to
+institutional decision-maker — provide concrete instantiations of this
+canonical user across roles, entry states, and scenarios:
+`docs/ux/personas.md`.
 
 ---
 
@@ -51,83 +56,134 @@ These questions were open at M4 close. The answers are binding UX
 constraints for all M5 distribution visualization work and for M6
 frontend decisions.
 
-### 1. Primary Cognitive Task
+### 1. Primary Cognitive Tasks by Mode
 
-**Question:** When the user scans a scenario output showing distributions
-across multiple indicators, what is her primary cognitive task — threshold
-alarm detection, trajectory tracking, or cross-scenario comparison?
+**Question:** What is the user's primary cognitive task at the tool — and
+does it vary across the three interaction modes (Replay, Simulation,
+Active Control)?
 
-**Answer: Threshold alarm detection.**
+**Answer: Yes — per-mode cognitive tasks, not a single universal formulation.**
 
-The canonical user's purpose at the tool is to determine whether a
-proposed fiscal adjustment path crosses human cost thresholds. This is
-a binary question: has any indicator crossed a floor, or is any
-indicator's distribution at material risk of crossing one?
+The M4-era answer ("threshold alarm detection") correctly identified a
+central user task but applied it uniformly across contexts where the
+cognitive task differs. EL Decision 1 (Issue #364) supersedes it. The
+three-mode per-task formulation was validated against all thirteen
+marquee acceptance cases across primary, secondary, and tertiary tiers.
 
-Trajectory tracking (where is this heading?) and cross-scenario
-comparison (how does A differ from B?) are both present in the
-workflow, but they are activated *after* the threshold scan. The user
-first asks: is anything in the danger zone? Only then does she ask:
-when does it get there, and would an alternative path avoid it?
+**Mode 1 (Replay) — Trajectory reconstruction AND historical pattern recognition**
 
-**Design implication for M5 distribution visualization:**
+Both tasks are valid primary cognitive tasks within Mode 1; both must be
+served by the instrument cluster. The academic economist (Persona 4) needs
+trajectory reconstruction: does the simulation reproduce what actually
+happened? The political advisor (Persona 3) needs historical pattern
+recognition: did the trajectory follow a recognizable pre-collapse pattern?
+These are distinct tasks with a shared instrument. The step axis annotation
+requirement — calendar dates and event labels on SIGNIFICANT steps — is the
+precondition for serving both tasks. Without it, the step axis serves the
+finance ministry specialist while remaining opaque to the political advisor
+and the institutional decision-maker.
 
-The MDA alert panel is the primary visual element. The radar chart is
-secondary (it shows which dimensions are under stress, supporting the
-threshold scan). The delta choropleth is tertiary (activated only after
-the user has identified what to compare).
+**Mode 2 (Simulation) — Threshold-safe path construction**
 
-Distribution bands on individual indicators must be legible as
-proximity-to-threshold information — not statistical detail. The
-ADR-006 composite alert rule (ci_lower < floor AND mean ≤ 1.5 × floor)
-directly operationalizes this task: it fires when the distribution
-places material probability mass below the floor, before the mean
-has crossed. The alert must be the first thing the user reads.
+The preparation task: which policy path achieves the required fiscal outcome
+while keeping all four framework indicators above their Minimum Descent
+Altitudes? The user is not passively scanning for alarms — she is
+constructing a defensible path. The comparison surface (divergence timeline
+for single-entity scenarios) shows which path crosses fewer thresholds, not
+just whether a specific path crosses one.
+
+**Mode 3 (Active Control) — Real-time steering within human cost constraints**
+
+Active negotiation: proposed terms applied as control inputs in real time,
+trajectory effects propagate and update the instrument cluster. The live A/B
+comparison — baseline ghost curves at 50% opacity versus active trajectory —
+makes the effect of each proposed term immediately legible. The MDA alert
+panel causal attribution ("caused by: −2% spending cut applied at step 3")
+is the negotiating instrument: it distinguishes threshold crossings caused by
+the proposed policy from those caused by the underlying scenario trajectory.
+
+**Design implication (EL Decisions 1 and 2):**
+
+The primary viewport is the instrument cluster. The trajectory view (four
+composite score curves on a shared step axis) is the primary Zone 1 instrument
+— the frame that makes all three per-mode cognitive tasks legible. The MDA
+alert panel and PMM widget are co-primary Zone 1 elements within the instrument
+cluster. The entity selector is a persistent header element, visible without
+navigation in all three modes.
+
+The choropleth is a navigable context surface, not a primary viewport element.
+The EntityDetailDrawer is demoted to detail and methodology surface — primary
+instruments are in the instrument cluster viewport, not inside the drawer.
+
+The M4-era design implication — "the MDA alert panel is the primary visual
+element; the radar chart is secondary" — correctly identified the alert panel's
+primacy but placed it inside the drawer. The alert panel occupies Zone 1 of the
+instrument cluster viewport directly. Distribution bands on individual indicators
+must remain legible as proximity-to-threshold information — the ADR-006 composite
+alert rule (ci_lower < floor AND mean ≤ 1.5 × floor) operationalizes this.
+
+Full hierarchy specification: `docs/ux/information-hierarchy.md`.
 
 ---
 
-### 2. Preparation Mode vs. Active Negotiation Mode
+### 2. Preparation, Active Negotiation, and Historical Analysis
 
-**Question:** Does the user's relationship to the tool differ between a
-preparation session (the night before) and an active negotiation session
-(tablet open on the table, 90 seconds to respond)?
+**Question:** Does the user's relationship to the tool differ across the three
+interaction modes — and how does this map to real-world usage contexts?
 
-**Answer: Yes — the information hierarchy differs; the underlying
-data requirement and primary cognitive task do not.**
+**Answer: Yes — the cognitive task and information hierarchy both differ
+across modes. The instrument architecture and underlying analytical standard
+do not.**
 
-**What changes:**
+**Three modes, three contexts:**
 
-In preparation mode, the specialist is building the argument. She has
-time to explore. She needs the full distribution, the cohort breakdown,
-the ability to advance step by step and observe where thresholds are
-crossed, and the ability to compare proposals. Every panel is relevant.
-The four-framework radar chart, MDA severity progression, and cohort-level
-indicator tables are all primary surfaces.
+*Mode 2 (Simulation) — Preparation: building the case*
 
-In active negotiation mode, the specialist is citing the argument
-she already built. She needs one thing in seconds: the threshold
-crossing she identified the night before — indicator, step, severity,
-cohort. She is not re-running the analysis. She is reading a conclusion
-that must be immediately visible.
+The specialist is at her desk the night before. She has time to explore.
+Primary cognitive task: threshold-safe path construction — which consolidation
+path keeps all four framework indicators above their MDAs? Every panel is
+relevant: full distribution bands, cohort breakdown, the comparison divergence
+timeline between the proposed path and the counter-proposal. The trajectory
+view shows where the proposed path fails; the divergence timeline confirms
+the counter-proposal avoids it.
 
-**What stays the same:**
+*Mode 3 (Active Control) — Active negotiation: steering in real time*
 
-The primary cognitive task is identical: threshold alarm detection.
-The MDA alert panel is the primary entry point in both modes — in
-preparation it is the scanning surface; in negotiation it is the
-recall surface. The underlying analytical standard — defensible
-argument, quantified uncertainty, pre-calibration disclosure — does
-not change between modes.
+The specialist is in the room, tablet open. The IMF proposes a modified
+term. She applies it as a control input. The trajectory updates: live A/B
+comparison shows the effect of the proposed term against the baseline she
+built the previous night. The MDA alert panel causal attribution confirms
+whether the proposed term is what causes the threshold crossing. She is not
+re-exploring — she is navigating the terrain she already mapped, with
+the proposed modification injected directly.
 
-**Design implication for M6:**
+*Mode 1 (Replay) — Historical analysis: trajectory reconstruction*
 
-Progressive disclosure achieves both modes without separate screens.
-The alert panel surfaces the headline finding (severity + indicator +
-step + top affected cohort) in the negotiation-mode scan. Clicking
-through opens the full preparation-mode detail. The M6 information
-hierarchy decision should ensure the top 1–3 MDA alerts are readable
-without scrolling in any viewport likely to be used at a negotiating
-table.
+The academic economist or political advisor examines how a trajectory actually
+unfolded. Primary cognitive tasks: trajectory reconstruction (does the model
+reproduce what happened?) and historical pattern recognition (did the
+trajectory follow a recognizable pre-crisis pattern?). The demonstrative
+entry state — Aicha Mbaye oriented in 60 seconds without driving the tool —
+is also a Mode 1 context: a pre-loaded, completed historical fixture navigated
+by someone other than the driver.
+
+**What stays the same across all three modes:**
+
+The instrument cluster is always the primary viewport. The step axis is always
+the shared coordinate system. The four-framework measurement is always
+simultaneous — no framework is hidden while another is examined. The underlying
+analytical standard — defensible argument, quantified uncertainty,
+pre-calibration disclosure — does not change between modes.
+
+**Design implication:**
+
+Progressive disclosure achieves all three modes without separate screens.
+The instrument cluster serves all three cognitive tasks when the correct mode
+is active. The mode indicator — always visible in the primary viewport header —
+tells both the user and any observer which cognitive task is active. The top
+1–3 MDA alerts must be readable without scrolling at all supported viewports.
+
+Journeys for each mode: `docs/ux/user-journeys.md`.
 
 ---
 
