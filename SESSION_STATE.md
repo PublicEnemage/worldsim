@@ -72,6 +72,7 @@ Twelve issues filed 2026-05-19. Must complete before M9 UX implementation begins
 
 | PR | Title | Date |
 |---|---|---|
+| #408 | docs(roadmap): WorldSim roadmap M9–M13 with demo arc, long-term direction, and process integration | 2026-05-22 |
 | #356 | docs(ux): M8 interaction model critique — panel synthesis (UX Designer, Dev Economist, Chief Methodologist) | 2026-05-18 |
 | #371 | chore(state): design foundation sequence — 12 issues #359–#370 filed | 2026-05-19 |
 | #372 | docs(claude): CLAUDE.md structural refactor — closes #359 | 2026-05-19 |
