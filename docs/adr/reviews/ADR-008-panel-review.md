@@ -3,7 +3,7 @@
 > **Artifact type:** ADR Panel Review
 > **ADR:** ADR-008 — UX Architecture: Instrument Cluster, Viewport, and Interaction Model
 > **ADR file:** `docs/adr/ADR-008-ux-architecture.md`
-> **Status:** Disposition recommendations pending EL decision
+> **Status:** Accepted — EL decision recorded 2026-05-22
 > **Review date:** 2026-05-22
 > **Convention:** `docs/adr/reviews/ADR-NNN-panel-review.md` — first instance of this artifact type
 
@@ -16,7 +16,7 @@
 | UX Designer Agent | C — UX frame and component decisions | Conditional sign-off ✓ |
 | Frontend Architect Agent | C — implementing agent (required per panel composition rule) | Conditional sign-off ✓ |
 | Chief Methodologist | C — confidence tier visual system and epistemic obligations | Conditional sign-off ✓ |
-| Engineering Lead | A — accountable on all ADR decisions | Pending |
+| Engineering Lead | A — accountable on all ADR decisions | Accepted ✓ (2026-05-22) |
 
 ---
 
@@ -24,18 +24,18 @@
 
 | ID | Source | Type | Severity | ADR change required? | Status |
 |---|---|---|---|---|---|
-| UX-F1 | UX Designer | Zone 1 co-primary spatial arrangement unspecified | Non-blocking | Add Open Risks note only | Pending EL |
-| UX-F2 | UX Designer | "COMPARE\_VIEW Zone 1C" label is ambiguous | Non-blocking | Yes — editorial | Pending EL |
-| UX-F3 | UX Designer | Alert tap expansion rendering mechanism under-specified | Non-blocking | Yes — one-sentence boundary | Pending EL |
-| UX-F4 | UX Designer | Blue/orange color accessibility — shape distinction not explicit | Non-blocking | Yes — one sentence | Pending EL |
-| FA-C1 | Frontend Architect | Four Zone 1 instruments at 1024×768: layout constraint unspecified | Non-blocking | Add Open Risks note only | Pending EL |
-| FA-C2 | Frontend Architect | Decision 14 atomicity: state management design decision required | Non-blocking | No — FA brief + design-decisions.md | Pending EL |
-| FA-C3 | Frontend Architect | Decision 17 control plane zone: minimum width unspecified; requires UX ruling | Non-blocking | No — joint EL+UX ruling then FA brief | Pending EL |
-| FA-C4 | Frontend Architect | Decision 13 uncertainty bands: "narrow/wide" not linked to ADR-006 schedule | Non-blocking | Yes — reference ADR-006 | Pending EL |
-| FA-C5 | Frontend Architect | Decision 11 step axis annotation: 6-step render width at 1024px not validated | Non-blocking | No — FA brief validation | Pending EL |
-| CM-1 | Chief Methodologist | Tier 4-5 WARNING-only rule: rationale missing from ADR; risks future override | Substantive | Yes — rationale paragraph | Pending EL |
-| CM-2 | Chief Methodologist | "Narrow/wide" uncertainty band widths: must reference ADR-007 or prohibit until specified | Substantive | Yes — replace with ADR-007 deferral | Pending EL |
-| CM-3 | Chief Methodologist | Negotiation-defensibility labels: pre-calibration compatibility | Logged — no action | No | Pending EL |
+| UX-F1 | UX Designer | Zone 1 co-primary spatial arrangement unspecified | Non-blocking | Add Open Risks note only | Resolved ✓ |
+| UX-F2 | UX Designer | "COMPARE\_VIEW Zone 1C" label is ambiguous | Non-blocking | Yes — editorial | Resolved ✓ |
+| UX-F3 | UX Designer | Alert tap expansion rendering mechanism under-specified | Non-blocking | Yes — one-sentence boundary | Resolved ✓ |
+| UX-F4 | UX Designer | Blue/orange color accessibility — shape distinction not explicit | Non-blocking | Yes — one sentence | Resolved ✓ |
+| FA-C1 | Frontend Architect | Four Zone 1 instruments at 1024×768: layout constraint unspecified | Non-blocking | Add Open Risks note only | Resolved ✓ |
+| FA-C2 | Frontend Architect | Decision 14 atomicity: state management design decision required | Non-blocking | No — FA brief + design-decisions.md | Resolved ✓ |
+| FA-C3 | Frontend Architect | Decision 17 control plane zone: minimum width unspecified; requires UX ruling | Non-blocking | No — joint EL+UX ruling then FA brief | Resolved ✓ |
+| FA-C4 | Frontend Architect | Decision 13 uncertainty bands: "narrow/wide" not linked to ADR-006 schedule | Non-blocking | Yes — reference ADR-006 | Resolved ✓ |
+| FA-C5 | Frontend Architect | Decision 11 step axis annotation: 6-step render width at 1024px not validated | Non-blocking | No — FA brief validation | Resolved ✓ |
+| CM-1 | Chief Methodologist | Tier 4-5 WARNING-only rule: rationale missing from ADR; risks future override | Substantive | Yes — rationale paragraph | Resolved ✓ |
+| CM-2 | Chief Methodologist | "Narrow/wide" uncertainty band widths: must reference ADR-007 or prohibit until specified | Substantive | Yes — replace with ADR-007 deferral | Resolved ✓ |
+| CM-3 | Chief Methodologist | Negotiation-defensibility labels: pre-calibration compatibility | Logged — no action | No | Resolved ✓ |
 
 ---
 
@@ -159,35 +159,46 @@ The answer determines the reserved zone width constant locked into the M9 layout
 
 ## Engineering Lead Decision Record
 
-*To be completed by the Engineering Lead.*
+**Review decision date:** 2026-05-22
 
-**Review decision date:** ___________
+**Decision:** Accept ADR-008 with all 6 INCORPORATE items approved.
 
 **On the six INCORPORATE items:**
 
 | Finding | Decision | Notes |
 |---|---|---|
-| UX-F2 (Zone 1C label fix) | ☐ Approve ☐ Reject | |
-| UX-F3 (Alert tap boundary) | ☐ Approve ☐ Reject | |
-| UX-F4 (Shape distinction) | ☐ Approve ☐ Reject | |
-| FA-C4 + CM-2 (Band widths → ADR-007 deferral) | ☐ Approve ☐ Reject | |
-| CM-1 (WARNING-only rationale) | ☐ Approve ☐ Reject | |
-| UX-F1 + FA-C1 Open Risks note | ☐ Approve ☐ Reject | |
+| UX-F2 (Zone 1C label fix) | ✓ Approved | Applied as written |
+| UX-F3 (Alert tap boundary) | ✓ Approved | Applied as written |
+| UX-F4 (Shape distinction) | ✓ Approved | Applied as written |
+| FA-C4 + CM-2 (Band widths → ADR-007 deferral) | ✓ Approved | Applied as written |
+| CM-1 (WARNING-only rationale) | ✓ Approved | Applied as written |
+| UX-F1 + FA-C1 Open Risks note | ✓ Approved | Applied as written |
 
 **On the joint EL + UX ruling (FA-C3):**
 
 Control plane "simultaneously visible" means:
-☐ (A) Headers only — stacked forms, ~280px reserved zone
+☑ **(A) Headers only — stacked forms, ~280px reserved zone**
 ☐ (B) Full fields — side-by-side forms, ~560px reserved zone
+
+Rationale: Two forms stacked vertically at 280px width satisfies the "simultaneously
+visible" requirement at Mode 3 introduction. The epistemic visual separation between
+policy inputs (blue) and exogenous shocks (orange) is preserved by stacking — both
+form headers remain on screen. Full-field side-by-side (~560px) would compress the
+trajectory view more than necessary at 1280px desktop minimum. The FA brief must
+document the minimum zone width constant as 280px and confirm the trajectory view
+width constraint is satisfied.
+
+**FA brief items deferred:**
+
+FA-C1, FA-C2, FA-C3 (per ruling above), FA-C4, FA-C5 — all deferred to M9 Frontend
+Architect brief. None reverse an ADR decision.
 
 **ADR-008 final acceptance:**
 
-Once approved INCORPORATE items are applied and the FA-C3 ruling is recorded:
+☑ ADR-008 status changed from Proposed → Accepted (2026-05-22)
+☑ All 6 INCORPORATE items applied to `docs/adr/ADR-008-ux-architecture.md`
 
-☐ ADR-008 status changed from Proposed → Accepted
-☐ PR #416 approved for merge
-
-**Engineering Lead sign-off:** ___________
+**Engineering Lead sign-off:** @PublicEnemage — 2026-05-22
 
 ---
 

@@ -1,15 +1,15 @@
 # ADR-008: UX Architecture — Instrument Cluster, Viewport, and Interaction Model
 
 ## Status
-Proposed
+Accepted
 
 ## Validity Context
 
 **Standards Version:** 2026-05-22
 **Valid Until:** Milestone 10 — Engine Integrity and Instrument Delivery (Demo 3)
-**License Status:** PROPOSED — pending panel review
+**License Status:** ACCEPTED — 2026-05-22
 
-**Panel (required for acceptance):**
+**Panel (accepted):**
 - UX Designer Agent (C — UX frame and component decisions)
 - Frontend Architect Agent (C — implementing agent, required per panel composition rule)
 - Chief Methodologist (C — confidence tier visual system, epistemic obligations)
@@ -158,8 +158,8 @@ opens the methodology note for that indicator.**
   brief. This ADR commits to the trajectory view as Zone 1A and specifies its
   requirements; ADR-010 will go deeper on the trajectory view component
   architecture (data streaming, rendering performance, step axis state management).
-- **Issue #397** — This ADR (ADR-008). Open until panel review complete and
-  Engineering Lead accepts.
+- **Issue #397** — This ADR (ADR-008). Closed 2026-05-22 — panel review complete,
+  EL accepted. See `docs/adr/reviews/ADR-008-panel-review.md`.
 
 ---
 
@@ -321,6 +321,10 @@ viewport — not inside the EntityDetailDrawer.
 - Framework source visible per alert row without requiring a framework tab to open
 - Alert entries are interactive: tapping an alert expands to show the trajectory
   view for that indicator at that step — not the entity drawer
+- The mechanism for showing the indicator trajectory detail must keep the trajectory
+  view (Zone 1A) visible — a full-screen overlay occluding the instrument cluster
+  is not acceptable. The specific rendering mechanism (inline expansion, sidebar,
+  coordinated trajectory view update) is a Frontend Architect brief decision.
 
 **Mode-specific behavior:**
 
@@ -455,7 +459,7 @@ COMPARE_VIEW Zone 1: Divergence timeline — two scenario trajectory curves
 shows which MDA alerts fire in the primary scenario but not the comparison
 scenario (step-level severity delta, not binary fire/no-fire).
 
-COMPARE_VIEW Zone 1C: Fiscal equivalence header — a single-line calculation
+COMPARE_VIEW Zone 1 header — Fiscal equivalence header: a single-line calculation
 visible without navigation: "Counter-proposal achieves X% of 5-year primary
 surplus target." This is visible in the comparison view header, not in Zone 3.
 
@@ -623,6 +627,11 @@ in every Mode 3 alert for which causation is attributable.
 blue used for shocks, orange used for policy inputs, or either color repurposed
 for a different UI element in the same viewport zone.
 
+**Accessibility:** Color is not the only distinguishing element — the shape
+difference (filled circle for policy inputs; vertical line for shocks) must
+also be consistent across all three layers, ensuring legibility for users with
+color vision deficiencies.
+
 ---
 
 ### Decision 13 — Confidence Tier Visual Differentiation
@@ -637,8 +646,14 @@ documentation.
 | Tier | Curve treatment |
 |---|---|
 | Tier 1–2 (MEASURED or REPORTED) | Solid curve, 100% opacity, no uncertainty band |
-| Tier 3 (SYNTHETIC_COMPARABLE) | Solid curve, 75% opacity, narrow uncertainty band visible |
-| Tier 4–5 (SYNTHETIC_MODEL / STRUCTURAL_ABSENCE) | Dashed curve, 60% opacity, wide uncertainty band, confidence badge adjacent to curve label |
+| Tier 3 (SYNTHETIC_COMPARABLE) | Solid curve, 75% opacity, uncertainty band (width ADR-007-gated — see note) |
+| Tier 4–5 (SYNTHETIC_MODEL / STRUCTURAL_ABSENCE) | Dashed curve, 60% opacity, uncertainty band (width ADR-007-gated — see note), confidence badge adjacent to curve label |
+
+**Uncertainty band widths (Tier 3-5):** Uncertainty band at width defined in
+ADR-007 (synthetic data framework) — Tier 3-5 band rendering is gated on ADR-007
+acceptance. Until ADR-007 is accepted, the visual differentiation (75% opacity
+solid / 60% opacity dashed / confidence badge) is implemented; band width rendering
+is deferred.
 
 **MDA alert behavior by tier:**
 
@@ -647,6 +662,14 @@ documentation.
 | Tier 1–2 | Full severity fires (WARNING / CRITICAL / TERMINAL) |
 | Tier 3 | Full severity fires, plus "(moderate confidence)" qualifier on alert text |
 | Tier 4–5 | WARNING-only regardless of computed severity, plus "(exploratory — do not cite)" badge. No CRITICAL or TERMINAL alerts from Tier 4–5 data. |
+
+The WARNING-only rule for Tier 4-5 does not mean the crossing is less severe —
+it means the epistemic standing of the data does not support a CRITICAL or TERMINAL
+claim with the confidence those labels carry. The severity labels carry an implicit
+confidence claim about the data quality underlying the crossing. A CRITICAL alert
+from Tier 1-2 data is a different kind of statement than a CRITICAL alert from
+SYNTHETIC_MODEL data. The former can be cited in a negotiation; the latter cannot.
+The severity label system must remain honest about this distinction.
 
 **Tier 4–5 instruments are not suppressed.** The governance signal, even as an
 exploratory estimate, is never moved to Zone 3 or hidden. Suppression would
@@ -960,7 +983,17 @@ be visually separated. If hardware constraints at 1024×768 force a conflict,
 the trajectory view wins and the control plane zone requires a scroll affordance
 for one form. This is a Mode 3 implementation decision; the M9 reservation must
 document the minimum zone width so the conflict is evaluated at M10 rather than
-discovered at Mode 3 introduction.
+discovered at Mode 3 introduction. The EL ruling on FA-C3 (2026-05-22) specifies
+Option A: stacked forms, ~280px reserved zone. "Simultaneously visible" means both
+form headers visible without scroll, not all form fields.
+
+**Zone 1 co-primary spatial arrangement:** The relative positions of Zone 1B (MDA
+alert panel), 1C (PMM widget), and 1D (four-framework current position) with respect
+to each other and to Zone 1A (trajectory view) are a Frontend Architect brief
+requirement. The brief must demonstrate simultaneous scannability of all Zone 1
+elements at 1024×768 and document MDA alert panel primacy among co-primary
+instruments (severity ordering: TERMINAL > CRITICAL > WARNING governs arrangement,
+not framework ordering).
 
 ---
 
