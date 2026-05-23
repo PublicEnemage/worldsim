@@ -19,6 +19,11 @@ isn't required."
 
 Entries appear in chronological order of occurrence.
 
+Not all entries are failures. Some are anticipations — the Engineering Lead sensing a
+structural gap before it caused a problem, naming it, and building the safeguard before
+the incident occurred. These deserve equal recognition: they represent the safety culture
+working at its best. Six of the thirteen entries are anticipatory.
+
 ---
 
 ## NM-001 — Recency Bias Creating Scope Spiral
@@ -413,6 +418,203 @@ Documented in: `CLAUDE.md §File authority is non-negotiable`,
 
 ---
 
+## NM-008 — Domain Expertise Gap: No Real-World Economist in the Room
+
+**Date:** ~2026-04-17 (Milestone 2 era)
+**Milestone:** M2 — Simulation Core
+**Detected by:** Engineering Lead (anticipation — before any scenario had run)
+**Severity:** High — without domain expertise, simulation economic relationships would be calibrated against theoretical assumptions, not real-world evidence
+**Type:** Anticipatory — caught before the gap caused a failure
+
+### What happened
+
+During Milestone 2, before any scenario had been run, the Engineering Lead sensed a structural gap: "I am sensing the need for another agent — almost like a business product manager who has the background of a first-class economist, keeps a pulse on historical and current economic and political trends, and has a seat at the table when we discuss even the first dry run on bare rails."
+
+The timing was deliberate: this concern was raised before the model's assumptions had been baked in through repeated use without challenge. The risk was not current — it was structural. An agent team with no domain economics expertise would calibrate relationships against internal consistency rather than empirical evidence from actual sovereign debt crises.
+
+### What was at risk
+
+A simulation built without economic domain expertise would produce outputs that look internally consistent but fail to match historical cases. The entire backtesting framework — and the credibility of WorldSim's findings in a negotiating room — depends on the model's economic relationships being calibrated against real-world evidence, not theoretical assumptions made by software engineers.
+
+### What caught it
+
+The Engineering Lead, anticipating the gap before it caused a failure. This is the safety culture working at its best: the hazard was identified before an incident, not after.
+
+### Process improvement
+
+**Development Economist role in the Domain Intelligence Council**:
+The Development Economist agent was established as a first-class DIC member with explicit authority to validate economic relationships, challenge calibration assumptions, and flag cases where the model's behaviour diverges from historical evidence. The role's working agreement commits to active challenge, not passive validation.
+
+Documented in: `docs/process/agents.md §Development Economist`,
+`docs/agents/domain-intelligence-council.md`
+
+---
+
+## NM-009 — Groupthink Risk: No Counter-Perspective in the Council
+
+**Date:** ~2026-04-17 (Milestone 2 era)
+**Milestone:** M2 — Simulation Core
+**Detected by:** Engineering Lead (anticipation — recognized structural lean during council composition discussion)
+**Severity:** Medium — a council with homogeneous perspective would produce groupthink rather than genuine challenge
+**Type:** Anticipatory — caught during design, before the council was used
+
+### What happened
+
+While composing the Domain Intelligence Council, the Engineering Lead raised a concern about structural bias: "What about adding an Investment/Capitalist oriented agent to bring the perspective of the art of the possible, in contrast to the likely risk-averse and short/medium tendencies that the current members are likely to lean towards?"
+
+The concern was not about any individual agent but about the composition as a whole: a council weighted toward risk-averse, welfare-oriented perspectives would consistently produce conservative outputs, potentially missing the investment and capital formation dimension that affects whether sovereign programmes actually work in practice.
+
+Claude's response confirmed the structural risk: "You're not just adding agents, you're recognizing that the Domain Intelligence Council needs to reflect the full complexity of the decisions WorldSim will inform."
+
+### What was at risk
+
+A homogeneous council produces validation rather than challenge. If all council members share the same analytical frame, the council's output will consistently reinforce existing model assumptions rather than surface their blindspots. For a tool designed to serve as kryptonite in asymmetric negotiations, a council that produces consensus without dissent is actively harmful.
+
+### What caught it
+
+The Engineering Lead, recognizing the groupthink risk during council composition rather than after the first review produced uninformative consensus.
+
+### Process improvement
+
+**Diverse DIC composition with explicit counter-perspectives**:
+The council was expanded to include agents representing perspectives that would constructively challenge the dominant welfare/risk-averse framing: Investment and Capital Formation, Trade and Geopolitical dynamics, and others reflecting the full range of actors in the rooms WorldSim is designed to inform. The blind interview process (NM-013) was the eventual mechanism for ensuring council members contribute genuine independent perspectives.
+
+Documented in: `docs/agents/domain-intelligence-council.md`
+
+---
+
+## NM-010 — UX North Star Had No Owner
+
+**Date:** ~2026-05-06 (Milestone 5-6 era)
+**Milestone:** M5-M6 transition
+**Detected by:** Engineering Lead (anticipation — noticed the gap before it produced a UI without coherent vision)
+**Severity:** High — without a UX north star, the Frontend Architect would build structurally sound components with no unified user experience intent
+**Type:** Anticipatory — caught before the full extent of the gap was visible in the UI
+
+### What happened
+
+The Engineering Lead noticed that the UI, while technically functional, lacked a coherent user experience vision: "I am thinking we may need to add a UX designer agent at some point soon. Someone needs to feed the intellectual problem space for the UI Frontend Architect, and right now that problem space will be dominated by untangling what we have built, but no voice of what the UX north star should be."
+
+Claude's response named the structural gap: "The Frontend Architect answers 'how should this be built.' It has no mandate to answer 'what should be built and why.' Without a UX Designer, the instrument cluster will be optimized for technical correctness but not for the cognitive load of a finance minister in a negotiation room."
+
+This concern was later confirmed when the M8 demo review found that the instrument cluster had the right components in the wrong relationship — a Case B verdict requiring a fundamental UX architecture rethink.
+
+### What was at risk
+
+A tool built without a UX north star will be coherent at the component level and incoherent at the user experience level. The finance ministry analyst sitting across from the IMF cannot afford cognitive friction — every second spent navigating to find an instrument is a second not spent on the argument. A technically correct but experientially incoherent tool fails its users in the room where it matters most.
+
+### What caught it
+
+The Engineering Lead, anticipating the gap from experience with product development rather than waiting for user feedback to surface it.
+
+### Process improvement
+
+**UX Designer Agent established with north-star authority**:
+The UX Designer agent was established with R on all UX documents and authority to define the instrument cluster's cognitive model, zone hierarchy, and interaction principles. The three-mode architecture (Mode 1/2/3), the six governing premises, and the Case B UX architecture verdict are all products of this agent having genuine authority over the UX frame.
+
+Documented in: `docs/process/agents.md §UX Designer Agent`,
+`docs/ux/north-star.md`, `docs/ux/information-hierarchy.md`
+
+---
+
+## NM-011 — Schema Had No Owner: Data Architect Role Created
+
+**Date:** ~2026-04-29 (immediately following the field name mismatch incident)
+**Milestone:** M4-M5 transition
+**Detected by:** Engineering Lead (anticipatory — proposed the structural fix directly after the NM-003 incident)
+**Severity:** High — without a schema owner, the field name assumption failure mode would recur on every new endpoint
+**Type:** Anticipatory — the structural fix was proposed before the next recurrence
+
+### What happened
+
+Directly following the field name mismatch incident (NM-003), the Engineering Lead proposed the structural fix: "We may need a versioned schema source of truth, owned by a Data Architect Agent who can watch out for schema field naming conventions and other data quality standards. If we had this schema source of truth, the QA agent could have used it as input when designing test cases."
+
+Claude's response confirmed: "If a Data Architect Agent had maintained a schema registry that defined the canonical shape of every data structure, the field name assumption that caused the bug would have failed at spec time, not at runtime."
+
+### What was at risk
+
+Without a schema owner, every new agent writing to the database would independently assume field names rather than reading an authoritative source. The NM-003 failure mode was structural, not incidental — it would recur on every new endpoint.
+
+### What caught it
+
+The Engineering Lead, connecting the incident to its structural cause and proposing the preventive architecture immediately rather than treating the incident as a one-off.
+
+### Process improvement
+
+**Data Architect Agent established as schema file owner**:
+The Data Architect holds R on `docs/schema/api_contracts.yml`, `docs/schema/database.yml`, and `docs/schema/simulation_state.yml`. All agents writing code that touches database fields must reference these files before writing. The file authority rule (NM-007) later formalized this into a project-wide principle.
+
+Documented in: `docs/process/agents.md §Data Architect Agent`,
+`docs/process/agent-raci.md §File Ownership`
+
+---
+
+## NM-012 — Matrix Compute Needed a Different Knowledge Profile
+
+**Date:** ~2026-05-15 (late Milestone 6 / early M7 era)
+**Milestone:** M6-M7 transition
+**Detected by:** Engineering Lead (anticipation — recognized the gap before matrix implementation had begun)
+**Severity:** High — without a Chief Engineer, matrix computation decisions would be made by the Architect Agent, whose knowledge profile is system design, not compute optimization
+**Type:** Anticipatory — caught before any matrix code was written
+
+### What happened
+
+Following a discussion about matrix arithmetic and the NOAA ensemble forecast insight, the Engineering Lead proposed a new role: "Given our discussion about matrix computation, should we on-board a Chief Engineer agent? The role is separate from the architect role because you need more nitty-gritty knowledge about CPU compute optimization, matrix math, ensemble computation."
+
+Claude's response confirmed the knowledge profile gap: "The matrix arithmetic work requires a different knowledge profile than what the Architect Agent brings. The Architect Agent reasons about system design, ADR structure, and module boundaries. The Chief Engineer needs to reason about instruction-level performance, memory access patterns, numerical precision, and hardware constraints on the target 4-core laptop."
+
+### What was at risk
+
+The simulation engine is the load-bearing substrate of everything WorldSim does. A matrix compute transition designed by an agent without the relevant knowledge profile could produce an engine that is fast on development hardware but slow on the target 4-core laptop — failing the equity requirement. The Swiss watch principle applies here precisely.
+
+### What caught it
+
+The Engineering Lead, recognizing that the technical depth of the matrix transition exceeded the Architect Agent's mandate before any implementation had been attempted.
+
+### Process improvement
+
+**Chief Engineer Agent established with compute substrate authority**:
+The Chief Engineer holds authority over engine performance decisions, baseline benchmarks, A/B validation methodology, and stress test design. ADR-009 (engine computation model) cannot be authored until the Chief Engineer completes Phase 1 baseline benchmarks — a hard constraint preventing speculative architectural commitments.
+
+Documented in: `docs/process/agents.md §Chief Engineer Agent`,
+`docs/architecture/backlog.md` (ARCH-003, ADR-009 constraint)
+
+---
+
+## NM-013 — The DIC Had Never Been Asked the Foundational Question
+
+**Date:** ~2026-05-07 (post-M6 demo)
+**Milestone:** M6-M7 transition
+**Detected by:** Engineering Lead (post-demo reflection — recognized an unused capability)
+**Severity:** High — the Domain Intelligence Council had existed for months but had only been used for technical validation, never asked whether the approach would actually serve its intended users
+**Type:** Anticipatory — caught before the tool reached institutional adoption
+
+### What happened
+
+After the M6 stakeholder demo, the Engineering Lead reflected: "It would be interesting to do a similarly blind stakeholder analysis interview with the domain council, to get their feedback on the problem we have identified and our approach to solving it. I think there is something very valuable at our fingertips — we just haven't asked yet."
+
+Claude's response named the gap: "The Domain Intelligence Council has been used primarily in a supporting role — validating ADR decisions, contributing elasticity citations, flagging methodological gaps. They haven't been asked the foundational question: do you believe this approach will serve the users it claims to serve?"
+
+The DIC blind interview that followed produced convergent findings that reshaped architectural priorities: DIRECTION_ONLY fidelity is insufficient for negotiating credibility; ecological and social modules need bidirectional event flow; asymmetric temporality between recoverable and irreversible damage was unrepresented. These were foundational gaps that months of internal development had not surfaced.
+
+### What was at risk
+
+A tool built without ever asking its intended users whether the approach was right could reach institutional adoption with structural gaps in its core analytical model. The finance ministry analyst needs more than directionally correct outputs — they need magnitude credibility. A tool that cannot provide that fails its mission regardless of how technically sophisticated it is.
+
+### What caught it
+
+The Engineering Lead, connecting the M6 demo's independent stakeholder review pattern to the DIC as a resource that had not yet been asked the hardest question.
+
+### Process improvement
+
+**DIC blind interview process established** (M8 entry gate):
+All nine DIC members are independently interviewed before major architectural decisions. Each is asked cold — with no prior exposure to existing design choices — whether the approach will serve the intended users. Convergent findings across independent interviews carry high evidential weight.
+
+Documented in: `docs/process/council-interview-prompt.md`,
+`docs/process/agents.md §Domain Intelligence Council`
+
+---
+
 ## Registry Maintenance
 
 ### How to add an entry
@@ -466,3 +668,11 @@ and NM-007 are three instances of the same failure mode across three milestones.
 RACI-grounded panel composition rule and the file authority rule are both responses to
 this pattern. When a new near-miss appears, check first whether it is another instance
 of this pattern before assuming a different root cause.
+
+A second pattern is also visible: six of the thirteen entries are anticipatory —
+the Engineering Lead sensing a structural gap before it caused a failure. NM-008,
+NM-009, NM-010, NM-011, NM-012, and NM-013 were all caught before any incident
+occurred. This is not luck. It is pattern recognition from experience applied
+consistently. The near-miss registry documents both kinds of signal: reactive catches
+that reveal process gaps, and anticipatory catches that reveal a safety culture
+functioning at its best.
