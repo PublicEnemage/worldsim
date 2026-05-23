@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-05-23 (PRs #484–#487 merged — Zone 1A/1B/1C/1D complete; Issues #460–#462 closed; #463 unblocked pending #459)**
+**Last updated: 2026-05-23 (PRs #489–#491 merged — Issue #463 fully closed; Zone 1 cluster live in App.tsx; Greece integration suite complete)**
 **Current milestone:** M9 — Standards Foundation
 
 ---
@@ -76,11 +76,11 @@ No open PRs — board clear as of 2026-05-23.
 
 | PR | Title | Date |
 |---|---|---|
+| #491 | test(e2e): #463 PR 2 — Greece integration suite + AC-001/002 skip removed (closes #463) | 2026-05-23 |
+| #490 | feat(frontend): wire InstrumentCluster into App.tsx — Zone 1 instruments live (Issue #463 PR 1) | 2026-05-23 |
+| #489 | test(qa): #459 — remaining acceptance tests: ModeIndicator, AC-006 RTL, AC-013, US-026 | 2026-05-23 |
 | #487 | feat(frontend): PMMWidgetZone1C + FourFrameworkZone1D — Zone 1C/1D instruments (Issue #462) | 2026-05-23 |
 | #486 | feat(frontend): MDAAlertPanelZone1B — Zone 1B instrument cluster panel (Issue #461) | 2026-05-23 |
-| #485 | chore(state): SESSION_STATE.md — PR #484 merged; Issue #460 closed; #461 next | 2026-05-23 |
-| #484 | feat(frontend): TrajectoryView component — Zone 1A instrument cluster (Issue #460) | 2026-05-23 |
-| #482 | process(ki): Known Issues registry — establish KI framework, file KI-001 | 2026-05-23 |
 | #481 | chore(state): SESSION_STATE.md — session end 2026-05-23 (PRs #479–#480) | 2026-05-23 |
 | #480 | test(qa): retrofit instrument cluster spec — split Type 1/Type 2 ACs, remove blanket skip (closes #473) | 2026-05-23 |
 | #479 | process(nm): NM-018 — hammer-nail; panel composition principle for pre-EL consultations | 2026-05-23 |
@@ -147,7 +147,7 @@ No open PRs — board clear as of 2026-05-23.
 | #460 ✅ | feat(frontend): TrajectoryView — Zone 1A (instrument cluster) | Closed — PR #484 merged |
 | #461 ✅ | feat(frontend): MDA Alert Panel — Zone 1B (instrument cluster) | Closed — PR #486 merged |
 | #462 ✅ | feat(frontend): PMM + Four-Framework — Zone 1C/1D (instrument cluster) | Closed — PR #487 merged |
-| #463 | test(e2e): Greece integration Playwright suite | Open — blocked by #459 (QA tests); #460–#462 ✅ |
+| #463 ✅ | test(e2e): Greece integration Playwright suite | Closed — PR #490 (App.tsx wiring) + PR #491 (Greece suite) merged |
 | #367 | docs(ux): persona-anchored IR review re-run (Persona 2) | Open — near-term |
 | #368 | docs(ux): DEMO issues re-triage #342–#350 | Open — near-term |
 
@@ -209,6 +209,7 @@ All Horizon:Immediate issues are now closed. M8 feature-complete.
 
 | Decision | Rationale | Date |
 |---|---|---|
+| Issue #463 fully closed — Zone 1 cluster live in App.tsx + Greece Playwright suite (PRs #489–#491) | PR #489 closed the four remaining QA acceptance test gaps (#459): ModeIndicator component + 13 Vitest tests; AC-006 RTL atomicity test (act() boundary, Vitest cleanup fix); AC-013 "(exp)" confidence badge Playwright guard; US-026 mode-indicator RTL act() test. PR #490 wired InstrumentCluster into App.tsx via ScenarioInstrumentCluster: trajectory fetch + parse (array→Record, Decimal string→number, boundary_proximity→normalized_absolute); data-testid duplication fixed in InstrumentCluster wrapper divs. PR #491 completed Issue #463 PR 2: removed test.skip() from AC-001/AC-002; added selectScenario() helper; created greece-integration.spec.ts (5 tests: smoke, mode indicator "Replay", data-current-step tracking, governance null AC-015, per-step cluster consistency + Mode 2 no-op guard). | 2026-05-23 |
 | Zone 1A/1B/1C/1D instrument cluster complete (PRs #484–#487) | All four co-primary instruments shipped: `TrajectoryView.tsx` (Zone 1A — ComposedChart, 4 active + 4 ghost Lines, divergence fills, CVD-safe framework colors, Mode 1 custom tick, (exp) badge, Path A dashed curves); `MDAAlertPanelZone1B.tsx` (Zone 1B — TERMINAL→CRITICAL→WARNING sort, compact 3-line at <320px / full-density at ≥320px, mode-specific tense, negotiation labels, causal attribution Mode 3 only); `PMMWidgetZone1C.tsx` (Zone 1C — mode-specific label, direction arrow, pending state at 40% opacity); `FourFrameworkZone1D.tsx` (Zone 1D — 4 framework scores derived from Zustand atom, null→`score-value--null`+"—", numeric→`score-value--numeric`). Store extended: `Zone1BAlert`, `mda_alerts`, `pmm_value`, `pmm_direction`, `setPmmState`. 104/104 Vitest tests passing. All Playwright E2E guards use isVisible no-op pattern pending App.tsx integration (#463). | 2026-05-23 |
 | TrajectoryView Zone 1A merged (PR #484, closes #460) | `TrajectoryView.tsx` (ComposedChart: 4 active Lines, 4 ghost Lines, Area divergence fills, ecological WARNING ReferenceLine, ADR-007-gated band infrastructure, Mode 1 custom tick, (exp) badge, Path A single-entity dashed curves); `InstrumentCluster.tsx` (two-column layout 480/240/280px at 1024×768, 580/400/280px at 1280×800, 280px control plane always rendered); `scenarioStepStore.ts` (Zustand atom, single-set() atomicity invariant); `frameworkColors.ts` (UX Designer ruling — teal #1A8FA0 replaces green #3A7A4B after CVD deuteranopia collision identified); DD-012–DD-015 added; FA brief CVD Validation Result recorded; MV-001 closed; 31/31 Vitest tests passing; AC-003/004/005 Playwright guards added (element not in App.tsx yet); MV-002 hardware validation pending before M9 exits. | 2026-05-23 |
 | Known Issues registry established — distinct category from near-misses (PR #482) | External infrastructure limitations (GitHub Actions, third-party APIs) cannot be fixed by process redesign — filing them as near-misses produces improvement recommendations against things we cannot change. Known Issues live in `docs/process/known-issues-registry.md`; near-misses in `docs/process/near-miss-registry.md`. Categorisation rule: if the fix requires changing our own code/process → near-miss; if the fix requires waiting for an upstream vendor → Known Issue. KI-001 filed: GitHub Actions `pull_request` event silently fails to fire (workaround: empty retriggering commit). CLAUDE.md, agents.md, agent-raci.md all updated. | 2026-05-23 |
