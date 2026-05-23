@@ -453,3 +453,78 @@ The Architect Agent authors the ADR — they are not a reviewer. The Engineering
 holds A on all ADR decisions — their sign-off is always required.
 
 Full backlog and panel composition process: `docs/architecture/backlog.md`
+
+---
+
+## File Ownership
+
+This table is the authoritative lookup for the file authority rule in CLAUDE.md. Before writing
+to any file, the acting agent verifies they hold R on that file. If another agent holds R, the
+acting agent produces a draft and requests the owning agent's review before committing. If a
+Required Consultant (C) is listed, that agent's input must be obtained before the change is
+finalized — not afterward.
+
+### Owned Files and Directories
+
+| File or directory | Owner (R) | Required Consultant (C) | Notes |
+|---|---|---|---|
+| `CLAUDE.md` | EL | Ar, PM | Constitutional document; structural changes require Architect review |
+| `SESSION_STATE.md` | PM | EL | PM maintains; EL reviews major restructuring |
+| `.github/` | EL | Ar | CI/CD pipeline changes require Architect review |
+| `docs/process/agents.md` | PM | EL | Agent persona definitions; EL approves new agent additions |
+| `docs/process/agent-raci.md` | PM | EL, Ar | RACI matrix; Architect consulted when decision-type grounding changes |
+| `docs/schema/api_contracts.yml` | DA | Ar | Ar consulted when response shape changes (API response shape is Architect territory) |
+| `docs/schema/database.yml` | DA | Ar, QA | Ar consulted on schema shape; QA consulted on CI enforcement gates |
+| `docs/schema/simulation_state.yml` | DA | Ar, QA | Same rules as database.yml |
+| `docs/DATA_STANDARDS.md` | DA | EL | EL holds A on data standards amendments |
+| `docs/adr/ADR-*.md` | Ar | EL, panel members | EL sign-off required on all ADRs; panel per §ADR Panel Composition |
+| `docs/adr/reviews/` | Ar | EL | Panel review artifacts authored by Architect |
+| `docs/architecture/` (non-ADR) | Ar | DA, FA | DA consulted when docs define schema contracts; FA consulted on frontend architecture |
+| `docs/architecture/backlog.md` | Ar | PM | ADR backlog; PM consulted on milestone assignment |
+| `docs/ux/` | UD | FA, UT | FA consulted on frontend feasibility; UT consulted on first-principles consistency |
+| `docs/frontend/` | FA | UD, Ar | UD consulted on design-affecting changes; Ar consulted on architectural decisions |
+| `docs/compliance/scan-registry.md` | Sr | EL | Compliance scan registry; EL informed of new entries |
+| `docs/compliance/` (other files) | EL | Sr, Ar | Sr consulted on security findings; Ar on compliance-architecture intersections |
+| `docs/roadmap/` | PM | EL, Ar | EL holds A on roadmap decisions; Ar consulted on milestone architecture |
+| `docs/data-sources/` | DA | DI (CM) | Chief Methodologist consulted on approved-source methodology changes |
+| `docs/standards/` | EL | Ar, PM | Standards documents; Ar and PM consulted on process-affecting changes |
+| `docs/CONTRIBUTING.md` | EL | PM, Ar | Process-affecting changes require PM and Architect review |
+| `frontend/` | FA | UD | UD consulted on design-affecting frontend changes |
+| `sim/` (simulation engine) | Im | Ar, CE | Ar consulted on engine architecture; CE on performance tradeoffs |
+| `tests/` | QA | Im | Im consulted on test scope and fixture coverage |
+
+### The Near-Miss That Created This Rule
+
+PR #429 committed changes to `docs/schema/api_contracts.yml` and `docs/schema/database.yml`
+before the Data Architect Agent reviewed them. The Engineering Lead flagged the violation
+mid-execution: "the Data Architect has authority over the api_contracts.yml and database.yml
+files, we should be consulting that agent for review before committing."
+
+The retroactive DA+Architect review found two substantive errors that would have shipped as
+the implementation contract:
+
+1. `scoring_basis` was labeled `"percentile_rank"` on ecological — semantically incorrect
+   because ecological uses boundary-proximity scoring (entity-intrinsic by definition), not a
+   cross-entity percentile rank. Fixed by extending the enum to three values:
+   `"percentile_rank" | "normalized_absolute" | "boundary_proximity"`.
+2. `mda_composite_floors` was listed in `db_reads` for the M9 trajectory endpoint — this
+   table does not exist in M9. Moved to a comment.
+
+A related note in the CM consultation template also labeled ecological `"percentile_rank"` and
+was corrected in the same pass. These errors were caught only because the file authority
+violation surfaced them. The rule exists so this review happens before committing, not after.
+
+### What 'C' Means in Practice
+
+A Required Consultant (C) entry means consultation must happen before the change is finalized —
+not as a courtesy after the fact. The correct sequence:
+
+1. Acting agent produces the draft change.
+2. C agent reviews and provides input.
+3. Acting agent incorporates the input (or documents disagreement for EL resolution).
+4. Only then is the change committed.
+
+Treating step 2 as optional ("I'll mention this to DA in the PR description") is notification,
+not consultation. It violates the R/C boundary. C means two-way communication, and the decision
+waits for that input. If the C agent's review would change the output — and the PR #429 incident
+shows it will — then committing before that review produces incorrect artifacts.

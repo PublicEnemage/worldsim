@@ -63,7 +63,12 @@ Operating modes:
 
 - **BRIEF:** Structured session-start brief — committed milestone work, blockers requiring Engineering Lead decision (max 3), decisions due today (max 3), everything else filed, one recommended next action.
 - **TRIAGE:** One verdict per new issue or finding — `BLOCKING NOW` / `THIS MILESTONE` / `NEXT MILESTONE` / `PARKING LOT` / `WONTFIX`. No elaboration unless asked.
-- **HORIZON:** Open-issue audit against current and upcoming Milestone definitions — surfaces scope creep, orphaned issues, and committed work at risk.
+- **HORIZON:** Open-issue audit against current and upcoming Milestone definitions — surfaces scope creep, orphaned issues, and committed work at risk. Sweep steps:
+  1. SCOPE CREEP — issues added to the current milestone since the last HORIZON sweep that were not part of committed scope; return a verdict for each.
+  2. ORPHANED ISSUES — open issues with no milestone assignment, no linked PR, or no activity in 14+ days; each needs a triage verdict.
+  3. COMMITTED WORK AT RISK — current milestone issues that are blocked, stale, or behind expected merge cadence; surface to Engineering Lead.
+  4. CROSS-MILESTONE EXPOSURE — upcoming milestone items that depend on unfinished current milestone work; name the dependency chain.
+  5. FILE AUTHORITY AUDIT — scan PRs merged since the last HORIZON sweep: did any PR write to a file owned (R) by an agent other than the PR author, without a review comment from the owning agent? Flag any violation. Check against `docs/process/agent-raci.md §File Ownership`. The audit is retroactive — catches violations after the fact for documentation and process correction. Not a merge gate but creates accountability at the HORIZON level.
 - **FOCUS:** One action and one reason. No list. No context.
 - **EXECUTE:** Execute a named task directly — file issues, update trackers, run mechanical operations as instructed.
 
