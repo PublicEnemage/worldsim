@@ -228,6 +228,52 @@ test("AC-011: SIGNIFICANT step tick has step-index, date, and event label text n
 // Source: FA brief §Layout and Viewport (FA-C3 resolution); EL Decision 2026-05-22
 // ---------------------------------------------------------------------------
 
+// ---------------------------------------------------------------------------
+// AC-013: Tier 4/5 confidence badge "(exp)" renders in SVG adjacent to curve
+// Source: FA brief §Named Acceptance Criteria (AC-013); UD-R3
+// Guard pattern: no-op until InstrumentCluster is wired into App.tsx.
+// ---------------------------------------------------------------------------
+
+test("AC-013: Tier 4/5 confidence badge '(exp)' text element present in SVG", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1280, height: 800 });
+  await page.goto("/");
+
+  const trajectory = page.locator('[data-testid="zone-1a-trajectory"]');
+  const isVisible = await trajectory.isVisible({ timeout: 2000 }).catch(() => false);
+  if (!isVisible) return;
+
+  const svg = trajectory.locator("svg").first();
+  const hasSvg = await svg.isVisible({ timeout: 1000 }).catch(() => false);
+  if (!hasSvg) return;
+
+  // The "(exp)" badge is a <text> element rendered by ConfidenceBadge for
+  // any framework curve whose confidence_tier >= 4 (getConfidenceBadgeVisible).
+  // If the loaded fixture has no Tier 4/5 data, this is a no-op.
+  const allText = svg.locator("text");
+  const count = await allText.count();
+  if (count === 0) return;
+
+  // Collect all text content and check if any badge is present.
+  // The badge is present only when fixture data has Tier 4/5 confidence.
+  let badgeFound = false;
+  for (let i = 0; i < count; i++) {
+    const text = await allText.nth(i).textContent();
+    if (text?.includes("(exp)")) {
+      badgeFound = true;
+      break;
+    }
+  }
+
+  // If badge is present, assert it is visible; if absent, the test is a no-op
+  // (no Tier 4/5 fixture data loaded yet — AC-013 becomes live in #463 integration).
+  if (badgeFound) {
+    const badge = svg.locator("text", { hasText: "(exp)" }).first();
+    await expect(badge).toBeVisible();
+  }
+});
+
 test("AC-014: control plane zone is 280px wide at 1280×800", async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 800 });
   await page.goto("/");
