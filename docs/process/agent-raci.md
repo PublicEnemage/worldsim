@@ -46,22 +46,23 @@
 | AF | Architecture Review Facilitator | Active (operational) |
 | IB | Intent Block Author Agent | Proposed (Issue #299) |
 | DQ | Data Quality Agent | Proposed (Issue #300) |
+| PO | Business Product Owner Agent | Active (Issue #440) |
 
 ---
 
 ## RACI Matrix
 
-| Decision type | EL | PM | Ar | Im | DA | QA | Sr | IR | So | CE | FA | UD | UT | DI | CO | AF | IB | DQ |
-|---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
-| 1. Architectural decisions | A | I | R | I | C | I | I | I | I | C | C | I | C | C | I | C | I | I |
-| 2. UX frame decisions | A | I | I | I | I | I | I | C | I | I | C | C | R | I | I | I | I | I |
-| 3. UX component decisions | A | I | I | I | I | I | I | C | I | I | C | R | I | I | I | I | I | I |
-| 4. Data / schema decisions | A | I | C | C | R | C | I | I | I | I | I | I | I | I | I | I | I | C |
-| 5. Domain / measurement decisions | A | I | C | I | I | C | C | I | I | I | I | I | I | R | C | C | I | C |
-| 6. Process / milestone decisions | A | R | C | I | I | C | I | I | I | I | I | I | C | I | C | I | I | I |
-| 7. Compliance decisions | A | I | I | C | C | C | R | I | I | I | I | I | I | C | I | I | I | C |
-| 8. Demo / stakeholder decisions | A | R | I | I | I | I | I | R | I | I | C | C | I | C | I | I | I | I |
-| 9. Agent activation decisions | A/R | C | I | I | I | I | I | I | I | I | I | I | I | I | I | I | I | I |
+| Decision type | EL | PM | Ar | Im | DA | QA | Sr | IR | So | CE | FA | UD | UT | DI | CO | AF | IB | DQ | PO |
+|---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
+| 1. Architectural decisions | A | I | R | I | C | I | I | I | I | C | C | I | C | C | I | C | I | I | I |
+| 2. UX frame decisions | A | I | I | I | I | I | I | C | I | I | C | C | R | I | I | I | I | I | C |
+| 3. UX component decisions | A | I | I | I | I | I | I | C | I | I | C | R | I | I | I | I | I | I | C |
+| 4. Data / schema decisions | A | I | C | C | R | C | I | I | I | I | I | I | I | I | I | I | I | C | I |
+| 5. Domain / measurement decisions | A | I | C | I | I | C | C | I | I | I | I | I | I | R | C | C | I | C | I |
+| 6. Process / milestone decisions | A | R | C | I | I | C | I | I | I | I | I | I | C | I | C | I | I | I | C |
+| 7. Compliance decisions | A | I | I | C | C | C | R | I | I | I | I | I | I | C | I | I | I | C | I |
+| 8. Demo / stakeholder decisions | A | R | I | I | I | I | I | R | I | I | C | C | I | C | I | I | I | I | R |
+| 9. Agent activation decisions | A/R | C | I | I | I | I | I | I | I | I | I | I | I | I | I | I | I | I | I |
 
 ---
 
@@ -139,6 +140,11 @@ within the accepted frame. Those are different authorities, and I respect the bo
 receive a desired conclusion before producing a critique. Independence is the value I provide."
 (`agents.md §UX Design Thinking — Working Agreement`)
 
+**PO — C:** "Voice of the customer in all scope decisions — when implementation tradeoffs arise,
+the PO assesses impact on the five named personas." A frame change affects which persona needs
+are served. The PO assesses user-value impact before the frame is committed.
+(`agents.md §Business Product Owner Agent`)
+
 ---
 
 ### 3. UX component decisions
@@ -168,6 +174,11 @@ Working Agreement`)
 **UT — I:** Explicitly stated: "RACI: ... I on component-level UX decisions." The Design
 Thinking Agent's authority ends at the frame level; component-level decisions belong to the UX
 Designer. (`agents.md §UX Design Thinking — Working Agreement`)
+
+**PO — C:** "The PO is the guardian of the five named personas. When an implementation decision
+would serve developer convenience but degrade a persona's primary cognitive task, the PO flags
+it." Zone and hierarchy decisions determine whether personas can accomplish their primary
+cognitive tasks. (`agents.md §Business Product Owner Agent`)
 
 ---
 
@@ -277,6 +288,10 @@ capability gaps." "Every ROADMAP output produces GitHub Issues with issue number
 recommendations that might be acted on later." Filed issues affect milestone scope.
 (`agents.md §Council Orchestrator — Working Agreement`)
 
+**PO — C:** "Backlog prioritization by user value is a PO input to the PM Agent's milestone
+management, not a unilateral PO decision." The PO assesses the user-value impact of scope cuts
+before they are decided. (`agents.md §Business Product Owner Agent`)
+
 ---
 
 ### 7. Compliance decisions
@@ -347,6 +362,11 @@ cannot contradict them without a recorded override. (`agents.md §UX Designer Ag
 **DI — C:** Domain accuracy of demo outputs is DIC territory. Domain members are activated
 for VALIDATE mode when simulation outputs are being presented as methodology-credible to
 stakeholders. (`agents.md §Domain Intelligence Council`)
+
+**PO — R:** "Demo story ownership — owns the 'what does this demo prove about user value?'
+question for every milestone demo." "The PO participates in M-close demos and assesses whether
+the demo proves the value proposition that was claimed for that milestone."
+(`agents.md §Business Product Owner Agent`)
 
 ---
 
@@ -481,7 +501,9 @@ finalized — not afterward.
 | `docs/adr/reviews/` | Ar | EL | Panel review artifacts authored by Architect |
 | `docs/architecture/` (non-ADR) | Ar | DA, FA | DA consulted when docs define schema contracts; FA consulted on frontend architecture |
 | `docs/architecture/backlog.md` | Ar | PM | ADR backlog; PM consulted on milestone assignment |
-| `docs/ux/` | UD | FA, UT | FA consulted on frontend feasibility; UT consulted on first-principles consistency |
+| `docs/ux/personas.md` | UD | PO | PO is guardian of the five named personas — consulted on any change to persona definitions |
+| `docs/ux/user-journeys.md` | UD | PO | User stories trace to journey steps; PO consulted when journey steps change |
+| `docs/ux/` (other files) | UD | FA, UT | FA consulted on frontend feasibility; UT consulted on first-principles consistency |
 | `docs/frontend/` | FA | UD, Ar | UD consulted on design-affecting changes; Ar consulted on architectural decisions |
 | `docs/compliance/scan-registry.md` | Sr | EL | Compliance scan registry; EL informed of new entries |
 | `docs/compliance/` (other files) | EL | Sr, Ar | Sr consulted on security findings; Ar on compliance-architecture intersections |
