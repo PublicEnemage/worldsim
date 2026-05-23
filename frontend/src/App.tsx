@@ -4,6 +4,8 @@ import ChoroplethMap from "./components/ChoroplethMap";
 import DeltaChoropleth from "./components/DeltaChoropleth";
 import EntityDetailDrawer from "./components/EntityDetailDrawer";
 import FidelityDashboard from "./components/FidelityDashboard";
+import { ModeIndicator } from "./components/ModeIndicator";
+import { ScenarioInstrumentCluster } from "./components/ScenarioInstrumentCluster";
 import ScenarioControls from "./components/ScenarioControls";
 import ScenarioPanel from "./components/ScenarioPanel";
 import type { ScenarioDetailResponse } from "./types";
@@ -117,6 +119,7 @@ export default function App() {
                 {selectedScenarioName}
               </span>
             )}
+            <ModeIndicator />
             <ScenarioControls
               scenarioId={selectedScenarioId}
               totalSteps={selectedScenarioSteps}
@@ -139,6 +142,18 @@ export default function App() {
       {fidelityOpen && <FidelityDashboard />}
 
       <main className="app-main" style={{ position: "relative" }}>
+        {/* Instrument cluster — primary viewport when a scenario is active (CLAUDE.md UX commitment 1) */}
+        {selectedScenarioId && (
+          <div style={{ overflowX: "auto", background: "#fafafa", borderBottom: "1px solid #e8e8e8" }}>
+            <ScenarioInstrumentCluster
+              scenarioId={selectedScenarioId}
+              stepCount={selectedScenarioSteps}
+              currentStep={currentStep ?? 0}
+            />
+          </div>
+        )}
+
+        {/* Context layer — choropleth map (navigable context per CLAUDE.md UX commitment 2) */}
         {showDelta ? (
           <DeltaChoropleth
             scenarioAId={selectedScenarioId}

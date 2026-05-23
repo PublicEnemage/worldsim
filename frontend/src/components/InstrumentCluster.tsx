@@ -85,10 +85,8 @@ export function InstrumentCluster({
         }}
       >
         {/* Zone 1B — MDA Alert Panel (~45% of column height) */}
-        <div
-          data-testid="zone-1b-mda-alerts"
-          style={{ flex: "0 0 45%", overflow: "hidden" }}
-        >
+        {/* data-testid lives on MDAAlertPanelZone1B root — not duplicated here */}
+        <div style={{ flex: "0 0 45%", overflow: "hidden" }}>
           {mdaPanel ?? (
             <div style={{ color: "#bbb", fontSize: 12, padding: 8 }}>
               MDA Alert Panel (Zone 1B)
@@ -97,10 +95,8 @@ export function InstrumentCluster({
         </div>
 
         {/* Zone 1C — PMM Widget (~25% of column height) */}
-        <div
-          data-testid="zone-1c-pmm"
-          style={{ flex: "0 0 25%", overflow: "hidden" }}
-        >
+        {/* data-testid lives on PMMWidgetZone1C root — not duplicated here */}
+        <div style={{ flex: "0 0 25%", overflow: "hidden" }}>
           {pmmWidget ?? (
             <div style={{ color: "#bbb", fontSize: 12, padding: 8 }}>
               PMM Widget (Zone 1C)
@@ -109,10 +105,8 @@ export function InstrumentCluster({
         </div>
 
         {/* Zone 1D — Four-Framework Current Position (~30% of column height) */}
-        <div
-          data-testid="zone-1d-four-framework"
-          style={{ flex: "0 0 30%", overflow: "hidden" }}
-        >
+        {/* data-testid lives on FourFrameworkZone1D root — not duplicated here */}
+        <div style={{ flex: "0 0 30%", overflow: "hidden" }}>
           {fourFramework ?? (
             <div style={{ color: "#bbb", fontSize: 12, padding: 8 }}>
               Four-Framework Current Position (Zone 1D)
