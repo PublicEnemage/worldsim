@@ -760,6 +760,128 @@ The following sequencing ensures no blocking dependency is encountered mid-imple
 | UD-R2: Multi-case tick format | §Mode 1 Step Axis Annotation | ✓ Stacked dates; must appear |
 | UD-R3: Curve-face badge | §Confidence Tier Visual | ✓ "(exp)" at rightmost data point; 11px min (UD-F2) |
 
+## Appendix — Data Architect Review Findings
+
+Data Architect Agent: REVIEW — 2026-05-22. Schema files read: `api_contracts.yml` v1.0,
+`database.yml` v1.1, `simulation_state.yml` v1.0.
+
+**Five findings. Three require EL decisions before the trajectory endpoint can be implemented.**
+
+| ID | Finding | Severity | Status |
+|---|---|---|---|
+| DA-F1 | `GET /scenarios/{id}/trajectory` absent from `api_contracts.yml` | Schema gap | Partial stub added 2026-05-22 — full spec blocked by DA-F2 and DA-F4 |
+| DA-F2 | No composite-score-level MDA floor storage in current schema | Blocking — EL decision required | Pending |
+| DA-F3 | `ci_lower`/`ci_upper` absent from all schema files | Schema gap | Registered as pending-ADR-007 in stub — no action required until ADR-007 |
+| DA-F4 | Single-entity null handling for financial/human_development undefined | Blocking — EL decision required | Pending |
+| DA-F5 | `step_event_label`/`step_significance` have no schema home | Blocking schema design | Pending |
+
+### DA-F1 — Trajectory Endpoint Absent from api_contracts.yml
+
+`GET /scenarios/{scenario_id}/trajectory` did not exist in `api_contracts.yml`. A partial
+schema stub has been added (2026-05-22) documenting the known fields and flagging the three
+open EL decisions as PENDING. The stub prevents implementation agents from calling or
+implementing the endpoint without a schema contract, and registers the pending gaps so they
+are visible in the schema file.
+
+**Action taken:** Partial entry added to `docs/schema/api_contracts.yml` with PENDING tags
+on DA-F2, DA-F3, DA-F4, DA-F5 elements.
+
+### DA-F2 — No Composite-Score-Level MDA Floor Storage (EL Decision Required)
+
+`mda_thresholds.floor_value` (`database.yml`) stores indicator-level breach thresholds
+(e.g., `poverty_headcount_ratio < 0.40`, `reserve_coverage_months < 2.5`). The trajectory
+view's Y-axis is the composite score. MDA floor lines on the trajectory view must be at the
+composite-score level (ADR-010 Decision 6, CM-R3 disposition). Projecting indicator-level
+floors to composite-score-level floors is explicitly prohibited by CM-R3 ("implies false
+precision; projection is methodologically dishonest"). There is no composite-score-level floor
+field or table in the current schema.
+
+**Two options for EL decision:**
+
+(a) **Add `composite_floor_value` field to `mda_thresholds`** — populated by a separate
+    process (not derived from `floor_value` projection). Requires Alembic migration.
+    Establishes a schema-native location for composite-score-level MDA floors.
+    New `mda_thresholds` rows can carry both `floor_value` (indicator-level, for Zone 2B)
+    and `composite_floor_value` (composite-level, for Zone 1A trajectory view).
+
+(b) **Defer MDA floor overlays on the trajectory view** — do not render MDA floor
+    `<ReferenceLine>` elements until a composite-score-level threshold table or field is
+    defined. Trajectory view renders without floor lines; Zone 2B retains indicator-level
+    MDA alert rows. MDA floor overlays are added in a future PR once the schema is resolved.
+
+**Implementation must not proceed on MDA floor overlays until EL chooses (a) or (b).**
+
+### DA-F3 — ci_lower / ci_upper Not in Any Schema File
+
+`ci_lower` and `ci_upper` fields appear in the FA brief's uncertainty band `<Area>` component
+and in the `TrajectoryResponse.FrameworkCurvePoint` shape. They do not exist in `database.yml`,
+`api_contracts.yml`, or `simulation_state.yml`. These fields will be populated by the
+BandingEngine (pending ADR-007). They are registered as PENDING in the trajectory endpoint
+stub added under DA-F1.
+
+**No immediate action required** — they are correctly gated on ADR-007 acceptance. The schema
+stub registration prevents silent addition without schema contract. When ADR-007 is accepted,
+update `api_contracts.yml` and `database.yml` in the same PR that implements the BandingEngine.
+
+### DA-F4 — Single-Entity Null: Trajectory View Undefined for Mode 1 Greece (EL Decision Required)
+
+In the existing `measurement-output` endpoint, `composite_score` is null for financial and
+human_development frameworks when `single_entity_warning=true` (Issue #193). The Greece demo
+fixture is a single-entity scenario. If the trajectory endpoint propagates this null, the
+trajectory view for Greece Mode 1 would show no financial or human_development curves —
+defeating the purpose of the primary demo scenario.
+
+The FA brief's null governance guard (`connectNulls={false}` on the governance `<Line>`) is
+correct. But it does not address the separate null case for financial/human_development in
+single-entity Mode 1.
+
+**Two options for EL decision:**
+
+(a) **Trajectory endpoint uses raw indicator signal for single-entity scenarios** — instead of
+    percentile rank composite score (which requires ≥2 entities), the trajectory endpoint
+    returns a single-entity-specific composite score derivation. Requires an ADR or EL
+    decision on the methodology. Unblocks Mode 1 Greece demo trajectory view.
+
+(b) **Mode 1 single-entity trajectory view shows "single-entity advisory" overlay** — financial
+    and human_development curves are suppressed; a user-visible label explains that composite
+    percentile rank requires a comparison entity. Trajectory view shows ecological and
+    governance curves only (both of which have different null reasons).
+
+**Issue #193 is a prerequisite for Mode 1 single-entity trajectory rendering.** The FA brief's
+implementation sequencing must note this dependency.
+
+### DA-F5 — step_event_label and step_significance Have No Schema Home
+
+The FA brief references `step_event_label` (≤ 8 words AND ≤ 32 characters) and
+`step_significance` ("SIGNIFICANT" | "STANDARD") as mandatory fields for Mode 1 step
+annotation. `effective_from` maps to `scenario_state_snapshots.timestep`. The other two
+fields have no schema home.
+
+**Three candidate storage approaches for EL/Architect decision:**
+
+(a) **Per-step metadata in scenario configuration JSONB** — add a `step_annotations` key to
+    `scenarios.configuration` with structure `{step_index: {label, significance}}`. Populated
+    at scenario creation. No migration needed (JSONB extension). Query: read from
+    `scenarios.configuration->'step_annotations'` in the trajectory endpoint.
+
+(b) **New `step_annotations` table** — one row per (scenario_id, step_index), columns:
+    `step_event_label text nullable`, `step_significance text nullable`. Alembic migration
+    required. More structured; supports future step-level metadata.
+
+(c) **Embedded in fixture JSON only; not DB-persisted** — fixture files carry the annotation
+    fields as configuration metadata; the trajectory endpoint derives them from the scenario
+    configuration at request time. No migration needed for historical fixtures.
+
+**Recommendation:** Option (a) for M9 (minimum viable; no migration). Option (b) if
+step-level metadata grows beyond two fields. The FA brief's fixture CI gate
+(`pytest tests/fixtures/`) enforces the character constraints; the storage schema question
+is orthogonal to validation.
+
+**The trajectory endpoint cannot return `step_event_label` or `step_significance` until
+this storage design is decided.**
+
+---
+
 ## Appendix — Review Findings Log
 
 Three-agent review conducted 2026-05-22 (UX Design Thinking, UX Designer, QA Lead).

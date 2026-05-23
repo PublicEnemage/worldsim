@@ -411,6 +411,123 @@ endpoints:
     db_reads: [scenarios, scenario_state_snapshots]
 
   - method: GET
+    path: "/scenarios/{scenario_id}/trajectory"
+    summary: >
+      Multi-step trajectory for all four measurement frameworks. Returns computed
+      steps only (dense array — ADR-010 Decision 2, FA-R3). null composite_score
+      on a returned step means governance-in-validation only, not an uncomputed step.
+      PARTIAL SCHEMA — three open EL decisions must be resolved before implementation.
+      See Data Architect findings DA-F1 through DA-F5 in docs/frontend/fa-brief-m9-instrument-cluster.md.
+    status: PENDING — EL decisions required on DA-F2 (MDA floor schema), DA-F4 (single-entity null handling)
+    auth: none
+    path_params:
+      scenario_id: {type: string}
+    response:
+      status: 200
+      body:
+        scenario_id: {type: string}
+        entity_id: {type: string}
+        steps:
+          type: array
+          description: >
+            Computed steps only — dense array (ADR-010 Decision 2). Absent steps
+            were not yet computed at response time. Step 0 = initial state.
+          items:
+            step_index: {type: integer}
+            effective_from:
+              type: string
+              format: "ISO 8601"
+              description: "From scenario_state_snapshots.timestep at this step"
+            step_event_label:
+              type: "string|null"
+              description: >
+                PENDING DA-F5 — storage schema not yet defined. Event label for
+                SIGNIFICANT steps in Mode 1. Must be ≤ 8 words AND ≤ 32 characters
+                (FA brief §Mode 1 Step Axis Annotation, DD-014).
+            step_significance:
+              type: "string|null"
+              description: >
+                PENDING DA-F5 — storage schema not yet defined.
+              values: ["SIGNIFICANT", "STANDARD", null]
+            financial:
+              composite_score:
+                type: "string|null"
+                description: >
+                  Decimal as string. null for governance-in-validation.
+                  PENDING DA-F4 — null also occurs in single-entity scenarios
+                  (single_entity_warning=true); EL decision required on trajectory
+                  endpoint behaviour for single-entity Mode 1.
+              confidence_tier: {type: integer, range: [1, 5]}
+              ci_lower:
+                type: "string|null"
+                description: >
+                  PENDING ADR-007 (DA-F3) — BandingEngine not yet implemented.
+                  null until ADR-007 accepted. Decimal as string when present.
+              ci_upper:
+                type: "string|null"
+                description: "PENDING ADR-007 (DA-F3) — same as ci_lower."
+            human_development:
+              composite_score: {type: "string|null", description: "Same null semantics as financial — see DA-F4"}
+              confidence_tier: {type: integer}
+              ci_lower: {type: "string|null", description: "PENDING ADR-007"}
+              ci_upper: {type: "string|null", description: "PENDING ADR-007"}
+            ecological:
+              composite_score: {type: "string|null"}
+              confidence_tier: {type: integer}
+              ci_lower: {type: "string|null", description: "PENDING ADR-007"}
+              ci_upper: {type: "string|null", description: "PENDING ADR-007"}
+            governance:
+              composite_score:
+                type: "string|null"
+                description: >
+                  null = governance-in-validation (GovernanceModule deferred M9,
+                  ADR-005 Amendment 3 Decision M8-4). Distinct from single-entity
+                  null in financial/human_development — see DA-F4.
+              confidence_tier: {type: integer}
+              ci_lower: {type: "string|null", description: "PENDING ADR-007"}
+              ci_upper: {type: "string|null", description: "PENDING ADR-007"}
+            policy_inputs:
+              type: array
+              description: Policy input events applied at this step. Source: scenario_scheduled_inputs.
+              items:
+                input_type: {type: string}
+                input_data: {type: object}
+            shock_events:
+              type: array
+              description: Exogenous shock events at this step.
+              items:
+                event_type: {type: string}
+                metadata: {type: object}
+            mda_floors:
+              type: array
+              description: >
+                PENDING DA-F2 — composite-score-level MDA floors have no storage in
+                current schema. mda_thresholds.floor_value is indicator-level.
+                EL decision required: (a) add composite_floor_value field to
+                mda_thresholds with migration; or (b) defer MDA floor overlays until
+                composite-score-level threshold table is defined. Projection from
+                indicator-level to composite-score-level is prohibited (CM-R3, ADR-010
+                Decision 6 — methodologically dishonest).
+              items:
+                framework: {type: string, values: ["financial", "human_development", "ecological", "governance"]}
+                floor_value:
+                  type: "string|null"
+                  description: "PENDING DA-F2 — composite-score-level; not indicator-level projection"
+                threshold_type: {type: string, values: ["WARNING", "CRITICAL", "TERMINAL"]}
+      status_404: "Scenario not found"
+    db_reads:
+      - scenarios
+      - scenario_state_snapshots
+      - mda_thresholds
+      - "[PENDING DA-F5] step_annotations or equivalent per-step metadata source"
+    notes:
+      - "DA-F1: Endpoint added 2026-05-22. Schema PARTIAL — five Data Architect findings pending EL decisions."
+      - "DA-F2: mda_floors blocked — no composite-score-level floor storage in current schema."
+      - "DA-F3: ci_lower/ci_upper fields registered as pending-ADR-007 placeholders."
+      - "DA-F4: single-entity null handling for financial/human_development composite_score requires EL decision."
+      - "DA-F5: step_event_label/step_significance have no schema home — storage design required."
+
+  - method: GET
     path: "/scenarios/{scenario_id}/measurement-output"
     summary: >
       Multi-framework measurement output for one entity at one step.
