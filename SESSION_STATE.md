@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated:** 2026-05-23 (M9 instrument cluster user stories — 29 stories, QA + FA consumers; PR #449)
+**Last updated:** 2026-05-23 (US-GAP-001 resolved — Mode 1 COMPARE_VIEW placeholder; EL decision M10; Issue #451 filed; PR #452)
 **Current milestone:** M9 — Standards Foundation
 
 ---
@@ -76,11 +76,11 @@ No open PRs — board clear as of 2026-05-23.
 
 | PR | Title | Date |
 |---|---|---|
+| #452 | docs(ux): US-GAP-001 resolved — Mode 1 COMPARE_VIEW placeholder; EL decision M10 (Issue #451) | 2026-05-23 |
 | #449 | docs(ux): M9 instrument cluster user stories — 29 stories, QA + FA consumers (closes #441) | 2026-05-23 |
 | #447 | docs(process): NM-014 systemic root cause — micro-management cycle and correct locus of specification | 2026-05-23 |
 | #445 | docs(process): PR merge gate — mandatory pause + SESSION_STATE auto-merge exception | 2026-05-23 |
 | #444 | fix(ci): actions/checkout@v6 → @v4 — fixes auth failure on all PRs | 2026-05-23 |
-| #443 | docs(process): near-miss registry — NM-014 file edit without commit; NM-015 CI gate not required | 2026-05-23 |
 | #438 | docs(process): blameless continuous improvement principle — Aviation SMS in CLAUDE.md | 2026-05-23 |
 | #436 | docs(process): near-miss registry — NM-008 through NM-013, agent team growth and DIC founding | 2026-05-23 |
 | #435 | docs(process): near-miss registry — NM-001 through NM-007, Aviation SMS methodology | 2026-05-23 |
@@ -161,7 +161,7 @@ All Horizon:Immediate issues are now closed. M8 feature-complete.
 | Decision | Context | Status |
 |---|---|---|
 | Trajectory endpoint implementation | FastAPI route + Pydantic model + normalized_absolute_strategy backend function. All prerequisites complete. May begin. | Ready — unblocked |
-| US-GAP-001 — Andreas Mode 1 comparative case surface | Persona 3 (Andreas Stefanidis) primary Mode 1 task is historical pattern recognition via comparable-case comparison. This requires a comparative surface not in the M9 instrument cluster spec. PO gap finding from Issue #441 story work. EL must decide: M9 addition or M10 gap. | Awaiting EL decision |
+| US-GAP-001 — Andreas Mode 1 comparative case surface | **Resolved.** EL decision 2026-05-23: M10 gap. Issue #451 filed. information-hierarchy.md §COMPARE_VIEW Mode 1 placeholder added. user-stories file updated to reflect partial M9 service for Persona 3. | Complete ✅ — PR #452 |
 | UX-RULING US-016 — alert text strings per mode | US-016 (Mode 1/2/3 alert text observable strings) has [UX-RULING] placeholder. QA cannot write the Playwright assertion until UX Designer provides the exact string for each mode. Acceptance criterion AC-013 blocked. | Awaiting UX Designer |
 | UX-RULING US-022 — null vs. zero CSS class | US-022 (four-framework current position null vs. zero rendering) has [UX-RULING] placeholder. QA must distinguish null-data vs. genuine-zero in the Playwright assertion. | Awaiting UX Designer |
 | UX-RULING US-026 — mode indicator label strings | US-026 (persistent header mode indicator) has [UX-RULING] placeholder. QA cannot assert the exact label text for Mode 1/2/3. | Awaiting UX Designer |
@@ -184,6 +184,7 @@ All Horizon:Immediate issues are now closed. M8 feature-complete.
 
 | Decision | Rationale | Date |
 |---|---|---|
+| US-GAP-001 — Mode 1 comparable-case comparison deferred to M10 | Pre-EL consultation: UX Design Thinking Agent, PO Agent, Architect Agent — unanimous M10 verdict. Key finding: the gap was narrower than stated. ADR-010 Decision 11 and FA brief §UD-R2 already specify the rendering layer for multi-case Mode 1 (step alignment, stacked entity dates). The missing piece is the Zone 2 entry point for selecting the second fixture — a COMPARE_VIEW architecture question, not an instrument cluster question. Mode 1 block added to `information-hierarchy.md §COMPARE_VIEW` with decision space documented. User stories file updated: US-GAP-001 converted from pending to resolved; M9 service level for Persona 3 stated explicitly (orientation sufficient; comparison M10). Issue #451 filed with full M10 deliverable spec. PR #452. | 2026-05-23 |
 | M9 instrument cluster user stories — 29 stories authored (Issue #441, PR #449) | PO Agent: EXECUTE. Two consumers: QA Lead (writes acceptance tests from stories before implementation) and Frontend Architect (implements to stories as user-value specification). 29 stories across 9 groups (US-001–US-029): Zone 1 Completeness, Trajectory View, MDA Alert Panel, PMM Widget, Four-Framework Current Position, Atomicity, Persistent Header, Control Plane Reserved Zone, Performance. All stories include Given/When/Then acceptance criteria tagged by test method [Playwright], [Vitest], [RTL], [pytest], [Manual]. Three [UX-RULING] placeholders (US-016, US-022, US-026) await UX Designer observable-string rulings. One [EL-DECISION] gap finding (US-GAP-001): Andreas Mode 1 comparative-case comparison requires a surface not in M9 spec — EL to decide M9 or M10. File: `docs/ux/user-stories-instrument-cluster-m9.md`. | 2026-05-23 |
 | NM-014 systemic root cause expanded — micro-management cycle named | The contributing factor section was accurate but incomplete. Expanded with a full nine-step cycle analysis: mistakes → more prescription → reduced agent reasoning → more mistakes → more prescription. Named the analogy to the tech lead failure mode. Stated the correct structural response: issues carry prescription, standing documents carry rules, agents write their plan before executing, prompts are outcome-oriented. Prescriptive prompting weight upgraded from "under investigation" to "confirmed as significant — both symptom and perpetuating mechanism." PR #447. | 2026-05-23 |
 | PR merge gate rule added to CLAUDE.md — mandatory pause + SESSION_STATE.md auto-merge exception | After opening any PR, Claude Code must stop all git operations, report the PR URL, and wait for user merge confirmation before pulling main or starting the next task. Exception: SESSION_STATE.md-only PRs are pre-authorized for auto-merge once the `changes` CI status check passes. Rationale: eliminates the concurrent-terminal race condition (two processes operating git on the same local repo without coordination) while preserving the human as merge coordinator and CI gate — especially important in parallel-session scenarios. PR #445. | 2026-05-23 |
