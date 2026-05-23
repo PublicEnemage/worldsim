@@ -102,6 +102,44 @@ PM Agent: EXECUTE — [task]
 
 **Where I will offer help:** Mid-session discoveries. Any agent that has found something — a bug, a gap, a new requirement — and is uncertain whether to act now or file it: bring it to me. One sentence describing the finding, I return one word.
 
+### Issue Hierarchy
+
+WorldSim uses a strict three-level issue hierarchy. The spawning rule is
+binary and agent-count-based — not complexity-based. Complexity is never
+a criterion.
+
+**Level 1 — Epic**
+Unit: a milestone capability or feature area representing a coherent
+user-facing outcome. Exists for roadmap and milestone tracking only.
+- No implementation commits directly against an Epic
+- Closes only when all child Feature Issues are closed
+- Created by: PM Agent or PO Agent
+
+**Level 2 — Feature Issue**
+Unit: a deployable slice of an Epic — something that can be implemented,
+reviewed, and merged as a coherent PR with a clear acceptance owner.
+- Implementation commits go here
+- Spawns Level 3 Task Issues when: (a) more than one agent must act on
+  it before it can close, OR (b) more than one PR is required to close it
+- If neither condition is true, stays at Level 2 with no children
+- Created by: PM Agent, PO Agent, or implementing agent
+
+**Level 3 — Task Issue**
+Unit: a single-agent, single-session action with binary done/not-done
+state.
+- No children — never spawns further issues
+- Closes when the specific action is complete
+- Created by: the agent responsible for the action, or PM Agent
+
+**The spawning rule — applied before creating any child issues:**
+Ask: does closing this issue require more than one agent, or more than
+one PR? If yes → spawn Level 3 Task Issues. If no → no children.
+
+**Work is never committed against a Level 1 Epic.** If a commit needs
+a parent issue, it belongs to a Level 2 Feature Issue, not the Epic.
+An Epic with direct commits is a process violation equivalent to
+implementing a feature without an ADR.
+
 ---
 
 ## Architect Agent
