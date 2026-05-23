@@ -87,18 +87,33 @@ Every criterion here is testable before M9 implementation is considered complete
 | AC-003 | Trajectory view minimum width ≥ 480px at 1024×768 | Computed width assertion in Playwright |
 | AC-004 | Trajectory view minimum width ≥ 580px at 1280×800 | Computed width assertion in Playwright |
 | AC-005 | Trajectory view minimum height ≥ 300px at any supported viewport | Computed height assertion in Playwright |
-| AC-006 | All four Zone 1 instruments update in a single render cycle on step advance | React Testing Library: assert all four instrument DOM nodes update before next paint |
-| AC-007 | ComposedChart initial render ≤ 100ms on 4-core target hardware | Performance.measure in Playwright; measured on throttled 4-core profile |
-| AC-008 | ComposedChart step navigation ≤ 100ms on 4-core target hardware | Performance.measure in Playwright |
-| AC-009 | Full Mode 3 component set (8 Lines + 4 Areas + 6+ ReferenceLines) ≤ 100ms | Performance.measure at Mode 3 full activation |
-| AC-010 | Divergence fill disappears when \|active - baseline\| ≤ 0.01 at every step | Unit test: assert no `<Area>` fill rendered when delta ≤ 0.01 |
+| AC-006 | All four Zone 1 instruments update in a single render cycle on step advance | React Testing Library: wrap step-advance in `act()`; assert all four instrument DOM nodes reflect new `current_step` within the same `act()` call before it resolves |
+| AC-007 | ComposedChart initial render ≤ 100ms on CI throttled profile | `performance.measure` in Playwright; 4× CPU throttle (`page.emulate({cpuThrottling:4})`); see also hardware validation note in §Performance Acceptance Criteria |
+| AC-008 | ComposedChart step navigation ≤ 100ms on CI throttled profile | `performance.measure` in Playwright; same throttle as AC-007 |
+| AC-009 | Full Mode 3 component set (8 Lines + 4 Areas + 6+ ReferenceLines) ≤ 100ms on CI throttled profile | `performance.measure` at Mode 3 full activation; same throttle |
+| AC-010 | Divergence fill disappears when \|active - baseline\| ≤ 0.01 at every step | Vitest unit test: assert no `<Area>` fill rendered when delta ≤ 0.01 |
 | AC-011 | Mode 1 step annotation renders three-line tick at ≥ 1024px viewport | Playwright screenshot; verify three text nodes per SIGNIFICANT step tick |
-| AC-012 | Step annotation event label: ≤ 8 words AND ≤ 32 characters; fixture CI gate rejects violations | CI schema validation test |
-| AC-013 | Four framework colors pass CVD check (deuteranopia + protanopia) | Screenshot through Color Oracle; UX Designer sign-off required |
-| AC-014 | Tier 4-5 curves show "(exp)" label adjacent to most recent data point in chart body | Playwright screenshot; assert element present in SVG |
-| AC-015 | Control plane reserved zone = 280px width at 1280×800; trajectory view width ≥ 580px | Computed width assertions in Playwright |
-| AC-016 | Null governance composite score renders as curve gap, not zero | Playwright: assert no SVG path segment at null-value steps |
-| AC-017 | UX Designer sign-off recorded in this brief before implementation begins | This document updated with sign-off before first PR |
+| AC-012 | Step annotation event label: ≤ 8 words AND ≤ 32 characters; fixture CI gate rejects violations | `pytest tests/fixtures/` schema validation; runs on every PR |
+| AC-013 | Tier 4-5 curves show "(exp)" label adjacent to most recent data point in chart body | Playwright screenshot; assert `<text>` element present in SVG adjacent to rightmost data point on Tier 4-5 curve |
+| AC-014 | Control plane reserved zone = 280px width at 1280×800; trajectory view width ≥ 580px | Computed width assertions in Playwright |
+| AC-015 | Null governance composite score renders as curve gap, not zero | Vitest unit test: mount `TrajectoryView` with fixture having `composite_score: null` at step 3; assert governance `<Line>` has `connectNulls={false}` prop; assert no rendered data-point element at step 3 x-position for governance line |
+
+---
+
+## Manual Validation Gates
+
+These gates cannot be automated in CI. Each must be completed and recorded before M9 exits.
+
+| ID | Gate | How completed |
+|---|---|---|
+| MV-001 | Four framework colors pass CVD check (deuteranopia + protanopia) | Color Oracle or equivalent; procedure in §Framework Colors; result recorded in §CVD Validation Result |
+| MV-002 | Performance ≤ 100ms on actual target hardware (8GB/4-core laptop) | Developer runs `performance.measure` test on target machine; documents result in PR description |
+| MV-003 | UX Designer sign-off on component layout decisions | Sign-off section completed in this brief before first implementation PR |
+
+MV-002 exists because Playwright's 4× CPU throttle (`cpuThrottling`) applies a slowdown to the
+JS thread on the test machine — it is not a simulation of a 4-core CPU. On high-core-count CI
+runners, 4× throttling may produce a faster effective runtime than an actual 4-core laptop. AC-007
+through AC-009 are the CI gate; MV-002 is the hardware confirmation before M9 closes.
 
 ---
 
@@ -139,6 +154,23 @@ Option A, 2026-05-22). At 1024×768, 560px trajectory + 240px co-primary + 280px
 legibility while satisfying the control plane zone reservation. The 480px minimum is confirmed
 against the step annotation render test (see §Mode 1 Step Axis Annotation) and the four-curve
 trajectory view (see §Performance Acceptance Criteria).
+
+**MDA alert panel compact row format at 240px (UD-F1 — UX Designer ruling):**
+
+At 240px column width (1024×768), the four fields required by ADR-008 Decision 5 cannot render
+at full density without overflow or expansion. The compact row format at this width is:
+
+- **Line 1:** Severity pill (8px × 6px colored circle) + severity abbreviation ("WARN" / "CRIT"
+  / "TERM") + framework source abbreviation ("FIN" / "HDI" / "ECO" / "GOV")
+- **Line 2:** Indicator name, truncated at 22 characters with ellipsis (e.g.,
+  `poverty_headcount` → "poverty headcount...")
+- **Line 3:** "Step N • [cohort abbreviation, ≤ 10 characters]"
+
+This satisfies "visible without expansion" at 240px. Three lines per alert row; no scroll
+within the MDA panel for the top 1–3 alerts.
+
+At 400px column width (1280×800), the full-density format from ADR-008 Decision 5 applies:
+all four fields untruncated on separate lines.
 
 **Right column vertical stacking order (1B / 1C / 1D):**
 
@@ -356,7 +388,8 @@ cell degrades. The fixture CI gate enforces both constraints at schema validatio
 **Fixture CI gate (binding):** Any Mode 1 scenario fixture with a SIGNIFICANT step whose
 `step_event_label` exceeds 8 words OR 32 characters must fail CI. The gate is a schema
 validation step, not a render-time check. Implementation: a pytest schema validator that
-checks every fixture JSON file.
+checks every fixture JSON file, located in `tests/fixtures/` and run as part of the standard
+`pytest tests/fixtures/` suite on every PR (QA-F6).
 
 ### Multi-Case Mode 1 Tick Format (UD-R2 Resolution — UX Designer Ruling)
 
@@ -483,7 +516,7 @@ the most recent data point on the curve:
 ```
 Text content: "(exp)"
 Position: 4px to the right of the rightmost non-null data point
-Font size: 10px
+Font size: 11px minimum (UX Designer ruling UD-F2 — informational text, not decorative)
 Color: framework color at 80% opacity (matches the curve's strokeOpacity=0.60 tier treatment)
 Visibility: only when confidence_tier ∈ {4, 5} for the framework's most recent step
 ```
@@ -623,19 +656,19 @@ implementation begins.
 **Specific items requiring UX Designer confirmation:**
 
 1. Zone 1 two-column layout (480px trajectory + 240px co-primary at 1024×768) — confirm the
-   240px right column is sufficient for MDA alert panel, PMM widget, and four-framework
-   position simultaneous scannability
+   240px right column satisfies simultaneous scannability with the compact row format (UD-F1)
 2. Right column vertical stacking order (1B → 1C → 1D, top to bottom) — confirm MDA primacy
-3. CVD validation outcome — confirm framework colors once validation is complete
-4. Curve-face `"(exp)"` badge positioning — confirm the 4px right-of-datapoint placement is
-   legible at the minimum trajectory view width
+3. MDA compact row format at 240px (UD-F1 ruling above) — confirm the 3-line compact spec
+4. CVD validation outcome — confirm framework colors once validation is complete (MV-001)
+5. Curve-face `"(exp)"` badge — confirm 11px font size (UD-F2) and 4px right-of-datapoint
+   placement at minimum trajectory view width
 
 **UX Designer sign-off:**
 
 *To be completed by the UX Designer Agent before implementation begins.*
 
 **Sign-off date:** ___________
-**Confirmed items:** ☐ Zone 1 layout ☐ Right column stacking ☐ Framework colors ☐ Badge positioning
+**Confirmed items:** ☐ Zone 1 layout ☐ Right column stacking ☐ Compact alert row format (UD-F1) ☐ Framework colors ☐ Badge font 11px (UD-F2) ☐ Badge positioning
 
 **Notes / revisions from UX Designer:** ___________
 
@@ -645,11 +678,12 @@ implementation begins.
 
 The following sequencing ensures no blocking dependency is encountered mid-implementation.
 
-**Pre-implementation (before first PR):**
+**Pre-implementation (before first PR) — blocking gates:**
 
+0. **UX Designer sign-off** (MV-003) — sign-off section completed in this document; no
+   implementation PR may open until this is recorded
 1. Complete CVD validation for framework colors; record result in §CVD Validation Result
-2. Obtain UX Designer sign-off (§UX Designer Sign-Off Required)
-3. Add DD-012 through DD-015 to `docs/frontend/design-decisions.md`
+2. Add DD-012 through DD-015 to `docs/frontend/design-decisions.md`
 4. Build and validate divergence fill proof-of-concept at `frontend/sandbox/trajectory-divergence-poc.tsx`
 5. Update `docs/schema/api_contracts.yml` with `GET /scenarios/{id}/trajectory` endpoint
 
@@ -678,14 +712,32 @@ The following sequencing ensures no blocking dependency is encountered mid-imple
 
 | Deferred item | Brief section | Status |
 |---|---|---|
-| FA-C1: Zone 1 layout at 1024×768 | §Layout and Viewport | ✓ Named constants: 480/240/280 |
+| FA-C1: Zone 1 layout at 1024×768 | §Layout and Viewport | ✓ Named constants: 480/240/280; compact alert format (UD-F1) |
 | FA-C2: State management design decision | §Shared State Architecture | ✓ Zustand atom; DD-012 required |
 | FA-C3: Control plane zone width | §Layout and Viewport | ✓ 280px confirmed (EL ruling) |
 | FA-C4: Bands linked to ADR-006 | §Uncertainty Band Infrastructure | ✓ Base schedule cited; Tier 3-5 multipliers ADR-007-gated |
 | FA-C5: Step annotation at 1024px | §Mode 1 Step Axis Annotation | ✓ 32-char constraint; 80px tick cell validated |
-| FA-R1: ComposedChart performance | §Performance Acceptance Criteria | ✓ ≤ 100ms; AC-007/008/009 |
+| FA-R1: ComposedChart performance | §Performance Acceptance Criteria | ✓ ≤ 100ms CI gate; hardware validation MV-002 |
 | FA-R2: Divergence fill approach | §Divergence Fill Implementation | ✓ Merged key `<Area>`; POC required |
-| FA-R4/UD-R1: CVD validation | §Framework Colors | ✓ Procedure specified; result pending |
+| FA-R4/UD-R1: CVD validation | §Framework Colors | ✓ Procedure specified; result pending (MV-001) |
 | FA-R5: Named trajectory view dimensions | §Layout and Viewport | ✓ AC-003/004/005 |
 | UD-R2: Multi-case tick format | §Mode 1 Step Axis Annotation | ✓ Stacked dates; must appear |
-| UD-R3: Curve-face badge | §Confidence Tier Visual | ✓ "(exp)" at rightmost data point |
+| UD-R3: Curve-face badge | §Confidence Tier Visual | ✓ "(exp)" at rightmost data point; 11px min (UD-F2) |
+
+## Appendix — Review Findings Log
+
+Three-agent review conducted 2026-05-22 (UX Design Thinking, UX Designer, QA Lead).
+All 10 findings incorporated; brief updated before PR merge.
+
+| ID | Source | Finding summary | Resolution |
+|---|---|---|---|
+| UT-F1 | UX Design Thinking | 240px column: MDA compact row format unspecified | INCORPORATED — §Layout and Viewport |
+| UT-F2 | UX Design Thinking | Choropleth navigation affordance out of brief scope | LOG — M9 implementation planning item |
+| UD-F1 | UX Designer | Compact alert row ruling at 240px: 3-line spec | INCORPORATED — §Layout and Viewport |
+| UD-F2 | UX Designer | Badge font 11px minimum (WCAG informational text) | INCORPORATED — §Confidence Tier Visual |
+| QA-F1 | QA Lead | AC-006: "before next paint" → `act()` call boundary | INCORPORATED — §Named Acceptance Criteria |
+| QA-F2 | QA Lead | Playwright throttle ≠ hardware; supplement with MV-002 | INCORPORATED — §Manual Validation Gates |
+| QA-F3 | QA Lead | AC-013 CVD cannot be automated | INCORPORATED — moved to §Manual Validation Gates |
+| QA-F4 | QA Lead | AC-017 sign-off is process gate, not acceptance criterion | INCORPORATED — moved to §Implementation Sequencing |
+| QA-F5 | QA Lead | AC-016 Playwright SVG assertion fragile → Vitest unit test | INCORPORATED — §Named Acceptance Criteria |
+| QA-F6 | QA Lead | Fixture CI gate: clarify `pytest tests/fixtures/` suite | INCORPORATED — §Mode 1 Step Axis Annotation |
