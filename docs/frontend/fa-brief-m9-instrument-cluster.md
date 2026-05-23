@@ -752,6 +752,92 @@ The following sequencing ensures no blocking dependency is encountered mid-imple
 
 ---
 
+## EL Decisions — Recorded 2026-05-22
+
+> These decisions were made following the six-agent parallel consultation (PR #426).
+> All three are recorded on Issue #366. Implementation may proceed against Path A
+> pending CM reference range consultation completion.
+
+### Decision A — MDA Floor Overlays: Deferred to M10
+
+**Decision:** M9 trajectory view ships without MDA floor `<ReferenceLine>` elements,
+with one exception.
+
+**Exception authorized:** The ecological WARNING floor at `y=1.0` is authorized for M9.
+Rationale: a composite ecological score of 1.0 means the entity is at the planetary
+boundary for at least one indicator. This is a boundary-crossing event by definition —
+no backtesting is required to establish this floor. It is defensible from first principles.
+
+**What is deferred:** Financial, human_development, and governance composite-score MDA
+floors. These cannot be defined without (1) a complete indicator inventory per framework,
+(2) backtesting evidence, and (3) a validated mapping function. The CM may not produce
+responsible values without these inputs.
+
+**M10 gate authorizations:**
+- CM consultation on indicator inventory and reference ranges is authorized and required
+  as an M10 prerequisite
+- M10-B schema confirmed: new `mda_composite_floors` table with `cm_approval_reference`
+  column (non-null — no composite floor value may be seeded without a traceable CM
+  consultation reference)
+
+**Required follow-on:** ADR-010 Decision 6 amendment to record M9 deferral and M10-B
+schema decision.
+
+---
+
+### Decision B — Single-Entity Trajectory: Path A Selected
+
+**Decision:** Path A — normalized absolute value composite scoring for single-entity
+scenarios. All four framework curves are rendered.
+
+**Rationale:** The M10 demo story is "WorldSim works — four frameworks live." Path B
+(two curves with advisory strip) would show the primary demo scenario as partially
+functional. Path A is the correct call for the mission. The CM will define the financial
+and HD reference ranges — this is the blocking prerequisite.
+
+**Path A behavioral specification (all rulings binding):**
+- Financial and HD curves in single-entity scenarios: `strokeDasharray="8 3"`
+- Recharts legend: `"Financial (single-country index)"` / `"Human Development (single-country index)"`
+- Curve hover tooltip: `"Single-country index — not comparable across scenarios"`
+- Zone 3 methodology note (mandatory): `"Scores for [country] reflect absolute indicator position, not ranking. Cross-scenario comparison is not valid."`
+- Scoring basis field: `scoring_basis: "normalized_absolute"` on `FrameworkCurvePoint` for financial/HD in single-entity scenarios; `"percentile_rank"` for ecological and governance
+- Confidence floor: Tier 3 minimum for all single-entity normalized scores
+
+**Hard implementation gate:** CM consultation to define financial and HD composite
+indicator reference ranges must complete before the trajectory endpoint implementation
+begins. The endpoint cannot compute normalized absolute composite scores without
+pre-declared reference ranges.
+
+**Required follow-on:**
+- ADR-010 Decision 2 amendment: add `scoring_basis` field to `FrameworkCurvePoint`;
+  document single-entity endpoint behavior; record Tier 3 confidence floor
+- Issue #193: updated with trajectory view dependency and Path A resolution direction
+
+---
+
+### Decision C — step_metadata Storage: JSONB Option (a) Confirmed
+
+**Decision:** `step_metadata` key in `scenarios.configuration` JSONB. No migration required.
+
+**Storage contract:**
+```json
+{
+  "step_metadata": {
+    "1": {"step_event_label": "Capital controls imposed", "step_significance": "SIGNIFICANT"},
+    "3": {"step_event_label": "ESM programme begins", "step_significance": "SIGNIFICANT"}
+  }
+}
+```
+
+Key is a 1-based step index string. Absence of a key = ROUTINE step. Values are
+`"SIGNIFICANT"` or `"ROUTINE"` — the value `"STANDARD"` is incorrect and must be
+rejected by the fixture CI gate (ADR-010 Decision 7 is the authority).
+
+**Required follow-on:** ADR-010 Decision 2 minor amendment to record the storage
+contract so the endpoint implementation has a schema reference.
+
+---
+
 ## Appendix — Brief Completeness Checklist
 
 | Deferred item | Brief section | Status |
