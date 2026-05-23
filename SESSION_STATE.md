@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated:** 2026-05-23 (PR #433 merged — file ownership table in agent-raci.md + HORIZON file authority audit step; PR #432 merged — CLAUDE.md file authority rule; Issue #431 closed)
+**Last updated:** 2026-05-23 (board cleanup — all 14 stale open PRs confirmed merged; PRs #434/#435/#436 merged; Open PRs table cleared)
 **Current milestone:** M9 — Standards Foundation
 
 ---
@@ -70,40 +70,22 @@ Twelve issues filed 2026-05-19. Must complete before M9 UX implementation begins
 
 ## Open PRs
 
-| PR | Title | Date |
-|---|---|---|
-| #427 | docs(frontend): EL decisions A/B/C recorded — unblock trajectory endpoint implementation | 2026-05-22 — MERGED |
-| #426 | docs(frontend): Six-agent parallel consultation — DA-F2/F4/F5 pre-implementation record | 2026-05-22 — MERGED |
-| #425 | docs(frontend): Architect Agent review of Data Architect findings (DA-F1–F5) | 2026-05-22 — MERGED |
-| #424 | docs(schema+frontend): Data Architect review — trajectory endpoint stub and 5 schema findings | 2026-05-22 — MERGED |
-| #423 | docs(frontend): FA brief — UX Designer Agent sign-off (2026-05-22) | 2026-05-22 — MERGED |
-| #422 | docs(frontend): FA brief — incorporate three-agent review findings | 2026-05-22 — MERGED |
-| #421 | docs(frontend): M9 FA brief — instrument cluster implementation (ADR-008 + ADR-010) | 2026-05-22 — MERGED |
-| #420 | docs(adr): ADR-010 accepted — EL decision recorded with rationale; ARCH-004 → ACCEPTED | 2026-05-22 — MERGED |
-| #417 | docs(process): ADR-008 panel review artifact and panel review process standard | 2026-05-22 |
-| #416 | docs(adr): ADR-008 — UX architecture: instrument cluster, viewport, and interaction model (closes #397) | 2026-05-22 |
-| #409 | docs(vision): WorldSim technical concepts — 18 architectural concepts with reasoning | 2026-05-22 |
-| #408 | docs(roadmap): WorldSim roadmap M9–M13 with demo arc, long-term direction, and process integration | 2026-05-22 |
-| #356 | docs(ux): M8 interaction model critique — panel synthesis (UX Designer, Dev Economist, Chief Methodologist) | 2026-05-18 |
-| #371 | chore(state): design foundation sequence — 12 issues #359–#370 filed | 2026-05-19 |
-| #372 | docs(claude): CLAUDE.md structural refactor — closes #359 | 2026-05-19 |
-| #373 | docs(adr): Chief Methodologist consultation — synthetic data framework (closes #361) | 2026-05-19 |
-| #383 | docs(vision): WorldSim founding document — synthesized from April-May 2026 founding conversations | 2026-05-20 |
-| #384 | docs(process): agent working agreements — all 15 agents (closes #360) | 2026-05-20 |
-| #385 | docs(ux): user persona document — five personas, entry state taxonomy, marquee cases (closes #362) | 2026-05-20 |
-| #388 ✅ | docs(ux): persona-grounded UX review — Case B and governing premises vs. five personas (closes #387) | 2026-05-21 — MERGED |
-| #390 ✅ | docs(ux): UX first-principles depth — six gaps closed, revised six premises (closes #363) | 2026-05-21 — MERGED |
-| #391 ✅ | chore(state): SESSION_STATE.md — PR #390 merged; Issue #363 closed; Issue #364 unblocked | 2026-05-21 — MERGED |
-| #396 ✅ | chore(state): SESSION_STATE.md — EL Decisions 1/2/3 recorded; Issue #364 closed; Issues #392–#395 filed | 2026-05-21 — MERGED |
-| #399 ✅ | docs(ux): UX document updates — EL Decisions 1/2/3 (north-star, information-hierarchy, user-journeys) | 2026-05-21 — MERGED |
+No open PRs — board clear as of 2026-05-23.
 
 ## Recently Merged PRs (last 5)
 
 | PR | Title | Date |
 |---|---|---|
+| #436 | docs(process): near-miss registry — NM-008 through NM-013, agent team growth and DIC founding | 2026-05-23 |
+| #435 | docs(process): near-miss registry — NM-001 through NM-007, Aviation SMS methodology | 2026-05-23 |
+| #434 | chore(state): SESSION_STATE.md — PR #432 + #433 merged; Issue #431 closed | 2026-05-23 |
 | #433 | docs(process): file ownership table and HORIZON file authority audit (closes #431) | 2026-05-23 |
 | #432 | docs(process): file authority rule in CLAUDE.md — agents must not write to owned files without prior owner review | 2026-05-23 |
 | #429 | docs(adr+schema): ADR-010 D6+D2 amendments; CM reference range consultation; api_contracts + database.yml | 2026-05-23 |
+| #417 | docs(process): ADR-008 panel review artifact and panel review process standard | 2026-05-22 |
+| #416 | docs(adr): ADR-008 — UX architecture: instrument cluster, viewport, and interaction model (closes #397) | 2026-05-22 |
+| #409 | docs(vision): WorldSim technical concepts — 18 architectural concepts with reasoning | 2026-05-22 |
+| #408 | docs(roadmap): WorldSim roadmap M9–M13 with demo arc, long-term direction, and process integration | 2026-05-22 |
 | #427 | docs(frontend): EL decisions A/B/C recorded — trajectory endpoint unblocked | 2026-05-22 |
 | #426 | docs(frontend): Six-agent parallel consultation — DA-F2/F4/F5 pre-implementation record | 2026-05-22 |
 | #425 | docs(frontend): Architect Agent review of Data Architect findings (DA-F1–F5) | 2026-05-22 |
@@ -111,6 +93,17 @@ Twelve issues filed 2026-05-19. Must complete before M9 UX implementation begins
 | #421 | docs(frontend): M9 FA brief — instrument cluster implementation (ADR-008 + ADR-010) | 2026-05-22 |
 | #420 | docs(adr): ADR-010 accepted — EL decision recorded with rationale; ARCH-004 → ACCEPTED | 2026-05-22 |
 | #401 | docs(process): agent-raci.md — RACI chart for all 15 agents (closes #369, #301) | 2026-05-21 |
+| #399 | docs(ux): UX document updates — EL Decisions 1/2/3 (north-star, information-hierarchy, user-journeys) | 2026-05-21 |
+| #390 | docs(ux): UX first-principles depth — six gaps closed, revised six premises (closes #363) | 2026-05-21 |
+| #388 | docs(ux): persona-grounded UX review — Case B and governing premises vs. five personas (closes #387) | 2026-05-21 |
+| #385 | docs(ux): user persona document — five personas, entry state taxonomy, marquee cases (closes #362) | 2026-05-20 |
+| #384 | docs(process): agent working agreements — all 15 agents (closes #360) | 2026-05-20 |
+| #383 | docs(vision): WorldSim founding document — synthesized from April-May 2026 founding conversations | 2026-05-20 |
+| #373 | docs(adr): Chief Methodologist consultation — synthetic data framework (closes #361) | 2026-05-19 |
+| #372 | docs(claude): CLAUDE.md structural refactor — closes #359 | 2026-05-19 |
+| #371 | chore(state): design foundation sequence — 12 issues #359–#370 filed | 2026-05-19 |
+| #356 | docs(ux): M8 interaction model critique — panel synthesis (UX Designer, Dev Economist, Chief Methodologist) | 2026-05-18 |
+| v0.8.0 | GitHub Release — Milestone 8 formal close | 2026-05-19 |
 | #399 | docs(ux): UX document updates — EL Decisions 1/2/3 (north-star, information-hierarchy, user-journeys) | 2026-05-21 |
 | #396 | chore(state): SESSION_STATE.md — EL Decisions 1/2/3 recorded; Issue #364 closed; Issues #392–#395 filed | 2026-05-21 |
 | #391 | chore(state): SESSION_STATE.md — PR #390 merged; Issue #363 closed; Issue #364 unblocked | 2026-05-21 |
@@ -181,6 +174,8 @@ All Horizon:Immediate issues are now closed. M8 feature-complete.
 
 | Decision | Rationale | Date |
 |---|---|---|
+| Near-miss registry created — NM-001 through NM-013 | `docs/process/near-miss-registry.md` created using Aviation SMS epistemology: near-misses treated with same rigor as incidents because they reveal hazards without the cost of failure. 7 reactive entries (NM-001–NM-007) + 6 anticipatory entries (NM-008–NM-013). Recurring pattern identified: agent acting in domain belonging to another agent without required consultation (NM-005, NM-006, NM-007). Second pattern: six entries are anticipatory — Engineering Lead sensing structural gaps before failure. Registry maintenance section defines template, severity levels, and the key question: "caught by process or by a person?" PR #435 + PR #436. | 2026-05-23 |
+| PR board cleared — all stale PRs confirmed merged | 14 PRs that appeared open in SESSION_STATE were confirmed merged via GitHub. Open PRs table cleared. Board is clean. | 2026-05-23 |
 | File authority rule + ownership table — Issue #431 closed | CLAUDE.md §Architectural Principles now includes the file authority rule: agents must verify they hold R before writing any file; if another agent holds R, produce a draft and request owner review before committing. `docs/process/agent-raci.md §File Ownership` added: 24-row lookup table (file/directory, Owner R, Required Consultant C) covering all major files; §Near-Miss section documents PR #429 incident (two substantive errors caught by retroactive DA+Ar review); §What 'C' Means in Practice defines the correct draft → C review → incorporate → commit sequence. HORIZON mode in `docs/process/agents.md` expanded from one-liner to five numbered sweep steps; step 5 = FILE AUTHORITY AUDIT. PR #432 (CLAUDE.md rule) + PR #433 (table + HORIZON step). | 2026-05-23 |
 | Issue #428 prerequisites complete — trajectory endpoint unblocked | (1) ADR-010 D6 amendment: M9 deferral of MDA floors; ecological WARNING at 1.0; M10-B schema. (2) CM reference range consultation: gdp_growth [-0.10, 0.06]; reserve_coverage_months [0.0, 12.0]; unemployment_rate [0.02, 0.30] inverted; net_enrollment_secondary [0.40, 1.00]; health_expenditure excluded; Tier 3 floor. (3) ADR-010 D2 amendment: scoring_basis three-value enum (percentile_rank / normalized_absolute / boundary_proximity); single-entity contract; step_metadata JSONB. DA+Ar review: scoring_basis ecological value corrected to "boundary_proximity" (was "percentile_rank" — semantically incorrect); db_reads M10 comment fix. PR #429 merged. Issue #428 closed. | 2026-05-23 |
 | EL Decisions A/B/C recorded — trajectory endpoint implementation unblocked | Decision A: MDA floor overlays deferred to M10; ecological WARNING at 1.0 authorized for M9; CM consultation on reference ranges authorized; M10-B schema confirmed. Decision B: Path A selected — normalized absolute composite for single-entity trajectory; four curves; Tier 3 confidence floor; CM reference range consultation is the hard next gate. Decision C: step_metadata JSONB option (a) confirmed. All recorded on Issue #366. Issue #193 updated. PR #427. | 2026-05-22 |
