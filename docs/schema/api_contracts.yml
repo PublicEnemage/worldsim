@@ -415,10 +415,10 @@ endpoints:
     summary: >
       Multi-step trajectory for all four measurement frameworks. Returns computed
       steps only (dense array — ADR-010 Decision 2, FA-R3). null composite_score
-      on a returned step means governance-in-validation only, not an uncomputed step.
-      PARTIAL SCHEMA — three open EL decisions must be resolved before implementation.
-      See Data Architect findings DA-F1 through DA-F5 in docs/frontend/fa-brief-m9-instrument-cluster.md.
-    status: PENDING — EL decisions required on DA-F2 (MDA floor schema), DA-F4 (single-entity null handling)
+      on a returned step means governance-in-validation OR no normalizable indicators
+      at that step for single-entity scenarios (see scoring_basis). Schema updated
+      2026-05-23 — EL Decisions A/B/C resolved; DA-F2/F4/F5 PENDINGs cleared.
+      ci_lower/ci_upper remain pending ADR-007.
     auth: none
     path_params:
       scenario_id: {type: string}
@@ -427,11 +427,25 @@ endpoints:
       body:
         scenario_id: {type: string}
         entity_id: {type: string}
+        step_count: {type: integer}
+        mda_floors:
+          type: array
+          description: >
+            Composite-score-level MDA floor lines for the trajectory view Y-axis.
+            At the TrajectoryResponse root — NOT per-step (ADR-010 Decision 2).
+            In M9: contains at most one entry (ecological WARNING at floor_value=1.0).
+            All other framework floors deferred to M10 (EL Decision A, Issue #428).
+            Empty array produces no ReferenceLine SVG elements — no render guard needed.
+          items:
+            framework: {type: string, values: ["financial", "human_development", "ecological", "governance"]}
+            floor_value: {type: string, description: "Decimal as string. Composite-score-level — not indicator-level projection (CM-R3, ADR-010 Decision 6)."}
+            severity: {type: string, values: ["WARNING", "CRITICAL", "TERMINAL"]}
+            label: {type: string, description: "e.g. 'Planetary boundary'"}
         steps:
           type: array
           description: >
             Computed steps only — dense array (ADR-010 Decision 2). Absent steps
-            were not yet computed at response time. Step 0 = initial state.
+            were not yet computed at response time.
           items:
             step_index: {type: integer}
             effective_from:
@@ -441,91 +455,89 @@ endpoints:
             step_event_label:
               type: "string|null"
               description: >
-                PENDING DA-F5 — storage schema not yet defined. Event label for
-                SIGNIFICANT steps in Mode 1. Must be ≤ 8 words AND ≤ 32 characters
-                (FA brief §Mode 1 Step Axis Annotation, DD-014).
+                Event label for SIGNIFICANT steps in Mode 1. Must be ≤ 8 words AND
+                ≤ 32 characters (FA brief §Mode 1 Step Axis Annotation, DD-014).
+                null when step_significance is ROUTINE. Sourced from
+                scenarios.configuration.step_metadata[step_index] (EL Decision C,
+                ADR-010 Decision 2 amendment 2026-05-23).
             step_significance:
-              type: "string|null"
+              type: string
+              values: ["SIGNIFICANT", "ROUTINE"]
               description: >
-                PENDING DA-F5 — storage schema not yet defined.
-              values: ["SIGNIFICANT", "STANDARD", null]
-            financial:
-              composite_score:
-                type: "string|null"
-                description: >
-                  Decimal as string. null for governance-in-validation.
-                  PENDING DA-F4 — null also occurs in single-entity scenarios
-                  (single_entity_warning=true); EL decision required on trajectory
-                  endpoint behaviour for single-entity Mode 1.
-              confidence_tier: {type: integer, range: [1, 5]}
-              ci_lower:
-                type: "string|null"
-                description: >
-                  PENDING ADR-007 (DA-F3) — BandingEngine not yet implemented.
-                  null until ADR-007 accepted. Decimal as string when present.
-              ci_upper:
-                type: "string|null"
-                description: "PENDING ADR-007 (DA-F3) — same as ci_lower."
-            human_development:
-              composite_score: {type: "string|null", description: "Same null semantics as financial — see DA-F4"}
-              confidence_tier: {type: integer}
-              ci_lower: {type: "string|null", description: "PENDING ADR-007"}
-              ci_upper: {type: "string|null", description: "PENDING ADR-007"}
-            ecological:
-              composite_score: {type: "string|null"}
-              confidence_tier: {type: integer}
-              ci_lower: {type: "string|null", description: "PENDING ADR-007"}
-              ci_upper: {type: "string|null", description: "PENDING ADR-007"}
-            governance:
-              composite_score:
-                type: "string|null"
-                description: >
-                  null = governance-in-validation (GovernanceModule deferred M9,
-                  ADR-005 Amendment 3 Decision M8-4). Distinct from single-entity
-                  null in financial/human_development — see DA-F4.
-              confidence_tier: {type: integer}
-              ci_lower: {type: "string|null", description: "PENDING ADR-007"}
-              ci_upper: {type: "string|null", description: "PENDING ADR-007"}
+                Per ADR-010 Decision 7. "STANDARD" is incorrect — rejected by
+                fixture validation. Sourced from scenarios.configuration.step_metadata.
+                Absent key in step_metadata = ROUTINE.
+            frameworks:
+              type: array
+              description: "Per-framework curve point for this step. One entry per active framework."
+              items:
+                framework:
+                  type: string
+                  values: ["financial", "human_development", "ecological", "governance"]
+                composite_score:
+                  type: "string|null"
+                  description: >
+                    Decimal as string. Three distinct null sources — use scoring_basis
+                    to disambiguate:
+                    (1) absent step = uncomputed (step absent from response, not null);
+                    (2) governance null = in-validation (scoring_basis: "percentile_rank");
+                    (3) single-entity financial/HD null = no normalizable indicators at
+                        this step (scoring_basis: "normalized_absolute").
+                scoring_basis:
+                  type: string
+                  values: ["percentile_rank", "normalized_absolute"]
+                  description: >
+                    "percentile_rank" — standard cross-entity composite; requires N≥2 entities.
+                    "normalized_absolute" — entity-intrinsic; financial and human_development
+                    in single-entity scenarios. Reference ranges in
+                    docs/architecture/cm-reference-range-consultation-2026-05-23.md §7a.
+                    Tier 3 confidence floor applies to all normalized_absolute scores.
+                    Ecological and governance always use "percentile_rank" (ecological uses
+                    boundary-proximity internally but the scoring_basis field value is
+                    "percentile_rank" for consistency — ecological is always entity-intrinsic).
+                confidence_tier:
+                  type: integer
+                  range: [1, 5]
+                  description: >
+                    Minimum Tier 3 when scoring_basis is "normalized_absolute" (single-entity
+                    normalized scores carry acknowledged range uncertainty).
+                ci_lower:
+                  type: "string|null"
+                  description: "PENDING ADR-007 — BandingEngine not yet implemented. null until ADR-007 accepted."
+                ci_upper:
+                  type: "string|null"
+                  description: "PENDING ADR-007 — same as ci_lower."
+                ci_coverage:
+                  type: "number|null"
+                  description: "PENDING ADR-007 — 0.80 when present."
+                is_pre_calibration:
+                  type: "boolean|null"
+                  description: "PENDING ADR-007."
             policy_inputs:
               type: array
-              description: Policy input events applied at this step. Source: scenario_scheduled_inputs.
+              description: "Policy input events applied at this step. Source: scenario_scheduled_inputs."
               items:
                 input_type: {type: string}
                 input_data: {type: object}
             shock_events:
               type: array
-              description: Exogenous shock events at this step.
+              description: "Exogenous shock events at this step."
               items:
                 event_type: {type: string}
                 metadata: {type: object}
-            mda_floors:
-              type: array
-              description: >
-                PENDING DA-F2 — composite-score-level MDA floors have no storage in
-                current schema. mda_thresholds.floor_value is indicator-level.
-                EL decision required: (a) add composite_floor_value field to
-                mda_thresholds with migration; or (b) defer MDA floor overlays until
-                composite-score-level threshold table is defined. Projection from
-                indicator-level to composite-score-level is prohibited (CM-R3, ADR-010
-                Decision 6 — methodologically dishonest).
-              items:
-                framework: {type: string, values: ["financial", "human_development", "ecological", "governance"]}
-                floor_value:
-                  type: "string|null"
-                  description: "PENDING DA-F2 — composite-score-level; not indicator-level projection"
-                threshold_type: {type: string, values: ["WARNING", "CRITICAL", "TERMINAL"]}
       status_404: "Scenario not found"
     db_reads:
       - scenarios
       - scenario_state_snapshots
-      - mda_thresholds
-      - "[PENDING DA-F5] step_annotations or equivalent per-step metadata source"
+      - mda_composite_floors  # M10 — table does not exist in M9; mda_floors array empty except ecological
     notes:
-      - "DA-F1: Endpoint added 2026-05-22. Schema PARTIAL — five Data Architect findings pending EL decisions."
-      - "DA-F2: mda_floors blocked — no composite-score-level floor storage in current schema."
-      - "DA-F3: ci_lower/ci_upper fields registered as pending-ADR-007 placeholders."
-      - "DA-F4: single-entity null handling for financial/human_development composite_score requires EL decision."
-      - "DA-F5: step_event_label/step_significance have no schema home — storage design required."
+      - "Schema updated 2026-05-23 — EL Decisions A/B/C resolved. All DA-F2/F4/F5 PENDINGs cleared."
+      - "DA-F2 resolved: mda_floors at response root (not per-step); M9 returns [] except ecological WARNING at 1.0."
+      - "DA-F3 remains: ci_lower/ci_upper pending ADR-007."
+      - "DA-F4 resolved: scoring_basis field added; Path A selected (normalized_absolute for single-entity financial/HD)."
+      - "DA-F5 resolved: step_event_label/step_significance sourced from scenarios.configuration.step_metadata JSONB."
+      - "step_significance values are SIGNIFICANT or ROUTINE only — STANDARD is incorrect (ADR-010 Decision 7)."
+      - "CM reference range consultation: docs/architecture/cm-reference-range-consultation-2026-05-23.md"
 
   - method: GET
     path: "/scenarios/{scenario_id}/measurement-output"
