@@ -22,7 +22,7 @@ Entries appear in chronological order of occurrence.
 Not all entries are failures. Some are anticipations — the Engineering Lead sensing a
 structural gap before it caused a problem, naming it, and building the safeguard before
 the incident occurred. These deserve equal recognition: they represent the safety culture
-working at its best. Six of the fifteen entries are anticipatory.
+working at its best. Nine of the eighteen entries are anticipatory.
 
 ---
 
@@ -897,6 +897,53 @@ The Engineering Lead — sensing that the governance anxiety about skip manageme
 - `docs/CODING_STANDARDS.md §Testing`: document the pattern as a standing coding standard.
 
 The fix is a decomposition discipline, not a skip governance mechanism. If decomposition is correct, skips are either unnecessary or are a small, explicitly-labelled set with a clear dependency statement — not a blanket suppression requiring automated expiry controls.
+
+---
+
+## NM-018 — Hammer-Nail: Technical Panel Produced Engineering Solutions to a Process Problem
+
+**Date:** 2026-05-23
+**Milestone:** M9 — Standards Foundation
+**Detected by:** Engineering Lead (anticipatory — the divergence between technical panel output and product/design agent output was recognized before any engineering recommendation was implemented)
+**Severity:** High — the panel was converging on significant tooling investment (CI skip-expiry guard, skip registry, DOM-presence fixture) to solve a problem whose root cause was a two-line decomposition discipline rule. Had those recommendations been implemented, the correct fix would have been buried under tooling complexity, and the underlying decomposition gap would have remained.
+**Type:** Anticipatory — caught after consultation but before implementation of any recommendation
+
+### What happened
+
+When `test.skip(true, ...)` in `instrument-cluster.spec.ts` raised governance anxiety, the Engineering Lead activated the natural panel for a skip governance question: Architect, Frontend Architect, and QA Lead. All three produced engineering responses — a CI guard enforcing skip expiry, a skip registry with mandatory lifecycle tracking, a DOM-presence fixture enabling partial test execution before all components shipped.
+
+The proposals were internally coherent and technically sound. They answered the question as posed: "How do we ensure skips are not forgotten or abused?"
+
+The PO Agent and UX Designer Agent were activated subsequently to examine whether the decomposition process had contributed to the problem. Both immediately reframed the question: the skip existed because zone-level ACs and component-level ACs had been bundled in a single spec without a categorization discipline. The skip was not a governance problem requiring new tooling — it was a symptom of a missing decomposition rule. Once the rule existed (Type 1 / Type 2 AC categorization, documented in `docs/CODING_STANDARDS.md §E2E Pre-implementation Test Categorization`), the skip was unnecessary.
+
+The technical panel had answered the wrong question correctly. The product/design agents asked the right question first.
+
+### What was at risk
+
+If the engineering recommendations had been implemented, the project would have added:
+- A CI skip-expiry guard
+- A skip registry with mandatory annotations
+- A DOM-presence fixture infrastructure
+
+...to solve what was actually a missing two-line rule in CODING_STANDARDS.md and two-paragraph updates to two working agreements. The tooling would have legitimized the blanket skip pattern by providing governance for it, rather than eliminating it. Future QA authors would have encountered the skip registry and inferred that blanket skips with registry entries were the correct practice.
+
+This is the hammer-nail failure mode applied to process design: when the consultation panel is composed entirely of technical agents, every problem — including process problems — presents as a technical problem.
+
+### What caught it
+
+The Engineering Lead — noticing that the product/design agents identified the root cause immediately, without the framing the technical panel had brought to the question. The divergence between the two groups' output was the signal: when two panels asked the same question and produced structurally different answer types (tooling vs. decomposition rule), the answer type was as diagnostic as the content.
+
+The retrospective question: "Why did the technical panel not ask 'why does this skip exist?'" The answer is structural, not a failure of any individual agent. Technical agents are calibrated on technical problems. Panel composition — specifically the inclusion of at least one agent from the problem's root cause domain — is as consequential as individual agent expertise.
+
+### Process improvement
+
+**Root cause:** No rule existed requiring the PM Agent to evaluate whether a consultation panel's composition matched the problem's root cause domain, not just its surface presentation. The default was to activate agents whose declared domain matched the problem as stated ("skip governance" → technical agents) without first asking whether the underlying cause might lie elsewhere.
+
+**Standing process change (this session):** A panel composition principle was added to the PM Agent's pre-EL consultation protocol in `docs/process/agents.md §PM Agent — Pre-EL Consultation` between the Activate independently step and the Synthesize step:
+
+> Before finalizing panel composition, ask: does the problem's surface presentation match its likely root cause domain? Technical surface problems can have process root causes; process surface problems can have methodology root causes. A panel composed entirely of agents from the surface domain will produce solutions optimised for the symptom, not the cause. When the root cause domain is uncertain or different from the surface domain, include at least one agent from the suspected root cause domain before activation.
+
+Documented in: `docs/process/agents.md §PM Agent — Pre-EL Consultation`, `docs/process/near-miss-registry.md NM-017` (the related root cause incident)
 
 ---
 

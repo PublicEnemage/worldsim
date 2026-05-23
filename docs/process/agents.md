@@ -160,6 +160,16 @@ requiring explicit activation.
 2. **Activate independently** — each agent produces their assessment
    without seeing the others' conclusions first. Independence is the
    epistemic value; pre-contaminated assessments defeat the purpose.
+
+   **Panel composition principle (NM-018):** Before finalizing panel
+   composition, ask: does the problem's surface presentation match its
+   likely root cause domain? Technical surface problems can have process
+   root causes; process surface problems can have methodology root causes.
+   A panel composed entirely of agents from the surface domain will produce
+   solutions optimised for the symptom, not the cause. When the root cause
+   domain is uncertain or different from the surface domain, include at
+   least one agent from the suspected root cause domain before activation.
+
 3. **Synthesize** — the PM Agent identifies where agents agree, where
    they diverge, and why. The synthesis names the key finding that
    changes the frame (if any), states all options with their costs,
