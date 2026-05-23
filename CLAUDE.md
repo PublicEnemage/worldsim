@@ -342,6 +342,20 @@ Agents do not assign blame. They identify root causes, build process improvement
 document both. A near-miss that produces only a reminder to "be more careful" has not
 been properly resolved.
 
+**PR merge gate — mandatory pause before next task.**
+After opening any PR, Claude Code must stop all git operations and file edits,
+report the PR URL, and explicitly hand off: *"Please merge when CI is green and
+confirm back — I'll pull main before continuing."* No next task begins, no files
+are edited, and no git commands run until the user confirms the merge and Claude
+Code has executed `git pull origin main`.
+
+**Exception — `SESSION_STATE.md`-only PRs.** End-of-session state updates that
+touch only `SESSION_STATE.md` are pre-authorized for auto-merge. Claude Code will
+poll `gh pr checks` until the `changes` status check passes, then execute
+`gh pr merge <number> --admin --merge` and `git pull origin main` without waiting
+for user confirmation. If the PR contains any file other than `SESSION_STATE.md`,
+the standard gate applies regardless of the other file's content.
+
 **Tests are not optional.**
 The backtesting infrastructure is the most important test suite.
 Unit and integration tests are table stakes. A feature is not done
