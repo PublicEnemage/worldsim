@@ -760,6 +760,250 @@ The following sequencing ensures no blocking dependency is encountered mid-imple
 | UD-R2: Multi-case tick format | §Mode 1 Step Axis Annotation | ✓ Stacked dates; must appear |
 | UD-R3: Curve-face badge | §Confidence Tier Visual | ✓ "(exp)" at rightmost data point; 11px min (UD-F2) |
 
+## Appendix — Architect Agent Review of Data Architect Findings
+
+Architect Agent: REVIEW — 2026-05-22. Documents read: ADR-010 Decisions 2, 5, 6, 7;
+RACI Row 4 (data/schema decisions); FA brief §Data Architect Review Findings; ADR-006 Decision 2.
+
+**Scope:** Disposition of DA-F1 through DA-F5; identification of further agent involvement
+required; proposed remedies. The Architect holds C on data/schema decisions (RACI Row 4);
+EL is A on all decisions that require scope change or methodology input.
+
+---
+
+### Arch-F1 — Terminology Discrepancy: "STANDARD" vs. "ROUTINE" (Blocking Correction)
+
+Before any other finding: the FA brief uses `step_significance: "SIGNIFICANT" | "STANDARD"`
+throughout (§Mode 1 Step Axis Annotation, §Named Acceptance Criteria AC-012). ADR-010
+Decision 7 defines `step_significance: "SIGNIFICANT" | "ROUTINE"`. The ADR is authoritative.
+"STANDARD" and "ROUTINE" are not equivalent — the fixture CI gate will enforce whichever
+term is in the schema validator. Using the wrong term means either valid fixtures fail CI,
+or invalid fixtures pass CI silently.
+
+**Required correction:** All instances of `"STANDARD"` in the FA brief's step_significance
+context must be changed to `"ROUTINE"` before the fixture CI gate is implemented. This is
+a brief error, not an ADR discrepancy.
+
+**No EL decision required.** Applied below in this same PR.
+
+---
+
+### DA-F1 — Trajectory Endpoint Absent from api_contracts.yml
+
+**Architect disposition: ADEQUATE AS STUB.** The partial stub added by the Data Architect is
+the correct interim state. The full endpoint specification is defined in ADR-010 Decision 2 —
+the stub is incomplete only because DA-F2, DA-F4, and DA-F5 are unresolved. The stub serves
+its purpose: it registers the endpoint so no implementation agent can call it without a schema
+contract.
+
+**No further agent involvement required for DA-F1 itself.** The stub completes when the three
+blocking findings are resolved. At that point, the Data Architect updates `api_contracts.yml`
+in the same PR that implements the backend endpoint.
+
+---
+
+### DA-F2 — No Composite-Score-Level MDA Floor Storage
+
+**Architect disposition: DEFER MDA FLOOR OVERLAYS TO M10, WITH CM CONSULTATION REQUIRED.**
+
+The root issue is methodological, not merely a schema gap. Composite-score-level MDA floors
+cannot be mechanically derived from indicator-level floors (CM-R3 rules this out; ADR-010
+Decision 6 records the ruling). They must be independently defined at the composite score
+level. Who defines them, and how, is a Chief Methodologist question — not an Architect
+question and not an EL decision alone.
+
+**What the Architect recommends:**
+
+1. **Activate Chief Methodologist** — with the following question: "Can composite-score-level
+   MDA floors be defined for the four measurement frameworks, and if so, by what methodology?
+   The trajectory view Y-axis is the composite score [0.0, 1.0] for financial and
+   human_development, [0.0, 2.0] for ecological, and [0.0, 1.0] for governance. What
+   composite score values constitute WARNING / CRITICAL / TERMINAL floor levels per framework?"
+   This is a methodology question; the Chief Methodologist's output is the input to the
+   schema and ADR-010 amendment.
+
+2. **Pending CM consultation: defer MDA floor overlays in M9.** The trajectory view ships
+   without `<ReferenceLine>` floor lines. Zone 1B MDA alerts fire correctly (indicator-level,
+   which is the right place for them per Decision 6's Zone 1B relationship). The trajectory
+   view is not silent about MDA state — Zone 1B carries it. What is deferred is the
+   floor-line visual overlay on the trajectory curves.
+
+3. **M10 entry gate:** CM methodology answer + schema design (new column on `mda_thresholds`,
+   or a new `mda_composite_floors` table, determined after CM output) + ADR-010 amendment to
+   Decision 6 recording the concrete floor values and storage approach.
+
+**ADR-010 amendment required:** If MDA floor overlays are deferred, Decision 6's implementation
+is partially suspended. An ADR-010 amendment is not required for the deferral itself — the ADR
+permits the trajectory view to not render floor lines during the M9 implementation phase. But
+when composite-score-level floors are defined and implemented in M10, a Decision 6 amendment is
+required to add the concrete `floor_value` semantics and source schema.
+
+**EL decision required:** Authorize the CM consultation and confirm the M9 deferral of MDA
+floor overlays as the implementation path.
+
+**Agent involvement:** Chief Methodologist (consultation on composite-score floor methodology).
+EL (decision to defer + authorize CM activation).
+
+---
+
+### DA-F3 — ci_lower / ci_upper Absent from Schema Files
+
+**Architect disposition: CORRECT AS-IS. No action until ADR-007.**
+
+The partial stub correctly registers these as pending-ADR-007 fields. Note for completeness:
+ADR-006 Decision 2 defines the BandedOutput contract (`ci_lower`, `ci_upper`, `ci_coverage`,
+`is_pre_calibration`, `clipped_lower`, `clipped_upper`). When the Data Architect updates
+`api_contracts.yml` at ADR-007 acceptance, they must reference ADR-006 Decision 2 as the
+authority for field names and types — do not derive them from the FA brief's `<Area>`
+component shape.
+
+The `fillOpacity` conditional in the brief (`ci_lower !== null ? 0.08 : 0`) is the correct
+zero-output guard. The infrastructure is in place; there is nothing to implement here in M9.
+
+**No further agent involvement required.**
+
+---
+
+### DA-F4 — Single-Entity Null Handling: Mode 1 Greece Trajectory View Blocked
+
+**Architect disposition: CRITICAL GAP. Chief Methodologist consultation required. EL decision
+required. This finding has the highest severity of the five.**
+
+**The core problem:** ADR-010 Decision 2 defines `composite_score: null` as meaning
+"governance-in-validation only." But the existing composite score computation returns null for
+financial and human_development in single-entity scenarios (Issue #193 — percentile rank
+requires ≥2 entities). The Greece fixture is a single-entity scenario. The trajectory view for
+Mode 1 Greece would render one curve (ecological, which is boundary-proximity-based and exempt
+from the single-entity null rule per ADR-005 Amendment 3 Decision M8-2). Financial and
+human_development would be empty. Governance would be null for a different reason (in-validation).
+
+A trajectory view with one meaningful curve is not the "multi-framework trajectory comparison
+legible at a glance" that ADR-008 defines as the Zone 1A requirement. This is a demo-breaking
+gap, not a corner case.
+
+**What the Architect recommends:**
+
+The trajectory endpoint must use a **different composite score methodology for single-entity
+scenarios** — one that produces non-null financial and human_development values without
+requiring a comparison entity. The percentile rank approach is correct for multi-entity
+comparison; it is wrong for single-entity trajectory display, where the meaningful question
+is not "how does this entity rank?" but "how does this entity's own trajectory evolve over
+time?"
+
+A normalized absolute value composite — averaging normalized indicator values within each
+framework using the same normalization scales used for percentile rank computation — is the
+leading candidate. This is a methodological decision that the Chief Methodologist must approve.
+
+**What the Architect does NOT recommend:** Changing the measurement-output endpoint to return
+non-null single-entity scores. That endpoint's null behavior is documented, and changing it
+would break the single_entity_warning contract. The trajectory endpoint is a new endpoint
+whose data contract is not yet fully established — the right place to resolve this.
+
+**Required ADR-010 amendment:** Decision 2 must be amended to define the trajectory endpoint's
+composite score computation methodology for single-entity scenarios, including:
+- What scoring approach is used (pending CM approval)
+- That `single_entity_warning` is NOT propagated to the trajectory response (the trajectory
+  response has no `single_entity_warning` field — it has curves or it does not)
+- That null financial/HD composite_score on the trajectory endpoint means something different
+  than null financial/HD on the measurement-output endpoint — the disambiguation must be
+  documented explicitly
+
+**Agent involvement required:**
+1. **Chief Methodologist** — methodology consultation on single-entity composite score for
+   trajectory view. Question: "What composite scoring approach is appropriate for single-entity
+   Mode 1 trajectory display, where percentile rank requires N≥2 entities? The goal is a
+   meaningful [0.0, 1.0] score that tracks a single entity's trajectory over time."
+2. **EL** — decision to authorize CM consultation; confirm ADR-010 amendment scope.
+3. **Architect Agent** — amend ADR-010 Decision 2 after CM output.
+
+**Until this is resolved, Mode 1 trajectory view for single-entity scenarios is not
+implementable per the current ADR-010 contract.** Recommend filing a GitHub issue to track
+this (updating Issue #193 with "trajectory view dependency" label or filing a new issue).
+
+---
+
+### DA-F5 — step_event_label / step_significance Have No Schema Home
+
+**Architect disposition: RECOMMEND OPTION (a) — scenario configuration JSONB extension.
+EL confirmation required (minor). ADR-010 Decision 2 must record the storage approach.**
+
+The fields are already specified in ADR-010 Decision 2's `TrajectoryStep` interface. The gap
+is purely storage: where does the backend read `step_event_label` and `step_significance` from?
+
+**Architect recommendation: add a `step_metadata` key to `scenarios.configuration` JSONB.**
+
+Schema extension (no migration required — JSONB):
+
+```json
+"step_metadata": {
+  "1": {
+    "step_event_label": "Deposit freeze announced",
+    "step_significance": "SIGNIFICANT"
+  },
+  "3": {
+    "step_event_label": "Troika agreement signed",
+    "step_significance": "SIGNIFICANT"
+  }
+}
+```
+
+- Keys are 1-based step index strings (matching `TrajectoryStep.step_index`)
+- Entries are absent for ROUTINE steps (not `"step_significance": "ROUTINE"` — absence implies ROUTINE)
+- The trajectory endpoint reads `scenarios.configuration->'step_metadata'->step_index::text`
+  to populate `step_event_label` and `step_significance` on each `TrajectoryStep`
+- The fixture CI gate validates `step_event_label` against the ≤ 8 words AND ≤ 32 characters
+  constraint on every fixture JSON file — the JSONB path is predictable
+
+**Why option (a) over (b) (new table):** Step annotations are scenario-configuration data,
+not operational data. They are authored once at fixture creation, never updated during
+simulation execution, and always read together with the scenario. JSONB embedding is the
+correct storage pattern for infrequently-updated configuration data. A dedicated table would
+be appropriate if step annotations were queried independently of their scenario or if they
+needed separate write access — neither applies here.
+
+**ADR-010 Decision 2 amendment required:** Add the storage contract for `step_event_label`
+and `step_significance` — `scenarios.configuration.step_metadata` JSONB key, keyed by
+step_index string. This is a minor clarification amendment, not a decision reversal.
+
+**api_contracts.yml update required:** The POST /scenarios request body schema must document
+`step_metadata` as an optional key in `configuration`. The Data Architect adds this when the
+feature is implemented.
+
+**Terminology correction** (Arch-F1 resolution): change `step_significance` value from
+`"STANDARD"` → `"ROUTINE"` throughout the FA brief, consistent with ADR-010 Decision 7.
+
+**Agent involvement:** None beyond EL confirmation of option (a). Architect amends ADR-010
+Decision 2 in the same PR as EL confirmation.
+
+---
+
+### Summary — Architect Recommended Actions
+
+| Finding | Disposition | EL Decision Required? | Agent consultation required | ADR change? |
+|---|---|---|---|---|
+| Arch-F1 | CORRECT — "STANDARD" → "ROUTINE" in FA brief | No | None | No — brief correction |
+| DA-F1 | ADEQUATE AS STUB — completes when blockers resolved | No | None | No |
+| DA-F2 | DEFER overlays to M10; CM consultation on composite-score floor methodology | Yes — authorize CM + deferral | Chief Methodologist | Yes — ADR-010 Decision 6 amendment at M10 |
+| DA-F3 | CORRECT AS-IS — pending ADR-007 | No | None | No |
+| DA-F4 | CRITICAL — CM consultation on single-entity trajectory scoring; ADR-010 Decision 2 amendment required | Yes — authorize CM + amendment scope | Chief Methodologist (primary), then Architect (amendment) | Yes — ADR-010 Decision 2 amendment |
+| DA-F5 | RECOMMEND option (a): `step_metadata` JSONB in `scenarios.configuration`; no migration | Yes — confirm option | None | Yes — ADR-010 Decision 2 minor amendment |
+
+**Immediate actions (before any trajectory view implementation):**
+
+1. **EL decision on DA-F2:** Authorize deferral of MDA floor overlays + Chief Methodologist
+   consultation on composite-score floor methodology
+2. **EL decision on DA-F4:** Authorize Chief Methodologist consultation on single-entity
+   trajectory scoring; confirm ADR-010 Decision 2 amendment is required
+3. **EL decision on DA-F5:** Confirm option (a) for step annotation storage
+4. **Correct Arch-F1:** Apply "STANDARD" → "ROUTINE" throughout FA brief (applied below)
+5. **File / update GitHub issue for DA-F4:** Update Issue #193 with trajectory view
+   dependency, or file a new issue. DA-F4 is a demo blocker, not a near-term horizon item.
+
+**No trajectory endpoint implementation may begin until DA-F2, DA-F4, and DA-F5
+dispositions are confirmed by the EL.**
+
+---
+
 ## Appendix — Data Architect Review Findings
 
 Data Architect Agent: REVIEW — 2026-05-22. Schema files read: `api_contracts.yml` v1.0,
@@ -853,7 +1097,7 @@ implementation sequencing must note this dependency.
 ### DA-F5 — step_event_label and step_significance Have No Schema Home
 
 The FA brief references `step_event_label` (≤ 8 words AND ≤ 32 characters) and
-`step_significance` ("SIGNIFICANT" | "STANDARD") as mandatory fields for Mode 1 step
+`step_significance` ("SIGNIFICANT" | "ROUTINE" — per ADR-010 Decision 7; "STANDARD" is incorrect) as mandatory fields for Mode 1 step
 annotation. `effective_from` maps to `scenario_state_snapshots.timestep`. The other two
 fields have no schema home.
 
