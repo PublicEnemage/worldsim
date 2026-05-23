@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated:** 2026-05-23 (board cleanup — all 14 stale open PRs confirmed merged; PRs #434/#435/#436 merged; Open PRs table cleared)
+**Last updated:** 2026-05-23 (CI fix checkout@v6→@v4; NM-014+NM-015 registry; branch protection remediation; PR merge gate rule in CLAUDE.md)
 **Current milestone:** M9 — Standards Foundation
 
 ---
@@ -76,6 +76,11 @@ No open PRs — board clear as of 2026-05-23.
 
 | PR | Title | Date |
 |---|---|---|
+| #445 | docs(process): PR merge gate — mandatory pause + SESSION_STATE auto-merge exception | 2026-05-23 |
+| #444 | fix(ci): actions/checkout@v6 → @v4 — fixes auth failure on all PRs | 2026-05-23 |
+| #443 | docs(process): near-miss registry — NM-014 file edit without commit; NM-015 CI gate not required | 2026-05-23 |
+| #442 | process(agents): Business Product Owner Agent — working agreement, RACI positions, file ownership | 2026-05-23 |
+| #438 | docs(process): blameless continuous improvement principle — Aviation SMS in CLAUDE.md | 2026-05-23 |
 | #436 | docs(process): near-miss registry — NM-008 through NM-013, agent team growth and DIC founding | 2026-05-23 |
 | #435 | docs(process): near-miss registry — NM-001 through NM-007, Aviation SMS methodology | 2026-05-23 |
 | #434 | chore(state): SESSION_STATE.md — PR #432 + #433 merged; Issue #431 closed | 2026-05-23 |
@@ -174,6 +179,10 @@ All Horizon:Immediate issues are now closed. M8 feature-complete.
 
 | Decision | Rationale | Date |
 |---|---|---|
+| PR merge gate rule added to CLAUDE.md — mandatory pause + SESSION_STATE.md auto-merge exception | After opening any PR, Claude Code must stop all git operations, report the PR URL, and wait for user merge confirmation before pulling main or starting the next task. Exception: SESSION_STATE.md-only PRs are pre-authorized for auto-merge once the `changes` CI status check passes. Rationale: eliminates the concurrent-terminal race condition (two processes operating git on the same local repo without coordination) while preserving the human as merge coordinator and CI gate — especially important in parallel-session scenarios. PR #445. | 2026-05-23 |
+| Branch protection remediation — `changes` and `compliance-scan` added to required status checks | Root-cause analysis of the checkout@v6 CI failure revealed that `changes` (the path-filter gate job) and `compliance-scan` were absent from required status checks. Only `lint`, `test-backend`, and `playwright-e2e` were required — all downstream of `changes`. When `changes` fails, downstream jobs are skipped-due-to-dependency-failure, potentially not blocking merges. Applied immediately via GitHub API (no PR required). Required checks now: `changes`, `test-backend`, `lint`, `playwright-e2e`, `compliance-scan`. NM-015 filed. | 2026-05-23 |
+| NM-014 + NM-015 filed — near-miss registry now 15 entries | NM-014: file edit reported as complete without being committed to a branch (agents.md in PO Agent EXECUTE). Process improvement: personal commit gate — a change is not reportable as done until it is on a branch and committed. NM-015: CI gate job (`changes`) was not a required status check; compliance-scan also absent. Process improvement: required checks must include the root gate job, not just its downstream dependents. Milestone exit checklist checkpoint added. PR #443. | 2026-05-23 |
+| CI fix — actions/checkout@v6 → @v4 | The April 19 checkout@v6 upgrade was intentional (Node.js 20 deprecation, v6 released January 2026) and appears to have regressed recently. All 7 occurrences across ci.yml and milestone-automation.yml updated to @v4 (current stable). This unblocked PR #443. PR #444. | 2026-05-23 |
 | Near-miss registry created — NM-001 through NM-013 | `docs/process/near-miss-registry.md` created using Aviation SMS epistemology: near-misses treated with same rigor as incidents because they reveal hazards without the cost of failure. 7 reactive entries (NM-001–NM-007) + 6 anticipatory entries (NM-008–NM-013). Recurring pattern identified: agent acting in domain belonging to another agent without required consultation (NM-005, NM-006, NM-007). Second pattern: six entries are anticipatory — Engineering Lead sensing structural gaps before failure. Registry maintenance section defines template, severity levels, and the key question: "caught by process or by a person?" PR #435 + PR #436. | 2026-05-23 |
 | PR board cleared — all stale PRs confirmed merged | 14 PRs that appeared open in SESSION_STATE were confirmed merged via GitHub. Open PRs table cleared. Board is clean. | 2026-05-23 |
 | File authority rule + ownership table — Issue #431 closed | CLAUDE.md §Architectural Principles now includes the file authority rule: agents must verify they hold R before writing any file; if another agent holds R, produce a draft and request owner review before committing. `docs/process/agent-raci.md §File Ownership` added: 24-row lookup table (file/directory, Owner R, Required Consultant C) covering all major files; §Near-Miss section documents PR #429 incident (two substantive errors caught by retroactive DA+Ar review); §What 'C' Means in Practice defines the correct draft → C review → incorporate → commit sequence. HORIZON mode in `docs/process/agents.md` expanded from one-liner to five numbered sweep steps; step 5 = FILE AUTHORITY AUDIT. PR #432 (CLAUDE.md rule) + PR #433 (table + HORIZON step). | 2026-05-23 |
