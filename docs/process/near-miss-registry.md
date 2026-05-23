@@ -664,24 +664,75 @@ no specified branch requires the agent to create a branch, commit the change, an
 PR URL — not to edit the file and report the edit. "Confirmation X was updated" must mean
 "X is committed on a branch and in a PR," not "X has new content locally."
 
+### Systemic root cause — the micro-management cycle
+
+The documented root cause (agent did not apply standing branch discipline
+rules) is accurate but incomplete. The deeper cause is a compounding cycle
+that had developed across M7–M9:
+
+1. An agent made a mistake or near-miss
+2. The response was to add more specification to the next prompt
+3. Each addition was individually justified — it addressed a real gap
+4. Together, the additions shifted prompting culture toward micro-management
+5. Prescriptive prompts reduced agent reasoning — when told exactly what
+   to do and how to report it, agents match the specified success criteria
+   literally rather than applying standing project rules from first principles
+6. Reduced reasoning made standing rules less likely to be applied
+   automatically
+7. Which produced more mistakes
+8. Which prompted more specification
+9. The cycle accelerated
+
+This is a well-documented failure mode in human organizations. A tech lead
+or director who compensates for team mistakes by becoming more prescriptive
+produces a team that is compliant but not capable — one that cannot function
+without exhaustive instruction. The load accumulates on the lead until
+something breaks. The correct response to the first leak in the dam is a
+structural fix, not a finger.
+
+The correct response to NM-014 is not "add a completion criteria checklist
+to every prompt." It is to restructure where specification lives:
+
+- **Issues carry the prescription** — what to produce, what done looks like,
+  what the acceptance criteria are. Issues are durable, reviewable,
+  version-controlled. Anyone — human or agent — can pick up an issue and
+  have the same instructions.
+- **Standing documents carry the rules** — CLAUDE.md, agent-raci.md,
+  the near-miss registry. Agents read these before executing. Rules do not
+  need to be re-specified in every prompt.
+- **Agents write their plan before executing** — before touching any file
+  or opening any branch, the agent states what it is going to do, which
+  documents it is reading, what branch it will use, and what the PR will
+  contain. This plan is the review surface. It can be corrected before
+  any implementation happens — without requiring the Engineering Lead to
+  have specified every detail in advance.
+- **Prompts are outcome-oriented** — "Execute Issue #NNN. Write your plan
+  first. Follow all standing project rules." The agent's reasoning fills
+  the gap, not the prompt's length.
+
 ### Contributing factor under investigation
 
-Prescriptive EXECUTE prompts — those that specify exact steps and per-action success criteria
-— may reduce agent reasoning about what constitutes completion. In this case, Action 1's
-success criterion was implicit but clear (a URL). Action 2's success criterion was stated as
-"confirmation agents.md was updated," which the agent matched literally (file has new content)
-rather than by the project's standing completion standard (change is committed and in a PR).
+Prescriptive EXECUTE prompts — those that specify exact steps and per-action
+success criteria — reduce agent reasoning about what constitutes completion.
+In NM-014, Action 2's success criterion was stated as "confirmation agents.md
+was updated," which the agent matched literally (file has new content) rather
+than by the project's standing completion standard (change is committed and
+in a PR).
 
-A less prescriptive instruction — "add the Business Product Owner Agent to agents.md" — would
-have required the agent to reason about what "done" means from first principles, which
-naturally includes the delivery chain: edit → branch → commit → PR → report URL.
+A less prescriptive instruction — "add the Business Product Owner Agent to
+agents.md" — would have required the agent to reason about what "done" means
+from first principles, which naturally includes the delivery chain:
+edit → branch → commit → PR → report URL.
 
-The weight of prescriptive prompting as a contributing factor is under investigation. It is
-an observation, not a concluded cause. The primary root cause remains the agent's failure to
-apply standing branch discipline rules regardless of how the task was framed.
+The weight of prescriptive prompting as a contributing factor is confirmed
+as significant, not merely a possibility. The primary and systemic root cause
+is the micro-management cycle described above. Prescriptive prompting is both
+a symptom of that cycle and a mechanism that perpetuates it.
 
 Documented in: `CLAUDE.md §Blameless continuous improvement is non-negotiable`,
-`docs/process/agent-raci.md §File Ownership` (branch discipline rule)
+`docs/process/agent-raci.md §File Ownership` (branch discipline rule),
+`docs/process/near-miss-registry.md §The recurring pattern` (systemic cause
+added 2026-05-23)
 
 ---
 
