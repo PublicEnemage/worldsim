@@ -2,9 +2,9 @@
 
 > **Owned by:** Business Product Owner Agent (R), UX Designer Agent (C)
 > **Authored:** 2026-05-23 — Issue #441
-> **Status:** Awaiting three UX Designer rulings (marked [UX-RULING]) before stories are
-> fully testable. All other criteria are final. EL decision on US-GAP-001 resolved:
-> M10 gap (Issue #451 filed 2026-05-23).
+> **Status:** All 29 stories are final. All UX Designer rulings resolved (2026-05-23).
+> EL decision on US-GAP-001 resolved: M10 gap (Issue #451). QA may begin writing
+> acceptance tests against all criteria immediately.
 >
 > **Consumers:**
 > - **QA Lead** — writes acceptance tests from the Given/When/Then criteria before
@@ -444,21 +444,25 @@ without an economist re-interpreting them for me.
 
 **Acceptance criteria:**
 - Given a Mode 1 scenario where an indicator crossed its floor at step 3, when the alert
-  panel renders, then the alert row text uses the Mode 1 historical tense pattern
-  [Playwright — assert [UX-RULING-1: exact observable string for Mode 1 alert tense]]
-- Given a Mode 1 alert row, then the text does not contain advisory-language strings
-  [Playwright — assert absence of [UX-RULING-1: advisory language strings to exclude
-  from Mode 1 alert text]]
-- Given Mode 2, then alert text uses the Mode 2 projected-warning pattern [Playwright —
-  assert [UX-RULING-1: Mode 2 observable string]]
-- Given Mode 3, then alert text uses the Mode 3 live-update pattern [Playwright —
-  assert [UX-RULING-1: Mode 3 observable string]]
+  panel renders, then the alert row text contains the substring `"crossed"` (past-tense
+  marker; ADR-008 alert tense spec) [Playwright — assert `"crossed"` present in alert row
+  text]
+- Given a Mode 1 alert row, then the text does not contain `"is projected"` and does not
+  contain `"Caused by:"` [Playwright — assert both substrings absent from all Mode 1 alert
+  rows]
+- Given Mode 2, then alert text contains the substring `"is projected to cross"` [Playwright —
+  assert `"is projected to cross"` present in alert row text]
+- Given Mode 3, then alert row text contains ` — ` (space-dash-dash-space separator) matching
+  the `"[SEVERITY] — [indicator] — [cohort] — step [N]"` format (all-caps severity) [Playwright —
+  assert ` — ` separator present; assert text begins with `"CRITICAL"` or `"WARNING"`]
 
 **Journey anchor:** Journey D Step 2
 **Cognitive task:** Mode 1: historical pattern recognition
 **M9 gate:** Required
-**[UX-RULING-1]:** Exact observable alert text strings per mode required from UX Designer
-before QA can write these assertions. See §Open Rulings.
+**UX-RULING-1 resolved (2026-05-23):** Mode 1 marker: `"crossed"`. Mode 1 exclusions:
+`"is projected"` and `"Caused by:"` absent. Mode 2 marker: `"is projected to cross"`.
+Mode 3 format: `"[SEVERITY] — [indicator] — [cohort] — step [N]"` with ` — ` separators.
+Source: ADR-008 §MDA Alert Panel mode-specific tense specification.
 
 ---
 
@@ -610,16 +614,22 @@ Tier 5 null is not evidence of zero governance health.
 - Given the governance composite score is exactly `0.00` at the current step, then the
   governance value element displays a numeric value (e.g., "0.00") — not "—" [Playwright —
   assert numeric text present when score is 0; assert "—" absent]
-- Given a null score, then the governance value element carries a visually distinct CSS
-  treatment distinguishing it from numeric values in peripheral vision [Playwright —
-  assert [UX-RULING-2: exact CSS class or DOM attribute for null vs. zero distinction]]
+- Given a null score, then the governance value element has CSS class `score-value--null`
+  applied, and that class applies a visually distinct treatment (at minimum reduced opacity
+  ≤ 60%) for peripheral-vision distinction [Playwright — assert element
+  `classList.contains('score-value--null')` is true when composite_score is null]
+- Given a zero-value score (`composite_score === 0.00`), then the element has CSS class
+  `score-value--numeric` applied and does not have `score-value--null` [Playwright — assert
+  `classList.contains('score-value--numeric')` true and `classList.contains('score-value--null')`
+  false when score is 0.00]
 
 **Journey anchor:** Journey A Step 3b
 **Cognitive task:** Mode 2: threshold-safe path construction
 **M9 gate:** Required
-**[UX-RULING-2]:** Exact CSS treatment (class name, attribute, or property) for null vs.
-zero distinction required from UX Designer before QA can write the third criterion.
-See §Open Rulings.
+**UX-RULING-2 resolved (2026-05-23):** Null score: CSS class `score-value--null` (visual
+treatment: opacity ≤ 60% minimum — specific color values are FA authority subject to CVD
+constraint). Numeric score including zero: CSS class `score-value--numeric`. Both classes are
+the Playwright-assertable contract distinguishing the two epistemic states.
 
 ---
 
@@ -712,20 +722,22 @@ prediction — and contextualize everything else I read in the instrument cluste
 
 **Acceptance criteria:**
 - Given Mode 1, when the instrument cluster renders, then the persistent header contains
-  the mode indicator with exact text [UX-RULING-3: Mode 1 label string] [Playwright —
-  assert mode indicator text exact match]
-- Given Mode 2, then the mode indicator shows [UX-RULING-3: Mode 2 label string]
-  [Playwright]
-- Given Mode 3, then the mode indicator shows [UX-RULING-3: Mode 3 label string]
-  [Playwright]
+  the mode indicator with exact text `"Replay"` [Playwright — assert mode indicator text
+  exactly equals `"Replay"`]
+- Given Mode 2, then the mode indicator shows exact text `"Simulation"` [Playwright —
+  assert exactly equals `"Simulation"`]
+- Given Mode 3, then the mode indicator shows exact text `"Active Control"` [Playwright —
+  assert exactly equals `"Active Control"`]
 - Given a mode change, then the mode indicator text updates within the same render cycle as
   the mode state change [RTL — assert indicator text within `act()` on mode change]
 
 **Journey anchor:** Journey D Step 1
 **Cognitive task:** Mode 1: trajectory reconstruction AND historical pattern recognition
 **M9 gate:** Required
-**[UX-RULING-3]:** Exact mode indicator label strings for all three modes required from
-UX Designer before QA can write these assertions. See §Open Rulings.
+**UX-RULING-3 resolved (2026-05-23):** Mode 1: `"Replay"`. Mode 2: `"Simulation"`.
+Mode 3: `"Active Control"`. Short-form ADR-008 mode names without `"Mode N"` prefix —
+header space constraint and Aicha's 20-second orientation test (US-026 journey anchor)
+both satisfied by `"Replay"` as an unambiguous historical marker.
 
 ---
 
@@ -870,16 +882,15 @@ tests written before implementation begins.
 
 ---
 
-## Open Rulings
+## Resolved Rulings
 
-Three acceptance criteria contain placeholders awaiting UX Designer confirmation.
-Stories are otherwise final and QA can begin writing all other criteria immediately.
+All three UX Designer rulings resolved 2026-05-23. No open rulings remain.
 
-| Ruling | Story | Question |
+| Ruling | Story | Resolution |
 |---|---|---|
-| [UX-RULING-1] | US-016 | Exact observable alert text strings per mode (Mode 1 historical, Mode 2 projected, Mode 3 live); exact advisory language strings to assert absent from Mode 1 rows |
-| [UX-RULING-2] | US-022 | Exact CSS class or DOM attribute distinguishing null composite score from zero-value score in the 1D panel |
-| [UX-RULING-3] | US-026 | Canonical mode indicator label strings for all three modes |
+| UX-RULING-1 | US-016 | Mode 1: `"crossed"` present; `"is projected"` and `"Caused by:"` absent. Mode 2: `"is projected to cross"` present. Mode 3: ` — ` separator format, begins with `"CRITICAL"` or `"WARNING"`. |
+| UX-RULING-2 | US-022 | Null score: CSS class `score-value--null` (opacity ≤ 60%). Numeric score incl. zero: CSS class `score-value--numeric`. |
+| UX-RULING-3 | US-026 | Mode 1: `"Replay"`. Mode 2: `"Simulation"`. Mode 3: `"Active Control"`. |
 
 ---
 
@@ -899,5 +910,6 @@ Stories are otherwise final and QA can begin writing all other criteria immediat
 
 **Total stories: 29 (US-001 through US-029)**
 **M9 Required: 29**
-**Open UX Designer rulings: 3** (US-016, US-022, US-026 — QA can write all other criteria)
+**Open UX Designer rulings: 0** — all three resolved 2026-05-23 (US-016, US-022, US-026)
 **EL decision resolved: 1** (US-GAP-001 — M10 gap; Issue #451 filed 2026-05-23)
+**QA gate: UNBLOCKED** — all acceptance criteria are final; QA may begin writing tests immediately
