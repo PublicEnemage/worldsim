@@ -14,7 +14,6 @@ from typing import Any
 
 from pydantic import BaseModel, ConfigDict, field_serializer, field_validator
 
-
 # ---------------------------------------------------------------------------
 # Trajectory endpoint schemas — Issue #458
 # ---------------------------------------------------------------------------

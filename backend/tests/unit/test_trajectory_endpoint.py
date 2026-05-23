@@ -29,7 +29,6 @@ from app.api.scenarios import (
 )
 from app.schemas import MDAFloorRecord, QuantitySchema
 
-
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
@@ -104,7 +103,7 @@ def test_normalized_absolute_strategy_gdp_growth() -> None:
 
 
 def test_normalized_absolute_strategy_lower_better() -> None:
-    """unemployment_rate=0.127 (lower_better): (0.30 − 0.127) / (0.30 − 0.02) = 0.173/0.28 = 0.6179."""
+    """unemployment_rate=0.127 (lower_better): (0.30-0.127)/(0.30-0.02) = 0.173/0.28 = 0.6179."""
     indicators = _entity_indicators({"unemployment_rate": ("0.127", "financial")})
     # unemployment_rate has measurement_framework=None in the existing test fixtures,
     # but here we test with explicit framework tag to verify strategy logic.
