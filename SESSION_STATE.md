@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-05-23 (session end — Known Issues registry established; KI-001; PR #482)
+**Last updated: 2026-05-23 (PR #484 merged — TrajectoryView Zone 1A; Issue #460 closed; #461 unblocked)**
 **Current milestone:** M9 — Standards Foundation
 
 ---
@@ -76,11 +76,11 @@ No open PRs — board clear as of 2026-05-23.
 
 | PR | Title | Date |
 |---|---|---|
+| #484 | feat(frontend): TrajectoryView component — Zone 1A instrument cluster (Issue #460) | 2026-05-23 |
 | #482 | process(ki): Known Issues registry — establish KI framework, file KI-001 | 2026-05-23 |
 | #481 | chore(state): SESSION_STATE.md — session end 2026-05-23 (PRs #479–#480) | 2026-05-23 |
 | #480 | test(qa): retrofit instrument cluster spec — split Type 1/Type 2 ACs, remove blanket skip (closes #473) | 2026-05-23 |
 | #479 | process(nm): NM-018 — hammer-nail; panel composition principle for pre-EL consultations | 2026-05-23 |
-| #478 | chore(state): SESSION_STATE.md — session end 2026-05-23 (PRs #468–#477) | 2026-05-23 |
 | #468 | feat(api): GET /scenarios/{id}/trajectory endpoint (closes #458) | 2026-05-23 |
 | #466 | docs(process): PM Agent pre-EL consultation — standing automatic capability (closes #464) | 2026-05-23 |
 | #456 | docs(process): PM Agent issue hierarchy rule — Epic → Feature → Task, binary spawning | 2026-05-23 |
@@ -141,8 +141,8 @@ No open PRs — board clear as of 2026-05-23.
 | Issue | Title | Status / Gate |
 |---|---|---|
 | #473 ✅ | test(qa): retrofit instrument-cluster spec — split component ACs into task scope; remove blanket skip | Closed — PR #480 merged; Type 1 ACs distributed to #460/#461/#462 via comments; integration spec created |
-| #460 | feat(frontend): TrajectoryView — Zone 1A (instrument cluster) | Open — unblocked; backend endpoint #458 merged |
-| #461 | feat(frontend): MDA Alert Panel — Zone 1B (instrument cluster) | Open — unblocked |
+| #460 ✅ | feat(frontend): TrajectoryView — Zone 1A (instrument cluster) | Closed — PR #484 merged |
+| #461 | feat(frontend): MDA Alert Panel — Zone 1B (instrument cluster) | Open — unblocked; next up |
 | #462 | feat(frontend): PMM + Four-Framework — Zone 1C/1D (instrument cluster) | Open — unblocked |
 | #463 | test(e2e): Greece integration Playwright suite | Open — blocked by #460 + #461 + #462 |
 | #367 | docs(ux): persona-anchored IR review re-run (Persona 2) | Open — near-term |
@@ -206,6 +206,7 @@ All Horizon:Immediate issues are now closed. M8 feature-complete.
 
 | Decision | Rationale | Date |
 |---|---|---|
+| TrajectoryView Zone 1A merged (PR #484, closes #460) | `TrajectoryView.tsx` (ComposedChart: 4 active Lines, 4 ghost Lines, Area divergence fills, ecological WARNING ReferenceLine, ADR-007-gated band infrastructure, Mode 1 custom tick, (exp) badge, Path A single-entity dashed curves); `InstrumentCluster.tsx` (two-column layout 480/240/280px at 1024×768, 580/400/280px at 1280×800, 280px control plane always rendered); `scenarioStepStore.ts` (Zustand atom, single-set() atomicity invariant); `frameworkColors.ts` (UX Designer ruling — teal #1A8FA0 replaces green #3A7A4B after CVD deuteranopia collision identified); DD-012–DD-015 added; FA brief CVD Validation Result recorded; MV-001 closed; 31/31 Vitest tests passing; AC-003/004/005 Playwright guards added (element not in App.tsx yet); MV-002 hardware validation pending before M9 exits. | 2026-05-23 |
 | Known Issues registry established — distinct category from near-misses (PR #482) | External infrastructure limitations (GitHub Actions, third-party APIs) cannot be fixed by process redesign — filing them as near-misses produces improvement recommendations against things we cannot change. Known Issues live in `docs/process/known-issues-registry.md`; near-misses in `docs/process/near-miss-registry.md`. Categorisation rule: if the fix requires changing our own code/process → near-miss; if the fix requires waiting for an upstream vendor → Known Issue. KI-001 filed: GitHub Actions `pull_request` event silently fails to fire (workaround: empty retriggering commit). CLAUDE.md, agents.md, agent-raci.md all updated. | 2026-05-23 |
 | Instrument cluster spec retrofit — blanket skip removed, Type 1/Type 2 split completed (PR #480, closes #473) | `instrument-cluster.spec.ts` deleted; `instrument-cluster-integration.spec.ts` created with only AC-001 and AC-002 (Type 2 integration-level, individual `test.skip()` per test — no file-level blanket suppression). Component-level ACs (AC-003–AC-014) distributed to implementing issues: AC-003–013 → #460 (TrajectoryView) with full test code; AC-014 + component tests → #462 (PMM + Four-Framework); component tests → #461 (MDA Alert Panel). CI green: no `test.skip(true, ...)` in any instrument cluster spec file. | 2026-05-23 |
 | NM-018 filed — hammer-nail: technical panel produced engineering solutions to a process problem (PR #479) | Three technical agents (Architect, Frontend Architect, QA Lead) consulted on skip governance; all three produced engineering solutions (CI guard, skip registry, DOM-presence fixture) to what was a process problem (missing AC categorization rule). PO Agent and UX Designer Agent immediately identified the correct root cause. Root cause of the near-miss: no rule existed requiring PM Agent to evaluate whether panel composition matched the problem's root cause domain, not just its surface presentation. Standing fix: panel composition principle added to PM Agent pre-EL consultation protocol in `docs/process/agents.md §PM Agent — Pre-EL Consultation` between steps 2 and 3. | 2026-05-23 |
