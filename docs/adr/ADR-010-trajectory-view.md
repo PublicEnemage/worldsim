@@ -179,6 +179,7 @@ interface FrameworkCurvePoint {
                                               //   "ecological" | "governance"
   composite_score: number | null;             // null = governance in validation
   confidence_tier: 1 | 2 | 3 | 4 | 5;
+  scoring_basis: "percentile_rank" | "normalized_absolute" | "boundary_proximity";  // Amendment 2026-05-23
   // ADR-006 banding fields (present when BandingEngine is invoked)
   ci_lower: number | null;
   ci_upper: number | null;
@@ -188,9 +189,9 @@ interface FrameworkCurvePoint {
 
 interface MDAFloor {
   framework: string;
-  indicator_key: string;
   floor_value: number;
   severity: "WARNING" | "CRITICAL" | "TERMINAL";
+  label: string;                              // e.g. "Planetary boundary"
 }
 ```
 
@@ -215,6 +216,59 @@ state update within the already-fetched trajectory data.
 the current trajectory response is frozen as the baseline state in the shared
 step atom (Decision 4). Subsequent trajectory fetches return the active
 (modified) trajectory. The baseline is held in client state, not re-fetched.
+
+**Amendment — single-entity scoring and step_metadata storage (2026-05-23, EL
+Decisions B and C, Issue #428):**
+
+**Single-entity composite scoring (Path A).** When a scenario contains fewer than
+two entities, percentile-rank composite scores are unavailable for the financial and
+human_development frameworks (ecological uses boundary-proximity scoring, which is
+entity-intrinsic; governance null is handled by Decision 5). In single-entity scenarios,
+the trajectory endpoint uses normalized absolute value composite scoring for financial
+and human_development, as specified in the Chief Methodologist consultation
+`docs/architecture/cm-reference-range-consultation-2026-05-23.md`.
+
+Key properties of the normalized absolute composite:
+
+- **Score range:** [0.0, 1.0] — same as percentile-rank composite; ecological [0.0, 2.0]
+  scale unchanged
+- **Confidence tier floor:** Tier 3 minimum for all normalized absolute scores,
+  regardless of the individual indicator confidence tiers
+- **Scoring basis field:** `FrameworkCurvePoint.scoring_basis` distinguishes
+  `"percentile_rank"` from `"normalized_absolute"` from `"boundary_proximity"`. This
+  field is mandatory on every `FrameworkCurvePoint` — it is never absent. Values by
+  framework in multi-entity scenarios: financial → `"percentile_rank"`;
+  human_development → `"percentile_rank"`; ecological → `"boundary_proximity"` (always
+  entity-intrinsic, calibrated to planetary boundary); governance → `"percentile_rank"`
+  (null composite_score when in-validation). In single-entity scenarios: financial and
+  human_development → `"normalized_absolute"`; ecological and governance unchanged.
+- **`null` composite_score semantics in single-entity scenarios:** A null
+  `composite_score` on a financial or HD curve in a single-entity scenario means
+  zero normalizable indicators were present for that framework at that step — not
+  governance-in-validation and not an uncomputed step. The three null sources remain
+  semantically distinct: (1) absent step = uncomputed; (2) null governance = in
+  validation; (3) null financial/HD in single-entity = no normalizable indicators
+  at that step. The `scoring_basis` field disambiguates cases (2) and (3) at render
+  time.
+
+**Step metadata storage (Decision C).** The `step_event_label` and `step_significance`
+fields on `TrajectoryStep` are sourced from the `step_metadata` key in
+`scenarios.configuration` JSONB. Structure:
+
+```json
+{
+  "step_metadata": {
+    "1": { "step_event_label": "Capital controls imposed", "step_significance": "SIGNIFICANT" },
+    "3": { "step_event_label": "ESM programme begins", "step_significance": "SIGNIFICANT" }
+  }
+}
+```
+
+Keys are 1-based step index strings. Absence of a key means the step is ROUTINE —
+`step_event_label` returns `null` and `step_significance` returns `"ROUTINE"` in the
+response. The value `"STANDARD"` is incorrect and must be rejected by fixture
+validation (see Decision 7). No database migration is required — `scenarios.configuration`
+is an unconstrained JSONB column.
 
 ---
 
@@ -369,6 +423,45 @@ alert panel are complementary surfaces for the same threshold crossing. The
 trajectory view shows the crossing in spatial context (which step, how deep
 below the floor); Zone 1B shows the crossing with causal attribution and cohort
 detail. Both must be consistent — the same step and the same threshold.
+
+**Amendment — M9 deferral (2026-05-23, EL Decision A, Issue #428):**
+
+Composite-score-level MDA floor values cannot be defined responsibly for M9.
+Defining them requires: (1) a complete indicator inventory per framework, (2)
+backtesting evidence showing historical composite score values at which MDA
+threshold violations co-occurred, and (3) a validated mapping function from
+indicator-level thresholds to composite score space. None of these conditions
+are satisfied at M9. Rendering invented floor values as authoritative
+`<ReferenceLine>` elements violates the No False Precision principle.
+
+**M9 trajectory view ships with `mda_floors: []` (empty array) for all
+frameworks** — except the ecological exception below. The `mda_floors.map()`
+render loop produces no SVG elements for an empty array; no conditional render
+guard or placeholder is needed.
+
+**Ecological exception — WARNING floor at y=1.0 authorized for M9:** An
+ecological composite score of 1.0 means the entity is at the planetary boundary
+for at least one indicator. This is a boundary-crossing event by definition.
+No backtesting is required to establish this floor value — it is inherent to the
+ecological scoring scale. The M9 trajectory endpoint may include:
+
+```typescript
+{ framework: "ecological", floor_value: 1.0, severity: "WARNING",
+  label: "Planetary boundary" }
+```
+
+in `mda_floors` when the ecological framework is active in the scenario.
+All other framework floors remain deferred.
+
+**M10 schema path — M10-B confirmed:** A new `mda_composite_floors` table
+(separate from `mda_thresholds`) is the correct M10 home for composite-score-level
+floors. The `mda_thresholds` table stores indicator-level thresholds; mixing
+composite-level floors into it blurs the Zone 1A / Zone 2B architectural boundary.
+The new table must include a non-null `cm_approval_reference` column — no composite
+floor value may be seeded without a traceable Chief Methodologist consultation
+reference. The `MDAFloor` response interface (above) remains correct; the backend
+will read from `mda_composite_floors` rather than `mda_thresholds` when that table
+exists.
 
 ---
 

@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated:** 2026-05-22 (Three EL decisions recorded — Path A selected, MDA floors deferred, step_metadata JSONB confirmed; CM reference range consultation is next hard gate; PR #427 open)
+**Last updated:** 2026-05-23 (Issue #428 prerequisites complete — CM consultation done; ADR-010 D2+D6 amendments applied; api_contracts.yml + database.yml updated; trajectory endpoint implementation unblocked; PR #429 open)
 **Current milestone:** M9 — Standards Foundation
 
 ---
@@ -72,7 +72,8 @@ Twelve issues filed 2026-05-19. Must complete before M9 UX implementation begins
 
 | PR | Title | Date |
 |---|---|---|
-| #427 | docs(frontend): EL decisions A/B/C recorded — unblock trajectory endpoint implementation | 2026-05-22 |
+| #429 | docs(adr+schema): ADR-010 D6+D2 amendments; CM reference range consultation; schema updates | 2026-05-23 |
+| #427 | docs(frontend): EL decisions A/B/C recorded — unblock trajectory endpoint implementation | 2026-05-22 — MERGED |
 | #426 | docs(frontend): Six-agent parallel consultation — DA-F2/F4/F5 pre-implementation record | 2026-05-22 — MERGED |
 | #425 | docs(frontend): Architect Agent review of Data Architect findings (DA-F1–F5) | 2026-05-22 — MERGED |
 | #424 | docs(schema+frontend): Data Architect review — trajectory endpoint stub and 5 schema findings | 2026-05-22 — MERGED |
@@ -159,9 +160,7 @@ All Horizon:Immediate issues are now closed. M8 feature-complete.
 
 | Decision | Context | Status |
 |---|---|---|
-| CM reference range consultation — financial + HD indicator reference ranges | IMMEDIATE NEXT GATE. Path A (Decision B) cannot be implemented until CM defines reference ranges for financial and HD composite indicators. Without declared reference ranges, the trajectory endpoint cannot compute normalized absolute composite scores. CM activation required: define reference ranges for each indicator contributing to the financial and HD framework composites, and document in a consultation artifact. | Pending — CM activation required |
-| ADR-010 Decision 2 amendment | Required to record: (1) scoring_basis field on FrameworkCurvePoint; (2) single-entity endpoint behavior (Path A); (3) Tier 3 confidence floor for normalized absolute scores; (4) step_metadata JSONB storage contract (Decision C). Architect Agent: EXECUTE after CM reference range consultation is complete. | Pending — after CM consultation |
-| ADR-010 Decision 6 amendment | Required to record: M9 deferral of composite-score MDA floor overlays; ecological WARNING at 1.0 authorized for M9; M10-B schema (mda_composite_floors table) confirmed. Architect Agent: EXECUTE. | Pending |
+| Trajectory endpoint implementation | FastAPI route + Pydantic model + normalized_absolute_strategy backend function. All prerequisites complete. May begin. | Ready — unblocked |
 |---|---|---|
 | Decision A (DA-F2): MDA floor overlays deferred to M10 | M9 trajectory view ships without MDA floor ReferenceLines except ecological WARNING at y=1.0 (boundary-crossing, defensible without backtesting). CM consultation on indicator inventory + reference ranges authorized as M10 prerequisite. M10-B schema confirmed (new mda_composite_floors table with cm_approval_reference column). ADR-010 Decision 6 amendment pending. | Complete ✅ — 2026-05-22 |
 | Decision B (DA-F4): Path A selected — normalized absolute composite for single-entity trajectory | Path A: four framework curves rendered for single-entity scenarios; financial/HD use normalized absolute value composite (Tier 3 floor); strokeDasharray="8 3"; "single-country index" legend + tooltip; Zone 3 methodology note mandatory. CM reference range consultation is the hard implementation gate. ADR-010 Decision 2 amendment + Issue #193 update required. | Complete ✅ — 2026-05-22 |
@@ -181,6 +180,7 @@ All Horizon:Immediate issues are now closed. M8 feature-complete.
 
 | Decision | Rationale | Date |
 |---|---|---|
+| Issue #428 prerequisites complete — trajectory endpoint unblocked | (1) ADR-010 Decision 6 amendment: M9 deferral of MDA floor overlays; ecological WARNING at 1.0 authorized; M10-B schema confirmed. (2) CM reference range consultation complete: gdp_growth [-0.10, 0.06]; reserve_coverage_months [0.0, 12.0]; unemployment_rate [0.02, 0.30] inverted; net_enrollment_secondary [0.40, 1.00]; health_expenditure excluded (non-monotonic); Tier 3 floor for all normalized_absolute scores. (3) ADR-010 Decision 2 amendment: scoring_basis field, single-entity scoring contract, step_metadata JSONB. api_contracts.yml and database.yml updated. Trajectory endpoint implementation now unblocked. PR #429. | 2026-05-23 |
 | EL Decisions A/B/C recorded — trajectory endpoint implementation unblocked | Decision A: MDA floor overlays deferred to M10; ecological WARNING at 1.0 authorized for M9; CM consultation on reference ranges authorized; M10-B schema confirmed. Decision B: Path A selected — normalized absolute composite for single-entity trajectory; four curves; Tier 3 confidence floor; CM reference range consultation is the hard next gate. Decision C: step_metadata JSONB option (a) confirmed. All recorded on Issue #366. Issue #193 updated. PR #427. | 2026-05-22 |
 | Six-agent parallel consultation — DA-F2/F4/F5 pre-implementation record | CM, UX Design Thinking, UX Designer, Data Architect, QA Lead, Frontend Architect activated simultaneously. Key rulings: (1) CM: single-entity normalized absolute composite is methodologically sound (Tier 3 floor); Path A requires pre-declared reference ranges before endpoint can compute. (2) CM: composite-score MDA floors cannot be defined without backtesting — defer to M10; ecological WARNING at 1.0 is only M9 exception. (3) UT: four-curve Mode 1 Greece is M9 exit requirement; DA-F4 is demo scope decision. (4) UD: Path A rulings (strokeDasharray="8 3", legend labels, tooltip) and Path B rulings (40px amber strip, approved text) recorded. (5) DA: step_metadata JSONB confirmed valid; scoring_basis field for Path A; single_entity_advisory at response root for Path B; mda_floors structural error in stub identified. (6) QA: AC-009 corrected (3 shock ReferenceLines, not 6+); AC-015 broadened to all four Lines. (7) FA: atom unchanged for all paths; connectNulls={false} confirmed on all 8 Lines; single_entity_advisory must not be atom field. Three EL decisions still pending. PR #426. | 2026-05-22 |
 | Architect Agent review of Data Architect findings — three EL decisions required | Data Architect found 5 schema gaps (DA-F1–F5). Architect dispositions: DA-F1 stub adequate; DA-F2 defer MDA floor overlays to M10 + CM consultation; DA-F3 correct as-is; DA-F4 CRITICAL (Greece Mode 1 blocked — single-entity null; CM + ADR-010 amendment required); DA-F5 step_metadata JSONB approach confirmed. Arch-F1: "STANDARD" → "ROUTINE" correction applied. Three EL decisions pending. PR #425. | 2026-05-22 |
