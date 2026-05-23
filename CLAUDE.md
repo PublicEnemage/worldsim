@@ -317,6 +317,14 @@ entry ASSIGNED, (3) derive the panel composition from `docs/process/agent-raci.m
 and (4) confirm the implementing agent is included in the panel. ADR numbers must
 not appear in issue titles or documents before they are assigned from the backlog.
 
+**File authority is non-negotiable.**
+Before writing to any file, the acting agent must verify they hold R (Responsible)
+on that file per `docs/process/agent-raci.md`. If another agent holds R, the acting
+agent must produce a draft and request the owning agent's review before committing.
+Writing directly to another agent's owned files without prior owner review is a
+process violation equivalent to implementing a feature without an ADR. The file
+ownership table is in `docs/process/agent-raci.md §File Ownership`.
+
 **Tests are not optional.**
 The backtesting infrastructure is the most important test suite.
 Unit and integration tests are table stakes. A feature is not done
