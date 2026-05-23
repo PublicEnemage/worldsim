@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated:** 2026-05-23 (session end — NM-018 + panel composition principle; Issue #473 retrofit; PRs #479–#480)
+**Last updated: 2026-05-23 (session end — Known Issues registry established; KI-001; PR #482)
 **Current milestone:** M9 — Standards Foundation
 
 ---
@@ -76,11 +76,11 @@ No open PRs — board clear as of 2026-05-23.
 
 | PR | Title | Date |
 |---|---|---|
+| #482 | process(ki): Known Issues registry — establish KI framework, file KI-001 | 2026-05-23 |
+| #481 | chore(state): SESSION_STATE.md — session end 2026-05-23 (PRs #479–#480) | 2026-05-23 |
 | #480 | test(qa): retrofit instrument cluster spec — split Type 1/Type 2 ACs, remove blanket skip (closes #473) | 2026-05-23 |
 | #479 | process(nm): NM-018 — hammer-nail; panel composition principle for pre-EL consultations | 2026-05-23 |
 | #478 | chore(state): SESSION_STATE.md — session end 2026-05-23 (PRs #468–#477) | 2026-05-23 |
-| #477 | process(agents): PO standing responsibilities — dual consumer + sequence gate (closes #470) | 2026-05-23 |
-| #476 | process(qa): Type 1/Type 2 AC categorization rule — QA Lead, PO, standards (closes #474) | 2026-05-23 |
 | #468 | feat(api): GET /scenarios/{id}/trajectory endpoint (closes #458) | 2026-05-23 |
 | #466 | docs(process): PM Agent pre-EL consultation — standing automatic capability (closes #464) | 2026-05-23 |
 | #456 | docs(process): PM Agent issue hierarchy rule — Epic → Feature → Task, binary spawning | 2026-05-23 |
@@ -206,6 +206,7 @@ All Horizon:Immediate issues are now closed. M8 feature-complete.
 
 | Decision | Rationale | Date |
 |---|---|---|
+| Known Issues registry established — distinct category from near-misses (PR #482) | External infrastructure limitations (GitHub Actions, third-party APIs) cannot be fixed by process redesign — filing them as near-misses produces improvement recommendations against things we cannot change. Known Issues live in `docs/process/known-issues-registry.md`; near-misses in `docs/process/near-miss-registry.md`. Categorisation rule: if the fix requires changing our own code/process → near-miss; if the fix requires waiting for an upstream vendor → Known Issue. KI-001 filed: GitHub Actions `pull_request` event silently fails to fire (workaround: empty retriggering commit). CLAUDE.md, agents.md, agent-raci.md all updated. | 2026-05-23 |
 | Instrument cluster spec retrofit — blanket skip removed, Type 1/Type 2 split completed (PR #480, closes #473) | `instrument-cluster.spec.ts` deleted; `instrument-cluster-integration.spec.ts` created with only AC-001 and AC-002 (Type 2 integration-level, individual `test.skip()` per test — no file-level blanket suppression). Component-level ACs (AC-003–AC-014) distributed to implementing issues: AC-003–013 → #460 (TrajectoryView) with full test code; AC-014 + component tests → #462 (PMM + Four-Framework); component tests → #461 (MDA Alert Panel). CI green: no `test.skip(true, ...)` in any instrument cluster spec file. | 2026-05-23 |
 | NM-018 filed — hammer-nail: technical panel produced engineering solutions to a process problem (PR #479) | Three technical agents (Architect, Frontend Architect, QA Lead) consulted on skip governance; all three produced engineering solutions (CI guard, skip registry, DOM-presence fixture) to what was a process problem (missing AC categorization rule). PO Agent and UX Designer Agent immediately identified the correct root cause. Root cause of the near-miss: no rule existed requiring PM Agent to evaluate whether panel composition matched the problem's root cause domain, not just its surface presentation. Standing fix: panel composition principle added to PM Agent pre-EL consultation protocol in `docs/process/agents.md §PM Agent — Pre-EL Consultation` between steps 2 and 3. | 2026-05-23 |
 | PO Agent standing responsibilities — dual consumer + sequence gate (PR #477, closes #470) | Two non-negotiable standing responsibilities added to PO working agreement: (1) Stories serve QA Lead and Frontend Architect equally — a story too vague for QA to write a meaningful test, or too abstracted for FA to make the right tradeoffs, is a weak story; (2) Stories → tests → implementation sequence gate — the PO owns enforcement; a story session is not complete until the stories doc is merged, a QA test authorship issue is filed blocking implementation, and the issue hierarchy is established. RACI rows 2 and 3 updated: PO consultation trigger now explicitly names QA/FA story consumers. | 2026-05-23 |
