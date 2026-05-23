@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-05-23 (PRs #489–#491 merged — Issue #463 fully closed; Zone 1 cluster live in App.tsx; Greece integration suite complete)**
+**Last updated: 2026-05-23 (PR #501 merged — Issue #493 closed; M9 IR review complete; M8 DEMO triage done; IR-001–IR-006 filed as M10 scope)**
 **Current milestone:** M9 — Standards Foundation
 
 ---
@@ -76,11 +76,11 @@ No open PRs — board clear as of 2026-05-23.
 
 | PR | Title | Date |
 |---|---|---|
+| #501 | docs(ir): M9 instrument cluster IR review + M8 DEMO triage (Issue #493) | 2026-05-23 |
 | #491 | test(e2e): #463 PR 2 — Greece integration suite + AC-001/002 skip removed (closes #463) | 2026-05-23 |
 | #490 | feat(frontend): wire InstrumentCluster into App.tsx — Zone 1 instruments live (Issue #463 PR 1) | 2026-05-23 |
 | #489 | test(qa): #459 — remaining acceptance tests: ModeIndicator, AC-006 RTL, AC-013, US-026 | 2026-05-23 |
 | #487 | feat(frontend): PMMWidgetZone1C + FourFrameworkZone1D — Zone 1C/1D instruments (Issue #462) | 2026-05-23 |
-| #486 | feat(frontend): MDAAlertPanelZone1B — Zone 1B instrument cluster panel (Issue #461) | 2026-05-23 |
 | #481 | chore(state): SESSION_STATE.md — session end 2026-05-23 (PRs #479–#480) | 2026-05-23 |
 | #480 | test(qa): retrofit instrument cluster spec — split Type 1/Type 2 ACs, remove blanket skip (closes #473) | 2026-05-23 |
 | #479 | process(nm): NM-018 — hammer-nail; panel composition principle for pre-EL consultations | 2026-05-23 |
@@ -150,7 +150,7 @@ No open PRs — board clear as of 2026-05-23.
 | #463 ✅ | test(e2e): Greece integration Playwright suite | Closed — PR #490 (App.tsx wiring) + PR #491 (Greece suite) merged |
 | #367 ✅ | docs(demo): persona-anchored IR review re-run (Persona 2) | Closed — superseded by M9 instrument cluster redesign; see #493 |
 | #368 ✅ | docs(demo): DEMO issues re-triage #342–#350 | Closed — superseded by M9 instrument cluster redesign; see #493 |
-| #493 | M9 demo — IR review + DEMO triage against Greece fixture with M9 cluster | Open — horizon:immediate |
+| #493 ✅ | M9 demo — IR review + DEMO triage against Greece fixture with M9 cluster | Closed — PR #501 merged |
 
 ---
 
@@ -210,6 +210,7 @@ All Horizon:Immediate issues are now closed. M8 feature-complete.
 
 | Decision | Rationale | Date |
 |---|---|---|
+| Issue #493 closed — M9 IR review + M8 DEMO triage complete (PR #501) | IR review at `docs/demo/m9/reviews/2026-05-23-v0.9-instrument-cluster-ir.md`. Six findings (IR-001–IR-006) filed as #495–#500 for M10. Two root causes: (A) data layer not wired to Zone 1B/1C — mda_alerts always [], PMM always null; (B) session state and entry-state architecture not implemented — landing screen is choropleth, step annotations absent for user-created scenarios. Root Cause B from M8 (drawer legibility) fully resolved by M9 architecture. M8 DEMO triage: #344 closed (text legibility resolved); #342/#343/#346/#347/#349 transformed + re-milestoned to M10; #345/#348/#350 persist to M10. Six M10 issues: #495 (IR-001 Critical — mda_alerts wiring), #496 (IR-002 — PMM endpoint), #497 (IR-003 — persistent scenario state/demonstrative entry), #498 (IR-004 — default step labels from start year), #499 (IR-005 — governance "(in validation)" inline), #500 (IR-006 — loading state). | 2026-05-23 |
 | Issue #463 fully closed — Zone 1 cluster live in App.tsx + Greece Playwright suite (PRs #489–#491) | PR #489 closed the four remaining QA acceptance test gaps (#459): ModeIndicator component + 13 Vitest tests; AC-006 RTL atomicity test (act() boundary, Vitest cleanup fix); AC-013 "(exp)" confidence badge Playwright guard; US-026 mode-indicator RTL act() test. PR #490 wired InstrumentCluster into App.tsx via ScenarioInstrumentCluster: trajectory fetch + parse (array→Record, Decimal string→number, boundary_proximity→normalized_absolute); data-testid duplication fixed in InstrumentCluster wrapper divs. PR #491 completed Issue #463 PR 2: removed test.skip() from AC-001/AC-002; added selectScenario() helper; created greece-integration.spec.ts (5 tests: smoke, mode indicator "Replay", data-current-step tracking, governance null AC-015, per-step cluster consistency + Mode 2 no-op guard). | 2026-05-23 |
 | Zone 1A/1B/1C/1D instrument cluster complete (PRs #484–#487) | All four co-primary instruments shipped: `TrajectoryView.tsx` (Zone 1A — ComposedChart, 4 active + 4 ghost Lines, divergence fills, CVD-safe framework colors, Mode 1 custom tick, (exp) badge, Path A dashed curves); `MDAAlertPanelZone1B.tsx` (Zone 1B — TERMINAL→CRITICAL→WARNING sort, compact 3-line at <320px / full-density at ≥320px, mode-specific tense, negotiation labels, causal attribution Mode 3 only); `PMMWidgetZone1C.tsx` (Zone 1C — mode-specific label, direction arrow, pending state at 40% opacity); `FourFrameworkZone1D.tsx` (Zone 1D — 4 framework scores derived from Zustand atom, null→`score-value--null`+"—", numeric→`score-value--numeric`). Store extended: `Zone1BAlert`, `mda_alerts`, `pmm_value`, `pmm_direction`, `setPmmState`. 104/104 Vitest tests passing. All Playwright E2E guards use isVisible no-op pattern pending App.tsx integration (#463). | 2026-05-23 |
 | TrajectoryView Zone 1A merged (PR #484, closes #460) | `TrajectoryView.tsx` (ComposedChart: 4 active Lines, 4 ghost Lines, Area divergence fills, ecological WARNING ReferenceLine, ADR-007-gated band infrastructure, Mode 1 custom tick, (exp) badge, Path A single-entity dashed curves); `InstrumentCluster.tsx` (two-column layout 480/240/280px at 1024×768, 580/400/280px at 1280×800, 280px control plane always rendered); `scenarioStepStore.ts` (Zustand atom, single-set() atomicity invariant); `frameworkColors.ts` (UX Designer ruling — teal #1A8FA0 replaces green #3A7A4B after CVD deuteranopia collision identified); DD-012–DD-015 added; FA brief CVD Validation Result recorded; MV-001 closed; 31/31 Vitest tests passing; AC-003/004/005 Playwright guards added (element not in App.tsx yet); MV-002 hardware validation pending before M9 exits. | 2026-05-23 |
