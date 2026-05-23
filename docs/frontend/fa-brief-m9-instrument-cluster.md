@@ -483,19 +483,30 @@ referenced in the implementing PR.
 
 ### CVD Validation Result
 
-*To be completed by the Frontend Architect Agent before TrajectoryView implementation.*
+**Date:** 2026-05-23
+**Tool used:** Deuteranopia simulation (software-based, standard CIE LMS cone model)
+**Outcome:** ☑ Revision required — green/orange collision under deuteranopia
 
-**Date:** ___________
-**Tool used:** ___________
-**Outcome:** ☐ All pairs pass — provisional values confirmed ☐ Revision required
+**Collision identified:** Provisional `#3A7A4B` (Ecological green) and `#C67C2E` (Human
+Development orange) both shift toward yellow-olive under deuteranopia (no green receptors,
+~6% of males). The two colors converge and become indistinguishable.
 
-**If revision required:**
+**Revised values (UX Designer ruling, 2026-05-23):**
 
 | Framework | Original hex | Revised hex | UX Designer ruling reference |
 |---|---|---|---|
-| | | | |
+| Financial | `#2D6A8B` | `#2271B3` | Strengthened blue — survives 60% opacity ghost curves |
+| Human Development | `#C67C2E` | `#D4841A` | Warm amber — shifts toward yellow under CVD |
+| Ecological | `#3A7A4B` | `#1A8FA0` | Teal — shifts toward blue under CVD (opposite direction from amber), resolving collision |
+| Governance | `#5C4A8A` | `#7B50A8` | Saturated purple — separates from Financial blue under CVD shift |
 
-**UX Designer sign-off on final colors:** ___________
+**UX Designer ruling rationale:** Teal (#1A8FA0) and amber (#D4841A) shift in opposite
+directions under deuteranopia simulation: teal toward blue, amber toward yellow. This
+preserves their distinction. The green/orange pair shifted in the same direction (both
+toward yellow-olive) and collapsed. No ADR amendment required — ADR-010 Decision 3
+commits to the CVD criteria, not the specific values.
+
+**UX Designer sign-off on final colors:** ☑ 2026-05-23 (verbal ruling, recorded in PR #460 description)
 
 ---
 

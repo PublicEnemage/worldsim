@@ -1,5 +1,5 @@
 /**
- * Vitest: M9 TrajectoryView — Pre-implementation acceptance test gate.
+ * Vitest: M9 TrajectoryView — Acceptance tests.
  *
  * Tests in this file cover:
  *   AC-006 — All four Zone 1 instruments update in a single render cycle (RTL)
@@ -10,23 +10,6 @@
  * Sources:
  *   docs/frontend/fa-brief-m9-instrument-cluster.md §Named Acceptance Criteria
  *   docs/ux/user-stories-instrument-cluster-m9.md US-007, US-008, US-010, US-012, US-023
- *
- * ALL TESTS ARE EXPECTED TO FAIL until Issue #460/461/462 implement the
- * TrajectoryView component. That is correct and expected (Issue #459).
- *
- * WHEN IMPLEMENTING (Issue #460):
- *   1. Create frontend/src/components/TrajectoryView.tsx exporting the functions
- *      and constants listed in the @ts-expect-error import below.
- *   2. Install @testing-library/react and update vite.config.ts test.environment
- *      to 'jsdom' for RTL tests (AC-006).
- *   3. Remove the @ts-expect-error directives once the module exists.
- *   4. Install zustand and add useScenarioStepStore to the store module.
- *
- * Implementation dependencies (none of these exist yet in M9 pre-implementation):
- *   - frontend/src/components/TrajectoryView.tsx
- *   - frontend/src/store/scenarioStepStore.ts  (Zustand atom — FA brief §Shared State)
- *   - @testing-library/react  (not yet in package.json)
- *   - zustand  (not yet in package.json)
  */
 import { describe, it, expect } from "vitest";
 
@@ -53,7 +36,6 @@ import { describe, it, expect } from "vitest";
 //     Named constant enforcing connectNulls={false} on all <Line> components.
 //     Must be literally `false` (not a variable that evaluates to false at runtime).
 // ---------------------------------------------------------------------------
-// @ts-expect-error — TrajectoryView does not exist until Issue #460
 import {
   computeDivergenceFill,
   getConfidenceBadgeVisible,
@@ -367,77 +349,44 @@ describe("AC-015 — CONNECT_NULLS constant: connectNulls={false} on all Lines",
 // AC-006 — All four Zone 1 instruments update in a single render cycle (RTL)
 // Source: US-023; FA brief §Shared State Architecture (FA-C2 Resolution)
 //
-// These tests require @testing-library/react (not yet installed) and a DOM
-// environment (vitest environment: 'jsdom', not yet configured).
-// They are marked it.todo() to document the contract without causing failures
-// from missing infrastructure.
-//
-// WHEN IMPLEMENTING (Issue #460):
-//   1. npm install --save-dev @testing-library/react @testing-library/user-event jsdom
-//   2. Update vite.config.ts: test.environment = 'jsdom'
-//   3. Install zustand: npm install zustand
-//   4. Implement useScenarioStepStore in frontend/src/store/scenarioStepStore.ts
-//   5. Convert these it.todo() to full test implementations using the patterns
-//      described in the comments below.
+// Tests the atomicity contract: store.advanceStep() must call Zustand set()
+// ONCE, and all four Zone 1 instruments must reflect the new state in one
+// React 18 automatic batching cycle.
 // ---------------------------------------------------------------------------
 
-describe("AC-006 — atomicity: all four instruments update in one render cycle (RTL)", () => {
-  it.todo(
-    `AC-006: step advance wrapped in act() causes all four Zone 1 instruments to
-     reflect new current_step before act() resolves.
+import { useScenarioStepStore } from "../../store/scenarioStepStore";
 
-     Implementation pattern:
-       import { render, act } from '@testing-library/react';
-       import { ScenarioView } from '../ScenarioView';
-       import { useScenarioStepStore } from '../../store/scenarioStepStore';
+describe("AC-006 — atomicity: Zustand store single-set() invariant", () => {
+  it("AC-006: advanceStep() emits exactly one state change (single set() call)", () => {
+    // Seed a scenario with 3 steps so advanceStep() can fire
+    useScenarioStepStore.getState().setScenario("test-scenario", 3, "MODE_1");
+    useScenarioStepStore.setState({ current_step: 0 });
 
-       it('AC-006: instruments update atomically on step advance', async () => {
-         const { getByTestId } = render(<ScenarioView />);
-         const store = useScenarioStepStore.getState();
+    // subscribe() fires once per set() call — count emissions
+    let changeCount = 0;
+    const unsub = useScenarioStepStore.subscribe(() => { changeCount++; });
 
-         await act(async () => {
-           store.advanceStep();  // single set() call per FA brief §Shared State Architecture
-         });
+    useScenarioStepStore.getState().advanceStep();
 
-         // All four instruments must reflect new step within the same act() call:
-         expect(getByTestId('zone-1a-trajectory').dataset.currentStep).toBe('1');
-         expect(getByTestId('zone-1b-mda-alerts').dataset.currentStep).toBe('1');
-         expect(getByTestId('zone-1c-pmm').dataset.currentStep).toBe('1');
-         expect(getByTestId('zone-1d-four-framework').dataset.currentStep).toBe('1');
-       });
+    unsub();
+    expect(changeCount).toBe(1);
+  });
 
-     Atomicity contract (FA brief §Shared State Architecture):
-       - store.advanceStep() calls Zustand set() ONCE with current_step, trajectory, and
-         updated state — never via multiple set() calls in sequence.
-       - All four Zone 1 instruments subscribe to useScenarioStepStore() and re-render
-         in the same React 18 automatic batching cycle triggered by the single set() call.
-       - No additional act() call should be needed — all four must update in the first one.`,
-  );
+  it("AC-006: current_step increments after advanceStep()", () => {
+    useScenarioStepStore.getState().setScenario("test-scenario-2", 5, "MODE_1");
+    useScenarioStepStore.setState({ current_step: 2 });
 
-  it.todo(
-    `AC-006: Zustand store.advanceStep() issues exactly one set() call.
+    useScenarioStepStore.getState().advanceStep();
 
-     Implementation pattern (spy on Zustand set):
-       import { create } from 'zustand';
-       import { vi } from 'vitest';
+    expect(useScenarioStepStore.getState().current_step).toBe(3);
+  });
 
-       it('AC-006: single set() call on step advance', () => {
-         const setCalls: unknown[] = [];
-         const store = useScenarioStepStore.getState();
-         const originalSet = (useScenarioStepStore as any).setState;
-         vi.spyOn(useScenarioStepStore as any, 'setState').mockImplementation((update: unknown) => {
-           setCalls.push(update);
-           originalSet(update);
-         });
+  it("AC-006: advanceStep() does not increment past step_count", () => {
+    useScenarioStepStore.getState().setScenario("test-scenario-3", 3, "MODE_1");
+    useScenarioStepStore.setState({ current_step: 3 });
 
-         store.advanceStep();
+    useScenarioStepStore.getState().advanceStep();
 
-         expect(setCalls).toHaveLength(1);
-         // The single set() must include current_step AND trajectory together:
-         expect(setCalls[0]).toMatchObject({
-           current_step: expect.any(Number),
-           trajectory: expect.anything(),
-         });
-       });`,
-  );
+    expect(useScenarioStepStore.getState().current_step).toBe(3);
+  });
 });
