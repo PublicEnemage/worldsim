@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated:** 2026-05-22 (M9 FA brief three-agent review complete — all 10 findings incorporated; PR #422 open for post-review edits; UX Designer sign-off pending)
+**Last updated:** 2026-05-22 (Architect Agent review of DA findings complete — three EL decisions required before trajectory endpoint implementation; PRs #423 #424 #425 open)
 **Current milestone:** M9 — Standards Foundation
 
 ---
@@ -72,7 +72,10 @@ Twelve issues filed 2026-05-19. Must complete before M9 UX implementation begins
 
 | PR | Title | Date |
 |---|---|---|
-| #422 | docs(frontend): FA brief — incorporate three-agent review findings | 2026-05-22 |
+| #425 | docs(frontend): Architect Agent review of Data Architect findings (DA-F1–F5) | 2026-05-22 |
+| #424 | docs(schema+frontend): Data Architect review — trajectory endpoint stub and 5 schema findings | 2026-05-22 — MERGED |
+| #423 | docs(frontend): FA brief — UX Designer Agent sign-off (2026-05-22) | 2026-05-22 — MERGED |
+| #422 | docs(frontend): FA brief — incorporate three-agent review findings | 2026-05-22 — MERGED |
 | #421 | docs(frontend): M9 FA brief — instrument cluster implementation (ADR-008 + ADR-010) | 2026-05-22 — MERGED |
 | #420 | docs(adr): ADR-010 accepted — EL decision recorded with rationale; ARCH-004 → ACCEPTED | 2026-05-22 — MERGED |
 | #417 | docs(process): ADR-008 panel review artifact and panel review process standard | 2026-05-22 |
@@ -96,9 +99,11 @@ Twelve issues filed 2026-05-19. Must complete before M9 UX implementation begins
 
 | PR | Title | Date |
 |---|---|---|
+| #424 | docs(schema+frontend): Data Architect review — trajectory endpoint stub and 5 schema findings | 2026-05-22 |
+| #423 | docs(frontend): FA brief — UX Designer Agent sign-off | 2026-05-22 |
+| #422 | docs(frontend): FA brief — three-agent review findings incorporated | 2026-05-22 |
 | #421 | docs(frontend): M9 FA brief — instrument cluster implementation (ADR-008 + ADR-010) | 2026-05-22 |
 | #420 | docs(adr): ADR-010 accepted — EL decision recorded with rationale; ARCH-004 → ACCEPTED | 2026-05-22 |
-| #419 | docs(adr): ADR-010 — trajectory view component architecture (closes #366) | 2026-05-22 |
 | #401 | docs(process): agent-raci.md — RACI chart for all 15 agents (closes #369, #301) | 2026-05-21 |
 | #399 | docs(ux): UX document updates — EL Decisions 1/2/3 (north-star, information-hierarchy, user-journeys) | 2026-05-21 |
 | #396 | chore(state): SESSION_STATE.md — EL Decisions 1/2/3 recorded; Issue #364 closed; Issues #392–#395 filed | 2026-05-21 |
@@ -150,6 +155,10 @@ All Horizon:Immediate issues are now closed. M8 feature-complete.
 
 | Decision | Context | Status |
 |---|---|---|
+| DA-F2: Defer MDA floor overlays to M10; authorize CM consultation | Architect recommendation: composite-score-level MDA floors cannot be derived from indicator-level (CM-R3). Must be independently defined by Chief Methodologist. M9 trajectory view ships without floor-line overlays; Zone 1B alert panel covers MDA state. CM consultation on floor methodology is M10 gate. ADR-010 Decision 6 amendment at M10. | Pending EL |
+| DA-F4: Single-entity trajectory scoring — authorize CM consultation + ADR-010 amendment | DEMO-CRITICAL. Greece fixture is single-entity. Percentile rank composite_score is null for financial/HD when N<2 entities (Issue #193). Trajectory view for Mode 1 Greece would show only ecological curve. CM consultation required on single-entity scoring methodology. ADR-010 Decision 2 amendment required. Update or replace Issue #193 with trajectory view dependency. | Pending EL |
+| DA-F5: Confirm step_metadata JSONB in scenarios.configuration | Architect recommends: add `step_metadata` key to `scenarios.configuration` JSONB (no migration). Keys are 1-based step index strings; values are `{step_event_label, step_significance}`. Absence = ROUTINE step. ADR-010 Decision 2 minor amendment to record storage contract. | Pending EL |
+|---|---|---|
 | ADR-010 acceptance | All 4 INCORPORATE items approved with rationale: FA-R3 (dense array contract — one null meaning only); FA-R4+UD-R1 (provisional hex values, UX Designer authority, RACI boundary correct); CM-R1 (No False Precision — deferral placeholder required); CM-R3 (composite-score floors only — indicator projection is methodologically dishonest). ADR-010 status → Accepted. ARCH-004 → ACCEPTED in backlog. M9 FA brief unblocked. | Complete ✅ — 2026-05-22 |
 | ADR-008 acceptance | All 6 INCORPORATE items applied; EL decision recorded (Option A: stacked forms, ~280px); ADR-008 status → Accepted; ARCH-002 → ACCEPTED in backlog. Issue #397 closed. FA brief (FA-C1–FA-C5) deferred to M9. | Complete ✅ — 2026-05-22 |
 | GovernanceModule promotion path | Deferred from M8 demo — five criteria not yet met — target M9 | Decided: deferred |
@@ -164,7 +173,9 @@ All Horizon:Immediate issues are now closed. M8 feature-complete.
 
 | Decision | Rationale | Date |
 |---|---|---|
-| M9 FA brief — three-agent review complete | UX Design Thinking Agent (frame-coherence), UX Designer Agent (component authority), QA Lead Agent (test-spec validation). All 10 findings dispositioned INCORPORATE. Key changes: AC-006 → `act()` call boundary; AC-007/008/009 throttle note + MV-002 hardware gate; AC-013 CVD → MV-001; AC-016 null governance → Vitest unit test; AC-017 sign-off → Implementation Sequencing; compact 3-line MDA alert row at 240px (UD-F1); badge font 11px minimum (UD-F2); Manual Validation Gates section added. Review Findings Log appendix in brief. PR #422 open. Pending: UX Designer sign-off, CVD validation, DD-012–DD-015. | 2026-05-22 |
+| Architect Agent review of Data Architect findings — three EL decisions required | Data Architect found 5 schema gaps (DA-F1–F5). Architect dispositions: DA-F1 stub adequate; DA-F2 defer MDA floor overlays to M10 + CM consultation; DA-F3 correct as-is; DA-F4 CRITICAL (Greece Mode 1 blocked — single-entity null; CM + ADR-010 amendment required); DA-F5 step_metadata JSONB approach confirmed. Arch-F1: "STANDARD" → "ROUTINE" correction applied. Three EL decisions pending. PR #425. | 2026-05-22 |
+| UX Designer sign-off — conditional on CVD | 4/5 items confirmed (layout, stacking, compact row, badge). Colors pending MV-001. PR #423. | 2026-05-22 |
+| M9 FA brief — three-agent review complete | All 10 findings INCORPORATE. Compact alert row (UD-F1), badge 11px (UD-F2), act() boundary (QA-F1), MV gates added. PR #422. | 2026-05-22 |
 | M9 FA brief authored — instrument cluster | Frontend Architect Agent: EXECUTE. All 11 deferred brief items (FA-C1–FA-C5 from ADR-008; FA-R1, FA-R2, FA-R4/UD-R1, FA-R5, UD-R2, UD-R3 from ADR-010) resolved with named acceptance criteria. Key decisions: Zustand atom for Zone 1 atomicity (DD-012); merged-key `<Area>` for divergence fill (DD-013); 32-char step annotation constraint (DD-014); 280px control plane confirmed (DD-015). Layout constants: 480px trajectory / 240px co-primary / 280px control plane at 1024×768; 580/400/280 at 1280×800. CVD validation procedure specified; result pending UX Designer sign-off. Brief at `docs/frontend/fa-brief-m9-instrument-cluster.md`. | 2026-05-22 |
 | ADR-010 drafted, panel-reviewed, and accepted | Architect Agent: EXECUTE. 10 decisions (Recharts SVG, GET /scenarios/{id}/trajectory endpoint, shared state atom, governance null rendering, composite-score-level MDA floors, Mode 1 step axis annotation, Mode 3 live A/B ghost curves and divergence fill, policy/shock markers, confidence tier visual, ADR-007-gated band infrastructure). 11 findings (4 INCORPORATE applied, 5 BRIEF, 1 LOG, 1 combined). EL approved all 4 INCORPORATE items with rationale recorded in `docs/adr/reviews/ADR-010-panel-review.md`. ADR-010 status: Accepted. M9 FA brief is unblocked. | 2026-05-22 |
 | ADR-008 accepted — PR open | All 6 INCORPORATE items applied to ADR-008. EL decision recorded in `docs/adr/reviews/ADR-008-panel-review.md`: all 6 approved; FA-C3 ruling = Option A (stacked forms, ~280px control plane zone). ADR-008 status: Accepted. ARCH-002 in backlog: ACCEPTED. Issue #397 closed. Five FA brief items (FA-C1–FA-C5) deferred to M9 FA brief — none reverse an ADR decision. | 2026-05-22 |
