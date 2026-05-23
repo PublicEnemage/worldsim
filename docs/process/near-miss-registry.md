@@ -22,7 +22,7 @@ Entries appear in chronological order of occurrence.
 Not all entries are failures. Some are anticipations — the Engineering Lead sensing a
 structural gap before it caused a problem, naming it, and building the safeguard before
 the incident occurred. These deserve equal recognition: they represent the safety culture
-working at its best. Nine of the eighteen entries are anticipatory.
+working at its best. Nine of the nineteen entries are anticipatory.
 
 ---
 
@@ -944,6 +944,95 @@ The retrospective question: "Why did the technical panel not ask 'why does this 
 > Before finalizing panel composition, ask: does the problem's surface presentation match its likely root cause domain? Technical surface problems can have process root causes; process surface problems can have methodology root causes. A panel composed entirely of agents from the surface domain will produce solutions optimised for the symptom, not the cause. When the root cause domain is uncertain or different from the surface domain, include at least one agent from the suspected root cause domain before activation.
 
 Documented in: `docs/process/agents.md §PM Agent — Pre-EL Consultation`, `docs/process/near-miss-registry.md NM-017` (the related root cause incident)
+
+---
+
+## NM-019 — Named Deliverables Invisible on the Board for an Entire Milestone
+
+**Date:** 2026-05-23 (identified at M9 exit review)
+**Milestone:** M9 — Standards Foundation
+**Detected by:** PM Agent root cause analysis (triggered by Engineering Lead
+asking "how did we find ourselves unclear on M9 scope?")
+**Severity:** High — three named M9 deliverables (ADR-007, GovernanceModule
+promotion path, STD-REVIEW-005) were listed in CLAUDE.md and/or ADR-005 as
+M9 commitments but were never decomposed into GitHub issues. They were
+invisible on the board for the entire milestone and only surfaced at exit
+review.
+**Type:** Reactive — caught at exit review, after the milestone had run its
+full course without the deliverables being tracked
+
+### What happened
+
+M9 scope was spread across four documents with no mechanical coupling between
+them: CLAUDE.md (constitutional prose), roadmap.md (narrative), the GitHub
+milestone board (issues only), and SESSION_STATE.md (current situation
+report). None of these has a formal relationship with any other. No diff is
+ever run between them.
+
+Three M9 deliverables fell through this gap:
+
+- **ADR-007** (synthetic data framework) — listed in CLAUDE.md as an M9
+  deliverable since at least M8 close. CM consultation complete (PR #373).
+  Formal ADR draft never written. Never filed as a GitHub issue.
+- **GovernanceModule promotion path** (5 criteria) — criteria written in
+  ADR-005 with "Valid Until: Milestone 9." 0 of 5 criteria were met at M8
+  exit. No M9 work touched any criterion. No issue filed tracking the gate.
+- **STD-REVIEW-005** — issue #439 existed but the document it tracks was
+  never created, and no process flagged that the issue was open-but-incomplete
+  until exit review.
+
+These are not failures of execution. They are failures of decomposition:
+named deliverables that lived in prose documents and were never converted into
+tracked work items. No agent's mandate included checking for this gap.
+
+### What was at risk
+
+A milestone can close with named commitments undelivered and no record of
+why. Downstream milestones build on assumptions about what was completed.
+If ADR-007 had not been caught at M9 exit, M10 would have proceeded without
+a synthetic data framework ADR, potentially building implementation on an
+unreviewed specification. The GovernanceModule promotion path has been
+deferred silently across two milestones; without a formal deferral record,
+the target date would continue to drift without accountability.
+
+### What caught it
+
+The Engineering Lead asked: "how did we find ourselves unclear on M9 scope?"
+The PM Agent ran a root cause analysis against the exit checklist (Issue #213)
+and the four scope sources. This is a retrospective catch — the gap had
+existed for the entire milestone before it was named.
+
+### Process improvements
+
+**Root cause:** No standing process converts "named in CLAUDE.md or roadmap.md"
+into "tracked on the board" at milestone kickoff. The PM Agent HORIZON sweep
+audits board state only — it does not compare the board against the
+constitution or the roadmap. The gap is structural, not behavioral.
+
+**Three fixes (implemented before M10 kickoff):**
+
+**1. MILESTONE_RUNBOOK.md kickoff gate** (Issue #503):
+Before the first implementation issue is filed for a milestone, the PM Agent
+must enumerate all deliverables named in CLAUDE.md and roadmap.md for that
+milestone and verify each has a corresponding GitHub issue with an owner and
+a horizon label. This list is the kickoff baseline. No implementation begins
+until verification is complete.
+
+**2. PM Agent HORIZON scope-completeness check** (Issue #503):
+The HORIZON sweep gains a sixth step: compare the open-issue list against
+CLAUDE.md-stated deliverables for the current milestone; flag any named
+deliverable with no corresponding issue as `scope-gap:untracked`. This makes
+the gap visible mid-milestone, not just at exit.
+
+**3. roadmap.md as linked diff surface** (Issue #503):
+Each milestone entry in roadmap.md must enumerate its blocking deliverables
+explicitly (not just narratively) and link to the tracking issue once filed.
+A milestone entry with no linked issue is a visible gap — the roadmap becomes
+a diff surface, not just a narrative document.
+
+Documented in: `docs/process/near-miss-registry.md NM-019`,
+`docs/MILESTONE_RUNBOOK.md §Kickoff Gate` (to be added, Issue #503),
+`docs/process/agents.md §PM Agent HORIZON` (to be updated, Issue #503)
 
 ---
 
