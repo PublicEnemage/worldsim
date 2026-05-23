@@ -615,6 +615,76 @@ Documented in: `docs/process/council-interview-prompt.md`,
 
 ---
 
+## NM-014 — File Edit Reported as Complete Without Commit
+
+**Date:** 2026-05-23
+**Milestone:** M9 — Standards Foundation
+**Detected by:** Engineering Lead (reviewing session output, noticed "agents.md changes from
+earlier are still uncommitted")
+**Severity:** Medium — the change was recoverable (bundled into the next PR), but was reported
+as complete when it existed only as a local unstaged edit
+
+### What happened
+
+An EXECUTE instruction contained two actions: file a GitHub issue (Action 1) and add the
+Business Product Owner Agent working agreement to `docs/process/agents.md` (Action 2).
+
+Action 1 produced an external artifact — a GitHub issue URL — making completion unambiguous.
+Action 2 was a file edit. The file was edited and the task was reported as done with
+"confirmation agents.md was updated." The change was never committed. It sat as an unstaged
+local edit on main.
+
+When the user continued with the next task, a `git checkout main` was issued before creating
+a new branch. At that point the agent noticed the unstaged change and bundled it into the
+subsequent PR (#442) rather than losing it. The Engineering Lead caught the pattern from
+output text: "agents.md changes from earlier are still uncommitted. I'll include them in this
+PR together with the RACI additions."
+
+### What was at risk
+
+If the session had ended, or if `git restore` or `git checkout -- .` had run for any reason,
+the agents.md change would have been lost — with no record of the loss, because it had already
+been reported as complete. The branch discipline rule (all changes on a branch + PR; direct
+commits to main are a governance deviation) was not applied at all — not even a commit to main,
+just an uncommitted local edit.
+
+### What caught it
+
+The Engineering Lead, reading the agent's own output in the next task. This was not caught by
+any process — it was caught by a human noticing an admission buried in a status sentence. There
+is no automated gate between "file edited" and "change committed."
+
+### Process improvement
+
+**Personal commit gate — a file change is not reportable as complete until it is on a branch
+and committed:**
+The branch discipline rule applies regardless of prompt style or whether a branch was
+explicitly specified in the EXECUTE instruction. An EXECUTE that includes a file change with
+no specified branch requires the agent to create a branch, commit the change, and report the
+PR URL — not to edit the file and report the edit. "Confirmation X was updated" must mean
+"X is committed on a branch and in a PR," not "X has new content locally."
+
+### Contributing factor under investigation
+
+Prescriptive EXECUTE prompts — those that specify exact steps and per-action success criteria
+— may reduce agent reasoning about what constitutes completion. In this case, Action 1's
+success criterion was implicit but clear (a URL). Action 2's success criterion was stated as
+"confirmation agents.md was updated," which the agent matched literally (file has new content)
+rather than by the project's standing completion standard (change is committed and in a PR).
+
+A less prescriptive instruction — "add the Business Product Owner Agent to agents.md" — would
+have required the agent to reason about what "done" means from first principles, which
+naturally includes the delivery chain: edit → branch → commit → PR → report URL.
+
+The weight of prescriptive prompting as a contributing factor is under investigation. It is
+an observation, not a concluded cause. The primary root cause remains the agent's failure to
+apply standing branch discipline rules regardless of how the task was framed.
+
+Documented in: `CLAUDE.md §Blameless continuous improvement is non-negotiable`,
+`docs/process/agent-raci.md §File Ownership` (branch discipline rule)
+
+---
+
 ## Registry Maintenance
 
 ### How to add an entry
