@@ -179,7 +179,7 @@ interface FrameworkCurvePoint {
                                               //   "ecological" | "governance"
   composite_score: number | null;             // null = governance in validation
   confidence_tier: 1 | 2 | 3 | 4 | 5;
-  scoring_basis: "percentile_rank" | "normalized_absolute";  // Amendment 2026-05-23
+  scoring_basis: "percentile_rank" | "normalized_absolute" | "boundary_proximity";  // Amendment 2026-05-23
   // ADR-006 banding fields (present when BandingEngine is invoked)
   ci_lower: number | null;
   ci_upper: number | null;
@@ -235,9 +235,13 @@ Key properties of the normalized absolute composite:
 - **Confidence tier floor:** Tier 3 minimum for all normalized absolute scores,
   regardless of the individual indicator confidence tiers
 - **Scoring basis field:** `FrameworkCurvePoint.scoring_basis` distinguishes
-  `"percentile_rank"` from `"normalized_absolute"`. This field is mandatory on every
-  `FrameworkCurvePoint` — it is never absent. Multi-entity scenarios carry
-  `"percentile_rank"` on all four frameworks.
+  `"percentile_rank"` from `"normalized_absolute"` from `"boundary_proximity"`. This
+  field is mandatory on every `FrameworkCurvePoint` — it is never absent. Values by
+  framework in multi-entity scenarios: financial → `"percentile_rank"`;
+  human_development → `"percentile_rank"`; ecological → `"boundary_proximity"` (always
+  entity-intrinsic, calibrated to planetary boundary); governance → `"percentile_rank"`
+  (null composite_score when in-validation). In single-entity scenarios: financial and
+  human_development → `"normalized_absolute"`; ecological and governance unchanged.
 - **`null` composite_score semantics in single-entity scenarios:** A null
   `composite_score` on a financial or HD curve in a single-entity scenario means
   zero normalizable indicators were present for that framework at that step — not

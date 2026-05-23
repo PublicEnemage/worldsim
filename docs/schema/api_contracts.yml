@@ -485,16 +485,16 @@ endpoints:
                         this step (scoring_basis: "normalized_absolute").
                 scoring_basis:
                   type: string
-                  values: ["percentile_rank", "normalized_absolute"]
+                  values: ["percentile_rank", "normalized_absolute", "boundary_proximity"]
                   description: >
-                    "percentile_rank" — standard cross-entity composite; requires N≥2 entities.
-                    "normalized_absolute" — entity-intrinsic; financial and human_development
-                    in single-entity scenarios. Reference ranges in
+                    "percentile_rank" — cross-entity composite; financial and human_development
+                    in multi-entity scenarios; governance (null composite_score when in-validation).
+                    "normalized_absolute" — entity-intrinsic against declared reference ranges;
+                    financial and human_development in single-entity scenarios (Path A). Tier 3
+                    confidence floor. Reference ranges:
                     docs/architecture/cm-reference-range-consultation-2026-05-23.md §7a.
-                    Tier 3 confidence floor applies to all normalized_absolute scores.
-                    Ecological and governance always use "percentile_rank" (ecological uses
-                    boundary-proximity internally but the scoring_basis field value is
-                    "percentile_rank" for consistency — ecological is always entity-intrinsic).
+                    "boundary_proximity" — ecological only; distance from planetary boundary;
+                    entity-intrinsic by definition. Scale [0.0, 2.0] (1.0 = at boundary).
                 confidence_tier:
                   type: integer
                   range: [1, 5]
@@ -529,7 +529,10 @@ endpoints:
     db_reads:
       - scenarios
       - scenario_state_snapshots
-      - mda_composite_floors  # M10 — table does not exist in M9; mda_floors array empty except ecological
+      # mda_composite_floors: M10 only — table does not exist in M9.
+      # In M9, mda_floors is constructed in application code:
+      # ecological WARNING entry (floor_value=1.0) added when ecological is active;
+      # all other framework floors return empty until mda_composite_floors is created (M10-B).
     notes:
       - "Schema updated 2026-05-23 — EL Decisions A/B/C resolved. All DA-F2/F4/F5 PENDINGs cleared."
       - "DA-F2 resolved: mda_floors at response root (not per-step); M9 returns [] except ecological WARNING at 1.0."

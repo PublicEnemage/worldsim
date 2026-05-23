@@ -404,14 +404,17 @@ The trajectory endpoint stub (DA-F1, PR #424) must be updated to include:
 ```yaml
 scoring_basis:
   type: string
-  enum: ["percentile_rank", "normalized_absolute"]
+  enum: ["percentile_rank", "normalized_absolute", "boundary_proximity"]
   description: >
     Scoring method for this framework curve at this step.
-    "percentile_rank" — standard cross-entity composite; requires N≥2 entities.
-    "normalized_absolute" — entity-intrinsic; reference ranges defined in
-    docs/architecture/cm-reference-range-consultation-2026-05-23.md §7a.
-    Single-entity scenarios use "normalized_absolute" for financial and
-    human_development; ecological and governance are unaffected.
+    "percentile_rank" — cross-entity composite; financial and human_development in
+    multi-entity scenarios; governance (null when in-validation).
+    "normalized_absolute" — entity-intrinsic against declared reference ranges;
+    financial and human_development in single-entity scenarios. Tier 3 floor.
+    "boundary_proximity" — ecological only; distance from planetary boundary;
+    always entity-intrinsic. Scale [0.0, 2.0]. Amended from two-value to three-value
+    enum per DA review (DA-R3, PR #429): "percentile_rank" on ecological was
+    semantically incorrect — ecological is never a cross-entity percentile rank.
 ```
 
 ---
