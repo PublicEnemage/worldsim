@@ -207,6 +207,127 @@ The "—" + dashed treatment is the reference implementation from `information-h
 
 ---
 
+## DD-012: Shared State Management — Zustand Atom for Zone 1 Instrument Atomicity
+
+**Decision:** All four Zone 1 instruments (`TrajectoryView`, MDA alert panel, PMM widget,
+four-framework current position) subscribe to a single Zustand store atom
+(`useScenarioStepStore`) scoped to the active scenario session.
+
+**Rationale:** React's `useState` at a top-level component would require prop-drilling the
+trajectory and step state through multiple nesting layers to each Zone 1 instrument. Zustand's
+hook-based subscription lets each instrument subscribe directly — while still deriving from the
+same `set()` call and batching within the same React render cycle.
+
+**Why not `useQuery` per instrument:** Independent `useQuery` hooks cannot guarantee
+simultaneous re-renders. Even with a shared React Query cache, two components subscribed to the
+same query key may re-render in separate cycles (ADR-010 Decision 4 Alternative 2). The shared
+Zustand atom updated in a single `set()` call, combined with React 18 automatic batching, is the
+mechanically correct approach for the atomicity requirement (ADR-008 Decision 14, ADR-010 Decision 4).
+
+**Invariant:** `store.advanceStep()` must call Zustand `set()` exactly once, carrying
+`current_step`, `trajectory`, and `computation_state` in the same update object. Multiple
+`set()` calls in a single step advance are a violation of the atomicity contract and cause
+stale-data flashes. AC-006 tests this invariant directly.
+
+**State atom shape (binding):**
+```typescript
+interface ScenarioStepState {
+  scenario_id: string;
+  current_step: number;
+  step_count: number;
+  trajectory: TrajectoryResponse | null;
+  baseline_trajectory: TrajectoryResponse | null;
+  computation_state: "idle" | "computing" | "complete";
+  mode: "MODE_1" | "MODE_2" | "MODE_3";
+}
+```
+
+**Source:** FA brief §Shared State Architecture (FA-C2 Resolution), 2026-05-22.
+
+---
+
+## DD-013: Divergence Fill — Merged Key `<Area>` Approach
+
+**Decision:** The Mode 3 divergence fill is implemented as a Recharts `<Area>` component whose
+data key pair spans both the active and baseline trajectories via a merged data array.
+Each step entry has both `{framework}_active` and `{framework}_baseline` fields; the `<Area>`
+renders fill between them.
+
+**Rationale:** The alternative (`<defs>` + `<clipPath>`) requires manually generating SVG path
+strings, with careful management of clip behavior at re-convergence. The merged-key approach
+stays within Recharts' component model — path generation is the library's responsibility, and
+fill naturally disappears when the delta collapses to zero. Step-count mismatches (partial active
+trajectory) propagate as `null` values in the merged array, which Recharts treats as gaps.
+
+**Proof-of-concept:** `frontend/sandbox/trajectory-divergence-poc.tsx` validates the approach at:
+(a) full 8-curve configuration, (b) re-convergence case (fill disappears), (c) step-count
+mismatch (partial active trajectory). Referenced in Issue #460 PR.
+
+**Decision function:** `computeDivergenceFill(active, baseline)` returns `true` only when
+`|active - baseline| > 0.01` and both values are non-null. The 0.01 threshold prevents visual
+noise from floating-point rounding near convergence. AC-010 tests this threshold exactly.
+
+**`connectNulls={false}` mandatory:** All four active `<Line>` and all four baseline ghost
+`<Line>` components must have `connectNulls={false}`. This applies to every framework, not
+only governance. AC-015 tests this directly.
+
+**Source:** FA brief §Divergence Fill Implementation (FA-R2 Resolution), 2026-05-22.
+
+---
+
+## DD-014: Step Annotation Character Constraint — ≤ 8 Words AND ≤ 32 Characters
+
+**Decision:** The `step_event_label` field on SIGNIFICANT steps is constrained to ≤ 8 words
+AND ≤ 32 characters (including spaces). Both constraints are enforced at fixture CI gate time
+(pytest), not only at render time.
+
+**Rationale:** The worst-case trajectory viewport width is 480px at 1024×768. With 6 steps,
+each step marker has ~80px horizontal space. At 11px font / 6px average char width:
+- 8-word constraint alone is insufficient — "Structural adjustment programme second phase
+  begins announced" is 8 words but ~54 chars (~324px at 6px/char), requiring 4 lines at 80px.
+- 32-character constraint ensures the label wraps into 2 lines at 80px (192px / 80px = 2.4 lines).
+
+Two lines is the design target; three lines is the permitted maximum.
+
+**Render-time safety net:** If a backend-supplied label exceeds 32 characters despite the
+fixture CI gate, the custom XAxis tick truncates with "…" at position 31. This prevents layout
+overflow without silently hiding data.
+
+**Enforcement:** `pytest tests/fixtures/` schema validator (QA-F6) runs on every PR. Any Mode 1
+scenario fixture with a SIGNIFICANT step whose `step_event_label` exceeds 8 words OR 32
+characters fails CI.
+
+**Source:** FA brief §Mode 1 Step Axis Annotation (FA-C5 Resolution), 2026-05-22.
+
+---
+
+## DD-015: Control Plane Zone — 280px Stacked Forms (EL Ruling)
+
+**Decision:** The control plane zone is a persistent 280px CSS grid column adjacent to the
+instrument cluster, reserved from M9 onward. In Mode 1 and Mode 2 it is empty whitespace. In
+Mode 3 it is populated with policy instruments form (blue) and scenario shocks form (orange),
+stacked vertically with both form headers visible without scroll.
+
+**Source of authority:** EL ruling 2026-05-22 (FA-C3 disposition in ADR-008 panel review).
+"Simultaneously visible" means both form headers visible without scroll, not all form fields.
+
+**Layout impact:** At 1024×768: trajectory view = 480px, co-primary cluster = 240px,
+control plane = 280px (total = 1000px, leaving 24px for padding/scrollbars). At 1280×800:
+580px + 400px + 280px = 1260px (leaving 20px).
+
+**Implementation:** The 280px column is always rendered. A CSS class `mode-3-active` populates
+it with form content. A subtle placeholder label "Control plane (Mode 3)" renders in Mode 1/2:
+≤ 11px font, ≤ 30% opacity, non-interactive (UX Designer sign-off, 2026-05-22).
+
+**Why not collapsible:** Collapsing the control plane zone in Mode 1/2 would require expanding
+it on Mode 3 entry, which triggers a layout reflow that shifts both the trajectory view and
+co-primary cluster widths. A reflow on mode switch violates the instrument layout stability
+requirement (ADR-008 Decision 13). The 280px column must be present at all times.
+
+**Source:** FA brief §Control Plane Zone (FA-C3 Resolution), ADR-008 panel review, 2026-05-22.
+
+---
+
 ## DD-010: Recharts for Radar Chart Over D3 or SVG-from-Scratch
 
 **Decision:** The radar chart uses Recharts `RechartsRadarChart` with custom
