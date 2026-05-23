@@ -665,12 +665,48 @@ implementation begins.
 
 **UX Designer sign-off:**
 
-*To be completed by the UX Designer Agent before implementation begins.*
+*UX Designer Agent: REVIEW — 2026-05-22. Documents read: `information-hierarchy.md` Zone 1,
+`agents.md` authority boundaries.*
 
-**Sign-off date:** ___________
-**Confirmed items:** ☐ Zone 1 layout ☐ Right column stacking ☐ Compact alert row format (UD-F1) ☐ Framework colors ☐ Badge font 11px (UD-F2) ☐ Badge positioning
+**Sign-off date:** 2026-05-22
+**Confirmed items:** ☑ Zone 1 layout ☑ Right column stacking ☑ Compact alert row format (UD-F1) ☐ Framework colors (conditional — pending MV-001 CVD result) ☑ Badge font 11px (UD-F2) ☑ Badge positioning (conditional — FA Agent must verify no SVG clip at 480px; may offset above-left if right placement clips)
 
-**Notes / revisions from UX Designer:** ___________
+**Ruling on each item:**
+
+1. **Zone 1 two-column layout (480px / 240px at 1024×768) — Confirmed.** 480px is sufficient
+   for legible four-curve trajectory comparison. The UD-F1 compact row format satisfies
+   information-hierarchy.md 1B requirements at 240px: severity, framework source, indicator
+   name (truncated), step + cohort all visible without expansion.
+
+2. **Right column stacking (1B → 1C → 1D) — Confirmed.** MDA alerts at top: threshold safety
+   signal is the highest-priority co-primary read in all three modes, most critical in Mode 3.
+   PMM above four-framework current position: margin status is a higher cognitive priority than
+   the absolute value readout.
+
+3. **Compact alert row format at 240px (UD-F1) — Confirmed.** Line 1 (severity pill +
+   abbreviation + framework source) satisfies the information-hierarchy.md requirement that
+   framework source be visible per alert without a tab. Ruling stands as issued in the
+   three-agent review.
+
+4. **Framework colors — Conditional sign-off.** Cannot confirm specific hex values until MV-001
+   CVD validation result is reported. Once the FA Agent completes CVD validation, I will issue
+   a color ruling within the same session: either (a) confirm provisional values, or (b) issue
+   revised hex values satisfying the ADR-010 Decision 3 criteria. Implementation must not
+   proceed with framework colors in code until this ruling is recorded in this section.
+
+5. **"(exp)" badge, 11px font, placement — Confirmed with condition.** 11px minimum confirmed
+   (UD-F2). Placement: FA Agent must verify the `<text>` element is not clipped at 480px
+   trajectory width before committing the implementation. If right-of-datapoint placement clips,
+   offset above-left instead. What matters: badge visible on the curve face during Mode 3
+   steering. The precise direction of offset is FA authority.
+
+**Additional ruling — Control plane zone placeholder text:** The "Control plane (Mode 3)"
+label in the reserved zone during Mode 1/2 is confirmed as acceptable, with one styling
+requirement added: ≤ 11px font, ≤ 30% opacity, non-interactive. It must read as a system
+annotation, not a navigation affordance. No button treatment, no collapse indicator, no chevron.
+
+**Pending:** UX Designer color ruling after MV-001 completion. FA Agent to return CVD result
+to this section; UX Designer will update item 4 in the same PR that records the result.
 
 ---
 
