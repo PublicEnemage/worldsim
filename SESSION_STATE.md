@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated:** 2026-05-23 (PM Agent pre-EL consultation standing capability — closes #464; PR #466)
+**Last updated:** 2026-05-23 (session end — backend trajectory endpoint merged; QA process rules; NM-016/017; PRs #468–#477)
 **Current milestone:** M9 — Standards Foundation
 
 ---
@@ -76,6 +76,12 @@ No open PRs — board clear as of 2026-05-23.
 
 | PR | Title | Date |
 |---|---|---|
+| #477 | process(agents): PO standing responsibilities — dual consumer + sequence gate (closes #470) | 2026-05-23 |
+| #476 | process(qa): Type 1/Type 2 AC categorization rule — QA Lead, PO, standards (closes #474) | 2026-05-23 |
+| #475 | process(nm): NM-017 — story–test–implementation decomposition mismatch | 2026-05-23 |
+| #472 | process(ci): pre-push lint gate — ruff+mypy required before any backend push (closes #471); NM-016 | 2026-05-23 |
+| #469 | test(qa): M9 instrument cluster — pre-implementation test authorship (closes #459) | 2026-05-23 |
+| #468 | feat(api): GET /scenarios/{id}/trajectory endpoint (closes #458) | 2026-05-23 |
 | #466 | docs(process): PM Agent pre-EL consultation — standing automatic capability (closes #464) | 2026-05-23 |
 | #456 | docs(process): PM Agent issue hierarchy rule — Epic → Feature → Task, binary spawning | 2026-05-23 |
 | #454 | docs(ux): resolve UX-RULING-1/2/3 — alert tense markers, null CSS class, mode labels | 2026-05-23 |
@@ -127,6 +133,20 @@ No open PRs — board clear as of 2026-05-23.
 | #338 | chore(demo): switch TTS voice to Zoe (Enhanced) | 2026-05-18 |
 | #336 | fix(dev): Python 3.12 Docker image rebuild — startup version guard, CONTRIBUTING docs | 2026-05-18 |
 | #335 | chore(state): SESSION_STATE.md update — PR #334 merged, demo prep standard, board cleanup | 2026-05-18 |
+
+---
+
+## Open Issues — M9 Horizon:Immediate (this session)
+
+| Issue | Title | Status / Gate |
+|---|---|---|
+| #473 | test(qa): retrofit instrument-cluster spec — split component ACs into task scope; remove blanket skip | Open — implement when #460/461/462 are scoped; each implementing agent receives their Type 1 ACs |
+| #460 | feat(frontend): TrajectoryView — Zone 1A (instrument cluster) | Open — unblocked; backend endpoint #458 merged |
+| #461 | feat(frontend): MDA Alert Panel — Zone 1B (instrument cluster) | Open — unblocked |
+| #462 | feat(frontend): PMM + Four-Framework — Zone 1C/1D (instrument cluster) | Open — unblocked |
+| #463 | test(e2e): Greece integration Playwright suite | Open — blocked by #460 + #461 + #462 |
+| #367 | docs(ux): persona-anchored IR review re-run (Persona 2) | Open — near-term |
+| #368 | docs(ux): DEMO issues re-triage #342–#350 | Open — near-term |
 
 ---
 
@@ -186,6 +206,13 @@ All Horizon:Immediate issues are now closed. M8 feature-complete.
 
 | Decision | Rationale | Date |
 |---|---|---|
+| PO Agent standing responsibilities — dual consumer + sequence gate (PR #477, closes #470) | Two non-negotiable standing responsibilities added to PO working agreement: (1) Stories serve QA Lead and Frontend Architect equally — a story too vague for QA to write a meaningful test, or too abstracted for FA to make the right tradeoffs, is a weak story; (2) Stories → tests → implementation sequence gate — the PO owns enforcement; a story session is not complete until the stories doc is merged, a QA test authorship issue is filed blocking implementation, and the issue hierarchy is established. RACI rows 2 and 3 updated: PO consultation trigger now explicitly names QA/FA story consumers. | 2026-05-23 |
+| Type 1/Type 2 AC categorization rule — CODING_STANDARDS + QA Lead + PO working agreements (PR #476, closes #474) | Before any QA E2E spec is authored against a multi-component feature, ACs must be categorized: Type 1 (component-level — testable when one component ships alone; lives in implementation task PR scope) vs Type 2 (integration-level — testable only when all named components coexist; lives in dedicated `<feature>-integration.spec.ts`). `test.skip(true, ...)` at file scope is a process violation for any spec containing Type 1 ACs. QA Lead working agreement (new) makes categorization the first standing commitment. PO pre-authorship check added. Documented in `docs/CODING_STANDARDS.md §E2E Pre-implementation Test Categorization`. | 2026-05-23 |
+| NM-017 filed — story–test–implementation decomposition mismatch (PR #475, anticipatory) | 16 instrument cluster ACs were suppressed by a blanket `test.skip(true, ...)` because zone-level and component-level ACs were bundled in a single spec file while implementation was decomposed into three Task Issues (#460/461/462). Engineering Lead identified the structural gap through governance anxiety about skip management — before any component shipped. Root cause: no AC categorization rule existed. Severity: High (CI blind spot across primary viewport ACs). Response: retrofit Issue #473 + process change Issue #474 (now complete via PR #476). | 2026-05-23 |
+| NM-016 + pre-push lint gate added to CLAUDE.md (PR #472, closes #471) | Two parallel agents (Issues #458 and #459) pushed PRs without running `ruff check .` locally. Both failed CI on I001/E501 — trivially preventable in two seconds locally. Root cause: agent prompts specified `pytest` but not `ruff`. Pre-push lint gate added to CLAUDE.md constitution: `cd backend && ruff check . && mypy app/` required before any push touching Python files. Local ruff==0.7.2 is identical to CI-pinned version — no environment gap. NM-016 filed. | 2026-05-23 |
+| Backend trajectory endpoint merged (PR #468, closes #458) | `GET /scenarios/{scenario_id}/trajectory` FastAPI endpoint live on main. Key contracts: `SINGLE_ENTITY_REFERENCE_RANGES` dict (gdp_growth, reserve_coverage_months, unemployment_rate, net_enrollment_secondary — health_expenditure excluded as non-monotonic); `normalized_absolute_strategy` function; ecological MDA floor (WARNING at 1.0) built in application code (no M9 DB table); `mda_floors` at response root; `step_significance` from `step_metadata` JSONB; Pydantic v2 schemas (`TrajectoryResponse`, `TrajectoryStep`, `TrajectoryFrameworkPoint`, `MDAFloorRecord`). 13 unit tests in `test_trajectory_endpoint.py`. | 2026-05-23 |
+| QA pre-implementation test authorship merged (PR #469, closes #459) | `frontend/tests/e2e/instrument-cluster.spec.ts` — 16 ACs (AC-001 through AC-014) as Playwright E2E gates. All tests wrapped with `test.skip(true, ...)` pending #460/461/462 (this skip is the subject of retrofit Issue #473). `page.emulate()` Puppeteer bug fixed → CDP session (`Emulation.setCPUThrottlingRate`). `frontend/src/components/__tests__/TrajectoryView.test.ts` — Vitest unit tests for AC-010/013/015. `backend/tests/fixtures/test_greece_fixture_step_metadata.py` — 13 pytest CI gate tests for AC-012 (step_event_label ≤8 words AND ≤32 chars). `frontend/tests/manual-validation/mv-gates.md` — MV-001/002/003 procedures. | 2026-05-23 |
+| Playwright test skip governance — three-agent consultation (anticipatory) | Engineering Lead asked how to prevent `test.skip()` from being abused or forgotten. Architect (skip registry — hermetic), Frontend Architect (DOM-presence fixture — self-healing), and QA Lead (test.fixme() + milestone exit gate) each assessed independently. Unanimous finding: skip must be visible and self-expiring. Key divergence: registry (auditable) vs DOM-presence (no maintenance). Recommendation: DOM-presence as runtime control + test.fixme() for visibility + Type 1/Type 2 discipline as root fix. Root fix (Type 1/Type 2 rule) eliminates the problem structurally — per NM-017, the correct fix is decomposition discipline, not skip governance tooling. | 2026-05-23 |
 | PM Agent pre-EL consultation — standing automatic capability (PR #466, closes #464) | Pre-EL consultation added to PM Agent working agreement as automatic standing responsibility. Three trigger conditions: [EL-DECISION] tag in any document; pending entry in SESSION_STATE.md §Pending EL Decisions; any agent raising an EL-authority question. Four-step process: identify → activate independently → synthesize → surface recommendation. RACI framing: EL holds A; PM Agent holds R for the consultation — cold questions reaching EL without prior consultation are a PM Agent failure. Disagreement handling: PM Agent names divergence and surfaces all positions; does not resolve. | 2026-05-23 |
 | Issue hierarchy rule encoded permanently (PR #456); M9 trajectory endpoint epic filed (#457–#463) | Binary three-level issue hierarchy (Epic → Feature → Task) added to PM Agent working agreement in agents.md and referenced in CLAUDE.md. Spawning rule: children created only when >1 agent OR >1 PR required — agent-count-based, not complexity-based. M9 instrument cluster epic #457 filed with six child Feature Issues: #458 (backend trajectory endpoint), #459 (QA test authorship — pre-implementation gate), #460 (TrajectoryView Zone 1A), #461 (MDA Alert Panel Zone 1B), #462 (PMM + Four-Framework Zone 1C/1D), #463 (Greece integration Playwright suite). #459 explicitly blocks #460/461/462. #463 spawns Level 3 Task Issues when prerequisites complete. Pre-EL consultation standing capability filed as #464 — PM Agent auto-coordinates before any EL decision reaches EL. | 2026-05-23 |
 | UX-RULING-1/2/3 resolved — QA gate fully unblocked (PR #454) | UX Designer Agent resolved all three open Playwright assertion placeholders in the M9 instrument cluster user stories. RULING-1 (US-016): alert tense markers per mode — Mode 1 `"crossed"`, Mode 2 `"is projected to cross"`, Mode 3 ` — ` separator format; advisory language exclusions. RULING-2 (US-022): null composite score → CSS class `score-value--null` (opacity ≤ 60%); numeric/zero → `score-value--numeric`. RULING-3 (US-026): mode indicator labels — `"Replay"` / `"Simulation"` / `"Active Control"`. All 29 stories now fully testable. QA gate UNBLOCKED. | 2026-05-23 |
