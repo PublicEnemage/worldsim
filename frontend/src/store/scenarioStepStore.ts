@@ -63,6 +63,10 @@ interface ScenarioStepState {
   computation_state: "idle" | "computing" | "complete";
   mode: "MODE_1" | "MODE_2" | "MODE_3";
   mda_alerts: Zone1BAlert[];
+  /** Zone 1C — Policy Maneuver Margin value at current step. */
+  pmm_value: number | null;
+  /** Zone 1C — Direction indicator: margin growing, shrinking, or flat since last step. */
+  pmm_direction: "up" | "down" | "flat" | null;
   setScenario: (
     scenario_id: string,
     step_count: number,
@@ -70,6 +74,8 @@ interface ScenarioStepState {
   ) => void;
   setTrajectory: (trajectory: TrajectoryResponse) => void;
   setMdaAlerts: (alerts: Zone1BAlert[]) => void;
+  /** Set PMM state in a single set() call (DD-012 atomicity). */
+  setPmmState: (value: number | null, direction: "up" | "down" | "flat" | null) => void;
   advanceStep: () => void;
   applyControlInput: (newTrajectory: TrajectoryResponse) => void;
   reset: () => void;
@@ -84,6 +90,8 @@ export const useScenarioStepStore = create<ScenarioStepState>((set, get) => ({
   computation_state: "idle",
   mode: "MODE_1",
   mda_alerts: [],
+  pmm_value: null,
+  pmm_direction: null,
 
   setScenario: (scenario_id, step_count, mode) =>
     set({
@@ -95,6 +103,8 @@ export const useScenarioStepStore = create<ScenarioStepState>((set, get) => ({
       baseline_trajectory: null,
       computation_state: "idle",
       mda_alerts: [],
+      pmm_value: null,
+      pmm_direction: null,
     }),
 
   setTrajectory: (trajectory) =>
@@ -105,6 +115,8 @@ export const useScenarioStepStore = create<ScenarioStepState>((set, get) => ({
     }),
 
   setMdaAlerts: (alerts) => set({ mda_alerts: alerts }),
+
+  setPmmState: (value, direction) => set({ pmm_value: value, pmm_direction: direction }),
 
   advanceStep: () => {
     const { current_step, step_count } = get();
@@ -132,5 +144,7 @@ export const useScenarioStepStore = create<ScenarioStepState>((set, get) => ({
       computation_state: "idle",
       mode: "MODE_1",
       mda_alerts: [],
+      pmm_value: null,
+      pmm_direction: null,
     }),
 }));
