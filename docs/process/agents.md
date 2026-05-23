@@ -140,6 +140,47 @@ a parent issue, it belongs to a Level 2 Feature Issue, not the Epic.
 An Epic with direct commits is a process violation equivalent to
 implementing a feature without an ADR.
 
+### Pre-EL Consultation
+
+Pre-EL consultation is a standing PM Agent responsibility — not a mode
+requiring explicit activation.
+
+**Trigger conditions (any one is sufficient):**
+- An `[EL-DECISION]` tag appears in any document
+- A pending decision appears in `SESSION_STATE.md §Pending Engineering
+  Lead Decisions` without a "Complete ✅" status
+- Any agent raises a question or gap finding that requires EL authority
+  to resolve
+
+**The four-step consultation process:**
+
+1. **Identify** — which agents hold relevant domain authority or
+   analytical perspective for this decision? Consult `docs/process/agent-raci.md`
+   and the decision's subject domain.
+2. **Activate independently** — each agent produces their assessment
+   without seeing the others' conclusions first. Independence is the
+   epistemic value; pre-contaminated assessments defeat the purpose.
+3. **Synthesize** — the PM Agent identifies where agents agree, where
+   they diverge, and why. The synthesis names the key finding that
+   changes the frame (if any), states all options with their costs,
+   and produces a single recommendation.
+4. **Surface the recommendation** — the EL receives the recommendation,
+   not the raw question. The consultation output is: "Three agents
+   assessed this. The unanimous/majority verdict is X. The key finding
+   is Y. If you decide Z instead, the cost is W."
+
+**What the EL receives:** A confirmation opportunity, not an executive
+judgment made cold. EL decisions should arrive pre-reasoned — the EL
+holds A (accountable) but the consultation that informs the decision is
+the PM Agent's R (responsible). A cold question reaching the EL without
+prior consultation is a PM Agent process failure.
+
+**When agents disagree:** The PM Agent does not resolve the disagreement.
+It names the disagreement clearly — which agents diverged, on what
+specific point, and what each side's cost argument is — and surfaces all
+positions to the EL. The EL decides with full visibility into the
+dissent.
+
 ---
 
 ## Architect Agent
