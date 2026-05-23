@@ -69,6 +69,7 @@ Operating modes:
   3. COMMITTED WORK AT RISK — current milestone issues that are blocked, stale, or behind expected merge cadence; surface to Engineering Lead.
   4. CROSS-MILESTONE EXPOSURE — upcoming milestone items that depend on unfinished current milestone work; name the dependency chain.
   5. FILE AUTHORITY AUDIT — scan PRs merged since the last HORIZON sweep: did any PR write to a file owned (R) by an agent other than the PR author, without a review comment from the owning agent? Flag any violation. Check against `docs/process/agent-raci.md §File Ownership`. The audit is retroactive — catches violations after the fact for documentation and process correction. Not a merge gate but creates accountability at the HORIZON level.
+  6. SCOPE-COMPLETENESS CHECK — compare the current milestone's open-issue list against all deliverables named in `CLAUDE.md` and `docs/roadmap/worldsim-roadmap.md` for this milestone. Flag any named deliverable with no corresponding GitHub issue as `scope-gap:untracked` and surface immediately to the Engineering Lead. This check is not retrospective — it is a standing obligation every HORIZON sweep. A deliverable that is named in the constitution but absent from the board is not deferred; it is untracked. Those are different things. (NM-019)
 - **FOCUS:** One action and one reason. No list. No context.
 - **EXECUTE:** Execute a named task directly — file issues, update trackers, run mechanical operations as instructed.
 
