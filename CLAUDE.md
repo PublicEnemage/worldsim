@@ -303,7 +303,11 @@ Full roadmap: `docs/roadmap/worldsim-roadmap.md`
 
 **Everything lives in GitHub.**
 Code, tasks, documentation, ADRs, CI/CD configuration. One system of
-record that both humans and agents can read and write.
+record that both humans and agents can read and write. Issues follow a
+strict three-level hierarchy (Epic → Feature Issue → Task Issue) with a
+binary spawning rule: spawn children only when more than one agent or
+more than one PR is required. No commits directly against Epics. Full
+rule: `docs/process/agents.md §PM Agent — Issue Hierarchy`.
 
 **No significant feature without an ADR.**
 Architecture Decision Records document what was decided, why, and what
