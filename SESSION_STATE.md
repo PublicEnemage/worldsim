@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated:** 2026-05-23 (UX-RULING-1/2/3 resolved — alert tense markers, null CSS class, mode labels; QA gate unblocked; PR #454)
+**Last updated:** 2026-05-23 (Issue hierarchy rule encoded PR #456; M9 trajectory endpoint epic #457 + six feature issues #458–#463 filed; pre-EL consultation standing capability #464 filed)
 **Current milestone:** M9 — Standards Foundation
 
 ---
@@ -76,6 +76,7 @@ No open PRs — board clear as of 2026-05-23.
 
 | PR | Title | Date |
 |---|---|---|
+| #456 | docs(process): PM Agent issue hierarchy rule — Epic → Feature → Task, binary spawning | 2026-05-23 |
 | #454 | docs(ux): resolve UX-RULING-1/2/3 — alert tense markers, null CSS class, mode labels | 2026-05-23 |
 | #452 | docs(ux): US-GAP-001 resolved — Mode 1 COMPARE_VIEW placeholder; EL decision M10 (Issue #451) | 2026-05-23 |
 | #449 | docs(ux): M9 instrument cluster user stories — 29 stories, QA + FA consumers (closes #441) | 2026-05-23 |
@@ -184,6 +185,7 @@ All Horizon:Immediate issues are now closed. M8 feature-complete.
 
 | Decision | Rationale | Date |
 |---|---|---|
+| Issue hierarchy rule encoded permanently (PR #456); M9 trajectory endpoint epic filed (#457–#463) | Binary three-level issue hierarchy (Epic → Feature → Task) added to PM Agent working agreement in agents.md and referenced in CLAUDE.md. Spawning rule: children created only when >1 agent OR >1 PR required — agent-count-based, not complexity-based. M9 instrument cluster epic #457 filed with six child Feature Issues: #458 (backend trajectory endpoint), #459 (QA test authorship — pre-implementation gate), #460 (TrajectoryView Zone 1A), #461 (MDA Alert Panel Zone 1B), #462 (PMM + Four-Framework Zone 1C/1D), #463 (Greece integration Playwright suite). #459 explicitly blocks #460/461/462. #463 spawns Level 3 Task Issues when prerequisites complete. Pre-EL consultation standing capability filed as #464 — PM Agent auto-coordinates before any EL decision reaches EL. | 2026-05-23 |
 | UX-RULING-1/2/3 resolved — QA gate fully unblocked (PR #454) | UX Designer Agent resolved all three open Playwright assertion placeholders in the M9 instrument cluster user stories. RULING-1 (US-016): alert tense markers per mode — Mode 1 `"crossed"`, Mode 2 `"is projected to cross"`, Mode 3 ` — ` separator format; advisory language exclusions. RULING-2 (US-022): null composite score → CSS class `score-value--null` (opacity ≤ 60%); numeric/zero → `score-value--numeric`. RULING-3 (US-026): mode indicator labels — `"Replay"` / `"Simulation"` / `"Active Control"`. All 29 stories now fully testable. QA gate UNBLOCKED. | 2026-05-23 |
 | US-GAP-001 — Mode 1 comparable-case comparison deferred to M10 | Pre-EL consultation: UX Design Thinking Agent, PO Agent, Architect Agent — unanimous M10 verdict. Key finding: the gap was narrower than stated. ADR-010 Decision 11 and FA brief §UD-R2 already specify the rendering layer for multi-case Mode 1 (step alignment, stacked entity dates). The missing piece is the Zone 2 entry point for selecting the second fixture — a COMPARE_VIEW architecture question, not an instrument cluster question. Mode 1 block added to `information-hierarchy.md §COMPARE_VIEW` with decision space documented. User stories file updated: US-GAP-001 converted from pending to resolved; M9 service level for Persona 3 stated explicitly (orientation sufficient; comparison M10). Issue #451 filed with full M10 deliverable spec. PR #452. | 2026-05-23 |
 | M9 instrument cluster user stories — 29 stories authored (Issue #441, PR #449) | PO Agent: EXECUTE. Two consumers: QA Lead (writes acceptance tests from stories before implementation) and Frontend Architect (implements to stories as user-value specification). 29 stories across 9 groups (US-001–US-029): Zone 1 Completeness, Trajectory View, MDA Alert Panel, PMM Widget, Four-Framework Current Position, Atomicity, Persistent Header, Control Plane Reserved Zone, Performance. All stories include Given/When/Then acceptance criteria tagged by test method [Playwright], [Vitest], [RTL], [pytest], [Manual]. Three [UX-RULING] placeholders (US-016, US-022, US-026) await UX Designer observable-string rulings. One [EL-DECISION] gap finding (US-GAP-001): Andreas Mode 1 comparative-case comparison requires a surface not in M9 spec — EL to decide M9 or M10. File: `docs/ux/user-stories-instrument-cluster-m9.md`. | 2026-05-23 |
