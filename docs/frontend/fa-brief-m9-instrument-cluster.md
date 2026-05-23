@@ -90,13 +90,13 @@ Every criterion here is testable before M9 implementation is considered complete
 | AC-006 | All four Zone 1 instruments update in a single render cycle on step advance | React Testing Library: wrap step-advance in `act()`; assert all four instrument DOM nodes reflect new `current_step` within the same `act()` call before it resolves |
 | AC-007 | ComposedChart initial render ≤ 100ms on CI throttled profile | `performance.measure` in Playwright; 4× CPU throttle (`page.emulate({cpuThrottling:4})`); see also hardware validation note in §Performance Acceptance Criteria |
 | AC-008 | ComposedChart step navigation ≤ 100ms on CI throttled profile | `performance.measure` in Playwright; same throttle as AC-007 |
-| AC-009 | Full Mode 3 component set (8 Lines + 4 Areas + 6+ ReferenceLines) ≤ 100ms on CI throttled profile | `performance.measure` at Mode 3 full activation; same throttle |
+| AC-009 | Full Mode 3 component set (8 Lines + 4 Areas + 3 shock-event ReferenceLines — MDA floor lines excluded from M9) ≤ 100ms on CI throttled profile | `performance.measure` at Mode 3 full activation; same throttle |
 | AC-010 | Divergence fill disappears when \|active - baseline\| ≤ 0.01 at every step | Vitest unit test: assert no `<Area>` fill rendered when delta ≤ 0.01 |
 | AC-011 | Mode 1 step annotation renders three-line tick at ≥ 1024px viewport | Playwright screenshot; verify three text nodes per SIGNIFICANT step tick |
 | AC-012 | Step annotation event label: ≤ 8 words AND ≤ 32 characters; fixture CI gate rejects violations | `pytest tests/fixtures/` schema validation; runs on every PR |
 | AC-013 | Tier 4-5 curves show "(exp)" label adjacent to most recent data point in chart body | Playwright screenshot; assert `<text>` element present in SVG adjacent to rightmost data point on Tier 4-5 curve |
 | AC-014 | Control plane reserved zone = 280px width at 1280×800; trajectory view width ≥ 580px | Computed width assertions in Playwright |
-| AC-015 | Null governance composite score renders as curve gap, not zero | Vitest unit test: mount `TrajectoryView` with fixture having `composite_score: null` at step 3; assert governance `<Line>` has `connectNulls={false}` prop; assert no rendered data-point element at step 3 x-position for governance line |
+| AC-015 | All four active `<Line>` components have `connectNulls={false}`; null composite score at any step renders as curve gap | Vitest unit test: mount `TrajectoryView` with fixture having `composite_score: null` at step 3 on each framework in turn; assert all four `<Line>` components have `connectNulls={false}` prop; assert no rendered data-point element at null step position |
 
 ---
 
@@ -599,22 +599,30 @@ required.
 
 ---
 
-## Governance Null Curve Rendering
+## Null Curve Rendering
 
-The governance `<Line>` component must have `connectNulls={false}`. This is not configurable —
-it is a hard requirement derived from ADR-010 Decision 5.
+All four active `<Line>` components must have `connectNulls={false}`. This is not configurable —
+it is a hard requirement derived from ADR-010 Decision 3. Governance is not the only framework
+that can produce null composite scores: uncomputed steps, single-entity scenarios (pending EL
+path decision), and governance-in-validation all produce nulls on different frameworks.
 
-**Implementation guard:** A unit test must assert that the governance `<Line>` rendered by
-TrajectoryView has `connectNulls={false}` regardless of the data passed. This test must not
-be conditional on the scenario having null governance values — it validates the component
-configuration, not the data.
-
-The test assertion:
-
-```typescript
-const governanceLine = screen.getByTestId("trajectory-line-governance");
-expect(governanceLine).toHaveAttribute("connectNulls", "false"); // or equivalent prop assertion
+```tsx
+// All four active Lines — connectNulls={false} is mandatory on each:
+<Line dataKey="financial_active" connectNulls={false} {...} />
+<Line dataKey="human_development_active" connectNulls={false} {...} />
+<Line dataKey="ecological_active" connectNulls={false} {...} />
+<Line dataKey="governance_active" connectNulls={false} {...} />
+// All four ghost Lines (Mode 3) — same rule applies:
+<Line dataKey="financial_baseline" connectNulls={false} {...} />
+<Line dataKey="human_development_baseline" connectNulls={false} {...} />
+<Line dataKey="ecological_baseline" connectNulls={false} {...} />
+<Line dataKey="governance_baseline" connectNulls={false} {...} />
 ```
+
+**Implementation guard:** A unit test must assert that all four active `<Line>` components
+rendered by `TrajectoryView` have `connectNulls={false}` regardless of the data passed. Test
+each framework with a fixture that places `composite_score: null` at step 3 for that framework;
+assert no rendered data-point element at that step position (AC-015).
 
 ---
 
@@ -1143,3 +1151,467 @@ All 10 findings incorporated; brief updated before PR merge.
 | QA-F4 | QA Lead | AC-017 sign-off is process gate, not acceptance criterion | INCORPORATED — moved to §Implementation Sequencing |
 | QA-F5 | QA Lead | AC-016 Playwright SVG assertion fragile → Vitest unit test | INCORPORATED — §Named Acceptance Criteria |
 | QA-F6 | QA Lead | Fixture CI gate: clarify `pytest tests/fixtures/` suite | INCORPORATED — §Mode 1 Step Axis Annotation |
+
+---
+
+## Appendix — Six-Agent Parallel Consultation (2026-05-22)
+
+> **Purpose:** Pre-implementation consultation on three unresolved questions identified
+> by the Architect Agent review of Data Architect findings (DA-F2, DA-F4, DA-F5).
+> Six agents activated simultaneously: Chief Methodologist, UX Design Thinking Agent,
+> UX Designer Agent, Data Architect Agent, QA Lead Agent, Frontend Architect Agent.
+> Outputs below are direct agent rulings; EL decisions still required.
+>
+> **Status:** EL decisions A (DA-F2), B (DA-F4), and C (DA-F5) remain pending.
+> This appendix records what each agent concluded so that EL can decide from
+> a complete record rather than from individual agent activations.
+
+---
+
+### Chief Methodologist — Ruling on DA-F4 (Single-Entity Trajectory Scoring)
+
+**Ruling date:** 2026-05-22
+
+**Question:** Is a single-entity trajectory display methodologically coherent? If yes,
+what scoring methodology applies when percentile-rank composite scores are unavailable
+(N < 2 entities)?
+
+**Ruling:**
+
+Single-entity trajectory display is methodologically coherent when the scoring basis is
+entity-intrinsic rather than comparative. The correct approach is a **normalized absolute
+value composite** — each indicator is measured against pre-declared reference ranges
+(not against a comparison population), and the composite score is derived from those
+normalized values.
+
+Properties of the normalized absolute value composite:
+
+- **Score range:** [0.0, 1.0] per framework (ecological remains [0.0, 2.0] on its
+  existing scale — no change to ecological composite methodology)
+- **Scoring basis:** entity-intrinsic — the score measures distance from pre-declared
+  reference range endpoints, not position in a comparison population
+- **Confidence floor:** Tier 3 minimum for all single-entity normalized scores — the
+  reference ranges are themselves methodologically uncertain
+- **Not interchangeable with percentile rank:** A normalized absolute score of 0.65
+  and a percentile rank of 0.65 have different interpretations; the frontend must
+  distinguish them in display labels and tooltips (see UX Designer rulings below)
+- **Reference range requirement:** The Chief Methodologist must define reference
+  ranges for each framework's composite indicator before this scoring path is live.
+  Greece Mode 1 trajectory requires: (1) financial composite reference range,
+  (2) human development composite reference range. Ecological already has a
+  calibrated range (planetary boundary at 1.0).
+
+**Prerequisite for Path A implementation:** A Chief Methodologist consultation
+(separate activation) defining indicator reference ranges for financial and HD
+frameworks. This is a blocking backend prerequisite — the trajectory endpoint cannot
+compute single-entity composite scores without declared reference ranges.
+
+**On ecological:** Ecological composite scores are entity-intrinsic by design
+(boundary proximity, not percentile rank). No change to ecological methodology.
+Ecological curves in Mode 1 Greece are already correct.
+
+---
+
+### Chief Methodologist — Ruling on DA-F2 (Composite-Score MDA Floors)
+
+**Ruling date:** 2026-05-22
+
+**Question:** Can composite-score-level MDA floor values be defined for the M9
+trajectory view? What is the correct methodology?
+
+**Ruling:**
+
+Composite-score-level MDA floors cannot be defined responsibly without:
+
+1. A complete indicator inventory per framework (which indicators contribute to each
+   composite score)
+2. Backtesting evidence showing historical composite score values at which MDA
+   threshold violations historically co-occurred
+3. A mapping function from indicator-level thresholds to composite score space —
+   which must itself be validated, not assumed
+
+Until all three conditions are met, any composite-score MDA floor value would be
+an assertion without methodological grounding. This is a No False Precision
+violation if rendered as an authoritative floor line.
+
+**Exception — ecological WARNING floor at 1.0:** The ecological composite score is
+calibrated directly to planetary boundary proximity. A score of 1.0 means the entity
+is at the planetary boundary for at least one indicator. This floor is defensible
+from first principles without additional backtesting: crossing 1.0 is definitionally
+a boundary-crossing event. An ecological `WARNING` floor at 1.0 may be rendered in M9.
+
+**All other framework floors:** Deferred. The trajectory view must not render
+MDA floor `<ReferenceLine>` elements for financial, human_development, or governance
+frameworks in M9.
+
+**Path to M10:** Authorize the Chief Methodologist to define the indicator inventory
+and reference range table for each framework as part of the M10 preparation work.
+The M10-B schema option (`mda_composite_floors` as a separate table with
+`cm_approval_reference` column) is the correct architectural home — it enforces
+that no composite floor value can be seeded without a CM consultation reference.
+
+---
+
+### UX Design Thinking Agent — Frame Verdict on DA-F4
+
+**Ruling date:** 2026-05-22
+
+**Question:** Is the instrument cluster frame coherent for a single-entity scenario?
+Is the Greece fixture the right demo scenario?
+
+**Frame verdict:**
+
+The instrument cluster frame IS coherent for single-entity scenarios. The trajectory
+view's purpose is to show how a single entity's framework scores evolve over time —
+comparative ranking is one scoring *method*, not the frame's purpose.
+
+The Greece fixture IS the right demo scenario. Single-entity Mode 1 Greece is
+maximally legible (no multi-entity visual complexity; the historical narrative is
+well-documented; the analytical story — austerity, human cost, political economy —
+spans all four frameworks).
+
+**DA-F4 is a demo scope decision, not a frame coherence failure.** The question
+is not "is this the right scenario?" but "how does Mode 1 Greece show four framework
+curves when two of them currently return null?"
+
+**Mode 1 Greece showing four curves is an M9 exit requirement.** A trajectory view
+that renders only two curves for the primary demo scenario does not demonstrate
+the instrument cluster concept. Both paths (A: normalized scoring, B: advisory strip)
+are frame-coherent; the choice is implementation scope and display intent.
+
+**Y-axis scoring basis labeling is required in Zone 1A regardless of path chosen.**
+When the scoring basis changes (percentile rank vs. normalized absolute), the Y-axis
+label must reflect the active methodology. This is not optional — unlabeled axes
+with different scoring bases would violate the No False Precision principle.
+
+---
+
+### UX Designer Agent — Path A and Path B Rulings on DA-F4
+
+**Ruling date:** 2026-05-22
+
+**Path A — Normalized absolute value composite (four curves rendered):**
+
+UX rulings if Path A is chosen:
+
+1. **Divergence fill style:** `strokeDasharray="8 3"` on financial and HD active
+   curves in single-entity scenarios — visually distinguishes normalized-absolute
+   curves from percentile-rank curves without hiding them. Ghost baseline uses
+   standard ghost styling (unchanged).
+
+2. **Legend label format:** "Financial (single-country index)" and "Human Development
+   (single-country index)" in the Recharts legend for single-entity scenarios.
+   Multi-entity scenarios use standard "Financial" / "Human Development" labels.
+   Legend label is a computed string — no static constant.
+
+3. **Tooltip copy:** On curve hover, tooltip body: `"Single-country index — not
+   comparable across scenarios"`. Positioned as a methodology note (Zone 3
+   equivalent, inline). Standard tooltip format otherwise unchanged.
+
+4. **Zone 3 methodology note (mandatory):** A persistent methodology note must
+   appear in Zone 3 for single-entity scenarios using normalized absolute scoring:
+   `"Scores for [country] reflect absolute indicator position, not ranking.
+   Cross-scenario comparison is not valid."` This note disappears when multi-entity
+   mode activates.
+
+5. **No layout changes.** Path A requires no changes to Zone 1A layout constants,
+   Zone 1B stacking, or control plane zone.
+
+**Path B — Advisory strip (two curves suppressed):**
+
+UX rulings if Path B is chosen:
+
+1. **Advisory strip dimensions:** ≤ 40px height, positioned below the X-axis tick
+   row, above Zone 1B. Amber background (`#F59E0B` or CVD-equivalent pending MV-001).
+   Full Zone 1A column width.
+
+2. **Advisory strip text (approved):** `"Comparative rankings require at least two
+   countries. Showing available trajectory for this single-country scenario."`
+   Maximum one line. If text wraps at 240px column width, abbreviate to: `"Rankings
+   require ≥ 2 countries — single-country trajectory shown."`
+
+3. **Zone 1D tooltip differentiation:** Governance null tooltip and financial/HD
+   suppression tooltip must be visually distinct. Financial/HD in Path B: light grey
+   dashed line with `"Not shown: percentile rank unavailable for single-country
+   scenarios"` tooltip. Governance null: existing hollow dot / dashed treatment
+   (unchanged).
+
+4. **AC-005 amendment:** Minimum trajectory chart body height must be adjusted to
+   ≥ 260px to accommodate the advisory strip without compressing the chart below
+   legibility threshold. (Original AC-005 minimum was not advisory-strip-aware.)
+
+**UX Designer does not select between Path A and Path B.** Path selection is an EL
+decision. Both paths have valid UX rulings recorded here.
+
+---
+
+### Data Architect Agent — Schema Shapes for All Three Open Questions
+
+**Ruling date:** 2026-05-22
+
+**On DA-F5 (step_metadata JSONB — confirmed valid):**
+
+Option (a) — `step_metadata` key in `scenarios.configuration` JSONB — is architecturally
+valid. No migration is required. The `scenarios.configuration` column is an unrestricted
+JSONB with no column-level constraints. Proposed key structure:
+
+```yaml
+# Addition to docs/schema/database.yml — scenarios.configuration key structure:
+step_metadata:
+  description: Per-step annotation data; absent = ROUTINE step
+  type: object
+  key: "1-based step index as string"
+  value:
+    step_event_label:
+      type: string
+      nullable: true
+      constraint: "≤ 8 words AND ≤ 32 characters"
+    step_significance:
+      type: string
+      enum: ["SIGNIFICANT", "ROUTINE"]
+      nullable: true
+      note: "Absent = ROUTINE; 'STANDARD' is incorrect (see ADR-010 Decision 7)"
+```
+
+Corresponding `api_contracts.yml` addition to `GET /scenarios/{scenario_id}/trajectory`
+step items:
+
+```yaml
+step_event_label:
+  type: string
+  nullable: true
+  description: "Human-readable step annotation (≤ 32 chars). Null = ROUTINE step."
+step_significance:
+  type: string
+  enum: ["SIGNIFICANT", "ROUTINE"]
+  nullable: true
+  description: "Per ADR-010 Decision 7. Null = ROUTINE. Never 'STANDARD'."
+```
+
+**On DA-F4 Path A — `scoring_basis` field:**
+
+```typescript
+interface FrameworkCurvePoint {
+  step_index: number;
+  composite_score: number | null;
+  ci_lower: number | null;  // ADR-007 gated
+  ci_upper: number | null;  // ADR-007 gated
+  scoring_basis: "percentile_rank" | "normalized_absolute";  // Path A addition
+}
+```
+
+This field is per-step (not per-response) because composite score methodology is
+per-framework and does not change within a scenario, but the field placement
+is consistent with the existing step-level data structure.
+
+**On DA-F4 Path B — `single_entity_advisory` field:**
+
+```typescript
+interface TrajectoryResponse {
+  scenario_id: string;
+  steps: TrajectoryStep[];
+  mda_floors: MDAFloor[];  // response root — NOT inside steps.items
+  single_entity_advisory: boolean;  // Path B addition; at response root
+}
+```
+
+**Structural error in existing api_contracts.yml stub (Arch-F1 follow-on):**
+The `mda_floors` array was placed inside `steps.items` in the DA-review stub.
+Per ADR-010 Decision 2, `mda_floors` is a `TrajectoryResponse`-level field
+(not per-step). The stub must be corrected when EL resolves DA-F2.
+
+**On DA-F2 Path B — M10 schema (preferred):**
+
+New `mda_composite_floors` table (M10-B) is preferred over adding a column to
+`mda_thresholds` (M10-A). Rationale: `mda_thresholds` stores indicator-level floors.
+Mixing composite-level floors into the same table blurs the Zone 1A / Zone 2B
+architectural boundary. Proposed M10-B structure:
+
+```sql
+CREATE TABLE mda_composite_floors (
+    id          uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    framework   text NOT NULL CHECK (framework IN ('financial', 'human_development',
+                    'ecological', 'governance')),
+    floor_value numeric NOT NULL,
+    label       text NOT NULL,
+    severity    text NOT NULL CHECK (severity IN ('WARNING', 'CRITICAL')),
+    cm_approval_reference  text NOT NULL,  -- CM consultation reference; cannot be null
+    effective_from date NOT NULL,
+    created_at  timestamptz DEFAULT now()
+);
+```
+
+The `cm_approval_reference` column enforces that no composite floor value can be
+seeded without a traceable Chief Methodologist consultation.
+
+---
+
+### QA Lead Agent — Acceptance Criterion Corrections and Additions
+
+**Ruling date:** 2026-05-22
+
+**AC-009 component count correction (MDA floor ReferenceLines excluded from M9):**
+
+Current AC-009 text references MDA floor `<ReferenceLine>` elements. Per DA-F2
+resolution (M9 deferral), MDA floor ReferenceLines are NOT implemented in M9.
+AC-009 must be corrected:
+
+```
+AC-009 (CORRECTED): Mode 3 ComposedChart at full activation includes:
+  8 <Line> components (4 active + 4 ghost)
+  4 <Area> components (divergence fills)
+  3 <ReferenceLine> components (shock events only — MDA floor lines excluded from M9)
+  Total: 15 SVG primitive groups
+  Render time ≤ 100ms on 4-core / 8GB hardware (MV-002)
+```
+
+**AC-015 broadening — `connectNulls={false}` applies to ALL four Lines:**
+
+Current AC-015 scopes `connectNulls={false}` to the governance `<Line>` only.
+ADR-010 Decision 3 requires `connectNulls={false}` on all four active `<Line>`
+components. Any framework can have a governance-in-validation null period.
+
+```
+AC-015 (CORRECTED): All four active <Line> components have connectNulls={false}.
+  Null gaps render as visual breaks. Applies to: financial, human_development,
+  ecological, governance. Test: Vitest unit test with fixture containing
+  null composite_score on non-governance step.
+```
+
+**AC-012 — Single-entity trajectory CI gate (Path A):**
+
+If EL chooses Path A, add:
+
+```python
+# tests/fixtures/test_single_entity_trajectory.py
+def test_single_entity_trajectory_has_scoring_basis():
+    """All FrameworkCurvePoints in a single-entity scenario carry scoring_basis."""
+    response = get_trajectory(scenario_id=GREECE_FIXTURE_ID)
+    assert response.single_entity_advisory is False  # Path A: advisory not shown
+    for step in response.steps:
+        for framework in ["financial", "human_development"]:
+            point = step.framework_scores[framework]
+            assert point.scoring_basis == "normalized_absolute"
+        for framework in ["ecological", "governance"]:
+            point = step.framework_scores[framework]
+            # ecological/governance use percentile_rank even in single-entity
+            assert point.scoring_basis == "percentile_rank"
+
+def test_single_entity_composite_score_tier_floor():
+    """Single-entity normalized composite scores are Tier 3 minimum."""
+    response = get_trajectory(scenario_id=GREECE_FIXTURE_ID)
+    for step in response.steps:
+        for framework in ["financial", "human_development"]:
+            point = step.framework_scores[framework]
+            if point.composite_score is not None:
+                assert point.confidence_tier >= 3
+```
+
+**Divergent AC sets — Path A vs Path B cannot merge until EL decides:**
+
+Path A ACs: AC-012 (scoring_basis field), Y-axis label unit test,
+Zone 3 methodology note Playwright assertion.
+
+Path B ACs: AC-012 (single_entity_advisory = true in fixture response),
+advisory strip render test (height ≤ 40px, amber color), financial/HD curve
+suppression test (null or absent in chart data).
+
+These are mutually exclusive. AC numbering branches at AC-012 and rejoins
+at AC-016 (post-path resolution). All post-path ACs must be written after
+EL chooses path.
+
+**M10 ACs (pre-drafted):**
+
+```
+AC-022 (M10): mda_composite_floors table populated; at least one WARNING floor
+  row per framework. cm_approval_reference column non-null for all rows.
+AC-023 (M10): ecological WARNING floor ReferenceLine renders at y=1.0 in
+  trajectory view when mda_composite_floors contains ecological WARNING row.
+AC-024 (M10): MDA floor ReferenceLine does not render when no composite floor
+  defined for that framework — empty array produces no SVG element.
+```
+
+---
+
+### Frontend Architect Agent — Implementation Constraints
+
+**Ruling date:** 2026-05-22
+
+**Zustand atom shape — unchanged for all paths:**
+
+`ScenarioStepState` atom shape is unchanged regardless of EL path choice:
+
+```typescript
+interface ScenarioStepState {
+  scenario_id: string;
+  current_step: number;
+  step_count: number;
+  trajectory: TrajectoryResponse | null;
+  baseline_trajectory: TrajectoryResponse | null;
+  computation_state: "idle" | "computing" | "complete";
+  mode: "MODE_1" | "MODE_2" | "MODE_3";
+}
+```
+
+`single_entity_advisory` must NOT be promoted to a separate atom field.
+If Path B is chosen, derive `single_entity_advisory` from
+`trajectory?.single_entity_advisory ?? false` at render time. Deriving from
+the trajectory object preserves atom atomicity — state transitions remain
+consistent (one fetch, one atom update, one render pass).
+
+**`connectNulls={false}` — all four Lines (AC-015 correction confirmed):**
+
+ADR-010 Decision 3 language: "all four `<Line>` components have
+`connectNulls={false}`." The existing AC-015 scope (governance only) is incorrect.
+Null gaps in any framework render as visual breaks. Governance is not special
+here — it is only the first case because governance null is the first known
+null source. Future null sources (uncomputed steps, single-entity suppression)
+affect all frameworks.
+
+```tsx
+// All four active Lines:
+<Line dataKey="financial_active" connectNulls={false} ... />
+<Line dataKey="human_development_active" connectNulls={false} ... />
+<Line dataKey="ecological_active" connectNulls={false} ... />
+<Line dataKey="governance_active" connectNulls={false} ... />
+// All four ghost Lines (Mode 3):
+<Line dataKey="financial_baseline" connectNulls={false} ... />
+<Line dataKey="human_development_baseline" connectNulls={false} ... />
+<Line dataKey="ecological_baseline" connectNulls={false} ... />
+<Line dataKey="governance_baseline" connectNulls={false} ... />
+```
+
+**Path B UI placement — option B-3 (legend-level advisory) most feasible:**
+
+If Path B is chosen, the FA recommends placing the advisory as a custom
+Recharts Legend component below the legend items rather than as a DOM strip
+below the X-axis (which requires Recharts composition escape). Both render
+the advisory visibly. The UX Designer has approved the Zone 1 column-width
+amber strip; the FA implementation preference is B-3 for Recharts containment.
+UX Designer must confirm B-3 is acceptable — if the amber strip must be
+positioned below the X-axis tick row and above Zone 1B (not within the
+chart legend), the FA will use a DOM-level wrapper with absolute positioning.
+
+**MDA floor scaffolding — none needed in M9:**
+
+The `mda_floors: MDAFloor[]` array at the `TrajectoryResponse` root should
+be returned as an empty array in M9. The rendering loop `mda_floors.map(floor =>
+<ReferenceLine ... />)` produces no SVG elements for an empty array — no
+scaffolding, no conditional render guard, no placeholder needed.
+The ecological WARNING floor (if EL authorizes) would be the first non-empty
+`mda_floors` entry and will render without any code change to the loop.
+
+---
+
+### Six-Agent Consultation Summary — Findings for EL Decision
+
+| Finding | Agents that weighed in | Consensus |
+|---|---|---|
+| DA-F4: Single-entity trajectory — Path A vs B | CM, UT, UD, DA, QA, FA | All six agents found both paths coherent. CM ruled Path A is methodologically sound if reference ranges are pre-declared. UT ruled four curves is an M9 exit requirement. Path selection is EL scope. |
+| DA-F4: Confidence floor for single-entity scores | CM | Tier 3 minimum — no consensus needed; methodology ruling. |
+| DA-F4: Reference ranges required before Path A | CM | Blocking prerequisite — CM consultation must define ranges before trajectory endpoint can compute single-entity composite scores. |
+| DA-F2: Composite-score MDA floors — M9 deferral | CM, QA, FA | Unanimous: defer. No responsible values without backtesting evidence. Ecological WARNING at 1.0 is the only defensible M9 exception. |
+| DA-F2: M10 schema — new table vs column | DA | M10-B (new table with cm_approval_reference) preferred. |
+| DA-F5: step_metadata JSONB approach | DA, FA | Confirmed valid. No migration needed. DA drafted schema text. |
+| AC-009 correction | QA, FA | Unanimous: 3 shock ReferenceLines only; MDA floor lines excluded from M9 count. |
+| AC-015 correction | QA, FA | Unanimous: `connectNulls={false}` on all 8 Lines (4 active + 4 ghost), not governance only. |

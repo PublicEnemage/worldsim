@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated:** 2026-05-22 (Architect Agent review of DA findings complete — three EL decisions required before trajectory endpoint implementation; PRs #423 #424 #425 open)
+**Last updated:** 2026-05-22 (Six-agent parallel consultation complete — CM, UT, UD, DA, QA, FA outputs recorded in FA brief appendix; three EL decisions remain pending; PR #426 open)
 **Current milestone:** M9 — Standards Foundation
 
 ---
@@ -72,7 +72,8 @@ Twelve issues filed 2026-05-19. Must complete before M9 UX implementation begins
 
 | PR | Title | Date |
 |---|---|---|
-| #425 | docs(frontend): Architect Agent review of Data Architect findings (DA-F1–F5) | 2026-05-22 |
+| #426 | docs(frontend): Six-agent parallel consultation — DA-F2/F4/F5 pre-implementation record | 2026-05-22 |
+| #425 | docs(frontend): Architect Agent review of Data Architect findings (DA-F1–F5) | 2026-05-22 — MERGED |
 | #424 | docs(schema+frontend): Data Architect review — trajectory endpoint stub and 5 schema findings | 2026-05-22 — MERGED |
 | #423 | docs(frontend): FA brief — UX Designer Agent sign-off (2026-05-22) | 2026-05-22 — MERGED |
 | #422 | docs(frontend): FA brief — incorporate three-agent review findings | 2026-05-22 — MERGED |
@@ -99,6 +100,7 @@ Twelve issues filed 2026-05-19. Must complete before M9 UX implementation begins
 
 | PR | Title | Date |
 |---|---|---|
+| #425 | docs(frontend): Architect Agent review of Data Architect findings (DA-F1–F5) | 2026-05-22 |
 | #424 | docs(schema+frontend): Data Architect review — trajectory endpoint stub and 5 schema findings | 2026-05-22 |
 | #423 | docs(frontend): FA brief — UX Designer Agent sign-off | 2026-05-22 |
 | #422 | docs(frontend): FA brief — three-agent review findings incorporated | 2026-05-22 |
@@ -155,9 +157,9 @@ All Horizon:Immediate issues are now closed. M8 feature-complete.
 
 | Decision | Context | Status |
 |---|---|---|
-| DA-F2: Defer MDA floor overlays to M10; authorize CM consultation | Architect recommendation: composite-score-level MDA floors cannot be derived from indicator-level (CM-R3). Must be independently defined by Chief Methodologist. M9 trajectory view ships without floor-line overlays; Zone 1B alert panel covers MDA state. CM consultation on floor methodology is M10 gate. ADR-010 Decision 6 amendment at M10. | Pending EL |
-| DA-F4: Single-entity trajectory scoring — authorize CM consultation + ADR-010 amendment | DEMO-CRITICAL. Greece fixture is single-entity. Percentile rank composite_score is null for financial/HD when N<2 entities (Issue #193). Trajectory view for Mode 1 Greece would show only ecological curve. CM consultation required on single-entity scoring methodology. ADR-010 Decision 2 amendment required. Update or replace Issue #193 with trajectory view dependency. | Pending EL |
-| DA-F5: Confirm step_metadata JSONB in scenarios.configuration | Architect recommends: add `step_metadata` key to `scenarios.configuration` JSONB (no migration). Keys are 1-based step index strings; values are `{step_event_label, step_significance}`. Absence = ROUTINE step. ADR-010 Decision 2 minor amendment to record storage contract. | Pending EL |
+| Decision A (DA-F2): Confirm M9 deferral of MDA floor overlays; authorize CM consultation for M10 | CM RULED: Cannot produce responsible composite-score-level floor values without indicator inventory + backtesting evidence. Ecological WARNING at 1.0 is the only defensible M9 exception (boundary-crossing by definition). All other frameworks deferred. QA + FA concur. EL must: (1) confirm M9 deferral (trajectory ships without MDA floor ReferenceLines except optional ecological WARNING); (2) authorize CM consultation on indicator inventory + reference ranges as M10 prerequisite; (3) confirm M10-B schema (new `mda_composite_floors` table with `cm_approval_reference` column). ADR-010 Decision 6 amendment records deferral. | Pending EL |
+| Decision B (DA-F4): Choose Path A or Path B for single-entity trajectory; authorize ADR-010 Decision 2 amendment | DEMO-CRITICAL. CM RULED: normalized absolute value composite is methodologically sound (Tier 3 floor); blocking prerequisite — CM must define indicator reference ranges before endpoint computes. UT RULED: four-curve Mode 1 Greece is M9 exit requirement. UX Designer rulings for both paths recorded in FA brief appendix. Path A: four curves, normalized scoring, dashed financial/HD, "single-country index" legend + tooltip. Path B: two curves suppressed, 40px amber advisory strip. EL must: (1) choose Path A or B; (2) if Path A — authorize separate CM consultation to define reference ranges; (3) confirm ADR-010 Decision 2 amendment; (4) update Issue #193 with trajectory view dependency. | Pending EL |
+| Decision C (DA-F5): Confirm step_metadata JSONB in scenarios.configuration | DA + FA concur: option (a) is valid, no migration needed. Keys: 1-based step index strings; values: `{step_event_label, step_significance}`. Absence = ROUTINE. Values: "SIGNIFICANT" or "ROUTINE" (never "STANDARD"). ADR-010 Decision 2 minor amendment records storage contract. EL must: confirm option (a). | Pending EL |
 |---|---|---|
 | ADR-010 acceptance | All 4 INCORPORATE items approved with rationale: FA-R3 (dense array contract — one null meaning only); FA-R4+UD-R1 (provisional hex values, UX Designer authority, RACI boundary correct); CM-R1 (No False Precision — deferral placeholder required); CM-R3 (composite-score floors only — indicator projection is methodologically dishonest). ADR-010 status → Accepted. ARCH-004 → ACCEPTED in backlog. M9 FA brief unblocked. | Complete ✅ — 2026-05-22 |
 | ADR-008 acceptance | All 6 INCORPORATE items applied; EL decision recorded (Option A: stacked forms, ~280px); ADR-008 status → Accepted; ARCH-002 → ACCEPTED in backlog. Issue #397 closed. FA brief (FA-C1–FA-C5) deferred to M9. | Complete ✅ — 2026-05-22 |
@@ -173,6 +175,7 @@ All Horizon:Immediate issues are now closed. M8 feature-complete.
 
 | Decision | Rationale | Date |
 |---|---|---|
+| Six-agent parallel consultation — DA-F2/F4/F5 pre-implementation record | CM, UX Design Thinking, UX Designer, Data Architect, QA Lead, Frontend Architect activated simultaneously. Key rulings: (1) CM: single-entity normalized absolute composite is methodologically sound (Tier 3 floor); Path A requires pre-declared reference ranges before endpoint can compute. (2) CM: composite-score MDA floors cannot be defined without backtesting — defer to M10; ecological WARNING at 1.0 is only M9 exception. (3) UT: four-curve Mode 1 Greece is M9 exit requirement; DA-F4 is demo scope decision. (4) UD: Path A rulings (strokeDasharray="8 3", legend labels, tooltip) and Path B rulings (40px amber strip, approved text) recorded. (5) DA: step_metadata JSONB confirmed valid; scoring_basis field for Path A; single_entity_advisory at response root for Path B; mda_floors structural error in stub identified. (6) QA: AC-009 corrected (3 shock ReferenceLines, not 6+); AC-015 broadened to all four Lines. (7) FA: atom unchanged for all paths; connectNulls={false} confirmed on all 8 Lines; single_entity_advisory must not be atom field. Three EL decisions still pending. PR #426. | 2026-05-22 |
 | Architect Agent review of Data Architect findings — three EL decisions required | Data Architect found 5 schema gaps (DA-F1–F5). Architect dispositions: DA-F1 stub adequate; DA-F2 defer MDA floor overlays to M10 + CM consultation; DA-F3 correct as-is; DA-F4 CRITICAL (Greece Mode 1 blocked — single-entity null; CM + ADR-010 amendment required); DA-F5 step_metadata JSONB approach confirmed. Arch-F1: "STANDARD" → "ROUTINE" correction applied. Three EL decisions pending. PR #425. | 2026-05-22 |
 | UX Designer sign-off — conditional on CVD | 4/5 items confirmed (layout, stacking, compact row, badge). Colors pending MV-001. PR #423. | 2026-05-22 |
 | M9 FA brief — three-agent review complete | All 10 findings INCORPORATE. Compact alert row (UD-F1), badge 11px (UD-F2), act() boundary (QA-F1), MV gates added. PR #422. | 2026-05-22 |
