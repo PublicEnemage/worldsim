@@ -275,6 +275,34 @@ Zone 3: System status, data source registry, configuration.
 The comparison surface is context-dependent. EL Decision 3 (Issue #364)
 establishes a conditional rule across all three modes.
 
+**Mode 1 — Replay (comparable-case comparison):** *(entry point spec deferred to M10 — Issue #451)*
+
+Zone 1: Two historical entity trajectory curves on the shared step axis, aligned
+by programme step (ADR-010 Decision 11). The primary question is "does this
+trajectory pattern match a recognizable historical precursor?" The political
+advisor (Persona 3) needs to compare the current case against a second historical
+fixture to build the pattern-recognition argument. The trajectory view rendering
+layer is Mode 1 comparison-ready (ADR-010 Decision 11; FA brief §UD-R2 tick
+format). What is not yet specced is the entry point — the UX mechanism by which
+a second historical fixture is selected. Options to be resolved at M10:
+
+- A "Compare against…" action in the Zone 2 scenario / fixture browser
+- A secondary entity selector in the persistent header (mode-conditional)
+- A fixture picker modal invoked from Zone 1
+
+Zone 2: Entry point for selecting the comparison fixture. Full specification is
+M10 scope.
+
+Zone 3: Methodology disclosures for both entities.
+
+The DeltaChoropleth has no role in Mode 1 comparisons. Mode 1 comparison is
+always temporal — two historical trajectories on the same step axis — not
+geographic.
+
+*Note: M9 partially serves Persona 3 (Andreas Stefanidis) in Mode 1. Step axis
+annotations (US-005) and declarative alert language (US-016) provide sufficient
+orientation. The comparable-case comparison surface is M10 scope (Issue #451).*
+
 **Mode 2 — Single-entity scenarios:**
 
 Zone 1: Divergence timeline — two scenario trajectory curves (proposed path
