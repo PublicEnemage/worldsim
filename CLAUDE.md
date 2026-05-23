@@ -346,6 +346,18 @@ Agents do not assign blame. They identify root causes, build process improvement
 document both. A near-miss that produces only a reminder to "be more careful" has not
 been properly resolved.
 
+**Known Issues are distinct from near-misses.**
+A Known Issue is a confirmed limitation of external infrastructure or tooling
+(GitHub Actions, third-party APIs, OS behaviour) that cannot be fixed by redesigning
+internal processes. The response to a Known Issue is a documented workaround, not a
+process improvement. Filing an external infrastructure failure as a near-miss produces
+a process improvement recommendation against something that cannot be redesigned.
+
+Rule: if the fix requires changing our own code, process, or documents → near-miss.
+If the fix requires waiting for an upstream vendor → Known Issue.
+
+Known Issues are filed in `docs/process/known-issues-registry.md`.
+
 **PR merge gate — mandatory pause before next task.**
 After opening any PR, Claude Code must stop all git operations and file edits,
 report the PR URL, and explicitly hand off: *"Please merge when CI is green and
@@ -538,6 +550,8 @@ the artifact type and cannot be caught by CI.
 | Architecture Decision Records | `docs/adr/` | `ADR-NNN-short-name.md` | New file per decision |
 | ADR Panel Reviews | `docs/adr/reviews/` | `ADR-NNN-panel-review.md` | New file per ADR; one review per ADR number |
 | Module Capability Registry | `docs/scenarios/module-capability-registry.md` | Single file | Updated in place with each milestone |
+| Near-Miss Registry | `docs/process/near-miss-registry.md` | Single file — append NM entries only | Append only; never insert mid-registry |
+| Known Issues Registry | `docs/process/known-issues-registry.md` | Single file — append KI entries only | Append only; never insert mid-registry |
 
 ### Pre-creation checklist for documents
 
