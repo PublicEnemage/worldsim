@@ -499,6 +499,8 @@ finalized — not afterward.
 | `.github/` | EL | Ar | CI/CD pipeline changes require Architect review |
 | `docs/process/agents.md` | PM | EL | Agent persona definitions; EL approves new agent additions |
 | `docs/process/agent-raci.md` | PM | EL, Ar | RACI matrix; Architect consulted when decision-type grounding changes |
+| `docs/process/near-miss-registry.md` | PM | EL | PM files entries; EL informed of High severity entries |
+| `docs/process/known-issues-registry.md` | PM | EL | PM files entries; EL informed of Medium/High severity entries |
 | `docs/schema/api_contracts.yml` | DA | Ar | Ar consulted when response shape changes (API response shape is Architect territory) |
 | `docs/schema/database.yml` | DA | Ar, QA | Ar consulted on schema shape; QA consulted on CI enforcement gates |
 | `docs/schema/simulation_state.yml` | DA | Ar, QA | Same rules as database.yml |
