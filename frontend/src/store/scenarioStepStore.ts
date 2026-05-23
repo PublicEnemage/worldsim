@@ -38,6 +38,22 @@ export interface TrajectoryResponse {
   steps: TrajectoryStep[];
 }
 
+/**
+ * Zone 1B MDA alert — enriched alert type for the instrument cluster panel.
+ * Extends indicator-level MDA data with framework context, step, confidence tier,
+ * and optional causal attribution (Mode 3 only).
+ */
+export interface Zone1BAlert {
+  mda_id: string;
+  indicator_key: string;
+  framework: string;
+  severity: "WARNING" | "CRITICAL" | "TERMINAL";
+  step_index: number;
+  cohort: string | null;
+  confidence_tier: number;
+  causal_attribution: string | null;
+}
+
 interface ScenarioStepState {
   scenario_id: string;
   current_step: number;
@@ -46,12 +62,14 @@ interface ScenarioStepState {
   baseline_trajectory: TrajectoryResponse | null;
   computation_state: "idle" | "computing" | "complete";
   mode: "MODE_1" | "MODE_2" | "MODE_3";
+  mda_alerts: Zone1BAlert[];
   setScenario: (
     scenario_id: string,
     step_count: number,
     mode: "MODE_1" | "MODE_2" | "MODE_3",
   ) => void;
   setTrajectory: (trajectory: TrajectoryResponse) => void;
+  setMdaAlerts: (alerts: Zone1BAlert[]) => void;
   advanceStep: () => void;
   applyControlInput: (newTrajectory: TrajectoryResponse) => void;
   reset: () => void;
@@ -65,6 +83,7 @@ export const useScenarioStepStore = create<ScenarioStepState>((set, get) => ({
   baseline_trajectory: null,
   computation_state: "idle",
   mode: "MODE_1",
+  mda_alerts: [],
 
   setScenario: (scenario_id, step_count, mode) =>
     set({
@@ -75,6 +94,7 @@ export const useScenarioStepStore = create<ScenarioStepState>((set, get) => ({
       trajectory: null,
       baseline_trajectory: null,
       computation_state: "idle",
+      mda_alerts: [],
     }),
 
   setTrajectory: (trajectory) =>
@@ -83,6 +103,8 @@ export const useScenarioStepStore = create<ScenarioStepState>((set, get) => ({
       current_step: trajectory.step_count,
       computation_state: "complete",
     }),
+
+  setMdaAlerts: (alerts) => set({ mda_alerts: alerts }),
 
   advanceStep: () => {
     const { current_step, step_count } = get();
@@ -109,5 +131,6 @@ export const useScenarioStepStore = create<ScenarioStepState>((set, get) => ({
       baseline_trajectory: null,
       computation_state: "idle",
       mode: "MODE_1",
+      mda_alerts: [],
     }),
 }));
