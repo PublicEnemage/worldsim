@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated:** 2026-05-22 (M9 FA brief authored — instrument cluster implementation; PR open; UX Designer sign-off pending)
+**Last updated:** 2026-05-22 (M9 FA brief three-agent review complete — all 10 findings incorporated; PR #422 open for post-review edits; UX Designer sign-off pending)
 **Current milestone:** M9 — Standards Foundation
 
 ---
@@ -72,7 +72,8 @@ Twelve issues filed 2026-05-19. Must complete before M9 UX implementation begins
 
 | PR | Title | Date |
 |---|---|---|
-| #421 | docs(frontend): M9 FA brief — instrument cluster implementation (ADR-008 + ADR-010) | 2026-05-22 |
+| #422 | docs(frontend): FA brief — incorporate three-agent review findings | 2026-05-22 |
+| #421 | docs(frontend): M9 FA brief — instrument cluster implementation (ADR-008 + ADR-010) | 2026-05-22 — MERGED |
 | #420 | docs(adr): ADR-010 accepted — EL decision recorded with rationale; ARCH-004 → ACCEPTED | 2026-05-22 — MERGED |
 | #417 | docs(process): ADR-008 panel review artifact and panel review process standard | 2026-05-22 |
 | #416 | docs(adr): ADR-008 — UX architecture: instrument cluster, viewport, and interaction model (closes #397) | 2026-05-22 |
@@ -95,6 +96,7 @@ Twelve issues filed 2026-05-19. Must complete before M9 UX implementation begins
 
 | PR | Title | Date |
 |---|---|---|
+| #421 | docs(frontend): M9 FA brief — instrument cluster implementation (ADR-008 + ADR-010) | 2026-05-22 |
 | #420 | docs(adr): ADR-010 accepted — EL decision recorded with rationale; ARCH-004 → ACCEPTED | 2026-05-22 |
 | #419 | docs(adr): ADR-010 — trajectory view component architecture (closes #366) | 2026-05-22 |
 | #401 | docs(process): agent-raci.md — RACI chart for all 15 agents (closes #369, #301) | 2026-05-21 |
@@ -162,6 +164,7 @@ All Horizon:Immediate issues are now closed. M8 feature-complete.
 
 | Decision | Rationale | Date |
 |---|---|---|
+| M9 FA brief — three-agent review complete | UX Design Thinking Agent (frame-coherence), UX Designer Agent (component authority), QA Lead Agent (test-spec validation). All 10 findings dispositioned INCORPORATE. Key changes: AC-006 → `act()` call boundary; AC-007/008/009 throttle note + MV-002 hardware gate; AC-013 CVD → MV-001; AC-016 null governance → Vitest unit test; AC-017 sign-off → Implementation Sequencing; compact 3-line MDA alert row at 240px (UD-F1); badge font 11px minimum (UD-F2); Manual Validation Gates section added. Review Findings Log appendix in brief. PR #422 open. Pending: UX Designer sign-off, CVD validation, DD-012–DD-015. | 2026-05-22 |
 | M9 FA brief authored — instrument cluster | Frontend Architect Agent: EXECUTE. All 11 deferred brief items (FA-C1–FA-C5 from ADR-008; FA-R1, FA-R2, FA-R4/UD-R1, FA-R5, UD-R2, UD-R3 from ADR-010) resolved with named acceptance criteria. Key decisions: Zustand atom for Zone 1 atomicity (DD-012); merged-key `<Area>` for divergence fill (DD-013); 32-char step annotation constraint (DD-014); 280px control plane confirmed (DD-015). Layout constants: 480px trajectory / 240px co-primary / 280px control plane at 1024×768; 580/400/280 at 1280×800. CVD validation procedure specified; result pending UX Designer sign-off. Brief at `docs/frontend/fa-brief-m9-instrument-cluster.md`. | 2026-05-22 |
 | ADR-010 drafted, panel-reviewed, and accepted | Architect Agent: EXECUTE. 10 decisions (Recharts SVG, GET /scenarios/{id}/trajectory endpoint, shared state atom, governance null rendering, composite-score-level MDA floors, Mode 1 step axis annotation, Mode 3 live A/B ghost curves and divergence fill, policy/shock markers, confidence tier visual, ADR-007-gated band infrastructure). 11 findings (4 INCORPORATE applied, 5 BRIEF, 1 LOG, 1 combined). EL approved all 4 INCORPORATE items with rationale recorded in `docs/adr/reviews/ADR-010-panel-review.md`. ADR-010 status: Accepted. M9 FA brief is unblocked. | 2026-05-22 |
 | ADR-008 accepted — PR open | All 6 INCORPORATE items applied to ADR-008. EL decision recorded in `docs/adr/reviews/ADR-008-panel-review.md`: all 6 approved; FA-C3 ruling = Option A (stacked forms, ~280px control plane zone). ADR-008 status: Accepted. ARCH-002 in backlog: ACCEPTED. Issue #397 closed. Five FA brief items (FA-C1–FA-C5) deferred to M9 FA brief — none reverse an ADR decision. | 2026-05-22 |
