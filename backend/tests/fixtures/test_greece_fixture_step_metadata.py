@@ -37,7 +37,6 @@ Sources:
 """
 from __future__ import annotations
 
-
 # ---------------------------------------------------------------------------
 # Validator functions — these are the fixture CI gate logic.
 # When the backend trajectory endpoint is implemented, these constraints must
@@ -176,7 +175,7 @@ def test_step_event_label_validator_accepts_label_at_32_char_boundary() -> None:
     # A single 32-char word is valid for char count but: 1 word <= 8 words.
     # However, 32 'A' chars is valid. Assert no char-count violation.
     char_violations = [v for v in violations if "32 characters" in v]
-    assert not char_violations, f"32-char label should not produce char violation: {char_violations}"
+    assert not char_violations, f"32-char label should pass char check: {char_violations}"
 
 
 def test_step_event_label_validator_rejects_overlong_chars() -> None:
