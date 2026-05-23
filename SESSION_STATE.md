@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-05-23 (PR #501 merged — Issue #493 closed; M9 IR review complete; M8 DEMO triage done; IR-001–IR-006 filed as M10 scope)**
+**Last updated: 2026-05-23 (PRs #503 + #505 merged — NM-019 filed; three process fixes: MILESTONE_RUNBOOK.md kickoff gate, HORIZON step 6, roadmap.md linkage requirement)**
 **Current milestone:** M9 — Standards Foundation
 
 ---
@@ -76,6 +76,8 @@ No open PRs — board clear as of 2026-05-23.
 
 | PR | Title | Date |
 |---|---|---|
+| #505 | process(nm-019): milestone kickoff gate, HORIZON step 6, roadmap linkage requirement (closes #504) | 2026-05-23 |
+| #503 | docs(process): NM-019 — named deliverables invisible on board for entire milestone | 2026-05-23 |
 | #501 | docs(ir): M9 instrument cluster IR review + M8 DEMO triage (Issue #493) | 2026-05-23 |
 | #491 | test(e2e): #463 PR 2 — Greece integration suite + AC-001/002 skip removed (closes #463) | 2026-05-23 |
 | #490 | feat(frontend): wire InstrumentCluster into App.tsx — Zone 1 instruments live (Issue #463 PR 1) | 2026-05-23 |
