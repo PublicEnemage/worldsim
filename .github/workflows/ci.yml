@@ -31,7 +31,7 @@ jobs:
       frontend: ${{ steps.filter.outputs.frontend }}
       backtesting: ${{ steps.filter.outputs.backtesting }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v4
       - uses: dorny/paths-filter@v3
         id: filter
         with:
@@ -49,7 +49,7 @@ jobs:
     needs: changes
     if: needs.changes.outputs.backend == 'true' || needs.changes.outputs.frontend == 'true'
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v4
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -115,7 +115,7 @@ jobs:
       DATABASE_URL: postgresql://worldsim:worldsim@localhost:5432/worldsim
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v4
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -169,7 +169,7 @@ jobs:
     timeout-minutes: 30
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v4
 
       - name: Start Docker Compose stack
         run: docker compose up -d --build
@@ -254,7 +254,7 @@ jobs:
     needs: changes
     if: needs.changes.outputs.backend == 'true' || needs.changes.outputs.frontend == 'true'
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v4
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -283,7 +283,7 @@ jobs:
     needs: [changes, lint]
     if: needs.changes.outputs.backend == 'true' || needs.changes.outputs.frontend == 'true'
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v4
 
       - name: Set up Python
         uses: actions/setup-python@v5
