@@ -360,6 +360,15 @@ poll `gh pr checks` until the `changes` status check passes, then execute
 for user confirmation. If the PR contains any file other than `SESSION_STATE.md`,
 the standard gate applies regardless of the other file's content.
 
+**Backend pre-push lint gate — mandatory before any `git push` touching Python files.**
+Before pushing any branch that modifies files under `backend/`, run:
+`cd backend && ruff check . && mypy app/`
+Both must exit 0. `ruff check . --fix` resolves most I001/E501 violations automatically;
+fix any remaining errors before pushing. CI is a confirmation, not a discovery mechanism.
+Local ruff is pinned to the same version as CI (`ruff==0.7.2` in `requirements.txt`) —
+there is no environment difference that would cause CI to catch what local missed.
+Near-miss record: NM-016 (`docs/process/near-miss-registry.md`).
+
 **Tests are not optional.**
 The backtesting infrastructure is the most important test suite.
 Unit and integration tests are table stakes. A feature is not done

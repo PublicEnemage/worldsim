@@ -797,6 +797,62 @@ current workflow gate structure is added to the M9 exit checklist.
 
 ---
 
+## NM-016 — Lint Gate Absent from Agent Prompts: Two PRs Failed CI on Trivially-Preventable Errors
+
+**Date:** 2026-05-23
+**Milestone:** M9 — Standards Foundation
+**Detected by:** Engineering Lead (CI failure on PR #468 and PR #469)
+**Severity:** Medium — no incorrect artifacts produced; CI caught the errors; two fix
+commits required and merge delayed
+
+### What happened
+
+Two parallel worktree agents (implementing Issues #458 and #459) opened PRs without
+running `ruff check .` locally. Both PRs failed the CI lint job immediately.
+
+Errors caught by CI but not locally:
+- `I001` (import block unsorted) in three files — auto-fixable by `ruff --fix` in seconds
+- `E501` (line > 100 chars) in two files — manual fix under 30 seconds each
+
+Root cause: the agent prompts specified `pytest` as the PR readiness check. Neither prompt
+mentioned `ruff check .`. The agents treated "tests pass" as "PR ready."
+
+The local ruff binary is `ruff==0.7.2` — identical to the CI-pinned version in
+`requirements.txt`. There is no environment difference. Every error CI caught was
+catchable locally in two seconds.
+
+### What was at risk
+
+In this instance: merge delay and two fix commits. In a higher-stakes case, an agent
+that skips the lint gate before pushing could introduce style violations that accumulate
+across a feature branch, requiring a separate cleanup commit or blocking a time-sensitive
+merge.
+
+### What caught it
+
+CI — which is the right gate but the wrong place for this to be caught first. The
+process had no local gate between "implementation complete" and "push." CI filled that
+gap, but at the cost of a push-fix-push cycle that a two-second local check would have
+eliminated.
+
+### Process improvement
+
+**Pre-push lint gate added to CLAUDE.md** (this PR, Issue #471):
+The rule is now in the permanent constitution — not in agent prompts. Every agent reads
+CLAUDE.md at session start. The rule reads:
+
+> Before pushing any branch that modifies files under `backend/`, run:
+> `cd backend && ruff check . && mypy app/`
+> Both must exit 0. CI is a confirmation, not a discovery mechanism.
+
+Future backend agent prompts do not need to specify `ruff check` — the rule applies
+automatically from the constitution. This is the NM-014 lesson applied: prescription
+belongs in standing documents, not in every prompt.
+
+Documented in: `CLAUDE.md §Backend pre-push lint gate`
+
+---
+
 ## Registry Maintenance
 
 ### How to add an entry
