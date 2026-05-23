@@ -46,6 +46,7 @@ from app.schemas import (
     DeltaRecord,
     FrameworkOutput,
     MDAAlert,
+    MDAFloorRecord,
     MultiFrameworkOutput,
     QuantitySchema,
     RunSummaryResponse,
@@ -55,6 +56,9 @@ from app.schemas import (
     ScenarioResponse,
     ScheduledInputSchema,
     SnapshotRecord,
+    TrajectoryFrameworkPoint,
+    TrajectoryResponse,
+    TrajectoryStep,
 )
 from app.simulation.mda_checker import alerts_from_events_snapshot
 from app.simulation.repositories.quantity_serde import IA1_CANONICAL_PHRASE
@@ -533,6 +537,283 @@ async def compare_scenarios(
 
 
 # ---------------------------------------------------------------------------
+# GET /scenarios/{scenario_id}/trajectory — Issue #458
+# ---------------------------------------------------------------------------
+
+# Four frameworks output in stable order for the trajectory response.
+_TRAJECTORY_FRAMEWORKS = ["financial", "human_development", "ecological", "governance"]
+
+# Minimum confidence tier for the normalized_absolute strategy (CM-R3).
+_NORMALIZED_ABSOLUTE_MIN_TIER = 3
+
+
+async def _compute_trajectory_framework_point(
+    entity_id: str,
+    entity_indicators: dict[str, QuantitySchema],
+    all_entity_attrs: dict[str, dict[str, QuantitySchema]],
+    framework: str,
+    is_single_entity: bool,
+    db_connection: asyncpg.Connection,
+    scenario_timestep: datetime | str,
+) -> TrajectoryFrameworkPoint:
+    """Compute one TrajectoryFrameworkPoint for an entity+framework at one step.
+
+    Dispatch logic:
+    - ecological: boundary_proximity strategy regardless of entity count.
+    - governance: always null, scoring_basis "percentile_rank".
+    - financial / human_development (single-entity): normalized_absolute strategy,
+      min confidence_tier = NORMALIZED_ABSOLUTE_MIN_TIER.
+    - financial / human_development (multi-entity): percentile_rank strategy.
+    """
+    if framework == "governance":
+        return TrajectoryFrameworkPoint(
+            framework=framework,
+            composite_score=None,
+            scoring_basis="percentile_rank",
+            confidence_tier=5,
+        )
+
+    if framework == "ecological":
+        context: dict[str, Any] = {
+            "boundary_constants": await _fetch_active_boundary_constants(
+                db_connection, scenario_timestep
+            )
+        }
+        score = _boundary_proximity_strategy(
+            entity_indicators, all_entity_attrs, framework, context
+        )
+        return TrajectoryFrameworkPoint(
+            framework=framework,
+            composite_score=str(score) if score is not None else None,
+            scoring_basis="boundary_proximity",
+            confidence_tier=2,
+        )
+
+    # financial or human_development
+    if is_single_entity:
+        score = _normalized_absolute_strategy(
+            entity_indicators, all_entity_attrs, framework, {}
+        )
+        # Confidence tier is the max of Tier 3 floor and the best indicator tier.
+        indicator_min_tier = min(
+            (
+                qty.confidence_tier
+                for qty in entity_indicators.values()
+                if (qty.measurement_framework or "financial") == framework
+            ),
+            default=_NORMALIZED_ABSOLUTE_MIN_TIER,
+        )
+        tier = max(indicator_min_tier, _NORMALIZED_ABSOLUTE_MIN_TIER)
+        return TrajectoryFrameworkPoint(
+            framework=framework,
+            composite_score=str(score) if score is not None else None,
+            scoring_basis="normalized_absolute",
+            confidence_tier=tier,
+        )
+
+    # multi-entity percentile rank
+    score = _percentile_rank_strategy(
+        entity_indicators, all_entity_attrs, framework, {}
+    )
+    indicator_min_tier = min(
+        (
+            qty.confidence_tier
+            for qty in entity_indicators.values()
+            if (qty.measurement_framework or "financial") == framework
+        ),
+        default=5,
+    )
+    return TrajectoryFrameworkPoint(
+        framework=framework,
+        composite_score=str(score) if score is not None else None,
+        scoring_basis="percentile_rank",
+        confidence_tier=indicator_min_tier,
+    )
+
+
+@router.get(
+    "/scenarios/{scenario_id}/trajectory",
+    response_model=TrajectoryResponse,
+)
+async def get_trajectory(
+    scenario_id: str,
+    conn: Annotated[asyncpg.Connection, Depends(get_db)],
+) -> TrajectoryResponse:
+    """Multi-step trajectory for all four measurement frameworks.
+
+    Returns computed steps as a dense array. Each step carries per-framework
+    composite scores and optional policy inputs. mda_floors is at the response
+    root (not per-step). In M9, mda_floors contains at most one entry:
+    ecological WARNING at floor_value=1.0 when EcologicalModule is active.
+
+    Composite score dispatch (Issue #458, CM consultation 2026-05-23):
+    - Single-entity: financial/HD use normalized_absolute; ecological uses
+      boundary_proximity; governance is always null.
+    - Multi-entity: financial/HD use percentile_rank; ecological uses
+      boundary_proximity; governance is always null.
+
+    step_significance is sourced from scenarios.configuration->>'step_metadata'
+    JSONB (ADR-010 Decision 7). Keys are 1-based step index strings. Absent key
+    → ROUTINE. "STANDARD" is never emitted — only "SIGNIFICANT" or "ROUTINE".
+
+    Returns 404 if scenario not found.
+    Returns 409 if scenario has no snapshots yet (run it first).
+    """
+    scenario_row = await conn.fetchrow(
+        "SELECT scenario_id, configuration FROM scenarios WHERE scenario_id = $1",
+        scenario_id,
+    )
+    if scenario_row is None:
+        raise HTTPException(
+            status_code=404, detail=f"Scenario '{scenario_id}' not found."
+        )
+
+    cfg_raw = scenario_row["configuration"]
+    if isinstance(cfg_raw, str):
+        cfg_raw = json.loads(cfg_raw)
+    entities: list[str] = cfg_raw.get("entities", [])
+    entity_id = entities[0] if entities else ""
+
+    # step_metadata keys are 1-based step index strings. Absent = ROUTINE.
+    step_metadata: dict[str, Any] = cfg_raw.get("step_metadata", {}) or {}
+
+    snapshot_rows = await conn.fetch(
+        """
+        SELECT step, timestep, state_data, events_snapshot
+        FROM scenario_state_snapshots
+        WHERE scenario_id = $1
+        ORDER BY step ASC
+        """,
+        scenario_id,
+    )
+    if not snapshot_rows:
+        raise HTTPException(
+            status_code=409,
+            detail=(
+                f"Scenario '{scenario_id}' has no snapshots. Run it first."
+            ),
+        )
+
+    policy_rows = await conn.fetch(
+        "SELECT step, input_type, input_data FROM scenario_scheduled_inputs WHERE scenario_id = $1",
+        scenario_id,
+    )
+    policy_by_step: dict[int, list[dict[str, Any]]] = {}
+    for r in policy_rows:
+        input_data = (
+            r["input_data"]
+            if isinstance(r["input_data"], dict)
+            else json.loads(r["input_data"])
+        )
+        policy_by_step.setdefault(r["step"], []).append(
+            {"input_type": r["input_type"], "input_data": input_data}
+        )
+
+    # Collect all state dicts for MDA floor detection and composite score dispatch.
+    all_step_states: list[dict[str, Any]] = []
+    for snap in snapshot_rows:
+        state_raw = snap["state_data"]
+        if isinstance(state_raw, str):
+            state_raw = json.loads(state_raw)
+        all_step_states.append(state_raw if isinstance(state_raw, dict) else {})
+
+    # M9 MDA floor logic: ecological WARNING at 1.0 when EcologicalModule active.
+    _ECOLOGICAL_PROXIMITY_KEYS = frozenset(
+        {"planetary_boundary_co2_proximity", "planetary_boundary_land_use_proximity"}
+    )
+    is_ecological_active = any(
+        any(k in _ECOLOGICAL_PROXIMITY_KEYS for k in state.get(entity_id, {}))
+        for state in all_step_states
+    )
+    if is_ecological_active:
+        mda_floors: list[MDAFloorRecord] = [
+            MDAFloorRecord(
+                framework="ecological",
+                floor_value="1.0",
+                severity="WARNING",
+                label="Planetary boundary",
+            )
+        ]
+    else:
+        mda_floors = []
+
+    steps: list[TrajectoryStep] = []
+    for snap, state_dict in zip(snapshot_rows, all_step_states, strict=True):
+        step_index: int = snap["step"]
+        timestep = snap["timestep"]
+        effective_from: str = (
+            timestep.isoformat() if hasattr(timestep, "isoformat") else str(timestep)
+        )
+
+        # step_metadata uses 1-based string keys.
+        step_meta: Any = step_metadata.get(str(step_index))
+        if isinstance(step_meta, dict):
+            raw_significance = step_meta.get("significance", "ROUTINE")
+            raw_label: str | None = step_meta.get("label")
+        elif step_meta is not None:
+            raw_significance = str(step_meta)
+            raw_label = None
+        else:
+            raw_significance = "ROUTINE"
+            raw_label = None
+
+        # Hard guarantee: never emit "STANDARD" — only "SIGNIFICANT" or "ROUTINE".
+        if raw_significance == "SIGNIFICANT":
+            step_significance = "SIGNIFICANT"
+            # Truncate label to 32 chars if necessary (API contract).
+            step_event_label: str | None = (raw_label or "")[:32] or None
+        else:
+            step_significance = "ROUTINE"
+            step_event_label = None
+
+        all_entity_attrs = _parse_entity_attrs(state_dict)
+        entity_indicators_by_fw: dict[str, dict[str, QuantitySchema]] = {
+            fw: {} for fw in _TRAJECTORY_FRAMEWORKS
+        }
+        target_attrs = all_entity_attrs.get(entity_id, {})
+        for attr_key, qty in target_attrs.items():
+            fw_tag = qty.measurement_framework or "financial"
+            if fw_tag in entity_indicators_by_fw:
+                entity_indicators_by_fw[fw_tag][attr_key] = qty
+
+        is_single_entity = len(all_entity_attrs) == 1
+
+        framework_points: list[TrajectoryFrameworkPoint] = []
+        for fw in _TRAJECTORY_FRAMEWORKS:
+            fw_indicators = entity_indicators_by_fw[fw]
+            point = await _compute_trajectory_framework_point(
+                entity_id=entity_id,
+                entity_indicators=fw_indicators,
+                all_entity_attrs=all_entity_attrs,
+                framework=fw,
+                is_single_entity=is_single_entity,
+                db_connection=conn,
+                scenario_timestep=timestep,
+            )
+            framework_points.append(point)
+
+        steps.append(
+            TrajectoryStep(
+                step_index=step_index,
+                effective_from=effective_from,
+                step_event_label=step_event_label,
+                step_significance=step_significance,
+                frameworks=framework_points,
+                policy_inputs=policy_by_step.get(step_index, []),
+                shock_events=[],
+            )
+        )
+
+    return TrajectoryResponse(
+        scenario_id=scenario_id,
+        entity_id=entity_id,
+        step_count=len(steps),
+        mda_floors=mda_floors,
+        steps=steps,
+    )
+
+
+# ---------------------------------------------------------------------------
 # GET /scenarios/{scenario_id}
 # ---------------------------------------------------------------------------
 
@@ -991,6 +1272,83 @@ def _boundary_proximity_strategy(
 
     composite = sum(proximity_scores) / Decimal(len(proximity_scores))
     return composite.quantize(Decimal("0.0001"))
+
+
+# ---------------------------------------------------------------------------
+# Normalized absolute strategy — Issue #458, CM consultation 2026-05-23
+# ---------------------------------------------------------------------------
+
+# Reference ranges for single-entity normalized_absolute composite score.
+# health_expenditure_pct_gdp is EXCLUDED — methodologically non-monotonic (CM-R3).
+# Indicators not in this dict are silently skipped (no normalizable value produced).
+SINGLE_ENTITY_REFERENCE_RANGES: dict[str, dict[str, Any]] = {
+    "gdp_growth": {
+        "low": Decimal("-0.10"),
+        "high": Decimal("0.06"),
+        "direction": "higher_better",
+    },
+    "reserve_coverage_months": {
+        "low": Decimal("0.0"),
+        "high": Decimal("12.0"),
+        "direction": "higher_better",
+    },
+    "unemployment_rate": {
+        "low": Decimal("0.02"),
+        "high": Decimal("0.30"),
+        "direction": "lower_better",
+    },
+    "net_enrollment_secondary": {
+        "low": Decimal("0.40"),
+        "high": Decimal("1.00"),
+        "direction": "higher_better",
+    },
+}
+
+
+def _normalized_absolute_strategy(
+    entity_indicators: dict[str, QuantitySchema],
+    all_entity_attrs: dict[str, dict[str, QuantitySchema]],
+    framework: str,
+    context: dict[str, Any],
+) -> Decimal | None:
+    """Normalize each indicator against a declared reference range and average.
+
+    Implements the Chief Methodologist reference-range consultation result
+    (2026-05-23). Returns [0.0, 1.0] Decimal or None when no normalizable
+    indicators are present. Confidence tier floor for the calling site is Tier 3.
+
+    Only indicators in SINGLE_ENTITY_REFERENCE_RANGES tagged to `framework` are
+    included. Indicators not in the reference table are skipped — the table is
+    the authoritative set of normalizable indicators for this strategy.
+
+    Clamping rule: scores below 0 are clamped to 0; scores above 1 are clamped
+    to 1. A value below range is mapped to 0 (worst); above range to 1 (best).
+    """
+    scores: list[Decimal] = []
+    for attr_key, qty in entity_indicators.items():
+        if (qty.measurement_framework or "financial") != framework:
+            continue
+        spec = SINGLE_ENTITY_REFERENCE_RANGES.get(attr_key)
+        if spec is None:
+            continue
+        try:
+            v = Decimal(qty.value)
+        except Exception:  # noqa: BLE001, S112
+            continue
+        low: Decimal = spec["low"]
+        high: Decimal = spec["high"]
+        denominator = high - low
+        if denominator == Decimal("0"):
+            continue
+        if spec["direction"] == "higher_better":
+            raw = (v - low) / denominator
+        else:
+            raw = (high - v) / denominator
+        scores.append(max(Decimal("0"), min(Decimal("1"), raw)))
+
+    if not scores:
+        return None
+    return (sum(scores) / Decimal(len(scores))).quantize(Decimal("0.0001"))
 
 
 # Registered strategies keyed by framework string. M9 governance strategy is added

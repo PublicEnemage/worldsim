@@ -14,6 +14,93 @@ from typing import Any
 
 from pydantic import BaseModel, ConfigDict, field_serializer, field_validator
 
+# ---------------------------------------------------------------------------
+# Trajectory endpoint schemas — Issue #458
+# ---------------------------------------------------------------------------
+
+
+class MDAFloorRecord(BaseModel):
+    """One composite-score-level MDA floor line for the trajectory view Y-axis.
+
+    floor_value is a Decimal serialised as string (float prohibition applies).
+    In M9, at most one entry is produced: ecological WARNING at floor_value="1.0"
+    when EcologicalModule is active. All other framework floors are deferred to M10.
+    """
+
+    model_config = ConfigDict(from_attributes=True)
+
+    framework: str
+    floor_value: str
+    severity: str
+    label: str
+
+    @field_validator("floor_value", mode="before")
+    @classmethod
+    def _coerce(cls, v: object) -> str:
+        if isinstance(v, int | float | Decimal):
+            return str(Decimal(str(v)))
+        return str(v)
+
+
+class TrajectoryFrameworkPoint(BaseModel):
+    """Per-framework composite score for one trajectory step.
+
+    ci_lower, ci_upper, ci_coverage, and is_pre_calibration are always null
+    pending ADR-007. composite_score is Decimal-as-string or null.
+    scoring_basis disambiguates null sources:
+      - "normalized_absolute" — single-entity financial/HD; null when no normalizable indicators
+      - "percentile_rank"     — multi-entity financial/HD, or governance (always null)
+      - "boundary_proximity"  — ecological only
+    """
+
+    model_config = ConfigDict(from_attributes=True)
+
+    framework: str
+    composite_score: str | None
+    scoring_basis: str
+    confidence_tier: int
+    ci_lower: None = None
+    ci_upper: None = None
+    ci_coverage: None = None
+    is_pre_calibration: None = None
+
+
+class TrajectoryStep(BaseModel):
+    """One computed step in the trajectory response.
+
+    step_significance is ALWAYS "SIGNIFICANT" or "ROUTINE" — never "STANDARD".
+    step_event_label is null when step_significance is ROUTINE.
+    policy_inputs lists ControlInput events applied at this step.
+    shock_events is empty for M9.
+    """
+
+    model_config = ConfigDict(from_attributes=True)
+
+    step_index: int
+    effective_from: str
+    step_event_label: str | None
+    step_significance: str
+    frameworks: list[TrajectoryFrameworkPoint]
+    policy_inputs: list[dict[str, Any]]
+    shock_events: list[dict[str, Any]] = []
+
+
+class TrajectoryResponse(BaseModel):
+    """Full trajectory for all four measurement frameworks across all computed steps.
+
+    mda_floors is at the response root, not per-step (ADR-010 Decision 2).
+    entity_id is the first entity in scenario configuration.entities.
+    steps is a dense array of computed steps only.
+    """
+
+    model_config = ConfigDict(from_attributes=True)
+
+    scenario_id: str
+    entity_id: str
+    step_count: int
+    mda_floors: list[MDAFloorRecord]
+    steps: list[TrajectoryStep]
+
 
 class QuantitySchema(BaseModel):
     """Serialized form of a Quantity value stored in the JSONB attribute store.
