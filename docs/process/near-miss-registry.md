@@ -22,7 +22,7 @@ Entries appear in chronological order of occurrence.
 Not all entries are failures. Some are anticipations — the Engineering Lead sensing a
 structural gap before it caused a problem, naming it, and building the safeguard before
 the incident occurred. These deserve equal recognition: they represent the safety culture
-working at its best. Six of the thirteen entries are anticipatory.
+working at its best. Six of the fifteen entries are anticipatory.
 
 ---
 
@@ -615,6 +615,137 @@ Documented in: `docs/process/council-interview-prompt.md`,
 
 ---
 
+## NM-014 — File Edit Reported as Complete Without Commit
+
+**Date:** 2026-05-23
+**Milestone:** M9 — Standards Foundation
+**Detected by:** Engineering Lead (reviewing session output, noticed "agents.md changes from
+earlier are still uncommitted")
+**Severity:** Medium — the change was recoverable (bundled into the next PR), but was reported
+as complete when it existed only as a local unstaged edit
+
+### What happened
+
+An EXECUTE instruction contained two actions: file a GitHub issue (Action 1) and add the
+Business Product Owner Agent working agreement to `docs/process/agents.md` (Action 2).
+
+Action 1 produced an external artifact — a GitHub issue URL — making completion unambiguous.
+Action 2 was a file edit. The file was edited and the task was reported as done with
+"confirmation agents.md was updated." The change was never committed. It sat as an unstaged
+local edit on main.
+
+When the user continued with the next task, a `git checkout main` was issued before creating
+a new branch. At that point the agent noticed the unstaged change and bundled it into the
+subsequent PR (#442) rather than losing it. The Engineering Lead caught the pattern from
+output text: "agents.md changes from earlier are still uncommitted. I'll include them in this
+PR together with the RACI additions."
+
+### What was at risk
+
+If the session had ended, or if `git restore` or `git checkout -- .` had run for any reason,
+the agents.md change would have been lost — with no record of the loss, because it had already
+been reported as complete. The branch discipline rule (all changes on a branch + PR; direct
+commits to main are a governance deviation) was not applied at all — not even a commit to main,
+just an uncommitted local edit.
+
+### What caught it
+
+The Engineering Lead, reading the agent's own output in the next task. This was not caught by
+any process — it was caught by a human noticing an admission buried in a status sentence. There
+is no automated gate between "file edited" and "change committed."
+
+### Process improvement
+
+**Personal commit gate — a file change is not reportable as complete until it is on a branch
+and committed:**
+The branch discipline rule applies regardless of prompt style or whether a branch was
+explicitly specified in the EXECUTE instruction. An EXECUTE that includes a file change with
+no specified branch requires the agent to create a branch, commit the change, and report the
+PR URL — not to edit the file and report the edit. "Confirmation X was updated" must mean
+"X is committed on a branch and in a PR," not "X has new content locally."
+
+### Contributing factor under investigation
+
+Prescriptive EXECUTE prompts — those that specify exact steps and per-action success criteria
+— may reduce agent reasoning about what constitutes completion. In this case, Action 1's
+success criterion was implicit but clear (a URL). Action 2's success criterion was stated as
+"confirmation agents.md was updated," which the agent matched literally (file has new content)
+rather than by the project's standing completion standard (change is committed and in a PR).
+
+A less prescriptive instruction — "add the Business Product Owner Agent to agents.md" — would
+have required the agent to reason about what "done" means from first principles, which
+naturally includes the delivery chain: edit → branch → commit → PR → report URL.
+
+The weight of prescriptive prompting as a contributing factor is under investigation. It is
+an observation, not a concluded cause. The primary root cause remains the agent's failure to
+apply standing branch discipline rules regardless of how the task was framed.
+
+Documented in: `CLAUDE.md §Blameless continuous improvement is non-negotiable`,
+`docs/process/agent-raci.md §File Ownership` (branch discipline rule)
+
+---
+
+## NM-015 — CI Gate Job Not a Required Status Check
+
+**Date:** 2026-05-23
+**Milestone:** M9 — Standards Foundation
+**Detected by:** Engineering Lead (root-cause analysis of PR #443 CI failure)
+**Severity:** High — the `changes` path-filter job, which gates all downstream CI jobs, was not
+a required status check; `compliance-scan` was also absent from the required set; branch
+protection had the correct intent but incomplete implementation
+
+### What happened
+
+During root-cause analysis of the `actions/checkout@v6` regression that failed PR #443, an
+audit of branch protection settings revealed that `changes` — the path-filter job that always
+runs and controls which downstream jobs execute — was not a required status check. Only three
+conditional downstream jobs (`lint`, `test-backend`, `playwright-e2e`) were required.
+`compliance-scan` was also absent.
+
+The structural gap: when `changes` fails, all jobs that `need: changes` are skipped due to
+failed-dependency propagation. Jobs skipped this way — unlike jobs legitimately skipped by
+their own `if:` condition — may not satisfy required check rules. Branch protection was
+configured to require the *outputs* of the gate, not the gate itself. Whether merges were
+actually blocked during the broken-CI period depends on how GitHub evaluates dependency-skipped
+versus condition-skipped jobs; the configuration made that determination ambiguous rather than
+unambiguous.
+
+The `actions/checkout@v6` action had reportedly worked since its January 2026 release date,
+then regressed sometime before PR #443. Because M9 work has been predominantly documentation
+changes, CI failures were minimally visible — all downstream jobs were skipped on docs-only PRs
+regardless of whether `changes` succeeded, making a `changes` failure indistinguishable from a
+legitimate docs-only skip in the PR status view.
+
+### What was at risk
+
+Any PR merged during the broken-CI period could potentially have merged without test or
+compliance validation. The compliance-scan job — which runs machine-detectable violation checks
+documented in `docs/compliance/scan-registry.md` — was not in the required set at all,
+meaning it was never a blocking gate even when CI was healthy.
+
+### What caught it
+
+Root-cause analysis triggered by the PR #443 CI failure. An explicit inspection of branch
+protection settings (`gh api repos/PublicEnemage/worldsim/branches/main/protection`) revealed
+the gap. The gap would not have been surfaced without actively examining the protection
+configuration — there is no process that routinely audits required status checks against the
+current workflow graph.
+
+### Process improvement
+
+**Immediate remediation (out-of-band, no PR required):** `changes` and `compliance-scan` added
+to required status checks via GitHub API during the same session the gap was identified.
+Required checks are now: `changes`, `test-backend`, `lint`, `playwright-e2e`, `compliance-scan`.
+
+**Structural rule:** Required status checks must include the root gate job (`changes`), not only
+its downstream dependents. When the dependency graph changes — a new gate job is introduced, or
+an existing gate is restructured — required status checks must be audited in the same commit.
+
+**Milestone exit checklist addition:** A checkpoint confirming required status checks match the
+current workflow gate structure is added to the M9 exit checklist.
+
+---
+
 ## Registry Maintenance
 
 ### How to add an entry
@@ -669,7 +800,7 @@ RACI-grounded panel composition rule and the file authority rule are both respon
 this pattern. When a new near-miss appears, check first whether it is another instance
 of this pattern before assuming a different root cause.
 
-A second pattern is also visible: six of the thirteen entries are anticipatory —
+A second pattern is also visible: six of the fifteen entries are anticipatory —
 the Engineering Lead sensing a structural gap before it caused a failure. NM-008,
 NM-009, NM-010, NM-011, NM-012, and NM-013 were all caught before any incident
 occurred. This is not luck. It is pattern recognition from experience applied
