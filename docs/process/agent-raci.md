@@ -142,7 +142,10 @@ receive a desired conclusion before producing a critique. Independence is the va
 
 **PO — C:** "Voice of the customer in all scope decisions — when implementation tradeoffs arise,
 the PO assesses impact on the five named personas." A frame change affects which persona needs
-are served. The PO assesses user-value impact before the frame is committed.
+are served. The PO assesses user-value impact before the frame is committed. Consultation is
+specifically required when a frame decision affects whether the two story consumers — QA Lead
+(writes acceptance tests from stories) and Frontend Architect (implements to stories as the
+user-value specification) — can effectively use the resulting stories.
 (`agents.md §Business Product Owner Agent`)
 
 ---
@@ -178,7 +181,10 @@ Designer. (`agents.md §UX Design Thinking — Working Agreement`)
 **PO — C:** "The PO is the guardian of the five named personas. When an implementation decision
 would serve developer convenience but degrade a persona's primary cognitive task, the PO flags
 it." Zone and hierarchy decisions determine whether personas can accomplish their primary
-cognitive tasks. (`agents.md §Business Product Owner Agent`)
+cognitive tasks. Consultation is specifically required when a component decision affects
+whether QA Lead can write a meaningful acceptance test from the resulting stories, or whether
+Frontend Architect can use those stories as a clear user-value specification to guide
+implementation tradeoffs. (`agents.md §Business Product Owner Agent`)
 
 ---
 
