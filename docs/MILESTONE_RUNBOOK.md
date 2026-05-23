@@ -61,6 +61,33 @@ Performed when the previous milestone closes and the next begins.
 
 ---
 
+## Kickoff Gate — Mandatory Before First Implementation Issue
+
+Before any implementation issue is filed for this milestone, the PM Agent
+must run a scope-completeness check:
+
+1. Read `CLAUDE.md` and enumerate every deliverable explicitly named for
+   this milestone.
+2. Read `docs/roadmap/worldsim-roadmap.md` and enumerate every blocking
+   deliverable listed for this milestone.
+3. For each named deliverable, verify a corresponding GitHub issue exists
+   with: an owner agent named, a `horizon:immediate` or `horizon:near-term`
+   label, and the correct milestone assigned.
+4. Any named deliverable with no corresponding issue is a
+   `scope-gap:untracked` finding. File it as an issue before proceeding.
+5. Present the kickoff baseline to the Engineering Lead: a table of all
+   named deliverables, their tracking issues, and their owners.
+
+**No implementation begins until this verification is complete and the
+Engineering Lead has confirmed the baseline.**
+
+This gate exists because named deliverables can live in prose documents
+for an entire milestone without ever becoming tracked work. The gate
+converts constitutional scope into board visibility at the moment it
+matters — before implementation begins, not at exit review. (NM-019)
+
+---
+
 ## Milestone Execution Workflow
 
 **Issues are the unit of work.** Every meaningful change has a GitHub Issue. PRs

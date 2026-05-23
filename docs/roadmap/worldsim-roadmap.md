@@ -37,6 +37,30 @@ The story is the democratization mission made concrete. The tool that showed Gre
 
 ---
 
+## Scope Linkage Requirement
+
+Each milestone entry in this document must enumerate its blocking deliverables
+explicitly — not just narratively — and link to the tracking GitHub issue once
+filed. A deliverable named here without a linked issue is a visible scope gap.
+
+Format for each blocking deliverable within a milestone entry:
+```
+- [Deliverable name] → Issue #NNN (horizon:immediate)
+```
+
+If the issue has not yet been filed, the entry reads:
+```
+- [Deliverable name] → UNTRACKED (file issue before kickoff begins)
+```
+
+This requirement exists because roadmap.md is designated as the canonical
+milestone scope reference in CLAUDE.md. A canonical reference that does not
+link to tracked work cannot be audited. The linkage makes the roadmap a diff
+surface: any milestone entry with UNTRACKED items is an open kickoff gate.
+(NM-019)
+
+---
+
 ## Milestone by Milestone
 
 ### Milestone 9 — Standards Foundation *(current)*
