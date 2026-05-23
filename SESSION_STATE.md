@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated:** 2026-05-23 (session end — backend trajectory endpoint merged; QA process rules; NM-016/017; PRs #468–#477)
+**Last updated:** 2026-05-23 (session end — NM-018 + panel composition principle; Issue #473 retrofit; PRs #479–#480)
 **Current milestone:** M9 — Standards Foundation
 
 ---
@@ -76,11 +76,11 @@ No open PRs — board clear as of 2026-05-23.
 
 | PR | Title | Date |
 |---|---|---|
+| #480 | test(qa): retrofit instrument cluster spec — split Type 1/Type 2 ACs, remove blanket skip (closes #473) | 2026-05-23 |
+| #479 | process(nm): NM-018 — hammer-nail; panel composition principle for pre-EL consultations | 2026-05-23 |
+| #478 | chore(state): SESSION_STATE.md — session end 2026-05-23 (PRs #468–#477) | 2026-05-23 |
 | #477 | process(agents): PO standing responsibilities — dual consumer + sequence gate (closes #470) | 2026-05-23 |
 | #476 | process(qa): Type 1/Type 2 AC categorization rule — QA Lead, PO, standards (closes #474) | 2026-05-23 |
-| #475 | process(nm): NM-017 — story–test–implementation decomposition mismatch | 2026-05-23 |
-| #472 | process(ci): pre-push lint gate — ruff+mypy required before any backend push (closes #471); NM-016 | 2026-05-23 |
-| #469 | test(qa): M9 instrument cluster — pre-implementation test authorship (closes #459) | 2026-05-23 |
 | #468 | feat(api): GET /scenarios/{id}/trajectory endpoint (closes #458) | 2026-05-23 |
 | #466 | docs(process): PM Agent pre-EL consultation — standing automatic capability (closes #464) | 2026-05-23 |
 | #456 | docs(process): PM Agent issue hierarchy rule — Epic → Feature → Task, binary spawning | 2026-05-23 |
@@ -140,7 +140,7 @@ No open PRs — board clear as of 2026-05-23.
 
 | Issue | Title | Status / Gate |
 |---|---|---|
-| #473 | test(qa): retrofit instrument-cluster spec — split component ACs into task scope; remove blanket skip | Open — implement when #460/461/462 are scoped; each implementing agent receives their Type 1 ACs |
+| #473 ✅ | test(qa): retrofit instrument-cluster spec — split component ACs into task scope; remove blanket skip | Closed — PR #480 merged; Type 1 ACs distributed to #460/#461/#462 via comments; integration spec created |
 | #460 | feat(frontend): TrajectoryView — Zone 1A (instrument cluster) | Open — unblocked; backend endpoint #458 merged |
 | #461 | feat(frontend): MDA Alert Panel — Zone 1B (instrument cluster) | Open — unblocked |
 | #462 | feat(frontend): PMM + Four-Framework — Zone 1C/1D (instrument cluster) | Open — unblocked |
@@ -206,6 +206,8 @@ All Horizon:Immediate issues are now closed. M8 feature-complete.
 
 | Decision | Rationale | Date |
 |---|---|---|
+| Instrument cluster spec retrofit — blanket skip removed, Type 1/Type 2 split completed (PR #480, closes #473) | `instrument-cluster.spec.ts` deleted; `instrument-cluster-integration.spec.ts` created with only AC-001 and AC-002 (Type 2 integration-level, individual `test.skip()` per test — no file-level blanket suppression). Component-level ACs (AC-003–AC-014) distributed to implementing issues: AC-003–013 → #460 (TrajectoryView) with full test code; AC-014 + component tests → #462 (PMM + Four-Framework); component tests → #461 (MDA Alert Panel). CI green: no `test.skip(true, ...)` in any instrument cluster spec file. | 2026-05-23 |
+| NM-018 filed — hammer-nail: technical panel produced engineering solutions to a process problem (PR #479) | Three technical agents (Architect, Frontend Architect, QA Lead) consulted on skip governance; all three produced engineering solutions (CI guard, skip registry, DOM-presence fixture) to what was a process problem (missing AC categorization rule). PO Agent and UX Designer Agent immediately identified the correct root cause. Root cause of the near-miss: no rule existed requiring PM Agent to evaluate whether panel composition matched the problem's root cause domain, not just its surface presentation. Standing fix: panel composition principle added to PM Agent pre-EL consultation protocol in `docs/process/agents.md §PM Agent — Pre-EL Consultation` between steps 2 and 3. | 2026-05-23 |
 | PO Agent standing responsibilities — dual consumer + sequence gate (PR #477, closes #470) | Two non-negotiable standing responsibilities added to PO working agreement: (1) Stories serve QA Lead and Frontend Architect equally — a story too vague for QA to write a meaningful test, or too abstracted for FA to make the right tradeoffs, is a weak story; (2) Stories → tests → implementation sequence gate — the PO owns enforcement; a story session is not complete until the stories doc is merged, a QA test authorship issue is filed blocking implementation, and the issue hierarchy is established. RACI rows 2 and 3 updated: PO consultation trigger now explicitly names QA/FA story consumers. | 2026-05-23 |
 | Type 1/Type 2 AC categorization rule — CODING_STANDARDS + QA Lead + PO working agreements (PR #476, closes #474) | Before any QA E2E spec is authored against a multi-component feature, ACs must be categorized: Type 1 (component-level — testable when one component ships alone; lives in implementation task PR scope) vs Type 2 (integration-level — testable only when all named components coexist; lives in dedicated `<feature>-integration.spec.ts`). `test.skip(true, ...)` at file scope is a process violation for any spec containing Type 1 ACs. QA Lead working agreement (new) makes categorization the first standing commitment. PO pre-authorship check added. Documented in `docs/CODING_STANDARDS.md §E2E Pre-implementation Test Categorization`. | 2026-05-23 |
 | NM-017 filed — story–test–implementation decomposition mismatch (PR #475, anticipatory) | 16 instrument cluster ACs were suppressed by a blanket `test.skip(true, ...)` because zone-level and component-level ACs were bundled in a single spec file while implementation was decomposed into three Task Issues (#460/461/462). Engineering Lead identified the structural gap through governance anxiety about skip management — before any component shipped. Root cause: no AC categorization rule existed. Severity: High (CI blind spot across primary viewport ACs). Response: retrofit Issue #473 + process change Issue #474 (now complete via PR #476). | 2026-05-23 |
