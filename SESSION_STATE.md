@@ -148,8 +148,9 @@ No open PRs — board clear as of 2026-05-23.
 | #461 ✅ | feat(frontend): MDA Alert Panel — Zone 1B (instrument cluster) | Closed — PR #486 merged |
 | #462 ✅ | feat(frontend): PMM + Four-Framework — Zone 1C/1D (instrument cluster) | Closed — PR #487 merged |
 | #463 ✅ | test(e2e): Greece integration Playwright suite | Closed — PR #490 (App.tsx wiring) + PR #491 (Greece suite) merged |
-| #367 | docs(ux): persona-anchored IR review re-run (Persona 2) | Open — near-term |
-| #368 | docs(ux): DEMO issues re-triage #342–#350 | Open — near-term |
+| #367 ✅ | docs(demo): persona-anchored IR review re-run (Persona 2) | Closed — superseded by M9 instrument cluster redesign; see #493 |
+| #368 ✅ | docs(demo): DEMO issues re-triage #342–#350 | Closed — superseded by M9 instrument cluster redesign; see #493 |
+| #493 | M9 demo — IR review + DEMO triage against Greece fixture with M9 cluster | Open — horizon:immediate |
 
 ---
 
