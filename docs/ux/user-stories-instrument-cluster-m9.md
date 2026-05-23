@@ -2,8 +2,9 @@
 
 > **Owned by:** Business Product Owner Agent (R), UX Designer Agent (C)
 > **Authored:** 2026-05-23 — Issue #441
-> **Status:** Awaiting three UX Designer rulings (marked [UX-RULING]) and one EL decision
-> (marked [EL-DECISION]) before stories are fully testable. All other criteria are final.
+> **Status:** Awaiting three UX Designer rulings (marked [UX-RULING]) before stories are
+> fully testable. All other criteria are final. EL decision on US-GAP-001 resolved:
+> M10 gap (Issue #451 filed 2026-05-23).
 >
 > **Consumers:**
 > - **QA Lead** — writes acceptance tests from the Given/When/Then criteria before
@@ -821,10 +822,16 @@ on well-resourced institutional machines.
 
 ## Gap Finding — US-GAP-001
 
-### Andreas's Mode 1 Historical Pattern Recognition — Comparative Surface Not in M9 Scope
+### Andreas's Mode 1 Historical Pattern Recognition — Comparative Surface Deferred to M10
 
-**This is a gap finding, not a story. It requires an EL scope decision before a story
-can be written. [EL-DECISION]**
+**EL decision recorded: M10 gap (2026-05-23). Issue #451 filed.**
+
+Pre-EL consultation panel: UX Design Thinking Agent, Business Product Owner Agent, Architect
+Agent — three-agent unanimous verdict M10. The gap is narrower than originally stated: the
+trajectory view rendering layer is already Mode 1 comparison-ready (ADR-010 Decision 11;
+FA brief §UD-R2 tick format). The missing piece is the UX entry point for selecting a second
+historical fixture — a Zone 2 / COMPARE_VIEW architecture question, not a Zone 1 instrument
+cluster question.
 
 **Persona:** Andreas Stefanidis (Persona 3 — Political Advisor)
 **Mode:** Mode 1 Retrospective / Reactive
@@ -840,28 +847,26 @@ US-005 (step axis annotations) enables Andreas to read event labels on SIGNIFICA
 US-003 (four curves) shows the trajectory shape he is trying to pattern-match against. US-016
 (Mode 1 declarative alert language) gives him findings in political narrative form.
 
-**What the M9 instrument cluster does not provide:**
+**What M9 does not provide — and why M10 is the correct home:**
 
 Pattern recognition requires mapping the current trajectory against a reference — "does this
 look like Cyprus 2013, or Portugal 2011?" The M9 instrument cluster renders one trajectory
-correctly. It has no surface for displaying a second reference trajectory simultaneously.
-The divergence timeline (information-hierarchy.md §COMPARE_VIEW Mode 2 single-entity) is
-the correct future surface for this comparison, but it operates in Mode 2 with two scenarios
-loaded, not in Mode 1 historical replay.
+correctly. It has no UX surface for selecting a second reference trajectory.
 
-**EL decision requested:**
+The rendering layer is not the gap: ADR-010 Decision 11 specifies alignment of two historical
+entities by programme step; FA brief §UD-R2 specifies the stacked entity date tick format.
+The `TrajectoryView` component will render multi-case Mode 1 correctly once given two data
+sets. The missing piece is the Zone 2 entry point for selecting the second fixture — a
+COMPARE_VIEW architecture question addressed in `information-hierarchy.md §COMPARE_VIEW
+Mode 1` (placeholder added 2026-05-23).
 
-Is Mode 1 comparable-case comparison (two historical trajectories simultaneously) an M9
-capability or an M10 gap? The options:
+**M9 service level for Persona 3:** Partially served. Orientation (step axis annotations,
+declarative alert language) is sufficient for M9. Comparable-case comparison — the full
+pattern recognition task — is M10 scope.
 
-- **If M9:** Write a story: "As Andreas in Mode 1 Retrospective, I need to select a second
-  historical fixture as a reference so that I can identify whether the current trajectory
-  matches a recognizable pre-collapse pattern." Requires scoping against FA brief and
-  information-hierarchy.md — this may require an ADR amendment.
-- **If M10 (recommended):** File an issue referencing this gap finding. The M9 stories
-  serve Andreas's basic orientation (US-005, US-016) without the comparative surface.
-  Document explicitly in this file that Persona 3's primary Mode 1 task is partially
-  served — sufficient for orientation, insufficient for full pattern recognition.
+**M10 deliverables:** See Issue #451 — entry point UX spec, backend endpoint extension,
+`comparison_trajectory` prop on `TrajectoryView`, and one user story with QA acceptance
+tests written before implementation begins.
 
 ---
 
@@ -895,4 +900,4 @@ Stories are otherwise final and QA can begin writing all other criteria immediat
 **Total stories: 29 (US-001 through US-029)**
 **M9 Required: 29**
 **Open UX Designer rulings: 3** (US-016, US-022, US-026 — QA can write all other criteria)
-**Open EL decision: 1** (US-GAP-001 — comparable-case comparison for Persona 3 Mode 1)
+**EL decision resolved: 1** (US-GAP-001 — M10 gap; Issue #451 filed 2026-05-23)
