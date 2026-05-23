@@ -853,6 +853,53 @@ Documented in: `CLAUDE.md §Backend pre-push lint gate`
 
 ---
 
+## NM-017 — Story–Test–Implementation Decomposition Mismatch: 16 ACs Suppressed by Blanket Skip
+
+**Date:** 2026-05-23
+**Milestone:** M9 — Standards Foundation
+**Detected by:** Engineering Lead (anticipatory — structural gap sensed through governance anxiety about skip management before any defect occurred)
+**Severity:** High — the blanket skip created a CI blind spot across 16 acceptance criteria for the instrument cluster's primary viewport. Had components shipped without the skip being removed, defects in the instrument cluster — what the finance minister actually sees — would have passed CI undetected.
+
+### What happened
+
+User stories for the M9 instrument cluster were correctly authored at the zone level: "all four Zone 1 instruments visible simultaneously without scroll." QA then authored a single spec file (Issue #459, `frontend/tests/e2e/instrument-cluster.spec.ts`) covering all 16 ACs derived from those stories. Implementation was simultaneously decomposed into three separate Task Issues: #460 (TrajectoryView), #461 (MDA Alert Panel), #462 (PMM + Four-Framework).
+
+The spec file contained two structurally distinct kinds of tests bundled together:
+
+- **Component-level ACs** (AC-003 through AC-014): testable the moment a single component ships, independent of the others. Example: "TrajectoryView width ≥ 480px at 1024×768."
+- **Zone-level integration ACs** (AC-001, AC-002): only satisfiable when all four instruments coexist simultaneously. Example: "All four Zone 1 instruments visible without scroll."
+
+Because the file contained zone-level ACs, no test in the file could pass until all three implementation tasks were complete. The entire file was suppressed with `test.skip(true, ...)`. Three agents (Architect, Frontend Architect, QA Lead) were consulted on skip governance controls — CI guards, skip registries, DOM-presence fixtures — before the Engineering Lead identified the root cause: the suppression was a symptom of the wrong decomposition, not a skip management problem requiring new tooling.
+
+The skip governance anxiety was real and appropriate. The underlying cause was that the sequence "stories → tests → implementation" had been followed faithfully, but without a rule governing how test granularity must match implementation granularity when implementation is decomposed by component.
+
+### What was at risk
+
+Sixteen acceptance criteria for the instrument cluster — the primary viewport of a tool used by finance ministers in high-stakes negotiations — suppressed in CI with no automated signal that they were unverified. If any of the three implementation tasks shipped and the skip was not removed, any defect in the zone-level layout commitment would pass CI and reach production. The reputational consequence of a visible defect in the primary instrument cluster for an institutional user would be significant.
+
+This is the class of failure where the test suite reports green, a human feels safe, and a real defect exists. That is the worst-case test failure mode.
+
+### What caught it
+
+The Engineering Lead — sensing that the governance anxiety about skip management was disproportionate to what the skip was actually protecting. The question "why do we need complex automated controls for a simple skip?" led to the root cause: the skip was covering a mismatch in decomposition, not a genuinely unavoidable pre-implementation state. This is an anticipatory near-miss: the structural gap was named before any component shipped, before any defect could have slipped through.
+
+### Process improvement
+
+**Root cause:** No rule existed requiring ACs to be categorized by testability scope before QA authors a spec. Zone-level ACs (requiring multiple components) and component-level ACs (requiring one component) were bundled in a single file because the process gave QA a flat list of ACs with no categorization discipline.
+
+**Two-part response:**
+
+**1. One-time retrofit (Issue #473):** Restructure `instrument-cluster.spec.ts` — remove the blanket skip, move component-level ACs into each implementation task's scope (#460, #461, #462), rename the remaining file to `instrument-cluster-integration.spec.ts` containing only AC-001 and AC-002 with an explicit dependency header.
+
+**2. Standing process change (Issue #474):** Document the Type 1 / Type 2 AC categorization rule in:
+- QA Lead working agreement (`docs/process/agents.md`): before authoring any spec, categorize each AC as component-level (Type 1, lives in implementation task scope) or integration-level (Type 2, lives in dedicated integration spec with explicit component dependencies named).
+- PO Agent working agreement (`docs/process/agents.md`): before commissioning a QA task, confirm ACs have been categorized by type. A QA task that spans both types must produce two outputs.
+- `docs/CODING_STANDARDS.md §Testing`: document the pattern as a standing coding standard.
+
+The fix is a decomposition discipline, not a skip governance mechanism. If decomposition is correct, skips are either unnecessary or are a small, explicitly-labelled set with a clear dependency statement — not a blanket suppression requiring automated expiry controls.
+
+---
+
 ## Registry Maintenance
 
 ### How to add an entry
