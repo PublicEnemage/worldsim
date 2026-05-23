@@ -22,7 +22,7 @@ Entries appear in chronological order of occurrence.
 Not all entries are failures. Some are anticipations — the Engineering Lead sensing a
 structural gap before it caused a problem, naming it, and building the safeguard before
 the incident occurred. These deserve equal recognition: they represent the safety culture
-working at its best. Six of the thirteen entries are anticipatory.
+working at its best. Six of the fifteen entries are anticipatory.
 
 ---
 
@@ -685,6 +685,67 @@ Documented in: `CLAUDE.md §Blameless continuous improvement is non-negotiable`,
 
 ---
 
+## NM-015 — CI Gate Job Not a Required Status Check
+
+**Date:** 2026-05-23
+**Milestone:** M9 — Standards Foundation
+**Detected by:** Engineering Lead (root-cause analysis of PR #443 CI failure)
+**Severity:** High — the `changes` path-filter job, which gates all downstream CI jobs, was not
+a required status check; `compliance-scan` was also absent from the required set; branch
+protection had the correct intent but incomplete implementation
+
+### What happened
+
+During root-cause analysis of the `actions/checkout@v6` regression that failed PR #443, an
+audit of branch protection settings revealed that `changes` — the path-filter job that always
+runs and controls which downstream jobs execute — was not a required status check. Only three
+conditional downstream jobs (`lint`, `test-backend`, `playwright-e2e`) were required.
+`compliance-scan` was also absent.
+
+The structural gap: when `changes` fails, all jobs that `need: changes` are skipped due to
+failed-dependency propagation. Jobs skipped this way — unlike jobs legitimately skipped by
+their own `if:` condition — may not satisfy required check rules. Branch protection was
+configured to require the *outputs* of the gate, not the gate itself. Whether merges were
+actually blocked during the broken-CI period depends on how GitHub evaluates dependency-skipped
+versus condition-skipped jobs; the configuration made that determination ambiguous rather than
+unambiguous.
+
+The `actions/checkout@v6` action had reportedly worked since its January 2026 release date,
+then regressed sometime before PR #443. Because M9 work has been predominantly documentation
+changes, CI failures were minimally visible — all downstream jobs were skipped on docs-only PRs
+regardless of whether `changes` succeeded, making a `changes` failure indistinguishable from a
+legitimate docs-only skip in the PR status view.
+
+### What was at risk
+
+Any PR merged during the broken-CI period could potentially have merged without test or
+compliance validation. The compliance-scan job — which runs machine-detectable violation checks
+documented in `docs/compliance/scan-registry.md` — was not in the required set at all,
+meaning it was never a blocking gate even when CI was healthy.
+
+### What caught it
+
+Root-cause analysis triggered by the PR #443 CI failure. An explicit inspection of branch
+protection settings (`gh api repos/PublicEnemage/worldsim/branches/main/protection`) revealed
+the gap. The gap would not have been surfaced without actively examining the protection
+configuration — there is no process that routinely audits required status checks against the
+current workflow graph.
+
+### Process improvement
+
+**Immediate remediation (out-of-band, no PR required):** `changes` and `compliance-scan` added
+to required status checks via GitHub API during the same session the gap was identified.
+Required checks are now: `changes`, `test-backend`, `lint`, `playwright-e2e`, `compliance-scan`.
+
+**Structural rule:** Required status checks must include the root gate job (`changes`), not only
+its downstream dependents. When the dependency graph changes — a new gate job is introduced, or
+an existing gate is restructured — required status checks must be audited in the same commit.
+
+**Milestone exit checklist addition:** A checkpoint confirming required status checks match the
+current workflow gate structure is added to the M9 exit checklist.
+
+---
+
 ## Registry Maintenance
 
 ### How to add an entry
@@ -739,7 +800,7 @@ RACI-grounded panel composition rule and the file authority rule are both respon
 this pattern. When a new near-miss appears, check first whether it is another instance
 of this pattern before assuming a different root cause.
 
-A second pattern is also visible: six of the thirteen entries are anticipatory —
+A second pattern is also visible: six of the fifteen entries are anticipatory —
 the Engineering Lead sensing a structural gap before it caused a failure. NM-008,
 NM-009, NM-010, NM-011, NM-012, and NM-013 were all caught before any incident
 occurred. This is not luck. It is pattern recognition from experience applied
