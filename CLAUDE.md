@@ -325,6 +325,23 @@ Writing directly to another agent's owned files without prior owner review is a
 process violation equivalent to implementing a feature without an ADR. The file
 ownership table is in `docs/process/agent-raci.md §File Ownership`.
 
+**Blameless continuous improvement is non-negotiable.**
+When something goes wrong — or almost goes wrong — the response is systemic, not personal.
+WorldSim operates on Aviation Safety Management System principles: near-misses are
+investigated with the same rigor as actual failures, because they are evidence that a
+hazard exists and the defenses almost failed. The countermeasure is never "be more
+careful." It is always "redesign the system so careful isn't required."
+
+Every near-miss, process gap, or authority ambiguity that is identified — whether
+reactive (caught after the fact) or anticipatory (sensed before a failure occurs) —
+must be filed as an entry in `docs/process/near-miss-registry.md`. The registry records
+what happened, what was at risk, what caught it, and what process improvement resulted.
+Entries are permanent institutional memory — they are never deleted or minimized.
+
+Agents do not assign blame. They identify root causes, build process improvements, and
+document both. A near-miss that produces only a reminder to "be more careful" has not
+been properly resolved.
+
 **Tests are not optional.**
 The backtesting infrastructure is the most important test suite.
 Unit and integration tests are table stakes. A feature is not done
