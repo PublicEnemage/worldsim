@@ -926,6 +926,43 @@ def test_austerity_shock_human_cost_scales_with_shock_magnitude():
 
 The human cost ledger is never a footnote. Its test coverage reflects this.
 
+### E2E Pre-implementation Test Categorization
+
+When implementation is decomposed into multiple Task Issues (one component per
+PR), E2E acceptance criteria must be categorized before QA authors any spec.
+Bundling both types into a single file against a multi-component feature creates
+an unsatisfiable intermediate state — no test can pass until every component
+exists — forcing a blanket skip that silences all ACs simultaneously. That is a
+CI blind spot, not a pre-implementation gate. (Near-miss NM-017.)
+
+**Type 1 — Component-level AC.** Testable the moment one component ships,
+independent of all others. Example: "TrajectoryView renders with minimum width
+480px." Lives in the implementation task's PR scope — the implementing agent
+writes it alongside the component. The test exists and passes on the day the
+component merges.
+
+**Type 2 — Integration-level AC.** Only satisfiable when multiple components
+coexist simultaneously. Example: "All four Zone 1 instruments visible without
+scroll at 1024×768." Lives in a dedicated integration spec file, separate from
+any component spec, with an explicit header naming its component dependencies.
+
+**Pre-authorship checklist (QA Lead and implementing agents):**
+
+1. For each AC, ask: can this pass if only one component from this feature
+   exists in the DOM? If yes → Type 1. If no → Type 2.
+2. Type 1 ACs are removed from the shared spec and handed to the implementing
+   agent for that component. They are not pre-written in a skipped file.
+3. Type 2 ACs live in a file named `<feature>-integration.spec.ts` with a
+   header comment of the form:
+   ```
+   // Integration gate — requires: Issue #NNN (ComponentA),
+   //                              Issue #NNN (ComponentB),
+   //                              Issue #NNN (ComponentC)
+   ```
+4. `test.skip(true, ...)` at file scope is a process violation for any spec
+   that contains Type 1 ACs. Type 1 ACs must never be suppressed — they must
+   be written in the scope where they are immediately satisfiable.
+
 ---
 
 ## User-Facing Alert Text Standards
