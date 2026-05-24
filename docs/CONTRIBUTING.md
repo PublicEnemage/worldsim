@@ -315,6 +315,34 @@ source for ADR numbers and status. Do not assign ADR numbers informally.
 
 ---
 
+## Document Referencing Convention
+
+WorldSim has two categories of documents: **living documents** (revised in place, e.g.
+`north-star.md`, `CLAUDE.md`, `agents.md`) and **stable documents** (immutable once
+accepted, e.g. ADRs, STD-REVIEWs, compliance scan entries).
+
+**When to reference an ADR vs. a living document:**
+
+When your document needs to reference a design decision that must survive future
+living-document updates, reference the ADR — not the living document. ADRs are immutable
+once accepted. Living documents change. A reference to `information-hierarchy.md §Zone 1`
+is a reference to a moving target; a reference to `ADR-008 §Decision 1` is a reference
+to a fixed point.
+
+Example: "The instrument cluster layout is specified in ADR-008 (Viewport Architecture),
+not in `information-hierarchy.md`."
+
+**When you update a living document:**
+
+1. Update the revision header: `Last significant revision`, `Updated against`, `Previous version context`
+2. Include a `Cross-references` section in the PR listing which other documents reference
+   the updated file and whether they need to be updated in the same PR
+
+These conventions are enforced by the PR template. See `docs/CODING_STANDARDS.md
+§Document Referencing Convention` for the full specification.
+
+---
+
 ## Contribution Workflow
 
 ### Branch Naming

@@ -1,13 +1,19 @@
 # ADR-007: Synthetic Data Framework
 
 ## Status
-Proposed
+Accepted
 
 ## Validity Context
 
 **Standards Version:** 2026-05-23
-**Valid Until:** Milestone 10 — Engine Integrity and Instrument Delivery (pending acceptance)
-**License Status:** PROPOSED — pending panel review and Engineering Lead acceptance
+**Valid Until:** Milestone 10 — Engine Integrity and Instrument Delivery
+**License Status:** ACCEPTED — 2026-05-23
+
+**Panel review:** 2026-05-23 — `docs/adr/reviews/ADR-007-panel-review.md`. Panel:
+Chief Methodologist (consultation complete, PR #373), Data Architect (conditional ✓),
+Development Economist DIC (conditional ✓), Engineering Lead (accepted ✓ 2026-05-23).
+Three INCORPORATE items applied (DA-F1 comparison group registry note, DA-F2 field
+clarity, DE-F1 Mode 3 rationale, DE-F2 reverse false-positive risk note).
 
 **Proposed:** 2026-05-23 — Initial draft. Based on Chief Methodologist consultation
 complete 2026-05-19 (PR #373, `docs/architecture/synthetic-data-consultation.md`).
@@ -277,9 +283,11 @@ official data for [indicator] to resolve."
 
 **Mode 3 Tightening**
 In Mode 3 (Active Control), Tier 4 exploratory signals are suppressed from the session
-entirely. Only Tier 1–3 alerts and "Cannot determine" signals are visible. The cognitive
-demands of real-time steering decisions cannot accommodate simultaneous assessment of
-low-confidence data quality signals.
+entirely. Only Tier 1–3 alerts and "Cannot determine" signals are visible. This
+suppression is intentional — in Mode 3, a false HD deterioration signal from a
+low-confidence synthetic estimate causes worse decisions than a missing signal. Analysts
+who need Tier 4 signals should shift to Mode 2 for data quality review before Mode 3
+steering.
 
 ### Summary Table
 
@@ -397,23 +405,25 @@ primary users — are most likely to produce legitimate divergences from regiona
 for non-manipulation reasons. The TSC governance gate exists precisely because this
 feature requires a level of governance independence not yet present in M9.
 
+**Open risk — reverse false-positive:** When a country's official data closely matches
+the synthetic baseline, an analyst may interpret this as data quality validation. This
+reading is incorrect — synthetic baseline conformance is not a certification. Close
+agreement between official data and the synthetic baseline does not mean the official
+data is reliable; it means the country's data falls within the estimated range for
+comparable countries. The tool must not be misread as a validation instrument.
+
 ---
 
 ## Panel
 
-This ADR requires review by:
-
 | Reviewer | Role | Status |
 |---|---|---|
-| Chief Methodologist (DIC) | Consulted — authored the consultation document | Consultation complete (PR #373) |
-| Data Architect Agent | Consulted — `Quantity` schema fields and comparison group registry | Pending |
-| Development Economist (DIC) | Consulted — human development indicator domain validation | Pending |
-| Engineering Lead | Accountable — final acceptance authority | Pending |
+| Chief Methodologist (DIC) | Consulted — authored the consultation document | Complete ✓ (PR #373, 2026-05-19) |
+| Data Architect Agent | Consulted — `Quantity` schema fields and comparison group registry | Conditional ✓ (2026-05-23) |
+| Development Economist (DIC) | Consulted — human development indicator domain validation | Conditional ✓ (2026-05-23) |
+| Engineering Lead | Accountable — final acceptance authority | Accepted ✓ (2026-05-23) |
 
-Consultation notes from the Chief Methodologist are in
-`docs/architecture/synthetic-data-consultation.md`. The panel review must address the
-seven sections above as a complete unit — section-by-section partial acceptance is not
-valid for this ADR.
+Full panel review artifact: `docs/adr/reviews/ADR-007-panel-review.md`.
 
 ---
 
@@ -444,14 +454,16 @@ epistemically correct alternative.
 ## Consequences
 
 **Schema changes:**
-- `Quantity` gains four new fields: `is_synthetic: bool`, `synthetic_method: str | None`,
-  `comparison_group_id: str | None`, `holdout_validated: bool | None`
-- New Alembic migration required
+- `Quantity` gains four new fields (all new, none pre-existing): `is_synthetic: bool`,
+  `synthetic_method: str | None`, `comparison_group_id: str | None`,
+  `holdout_validated: bool | None`
+- New Alembic migration required for all four fields
 
 **New components:**
 - `SyntheticDataEngine` — responsible for method selection, execution, and absence declaration
-- Comparison group registry (structure defined before Method A deployment; managed by Data
-  Quality Agent)
+- Comparison group registry: follows the existing `source_registry` pattern in
+  `docs/schema/database.yml`; a new registry table definition is required before Method A
+  deployment; managed by the Data Quality Agent (Issue #300)
 
 **Unchanged:**
 - `BandingEngine` — does not change; synthetic inference bands are a separate output
