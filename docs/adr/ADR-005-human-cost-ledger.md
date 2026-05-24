@@ -6,8 +6,14 @@ Accepted
 ## Validity Context
 
 **Standards Version:** 2026-04-15 (date standards documents were established)
-**Valid Until:** Milestone 9 — Standards Foundation
+**Valid Until:** Milestone 10 — Engine Integrity and Instrument Delivery
 **License Status:** CURRENT
+
+**Amendment 4 applied:** 2026-05-23 — M9 Exit GovernanceModule Deferral.
+Formal M9 exit assessment: all five GovernanceModule promotion criteria remain at 0/5
+met at M9 close. GovernanceModule promotion formally deferred to M10. License renewed
+through Milestone 10. M9 Governance Normalization Obligation and Decision M8-5 tooltip
+update obligation both carry forward unchanged. See Amendment 4 section at end of document.
 
 **Amendment 3 applied:** 2026-05-17 — M8 Ecological Framework Completion.
 Six decisions (M8-1 through M8-6): boundary proximity normalization replacing
@@ -25,7 +31,15 @@ path, and `confidence_tier` Alembic migration (Decision M8-6). Closes Issue #218
 Four-agent panel review (PR #303) informed all six decisions. See Amendment 3
 section at end of document.
 
-**Last Reviewed:** 2026-05-17 — Amendment 3 acceptance. Renewal trigger fired:
+**Last Reviewed:** 2026-05-23 — M9 exit review / Amendment 4. No renewal triggers
+fired during Milestone 9 beyond the GovernanceModule deferral formalized in Amendment 4.
+GovernanceModule promotion (five criteria per Decision M8-4) assessed: 0/5 met at M9
+close. Formal deferral to M10 recorded. No changes to `MeasurementFramework` taxonomy,
+`CohortSpec` segmentation axes, `MDASeverity` enum, or radar chart normalization
+methodology during M9. License renewed through Milestone 10 — Engine Integrity and
+Instrument Delivery. Next scheduled review at Milestone 10 close.
+
+**Previously reviewed:** 2026-05-17 — Amendment 3 acceptance. Renewal trigger fired:
 "Radar chart normalization methodology changed from percentile-based cross-entity
 ranking to an alternative" (Validity Context §Renewal Triggers). ADR transitioned
 ACCEPTED → UNDER-REVIEW on trigger fire; Engineering Lead acceptance of Amendment 3
@@ -2498,3 +2512,65 @@ Decision M8-6 confidence tier table entry and the derived indicator confidence t
 that depends on it. This trigger exists because boundary constant confidence tiers
 propagate to derived indicator tiers via the `max()` rule — a constant tier change
 silently changes indicator tier without this guard.
+
+---
+
+## Amendment 4 — M9 Exit GovernanceModule Deferral
+
+**Applied:** 2026-05-23
+**Issue:** #507
+**Author:** PM Agent
+**Scope:** Validity Context header update; formal M9 exit assessment; GovernanceModule
+promotion deferral to M10; carried obligations confirmed.
+
+### M9 Exit Assessment — GovernanceModule Promotion Criteria
+
+Decision M8-4 established five promotion criteria for GovernanceModule. At M9 close, all
+five criteria remain unmet:
+
+| Criterion | Status at M9 exit |
+|---|---|
+| 1. Backtesting threshold: governance scores produce backtesting results within the per-indicator error tolerance defined in `docs/DATA_STANDARDS.md §Backtesting Integrity` | **Not met** — No backtesting run completed for governance axis at M9 |
+| 2. ADR amendment accepted formalizing the normalization methodology for governance composite score | **Not met** — Normalization methodology not yet specified; M9 Governance Normalization Obligation active (see below) |
+| 3. Source field populated for all five indicator keys with `source_registry` draft-certified entry | **Not met** — Source field registry entries not yet filed |
+| 4. `[SIM-INTEGRITY]` WARNING fires when `compute()` receives unexpected null for any of the five indicator keys | **Not met** — Not yet implemented |
+| 5. Integration test asserting that a scenario with real governance data produces a non-null governance composite score | **Not met** — Not yet written |
+
+**Outcome:** GovernanceModule promotion formally deferred to Milestone 10 — Engine
+Integrity and Instrument Delivery.
+
+### M9 Governance Normalization Obligation — Carried Forward Unchanged
+
+The obligation recorded in Decision M8-4 is unchanged and carries forward to M10:
+
+> Before specifying the governance composite score strategy, the implementing engineer
+> must audit each of the five governance indicators for absolute threshold equivalents:
+> the V-Dem threshold at which a country is classified "Electoral Autocracy," the
+> Reporters Without Borders press freedom index floor classifications, the World Justice
+> Project rule of law score breakpoints, and equivalent threshold-anchored classifications
+> for the remaining two indicators. If any of these absolute thresholds exist and are
+> interpretable as natural boundaries, the normalization methodology for that indicator
+> must use boundary proximity (as in Decision M8-1 for ecological indicators) rather
+> than percentile rank.
+
+This audit is a mandatory precondition for Criterion 2 at M10. It is not discretionary.
+
+### Decision M8-5 Tooltip Update Obligation — Carried Forward to M10
+
+The `_GOVERNANCE_IN_VALIDATION_TOOLTIP` constant in `RadarChart.tsx` currently reads:
+
+```
+"Governance — in validation. (0 of 5 met at M8. Target: M9)"
+```
+
+This text is stale at M9 exit. The obligation to update it to reflect "0 of 5 met at M9.
+Target: M10" is carried forward as a mandatory M10 implementation task. The tooltip must
+be updated in the same commit as the GovernanceModule implementation work begins.
+
+### License Renewal
+
+**Valid Until:** Milestone 10 — Engine Integrity and Instrument Delivery
+**License Status:** CURRENT (renewed at M9 exit, 2026-05-23)
+
+No renewal triggers fired during Milestone 9. The ADR remains sound as written through M10.
+Scheduled review at M10 close.
