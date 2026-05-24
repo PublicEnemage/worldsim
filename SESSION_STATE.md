@@ -5,8 +5,8 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-05-23 (PRs #503 + #505 merged — NM-019 filed; three process fixes: MILESTONE_RUNBOOK.md kickoff gate, HORIZON step 6, roadmap.md linkage requirement)**
-**Current milestone:** M9 — Standards Foundation
+**Last updated: 2026-05-23 (PRs #509 + #510 merged — M9 exit ceremony complete; ADR-007 accepted; ADR-001/002 renewed; STD-REVIEW-005; SCAN-023; document referencing convention; all horizon:immediate issues closed or formally deferred)**
+**Current milestone:** M9 — Standards Foundation (human-gate phase — awaiting EL sign-off on Issue #213 and M10 creation)
 
 ---
 
@@ -68,6 +68,18 @@ Twelve issues filed 2026-05-19. Must complete before M9 UX implementation begins
 
 ---
 
+## M9 Human Gates Remaining (EL only)
+
+| Gate | Description | Status |
+|---|---|---|
+| Socratic Agent TEST | Run Socratic Agent TEST session on M9 architecture — mandatory M9 exit gate | Pending EL |
+| Issue #213 checklist | EL sign-off on all remaining M9 exit checklist items | Pending EL |
+| M10 creation ceremony | Create M10 milestone and file kickoff issues | Pending EL |
+| Issue #213 close | Final M9 closure action — close after all gates pass | Pending EL |
+| MV-002 hardware validation | Run AC-007/008/009 without throttle on real 8GB/4-core laptop; record render times ≤100ms. Procedure: `frontend/tests/manual-validation/mv-gates.md` | Pending EL |
+
+---
+
 ## Open PRs
 
 No open PRs — board clear as of 2026-05-23.
@@ -76,6 +88,9 @@ No open PRs — board clear as of 2026-05-23.
 
 | PR | Title | Date |
 |---|---|---|
+| #510 | docs(adr): ADR-007 accepted — panel review, Mermaid diagram, ADR-001/002 renewals, document referencing convention, STD-REVIEW-005, SCAN-023 | 2026-05-23 |
+| #509 | docs(adr): ADR-005 Amendment 4 + ADR-007 Synthetic Data Framework (Proposed) — M9 exit ceremony | 2026-05-23 |
+| #506 | docs(process): architecture backlog — pre-ADR queue, RACI-grounded panel composition rule (closes #405) | 2026-05-23 |
 | #505 | process(nm-019): milestone kickoff gate, HORIZON step 6, roadmap linkage requirement (closes #504) | 2026-05-23 |
 | #503 | docs(process): NM-019 — named deliverables invisible on board for entire milestone | 2026-05-23 |
 | #501 | docs(ir): M9 instrument cluster IR review + M8 DEMO triage (Issue #493) | 2026-05-23 |
@@ -212,6 +227,13 @@ All Horizon:Immediate issues are now closed. M8 feature-complete.
 
 | Decision | Rationale | Date |
 |---|---|---|
+| ADR-007 accepted — Synthetic Data Framework (PR #510, closes #508) | Seven-section framework: five-method hierarchy (Bayesian > MICE > Bootstrap > Structural Extrapolation > Structural Absence), mandatory per-indicator disclosure (never suppressible), scenario banding (pessimistic/realistic/optimistic), confidence tier sub-labels (Tiers 3–5), MDA alert behavior by tier (Tier 3 advisory amber / Tier 4 secondary panel only / Tier 5 none), three-condition meaninglessness threshold, anomaly detection (TSC sign-off required). Four INCORPORATE items applied from panel review (CM, Data Architect, Development Economist). `Quantity` gains 4 new fields: `is_synthetic: bool`, `synthetic_method: str \| None`, `comparison_group_id: str \| None`, `holdout_validated: bool \| None` — all new, none pre-existing. Comparison group registry follows `source_registry` pattern (Issue #300, managed by Data Quality Agent). ADR-007 Mermaid flowchart at `docs/architecture/ADR-007-method-selection-flowchart.mmd`. ARCH-001 in backlog: ACCEPTED. | 2026-05-23 |
+| ADR-005 Amendment 4 — GovernanceModule M9 exit formal assessment (PR #509, closes #507) | Five promotion criteria assessed: all Not Met. GovernanceModule formally deferred to M10. M9 Governance Normalization Obligation recorded: before specifying governance composite score strategy, must audit each of five indicators for absolute threshold equivalents (V-Dem electoral autocracy threshold, RSF press freedom floor, WJP rule of law breakpoints). ADR-005 M8-5 tooltip obligation updated: Target M9 → Target M10. License renewed for M10. | 2026-05-23 |
+| Document referencing convention — Issue #398 resolved (PR #510) | Three conventions added to `docs/CODING_STANDARDS.md §Document Referencing Convention`: (1) revision header on all living documents (format specified); (2) ADRs as stable reference points vs. living documents; (3) PR Cross-references section — required field on all PRs that update a living document. Revision headers added to six living documents: `north-star.md`, `information-hierarchy.md`, `user-journeys.md`, `simulation-framework.md`, `CLAUDE.md`, `docs/process/agents.md`. PR template updated. CONTRIBUTING.md updated. | 2026-05-23 |
+| STD-REVIEW-005 complete — M9 exit standards gap inventory (PR #510, closes #439) | Eight gaps total. Carried from STD-REVIEW-004: (1) no canonical unit registry (#252), (2) no field-level data certification (#252), (3) WGI territorial convention (no Issue), (4) [SIM-INTEGRITY] logging formal section (promote to Immediate for M10). New M9 gaps: M9-1 synthetic data tier floor (#508 implementation gate), M9-2 `step_event_label` mandatory fixture field (#395), M9-3 per-indicator badge disclosure (no Issue), M9-4 document referencing convention (RESOLVED this PR). Three M10 kickoff gates: (1) [SIM-INTEGRITY] logging section before first M10 engine PR; (2) `step_event_label` in DATA_STANDARDS.md before first M10 backtesting fixture; (3) synthetic data tier floor in DATA_STANDARDS.md before Quantity schema extension Alembic migration. Schema drift check: no drift (M9 docs-only). | 2026-05-23 |
+| SCAN-023 filed — M9 milestone-exit compliance scan (PR #510) | Documentation-only milestone — no simulation code, no Python/TypeScript/Alembic files, no compliance scan tool applicable. All ADRs CURRENT at M9 exit: ADR-001/002 renewed for M10; ADR-007 accepted 2026-05-23; ADR-008/010 accepted 2026-05-22; ADR-003/004/005/006 reviewed and CURRENT. 809 unit tests unchanged from M8 (no code shipped in M9). Three M10 kickoff gates documented in STD-REVIEW-005. | 2026-05-23 |
+| ADR-001 and ADR-002 license renewals — Valid Until M10 (PR #510) | ADR-001 (Simulation Core Data Model): `Valid Until` extended to Milestone 10. M9 exit review entry added: no renewal triggers fired — M9 was documentation-only. M8 exit review entry added (SCAN-022, previously missing). ADR-002 (Input Orchestration Layer): same pattern. M9 review note: ADR-007 adds Quantity fields — this is NOT an ADR-002 trigger (ControlInput taxonomy unchanged). | 2026-05-23 |
+| All M9 horizon:immediate issues closed or formally deferred (Issue #213 comment) | Formal deferral comment posted on Issue #213 covering all remaining open M9 issues. Issues closed this session: #507 (ADR-005 Amendment 4), #508 (ADR-007 accepted), #251 (architecture backlog), #378 (architecture backlog process), #439 (STD-REVIEW-005), #398 (document referencing convention). M9 is now in human-gate phase. | 2026-05-23 |
 | Issue #493 closed — M9 IR review + M8 DEMO triage complete (PR #501) | IR review at `docs/demo/m9/reviews/2026-05-23-v0.9-instrument-cluster-ir.md`. Six findings (IR-001–IR-006) filed as #495–#500 for M10. Two root causes: (A) data layer not wired to Zone 1B/1C — mda_alerts always [], PMM always null; (B) session state and entry-state architecture not implemented — landing screen is choropleth, step annotations absent for user-created scenarios. Root Cause B from M8 (drawer legibility) fully resolved by M9 architecture. M8 DEMO triage: #344 closed (text legibility resolved); #342/#343/#346/#347/#349 transformed + re-milestoned to M10; #345/#348/#350 persist to M10. Six M10 issues: #495 (IR-001 Critical — mda_alerts wiring), #496 (IR-002 — PMM endpoint), #497 (IR-003 — persistent scenario state/demonstrative entry), #498 (IR-004 — default step labels from start year), #499 (IR-005 — governance "(in validation)" inline), #500 (IR-006 — loading state). | 2026-05-23 |
 | Issue #463 fully closed — Zone 1 cluster live in App.tsx + Greece Playwright suite (PRs #489–#491) | PR #489 closed the four remaining QA acceptance test gaps (#459): ModeIndicator component + 13 Vitest tests; AC-006 RTL atomicity test (act() boundary, Vitest cleanup fix); AC-013 "(exp)" confidence badge Playwright guard; US-026 mode-indicator RTL act() test. PR #490 wired InstrumentCluster into App.tsx via ScenarioInstrumentCluster: trajectory fetch + parse (array→Record, Decimal string→number, boundary_proximity→normalized_absolute); data-testid duplication fixed in InstrumentCluster wrapper divs. PR #491 completed Issue #463 PR 2: removed test.skip() from AC-001/AC-002; added selectScenario() helper; created greece-integration.spec.ts (5 tests: smoke, mode indicator "Replay", data-current-step tracking, governance null AC-015, per-step cluster consistency + Mode 2 no-op guard). | 2026-05-23 |
 | Zone 1A/1B/1C/1D instrument cluster complete (PRs #484–#487) | All four co-primary instruments shipped: `TrajectoryView.tsx` (Zone 1A — ComposedChart, 4 active + 4 ghost Lines, divergence fills, CVD-safe framework colors, Mode 1 custom tick, (exp) badge, Path A dashed curves); `MDAAlertPanelZone1B.tsx` (Zone 1B — TERMINAL→CRITICAL→WARNING sort, compact 3-line at <320px / full-density at ≥320px, mode-specific tense, negotiation labels, causal attribution Mode 3 only); `PMMWidgetZone1C.tsx` (Zone 1C — mode-specific label, direction arrow, pending state at 40% opacity); `FourFrameworkZone1D.tsx` (Zone 1D — 4 framework scores derived from Zustand atom, null→`score-value--null`+"—", numeric→`score-value--numeric`). Store extended: `Zone1BAlert`, `mda_alerts`, `pmm_value`, `pmm_direction`, `setPmmState`. 104/104 Vitest tests passing. All Playwright E2E guards use isVisible no-op pattern pending App.tsx integration (#463). | 2026-05-23 |
@@ -289,6 +311,27 @@ All Horizon:Immediate issues are now closed. M8 feature-complete.
 ---
 
 ## Architectural State — Key Facts for Session Continuity
+
+**ADR-007 Synthetic Data Framework — accepted ✅ (PR #510). Live in `docs/adr/ADR-007-synthetic-data-framework.md`.**
+
+- Five-method hierarchy: Bayesian Structural (Method A, requires ≥10 comparables + holdout) → MICE (Method B, bounded gap ≤3 periods) → Bootstrap Resampling (Method C) → Structural Extrapolation (Method D) → Structural Absence (Method E, generates bounds only)
+- Quantity schema extension (4 new fields — M10 implementation prerequisite, Alembic migration required): `is_synthetic: bool`, `synthetic_method: str | None`, `comparison_group_id: str | None`, `holdout_validated: bool | None`
+- MDA alert behavior: Tier 3 → advisory amber dashed in primary cluster; Tier 4 → exploratory signal secondary panel only; Tier 5 → no alert; CI straddling MDA floor → blue "Cannot determine MDA status" in primary cluster
+- Comparison group registry: follows `source_registry` pattern, new table required before Method A deployment, managed by Data Quality Agent (Issue #300)
+- Anomaly detection: opt-in, Modes 1+2 only, TSC sign-off before production, governance indicators permanently excluded
+- Panel review artifact: `docs/adr/reviews/ADR-007-panel-review.md`. Mermaid diagram: `docs/architecture/ADR-007-method-selection-flowchart.mmd`
+
+**ADR-005 Amendment 4 — applied ✅ (PR #509). GovernanceModule formally deferred to M10.**
+
+- Five promotion criteria all Not Met at M9 exit. Target: M10.
+- M9 Governance Normalization Obligation: audit each of five indicators for absolute threshold equivalents before specifying composite score strategy.
+- M8-5 tooltip obligation: update `(Target: M9)` → `(Target: M10)` before first GovernanceModule PR.
+- ADR-005 License renewed: Valid Until Milestone 10.
+
+**ADR-001 + ADR-002 — renewed ✅ (PR #510). Valid Until Milestone 10.**
+
+- No renewal triggers fired in M9 (documentation-only milestone).
+- M8 exit review entries added (previously missing from SCAN-022 period).
 
 **ADR-005 Amendment 3 — merged ✅ (PR #309). Now live in `docs/adr/ADR-005-human-cost-ledger.md`.**
 
