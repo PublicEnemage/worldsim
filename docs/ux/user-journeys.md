@@ -1,5 +1,9 @@
 # User Journeys — WorldSim Frontend
 
+> Last significant revision: 2026-05-22
+> Updated against: ADR-008 (UX Architecture) accepted 2026-05-22; five formal user personas (docs/ux/personas.md)
+> Previous version context: Pre-persona-formalization — journeys anchored to generic analyst archetype
+
 > Owned by the UX Designer Agent. Documents the primary user journeys for
 > the canonical user defined in `docs/ux/north-star.md`. These journeys are
 > the reference for information hierarchy decisions and for evaluating whether

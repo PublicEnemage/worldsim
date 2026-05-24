@@ -1000,6 +1000,54 @@ document must be reflected here in the same commit.
 
 ---
 
+## Document Referencing Convention
+
+Living documents (documents subject to in-place updates) are revised without creating new
+files. When a document is revised, existing references to that document silently point at
+a changed artifact. Three conventions prevent silent reference staleness. (Issue #398)
+
+### Convention 1 — Revision Header on Living Documents
+
+Every living document that is subject to in-place updates must carry a revision header
+immediately below the document title:
+
+```markdown
+> Last significant revision: YYYY-MM-DD
+> Updated against: [Decision record or ADR reference]
+> Previous version context: [Brief description of what changed and from what]
+```
+
+**Living documents subject to this requirement:** `docs/ux/north-star.md`,
+`docs/ux/information-hierarchy.md`, `docs/ux/user-journeys.md`, `CLAUDE.md`,
+`docs/process/agents.md`, `docs/architecture/simulation-framework.md`, and any
+document designated living when created. The designation must be added at creation time.
+
+Cost: one minute per document update. Benefit: every future reader knows which era of
+the document a reference was written against.
+
+### Convention 2 — ADRs as Stable Reference Points
+
+When any document needs to reference a design decision that must survive future
+living-document updates, it references the ADR, not the living document.
+
+- **Living document:** Always current, revised in place, references may go stale
+- **ADR:** Immutable once accepted, amended rather than overwritten, safe to reference
+
+Example: if `agents.md` needs to reference the viewport architecture decision, it
+references ADR-008 (immutable) — not `information-hierarchy.md` (mutable).
+
+### Convention 3 — PR Cross-References Section
+
+PRs that update living documents must include a **Cross-references** section listing
+which other documents contain references to the updated file. The PR author decides
+whether those references need updating in the same PR.
+
+This is a required PR template field, not an advisory checklist item. An update to a
+living document without a cross-references section has not followed the document
+referencing convention.
+
+---
+
 ## Diagram Standards
 
 ### Format: Mermaid

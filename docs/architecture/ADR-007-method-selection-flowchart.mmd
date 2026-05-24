@@ -1,0 +1,34 @@
+flowchart TD
+    START([Missing indicator\nfor entity]) --> Q1{Entity has ≥80%\nobserved data AND\ngap ≤3 bounded periods?}
+
+    Q1 -->|Yes| MICE[Method B: MICE\nTier 3 short gap\nTier 4 long gap]
+    Q1 -->|No| Q2{Missingness\nis MNAR?}
+
+    Q2 -->|Yes| ABSENT[Method E:\nStructural Absence Declaration\nTier 5]
+    Q2 -->|No| Q3{Valid comparison\ngroup ≥10 countries\nwith target variable?}
+
+    Q3 -->|Yes| BAYES[Method A: Hierarchical\nBayesian Inference\nTier 3 holdout-validated\nTier 4 unvalidated]
+    Q3 -->|No| Q4{Small peer group\n5–9 countries?}
+
+    Q4 -->|Yes| BOOT[Method C: Bootstrap\nResampling or Method A\nat Tier 4]
+    Q4 -->|No| Q5{Validated structural\nequation in source\nregistry, observed\ncovariates, ≤5yr horizon?}
+
+    Q5 -->|Yes| STRUCT[Method D:\nStructural Extrapolation\nTier 4]
+    Q5 -->|No| ABSENT2[Method E:\nStructural Absence Declaration\nTier 5]
+
+    MICE --> OUTPUT
+    BAYES --> OUTPUT
+    BOOT --> OUTPUT
+    STRUCT --> OUTPUT
+    ABSENT --> OUTPUT
+    ABSENT2 --> OUTPUT
+
+    OUTPUT([Synthetic Quantity\nwith is_synthetic, synthetic_method\ncomparison_group_id, holdout_validated]) --> MDA{CI spans\nMDA floor?}
+
+    MDA -->|Yes| CANNOT[Cannot Determine\nMDA Status — blue signal\nprimary cluster]
+    MDA -->|No| TIER{Confidence\ntier?}
+
+    TIER -->|Tier 1–2 real| FULL[Full MDA Alert\nred solid]
+    TIER -->|Tier 3 SYNTHETIC_COMPARABLE| ADVISORY[Advisory MDA Alert\namber dashed\nprimary cluster]
+    TIER -->|Tier 4 SYNTHETIC_MODEL| EXPLORATORY[Exploratory Signal\nsecondary panel only\nnot primary cluster]
+    TIER -->|Tier 5 SYNTHETIC_PROXY| NONE[No Alert\nStructural Absence\nDeclaration only]

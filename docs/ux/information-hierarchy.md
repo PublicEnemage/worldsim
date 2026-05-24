@@ -1,5 +1,9 @@
 # Information Hierarchy — WorldSim Dashboard
 
+> Last significant revision: 2026-05-22
+> Updated against: ADR-008 (UX Architecture — Instrument Cluster, Viewport, Interaction Model) and ADR-010 (Trajectory View as Primary Instrument), both accepted 2026-05-22
+> Previous version context: Pre-Case B verdict — instruments in Zone 2/3 drawer, choropleth in primary viewport
+
 > Owned by the UX Designer Agent. This document defines the visual weight
 > and disclosure depth of every element on the WorldSim dashboard. It is
 > the reference for all Frontend Architect decisions about layout, ordering,

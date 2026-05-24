@@ -1,5 +1,9 @@
 # WorldSim Agent Roster
 
+> Last significant revision: 2026-05-23
+> Updated against: NM-019 process fix (PR #505) — PM Agent HORIZON step 6 SCOPE-COMPLETENESS CHECK added; RACI panel composition rule added; 15-agent roster finalized at M9 exit
+> Previous version context: Pre-M9 exit — HORIZON had 5 steps (now 6); panel composition rule not yet in backlog.md
+
 > This is the canonical home for all agent persona definitions,
 > activation protocols, independence requirements, and RACI position
 > references. All agents operating in this codebase must read this

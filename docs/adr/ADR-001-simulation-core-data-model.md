@@ -6,10 +6,27 @@ Accepted
 ## Validity Context
 
 **Standards Version:** 2026-04-15 (date standards documents were established)
-**Valid Until:** Milestone 8 — Ecological and Governance Frameworks
+**Valid Until:** Milestone 10 — Engine Integrity and Instrument Delivery
 **License Status:** CURRENT
 
-**Last Reviewed:** 2026-05-10 — Milestone 7 exit review. No renewal triggers
+**Last Reviewed:** 2026-05-23 — M9 exit review. No renewal triggers fired during
+Milestone 9. M9 was a documentation, standards, and process milestone — no simulation
+core data model changes, no `MeasurementFramework` taxonomy changes, no
+`DATA_STANDARDS.md` unit standard changes affecting attribute store design, no
+backtesting integrity rule changes requiring state representation changes. License
+Status confirmed CURRENT. License renewed through Milestone 10 — Engine Integrity and
+Instrument Delivery. Next scheduled review at Milestone 10 close.
+
+**Previously reviewed:** 2026-05-19 — M8 exit review (SCAN-022). No renewal triggers
+fired during Milestone 8. M8 EcologicalModule boundary proximity normalization
+(`_boundary_proximity_strategy()`) is within the existing `MeasurementFramework`
+taxonomy (ECOLOGICAL is an existing enum value) and produces outputs via the existing
+Quantity-delta Event contract. No structural changes to `SimulationEntity.attributes`
+required. No `MeasurementFramework` taxonomy modifications, no `DATA_STANDARDS.md` unit
+standard changes affecting attribute store design. License Status confirmed CURRENT.
+License renewed for Milestone 9.
+
+**Previously reviewed:** 2026-05-10 — Milestone 7 exit review. No renewal triggers
 fired during Milestone 7. License Status confirmed CURRENT. M7 delivered:
 Defensive Programming section added to `CODING_STANDARDS.md` (Issue #224) —
 no changes to `MeasurementFramework` taxonomy, `DATA_STANDARDS.md §Units and

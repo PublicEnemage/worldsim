@@ -1,5 +1,9 @@
 # WorldSim Simulation Framework
 
+> Last significant revision: 2026-05-22
+> Updated against: CLAUDE.md structural refactor (PR #372) — simulation framework extracted from CLAUDE.md; Platform Principle, Synthetic Data Layer, UX Architectural Commitments added to CLAUDE.md
+> Previous version context: Content was inline in CLAUDE.md before Issue #359 extraction
+
 > Extracted from CLAUDE.md (Issue #359). This document is mandatory reading
 > for all agents. See CLAUDE.md §Session Continuity for the role-based
 > reading table.

@@ -1,5 +1,9 @@
 # UX North Star
 
+> Last significant revision: 2026-05-22
+> Updated against: ADR-008 (UX Architecture — Instrument Cluster, Viewport, Interaction Model) accepted 2026-05-22
+> Previous version context: Pre-Case B verdict — choropleth as primary viewport, instruments in drawer
+
 > Owned by the UX Designer Agent. This document is the authoritative source
 > for who we are building for, what they are trying to do, and what the
 > experience must make possible. All frontend decisions are evaluated against

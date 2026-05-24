@@ -6,10 +6,26 @@ Accepted
 ## Validity Context
 
 **Standards Version:** 2026-04-15 (date standards documents were established)
-**Valid Until:** Milestone 8 — Ecological and Governance Frameworks
+**Valid Until:** Milestone 10 — Engine Integrity and Instrument Delivery
 **License Status:** CURRENT
 
-**Last Reviewed:** 2026-05-10 — Milestone 7 exit review. No renewal triggers
+**Last Reviewed:** 2026-05-23 — M9 exit review. No renewal triggers fired during
+Milestone 9. M9 was a documentation, standards, and process milestone — no
+`ControlInput` type taxonomy changes, no audit trail schema requirement changes, no
+uncertainty quantification standard additions affecting how events carry uncertainty
+metadata. ADR-007 (Synthetic Data Framework, accepted 2026-05-23) adds `is_synthetic`
+and related fields to `Quantity` — these are Quantity schema extensions, not
+`ControlInput` type additions, and do not trigger this ADR's renewal. License Status
+confirmed CURRENT. License renewed through Milestone 10 — Engine Integrity and
+Instrument Delivery. Next scheduled review at Milestone 10 close.
+
+**Previously reviewed:** 2026-05-19 — M8 exit review (SCAN-022). No renewal triggers
+fired during Milestone 8. EcologicalModule and GovernanceModule outputs use the
+existing Quantity-delta Event contract; no new `ControlInput` types, audit trail schema
+changes, or `MeasurementFramework` tagging requirement changes. License Status confirmed
+CURRENT. License renewed for Milestone 9.
+
+**Previously reviewed:** 2026-05-10 — Milestone 7 exit review. No renewal triggers
 fired during Milestone 7. License Status confirmed CURRENT. M7 delivered no
 changes to `ControlInput` type taxonomy, audit trail schema requirements, or
 `MeasurementFramework` tagging requirements. `[SIM-INTEGRITY]` logging

@@ -1,5 +1,9 @@
 # CLAUDE.md — WorldSim Project Context
 
+> Last significant revision: 2026-05-23
+> Updated against: M9 exit — NM-019 process fixes (PR #505), agent RACI/panel composition rule, roadmap scope linkage requirement; ADR-007 accepted; GovernanceModule deferred to M10
+> Previous version context: Pre-M9 exit — simulation framework was inline, no synthetic data framework section, no architecture backlog process
+
 ## What This Project Is:
 
 This is an open-source geopolitical-economic simulation platform designed to

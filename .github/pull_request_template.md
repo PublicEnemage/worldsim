@@ -24,5 +24,11 @@ Closes #
 - [ ] ADR referenced if architectural decisions were made
 - [ ] Board updated — issue moved to In Review
 
+## Cross-references
+<!-- Required when this PR updates a living document (north-star.md, information-hierarchy.md,
+user-journeys.md, CLAUDE.md, agents.md, simulation-framework.md, or any document designated living).
+List which other documents reference the updated file and whether they need updating. -->
+<!-- If this PR does not update a living document, delete this section. -->
+
 ## Notes for reviewer
 <!-- Anything the Engineering Lead should pay particular attention to -->
