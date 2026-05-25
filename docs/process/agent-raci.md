@@ -512,7 +512,7 @@ finalized — not afterward.
 | `SESSION_STATE.md` | PM | EL | PM maintains; EL reviews major restructuring |
 | `.github/` | EL | Ar | CI/CD pipeline changes require Architect review |
 | `docs/process/agents.md` | PM | EL | Agent persona definitions; EL approves new agent additions |
-| `docs/process/agent-raci.md` | PM | EL, Ar | RACI matrix; Architect consulted when decision-type grounding changes |
+| `docs/process/agent-raci.md` | PM | EL, Ar | RACI matrix; Architect consulted when decision-type grounding changes. Any addition to or change of decision-type grounding text (rows in the RACI matrix) triggers Required C (Ar) — "addition" qualifies, not only "change." (NM-021) |
 | `docs/process/near-miss-registry.md` | PI | EL | PI files entries; EL informed of High severity entries; PM informed of all entries (I) |
 | `docs/process/known-issues-registry.md` | PI | EL | PI files entries; EL informed of Medium/High severity entries; PM informed of all entries (I) |
 | `docs/schema/api_contracts.yml` | DA | Ar | Ar consulted when response shape changes (API response shape is Architect territory) |
@@ -522,7 +522,7 @@ finalized — not afterward.
 | `docs/adr/ADR-*.md` | Ar | EL, panel members | EL sign-off required on all ADRs; panel per §ADR Panel Composition |
 | `docs/adr/reviews/` | Ar | EL | Panel review artifacts authored by Architect |
 | `docs/architecture/` (non-ADR) | Ar | DA, FA | DA consulted when docs define schema contracts; FA consulted on frontend architecture |
-| `docs/architecture/backlog.md` | Ar | PM | ADR backlog; PM consulted on milestone assignment |
+| `docs/architecture/backlog.md` | Ar | PM | ADR backlog; PM consulted on milestone assignment. Process rule additions (e.g. prerequisite clauses, priority review rules) also require Ar review — not only ADR number assignment changes. (NM-021) |
 | `docs/ux/personas.md` | UD | PO | PO is guardian of the five named personas — consulted on any change to persona definitions |
 | `docs/ux/user-journeys.md` | UD | PO | User stories trace to journey steps; PO consulted when journey steps change |
 | `docs/ux/` (other files) | UD | FA, UT | FA consulted on frontend feasibility; UT consulted on first-principles consistency |

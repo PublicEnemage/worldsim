@@ -1,7 +1,7 @@
 # WorldSim Near-Miss Registry
 
 > **Artifact type:** Permanent institutional record
-> **Maintained by:** PM Agent (R), Engineering Lead (A)
+> **Maintained by:** Process Integrity Agent (R), Engineering Lead (A)
 > **Update trigger:** Any near-miss identified during development, HORIZON sweep,
 > or post-session review
 > **Canonical location:** `docs/process/near-miss-registry.md`
@@ -22,7 +22,7 @@ Entries appear in chronological order of occurrence.
 Not all entries are failures. Some are anticipations — the Engineering Lead sensing a
 structural gap before it caused a problem, naming it, and building the safeguard before
 the incident occurred. These deserve equal recognition: they represent the safety culture
-working at its best. Nine of the nineteen entries are anticipatory.
+working at its best. Twelve of the twenty-two entries are anticipatory.
 
 ---
 
@@ -1229,6 +1229,118 @@ Documented in: `docs/process/near-miss-registry.md §NM-020`,
 `docs/process/agents.md §Chief Engineer Agent` (stale ADR-007 reference corrected to ADR-009 in this PR),
 `docs/architecture/backlog.md §Prerequisite Clause Rule` (added this PR),
 Issue #514 — Phase 1 baseline benchmarks (filed as part of this PR; milestone to M10 once M10 is created)
+
+---
+
+## NM-021 — File Authority Rule Not Applied Under EXECUTE Task Pressure: Two PRs Wrote to Unowned Files
+
+**Date:** 2026-05-25
+**Milestone:** M9 → M10 boundary
+**Detected by:** Process Integrity Agent (inaugural four-lens AUDIT — Registry Lens + Process Adherence Lens)
+**Severity:** Medium — no incorrect artifacts produced in either PR; both changes were substantively correct; but the process obligation (verify R before writing; obtain Required C before committing) was not met in two consecutive PRs
+
+### What happened
+
+Two PRs in the M9–M10 boundary session made file changes that violated the file authority rule (PR #432, CLAUDE.md §File authority is non-negotiable). Both violations were identified during the inaugural process audit:
+
+**Violation A — PR #515 (`docs/architecture/backlog.md`):**
+PM Agent added the Prerequisite Clause Rule section to `docs/architecture/backlog.md` as part of the NM-020 process improvements. The file ownership table shows `docs/architecture/backlog.md` | Owner: Ar (R) | Required C: PM. PM Agent wrote to a file owned by Ar without Ar Agent review. The process improvement text was substantively correct and appropriate to the file's scope, but the file authority obligation was not met: PM does not hold R on backlog.md and must obtain Ar review before committing.
+
+**Violation B — PR #517 (`docs/process/agent-raci.md` — decision-type grounding):**
+PM Agent added PI Agent grounding text to Rows 6 and 7 of the RACI matrix in agent-raci.md. The file ownership table shows `docs/process/agent-raci.md` | Owner: PM (R) | Required C: EL, Ar — "Architect consulted when decision-type grounding changes." The grounding additions to Rows 6 and 7 are decision-type grounding changes. PM holds R ✓, but Required C (Ar) was not obtained or documented before committing. Per the file authority rule: "If a Required Consultant (C) is listed, that agent's input must be obtained before the change is finalized — not afterward."
+
+Both violations occurred in an EXECUTE session with multiple concurrent file changes and task pressure to deliver. The file authority rule was applied correctly to PM-owned files in the same PRs; it was not applied to the secondary files that required consultation or ownership verification.
+
+**Contributing pattern — scan registry ordering (third occurrence):**
+The compliance scan registry ordering violation (SCAN-022 appearing after SCAN-023 in PR #510) reflects the same failure mode: a process obligation that requires a specific check before committing (verify ascending order) was not executed when two entries were being filed simultaneously. The check is a reading obligation — it does not have a structural gate. Three occurrences of this specific violation type (the third occurring in the Standards Foundation milestone) confirms the pattern is systemic, not incidental.
+
+### What was at risk
+
+**Violation A:** Ar Agent, when reviewing backlog.md in a future session, might have noted that the Prerequisite Clause Rule's placement or language overlaps with their authority over ADR numbering and backlog management. A future PM-initiated change to backlog.md structure without Ar review creates institutional ambiguity about the boundary between PM process authority and Ar ADR-backlog authority.
+
+**Violation B:** Ar is Required C on decision-type grounding specifically because grounding text can have architectural implications — establishing that PI Agent has R on decisions that touch Ar's domain, for example, or defining PI's scope in a way that creates overlap with Ar review obligations. Missing the consultation means the grounding text was established without the one agent whose perspective would catch architectural boundary issues.
+
+**Scan ordering:** A third ordering inversion in the compliance scan registry further degrades trust in the registry's structural integrity. If the table is found out of order by a future agent or human reviewer, it creates uncertainty about whether other structural properties are also unreliable.
+
+### What caught it
+
+The inaugural Process Integrity Agent AUDIT — systematic four-lens review detected the file authority concerns in the Process Adherence Lens and the scan ordering violation in the Registry Lens. Neither was caught at the time of the PRs. Both merges were approved by the Engineering Lead, but the EL approval process focuses on content, not file authority compliance — the HORIZON file authority audit is the retroactive mechanism, and the PI AUDIT is now a standing earlier-detection mechanism.
+
+### Process improvement
+
+**Root cause:** The file authority rule is a pre-commit reading obligation. It is not enforced by any structural gate. An agent executing a multi-file EXECUTE task must apply the check independently for each file, without any automated reminder. Under task pressure, the check is applied reliably to primary owned files and inconsistently to secondary files requiring consultation or ownership verification.
+
+**Three fixes:**
+
+**1. File authority pre-commit checklist in the PM Agent working agreement (and any EXECUTE-mode agent):**
+Before committing any set of changes, the acting agent must apply the file authority check to every file in the changeset — not just the primary files, not just the files the agent authored in the current task. The check is: "For each file in `git diff --name-only`: does this agent hold R? If not, has the owning agent reviewed? Is this agent Required C on any of these files from another agent's perspective?"
+
+This rule should be added to the PM Agent working agreement under "What I commit to doing" and referenced in the Implementation Agents Pre-PR Checklist.
+
+**2. Architect Agent standing consultation for backlog.md and agent-raci.md grounding changes:**
+Add an explicit note to the backlog.md file ownership row: "Process rule additions require Ar review — not just ADR number assignment changes." Add a note to the agent-raci.md row: "Any change to decision-type grounding text triggers Required C (Ar)."
+
+These clarifications prevent the ambiguity where an agent correctly reads "Architect consulted when decision-type grounding changes" but does not recognize that grounding additions (not just changes to existing grounding) also qualify.
+
+**3. Scan registry verification step in the compliance SCAN mode:**
+Before committing any change to `docs/compliance/scan-registry.md`, verify: (a) the new entry is appended after all existing entries, and (b) the table reads in ascending SCAN number order. If filing multiple entries in one session, verify order after each append, not just after the last one.
+
+Documented in: `docs/process/agents.md §PM Agent — Working Agreement` (checklist addition pending this entry), `docs/process/agent-raci.md §File Ownership` (clarification pending EL review)
+
+---
+
+## NM-022 — No Standing Process for Detecting Stale Cross-References in Authoritative Documents
+
+**Date:** 2026-05-25
+**Milestone:** M9 → M10 boundary
+**Detected by:** Process Integrity Agent (inaugural four-lens AUDIT — Systemic Lens)
+**Severity:** Medium — stale references mislead agents who read them; the CE ADR reference contributed to a High-severity near-miss (NM-020); no incident produced by the stale registry header, but the pattern is active
+**Type:** Anticipatory — stale references identified before causing a new failure
+
+### What happened
+
+Three stale cross-references were identified in authoritative documents during the inaugural audit:
+
+**Stale reference 1 (pre-existing, contributed to NM-020):**
+`docs/process/agents.md §Chief Engineer Agent` contained "ADR-007 (sparse matrix propagation, M10 Engine Integrity milestone)" in three locations. ADR-007 was assigned to the Synthetic Data Framework (ARCH-001). The sparse matrix ADR is ADR-009 (ARCH-003, M11). This reference was stale for at minimum the duration between ADR-007's assignment and the NM-020 correction (PR #515). During that period, any agent reading agents.md to determine Chief Engineer activation conditions would conclude the trigger was a now-completed ADR, not the pending ADR-009. This stale reference is listed as a contributing factor in NM-020.
+
+**Stale reference 2 (introduced by PR #517, caught within the same session):**
+The near-miss registry header was updated from `Maintained by: PM Agent (R)` to `Process Integrity Agent (R)` in the file ownership table (PR #517), but the registry's own header was not updated in the same commit. The header continued to read `PM Agent (R)` while the file ownership table said `PI`. These two authoritative sources were in direct contradiction. Any agent consulting the registry header (rather than agent-raci.md) to determine who maintains this file would reach the wrong conclusion.
+
+**Stale reference 3 (stale count in registry header):**
+The near-miss registry narrative read "Nine of the nineteen entries are anticipatory" after NM-020 was filed, making the count stale by two (entries: 20, anticipatory: 11). This was a minor accuracy issue but reflects the same root pattern.
+
+### What was at risk
+
+**Stale reference 1 (CE ADR):** An agent activating the Chief Engineer based on agents.md would conclude the Chief Engineer had already been triggered (ADR-007 is complete) and would not activate the Chief Engineer for ADR-009 preparation or Phase 1 baseline benchmarks. This is precisely the activation failure that contributed to NM-020 — the compute baseline was never tracked in part because no active agent held a HORIZON obligation for it.
+
+**Stale reference 2 (registry header):** An agent using the registry header to identify the file owner would route new near-miss entries to PM Agent — who no longer holds R. This would create an unauthorized write (PM writing to PI's file), repeating the NM-007 pattern with the specific file that exists to document that pattern.
+
+**General pattern:** Authoritative documents that contradict each other create an institutional ambiguity that agents resolve by choosing one source over another, with no consistent rule for which source wins. The file ownership table is the authoritative source for file ownership; the registry header is a convenience reference. When they conflict, an agent may not know which to trust.
+
+### What caught it
+
+The inaugural Process Integrity Agent AUDIT — Systemic Lens review of cross-references between authoritative documents. Stale reference 1 was caught by the Engineering Lead (NM-020). Stale reference 2 was caught in this audit. No process existed that would have caught either proactively.
+
+### Process improvement
+
+**Root cause:** Authoritative documents that reference facts from other authoritative documents (agent names, ADR numbers, file owners, entry counts) are not audited for staleness when the referenced fact changes. The process that updates the source of truth does not include a check for all other documents that cite that truth.
+
+**Two fixes:**
+
+**1. Ownership transfer checklist:** When a file ownership row changes in agent-raci.md, a one-step check is required before committing: search for any document that contains the old owner's name adjacent to the affected file path or role. Files that must be checked for every ownership change:
+- The file's own header or preamble (if it self-references its owner)
+- `CLAUDE.md` (if the file is referenced in the constitution)
+- `SESSION_STATE.md` (if the transfer is a key decision)
+- The near-miss registry (if the transfer was triggered by a process improvement)
+
+This check takes two minutes and prevents the class of stale-header defect that appeared in this audit.
+
+**2. ADR number audit in agent activation triggers:** Any `agents.md` entry that references an ADR number in its activation trigger must be reviewed when that ADR number is assigned to a topic. The Chief Engineer's activation trigger referenced ADR-007 because that was the next unassigned number when the Chief Engineer role was defined. When ADR-007 was assigned to Synthetic Data Framework, no process flagged the Chief Engineer activation trigger as requiring update.
+
+Add to the Architect Agent's AMEND mode: "Before filing any ADR assignment or acceptance, grep `docs/process/agents.md` for references to that ADR number. If found in an activation trigger, verify the trigger still correctly describes the ADR's topic, and if not, amend the trigger in the same PR."
+
+Documented in: `docs/process/agents.md §Architect Agent — AMEND mode` (addition pending), `docs/process/agent-raci.md §File Ownership` (ownership transfer checklist pending)
 
 ---
 
