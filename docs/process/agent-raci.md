@@ -48,22 +48,23 @@
 | DQ | Data Quality Agent | Proposed (Issue #300) |
 | PO | Business Product Owner Agent | Active (Issue #440) |
 | PI | Process Integrity Agent | Active (Issue #516) |
+| CU | Customer Agent | Active (Issue #532) |
 
 ---
 
 ## RACI Matrix
 
-| Decision type | EL | PM | Ar | Im | DA | QA | Sr | IR | So | CE | FA | UD | UT | DI | CO | AF | IB | DQ | PO | PI |
-|---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
-| 1. Architectural decisions | A | I | R | I | C | I | I | I | I | C | C | I | C | C | I | C | I | I | I | I |
-| 2. UX frame decisions | A | I | I | I | I | I | I | C | I | I | C | C | R | I | I | I | I | I | C | I |
-| 3. UX component decisions | A | I | I | I | I | I | I | C | I | I | C | R | I | I | I | I | I | I | C | I |
-| 4. Data / schema decisions | A | I | C | C | R | C | I | I | I | I | I | I | I | I | I | I | I | C | I | I |
-| 5. Domain / measurement decisions | A | I | C | I | I | C | C | I | I | I | I | I | I | R | C | C | I | C | I | I |
-| 6. Process / milestone decisions | A | R | C | I | I | C | I | I | I | I | I | I | C | I | C | I | I | I | C | R |
-| 7. Compliance decisions | A | I | I | C | C | C | R | I | I | I | I | I | I | C | I | I | I | C | I | R |
-| 8. Demo / stakeholder decisions | A | R | I | I | I | I | I | R | I | I | C | C | I | C | I | I | I | I | R | I |
-| 9. Agent activation decisions | A/R | C | I | I | I | I | I | I | I | I | I | I | I | I | I | I | I | I | I | I |
+| Decision type | EL | PM | Ar | Im | DA | QA | Sr | IR | So | CE | FA | UD | UT | DI | CO | AF | IB | DQ | PO | PI | CU |
+|---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
+| 1. Architectural decisions | A | I | R | I | C | I | I | I | I | C | C | I | C | C | I | C | I | I | I | I | C |
+| 2. UX frame decisions | A | I | I | I | I | I | I | C | I | I | C | C | R | I | I | I | I | I | C | I | C |
+| 3. UX component decisions | A | I | I | I | I | I | I | C | I | I | C | R | I | I | I | I | I | I | C | I | C |
+| 4. Data / schema decisions | A | I | C | C | R | C | I | I | I | I | I | I | I | I | I | I | I | C | I | I | I |
+| 5. Domain / measurement decisions | A | I | C | I | I | C | C | I | I | I | I | I | I | R | C | C | I | C | I | I | I |
+| 6. Process / milestone decisions | A | R | C | I | I | C | I | I | I | I | I | I | C | I | C | I | I | I | C | R | I |
+| 7. Compliance decisions | A | I | I | C | C | C | R | I | I | I | I | I | I | C | I | I | I | C | I | R | I |
+| 8. Demo / stakeholder decisions | A | R | I | I | I | I | I | R | I | I | C | C | I | C | I | I | I | I | R | I | C |
+| 9. Agent activation decisions | A/R | C | I | I | I | I | I | I | I | I | I | I | I | I | I | I | I | I | I | I | I |
 
 ---
 
@@ -112,6 +113,11 @@ code." (`agents.md §Architecture Review Facilitator — Working Agreement`)
 structured domain challenges that inform ADR option selection but does not author ADR text.
 (`agents.md §Architecture Review Facilitator — Working Agreement`)
 
+**CU — C:** "Before any ADR accepting a new output format or indicator is finalized, I will
+produce a Layer 3 usability finding for the panel record if consulted." Customer Agent is
+consulted on any ADR introducing a new output format or user-facing indicator to ensure the
+output is self-interpreting for non-technical users. (`agents.md §Customer Agent — Working Agreement`)
+
 ---
 
 ### 2. UX frame decisions
@@ -148,6 +154,12 @@ specifically required when a frame decision affects whether the two story consum
 (writes acceptance tests from stories) and Frontend Architect (implements to stories as the
 user-value specification) — can effectively use the resulting stories.
 (`agents.md §Business Product Owner Agent`)
+
+**CU — C:** "The Customer Agent asks: does the user understand the output well enough to act on
+it? — the institutional capacity question." Frame decisions shape the environment Personas 2, 3,
+and 5 navigate under time pressure. Consulted when a frame decision affects the 90-second
+retrieval window (Persona 2 Reactive) or 5-minute demonstration window (Persona 5 Reactive).
+(`agents.md §Customer Agent`)
 
 ---
 
@@ -186,6 +198,13 @@ cognitive tasks. Consultation is specifically required when a component decision
 whether QA Lead can write a meaningful acceptance test from the resulting stories, or whether
 Frontend Architect can use those stories as a clear user-value specification to guide
 implementation tradeoffs. (`agents.md §Business Product Owner Agent`)
+
+**CU — C:** "I hold the 90-second retrieval window (Persona 2 Reactive) and the 5-minute
+demonstration window (Persona 5 Reactive) as non-negotiable gates." Component decisions that
+determine which elements appear at which step in the Reactive entry state directly affect
+whether Personas 2 and 5 can use the output without specialist mediation. Consulted when a
+component decision changes what is visible in the instrument cluster on load.
+(`agents.md §Customer Agent — Working Agreement`)
 
 ---
 
@@ -388,6 +407,12 @@ question for every milestone demo." "The PO participates in M-close demos and as
 the demo proves the value proposition that was claimed for that milestone."
 (`agents.md §Business Product Owner Agent`)
 
+**CU — C:** "I participate in every milestone demo review and assess whether the demo is usable
+by non-technical personas." Customer Agent is consulted before any demo targeting Persona 5
+(the Institutional Decision-Maker) to verify the demonstration meets the 5-minute window gate
+and requires no specialist translation of the primary finding. (`agents.md §Customer Agent —
+Working Agreement`)
+
 ---
 
 ### 9. Agent activation decisions
@@ -445,6 +470,9 @@ These are explicit commitments in working agreements, not inferred relationships
 | Investment Agent | Development Economist | "Before a CATALYTIC recommendation, I will tell you which cohorts benefit and which don't." | Development Economist working agreement (offer of help) |
 | Council Orchestrator | PM Agent | "Every ROADMAP output includes filed issue numbers for the next HORIZON sweep." | Council Orchestrator working agreement (offer of help) |
 | Council Orchestrator | Architecture Review Facilitator | "When a council session surfaces architectural implications, I flag them to you before the session output is finalized." | Council Orchestrator working agreement (offer of help) |
+| Customer Agent | UX Designer | "Before any new instrument or indicator label is finalized, request a Customer Agent AUDIT pass for Persona 5 legibility." | Customer Agent working agreement (offer of help) |
+| Customer Agent | PO Agent | "When a story involves Personas 2, 3, or 5, request a Customer Agent review of the acceptance criteria before QA authorship begins." | Customer Agent working agreement (offer of help) |
+| Customer Agent | Architect Agent | "When an ADR introduces a new output format, flag it to me before the panel review. I will produce a Layer 3 usability finding for the panel record." | Customer Agent working agreement (offer of help) |
 
 ---
 
@@ -536,6 +564,7 @@ finalized — not afterward.
 | `frontend/` | FA | UD | UD consulted on design-affecting frontend changes |
 | `sim/` (simulation engine) | Im | Ar, CE | Ar consulted on engine architecture; CE on performance tradeoffs |
 | `tests/` | QA | Im | Im consulted on test scope and fixture coverage |
+| `docs/customer/` | CU | EL | Customer Agent output directory: Layer 3 usability assessments (AUDIT mode), institutional adoption pathway documents (ADOPTION mode), customer voice briefs (BRIEF mode) |
 
 ### The Near-Miss That Created This Rule
 
