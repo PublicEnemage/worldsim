@@ -37,7 +37,7 @@
 | Sr | Security & Review Agent | Active |
 | IR | Independent Review Agent | Active |
 | So | Socratic Agent | Active |
-| CE | Chief Engineer Agent | Defined-inactive (activation trigger: ADR-007) |
+| CE | Chief Engineer Agent | Defined-inactive (activation trigger: ADR-009) |
 | FA | Frontend Architect Agent | Active |
 | UD | UX Designer Agent | Active |
 | UT | UX Design Thinking Agent | Active |
@@ -47,22 +47,23 @@
 | IB | Intent Block Author Agent | Proposed (Issue #299) |
 | DQ | Data Quality Agent | Proposed (Issue #300) |
 | PO | Business Product Owner Agent | Active (Issue #440) |
+| PI | Process Integrity Agent | Active (Issue #516) |
 
 ---
 
 ## RACI Matrix
 
-| Decision type | EL | PM | Ar | Im | DA | QA | Sr | IR | So | CE | FA | UD | UT | DI | CO | AF | IB | DQ | PO |
-|---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
-| 1. Architectural decisions | A | I | R | I | C | I | I | I | I | C | C | I | C | C | I | C | I | I | I |
-| 2. UX frame decisions | A | I | I | I | I | I | I | C | I | I | C | C | R | I | I | I | I | I | C |
-| 3. UX component decisions | A | I | I | I | I | I | I | C | I | I | C | R | I | I | I | I | I | I | C |
-| 4. Data / schema decisions | A | I | C | C | R | C | I | I | I | I | I | I | I | I | I | I | I | C | I |
-| 5. Domain / measurement decisions | A | I | C | I | I | C | C | I | I | I | I | I | I | R | C | C | I | C | I |
-| 6. Process / milestone decisions | A | R | C | I | I | C | I | I | I | I | I | I | C | I | C | I | I | I | C |
-| 7. Compliance decisions | A | I | I | C | C | C | R | I | I | I | I | I | I | C | I | I | I | C | I |
-| 8. Demo / stakeholder decisions | A | R | I | I | I | I | I | R | I | I | C | C | I | C | I | I | I | I | R |
-| 9. Agent activation decisions | A/R | C | I | I | I | I | I | I | I | I | I | I | I | I | I | I | I | I | I |
+| Decision type | EL | PM | Ar | Im | DA | QA | Sr | IR | So | CE | FA | UD | UT | DI | CO | AF | IB | DQ | PO | PI |
+|---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
+| 1. Architectural decisions | A | I | R | I | C | I | I | I | I | C | C | I | C | C | I | C | I | I | I | I |
+| 2. UX frame decisions | A | I | I | I | I | I | I | C | I | I | C | C | R | I | I | I | I | I | C | I |
+| 3. UX component decisions | A | I | I | I | I | I | I | C | I | I | C | R | I | I | I | I | I | I | C | I |
+| 4. Data / schema decisions | A | I | C | C | R | C | I | I | I | I | I | I | I | I | I | I | I | C | I | I |
+| 5. Domain / measurement decisions | A | I | C | I | I | C | C | I | I | I | I | I | I | R | C | C | I | C | I | I |
+| 6. Process / milestone decisions | A | R | C | I | I | C | I | I | I | I | I | I | C | I | C | I | I | I | C | R |
+| 7. Compliance decisions | A | I | I | C | C | C | R | I | I | I | I | I | I | C | I | I | I | C | I | R |
+| 8. Demo / stakeholder decisions | A | R | I | I | I | I | I | R | I | I | C | C | I | C | I | I | I | I | R | I |
+| 9. Agent activation decisions | A/R | C | I | I | I | I | I | I | I | I | I | I | I | I | I | I | I | I | I | I |
 
 ---
 
@@ -298,6 +299,12 @@ recommendations that might be acted on later." Filed issues affect milestone sco
 management, not a unilateral PO decision." The PO assesses the user-value impact of scope cuts
 before they are decided. (`agents.md §Business Product Owner Agent`)
 
+**PI — R:** "I own the record of what the project learned about itself. PM decides what to work
+on next; I ensure the project does not repeat what it already learned was a hazard." Owns the
+near-miss registry, known-issues registry, and process audit (four-lens, milestone cadence) —
+the evidence trail that makes the blameless continuous improvement principle operational.
+(`agents.md §Process Integrity Agent — Working Agreement`)
+
 ---
 
 ### 7. Compliance decisions
@@ -338,6 +345,13 @@ formal compliance review. (`agents.md §Geopolitical Analyst — Working Agreeme
 field semantics." Source field compliance — transformation verification, plausibility bounds,
 territorial convention conflicts in source registrations — is within DQ scope.
 (`agents.md §Data Quality Agent`)
+
+**PI — R:** "Compliance scan entries follow the append-only rule unconditionally. I verify
+ascending SCAN number order before committing." Executes compliance scans and appends SCAN
+entries to `docs/compliance/scan-registry.md`. Runs ADR license audits — verifies ADR panel
+compositions against `docs/process/agent-raci.md` and confirms prerequisite clause tracking
+per `docs/architecture/backlog.md §Prerequisite Clause Rule`.
+(`agents.md §Process Integrity Agent — Working Agreement`)
 
 ---
 
@@ -443,7 +457,7 @@ notified in every case.
 | Agent | Basis for implicit-I-only status |
 |---|---|
 | So (Socratic Agent) | "Does not produce code or architecture — produces understanding." Works directly with Engineering Lead only. (`agents.md §Socratic Agent`) |
-| CE (Chief Engineer Agent) | Defined-inactive until ADR-007 activation. C on architectural decisions with computational implications; I on all other decision types until activated. (`agents.md §Chief Engineer Agent`) |
+| CE (Chief Engineer Agent) | Defined-inactive until ADR-009 activation. C on architectural decisions with computational implications; I on all other decision types until activated. (`agents.md §Chief Engineer Agent`) |
 | IB (Intent Block Author Agent) | Proposed status; full working agreement pending Issue #299. No active role in any decision type at this governance stage. |
 
 ---
@@ -499,8 +513,8 @@ finalized — not afterward.
 | `.github/` | EL | Ar | CI/CD pipeline changes require Architect review |
 | `docs/process/agents.md` | PM | EL | Agent persona definitions; EL approves new agent additions |
 | `docs/process/agent-raci.md` | PM | EL, Ar | RACI matrix; Architect consulted when decision-type grounding changes |
-| `docs/process/near-miss-registry.md` | PM | EL | PM files entries; EL informed of High severity entries |
-| `docs/process/known-issues-registry.md` | PM | EL | PM files entries; EL informed of Medium/High severity entries |
+| `docs/process/near-miss-registry.md` | PI | EL | PI files entries; EL informed of High severity entries; PM informed of all entries (I) |
+| `docs/process/known-issues-registry.md` | PI | EL | PI files entries; EL informed of Medium/High severity entries; PM informed of all entries (I) |
 | `docs/schema/api_contracts.yml` | DA | Ar | Ar consulted when response shape changes (API response shape is Architect territory) |
 | `docs/schema/database.yml` | DA | Ar, QA | Ar consulted on schema shape; QA consulted on CI enforcement gates |
 | `docs/schema/simulation_state.yml` | DA | Ar, QA | Same rules as database.yml |
@@ -513,7 +527,7 @@ finalized — not afterward.
 | `docs/ux/user-journeys.md` | UD | PO | User stories trace to journey steps; PO consulted when journey steps change |
 | `docs/ux/` (other files) | UD | FA, UT | FA consulted on frontend feasibility; UT consulted on first-principles consistency |
 | `docs/frontend/` | FA | UD, Ar | UD consulted on design-affecting changes; Ar consulted on architectural decisions |
-| `docs/compliance/scan-registry.md` | Sr | EL | Compliance scan registry; EL informed of new entries |
+| `docs/compliance/scan-registry.md` | PI | EL, Sr | PI executes scans and files entries; Sr consulted on security-relevant findings; EL informed of new entries |
 | `docs/compliance/` (other files) | EL | Sr, Ar | Sr consulted on security findings; Ar on compliance-architecture intersections |
 | `docs/roadmap/` | PM | EL, Ar | EL holds A on roadmap decisions; Ar consulted on milestone architecture |
 | `docs/data-sources/` | DA | DI (CM) | Chief Methodologist consulted on approved-source methodology changes |
