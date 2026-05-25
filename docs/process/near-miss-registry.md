@@ -1344,6 +1344,113 @@ Documented in: `docs/process/agents.md §Architect Agent — AMEND mode` (additi
 
 ---
 
+## NM-023 — CONTRIBUTING.md "Branch from develop" Stale Instruction (Anticipatory)
+
+**Date:** 2026-05-25
+**Milestone:** M9 → M10 boundary
+**Detected by:** Process Integrity Agent (PI-AUDIT-002 pipeline audit — reading phase cross-reference check)
+**Severity:** Medium — actively misleading instruction in mandatory session-start reading; would block or misdirect any new contributor (human or agent) following the documented workflow
+**Type:** Anticipatory — caught before a contributor attempted to branch from the non-existent `develop` branch
+
+### What happened
+
+`docs/CONTRIBUTING.md §Branch Discipline` instructs contributors to "Branch from develop, not main." The project operates entirely on `main`. The `develop` branch does not exist. CLAUDE.md PR merge gate specifies `git pull origin main`. SESSION_STATE.md shows all branches are created from and merged into `main`. The instruction in CONTRIBUTING.md is the inverse of the correct procedure and has been stale for at least multiple milestones.
+
+### What was at risk
+
+A new contributor (human or agent) following CONTRIBUTING.md as mandatory reading would attempt `git checkout -b feature/X develop`. In the agent context, this would produce a "pathspec 'develop' did not match" error, creating confusion about repository state. A human contributor might create `develop` locally and push it, creating an unexpected remote branch. Either path adds friction to first-time contribution and contradicts every other authoritative document.
+
+### What caught it
+
+PI-AUDIT-002 cross-referencing CONTRIBUTING.md against CLAUDE.md PR merge gate, SESSION_STATE.md branch practice, and git log history. No process would have caught this proactively — it was not included in any cross-reference audit or stale-document check.
+
+### Process improvement
+
+**Root cause:** CONTRIBUTING.md was written for a branching strategy (git-flow with develop) that the project abandoned. The change to main-branch development was not reflected in CONTRIBUTING.md.
+
+**Fix:** Update CONTRIBUTING.md branch instructions to specify `main` as the base branch. In the same PR, review CONTRIBUTING.md for other references to `develop` or any other stale branching terminology. See Issue #536.
+
+Add to NM-022's "ADR number audit" pattern: when a project-level workflow decision changes (branching strategy, CI tool, test framework), the CONTRIBUTING.md changelog entry for that decision must include a search-and-replace pass on stale references. The stale-reference checklist from NM-022 §Process improvement applies to CONTRIBUTING.md changes too.
+
+---
+
+## NM-024 — Playwright Sequence Phases 3–4 Not CI-Enforceable (Anticipatory)
+
+**Date:** 2026-05-25
+**Milestone:** M9 → M10 boundary
+**Detected by:** Process Integrity Agent (PI-AUDIT-002 — ADR library review, ADR-006 Decision 12)
+**Severity:** High — the Playwright test sequence is the primary quality gate for instrument-cluster frontend changes; unenforceable phases represent an invisible gap that will predictably manifest under M10 sprint pressure
+**Type:** Anticipatory — gap acknowledged in ADR-006 itself; PI AUDIT formalizes it as a near-miss requiring a process fix
+
+### What happened
+
+ADR-006 Decision 12 mandates a 4-phase Playwright test sequence for all frontend PRs touching the instrument cluster:
+- Phase 1: Component isolation
+- Phase 2: Full render cycle (step advance → instrument update)
+- Phase 3: Mode transition safety (Mode 1→Mode 3 state does not ghost into the wrong instrument)
+- Phase 4: Performance envelope (≤16ms per frame render budget)
+
+The ADR itself states: "The Playwright test sequence (Decision 12) cannot be automatically enforced by CI. It is a PR review discipline requirement." This language was accepted at ADR-006 review as a documented limitation, not a resolved gap. It is not a Known Issue (not an external infrastructure constraint) — it is an unresolved process gap.
+
+### What was at risk
+
+Under M10 sprint pressure, Phases 3 and 4 are the first tests to slip. Phase 3 (mode transition) tests the cross-instrument state contract (ADR-010 §ScenarioStepState) — a failure here could produce ghosted values from Mode 1 persisting into a Mode 3 steering session, corrupting the finance minister's real-time decision context. Phase 4 (render budget) ensures the equitable build requirement (≤16ms on a 4-core machine). Neither failure is caught by CI, and neither would be visible in a quick manual smoke test of the happy path.
+
+### What caught it
+
+PI-AUDIT-002 reading ADR-006 Decision 12 and recognizing the "PR review discipline requirement" language as a formally acknowledged but unresolved vulnerability. The capstone feature trace (PFS Widget, Steps 9 and 11) demonstrated that a real M10 feature would pass through this gate with attestation-only enforcement.
+
+### Process improvement
+
+**Root cause:** The Playwright phase 3–4 sequence was designed for correctness (right tests) but not for enforceability (guaranteed to be run). The enforcement mechanism was deferred from ADR authoring with no corresponding issue filed.
+
+**Three fixes:**
+
+1. **Add Playwright sequence to PR description template (immediate):** Require the frontend agent to attest phases 3–4 completion in a required PR field, not optional prose. Reviewers are instructed to reject PRs that omit the attestation. This does not enforce correctness but does enforce visibility.
+
+2. **Evaluate partial CI automation (M10 scope):** Assess whether Phases 3 and 4 can run against a lightweight frontend-only test harness (not full Docker Compose) consistent with the equitable build requirement. If feasible, implement as a required CI status check. See Issue #543.
+
+3. **Add to CONTRIBUTING.md PR checklist:** Include the Playwright sequence as a named item in the frontend PR checklist alongside the backend lint gate.
+
+---
+
+## NM-025 — Demo Story Ownership Gap (Anticipatory)
+
+**Date:** 2026-05-25
+**Milestone:** M9 → M10 boundary
+**Detected by:** Process Integrity Agent (PI-AUDIT-002 capstone trace — Step 14)
+**Severity:** High — Demo 3 is the primary external validation of M10's mission alignment; absence of a defined owner creates a predictable gap at milestone exit
+**Type:** Anticipatory — gap identified before M10 demo preparation begins
+
+### What happened
+
+The worldsim-roadmap.md defines demo anchors for each milestone. M10 specifies Demo 3 with a finance minister Mode 3 scenario. No agent holds R (Responsible) for demo preparation, demo script, scenario fixture selection, or demo delivery in `docs/process/agent-raci.md`. The PM Agent holds R on roadmap/; the Customer Agent holds R on docs/customer/ — but neither is designated for demo execution.
+
+### What was at risk
+
+In the absence of ownership, demo preparation defaults to whoever has time at milestone exit. The specific risks:
+1. Demo scenario is chosen for technical correctness, not narrative coherence with the finance minister persona (Customer Agent's domain).
+2. Demo script is not validated against Layer 3 usability — the demo may use vocabulary or frame problems in ways that would confuse, not empower, the target user.
+3. Demo preparation is the first item cut under end-of-milestone pressure because it has no blocking issue in the exit checklist.
+
+The mission impact is real: a poorly framed Demo 3 is the primary external signal to potential institutional users. The tool could be technically sound and institutionally unconvincing simultaneously if the demo is not mission-anchored.
+
+### What caught it
+
+PI-AUDIT-002 capstone trace hitting Step 14 and finding no R-holder in agent-raci.md. This is a structural absence, not an oversight in any individual session.
+
+### Process improvement
+
+**Root cause:** The demo anchor is defined in the roadmap (owned by PM) but the execution is owned by no one. There is no line item in the milestone creation ceremony that assigns demo ownership.
+
+**Two fixes:**
+
+1. **Designate PM Agent as R for demo preparation.** PM understands the roadmap intent and coordinates across agents. The Customer Agent holds C (consulted) to validate Layer 3 framing of the demo scenario and script. Add `docs/demos/` to agent-raci.md File Ownership table with PM Agent as R, Customer Agent as C. See Issue #537.
+
+2. **Add demo preparation to milestone creation ceremony checklist.** The milestone creation ceremony currently produces: GitHub milestone object, auto-exit-checklist issue, scope definition issue. Add a fourth artifact: demo preparation issue, assigned to PM Agent, requiring Customer Agent AUDIT sign-off before milestone exit. This makes demo prep a blocking exit requirement, not an afterthought.
+
+---
+
 ## Registry Maintenance
 
 ### How to add an entry
