@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-05-25 (PR #533 merged — Customer Agent defined; Layer 3 institutional capacity mandate; closes #532)**
+**Last updated: 2026-05-25 (PR #548 merged — PI-AUDIT-002 end-to-end pipeline audit complete; NM-023/024/025 filed; Issues #535–#547 filed)**
 **Current milestone:** M9 — Standards Foundation (human-gate phase — awaiting EL sign-off on Issue #213 and M10 creation)
 
 ---
@@ -88,6 +88,7 @@ No open PRs — board clear as of 2026-05-25.
 
 | PR | Title | Date |
 |---|---|---|
+| #548 | process(audit): PI-AUDIT-002 — end-to-end feature delivery pipeline | 2026-05-25 |
 | #533 | process(agents): Customer Agent — Layer 3 institutional capacity (closes #532) | 2026-05-25 |
 | #530 | process(pi-review): PI Agent REVIEW — agent team organization (PI-REVIEW-001); Issues #521–#529 | 2026-05-25 |
 | #519 | process(pi-audit): inaugural PI Agent four-lens audit — NM-021, NM-022, scan ordering fix | 2026-05-25 |
@@ -230,6 +231,7 @@ All Horizon:Immediate issues are now closed. M8 feature-complete.
 
 | Decision | Rationale | Date |
 |---|---|---|
+| PI-AUDIT-002 complete (PR #548) — end-to-end pipeline audit | All 8 pipeline stages documented. 14 findings (F-RUNBOOK-1, F-CONTRIB-1, F-AGENTS-1/2, F-PIPELINE-1/2/3/4, F-ADR-1 through F-ADR-9). Capstone: Political Feasibility Score widget traced through 14 pipeline steps — 5 FRAGILE or BREAKDOWN. Three near-miss entries filed (NM-023: CONTRIBUTING.md "branch from develop" stale; NM-024: Playwright phases 3–4 not CI-enforceable; NM-025: demo story ownership gap). 13 GitHub issues filed (#535–#547). Highest-leverage M10 blockers: #538 (ADR threshold criteria), #541 (cross-ADR impact PR field), #543 (Playwright enforcement). Audit doc: `docs/process/audits/PI-AUDIT-002-pipeline-2026-05-25.md`. | 2026-05-25 |
 | Customer Agent defined (PR #533, closes #532) | Active agent (CU) for Layer 3 institutional capacity asymmetry — the gap identified in PI-REVIEW-001 F-001. Mandate: ensure WorldSim outputs are usable without specialist mediation by Personas 2 (Ministry Negotiator), 3 (Political Advisor), and 5 (Institutional Decision-Maker). Canonical question: does this output make sense to Aicha Mbaye's chief of staff, alone with a tablet, in five minutes, without Lucas Ferreira in the room? Three activation modes: AUDIT (Layer 3 usability pass/fail), ADOPTION (institutional adoption pathway), BRIEF (customer voice for EL). Standing gates: 90-second retrieval window (Persona 2 Reactive) and 5-minute demonstration window (Persona 5 Reactive). RACI: C on Rows 1/2/3/8; R on docs/customer/ artifacts. Three standing consultation obligations added to agent-raci.md cross-agent patterns (CU → UX Designer, CU → PO, CU → Ar). File authority: agents.md (PM R ✓, EL C satisfied by EXECUTE); agent-raci.md decision-type grounding additions flagged for Ar review per NM-021. | 2026-05-25 |
 | PI Agent REVIEW — agent team organization (PR #530, closes no issue — REVIEW mode produces findings doc) | Agent team assessed against the Founding Document's three-layered asymmetry frame. Nine findings across six concrete gaps (F-001–F-006) and three systemic observations (S-001–S-004, S-001 descriptive only). Key structural gap: Layer 3 information asymmetry (institutional capacity) has no dedicated agent. Secondary gaps: backtesting Eureka function (learning from historical divergences) has no owner; IB and DQ agents must be defined before M10 implementation begins; CE activation trigger has fired (Issue #514 commissioned) but CE remains defined-inactive; Mode 3 zone compatibility has no standing implementation gate; DIC blind interview protocol not encoded at the individual member level. Nine GitHub issues filed (#521–#529). Comment filed on Issue #278 (technocratic emigration orphan — M11 triage recommendation). Findings document: `docs/process/audits/PI-REVIEW-001-agent-team-2026-05-25.md`. | 2026-05-25 |
 | PI Agent inaugural four-lens audit complete (PR #519) | Registry lens: near-miss registry header corrected (PM→PI), count updated (19→22 entries). Process adherence lens: two file authority violations across PRs #515 and #517 filed as NM-021. Compliance lens: scan ordering inversion corrected (SCAN-022 before SCAN-023) — third occurrence confirmed systemic. Systemic lens: stale cross-reference pattern filed as NM-022 (CE ADR ref stale 3+ milestones; registry header stale after PR #517; no standing detection process). Process improvements applied: PM Agent and Implementation Agents pre-commit checklists (file authority check per NM-021); PI Agent working agreement (enhanced scan ordering rule; ownership transfer checklist per NM-022); Architect Agent AMEND mode (ADR number cross-reference grep per NM-022); agent-raci.md Notes column clarifications for backlog.md and agent-raci.md rows (per NM-021). | 2026-05-25 |
