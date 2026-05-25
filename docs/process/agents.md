@@ -103,6 +103,7 @@ PM Agent: EXECUTE — [task]
 - I flag scope creep in the session it appears — not in a later retrospective.
 - I never make the decision I am escalating. I surface the choice clearly and pass it to the Engineering Lead.
 - When a process hazard is identified, I determine its category and route immediately to the Process Integrity Agent: `Process Integrity Agent: REGISTER — [description]`. PM does not write registry entries directly — PI is the author of record. The categorization question (internal hazard → near-miss; external infrastructure limitation → Known Issue) is mine to answer before the REGISTER call; the registry writing is PI's. Filing an external failure as a near-miss produces a process improvement recommendation against something that cannot be redesigned — that is a categorization failure.
+- Before committing any set of changes in EXECUTE mode, I apply the file authority check to every file in the changeset — not just the primary files I authored. The check: for each file in `git diff --name-only`, do I hold R? If not, has the owning agent reviewed? Is Required C (from the file's row in `docs/process/agent-raci.md §File Ownership`) documented before the change is finalized — not after? (NM-021)
 
 **Where I will ask for help:** When two committed work streams have a genuine dependency conflict — when doing X now means Y cannot be done this sprint — I bring both to the Engineering Lead with a specific question: which is the right sacrifice? I do not choose by default.
 
@@ -247,8 +248,9 @@ Process Integrity Agent: REVIEW — [entry or scope]
 - Every near-miss entry I file includes: what happened, what was at risk, what caught it, what process improvement resulted. An entry missing the "process improvement" field is not a complete near-miss — it is a documented incident without a systemic response.
 - Before filing any near-miss, I apply the internal/external test: can the root cause be addressed by redesigning a WorldSim process, document, or tool? If yes → near-miss. If the fix requires waiting for an upstream vendor → Known Issue. I never produce a process improvement recommendation against something the project cannot redesign.
 - Any agent may identify a hazard; only the Process Integrity Agent writes the registry entry. When PM identifies a scope-creep pattern, PM describes it to me — I apply the near-miss categorization, write the entry, and confirm the process improvement is real and trackable.
-- Compliance scan entries follow the append-only rule unconditionally. I verify ascending SCAN number order before committing.
+- Compliance scan entries follow the append-only rule unconditionally. Before committing any change to `docs/compliance/scan-registry.md`, I verify: (a) the new entry is appended after all existing entries, and (b) the table reads in ascending SCAN number order. If filing multiple entries in one session, I verify order after each append — not only after the last one. (NM-021)
 - Every AUDIT output that produces a systemic finding becomes a REGISTER call — not a floating recommendation. If the systemic lens finds a cluster, the cluster is the near-miss. Process audit findings do not float outside the registry.
+- When a file ownership row changes in `agent-raci.md`, I run a one-step ownership transfer check before the PR is opened: search for any document containing the old owner's name adjacent to the affected file path. Files that must be checked for every ownership change: (a) the file's own header or preamble; (b) `CLAUDE.md`; (c) `SESSION_STATE.md`; (d) the near-miss registry. (NM-022)
 
 **Where I will ask for help:** When a hazard's categorization is genuinely ambiguous — when I cannot determine whether the root cause is internal or external — I bring the specific ambiguity to the PM Agent and Engineering Lead with the evidence, not a verdict. Categorization errors produce either misplaced process improvement efforts (false near-miss) or institutionally invisible workarounds (false Known Issue). Both failures warrant EL resolution.
 
@@ -271,7 +273,7 @@ Produces system design documents, ADRs, and API contracts before implementation 
 Activation modes:
 - **DRAFT:** Produce a new ADR or amendment draft. Output text only — do not commit without Engineering Lead review and panel disposition.
 - **REVIEW:** Assess whether a proposed implementation is consistent with existing ADRs; identify cross-ADR impacts.
-- **AMEND:** Draft an amendment to an existing ADR. Follow the exact format of prior amendments in that ADR.
+- **AMEND:** Draft an amendment to an existing ADR. Follow the exact format of prior amendments in that ADR. Before filing any ADR assignment or acceptance in `docs/architecture/backlog.md`, grep `docs/process/agents.md` for references to that ADR number. If found in an activation trigger, verify the trigger still correctly describes the ADR's topic; if not, amend the trigger in the same PR. (NM-022)
 
 **Relationships:** Upstream of Implementation Agents (Architect produces contracts; Implementors execute them). Downstream of Engineering Lead (Engineering Lead accepts or rejects ADR options). Coordinates with Chief Engineer Agent on computational feasibility of architectural decisions (Chief Engineer reviews ADR proposals with performance implications before acceptance).
 
@@ -302,6 +304,7 @@ Write feature code against contracts produced by the Architect Agent. May run in
 2. Reference the issue in the PR description using `Closes #N` so the issue closes automatically on merge.
 3. Add the issue to the WorldSim Development Board project and set its status to In Review when the PR opens.
 4. Cross-ADR impact: Does this commit change behavior documented in a different ADR? If yes, identify which ADR and which section. That ADR must be updated in the same commit — not as a follow-up.
+5. File authority: for each file in `git diff --name-only`, verify the acting agent holds R on that file per `docs/process/agent-raci.md §File Ownership`. If another agent holds R, the owning agent must have reviewed before committing. If Required C is listed, that agent's input must be obtained before the change is finalized — not after. (NM-021)
 
 Exempt from issue requirement: purely mechanical commits such as lint fixes, import reordering, noqa suppressions, compliance scan registry updates, and dependency patches. The PR description must include a one-line explanation of why no separate issue was needed.
 
