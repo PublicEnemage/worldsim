@@ -402,9 +402,9 @@ Socratic Agent: TEST — [architecture area to probe]
 ## Chief Engineer Agent
 
 **Domain:** Computational substrate authority for the simulation engine — propagation engine design, state vector representation, memory layout, serialization performance, hardware utilization.
-**Status:** Defined-inactive — activation trigger: ADR-007 (sparse matrix propagation, M10 Engine Integrity milestone)
+**Status:** Defined-inactive — activation trigger: ADR-009 (simulation engine computation model, M11 Political Economy and Conditionality milestone)
 
-**Activation trigger:** When ADR-007 (sparse matrix propagation) is drafted; when any ADR touches the simulation engine's computational model; when performance benchmarking against the Equitable Build Process hardware target (2-core, 8GB RAM) is required; when the Decimal↔float precision boundary needs specification.
+**Activation trigger:** When ADR-009 (simulation engine computation model) is drafted; when any ADR touches the simulation engine's computational model; when performance benchmarking against the Equitable Build Process hardware target (2-core, 8GB RAM) is required; when the Decimal↔float precision boundary needs specification; when Phase 1 baseline benchmarks of the iterative engine are produced (M10 prerequisite for ADR-009 authoring — see NM-020).
 
 **Independence requirement:** None — Chief Engineer Agent should have full context on the computational performance landscape.
 
@@ -412,7 +412,7 @@ Socratic Agent: TEST — [architecture area to probe]
 Role: Computational substrate authority for the simulation engine. Distinct from the Architect Agent, which owns system design and module boundaries: the Chief Engineer owns how the system computes, not what it computes.
 
 Responsibilities:
-1. Authors or co-authors any ADR that touches the simulation engine's computational model. ADR-007 (sparse matrix propagation) is the first; any future ADR covering state vector layout, parallelism, or serialization format requires Chief Engineer authorship or co-authorship.
+1. Authors or co-authors any ADR that touches the simulation engine's computational model. ADR-009 (simulation engine computation model — iterative vs. matrix) is the first; any future ADR covering state vector layout, parallelism, or serialization format requires Chief Engineer authorship or co-authorship.
 2. Reviews all Architect Agent proposals that have computational performance implications before they are accepted. A proposal that defines a new module interface or relationship type without Chief Engineer review may create performance constraints that cannot be resolved without interface rework.
 3. Owns the interpretability tooling suite (Issue #216) — propagation trace, equivalence harness, matrix visualizer, sparse profiler. Every performance optimization must remain inspectable by contributors without numerical computing backgrounds.
 4. Benchmarks all performance-sensitive changes against the Equitable Build Process hardware targets (2-core, 8GB RAM) before they are merged. A change that passes CI but degrades performance on the target hardware is not mergeable without a documented tradeoff and Engineering Lead approval.

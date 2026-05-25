@@ -36,6 +36,20 @@ Minimum panel by ADR type:
 The Architect Agent authors the ADR — they are not a reviewer. The Engineering Lead is
 accountable on all ADRs — their sign-off is always required.
 
+## Prerequisite Clause Rule
+
+Any entry whose Notes field contains a prerequisite clause ("Do not author until [condition]")
+must have a corresponding GitHub issue filed for that prerequisite before the milestone begins
+in which the prerequisite must be completed. The issue is the accountability mechanism; the
+Notes clause is a reminder, not a tracker.
+
+At M10 kickoff: verify that ARCH-003's prerequisite (Phase 1 baseline benchmarks) has a
+corresponding GitHub issue milestoned to M10. If none exists, file one immediately as part
+of the kickoff gate (per MILESTONE_RUNBOOK.md §Kickoff Gate).
+
+Root cause: NM-020 — Phase 1 baseline benchmarks were listed as an ARCH-003 Notes prerequisite
+for three milestones without ever being converted to a tracked work item.
+
 ## Priority Review
 
 The PM Agent HORIZON sweep must include a backlog review before any ADR activation:
