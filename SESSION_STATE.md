@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-05-23 (PRs #509 + #510 merged — M9 exit ceremony complete; ADR-007 accepted; ADR-001/002 renewed; STD-REVIEW-005; SCAN-023; document referencing convention; all horizon:immediate issues closed or formally deferred)**
+**Last updated: 2026-05-25 (PRs #515 + #517 merged — NM-020 filed; Process Integrity Agent defined; CE stale ADR ref fixed in agents.md and agent-raci.md; backlog prerequisite clause rule added; Issue #514 filed for Phase 1 baseline benchmarks)**
 **Current milestone:** M9 — Standards Foundation (human-gate phase — awaiting EL sign-off on Issue #213 and M10 creation)
 
 ---
@@ -82,17 +82,17 @@ Twelve issues filed 2026-05-19. Must complete before M9 UX implementation begins
 
 ## Open PRs
 
-No open PRs — board clear as of 2026-05-23.
+No open PRs — board clear as of 2026-05-25.
 
 ## Recently Merged PRs (last 5)
 
 | PR | Title | Date |
 |---|---|---|
+| #517 | feat(process): Define Process Integrity Agent (closes #516) | 2026-05-25 |
+| #515 | docs(process): NM-020 — backend compute baseline gap; fix stale Chief Engineer ADR ref; backlog prerequisite rule | 2026-05-25 |
+| #511 | chore(state): SESSION_STATE.md — M9 exit ceremony complete (PRs #509 + #510) | 2026-05-25 |
 | #510 | docs(adr): ADR-007 accepted — panel review, Mermaid diagram, ADR-001/002 renewals, document referencing convention, STD-REVIEW-005, SCAN-023 | 2026-05-23 |
 | #509 | docs(adr): ADR-005 Amendment 4 + ADR-007 Synthetic Data Framework (Proposed) — M9 exit ceremony | 2026-05-23 |
-| #506 | docs(process): architecture backlog — pre-ADR queue, RACI-grounded panel composition rule (closes #405) | 2026-05-23 |
-| #505 | process(nm-019): milestone kickoff gate, HORIZON step 6, roadmap linkage requirement (closes #504) | 2026-05-23 |
-| #503 | docs(process): NM-019 — named deliverables invisible on board for entire milestone | 2026-05-23 |
 | #501 | docs(ir): M9 instrument cluster IR review + M8 DEMO triage (Issue #493) | 2026-05-23 |
 | #491 | test(e2e): #463 PR 2 — Greece integration suite + AC-001/002 skip removed (closes #463) | 2026-05-23 |
 | #490 | feat(frontend): wire InstrumentCluster into App.tsx — Zone 1 instruments live (Issue #463 PR 1) | 2026-05-23 |
@@ -227,6 +227,8 @@ All Horizon:Immediate issues are now closed. M8 feature-complete.
 
 | Decision | Rationale | Date |
 |---|---|---|
+| Process Integrity Agent defined (PR #517, closes #516) | New standing agent (PI) owns the process health evidence trail: near-miss-registry.md, known-issues-registry.md, compliance scan registry, ADR license audit. PM becomes Informed on registry files; PI is author of record. Four activation modes: REGISTER, AUDIT (four-lens: registry health / process adherence / compliance / systemic clustering), SCAN, REVIEW. File ownership transferred: near-miss-registry.md + known-issues-registry.md PM→PI; scan-registry.md Sr→PI (Sr becomes Required C on security-relevant findings). PM working agreement updated: PM determines categorization, routes to `Process Integrity Agent: REGISTER`. PI added to RACI matrix: R on rows 6 (process/milestone) and 7 (compliance). CE stale ref fixed in agent-raci.md Agent Key and Cells with Implicit I Only (ADR-007 → ADR-009). | 2026-05-25 |
+| NM-020 filed — backend compute baseline gap; stale CE ADR ref fixed; backlog prerequisite clause rule added (PR #515) | Phase 1 baseline benchmarks for the iterative simulation engine (comprehensive profiling: per-step cost at 1/10/100 entities, propagation cost as edges scale, Monte Carlo throughput) were never established as a tracked work item despite being listed as a prerequisite for ADR-009 authoring across three milestones. Root causes: (1) backlog Notes "Do not author until X" creates no GitHub issue; (2) stale CE ADR reference in agents.md (ADR-007 → ADR-009 in three locations); (3) naming collision — MV-002 is a frontend render gate, not a compute baseline; (4) Chief Engineer Defined-inactive with no HORIZON obligation for its activation prerequisite. Five process improvements: Issue #514 filed (Phase 1 baseline benchmarks, assign to M10 when created); agents.md stale refs corrected; backlog prerequisite clause rule added to docs/architecture/backlog.md; MV-002 explicitly scoped as frontend-only in mv-gates.md; HORIZON check extension documented. | 2026-05-25 |
 | ADR-007 accepted — Synthetic Data Framework (PR #510, closes #508) | Seven-section framework: five-method hierarchy (Bayesian > MICE > Bootstrap > Structural Extrapolation > Structural Absence), mandatory per-indicator disclosure (never suppressible), scenario banding (pessimistic/realistic/optimistic), confidence tier sub-labels (Tiers 3–5), MDA alert behavior by tier (Tier 3 advisory amber / Tier 4 secondary panel only / Tier 5 none), three-condition meaninglessness threshold, anomaly detection (TSC sign-off required). Four INCORPORATE items applied from panel review (CM, Data Architect, Development Economist). `Quantity` gains 4 new fields: `is_synthetic: bool`, `synthetic_method: str \| None`, `comparison_group_id: str \| None`, `holdout_validated: bool \| None` — all new, none pre-existing. Comparison group registry follows `source_registry` pattern (Issue #300, managed by Data Quality Agent). ADR-007 Mermaid flowchart at `docs/architecture/ADR-007-method-selection-flowchart.mmd`. ARCH-001 in backlog: ACCEPTED. | 2026-05-23 |
 | ADR-005 Amendment 4 — GovernanceModule M9 exit formal assessment (PR #509, closes #507) | Five promotion criteria assessed: all Not Met. GovernanceModule formally deferred to M10. M9 Governance Normalization Obligation recorded: before specifying governance composite score strategy, must audit each of five indicators for absolute threshold equivalents (V-Dem electoral autocracy threshold, RSF press freedom floor, WJP rule of law breakpoints). ADR-005 M8-5 tooltip obligation updated: Target M9 → Target M10. License renewed for M10. | 2026-05-23 |
 | Document referencing convention — Issue #398 resolved (PR #510) | Three conventions added to `docs/CODING_STANDARDS.md §Document Referencing Convention`: (1) revision header on all living documents (format specified); (2) ADRs as stable reference points vs. living documents; (3) PR Cross-references section — required field on all PRs that update a living document. Revision headers added to six living documents: `north-star.md`, `information-hierarchy.md`, `user-journeys.md`, `simulation-framework.md`, `CLAUDE.md`, `docs/process/agents.md`. PR template updated. CONTRIBUTING.md updated. | 2026-05-23 |
