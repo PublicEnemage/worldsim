@@ -1036,6 +1036,202 @@ Documented in: `docs/process/near-miss-registry.md NM-019`,
 
 ---
 
+## NM-020 — Phase 1 Baseline Benchmarks Never Tracked: Backend Compute Latency Gap Before Matrix Engine Retrofit
+
+**Date:** 2026-05-25 (identified at M9 exit, during M10 kickoff preparation)
+**Milestone:** M9 → M10 boundary
+**Detected by:** Engineering Lead (anticipatory — observed that MV-002 was frontend-scoped while the
+original compute baseline intent remained untracked)
+**Severity:** High — ADR-009 (the most consequential architectural decision the project will make) has
+a hard authoring constraint: "Do not author until Phase 1 baseline benchmarks are complete." No baseline
+exists. No issue tracks it. No milestone owns it. M11 would begin without the empirical evidence required
+to author ADR-009.
+**Type:** Anticipatory — caught at M9 exit before M11 began
+
+### What happened
+
+**Lineage of the compute baseline requirement:**
+
+NM-012 (~2026-05-15, M6-M7 transition) established the Chief Engineer role with an explicit process
+improvement: "ADR-009 (engine computation model) cannot be authored until the Chief Engineer completes
+Phase 1 baseline benchmarks — a hard constraint preventing speculative architectural commitments."
+
+The benchmarks were defined across four documents:
+
+- `docs/vision/worldsim-technical-concepts.md §The Matrix Engine` (PR #409, 2026-05-22): "Comprehensive
+  baseline benchmarks of the current iterative engine on target hardware before any matrix code is
+  written. Not on development machines. On the 4-core laptop and the GitHub Actions free-tier runner.
+  What does one step computation cost at 1 entity? 10? 100? What does propagation cost as relationship
+  edges increase?"
+- `docs/roadmap/worldsim-roadmap.md §Milestone 11`: "Phase 1 baseline benchmarks — current engine
+  performance on target hardware (4-core laptop / GitHub Actions free-tier runner). Not on development
+  machines." Listed as the first M11 deliverable.
+- `docs/architecture/backlog.md §ARCH-003`: "Do not author until M11 Phase 1 baseline benchmarks
+  complete."
+- Issue #217 (ADR-009 requirements, §c): "The target must be measured, not estimated, using the iterative
+  model as the baseline."
+
+**How MV-002 was introduced and why it does not cover the compute baseline:**
+
+During the M9 FA brief review (2026-05-22), QA Lead raised QA-F2: "Playwright CPU throttle ≠ hardware;
+supplement with MV-002." This was INCORPORATED into the FA brief as MV-002: "Performance ≤ 100ms on
+actual target hardware (8GB/4-core laptop)." MV-002 is scoped exclusively to the **frontend**
+TrajectoryView ComposedChart render time. Its three measurement targets are:
+
+- Initial render time (ComposedChart SVG)
+- Step navigation render time (re-render on step advance)
+- Full Mode 3 component set render time (8 Lines + 4 Areas + 3 shock ReferenceLines)
+
+The Phase 1 baseline benchmarks measure the **backend** simulation propagation engine:
+
+- Iterative propagation cost per step at 1, 10, 100 entities
+- Propagation cost as relationship edges scale
+- Monte Carlo ensemble throughput on the 2-core CI runner and the 4-core laptop
+- Measured in seconds/minutes, not milliseconds
+
+These are different systems, different measurement instruments, different target hardware
+configurations (4-core for MV-002; both 2-core CI runner AND 4-core laptop for Phase 1),
+and different pass criteria (MV-002 has a 100ms threshold; Phase 1 benchmarks establish the
+threshold that ADR-009 will commit to). They cannot substitute for each other.
+
+**Why the compute baseline was never tracked:**
+
+Three mechanisms failed in sequence:
+
+1. **"Do not author until X" clauses do not create issues.** The architecture backlog note
+   for ARCH-003 says "Do not author until M11 Phase 1 baseline benchmarks complete." This
+   is a prose constraint, not a tracked work item. No mechanism converts backlog constraint
+   prose into a GitHub issue with an owner, milestone, and acceptance criteria.
+
+2. **The benchmarks are framed as an M11 prerequisite, not an M10 deliverable.** The roadmap
+   lists Phase 1 benchmarks under M11. The NM-019 HORIZON scope-completeness check looks at
+   "deliverables named in CLAUDE.md and roadmap.md for the current milestone." The benchmarks
+   appear under M11 — so the check does not flag them as untracked for M10, even though they
+   must be completed during M10 to unblock M11 ADR-009 authoring.
+
+3. **The Chief Engineer is Defined-inactive.** No active agent holds standing responsibility
+   for auditing whether the Phase 1 benchmark prerequisite is scheduled. An active agent's
+   HORIZON sweep would catch this; a defined-inactive agent has no HORIZON obligation.
+
+**Contributing factor — stale ADR reference in agents.md:**
+
+`docs/process/agents.md §Chief Engineer Agent` (lines 405, 407, 415) still references
+"ADR-007 (sparse matrix propagation, M10 Engine Integrity milestone)" in three places. ADR-007
+was assigned to the Synthetic Data Framework (ARCH-001, accepted 2026-05-23). The sparse matrix
+computation ADR is ADR-009 (ARCH-003, M11). The milestone is M11, not M10. This stale reference
+means:
+- Any agent reading agents.md to determine when to activate the Chief Engineer would conclude the
+  trigger was ADR-007 (now complete) rather than ADR-009 (still pending).
+- The Chief Engineer would never self-identify as needed for M10 benchmark preparation
+  based on agents.md alone.
+- The stale "M10" milestone reference would lead an agent to expect Chief Engineer activation
+  during M10 for engine work — but for the wrong ADR.
+
+**Contributing factor — surface naming overlap between MV-002 and Phase 1 benchmarks:**
+
+Both MV-002 and the Phase 1 baseline benchmarks are described as "performance on target hardware."
+Both involve 4-core machines. The lexical overlap is significant enough that an agent reviewing the
+FA brief's MV-002 definition could conclude the performance baseline intent was satisfied —
+particularly without the Chief Engineer present in the panel to distinguish frontend render
+performance from backend propagation throughput. The FA brief's review panel (QA Lead, UX
+Design Thinking, UX Designer) had no member with computational substrate authority.
+
+### What was at risk
+
+ADR-009 is described in worldsim-technical-concepts.md as "the most consequential architectural
+decision the project will make." The ADR commits to one of: (a) parallel run of iterative and
+matrix engines before cutover, or (b) hard cutover gated by an equivalence test harness. Either
+path requires a concrete, measured performance target — "A Monte Carlo ensemble of 1,000 runs
+on the Greece scenario must complete within X minutes on the CI runner" (Issue #217 §c). X must be
+measured from the iterative engine baseline, not estimated.
+
+Without Phase 1 baseline benchmarks:
+
+- M11 begins. Chief Engineer is activated. ADR-009 authoring begins. Section (c) requires
+  a measured baseline. The baseline does not exist. ADR-009 cannot be completed responsibly —
+  the performance commitment would be a guess with a document number, not an empirically-grounded
+  target (verbatim from worldsim-technical-concepts.md).
+- OR: A hasty baseline is produced at M11 kickoff under time pressure, without the methodological
+  rigor defined in worldsim-technical-concepts.md — a single-machine measurement rather than a
+  cross-hardware benchmark, taken once rather than across multiple scenario sizes.
+- OR: The ADR is authored and accepted without a hardware performance commitment, leaving the
+  M11 Phase 2 A/B validation without an equivalence target.
+
+Any of these paths degrades the quality of the most consequential architectural decision in the
+project's history. The Equitable Build Process principle — this tool must run on a four-core
+laptop — is the specific equity commitment at risk.
+
+### What caught it
+
+The Engineering Lead, observing at M9 exit that MV-002's description ("performance on target
+hardware") overlapped with the Phase 1 baseline benchmark intent without satisfying it. The
+question "what happened to the backend compute baseline?" surfaced the gap. This is an
+anticipatory catch — no M11 decision had been made in error yet, but the preconditions for
+a forced choice at M11 kickoff were in place.
+
+### Process improvements
+
+**1. File a GitHub issue for Phase 1 baseline benchmarks as an M10 prerequisite. (Done — Issue #514)**
+
+The issue must:
+- Be milestoned to M10 (not M11 — it must complete before M11 ADR-009 authoring begins)
+- Have concrete acceptance criteria: measured performance data for the iterative engine on
+  both the 4-core laptop and the 2-core CI runner, across scenario sizes of 1, 10, and 100
+  entities, with propagation cost as relationship edges scale (per Issue #217 §c)
+- Explicitly block ADR-009 authoring (Issue #217 is the blocking relationship to record)
+- Be owned by the Chief Engineer when activated; owned by the Engineering Lead as gate-keeper
+  until activation
+
+**2. Correct stale ADR reference in agents.md.**
+
+The Chief Engineer section must be updated in the same PR as this near-miss entry:
+- Line 405: `ADR-007 (sparse matrix propagation, M10 Engine Integrity milestone)` →
+  `ADR-009 (simulation engine computation model, M11 Political Economy and Conditionality milestone)`
+- Line 407: same correction to activation trigger
+- Line 415: `ADR-007 (sparse matrix propagation) is the first` → `ADR-009 (simulation engine
+  computation model) is the first`
+
+**3. Architecture backlog rule: "Do not author until X" must have a corresponding GitHub issue.**
+
+Any ARCH-NNN backlog entry whose notes contain a prerequisite clause ("Do not author until
+[condition]") must have a corresponding GitHub issue filed for that prerequisite before the
+milestone begins in which the prerequisite must be completed. The issue is the accountability
+mechanism; the backlog note is a reminder, not a tracker.
+
+Add to `docs/architecture/backlog.md §Process`: "Any entry with a prerequisite clause in its
+Notes field must have a linked GitHub issue for that prerequisite. If no issue exists at the
+time the constraint is identified, file one immediately."
+
+**4. Distinguish MV gates from pre-retrofit baseline measurements in the Chief Engineer working
+agreement.**
+
+MV gates are pass/fail acceptance criteria for shipped features (frontend render ≤100ms).
+Pre-retrofit baseline measurements are empirical surveys of existing code without a pass/fail
+threshold — they establish the threshold. A future agent or reviewer should not confuse the
+two based on shared "hardware performance" language. The Chief Engineer working agreement
+should include: "Phase 1 baseline benchmarks are not MV gates. MV gates are acceptance criteria
+for shipped feature components. Phase 1 benchmarks establish the empirical foundation for
+ADR-009's hardware performance commitment. They are related in subject matter and unrelated
+in purpose."
+
+**5. NM-019 fix extension: HORIZON scope-completeness check must include cross-milestone
+prerequisites.**
+
+The NM-019 fix checks "deliverables named in CLAUDE.md and roadmap.md for the current
+milestone." The Phase 1 benchmarks appear in the roadmap under M11 but must be completed
+in M10. A prerequisite that is listed under a future milestone but must execute in the current
+milestone is not caught by the current HORIZON check. Add to the HORIZON step 6 instruction:
+"Also flag any item in the next milestone's roadmap entry that is a prerequisite for that
+milestone's first ADR, if that prerequisite has no corresponding GitHub issue and no PR in
+the current milestone."
+
+Documented in: `docs/process/near-miss-registry.md §NM-020`,
+`docs/process/agents.md §Chief Engineer Agent` (stale ADR-007 reference corrected to ADR-009 in this PR),
+`docs/architecture/backlog.md §Prerequisite Clause Rule` (added this PR),
+Issue #514 — Phase 1 baseline benchmarks (filed as part of this PR; milestone to M10 once M10 is created)
+
+---
+
 ## Registry Maintenance
 
 ### How to add an entry
