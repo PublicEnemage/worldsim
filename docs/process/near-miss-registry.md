@@ -1451,6 +1451,52 @@ PI-AUDIT-002 capstone trace hitting Step 14 and finding no R-holder in agent-rac
 
 ---
 
+## NM-026 — Issue Closed as Completed Without Delivery: #514 Phase 1 Benchmark (Reactive)
+
+**Date:** 2026-05-29
+**Milestone:** M9 → M10 boundary (closure occurred 2026-05-25)
+**Detected by:** PM Agent BRIEF + EL cross-check (2026-05-29) — EL noticed #514 was closed but the benchmark document did not exist
+**Severity:** High — a blocking M10 prerequisite (#514 gates #217 / ADR-009 authoring) was removed from the board without the work being done; the board showed no open obligation where one existed
+**Type:** Reactive — the bad closure occurred on 2026-05-25; detected four days later
+
+### What happened
+
+Issue #514 ("Phase 1 baseline benchmarks — iterative engine on target hardware") was closed COMPLETED on 2026-05-25T17:54:54Z by the Engineering Lead during M9 exit cleanup. No PR referenced the closure. The required deliverable — `docs/architecture/engine-baseline-benchmarks-m10.md` — was never produced.
+
+The proximate cause was a category error: NM-020 (filed in PR #515) described the Phase 1 benchmark gap as a near-miss, which led to the false impression that filing the near-miss resolved the obligation. It did not. NM-020 is the record that a gap was identified; it is not the gap's resolution.
+
+The same batch-closure session closed Issue #514 within seconds of Issue #532 (Customer Agent) and the M9 exit checklist (#213). #532 was legitimate (PR #533 delivered the work). #514 was not. The closures were co-located in time, making individual verification less likely.
+
+The M9 exit ceremony (MILESTONE_RUNBOOK.md §Exit Ceremony) has seven steps. None require verifying that issues being closed as COMPLETED have either a PR reference or a documented EL rationale for non-PR closure. This structural absence is the root cause; the individual error is the consequence.
+
+A companion gap: Issue #550 (MV-002 frontend render baseline) did not exist as a GitHub issue. It was tracked only in `SESSION_STATE.md` as a pending human gate and in `mv-gates.md` as a procedure. It was therefore invisible to board management and had no exit-checklist hook.
+
+### What was at risk
+
+**#514:** ADR-009 (simulation engine computation model — iterative vs. matrix) cannot be authored until Phase 1 baseline benchmarks exist as the empirical "before" measurement. With #514 closed and off the board, M10 could have proceeded through its full implementation sprint with no one realizing ADR-009's authoring prerequisite was unmet — until M11 planning surfaced the gap at the worst possible time.
+
+**#550 / MV-002:** Without a GitHub issue, the MV-002 gate had no owner, no milestone assignment, and no exit-checklist hook. It could have been skipped at M10 exit with no detection mechanism — shipping a performance regression for resource-constrained users.
+
+### What caught it
+
+EL question during PM Agent BRIEF at M10 entry: "Do we have an issue created for the MV-002 baseline?" The absence of an issue was the first signal. Checking #514's closure then revealed the benchmark document was never produced. The cross-check was triggered by EL pattern recognition, not by any process.
+
+### Process improvement
+
+**Root cause:** The MILESTONE_RUNBOOK.md exit ceremony has no step requiring verification that issues closed COMPLETED during exit cleanup have delivery evidence. The ceremony specifies what ceremonies to run (compliance scan, Socratic TEST, release tag) but not how to verify individual issue state before closure.
+
+**Three fixes:**
+
+1. **Add Issue Disposition Audit to exit ceremony (Step 1.5).** Before the exit checklist is signed off, a structured audit of all milestone issues is required. The audit produces a disposition record for every issue. No issue may be closed COMPLETED during exit cleanup without passing the audit gate. See MILESTONE_RUNBOOK.md §Exit Ceremony (SOP added in this PR).
+
+2. **Explicit rule: near-miss filing does not close the issue it references.** A near-miss entry that names an issue as an example of a gap does not resolve that issue. The issue remains open until the deliverable it requires is produced. Add this rule to the near-miss registry maintenance section and to MILESTONE_RUNBOOK.md §Issue Disposition Audit.
+
+3. **Board-visibility requirement for manual gates.** Any gate defined in a prose document (mv-gates.md, SESSION_STATE.md, exit checklist comments) that requires EL action must also have a corresponding GitHub issue. Manual gates without board representation are invisible to board management. Issue creation is part of gate definition, not an optional follow-up.
+
+Documented in: MILESTONE_RUNBOOK.md §Exit Ceremony (Step 1.5 added), Issue #550 (MV-002 created), Issue #514 (reopened).
+
+---
+
 ## Registry Maintenance
 
 ### How to add an entry
