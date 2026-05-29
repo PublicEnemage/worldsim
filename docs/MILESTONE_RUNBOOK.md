@@ -141,9 +141,52 @@ The roadmap is not silently overwritten. Every update includes a dated note expl
 
 ---
 
+## Issue Disposition Audit
+
+**Performed before the exit checklist is signed off.** This is a blocking gate, not a
+retrospective. No milestone may close until every issue assigned to it has been explicitly
+dispositioned. (Root: NM-026 — Issue #514 closed COMPLETED without delivery during M9 exit.)
+
+For every issue assigned to the closing milestone:
+
+**If CLOSED/COMPLETED:**
+The closure must have one of the following:
+- A pull request that references the issue with a closing keyword (`closes #N`, `fixes #N`)
+  in the PR body or a commit message.
+- An Engineering Lead comment on the issue explaining the non-PR closure. Acceptable
+  explanations: "superseded by Issue #N", "addressed in PR #N body (no auto-link)", "manual
+  process gate — completion recorded as comment on exit checklist #N", "not-planned because X".
+- For epics and parent issues: a comment confirming all child issues are closed.
+
+**If still OPEN:**
+Must be explicitly re-milestoned to a future milestone with a brief comment explaining
+the deferral, OR closed as NOT_PLANNED with a rationale comment. No issue may remain
+in OPEN state against a closing milestone — open issues in a closed milestone are
+invisible to future board management.
+
+**The near-miss filing rule:** A near-miss entry that names an issue as an example of a
+gap does **not** resolve that issue. Filing NM-020 about Issue #514 did not close Issue
+#514. The near-miss documents that the gap was identified; the issue must remain open
+until the deliverable it requires is produced. This rule is non-negotiable: near-miss
+entries are evidence, not resolutions.
+
+**Board-visibility requirement for manual gates:** Any gate defined in a prose document
+(mv-gates.md, SESSION_STATE.md, exit checklist prose, ADR text) that requires Engineering
+Lead action before milestone exit must also have a corresponding GitHub issue. Manual
+gates without board representation are invisible to board management and have no
+exit-checklist hook. Issue creation is part of gate definition, not an optional follow-up.
+
+**Audit record:** Post a comment on the exit checklist issue listing each dispositioned
+issue: number, title, disposition type (PR / EL comment / re-milestoned / not-planned).
+This comment is the audit trail. The exit checklist may not be signed off until this
+comment exists.
+
+---
+
 ## Milestone Closure Ceremony
 
-Performed when all exit checklist items are confirmed green.
+Performed when all exit checklist items are confirmed green **and the Issue Disposition
+Audit above is complete.**
 
 1. **Exit checklist fully checked.** Every item in the milestone exit checklist Issue
    is checked. Any item that was skipped has a documented rationale as a comment on
