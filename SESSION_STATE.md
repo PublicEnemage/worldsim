@@ -5,8 +5,8 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-05-25 (PR #548 merged — PI-AUDIT-002 end-to-end pipeline audit complete; NM-023/024/025 filed; Issues #535–#547 filed)**
-**Current milestone:** M9 — Standards Foundation (human-gate phase — awaiting EL sign-off on Issue #213 and M10 creation)
+**Last updated: 2026-05-29 (PR #551 merged — Issue Disposition Audit SOP + NM-026; #514 reopened; #550 created for MV-002)**
+**Current milestone:** M10 — Engine Integrity and Backtesting (M9 formally closed; M10 active)
 
 ---
 
@@ -68,26 +68,21 @@ Twelve issues filed 2026-05-19. Must complete before M9 UX implementation begins
 
 ---
 
-## M9 Human Gates Remaining (EL only)
+## M9 Human Gates — COMPLETE
 
-| Gate | Description | Status |
-|---|---|---|
-| Socratic Agent TEST | Run Socratic Agent TEST session on M9 architecture — mandatory M9 exit gate | Pending EL |
-| Issue #213 checklist | EL sign-off on all remaining M9 exit checklist items | Pending EL |
-| M10 creation ceremony | Create M10 milestone and file kickoff issues | Pending EL |
-| Issue #213 close | Final M9 closure action — close after all gates pass | Pending EL |
-| MV-002 hardware validation | Run AC-007/008/009 without throttle on real 8GB/4-core laptop; record render times ≤100ms. Procedure: `frontend/tests/manual-validation/mv-gates.md` | Pending EL |
+M9 formally closed. Issue #213 (M9 Exit Checklist) closed 2026-05-24. M10 milestone created and active.
 
 ---
 
 ## Open PRs
 
-No open PRs — board clear as of 2026-05-25.
+No open PRs — board clear as of 2026-05-29.
 
 ## Recently Merged PRs (last 5)
 
 | PR | Title | Date |
 |---|---|---|
+| #551 | process(exit): Issue Disposition Audit SOP — milestone exit cleanup codified (NM-026) | 2026-05-29 |
 | #548 | process(audit): PI-AUDIT-002 — end-to-end feature delivery pipeline | 2026-05-25 |
 | #533 | process(agents): Customer Agent — Layer 3 institutional capacity (closes #532) | 2026-05-25 |
 | #530 | process(pi-review): PI Agent REVIEW — agent team organization (PI-REVIEW-001); Issues #521–#529 | 2026-05-25 |
@@ -231,6 +226,7 @@ All Horizon:Immediate issues are now closed. M8 feature-complete.
 
 | Decision | Rationale | Date |
 |---|---|---|
+| Issue Disposition Audit SOP + NM-026 (PR #551) | Codified milestone exit issue cleanup as a blocking pre-step in MILESTONE_RUNBOOK.md §Issue Disposition Audit. Root: Issue #514 closed COMPLETED during M9 exit without delivering the benchmark document — NM-020 referenced it (documented the gap) which EL interpreted as resolution. Three rules now explicit: (1) COMPLETED closures require PR or EL comment; (2) near-miss filing does not close the issue it references; (3) manual gates must have GitHub issues. NM-026 filed (Reactive, High). Issue #514 reopened (M10 blocking prerequisite for ADR-009). Issue #550 created for MV-002 frontend render baseline. M9 exit window audit: #514 confirmed only bad closure; all others legitimate. | 2026-05-29 |
 | PI-AUDIT-002 complete (PR #548) — end-to-end pipeline audit | All 8 pipeline stages documented. 14 findings (F-RUNBOOK-1, F-CONTRIB-1, F-AGENTS-1/2, F-PIPELINE-1/2/3/4, F-ADR-1 through F-ADR-9). Capstone: Political Feasibility Score widget traced through 14 pipeline steps — 5 FRAGILE or BREAKDOWN. Three near-miss entries filed (NM-023: CONTRIBUTING.md "branch from develop" stale; NM-024: Playwright phases 3–4 not CI-enforceable; NM-025: demo story ownership gap). 13 GitHub issues filed (#535–#547). Highest-leverage M10 blockers: #538 (ADR threshold criteria), #541 (cross-ADR impact PR field), #543 (Playwright enforcement). Audit doc: `docs/process/audits/PI-AUDIT-002-pipeline-2026-05-25.md`. | 2026-05-25 |
 | Customer Agent defined (PR #533, closes #532) | Active agent (CU) for Layer 3 institutional capacity asymmetry — the gap identified in PI-REVIEW-001 F-001. Mandate: ensure WorldSim outputs are usable without specialist mediation by Personas 2 (Ministry Negotiator), 3 (Political Advisor), and 5 (Institutional Decision-Maker). Canonical question: does this output make sense to Aicha Mbaye's chief of staff, alone with a tablet, in five minutes, without Lucas Ferreira in the room? Three activation modes: AUDIT (Layer 3 usability pass/fail), ADOPTION (institutional adoption pathway), BRIEF (customer voice for EL). Standing gates: 90-second retrieval window (Persona 2 Reactive) and 5-minute demonstration window (Persona 5 Reactive). RACI: C on Rows 1/2/3/8; R on docs/customer/ artifacts. Three standing consultation obligations added to agent-raci.md cross-agent patterns (CU → UX Designer, CU → PO, CU → Ar). File authority: agents.md (PM R ✓, EL C satisfied by EXECUTE); agent-raci.md decision-type grounding additions flagged for Ar review per NM-021. | 2026-05-25 |
 | PI Agent REVIEW — agent team organization (PR #530, closes no issue — REVIEW mode produces findings doc) | Agent team assessed against the Founding Document's three-layered asymmetry frame. Nine findings across six concrete gaps (F-001–F-006) and three systemic observations (S-001–S-004, S-001 descriptive only). Key structural gap: Layer 3 information asymmetry (institutional capacity) has no dedicated agent. Secondary gaps: backtesting Eureka function (learning from historical divergences) has no owner; IB and DQ agents must be defined before M10 implementation begins; CE activation trigger has fired (Issue #514 commissioned) but CE remains defined-inactive; Mode 3 zone compatibility has no standing implementation gate; DIC blind interview protocol not encoded at the individual member level. Nine GitHub issues filed (#521–#529). Comment filed on Issue #278 (technocratic emigration orphan — M11 triage recommendation). Findings document: `docs/process/audits/PI-REVIEW-001-agent-team-2026-05-25.md`. | 2026-05-25 |
