@@ -94,7 +94,7 @@ surface: any milestone entry with UNTRACKED items is an open kickoff gate.
 - GovernanceModule promoted — governance axis live with real data; five ADR-005 Amendment 4 promotion criteria → Issue #556 (horizon:immediate) [filed 2026-05-30; blocking prerequisite: #523 IB+DQ agent definitions]
 - PMM (Policy Manoeuvre Margin) live computation → Issue #496 (horizon:immediate)
 - Second country backtesting fixture — Argentina 2000–2002 (confirmed 2026-05-30) → Issue #553 (horizon:immediate) [CM data availability check is blocking prerequisite before implementation]
-- Mean-reversion channel → Issue #221 [**EL DECISION PENDING** — roadmap previously stated "hard constraint, cannot be deferred past M10"; issue moved to M11 per 2026-05-30 board split; EL must either re-milestone #221 to M10 or confirm M11 deferral and remove this constraint]
+- Mean-reversion channel → Issue #221 (M11) [EL decision 2026-05-30: M11 deferral accepted. Greece MAGNITUDE fidelity gap at stabilisation cases is acknowledged. Demo 3 proceeds without the mean-reversion channel. Deferred to M11 where engine integrity is the milestone theme and MacroeconomicModule fidelity work is in scope alongside ADR-009.]
 - Phase 1 baseline benchmarks — iterative engine on target hardware (4-core/8GB laptop AND GitHub Actions free-tier runner) → Issue #514 (horizon:immediate) [moved from M11 to M10 per NM-020, 2026-05-25; prerequisite for ADR-009 authoring in M11; Chief Engineer activation required]
 - step_event_label mandatory field on all Mode 1 fixtures → Issue #395 (horizon:immediate)
 - Playwright demo advancement test and legibility assertions → Issues #376, #377 (horizon:immediate)
