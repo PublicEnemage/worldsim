@@ -9,7 +9,7 @@
 > acting on this chart. If agents.md and this chart conflict, agents.md governs.
 >
 > Issue: #369 (supersedes #301)
-> Last updated: 2026-05-21
+> Last updated: 2026-05-30
 
 ---
 
@@ -37,15 +37,15 @@
 | Sr | Security & Review Agent | Active |
 | IR | Independent Review Agent | Active |
 | So | Socratic Agent | Active |
-| CE | Chief Engineer Agent | Defined-inactive (activation trigger: ADR-009) |
+| CE | Chief Engineer Agent | Active (Issue #524, M10) |
 | FA | Frontend Architect Agent | Active |
 | UD | UX Designer Agent | Active |
 | UT | UX Design Thinking Agent | Active |
 | DI | Domain Intelligence Council (9 members) | Active |
 | CO | Council Orchestrator | Active (operational) |
 | AF | Architecture Review Facilitator | Active (operational) |
-| IB | Intent Block Author Agent | Proposed (Issue #299) |
-| DQ | Data Quality Agent | Proposed (Issue #300) |
+| IB | Intent Block Author Agent | Active (Issue #299) |
+| DQ | Data Quality Agent | Active (Issue #300) |
 | PO | Business Product Owner Agent | Active (Issue #440) |
 | PI | Process Integrity Agent | Active (Issue #516) |
 | CU | Customer Agent | Active (Issue #532) |
@@ -62,7 +62,7 @@
 | 4. Data / schema decisions | A | I | C | C | R | C | I | I | I | I | I | I | I | I | I | I | I | C | I | I | I |
 | 5. Domain / measurement decisions | A | I | C | I | I | C | C | I | I | I | I | I | I | R | C | C | I | C | I | I | I |
 | 6. Process / milestone decisions | A | R | C | I | I | C | I | I | I | I | I | I | C | I | C | I | I | I | C | R | I |
-| 7. Compliance decisions | A | I | I | C | C | C | R | I | I | I | I | I | I | C | I | I | I | C | I | R | I |
+| 7. Compliance decisions | A | I | I | C | C | C | R | I | I | I | I | I | I | C | I | I | R | C | I | R | I |
 | 8. Demo / stakeholder decisions | A | R | I | I | I | I | I | R | I | I | C | C | I | C | I | I | I | I | R | I | C |
 | 9. Agent activation decisions | A/R | C | I | I | I | I | I | I | I | I | I | I | I | I | I | I | I | I | I | I | I |
 
@@ -360,6 +360,13 @@ as it could serve defense, and I do so before the finding appears in output." Th
 relationship — the Geopolitical Analyst flags to the Security & Review Agent, who conducts the
 formal compliance review. (`agents.md §Geopolitical Analyst — Working Agreement`)
 
+**IB — R:** Intent block divergence detection is a compliance function: when a divergence is
+found between an intent block and its implementation, IB files it as a GitHub Issue. The
+divergence may mean the intent block was wrong or the implementation is wrong — IB surfaces
+the finding; the Engineering Lead determines which. The segregation of duties rule (implementer
+cannot author their own intent block) is enforced at the session boundary.
+(`agents.md §Intent Block Author Agent — Working Agreement`)
+
 **DQ — C:** "RACI position: ... C on data standards gap dispositions when gaps involve source
 field semantics." Source field compliance — transformation verification, plausibility bounds,
 territorial convention conflicts in source registrations — is within DQ scope.
@@ -485,8 +492,7 @@ notified in every case.
 | Agent | Basis for implicit-I-only status |
 |---|---|
 | So (Socratic Agent) | "Does not produce code or architecture — produces understanding." Works directly with Engineering Lead only. (`agents.md §Socratic Agent`) |
-| CE (Chief Engineer Agent) | Defined-inactive until ADR-009 activation. C on architectural decisions with computational implications; I on all other decision types until activated. (`agents.md §Chief Engineer Agent`) |
-| IB (Intent Block Author Agent) | Proposed status; full working agreement pending Issue #299. No active role in any decision type at this governance stage. |
+| CE (Chief Engineer Agent) | Active as of Issue #524 (M10). C on architectural decisions with computational implications; I on all other decision types outside simulation engine scope. (`agents.md §Chief Engineer Agent`) |
 
 ---
 
@@ -565,6 +571,8 @@ finalized — not afterward.
 | `sim/` (simulation engine) | Im | Ar, CE | Ar consulted on engine architecture; CE on performance tradeoffs |
 | `tests/` | QA | Im | Im consulted on test scope and fixture coverage |
 | `docs/customer/` | CU | EL | Customer Agent output directory: Layer 3 usability assessments (AUDIT mode), institutional adoption pathway documents (ADOPTION mode), customer voice briefs (BRIEF mode) |
+| `docs/process/intent-block-author-prompt.md` | PM | EL | Activation prompt for IB Agent; PM owns as part of agent process infrastructure |
+| `docs/process/data-quality-agent-prompt.md` | PM | EL | Activation prompt for DQ Agent; PM owns as part of agent process infrastructure |
 
 ### The Near-Miss That Created This Rule
 
