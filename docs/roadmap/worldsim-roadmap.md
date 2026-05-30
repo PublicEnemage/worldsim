@@ -1,8 +1,8 @@
 # WorldSim Roadmap
 
-> Last significant revision: 2026-05-22
-> Next mandatory review: Milestone 9 close
-> Updated against: M9 design foundation sequence complete; M10–M13 arc established through demo-anchored working-backwards analysis
+> Last significant revision: 2026-05-30
+> Next mandatory review: Milestone 10 close
+> Updated against: M10 kickoff gate — Argentina 2000–2002 confirmed as second country fixture; Phase 1 benchmarks moved to M10 per NM-020; GovernanceModule #556 filed; scope linkage issue numbers added; #221 conflict flagged pending EL decision
 > Canonical location: `docs/roadmap/worldsim-roadmap.md`
 
 *This document is directionally committed, not contractually precise. When scope changes materially, this document is updated with a dated rationale note — not silently overwritten. The change history is the accountability mechanism.*
@@ -90,14 +90,15 @@ surface: any milestone entry with UNTRACKED items is an open kickoff gate.
 **Core deliverable:** The instrument cluster redesign implemented, all four radar axes live with real data, and a second country backtesting fixture. The tool that Demo 3 will show.
 
 **What ships:**
-- Instrument cluster implementation — trajectory view as Zone 1 primary, MDA alerts always visible without navigation, step axis annotated with calendar dates and event labels
-- GovernanceModule promoted — governance axis live with real data
-- PMM (Policy Manoeuvre Margin) live computation
-- Second country backtesting fixture — Ecuador or Argentina (to be confirmed)
-- Mean-reversion channel (#221) — hard constraint, cannot be deferred past M10
-- step_event_label mandatory field on all Mode 1 fixtures (#395)
-- Playwright demo advancement test and legibility assertions as M10 exit gates
-- Confidence tier standards — prerequisite for M11 uncertainty quantification work
+- Instrument cluster implementation — trajectory view as Zone 1 primary, MDA alerts always visible without navigation, step axis annotated with calendar dates and event labels → Issues #495, #496, #497, #498, #499, #500 (horizon:immediate)
+- GovernanceModule promoted — governance axis live with real data; five ADR-005 Amendment 4 promotion criteria → Issue #556 (horizon:immediate) [filed 2026-05-30; blocking prerequisite: #523 IB+DQ agent definitions]
+- PMM (Policy Manoeuvre Margin) live computation → Issue #496 (horizon:immediate)
+- Second country backtesting fixture — Argentina 2000–2002 (confirmed 2026-05-30) → Issue #553 (horizon:immediate) [CM data availability check is blocking prerequisite before implementation]
+- Mean-reversion channel → Issue #221 [**EL DECISION PENDING** — roadmap previously stated "hard constraint, cannot be deferred past M10"; issue moved to M11 per 2026-05-30 board split; EL must either re-milestone #221 to M10 or confirm M11 deferral and remove this constraint]
+- Phase 1 baseline benchmarks — iterative engine on target hardware (4-core/8GB laptop AND GitHub Actions free-tier runner) → Issue #514 (horizon:immediate) [moved from M11 to M10 per NM-020, 2026-05-25; prerequisite for ADR-009 authoring in M11; Chief Engineer activation required]
+- step_event_label mandatory field on all Mode 1 fixtures → Issue #395 (horizon:immediate)
+- Playwright demo advancement test and legibility assertions → Issues #376, #377 (horizon:immediate)
+- Confidence tier standards (SA-02) — prerequisite for M11 uncertainty quantification → Issue #43 (horizon:immediate)
 
 **Demo:** Demo 3 at M10 close. All four frameworks live. Second country live. Instrument cluster redesigned.
 
@@ -114,7 +115,7 @@ surface: any milestone entry with UNTRACKED items is an open kickoff gate.
 **What ships:**
 
 *Matrix engine investigation (Chief Engineer owned):*
-- Phase 1 baseline benchmarks — current engine performance on target hardware (4-core laptop / GitHub Actions free-tier runner). Not on development machines.
+- Phase 1 baseline benchmarks — [moved to M10, Issue #514 (horizon:immediate), per NM-020 2026-05-25; ADR-009 authoring depends on M10 benchmark results before matrix investigation begins]
 - ADR-009 authored and accepted — after Phase 1 results, before any matrix code written
 - Sparse matrix proof-of-concept — matrix engine running alongside iterative engine. Not a replacement.
 - Phase 2 A/B validation — output equivalence to Decimal precision, performance comparison on identical hardware, full backtesting suite passing identically on both engines
