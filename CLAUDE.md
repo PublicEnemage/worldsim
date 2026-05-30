@@ -1,8 +1,8 @@
 # CLAUDE.md — WorldSim Project Context
 
-> Last significant revision: 2026-05-23
-> Updated against: M9 exit — NM-019 process fixes (PR #505), agent RACI/panel composition rule, roadmap scope linkage requirement; ADR-007 accepted; GovernanceModule deferred to M10
-> Previous version context: Pre-M9 exit — simulation framework was inline, no synthetic data framework section, no architecture backlog process
+> Last significant revision: 2026-05-30
+> Updated against: M10 kickoff — M9 closed (v0.9.0); M10 current; M11 next; ADR-007 accepted; GovernanceModule #556 in M10; Argentina #553 confirmed; GitHub milestone titles/descriptions corrected
+> Previous version context: M9 exit (2026-05-23) — M9 Standards Foundation current, M10 next, ADR-007 forthcoming
 
 ## What This Project Is:
 
@@ -270,17 +270,15 @@ Detailed domain profiles: `docs/agents/domain-intelligence-council.md`
 
 ## What We Are Building First
 
-M0–M8 complete (v0.1.0–v0.8.0). ADRs 001–006 current; ADR-007 forthcoming.
+M0–M9 complete (v0.1.0–v0.9.0). ADRs 001–007 current.
 See GitHub Releases for full delivery history.
 
-**Milestone 9 — Standards Foundation (Current)**
-- GovernanceModule promotion path (five criteria; target M9)
-- UX architecture rethink — Case B verdict executed; instrument cluster in
-  primary viewport; control plane zone reserved
-- User persona document (five personas, marquee acceptance cases)
-- Synthetic data framework ADR (ADR-007) — Chief Methodologist consultation
-  complete; formal ADR pending
-- Agent working agreements (15 agents; RACI chart)
+**Milestone 10 — Engine Integrity and Instrument Delivery (Current)**
+- Instrument cluster redesign — all four Zone 1 axes live with real data
+- GovernanceModule promoted — governance axis live (five ADR-005 criteria; Issue #556)
+- PMM (Policy Manoeuvre Margin) live computation
+- Argentina 2000–2002 second country fixture (Demo 3; Issue #553)
+- Phase 1 engine baseline benchmarks — prerequisite for ADR-009 (Issue #514)
 
 Each milestone is a vertical slice — working software at every stage,
 not infrastructure waiting for features.
@@ -289,15 +287,15 @@ not infrastructure waiting for features.
 
 ## Milestone Roadmap
 
-M0–M8 complete (v0.1.0–v0.8.0). M9 current. See GitHub Releases for full delivery history.
+M0–M9 complete (v0.1.0–v0.9.0). M10 current. See GitHub Releases for full delivery history.
 
-The full roadmap covering M9 through M13 — milestone deliverables, demo anchors, canonical users served, and the long-term resolution spectrum direction — is maintained at `docs/roadmap/worldsim-roadmap.md`. That document is the canonical reference. The summary below reflects current and next milestone only.
+The full roadmap covering M10 through M13 — milestone deliverables, demo anchors, canonical users served, and the long-term resolution spectrum direction — is maintained at `docs/roadmap/worldsim-roadmap.md`. That document is the canonical reference. The summary below reflects current and next milestone only.
 
-**Milestone 9 — Standards Foundation (Current)**
-Core deliverable: UX design foundation, instrument cluster specification, agent working agreements, synthetic data framework, architecture backlog process.
+**Milestone 10 — Engine Integrity and Instrument Delivery (Current)**
+Core deliverable: Instrument cluster redesign implemented, all four radar axes live with real data, GovernanceModule promoted, Argentina 2000–2002 second country fixture. Demo 3.
 
-**Milestone 10 — Engine Integrity and Instrument Delivery (Next)**
-Core deliverable: Instrument cluster redesign implemented, all four radar axes live, second country fixture. Demo 3.
+**Milestone 11 — Engine Investigation and Political Economy (Next)**
+Core deliverable: ADR-009 (simulation engine computation model), sparse matrix proof-of-concept, political economy module (conditionality, political feasibility, elite capture). No demo.
 
 Full roadmap: `docs/roadmap/worldsim-roadmap.md`
 
