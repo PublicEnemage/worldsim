@@ -64,7 +64,20 @@ Performed when the previous milestone closes and the next begins.
 ## Kickoff Gate — Mandatory Before First Implementation Issue
 
 Before any implementation issue is filed for this milestone, the PM Agent
-must run a scope-completeness check:
+must run the following checks in order:
+
+0. **Milestone metadata alignment check.** Before scope verification begins,
+   verify all four milestone artifacts are aligned with the milestone now
+   starting as **Current**:
+   - GitHub milestone title matches `Milestone N — <Name>` convention
+   - GitHub milestone description reflects the core deliverable of the
+     milestone now beginning — not a prior or future milestone's scope
+   - `CLAUDE.md §What We Are Building First` shows the new milestone as
+     current with bullet points matching its core deliverables
+   - `CLAUDE.md §Milestone Roadmap` shows the new milestone as Current and
+     the next as Next
+   Any misalignment found must be corrected before proceeding to step 1.
+   (Issue #561)
 
 1. Read `CLAUDE.md` and enumerate every deliverable explicitly named for
    this milestone.
@@ -227,7 +240,19 @@ Audit above is complete.**
    - [one-line summary of open finding count by severity]
    ```
 
-7. **Next milestone creation ceremony triggered.** Unless this is the final milestone,
+7. **Milestone metadata alignment check.** Before the next milestone creation
+   ceremony, verify all four artifacts have been updated to reflect this milestone
+   as complete and the next as current:
+   - GitHub milestone description updated to reflect what shipped and any explicit
+     deferrals (with issue numbers and dated rationale)
+   - `CLAUDE.md §What We Are Building First` updated to show the next milestone
+     as current with correct bullet points
+   - `CLAUDE.md §Milestone Roadmap` updated to show the next milestone as Current
+   - `docs/roadmap/worldsim-roadmap.md` revision header updated; scope deferrals
+     noted with dated rationale
+   Any misalignment found must be corrected before step 8. (Issue #561)
+
+8. **Next milestone creation ceremony triggered.** Unless this is the final milestone,
    immediately initiate the creation ceremony for Milestone N+1. Do not leave a gap
    between milestones — the gap is where work loses coherence and Issues accumulate
    without context.
