@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-05-30 (M10 kickoff gate complete — #556 filed, roadmap updated PR #557; EL decision pending on #221)**
+**Last updated: 2026-05-30 (M10 kickoff gate fully resolved — #221 Option B accepted; roadmap final; implementation unblocked pending #523/#524/#514/#550)**
 **Current milestone:** M10 — Engine Integrity and Backtesting (M9 formally closed; M10 active)
 
 ---
@@ -202,7 +202,7 @@ All Horizon:Immediate issues are now closed. M8 feature-complete.
 
 | Decision | Context | Status |
 |---|---|---|
-| #221 mean-reversion channel — M10 or M11? | Roadmap stated "hard constraint, cannot be deferred past M10." Board split 2026-05-30 moved #221 to M11 (EL approved split). Conflict identified at M10 kickoff gate. Option A: revert #221 to M10 (roadmap constraint stands, M10 scope grows). Option B: accept M11 deferral (confirm split decision supersedes roadmap; roadmap will be updated to remove hard-constraint language with rationale). Kickoff gate is blocked on this decision. | **PENDING** |
+| #221 mean-reversion channel — M10 or M11? | Option B selected 2026-05-30: M11 deferral confirmed. Greece MAGNITUDE fidelity gap at stabilisation cases acknowledged. Demo 3 proceeds without mean-reversion channel. Roadmap updated (hard-constraint language removed; rationale recorded). Decision posted on #261 and #221. | Complete ✅ — 2026-05-30 |
 |---|---|---|
 | Trajectory endpoint implementation | FastAPI route + Pydantic model + normalized_absolute_strategy backend function. All prerequisites complete. May begin. | Ready — unblocked |
 | US-GAP-001 — Andreas Mode 1 comparative case surface | **Resolved.** EL decision 2026-05-23: M10 gap. Issue #451 filed. information-hierarchy.md §COMPARE_VIEW Mode 1 placeholder added. user-stories file updated to reflect partial M9 service for Persona 3. | Complete ✅ — PR #452 |
