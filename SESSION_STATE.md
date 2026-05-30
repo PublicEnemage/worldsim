@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-05-30 (M10/M11 issue split executed — 54 M10 open, 42 M11 open, 0 unmilestoned)**
+**Last updated: 2026-05-30 (M10 kickoff gate complete — #556 filed, roadmap updated PR #557; EL decision pending on #221)**
 **Current milestone:** M10 — Engine Integrity and Backtesting (M9 formally closed; M10 active)
 
 ---
@@ -202,6 +202,8 @@ All Horizon:Immediate issues are now closed. M8 feature-complete.
 
 | Decision | Context | Status |
 |---|---|---|
+| #221 mean-reversion channel — M10 or M11? | Roadmap stated "hard constraint, cannot be deferred past M10." Board split 2026-05-30 moved #221 to M11 (EL approved split). Conflict identified at M10 kickoff gate. Option A: revert #221 to M10 (roadmap constraint stands, M10 scope grows). Option B: accept M11 deferral (confirm split decision supersedes roadmap; roadmap will be updated to remove hard-constraint language with rationale). Kickoff gate is blocked on this decision. | **PENDING** |
+|---|---|---|
 | Trajectory endpoint implementation | FastAPI route + Pydantic model + normalized_absolute_strategy backend function. All prerequisites complete. May begin. | Ready — unblocked |
 | US-GAP-001 — Andreas Mode 1 comparative case surface | **Resolved.** EL decision 2026-05-23: M10 gap. Issue #451 filed. information-hierarchy.md §COMPARE_VIEW Mode 1 placeholder added. user-stories file updated to reflect partial M9 service for Persona 3. | Complete ✅ — PR #452 |
 | UX-RULING US-016 — alert text strings per mode | **Resolved.** Mode 1: `"crossed"` present; `"is projected"` + `"Caused by:"` absent. Mode 2: `"is projected to cross"`. Mode 3: ` — ` separator; starts with `"CRITICAL"` or `"WARNING"`. PR #454. | Complete ✅ — 2026-05-23 |
@@ -226,6 +228,7 @@ All Horizon:Immediate issues are now closed. M8 feature-complete.
 
 | Decision | Rationale | Date |
 |---|---|---|
+| M10 kickoff gate complete (2026-05-30) — PR #557 | PM Agent scope-completeness check run against CLAUDE.md and roadmap. Finding 1 RESOLVED: GovernanceModule promotion was untracked — Issue #556 filed (M10 Immediate, five ADR-005 criteria). Finding 2 EL DECISION PENDING: #221 (mean-reversion channel) — roadmap stated "hard constraint, cannot be deferred past M10" but board split moved it to M11; EL must choose Option A (revert #221 to M10) or Option B (accept M11 deferral + roadmap update). Roadmap updated (PR #557): Argentina confirmed (#553), Phase 1 benchmarks in M10 (#514), scope linkage issue numbers added. Kickoff baseline posted on exit checklist #261. Pre-implementation gate sequence: #523 → #524 → EL decision on #221 → #514 → #550. No implementation PR may open until EL confirms baseline. | 2026-05-30 |
 | M10/M11 issue split executed (2026-05-30) | Four-batch milestone reorganization: (1) 11 unmilestoned issues → M10 Immediate (#514, #523, #524, #535–#539, #541, #543, #550); (2) 12 unmilestoned issues → M10 Near-Term (#522, #525–#529, #540, #542, #544–#547); (3) 11 Demo-3-critical issues upgraded M10 Near-Term → M10 Immediate (#342, #343, #345–#348, #350, #496–#498, #500); (4) 23 engine/SA-* standards issues pushed M10 → M11 (#29, #44, #46, #91–#92, #95, #103, #116, #118–#119, #122–#123, #147, #151–#152, #154–#155, #160, #173, #221–#222, #271, #275). Board: M10 = 54 open (34 Immediate / 20 Near-Term), M11 = 42 open, unmilestoned = 0. Kept in M10 (foundational, ADR-007/Demo 3 prerequisites): #22, #27, #30, #43, #45, #89, #102, #184, #451. | 2026-05-30 |
 | Argentina 2000–2002 second country fixture filed — Issue #553 | Demo 3 anchor issue filed: `feat(fixture): Argentina 2000–2002 second country fixture — IMF debt crisis (Demo 3)`. Milestone: M10, horizon:immediate. CM data availability check is the blocking prerequisite before implementation begins — CM must validate all core WorldSim indicators at Tier 1–2 for the 1999–2003 window (IMF IFS/WEO, WDI, INDEC 2000–2002 pre-manipulation era, V-Dem, ILO, UNESCO). Argentina selected over Iceland 2008–2011 and South Korea 1997–1999: IMF SBA data Tier 1, INDEC 2000–2002 Tier 1–2 (pre-manipulation), V-Dem Tier 1, distinct political economy from Greece. Demo 3 requires all four Zone 1 axes live with Argentina data + Greece comparison. | 2026-05-30 |
 | Issue Disposition Audit SOP + NM-026 (PR #551) | Codified milestone exit issue cleanup as a blocking pre-step in MILESTONE_RUNBOOK.md §Issue Disposition Audit. Root: Issue #514 closed COMPLETED during M9 exit without delivering the benchmark document — NM-020 referenced it (documented the gap) which EL interpreted as resolution. Three rules now explicit: (1) COMPLETED closures require PR or EL comment; (2) near-miss filing does not close the issue it references; (3) manual gates must have GitHub issues. NM-026 filed (Reactive, High). Issue #514 reopened (M10 blocking prerequisite for ADR-009). Issue #550 created for MV-002 frontend render baseline. M9 exit window audit: #514 confirmed only bad closure; all others legitimate. | 2026-05-29 |
