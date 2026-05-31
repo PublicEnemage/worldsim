@@ -1497,6 +1497,58 @@ Documented in: MILESTONE_RUNBOOK.md §Exit Ceremony (Step 1.5 added), Issue #550
 
 ---
 
+## NM-027 — Performance Tests Silently No-Op: AC-007 and AC-008 Measured Nothing for One Milestone (Reactive)
+
+**Date:** 2026-05-31
+**Milestone:** M9 implementation → M10 (gap existed from M9; detected at M10 MV-002 pre-execution)
+**Detected by:** EL + CE Agent readiness check before running MV-002 on target hardware
+**Severity:** High — AC-007 and AC-008 were listed as active CI gates and referenced in the MV-002 procedure, but both produced false-green results with zero measurement for one full milestone
+**Type:** Reactive — the gap was introduced during M9 implementation (PRs #484/#489); detected at M10 MV-002 execution attempt
+
+### What happened
+
+During M9, the QA Lead authored `trajectory-view.spec.ts` with AC-007 (initial render ≤ 100ms) and AC-008 (step navigation ≤ 100ms). Both tests were written with no-op guards designed for the case where the component is not yet wired into the app:
+
+- AC-007: `if (renderMs !== null)` — skips the assertion if no `"trajectory-render"` performance mark is found
+- AC-008: `if (hasAdvance)` — skips the assertion if no `[data-testid="advance-step-btn"]` element is found
+
+The Frontend Architect implemented `TrajectoryView.tsx` (PR #484) without emitting `performance.measure("trajectory-render-initial", ...)`. The component was fully wired into App.tsx (PR #490) and the Greece integration Playwright suite was passing (PR #491) — but `performance.getEntriesByType("measure")` returned an empty array on every run because the mark was never emitted.
+
+The advance button in `ScenarioControls.tsx` existed but had no `data-testid`. The `hasAdvance` guard therefore evaluated to `false` on every CI run.
+
+Both tests passed in CI throughout M9. Neither the FA nor the QA Lead identified that the tests were no-ops. MV-002 was listed in `mv-gates.md` as a pending human gate guarded by these CI tests. When M10 pre-execution began, a readiness check discovered both gaps. The tests were producing false confidence: the CI board showed green, the gate was listed as "pending hardware confirmation," and the implicit assumption was that the software-side constraint was met.
+
+### What was at risk
+
+**False CI gate.** AC-007 and AC-008 were listed in the M9 exit criteria as CI gates for performance. Had MV-002 been executed on the ProBook without a readiness check, the Playwright tests would have passed (as no-ops), the issue would have been closed with no render time measurements, and the milestone would have recorded "performance validated on target hardware" with zero supporting data.
+
+**Invisible performance regression path.** The missing performance mark means there is no automated signal if a future change causes TrajectoryView to render slowly. A component that takes 500ms to paint would continue to pass AC-007 silently, because AC-007 has no observation window into what it is supposed to guard.
+
+### What caught it
+
+A manual readiness assessment run before executing MV-002. The CE Agent read `trajectory-view.spec.ts` and `TrajectoryView.tsx` side-by-side and asked: "Does the component actually emit the mark this test is looking for?" No process required this check. It was human pattern recognition, not a process gate.
+
+### Process improvement
+
+**Root cause:** Two structural gaps enabled this failure:
+
+1. **No verification step between "test authored" and "test activates."** The QA Lead wrote the no-op guard correctly — it is the right pattern when a component is not yet wired up. But there is no process step requiring the guard to be removed (or the mark/testid to be added) when the component ships. The QA pre-implementation test authorship commitment (`docs/process/agents.md §QA Lead`) specifies writing tests before implementation; it does not require a post-implementation activation check to verify the guard is no longer needed.
+
+2. **No FA pre-PR checklist item for performance mark compliance.** The FA brief (`docs/frontend/fa-brief-m9-instrument-cluster.md`) specified AC-007–AC-009 as named acceptance criteria, but the FA's pre-PR checklist has no step requiring verification that performance marks named in the ACs are actually emitted by the implemented component.
+
+**Three fixes:**
+
+1. **QA Lead working agreement — add post-ship activation check.** After any PR that wires a previously no-op-guarded component into the running app, QA Lead must verify that all guarded assertions are either (a) now producing real measurements, or (b) still correctly guarded with a documented reason. A test that has been no-op for more than one milestone without documentation is a process violation.
+
+2. **FA pre-PR checklist — add performance mark compliance item.** Before any PR that implements a component with named performance ACs (AC-007/AC-008 pattern), FA must verify that the component emits the `performance.measure()` or `performance.mark()` entries named in the spec. If not emitted, the PR is incomplete.
+
+3. **CI no-op detection note.** The pattern `if (someValue !== null) { expect(someValue).toBeLessThan(...) }` is a valid test design for not-yet-implemented features. But any such guard must have a corresponding issue tracking its eventual removal or satisfaction. "Perpetually guarded" tests are not CI gates — they are documentation of future intent. The QA Lead working agreement should reflect this explicitly.
+
+Documented in: Issue #568 (readiness fixes — PR #570), Issue #569 (Mode 3 MV-002 re-run, M12), Issue #550 (MV-002 execution, now unblocked).
+FA and QA Lead notified in `docs/process/agents.md` working agreement updates below.
+
+---
+
 ## Registry Maintenance
 
 ### How to add an entry

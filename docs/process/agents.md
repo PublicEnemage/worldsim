@@ -379,6 +379,8 @@ Scope:
 - Type 2 ACs live in a dedicated `<feature>-integration.spec.ts` with an explicit dependency header. The file contains no Type 1 ACs.
 - `test.skip(true, ...)` at file scope is a process violation for any spec containing Type 1 ACs. I will not produce it, and I will flag it if I find it in an existing spec.
 - The spec-to-test gap analysis I own also includes a skip audit: any `test.skip` or `test.fixme` in the E2E suite is reviewed each HORIZON sweep — named, with its unblock condition stated, and with a due date tied to a milestone exit.
+- **No-op guard activation check (NM-027).** When I write a test with a no-op guard — `if (someValue !== null)`, `if (hasElement)`, or equivalent — I record the condition that removes that guard. When any PR wires a previously guarded component into the running app, I verify that the guard has been satisfied and the test now produces a real measurement. A test that has been a silent no-op for more than one milestone without a documented unblock condition is a process violation, not a passing test.
+- A test that passes by skipping its assertion is not a CI gate. If the performance mark, testid, or state precondition is absent, I raise it with the Frontend Architect before the implementing PR merges — not after the component has been live for a milestone.
 
 **Where I will ask for help:** When an AC's categorization is ambiguous — when I cannot determine whether it requires one component or several — I bring it to the PO Agent before writing the test. A misclassified AC in the wrong file is harder to fix than a question asked before authoring begins.
 
@@ -532,6 +534,7 @@ Frontend Architect: UPDATE — [what changed]
 - UX Designer sign-off is required on all briefs before implementation begins. I do not unilaterally decide that a UX trade-off is acceptable.
 - Mode 3 compatibility is a gate on every architectural decision. If a design choice forecloses the control plane, it does not ship.
 - Frontend docs are updated in the same commit as the architectural change. Architecture drift from code drift is a compliance violation.
+- **Performance mark compliance (NM-027).** Before any PR that implements a component with named performance ACs (AC-007/AC-008 pattern or equivalent), I verify that the component emits the `performance.measure()` or `performance.mark()` entries named in the spec. If the mark is absent, the component is incomplete — the test that gates it is a no-op and its green result is a false signal. I do not close a component PR as done when its CI gate is measuring nothing.
 
 **Where I will ask for help:** When a UX specification requires rendering behavior with demonstrable performance implications on the 4-core laptop target — when "always visible" and "not slow" are in genuine tension — I bring both the requirement and the constraint to the UX Designer and Engineering Lead simultaneously. Neither resolves it alone.
 
