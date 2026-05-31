@@ -5,8 +5,8 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-05-30 (M10 kickoff gate fully resolved — #221 Option B accepted; roadmap final; implementation unblocked pending #523/#524/#514/#550)**
-**Current milestone:** M10 — Engine Integrity and Backtesting (M9 formally closed; M10 active)
+**Last updated: 2026-05-31 (Issue #514 complete — Phase 1 benchmarks merged; Python 3.13 configs updated; IB/DQ/CE agents active; board clear)**
+**Current milestone:** M10 — Engine Integrity and Instrument Delivery (M9 formally closed; M10 active)
 
 ---
 
@@ -76,12 +76,17 @@ M9 formally closed. Issue #213 (M9 Exit Checklist) closed 2026-05-24. M10 milest
 
 ## Open PRs
 
-No open PRs — board clear as of 2026-05-29.
+No open PRs — board clear as of 2026-05-31.
 
 ## Recently Merged PRs (last 5)
 
 | PR | Title | Date |
 |---|---|---|
+| #566 | docs(benchmarks): Phase 1 engine baseline results — Issue #514 closed | 2026-05-31 |
+| #565 | feat(benchmark): Phase 1 engine baseline benchmark script — Issue #514 | 2026-05-31 |
+| #564 | chore(python): Python 3.12 → 3.13 in pyproject.toml, .python-version, ci.yml, CONTRIBUTING.md | 2026-05-31 |
+| #563 | process(agents): IB + DQ full definitions; CE activated (#524); PM HORIZON step 7; RACI row 7 IB→R | 2026-05-31 |
+| #562 | process(runbook): MILESTONE_RUNBOOK.md — Kickoff Gate step 0 + Closure Ceremony step 7 (metadata alignment, closes #561) | 2026-05-31 |
 | #551 | process(exit): Issue Disposition Audit SOP — milestone exit cleanup codified (NM-026) | 2026-05-29 |
 | #548 | process(audit): PI-AUDIT-002 — end-to-end feature delivery pipeline | 2026-05-25 |
 | #533 | process(agents): Customer Agent — Layer 3 institutional capacity (closes #532) | 2026-05-25 |
@@ -228,6 +233,10 @@ All Horizon:Immediate issues are now closed. M8 feature-complete.
 
 | Decision | Rationale | Date |
 |---|---|---|
+| Issue #514 complete — Phase 1 engine baseline benchmarks (PRs #565 + #566) | Script (`backend/scripts/benchmark_phase1.py`) and results document (`docs/architecture/engine-baseline-benchmarks-m10.md`) merged. Two machines measured: M1 Pro dev machine and ProBook (i5-8265U, 8 GiB, Windows 11). Key findings: (1) edge density, not entity count, drives propagation cost; (2) ProBook throughput ~5,750 MC runs/s — within interactive budget; (3) memory negligible (< 0.2 MiB at largest config); (4) no blocking constraint for ADR-009. Five findings documented for ADR-009 authoring. | 2026-05-31 |
+| Python 3.12 → 3.13 upgrade — PR #564 | pyproject.toml, .python-version, ci.yml (4 jobs), and CONTRIBUTING.md updated to Python 3.13. Rationale: dev machine runs 3.13.11; benchmark comparisons require identical Python version across machines; upgrading configs is correct over downgrading dev environment. | 2026-05-31 |
+| IB + DQ agents fully defined; CE activated — PR #563 (closes #523 + #524) | IB Agent (Intent Block Author): full working agreement, RACI row 7 promoted I→R (divergence detection is compliance function), activation prompt template at `docs/process/intent-block-author-prompt.md`. DQ Agent (Data Quality): full working agreement, certification battery, activation prompt template at `docs/process/data-quality-agent-prompt.md`. CE Agent: status promoted Defined-inactive → Active (M10, Issue #514). PM HORIZON step 7: Defined-inactive activation audit added (checks open milestone board against each Defined-inactive agent's trigger each sweep). | 2026-05-31 |
+| Recurring metadata alignment check — PR #562 (closes #561) | MILESTONE_RUNBOOK.md: Kickoff Gate step 0 (four-artifact metadata alignment check) and Closure Ceremony step 7 (same check before next milestone creation) added. Four artifacts: GitHub milestone title/description, CLAUDE.md §What We Are Building First, CLAUDE.md §Milestone Roadmap, roadmap.md. Root cause of six M10 kickoff discrepancies: no ceremony step prompted the check. | 2026-05-31 |
 | M10 kickoff gate complete (2026-05-30) — PR #557 | PM Agent scope-completeness check run against CLAUDE.md and roadmap. Finding 1 RESOLVED: GovernanceModule promotion was untracked — Issue #556 filed (M10 Immediate, five ADR-005 criteria). Finding 2 EL DECISION PENDING: #221 (mean-reversion channel) — roadmap stated "hard constraint, cannot be deferred past M10" but board split moved it to M11; EL must choose Option A (revert #221 to M10) or Option B (accept M11 deferral + roadmap update). Roadmap updated (PR #557): Argentina confirmed (#553), Phase 1 benchmarks in M10 (#514), scope linkage issue numbers added. Kickoff baseline posted on exit checklist #261. Pre-implementation gate sequence: #523 → #524 → EL decision on #221 → #514 → #550. No implementation PR may open until EL confirms baseline. | 2026-05-30 |
 | M10/M11 issue split executed (2026-05-30) | Four-batch milestone reorganization: (1) 11 unmilestoned issues → M10 Immediate (#514, #523, #524, #535–#539, #541, #543, #550); (2) 12 unmilestoned issues → M10 Near-Term (#522, #525–#529, #540, #542, #544–#547); (3) 11 Demo-3-critical issues upgraded M10 Near-Term → M10 Immediate (#342, #343, #345–#348, #350, #496–#498, #500); (4) 23 engine/SA-* standards issues pushed M10 → M11 (#29, #44, #46, #91–#92, #95, #103, #116, #118–#119, #122–#123, #147, #151–#152, #154–#155, #160, #173, #221–#222, #271, #275). Board: M10 = 54 open (34 Immediate / 20 Near-Term), M11 = 42 open, unmilestoned = 0. Kept in M10 (foundational, ADR-007/Demo 3 prerequisites): #22, #27, #30, #43, #45, #89, #102, #184, #451. | 2026-05-30 |
 | Argentina 2000–2002 second country fixture filed — Issue #553 | Demo 3 anchor issue filed: `feat(fixture): Argentina 2000–2002 second country fixture — IMF debt crisis (Demo 3)`. Milestone: M10, horizon:immediate. CM data availability check is the blocking prerequisite before implementation begins — CM must validate all core WorldSim indicators at Tier 1–2 for the 1999–2003 window (IMF IFS/WEO, WDI, INDEC 2000–2002 pre-manipulation era, V-Dem, ILO, UNESCO). Argentina selected over Iceland 2008–2011 and South Korea 1997–1999: IMF SBA data Tier 1, INDEC 2000–2002 Tier 1–2 (pre-manipulation), V-Dem Tier 1, distinct political economy from Greece. Demo 3 requires all four Zone 1 axes live with Argentina data + Greece comparison. | 2026-05-30 |
