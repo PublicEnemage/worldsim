@@ -43,7 +43,7 @@ Proprietary analytical capability defeats the purpose entirely.
 
 | Software | Minimum Version | Purpose |
 |---|---|---|
-| Python | 3.12.x | Backend simulation engine |
+| Python | 3.13.x | Backend simulation engine |
 | Node.js | 20 LTS | Frontend toolchain |
 | PostgreSQL | 15.x with PostGIS 3.x | Spatial database (Milestone 2+) |
 | Redis | 7.x | Simulation state during active runs |
@@ -67,26 +67,23 @@ git checkout -b feat/your-feature-name
 
 ### Step 2: Python Environment
 
-**Python 3.12 is required.** The project uses `datetime.UTC` (introduced in
-3.11) and configures ruff with `target-version = "py312"` and mypy with
-`python_version = "3.12"`. Running tests under Python 3.10 or earlier produces
-`ImportError: cannot import name 'UTC' from 'datetime'` at collection time.
-The test suite will surface this immediately with a clear error message.
+**Python 3.13 is required.** The project configures ruff with
+`target-version = "py313"` and mypy with `python_version = "3.13"`.
 
-`backend/.python-version` pins the directory to Python 3.12. If you use
+`backend/.python-version` pins the directory to Python 3.13. If you use
 **pyenv**, it activates the correct interpreter automatically:
 
 ```bash
-# One-time: install Python 3.12 via pyenv
-pyenv install 3.12.9          # or the latest 3.12.x patch
-cd backend                    # .python-version activates 3.12 automatically
-python --version              # should print Python 3.12.x
+# One-time: install Python 3.13 via pyenv
+pyenv install 3.13.11         # or the latest 3.13.x patch
+cd backend                    # .python-version activates 3.13 automatically
+python --version              # should print Python 3.13.x
 ```
 
 If you use **conda**:
 
 ```bash
-conda create -n worldsim python=3.12
+conda create -n worldsim python=3.13
 conda activate worldsim
 ```
 
@@ -94,7 +91,7 @@ Then create the venv and install dependencies:
 
 ```bash
 cd backend
-python3.12 -m venv .venv
+python3.13 -m venv .venv
 source .venv/bin/activate          # Linux/Mac
 # .venv\Scripts\activate           # Windows PowerShell
 
@@ -106,7 +103,7 @@ Verify the installation:
 
 ```bash
 python -c "import numpy, pandas, networkx, fastapi; print('Backend dependencies OK')"
-python -c "from datetime import UTC; print('Python 3.11+ confirmed')"
+python -c "from datetime import UTC; print('Python 3.13 confirmed')"
 ```
 
 ### Step 3: Database Setup (Milestone 2+)
@@ -116,8 +113,8 @@ step if working on simulation logic, skip to Step 4.
 
 ```bash
 # Build the API image first — required after a fresh clone or any Dockerfile change.
-# The codebase uses Python 3.12 syntax (PEP 695 type aliases); a stale image
-# built on an earlier Python version will fail to start with SyntaxError.
+# The codebase targets Python 3.13; a stale image built on an earlier Python
+# version may fail to start with SyntaxError or import errors.
 docker compose build api
 
 # Start local services with Docker
