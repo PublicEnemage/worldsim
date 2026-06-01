@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-05-31 (Issue #514 complete — Phase 1 benchmarks merged; Python 3.13 configs updated; IB/DQ/CE agents active; board clear)**
+**Last updated: 2026-06-01 (PR #570 merged — Issue #568 + #571 closed; NM-027 process improvements encoded; CI playwright-e2e fixed via system Chrome; Issue #550 MV-002 unblocked)**
 **Current milestone:** M10 — Engine Integrity and Instrument Delivery (M9 formally closed; M10 active)
 
 ---
@@ -76,17 +76,17 @@ M9 formally closed. Issue #213 (M9 Exit Checklist) closed 2026-05-24. M10 milest
 
 ## Open PRs
 
-No open PRs — board clear as of 2026-05-31.
+No open PRs — board clear as of 2026-06-01.
 
 ## Recently Merged PRs (last 5)
 
 | PR | Title | Date |
 |---|---|---|
+| #570 | test(perf)+process(nm): MV-002 readiness — trajectory-render mark, advance-step-btn testid, NM-027, QA/FA working agreements, CI playwright-e2e fix (closes #568, #571) | 2026-06-01 |
+| #567 | chore(state): SESSION_STATE.md — Issue #514 complete; Python 3.13; agents #523/#524 (#567) | 2026-05-31 |
 | #566 | docs(benchmarks): Phase 1 engine baseline results — Issue #514 closed | 2026-05-31 |
 | #565 | feat(benchmark): Phase 1 engine baseline benchmark script — Issue #514 | 2026-05-31 |
 | #564 | chore(python): Python 3.12 → 3.13 in pyproject.toml, .python-version, ci.yml, CONTRIBUTING.md | 2026-05-31 |
-| #563 | process(agents): IB + DQ full definitions; CE activated (#524); PM HORIZON step 7; RACI row 7 IB→R | 2026-05-31 |
-| #562 | process(runbook): MILESTONE_RUNBOOK.md — Kickoff Gate step 0 + Closure Ceremony step 7 (metadata alignment, closes #561) | 2026-05-31 |
 | #551 | process(exit): Issue Disposition Audit SOP — milestone exit cleanup codified (NM-026) | 2026-05-29 |
 | #548 | process(audit): PI-AUDIT-002 — end-to-end feature delivery pipeline | 2026-05-25 |
 | #533 | process(agents): Customer Agent — Layer 3 institutional capacity (closes #532) | 2026-05-25 |
@@ -175,6 +175,15 @@ No open PRs — board clear as of 2026-05-31.
 
 ---
 
+## Open Issues — M10 Horizon:Immediate (active)
+
+| Issue | Title | Status / Gate |
+|---|---|---|
+| #550 | test(e2e): MV-002 hardware render baseline — TrajectoryView ≤ 100ms on ProBook | **Unblocked** — PR #570 merged (trajectory-render mark + advance-step-btn testid). Next: install Node.js + Playwright on ProBook; run AC-007/AC-008 without CPU throttle; record measurements; post results on #550 and close. |
+| #569 | test(e2e): AC-009 re-run — Mode 3 advance-step → render ≤ 100ms (hardware baseline) | Deferred M12 — Mode 3 not yet built. Blocked by Mode 3 implementation. |
+
+---
+
 ## Open Issues — M8 Horizon:Immediate
 
 All Horizon:Immediate issues are now closed. M8 feature-complete.
@@ -233,6 +242,8 @@ All Horizon:Immediate issues are now closed. M8 feature-complete.
 
 | Decision | Rationale | Date |
 |---|---|---|
+| NM-027 — AC-007/AC-008 silent no-ops; QA Lead + FA process improvements (PR #570, closes #568, #571) | AC-007 (trajectory-render performance mark) and AC-008 (advance-step-btn testid) were silent no-ops for one full milestone. `TrajectoryView.tsx`: `useLayoutEffect` + `requestAnimationFrame` pattern fires `performance.measure("trajectory-render-initial", ...)` once per mount. `ScenarioControls.tsx`: `data-testid="advance-step-btn"` added to advance button. Four process findings encoded: QA-NM027-F1 (HORIZON skip audit extended to `if (value !== null)` guard pattern); QA-NM027-F2 (guarded tests must carry explicit implementation dependency record); FA-NM027-F1 (pre-PR checklist distinguishes structural vs behavioural ACs); FA-NM027-F2 (FA brief authorship standard — `[behavioural]` annotation required). Issue #550 (MV-002) unblocked. Issue #569 (M12 AC-009 re-run) open. | 2026-06-01 |
+| CI playwright-e2e fixed — system Chrome replaces CDN download (PR #570) | Five consecutive `playwright-e2e` cancellations traced to Playwright Chromium CDN delivering at ~40 KB/s on free-tier runner (~60-min download). Fix: `playwright.config.ts` uses `channel: "chrome"` (system-installed Google Chrome on ubuntu-latest runners — no download). `ci.yml`: removed cache + conditional install steps; kept only `npx playwright install-deps chromium` (fast apt-get, ~2 min). Timeout restored to 30 min. CI green on first run after fix. | 2026-06-01 |
 | Issue #514 complete — Phase 1 engine baseline benchmarks (PRs #565 + #566) | Script (`backend/scripts/benchmark_phase1.py`) and results document (`docs/architecture/engine-baseline-benchmarks-m10.md`) merged. Two machines measured: M1 Pro dev machine and ProBook (i5-8265U, 8 GiB, Windows 11). Key findings: (1) edge density, not entity count, drives propagation cost; (2) ProBook throughput ~5,750 MC runs/s — within interactive budget; (3) memory negligible (< 0.2 MiB at largest config); (4) no blocking constraint for ADR-009. Five findings documented for ADR-009 authoring. | 2026-05-31 |
 | Python 3.12 → 3.13 upgrade — PR #564 | pyproject.toml, .python-version, ci.yml (4 jobs), and CONTRIBUTING.md updated to Python 3.13. Rationale: dev machine runs 3.13.11; benchmark comparisons require identical Python version across machines; upgrading configs is correct over downgrading dev environment. | 2026-05-31 |
 | IB + DQ agents fully defined; CE activated — PR #563 (closes #523 + #524) | IB Agent (Intent Block Author): full working agreement, RACI row 7 promoted I→R (divergence detection is compliance function), activation prompt template at `docs/process/intent-block-author-prompt.md`. DQ Agent (Data Quality): full working agreement, certification battery, activation prompt template at `docs/process/data-quality-agent-prompt.md`. CE Agent: status promoted Defined-inactive → Active (M10, Issue #514). PM HORIZON step 7: Defined-inactive activation audit added (checks open milestone board against each Defined-inactive agent's trigger each sweep). | 2026-05-31 |
