@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-01 (PR #570 merged — Issue #568 + #571 closed; NM-027 process improvements encoded; CI playwright-e2e fixed via system Chrome; Issue #550 MV-002 unblocked)**
+**Last updated: 2026-06-01 (PR #578 merged — Issue #550 MV-002 complete; PRs #573 + #578 merged; Issues #574–#577 filed — vision-to-architecture bridge epic; board clear)**
 **Current milestone:** M10 — Engine Integrity and Instrument Delivery (M9 formally closed; M10 active)
 
 ---
@@ -82,6 +82,8 @@ No open PRs — board clear as of 2026-06-01.
 
 | PR | Title | Date |
 |---|---|---|
+| #578 | docs(mv): MV-002 hardware validation complete — ProBook i5-8265U results recorded, Issue #550 closed | 2026-06-01 |
+| #573 | docs(vision): intellectual foundations + founding document recommendations — May 2026 brainstorming session | 2026-06-01 |
 | #570 | test(perf)+process(nm): MV-002 readiness — trajectory-render mark, advance-step-btn testid, NM-027, QA/FA working agreements, CI playwright-e2e fix (closes #568, #571) | 2026-06-01 |
 | #567 | chore(state): SESSION_STATE.md — Issue #514 complete; Python 3.13; agents #523/#524 (#567) | 2026-05-31 |
 | #566 | docs(benchmarks): Phase 1 engine baseline results — Issue #514 closed | 2026-05-31 |
@@ -179,8 +181,9 @@ No open PRs — board clear as of 2026-06-01.
 
 | Issue | Title | Status / Gate |
 |---|---|---|
-| #550 | test(e2e): MV-002 hardware render baseline — TrajectoryView ≤ 100ms on ProBook | **Unblocked** — PR #570 merged (trajectory-render mark + advance-step-btn testid). Next: install Node.js + Playwright on ProBook; run AC-007/AC-008 without CPU throttle; record measurements; post results on #550 and close. |
+| #550 ✅ | test(e2e): MV-002 hardware render baseline — TrajectoryView ≤ 100ms on ProBook | **Closed 2026-06-01** — AC-007 ✅ PASSED ≤ 100ms (4× throttle active), AC-008 ✅ PASSED ≤ 100ms (4× throttle active). Machine: HP ProBook i5-8265U, 8 GiB RAM, 4 cores, Windows 11. PR #578. |
 | #569 | test(e2e): AC-009 re-run — Mode 3 advance-step → render ≤ 100ms (hardware baseline) | Deferred M12 — Mode 3 not yet built. Blocked by Mode 3 implementation. |
+| #574 | Epic: Vision-to-Architecture Bridge — personas → user experiences → technical concepts | **Filed 2026-06-01** — Three child issues: #575 (personas extension, second ring of actors), #576 (user experiences for second ring), #577 (technical concepts gap analysis). Sequencing: #575 → #576 → #577. No active horizon assignment yet — EL to prioritize M10 or M11. |
 
 ---
 
