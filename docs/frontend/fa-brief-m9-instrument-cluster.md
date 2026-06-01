@@ -80,6 +80,14 @@ two ADR panel reviews.
 
 Every criterion here is testable before M9 implementation is considered complete.
 
+**Authorship standard — behavioural ACs (FA-NM027-F2):** ACs that require explicit component
+participation to be observable are marked **[behavioural]**. For each behavioural AC, the
+"How tested" column specifies both the test mechanism AND the implementation requirement: what
+the component must emit for the test to produce a real measurement rather than a no-op. Structural
+ACs (DOM width/height/presence) do not require this — the DOM provides the observation surface
+automatically. Behavioural ACs do, and the implementing agent is responsible for satisfying the
+stated implementation requirement before the PR is marked complete.
+
 | ID | Criterion | How tested |
 |---|---|---|
 | AC-001 | All four Zone 1 instruments visible without scroll at 1024×768 | Playwright screenshot at 1024×768 viewport |
@@ -88,9 +96,9 @@ Every criterion here is testable before M9 implementation is considered complete
 | AC-004 | Trajectory view minimum width ≥ 580px at 1280×800 | Computed width assertion in Playwright |
 | AC-005 | Trajectory view minimum height ≥ 300px at any supported viewport | Computed height assertion in Playwright |
 | AC-006 | All four Zone 1 instruments update in a single render cycle on step advance | React Testing Library: wrap step-advance in `act()`; assert all four instrument DOM nodes reflect new `current_step` within the same `act()` call before it resolves |
-| AC-007 | ComposedChart initial render ≤ 100ms on CI throttled profile | `performance.measure` in Playwright; 4× CPU throttle (`page.emulate({cpuThrottling:4})`); see also hardware validation note in §Performance Acceptance Criteria |
-| AC-008 | ComposedChart step navigation ≤ 100ms on CI throttled profile | `performance.measure` in Playwright; same throttle as AC-007 |
-| AC-009 | Full Mode 3 component set (8 Lines + 4 Areas + 3 shock-event ReferenceLines — MDA floor lines excluded from M9) ≤ 100ms on CI throttled profile | `performance.measure` at Mode 3 full activation; same throttle |
+| AC-007 **[behavioural]** | ComposedChart initial render ≤ 100ms on CI throttled profile | Playwright reads `performance.getEntriesByType("measure")` for an entry starting with `"trajectory-render"`. **Implementation requirement:** `TrajectoryView` must call `performance.measure("trajectory-render-initial", { start, end })` via `useLayoutEffect` + `requestAnimationFrame` when trajectory data first arrives. Without this call, AC-007 is a silent no-op. 4× CPU throttle applied; see §Performance Acceptance Criteria. |
+| AC-008 **[behavioural]** | ComposedChart step navigation ≤ 100ms on CI throttled profile | Playwright locates `[data-testid="advance-step-btn"]`, clicks it, and measures time between `performance.mark("nav-start")` and `performance.mark("nav-end")`. **Implementation requirement:** The step-advance button in `ScenarioControls` must have `data-testid="advance-step-btn"`. Without this attribute, AC-008 is a silent no-op. Same throttle as AC-007. |
+| AC-009 **[behavioural]** | Full Mode 3 component set (8 Lines + 4 Areas + 3 shock-event ReferenceLines — MDA floor lines excluded from M9) ≤ 100ms on CI throttled profile | Playwright locates `[data-testid="mode-3-activate"]` and measures render time. **Implementation requirement:** The Mode 3 activation control must have `data-testid="mode-3-activate"`. AC-009 is a structural no-op until Mode 3 ships (M12 — Issue #569). |
 | AC-010 | Divergence fill disappears when \|active - baseline\| ≤ 0.01 at every step | Vitest unit test: assert no `<Area>` fill rendered when delta ≤ 0.01 |
 | AC-011 | Mode 1 step annotation renders three-line tick at ≥ 1024px viewport | Playwright screenshot; verify three text nodes per SIGNIFICANT step tick |
 | AC-012 | Step annotation event label: ≤ 8 words AND ≤ 32 characters; fixture CI gate rejects violations | `pytest tests/fixtures/` schema validation; runs on every PR |

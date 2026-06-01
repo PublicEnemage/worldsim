@@ -5,7 +5,7 @@
  * Design decisions: DD-012 (Zustand atom), DD-013 (divergence fill), DD-014 (step annotation).
  * Framework colors: frameworkColors.ts (UX Designer ruling, MV-001 closed 2026-05-23).
  */
-import React, { useMemo } from "react";
+import React, { useMemo, useLayoutEffect, useRef } from "react";
 import {
   ComposedChart,
   Line,
@@ -300,6 +300,20 @@ export function TrajectoryView({
   }, [trajectory, baseline_trajectory]);
 
   const showBaseline = mode === "MODE_3" && baseline_trajectory !== null;
+
+  // Performance mark for AC-007 / MV-002. Fires once when trajectory data first
+  // arrives: measures from post-DOM-update to post-paint via requestAnimationFrame.
+  // Name starts with "trajectory-render" to match the AC-007 assertion.
+  const perfMarkFired = useRef(false);
+  useLayoutEffect(() => {
+    if (mergedData.length === 0 || perfMarkFired.current) return;
+    perfMarkFired.current = true;
+    const start = performance.now();
+    const raf = requestAnimationFrame(() => {
+      performance.measure("trajectory-render-initial", { start, end: performance.now() });
+    });
+    return () => cancelAnimationFrame(raf);
+  }, [mergedData.length]);
 
   // Determine if single-entity scenario (Path A: normalized_absolute scoring)
   const isSingleEntity = mergedData.some(

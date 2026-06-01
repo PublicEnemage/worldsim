@@ -50,6 +50,7 @@ export default function ScenarioControls({ scenarioId, totalSteps, onStepChange 
       </span>
 
       <button
+        data-testid="advance-step-btn"
         onClick={advance}
         disabled={loading || isComplete}
         style={{

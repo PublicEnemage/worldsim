@@ -231,8 +231,11 @@ jobs:
           sudo rm -rf frontend/node_modules
           cd frontend && npm ci
 
-      - name: Install Playwright Chromium and system dependencies
-        run: cd frontend && npx playwright install chromium --with-deps
+      # playwright.config.ts uses channel:"chrome" — tests run against the system
+      # Google Chrome pre-installed on ubuntu-latest runners. No browser download.
+      # Only system-level packages are needed (fast apt-get, no CDN download).
+      - name: Install Playwright system dependencies
+        run: cd frontend && npx playwright install-deps chromium
 
       - name: Run Playwright E2E tests
         run: cd frontend && npx playwright test
