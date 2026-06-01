@@ -17,7 +17,11 @@ export default defineConfig({
   projects: [
     {
       name: "chromium",
-      use: { browserName: "chromium" },
+      // channel: "chrome" uses the system-installed Google Chrome instead of
+      // downloading Playwright's Chromium build. GitHub Actions ubuntu-latest
+      // runners have Chrome pre-installed; local dev machines typically do too.
+      // This eliminates the ~60-minute free-tier CDN download from CI.
+      use: { browserName: "chromium", channel: "chrome" },
     },
   ],
 });
