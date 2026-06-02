@@ -550,8 +550,9 @@ post-processing overlay layer. See Issue #577.
 **As** Abena Osei, preparing a civil society accountability report readable by community
 members and programme beneficiaries — not specialist economists,
 **I need** a community-audience rendering of the trajectory comparison that uses plain
-language, removes confidence tier notation, and is formatted for the publication formats
-SEND Ghana uses (A4 two-column, screen-readable PDF),
+language, replaces technical confidence tier notation with plain-language epistemic
+disclosure, and is formatted for the publication formats SEND Ghana uses
+(A4 two-column, screen-readable PDF),
 **so that** the accountability finding — "the government spent less than it committed on
 social protection, and child nutrition crossed a warning threshold as a result" — reaches
 the communities that are the intended beneficiaries of the programme and the primary
@@ -568,9 +569,18 @@ assessment. See Issue #577.
   is accessible from the compare view [Playwright — assert community export control present
   in compare view]
 - Given the community report export is activated, then the output document contains no
-  technical notation: no "composite_score", no "confidence_tier N", no "MDA", no "Tier N"
-  strings as primary content [pytest — assert technical notation strings absent from
-  community report output]
+  technical notation as primary content: no "composite_score", no "confidence_tier N",
+  no "MDA", no "Tier N" strings appear as lead findings or section headers
+  [pytest — assert technical notation strings absent from primary-content elements of
+  community report output; see epistemic disclosure criterion below]
+- Given any indicator in the community report has confidence_tier ≥ 3, then the report
+  contains a plain-language epistemic disclosure for that indicator, consistent with the
+  vocabulary mapping standard: Tier 3 → "Based on a model estimate from comparable
+  countries"; Tier 4 → "This is an estimated figure — independent verification
+  recommended"; Tier 5 → "Insufficient data — the model could not compute this reliably";
+  this disclosure replaces, and does not omit, the confidence tier notation
+  [pytest — assert disclosure string present adjacent to each Tier 3+ indicator finding
+  in community report output; assert no Tier 3+ indicator appears without disclosure]
 - Given the community report, then the primary finding is stated as a plain-language
   sentence explaining the consequence for people — not for indicators
   [Manual — spot-check that no indicator-centric language appears as the lead finding]
@@ -581,6 +591,13 @@ assessment. See Issue #577.
 **Journey anchor:** Journey G Step 7
 **Tag:** [Phase-3-TBD]
 **Phase 3 scope assessment required (Issue #577) before implementation begins.**
+**Correction applied 2026-06-02 (PI-REVIEW-002 F-005):** North-star sentence updated from
+"removes confidence tier notation" to "replaces technical confidence tier notation with
+plain-language epistemic disclosure." Technical-notation criterion scoped to primary content
+only. Epistemic disclosure criterion added (Tier 3/4/5 vocabulary mapping standard). The
+No False Precision principle is absolute — stripping uncertainty disclosure entirely from
+any WorldSim output is not acceptable regardless of audience. Chief Methodologist is
+Required Consultant (C) on the vocabulary mapping standard before implementation begins.
 
 ---
 
