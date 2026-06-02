@@ -1,8 +1,8 @@
 # User Journeys — WorldSim Frontend
 
-> Last significant revision: 2026-05-22
-> Updated against: ADR-008 (UX Architecture) accepted 2026-05-22; five formal user personas (docs/ux/personas.md)
-> Previous version context: Pre-persona-formalization — journeys anchored to generic analyst archetype
+> Last significant revision: 2026-06-02
+> Updated against: Issue #576 (public advocacy journeys — Personas 6, 7, 8, 4V); personas.md extended by PR #592
+> Previous version context: 2026-05-22 — ADR-008 accepted; five formal user personas; four journeys A–D
 
 > Owned by the UX Designer Agent. Documents the primary user journeys for
 > the canonical user defined in `docs/ux/north-star.md`. These journeys are
@@ -522,6 +522,601 @@ WorldSim for the first time.
 
 ---
 
+## Journey E: Story Investigation — The Journalist's Session
+
+**Context:** Farida Haidari, Senior Correspondent, Economic Desk, Dawn, Karachi. She is
+investigating the combined effect of Pakistan's IMF energy subsidy removal (June 2022) and
+the catastrophic 2022 floods on food security for the bottom income quintile in Sindh. She
+has a 2-hour session cap and no economist to mediate output for her. She arrives with a
+specific hypothesis: the combined shock broke the programme's bottom-quintile protection
+assumption in a way the IMF's programme design did not surface. She needs one publishable
+sentence confirmed or refuted.
+
+**Entry state:** Application open, no scenario selected (BASELINE_VIEW). IMF 7th EFF review
+documents beside her. Time: 2 hours maximum.
+
+*Critical Layer 3 constraint:* This journey must be completable by a user who has no
+specialist economics training. At every step where the tool requires domain knowledge to
+proceed, the journey fails. Configuration field labels, alert text, and source attribution
+must all be interpretable without a Ph.D. economist in the room.
+
+---
+
+### Steps
+
+**Step 1 — Orient: identify the comparison question**
+
+She reads the scenario list. There are no pre-built scenarios for Pakistan 2022. She must
+create two: Scenario A (programme + subsidy removal, no flood) and Scenario B (programme +
+subsidy removal + flood displacement). She creates Scenario A first.
+
+*Information need at this step:* The scenario creation form must present field labels in
+plain language. "Energy subsidy removal" and "income displacement shock" must be recognizable
+as the inputs she is configuring — not require econometric vocabulary to describe.
+
+*Critical constraint:* She must be able to create Scenario A without opening a help document
+or asking a specialist what a field means. Configuration path must take under 15 minutes.
+
+---
+
+**Step 2 — Run Scenario A: programme-only baseline**
+
+She advances Scenario A through 2 steps. The MDA alert panel at each step shows no CRITICAL
+food security alert — consistent with the IMF programme design's assumption that the targeted
+subsidy scheme protects the bottom quintile from the energy price shock alone.
+
+*Information need:* The MDA alert panel shows either (a) no alert, or (b) a WARNING-or-below
+alert for food security. This confirms that the programme-only path, absent the flood, does
+not breach the critical threshold. The absence of a CRITICAL alert is itself a finding —
+she records it.
+
+*Decision point:*
+- **CRITICAL alert fires in Scenario A** → The programme design was inadequate even without
+  the flood. Her hypothesis is partially wrong; the finding is stronger. She adjusts the
+  narrative.
+- **No CRITICAL alert in Scenario A** → Programme-only path holds. Proceed to Scenario B.
+
+---
+
+**Step 3 — Create Scenario B: add the flood displacement shock**
+
+She creates Scenario B, identical to Scenario A with one addition: an agricultural income
+displacement shock applied at step 1 representing the flood's impact (30% reduction in
+agricultural income for 2 steps in flood-affected regions).
+
+*Information need:* The shock input type must be selectable and its parameters
+(magnitude, duration, target entity) must be configurable without specialist mediation.
+The parameter labels must match her understanding of what the flood did: income loss, not
+a technical propagation coefficient.
+
+---
+
+**Step 4 — Run Scenario B: read the combined-shock finding**
+
+She advances Scenario B through 2 steps. The MDA alert panel fires.
+
+*Information need — the critical moment of this journey:*
+
+The alert panel must produce a plain-language statement that Farida can read directly:
+- What happened (indicator name in English, not econometric notation)
+- To whom (income cohort, not a model variable name)
+- When (step index, not an internal state label)
+- How severe (severity level, translated to plain language if possible: "CRITICAL" is
+  acceptable; "HDI propagation chain floor breach" is not)
+
+The source registry ID for each cited indicator must be visible — she needs to be able
+to state in her article: "According to a WorldSim simulation drawing on [source], the
+[indicator] for [cohort] crossed a [severity] threshold at [step]."
+
+*Decision point:*
+- **CRITICAL alert fires at step 1** → Hypothesis confirmed. The combined shock broke
+  the protection assumption one step earlier than the programme model accounted for.
+  She has the sentence.
+- **No CRITICAL alert in Scenario B** → Hypothesis refuted or the confidence tier on
+  the flood shock is too low to produce a CRITICAL breach. She either adjusts the shock
+  magnitude or reports: "Our simulation found no critical threshold crossing under the
+  combined shock conditions modeled — which conflicts with subsequent household data."
+
+---
+
+**Step 5 — Extract the citable sentence**
+
+She reads the MDA alert. The primary finding is: "Under combined shock conditions
+[programme + flood], food security for the lowest income quintile crossed a CRITICAL
+threshold at step 1. Under programme-only conditions, this threshold was not breached."
+
+She records:
+- The alert text verbatim
+- The source registry ID for the food security indicator
+- The confidence tier (she will note this in the methodology note)
+- The scenario parameters (what inputs produced this finding, for reproducibility)
+
+*Information need:* The alert text must be specific enough to quote as a sentence without
+requiring her to translate it. The ia1_disclosure must be visible and must be frameable as
+epistemic honesty, not as a disqualifying caveat.
+
+---
+
+**Exit state:**
+
+Farida has one of two outcomes:
+1. **Hypothesis confirmed** — She has a specific, citable threshold crossing that was not
+   in the official programme analysis. The article can state: "A simulation analysis shows
+   that the combined shock broke the programme's protective assumption for the lowest income
+   quintile at step 1 — a finding absent from the IMF's 7th review documentation."
+2. **Hypothesis refuted** — The simulation does not confirm the combined-shock breach at
+   CRITICAL severity. She reports the negative result honestly and investigates whether the
+   confidence tier or model calibration explains the discrepancy.
+
+In either case, the tool has served the journalism use case: it has provided a specific,
+traceable, transparent analytical finding — not a narrative claim.
+
+---
+
+## Journey F: Legislative Brief — The Parliamentary Economist's Preparation
+
+**Context:** James Ochieng, Senior Economist, Kenya Parliamentary Budget Office. 72 hours
+before the Finance Committee hearing on the 7th IMF EFF programme review. He needs to
+independently assess whether the 3.5% GDP consolidation path crosses human development
+thresholds that the Treasury's programme presentation does not flag, and whether a 2%
+alternative path avoids those crossings. The output is a 4-page committee brief in Hansard-
+citable form.
+
+**Entry state:** Application open, no scenario selected (BASELINE_VIEW). IMF 7th EFF
+documents, KNBS data, and Treasury fiscal framework on his desk. Preparatory entry state.
+72 hours available but the brief must be written, reviewed internally, and submitted before
+the hearing. Session budget: 4–6 hours across the 72-hour window.
+
+*Critical constraint:* James's brief will be cited in Hansard. Every finding must carry
+an explicit confidence tier, a citable methodology source, and must be reproducible if
+re-run during the hearing day. Non-reproducible or confidence-tier-absent outputs cannot
+appear in the brief.
+
+---
+
+### Steps
+
+**Step 1 — Orient: plan the two-scenario comparison**
+
+He reviews the IMF 7th review documents. He identifies the two paths to compare:
+- Scenario A: 3.5% GDP consolidation per IMF EFF recommendation (4 annual steps)
+- Scenario B: 2% alternative consolidation (same fiscal sustainability requirement, gentler path)
+
+He confirms that Kenya's baseline data is available in WorldSim or must be seeded. He
+reads the source registry to confirm which Kenya indicators are at Tier 1–2 (World Bank
+WDI, IMF Article IV) vs. Tier 3 (synthetic comparables for subnational indicators).
+
+*Information need:* The source registry must be accessible from the tool and must allow
+him to verify which Kenya data points are available and at what confidence tier before
+he builds the scenario.
+
+---
+
+**Step 2 — Create and run Scenario A: programme path**
+
+He creates Scenario A — Kenya, 3.5% fiscal consolidation, 4 annual steps. He seeds the
+initial attributes from the Kenya 2022 baseline (KNBS, IMF data). He advances all 4 steps.
+
+At each step, he reads the MDA alert panel and trajectory view. He records:
+- Which indicators cross WARNING or CRITICAL thresholds
+- At which step each crossing first occurs
+- The confidence tier of each indicator
+
+*Information need:* The step-level output must be readable without opening a drawer. The
+trajectory view shows the composite score curves; the MDA alert panel shows the specific
+threshold crossings with indicator name, step, severity, and confidence tier.
+
+---
+
+**Step 3 — Create and run Scenario B: alternative path**
+
+He creates Scenario B — Kenya, 2% fiscal consolidation, same 4 steps. He advances all
+4 steps and records which threshold crossings, if any, occur under the softer path.
+
+*Decision point:*
+- **Scenario B shows no threshold crossings where Scenario A shows crossings** → The
+  alternative path avoids the human development cost identified in Scenario A. The
+  committee brief can cite the specific delta: "The programme path triggers X threshold
+  crossing(s) that the 2% alternative path avoids within the 4-step horizon."
+- **Scenario B also shows threshold crossings** → The fiscal sustainability floor is the
+  binding constraint regardless of pace. The brief will note which crossings are
+  pace-sensitive and which are structural.
+
+---
+
+**Step 4 — Open comparison view: document the divergence**
+
+He opens the comparison view (COMPARE_VIEW) between Scenario A and Scenario B. The
+divergence timeline shows where the two paths separate and at what step each scenario's
+composite scores diverge.
+
+*Information need at this step — Hansard standard:*
+- Specific indicator names at which the paths diverge, with step-level precision
+- Confidence tier for each diverging indicator
+- Whether the divergence is within or outside the pre-calibration uncertainty band
+- Whether the methodology source (the ADR governing the fiscal multiplier or indicator
+  propagation) can be cited by reference number
+
+He extracts the tabular data: indicator, step A crossing, step B crossing, delta in
+crossing timing, confidence tier.
+
+---
+
+**Step 5 — Access methodology documentation for citation**
+
+Before drafting the brief, he navigates to the methodology source for the key findings.
+For the fiscal multiplier assumption: he needs the ADR number and version to cite.
+For the human development propagation chain: he needs the documented calibration source.
+
+*Information need:* The methodology documentation must be accessible from within the
+tool without navigating to an external GitHub repository or documentation site. He must
+be able to cite: "WorldSim simulation (ADR-XXX, version M10) projects..."
+
+*Design requirement this imposes:* A path from any indicator output to its governing
+ADR reference must be present in the instrument cluster. This is not currently confirmed
+as implemented — see US-036.
+
+---
+
+**Step 6 — Draft the committee brief**
+
+He drafts the 4-page brief from the tabular output. He cites the tool, the ADR, the
+confidence tier per indicator, and the comparison finding. He submits it for internal
+PBO review before the hearing.
+
+*Information need:* The tabular output must be extractable (ideally downloadable; if not,
+readable for manual transcription). The brief must be draftable within 2 hours from the
+scenario run output.
+
+---
+
+**Exit state:**
+
+James has a committee brief that:
+- Names the specific human development threshold crossings under the programme path,
+  with indicator, step, severity, and confidence tier
+- Names the crossings avoided under the 2% alternative path
+- Cites the methodology by ADR reference and pre-calibration disclosure
+- Is reproducible during the committee hearing if a member requests re-running
+
+The brief's value is specificity: "The programme path triggers an education spending
+WARNING at step 2 and a healthcare capacity WARNING at step 3, which the 2% alternative
+path avoids within the 4-step horizon." This is the finding the committee minority report
+needed.
+
+---
+
+## Journey G: Accountability Monitoring — The Civil Society Monitor's Review
+
+**Context:** Abena Osei, Programme Economist, SEND Ghana. Six months into Ghana's IMF ECF
+programme (signed May 2023, $3B), her field monitoring shows social protection spending
+below the programme's committed floor. She has 30 days to produce a monitoring brief for
+Parliament, the IMF Mission Chief, and community organizations in northern Ghana. The brief
+must be citable, specific, and legible to a community audience without university education.
+
+**Entry state:** Application open, no scenario selected (BASELINE_VIEW). Ghana ECF
+programme document and Treasury quarterly expenditure data beside her. Retrospective
+entry state (accountability tracking sub-mode — reference path known: the programme's
+committed trajectory. Exercise: verify whether observed actuals track it).
+
+*Panel ruling (Decision 2 — Option C):* This journey uses Mode 2 to reproduce the
+committed programme baseline. The observed-actuals comparison overlay — inputting real
+step-level expenditure data into the tool for divergence calculation — is not yet a
+platform capability. Steps 1–5 below represent current capability. Steps 6–7 are
+[Phase-3-TBD] and are the formal input to Phase 3 (Issue #577).
+
+---
+
+### Steps
+
+**Step 1 — Orient: reproduce the committed baseline inputs**
+
+She reads the Ghana ECF programme document. She identifies the committed programme inputs:
+social protection spending floor (as a percentage of GDP), healthcare floor commitment,
+baseline GDP growth assumption, initial poverty headcount.
+
+She creates Scenario A — Ghana, ECF programme inputs, 4 steps — using the committed
+spending levels as the initial attributes and fiscal parameters. This is the reference
+scenario: what should happen if the programme's commitments are honored.
+
+*Information need:* The scenario inputs must map to the programme document's terminology.
+She must be able to say: "I am entering the programme's committed social protection floor
+as this input field."
+
+---
+
+**Step 2 — Advance Scenario A: the committed baseline trajectory**
+
+She advances all 4 steps. She records the projected trajectory for social protection
+spending, poverty headcount, and child nutrition at committed spending levels.
+
+*Information need at this step — the accountability reference:*
+- At committed spending levels, does child nutrition hold below WARNING across all 4 steps?
+- At committed spending levels, does poverty headcount decline or hold stable?
+- What specific indicator values does the simulation project at committed spending?
+
+These values become the accountability baseline: what the programme committed to produce.
+
+---
+
+**Step 3 — Create Scenario B: observed (below-committed) spending**
+
+She creates Scenario B — identical to Scenario A, except she enters the observed social
+protection spending level (0.3 percentage points of GDP below the committed floor, per
+Treasury quarterly data).
+
+*Information need:* The spending parameter must be editable as a direct input without
+requiring her to model the fiscal mechanics. She enters: "Social protection spending:
+0.9% of GDP" rather than "Apply a negative fiscal impulse of 0.3% GDP to the social
+protection transfer function."
+
+---
+
+**Step 4 — Advance Scenario B: identify the threshold crossing**
+
+She advances all 4 steps. She records where the below-committed spending scenario diverges
+from the committed baseline.
+
+*Decision point:*
+- **Scenario B crosses child nutrition WARNING where Scenario A does not** → The social
+  protection floor shortfall directly drives a threshold crossing that the programme's
+  commitment was designed to prevent. This is the accountability finding.
+- **Both scenarios cross the same thresholds** → The floor shortfall is not the binding
+  factor for this specific indicator. She investigates which indicator shows the
+  most meaningful divergence.
+
+---
+
+**Step 5 — Compare: document the commitment gap**
+
+She opens the comparison view (COMPARE_VIEW). The divergence between Scenario A
+(committed) and Scenario B (observed) shows: at committed spending, child nutrition
+holds below WARNING at step 2. At observed spending, child nutrition crosses WARNING
+at step 2 and approaches CRITICAL at step 4.
+
+The accountability brief states: "The social protection floor shortfall is projected to
+drive child malnutrition above warning threshold by step 2. This is the specific outcome
+the programme's floor commitment was designed to prevent. At committed spending levels,
+this threshold crossing does not occur within the 4-step programme horizon."
+
+*Design requirement this imposes:* The comparison view must surface per-indicator
+threshold crossing timing with enough precision for the brief ("step 2" not "early
+in the programme"). The committed vs. observed scenario labels must be clearly
+distinguishable in the comparison output.
+
+---
+
+**Step 6 — [Phase-3-TBD] — Observed-actuals overlay**
+
+This step does not exist in the current architecture. The platform capability required:
+Abena inputs actual quarterly Treasury expenditure data for each step — not as a
+scenario parameter but as observed real-world actuals — and the tool overlays those
+actuals against the simulation's projected trajectory for each indicator.
+
+This would produce: "At step 1, simulation projected 1.2% GDP in social protection;
+observed: 0.9% GDP. Divergence: −0.3 percentage points. Projected threshold crossing
+without remediation: step 2." This is the direct accountability overlay.
+
+*Why this is [Phase-3-TBD]:* No current mode accepts real-world observations as step-level
+inputs alongside a simulation trajectory. The architecture would require a new data
+ingestion path and a new rendering mode in the trajectory view. The DIC panel (Issue #577)
+must assess whether this capability belongs in an extended Mode 1 ("observed-actuals replay"),
+a new Mode 4, or as a post-processing overlay on existing trajectory output.
+
+---
+
+**Step 7 — [Phase-3-TBD] — Community-audience output layer**
+
+The monitoring brief must be legible to a community leader in northern Ghana without a
+university education. The current tool produces technical output: trajectory curves,
+composite scores, confidence tiers, ADR references. None of these are directly legible
+to a community audience without translation.
+
+The platform capability required: a separate output layer that renders the same finding
+in plain language — per commitment, per indicator — without the technical scaffolding.
+"The government spent less than it promised on social protection. Our simulation shows
+this shortfall is likely to drive malnutrition above safe levels by [date]. This is the
+specific risk the programme's protection commitment was designed to prevent."
+
+*Why this is [Phase-3-TBD]:* The current rendering pipeline has one output mode. A
+separate community-audience rendering layer requires a new content type — not a different
+chart but a different document — with different vocabulary rules, different confidence
+disclosure conventions (simplified but not dishonest), and different export format.
+
+---
+
+**Exit state:**
+
+Abena has a two-layer output:
+- Technical layer (for the parliamentary and IMF audience): step-level comparison of
+  committed vs. observed spending scenarios, with indicator-specific threshold crossings,
+  confidence tiers, and ADR references. Completable with current platform.
+- Community layer (for northern Ghana community organizations): plain-language summary
+  of which commitments are being honored and which are not, with human-cost consequences
+  stated plainly. Requires [Phase-3-TBD] community-audience rendering capability.
+
+The accountability finding — that the social protection floor shortfall drives a specific
+indicator threshold crossing that committed spending would have prevented — is produceable
+from the current platform (Steps 1–5). The integrated overlay and community layer require
+Phase 3 architectural work.
+
+---
+
+## Journey H: Backtesting with Personal Observation — The Personal-Connection Researcher
+
+**Context:** Dr. Priya Krishnaswamy, Research Associate, Centre for Development Studies,
+Thiruvananthapuram. She wants to use WorldSim to backtest India's 2020 farm law
+deregulation against her Wardha district field data (47 households, 2015 survey plus
+2021 follow-up). Her father is a cotton farmer in Wardha district. She is both academic
+evaluator and personally invested in the simulation's accuracy. She enters in Evaluative
+mode (reads methodology documentation first) before running the Retrospective (backtesting)
+session.
+
+**Entry state:** Application open. She reads methodology documentation before touching the
+simulation. Evaluative mode first, then transition to Retrospective for the backtesting run.
+
+*Critical trust condition:* When the simulation's output diverges from her field data,
+she needs to see the specific model assumption that drives the divergence. A confidence
+tier disclaimer is insufficient — she needs the mechanism, not just the uncertainty level.
+
+---
+
+### Steps
+
+**Step 1 — Evaluate: read the agricultural income transmission methodology**
+
+She navigates from the instrument cluster to the methodology documentation. She reads:
+(a) What policy input type covers agricultural price floor removal?
+(b) What is the propagation chain from farm gate price to household food security?
+(c) What comparison group is used for India agricultural income estimates?
+(d) What confidence tier applies to Vidarbha cotton farm income estimates?
+
+*Information need:* The methodology documentation path must be accessible from the
+instrument cluster without navigating to an external site. The agricultural propagation
+chain (if implemented) must be documented with the specific elasticities used and the
+source for each.
+
+*Decision point:*
+- **Agricultural income transmission chain is documented and implemented** → Proceed
+  to Step 2 with trust that the simulation can answer her research question. Note the
+  comparison group for potential divergence analysis.
+- **Agricultural income transmission chain is not yet implemented** → [Near-Term-Gap].
+  The simulation cannot serve her primary research question. She documents this as a
+  calibration gap and uses WorldSim for the available indicators (rural poverty headcount,
+  food security) rather than the full agricultural chain. See US-045.
+
+---
+
+**Step 2 — Configure: create the India farm law backtesting scenario**
+
+She creates a backtesting scenario: India, 2020-2021, 2 annual steps, starting from the
+pre-farm-law deregulation baseline. She applies the policy input: farm law deregulation
+(effective removal of MSP price floor guarantee) at step 1.
+
+*Information need:* The policy input for MSP price floor removal must be available in the
+ControlInput taxonomy. If it is not (likely a [Near-Term-Gap] at M10), she uses the closest
+available instrument (general agricultural subsidy change) and notes the calibration
+approximation.
+
+---
+
+**Step 3 — Advance: record the projected agricultural income trajectory**
+
+She advances through 2 steps. She records the projected values:
+- Agricultural income trajectory for cotton farmers (rural Maharashtra)
+- Household food security indicator
+- Child nutrition indicator (if available)
+
+*Information need:* The step-level indicator values must be readable without opening a
+drawer. The confidence tier for each indicator must be visible per indicator.
+
+*She records the simulation's prediction:* "Income decline projected at 18% at step 1
+(Maharashtra agricultural comparables, Tier 3 SYNTHETIC_COMPARABLE)."
+
+---
+
+**Step 4 — Compare: her field data vs. the simulation**
+
+She takes the simulation's projected trajectory and compares it manually to her Wardha
+field data: 23% income decline observed in 2021 follow-up survey (47 households).
+
+Divergence: 5 percentage points. The simulation underpredicts the income decline.
+
+*Information need at this step — the core trust test:*
+
+She needs to see why the simulation predicts 18% when her data shows 23%. The tool must
+show the specific assumption driving the divergence:
+- "Comparison group: Maharashtra agricultural averages (not Wardha district)"
+- "Elasticity: -0.18 per MSP removal unit (from Maharashtra state regression)"
+- "Wardha cotton specific: no Wardha district data available in comparison group"
+
+If the tool cannot show this assumption, she cannot include the simulation in a journal
+submission — the divergence is uninterpretable without knowing its source.
+
+*Design requirement this imposes:* From any indicator output, the user must be able to
+navigate to the specific comparison group and elasticity assumption that produced that
+value. This requires methodology transparency at the assumption level, not just at the
+ADR level. Current capability: ADR-level documentation accessible. Assumption-level
+display: [Near-Term-Gap] — engineering work to surface the specific comparison group
+ID and elasticity value in the indicator display.
+
+---
+
+**Step 5 — Interpret: accept or challenge the divergence**
+
+Priya reads the comparison group disclosure: "Maharashtra agricultural comparables (not
+Wardha district-specific)." She accepts the 5-point divergence as within the plausible
+range for district-level vs. regional estimation. Wardha district has historically
+performed worse than Maharashtra state average on agricultural income volatility — a
+finding documented in her dissertation.
+
+She notes: the simulation is calibrated to state-level patterns; her field data is
+district-level. The divergence is methodologically expected, not a model error. She
+can include the simulation in her journal submission with appropriate qualification:
+"WorldSim projects a 18% decline using Maharashtra state agricultural comparables
+(Tier 3 SYNTHETIC_COMPARABLE); our Wardha district field data shows 23%. The 5-point
+difference falls within the plausible range for district-level vs. state-level estimation."
+
+*Information need:* The confidence tier system must show SYNTHETIC_COMPARABLE with the
+comparison group ID exposed. The user must be able to state, in one sentence, what
+comparison group produced the estimate.
+
+---
+
+**Step 6 — Export: download trajectory data for journal appendix**
+
+She exports the simulation's full trajectory output — projected agricultural income,
+food security indicator, confidence tier per indicator, comparison group — as a
+structured data file (CSV or JSON) for inclusion in her journal submission as a data
+appendix.
+
+*Information need:* The export format must include: indicator name, step, projected
+value, confidence tier, comparison group ID, synthetic method flag, source registry IDs.
+These fields are all present in the Quantity schema (QuantitySchema + ADR-007 fields).
+The missing piece is a download path from the instrument cluster to this structured file.
+
+This is [Near-Term-Gap] — the data exists; the export path does not.
+
+---
+
+**Step 7 — [Phase-3-TBD] — X-ray layer: structural dependency visualization**
+
+In a subsequent session, Priya wants to show her research seminar the full causal chain
+from the farm law policy input to the food security indicator. She wants a visualization
+that traces: MSP price floor removal → farm gate price reduction → farm income decline →
+debt service default → food expenditure reduction → child malnutrition indicator.
+
+This is not a trajectory chart. It is a network graph showing the multi-hop causal
+path through the propagation engine — the "X-ray layer" of the simulation. It answers:
+"What is the model's theory of causation from policy input to human cost indicator?"
+
+*Why this is [Phase-3-TBD]:* The current trajectory view renders outcomes (composite
+scores, indicator values) across time. It does not render the causal structure that
+produces those outcomes. A causal-graph visualization requires a new rendering mode —
+one that reads the propagation engine's relationship graph and displays it as a navigable
+dependency chain. This could live in Zone 2 (navigable context) without conflicting with
+Premise 1 (Zone 1 instruments always visible). The DIC panel (Issue #577) must assess
+the architectural requirements and whether this belongs in M11 or M12 scope.
+
+---
+
+**Exit state:**
+
+Dr. Krishnaswamy has produced:
+- A backtesting comparison between the simulation's projected agricultural income
+  trajectory and her Wardha field data, with the specific comparison group and
+  divergence interpretable
+- The comparison group disclosure and confidence tier qualification for her journal
+  submission
+- A gap identification: the agricultural income transmission chain requires Wardha
+  district-specific calibration (not currently available); this is a data gap she
+  can document and contribute to the comparison group registry
+
+The [Phase-3-TBD] items — trajectory export and the X-ray causal graph — are the
+Phase 3 inputs for the DIC architectural review.
+
+---
+
 ## Journey Dependency Map
 
 | Journey | Mode | Primary WorldSim state | Primary UI surface | Dependency |
@@ -541,3 +1136,19 @@ WorldSim for the first time.
 | D — Demonstrative Step 1 | Mode 1 | SCENARIO_PRELOADED | Trajectory view + step axis annotation | Gap 1B fixture fields |
 | D — Demonstrative Step 2 | Mode 1 | SCENARIO_PRELOADED | MDA alert panel | ADR-006 Decision 5 alert_source |
 | D — Demonstrative Step 3 | Mode 1 | SCENARIO_PRELOADED | PMM widget (historical label) | Gap 5 mode-specific labels |
+| E — Investigation Step 3 | Mode 2 | SCENARIO_RUNNING | MDA alert panel (plain language) | US-030 plain-language requirement |
+| E — Investigation Step 4 | Mode 2 | COMPARE_VIEW | MDA alert panel (differentiated) | US-033 comparison differentiation |
+| E — Investigation Step 5 | Mode 2 | DRAWER_DATA | Source attribution at indicator level | US-034 [Near-Term-Gap] |
+| F — Legislative Brief Step 3 | Mode 2 | SCENARIO_RUNNING | Trajectory view + MDA alert panel | US-035 comparison |
+| F — Legislative Brief Step 5 | Mode 2 | COMPARE_VIEW | Divergence timeline with indicator specificity | US-038 confidence tier in comparison |
+| F — Legislative Brief Step 6 | Mode 2 | COMPLETE | Methodology documentation path | US-036 ADR reference accessible |
+| F — Legislative Brief Step 7 | Mode 2 | COMPLETE | Downloadable tabular output | US-037 [Near-Term-Gap] |
+| G — Accountability Step 2 | Mode 2 | SCENARIO_RUNNING | Trajectory view (committed baseline) | US-040 baseline reproduction |
+| G — Accountability Step 4 | Mode 2 | COMPARE_VIEW | Divergence view (committed vs. observed spending) | US-041 spending comparison |
+| G — Accountability Step 5 | [Phase-3-TBD] | ACTUALS_OVERLAY | Observed-actuals input + overlay | US-042 [Phase-3-TBD] |
+| G — Accountability Step 6 | [Phase-3-TBD] | ACTUALS_OVERLAY | Community-audience output layer | US-043 [Phase-3-TBD] |
+| H — Backtesting Step 1 | Mode 1 | BASELINE_VIEW | Methodology documentation | US-044 method docs accessible |
+| H — Backtesting Step 3 | Mode 1 | SCENARIO_RUNNING | Trajectory view (agricultural chain) | US-045 [Near-Term-Gap] |
+| H — Backtesting Step 5 | Mode 1 | COMPLETE | Divergence explainability (assumption visible) | US-047 [Near-Term-Gap] |
+| H — Backtesting Step 6 | Mode 1 | COMPLETE | Trajectory data export | US-046 [Near-Term-Gap] |
+| H — Backtesting Step 7 | [Phase-3-TBD] | XRAY_LAYER | Structural dependency visualization | US-048 [Phase-3-TBD] |
