@@ -21,6 +21,7 @@ export default function ScenarioPanel({
   const [scenarios, setScenarios] = useState<ScenarioResponse[]>([]);
   const [listError, setListError] = useState<string | null>(null);
   const [createName, setCreateName] = useState("");
+  const [createStartYear, setCreateStartYear] = useState(2020);
   const [creating, setCreating] = useState(false);
   const [createSuccess, setCreateSuccess] = useState<string | null>(null);
   const [createError, setCreateError] = useState<string | null>(null);
@@ -70,6 +71,7 @@ export default function ScenarioPanel({
     setCreateSuccess(null);
 
     try {
+      const startDate = `${createStartYear}-01-01`;
       const res = await fetch(`${API_BASE}/scenarios`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -80,6 +82,7 @@ export default function ScenarioPanel({
             entities: ["GRC"],
             n_steps: 3,
             timestep_label: "annual",
+            start_date: startDate,
             initial_attributes: {},
           },
           scheduled_inputs: [],
@@ -89,6 +92,7 @@ export default function ScenarioPanel({
       if (res.ok) {
         setCreateSuccess(`"${name}" created.`);
         setCreateName("");
+        setCreateStartYear(2020);
         void fetchScenarios();
       } else {
         const body = await res.json().catch(() => ({})) as { detail?: string };
@@ -180,6 +184,16 @@ export default function ScenarioPanel({
               }}
               disabled={creating}
             />
+            <input
+              className="scenario-create-input scenario-create-input--year"
+              type="number"
+              aria-label="Start year"
+              min={1900}
+              max={2100}
+              value={createStartYear}
+              onChange={(e) => setCreateStartYear(Number(e.target.value))}
+              disabled={creating}
+            />
             <button
               className="scenario-btn scenario-btn--create"
               type="submit"
@@ -195,7 +209,7 @@ export default function ScenarioPanel({
             <div className="scenario-panel-error">{createError}</div>
           )}
           <div className="scenario-create-hint">
-            Creates a GRC scenario with 3 annual steps.
+            Creates a GRC scenario with 3 annual steps starting at the given year.
           </div>
         </div>
       </div>
