@@ -916,6 +916,67 @@ For sources that do not support vintage retrieval, use the following handling:
 
 ---
 
+## Scenario Fixture Step Annotation
+
+**Authority:** EL Decision 1 (2026-05-21, Premise 3); PR #390 Gap 1B; Issue #395.
+
+Every Mode 1 scenario fixture must carry step annotation metadata. Without it, the
+instrument cluster's step axis is legible only to users who already know the historical
+context (Personas 1 and 2) and opaque to non-specialist decision-makers (Personas 3 and 5).
+A fixture missing annotation on its SIGNIFICANT steps is an incomplete fixture, not a
+styling gap.
+
+### The `step_metadata` Field
+
+`step_metadata` is a JSONB key in `scenarios.configuration`. Keys are 1-based step
+index strings; values carry two fields:
+
+```json
+{
+  "1": {"significance": "SIGNIFICANT", "label": "First Memorandum / IMF SBA"},
+  "2": {"significance": "ROUTINE", "label": ""}
+}
+```
+
+### `significance` Values
+
+| Value | Meaning | Zone 1A rendering |
+|---|---|---|
+| `SIGNIFICANT` | A named historical event occurred at this step — policy decision, shock, threshold crossing | Annotated tick mark with label |
+| `ROUTINE` | No named event; normal step in the progression | Standard tick |
+| `CRITICAL` | Reserved for irreversible threshold crossings (default declaration, capital controls) | Bold annotated tick (future) |
+
+### `label` Field Constraints
+
+Labels must satisfy **both** constraints simultaneously:
+
+- **≤ 8 words**
+- **≤ 32 characters**
+
+The 32-character limit is enforced at fixture authoring time. The 8-word limit is a
+readability gate — labels requiring more than 8 words to be meaningful must be shortened
+at authoring time, not truncated at render time. See `docs/ux/standards.md §14`.
+
+### Mandatory Coverage Rule
+
+Every SIGNIFICANT step must have a non-empty `label`. A fixture that marks a step as
+SIGNIFICANT but provides an empty label is invalid. ROUTINE steps may omit the label
+field entirely.
+
+This constraint is enforced by:
+- The fixture acceptance test in `backend/tests/fixtures/test_step_metadata_contract.py`
+- The CI gate: any backtesting fixture merged without step_metadata is a standards violation
+
+### Existing Fixtures
+
+| Fixture | Status |
+|---|---|
+| Argentina 2001–2002 (`build_argentina_demo_scenario`) | Compliant — steps 1–3 SIGNIFICANT with labels; step 4 ROUTINE |
+| Greece 2010–2015 (`build_greece_demo_scenario`) | Compliant — all 6 steps SIGNIFICANT with labels (added Issue #395) |
+| Greece 2010–2015 base (`build_greece_scenario`) | Compliant — step_metadata added to base fixture (Issue #395) |
+
+---
+
 ## Gap-Filling Standards
 
 ### Permissible Methods, in Order of Preference
