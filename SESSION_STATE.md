@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-02 (EL decision — US-039 confirmed M12; both Issue #577 pre-activation blockers resolved; Architecture Review TARGETED now unblocked)**
+**Last updated: 2026-06-02 (ARCH-REVIEW-006 complete — Issue #577 targeted architectural scope review; 11 child issues enumerated; 1 Immediate blocker: CM vocabulary mapping standard)**
 **Current milestone:** M10 — Engine Integrity and Instrument Delivery (M9 formally closed; M10 active)
 
 ---
@@ -82,11 +82,11 @@ No open PRs — board clear as of 2026-06-02.
 
 | PR | Title | Date |
 |---|---|---|
+| #601 | docs(architecture): ARCH-REVIEW-006 — Issue #577 targeted architectural scope review | 2026-06-02 |
 | #598 | docs(ux): US-043 No False Precision correction — epistemic disclosure criterion (PI-REVIEW-002 F-005) | 2026-06-02 |
 | #596 | process(pi-review): PI-REVIEW-002 — Issue #577 [Phase-3-TBD] scope assessment | 2026-06-02 |
 | #594 | docs(ux): public advocacy user journeys (E–H) and user stories US-030–US-048 (closes #576) | 2026-06-02 |
 | #592 | docs(ux): public advocacy personas — Personas 6–8 and Persona 4V (closes #575) | 2026-06-02 |
-| #590 | feat(fixture): Argentina Demo 3 — crisis arc with all four Zone 1 axes live (closes #553) | 2026-06-02 |
 | #587 | feat(zone-1c): PMM live computation — Issue #496 (IR-002) | 2026-06-02 |
 | #585 | feat(governance): GovernanceModule promoted to live axis — ADR-005 Amendment 4 (closes #556, #499) | 2026-06-02 |
 | #583 | feat(frontend): default step labels from start year — IR-004 (closes #498) | 2026-06-02 |
@@ -197,7 +197,7 @@ No open PRs — board clear as of 2026-06-02.
 | #569 | test(e2e): AC-009 re-run — Mode 3 advance-step → render ≤ 100ms (hardware baseline) | Deferred M12 — Mode 3 not yet built. Blocked by Mode 3 implementation. |
 | #575 ✅ | docs(ux): public advocacy personas — Investigative Journalist, Parliamentary Economist, Civil Society Monitor, Persona 4V | **Closed 2026-06-02** — PR #592 merged. Panel: PO Agent (R), UX Designer (C), Development Economist (C), Political Economist (C), Customer Agent (C). Four additions: Persona 6 (Farida Haidari, journalist, Dawn/Pakistan), Persona 7 (James Ochieng, Kenya PBO), Persona 8 (Abena Osei, SEND Ghana), Persona 4V (Dr. Priya Krishnaswamy, CDS/JNU). Primary Cases 6 (Pakistan flood + IMF combined shock), 7 (Kenya committee brief), 8 (Ghana accountability gap), Persona 4V marquee case (The Wardha Divergence). Retrospective entry state extended to cover accountability tracking sub-mode (no 7th state). Customer Agent finding: integrated observed-actuals input (Persona 8 accountability use case) is not a current platform capability — flagged in Persona 8 failure mode and Primary Case 8 exit criteria; roadmap item. |
 | #574 | Epic: Vision-to-Architecture Bridge — personas → user experiences → technical concepts | **Filed 2026-06-01** — Three child issues: #575 ✅ (personas extension, closed PR #592), #576 ✅ (user experiences for second ring, closed PR #594), #577 (Phase 3 DIC technical concept review — unblocked). No active horizon assignment — EL to prioritize M10 or M11. |
-| #577 | docs(ux): Phase 3 DIC technical concept review — [Phase-3-TBD] stories from Issue #576 | **FULLY UNBLOCKED 2026-06-02.** Both pre-activation blockers resolved: (1) US-043 No False Precision correction applied (PR #598); (2) EL confirmed US-039 milestone = M12 (no urgency for M11 pull-in). Activation: `Architecture Review: TARGETED — Issue #577`. Scope: US-039 (Mode 3 extension, M12), US-042 (post-processing overlay, M11), US-043 (standalone export, M11 — CM Required C on vocabulary mapping standard before implementation), US-048 (Zone 2 + backend provenance API, M11/M12 — Chief Engineer gates ADR-009). Ready to activate when EL directs. |
+| #577 | docs(ux): Phase 3 DIC technical concept review — [Phase-3-TBD] stories from Issue #576 | **ARCH-REVIEW-006 complete (PR #601, 2026-06-02).** 16 blindspots classified: 1 Immediate, 12 Near-Term, 3 Long-Term. 11 GitHub Issues to file as #577 children. One Immediate blocker: CM must author vocabulary mapping standard (AR-006-B-007) before any US-043 implementation begins. Full findings: `docs/architecture/reviews/ARCH-REVIEW-006-milestone10.md`. Next action: file 11 child issues under #577. |
 
 ---
 
@@ -259,6 +259,7 @@ All Horizon:Immediate issues are now closed. M8 feature-complete.
 
 | Decision | Rationale | Date |
 |---|---|---|
+| ARCH-REVIEW-006 complete — Issue #577 scope review | Architecture Review Facilitator TARGETED review produced 16 blindspots across US-039/042/043/048. One Immediate blocker: CM vocabulary mapping standard (AR-006-B-007) must be authored before US-043 implementation begins. 11 GitHub Issues enumerated as Issue #577 children. Zone 1/2 bidirectional coupling atom (AR-006-B-011) and Zone 2 multi-view model (AR-006-B-012) are the two architectural pre-decisions for US-048. Branch-and-recompute CE assessment (AR-006-B-001) is the prerequisite for US-039 M12 scoping. `docs/architecture/reviews/ARCH-REVIEW-006-milestone10.md`. | 2026-06-02 |
 | EL decision — US-039 milestone confirmed M12 | No urgency to pull US-039 (Mode 3 real-time parameter change) into M11. Mode 3 is the M12 core deliverable; building the control plane form before Mode 3 instrumentation exists would be premature. Exception path (Mode 2 quick-create variant) not pursued. Issue #577 pre-activation blocker resolved. | 2026-06-02 |
 | US-043 No False Precision correction applied (PR #598) | PI-REVIEW-002 F-005 resolved. Three changes to `docs/ux/user-stories-public-advocacy-m10.md`: (1) north-star sentence: "removes confidence tier notation" → "replaces technical confidence tier notation with plain-language epistemic disclosure"; (2) technical-notation criterion scoped to primary content only, with cross-reference to disclosure criterion; (3) new acceptance criterion added: for any indicator with confidence_tier ≥ 3, community report must contain plain-language epistemic disclosure per vocabulary mapping standard (Tier 3 → "Based on a model estimate from comparable countries"; Tier 4 → "This is an estimated figure — independent verification recommended"; Tier 5 → "Insufficient data — the model could not compute this reliably"). Chief Methodologist is Required Consultant on vocabulary mapping standard before implementation begins. QA may now write the pytest criterion for disclosure presence. | 2026-06-02 |
 | PI-REVIEW-002 complete — Issue #577 scope assessed (PR #596) | Four [Phase-3-TBD] stories from Issue #576 classified: US-039 → Extension of Mode 3 (M12; exception path to M11 if Mode 2 variant confirmed by UX Designer); US-042 → Post-processing overlay recommended — epistemically correct; Mode 4 rejected; Mode 1 extension possible with DA input (M11); US-043 → Standalone rendering/export tool — HIGH No False Precision risk: acceptance criteria must add plain-language epistemic disclosure vocabulary (Tier 3/4/5) before implementation begins (M11); US-048 → New Zone 2 surface + backend provenance API — bidirectional Zone 1/2 coupling novel; Chief Engineer gates on graph traversal feasibility; ADR-009 may be prerequisite (M11 or M12). Key process clarification: correct Issue #577 activation is `Architecture Review: TARGETED`, not `Council Orchestrator: ORCHESTRATE`. Pre-activation blockers: PO Agent corrects US-043 acceptance criteria; EL confirms US-039 milestone. | 2026-06-02 |
