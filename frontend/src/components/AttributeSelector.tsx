@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import type { AttributeSummary } from "../types";
+import { getIndicatorDisplayNameAny } from "../lib/indicatorDisplayNames";
 
 const API_BASE = "http://localhost:8000/api/v1";
 
@@ -57,7 +58,7 @@ export default function AttributeSelector({ value, onChange }: Props) {
     >
       {options.map((a) => (
         <option key={a.attribute_key} value={a.attribute_key}>
-          {a.attribute_key} ({a.unit}, {a.variable_type})
+          {getIndicatorDisplayNameAny(a.attribute_key)} ({a.unit}, {a.variable_type})
         </option>
       ))}
     </select>
