@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-02 (PR #626 merged — #376/#377 closed; DEMO-007/#348 + DEMO-009/#350 closed; #345/DEMO-004 data precondition noted)**
+**Last updated: 2026-06-02 (PR #629 merged — #379/#628 closed; #342/#343/#346 closed; demo-preparation-standard.md M10 update complete)**
 **Current milestone:** M10 — Engine Integrity and Instrument Delivery (M9 formally closed; M10 active)
 
 ---
@@ -76,12 +76,13 @@ M9 formally closed. Issue #213 (M9 Exit Checklist) closed 2026-05-24. M10 milest
 
 ## Open PRs
 
-No open PRs — board clear as of 2026-06-02 (post PR #626 merge).
+No open PRs — board clear as of 2026-06-02 (post PR #629 merge).
 
 ## Recently Merged PRs (last 5)
 
 | PR | Title | Date |
 |---|---|---|
+| #629 | docs(process): demo preparation standard M10 update — screenshot naming, legibility gate, narration check (closes #379, #628) | 2026-06-02 |
 | #626 | test(e2e): demo advancement flow and legibility regression guards (closes #376, #377) | 2026-06-02 |
 | #624 | fix(fixture): Argentina Demo 3 — emergency_declaration at step 2 triggers governance MDA (closes #615) | 2026-06-02 |
 | #622 | fix(frontend): Zone 1D ecological boundary annotation + AttributeSelector display names (closes #616, #617) | 2026-06-02 |
@@ -207,6 +208,11 @@ No open PRs — board clear as of 2026-06-02 (post PR #626 merge).
 | #617 ✅ | fix(frontend): AttributeSelector display names — add getIndicatorDisplayNameAny(), wire into AttributeSelector.tsx | **Closed 2026-06-02** — PR #622 merged. `getIndicatorDisplayNameAny(key)` added to `indicatorDisplayNames.ts` (iterates all framework blocks, title-case fallback). Wired into `AttributeSelector.tsx` — dropdown now shows "GDP Growth (%, FLOW)" instead of "gdp_growth (%, FLOW)". |
 | #376 ✅ | test(e2e): Playwright demo advancement flow test — scenario advance, choropleth change, MDA accumulation, radar legibility | **Closed 2026-06-02** — PR #626 merged. `demo-advancement-flow.spec.ts`: 5 tests at 1440×900 — all four Zone 1 instruments live at every step; `choropleth-map` `data-step` attribute increments 0→1→2→3 (DEMO-001 guard); Zone 1B MDA panel live/non-blank at every step (DEMO-004 guard); Zone 1D framework scores non-empty at final step; advance button disabled exactly at step 3 (no overshoot). `ChoroplethMap.tsx`: `data-testid="choropleth-map"` + `data-step={currentStep ?? 0}` added to outer container. |
 | #377 ✅ | test(e2e): legibility assertions — minimum font size, non-truncation, visibility for all demo components | **Closed 2026-06-02** — PR #626 merged. `demo-legibility.spec.ts`: 6 tests at 1440×900 — Zone 1 instrument bounding boxes non-zero (DEMO-002/003/005/006 guard); Zone 1C PMM value rendered ≥ 20px; Zone 1D framework labels ≥ 10px and not overflow-clipped; `ecological-boundary-note` visible with "1.0 = boundary" text (#616 regression guard); null composite rows carry dashed left border, live rows carry solid border (DEMO-006 guard); Zone 1B MDA text not overflow-clipped (DEMO-003 guard). |
+| #342 ✅ | demo(choropleth): single-entity scenario shows no visible change across steps (DEMO-001) | **Closed 2026-06-02** — UX-RULING-4 (binding). FA Agent proposed HUD overlay on choropleth and Zone 1D attribute row; both declined. Root cause reframed: choropleth is a geographic context surface, not a change instrument. M10 fix: narration update (child #628, closed PR #629). M11 fix: Option B scenario-relative color scale (cross-step range endpoint required). |
+| #343 ✅ | demo(radar): thesis frame asymmetry not independently legible without narration (DEMO-002) | **Closed 2026-06-02** — Substantially resolved by M9/M10 instrument cluster redesign. Narrow-drawer root cause no longer exists; Zone 1A is primary viewport instrument. M10 IR review: "substantially resolved." |
+| #346 ✅ | demo(radar): axis labels and scores not legible at drawer scale (DEMO-005) | **Closed 2026-06-02** — Resolved by M9/M10 instrument cluster redesign. Zone 1D covers multi-framework readout in primary viewport; font sizes validated by `demo-legibility.spec.ts`. M10 IR review: "Significant→Minor." |
+| #379 ✅ | process: demo preparation standard as pre-condition — standard must exist and be read before demo assembly begins | **Closed 2026-06-02** — PR #629 merged. `demo-preparation-standard.md`: Step 5a (narration instrument check, UX-RULING-4), Step 5b (legibility Playwright gate), Step 6 amendment (screenshot naming in presentation order). Carried forward from M9. |
+| #628 ✅ | demo(script): update Demo 3 narration — route quantitative change to Zone 1A, not choropleth | **Closed 2026-06-02** — PR #629 merged. Child of #342, spawned from UX-RULING-4. `demo_argentina_2001_2002.py`: presenter instruction block in `_print_divergence_narrative` routes narrator to Zone 1A, not choropleth. |
 
 ---
 
@@ -268,6 +274,8 @@ All Horizon:Immediate issues are now closed. M8 feature-complete.
 
 | Decision | Rationale | Date |
 |---|---|---|
+| UX-RULING-4 — choropleth is a context surface, not a change instrument; #342/DEMO-001 closed as narration-fix scope | FA Agent proposed two fixes for DEMO-001 (HUD overlay on choropleth; supplementary Zone 1D attribute row). UX Designer declined both as hierarchy inversions. Ruling reframed the root cause: the demo narration was pointing at the wrong instrument. M10 fix: narration update only (child #628, PR #629). M11 fix: Option B scenario-relative color scale (requires cross-step range endpoint — scoped for M11). Zone 1D is composite scores only (no raw indicator rows) until a new UX ruling authorises an expansion. | 2026-06-02 |
+| DEMO issue dispositions — full sweep complete (2026-06-02) | Closed: #342 (DEMO-001, narration), #343 (DEMO-002, redesign), #346 (DEMO-005, redesign), #348 (DEMO-007, #616 fix), #350 (DEMO-009, #617 fix), #379 (demo standard), #628 (narration script). Left open: #345 (DEMO-004, investigation required — manual Argentina demo run needed), #349 (DEMO-008, screenshot naming — near-term, addressed in demo standard Step 6). | 2026-06-02 |
 | DEMO issue dispositions — #348/DEMO-007 + #350/DEMO-009 closed; #345/DEMO-004 data precondition noted (2026-06-02) | #348 (DEMO-007, "boundary reference absent") closed — resolved by PR #622 (#616: `ecological-boundary-note` span; regression-guarded by `demo-legibility.spec.ts` in PR #626). #350 (DEMO-009, "attribute selector raw field names") closed — resolved by PR #622 (#617: `getIndicatorDisplayNameAny()` wired). #345 (DEMO-004, "alerts appear identical across steps") left open with data-precondition comment: PR #624 (#615) provides Argentina governance alert variation at step 3; the test gate is `demo-advancement-flow.spec.ts` test 3 (Zone 1B live/non-blank). Close #345 after a full demo run-through confirms visual accumulation end-to-end. #342/343/346/349 remain open (not addressed by this session's PRs). | 2026-06-02 |
 | Demo 3 readiness gate COMPLETE — PRs #622 + #624 (2026-06-02) | All three IR-M10 gate items closed: #615 (governance MDA breach — `emergency_declaration` at step 2, GovernanceModule one-step lag → score 0.665 at step 3 ≤ 0.70 floor); #616 (Zone 1D ecological annotation — "1.0 = boundary" sub-label); #617 (AttributeSelector display names — `getIndicatorDisplayNameAny()`). Demo 3 is presentation-ready. Root cause of #615: fixture comment falsely claimed `emergency_declaration` was already in base scheduled_inputs; it was not; `default_declaration` is not subscribed by GovernanceModule. | 2026-06-02 |
 | Demo 3 IR review complete — PR #618 (2026-06-02) | IR review at `docs/demo/m10/reviews/2026-06-02-v0.10-demo3-ir.md`. All six M9 IR findings (IR-001–IR-006) confirmed closed by M10 PRs. DEMO issue re-triage: #347 (DEMO-006) CLOSED — governance live; #342 (DEMO-001) Critical→Minor — Zone 1A is primary instrument; #343 (DEMO-002) Substantially resolved; #346 (DEMO-005) Significant→Minor — Zone 1D covers it. Three new findings: IR-M10-001 (Argentina MDA accumulation uncertainty → #615), IR-M10-002 (ecological Zone 1D annotation gap → #616), IR-M10-003 (AttributeSelector raw field names → #617). Demo 3 readiness gate: #615/#616/#617 must close before Demo 3 presentation. Positive: all four Zone 1 instruments live, governance live (4th axis solid, no longer dashed), Platform Principle demonstrated. | 2026-06-02 |
