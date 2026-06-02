@@ -1239,9 +1239,23 @@ A new Architecture Decision Record is required when:
 4. A design alternative was seriously considered and rejected
 5. A significant data model changes
 
-If you are unsure whether an ADR is required, it is. Write it. The cost of
-an unnecessary ADR is an hour of writing. The cost of building a significant
-feature without architectural alignment is weeks of rework.
+**ADR threshold criteria** — use this table when uncertain:
+
+| Change type | ADR required? |
+|---|---|
+| New simulation module or measurement framework | New ADR |
+| New public API endpoint | New ADR |
+| New composite score methodology | New ADR |
+| New database table or schema type | New ADR |
+| New interaction mode or primary viewport behavior | New ADR |
+| Change to a class interface defined by an existing ADR | ADR amendment in same commit |
+| Frontend visual change within existing ADR spec | No ADR required |
+| Bug fix that does not change externally-observable behavior | No ADR required |
+| Documentation or process change | No ADR required |
+
+When a case is ambiguous, PM Agent and Architect Agent jointly own the call. Neither
+agent escalates to EL without first consulting each other. When in doubt, write the ADR —
+the cost of an unnecessary one is an hour; the cost of missing one is weeks of rework.
 
 ### Required Sections
 

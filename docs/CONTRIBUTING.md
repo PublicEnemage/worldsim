@@ -57,11 +57,10 @@ git clone https://github.com/PublicEnemage/worldsim.git
 cd worldsim
 ```
 
-Create your feature branch from `develop`, not `main` (see Contribution
-Workflow below):
+Create your feature branch from `main` (see Contribution Workflow below):
 
 ```bash
-git checkout develop
+git checkout main && git pull origin main
 git checkout -b feat/your-feature-name
 ```
 
@@ -352,16 +351,16 @@ test/short-description         # test additions
 refactor/short-description     # refactoring
 ```
 
-Branch from `develop`. Never branch from `main`.
+Branch from `main`. Always pull `origin/main` before creating a new branch.
 
 ### Step-by-Step
 
 1. **Fork and clone** the repository if you are an external contributor.
    Core team members clone directly.
 
-2. **Create a branch** from `develop`:
+2. **Create a branch** from `main`:
    ```bash
-   git checkout develop && git pull origin develop
+   git checkout main && git pull origin main
    git checkout -b feat/your-feature-name
    ```
 
@@ -387,7 +386,7 @@ Branch from `develop`. Never branch from `main`.
    pytest tests/backtesting/ -v
    ```
 
-7. **Open a pull request** against `develop` (not `main`) using the PR template.
+7. **Open a pull request** against `main` using the PR template.
    The PR title must follow conventional commits format:
    `feat(engine): short description in imperative mood`
 
@@ -397,6 +396,9 @@ Branch from `develop`. Never branch from `main`.
    - How does it affect the human cost ledger?
    - Which tests cover it?
    - Does the backtesting suite still pass?
+   - **ADRs Affected** (required field): list every ADR whose scope this PR touches,
+     whether it is compliant with that ADR, or whether an amendment is required.
+     If no ADR scope is touched, state that explicitly. See Pre-PR Checklist §2.
 
 9. **Respond to review**. Reviews may be from human maintainers or from
    the QA or Security agents. Address all comments before merge.
@@ -440,14 +442,45 @@ The ADR-005 Amendment 2 incident is the canonical reference for what skipping
 this check costs: a module's subscription contract drifted for a full
 milestone before a Socratic TEST surfaced it.
 
-**3. Tests pass (including backtesting suite):**
+**3. ADRs Affected enumerated:** Every PR description must include an "ADRs Affected"
+section. For each ADR whose scope this PR touches, state which decisions are touched
+and whether the PR is compliant or whether an amendment is required in the same commit.
+If no ADR scope is touched, state: *"No ADR scope is touched by this PR."*
+
+```markdown
+## ADRs Affected
+
+| ADR | Decision(s) touched | Compliant? |
+|---|---|---|
+| ADR-NNN | Decision N: ... | Yes / Amendment required |
+```
+
+**4. Tests pass (including backtesting suite):**
 ```bash
 pytest tests/unit -v
 pytest tests/backtesting/ -v
 ```
 A backtesting regression is a blocker. It cannot be quietly accepted.
 
-**4. Issue governance complete** (see CLAUDE.md §Pre-PR Checklist for full
+**5. Playwright phases 3–4 attested (frontend PRs touching instrument-cluster components):**
+ADR-006 Decision 12 requires a 4-phase Playwright sequence for all instrument-cluster
+frontend PRs. Phases 3 and 4 cannot run in CI — they are a PR review discipline gate.
+
+- **Phase 3 (mode transition safety):** Navigate Mode 1 → Mode 2 → Mode 3 and back. Verify
+  no instrument retains stale values from the prior mode. No ghosted readings in Zone 1.
+- **Phase 4 (render budget):** Confirm Zone 1A trajectory re-render completes within the
+  MV-002 budget (≤ 100ms at 4× CPU throttle on the reference machine).
+
+PR description must include the following attestation for any PR touching instrument-cluster
+components:
+
+> Playwright Phase 3 (mode transition) run locally: [ ] Yes [ ] N/A (no mode-transition behavior changed)
+> Playwright Phase 4 (render budget) run locally: [ ] Yes [ ] N/A (no render-path behavior changed)
+
+A PR that omits this attestation will be returned. NM-024 documents the near-miss that
+produced this requirement.
+
+**6. Issue governance complete** (see CLAUDE.md §Pre-PR Checklist for full
 requirements): issue exists, referenced with `Closes #N`, added to the
 Development Board.
 

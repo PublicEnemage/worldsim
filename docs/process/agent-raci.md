@@ -480,6 +480,7 @@ These are explicit commitments in working agreements, not inferred relationships
 | Customer Agent | UX Designer | "Before any new instrument or indicator label is finalized, request a Customer Agent AUDIT pass for Persona 5 legibility." | Customer Agent working agreement (offer of help) |
 | Customer Agent | PO Agent | "When a story involves Personas 2, 3, or 5, request a Customer Agent review of the acceptance criteria before QA authorship begins." | Customer Agent working agreement (offer of help) |
 | Customer Agent | Architect Agent | "When an ADR introduces a new output format, flag it to me before the panel review. I will produce a Layer 3 usability finding for the panel record." | Customer Agent working agreement (offer of help) |
+| Architect Agent | Customer Agent | For any ADR whose scope includes a user-visible instrument, widget, or workflow change: invoke `Customer Agent: AUDIT — [scope]` on the draft before the panel review is distributed. The Customer Agent response must be included in the ADR's Context section. | Issue #539 (PI-AUDIT-002 F-PIPELINE-2) |
 
 ---
 
@@ -520,7 +521,7 @@ Minimum panels by ADR type (derived from the RACI matrix above):
 | Frontend architecture | Row 1 (Architectural decisions) | Architect Agent (author), Frontend Architect Agent (C), Engineering Lead (A) |
 | Simulation engine | Row 1 (Architectural decisions) | Architect Agent (author), Chief Engineer Agent (C), Chief Methodologist (via DI — C), Engineering Lead (A) |
 | Data standards | Row 4 (Data / schema decisions) | Architect Agent (C), Chief Methodologist (via DI — C), Development Economist (domain validation), Engineering Lead (A) |
-| UX design | Row 2/3 (UX frame / component decisions) | Architect Agent (C), UX Designer Agent (R), Frontend Architect Agent (C), Engineering Lead (A) |
+| UX design | Row 2/3 (UX frame / component decisions) | Architect Agent (C), UX Designer Agent (R), Frontend Architect Agent (C), Customer Agent (C — Layer 3 usability finding), Engineering Lead (A) |
 | Cross-cutting | All relevant rows | Relevant R/C agents per RACI, Engineering Lead (A) |
 
 The Architect Agent authors the ADR — they are not a reviewer. The Engineering Lead

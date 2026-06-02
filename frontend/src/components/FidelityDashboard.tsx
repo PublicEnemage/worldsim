@@ -58,7 +58,7 @@ const CASES: CrisisCase[] = [
     ],
     notes:
       "Three consecutive years of GDP contraction correctly predicted. " +
-      "MAGNITUDE deferred to M7 — accumulation-only model lacks mean-reversion channel " +
+      "MAGNITUDE deferred to M11 — accumulation-only model lacks mean-reversion channel " +
       "(Issue #221).",
   },
   {
@@ -86,7 +86,7 @@ const CASES: CrisisCase[] = [
       "Step 2 is the first MAGNITUDE-validated result in WorldSim. " +
       "Mechanism: depressed-regime multiplier (1.5×) applied to Zero Deficit Plan " +
       "spending cut (−6.5% of GDP). " +
-      "Step 1 MAGNITUDE deferred to M7 — one-step lag structural gap (Issue #222).",
+      "Step 1 MAGNITUDE deferred to M11 — one-step lag structural gap (Issue #222).",
   },
   {
     caseId: "LEBANON_2019_2020",
@@ -145,7 +145,7 @@ const STRUCTURAL_GAPS = [
       "processes prior-step events only. Step 1 reports the initial seed (−0.8%) " +
       "while the historical outturn (−4.4%) reflects the contemporaneous shock. " +
       "Model deviation: 82%. Not fixable by parameter calibration.",
-    milestone: "M7",
+    milestone: "M11",
     deviation: "−0.8% model vs −4.4% actual (82% deviation)",
   },
   {
@@ -159,7 +159,7 @@ const STRUCTURAL_GAPS = [
       "from −8.9% to −6.6% without a positive fiscal shock in the fixture. " +
       "Requires a mean-reversion channel in MacroeconomicModule (Chief Methodologist " +
       "+ Chief Engineer joint ADR).",
-    milestone: "M7",
+    milestone: "M11",
     deviation: "GRC step 2: −21.4% model vs −8.9% actual (140%); step 3: −31.4% vs −6.6% (376%)",
   },
 ];
@@ -486,7 +486,7 @@ export default function FidelityDashboard() {
       >
         <strong style={{ color: "#93c5fd" }}>ADR-006 Monte Carlo upgrade trigger:</strong>{" "}
         {magnitudePasses} of 2 required MAGNITUDE cases achieved.
-        Argentina 2002 (step 2) is the first. One additional MAGNITUDE case (scheduled for M7)
+        Argentina 2002 (step 2) is the first. One additional MAGNITUDE case (deferred to M11)
         unlocks the full DISTRIBUTION_COMBINED threshold infrastructure and uncertainty band
         calibration.
       </div>

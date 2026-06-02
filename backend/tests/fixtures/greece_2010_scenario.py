@@ -138,6 +138,17 @@ def build_greece_scenario() -> ScenarioCreateRequest:
             n_steps=6,
             timestep_label="annual",
             start_date=date(2010, 1, 1),
+            # step_metadata: all 6 steps are SIGNIFICANT — every year in the Greece
+            # 2010–2015 arc has a named programme event. Labels ≤32 chars AND ≤8 words
+            # per DATA_STANDARDS.md §Scenario Fixture Step Annotation (Issue #395).
+            step_metadata={
+                "1": {"significance": "SIGNIFICANT", "label": "First Memorandum / IMF SBA"},
+                "2": {"significance": "SIGNIFICANT", "label": "Second Memorandum / MTFS"},
+                "3": {"significance": "SIGNIFICANT", "label": "Third Memorandum / PSI"},
+                "4": {"significance": "SIGNIFICANT", "label": "Primary Surplus Achieved"},
+                "5": {"significance": "SIGNIFICANT", "label": "Privatisation / Snap Elections"},
+                "6": {"significance": "CRITICAL", "label": "Capital Controls / Referendum"},
+            },
             initial_attributes={
                 "GRC": {
                     "gdp_growth": initial_gdp_growth,
