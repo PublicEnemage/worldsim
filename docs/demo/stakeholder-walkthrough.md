@@ -1,15 +1,12 @@
-# WorldSim Stakeholder Demonstration — Presenter Guide
-
-> **Current version:** [`docs/demo/m8/stakeholder-walkthrough.md`](m8/stakeholder-walkthrough.md) (v0.8.0, Milestone 8 — Ecological and Governance Frameworks)
-> **Previous version archived at:** [`docs/demo/m6/stakeholder-walkthrough.md`](m6/stakeholder-walkthrough.md) (v0.6.0, Milestone 6)
->
-> This file is the M6-era walkthrough, retained for archive reference. For the current presenter guide, use the M8 version linked above.
-
----
+# WorldSim Stakeholder Demonstration — Presenter Guide (v0.10.0 / Milestone 10)
 
 > UX Designer Agent — Journey: Stakeholder demonstration walkthrough.
 > Grounded in `docs/ux/north-star.md` §Resolved Design Questions and
-> `docs/ux/user-journeys.md`. Read both documents before adapting this guide.
+> `docs/ux/information-hierarchy.md`. Read both documents before adapting this guide.
+>
+> **Version:** v0.10.0 — Milestone 10 (Engine Integrity and Instrument Delivery)
+> **Supersedes:** `docs/demo/m8/stakeholder-walkthrough.md` (v0.8.0)
+> **Scenario:** Argentina 2001–2004 sovereign default and Kirchner recovery — four steps
 >
 > Target audience for the demo: non-technical stakeholders and domain experts.
 > Not developers. Not data scientists.
@@ -19,6 +16,32 @@
 ---
 
 ## Presenter Briefing — Read Before the Room Fills
+
+### What Is New in Milestone 10
+
+Three things are live for the first time:
+
+1. **GovernanceModule promoted — all four axes live.** The governance composite
+   score meets all five ADR-005 promotion criteria. Zone 1D now renders four real
+   numbers. The dashed "in validation" treatment is gone. The fourth axis is no
+   longer a placeholder — it is a live measurement output derived from WGI Rule
+   of Law and V-Dem Liberal Democracy Index data.
+
+2. **PMM live computation.** Policy Manoeuvre Margin — the margin between the
+   current trajectory and the nearest MDA threshold — is computed from the
+   simulation state at each step. Zone 1C shows a directional signal: whether
+   the fiscal path is widening or narrowing the available policy space.
+
+3. **Argentina 2001–2002 — the second country fixture.** Demo 3 runs Argentina's
+   sovereign default, convertibility collapse, and Kirchner recovery. This is
+   a structurally distinct crisis mechanism from Greece (external conditionality
+   vs domestic convertibility collapse). The same engine runs both. That is the
+   Platform Principle — one analytical framework, different ingredients.
+
+**Architecture change from M8:** Zone 1A (Trajectory View) is now the primary
+analytical surface, not the EntityDetailDrawer radar chart. The instrument cluster
+shows all four frameworks simultaneously in the primary viewport. The choropleth
+(Zone 2A) is geographic context only — it is not the demo's thesis visualization.
 
 ### Who Is in the Room
 
@@ -43,10 +66,6 @@ The likely profiles:
   technical implementation is credible, and leave with a clear sense of what
   makes this different from existing tools.
 
-The presentation serves all three audiences simultaneously. The live application
-sequence serves the policy analysts. The backtesting argument serves the
-economists. The North Star closing serves the funders. Keep all three in view.
-
 ### What They Need to Leave Believing
 
 Three things, in priority order:
@@ -59,41 +78,15 @@ Three things, in priority order:
 
 2. **The model is disciplined, not aspirational.** Backtesting against five
    historical crises with documented fidelity thresholds and explicit blind
-   spot disclosure is evidence of methodological seriousness. The model knows
-   what it does not know. That is a harder standard to meet than simply
-   producing plausible-looking outputs.
+   spot disclosure is evidence of methodological seriousness. Argentina 2002
+   is the first MAGNITUDE-validated result — the model produces a contraction
+   of −10.55% against the historical −10.9%, a 3.2% deviation. That is not
+   a coincidence. That is calibration evidence.
 
 3. **The roadmap is coherent and sequenced correctly.** What exists today is
-   working software, not a prototype. What comes next (uncertainty
-   visualization, ecological and governance composite scores) follows directly
-   from the epistemic commitments already made. The trajectory is legible.
-
-### Honest Disclosure Required
-
-Do not oversell the current state. The following are honest statements that
-must be available if questions arise:
-
-- The simulation produces distributions, not predictions. Uncertainty bands
-  are currently pre-calibration — meaning they reflect a reasonable range
-  of model outcomes, not empirically calibrated confidence intervals. This
-  is disclosed in the interface and in the methodology documentation.
-
-- The ecological and governance composite scores are currently null in
-  scenario outputs. The modules exist (GovernanceModule ships in M6) but
-  the axes are not yet integrated into the radar chart display. These are
-  live scores in M8.
-
-- Fidelity thresholds at this milestone are DIRECTION_ONLY for all five
-  backtesting cases. The model gets the direction right. Magnitude
-  calibration is the next validation layer.
-
-- The canonical user is a finance ministry counterpart in a negotiation.
-  The tool is not designed for real-time trading, surveillance, or any
-  use case involving financial advantage over the actors it is designed
-  to assist.
-
-If any of these disclosures become a problem in the room, they are not problems
-with the tool — they are evidence that the tool's epistemic honesty is working.
+   working software at v0.10.0, not a prototype. All four analytical frameworks
+   are live. The second country fixture demonstrates the Platform Principle.
+   What comes next follows directly from the backtesting evidence.
 
 ---
 
@@ -149,199 +142,192 @@ reads those consequences as evidence. Evidence is power.
 ### Setup
 
 The application should be running and the map loaded before the session starts.
-Do not demo a loading screen. The Greece 2010 backtesting scenario should be
-pre-created so that the "create scenario" step is demonstrating the interface,
-not waiting on a database write.
+Do not demo a loading screen. The scenario does not need to be pre-created —
+the creation step happens in the Playwright walkthrough.
+
+Run `./scripts/demo.sh --run` to launch the stack and the Playwright walkthrough,
+or `./scripts/demo.sh` to start the stack and follow the guide manually.
 
 The sequence below is precise. Follow it exactly. Each step has a specific
 cognitive purpose for the audience.
+
+**Primary surface:** The Zone 1 instrument cluster on the left side of the
+primary viewport — four instruments always visible. This is where the demo
+argument lives. The map is geographic context.
 
 ---
 
 ### Step 1 — The Map Loads
 
-**What the audience sees:** A world map. Countries rendered as polygons. A
-color gradient indicating an attribute value. The interface is familiar —
-it looks like every geopolitical visualization tool they have seen.
+**What the audience sees:** A world map as geographic context. Countries visible
+as reference polygons. On the left: the Zone 1 instrument cluster — trajectory
+view, MDA alert panel, PMM widget, four-framework current position.
 
 **What the presenter says:**
 
-> This is the application's baseline view. The choropleth shows a simulation
-> attribute across entities — in this case, GDP growth rate from the most
-> recent completed scenario step. Each country is colored by its simulated
-> value. Click any country to open its analysis panel.
->
-> What makes this different from a data visualization tool will become clear
-> in a moment.
+> This is the baseline view. The map provides geographic context — you can see
+> where any country sits relative to its neighbours, and in a multi-entity
+> scenario you can see how the analysis distributes across a region. The
+> analytical instrument is the panel on the left: four instruments, always
+> visible, updated with each simulation step.
 
-**Cognitive purpose:** Orient. Establish that this is an interactive, not a
-static display. Avoid spending time here — the map is familiar territory and
-earns nothing on its own.
+**Cognitive purpose:** Orient. Establish that the primary analytical surface is
+the instrument cluster, not the map. The map is a navigation aid, not the
+thesis visualization.
+
+**Key M10 note:** Do NOT narrate "watch Argentina shift in the choropleth" —
+that was the M8 narration. Per UX-RULING-4, the choropleth is geographic
+context. The trajectory view (Zone 1A) is now the instrument.
 
 ---
 
-### Step 2 — Create the Greece 2010 Scenario
+### Step 2 — Create the Argentina Demo 3 Scenario
 
-**What the audience sees:** The scenario creation panel. Presenter selects
-entity "GRC", sets n_steps to 3, and confirms. The scenario appears in the
-scenario list with status "pending."
+**What the audience sees:** The scenario creation panel. The Playwright
+walkthrough selects the pre-created Argentina Demo 3 scenario and activates it.
+The Zone 1 instruments load with Argentina data.
 
 **What the presenter says:**
 
-> We're going to model Greece's 2010–2012 fiscal adjustment programme. This is
-> a historical case — we know what happened. In the simulation, we'll inject
-> the IMF programme conditions as scheduled inputs: the fiscal tightening, the
-> emergency declarations, the structural conditionality. Then we advance the
-> scenario step by step and observe what the model produces.
+> We are modelling Argentina's 2001 to 2002 sovereign default — four years.
+> The Zero Deficit Plan: a pro-cyclical spending cut of 6.5 percent of GDP,
+> imposed in July 2001. The IMF Blindaje programme. Then the default itself —
+> declared in December 2001, 81.8 billion US dollars, the largest in history
+> at the time. Then the Kirchner recovery.
 >
-> The reason we're starting with a historical case rather than a hypothetical
-> is important. It's the point of the backtesting discipline, which we'll come
-> back to.
+> The crisis conditions are the scheduled inputs. The simulation produces the
+> consequences. Each step is one year.
 
 **Cognitive purpose:** Establish that scenarios are structured, not arbitrary.
-Conditionality terms are the inputs. The simulation produces the consequences.
-The causal arrow is explicit.
+The historical events — the programme conditions, the default, the emergency
+declaration — are the inputs. What the simulation does with them is the output.
 
 ---
 
-### Step 3 — Advance to Step 3
+### Step 3 — Advance Through Four Steps
 
-**What the audience sees:** The presenter clicks the Advance button three times
-(or uses the run button for the full scenario). The step counter increments:
-Step 1 / 3 → Step 2 / 3 → Step 3 / 3. The choropleth updates at each step.
-Greece shifts color.
+**What the audience sees:** The presenter clicks Next Step four times. The step
+counter increments: 1/4 → 2/4 → 3/4 → 4/4. Zone 1A updates at each step.
 
 **What the presenter says:**
 
-> Each step here is one year. We're advancing through 2010, 2011, 2012 — the
-> three years of the initial programme. At each step, the simulation applies
-> the scheduled inputs and propagates their effects through the model's
-> relationship graph. You can see Greece shift in the choropleth as the
-> fiscal contraction accumulates across steps.
->
-> What the choropleth is showing is the point estimate — the central value of
-> the distribution. The full picture is in the entity panel.
+> Each step is one year. Watch the trajectory view as the crisis arc unfolds.
+> The step labels come from the historical event record: Zero Deficit Plan,
+> Default, Kirchner recovery, Growth consolidation.
 
-**Cognitive purpose:** Show time progression. Establish that the simulation
-runs sequentially through a programme horizon, not all at once. The choropleth
-update makes the progression visible.
+**Cognitive purpose:** Show time progression. Establish the four-step arc from
+crisis entry to recovery. The Zone 1A trajectory curves tell the story across
+steps without requiring the audience to open any additional panel.
 
 ---
 
-### Step 4 — Click Greece, Drawer Opens
+### Step 4 — Step 3 — The Thesis Frame
 
-**What the audience sees:** The EntityDetailDrawer slides open. The panel
-shows Greece's simulation state at Step 3. The MDA alert panel is at the top.
-Below it, the radar chart. Below that, framework-specific indicators with
-confidence tiers.
+**What the audience sees:** At Step 3 (2003 — Kirchner recovery begins), the
+Zone 1A trajectory shows the financial curve rising from its step 2 trough
+while the governance curve remains flat near the breach floor.
 
 **What the presenter says:**
 
-> This panel is the primary analytical surface. What I want to draw your
-> attention to first is the top of the panel.
-
-**Pause. Let them read it.**
-
-> These are the Minimum Descent Altitude alerts. The terminology comes from
-> aviation: an MDA is the altitude below which an aircraft cannot safely
-> descend given the terrain. In this simulation, MDAs are human cost floors —
-> levels below which consequences become irreversible, or where standard policy
-> frameworks no longer provide protection.
+> Step 3 is 2003. The Kirchner recovery is beginning. Look at the trajectory view.
 >
-> The alert fires when the simulation determines that an indicator has crossed
-> one of those floors. What you're reading is not a warning about the model's
-> own uncertainty. It is a finding about where the proposed path takes the
-> population.
+> The financial curve — the dashed line — is rising. GDP is recovering. The
+> heterodox policies are working on the headline number.
+>
+> Now look at the governance curve. It is flat. Still in the breach zone.
+>
+> The emergency declaration from December 2001 — the state of siege that ran
+> concurrent with the default — drove democratic quality below the analytical
+> threshold. That institutional damage does not repair itself as fast as GDP
+> recovers.
+>
+> Financial recovery and institutional recovery are not the same event. No
+> single-axis measurement tool can show you both simultaneously. This one does.
 
-**Cognitive purpose:** Introduce the primary visual element (per north-star.md
-§Resolved Design Question 1: MDA alert panel is primary). The alert is the
-first thing the canonical user reads. It must be the first thing the audience
-hears explained.
+**PAUSE — let them look at Zone 1B.**
 
 ---
 
-### Step 5 — Call Out the MDA Alert Panel
+### Step 5 — Zone 1B — MDA Alert: Governance WARNING
 
-**What the audience sees:** The presenter highlights a specific alert —
-for example, a CRITICAL severity alert on unemployment or poverty headcount
-at step 3.
+**What the audience sees:** Zone 1B (MDA Alert Panel) shows a governance WARNING
+alert: democratic quality score at 0.665, below the MDA-GOV-DEMOCRACY-FLOOR
+threshold of 0.70. Step 3. Governance framework.
 
 **What the presenter says:**
 
-> Read this alert as a piece of evidence: "Under this fiscal adjustment path,
-> [indicator] crosses the critical threshold at programme year 3. This affects
-> primarily [cohort]." That sentence is the analytical finding. It is specific
-> enough to cite in a negotiation. It names an indicator, a step, a severity
-> level, and a population cohort.
+> This is a Minimum Descent Altitude alert. In aviation, the MDA is the floor
+> below which an aircraft cannot safely descend given the terrain. In this
+> simulation, MDAs are analytical floors — levels below which consequences
+> become structural rather than correctable.
 >
-> This is what 'capability analysis' means in practice. The finance ministry
-> specialist is not being alarmed by the simulation. She is being handed a
-> finding that she can use. Her argument at the negotiating table becomes:
-> "Under this path, poverty headcount crosses the critical threshold in year
-> three. In comparable historical cases — which we can show you — that level
-> of deterioration produced programme collapse. Here is the evidence."
+> Read this alert as a sentence: democratic quality score has dropped to 0.665 —
+> below the threshold of 0.70 — at step 3, under the governance framework.
 >
-> The simulation gives her the analytical standing to make that argument
-> specifically, not generally.
+> That sentence is specific enough to cite in a negotiation. You are not
+> saying "things look bad." You are citing a finding with an indicator, a
+> threshold, a step, and a framework. That is the difference between intuition
+> and analytical standing.
 
-**Cognitive purpose:** Translate the UI into the use case. The audience
-understands negotiating contexts. Connect the visual output to the human
-situation it serves.
+**Cognitive purpose:** Introduce the MDA alert as citeable evidence. The format
+matters: indicator / severity / step / framework. A ministry official who can
+cite a specific threshold crossing has changed the character of the conversation.
 
 ---
 
-### Step 6 — Radar Chart as Secondary
+### Step 6 — Zone 1D — Four-Framework Current Position
 
-**What the audience sees:** The presenter scrolls down to the radar chart,
-which shows four axes: financial, human development, ecological, governance.
+**What the audience sees:** Zone 1D shows all four framework rows. Ecological
+and governance are live composite scores. Financial and human development show
+a null treatment — not zero, but explicitly disclosed as deferred.
 
 **What the presenter says:**
 
-> Below the alert panel is the radar chart — four axes, one for each
-> measurement framework the simulation tracks. Financial indicators: fiscal
-> balance, GDP trajectory. Human development: poverty headcount, health system
-> capacity. Ecological: currently null — that module ships in Milestone 8.
-> Governance: institutional quality indicators, now live as of this milestone.
+> Four axes: financial, human development, ecological, governance. At Milestone 10,
+> all four are in the instrument cluster.
 >
-> The radar chart tells you which dimensions are under stress, which supports
-> the threshold scan the alert panel just completed. If the financial axis
-> shows deterioration but the human development axis is flat, the programme
-> may be fiscally painful without being humanly catastrophic. If both collapse
-> simultaneously, the analysis changes.
+> Ecological composite: 1.07 — Argentina is 7 percent beyond the CO2 planetary
+> boundary. The reference point is 1.0. Above 1.0 means the boundary is exceeded.
 >
-> I'll be honest about what is not on the screen yet: the ecological and
-> governance axes are showing preliminary values. They will show composite
-> scores in M8. What you see now is the architecture for a four-framework
-> assessment, with two frameworks producing full composite outputs today.
+> Governance composite: 0.665 — below the MDA floor. The composite is derived from
+> World Bank Governance Indicators and V-Dem Liberal Democracy Index data. This is
+> not an estimate — it is a measurement strategy applied to certified source data.
+>
+> Financial and human development composites show as deferred. The percentile-rank
+> scoring strategy requires at least two entities for a meaningful comparison.
+> When you add a second country to this analysis, those composites activate.
+> The limitation is disclosed in the interface. The indicators — GDP growth,
+> unemployment — are live.
 
-**Cognitive purpose:** Show the radar chart as the framework overview (per
-north-star.md: secondary to the alert panel). Introduce the multi-currency
-measurement principle. Be transparent about what is null.
+**Cognitive purpose:** Introduce the four-framework measurement principle. The
+ecological and governance live scores and the honest null treatment for financial
+and HD are all deliberate choices — each needs to land as methodology, not gap.
 
 ---
 
-### Step 7 — Enter Compare Mode
+### Step 7 — Step 4 — Recovery Without Restoration
 
-**What the audience sees:** The presenter opens compare mode and selects a
-second scenario — either a pre-created alternative with softer conditionality
-terms, or a demonstration of the DeltaChoropleth showing divergence between
-the two.
+**What the audience sees:** The presenter advances to Step 4 (2004 — growth
+consolidation). Zone 1A shows the full four-step arc. GDP growing at +9%.
+Governance composite healing slowly — not yet at full recovery.
 
 **What the presenter says:**
 
-> This is the counter-proposal function. Once you have identified which terms
-> produce threshold crossings, you model an alternative — the same fiscal
-> outcome, achieved differently. The DeltaChoropleth shows you, geographically,
-> where the two scenarios diverge. The entity drawer in compare mode lets you
-> read the divergence at the indicator level.
+> Step 4 is 2004. GDP growing at plus 9 percent. The Kirchner recovery is entrenched.
 >
-> The argument becomes: "This path crosses the threshold. This alternative
-> path achieves the same primary fiscal objective and does not. Here is the
-> evidence for both."
+> Now look at the trajectory arc as a whole: four steps, all four frameworks.
+> The financial arc has recovered. The governance arc is healing — but slowly.
+> Institutional recovery lags financial recovery, sometimes by years.
+>
+> And this is the platform principle made concrete: the same engine, the same
+> instruments, the same analytical discipline that modelled Greece in 2010 to 2015
+> now models Argentina from 2001 to 2004. Different crisis arc, different geopolitical
+> context, same tool. A finance minister in any country facing programme conditionality
+> can use this. The inputs change. The analytical framework does not.
 
-**Cognitive purpose:** Complete the preparation journey (per user-journeys.md
-Journey A Step 6). The tool is not just a diagnostic — it produces the
-counter-proposal as an analytical output.
+**Cognitive purpose:** Close the live demo on the Platform Principle. This is the
+most important claim for potential adopters — the tool is not built for one country
+or one crisis type. It generalizes.
 
 ---
 
@@ -349,219 +335,143 @@ counter-proposal as an analytical output.
 
 ### The IMF Multiplier Error
 
-> In 2013, Olivier Blanchard and Daniel Leigh — the IMF's chief economist and
-> a senior economist in the Research Department — published a paper that became
-> one of the more uncomfortable self-assessments any major institution has
-> produced.
+> In 2013, Olivier Blanchard and Daniel Leigh published a paper that became one of
+> the more uncomfortable self-assessments any major institution has produced.
 >
-> The paper examined the fiscal multipliers the IMF had been using in its
-> programme designs during the 2010–2012 European austerity period. A fiscal
-> multiplier is the relationship between a unit of government spending cuts and
-> the resulting change in output. If the multiplier is 0.5, cutting spending
-> by 1 percentage point of GDP reduces GDP by half a point. The IMF's programme
-> forecasts were built on multipliers around that range.
+> The paper examined the fiscal multipliers the IMF had been using in its programme
+> designs during the 2010–2012 European austerity period. A fiscal multiplier is the
+> relationship between a unit of government spending cuts and the resulting change in
+> output. If the multiplier is 0.5, cutting spending by 1 percentage point of GDP
+> reduces GDP by half a point. The IMF's programme forecasts were built on multipliers
+> around that range.
 >
-> The empirical evidence, once Blanchard and Leigh examined it, showed that
-> the actual multipliers in the European austerity cases were roughly 1.5 —
-> three times what the programmes had assumed. A one-point spending cut was
-> contracting GDP by one and a half points, not half a point. The programmes
-> produced significantly more economic damage than their models predicted,
-> which required further fiscal tightening to hit primary balance targets,
-> which contracted GDP further, in a compounding cycle.
+> The empirical evidence showed that the actual multipliers in the European austerity
+> cases were roughly 1.5 — three times what the programmes had assumed. A one-point
+> spending cut was contracting GDP by one and a half points, not half a point. The
+> programmes produced significantly more economic damage than their models predicted,
+> which required further fiscal tightening to hit primary balance targets, which
+> contracted GDP further, in a compounding cycle.
 >
-> This is not a criticism of the IMF. It is an illustration of the epistemic
-> problem: model assumptions embedded in consequential decisions are not
-> always visible to the parties most affected by those decisions. The finance
-> ministry sitting across the table did not have a mechanism to interrogate
-> the multiplier assumption and produce its own analysis. The IMF was using a
-> model that turned out to be systematically wrong in a predictable direction,
-> and no counterpart had the tools to surface that.
->
-> Backtesting discipline is one response to that problem. You run your model
-> against historical cases where the outcomes are known. You measure the gap
-> between what your model produces and what actually happened. You document
-> where the model is right, where it is wrong, and why. You ship that
-> documentation alongside your outputs.
+> This is not a criticism of the IMF. It is an illustration of the epistemic problem:
+> model assumptions embedded in consequential decisions are not always visible to the
+> parties most affected by those decisions. The finance ministry sitting across the
+> table did not have a mechanism to interrogate the multiplier assumption. The IMF
+> was using a model that turned out to be systematically wrong in a predictable
+> direction, and no counterpart had the tools to surface that.
 
 ### The Five Cases
 
-> WorldSim has been validated against five historical crisis cases. Each one
-> was selected because it represents a distinct crisis mechanism — not the same
-> failure mode five times.
+> WorldSim has been validated against five historical crisis cases. Each one was
+> selected because it represents a distinct crisis mechanism.
 >
-> **Greece 2010–2012** — a fiscal consolidation programme under external
-> conditionality. GDP contracted for three consecutive years. The simulation
-> correctly predicts contraction at each step and the direction of unemployment
-> movement.
+> **Greece 2010–2012** — fiscal consolidation under external conditionality. GDP
+> contracted for three consecutive years. The simulation correctly predicts
+> contraction at each step.
 >
-> **Argentina 2001–2002** — sovereign default and currency crisis following
-> a convertibility peg. A different mechanism from Greece: the binding constraint
-> was not fiscal space but monetary credibility. The simulation captures the
-> contractionary dynamics.
+> **Argentina 2001–2002** — sovereign default and convertibility peg collapse.
+> A different mechanism from Greece: the binding constraint was monetary credibility,
+> not fiscal space. The simulation captures the contractionary dynamics. And for
+> Argentina 2002, the model is validated not just on direction but on magnitude:
+> simulated GDP contraction of −10.55% against the historical −10.9% — a deviation
+> of 3.2 percent. That is the first MAGNITUDE-validated result in WorldSim.
 >
-> **Lebanon 2019–2020** — a compound crisis: a banking system collapse that
-> became a currency crisis that became a sovereign debt crisis, with the
-> Beirut port explosion as a compounding shock in year two. Lebanon is the
-> cascade case — multiple systems failing simultaneously and interacting. The
-> simulation correctly predicts contraction at both steps.
+> **Lebanon 2019–2020** — a compound crisis: banking collapse, currency crisis,
+> sovereign debt crisis, and the Beirut port explosion in year two. The cascade
+> case. The simulation correctly predicts contraction at both steps.
 >
-> **Thailand 1997–2000** — the Asian financial crisis. An externally triggered
-> currency speculative attack that produced domestic balance-sheet deterioration.
-> The mechanism is different from all three prior cases: externally induced
-> contagion, not domestically generated stress. The simulation captures
-> contraction in both crisis years.
+> **Thailand 1997–2000** — externally triggered currency speculative attack producing
+> domestic balance-sheet deterioration. The mechanism is different from all three
+> prior cases: externally induced contagion, not domestically generated stress.
 >
-> **Ecuador 1999–2000** — the dollarization case. Ecuador entered a banking
-> collapse and hyperinflation in 1999, then replaced its national currency with
-> the US dollar in January 2000. GDP contracted -6.3% in 1999 and recovered
-> +2.8% in 2000. This is the first case with a recovery at step two — it tests
-> whether the simulation can distinguish stabilization dynamics from continued
-> deterioration. The fidelity threshold for step two is not 'predict
-> contraction' but 'do not predict deeper contraction than step one.' The model
-> passes. The recovery itself is a documented blind spot: dollarization
-> stabilization and oil price recovery are not yet modeled.
+> **Ecuador 1999–2000** — banking collapse and dollarization. The first case with
+> a recovery at step two. The fidelity threshold is "do not predict deeper contraction
+> than step one" — not "predict contraction." The model passes. The recovery itself
+> is a documented blind spot: dollarization stabilization is not yet modeled.
 
-### What DIRECTION_ONLY Means in Plain Language
+### What DIRECTION_ONLY Means
 
-> The current fidelity threshold type is called DIRECTION_ONLY. In plain
-> language: the model is being tested on whether it gets the sign right.
-> Did GDP go down or up? Did unemployment rise or fall? It is a binary test.
+> The current fidelity threshold type is called DIRECTION_ONLY. In plain language:
+> the model is being tested on whether it gets the sign right. Did GDP go down or up?
+> Did unemployment rise or fall? It is a binary test.
 >
-> The model passes DIRECTION_ONLY on all five cases. That is a meaningful
-> result — a model that randomly produced outputs would pass roughly 50% of
-> binary sign tests. Consistent directional accuracy across five distinct
-> crisis mechanisms and ten sign checks is evidence that the model is capturing
-> real causal dynamics.
+> The model passes DIRECTION_ONLY on all five cases across ten sign checks. A model
+> that randomly produced outputs would pass roughly 50% of binary sign tests.
+> Consistent directional accuracy across five distinct crisis mechanisms is evidence
+> that the model is capturing real causal dynamics.
 >
-> What DIRECTION_ONLY does not validate is magnitude. The model may predict
-> -1.5% GDP when the historical outturn was -6.3%. Both pass DIRECTION_ONLY.
-> Magnitude calibration — DISTRIBUTION_COMBINED thresholds — is the next
-> validation layer. We are working toward it. We are not claiming it yet.
+> Magnitude calibration — DISTRIBUTION_COMBINED thresholds — is the next validation
+> layer. Argentina 2002 is the first step toward it. We are working toward it. We
+> are not claiming it before we have evidence.
 >
 > This is the discipline: document what the model has been shown to get right.
 > Document what has not been validated. Ship both.
-
-### Why Backtesting Discipline Matters
-
-> Every analytical tool used in consequential decisions should be held to
-> backtesting discipline. The IMF's multiplier error was not a failure of
-> intent — it was a failure to run their model against historical outcomes
-> with sufficient rigor before embedding it in programme design. The lesson
-> is not that the IMF was wrong. The lesson is that any model, used without
-> systematic comparison to historical evidence, will accumulate hidden error.
->
-> For a tool designed to give finance ministries analytical standing in
-> negotiations, epistemic honesty is not optional. A ministry official who
-> cites a finding from this simulation in a negotiation is staking their
-> credibility on it. The tool must be able to tell her what it has and has
-> not been shown to do.
 
 ---
 
 ## Section 4 — What Is Being Built (5 minutes)
 
 > The roadmap is best understood as a sequence of expanding analytical capability —
-> each milestone extending what can be seen, not filling in what was missing.
+> each milestone extending what can be seen and trusted.
 
-### Milestone 7 — Uncertainty Visualization
+### Milestones 6 through 9 — Foundation (Complete)
 
-> The simulation currently produces distributions with pre-calibration bands.
-> The bands are visible in the interface but not yet calibrated against
-> historical variance. Milestone 7 delivers the uncertainty visualization that
-> makes those bands meaningful: band widths proportional to projection horizon,
-> alert source distinction between distribution-triggered and point-estimate-
-> triggered findings, and the non-suppressible pre-calibration disclosure
-> integrated into the alert language.
+> The first four milestones established the technical and methodological foundation:
+> compliance framework clean, legibility baseline measured and documented, the
+> backtesting suite covering five historical cases, the ecological composite score
+> live, the governance module meeting its promotion criteria. These were not features —
+> they were discipline. A simulation that produces outputs without a clean bill of
+> methodological health is a tool that cannot be trusted in the setting it is designed
+> for.
+
+### Milestone 10 — Engine Integrity and Instrument Delivery (Complete — Current Version)
+
+> Milestone 10 delivers what you have seen in this demonstration: all four Zone 1
+> axes live with real data, GovernanceModule promoted from null placeholder to a live
+> composite score, PMM live computation, and the Argentina second country fixture.
 >
-> What this changes in practice: a finance ministry specialist will be able to
-> say not just "the central estimate shows a year-3 breach" but "the
-> distribution places 80% probability mass below the threshold at year 3, even
-> accounting for model uncertainty." That is a materially stronger finding.
-
-### Milestone 8 — Ecological and Governance Composite Scores
-
-> The radar chart currently has four axes. Two produce full composite outputs
-> today: financial and human development. Two are emerging: ecological and
-> governance.
+> The instrument cluster is now substantive across all four frameworks. For the first
+> time, the demo shows four live curves on a shared step axis, an MDA alert that fires
+> and is specific enough to cite, a PMM that gives a directional signal, and a
+> four-framework readout with real numbers for ecological and governance.
 >
-> Milestone 8 completes all four. The ecological module will surface planetary
-> boundary proximity, natural capital depletion, and agricultural stress indices
-> — dimensions that are systematically absent from IMF programme analysis but
-> that directly affect the long-term sustainability of fiscal consolidation
-> paths. A programme that achieves primary balance by reducing agricultural
-> investment in a climate-stressed agricultural economy is producing a different
-> risk profile than one that achieves the same balance through administrative
-> efficiency gains.
->
-> The governance module — which ships its first indicators this milestone —
-> will surface rule-of-law degradation and democratic quality erosion as
-> programme consequences. These are not peripheral concerns. An adjustment
-> programme that stabilizes fiscal accounts while undermining institutional
-> quality is producing a different trajectory than a programme that preserves
-> both. The four-axis radar chart makes that comparison visible.
->
-> Also in Milestone 8: the causal meta-map — a visualization of the causal
-> relationships the simulation is modeling, so that any user (or reviewer)
-> can inspect the assumption embedded in every output. The model's theory of
-> the world is not hidden in source code. It is displayed alongside the output.
+> The Platform Principle is demonstrated in practice, not just claimed: same engine,
+> different inputs, second country, same analytical discipline.
 
-### Milestone 9 — Methodology Publication and External Validation
+### Milestone 11 — Engine Investigation and Political Economy (Next)
 
-> The final piece of the current roadmap is methodology publication and the
-> formation of a Technical Steering Committee. Every assumption the simulation
-> makes — every elasticity, every multiplier, every threshold value — will be
-> published with source citations and open to external challenge. Domain experts
-> in sovereign debt, ecological economics, and governance will review the
-> methodology and contribute to calibration.
+> Milestone 11 addresses what the backtesting evidence tells us to look at next.
 >
-> This is what 'open source as strategy' means in practice. The tool's
-> credibility does not rest on the authority of its producers. It rests on
-> the transparency of its methodology and the quality of its backtesting
-> evidence. Anyone can inspect, challenge, and improve the assumptions.
-> That is the standard the tool is designed to meet.
+> The backtesting suite has two documented structural gaps: the one-step lag in
+> Argentina's 2001 step (the Zero Deficit Plan fires but the MacroeconomicModule
+> processes it with a lag), and the missing mean-reversion channel in Greece
+> (GDP only accumulates downward, never receives an endogenous recovery impulse).
+> Both require engine-level investigation. ADR-009 will define the computation model.
+>
+> M11 also introduces the political economy module: conditionality modeling, political
+> feasibility scoring, elite capture dynamics. This is what moves the simulation
+> from mechanical consequence modeling toward the full analysis a finance ministry
+> needs in a live negotiation.
+>
+> Frame this as expanding capability, not missing features. What exists today is the
+> capability that has been validated. What comes next is what the backtesting evidence
+> and the epistemic commitments already made require.
 
 ---
 
-## Section 5 — The North Star (1 minute)
-
-> I want to close with the reason this project exists, stated as plainly as
-> possible.
->
-> There is a quinoa farmer in Bolivia who will never know this tool exists.
-> He does not have internet access reliable enough to open a web application.
-> He does not speak the language the interface is written in. He has no idea
-> what an IMF programme is, or what a fiscal multiplier means, or why it
-> matters.
->
-> His government might know. If his government has a finance minister with
-> better analytical tools, that minister can negotiate better terms. Better
-> terms produce different fiscal paths. Different fiscal paths produce
-> different human consequences.
->
-> The quinoa farmer lives at the end of that chain. Every decision we make
-> about this tool — what to build first, what to be honest about, what not
-> to oversell — we make as if he is watching. Not because he is. But because
-> that framing is the right discipline.
->
-> Build it as if he does.
-
----
-
-## Section 6 — Q&A Preparation
+## Section 5 — Q&A Preparation
 
 ### "Why not use existing IMF tools? They already have analytical infrastructure."
 
-> The IMF's analytical tools are built for the IMF's analytical tasks. They
-> are excellent at what they are designed to do. The capability gap we are
-> addressing is not that the IMF's tools are bad — it is that they belong to
-> the IMF.
+> The IMF's analytical tools are built for the IMF's analytical tasks. They are
+> excellent at what they are designed to do. The capability gap we are addressing
+> is not that the IMF's tools are bad — it is that they belong to the IMF.
 >
 > When a finance ministry uses the IMF's projections as its primary analytical
 > input, it is evaluating conditionality terms against the model that produced
-> those terms. That is a structural problem regardless of the quality of the
-> model. The ministry needs its own analytical infrastructure — one that runs
-> on its own assumptions and surfaces its own findings, which it can then
-> compare to what the IMF is showing.
+> those terms. That is a structural problem regardless of the quality of the model.
+> The ministry needs its own analytical infrastructure — one that runs on its own
+> assumptions and surfaces its own findings, which it can then compare to what the
+> IMF is showing.
 >
 > This tool does not compete with IMF methodology. It gives the ministry team
 > a mechanism to interrogate it.
@@ -569,57 +479,129 @@ counter-proposal as an analytical output.
 ### "How do you validate the model?"
 
 > Backtesting against historical cases with documented fidelity thresholds.
-> Five crisis cases covering five distinct crisis mechanisms. Explicit
-> separation between what has been validated (DIRECTION_ONLY: the sign of
-> directional change) and what has not (magnitude calibration). Documented
-> blind spots for each case — the things the model did not capture and why.
+> Five crisis cases covering five distinct crisis mechanisms. Explicit separation
+> between what has been validated — DIRECTION_ONLY, the sign of directional change —
+> and what has not — magnitude calibration. Documented blind spots for each case.
 >
-> The validation architecture is transparent by design. Every fidelity
-> threshold is registered in the database with its source citation. Every
-> backtesting test is in the public repository and runs in CI — a failure
-> is a build failure. The methodology will be published with source citations
-> and submitted to external domain expert review at Milestone 9.
+> The Argentina 2002 step is also the first MAGNITUDE-validated result: simulated
+> GDP contraction of −10.55% against the historical −10.9%. Deviation: 3.2 percent,
+> within the validated ±20% band. One case does not make a calibration claim —
+> but it is the first evidence that magnitude accuracy is achievable.
 >
-> What we cannot claim: that the model is calibrated to produce
-> quantitatively accurate magnitude estimates. That is the next validation
-> layer. We are working toward it and will not claim it before we have evidence.
+> The validation architecture is transparent by design. Every fidelity threshold
+> is registered in the database with its source citation. Every backtesting test
+> is in the public repository and runs in CI — a failure is a build failure.
+
+### "Why are financial and human development composites showing as null?"
+
+> The percentile-rank scoring strategy for financial and human development composite
+> scores requires at least two entities for a meaningful comparison — similar to
+> how a percentile requires a distribution. A single entity has no peers to rank
+> against.
+>
+> This is not a failure. It is the tool being honest about what composite scores
+> mean: a governance composite that uses an absolute scoring strategy (WGI and
+> V-Dem normalized to a common scale) can produce a meaningful number for one
+> country. A composite that requires peer comparison cannot — not meaningfully, for
+> a single entity.
+>
+> The indicators — GDP growth, unemployment — are live and displaying correctly.
+> The composite awaits a second entity. Add Argentina's regional peers, or run a
+> comparison scenario with Brazil, and the composites activate.
 
 ### "Who is this for?"
 
-> The primary user is a debt restructuring specialist at a finance ministry
-> in a developing or emerging market economy — specifically, one that
-> encounters IMF or World Bank programmes as negotiating counterparts rather
-> than as programme designers. They have graduate-level economics training.
-> They are not data scientists. They need to reach an analytically defensible
-> conclusion in minutes, not hours, under cognitive load.
+> The primary user is a debt restructuring specialist at a finance ministry in a
+> developing or emerging market economy — specifically, one that encounters IMF or
+> World Bank programmes as negotiating counterparts rather than as programme designers.
+> They have graduate-level economics training. They are not data scientists. They
+> need to reach an analytically defensible conclusion in minutes, not hours, under
+> cognitive load.
 >
-> Secondary users: independent economists and civil society analysts who
-> want to evaluate programme conditionality against human cost consequences
-> that official programme documents do not surface. Third: journalists and
-> accountability institutions who need an accessible mechanism to interrogate
-> what a proposed programme actually does to a population.
+> Secondary users: independent economists and civil society analysts who want to
+> evaluate programme conditionality against human cost consequences that official
+> programme documents do not surface. Third: journalists and accountability
+> institutions who need an accessible mechanism to interrogate what a proposed
+> programme actually does to a population.
 >
 > What this tool is not for: sovereign wealth fund analysis, trading strategy,
-> sanctions design, or any use case in which the analytical advantage runs
-> against vulnerable actors rather than toward them.
+> sanctions design, or any use case in which the analytical advantage runs against
+> vulnerable actors rather than toward them.
 
 ### "What does it cost to run?"
 
-> The software is open source and free to use. The infrastructure requirements
-> are a PostgreSQL database and a Python runtime — both available on commodity
-> cloud hardware at negligible cost for a single ministry's analytical load.
-> The application is designed to run on a machine with 8GB of RAM. It does not
-> require paid APIs, licensed datasets, or proprietary services.
+> The software is open source and free to use. The infrastructure requirements are
+> a PostgreSQL database and a Python runtime — both available on commodity cloud
+> hardware at negligible cost for a single ministry's analytical load. The application
+> is designed to run on a machine with 8GB of RAM. It does not require paid APIs,
+> licensed datasets, or proprietary services.
 >
-> All data sources used in the simulation and backtesting are open-licensed:
-> IMF World Economic Outlook, World Bank World Development Indicators, Natural
-> Earth boundary data. The methodology documentation will be available under
-> the same license as the software.
+> All data sources used in the simulation and backtesting are open-licensed: IMF
+> World Economic Outlook, World Bank World Development Indicators, Natural Earth
+> boundary data, NOAA Mauna Loa Observatory, V-Dem. The methodology documentation
+> will be available under the same license as the software.
+
+---
+
+## Section 6 — Honest Disclosures (available if asked)
+
+These statements must be available if questions arise. Do not proactively
+volunteer them in the main presentation unless a direct question requires it.
+Frame them as evidence that the tool's epistemic honesty is working.
+
+- **Distributions are pre-calibration.** Uncertainty bands reflect a reasonable
+  range of model outcomes, not empirically calibrated confidence intervals.
+  Disclosed in the interface and in the methodology documentation.
+
+- **Ecological composite score is CO2-only.** The ecological module covers CO2
+  planetary boundary proximity against the Rockström 2009 reference (350 ppm).
+  Additional planetary boundary indicators (biodiversity, nitrogen, water) are
+  framework scope for future milestones.
+
+- **Financial and human development composites are null for single-entity scenarios.**
+  Percentile-rank scoring requires ≥2 entities. Indicators (gdp_growth,
+  unemployment_rate) are live. Disclosed in Zone 1D, not hidden.
+
+- **Financial and HD curves in Zone 1A are dashed (Path A).** The dashed
+  treatment indicates normalized-absolute scoring strategy applied without
+  peer comparison. Methodology note available in Zone 3.
+
+- **GDP magnitude at step 1 (Argentina 2001) is a documented structural gap.**
+  The Zero Deficit Plan fires at step 1 but MacroeconomicModule processes it
+  with a one-step lag. Model produces −0.8% vs historical −4.4% (82% deviation).
+  Filed as Issue #222, deferred to M11 (engine investigation scope).
+
+- **GovernanceModule mean-reversion dynamics are simplified at M10.** The
+  full political economy module (M11) adds conditionality modeling, elite capture,
+  and democratic backsliding dynamics. Current governance composite is a
+  normalized absolute score, not a full political economy model.
+
+- **This tool is not for financial advantage or surveillance.** The canonical user
+  is a finance ministry counterpart in a negotiation. The tool does not assist in
+  executing financial attacks, identifying exploitable vulnerabilities in adversaries,
+  or any use case that amplifies power asymmetries against vulnerable actors.
+
+---
+
+## Section 7 — The North Star (1 minute)
+
+> I want to close with the reason this project exists, stated as plainly as possible.
 >
-> The Equitable Build Process principle embedded in the project's architecture
-> documents is not incidental. A tool designed to level the playing field for
-> resource-constrained actors must not reproduce the resource asymmetry it is
-> designed to counter in its own infrastructure requirements.
+> There is a quinoa farmer in Bolivia who will never know this tool exists. He does
+> not have internet access reliable enough to open a web application. He does not
+> speak the language the interface is written in. He has no idea what an IMF programme
+> is, or what a fiscal multiplier means, or why it matters.
+>
+> His government might know. If his government has a finance minister with better
+> analytical tools, that minister can negotiate better terms. Better terms produce
+> different fiscal paths. Different fiscal paths produce different human consequences.
+>
+> The quinoa farmer lives at the end of that chain. Every decision we make about
+> this tool — what to build first, what to be honest about, what not to oversell —
+> we make as if he is watching. Not because he is. But because that framing is the
+> right discipline.
+>
+> Build it as if he does.
 
 ---
 
@@ -627,13 +609,29 @@ counter-proposal as an analytical output.
 
 | Section | Content | Time |
 |---|---|---|
-| Presenter setup | Map loaded, Greece scenario pre-created | Before room fills |
+| Presenter setup | Stack running, map loaded | Before room fills |
 | Section 1 | Problem framing | 3 min |
-| Section 2 | Live application sequence (7 steps) | 5 min |
+| Section 2 | Live application (7 steps) | 5 min |
 | Section 3 | Backtesting credibility | 5 min |
 | Section 4 | Roadmap | 5 min |
-| Section 5 | North Star closing | 1 min |
+| Section 7 | North Star closing | 1 min |
 | Q&A | See prepared responses above | Remaining time |
 
 Total structured content: 19 minutes. Leave at least 10 minutes for Q&A.
 The Q&A is where domain economists will engage most seriously — do not compress it.
+
+---
+
+## Screenshot Reference (M10 Demo 3 Frames)
+
+Captured: [to be filled after Step 6]. Located in `docs/demo/m10/screenshots/`.
+
+| Presentation order | File | Step | Zone 1 state | Caption |
+|---|---|---|---|---|
+| 1 — Thesis | `frame-c-step3-divergence.png` | 3 / 4 | Zone 1A: financial ↑, governance flat | Financial recovery begins; governance WARNING still active — the asymmetry is the argument |
+| 2 — Instrument | `frame-a-step1-instrument.png` | 1 / 4 | Zone 1 baseline, all instruments loaded | Argentina at programme entry: all four Zone 1 instruments live with crisis-arc initial state |
+| 3 — Crisis | `frame-b-step2-crisis.png` | 2 / 4 | Zone 1A: step 2 inflection, MDA alerts | Sovereign default and devaluation — the sharpest inflection; first MAGNITUDE-validated step |
+| 4 — Evidence | `frame-d-step3-evidence.png` | 3 / 4 | Zone 1B: governance WARNING full card | Threshold breach rendered as structured evidence — specific enough to cite |
+| 5 — Recovery | `frame-e-step4-recovery.png` | 4 / 4 | Zone 1D: all four frameworks, recovery arc | GDP recovering; governance healing slowly — Platform Principle in practice |
+
+See `docs/demo/m10/screenshot-brief.md` for the full UX Agent brief and frame-by-frame specifications.
