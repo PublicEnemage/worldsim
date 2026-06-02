@@ -182,7 +182,7 @@ No open PRs — board clear as of 2026-06-02.
 | Issue | Title | Status / Gate |
 |---|---|---|
 | #550 ✅ | test(e2e): MV-002 hardware render baseline — TrajectoryView ≤ 100ms on ProBook | **Closed 2026-06-01** — AC-007 ✅ PASSED ≤ 100ms (4× throttle active), AC-008 ✅ PASSED ≤ 100ms (4× throttle active). Machine: HP ProBook i5-8265U, 8 GiB RAM, 4 cores, Windows 11. PR #578. |
-| #495 | feat(frontend): wire mda_alerts into MDA Alert Panel — Zone 1B live data (IR-001 Critical) | **Unblocked** — Zone 1B component exists; endpoint returns alerts; wiring not yet done. |
+| #495 ✅ | feat(frontend): wire mda_alerts into MDA Alert Panel — Zone 1B live data (IR-001 Critical) | **Closed** — measurement-output fetch wired in ScenarioInstrumentCluster.tsx; store.setMdaAlerts() called after each step advance. |
 | #496 ✅ | feat(api): PMM live computation backend endpoint (IR-002) | **Closed 2026-06-02** — PR #587 merged. Per-step PMM embedded in trajectory response; frontend syncs to store on step change. |
 | #497 ✅ | feat(frontend): persistent scenario state + demonstrative entry — localStorage + URL param (IR-003) | **Closed 2026-06-02** — PR #584 merged. localStorage `worldsim_last_scenario` key; URL `?scenario=` param takes precedence. |
 | #498 ✅ | feat(frontend): default step labels from start year (IR-004) | **Closed 2026-06-02** — PR #583 merged. Start year input in create form; `start_date` passed to backend. |
