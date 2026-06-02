@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-02 (PR #629 merged — #379/#628 closed; #342/#343/#346 closed; demo-preparation-standard.md M10 update complete)**
+**Last updated: 2026-06-02 (PR #631 merged — #537/#620 closed; docs/demo/ RACI ownership added; docs/ux/standards.md created)**
 **Current milestone:** M10 — Engine Integrity and Instrument Delivery (M9 formally closed; M10 active)
 
 ---
@@ -76,12 +76,13 @@ M9 formally closed. Issue #213 (M9 Exit Checklist) closed 2026-05-24. M10 milest
 
 ## Open PRs
 
-No open PRs — board clear as of 2026-06-02 (post PR #629 merge).
+No open PRs — board clear as of 2026-06-02 (post PR #631 merge).
 
 ## Recently Merged PRs (last 5)
 
 | PR | Title | Date |
 |---|---|---|
+| #631 | docs(process): agent-raci docs/demo/ ownership + UX/UI standards document (closes #537, #620) | 2026-06-02 |
 | #629 | docs(process): demo preparation standard M10 update — screenshot naming, legibility gate, narration check (closes #379, #628) | 2026-06-02 |
 | #626 | test(e2e): demo advancement flow and legibility regression guards (closes #376, #377) | 2026-06-02 |
 | #624 | fix(fixture): Argentina Demo 3 — emergency_declaration at step 2 triggers governance MDA (closes #615) | 2026-06-02 |
@@ -213,6 +214,8 @@ No open PRs — board clear as of 2026-06-02 (post PR #629 merge).
 | #346 ✅ | demo(radar): axis labels and scores not legible at drawer scale (DEMO-005) | **Closed 2026-06-02** — Resolved by M9/M10 instrument cluster redesign. Zone 1D covers multi-framework readout in primary viewport; font sizes validated by `demo-legibility.spec.ts`. M10 IR review: "Significant→Minor." |
 | #379 ✅ | process: demo preparation standard as pre-condition — standard must exist and be read before demo assembly begins | **Closed 2026-06-02** — PR #629 merged. `demo-preparation-standard.md`: Step 5a (narration instrument check, UX-RULING-4), Step 5b (legibility Playwright gate), Step 6 amendment (screenshot naming in presentation order). Carried forward from M9. |
 | #628 ✅ | demo(script): update Demo 3 narration — route quantitative change to Zone 1A, not choropleth | **Closed 2026-06-02** — PR #629 merged. Child of #342, spawned from UX-RULING-4. `demo_argentina_2001_2002.py`: presenter instruction block in `_print_divergence_narrative` routes narrator to Zone 1A, not choropleth. |
+| #537 ✅ | process: docs/demo/ file ownership — PM Agent must be R on demo preparation sequence | **Closed 2026-06-02** — PR #631 merged. `docs/demo/` row added to `docs/process/agent-raci.md` File Ownership table. PM Agent is R; Customer Agent and UX Designer are C. Demo preparation is a blocking exit requirement per milestone. |
+| #620 ✅ | docs(ux): UX/UI standards document — consolidated settled decisions with authority citations | **Closed 2026-06-02** — PR #631 merged. `docs/ux/standards.md` created with 15 sections: Framework Color Contract, Color Semantic Contract, Zone 1 Always-Visible Constraint, Zone Layout Dimensions, Choropleth Role (UX-RULING-4), Zone 1D Content Constraint (UX-RULING-4), Null vs. Zero Rendering, MDA Alert Sort Order, Mode-Specific Alert Tense (UX-RULING-1), Mode Indicator Labels (UX-RULING-3), Confidence Tier Visual, Zustand Atomic Update Contract, Loading/Error State Patterns, Step Annotation Rule, Automatic A/B Split (Mode 3). EL sign-off required for any amendment. |
 
 ---
 
@@ -274,6 +277,7 @@ All Horizon:Immediate issues are now closed. M8 feature-complete.
 
 | Decision | Rationale | Date |
 |---|---|---|
+| docs/demo/ RACI ownership established; UX/UI standards document created (PR #631) | PM Agent is now R on `docs/demo/` — demo preparation is a blocking exit requirement per milestone. `docs/ux/standards.md` created as the canonical consolidated standards document (15 sections, 15 settled decisions). EL sign-off required for any new standard or existing change. UX Designer Agent is R; Frontend Architect Agent is Required C. | 2026-06-02 |
 | UX-RULING-4 — choropleth is a context surface, not a change instrument; #342/DEMO-001 closed as narration-fix scope | FA Agent proposed two fixes for DEMO-001 (HUD overlay on choropleth; supplementary Zone 1D attribute row). UX Designer declined both as hierarchy inversions. Ruling reframed the root cause: the demo narration was pointing at the wrong instrument. M10 fix: narration update only (child #628, PR #629). M11 fix: Option B scenario-relative color scale (requires cross-step range endpoint — scoped for M11). Zone 1D is composite scores only (no raw indicator rows) until a new UX ruling authorises an expansion. | 2026-06-02 |
 | DEMO issue dispositions — full sweep complete (2026-06-02) | Closed: #342 (DEMO-001, narration), #343 (DEMO-002, redesign), #346 (DEMO-005, redesign), #348 (DEMO-007, #616 fix), #350 (DEMO-009, #617 fix), #379 (demo standard), #628 (narration script). Left open: #345 (DEMO-004, investigation required — manual Argentina demo run needed), #349 (DEMO-008, screenshot naming — near-term, addressed in demo standard Step 6). | 2026-06-02 |
 | DEMO issue dispositions — #348/DEMO-007 + #350/DEMO-009 closed; #345/DEMO-004 data precondition noted (2026-06-02) | #348 (DEMO-007, "boundary reference absent") closed — resolved by PR #622 (#616: `ecological-boundary-note` span; regression-guarded by `demo-legibility.spec.ts` in PR #626). #350 (DEMO-009, "attribute selector raw field names") closed — resolved by PR #622 (#617: `getIndicatorDisplayNameAny()` wired). #345 (DEMO-004, "alerts appear identical across steps") left open with data-precondition comment: PR #624 (#615) provides Argentina governance alert variation at step 3; the test gate is `demo-advancement-flow.spec.ts` test 3 (Zone 1B live/non-blank). Close #345 after a full demo run-through confirms visual accumulation end-to-end. #342/343/346/349 remain open (not addressed by this session's PRs). | 2026-06-02 |
