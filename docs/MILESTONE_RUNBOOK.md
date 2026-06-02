@@ -644,15 +644,26 @@ final compliance posture of affected modules.
 
 ## Milestone Definition Table
 
-The five WorldSim milestones, their themes, entry criteria, and exit criteria.
+WorldSim milestone sequence, themes, and current status. Full entry/exit criteria for each
+milestone are recorded in the corresponding GitHub milestone description and exit checklist
+issue. See `docs/roadmap/worldsim-roadmap.md` for the forward roadmap.
 
-| # | Theme | Entry Criteria | Exit Criteria | Status |
-|---|---|---|---|---|
-| 0 | Foundation | Repository created | CI/CD pipeline active; ADR-001 accepted; CLAUDE.md, CODING_STANDARDS.md, DATA_STANDARDS.md, CONTRIBUTING.md committed; technology stack verified | **Complete** |
-| 1 | Simulation Core | Milestone 0 complete | Country entity data model implemented per ADR-001; basic event propagation graph working; annual timestep engine running; World Bank seed data loaded for at least 10 countries; simulation output verified through CLI and unit tests; no UI required | **In Progress** |
-| 2 | Geospatial Foundation | Milestone 1 complete | PostGIS database with country boundary GeoJSON (Natural Earth); FastAPI layer serving country data; MapLibre GL frontend rendering one variable as choropleth; the map renders correctly in browser; one variable, no scenarios yet | Upcoming |
-| 3 | Scenario Engine | Milestone 2 complete | User-defined scenario configuration; time acceleration controls; comparative scenario output; first backtesting run against one documented historical case (Greece 2010–2012 or Thailand 1997) with fidelity thresholds defined and CI-enforced | Upcoming |
-| 4 | Human Cost Ledger | Milestone 3 complete | Cohort-level demographic module active; multi-currency measurement output (Financial, Human Development, Ecological, Governance simultaneously); Minimum Descent Altitude threshold system firing alerts; radar chart dashboard displaying all four dimensions with equal visual weight | Upcoming |
+| # | Theme | GitHub Title | Status |
+|---|---|---|---|
+| 0 | Foundation | Milestone 0 — Foundation | **Complete** |
+| 1 | Simulation Core | Milestone 1 — Simulation Core | **Complete** |
+| 2 | Geospatial Foundation | Milestone 2 — Geospatial Foundation | **Complete** |
+| 3 | Scenario Engine | Milestone 3 — Scenario Engine | **Complete** |
+| 4 | Human Cost Ledger | Milestone 4 — Human Cost Ledger | **Complete** |
+| 5 | Calibration and Uncertainty | Milestone 5 — Calibration and Uncertainty | **Complete** |
+| 6 | Backtesting Coverage Expansion | Milestone 6 — Backtesting Coverage Expansion | **Complete** |
+| 7 | Technical Foundation | Milestone 7 — Technical Foundation | **Complete** |
+| 8 | Ecological and Governance Frameworks | Milestone 8 — Ecological and Governance Frameworks | **Complete** |
+| 9 | Standards Foundation | Milestone 9 — Standards Foundation | **Complete** |
+| 10 | Engine Integrity and Instrument Delivery | Milestone 10 — Engine Integrity and Instrument Delivery | **Current** |
+| 11 | Engine Investigation and Political Economy | Milestone 11 — Engine Investigation and Political Economy | Upcoming |
+| 12 | Active Control and External Sector | Milestone 12 — Active Control and External Sector | Upcoming |
+| 13 | Methodology Publication | Milestone 13 — Methodology Publication | Upcoming |
 
 ---
 
