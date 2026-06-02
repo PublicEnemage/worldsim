@@ -151,31 +151,25 @@ export function FourFrameworkZone1D({
     );
   }
 
-  // Error state: does not block the rest of the instrument cluster (IR-006).
-  if (isError) {
-    return (
-      <div
-        data-testid={dataTestId}
-        data-current-step={current_step}
-        data-error="true"
-        style={{ ...CONTAINER_STYLE, alignItems: "center", justifyContent: "center" }}
-      >
-        <span
-          data-testid="zone-1d-error"
-          style={{ fontSize: 11, color: "#aaa", fontStyle: "italic" }}
-        >
-          Data unavailable
-        </span>
-      </div>
-    );
-  }
-
+  // Normal render — framework rows always present in DOM regardless of error
+  // state (IR-006). Error indicator is inline above the rows so existing
+  // testids remain discoverable. When isError=true, trajectory is null so
+  // all scores render as "—" (same as pre-fetch state).
   return (
     <div
       data-testid={dataTestId}
       data-current-step={current_step}
+      {...(isError ? { "data-error": "true" } : {})}
       style={CONTAINER_STYLE}
     >
+      {isError && (
+        <span
+          data-testid="zone-1d-error"
+          style={{ fontSize: 9, color: "#aaa", fontStyle: "italic", paddingBottom: 2 }}
+        >
+          Data unavailable
+        </span>
+      )}
       {FRAMEWORK_ORDER.map((key) => {
         const point = currentStepData?.frameworks[key] ?? null;
         const score = point?.composite_score ?? null;
