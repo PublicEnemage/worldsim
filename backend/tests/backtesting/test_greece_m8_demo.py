@@ -144,7 +144,7 @@ def _print_demo_table(outputs: list[dict[str, Any]]) -> None:
         eco_str = f"{float(eco_composite):.4f}" if eco_composite is not None else "—"
 
         gov_composite = gov_output.get("composite_score")
-        gov_str = "— (M9)" if gov_composite is None else f"{float(gov_composite):.4f}"
+        gov_str = "— (no data)" if gov_composite is None else f"{float(gov_composite):.4f}"
 
         all_alerts = (
             fin_output.get("mda_alerts", [])
@@ -162,7 +162,7 @@ def _print_demo_table(outputs: list[dict[str, Any]]) -> None:
     print("Notes:")
     print("  GDP Growth / Unemployment: individual indicators (not composite scores)")
     print("  Eco Composite: boundary proximity [0.0–2.0]; 1.0 = boundary exactly met")
-    print("  Governance: null — deferred to M9 (ADR-005 Decision M8-4)")
+    print("  Governance: normalized_absolute [0,1] — WGI/V-Dem (ADR-005 Amendment 4, M10)")
     print("  Financial/HD composites: null — single-entity scenario (Issue #193)")
     print("  single_entity_warning=True: percentile rank requires ≥2 entities")
     single_entity_warning = outputs[0].get("single_entity_warning", False) if outputs else False
@@ -219,28 +219,65 @@ async def test_greece_m8_demo_ecological_composite_non_null_all_steps(
         await demo_client.delete(f"/api/v1/scenarios/{scenario_id}")
 
 
-async def test_greece_m8_demo_governance_composite_null_all_steps(
+async def test_greece_m10_demo_governance_composite_non_null_all_steps(
     demo_client: httpx.AsyncClient,
 ) -> None:
-    """Governance composite is null at all 6 steps (deferred to M9).
+    """Governance composite is non-null at all 6 steps with GovernanceModule enabled.
 
-    Confirms ADR-005 Decision M8-4: GovernanceModule deferred; 5 of 5
-    promotion criteria not met. Governance axis renders as null/"in validation".
+    Confirms ADR-005 Amendment 4 (M10 promotion, Issue #556): GovernanceModule
+    promoted; normalized_absolute strategy uses WGI/V-Dem seeds. Composite score
+    must be in [0.0, 1.0] at every step once governance indicators are seeded.
     """
     scenario_id, outputs = await _create_run_and_fetch_outputs(demo_client)
     try:
+        from decimal import Decimal as _Decimal
         for output in outputs:
             step = output["step_index"]
             gov_output = output["outputs"].get("governance", {})
-            assert gov_output.get("composite_score") is None, (
-                f"Governance composite unexpectedly non-null at step {step}. "
-                "GovernanceModule was deferred to M9 (ADR-005 Decision M8-4)."
+            composite = gov_output.get("composite_score")
+            assert composite is not None, (
+                f"Governance composite is null at step {step}. "
+                "GovernanceModule was promoted in M10 (ADR-005 Amendment 4). "
+                "Check that modules_config.governance.enabled=True and that "
+                "rule_of_law_percentile and democratic_quality_score are seeded."
             )
-            gov_note = gov_output.get("note", "")
-            assert gov_note, (
-                f"Governance output has no note at step {step}. "
-                "Unimplemented frameworks must carry an explanatory note."
+            composite_decimal = _Decimal(str(composite))
+            assert _Decimal("0") <= composite_decimal <= _Decimal("1"), (
+                f"Governance composite {composite} at step {step} outside [0.0, 1.0]"
             )
+    finally:
+        await demo_client.delete(f"/api/v1/scenarios/{scenario_id}")
+
+
+async def test_greece_m10_demo_governance_mda_alert_fires_step_6(
+    demo_client: httpx.AsyncClient,
+) -> None:
+    """MDA-GOV-DEMOCRACY-FLOOR WARNING fires at step 6 (Issue #556 Criterion 6).
+
+    The emergency_declaration at step 5 (2014 political crisis) propagates through
+    GovernanceModule's one-step lag, reducing democratic_quality_score by 0.05 at
+    step 6. With seed 0.72 and IMF-acceptance increment (+0.005), the step-6 value
+    ≈ 0.675 < 0.70 floor → WARNING fires.
+    """
+    scenario_id, outputs = await _create_run_and_fetch_outputs(demo_client)
+    try:
+        step6_output = next((o for o in outputs if o["step_index"] == 6), None)
+        assert step6_output is not None, "No step 6 output found"
+        gov_output = step6_output["outputs"].get("governance", {})
+        gov_alerts = gov_output.get("mda_alerts", [])
+        democracy_alerts = [
+            a for a in gov_alerts if a.get("indicator_key") == "democratic_quality_score"
+        ]
+        assert democracy_alerts, (
+            "No democratic_quality_score MDA alert at step 6. "
+            "Expected MDA-GOV-DEMOCRACY-FLOOR WARNING from emergency_declaration at step 5. "
+            f"Governance composite at step 6: {gov_output.get('composite_score')}. "
+            f"All governance alerts at step 6: {gov_alerts}"
+        )
+        alert = democracy_alerts[0]
+        assert alert.get("severity") in ("WARNING", "CRITICAL", "TERMINAL"), (
+            f"Unexpected severity: {alert.get('severity')}"
+        )
     finally:
         await demo_client.delete(f"/api/v1/scenarios/{scenario_id}")
 

@@ -179,6 +179,72 @@ def test_imf_acceptance_triggers_democratic_quality_delta() -> None:
 
 
 # ---------------------------------------------------------------------------
+# Test: emergency_declaration → democratic_quality_score (ADR-005 Amendment 4)
+# ---------------------------------------------------------------------------
+
+
+def _emergency_event(source_entity_id: str) -> object:
+    from app.simulation.engine.models import Event, MeasurementFramework
+    from app.simulation.engine.quantity import Quantity, VariableType
+
+    ts = datetime(2014, 1, 1, tzinfo=timezone.utc)  # noqa: UP017
+    return Event(
+        event_id="test-emergency-event",
+        source_entity_id=source_entity_id,
+        event_type="emergency_declaration",
+        affected_attributes={
+            "emergency_declaration": Quantity(
+                value=Decimal("1.0"),
+                unit="dimensionless",
+                variable_type=VariableType.DIMENSIONLESS,
+                measurement_framework=MeasurementFramework.FINANCIAL,
+                confidence_tier=2,
+            )
+        },
+        propagation_rules=[],
+        timestep_originated=ts,
+        framework=MeasurementFramework.FINANCIAL,
+    )
+
+
+def test_emergency_declaration_triggers_democratic_quality_delta() -> None:
+    """emergency_declaration → democratic_quality_score delta (ADR-005 Amendment 4)."""
+    emg_ev = _emergency_event("GRC")
+    state = _make_state("GRC", entity_type="country", prior_events=[emg_ev])
+    module = GovernanceModule()
+    ts = datetime(2015, 1, 1, tzinfo=timezone.utc)  # noqa: UP017
+    events = module.compute(state.entities["GRC"], state, ts)
+    assert len(events) == 1
+    assert "democratic_quality_score" in events[0].affected_attributes
+
+
+def test_emergency_declaration_democratic_quality_delta_is_negative() -> None:
+    """Emergency declaration reduces democratic quality (elasticity = -0.05)."""
+    emg_ev = _emergency_event("GRC")
+    state = _make_state("GRC", entity_type="country", prior_events=[emg_ev])
+    module = GovernanceModule()
+    ts = datetime(2015, 1, 1, tzinfo=timezone.utc)  # noqa: UP017
+    events = module.compute(state.entities["GRC"], state, ts)
+    qty = events[0].affected_attributes["democratic_quality_score"]
+    assert qty.value < Decimal("0"), (
+        f"Expected negative delta for emergency_declaration, got {qty.value}"
+    )
+
+
+def test_emergency_declaration_delta_magnitude() -> None:
+    """delta = +1.0 × -0.05 = -0.05 on democratic_quality_score."""
+    emg_ev = _emergency_event("GRC")
+    state = _make_state("GRC", entity_type="country", prior_events=[emg_ev])
+    module = GovernanceModule()
+    ts = datetime(2015, 1, 1, tzinfo=timezone.utc)  # noqa: UP017
+    events = module.compute(state.entities["GRC"], state, ts)
+    qty = events[0].affected_attributes["democratic_quality_score"]
+    assert qty.value == Decimal("-0.05"), (
+        f"Expected delta -0.05, got {qty.value}"
+    )
+
+
+# ---------------------------------------------------------------------------
 # Test: MeasurementFramework.GOVERNANCE tagging (Issue #42)
 # ---------------------------------------------------------------------------
 
@@ -327,6 +393,11 @@ def test_unknown_event_type_produces_no_events() -> None:
 
 def test_registry_has_at_least_two_entries() -> None:
     assert len(GOVERNANCE_ELASTICITY_REGISTRY) >= 2
+
+
+def test_registry_has_at_least_three_entries() -> None:
+    """M10 promotion: registry must cover ≥ 3 event-indicator pairs (Issue #556 Criterion 2)."""
+    assert len(GOVERNANCE_ELASTICITY_REGISTRY) >= 3
 
 
 def test_registry_source_registry_ids_follow_convention() -> None:

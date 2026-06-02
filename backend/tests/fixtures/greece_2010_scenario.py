@@ -257,30 +257,30 @@ def build_greece_scenario() -> ScenarioCreateRequest:
 
 
 def build_greece_demo_scenario() -> ScenarioCreateRequest:
-    """Build the Greece 2010–2015 M8 demo scenario with EcologicalModule enabled.
+    """Build the Greece 2010–2015 M10 demo scenario with Ecological and GovernanceModules enabled.
 
     Extends build_greece_scenario() with:
       - modules_config enabling EcologicalModule (planetary boundary proximity)
+        and GovernanceModule (democratic quality + rule of law; ADR-005 Amendment 4)
       - co2_concentration_ppm initial seed (388.0 ppm — Mauna Loa 2010 annual mean)
+      - rule_of_law_percentile initial seed (60.0 — WGI Rule of Law GRC 2010)
+      - democratic_quality_score initial seed (0.72 — V-Dem LDI GRC 2010)
+      - emergency_declaration scheduled input at step 5 (2014 political crisis /
+        snap elections) to produce the governance deterioration event at step 6,
+        triggering the MDA-GOV-DEMOCRACY-FLOOR alert (Issue #556 Criterion 6)
 
-    The CO2 seed is required so the EcologicalModule stock path can compute
-    boundary proximity at step 1 (before any GDP-driven delta arrives via the
-    one-step-lag delta path). Without it, co2_concentration_ppm is absent from
-    entity.attributes at step 1 and the stock path skips with [SIM-INTEGRITY]
-    WARNING. Source: NOAA_MLO_2010 (Mauna Loa Observatory, 388.0 ppm annual mean).
+    Composite score status (M10):
+      Ecological      — live (boundary proximity; 1 indicator active: CO2)
+      Governance      — live (normalized_absolute; 2 indicators: LDI + RL percentile)
+      Financial       — null (single-entity guard, Issue #193)
+      Human Dev       — null (single-entity guard, Issue #193)
 
-    The ecological composite score is the only non-null composite in this
-    single-entity scenario — financial and human_development composites are null
-    because percentile rank requires ≥2 entities (single_entity_warning=True,
-    Issue #193, ADR-005 Decision M8-2). Governance composite is null pending M9.
-
-    References: Issue #269; ADR-005 Amendment 3 Decisions M8-2/M8-3/M8-6.
+    References: Issue #269 (M8 demo); Issue #556 (M10 governance promotion);
+    ADR-005 Amendments 3 and 4.
     """
     base = build_greece_scenario()
 
     # NOAA Mauna Loa Observatory 2010 annual mean: 388.0 ppm (confidence_tier=1).
-    # Provides the initial stock value for the EcologicalModule stock path so that
-    # planetary_boundary_co2_proximity is non-null at step 1.
     initial_co2_concentration = QuantitySchema(
         value="388.0",
         unit="ppm",
@@ -291,27 +291,82 @@ def build_greece_demo_scenario() -> ScenarioCreateRequest:
         measurement_framework="ecological",
     )
 
+    # World Bank WGI 2010 — Rule of Law Percentile Rank for Greece: 60.0.
+    # Confidence tier 2 (official multilateral statistics, annual survey).
+    # Source: World Bank Worldwide Governance Indicators 2010 vintage.
+    initial_rule_of_law = QuantitySchema(
+        value="60.0",
+        unit="percentile_0_100",
+        variable_type="stock",
+        confidence_tier=2,
+        observation_date=date(2010, 1, 1),
+        source_registry_id="WB_WGI_GRC_2010_RULE_OF_LAW",
+        measurement_framework="governance",
+    )
+
+    # V-Dem v13 Liberal Democracy Index for Greece 2010: 0.72.
+    # Confidence tier 3 (expert-coded survey; high credibility but not official stats).
+    # Provides the initial seed for the democratic_quality_score stock path.
+    initial_democratic_quality = QuantitySchema(
+        value="0.72",
+        unit="ratio_0_1",
+        variable_type="stock",
+        confidence_tier=3,
+        observation_date=date(2010, 1, 1),
+        source_registry_id="VDEM_V13_GRC_2010_LDI",
+        measurement_framework="governance",
+    )
+
     updated_grc_attrs = {
         **base.configuration.initial_attributes.get("GRC", {}),
         "co2_concentration_ppm": initial_co2_concentration,
+        "rule_of_law_percentile": initial_rule_of_law,
+        "democratic_quality_score": initial_democratic_quality,
     }
+
     demo_config = base.configuration.model_copy(
         update={
-            "modules_config": {"ecological": {"enabled": True}},
+            "modules_config": {
+                "ecological": {"enabled": True},
+                "governance": {"enabled": True},
+            },
             "initial_attributes": {"GRC": updated_grc_attrs},
         }
     )
+
+    # emergency_declaration at step 5 (2014 political crisis — snap elections,
+    # intensified anti-austerity governance pressure). One-step lag: GovernanceModule
+    # reads this as a prior-step event at step 6, reducing democratic_quality_score
+    # by 0.05 (elasticity -0.05 × magnitude +1.0). With seed 0.72 and cumulative
+    # IMF-acceptance delta +0.005, step-6 score ≈ 0.675 < 0.70 floor →
+    # MDA-GOV-DEMOCRACY-FLOOR WARNING fires (Issue #556 Criterion 6).
+    emergency_input = ScheduledInputSchema(
+        step=5,
+        input_type="EmergencyPolicyInput",
+        input_data={
+            "instrument": "emergency_declaration",
+            "target_entity": "GRC",
+            "expected_duration": 2,
+        },
+    )
+
+    demo_scheduled = list(base.scheduled_inputs) + [emergency_input]
+
     return base.model_copy(update={
-        "name": "Greece 2010-2015 M8 Demo — Multi-Framework Measurement",
+        "name": "Greece 2010-2015 M10 Demo — Multi-Framework Measurement",
         "description": (
-            "M8 end-of-milestone demo scenario (Issue #269). "
-            "EcologicalModule enabled — produces planetary boundary "
-            "proximity scores at all six steps. Financial and human_development "
-            "composite scores are null in this single-entity scenario "
+            "M10 end-of-milestone demo scenario (Issue #556). "
+            "EcologicalModule and GovernanceModule enabled — all four framework axes live. "
+            "Governance composite uses normalized_absolute strategy "
+            "(WGI/V-Dem; ADR-005 Amendment 4). "
+            "Financial and human_development composites are null "
             "(percentile rank requires ≥2 entities, Issue #193). "
-            "Governance composite is null pending Milestone 9 promotion criteria. "
             "Initial state: IMF WEO April 2010 + Eurostat LFS 2010 + WDI 2010 "
-            "+ IMF CR10/110 (reserve_coverage_months) + NOAA MLO 2010 (co2_concentration_ppm)."
+            "+ IMF CR10/110 (reserve_coverage_months) "
+            "+ NOAA MLO 2010 (co2_concentration_ppm) "
+            "+ WB WGI 2010 (rule_of_law_percentile=60.0) "
+            "+ V-Dem v13 (democratic_quality_score=0.72)."
         ),
         "configuration": demo_config,
+        "scheduled_inputs": demo_scheduled,
     })
