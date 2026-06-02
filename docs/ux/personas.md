@@ -10,10 +10,11 @@
 >
 > First draft completed: 2026-05-20 (Issue #362).
 > Engineering Lead review required before canonical status.
+> Public advocacy personas (6–8, Persona 4V) added: 2026-06-02 (Issue #575, panel-authorized).
 
 ---
 
-## Section 1 — Five Formal Personas
+## Section 1 — Formal Personas
 
 ---
 
@@ -456,6 +457,441 @@ declare its confidence honestly, not retreat behind methodology.
 
 ---
 
+### Persona 6 — The Investigative Journalist
+
+*Public advocacy persona, Issue #575. Panel-authorized addition.*
+
+**Identity**
+
+Farida Haidari. Senior Correspondent, Economic and Financial Desk, Dawn, Karachi.
+36 years old. BA in Journalism from University of Karachi; MSc in International
+Political Economy from SOAS, University of London. Eight years covering Pakistan's
+macroeconomic beat — IMF programme negotiations, sovereign debt management,
+agricultural shocks, industrial contraction. She is not an economist. She reads
+economic evidence with the precision of someone trained to find the buried fact,
+not the headline claim. In August 2022, one-third of Pakistan submerged under
+catastrophic flooding while the country was simultaneously under IMF programme
+pressure requiring energy subsidy removal. She covered the human cost story. She
+believes the causal chain between IMF conditionality, flood displacement, and food
+security collapse was never quantified and published — not because the evidence
+did not exist, but because no tool assembled it.
+
+**Domain Expertise Profile**
+
+Deep: financial and economic journalism, investigative data analysis, public records
+navigation, interview methodology for technical subjects, synthesis under deadline.
+Moderate: reading IMF Article IV documents and fiscal frameworks; understanding of
+balance sheets, debt sustainability arithmetic, and programme conditionality. Edge:
+econometric methodology, confidence tier systems, simulation architecture,
+multi-framework composite scoring. She does not know what a fiscal multiplier is
+at the mathematical level. She knows what it means for the families she interviews.
+
+**Mental Model at Session Entry**
+
+"A good tool gives me a specific, defensible claim I can put in a sentence." Farida
+enters with a hypothesis, not a question. She knows what she is looking for — a
+threshold crossing, a specific cohort, a specific step — that the official
+programme narrative did not surface. She needs the tool to confirm or refute the
+hypothesis with enough specificity to be publishable. "Human development
+deteriorated" is not publishable. "The bottom income quintile in flood-affected
+Sindh crossed a food security warning threshold at step 1 under combined shock
+conditions, while the programme modeled the flood and subsidy removal as
+independent shocks" is publishable.
+
+**Entry State and Frame of Mind**
+
+Primary state: **Investigative** — on a story, pursuing a specific hypothesis
+within a 3-week investigative window before publication deadline.
+Secondary state: **Reactive** — breaking-news mode when the IMF releases a country
+statement or a new programme review triggers a deadline.
+
+Most demanding: Investigative on a 3-week deadline. Farida will spend at most two
+hours with WorldSim to extract the specific claim. If the tool cannot surface a
+specific, citable finding in that session, it does not appear in the story and she
+does not return for the next one.
+
+Critical Layer 3 constraint: Farida has no specialist to mediate. She uses the tool
+directly. If the instrument cluster requires economist-level interpretation to
+produce a publishable claim, the tool has failed the journalism use case entirely.
+The MDA alert summary must produce a sentence she can quote without requiring her
+to understand how the simulation engine propagates events.
+
+**Primary Task**
+
+Identify the specific threshold crossing — indicator, step, income cohort, severity
+— attributable to a combination of shocks, documented with enough precision to be
+cited in a published article. The claim must be: (a) falsifiable and attributed to
+a citable source (source registry ID visible); (b) specific enough to name the
+cohort and the step; (c) defensible under editorial fact-checking; (d) distinct
+from aggregate macroeconomic claims already on the public record.
+
+**Trust Threshold**
+
+Two non-negotiable conditions: (1) the source for every cited indicator must be
+visible and citable at the indicator level — she needs the source registry ID to
+include in her article's methodology note; (2) the finding must be specific enough
+to be operationally distinct from what is already in the public domain — generic
+deterioration signals are not publishable. Additionally: (3) the plain-language
+alert must not claim more than the data supports. A Tier 3 synthetic estimate
+stated as certain is a story about WorldSim's methodology problems, not about the
+scenario.
+
+**Preferred Information Format**
+
+One specific claim, in plain language, with: indicator name, step index, cohort,
+severity, and source citation. She will quote this as a sentence in the article.
+She will not quote a chart. The MDA alert panel is her primary surface, provided
+each alert states its claim in plain language rather than composite score notation.
+She does not need to understand the radar chart; she needs the alert to tell her
+what happened to whom at which step.
+
+**Failure Mode**
+
+Farida does not return to WorldSim if: (1) the instrument cluster requires an
+economist to interpret — she will not cite an output she cannot explain; (2) the
+plain-language MDA alert is absent or uses technical notation ("HDI indicator
+below MDA floor") without a plain-language equivalent; (3) source attribution is
+not visible at the indicator level — without a citable source, the finding cannot
+be published; (4) the session produces only aggregate findings already on the
+public record, adding no specific claim she can cite uniquely.
+
+---
+
+### Persona 7 — The Parliamentary Economist
+
+*Public advocacy persona, Issue #575. Panel-authorized addition.*
+*Political Economist validation: Kenya Parliamentary Budget Office established under
+Public Finance Management Act 2012 — confirmed. Finance and National Planning
+Committee — confirmed. EFF programme 7th review timeline — plausible. The persona
+correctly notes that PBO economists typically review Treasury submissions rather
+than run independent models; WorldSim's value here is enabling the independent
+modelling that is within the PBO's mandate but constrained by available tools.*
+
+**Identity**
+
+James Ochieng. Senior Economist, Parliamentary Budget Office, Republic of Kenya.
+41 years old. MSc in Economics from University of Nairobi; 7 years as a Treasury
+analyst; 5 years at the PBO since its establishment under the Public Finance
+Management Act 2012. His institutional mandate is to provide the National
+Assembly's Finance and National Planning Committee with independent fiscal
+analysis — analysis produced outside the Treasury and outside the IMF programme
+team. He is not adversarial; he is institutionally required to be independent.
+He has testified before the Finance Committee on Kenya's 2023 EFF programme four
+times. He is preparing for the fifth hearing in 72 hours.
+
+**Domain Expertise Profile**
+
+Deep: fiscal policy and budget analysis, public expenditure tracking, programme
+conditionality assessment, parliamentary procedure and evidence standards.
+Moderate: econometric methods — can read regression output, understands confidence
+intervals, does not independently build structural models. Edge: simulation
+architecture, synthetic data methodology, multi-framework composite scoring.
+James knows the Kenya fiscal data better than almost anyone outside the Treasury.
+He knows which numbers in the IMF's programme projections are contested and why.
+
+**Mental Model at Session Entry**
+
+"A good tool gives me the independent estimate the Treasury won't produce." James
+is not adversarial to the IMF or the Treasury — he is institutionally required to
+be independent of both. He needs WorldSim to produce the same fiscal sustainability
+and human cost analysis the Treasury is presenting, so the Finance Committee can
+hear an independent verification or challenge. If the simulation agrees with the
+Treasury's projections, the committee hearing will say so. If it diverges, the
+committee needs to know where, why, and at which step.
+
+**Entry State and Frame of Mind**
+
+Primary state: **Preparatory** — 72 hours before a committee hearing; building the
+independent evidence base.
+Secondary state: **Reactive** — emergency session, often following IMF press
+releases or mid-programme review announcements.
+Occasional: **Evaluative** — assessing WorldSim's methodology before citing it in
+Hansard for the first time. **Retrospective** — running Kenya's 2011 IMF programme
+as a historical calibration before relying on the tool for current-programme analysis.
+
+Most demanding: Preparatory with a 72-hour deadline. James has three days to run
+the independent scenario, compare it to the Treasury's projections, identify
+divergences, and produce a 4-page committee brief that a Finance Committee member
+without specialist training can follow. Time is fixed; quality cannot be cut.
+
+Critical constraint: James's brief will be cited in Hansard — the official
+parliamentary record. A finding later demonstrated to be wrong has institutional
+consequences beyond a single session. His trust threshold is accordingly high:
+the simulation must carry explicit confidence tiers, transparent methodology, and
+a clear statement of what is modeled versus what is assumed.
+
+**Primary Task**
+
+Produce an independent assessment of Kenya's 3.5% GDP fiscal consolidation path
+under the 2023 EFF programme. Specifically: (1) does the simulation confirm or
+challenge the Treasury/IMF GDP growth projection at each step?; (2) which human
+development indicators cross WARNING or CRITICAL thresholds under the programme
+path that the official projections do not flag?; (3) does an alternative 2%
+consolidation path avoid those threshold crossings while maintaining fiscal
+sustainability above the MDA floor? The committee brief must name the specific
+terms and steps where the two paths diverge.
+
+**Trust Threshold**
+
+Parliamentary evidence standards: (1) methodology must be transparent enough to
+withstand a Treasury rebuttal in committee — James needs to explain, in plain
+language, how WorldSim reached its finding; (2) confidence tiers must be visible
+per indicator — a Tier 2 finding is defensible in committee; a Tier 3 synthetic
+estimate requires explicit qualification; (3) the output must be reproducible
+within the committee hearing day — if a committee member requests a re-run with
+different assumptions, he must be able to do it. Non-reproducible outputs cannot
+be cited in Hansard.
+
+**Preferred Information Format**
+
+4-page committee brief format: executive summary (1 page, no jargon, three key
+findings); threshold crossing table (indicator, step, severity, scenario
+comparison); methodology note (confidence tiers, data sources, model limitations
+disclosed). He will produce this brief from WorldSim's tabular output. Trajectory
+charts are useful for orientation. He needs the underlying data in downloadable
+form for independent formatting.
+
+**Failure Mode**
+
+James cannot use WorldSim for committee testimony if: (1) the methodology is not
+accessible from within the tool — he needs to be able to cite the ADR governing
+the fiscal multiplier specification, not just state "the model shows X"; (2)
+confidence tiers are aggregated or unavailable at the indicator level — "the model
+is pre-calibration" without specifying which indicators carry which tier is
+insufficient for parliamentary evidence; (3) the simulation cannot be re-run with
+user-specified parameters in real time — if he cannot change the consolidation rate
+and observe the effect, the tool is a black box that Hansard cannot cite.
+
+---
+
+### Persona 8 — The Civil Society Monitor
+
+*Public advocacy persona, Issue #575. Panel-authorized addition.*
+*Political Economist validation: SEND Ghana is a real organization (Social
+Enterprise Development Foundation of West Africa, Accra). Ghana ECF programme
+($3B, May 2023) confirmed. Social protection floor commitment in Ghana ECF is a
+real programme feature — SEND Ghana has published monitoring reports on it. The
+1.2% GDP floor is used as a plausible approximation; the actual programme uses
+absolute spending floors in specific categories. Persona validated.*
+*Customer Agent finding: integrated observed-actuals input (entering real-world
+step data alongside projected trajectory) is not a current platform capability.
+This is flagged in the Primary Task section and reflected in the Failure Mode.*
+
+**Identity**
+
+Abena Osei. Programme Economist, SEND Ghana (Social Enterprise Development
+Foundation of West Africa), Accra. 33 years old. BSc in Economics from University
+of Ghana, Legon; MSc in Development Economics from the Institute of Social
+Studies, The Hague. 6 years at SEND Ghana, the last two focused on tracking
+Ghana's IMF programme commitments against reported outcomes. She is not the
+government; she is not the IMF. She is the civil society actor whose institutional
+role is to hold both accountable to what was promised. She tracks the gap between
+the programme's stated human development commitments and what field monitoring
+shows.
+
+**Domain Expertise Profile**
+
+Deep: programme monitoring and evaluation, participatory data collection,
+community-level impact assessment, public finance tracking, civil society
+advocacy. Moderate: macroeconomic analysis — reads programme documents, fiscal
+frameworks, and MDA definitions; moderate quantitative skills. Edge: simulation
+architecture, synthetic data methodology. Abena knows what the programme
+committed to. She has the baseline data. She needs to track whether the trajectory
+is matching the commitment.
+
+**Mental Model at Session Entry**
+
+"A good tool shows me where the gap is between what was promised and what is
+happening." Abena entered Ghana's IMF programme monitoring cycle in 2022. She
+knows what the programme's baseline scenario claimed. She needs WorldSim to
+reproduce that baseline and compare it to observed outcomes — step by step — so
+she can identify which commitments are being honored and which are diverging.
+
+**Entry State and Frame of Mind**
+
+Primary state: **Retrospective** — accountability tracking sub-mode. The committed
+baseline is known (the programme's own projections); the exercise is verification
+of whether observed actuals match it. This is distinct from historical calibration
+(where the outcome is fully known): here the trajectory is still emerging, but
+the reference path is fixed.
+Secondary state: **Investigative** — when following up on a specific government or
+IMF claim about programme outcomes.
+
+Most demanding: Retrospective in accountability mode with a publication deadline.
+Ghana's December 2022 IMF programme included explicit social protection floor
+commitments. Six months in, field monitoring shows spending below the floor. Abena
+has 30 days to present this finding to Parliament, the IMF Ghana Mission Chief,
+and community organizations in northern Ghana. The evidence must be specific enough
+to require a specific response — not a generic acknowledgment.
+
+**Primary Task**
+
+Reproduce the Ghana 2022-2023 IMF programme's committed baseline trajectory for
+social protection spending and healthcare floor commitments. Compare the baseline
+to observed quarterly expenditure data. Identify the steps at which committed
+expenditure levels are not being met. Produce a quarterly monitoring brief that
+names the specific commitments not honored and the human development indicators
+most at risk.
+
+Current platform limitation (Customer Agent finding, Issue #575 panel): WorldSim
+can reproduce the programme baseline as a forward scenario. It does not currently
+support entering observed actuals as step-level inputs for divergence calculation
+within the tool. Abena's accountability tracking requires this capability. Until
+it exists, she manually compares the simulation's step-level projected output to
+her observed data — possible but not integrated. This gap is a primary engineering
+requirement for the civil society monitoring use case. Filed for roadmap
+consideration.
+
+**Trust Threshold**
+
+Community accountability standards: (1) findings must be tied to specific,
+verifiable commitments — the simulation generates the counterfactual baseline, but
+the accountability finding is the gap between that baseline and observed data;
+(2) the monitoring brief must be legible to a community leader in northern Ghana
+without a university education — plain language is not a preference, it is an
+institutional obligation; (3) where the simulation introduces uncertainty, that
+uncertainty must be disclosed. She will not present a synthetic inference as a
+programme commitment.
+
+**Preferred Information Format**
+
+Two-layer output: (1) technical layer (her own analysis) — trajectory chart
+showing programme baseline against observed actuals, with divergence markers;
+confidence tiers per indicator; source attribution; (2) community layer (the
+monitoring brief) — plain-language summary per commitment: on-track or diverging,
+and what that means in terms of specific services (school meals, health clinic
+visits, cash transfer amounts). Both layers must be produceable from a single
+session.
+
+**Failure Mode**
+
+Abena cannot use WorldSim for accountability monitoring if: (1) the platform
+cannot integrate observed actuals alongside simulated projections — the core
+accountability function requires comparing what was promised to what happened
+(structural gap flagged above; roadmap item); (2) the output cannot be translated
+into plain language for community audiences — expert-only output is institutionally
+unusable; (3) the baseline scenario cannot be reproduced from the programme's own
+committed inputs — if the simulation's baseline does not match the programme's
+stated commitment, the comparison is invalid.
+
+---
+
+### Persona 4 Variant — The Personal-Connection Researcher
+
+*Variant of Persona 4 (The Academic Researcher). Same 8-dimension format.
+EL-authorized addition (Issue #575). Differentiated by: lived proximity to the
+subject; personal stake in findings' accuracy; higher tolerance for tool limitations
+combined with sharper challenge of findings that contradict direct observation.*
+*Development Economist validation: Vidarbha cotton farmer suicide crisis is
+extensively documented — NSSO Agricultural Household Survey (2013, 2019),
+M.S. Swaminathan Commission reports (2004–2006), AGMARK price series (Wardha
+district), EPW literature (Mishra 2008, Nagaraj et al. 2014). CDS
+Thiruvananthapuram and JNU are real institutions with active agrarian economics
+programmes. The causal chain (AGMARK cotton price → farm gate revenue → household
+debt service → food expenditure reduction) is established in the literature.
+Historical grounding confirmed.*
+
+**Identity**
+
+Dr. Priya Krishnaswamy. Research Associate, Centre for Development Studies,
+Thiruvananthapuram, Kerala. 32 years old. PhD in Agricultural Economics from
+Jawaharlal Nehru University; dissertation on the political economy of agricultural
+subsidies and farmer indebtedness in Vidarbha, Maharashtra. Her father is a cotton
+farmer in Wardha district — one of the districts with the highest farmer suicide
+rates in India's farm crisis period (2004–2015). She studies the academic
+literature on agrarian distress with the knowledge that the farm in the literature
+is her family's farm. She uses WorldSim because she wants to know whether the
+simulation's output about agricultural market reform and income volatility matches
+what she has observed directly — and when it does not, she wants to know exactly
+which assumption produced the divergence.
+
+**Domain Expertise Profile**
+
+Deep: agricultural economics, political economy of rural markets, farmer
+indebtedness and credit access, rural poverty measurement, agrarian distress
+indicators. Moderate: macroeconomic modeling, simulation methodology, confidence
+tier systems. Edge: simulation architecture, governance module outputs, financial
+composite scoring. Her edge is not the economics — it is this specific tool's
+implementation of agricultural income transmission chains, which she will verify
+against her own field data and her dissertation dataset.
+
+**Mental Model at Session Entry**
+
+"A good tool tells me whether its model matches what I've observed — and if not,
+shows me exactly where the divergence is." Priya is both evaluator and engaged
+user. She enters with more tolerance for limitation than Amara (Persona 4) — she
+knows real-world complexity cannot be fully modeled. But she is harder to convince
+when a finding contradicts her direct observation. If WorldSim shows agricultural
+market deregulation has a neutral effect on cotton farm income in step 2, and her
+dissertation data shows income declined 32% in comparable districts in the same
+period, she wants to see the specific model assumption that produces the discrepancy
+— not a confidence tier disclaimer.
+
+**Entry State and Frame of Mind**
+
+Primary states: **Investigative** (pursuing a research question using WorldSim as
+one instrument in a multi-method analysis), **Retrospective** (running historical
+cases to compare simulation output to field data she collected directly), and
+**Evaluative** (assessing whether WorldSim's agrarian distress modeling is
+sufficiently calibrated to be cited in an agricultural economics journal).
+
+Most demanding: Retrospective with personal-observation verification. When the
+simulation diverges from what she observed in Wardha district — not what the
+literature says, but what she personally documented — she needs the model to show
+its work at the specific variable level where the divergence occurs. This is the
+most demanding trust test: the user knows more than the model about one specific
+data point, and the model must acknowledge that.
+
+**Primary Task**
+
+Use WorldSim to model the income and food security trajectory for smallholder
+cotton farmers in Vidarbha during India's 2020-2021 farm law reform period.
+Specifically: (1) does the simulation's output for agricultural income volatility
+under market deregulation match the pattern documented in her field data?;
+(2) does the human development propagation chain — from farm income decline to
+household food security to child nutrition — match established agricultural
+economics literature on Vidarbha?; (3) produce a backtesting comparison between
+the simulation's trajectory and the NSSO Agricultural Household Survey data that
+she can include in a journal submission.
+
+**Trust Threshold**
+
+Three conditions, in priority order: (1) the simulation's output must be
+falsifiable against her own data — a discrepancy is acceptable if the tool shows
+exactly which assumption produces it; (2) confidence tiers must be displayed at
+sub-indicator level, distinguishing SYNTHETIC_COMPARABLE (regional agricultural
+data available) from OBSERVED (actual AGMARK cotton price series); (3) the
+backtesting divergence metric must be downloadable in a format suitable for a
+journal data appendix — the format matters for peer review. Additionally: when
+the simulation conflicts with her direct observation, the tool must not claim the
+simulation is more accurate than her fieldwork. Her dissertation dataset (47
+households, Wardha district, 2015) is Tier 2-3 for those households and Tier 4
+for regional inference. The simulation's comparable-economy estimate is Tier 3.
+They are roughly comparable in credibility. The tool must reflect this.
+
+**Preferred Information Format**
+
+Methodology documentation first; numerical output second; charts for orientation
+only. She will export raw trajectory data to R for independent analysis. She reads
+confidence tier displays carefully and will challenge a synthetic estimate that
+appears to carry more precision than the underlying comparison group justifies.
+The divergence table (simulation prediction vs. observed outcome) is her primary
+analytical artifact.
+
+**Failure Mode**
+
+Priya disengages from WorldSim as a research instrument if: (1) the model produces
+output that conflicts with her direct observation without showing the specific
+assumption driving the divergence — she cannot include an unexplained discrepancy
+in a journal submission; (2) the agricultural income transmission chain is
+unimplemented or modeled as a simple GDP multiplier rather than a structured
+propagation from farm gate price to household income to food security — if the
+causal mechanism is absent, the tool is not useful for her research question;
+(3) the backtesting output cannot be exported in a citeable format — the journal
+data appendix requirement is non-negotiable.
+
+---
+
 ## Section 2 — Entry State Taxonomy
 
 Six entry states. Each maps to a distinct cognitive mode, opening screen
@@ -468,21 +904,21 @@ requirement, and failure condition. Personas experience different subsets.
 | **Preparatory** | A known event is upcoming (negotiation, board meeting, crisis decision). Building the evidence base before it. | A clear path to scenario configuration from the landing state. A completed scenario opens directly to its summary output. | The scenario configuration workflow is buried or requires more than 3 steps to reach. The evidence assembly takes longer than the available preparation window. |
 | **Demonstrative** | Showing the tool to an audience. Performance context; the analyst is not the audience; the audience is a decision-maker. | The instrument cluster is visible on the opening screen. The primary finding is legible without navigation. No setup required to reach the demonstration state. | The opening screen is a configuration view, empty canvas, or table of contents. The demonstrator must narrate what is about to appear before anything appears. |
 | **Evaluative** | Assessing the tool's credibility and methodology. Meta-level exploration. Not consuming output — inspecting how the output is produced. | A direct path from any output to its methodology source. Confidence tier displayed per indicator. Backtesting output accessible. | The methodology is behind a link or a separate documentation site. The tool's claims about its own accuracy cannot be tested from within the session. |
-| **Retrospective** | Running a historical case with known outcome to calibrate understanding or test tool accuracy. The outcome is known; the exercise is epistemic. | Mode 1 (Replay) is accessible from the landing state. Historical fixture data is loadable without custom configuration. The step counter makes the historical timeline legible. | Mode 1 requires the same setup as Mode 2. The user cannot distinguish a historical replay from a forward scenario. Historical calibration is treated as a scenario, not a replay. |
+| **Retrospective** | Running a known reference path against actual or observed trajectories. Two sub-modes: (a) Historical calibration — the outcome is fully known; the exercise tests model accuracy against history. (b) Accountability tracking — a prior projection or committed programme baseline is known; the exercise verifies whether observed actuals track the reference path. In both sub-modes, the reference path is known; the exercise is verification. The outcome may be fully known (calibration) or still emerging (accountability). | Mode 1 (Replay) is accessible from the landing state. Historical fixture data is loadable without custom configuration. The step counter makes the historical timeline legible. For accountability tracking: a prior scenario's projected output is accessible for step-by-step comparison alongside observed actuals. (Note: integrated observed-actuals input is a forward capability; manual comparison is currently required.) | Mode 1 requires the same setup as Mode 2. The user cannot distinguish a historical replay from a forward scenario. For accountability tracking: the baseline scenario cannot be reproduced from programme inputs, or the tool conflates simulation uncertainty with programme commitment uncertainty. |
 
 ### Entry State × Persona Matrix
 
 Frequency indicators: **P** = primary entry state for this persona;
 **S** = secondary entry state; **O** = occasional; **—** = not typical.
 
-| Entry State | Persona 1: Programme Analyst | Persona 2: Ministry Negotiator | Persona 3: Political Advisor | Persona 4: Academic Researcher | Persona 5: Decision-Maker |
-|---|---|---|---|---|---|
-| Investigative | S | O | O | P | — |
-| Reactive | O | P | P | — | S |
-| Preparatory | P | P | S | O | — |
-| Demonstrative | — | O | S | O | P |
-| Evaluative | S | — | — | P | — |
-| Retrospective | S | O | — | P | — |
+| Entry State | P1: Programme Analyst | P2: Ministry Negotiator | P3: Political Advisor | P4: Academic Researcher | P5: Decision-Maker | P6: Journalist | P7: Parliamentary Economist | P8: Civil Society Monitor | P4V: Personal-Connection Researcher |
+|---|---|---|---|---|---|---|---|---|---|
+| Investigative | S | O | O | P | — | P | O | S | P |
+| Reactive | O | P | P | — | S | S | S | — | — |
+| Preparatory | P | P | S | O | — | — | P | — | O |
+| Demonstrative | — | O | S | O | P | — | — | — | — |
+| Evaluative | S | — | — | P | — | — | S | — | P |
+| Retrospective | S | O | — | P | — | — | O | P | P |
 
 ### Most Demanding Entry State per Persona
 
@@ -493,6 +929,10 @@ Frequency indicators: **P** = primary entry state for this persona;
 | 3 — Political Advisor | Reactive (crisis window) | 48-hour decision horizon; historical precedent pattern is the primary need |
 | 4 — Academic Researcher | Evaluative | Tool must survive methodological scrutiny; any opacity breaks trust permanently |
 | 5 — Decision-Maker | Reactive | 3-minute answer window; no tolerance for navigation or technical interpretation |
+| 6 — Investigative Journalist | Investigative | 2-hour session cap; publishable specific claim required; no specialist mediation; plain-language output is mandatory |
+| 7 — Parliamentary Economist | Preparatory | 72-hour deadline; findings cited in Hansard; reproducible within the committee hearing day |
+| 8 — Civil Society Monitor | Retrospective (accountability) | 30-day publication cycle; community-audience legibility required; platform capability gap for integrated actuals input |
+| 4V — Personal-Connection Researcher | Retrospective | Personal-observation verification: when simulation diverges from direct field data, the specific assumption must be visible |
 
 ---
 
@@ -795,6 +1235,267 @@ away from the primary viewport? Is the instrument cluster state at step 6
 (2015) accessible from the landing screen without requiring scenario setup?
 Can the demonstration be completed within 5 minutes by someone who has not
 prepared a scenario in advance?"
+
+---
+
+### Primary Case 6 — The Flood and the Programme
+
+**Persona:** 6 — The Investigative Journalist
+
+**The room:** Dawn newsroom, Karachi, October 2022. Farida has returned from a
+two-week reporting trip to Sindh province, where she interviewed flood-displaced
+families subsisting on government relief food distribution. Pakistan's catastrophic
+2022 monsoon floods — the most destructive in the country's recorded history —
+submerged one-third of the country between July and September. Simultaneously,
+Pakistan was under IMF pressure to remove energy subsidies as a condition of the
+7th EFF review. Subsidies were removed in June 2022, one month before the floods
+began. The IMF programme's targeted subsidy scheme was designed to protect the
+bottom quintile from the subsidy removal; it was not designed for a simultaneous
+30% agricultural income loss from flood displacement.
+
+**What they had:** IMF 7th EFF review documents; HIES 2018-19 household data;
+NDMA flood damage assessments; reporting from field visits with displaced families;
+existing public analysis treating the flood and the subsidy removal as separate
+events.
+
+**What they lacked:** A tool that models what happens to a specific income cohort
+when a fiscal shock (energy price increase) and a physical displacement shock
+(agricultural income loss from flood) operate simultaneously rather than
+sequentially. The IMF programme's bottom-quintile protection assumption held under
+subsidy removal alone. It was not evaluated under the combined shock. No published
+analysis had quantified the combined effect on a specific cohort at a specific step.
+
+**The decision made:** (Prospective) If the simulation confirms that the combined
+shock drives a CRITICAL food security threshold crossing at step 1 for the bottom
+income quintile, Farida has the publishable claim: "The IMF programme's bottom
+quintile protection assumption failed under combined shock conditions — a finding
+the programme design did not surface."
+
+**The consequence:** HIES data released in 2023 showed poverty headcount in
+flood-affected districts rose sharply in 2022-23. If WorldSim's combined-shock
+scenario predicted this crossing before the data was released, the tool
+demonstrated prospective value for economic journalism. If the data was already
+available, the tool provided the specific causal mechanism — the interaction of
+two shocks on one cohort at one step — that explained what the aggregate data showed.
+
+**The WorldSim intervention:** Farida runs two scenarios: (a) IMF programme +
+energy subsidy removal only; (b) IMF programme + energy subsidy removal +
+agricultural income displacement shock (30% agricultural capacity reduction for
+flood-affected districts, 2 steps). The comparison view shows: scenario (a) —
+no CRITICAL food security alert in the first 2 steps (consistent with programme
+design). Scenario (b) — CRITICAL food security alert for bottom income quintile
+at step 1; CRITICAL poverty headcount at step 2. The plain-language MDA alert
+reads: "Food security for Pakistan's lowest-income households crossed a critical
+threshold at step 1 under combined shock conditions. Under programme-only
+conditions, this threshold was not breached in the same period." That is the
+sentence that goes into the article.
+
+**Exit criteria (acceptance test):** "Can a user with no specialist economics
+training navigate from the landing screen to a plain-language MDA alert summary
+within 30 minutes? Does the comparison view produce a differentiated
+threshold-crossing finding between the combined-shock scenario and the
+programme-only scenario, with cohort specificity (bottom income quintile) and step
+precision? Is the source registry ID for each cited indicator visible and
+accessible without navigating away from the instrument cluster? Is the
+plain-language MDA alert legible to a non-economist journalist without requiring
+specialist interpretation?"
+
+---
+
+### Primary Case 7 — The Committee Brief
+
+**Persona:** 7 — The Parliamentary Economist
+
+**The room:** Parliamentary Budget Office, Nairobi, March 2023. The National
+Assembly Finance and National Planning Committee is hearing evidence on the 7th
+review of Kenya's IMF EFF programme. The Treasury has presented its mid-programme
+assessment showing the fiscal path is on track. James has 72 hours to produce an
+independent assessment — specifically, whether the 3.5% GDP consolidation path
+is producing human development threshold crossings that the official projections
+do not flag.
+
+**What they had:** IMF 7th EFF review documents; Kenya Treasury fiscal framework
+presentation; KNBS data through Q3 2022; Kenya's Medium-Term Budget Strategy
+Statement; World Bank WDI Kenya page; the PBO's own prior brief from the 4th
+review hearing.
+
+**What they lacked:** A quantified, indicator-specific threshold-crossing analysis
+showing how the 3.5% path compares to a 2% alternative on human development
+outcomes. The Treasury's presentation treated human development in aggregate terms
+("poverty reduction is on track"). The Finance Committee minority report from the
+previous hearing had recommended slowing the consolidation pace — but was unable
+to name the specific threshold, indicator, step, and cohort that a slower path
+would protect. The minority report stated a concern; it did not state a finding.
+
+**The decision made:** (Historical) The Finance Committee published a minority
+report recommending re-examination of the consolidation pace, citing human
+development risks in healthcare and education spending. The minority report cited
+insufficient quantified evidence — the exact gap WorldSim addresses.
+
+**The consequence:** The minority report had limited impact because it lacked
+indicator-specific threshold-crossing evidence. "We believe the consolidation is
+too fast" without naming the specific threshold, cohort, and step cannot survive a
+Treasury rebuttal that cites its own programme projections. Step-level threshold
+evidence with indicator specificity would have produced a more defensible brief.
+
+**The WorldSim intervention:** James runs two scenarios: (a) 3.5% GDP
+consolidation per IMF EFF; (b) 2% alternative. The comparison shows: at 3.5%,
+education spending crosses WARNING at step 2 (below UNESCO per-student expenditure
+floor); healthcare capacity crosses WARNING at step 3. At 2%, neither threshold is
+crossed within the 4-step programme horizon. The committee brief states: "The
+programme path triggers two WARNING threshold crossings — education spending at
+step 2 and healthcare capacity at step 3 — that the 2% alternative path avoids
+within the programme horizon." This is the finding the minority report needed.
+
+**Exit criteria (acceptance test):** "Does the comparison view identify specific
+human development threshold crossings at the programme-recommended consolidation
+rate that are avoided at the 2% alternative, with indicator name, step index, and
+severity? Is the simulation reproducible with a different consolidation rate within
+the committee hearing day (same-session parameter change)? Is the methodology
+documentation accessible from within the tool and citable by ADR reference without
+navigating to an external site? Can a 4-page committee brief be drafted from the
+tool's tabular output within 2 hours?"
+
+---
+
+### Primary Case 8 — The Accountability Gap
+
+**Persona:** 8 — The Civil Society Monitor
+
+**The room:** SEND Ghana offices, Accra, July 2023. Ghana signed its IMF ECF
+programme in May 2023 — $3B over three years — following the 2022 debt default
+and restructuring process. The programme included explicit social protection floor
+commitments: government spending on social protection would not fall below a
+defined floor during the programme period. Six months in, Abena's team has
+obtained Treasury quarterly expenditure data showing social protection spending
+below the committed floor. She needs to present this finding to the National
+Assembly Finance Committee, the IMF Ghana Mission Chief, and community
+organizations in northern Ghana within 30 days.
+
+**What they had:** Ghana's IMF ECF programme document (May 2023); Treasury
+quarterly expenditure reports; SEND Ghana field monitoring data from community-
+level cash transfer disbursements; prior SEND Ghana analyses of Ghana's LEAP
+programme performance going back to 2012.
+
+**What they lacked:** A tool that could reproduce the programme's committed
+trajectory — what social protection spending should look like at each step under
+the programme floor — and compare it to the observed trajectory with indicator-
+level specificity. Without the committed baseline, the finding is: "spending is
+below commitment." With the committed baseline and a divergence simulation: "at
+observed spending levels, the social protection floor is breached, and this breach
+predicts child nutrition crossing a threshold the programme commitment was
+specifically designed to prevent."
+
+**The decision made:** (Prospective) If SEND Ghana presents a specific,
+step-level divergence finding — not a general shortfall but an indicator-specific
+threshold crossing attributable to the spending floor breach — the IMF Mission
+Chief cannot respond with "the programme is broadly on track" without addressing
+the specific finding. A specific claim requires a specific response. A generic
+concern does not.
+
+**The consequence:** Ghana's LEAP programme has consistently underperformed
+stated targets since 2012. Each shortfall has been documented and generally
+acknowledged without specific corrective action, partly because documentation
+has been in aggregate terms easy to counter with aggregate assurances. Indicator-
+specific, step-level threshold evidence creates accountability where aggregate
+evidence does not. This case is the civil society monitor's core thesis: specific
+claims produce specific responses.
+
+**The WorldSim intervention:** Abena reproduces the Ghana ECF baseline scenario
+using the programme's committed inputs. The simulation produces the projected
+trajectory for social protection spending, poverty headcount, and child nutrition
+at committed spending levels. She manually compares step-level projected values to
+her observed Treasury data (current platform limitation: this comparison is
+external to the tool). The divergence at step 1: observed spending is 0.3
+percentage points of GDP below the committed floor. Running a second scenario with
+the corrected (lower) spending input shows child malnutrition crossing WARNING at
+step 2 and approaching CRITICAL at step 4 if the shortfall continues. The
+accountability brief states: "The social protection floor shortfall is projected to
+drive child malnutrition above warning threshold by step 2 — the specific outcome
+the programme commitment was designed to prevent."
+
+**Exit criteria (acceptance test):** "Can the tool reproduce a committed programme
+baseline from programme document inputs? Can the user run a second scenario with
+observed (lower) spending and compare the divergence from the committed baseline?
+Does the divergence comparison identify specific indicator threshold crossings at
+the observed spending level that are avoided at the committed level? Is the
+plain-language summary legible to a community organization audience? Note: this
+acceptance test is partially forward-looking — integrated observed-actuals input
+is a roadmap item; the current acceptance criterion is met if the two-scenario
+comparison (committed vs. observed spending level) produces the required divergence
+output."
+
+---
+
+### Persona 4V Marquee Case — The Wardha Divergence
+
+*Backtesting stress test for WorldSim's agricultural income transmission chain.
+Development Economist validates: the causal mechanism (AGMARK cotton price →
+farm gate revenue → household debt service → food expenditure reduction) is
+established in the literature (Nagaraj et al. 2014, JNU Agrarian Research Group;
+Mishra 2008, EPW). NSSO Agricultural Household Survey 2013 and 2019 provide the
+comparison dataset. Historical grounding confirmed.*
+
+**Persona:** 4 Variant — The Personal-Connection Researcher
+
+**The room:** CDS Thiruvananthapuram, March 2022. India's three farm laws were
+repealed in November 2021 following a 13-month farmers' protest. Priya is writing
+a journal article on whether the farm laws' projected deregulation effects would
+have matched the income and food security trajectory that Vidarbha cotton farmers
+actually experienced during the protest period (November 2020 – November 2021).
+She wants to use WorldSim to model the projected trajectory and compare it to her
+field data.
+
+**What they had:** NSSO Agricultural Household Survey 2013 and 2019 data; AGMARK
+historical cotton price series for Wardha district 2015-2021; her own dissertation
+field survey (47 households, Wardha district, 2015); published literature on
+agricultural income volatility in Maharashtra.
+
+**What they lacked:** A simulation framework modeling the specific transmission
+chain: cotton AGMARK price → farm gate revenue → debt service capacity → household
+food expenditure reduction, under market deregulation conditions. Standard
+macroeconomic models do not capture this chain at the household level. The farm
+law scenario requires a policy input (removal of MSP price floor guarantee)
+propagating through the agricultural income chain to human development indicators.
+
+**The decision made:** (Prospective) If the simulation's projected trajectory under
+market deregulation matches the income and food security pattern in her field data,
+WorldSim has validated its agricultural transmission chain for this use case. If
+it diverges, the specific assumption causing the divergence becomes the journal
+article's finding: "WorldSim's model underestimates [X] because [Y] assumption
+does not capture [Z] mechanism."
+
+**The consequence:** Either outcome is valuable: confirmation validates the tool for
+agricultural economics research; divergence identifies a calibration gap that the
+tool's documentation should disclose. The exercise is adversarial review as
+epistemic contribution — the same discipline that makes backtesting the primary
+signal for model improvement.
+
+**The WorldSim intervention:** Priya runs the India agricultural scenario with farm
+law deregulation as the policy input — removal of the MSP price floor modeled as
+a price floor removal affecting cotton farm gate revenue for 2 steps. The
+simulation produces: projected cotton farm income trajectory; household food
+expenditure; child nutrition indicator. She downloads the trajectory and compares
+it to her Wardha field data: simulation predicts 18% income decline at step 1;
+her 2021 field follow-up shows 23% decline. Divergence: 5 percentage points. The
+tool discloses the assumption: "Wardha district-specific data not available;
+estimate derived from Maharashtra agricultural comparables." The confidence tier
+system shows the simulation estimate is Tier 3 (SYNTHETIC_COMPARABLE). Her field
+data for those 47 households is Tier 2 for those households, Tier 4 for regional
+inference. They are roughly comparable in credibility for this data point. Priya
+accepts the divergence as within the plausible range for district-level vs.
+regional estimation. She cites the simulation with the appropriate qualification
+in the journal data appendix.
+
+**Exit criteria (acceptance test):** "Does the simulation model an agricultural
+price floor removal and propagate it through farm income to food security human
+development indicators with step-level output? Does the backtesting divergence
+table show predicted vs. observed income trajectory for cotton farmers, with the
+specific comparison group disclosed? Can the trajectory data be exported in a
+format suitable for a journal data appendix? When the user has district-level
+field data that diverges from the simulation's regional estimate by 5 percentage
+points, does the tool correctly disclose the comparison group and confidence tier
+such that the divergence is interpretable rather than opaque?"
 
 ---
 
