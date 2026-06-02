@@ -224,7 +224,11 @@ export default function ChoroplethMap({ attributeName, title, scenarioId, curren
   }, [attributeName, title, scenarioId, currentStep]);
 
   return (
-    <div style={{ position: "relative", width: "100%", height: "100%" }}>
+    <div
+      data-testid="choropleth-map"
+      data-step={currentStep ?? 0}
+      style={{ position: "relative", width: "100%", height: "100%" }}
+    >
       <div ref={containerRef} style={{ width: "100%", height: "100%" }} />
       {error && (
         <div
