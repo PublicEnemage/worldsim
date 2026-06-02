@@ -15,6 +15,44 @@ const API_BASE = "http://localhost:8000/api/v1";
 
 const DEFAULT_ATTRIBUTE = "gdp_usd_millions";
 
+// ---------------------------------------------------------------------------
+// Persistent scenario state — IR-003
+// ---------------------------------------------------------------------------
+
+const LAST_SCENARIO_KEY = "worldsim_last_scenario";
+
+interface StoredScenario {
+  id: string;
+  name: string;
+  totalSteps: number;
+}
+
+function readStoredScenario(): StoredScenario | null {
+  try {
+    const raw = localStorage.getItem(LAST_SCENARIO_KEY);
+    return raw ? (JSON.parse(raw) as StoredScenario) : null;
+  } catch {
+    return null;
+  }
+}
+
+function writeStoredScenario(s: StoredScenario): void {
+  try {
+    localStorage.setItem(LAST_SCENARIO_KEY, JSON.stringify(s));
+  } catch {
+    // Non-fatal — private browsing or quota exceeded
+  }
+}
+
+// Returns ?scenario= URL param value, or null if absent.
+function getUrlScenarioId(): string | null {
+  try {
+    return new URLSearchParams(window.location.search).get("scenario");
+  } catch {
+    return null;
+  }
+}
+
 export default function App() {
   const [attributeName, setAttributeName] = useState(DEFAULT_ATTRIBUTE);
   const [selectedScenarioId, setSelectedScenarioId] = useState<string | null>(null);
@@ -42,11 +80,46 @@ export default function App() {
     setSelectedScenarioSteps(totalSteps);
     setCurrentStep(null);
     setSelectedEntityId(null);
+    writeStoredScenario({ id, name, totalSteps });
   };
 
   const handleEntityClick = (entityId: string) => {
     setSelectedEntityId(entityId);
   };
+
+  // Restore last active scenario on mount (IR-003).
+  // URL ?scenario= takes precedence; falls back to localStorage.
+  // Non-fatal: if the stored ID no longer exists, clear stale localStorage silently.
+  useEffect(() => {
+    const urlId = getUrlScenarioId();
+    const stored = readStoredScenario();
+    const scenarioId = urlId ?? stored?.id ?? null;
+    if (!scenarioId) return;
+
+    let cancelled = false;
+    fetch(`${API_BASE}/scenarios/${encodeURIComponent(scenarioId)}`)
+      .then((res) => (res.ok ? (res.json() as Promise<ScenarioDetailResponse>) : null))
+      .then((detail) => {
+        if (cancelled || !detail) {
+          if (!urlId) localStorage.removeItem(LAST_SCENARIO_KEY);
+          return;
+        }
+        setSelectedScenarioId(detail.scenario_id);
+        setSelectedScenarioName(detail.name);
+        setSelectedScenarioSteps(detail.configuration.n_steps);
+        // Fast-forward step if already completed — mirrors the existing completed-scenario effect.
+        if (detail.status === "completed") {
+          setCurrentStep(detail.configuration.n_steps);
+        }
+      })
+      .catch(() => {
+        if (!cancelled && !urlId) localStorage.removeItem(LAST_SCENARIO_KEY);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps — intentionally runs once on mount
 
   // Playwright E2E test seam — DEV mode only, eliminated from production builds.
   // Exposes entity-selection handler so tests can open the drawer without clicking
