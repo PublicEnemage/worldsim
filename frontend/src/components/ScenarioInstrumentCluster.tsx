@@ -218,6 +218,10 @@ export function ScenarioInstrumentCluster({
       .then((raw) => {
         if (cancelled) return;
         store.setTrajectory(parseTrajectoryResponse(raw));
+        // setTrajectory also sets current_step = trajectory.step_count (designed for
+        // re-selection of completed scenarios). Re-assert the prop-driven step value
+        // so Zone 1 instruments reflect the step that actually triggered this fetch.
+        useScenarioStepStore.setState({ current_step: currentStep });
         setTrajectoryLoading(false);
       })
       .catch(() => {

@@ -358,6 +358,12 @@ test("IR-004: start_year input seeds trajectory tick year labels", async ({
   // Advance one step so the trajectory SVG has tick labels to inspect.
   await advanceStep(page, 1, 3);
 
+  // Wait for the trajectory fetch triggered by the step advance to complete.
+  // Without this, allTextContents() runs against an empty SVG on slow CI runners.
+  await expect(zone1d).not.toHaveAttribute("data-loading", "true", {
+    timeout: 10_000,
+  });
+
   // Guard: trajectory SVG may not render at all viewports (no-op if absent).
   const svg = page.locator('[data-testid="zone-1a-trajectory"] svg').first();
   const hasSvg = await svg.isVisible({ timeout: 3_000 }).catch(() => false);
