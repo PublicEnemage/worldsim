@@ -465,3 +465,77 @@ def test_build_argentina_demo_scenario_serializes_to_json() -> None:
     cfg = dumped["configuration"]
     assert "step_metadata" in cfg
     assert cfg["step_metadata"]["1"]["significance"] == "SIGNIFICANT"
+
+
+def test_build_argentina_demo_scenario_has_emergency_declaration_at_step2() -> None:
+    """Demo scenario must include emergency_declaration at step 2 (state of siege,
+    December 19 2001 — concurrent with sovereign default).
+
+    This is the instrument that drives democratic_quality_score below the 0.70
+    MDA-GOV-DEMOCRACY-FLOOR at step 3 via GovernanceModule one-step lag (#615).
+    """
+    demo = build_argentina_demo_scenario()
+    emergency_at_step2 = [
+        si for si in demo.scheduled_inputs
+        if si.step == 2
+        and si.input_type == "EmergencyPolicyInput"
+        and si.input_data.get("instrument") == "emergency_declaration"
+    ]
+    assert len(emergency_at_step2) == 1, (
+        "Demo scenario must have exactly one emergency_declaration at step 2 "
+        f"(found {len(emergency_at_step2)})"
+    )
+
+
+def test_build_argentina_demo_scenario_emergency_declaration_step_in_range() -> None:
+    """emergency_declaration step must be within [0, n_steps]."""
+    demo = build_argentina_demo_scenario()
+    n = demo.configuration.n_steps
+    for si in demo.scheduled_inputs:
+        assert 0 <= si.step <= n, (
+            f"Scheduled input step {si.step} outside valid range [0, {n}]"
+        )
+
+
+def test_build_argentina_demo_scenario_governance_mda_breach_math() -> None:
+    """Verify democratic_quality_score drops below 0.70 at step 3.
+
+    GovernanceModule one-step lag applies elasticities from the prior step:
+      Step 2 reads step 1: imf_program_acceptance × +0.005 = +0.005
+        → score: 0.71 + 0.005 = 0.715 (above 0.70 — no breach)
+      Step 3 reads step 2: emergency_declaration × -0.05 = -0.05
+        → score: 0.715 - 0.05 = 0.665 ≤ 0.70 — MDA WARNING fires
+
+    This test encodes the expected score trajectory as a regression gate.
+    If the elasticity values or initial seed change, this test will catch it.
+    """
+    from decimal import Decimal
+
+    from app.simulation.modules.governance.elasticities import GOVERNANCE_ELASTICITY_REGISTRY
+
+    initial_dqs = Decimal("0.71")
+    mda_floor = Decimal("0.70")
+
+    imf_elasticity = next(
+        r.elasticity for r in GOVERNANCE_ELASTICITY_REGISTRY
+        if r.event_type == "imf_program_acceptance"
+        and r.indicator_key == "democratic_quality_score"
+    )
+    emergency_elasticity = next(
+        r.elasticity for r in GOVERNANCE_ELASTICITY_REGISTRY
+        if r.event_type == "emergency_declaration" and r.indicator_key == "democratic_quality_score"
+    )
+
+    # Step 2 effect: imf_program_acceptance fires at step 1 → processed at step 2
+    score_after_step2 = initial_dqs + (Decimal("1") * imf_elasticity)
+    assert score_after_step2 > mda_floor, (
+        f"Score after step 2 ({score_after_step2}) must be above MDA floor — "
+        "breach should not fire until step 3"
+    )
+
+    # Step 3 effect: emergency_declaration fires at step 2 → processed at step 3
+    score_after_step3 = score_after_step2 + (Decimal("1") * emergency_elasticity)
+    assert score_after_step3 <= mda_floor, (
+        f"Score after step 3 ({score_after_step3}) must be ≤ MDA floor {mda_floor} — "
+        "MDA-GOV-DEMOCRACY-FLOOR WARNING must fire at step 3"
+    )

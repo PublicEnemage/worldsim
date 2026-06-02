@@ -24,7 +24,11 @@ Simulation structure:
 
   build_argentina_demo_scenario(): n_steps=4 (annual: 2001→2004).
     Demo 3 variant. Extends the base with EcologicalModule, GovernanceModule,
-    step_metadata event labels, and recovery-phase steps (Issue #553).
+    step_metadata event labels, recovery-phase steps, and an emergency_declaration
+    at step 2 (state of siege, December 19 2001 — concurrent with sovereign default).
+    The emergency_declaration drives democratic_quality_score below the 0.70 MDA
+    floor at step 3, producing a governance WARNING during the Kirchner recovery
+    period (Issue #553, #615).
 
 Scheduled inputs:
   Step 1: IMF program acceptance (Blindaje) + fiscal spending cut (Zero Deficit Plan)
@@ -156,8 +160,8 @@ def build_argentina_demo_scenario() -> ScenarioCreateRequest:
       - co2_concentration_ppm initial seed (369.5 ppm — NOAA Mauna Loa 2000 mean)
       - rule_of_law_percentile initial seed (33.2 — WGI Rule of Law ARG 2000)
       - democratic_quality_score initial seed (0.71 — V-Dem LDI ARG 2000)
-      - step_metadata with SIGNIFICANT labels for crisis steps 1 and 2,
-        and SIGNIFICANT label for the Kirchner recovery at step 3
+      - step_metadata with SIGNIFICANT labels for crisis steps 1–3
+      - emergency_declaration at step 2 (state of siege, December 19 2001)
 
     Composite score status (M10):
       Ecological      — live (boundary proximity; CO2 active)
@@ -245,21 +249,37 @@ def build_argentina_demo_scenario() -> ScenarioCreateRequest:
         }
     )
 
-    # emergency_declaration at step 1 is already in base.scheduled_inputs.
-    # No additional inputs needed for steps 3–4 (recovery driven by prior-shock
-    # unwind and endogenous state dynamics). Steps 3 and 4 are ROUTINE in
-    # scheduled_inputs — the GovernanceModule will read the emergency_declaration
-    # one-step lag at step 2 (default) to reduce democratic_quality_score.
+    # Add emergency_declaration at step 2: Argentina's state of siege was declared
+    # December 19, 2001 — the same step as the sovereign default. GovernanceModule
+    # applies a one-step lag, so this event is processed at step 3. The elasticity
+    # is -0.05 on democratic_quality_score (Bermeo 2016). Starting at 0.715 after
+    # the imf_program_acceptance effect (+0.005 at step 2), the score drops to
+    # 0.665 at step 3 — below the MDA-GOV-DEMOCRACY-FLOOR threshold of 0.70.
+    # MDA WARNING fires at step 3 (the Kirchner recovery), showing that governance
+    # damage persists even as the economy begins to recover.
+    demo_scheduled_inputs = list(base.scheduled_inputs) + [
+        ScheduledInputSchema(
+            step=2,
+            input_type="EmergencyPolicyInput",
+            input_data={
+                "instrument": "emergency_declaration",
+                "target_entity": "ARG",
+                "expected_duration": 1,
+            },
+        ),
+    ]
 
     return base.model_copy(update={
         "name": "Argentina 2001-2002 Demo 3 — Crisis Arc and Kirchner Recovery",
         "description": (
             "Demo 3 scenario (Issue #553). "
             "EcologicalModule and GovernanceModule enabled — all four framework axes live. "
-            "Crisis arc: Zero Deficit Plan (2001) → sovereign default (2002) → "
+            "Crisis arc: Zero Deficit Plan (2001) → sovereign default + state of siege (2002) → "
             "Kirchner recovery (2003–2004). "
             "Governance composite uses normalized_absolute strategy "
             "(WGI/V-Dem; ADR-005 Amendment 4). "
+            "MDA-GOV-DEMOCRACY-FLOOR breached at step 3: emergency_declaration (step 2) "
+            "drives democratic_quality_score to 0.665 via GovernanceModule one-step lag. "
             "Financial and human_development composites are null "
             "(percentile rank requires ≥2 entities, Issue #193). "
             "Initial state: IMF WEO April 2001 + INDEC EPH October 2000 "
@@ -268,4 +288,5 @@ def build_argentina_demo_scenario() -> ScenarioCreateRequest:
             "+ V-Dem v13 (democratic_quality_score=0.71)."
         ),
         "configuration": demo_config,
+        "scheduled_inputs": demo_scheduled_inputs,
     })
