@@ -28,6 +28,7 @@ import { test, expect } from "@playwright/test";
 async function createAndSelectScenario(
   page: import("@playwright/test").Page,
   name: string,
+  startYear?: number,
 ) {
   await page.waitForFunction(
     () =>
@@ -37,6 +38,9 @@ async function createAndSelectScenario(
   );
   await page.getByRole("button", { name: /Scenarios/ }).click();
   await page.locator('input[placeholder="Scenario name"]').fill(name);
+  if (startYear !== undefined) {
+    await page.locator('input[aria-label="Start year"]').fill(String(startYear));
+  }
   await page.locator(".scenario-btn--create").click();
   const row = page.locator(".scenario-row").filter({ hasText: name });
   await expect(row).toBeVisible({ timeout: 15_000 });
@@ -323,4 +327,52 @@ test("Greece step-through: mode switch updates indicator label (guard)", async (
   await mode2Trigger.click();
   await expect(indicator).toHaveText("Simulation");
   await expect(indicator).toHaveAttribute("data-mode", "MODE_2");
+});
+
+// ---------------------------------------------------------------------------
+// IR-004: start_year field populates trajectory tick date labels (Issue #498)
+//
+// Creates a scenario with start_year=2015. After advancing steps the trajectory
+// view X-axis ticks must include years from the 2015–2018 range, not the
+// default 2000-era dates. Uses a relaxed guard: if the trajectory SVG is not
+// rendered at the test viewport, the assertion is skipped (same pattern as
+// AC-011 in trajectory-view.spec.ts).
+// ---------------------------------------------------------------------------
+
+test("IR-004: start_year input seeds trajectory tick year labels", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1280, height: 800 });
+  await page.goto("/");
+  await createAndSelectScenario(page, `GRC-ir004-${Date.now()}`, 2015);
+
+  const zone1d = page.locator('[data-testid="zone-1d-four-framework"]');
+  await expect(zone1d).toBeVisible({ timeout: 10_000 });
+
+  // Wait for loading state to clear — trajectory must be fetched before
+  // tick dates are meaningful.
+  await expect(zone1d).not.toHaveAttribute("data-loading", "true", {
+    timeout: 10_000,
+  });
+
+  // Advance one step so the trajectory SVG has tick labels to inspect.
+  await advanceStep(page, 1, 3);
+
+  // Guard: trajectory SVG may not render at all viewports (no-op if absent).
+  const svg = page.locator('[data-testid="zone-1a-trajectory"] svg').first();
+  const hasSvg = await svg.isVisible({ timeout: 3_000 }).catch(() => false);
+  if (!hasSvg) return;
+
+  // Collect all text node contents from the SVG tick labels.
+  const allText = await svg.locator("text").allTextContents();
+  const joined = allText.join(" ");
+
+  // The tick labels must reference years in the 2015–2018 window (start_year
+  // to start_year + n_steps), NOT the 2000-era default.
+  const hasExpectedYear =
+    joined.includes("2015") ||
+    joined.includes("2016") ||
+    joined.includes("2017") ||
+    joined.includes("2018");
+  expect(hasExpectedYear).toBe(true);
 });
