@@ -10,10 +10,10 @@
  * as Decimal string; the store expects number | null. Both conversions
  * happen in parseTrajectoryResponse().
  *
- * MDA alerts: Zone 1B alerts are derived from the step-advance response
- * (mda_alerts per framework_output). In M9, with no advance endpoint
- * integration yet, mda_alerts defaults to [] (no alerts shown until
- * the advance endpoint is wired in a follow-up PR).
+ * MDA alerts: Zone 1B alerts are fetched from GET /measurement-output after
+ * each step advance (IR-001). Alerts are absent at step 0 (no simulation
+ * output yet). Mapping from MDAAlert → Zone1BAlert derives framework from
+ * the output record key and confidence_tier from the indicator record.
  *
  * PMM: pmm_value and pmm_direction remain null in M9 (no PMM endpoint
  * exists yet; the PMM widget renders "—"). This is correct per ADR-008
@@ -25,7 +25,7 @@ import { MDAAlertPanelZone1B } from "./MDAAlertPanelZone1B";
 import { PMMWidgetZone1C } from "./PMMWidgetZone1C";
 import { FourFrameworkZone1D } from "./FourFrameworkZone1D";
 import { useScenarioStepStore } from "../store/scenarioStepStore";
-import type { TrajectoryResponse, TrajectoryFrameworkPoint } from "../store/scenarioStepStore";
+import type { TrajectoryResponse, TrajectoryFrameworkPoint, Zone1BAlert } from "../store/scenarioStepStore";
 
 const API_BASE = "http://localhost:8000/api/v1";
 
@@ -101,6 +101,59 @@ function parseTrajectoryResponse(raw: RawTrajectoryResponse): TrajectoryResponse
 }
 
 // ---------------------------------------------------------------------------
+// MDA alert response parsing (IR-001)
+// ---------------------------------------------------------------------------
+
+interface RawMDAAlert {
+  mda_id: string;
+  entity_id: string;
+  indicator_key: string;
+  severity: "WARNING" | "CRITICAL" | "TERMINAL";
+  floor_value: string;
+  current_value: string;
+  approach_pct_remaining: string;
+  consecutive_breach_steps: number;
+}
+
+interface RawFrameworkOutputForAlerts {
+  mda_alerts: RawMDAAlert[];
+  indicators: Record<string, unknown>;
+}
+
+interface RawMultiFrameworkOutput {
+  entity_id: string;
+  step_index: number;
+  outputs: Record<string, RawFrameworkOutputForAlerts>;
+}
+
+function parseMdaAlerts(raw: RawMultiFrameworkOutput): Zone1BAlert[] {
+  const alerts: Zone1BAlert[] = [];
+  for (const [framework, output] of Object.entries(raw.outputs)) {
+    for (const alert of output.mda_alerts) {
+      const indicator = output.indicators[alert.indicator_key];
+      const confidence_tier =
+        indicator != null &&
+        typeof indicator === "object" &&
+        "confidence_tier" in indicator &&
+        typeof (indicator as { confidence_tier: unknown }).confidence_tier === "number"
+          ? (indicator as { confidence_tier: number }).confidence_tier
+          : 2;
+      alerts.push({
+        mda_id: alert.mda_id,
+        indicator_key: alert.indicator_key,
+        framework,
+        severity: alert.severity,
+        step_index: raw.step_index,
+        cohort: null,
+        causal_attribution: null,
+        confidence_tier,
+      });
+    }
+  }
+  return alerts;
+}
+
+// ---------------------------------------------------------------------------
 // ScenarioInstrumentCluster
 // ---------------------------------------------------------------------------
 
@@ -150,6 +203,31 @@ export function ScenarioInstrumentCluster({
       cancelled = true;
     };
   }, [scenarioId]);
+
+  // Fetch MDA alerts from measurement-output after each step advance (IR-001).
+  // Entity ID comes from the trajectory response already fetched above.
+  // Skipped at step 0 — no simulation output exists before the first advance.
+  useEffect(() => {
+    const entityId = store.trajectory?.entity_id;
+    if (!scenarioId || !entityId || currentStep === 0) return;
+    let cancelled = false;
+
+    fetch(
+      `${API_BASE}/scenarios/${encodeURIComponent(scenarioId)}/measurement-output?entity_id=${encodeURIComponent(entityId)}&step=${currentStep}`
+    )
+      .then((res) => (res.ok ? (res.json() as Promise<RawMultiFrameworkOutput>) : null))
+      .then((raw) => {
+        if (cancelled || !raw) return;
+        store.setMdaAlerts(parseMdaAlerts(raw));
+      })
+      .catch(() => {
+        // Non-fatal — Zone 1B remains in previous state
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [scenarioId, currentStep, store.trajectory?.entity_id]);
 
   return (
     <InstrumentCluster

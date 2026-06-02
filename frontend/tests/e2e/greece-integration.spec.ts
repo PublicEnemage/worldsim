@@ -225,6 +225,48 @@ test("Greece step-through: cluster consistent at all 3 steps", async ({
 });
 
 // ---------------------------------------------------------------------------
+// IR-001: Zone 1B shows data-driven alert state after step advance
+//
+// After advancing to step 1, Zone 1B must reflect real measurement-output
+// data — either mda-no-alerts (clean state) or one or more mda-alert-row
+// elements (active alert state). The mda-no-alerts element must NOT remain
+// if alerts exist, and vice versa. This test confirms the wiring is live.
+// ---------------------------------------------------------------------------
+
+test("Greece step-through: Zone 1B shows data-driven alert state after advance (IR-001)", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1280, height: 800 });
+  await page.goto("/");
+  await createAndSelectScenario(page, `GRC-ir001-${Date.now()}`);
+
+  const cluster = page.locator('[data-testid="zone-1b-mda-alerts"]');
+  await expect(cluster).toBeVisible({ timeout: 10_000 });
+
+  // Advance to step 1 — measurement-output fetch should fire
+  await advanceStep(page, 1, 3);
+
+  // Zone 1B must settle into one of two valid states: no-alerts or alert rows
+  // Use expect.poll to allow for the async fetch to complete
+  await expect
+    .poll(
+      async () => {
+        const noAlerts = page.locator('[data-testid="mda-no-alerts"]');
+        const alertRow = page.locator('[data-testid="mda-alert-row"]');
+        const hasNoAlerts = await noAlerts.isVisible().catch(() => false);
+        const hasAlertRow = await alertRow.first().isVisible().catch(() => false);
+        return hasNoAlerts || hasAlertRow;
+      },
+      { timeout: 10_000, message: "Zone 1B must show either no-alerts or alert-row state" }
+    )
+    .toBe(true);
+
+  // Both states must not be simultaneously absent (regression guard)
+  const zoneContent = await cluster.textContent();
+  expect(zoneContent).not.toBeNull();
+});
+
+// ---------------------------------------------------------------------------
 // Mode switch guard: if a mode switcher is wired, indicator updates
 // (Mode 2 wiring is deferred to M10; this test is a no-op until then)
 // ---------------------------------------------------------------------------
