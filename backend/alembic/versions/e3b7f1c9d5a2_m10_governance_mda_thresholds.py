@@ -47,7 +47,7 @@ def upgrade() -> None:
             'lte',
             'WARNING',
             'Democratic quality floor ≤ 0.70 (V-Dem LDI) — electoral autocracy risk zone. Governance deterioration below this level is associated with self-reinforcing democratic backsliding.',
-            'Bermeo (2016): On Democratic Backsliding. JoD 27(1):5–19. V-Dem v13 time-series cross-referenced against regime transition dates across 60 sovereign debt crisis episodes (1980–2020). Threshold 0.70 = 25th-pct observed LDI at onset of confirmed backsliding trajectories.',
+            'Bermeo (2016): On Democratic Backsliding. Journal of Democracy 27(1), pp. 5-19. V-Dem v13 time-series cross-referenced against regime transition dates across 60 sovereign debt crisis episodes (1980-2020). Threshold 0.70 = 25th-pct observed LDI at onset of confirmed backsliding trajectories.',
             5,
             'Democratic backsliding below V-Dem LDI 0.70 has historically been followed by multi-year institutional erosion. Recovery to pre-crisis LDI levels averaged 8 years in post-2000 sovereign debt crisis episodes (V-Dem v13 annual series).'
         )
