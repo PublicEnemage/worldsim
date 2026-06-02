@@ -560,19 +560,13 @@ async def _compute_trajectory_framework_point(
 
     Dispatch logic:
     - ecological: boundary_proximity strategy regardless of entity count.
-    - governance: always null, scoring_basis "percentile_rank".
+    - governance: normalized_absolute strategy regardless of entity count
+      (ADR-005 Amendment 4 — M10 promotion, Issue #556). WGI/V-Dem scores are
+      country-level absolutes; percentile rank is not meaningful for a single entity.
     - financial / human_development (single-entity): normalized_absolute strategy,
       min confidence_tier = NORMALIZED_ABSOLUTE_MIN_TIER.
     - financial / human_development (multi-entity): percentile_rank strategy.
     """
-    if framework == "governance":
-        return TrajectoryFrameworkPoint(
-            framework=framework,
-            composite_score=None,
-            scoring_basis="percentile_rank",
-            confidence_tier=5,
-        )
-
     if framework == "ecological":
         context: dict[str, Any] = {
             "boundary_constants": await _fetch_active_boundary_constants(
@@ -587,6 +581,27 @@ async def _compute_trajectory_framework_point(
             composite_score=str(score) if score is not None else None,
             scoring_basis="boundary_proximity",
             confidence_tier=2,
+        )
+
+    # governance — normalized_absolute regardless of entity count (ADR-005 Amendment 4).
+    if framework == "governance":
+        score = _normalized_absolute_strategy(
+            entity_indicators, all_entity_attrs, framework, {}
+        )
+        indicator_min_tier = min(
+            (
+                qty.confidence_tier
+                for qty in entity_indicators.values()
+                if (qty.measurement_framework or "financial") == framework
+            ),
+            default=_NORMALIZED_ABSOLUTE_MIN_TIER,
+        )
+        tier = max(indicator_min_tier, _NORMALIZED_ABSOLUTE_MIN_TIER)
+        return TrajectoryFrameworkPoint(
+            framework=framework,
+            composite_score=str(score) if score is not None else None,
+            scoring_basis="normalized_absolute",
+            confidence_tier=tier,
         )
 
     # financial or human_development
@@ -646,11 +661,11 @@ async def get_trajectory(
     root (not per-step). In M9, mda_floors contains at most one entry:
     ecological WARNING at floor_value=1.0 when EcologicalModule is active.
 
-    Composite score dispatch (Issue #458, CM consultation 2026-05-23):
+    Composite score dispatch (Issue #458, CM consultation 2026-05-23; ADR-005 Amendment 4):
     - Single-entity: financial/HD use normalized_absolute; ecological uses
-      boundary_proximity; governance is always null.
+      boundary_proximity; governance uses normalized_absolute (WGI/V-Dem are country absolutes).
     - Multi-entity: financial/HD use percentile_rank; ecological uses
-      boundary_proximity; governance is always null.
+      boundary_proximity; governance uses normalized_absolute (entity count irrelevant).
 
     step_significance is sourced from scenarios.configuration->>'step_metadata'
     JSONB (ADR-010 Decision 7). Keys are 1-based step index strings. Absent key
@@ -1075,10 +1090,8 @@ async def list_snapshots(
 # GET /scenarios/{scenario_id}/measurement-output — ADR-005 Decision 2
 # ---------------------------------------------------------------------------
 
-_UNIMPLEMENTED_FRAMEWORKS = {"governance"}
-_UNIMPLEMENTED_NOTES = {
-    "governance": "Governance module not yet implemented — see module-capability-registry.md",
-}
+# Governance promoted to production in M10 per ADR-005 Amendment 4 (Issue #556).
+_UNIMPLEMENTED_FRAMEWORKS: set[str] = set()
 # ADR-005 Amendment 3 Decision M8-1 mandatory note template — must appear on every
 # ecological FrameworkOutput. {n_indicators} is the count of active *_proximity
 # indicators at query time. Non-compliance is an ADR violation.
@@ -1103,7 +1116,9 @@ _SINGLE_ENTITY_NOTE = (
 )
 # ADR-005 Amendment 3 Decision M8-2: ecological is exempt from is_single_entity guard
 # because boundary proximity is physically meaningful for a single entity.
-_SINGLE_ENTITY_GUARD_EXEMPT_FRAMEWORKS: frozenset[str] = frozenset({"ecological"})
+# Governance exempt per ADR-005 Amendment 4 — normalized_absolute is meaningful
+# for single entities (WGI/V-Dem scores are country-level, not relative to peers).
+_SINGLE_ENTITY_GUARD_EXEMPT_FRAMEWORKS: frozenset[str] = frozenset({"ecological", "governance"})
 # ADR-005 Amendment 3 Decision M8-3: frameworks validated for percentile-rank composite.
 # Governance is absent (M9 deferred — Decision M8-4). Unregistered frameworks fall
 # through to percentile rank with a [SIM-INTEGRITY] WARNING.
@@ -1302,6 +1317,21 @@ SINGLE_ENTITY_REFERENCE_RANGES: dict[str, dict[str, Any]] = {
         "high": Decimal("1.00"),
         "direction": "higher_better",
     },
+    # Governance indicators — ADR-005 Amendment 4 promotion (Issue #556).
+    # rule_of_law_percentile: WGI percentile rank [0, 100]; higher = better governance.
+    # Reference range covers the full WGI percentile span; normalization maps to [0, 1].
+    "rule_of_law_percentile": {
+        "low": Decimal("0"),
+        "high": Decimal("100"),
+        "direction": "higher_better",
+    },
+    # democratic_quality_score: V-Dem Liberal Democracy Index [0, 1]; higher = better.
+    # Already in unit interval; reference range is the full LDI scale.
+    "democratic_quality_score": {
+        "low": Decimal("0"),
+        "high": Decimal("1"),
+        "direction": "higher_better",
+    },
 }
 
 
@@ -1351,10 +1381,11 @@ def _normalized_absolute_strategy(
     return (sum(scores) / Decimal(len(scores))).quantize(Decimal("0.0001"))
 
 
-# Registered strategies keyed by framework string. M9 governance strategy is added
-# in ADR-005 Amendment 4 when GovernanceModule promotion criteria are met (Decision M8-4).
+# Registered strategies keyed by framework string.
+# Governance registered here per ADR-005 Amendment 4 — M10 promotion (Issue #556).
 _COMPOSITE_STRATEGIES: dict[str, CompositeStrategy] = {
     "ecological": _boundary_proximity_strategy,
+    "governance": _normalized_absolute_strategy,
 }
 _DEFAULT_COMPOSITE_STRATEGY: CompositeStrategy = _percentile_rank_strategy
 
@@ -1432,8 +1463,9 @@ async def get_measurement_output(
     CODING_STANDARDS.md §measurement_framework Tagging). Composite score dispatch
     is framework-specific: ecological uses boundary proximity normalization [0.0, 2.0]
     (ADR-005 Amendment 3 Decision M8-3); financial and human_development use mean
-    percentile rank [0.0, 1.0]; governance returns null (deferred to M9, Decision M8-4).
-    Ecological is exempt from the single-entity composite suppression guard (Decision M8-2).
+    percentile rank [0.0, 1.0]; governance uses normalized_absolute [0.0, 1.0] (ADR-005
+    Amendment 4 — M10 promotion, Issue #556). Ecological and governance are exempt from the
+    single-entity composite suppression guard (Decision M8-2, Amendment 4).
     ia1_disclosure is always IA1_CANONICAL_PHRASE. ADR-005 Decision 2, Amendment 3.
 
     Query params:
@@ -1507,19 +1539,6 @@ async def get_measurement_output(
             a.consecutive_breach_steps >= 1 for a in fw_alerts
         )
 
-        if fw in _UNIMPLEMENTED_FRAMEWORKS:
-            outputs[fw] = FrameworkOutput(
-                framework=fw,
-                entity_id=entity_id,
-                timestep=timestep_str,
-                indicators={},
-                composite_score=None,
-                mda_alerts=fw_alerts,
-                has_below_floor_indicator=has_below_floor,
-                note=_UNIMPLEMENTED_NOTES[fw],
-            )
-            continue
-
         indicators = {
             k: v.model_copy(update={"confidence_tier": effective_tier(v.confidence_tier, step)})
             for k, v in target_attrs.items()
@@ -1534,12 +1553,14 @@ async def get_measurement_output(
             )
         # ADR-005 Amendment 3 Decision M8-1: ecological note is mandatory regardless of
         # composite_score; {n_indicators} counts active *_proximity attributes.
+        # ADR-005 Amendment 4: governance is also exempt — normalized_absolute is
+        # meaningful for a single entity; the single-entity note must not be applied.
         if fw == "ecological":
             n_indicators = sum(1 for k in indicators if k.endswith("_proximity"))
             note: str | None = _ECOLOGICAL_MANDATORY_NOTE_TEMPLATE.format(
                 n_indicators=n_indicators
             )
-        elif is_single_entity:
+        elif is_single_entity and fw not in _SINGLE_ENTITY_GUARD_EXEMPT_FRAMEWORKS:
             note = _SINGLE_ENTITY_NOTE
         else:
             note = None
