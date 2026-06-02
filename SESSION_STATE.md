@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-02 (PR #624 merged — #615 closed; Demo 3 readiness gate COMPLETE — all three gate items closed #615/#616/#617)**
+**Last updated: 2026-06-02 (PR #626 merged — #376/#377 closed; DEMO-007/#348 + DEMO-009/#350 closed; #345/DEMO-004 data precondition noted)**
 **Current milestone:** M10 — Engine Integrity and Instrument Delivery (M9 formally closed; M10 active)
 
 ---
@@ -76,12 +76,13 @@ M9 formally closed. Issue #213 (M9 Exit Checklist) closed 2026-05-24. M10 milest
 
 ## Open PRs
 
-No open PRs — board clear as of 2026-06-02.
+No open PRs — board clear as of 2026-06-02 (post PR #626 merge).
 
 ## Recently Merged PRs (last 5)
 
 | PR | Title | Date |
 |---|---|---|
+| #626 | test(e2e): demo advancement flow and legibility regression guards (closes #376, #377) | 2026-06-02 |
 | #624 | fix(fixture): Argentina Demo 3 — emergency_declaration at step 2 triggers governance MDA (closes #615) | 2026-06-02 |
 | #622 | fix(frontend): Zone 1D ecological boundary annotation + AttributeSelector display names (closes #616, #617) | 2026-06-02 |
 | #618 | docs(demo): Demo 3 IR review — v0.10 Argentina + instrument cluster (closes #347 DEMO-006) | 2026-06-02 |
@@ -204,6 +205,8 @@ No open PRs — board clear as of 2026-06-02.
 | #615 ✅ | fix(fixture): Argentina Demo 3 — verify MDA alerts fire at step 2+; adjust governance seed if floor does not breach | **Closed 2026-06-02** — PR #624 merged. `emergency_declaration` added at step 2 (state of siege, December 19 2001 — concurrent with sovereign default). GovernanceModule one-step lag: processed at step 3, reducing `democratic_quality_score` by 0.05 (Bermeo 2016 elasticity). Score path: 0.71 → 0.715 (step 2, imf effect) → **0.665** (step 3) ≤ 0.70 floor → MDA WARNING fires at step 3. Three new regression tests including `test_build_argentina_demo_scenario_governance_mda_breach_math` (elasticity arithmetic gate). Wrong comment about base scheduled_inputs also corrected. |
 | #616 ✅ | fix(frontend): Zone 1D ecological boundary annotation — "(1.0 = boundary)" sub-label or tooltip | **Closed 2026-06-02** — PR #622 merged. `"1.0 = boundary"` sub-label (9px, muted) added below "Ecological" row label in `FourFrameworkZone1D.tsx`. Ecological row only. `data-testid="ecological-boundary-note"` for future E2E assertion. |
 | #617 ✅ | fix(frontend): AttributeSelector display names — add getIndicatorDisplayNameAny(), wire into AttributeSelector.tsx | **Closed 2026-06-02** — PR #622 merged. `getIndicatorDisplayNameAny(key)` added to `indicatorDisplayNames.ts` (iterates all framework blocks, title-case fallback). Wired into `AttributeSelector.tsx` — dropdown now shows "GDP Growth (%, FLOW)" instead of "gdp_growth (%, FLOW)". |
+| #376 ✅ | test(e2e): Playwright demo advancement flow test — scenario advance, choropleth change, MDA accumulation, radar legibility | **Closed 2026-06-02** — PR #626 merged. `demo-advancement-flow.spec.ts`: 5 tests at 1440×900 — all four Zone 1 instruments live at every step; `choropleth-map` `data-step` attribute increments 0→1→2→3 (DEMO-001 guard); Zone 1B MDA panel live/non-blank at every step (DEMO-004 guard); Zone 1D framework scores non-empty at final step; advance button disabled exactly at step 3 (no overshoot). `ChoroplethMap.tsx`: `data-testid="choropleth-map"` + `data-step={currentStep ?? 0}` added to outer container. |
+| #377 ✅ | test(e2e): legibility assertions — minimum font size, non-truncation, visibility for all demo components | **Closed 2026-06-02** — PR #626 merged. `demo-legibility.spec.ts`: 6 tests at 1440×900 — Zone 1 instrument bounding boxes non-zero (DEMO-002/003/005/006 guard); Zone 1C PMM value rendered ≥ 20px; Zone 1D framework labels ≥ 10px and not overflow-clipped; `ecological-boundary-note` visible with "1.0 = boundary" text (#616 regression guard); null composite rows carry dashed left border, live rows carry solid border (DEMO-006 guard); Zone 1B MDA text not overflow-clipped (DEMO-003 guard). |
 
 ---
 
@@ -265,6 +268,7 @@ All Horizon:Immediate issues are now closed. M8 feature-complete.
 
 | Decision | Rationale | Date |
 |---|---|---|
+| DEMO issue dispositions — #348/DEMO-007 + #350/DEMO-009 closed; #345/DEMO-004 data precondition noted (2026-06-02) | #348 (DEMO-007, "boundary reference absent") closed — resolved by PR #622 (#616: `ecological-boundary-note` span; regression-guarded by `demo-legibility.spec.ts` in PR #626). #350 (DEMO-009, "attribute selector raw field names") closed — resolved by PR #622 (#617: `getIndicatorDisplayNameAny()` wired). #345 (DEMO-004, "alerts appear identical across steps") left open with data-precondition comment: PR #624 (#615) provides Argentina governance alert variation at step 3; the test gate is `demo-advancement-flow.spec.ts` test 3 (Zone 1B live/non-blank). Close #345 after a full demo run-through confirms visual accumulation end-to-end. #342/343/346/349 remain open (not addressed by this session's PRs). | 2026-06-02 |
 | Demo 3 readiness gate COMPLETE — PRs #622 + #624 (2026-06-02) | All three IR-M10 gate items closed: #615 (governance MDA breach — `emergency_declaration` at step 2, GovernanceModule one-step lag → score 0.665 at step 3 ≤ 0.70 floor); #616 (Zone 1D ecological annotation — "1.0 = boundary" sub-label); #617 (AttributeSelector display names — `getIndicatorDisplayNameAny()`). Demo 3 is presentation-ready. Root cause of #615: fixture comment falsely claimed `emergency_declaration` was already in base scheduled_inputs; it was not; `default_declaration` is not subscribed by GovernanceModule. | 2026-06-02 |
 | Demo 3 IR review complete — PR #618 (2026-06-02) | IR review at `docs/demo/m10/reviews/2026-06-02-v0.10-demo3-ir.md`. All six M9 IR findings (IR-001–IR-006) confirmed closed by M10 PRs. DEMO issue re-triage: #347 (DEMO-006) CLOSED — governance live; #342 (DEMO-001) Critical→Minor — Zone 1A is primary instrument; #343 (DEMO-002) Substantially resolved; #346 (DEMO-005) Significant→Minor — Zone 1D covers it. Three new findings: IR-M10-001 (Argentina MDA accumulation uncertainty → #615), IR-M10-002 (ecological Zone 1D annotation gap → #616), IR-M10-003 (AttributeSelector raw field names → #617). Demo 3 readiness gate: #615/#616/#617 must close before Demo 3 presentation. Positive: all four Zone 1 instruments live, governance live (4th axis solid, no longer dashed), Platform Principle demonstrated. | 2026-06-02 |
 | ARCH-REVIEW-006 complete — Issue #577 scope review; 11 child issues filed (#603–#614) | Architecture Review Facilitator TARGETED review produced 16 blindspots across US-039/042/043/048. One Immediate blocker: CM vocabulary mapping standard (#603, AR-006-B-007) must be authored before US-043 implementation begins. 11 GitHub Issues filed as Issue #577 children (#603–#614) with tracking comment on #577. Zone 1/2 bidirectional coupling atom (AR-006-B-011, #609) and Zone 2 multi-view model (AR-006-B-012, #610) are the two architectural pre-decisions for US-048. Branch-and-recompute CE assessment (AR-006-B-001, #604) is the prerequisite for US-039 M12 scoping. `docs/architecture/reviews/ARCH-REVIEW-006-milestone10.md`. | 2026-06-02 |
