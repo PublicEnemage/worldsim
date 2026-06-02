@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-01 (PR #578 merged — Issue #550 MV-002 complete; PRs #573 + #578 merged; Issues #574–#577 filed — vision-to-architecture bridge epic; board clear)**
+**Last updated: 2026-06-02 (PR #585 merged — Issue #556 GovernanceModule promoted (ADR-005 Amendment 4); PRs #583/#584 merged — IR-003/#497 and IR-004/#498; board clear)**
 **Current milestone:** M10 — Engine Integrity and Instrument Delivery (M9 formally closed; M10 active)
 
 ---
@@ -76,17 +76,17 @@ M9 formally closed. Issue #213 (M9 Exit Checklist) closed 2026-05-24. M10 milest
 
 ## Open PRs
 
-No open PRs — board clear as of 2026-06-01.
+No open PRs — board clear as of 2026-06-02.
 
 ## Recently Merged PRs (last 5)
 
 | PR | Title | Date |
 |---|---|---|
+| #585 | feat(governance): GovernanceModule promoted to live axis — ADR-005 Amendment 4 (closes #556, #499) | 2026-06-02 |
+| #584 | feat(frontend): persistent scenario state + demonstrative entry — localStorage + URL param (closes #497) | 2026-06-02 |
+| #583 | feat(frontend): default step labels from start year — IR-004 (closes #498) | 2026-06-02 |
 | #578 | docs(mv): MV-002 hardware validation complete — ProBook i5-8265U results recorded, Issue #550 closed | 2026-06-01 |
 | #573 | docs(vision): intellectual foundations + founding document recommendations — May 2026 brainstorming session | 2026-06-01 |
-| #570 | test(perf)+process(nm): MV-002 readiness — trajectory-render mark, advance-step-btn testid, NM-027, QA/FA working agreements, CI playwright-e2e fix (closes #568, #571) | 2026-06-01 |
-| #567 | chore(state): SESSION_STATE.md — Issue #514 complete; Python 3.13; agents #523/#524 (#567) | 2026-05-31 |
-| #566 | docs(benchmarks): Phase 1 engine baseline results — Issue #514 closed | 2026-05-31 |
 | #565 | feat(benchmark): Phase 1 engine baseline benchmark script — Issue #514 | 2026-05-31 |
 | #564 | chore(python): Python 3.12 → 3.13 in pyproject.toml, .python-version, ci.yml, CONTRIBUTING.md | 2026-05-31 |
 | #551 | process(exit): Issue Disposition Audit SOP — milestone exit cleanup codified (NM-026) | 2026-05-29 |
@@ -182,6 +182,14 @@ No open PRs — board clear as of 2026-06-01.
 | Issue | Title | Status / Gate |
 |---|---|---|
 | #550 ✅ | test(e2e): MV-002 hardware render baseline — TrajectoryView ≤ 100ms on ProBook | **Closed 2026-06-01** — AC-007 ✅ PASSED ≤ 100ms (4× throttle active), AC-008 ✅ PASSED ≤ 100ms (4× throttle active). Machine: HP ProBook i5-8265U, 8 GiB RAM, 4 cores, Windows 11. PR #578. |
+| #495 | feat(frontend): wire mda_alerts into MDA Alert Panel — Zone 1B live data (IR-001 Critical) | **Unblocked** — Zone 1B component exists; endpoint returns alerts; wiring not yet done. |
+| #496 | feat(api): PMM live computation backend endpoint (IR-002) | **Unblocked** — PMM widget exists (null placeholder); endpoint not yet built. |
+| #497 ✅ | feat(frontend): persistent scenario state + demonstrative entry — localStorage + URL param (IR-003) | **Closed 2026-06-02** — PR #584 merged. localStorage `worldsim_last_scenario` key; URL `?scenario=` param takes precedence. |
+| #498 ✅ | feat(frontend): default step labels from start year (IR-004) | **Closed 2026-06-02** — PR #583 merged. Start year input in create form; `start_date` passed to backend. |
+| #499 ✅ | fix(frontend): remove governance "(in validation)" annotation (IR-005) | **Closed 2026-06-02** — PR #585 merged as part of Issue #556 (governance promotion). |
+| #500 ✅ | feat(frontend): Zone 1D loading state skeleton (IR-006) | **Closed** (prior session) — PR #582 merged. |
+| #553 | feat(fixture): Argentina 2000–2002 second country fixture — IMF debt crisis (Demo 3) | **Pending** — CM data availability check is the blocking prerequisite. |
+| #556 ✅ | feat(governance): GovernanceModule M10 promotion — ADR-005 Amendment 4 | **Closed 2026-06-02** — PR #585 merged. All five criteria met. |
 | #569 | test(e2e): AC-009 re-run — Mode 3 advance-step → render ≤ 100ms (hardware baseline) | Deferred M12 — Mode 3 not yet built. Blocked by Mode 3 implementation. |
 | #574 | Epic: Vision-to-Architecture Bridge — personas → user experiences → technical concepts | **Filed 2026-06-01** — Three child issues: #575 (personas extension, second ring of actors), #576 (user experiences for second ring), #577 (technical concepts gap analysis). Sequencing: #575 → #576 → #577. No active horizon assignment yet — EL to prioritize M10 or M11. |
 
@@ -355,12 +363,18 @@ All Horizon:Immediate issues are now closed. M8 feature-complete.
 - Anomaly detection: opt-in, Modes 1+2 only, TSC sign-off before production, governance indicators permanently excluded
 - Panel review artifact: `docs/adr/reviews/ADR-007-panel-review.md`. Mermaid diagram: `docs/architecture/ADR-007-method-selection-flowchart.mmd`
 
-**ADR-005 Amendment 4 — applied ✅ (PR #509). GovernanceModule formally deferred to M10.**
+**ADR-005 Amendment 4 — GovernanceModule PROMOTED ✅ (PR #585, Issue #556). Governance axis live as of M10.**
 
-- Five promotion criteria all Not Met at M9 exit. Target: M10.
-- M9 Governance Normalization Obligation: audit each of five indicators for absolute threshold equivalents before specifying composite score strategy.
-- M8-5 tooltip obligation: update `(Target: M9)` → `(Target: M10)` before first GovernanceModule PR.
-- ADR-005 License renewed: Valid Until Milestone 10.
+- All five promotion criteria met at M10. Governance composite live via `normalized_absolute_strategy`.
+- `SINGLE_ENTITY_GUARD_EXEMPT_FRAMEWORKS = frozenset({"ecological", "governance"})` — governance exempt from single-entity null suppression and single-entity note.
+- `_UNIMPLEMENTED_FRAMEWORKS = set()` — empty; governance removed at promotion.
+- Three elasticities: `gdp_growth_change→rule_of_law_percentile` (-0.08), `imf_program_acceptance→democratic_quality_score` (+0.005), `emergency_declaration→democratic_quality_score` (-0.05; Bermeo 2016).
+- MDA threshold seeded: `MDA-GOV-DEMOCRACY-FLOOR` — `democratic_quality_score ≤ 0.70 → WARNING` (migration `e3b7f1c9d5a2`).
+- Greece M10 demo fixture: WGI 2010 rule-of-law seed (60.0), V-Dem 2010 LDI seed (0.72), `emergency_declaration` at step 5 → MDA alert fires step 6.
+- `EmergencyInstrument.EMERGENCY_DECLARATION = "emergency_declaration"` added to enum.
+- `FourFrameworkZone1D.tsx`: `(in validation)` annotation removed (IR-005 resolved).
+- `greenlet==3.1.1` added to requirements.txt (SQLAlchemy async on Python 3.13 CI).
+- Promotion gate tests in `test_measurement_output.py` removed; replaced by backtesting integration test.
 
 **ADR-001 + ADR-002 — renewed ✅ (PR #510). Valid Until Milestone 10.**
 
@@ -381,7 +395,7 @@ All Horizon:Immediate issues are now closed. M8 feature-complete.
 **M8 ecological backend — merged ✅ (PR #324). Implements Issues #312, #313, #314:**
 - `_compute_composite_score` now async with three-branch dispatch; ecological uses `_boundary_proximity_strategy`
 - `_ECOLOGICAL_MANDATORY_NOTE_TEMPLATE` with `{n_indicators}` slot
-- `_SINGLE_ENTITY_GUARD_EXEMPT_FRAMEWORKS = frozenset({"ecological"})` — ecological not suppressed for single-entity scenarios
+- `_SINGLE_ENTITY_GUARD_EXEMPT_FRAMEWORKS = frozenset({"ecological", "governance"})` — both exempt from single-entity null suppression (governance added M10 PR #585)
 - Migrations: `c1a4e7f2d9b3` (confidence_tier), `d2b5f8a3e6c4` (ecological MDA thresholds)
 - EcologicalModule: stock-path proximity computation from `entity.attributes`; temporal guards per `effective_from`
 - `land_use_pressure_index` proximity uses `min(v, 2.0)` — no division by 0.25 (double-normalization prevention)
