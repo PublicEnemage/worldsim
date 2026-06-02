@@ -2,8 +2,9 @@
  * ScenarioInstrumentCluster — composed Zone 1 cluster for App.tsx.
  *
  * Wires all four Zone 1 instruments into InstrumentCluster and connects
- * the Zustand atom to the trajectory API. Fetches trajectory when
- * scenarioId is set; keeps store current_step in sync with ScenarioControls.
+ * the Zustand atom to the trajectory API. Fetches trajectory after each
+ * step advance (currentStep > 0); skips step 0 where the API returns 409.
+ * Keeps store current_step in sync with ScenarioControls.
  *
  * Trajectory parsing: the API returns frameworks as an array; the store
  * expects Record<string, TrajectoryFrameworkPoint>. composite_score arrives
@@ -200,9 +201,10 @@ export function ScenarioInstrumentCluster({
     }
   }, [currentStep]);
 
-  // Fetch trajectory when scenario changes
+  // Fetch trajectory after each step advance.
+  // Skipped at step 0 — no snapshots exist before the first advance (API returns 409).
   useEffect(() => {
-    if (!scenarioId) return;
+    if (!scenarioId || currentStep === 0) return;
     let cancelled = false;
 
     setTrajectoryLoading(true);
@@ -227,7 +229,7 @@ export function ScenarioInstrumentCluster({
     return () => {
       cancelled = true;
     };
-  }, [scenarioId]);
+  }, [scenarioId, currentStep]);
 
   // Sync PMM from trajectory step data when current step changes (Issue #496).
   // PMM is pre-computed per step by the backend; no additional fetch needed.

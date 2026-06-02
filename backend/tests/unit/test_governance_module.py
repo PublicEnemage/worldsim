@@ -97,7 +97,9 @@ def _imf_event(source_entity_id: str) -> object:
     return Event(
         event_id="test-imf-event",
         source_entity_id=source_entity_id,
-        event_type="imf_program_acceptance",
+        # EmergencyPolicyInput.to_events() emits "emergency_policy_{instrument.value}",
+        # so IMF_PROGRAM_ACCEPTANCE → "emergency_policy_imf_program_acceptance".
+        event_type="emergency_policy_imf_program_acceptance",
         affected_attributes={
             "imf_program_acceptance": Quantity(
                 value=Decimal("1.0"),
@@ -191,7 +193,9 @@ def _emergency_event(source_entity_id: str) -> object:
     return Event(
         event_id="test-emergency-event",
         source_entity_id=source_entity_id,
-        event_type="emergency_declaration",
+        # EmergencyPolicyInput.to_events() emits "emergency_policy_{instrument.value}",
+        # so EMERGENCY_DECLARATION → "emergency_policy_emergency_declaration".
+        event_type="emergency_policy_emergency_declaration",
         affected_attributes={
             "emergency_declaration": Quantity(
                 value=Decimal("1.0"),
@@ -278,11 +282,13 @@ def test_all_affected_attributes_have_governance_framework() -> None:
 
 
 def test_get_subscribed_events_matches_decision_6() -> None:
+    # Event types match EmergencyPolicyInput.to_events() output format:
+    # "emergency_policy_{instrument.value}" not the bare instrument name.
     expected = {
         "gdp_growth_change",
         "fiscal_policy_spending_change",
-        "imf_program_acceptance",
-        "emergency_declaration",
+        "emergency_policy_imf_program_acceptance",
+        "emergency_policy_emergency_declaration",
     }
     module = GovernanceModule()
     assert set(module.get_subscribed_events()) == expected
@@ -292,8 +298,8 @@ def test_subscribed_events_constant_matches_decision_6() -> None:
     expected = {
         "gdp_growth_change",
         "fiscal_policy_spending_change",
-        "imf_program_acceptance",
-        "emergency_declaration",
+        "emergency_policy_imf_program_acceptance",
+        "emergency_policy_emergency_declaration",
     }
     assert expected == _SUBSCRIBED_EVENTS
 

@@ -1296,19 +1296,20 @@ async def _fetch_active_boundary_constants(
     db_connection: asyncpg.Connection,
     scenario_timestep: datetime | str,
 ) -> dict[str, Decimal]:
-    """Return active boundary constants at simulation time from simulation_reference_constants.
+    """Return currently-known boundary constants from simulation_reference_constants.
 
-    Effective-at-simulation-time query per ADR-005 Amendment 3 Decision M8-6.
-    Returns constant_id → Decimal value for constants active at scenario_timestep.
+    Uses NOW() rather than scenario_timestep for the effective_from filter: planetary
+    boundaries are physical facts that predate their scientific definition date, so
+    retroactive backtesting must apply currently-known boundaries to historical data.
+    scenario_timestep is accepted for API compatibility but not used in the query.
     """
     rows = await db_connection.fetch(
         """
         SELECT constant_id, value
         FROM simulation_reference_constants
-        WHERE effective_from <= $1
-          AND (effective_through IS NULL OR effective_through >= $1)
+        WHERE effective_from <= NOW()
+          AND (effective_through IS NULL OR effective_through >= NOW())
         """,
-        scenario_timestep,
     )
     return {row["constant_id"]: Decimal(str(row["value"])) for row in rows}
 

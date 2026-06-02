@@ -97,22 +97,32 @@ _BOUNDARY_CONSTANT_EFFECTIVE_FROM: dict[str, datetime] = {
     "ECOLOGICAL_LAND_USE_PLANETARY_BOUNDARY_RATIO": datetime(2023, 9, 13, tzinfo=UTC),
 }
 
-# Maps base indicator key → (constant_id, is_pre_normalized, output_key, confidence_tier)
+# Maps base indicator key →
+#   (constant_id, is_pre_normalized, output_key, confidence_tier, retroactive)
 # is_pre_normalized=True: formula is min(v, 2.0) — indicator already boundary-relative.
 # is_pre_normalized=False: formula is min(v / boundary_value, 2.0).
 # confidence_tier = max(source_indicator_tier, boundary_constant_tier=2) per ADR-001 Amendment 1.
-_PROXIMITY_INDICATOR_CONFIG: dict[str, tuple[str, bool, str, int]] = {
+# retroactive=True: boundary may be applied to simulation timesteps before effective_from.
+#   Rationale: the CO2 350 ppm boundary is a physical threshold derived from pre-industrial
+#   concentrations — it predates its scientific publication (Rockström 2009). Retroactive
+#   backtesting against historical data is analytically valid.
+# retroactive=False: boundary is not applicable before effective_from.
+#   Rationale: the Richardson 2023 land-use boundary reflects new methodology not available
+#   for pre-2023 analysis.
+_PROXIMITY_INDICATOR_CONFIG: dict[str, tuple[str, bool, str, int, bool]] = {
     "co2_concentration_ppm": (
         "ECOLOGICAL_CO2_PLANETARY_BOUNDARY_PPM",
-        False,  # absolute-scale ppm — divide by 350
+        False,   # absolute-scale ppm — divide by 350
         "planetary_boundary_co2_proximity",
-        2,  # max(source=1, boundary=2) = 2
+        2,       # max(source=1, boundary=2) = 2
+        True,    # retroactive: physical threshold, valid for pre-2009 backtesting
     ),
     "land_use_pressure_index": (
         "ECOLOGICAL_LAND_USE_PLANETARY_BOUNDARY_RATIO",
-        True,  # already boundary-relative ratio — no division (ADR M8-6: no double-normalization)
+        True,    # already boundary-relative ratio — no division (ADR M8-6: no double-normalization)
         "planetary_boundary_land_use_proximity",
-        3,  # max(source=3, boundary=2) = 3
+        3,       # max(source=3, boundary=2) = 3
+        False,   # not retroactive: Richardson 2023 methodology, not valid for pre-2023 analysis
     ),
 }
 
@@ -130,10 +140,10 @@ def _compute_proximity_indicators(
     """
     result: dict[str, Quantity] = {}
 
-    for base_key, (constant_id, is_pre_normalized, output_key, confidence_tier) in \
+    for base_key, (constant_id, is_pre_normalized, output_key, confidence_tier, retroactive) in \
             _PROXIMITY_INDICATOR_CONFIG.items():
         effective_from = _BOUNDARY_CONSTANT_EFFECTIVE_FROM.get(constant_id)
-        if effective_from is not None and timestep < effective_from:
+        if effective_from is not None and not retroactive and timestep < effective_from:
             _log.warning(
                 "[SIM-INTEGRITY] Boundary constant '%s' not active at timestep=%r "
                 "(effective_from=%r) — skipping proximity for '%s'.",
