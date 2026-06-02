@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-02 (PR #587 merged — Issue #496 PMM live computation (IR-002); Zone 1C PMM widget live; board clear)**
+**Last updated: 2026-06-02 (PR #590 merged — Issue #553 Argentina Demo 3 closed; step_metadata in ScenarioConfigSchema; build_argentina_demo_scenario() live)**
 **Current milestone:** M10 — Engine Integrity and Instrument Delivery (M9 formally closed; M10 active)
 
 ---
@@ -82,6 +82,7 @@ No open PRs — board clear as of 2026-06-02.
 
 | PR | Title | Date |
 |---|---|---|
+| #590 | feat(fixture): Argentina Demo 3 — crisis arc with all four Zone 1 axes live (closes #553) | 2026-06-02 |
 | #587 | feat(zone-1c): PMM live computation — Issue #496 (IR-002) | 2026-06-02 |
 | #585 | feat(governance): GovernanceModule promoted to live axis — ADR-005 Amendment 4 (closes #556, #499) | 2026-06-02 |
 | #584 | feat(frontend): persistent scenario state + demonstrative entry — localStorage + URL param (closes #497) | 2026-06-02 |
@@ -188,7 +189,7 @@ No open PRs — board clear as of 2026-06-02.
 | #498 ✅ | feat(frontend): default step labels from start year (IR-004) | **Closed 2026-06-02** — PR #583 merged. Start year input in create form; `start_date` passed to backend. |
 | #499 ✅ | fix(frontend): remove governance "(in validation)" annotation (IR-005) | **Closed 2026-06-02** — PR #585 merged as part of Issue #556 (governance promotion). |
 | #500 ✅ | feat(frontend): Zone 1D loading state skeleton (IR-006) | **Closed** (prior session) — PR #582 merged. |
-| #553 | feat(fixture): Argentina 2000–2002 second country fixture — IMF debt crisis (Demo 3) | **Pending** — CM data availability check is the blocking prerequisite. |
+| #553 ✅ | feat(fixture): Argentina 2000–2002 second country fixture — IMF debt crisis (Demo 3) | **Closed 2026-06-02** — PR #590 merged. `build_argentina_demo_scenario()`: n_steps=4, EcologicalModule + GovernanceModule, NOAA MLO 2000 CO2 seed, WGI/V-Dem ARG 2000 governance seeds, step_metadata event labels (steps 1–3 SIGNIFICANT). `step_metadata` added to `ScenarioConfigSchema` (was being stripped by Pydantic on POST). Demo script at `backend/scripts/demo_argentina_2001_2002.py`. |
 | #556 ✅ | feat(governance): GovernanceModule M10 promotion — ADR-005 Amendment 4 | **Closed 2026-06-02** — PR #585 merged. All five criteria met. |
 | #569 | test(e2e): AC-009 re-run — Mode 3 advance-step → render ≤ 100ms (hardware baseline) | Deferred M12 — Mode 3 not yet built. Blocked by Mode 3 implementation. |
 | #574 | Epic: Vision-to-Architecture Bridge — personas → user experiences → technical concepts | **Filed 2026-06-01** — Three child issues: #575 (personas extension, second ring of actors), #576 (user experiences for second ring), #577 (technical concepts gap analysis). Sequencing: #575 → #576 → #577. No active horizon assignment yet — EL to prioritize M10 or M11. |
@@ -253,6 +254,7 @@ All Horizon:Immediate issues are now closed. M8 feature-complete.
 
 | Decision | Rationale | Date |
 |---|---|---|
+| Argentina Demo 3 complete — Issue #553 closed (PR #590) | `build_argentina_demo_scenario()` added to `tests/fixtures/argentina_2001_2002_scenario.py` following the `build_greece_demo_scenario()` pattern. Extends the 2-step backtesting base to 4 steps (2001–2004 arc through Kirchner recovery). EcologicalModule enabled with CO2 seed 369.5 ppm (NOAA MLO 2000); GovernanceModule enabled with rule_of_law_percentile=33.2 (WGI ARG 2000) and democratic_quality_score=0.71 (V-Dem LDI ARG 2000). step_metadata event labels: step 1 "Zero Deficit Plan / Blindaje" (SIGNIFICANT), step 2 "Default / Peso devaluation" (SIGNIFICANT), step 3 "Kirchner recovery begins" (SIGNIFICANT), step 4 ROUTINE. Latent bug fixed: `step_metadata` added as declared field to `ScenarioConfigSchema` in `app/schemas.py` — field was already read by the trajectory endpoint from `cfg_raw` but was silently stripped by Pydantic on POST. Demo walkthrough script at `backend/scripts/demo_argentina_2001_2002.py`. 21 new unit tests (51 total in `test_argentina_backtesting_fixtures.py`). | 2026-06-02 |
 | NM-027 — AC-007/AC-008 silent no-ops; QA Lead + FA process improvements (PR #570, closes #568, #571) | AC-007 (trajectory-render performance mark) and AC-008 (advance-step-btn testid) were silent no-ops for one full milestone. `TrajectoryView.tsx`: `useLayoutEffect` + `requestAnimationFrame` pattern fires `performance.measure("trajectory-render-initial", ...)` once per mount. `ScenarioControls.tsx`: `data-testid="advance-step-btn"` added to advance button. Four process findings encoded: QA-NM027-F1 (HORIZON skip audit extended to `if (value !== null)` guard pattern); QA-NM027-F2 (guarded tests must carry explicit implementation dependency record); FA-NM027-F1 (pre-PR checklist distinguishes structural vs behavioural ACs); FA-NM027-F2 (FA brief authorship standard — `[behavioural]` annotation required). Issue #550 (MV-002) unblocked. Issue #569 (M12 AC-009 re-run) open. | 2026-06-01 |
 | CI playwright-e2e fixed — system Chrome replaces CDN download (PR #570) | Five consecutive `playwright-e2e` cancellations traced to Playwright Chromium CDN delivering at ~40 KB/s on free-tier runner (~60-min download). Fix: `playwright.config.ts` uses `channel: "chrome"` (system-installed Google Chrome on ubuntu-latest runners — no download). `ci.yml`: removed cache + conditional install steps; kept only `npx playwright install-deps chromium` (fast apt-get, ~2 min). Timeout restored to 30 min. CI green on first run after fix. | 2026-06-01 |
 | Issue #514 complete — Phase 1 engine baseline benchmarks (PRs #565 + #566) | Script (`backend/scripts/benchmark_phase1.py`) and results document (`docs/architecture/engine-baseline-benchmarks-m10.md`) merged. Two machines measured: M1 Pro dev machine and ProBook (i5-8265U, 8 GiB, Windows 11). Key findings: (1) edge density, not entity count, drives propagation cost; (2) ProBook throughput ~5,750 MC runs/s — within interactive budget; (3) memory negligible (< 0.2 MiB at largest config); (4) no blocking constraint for ADR-009. Five findings documented for ADR-009 authoring. | 2026-05-31 |
