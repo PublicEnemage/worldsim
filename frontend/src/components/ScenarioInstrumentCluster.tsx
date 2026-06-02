@@ -19,7 +19,7 @@
  * exists yet; the PMM widget renders "—"). This is correct per ADR-008
  * Decision 6: null renders as "—" (instrument in validation).
  */
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { InstrumentCluster } from "./InstrumentCluster";
 import { MDAAlertPanelZone1B } from "./MDAAlertPanelZone1B";
 import { PMMWidgetZone1C } from "./PMMWidgetZone1C";
@@ -172,6 +172,11 @@ export function ScenarioInstrumentCluster({
 }: ScenarioInstrumentClusterProps) {
   const store = useScenarioStepStore();
 
+  // Fetch lifecycle state for Zone 1D loading/error display (IR-006).
+  // Local state — not Zustand — because this is fetch lifecycle, not simulation state.
+  const [trajectoryLoading, setTrajectoryLoading] = useState(false);
+  const [trajectoryError, setTrajectoryError] = useState(false);
+
   // Initialise store when scenario changes
   useEffect(() => {
     store.setScenario(scenarioId, stepCount, "MODE_1");
@@ -189,14 +194,23 @@ export function ScenarioInstrumentCluster({
     if (!scenarioId) return;
     let cancelled = false;
 
+    setTrajectoryLoading(true);
+    setTrajectoryError(false);
+
     fetch(`${API_BASE}/scenarios/${encodeURIComponent(scenarioId)}/trajectory`)
-      .then((res) => (res.ok ? (res.json() as Promise<RawTrajectoryResponse>) : null))
+      .then((res) => {
+        if (!res.ok) throw new Error(`trajectory fetch failed: ${res.status}`);
+        return res.json() as Promise<RawTrajectoryResponse>;
+      })
       .then((raw) => {
-        if (cancelled || !raw) return;
+        if (cancelled) return;
         store.setTrajectory(parseTrajectoryResponse(raw));
+        setTrajectoryLoading(false);
       })
       .catch(() => {
-        // Non-fatal — TrajectoryView renders empty state when trajectory is null
+        if (cancelled) return;
+        setTrajectoryLoading(false);
+        setTrajectoryError(true);
       });
 
     return () => {
@@ -234,7 +248,12 @@ export function ScenarioInstrumentCluster({
       entityIds={entityIds}
       mdaPanel={<MDAAlertPanelZone1B columnWidth={240} />}
       pmmWidget={<PMMWidgetZone1C />}
-      fourFramework={<FourFrameworkZone1D />}
+      fourFramework={
+        <FourFrameworkZone1D
+          isLoading={trajectoryLoading}
+          isError={trajectoryError}
+        />
+      }
     />
   );
 }

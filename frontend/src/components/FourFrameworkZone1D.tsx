@@ -80,10 +80,25 @@ export function getGovernanceAnnotation(
 
 interface FourFrameworkZone1DProps {
   "data-testid"?: string;
+  /** True while the trajectory fetch is in flight (IR-006). */
+  isLoading?: boolean;
+  /** True if the trajectory fetch failed (IR-006). */
+  isError?: boolean;
 }
+
+const CONTAINER_STYLE: React.CSSProperties = {
+  padding: "6px 10px",
+  boxSizing: "border-box",
+  height: "100%",
+  display: "flex",
+  flexDirection: "column",
+  justifyContent: "space-around",
+};
 
 export function FourFrameworkZone1D({
   "data-testid": dataTestId = "zone-1d-four-framework",
+  isLoading = false,
+  isError = false,
 }: FourFrameworkZone1DProps) {
   const { trajectory, current_step } = useScenarioStepStore();
 
@@ -91,18 +106,75 @@ export function FourFrameworkZone1D({
     (s) => s.step_index === current_step,
   ) ?? null;
 
+  // Loading skeleton: maintain DOM structure so framework-row testids are
+  // always present — existing E2E tests can locate them immediately (IR-006).
+  if (isLoading) {
+    return (
+      <div
+        data-testid={dataTestId}
+        data-current-step={current_step}
+        data-loading="true"
+        style={CONTAINER_STYLE}
+      >
+        {FRAMEWORK_ORDER.map((key) => {
+          const color = FRAMEWORK_COLORS[key as keyof typeof FRAMEWORK_COLORS] ?? "#888";
+          return (
+            <div
+              key={key}
+              data-testid={`framework-row-${key}`}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                borderLeft: `3px solid ${color}`,
+                paddingLeft: 6,
+                paddingTop: 3,
+                paddingBottom: 3,
+                borderLeftStyle: "dashed",
+                opacity: 0.35,
+              }}
+            >
+              <span style={{ fontSize: 11, color: "#555", fontWeight: 500 }}>
+                {FRAMEWORK_DISPLAY_LABELS[key] ?? key}
+              </span>
+              <span
+                data-testid={`framework-score-${key}`}
+                className="score-value--loading"
+                style={{ fontSize: 13, fontWeight: 700, color: "#bbb", fontVariantNumeric: "tabular-nums" }}
+              >
+                …
+              </span>
+            </div>
+          );
+        })}
+      </div>
+    );
+  }
+
+  // Error state: does not block the rest of the instrument cluster (IR-006).
+  if (isError) {
+    return (
+      <div
+        data-testid={dataTestId}
+        data-current-step={current_step}
+        data-error="true"
+        style={{ ...CONTAINER_STYLE, alignItems: "center", justifyContent: "center" }}
+      >
+        <span
+          data-testid="zone-1d-error"
+          style={{ fontSize: 11, color: "#aaa", fontStyle: "italic" }}
+        >
+          Data unavailable
+        </span>
+      </div>
+    );
+  }
+
   return (
     <div
       data-testid={dataTestId}
       data-current-step={current_step}
-      style={{
-        padding: "6px 10px",
-        boxSizing: "border-box",
-        height: "100%",
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "space-around",
-      }}
+      style={CONTAINER_STYLE}
     >
       {FRAMEWORK_ORDER.map((key) => {
         const point = currentStepData?.frameworks[key] ?? null;
@@ -126,7 +198,6 @@ export function FourFrameworkZone1D({
               paddingLeft: 6,
               paddingTop: 3,
               paddingBottom: 3,
-              // Dashed border treatment for null axes (DD-011 extension into Zone 1)
               borderLeftStyle: isNull ? "dashed" : "solid",
               opacity: isNull ? 0.6 : 1,
             }}

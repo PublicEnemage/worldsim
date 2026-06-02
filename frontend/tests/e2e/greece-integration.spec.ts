@@ -226,6 +226,39 @@ test("Greece step-through: cluster consistent at all 3 steps", async ({
 });
 
 // ---------------------------------------------------------------------------
+// IR-006: Zone 1D loading state — framework rows present immediately,
+// data-loading attribute absent once trajectory fetch completes.
+//
+// The loading state may be sub-second on fast connections. The test
+// verifies the post-loading invariant: data-loading is gone and all four
+// framework-row testids are present. The loading skeleton maintains DOM
+// structure so testids are discoverable throughout the fetch window.
+// ---------------------------------------------------------------------------
+
+test("Greece step-through: Zone 1D loading state resolves to data after scenario selection (IR-006)", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1280, height: 800 });
+  await page.goto("/");
+  await createAndSelectScenario(page, `GRC-ir006-${Date.now()}`);
+
+  const zone1d = page.locator('[data-testid="zone-1d-four-framework"]');
+  await expect(zone1d).toBeVisible({ timeout: 10_000 });
+
+  // After loading completes, data-loading attribute must be absent
+  await expect(zone1d).not.toHaveAttribute("data-loading", "true", {
+    timeout: 10_000,
+  });
+
+  // All four framework rows must be present (skeleton preserved them during fetch)
+  for (const fw of ["financial", "human_development", "ecological", "governance"]) {
+    await expect(
+      page.locator(`[data-testid="framework-row-${fw}"]`),
+    ).toBeVisible();
+  }
+});
+
+// ---------------------------------------------------------------------------
 // IR-001: Zone 1B shows data-driven alert state after step advance
 //
 // After advancing to step 1, Zone 1B must reflect real measurement-output
