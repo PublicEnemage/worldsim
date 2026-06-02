@@ -234,6 +234,7 @@ async def test_step_significance_absent_key_is_routine() -> None:
     conn2.fetch = AsyncMock(side_effect=[
         [snap],    # snapshot_rows
         [],        # policy_rows
+        [],        # mda_threshold_rows (PMM computation — Issue #496)
         [],        # boundary constants for step 1 ecological
     ])
 

@@ -15,9 +15,10 @@
  * output yet). Mapping from MDAAlert → Zone1BAlert derives framework from
  * the output record key and confidence_tier from the indicator record.
  *
- * PMM: pmm_value and pmm_direction remain null in M9 (no PMM endpoint
- * exists yet; the PMM widget renders "—"). This is correct per ADR-008
- * Decision 6: null renders as "—" (instrument in validation).
+ * PMM: pmm_value and pmm_direction are populated from per-step PMM data
+ * embedded in the trajectory response (Issue #496). Synced via useEffect
+ * on currentStep + store.trajectory. Null at step 0 or when no MDA
+ * thresholds have matching indicator data for the step.
  */
 import React, { useEffect, useState } from "react";
 import { InstrumentCluster } from "./InstrumentCluster";
@@ -48,6 +49,7 @@ interface RawTrajectoryStep {
   step_event_label: string | null;
   step_significance: "SIGNIFICANT" | "ROUTINE";
   frameworks: RawFrameworkPoint[];
+  pmm: { value: string; direction: string } | null;
 }
 
 interface RawTrajectoryResponse {
@@ -89,12 +91,21 @@ function parseTrajectoryResponse(raw: RawTrajectoryResponse): TrajectoryResponse
               : fw.scoring_basis,
         };
       }
+      const pmm =
+        step.pmm !== null && step.pmm !== undefined
+          ? {
+              value: parseFloat(step.pmm.value),
+              direction: step.pmm.direction as "up" | "down" | "flat",
+            }
+          : null;
+
       return {
         step_index: step.step_index,
         effective_from: step.effective_from,
         step_event_label: step.step_event_label,
         step_significance: step.step_significance,
         frameworks: frameworkMap,
+        pmm,
       };
     }),
   };
@@ -217,6 +228,22 @@ export function ScenarioInstrumentCluster({
       cancelled = true;
     };
   }, [scenarioId]);
+
+  // Sync PMM from trajectory step data when current step changes (Issue #496).
+  // PMM is pre-computed per step by the backend; no additional fetch needed.
+  useEffect(() => {
+    const traj = store.trajectory;
+    if (!traj || currentStep === 0) {
+      store.setPmmState(null, null);
+      return;
+    }
+    const step = traj.steps.find((s) => s.step_index === currentStep);
+    if (step?.pmm != null) {
+      store.setPmmState(step.pmm.value, step.pmm.direction);
+    } else {
+      store.setPmmState(null, null);
+    }
+  }, [currentStep, store.trajectory]);
 
   // Fetch MDA alerts from measurement-output after each step advance (IR-001).
   // Entity ID comes from the trajectory response already fetched above.

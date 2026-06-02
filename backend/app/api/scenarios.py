@@ -48,6 +48,7 @@ from app.schemas import (
     MDAAlert,
     MDAFloorRecord,
     MultiFrameworkOutput,
+    PMMRecord,
     QuantitySchema,
     RunSummaryResponse,
     ScenarioConfigSchema,
@@ -546,6 +547,105 @@ _TRAJECTORY_FRAMEWORKS = ["financial", "human_development", "ecological", "gover
 # Minimum confidence tier for the normalized_absolute strategy (CM-R3).
 _NORMALIZED_ABSOLUTE_MIN_TIER = 3
 
+# ---------------------------------------------------------------------------
+# PMM computation — Issue #496
+# ---------------------------------------------------------------------------
+
+_PMM_DIRECTION_THRESHOLD = Decimal("0.01")
+
+
+def _pmm_indicator_margin(
+    current_value: Decimal,
+    floor_value: Decimal,
+    approach_pct: Decimal,
+    comparison_operator: str,
+) -> Decimal:
+    """Compute [0, 1] margin for one indicator against its MDA threshold.
+
+    margin = 0.0 at or past the floor; 1.0 when outside the approach window.
+    The approach window is floor_value * approach_pct wide.
+
+    lte (lower-bound, breach when current <= floor):
+      safe zone: current > floor*(1+approach_pct)
+      approach zone: floor < current <= floor*(1+approach_pct)
+
+    gte (upper-bound, breach when current >= floor):
+      safe zone: current < floor*(1-approach_pct)
+      approach zone: floor*(1-approach_pct) <= current < floor
+    """
+    approach_span = floor_value * approach_pct
+    if approach_span <= Decimal("0"):
+        # Degenerate threshold — treat as binary.
+        if comparison_operator == "gte":
+            return Decimal("0") if current_value >= floor_value else Decimal("1")
+        return Decimal("0") if current_value <= floor_value else Decimal("1")
+
+    if comparison_operator == "gte":
+        if current_value >= floor_value:
+            return Decimal("0")
+        raw = (floor_value - current_value) / approach_span
+    else:
+        if current_value <= floor_value:
+            return Decimal("0")
+        raw = (current_value - floor_value) / approach_span
+
+    return min(Decimal("1"), raw)
+
+
+def _compute_pmm_for_step(
+    entity_id: str,
+    entity_attrs: dict[str, QuantitySchema],
+    mda_thresholds: list[dict[str, object]],
+    prev_pmm: Decimal | None,
+) -> PMMRecord | None:
+    """Compute PMM for one trajectory step from indicator values and MDA thresholds.
+
+    Only 'all'-scoped thresholds are evaluated — cohort-scoped thresholds
+    require cohort entity lookups not available at the trajectory level.
+    Returns None when no threshold has a matching indicator in entity_attrs.
+
+    Direction is computed relative to prev_pmm:
+      delta > _PMM_DIRECTION_THRESHOLD  → "up"
+      delta < -_PMM_DIRECTION_THRESHOLD → "down"
+      otherwise                         → "flat"
+    """
+    margins: list[Decimal] = []
+
+    for row in mda_thresholds:
+        entity_scope = str(row.get("entity_scope", "all"))
+        if entity_scope != "all" and entity_scope != entity_id:
+            continue
+
+        indicator_key = str(row["indicator_key"])
+        qty = entity_attrs.get(indicator_key)
+        if qty is None:
+            continue
+
+        with contextlib.suppress(Exception):
+            current = Decimal(qty.value)
+            floor_value = Decimal(str(row["floor_value"]))
+            approach_pct = Decimal(str(row["approach_pct"]))
+            op = str(row.get("comparison_operator", "lte"))
+            margins.append(_pmm_indicator_margin(current, floor_value, approach_pct, op))
+
+    if not margins:
+        return None
+
+    pmm_value = min(margins)
+
+    if prev_pmm is None:
+        direction = "flat"
+    else:
+        delta = pmm_value - prev_pmm
+        if delta > _PMM_DIRECTION_THRESHOLD:
+            direction = "up"
+        elif delta < -_PMM_DIRECTION_THRESHOLD:
+            direction = "down"
+        else:
+            direction = "flat"
+
+    return PMMRecord(value=str(pmm_value), direction=direction)
+
 
 async def _compute_trajectory_framework_point(
     entity_id: str,
@@ -657,9 +757,14 @@ async def get_trajectory(
     """Multi-step trajectory for all four measurement frameworks.
 
     Returns computed steps as a dense array. Each step carries per-framework
-    composite scores and optional policy inputs. mda_floors is at the response
-    root (not per-step). In M9, mda_floors contains at most one entry:
-    ecological WARNING at floor_value=1.0 when EcologicalModule is active.
+    composite scores, optional policy inputs, and PMM (Policy Maneuver Margin).
+    mda_floors is at the response root (not per-step). In M9, mda_floors
+    contains at most one entry: ecological WARNING at floor_value=1.0 when
+    EcologicalModule is active.
+
+    PMM computation (Issue #496): each step's pmm field is derived from all
+    'all'-scoped MDA thresholds in the database. PMM = min(indicator margins)
+    across thresholds with matching indicator data; null when no matching data.
 
     Composite score dispatch (Issue #458, CM consultation 2026-05-23; ADR-005 Amendment 4):
     - Single-entity: financial/HD use normalized_absolute; ecological uses
@@ -724,6 +829,16 @@ async def get_trajectory(
             {"input_type": r["input_type"], "input_data": input_data}
         )
 
+    # Fetch MDA thresholds once for PMM computation (Issue #496).
+    mda_threshold_rows = await conn.fetch(
+        """
+        SELECT indicator_key, entity_scope, floor_value, approach_pct, comparison_operator
+        FROM mda_thresholds
+        ORDER BY mda_id
+        """
+    )
+    mda_thresholds_for_pmm: list[dict[str, object]] = [dict(r) for r in mda_threshold_rows]
+
     # Collect all state dicts for MDA floor detection and composite score dispatch.
     all_step_states: list[dict[str, Any]] = []
     for snap in snapshot_rows:
@@ -753,6 +868,7 @@ async def get_trajectory(
         mda_floors = []
 
     steps: list[TrajectoryStep] = []
+    prev_pmm_value: Decimal | None = None
     for snap, state_dict in zip(snapshot_rows, all_step_states, strict=True):
         step_index: int = snap["step"]
         timestep = snap["timestep"]
@@ -807,6 +923,15 @@ async def get_trajectory(
             )
             framework_points.append(point)
 
+        pmm_record = _compute_pmm_for_step(
+            entity_id=entity_id,
+            entity_attrs=target_attrs,
+            mda_thresholds=mda_thresholds_for_pmm,
+            prev_pmm=prev_pmm_value,
+        )
+        if pmm_record is not None:
+            prev_pmm_value = Decimal(pmm_record.value)
+
         steps.append(
             TrajectoryStep(
                 step_index=step_index,
@@ -816,6 +941,7 @@ async def get_trajectory(
                 frameworks=framework_points,
                 policy_inputs=policy_by_step.get(step_index, []),
                 shock_events=[],
+                pmm=pmm_record,
             )
         )
 
