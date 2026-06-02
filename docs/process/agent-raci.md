@@ -563,6 +563,7 @@ finalized — not afterward.
 | `docs/frontend/` | FA | UD, Ar | UD consulted on design-affecting changes; Ar consulted on architectural decisions |
 | `docs/compliance/scan-registry.md` | PI | EL, Sr | PI executes scans and files entries; Sr consulted on security-relevant findings; EL informed of new entries |
 | `docs/compliance/` (other files) | EL | Sr, Ar | Sr consulted on security findings; Ar on compliance-architecture intersections |
+| `docs/demo/` | PM | CU, UD | PM owns demo preparation sequence and walkthrough documents; Customer Agent consulted on Layer 3 usability framing; UX Designer consulted when demo content involves zone or hierarchy decisions (UX-RULING-4). Demo preparation is a blocking exit requirement per milestone — a demo preparation issue must be filed and linked in the milestone exit checklist before the checklist closes. (Issue #537) |
 | `docs/roadmap/` | PM | EL, Ar | EL holds A on roadmap decisions; Ar consulted on milestone architecture |
 | `docs/data-sources/` | DA | DI (CM) | Chief Methodologist consulted on approved-source methodology changes |
 | `docs/standards/` | EL | Ar, PM | Standards documents; Ar and PM consulted on process-affecting changes |
