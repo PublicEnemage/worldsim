@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-02 (PR #585 merged — Issue #556 GovernanceModule promoted (ADR-005 Amendment 4); PRs #583/#584 merged — IR-003/#497 and IR-004/#498; board clear)**
+**Last updated: 2026-06-02 (PR #587 merged — Issue #496 PMM live computation (IR-002); Zone 1C PMM widget live; board clear)**
 **Current milestone:** M10 — Engine Integrity and Instrument Delivery (M9 formally closed; M10 active)
 
 ---
@@ -82,11 +82,11 @@ No open PRs — board clear as of 2026-06-02.
 
 | PR | Title | Date |
 |---|---|---|
+| #587 | feat(zone-1c): PMM live computation — Issue #496 (IR-002) | 2026-06-02 |
 | #585 | feat(governance): GovernanceModule promoted to live axis — ADR-005 Amendment 4 (closes #556, #499) | 2026-06-02 |
 | #584 | feat(frontend): persistent scenario state + demonstrative entry — localStorage + URL param (closes #497) | 2026-06-02 |
 | #583 | feat(frontend): default step labels from start year — IR-004 (closes #498) | 2026-06-02 |
 | #578 | docs(mv): MV-002 hardware validation complete — ProBook i5-8265U results recorded, Issue #550 closed | 2026-06-01 |
-| #573 | docs(vision): intellectual foundations + founding document recommendations — May 2026 brainstorming session | 2026-06-01 |
 | #565 | feat(benchmark): Phase 1 engine baseline benchmark script — Issue #514 | 2026-05-31 |
 | #564 | chore(python): Python 3.12 → 3.13 in pyproject.toml, .python-version, ci.yml, CONTRIBUTING.md | 2026-05-31 |
 | #551 | process(exit): Issue Disposition Audit SOP — milestone exit cleanup codified (NM-026) | 2026-05-29 |
@@ -183,7 +183,7 @@ No open PRs — board clear as of 2026-06-02.
 |---|---|---|
 | #550 ✅ | test(e2e): MV-002 hardware render baseline — TrajectoryView ≤ 100ms on ProBook | **Closed 2026-06-01** — AC-007 ✅ PASSED ≤ 100ms (4× throttle active), AC-008 ✅ PASSED ≤ 100ms (4× throttle active). Machine: HP ProBook i5-8265U, 8 GiB RAM, 4 cores, Windows 11. PR #578. |
 | #495 | feat(frontend): wire mda_alerts into MDA Alert Panel — Zone 1B live data (IR-001 Critical) | **Unblocked** — Zone 1B component exists; endpoint returns alerts; wiring not yet done. |
-| #496 | feat(api): PMM live computation backend endpoint (IR-002) | **Unblocked** — PMM widget exists (null placeholder); endpoint not yet built. |
+| #496 ✅ | feat(api): PMM live computation backend endpoint (IR-002) | **Closed 2026-06-02** — PR #587 merged. Per-step PMM embedded in trajectory response; frontend syncs to store on step change. |
 | #497 ✅ | feat(frontend): persistent scenario state + demonstrative entry — localStorage + URL param (IR-003) | **Closed 2026-06-02** — PR #584 merged. localStorage `worldsim_last_scenario` key; URL `?scenario=` param takes precedence. |
 | #498 ✅ | feat(frontend): default step labels from start year (IR-004) | **Closed 2026-06-02** — PR #583 merged. Start year input in create form; `start_date` passed to backend. |
 | #499 ✅ | fix(frontend): remove governance "(in validation)" annotation (IR-005) | **Closed 2026-06-02** — PR #585 merged as part of Issue #556 (governance promotion). |
@@ -375,6 +375,15 @@ All Horizon:Immediate issues are now closed. M8 feature-complete.
 - `FourFrameworkZone1D.tsx`: `(in validation)` annotation removed (IR-005 resolved).
 - `greenlet==3.1.1` added to requirements.txt (SQLAlchemy async on Python 3.13 CI).
 - Promotion gate tests in `test_measurement_output.py` removed; replaced by backtesting integration test.
+
+**PMM live computation — merged ✅ (PR #587, Issue #496 IR-002):**
+- `PMMRecord` schema: `value` (Decimal-as-str, [0,1]) + `direction` ("up"/"down"/"flat")
+- `TrajectoryStep.pmm: PMMRecord | None` — null when no 'all'-scoped MDA threshold has matching indicator
+- `_pmm_indicator_margin()`: [0,1] headroom for one threshold; approach window = `floor * approach_pct`; both `lte` (lower-bound) and `gte` (upper-bound) operators supported
+- `_compute_pmm_for_step()`: min-of-margins across all applicable thresholds; direction from prev-step delta vs ±0.01; cohort-scoped thresholds skipped; entity-scoped thresholds matched by exact entity_id
+- MDA thresholds fetched once per trajectory request (not per step)
+- Frontend: `useEffect([currentStep, store.trajectory])` in `ScenarioInstrumentCluster` syncs `pmm_value`/`pmm_direction` to Zustand store; `TrajectoryStep` store type extended with `pmm` field
+- 29 new unit tests: `backend/tests/unit/test_pmm_computation.py`
 
 **ADR-001 + ADR-002 — renewed ✅ (PR #510). Valid Until Milestone 10.**
 
