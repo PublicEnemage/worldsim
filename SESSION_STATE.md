@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-02 (PR #631 merged — #537/#620 closed; docs/demo/ RACI ownership added; docs/ux/standards.md created)**
+**Last updated: 2026-06-02 (PR #635 merged — #395/#512/#535/#536/#538/#539/#541/#543 closed; process docs, step annotation standard, Greece fixture, fidelity dashboard)**
 **Current milestone:** M10 — Engine Integrity and Instrument Delivery (M9 formally closed; M10 active)
 
 ---
@@ -76,12 +76,13 @@ M9 formally closed. Issue #213 (M9 Exit Checklist) closed 2026-05-24. M10 milest
 
 ## Open PRs
 
-No open PRs — board clear as of 2026-06-02 (post PR #631 merge).
+No open PRs — board clear as of 2026-06-02 (post PR #635 merge).
 
 ## Recently Merged PRs (last 5)
 
 | PR | Title | Date |
 |---|---|---|
+| #635 | fix(process): M10 immediate issues — process docs, ADR threshold, PR checklist, step annotation, fidelity labels (closes #395, #512, #535, #536, #538, #539, #541, #543) | 2026-06-02 |
 | #631 | docs(process): agent-raci docs/demo/ ownership + UX/UI standards document (closes #537, #620) | 2026-06-02 |
 | #629 | docs(process): demo preparation standard M10 update — screenshot naming, legibility gate, narration check (closes #379, #628) | 2026-06-02 |
 | #626 | test(e2e): demo advancement flow and legibility regression guards (closes #376, #377) | 2026-06-02 |
@@ -215,6 +216,14 @@ No open PRs — board clear as of 2026-06-02 (post PR #631 merge).
 | #379 ✅ | process: demo preparation standard as pre-condition — standard must exist and be read before demo assembly begins | **Closed 2026-06-02** — PR #629 merged. `demo-preparation-standard.md`: Step 5a (narration instrument check, UX-RULING-4), Step 5b (legibility Playwright gate), Step 6 amendment (screenshot naming in presentation order). Carried forward from M9. |
 | #628 ✅ | demo(script): update Demo 3 narration — route quantitative change to Zone 1A, not choropleth | **Closed 2026-06-02** — PR #629 merged. Child of #342, spawned from UX-RULING-4. `demo_argentina_2001_2002.py`: presenter instruction block in `_print_divergence_narrative` routes narrator to Zone 1A, not choropleth. |
 | #537 ✅ | process: docs/demo/ file ownership — PM Agent must be R on demo preparation sequence | **Closed 2026-06-02** — PR #631 merged. `docs/demo/` row added to `docs/process/agent-raci.md` File Ownership table. PM Agent is R; Customer Agent and UX Designer are C. Demo preparation is a blocking exit requirement per milestone. |
+| #535 ✅ | MILESTONE_RUNBOOK.md: update milestone definition table to reflect M9 exit | **Closed 2026-06-02** — PR #635 merged. Table expanded from M0–M4 (M1 marked "In Progress") to M0–M13 with current status. M0–M9 Complete, M10 Current, M11–M13 Upcoming. |
+| #536 ✅ | CONTRIBUTING.md: fix stale 'branch from develop' instruction | **Closed 2026-06-02** — PR #635 merged. All four "branch from develop" occurrences replaced with "branch from main". |
+| #538 ✅ | Document 'significant feature' threshold for ADR requirement | **Closed 2026-06-02** — PR #635 merged. Explicit ADR threshold criteria table added to `CODING_STANDARDS.md §ADR Requirements`: 8 rows covering new module/API/methodology (new ADR), interface changes (amendment), bug/visual/docs (no ADR). PM + Architect jointly own ambiguous calls. |
+| #539 ✅ | Add Customer Agent as 13th standing consultation obligation for UX-facing ADRs | **Closed 2026-06-02** — PR #635 merged. Architect → Customer Agent obligation added to `agent-raci.md §Standing Consultation Obligations`. Customer Agent added to UX-design ADR minimum panel (C — Layer 3 usability finding). |
+| #541 ✅ | PR template: require cross-ADR impact enumeration as a required field | **Closed 2026-06-02** — PR #635 merged. "ADRs Affected" section added to `CONTRIBUTING.md` PR template (step 8) and Pre-PR Checklist (§3) with table template. |
+| #543 ✅ | ADR-006 Decision 12: evaluate CI-enforcement path for Playwright phases 3–4 | **Closed 2026-06-02** — PR #635 merged. Playwright phases 3–4 attestation added to `CONTRIBUTING.md` Pre-PR Checklist §5 for instrument-cluster frontend PRs. Mode transition safety (Phase 3) and render budget (Phase 4) attestation text required in PR description. CI enforcement evaluation deferred to M11. |
+| #395 ✅ | data: step_event_label mandatory field — Mode 1 fixtures without event labels are incomplete | **Closed 2026-06-02** — PR #635 merged. `DATA_STANDARDS.md §Scenario Fixture Step Annotation` added: step_metadata JSONB contract, significance enum (ROUTINE/SIGNIFICANT/CRITICAL), label constraints (≤8 words AND ≤32 chars), mandatory coverage rule. Greece fixture `build_greece_scenario()` updated with step_metadata for all 6 steps — all SIGNIFICANT, step 6 CRITICAL. Argentina fixture already compliant. |
+| #512 ✅ | fix(fidelity): stale 'Deferred to M7' labels in backtesting dashboard | **Closed 2026-06-02** — PR #635 merged. `FidelityDashboard.tsx`: "Deferred to M7" → "M11" in both gap card notes (GRC #221, ARG #222), both milestone fields, and ADR-006 trigger line footer. Issues #221/#222 are open on M11; no work was delivered in M7/M8/M9. |
 | #620 ✅ | docs(ux): UX/UI standards document — consolidated settled decisions with authority citations | **Closed 2026-06-02** — PR #631 merged. `docs/ux/standards.md` created with 15 sections: Framework Color Contract, Color Semantic Contract, Zone 1 Always-Visible Constraint, Zone Layout Dimensions, Choropleth Role (UX-RULING-4), Zone 1D Content Constraint (UX-RULING-4), Null vs. Zero Rendering, MDA Alert Sort Order, Mode-Specific Alert Tense (UX-RULING-1), Mode Indicator Labels (UX-RULING-3), Confidence Tier Visual, Zustand Atomic Update Contract, Loading/Error State Patterns, Step Annotation Rule, Automatic A/B Split (Mode 3). EL sign-off required for any amendment. |
 
 ---
@@ -277,6 +286,8 @@ All Horizon:Immediate issues are now closed. M8 feature-complete.
 
 | Decision | Rationale | Date |
 |---|---|---|
+| M10 Immediate process sweep complete (PR #635) — 8 issues closed | MILESTONE_RUNBOOK.md table corrected to M0–M13; CONTRIBUTING.md stale develop-branch instructions replaced; ADR threshold criteria table added to CODING_STANDARDS.md; "ADRs Affected" and Playwright phases 3–4 attestation added to PR checklist; Customer Agent added as 13th standing consultation obligation (UX-facing ADRs); step_event_label mandatory field standard added to DATA_STANDARDS.md; Greece fixture annotated with step_metadata; FidelityDashboard M7 labels updated to M11. Remaining M10 Immediate: #261 (exit checklist), #345 (DEMO-004 manual run), #634 (demo prep Steps 2–6, Step 7, 8, 9). | 2026-06-02 |
+| IR review (PR #618) is a pre-gate triage artifact, not the Step 7 review for Issue #634 | The earlier IR review predates UX-RULING-4 and was conducted without screenshots. Step 7 on Issue #634 remains unchecked. The proper Step 7 review requires: Steps 2–6 complete (UX Agent screenshot brief, demo.sh update, Playwright spec update, walkthrough update, screenshot capture), then a fresh IR session with screenshots in UX Agent brief sequence and UX-RULING-4 narration discipline in scope. | 2026-06-02 |
 | docs/demo/ RACI ownership established; UX/UI standards document created (PR #631) | PM Agent is now R on `docs/demo/` — demo preparation is a blocking exit requirement per milestone. `docs/ux/standards.md` created as the canonical consolidated standards document (15 sections, 15 settled decisions). EL sign-off required for any new standard or existing change. UX Designer Agent is R; Frontend Architect Agent is Required C. | 2026-06-02 |
 | UX-RULING-4 — choropleth is a context surface, not a change instrument; #342/DEMO-001 closed as narration-fix scope | FA Agent proposed two fixes for DEMO-001 (HUD overlay on choropleth; supplementary Zone 1D attribute row). UX Designer declined both as hierarchy inversions. Ruling reframed the root cause: the demo narration was pointing at the wrong instrument. M10 fix: narration update only (child #628, PR #629). M11 fix: Option B scenario-relative color scale (requires cross-step range endpoint — scoped for M11). Zone 1D is composite scores only (no raw indicator rows) until a new UX ruling authorises an expansion. | 2026-06-02 |
 | DEMO issue dispositions — full sweep complete (2026-06-02) | Closed: #342 (DEMO-001, narration), #343 (DEMO-002, redesign), #346 (DEMO-005, redesign), #348 (DEMO-007, #616 fix), #350 (DEMO-009, #617 fix), #379 (demo standard), #628 (narration script). Left open: #345 (DEMO-004, investigation required — manual Argentina demo run needed), #349 (DEMO-008, screenshot naming — near-term, addressed in demo standard Step 6). | 2026-06-02 |
