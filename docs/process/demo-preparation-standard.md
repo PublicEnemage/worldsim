@@ -1,8 +1,9 @@
 # Demo Preparation Standard
 
 **Established:** 2026-05-18
+**Last revised:** 2026-06-02 (M10 — screenshot naming, legibility gate, narration instrument check; closes #379)
 **Cadence:** Every two milestones (M6, M8, M10, M12...)
-**Reference cases:** Issue #220 (M6), Issue #333 (M8)
+**Reference cases:** Issue #220 (M6), Issue #333 (M8), Issue #261 (M10)
 
 ---
 
@@ -105,6 +106,41 @@ Update the current version for this milestone:
 
 Do NOT change Section 3 (Backtesting Credibility) or Section 5 (North Star).
 
+### Step 5a — Narration instrument check (M10 forward — UX-RULING-4)
+
+Before screenshots are captured, review the presenter script and any narration in
+`scripts/demo.sh` for the following violation:
+
+> Any sentence that routes the audience to the choropleth for quantitative step-to-step
+> change (e.g. "watch [entity] shift in the choropleth") is incorrect per UX-RULING-4.
+
+The choropleth is a navigable context surface — it provides geographic anchoring, not
+quantitative signal. Quantitative change narration must route to Zone 1A (trajectory
+curves) or Zone 1D (composite score readout).
+
+**Correction template:**
+- Remove: "Watch [entity] shift in the choropleth as [event] accumulates"
+- Replace: "Watch the trajectory curves — [framework] composite score [direction] through steps [N]–[N+1]"
+- Choropleth narration scope: "The choropleth anchors us — we are looking at [entity], a single country in the global distribution"
+
+This check closes Issue #628 for each demo cycle. It recurs each milestone until
+Option B (scenario-relative color scale) is implemented in M11, after which the
+choropleth will visually corroborate Zone 1A and the narration restriction lifts.
+
+### Step 5b — Legibility validation at 1440×900 (M10 forward — Issue #377)
+
+Before capturing screenshots, run the legibility E2E suite at 1440×900:
+
+```bash
+cd frontend
+npx playwright test tests/e2e/demo-legibility.spec.ts --project=chromium
+npx playwright test tests/e2e/demo-advancement-flow.spec.ts --project=chromium
+```
+
+All tests must pass before screenshots are captured. A legibility failure means a
+frame will be illegible in the review — the same defect class as DEMO-002, DEMO-003,
+DEMO-005. Fix the failing assertion before proceeding to Step 6.
+
 ### Step 6 — Run the demo and capture screenshots
 
 ```bash
@@ -113,6 +149,22 @@ Do NOT change Section 3 (Backtesting Credibility) or Section 5 (North Star).
 ```
 
 Screenshots land in `docs/demo/m{N}/screenshots/`. Verify five frames match the UX Agent brief.
+
+**Screenshot naming requirement (M10 forward — DEMO-008 / Issue #349):**
+Screenshots must be named in presentation order, not capture order. If the UX Agent
+brief specifies a sequence (e.g. C → A → B → D → E), the filenames must reflect
+that sequence:
+
+```
+frame-01-thesis.png        ← presentation order 1 (may be capture frame C)
+frame-02-instrument.png    ← presentation order 2
+frame-03-step1.png         ← presentation order 3
+...
+```
+
+Alternatively, include a `SEQUENCE.md` in `docs/demo/m{N}/screenshots/` that maps
+capture names to presentation order explicitly. Either convention is acceptable;
+capture-order-only filenames are not.
 
 ### Step 7 — Independent Review Agent
 
@@ -161,4 +213,5 @@ Use `scripts/demo.sh` to start the stack before the audience arrives.
 | Milestone | Issue | Review |
 |---|---|---|
 | M6 | #220 | `docs/demo/m6/reviews/2026-05-07-v0.6.0-stakeholder-review.md` |
-| M8 | #333 | `docs/demo/m8/reviews/` (pending) |
+| M8 | #333 | `docs/demo/m8/reviews/2026-05-18-v0.8.0-stakeholder-review.md` |
+| M10 | #261 | `docs/demo/m10/reviews/` (in progress) |

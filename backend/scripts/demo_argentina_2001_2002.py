@@ -202,10 +202,18 @@ def _print_mda_summary(outputs: list[dict[str, Any]]) -> None:
 
 
 def _print_divergence_narrative(outputs: list[dict[str, Any]]) -> None:
+    # Narration discipline (UX-RULING-4 / Issue #628):
+    # The choropleth is a geographic anchor — do NOT narrate it as the change instrument.
+    # Route quantitative change to Zone 1A trajectory curves and Zone 1D composite scores.
+    # Correct:   "Watch the trajectory curves — governance composite declining at step 3"
+    # Incorrect: "Watch Argentina shift in the choropleth as the crisis accumulates"
     outputs_by_step = {o["step_index"]: o for o in outputs}
 
     print("PRIMARY VISUAL ARGUMENT — The Divergence")
     print("-" * 70)
+    print("  [Zone 1A trajectory curves show the crisis arc — point there, not the choropleth.")
+    print("   The choropleth anchors the scenario geographically: ARG in the global distribution.]")
+    print()
 
     for step in [2, 3, 4]:
         if step not in outputs_by_step:
