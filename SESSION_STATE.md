@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-02 (Demo 3 IR review complete — PR #618; three Demo 3 readiness gate issues filed #615/#616/#617; DEMO-006 #347 closed; #342/#343/#346 severity downgraded; 11 #577 child issues filed #603–#614)**
+**Last updated: 2026-06-02 (PR #622 merged — #616 Zone 1D ecological annotation + #617 AttributeSelector display names closed; Demo 3 readiness gate: #615 only remains)**
 **Current milestone:** M10 — Engine Integrity and Instrument Delivery (M9 formally closed; M10 active)
 
 ---
@@ -82,6 +82,7 @@ No open PRs — board clear as of 2026-06-02.
 
 | PR | Title | Date |
 |---|---|---|
+| #622 | fix(frontend): Zone 1D ecological boundary annotation + AttributeSelector display names (closes #616, #617) | 2026-06-02 |
 | #618 | docs(demo): Demo 3 IR review — v0.10 Argentina + instrument cluster (closes #347 DEMO-006) | 2026-06-02 |
 | #601 | docs(architecture): ARCH-REVIEW-006 — Issue #577 targeted architectural scope review | 2026-06-02 |
 | #598 | docs(ux): US-043 No False Precision correction — epistemic disclosure criterion (PI-REVIEW-002 F-005) | 2026-06-02 |
@@ -200,8 +201,8 @@ No open PRs — board clear as of 2026-06-02.
 | #574 | Epic: Vision-to-Architecture Bridge — personas → user experiences → technical concepts | **Filed 2026-06-01** — Three child issues: #575 ✅ (personas extension, closed PR #592), #576 ✅ (user experiences for second ring, closed PR #594), #577 (Phase 3 DIC technical concept review — unblocked). No active horizon assignment — EL to prioritize M10 or M11. |
 | #577 | docs(ux): Phase 3 DIC technical concept review — [Phase-3-TBD] stories from Issue #576 | **ARCH-REVIEW-006 complete (PR #601, 2026-06-02). 11 child issues filed #603–#614 (2026-06-02).** 16 blindspots classified: 1 Immediate, 12 Near-Term, 3 Long-Term. One Immediate blocker: CM must author vocabulary mapping standard (#603, AR-006-B-007) before any US-043 implementation begins. Full findings: `docs/architecture/reviews/ARCH-REVIEW-006-milestone10.md`. Tracking comment posted on #577. |
 | #615 | fix(fixture): Argentina Demo 3 — verify MDA alerts fire at step 2+; adjust governance seed if floor does not breach | **Open — Demo 3 blocker (IR-M10-001).** Governance MDA floor `democratic_quality_score ≤ 0.70 → WARNING`. Argentina starts at 0.71. Without `emergency_declaration` instrument event in the 4-step fixture, the floor may not breach. Fix options: (a) lower seed to 0.68, or (b) add `unemployment_rate > 0.20 → WARNING` threshold (historically accurate: Argentina 2002 at 21.5%). Run fixture end-to-end and verify MDA alert fires at step 2+ before Demo 3. |
-| #616 | fix(frontend): Zone 1D ecological boundary annotation — "(1.0 = boundary)" sub-label or tooltip | **Open — Demo 3 blocker (IR-M10-002).** `FourFrameworkZone1D.tsx` renders ecological composite as raw number (e.g. "1.07") with no indication that 1.0 = planetary boundary. All other frameworks use [0,1] scoring; Zone 1D does not communicate the ecological scale difference. Fix: ~3 lines JSX — tooltip or inline sub-label on ecological row only. |
-| #617 | fix(frontend): AttributeSelector display names — add getIndicatorDisplayNameAny(), wire into AttributeSelector.tsx | **Open — Demo 3 blocker (IR-M10-003).** `AttributeSelector.tsx` renders `{a.attribute_key} ({a.unit}, {a.variable_type})` — raw API field names. `indicatorDisplayNames.ts` registry exists (`getIndicatorDisplayName(framework, key)`) but is not called from AttributeSelector. Fix: add `getIndicatorDisplayNameAny(key)` (iterates all framework blocks, returns first match), use in AttributeSelector dropdown. |
+| #616 ✅ | fix(frontend): Zone 1D ecological boundary annotation — "(1.0 = boundary)" sub-label or tooltip | **Closed 2026-06-02** — PR #622 merged. `"1.0 = boundary"` sub-label (9px, muted) added below "Ecological" row label in `FourFrameworkZone1D.tsx`. Ecological row only. `data-testid="ecological-boundary-note"` for future E2E assertion. |
+| #617 ✅ | fix(frontend): AttributeSelector display names — add getIndicatorDisplayNameAny(), wire into AttributeSelector.tsx | **Closed 2026-06-02** — PR #622 merged. `getIndicatorDisplayNameAny(key)` added to `indicatorDisplayNames.ts` (iterates all framework blocks, title-case fallback). Wired into `AttributeSelector.tsx` — dropdown now shows "GDP Growth (%, FLOW)" instead of "gdp_growth (%, FLOW)". |
 
 ---
 
