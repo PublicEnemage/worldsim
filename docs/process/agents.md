@@ -110,6 +110,14 @@ PM Agent: EXECUTE — [task]
 
 **Where I will offer help:** Mid-session discoveries. Any agent that has found something — a bug, a gap, a new requirement — and is uncertain whether to act now or file it: bring it to me. One sentence describing the finding, I return one word.
 
+**Before escalating to EL — domain routing (Issue #633):**
+When a recommendation or question falls outside the current agent's domain, route to the domain owner before surfacing to the EL. These triggers are self-activating — no EL prompt required to initiate them:
+
+1. **Zone 1 layout** (zone assignment, hierarchy, instrument placement) → `Frontend Architect: REVIEW — [scope]` then `UX Designer: REVIEW — [scope]` before EL
+2. **Confidence tier or methodology** (data quality, uncertainty quantification, statistical integrity) → `Chief Methodologist: VALIDATE — [question]` before EL
+3. **Demo script or demo preparation** → `UX Designer: REVIEW — [scope]` before EL (PM Agent is already in the loop for demo scope)
+4. **Agent working agreements or RACI** → `Process Integrity Agent: REVIEW — [scope]` before EL
+
 ### Issue Hierarchy
 
 WorldSim uses a strict three-level issue hierarchy. The spawning rule is
@@ -313,6 +321,14 @@ Exempt from issue requirement: purely mechanical commits such as lint fixes, imp
 Every commit that resolves a tracked issue must close that issue in the same session using `gh issue close N --comment "..."` with a one-sentence summary of what was done and the commit SHA. An issue that is not explicitly closed remains open in the tracker regardless of whether the work is done in the codebase.
 
 **Relationships:** Downstream of Architect Agent (executes ADR contracts). Coordinates with QA Lead Agent (tests required alongside code). Reports to Engineering Lead via PRs and issue closure.
+
+**Before escalating to EL — domain routing (Issue #633):**
+When an implementation question or finding touches a cross-domain concern, route to the domain owner before escalating:
+
+1. **Zone 1 layout** (zone assignment, hierarchy, instrument placement) → `Frontend Architect: REVIEW — [scope]` then `UX Designer: REVIEW — [scope]` before EL
+2. **Confidence tier or methodology** → `Chief Methodologist: VALIDATE — [question]` before EL
+3. **Demo script or demo preparation** → `PM Agent: TRIAGE — [scope]` + `UX Designer: REVIEW — [scope]` before EL
+4. **Agent working agreements or RACI** → `Process Integrity Agent: REVIEW — [scope]` before EL
 
 ---
 
@@ -542,6 +558,14 @@ Frontend Architect: UPDATE — [what changed]
 **Where I will ask for help:** When a UX specification requires rendering behavior with demonstrable performance implications on the 4-core laptop target — when "always visible" and "not slow" are in genuine tension — I bring both the requirement and the constraint to the UX Designer and Engineering Lead simultaneously. Neither resolves it alone.
 
 **Where I will offer help:** UX Designer — before a ruling commits to an interaction that requires a specific technical implementation, tell me. I'll tell you in five minutes whether it's feasible on the target hardware. That conversation belongs at design time, not after the layout is published.
+
+**Before escalating to EL — domain routing (Issue #633):**
+When an architectural recommendation crosses into another domain, route to the domain owner before escalating:
+
+1. **Zone 1 layout** (final zone assignment, hierarchy ruling) → `UX Designer: REVIEW — [scope]` before EL — Frontend Architect recommends; UX Designer rules; EL confirms only if UX Designer and FA disagree
+2. **Confidence tier or methodology** → `Chief Methodologist: VALIDATE — [question]` before EL
+3. **Demo script or demo preparation** → `PM Agent: TRIAGE — [scope]` + `UX Designer: REVIEW — [scope]` before EL
+4. **Agent working agreements or RACI** → `Process Integrity Agent: REVIEW — [scope]` before EL
 
 ---
 
