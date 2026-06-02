@@ -13,6 +13,8 @@ import { describe, it, expect } from "vitest";
 import {
   formatScore,
   getScoreClass,
+  getGovernanceAnnotation,
+  GOVERNANCE_IN_VALIDATION_ANNOTATION,
   FRAMEWORK_DISPLAY_LABELS,
   FRAMEWORK_ORDER,
 } from "../FourFrameworkZone1D";
@@ -123,6 +125,46 @@ describe("US-021 — FRAMEWORK_DISPLAY_LABELS: human-readable framework labels",
     for (const label of Object.values(FRAMEWORK_DISPLAY_LABELS)) {
       expect(label).not.toContain("_");
     }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// IR-005 — getGovernanceAnnotation: inline annotation for governance null
+// ---------------------------------------------------------------------------
+
+describe("IR-005 — getGovernanceAnnotation: governance null shows inline annotation", () => {
+  it("governance + null → GOVERNANCE_IN_VALIDATION_ANNOTATION", () => {
+    expect(getGovernanceAnnotation("governance", null)).toBe(
+      GOVERNANCE_IN_VALIDATION_ANNOTATION,
+    );
+  });
+
+  it("governance + null annotation equals '(in validation)'", () => {
+    expect(getGovernanceAnnotation("governance", null)).toBe("(in validation)");
+  });
+
+  it("governance + numeric score → null (no annotation when score is present)", () => {
+    expect(getGovernanceAnnotation("governance", 0.75)).toBeNull();
+  });
+
+  it("governance + zero score → null (zero is not null)", () => {
+    expect(getGovernanceAnnotation("governance", 0)).toBeNull();
+  });
+
+  it("financial + null → null (non-governance null has no annotation)", () => {
+    expect(getGovernanceAnnotation("financial", null)).toBeNull();
+  });
+
+  it("human_development + null → null", () => {
+    expect(getGovernanceAnnotation("human_development", null)).toBeNull();
+  });
+
+  it("ecological + null → null", () => {
+    expect(getGovernanceAnnotation("ecological", null)).toBeNull();
+  });
+
+  it("GOVERNANCE_IN_VALIDATION_ANNOTATION constant is the canonical string", () => {
+    expect(GOVERNANCE_IN_VALIDATION_ANNOTATION).toBe("(in validation)");
   });
 });
 

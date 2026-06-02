@@ -154,14 +154,15 @@ test("Greece step-through: governance null renders as — not zero (AC-015)", as
   const govText = await govScore.textContent();
 
   if (govClass?.includes("score-value--null")) {
-    // Null case: must display "—", must not display "0" or "0.00"
-    expect(govText?.trim()).toBe("—");
+    // Null case: must start with "—" (IR-005 adds inline annotation so full
+    // textContent is "—(in validation)", not bare "—"). Must not be "0".
+    expect(govText?.trim()).toMatch(/^—/);
     expect(govText?.trim()).not.toBe("0");
     expect(govText?.trim()).not.toBe("0.00");
   } else {
     // Numeric case: class must be score-value--numeric, text must not be "—"
     expect(govClass).toContain("score-value--numeric");
-    expect(govText?.trim()).not.toBe("—");
+    expect(govText?.trim()).not.toMatch(/^—/);
   }
 });
 
