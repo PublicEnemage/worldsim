@@ -6,7 +6,7 @@ Covers:
   - FINANCIAL framework groups financial-tagged attributes correctly
   - Untagged attributes (measurement_framework=None) classified as FINANCIAL
   - ECOLOGICAL returns composite_score=None with note field
-  - GOVERNANCE returns composite_score=None with note field
+  - GOVERNANCE returns composite_score=None when no governance indicators in state (promoted M10)
   - composite_score is serialized as a string, not a float
   - Single-entity scenario: composite_score=None, single_entity_warning=True (Issue #193)
   - Multi-entity scenario: composite_score non-null, single_entity_warning=False (Issue #193)
@@ -226,7 +226,13 @@ async def test_ecological_returns_null_composite_score_with_note() -> None:
 
 
 @pytest.mark.asyncio
-async def test_governance_returns_null_composite_score_with_note() -> None:
+async def test_governance_returns_null_composite_score_when_no_indicators() -> None:
+    """Governance composite is None when no governance indicators are present in state.
+
+    Governance is live (ADR-005 Amendment 4, M10), but the test fixture state has no
+    rule_of_law_percentile or democratic_quality_score — normalized_absolute returns None.
+    No note is emitted in this case (the 'not yet implemented' note was removed at promotion).
+    """
     conn = _make_conn(
         {"scenario_id": "scen-1"},
         _snap_row(),
@@ -237,8 +243,7 @@ async def test_governance_returns_null_composite_score_with_note() -> None:
     )
     governance = result.outputs["governance"]
     assert governance.composite_score is None
-    assert governance.note is not None
-    assert "not yet implemented" in governance.note
+    assert governance.note is None
 
 
 @pytest.mark.asyncio
@@ -394,9 +399,10 @@ async def test_single_entity_note_on_implemented_frameworks() -> None:
 
 
 @pytest.mark.asyncio
-async def test_single_entity_unimplemented_frameworks_keep_their_note() -> None:
+async def test_single_entity_exempt_frameworks_note_behavior() -> None:
     """Single-entity: ecological gets the mandatory ADR-005 Amendment B note;
-    governance (still unimplemented) keeps the 'not yet implemented' note."""
+    governance (promoted M10, ADR-005 Amendment 4) gets no note — exempt from
+    both the single-entity composite guard and the single-entity note."""
     conn = _make_conn(
         {"scenario_id": "scen-1"},
         _snap_row(state=_SINGLE_ENTITY_STATE),
@@ -408,8 +414,8 @@ async def test_single_entity_unimplemented_frameworks_keep_their_note() -> None:
     # ADR-005 Amendment 3 Decision M8-1: ecological always gets the mandatory boundary note.
     assert "boundary" in result.outputs["ecological"].note
     assert "Composite range: [0.0, 2.0]" in result.outputs["ecological"].note
-    # Governance module still unimplemented (deferred to M9 — Decision M8-4).
-    assert "not yet implemented" in result.outputs["governance"].note
+    # Governance promoted (ADR-005 Amendment 4): no single-entity note, no unimplemented note.
+    assert result.outputs["governance"].note is None
 
 
 @pytest.mark.asyncio
@@ -427,53 +433,15 @@ async def test_multi_entity_single_entity_warning_is_false() -> None:
 
 
 # ---------------------------------------------------------------------------
-# Framework Promotion Protocol CI enforcement — CODING_STANDARDS.md §Framework Promotion Protocol
+# Framework Promotion Protocol — governance promoted M10 (ADR-005 Amendment 4)
 # ---------------------------------------------------------------------------
-
-
-def test_governance_is_in_unimplemented_frameworks() -> None:
-    """CI enforcement: governance composite scores must be None while 'governance'
-    is in _UNIMPLEMENTED_FRAMEWORKS.
-
-    This test is the explicit, testable precondition for promotion. It will
-    PASS as long as governance is unimplemented (correct) and must be REMOVED
-    (not just disabled) when the companion integration test that satisfies
-    promotion criterion 5 is written and passes.
-
-    CODING_STANDARDS.md §Framework Promotion Protocol promotion criterion 5:
-    'The act of satisfying the companion integration test is the explicit,
-    testable precondition for the API surface change.'
-    """
-    from app.api.scenarios import _UNIMPLEMENTED_FRAMEWORKS
-    assert "governance" in _UNIMPLEMENTED_FRAMEWORKS, (
-        "governance was removed from _UNIMPLEMENTED_FRAMEWORKS without satisfying "
-        "all five promotion criteria in CODING_STANDARDS.md §Framework Promotion Protocol. "
-        "Remove this test only after the companion integration test passes."
-    )
-
-
-@pytest.mark.asyncio
-async def test_governance_composite_score_is_none_when_unimplemented() -> None:
-    """Governance composite_score must be None while governance is in _UNIMPLEMENTED_FRAMEWORKS.
-
-    Companion to test_governance_is_in_unimplemented_frameworks. If governance
-    is promoted, both this test and the guard test above must be updated together.
-    """
-    from app.api.scenarios import _UNIMPLEMENTED_FRAMEWORKS
-    if "governance" not in _UNIMPLEMENTED_FRAMEWORKS:
-        pytest.skip("governance has been promoted — update this test")
-
-    conn = _make_conn(
-        {"scenario_id": "scen-1"},
-        _snap_row(),
-        _entity_row(),
-    )
-    result = await get_measurement_output(
-        scenario_id="scen-1", entity_id="GRC", step=1, conn=conn
-    )
-    assert result.outputs["governance"].composite_score is None, (
-        "governance composite_score must be None while governance is unimplemented"
-    )
+# test_governance_is_in_unimplemented_frameworks and its companion
+# test_governance_composite_score_is_none_when_unimplemented were the promotion
+# gate for governance. They are removed here because governance has been promoted:
+# _UNIMPLEMENTED_FRAMEWORKS is now empty and the backtesting integration test
+# test_greece_m10_demo_governance_composite_non_null_all_steps satisfies
+# CODING_STANDARDS.md §Framework Promotion Protocol criterion 5.
+# See: Issue #556, ADR-005 Amendment 4.
 
 
 @pytest.mark.asyncio

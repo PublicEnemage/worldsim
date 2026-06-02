@@ -1553,12 +1553,14 @@ async def get_measurement_output(
             )
         # ADR-005 Amendment 3 Decision M8-1: ecological note is mandatory regardless of
         # composite_score; {n_indicators} counts active *_proximity attributes.
+        # ADR-005 Amendment 4: governance is also exempt — normalized_absolute is
+        # meaningful for a single entity; the single-entity note must not be applied.
         if fw == "ecological":
             n_indicators = sum(1 for k in indicators if k.endswith("_proximity"))
             note: str | None = _ECOLOGICAL_MANDATORY_NOTE_TEMPLATE.format(
                 n_indicators=n_indicators
             )
-        elif is_single_entity:
+        elif is_single_entity and fw not in _SINGLE_ENTITY_GUARD_EXEMPT_FRAMEWORKS:
             note = _SINGLE_ENTITY_NOTE
         else:
             note = None
