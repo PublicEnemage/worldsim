@@ -115,6 +115,7 @@ class EmergencyInstrument(Enum):
     NATIONALIZATION = "nationalization"
     IMF_PROGRAM_ACCEPTANCE = "imf_program_acceptance"
     DEFAULT_DECLARATION = "default_declaration"
+    EMERGENCY_DECLARATION = "emergency_declaration"
 
 
 class StructuralInstrument(Enum):
