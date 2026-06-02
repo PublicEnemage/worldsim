@@ -78,3 +78,13 @@ function formatFallback(key: string): string {
 export function getIndicatorDisplayName(framework: string, key: string): string {
   return INDICATOR_DISPLAY_NAMES[framework]?.[key] ?? formatFallback(key);
 }
+
+/** Framework-agnostic lookup — returns the first matching display name across all
+ *  framework blocks, falling back to title-cased key. Used by surfaces that have
+ *  the attribute key but not the framework (e.g. AttributeSelector). */
+export function getIndicatorDisplayNameAny(key: string): string {
+  for (const block of Object.values(INDICATOR_DISPLAY_NAMES)) {
+    if (key in block) return block[key];
+  }
+  return formatFallback(key);
+}

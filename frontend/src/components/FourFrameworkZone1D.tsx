@@ -183,6 +183,14 @@ export function FourFrameworkZone1D({
               }}
             >
               {displayLabel}
+              {key === "ecological" && (
+                <span
+                  data-testid="ecological-boundary-note"
+                  style={{ display: "block", fontSize: 9, color: "#888", fontWeight: 400 }}
+                >
+                  1.0 = boundary
+                </span>
+              )}
             </span>
 
             <span
