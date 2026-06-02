@@ -355,13 +355,23 @@ test("IR-004: start_year input seeds trajectory tick year labels", async ({
     timeout: 10_000,
   });
 
+  // Register the response listener BEFORE advancing so we don't miss the event.
+  // waitForResponse hooks into the network layer — it is not subject to the React
+  // effect timing race that data-loading attribute checks face.
+  const trajectoryDone = page.waitForResponse(
+    (resp) => resp.url().includes("/trajectory") && resp.status() === 200,
+    { timeout: 15_000 },
+  );
+
   // Advance one step so the trajectory SVG has tick labels to inspect.
   await advanceStep(page, 1, 3);
 
-  // Wait for the trajectory fetch triggered by the step advance to complete.
-  // Without this, allTextContents() runs against an empty SVG on slow CI runners.
+  // Block until the trajectory API response arrives (network round-trip complete).
+  await trajectoryDone;
+
+  // React may still be processing the response; wait for the loading flag to clear.
   await expect(zone1d).not.toHaveAttribute("data-loading", "true", {
-    timeout: 10_000,
+    timeout: 5_000,
   });
 
   // Guard: trajectory SVG may not render at all viewports (no-op if absent).
