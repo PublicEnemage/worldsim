@@ -54,6 +54,26 @@ export function getScoreClass(score: number | null): "score-value--null" | "scor
   return score === null ? "score-value--null" : "score-value--numeric";
 }
 
+/**
+ * Inline annotation shown next to the governance score when null (IR-005).
+ * Governance null means "not yet computed"; other null frameworks have
+ * different semantics that will be addressed in future milestones.
+ */
+export const GOVERNANCE_IN_VALIDATION_ANNOTATION = "(in validation)";
+
+/**
+ * Returns the inline annotation for a score cell, or null if no annotation applies.
+ * Only governance + null score produces an annotation (IR-005).
+ */
+export function getGovernanceAnnotation(
+  framework: string,
+  score: number | null,
+): string | null {
+  return framework === "governance" && score === null
+    ? GOVERNANCE_IN_VALIDATION_ANNOTATION
+    : null;
+}
+
 // ---------------------------------------------------------------------------
 // FourFrameworkZone1D
 // ---------------------------------------------------------------------------
@@ -91,6 +111,8 @@ export function FourFrameworkZone1D({
         const displayLabel = FRAMEWORK_DISPLAY_LABELS[key] ?? key;
         const color = FRAMEWORK_COLORS[key as keyof typeof FRAMEWORK_COLORS] ?? "#888";
         const isNull = score === null;
+
+        const annotation = getGovernanceAnnotation(key, score);
 
         return (
           <div
@@ -131,6 +153,14 @@ export function FourFrameworkZone1D({
               }}
             >
               {formatScore(score)}
+              {annotation !== null && (
+                <span
+                  data-testid="governance-in-validation"
+                  style={{ fontSize: 9, fontWeight: 400, marginLeft: 4, opacity: 0.8 }}
+                >
+                  {annotation}
+                </span>
+              )}
             </span>
           </div>
         );
