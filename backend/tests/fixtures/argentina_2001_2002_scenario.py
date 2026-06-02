@@ -14,19 +14,29 @@ Historical context:
         in history at the time). Pesification and devaluation (January 2002) ended
         the convertibility era.
 
+  2003–2004: Kirchner recovery — GDP rebounded strongly (8.8% in 2003, 9.0% in 2004)
+             under heterodox policies: debt restructuring, export tax revenue, peso
+             undervaluation, and suppression of utility tariffs.
+
 Simulation structure:
-  n_steps=2 (annual); step 1 = 2001, step 2 = 2002.
-  Initial state reflects Argentina's 2000 economic baseline (recession onset).
+  build_argentina_scenario(): n_steps=2 (annual); step 1 = 2001, step 2 = 2002.
+    Backtesting fixture. Initial state reflects Argentina's 2000 baseline.
+
+  build_argentina_demo_scenario(): n_steps=4 (annual: 2001→2004).
+    Demo 3 variant. Extends the base with EcologicalModule, GovernanceModule,
+    step_metadata event labels, and recovery-phase steps (Issue #553).
 
 Scheduled inputs:
   Step 1: IMF program acceptance (Blindaje) + fiscal spending cut (Zero Deficit Plan)
   Step 2: Default declaration
+  Step 3 (demo only): Recovery — no active shock; ROUTINE step
+  Step 4 (demo only): Consolidation — no active shock; ROUTINE step
 
 Initial state sources:
   gdp_growth        — IMF WEO April 2001 (2000 outturn: -0.8%)
   unemployment_rate — INDEC EPH October 2000 wave (14.7%)
 
-References: Issue #192; ARCH-REVIEW-004 second-case recommendation.
+References: Issue #192; Issue #553; ARCH-REVIEW-004 second-case recommendation.
 """
 from __future__ import annotations
 
@@ -135,3 +145,127 @@ def build_argentina_scenario() -> ScenarioCreateRequest:
             ),
         ],
     )
+
+
+def build_argentina_demo_scenario() -> ScenarioCreateRequest:
+    """Build the Argentina 2001–2002 Demo 3 scenario with all four Zone 1 axes live.
+
+    Extends build_argentina_scenario() with:
+      - n_steps=4 (crisis arc through 2004 recovery)
+      - modules_config enabling EcologicalModule and GovernanceModule
+      - co2_concentration_ppm initial seed (369.5 ppm — NOAA Mauna Loa 2000 mean)
+      - rule_of_law_percentile initial seed (33.2 — WGI Rule of Law ARG 2000)
+      - democratic_quality_score initial seed (0.71 — V-Dem LDI ARG 2000)
+      - step_metadata with SIGNIFICANT labels for crisis steps 1 and 2,
+        and SIGNIFICANT label for the Kirchner recovery at step 3
+
+    Composite score status (M10):
+      Ecological      — live (boundary proximity; CO2 active)
+      Governance      — live (normalized_absolute; LDI + rule of law percentile)
+      Financial       — null (single-entity guard, Issue #193)
+      Human Dev       — null (single-entity guard, Issue #193)
+
+    Step arc:
+      Step 1 (2001): Zero Deficit Plan + IMF Blindaje (SIGNIFICANT)
+      Step 2 (2002): Default declaration / Peso devaluation (SIGNIFICANT)
+      Step 3 (2003): Kirchner recovery begins (SIGNIFICANT)
+      Step 4 (2004): Growth consolidation (ROUTINE)
+
+    References: Issue #553 (Demo 3); build_greece_demo_scenario() (pattern reference).
+    """
+    base = build_argentina_scenario()
+
+    # NOAA Mauna Loa Observatory 2000 annual mean: 369.5 ppm (confidence_tier=1).
+    initial_co2_concentration = QuantitySchema(
+        value="369.5",
+        unit="ppm",
+        variable_type="stock",
+        confidence_tier=1,
+        observation_date=date(2000, 1, 1),
+        source_registry_id="NOAA_MLO_2000",
+        measurement_framework="ecological",
+    )
+
+    # World Bank WGI 2000 — Rule of Law Percentile Rank for Argentina: 33.2.
+    # Argentina's rule of law stood at the 33rd percentile in 2000, already under
+    # stress from institutional gridlock and provincial fiscal crises.
+    # Confidence tier 2 (official multilateral statistics, annual survey).
+    initial_rule_of_law = QuantitySchema(
+        value="33.2",
+        unit="percentile_0_100",
+        variable_type="stock",
+        confidence_tier=2,
+        observation_date=date(2000, 1, 1),
+        source_registry_id="WB_WGI_ARG_2000_RULE_OF_LAW",
+        measurement_framework="governance",
+    )
+
+    # V-Dem v13 Liberal Democracy Index for Argentina 2000: 0.71.
+    # Argentina was a functioning democracy pre-crisis. The LDI will decline
+    # through steps 1–2 under emergency conditions (state of siege, five
+    # presidents in ten days, social unrest).
+    # Confidence tier 3 (expert-coded survey).
+    initial_democratic_quality = QuantitySchema(
+        value="0.71",
+        unit="ratio_0_1",
+        variable_type="stock",
+        confidence_tier=3,
+        observation_date=date(2000, 1, 1),
+        source_registry_id="VDEM_V13_ARG_2000_LDI",
+        measurement_framework="governance",
+    )
+
+    updated_arg_attrs = {
+        **base.configuration.initial_attributes.get("ARG", {}),
+        "co2_concentration_ppm": initial_co2_concentration,
+        "rule_of_law_percentile": initial_rule_of_law,
+        "democratic_quality_score": initial_democratic_quality,
+    }
+
+    # step_metadata: 1-based string keys → significance + label.
+    # Steps 1, 2, and 3 are SIGNIFICANT (major crisis events and recovery onset).
+    # Step 4 (2004 consolidation) is ROUTINE.
+    # Labels are truncated to ≤32 chars per the trajectory endpoint contract.
+    step_metadata = {
+        "1": {"significance": "SIGNIFICANT", "label": "Zero Deficit Plan / Blindaje"},
+        "2": {"significance": "SIGNIFICANT", "label": "Default / Peso devaluation"},
+        "3": {"significance": "SIGNIFICANT", "label": "Kirchner recovery begins"},
+    }
+
+    demo_config = base.configuration.model_copy(
+        update={
+            "n_steps": 4,
+            "start_date": date(2000, 1, 1),
+            "modules_config": {
+                "ecological": {"enabled": True},
+                "governance": {"enabled": True},
+            },
+            "initial_attributes": {"ARG": updated_arg_attrs},
+            "step_metadata": step_metadata,
+        }
+    )
+
+    # emergency_declaration at step 1 is already in base.scheduled_inputs.
+    # No additional inputs needed for steps 3–4 (recovery driven by prior-shock
+    # unwind and endogenous state dynamics). Steps 3 and 4 are ROUTINE in
+    # scheduled_inputs — the GovernanceModule will read the emergency_declaration
+    # one-step lag at step 2 (default) to reduce democratic_quality_score.
+
+    return base.model_copy(update={
+        "name": "Argentina 2001-2002 Demo 3 — Crisis Arc and Kirchner Recovery",
+        "description": (
+            "Demo 3 scenario (Issue #553). "
+            "EcologicalModule and GovernanceModule enabled — all four framework axes live. "
+            "Crisis arc: Zero Deficit Plan (2001) → sovereign default (2002) → "
+            "Kirchner recovery (2003–2004). "
+            "Governance composite uses normalized_absolute strategy "
+            "(WGI/V-Dem; ADR-005 Amendment 4). "
+            "Financial and human_development composites are null "
+            "(percentile rank requires ≥2 entities, Issue #193). "
+            "Initial state: IMF WEO April 2001 + INDEC EPH October 2000 "
+            "+ NOAA MLO 2000 (co2_concentration_ppm=369.5) "
+            "+ WB WGI 2000 (rule_of_law_percentile=33.2) "
+            "+ V-Dem v13 (democratic_quality_score=0.71)."
+        ),
+        "configuration": demo_config,
+    })

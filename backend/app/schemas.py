@@ -262,6 +262,11 @@ class ScenarioConfigSchema(BaseModel):
         "2010-01-01"). When absent the runner defaults to 2000-01-01. Supply
         this for historical backtesting scenarios so displayed step dates match
         the historical period.
+    `step_metadata` — optional per-step annotation dict keyed by 1-based step
+        index string. Each value is a dict with `significance` ("SIGNIFICANT" |
+        "ROUTINE") and optional `label` (str, max 32 chars). Absent keys default
+        to ROUTINE. Consumed by the trajectory endpoint for step_significance and
+        step_event_label fields (ADR-010 Decision 7).
     """
 
     model_config = ConfigDict(from_attributes=True)
@@ -272,6 +277,7 @@ class ScenarioConfigSchema(BaseModel):
     timestep_label: str = "annual"
     modules_config: dict[str, Any] = {}
     start_date: date | None = None
+    step_metadata: dict[str, Any] = {}
 
 
 class ScheduledInputSchema(BaseModel):

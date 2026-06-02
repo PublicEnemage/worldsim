@@ -1,4 +1,4 @@
-"""Unit tests for Argentina 2001–2002 backtesting fixtures — Issue #192.
+"""Unit tests for Argentina 2001–2002 backtesting fixtures — Issues #192, #553.
 
 Covers:
   - ArgentinaActuals field values match documented IMF WEO / INDEC EPH data
@@ -8,6 +8,8 @@ Covers:
   - IA1_DISCLOSURE matches IA1_CANONICAL_PHRASE
   - PARAMETER_CALIBRATION_DISCLOSURE is non-empty
   - fidelity_report helpers work with entity_id="ARG"
+  - build_argentina_demo_scenario() — Demo 3 (Issue #553):
+      n_steps=4, ecological/governance seeds, step_metadata event labels
 
 All tests run without a database connection.
 """
@@ -27,7 +29,10 @@ from tests.fixtures.argentina_2001_2002_actuals import (
     PARAMETER_CALIBRATION_DISCLOSURE,
     THRESHOLDS,
 )
-from tests.fixtures.argentina_2001_2002_scenario import build_argentina_scenario
+from tests.fixtures.argentina_2001_2002_scenario import (
+    build_argentina_demo_scenario,
+    build_argentina_scenario,
+)
 
 # ---------------------------------------------------------------------------
 # ArgentinaActuals
@@ -313,3 +318,150 @@ def test_format_fidelity_report_with_arg_entity() -> None:
     assert isinstance(report, str)
     assert len(report) > 100
     assert "Overall: PASS" in report
+
+
+# ---------------------------------------------------------------------------
+# build_argentina_demo_scenario() — Issue #553 Demo 3
+# ---------------------------------------------------------------------------
+
+
+def test_build_argentina_demo_scenario_returns_scenario_create_request() -> None:
+    from app.schemas import ScenarioCreateRequest
+    demo = build_argentina_demo_scenario()
+    assert isinstance(demo, ScenarioCreateRequest)
+
+
+def test_build_argentina_demo_scenario_name_references_demo() -> None:
+    demo = build_argentina_demo_scenario()
+    assert "Demo" in demo.name or "demo" in demo.name.lower() or "Argentina" in demo.name
+
+
+def test_build_argentina_demo_scenario_n_steps_is_4() -> None:
+    """Demo arc covers 4 annual steps (2001–2004)."""
+    demo = build_argentina_demo_scenario()
+    assert demo.configuration.n_steps == 4
+
+
+def test_build_argentina_demo_scenario_has_arg_entity() -> None:
+    demo = build_argentina_demo_scenario()
+    assert "ARG" in demo.configuration.entities
+
+
+def test_build_argentina_demo_scenario_start_date_is_2000() -> None:
+    from datetime import date
+    demo = build_argentina_demo_scenario()
+    assert demo.configuration.start_date == date(2000, 1, 1)
+
+
+def test_build_argentina_demo_scenario_ecological_module_enabled() -> None:
+    demo = build_argentina_demo_scenario()
+    assert demo.configuration.modules_config.get("ecological", {}).get("enabled") is True
+
+
+def test_build_argentina_demo_scenario_governance_module_enabled() -> None:
+    demo = build_argentina_demo_scenario()
+    assert demo.configuration.modules_config.get("governance", {}).get("enabled") is True
+
+
+def test_build_argentina_demo_scenario_has_co2_seed() -> None:
+    """Ecological seed: co2_concentration_ppm = 369.5 (NOAA MLO 2000)."""
+    demo = build_argentina_demo_scenario()
+    attrs = demo.configuration.initial_attributes["ARG"]
+    assert "co2_concentration_ppm" in attrs
+    co2 = attrs["co2_concentration_ppm"]
+    assert co2.value == "369.5"
+    assert co2.measurement_framework == "ecological"
+    assert co2.source_registry_id == "NOAA_MLO_2000"
+
+
+def test_build_argentina_demo_scenario_has_rule_of_law_seed() -> None:
+    """Governance seed: rule_of_law_percentile = 33.2 (WGI ARG 2000)."""
+    demo = build_argentina_demo_scenario()
+    attrs = demo.configuration.initial_attributes["ARG"]
+    assert "rule_of_law_percentile" in attrs
+    rol = attrs["rule_of_law_percentile"]
+    assert rol.value == "33.2"
+    assert rol.measurement_framework == "governance"
+    assert rol.source_registry_id == "WB_WGI_ARG_2000_RULE_OF_LAW"
+
+
+def test_build_argentina_demo_scenario_has_democratic_quality_seed() -> None:
+    """Governance seed: democratic_quality_score = 0.71 (V-Dem LDI ARG 2000)."""
+    demo = build_argentina_demo_scenario()
+    attrs = demo.configuration.initial_attributes["ARG"]
+    assert "democratic_quality_score" in attrs
+    dqs = attrs["democratic_quality_score"]
+    assert dqs.value == "0.71"
+    assert dqs.measurement_framework == "governance"
+    assert dqs.source_registry_id == "VDEM_V13_ARG_2000_LDI"
+
+
+def test_build_argentina_demo_scenario_has_step_metadata() -> None:
+    """step_metadata must contain entries for steps 1, 2, and 3."""
+    demo = build_argentina_demo_scenario()
+    sm = demo.configuration.step_metadata
+    assert "1" in sm
+    assert "2" in sm
+    assert "3" in sm
+
+
+def test_build_argentina_demo_scenario_step1_is_significant() -> None:
+    demo = build_argentina_demo_scenario()
+    sm = demo.configuration.step_metadata
+    assert sm["1"]["significance"] == "SIGNIFICANT"
+    assert len(sm["1"]["label"]) <= 32
+
+
+def test_build_argentina_demo_scenario_step2_is_significant() -> None:
+    demo = build_argentina_demo_scenario()
+    sm = demo.configuration.step_metadata
+    assert sm["2"]["significance"] == "SIGNIFICANT"
+    assert len(sm["2"]["label"]) <= 32
+
+
+def test_build_argentina_demo_scenario_step3_is_significant() -> None:
+    demo = build_argentina_demo_scenario()
+    sm = demo.configuration.step_metadata
+    assert sm["3"]["significance"] == "SIGNIFICANT"
+    assert "Kirchner" in sm["3"]["label"]
+
+
+def test_build_argentina_demo_scenario_all_labels_under_32_chars() -> None:
+    """All step_metadata labels must be ≤32 chars (trajectory endpoint contract)."""
+    demo = build_argentina_demo_scenario()
+    for key, meta in demo.configuration.step_metadata.items():
+        label = meta.get("label", "")
+        assert len(label) <= 32, (
+            f"step_metadata[{key!r}] label exceeds 32 chars: {label!r} ({len(label)} chars)"
+        )
+
+
+def test_build_argentina_demo_scenario_inherits_base_scheduled_inputs() -> None:
+    """Demo scenario must retain the base backtesting scheduled inputs."""
+    base = build_argentina_scenario()
+    demo = build_argentina_demo_scenario()
+    base_steps = {(si.step, si.input_type) for si in base.scheduled_inputs}
+    demo_steps = {(si.step, si.input_type) for si in demo.scheduled_inputs}
+    assert base_steps.issubset(demo_steps), (
+        f"Demo scenario is missing base inputs: {base_steps - demo_steps}"
+    )
+
+
+def test_build_argentina_demo_scenario_all_quantity_values_are_strings() -> None:
+    """Float prohibition applies to all initial attributes including demo seeds."""
+    demo = build_argentina_demo_scenario()
+    for entity_id, attrs in demo.configuration.initial_attributes.items():
+        for attr_key, qty in attrs.items():
+            assert isinstance(qty.value, str), (
+                f"Float prohibition: {entity_id}.{attr_key}.value "
+                f"is {type(qty.value).__name__}, expected str"
+            )
+
+
+def test_build_argentina_demo_scenario_serializes_to_json() -> None:
+    """model_dump(mode='json') must succeed — step_metadata must round-trip."""
+    demo = build_argentina_demo_scenario()
+    dumped = demo.model_dump(mode="json")
+    cfg = dumped["configuration"]
+    assert "step_metadata" in cfg
+    assert cfg["step_metadata"]["1"]["significance"] == "SIGNIFICANT"
