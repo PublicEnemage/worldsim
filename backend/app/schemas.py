@@ -65,6 +65,28 @@ class TrajectoryFrameworkPoint(BaseModel):
     is_pre_calibration: None = None
 
 
+class PMMRecord(BaseModel):
+    """Per-step Policy Maneuver Margin — Zone 1C (ADR-008 Decision 6, Issue #496).
+
+    value in [0, 1]: 0.0 = at or below an MDA floor; 1.0 = outside all approach zones.
+    direction: "up" | "down" | "flat" relative to the previous step.
+    Both fields are present when any 'all'-scoped MDA threshold has a matching
+    indicator in entity state. Null when no thresholds can be evaluated.
+    """
+
+    model_config = ConfigDict(from_attributes=True)
+
+    value: str
+    direction: str
+
+    @field_validator("value", mode="before")
+    @classmethod
+    def _coerce(cls, v: object) -> str:
+        if isinstance(v, int | float | Decimal):
+            return str(Decimal(str(v)))
+        return str(v)
+
+
 class TrajectoryStep(BaseModel):
     """One computed step in the trajectory response.
 
@@ -72,6 +94,7 @@ class TrajectoryStep(BaseModel):
     step_event_label is null when step_significance is ROUTINE.
     policy_inputs lists ControlInput events applied at this step.
     shock_events is empty for M9.
+    pmm is null when no 'all'-scoped MDA thresholds have indicator data for this step.
     """
 
     model_config = ConfigDict(from_attributes=True)
@@ -83,6 +106,7 @@ class TrajectoryStep(BaseModel):
     frameworks: list[TrajectoryFrameworkPoint]
     policy_inputs: list[dict[str, Any]]
     shock_events: list[dict[str, Any]] = []
+    pmm: PMMRecord | None = None
 
 
 class TrajectoryResponse(BaseModel):
@@ -91,6 +115,7 @@ class TrajectoryResponse(BaseModel):
     mda_floors is at the response root, not per-step (ADR-010 Decision 2).
     entity_id is the first entity in scenario configuration.entities.
     steps is a dense array of computed steps only.
+    Each step carries pmm (Policy Maneuver Margin) derived from MDA thresholds (Issue #496).
     """
 
     model_config = ConfigDict(from_attributes=True)

@@ -21,6 +21,7 @@ export interface TrajectoryStep {
   step_event_label: string | null;
   step_significance: "SIGNIFICANT" | "ROUTINE";
   frameworks: Record<string, TrajectoryFrameworkPoint>;
+  pmm: { value: number; direction: "up" | "down" | "flat" } | null;
 }
 
 export interface MDAFloor {
