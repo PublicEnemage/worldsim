@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-02 (PR #645 merged — Step 4 narration honest scope framing; issues #642/643/644 filed for M11; financial narration EL decision resolved)**
+**Last updated: 2026-06-02 (PRs #649/#650/#651 merged — Demo 3 screenshot IR review; PMM breach-exclusion fix; Zone 1B responsive columnWidth; Step 9 stakeholder demo confirmed; issue #652 filed)**
 **Current milestone:** M10 — Engine Integrity and Instrument Delivery (M9 formally closed; M10 active)
 
 ---
@@ -76,12 +76,15 @@ M9 formally closed. Issue #213 (M9 Exit Checklist) closed 2026-05-24. M10 milest
 
 ## Open PRs
 
-No open PRs — board clear as of 2026-06-02 (post PR #645 merge).
+No open PRs — board clear as of 2026-06-02 (post PR #651 merge).
 
 ## Recently Merged PRs (last 5)
 
 | PR | Title | Date |
 |---|---|---|
+| #651 | fix(zone1b): pass responsive columnWidth to MDAAlertPanelZone1B (closes #647) | 2026-06-02 |
+| #650 | fix(pmm): skip breached thresholds — PMM measures remaining headroom (closes #648) | 2026-06-02 |
+| #649 | docs(demo): Step 7 screenshot IR — Demo 3 five-frame review; IR-S7-001 through IR-S7-005 | 2026-06-02 |
 | #645 | docs(demo): Step 4 narration — honest scope framing replaces false recovery claim | 2026-06-02 |
 | #640 | docs(process): NM-028/029/030 — Demo 3 near-miss filings | 2026-06-02 |
 | #639 | fix(demo3): four CRITICAL blocking bugs — trajectory re-fetch, governance event mismatch, ecological temporal guard, boundary constant fetch | 2026-06-02 |
@@ -290,6 +293,10 @@ All Horizon:Immediate issues are now closed. M8 feature-complete.
 
 | Decision | Rationale | Date |
 |---|---|---|
+| Demo 3 Step 9 complete — stakeholder demo session confirmed end-to-end (PRs #649–#651) | Playwright demo spec ran at 1440×900 (1 passed, 4.3m). Five frames captured. PMM trajectory API confirmed: Steps 0–1 = 0.2857 (governance headroom ≈ 0.29, CO2 breach excluded), Step 2 = 0.4286 (↑ Kirchner improvement), Steps 3–4 = None (governance threshold breached). Zone 1B full-density cards render at 400px column (WARNING cards legible). Issues #634/#647/#648/#345 closed. Issue #652 filed (narration legibility — umbrella framing and synthesis; M10 Near-Term). | 2026-06-02 |
+| PMM breach-exclusion fix — skip breached thresholds (PR #650, closes #648) | Root cause: ecological CO2 boundary (≥ 1.0) breached from step 0 in Argentina (seed ≈ 1.056); old min(margins) collapsed to 0, masking governance headroom. Fix: `_compute_pmm_for_step` skips thresholds with margin == 0. MDA alerts carry the breach signal; PMM measures remaining headroom on non-breached thresholds. Returns None when all thresholds breached (shown as "—" in UI). 31 unit tests pass; three new tests replace `test_min_across_thresholds` (which encoded the old wrong contract). | 2026-06-02 |
+| Zone 1B responsive columnWidth fix (PR #651, closes #647) | Root cause: `MDAAlertPanelZone1B` hardcoded `columnWidth={240}` in ScenarioInstrumentCluster — always compact (11px, abbreviated labels) regardless of viewport. At 1440×900 the co-primary column is 400px → should be full-density (12px, full severity labels, untruncated names). Fix: exported `LAYOUT` and `useViewportBreakpoint` from InstrumentCluster; ScenarioInstrumentCluster now passes `LAYOUT[bp].coPrimary` as columnWidth. Resolves IR-S7-001 (CRITICAL) from Demo 3 IR review. | 2026-06-02 |
+| EL decision — Demo 3 narration legibility gap (Issue #652) | Narration delivers facts without scaffolding: no umbrella sentence (why now?), no synthesis sentence (so what?), no connective tissue between steps. Same compression-over-legibility problem as Issue #621 applied to narration. EL instructed: file Issue #652, assign M10 Near-Term; independent reviewer activation using senior fiscal policy analyst framing (someone who has sat on both sides of a programme negotiation). UX Designer Agent is R; PM Agent is C. Rewrite should not change factual content — only add framing. | 2026-06-02 |
 | Financial narration EL decision — Step 4 wording (PR #645) | Replaced "the financial arc has recovered" with honest scope framing: directs audience to the GDP indicator panel (showing +9%), acknowledges the Kirchner recovery is real, notes governance healing slowly, and explicitly names the recovery arc as M11 scope. Resolves the demo-blocking narration gap identified in Demo 3 review (Issue #634). Three M11 issues filed from panel review: #642 (EmergencyPolicyInput integration test — mandatory before M11 exit), #643 (ESLint exhaustive-deps audit), #644 (setTrajectory refactor — must not set current_step as side effect). All three assigned to Milestone 11 via GitHub API. | 2026-06-02 |
 | Demo 3 CRITICAL bug cluster fixed + screenshots captured (PR #639) | Four bugs fixed: (1) `ScenarioInstrumentCluster.tsx` trajectory useEffect depended only on `[scenarioId]` — never re-fetched after step advances; fixed to `[scenarioId, currentStep]` with step-0 guard. (2) `setTrajectory` store action sets `current_step: trajectory.step_count`, clobbering prop-driven step; fixed by immediately re-asserting `currentStep` after `setTrajectory`. (3) GovernanceModule `_SUBSCRIBED_EVENTS` used bare instrument names (`"emergency_declaration"`); `EmergencyPolicyInput.to_events()` emits `"emergency_policy_emergency_declaration"` — corrected throughout module + elasticity registry + unit tests. (4) EcologicalModule temporal guard blocked pre-2009 CO2 proximity for Argentina (2001 start); fixed with per-constant `retroactive` flag; `_fetch_active_boundary_constants` changed to `WHERE effective_from <= NOW()`. Five Demo 3 screenshots captured with real data. Governance MDA-GOV-DEMOCRACY-FLOOR fires at step 3 (DQS 0.665 < 0.70). IR-004 Playwright test fixed: `page.waitForResponse` before `advanceStep`, then `page.waitForFunction` polls DOM for year text. Known gap: financial composite stays 0.0000 from step 2 (Kirchner recovery not in fixture) — narration "financial arc recovered" does not match instrument output; decision required before demo session. | 2026-06-02 |
 | NM-028/029/030 filed + panel review posted (PR #640, comment on #634) | Three near-misses filed: NM-028 (IR-004 silent no-op — hasSvg guard returned early for one milestone; same anti-pattern as NM-027; no-op check not run at wire-up merge boundary); NM-029 (GovernanceModule event_type false positive coverage — 25 unit tests passed with wrong synthetic event_type strings, never crossing EmergencyPolicyInput adapter; highest-severity of the three); NM-030 (EcologicalModule temporal guard silently blocked retroactive CO2 proximity for pre-2009 backtesting without user-visible error). Four-agent panel review (Architect, Frontend Architect, QA Lead, UX Designer) posted to Issue #634. Key panel findings: `setTrajectory` should not set `current_step` (FA — store design flaw, follow-up issue needed); ESLint `exhaustive-deps` rule should be audited and enforced (would have caught the useEffect missing-dependency bug); integration test required for input adapter → subscriber event_type contract; financial 0.0000 vs. "recovered" narration is a demo-blocking UX gap requiring EL decision. | 2026-06-02 |
@@ -431,14 +438,15 @@ All Horizon:Immediate issues are now closed. M8 feature-complete.
 - `greenlet==3.1.1` added to requirements.txt (SQLAlchemy async on Python 3.13 CI).
 - Promotion gate tests in `test_measurement_output.py` removed; replaced by backtesting integration test.
 
-**PMM live computation — merged ✅ (PR #587, Issue #496 IR-002):**
+**PMM live computation — merged ✅ (PR #587, Issue #496 IR-002). Breach-exclusion fix — PR #650 (closes #648):**
 - `PMMRecord` schema: `value` (Decimal-as-str, [0,1]) + `direction` ("up"/"down"/"flat")
-- `TrajectoryStep.pmm: PMMRecord | None` — null when no 'all'-scoped MDA threshold has matching indicator
+- `TrajectoryStep.pmm: PMMRecord | None` — null when no applicable threshold has matching indicator, OR when all thresholds are already breached
 - `_pmm_indicator_margin()`: [0,1] headroom for one threshold; approach window = `floor * approach_pct`; both `lte` (lower-bound) and `gte` (upper-bound) operators supported
-- `_compute_pmm_for_step()`: min-of-margins across all applicable thresholds; direction from prev-step delta vs ±0.01; cohort-scoped thresholds skipped; entity-scoped thresholds matched by exact entity_id
+- `_compute_pmm_for_step()`: **skips breached thresholds (margin == 0)**; min-of-margins across non-breached applicable thresholds; returns None when all thresholds breached (displayed as "—"); direction from prev-step delta vs ±0.01; cohort-scoped thresholds skipped; entity-scoped thresholds matched by exact entity_id
 - MDA thresholds fetched once per trajectory request (not per step)
+- Argentina Demo 3 PMM path: Steps 0–1 ≈ 0.2857 (governance headroom; ecological CO2 breach excluded), Step 2 ≈ 0.4286 (↑ Kirchner recovery improvement), Steps 3–4 = None / "—" (governance threshold breached by emergency_declaration at step 2)
 - Frontend: `useEffect([currentStep, store.trajectory])` in `ScenarioInstrumentCluster` syncs `pmm_value`/`pmm_direction` to Zustand store; `TrajectoryStep` store type extended with `pmm` field
-- 29 new unit tests: `backend/tests/unit/test_pmm_computation.py`
+- 31 unit tests: `backend/tests/unit/test_pmm_computation.py` (3 new breach-exclusion tests replace old `test_min_across_thresholds`)
 
 **ADR-001 + ADR-002 — renewed ✅ (PR #510). Valid Until Milestone 10.**
 
