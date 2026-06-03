@@ -1,7 +1,7 @@
 # Demo Preparation Standard
 
 **Established:** 2026-05-18
-**Last revised:** 2026-06-02 (M10 — screenshot naming, legibility gate, narration instrument check, NARRATION-RULING-1 self-check; closes #379)
+**Last revised:** 2026-06-02 (M10 — screenshot naming, legibility gate, narration instrument check, NARRATION-RULING-1 self-check, review naming convention enforcement; closes #379, NM-031)
 **Cadence:** Every two milestones (M6, M8, M10, M12...)
 **Reference cases:** Issue #220 (M6), Issue #333 (M8), Issue #261 (M10)
 
@@ -39,9 +39,28 @@ docs/demo/
       frame-d-<label>.png
       frame-e-<label>.png
     reviews/
-      YYYY-MM-DD-v{version}-stakeholder-review.md
+      YYYY-MM-DD-v{version}-stakeholder-review.md   ← canonical Step 7 review
+      YYYY-MM-DD-v{version}-pre-gate-triage.md      ← optional; pre-gate only
   stakeholder-walkthrough.md       — current version (updated each demo cycle)
 ```
+
+**Naming rule — mandatory pre-creation check:**
+Before saving any review document, run:
+```bash
+find docs/demo/ -name "*stakeholder-review*"
+```
+Confirm the new filename matches the pattern `YYYY-MM-DD-v{version}-stakeholder-review.md`
+exactly — same prefix, same separator style, same suffix. The M8 file
+(`2026-05-18-v0.8.0-stakeholder-review.md`) is the canonical reference instance.
+
+**Pre-gate triage reviews** (conducted before screenshots are captured) are a distinct
+artifact from the canonical Step 7 review. If a pre-gate triage IR is run, save it as
+`YYYY-MM-DD-v{version}-pre-gate-triage.md` in the same `reviews/` folder. Add a header
+note identifying it as pre-gate. The canonical Step 7 review must still be conducted
+separately (with screenshots) and saved under the `*-stakeholder-review.md` name. Do not
+use a descriptive suffix (e.g. `demo3-screenshot-ir`, `demo3-ir`) in place of the
+canonical name — the suffix is always `-stakeholder-review.md` for Step 7 and
+`-pre-gate-triage.md` for pre-gate work. NM-031 documents the M10 deviation.
 
 Playwright specs are similarly versioned:
 
@@ -235,4 +254,4 @@ Use `scripts/demo.sh` to start the stack before the audience arrives.
 |---|---|---|
 | M6 | #220 | `docs/demo/m6/reviews/2026-05-07-v0.6.0-stakeholder-review.md` |
 | M8 | #333 | `docs/demo/m8/reviews/2026-05-18-v0.8.0-stakeholder-review.md` |
-| M10 | #261 | `docs/demo/m10/reviews/` (in progress) |
+| M10 | #261 | `docs/demo/m10/reviews/2026-06-02-v0.10.0-stakeholder-review.md` |
