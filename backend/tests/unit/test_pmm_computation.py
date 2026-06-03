@@ -194,13 +194,16 @@ class TestComputePmmForStep:
         assert result is not None
         assert Decimal(result.value) == Decimal("0.5")
 
-    def test_min_across_thresholds(self) -> None:
-        # reserves margin = 1.0 (well above), debt margin = 0 (at breach)
+    def test_breached_threshold_excluded_non_breached_contributes(self) -> None:
+        # debt_gdp_ratio is at breach (margin=0) — excluded from PMM.
+        # reserve_coverage_months is well outside approach zone (margin=1.0).
+        # PMM = 1.0 (only the non-breached threshold contributes).
+        # Breached thresholds are MDA-alert territory; PMM measures remaining headroom.
         result = _compute_pmm_for_step(
             entity_id="GRC",
             entity_attrs={
                 "reserve_coverage_months": _qty("10.0"),
-                "debt_gdp_ratio": _qty("1.20"),  # at floor for gte
+                "debt_gdp_ratio": _qty("1.20"),  # at floor for gte — breach
             },
             mda_thresholds=[
                 _threshold("reserve_coverage_months", "2.5", "0.20", "lte"),
@@ -209,7 +212,46 @@ class TestComputePmmForStep:
             prev_pmm=None,
         )
         assert result is not None
-        assert Decimal(result.value) == Decimal("0")
+        assert Decimal(result.value) == Decimal("1")
+
+    def test_all_thresholds_breached_returns_none(self) -> None:
+        # All thresholds at breach — PMM is None (shown as "—" in UI).
+        # MDA alerts carry the breach signal; PMM has nothing to measure.
+        result = _compute_pmm_for_step(
+            entity_id="GRC",
+            entity_attrs={
+                "reserve_coverage_months": _qty("2.0"),  # below floor 2.5 — breach
+                "debt_gdp_ratio": _qty("1.20"),          # at floor 1.20 — breach
+            },
+            mda_thresholds=[
+                _threshold("reserve_coverage_months", "2.5", "0.20", "lte"),
+                _threshold("debt_gdp_ratio", "1.20", "0.10", "gte"),
+            ],
+            prev_pmm=None,
+        )
+        assert result is None
+
+    def test_ecological_breach_excluded_governance_margin_survives(self) -> None:
+        # Argentina Demo 3 pattern: CO2 proximity already breached (>=1.0),
+        # governance score not yet breached (0.71 > 0.70 floor).
+        # PMM = governance margin only; ecological breach is excluded.
+        # governance margin = (0.71 - 0.70) / (0.70 * 0.05) = 0.01/0.035 ≈ 0.2857
+        result = _compute_pmm_for_step(
+            entity_id="ARG",
+            entity_attrs={
+                "planetary_boundary_co2_proximity": _qty("1.056"),  # breach
+                "democratic_quality_score": _qty("0.71"),           # not breached
+            },
+            mda_thresholds=[
+                _threshold("planetary_boundary_co2_proximity", "1.0", "0.05", "gte"),
+                _threshold("democratic_quality_score", "0.70", "0.05", "lte"),
+            ],
+            prev_pmm=None,
+        )
+        assert result is not None
+        expected = (Decimal("0.71") - Decimal("0.70")) / (Decimal("0.70") * Decimal("0.05"))
+        assert abs(Decimal(result.value) - expected) < Decimal("0.0001")
+        assert result.direction == "flat"  # prev_pmm is None
 
     def test_direction_up_when_pmm_improves(self) -> None:
         result = _compute_pmm_for_step(
