@@ -62,8 +62,9 @@ GOVERNANCE_ELASTICITY_REGISTRY: list[GovernanceElasticity] = [
     # concentrated to achieve conditionality. Net elasticity positive (modest
     # improvement) at +0.005 on V-Dem Liberal Democracy Index per acceptance
     # event. Event magnitude for imf_program_acceptance is +1.0 (binary signal).
+    # event_type: EmergencyPolicyInput emits "emergency_policy_{instrument.value}".
     GovernanceElasticity(
-        event_type="imf_program_acceptance",
+        event_type="emergency_policy_imf_program_acceptance",
         indicator_key="democratic_quality_score",
         elasticity=Decimal("0.005"),
         confidence_tier=3,
@@ -84,8 +85,9 @@ GOVERNANCE_ELASTICITY_REGISTRY: list[GovernanceElasticity] = [
     # democratic_quality_score by 0.05 on the V-Dem [0,1] scale, consistent
     # with the 2015 Greece capital-controls-era democratic backsliding observed
     # in V-Dem v13 data (LDI dropped from 0.72 to 0.67 across 2014–2015).
+    # event_type: EmergencyPolicyInput emits "emergency_policy_{instrument.value}".
     GovernanceElasticity(
-        event_type="emergency_declaration",
+        event_type="emergency_policy_emergency_declaration",
         indicator_key="democratic_quality_score",
         elasticity=Decimal("-0.05"),
         confidence_tier=3,

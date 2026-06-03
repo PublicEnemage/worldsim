@@ -50,8 +50,10 @@ _DEFAULT_GOVERNANCE_UNIT = "dimensionless"
 _SUBSCRIBED_EVENTS = frozenset({
     "gdp_growth_change",
     "fiscal_policy_spending_change",
-    "imf_program_acceptance",
-    "emergency_declaration",
+    # EmergencyPolicyInput.to_events() emits "emergency_policy_{instrument.value}",
+    # not the bare instrument name. These must match the actual event_type produced.
+    "emergency_policy_imf_program_acceptance",
+    "emergency_policy_emergency_declaration",
 })
 
 

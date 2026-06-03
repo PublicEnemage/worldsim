@@ -518,12 +518,13 @@ def test_build_argentina_demo_scenario_governance_mda_breach_math() -> None:
 
     imf_elasticity = next(
         r.elasticity for r in GOVERNANCE_ELASTICITY_REGISTRY
-        if r.event_type == "imf_program_acceptance"
+        if r.event_type == "emergency_policy_imf_program_acceptance"
         and r.indicator_key == "democratic_quality_score"
     )
     emergency_elasticity = next(
         r.elasticity for r in GOVERNANCE_ELASTICITY_REGISTRY
-        if r.event_type == "emergency_declaration" and r.indicator_key == "democratic_quality_score"
+        if r.event_type == "emergency_policy_emergency_declaration"
+        and r.indicator_key == "democratic_quality_score"
     )
 
     # Step 2 effect: imf_program_acceptance fires at step 1 → processed at step 2
