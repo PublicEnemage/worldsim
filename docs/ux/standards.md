@@ -256,3 +256,45 @@ scenario curves render at 100% opacity, 2px stroke. A divergence fill region (5�
 appears where they separate.
 
 This is not a user-toggled feature. The comparison is always live once a control input exists.
+
+---
+
+## 16. Live-Application Narration Structure (NARRATION-RULING-1)
+
+**Authority:** EL ruling 2026-06-02 (Issue #652, Issue #654).
+
+Every live-application narration block in Section 2 of the stakeholder walkthrough
+follows a mandatory three-layer structure:
+
+1. **Umbrella** — what is happening and why it matters now, before any facts are
+   stated. One to two sentences that orient the audience to the cognitive task of the
+   current step. Answers: "What am I looking at and why does it matter at this moment
+   in the presentation arc?"
+
+2. **Facts** — the instrument output, exactly as readable on screen. No interpretation
+   yet. "The PMM widget reads 0.29." "Zone 1B shows a CRITICAL threshold breach on
+   `reserve_coverage_months` at step 2."
+
+3. **Synthesis** — so what. The implication for the audience's decision context: the
+   negotiating room, the ministry brief, the policy lever that no longer exists. One to
+   two sentences that connect the fact to the use case.
+
+**Transitions:** Where the presentation arc demands connective tissue between steps
+(e.g. "that is what Zone 1A showed — Zone 1B now puts a specific number on it"), a
+transition sentence is required. Transitions are not optional when a step's argument
+depends on the previous step's finding.
+
+**Edge case:** When existing narration already embeds a strong synthesis within the
+fact statement itself, a separate synthesis sentence is redundant. The test: can a
+listener who looked away during the fact statement understand the implication from the
+synthesis sentence alone? If yes, the synthesis is present whether or not it is
+structurally separate.
+
+**Violation:** A narration block that opens with an instrument reading before the
+umbrella is in place violates this standard. "The PMM widget shows 0.29" as an opener
+is a violation; "This is the frame that tells us how much headroom remains — the PMM
+widget reads 0.29" is not.
+
+**Check cadence:** Applied at Step 5c of the Demo Preparation Standard for each
+milestone cycle (M10 forward). Authority reference in prep standard:
+`docs/process/demo-preparation-standard.md §Step 5c`.

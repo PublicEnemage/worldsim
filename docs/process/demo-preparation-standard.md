@@ -1,7 +1,7 @@
 # Demo Preparation Standard
 
 **Established:** 2026-05-18
-**Last revised:** 2026-06-02 (M10 — screenshot naming, legibility gate, narration instrument check; closes #379)
+**Last revised:** 2026-06-02 (M10 — screenshot naming, legibility gate, narration instrument check, NARRATION-RULING-1 self-check; closes #379)
 **Cadence:** Every two milestones (M6, M8, M10, M12...)
 **Reference cases:** Issue #220 (M6), Issue #333 (M8), Issue #261 (M10)
 
@@ -140,6 +140,27 @@ npx playwright test tests/e2e/demo-advancement-flow.spec.ts --project=chromium
 All tests must pass before screenshots are captured. A legibility failure means a
 frame will be illegible in the review — the same defect class as DEMO-002, DEMO-003,
 DEMO-005. Fix the failing assertion before proceeding to Step 6.
+
+### Step 5c — Narration structure self-check (M10 forward — NARRATION-RULING-1)
+
+Before the Independent Review Agent sees the script, apply a self-check to every
+live-application step in Section 2 of `docs/demo/stakeholder-walkthrough.md`.
+For each step, verify all three of:
+
+- [ ] **Umbrella present.** One to two sentences orient the audience before any
+  instrument reading is stated. The step does not open with a fact.
+- [ ] **Synthesis present.** After the instrument output, one to two sentences
+  draw the implication for the decision context (negotiating room, ministry brief,
+  policy headroom).
+- [ ] **Transitions present where required.** If the step's argument depends on
+  the prior step's finding, a connective sentence bridges them. Steps in a causal
+  chain are not self-contained.
+
+Authority: NARRATION-RULING-1 (`docs/ux/standards.md §16`).
+
+This check gates against the class of defect documented in Issue #652: narration
+that presents instrument output without framing or implication, introducing
+presenter-skill dependency for the "so what" the audience needs.
 
 ### Step 6 — Run the demo and capture screenshots
 
