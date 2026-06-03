@@ -375,20 +375,50 @@ test("IR-004: start_year input seeds trajectory tick year labels", async ({
   });
 
   // Guard: trajectory SVG may not render at all viewports (no-op if absent).
-  const svg = page.locator('[data-testid="zone-1a-trajectory"] svg').first();
-  const hasSvg = await svg.isVisible({ timeout: 3_000 }).catch(() => false);
-  if (!hasSvg) return;
+  const svgVisible = await page
+    .locator('[data-testid="zone-1a-trajectory"] svg')
+    .first()
+    .isVisible()
+    .catch(() => false);
+  if (!svgVisible) return;
 
-  // Collect all text node contents from the SVG tick labels.
-  const allText = await svg.locator("text").allTextContents();
-  const joined = allText.join(" ");
+  // Poll the browser DOM until tick labels include a year in the expected window.
+  // waitForFunction runs JS directly in the browser — immune to React render delay
+  // and Playwright polling interval races that allTextContents() point-in-time
+  // snapshots face. If this times out, the catch captures actual SVG content for
+  // diagnosis in the failure message.
+  const yearFound = await page
+    .waitForFunction(
+      () => {
+        const texts = Array.from(
+          document.querySelectorAll(
+            '[data-testid="zone-1a-trajectory"] svg text',
+          ),
+        )
+          .map((el) => el.textContent ?? "")
+          .join(" ");
+        return (
+          texts.includes("2015") ||
+          texts.includes("2016") ||
+          texts.includes("2017") ||
+          texts.includes("2018")
+        );
+      },
+      { timeout: 10_000 },
+    )
+    .catch(async () => {
+      const actualText = await page.evaluate(() =>
+        Array.from(
+          document.querySelectorAll(
+            '[data-testid="zone-1a-trajectory"] svg text',
+          ),
+        )
+          .map((el) => el.textContent)
+          .join(" | "),
+      );
+      console.error(`IR-004 DIAGNOSTIC: SVG text content = "${actualText}"`);
+      return null;
+    });
 
-  // The tick labels must reference years in the 2015–2018 window (start_year
-  // to start_year + n_steps), NOT the 2000-era default.
-  const hasExpectedYear =
-    joined.includes("2015") ||
-    joined.includes("2016") ||
-    joined.includes("2017") ||
-    joined.includes("2018");
-  expect(hasExpectedYear).toBe(true);
+  expect(yearFound, "Trajectory tick labels must include a year in 2015–2018 range").not.toBeNull();
 });
