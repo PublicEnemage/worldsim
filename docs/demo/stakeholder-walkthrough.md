@@ -313,11 +313,16 @@ Governance composite healing slowly — not yet at full recovery.
 
 **What the presenter says:**
 
-> Step 4 is 2004. GDP growing at plus 9 percent. The Kirchner recovery is entrenched.
+> Step 4 is 2004. The GDP numbers — which you can see in the indicator panel —
+> are growing at plus 9 percent. The Kirchner recovery is real.
 >
-> Now look at the trajectory arc as a whole: four steps, all four frameworks.
-> The financial arc has recovered. The governance arc is healing — but slowly.
+> But look at the governance composite: it's healing slowly, not yet restored.
 > Institutional recovery lags financial recovery, sometimes by years.
+>
+> And this points to something the current fixture doesn't yet model: the full
+> Kirchner recovery arc. That's a scope limitation we're honest about — the
+> simulation captures the crisis, the default, and the governance deterioration.
+> The recovery phase is M11 scope.
 >
 > And this is the platform principle made concrete: the same engine, the same
 > instruments, the same analytical discipline that modelled Greece in 2010 to 2015
