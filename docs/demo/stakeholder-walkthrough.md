@@ -165,11 +165,18 @@ view, MDA alert panel, PMM widget, four-framework current position.
 
 **What the presenter says:**
 
-> This is the baseline view. The map provides geographic context — you can see
-> where any country sits relative to its neighbours, and in a multi-entity
-> scenario you can see how the analysis distributes across a region. The
-> analytical instrument is the panel on the left: four instruments, always
-> visible, updated with each simulation step.
+> This is the tool running — not a mock-up, not a recorded screen. This is
+> what a ministry analyst would open.
+>
+> The map provides geographic context — you can see where any country sits
+> relative to its neighbours, and in a multi-entity scenario you can see how
+> the analysis distributes across a region. The analytical instrument is the
+> panel on the left: four instruments, always visible, updated with each
+> simulation step.
+>
+> In the next few minutes, that panel will show you a sovereign debt crisis
+> from the inside — the same sequence of decision points a ministry team
+> would see, with the same instruments, in real time.
 
 **Cognitive purpose:** Orient. Establish that the primary analytical surface is
 the instrument cluster, not the map. The map is a navigation aid, not the
@@ -189,6 +196,11 @@ The Zone 1 instruments load with Argentina data.
 
 **What the presenter says:**
 
+> We chose Argentina 2001 because it is structurally different from every
+> European austerity case. This is not an external conditionality story —
+> it is a convertibility collapse. If the same engine handles both, that
+> tells us something.
+>
 > We are modelling Argentina's 2001 to 2002 sovereign default — four years.
 > The Zero Deficit Plan: a pro-cyclical spending cut of 6.5 percent of GDP,
 > imposed in July 2001. The IMF Blindaje programme. Then the default itself —
@@ -197,6 +209,9 @@ The Zone 1 instruments load with Argentina data.
 >
 > The crisis conditions are the scheduled inputs. The simulation produces the
 > consequences. Each step is one year.
+>
+> What you are about to see is not a chart of history — it is the instrument
+> cluster reading that scenario forward, one step at a time.
 
 **Cognitive purpose:** Establish that scenarios are structured, not arbitrary.
 The historical events — the programme conditions, the default, the emergency
@@ -211,9 +226,16 @@ counter increments: 1/4 → 2/4 → 3/4 → 4/4. Zone 1A updates at each step.
 
 **What the presenter says:**
 
+> Before we pause on any specific step, I want you to see the full arc —
+> the shape of the crisis and recovery is the context for everything that
+> follows.
+>
 > Each step is one year. Watch the trajectory view as the crisis arc unfolds.
 > The step labels come from the historical event record: Zero Deficit Plan,
 > Default, Kirchner recovery, Growth consolidation.
+>
+> Notice that different curves move at different speeds. That asymmetry is
+> exactly where the argument lives.
 
 **Cognitive purpose:** Show time progression. Establish the four-step arc from
 crisis entry to recovery. The Zone 1A trajectory curves tell the story across
@@ -229,6 +251,9 @@ while the governance curve remains flat near the breach floor.
 
 **What the presenter says:**
 
+> This is the frame that matters most. Step 3 is where the instrument shows
+> something a single-axis measurement cannot.
+>
 > Step 3 is 2003. The Kirchner recovery is beginning. Look at the trajectory view.
 >
 > The financial curve — the dashed line — is rising. GDP is recovering. The
@@ -243,6 +268,8 @@ while the governance curve remains flat near the breach floor.
 >
 > Financial recovery and institutional recovery are not the same event. No
 > single-axis measurement tool can show you both simultaneously. This one does.
+>
+> And the next panel puts a specific, citeable number on what you just saw.
 
 **PAUSE — let them look at Zone 1B.**
 
@@ -256,6 +283,10 @@ threshold of 0.70. Step 3. Governance framework.
 
 **What the presenter says:**
 
+> Zone 1A showed you the trajectory. Zone 1B tells you what the trajectory
+> has crossed — in a form that is specific enough to take into a room where
+> evidence needs a source, a threshold, and a step.
+>
 > This is a Minimum Descent Altitude alert. In aviation, the MDA is the floor
 > below which an aircraft cannot safely descend given the terrain. In this
 > simulation, MDAs are analytical floors — levels below which consequences
@@ -267,7 +298,8 @@ threshold of 0.70. Step 3. Governance framework.
 > That sentence is specific enough to cite in a negotiation. You are not
 > saying "things look bad." You are citing a finding with an indicator, a
 > threshold, a step, and a framework. That is the difference between intuition
-> and analytical standing.
+> and analytical standing. And it changes what the ministry can put on the
+> table.
 
 **Cognitive purpose:** Introduce the MDA alert as citeable evidence. The format
 matters: indicator / severity / step / framework. A ministry official who can
@@ -283,6 +315,10 @@ a null treatment — not zero, but explicitly disclosed as deferred.
 
 **What the presenter says:**
 
+> Every programme negotiation makes assumptions across multiple domains at once —
+> fiscal, human, ecological, governance. Zone 1D answers: what does the full
+> picture look like at this step, simultaneously?
+>
 > Four axes: financial, human development, ecological, governance. At Milestone 10,
 > all four are in the instrument cluster.
 >
@@ -298,6 +334,9 @@ a null treatment — not zero, but explicitly disclosed as deferred.
 > When you add a second country to this analysis, those composites activate.
 > The limitation is disclosed in the interface. The indicators — GDP growth,
 > unemployment — are live.
+>
+> The nulls are not hiding anything. They are the model being precise about what
+> a composite score requires to mean something.
 
 **Cognitive purpose:** Introduce the four-framework measurement principle. The
 ecological and governance live scores and the honest null treatment for financial
@@ -313,6 +352,9 @@ Governance composite healing slowly — not yet at full recovery.
 
 **What the presenter says:**
 
+> One more step — because recovery is where the instrument makes the finding
+> that a headline GDP number cannot.
+>
 > Step 4 is 2004. The GDP numbers — which you can see in the indicator panel —
 > are growing at plus 9 percent. The Kirchner recovery is real.
 >
@@ -329,6 +371,8 @@ Governance composite healing slowly — not yet at full recovery.
 > now models Argentina from 2001 to 2004. Different crisis arc, different geopolitical
 > context, same tool. A finance minister in any country facing programme conditionality
 > can use this. The inputs change. The analytical framework does not.
+>
+> That is the tool. What makes the finding credible is what we validated it against.
 
 **Cognitive purpose:** Close the live demo on the Platform Principle. This is the
 most important claim for potential adopters — the tool is not built for one country
