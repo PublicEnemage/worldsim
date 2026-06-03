@@ -75,6 +75,20 @@ are updated in place. They are operational tools, not artifacts.
 
 ---
 
+## Three-Tier Review Structure (M10 forward)
+
+Every demo cycle passes through three review tiers in sequence. No tier may be skipped.
+
+| Tier | Step | Who | Gate |
+|---|---|---|---|
+| Self-check | 5a / 5b / 5c | Acting agent | Narration instrument check + Playwright legibility + NARRATION-RULING-1 all pass |
+| **Internal team review** | **6b** | **Nine-agent panel (PM Agent orchestrates)** | **All CRITICAL findings resolved + filed; all HIGH findings filed — before Step 7** |
+| Independent review | 7 | Fresh Claude instance (IR Agent) | All CRITICAL and HIGH findings from IR filed as GitHub issues — before Step 9 |
+
+The tiers are sequential and non-negotiable. The IR Agent (Step 7) must not be activated until the Step 6b gate is satisfied. The stakeholder session (Step 9) must not occur until the Step 8 gate is satisfied.
+
+---
+
 ## Preparation Steps — In Order
 
 ### Step 1 — File the demo preparation issue
@@ -205,6 +219,62 @@ frame-03-step1.png         ← presentation order 3
 Alternatively, include a `SEQUENCE.md` in `docs/demo/m{N}/screenshots/` that maps
 capture names to presentation order explicitly. Either convention is acceptable;
 capture-order-only filenames are not.
+
+### Step 6b — Internal Team Review (M10 forward — Issue #663)
+
+Activate the nine-agent panel before the Independent Review Agent sees any screenshots.
+Each agent reviews the captured screenshots and the narration script independently against
+their defined lens. This is not a cross-agent discussion — findings are produced in parallel,
+then aggregated by PM Agent.
+
+**Activation:** PM Agent provides each agent with: (1) the screenshot set in UX Agent brief
+presentation sequence, (2) `docs/demo/stakeholder-walkthrough.md`, and (3) their lens below.
+
+**Panel and lenses:**
+
+| Agent | Lens |
+|---|---|
+| Frontend Architect | Rendering fidelity, layout contract vs. spec (ADR-008/ADR-010), component behavior |
+| UX Designer | Design system compliance, `docs/ux/standards.md` conformance, visual hierarchy |
+| UX Design Thinking Agent | Mode-specific cognitive task alignment, instrument legibility, NARRATION-RULING-1 conformance |
+| PO Agent | User story acceptance criteria alignment — does the demo deliver on the stated stories? |
+| Customer Agent | Layer 3 usability — can the non-specialist user read this without specialist mediation? |
+| QA Lead | Acceptance criteria coverage — does the demo surface what the test suite asserts? |
+| Data Architect | Data fidelity — provenance indicators, synthetic flags, confidence tiers correctly displayed? |
+| Chief Methodologist (DIC) | No False Precision — uncertainty signals, bands, tiers correctly surfaced? |
+| Development Economist (DIC) | Human cost ledger — is human impact given equal visual weight to financial indicators? |
+
+**Finding format (per agent):**
+
+```
+[DEMO-NNN]: [one-line title]
+Severity: CRITICAL / HIGH / MEDIUM / LOW
+Screenshot ref: [frame label or step number]
+What is shown: [description]
+What should be shown / what is missing: [description]
+Recommendation: [specific actionable change]
+```
+
+**Finding numbering:** Internal review findings enter the `DEMO-NNN` namespace, continuing
+from the last number used in the most recent milestone's IR review. PM Agent checks the
+last assigned `DEMO-NNN` before beginning aggregation.
+
+**Artifact format** (`YYYY-MM-DD-vX.X.X-internal-review.md` in `docs/demo/m{N}/reviews/`):
+1. One section per agent — each agent's findings in the format above, unedited.
+2. PM Agent consolidated summary table:
+   `| Finding ID | Agent | Severity | One-line description | Status |`
+3. Gate status declaration: which CRITICAL findings are resolved (with disposition), which
+   HIGH findings are filed with GitHub issue numbers.
+
+**CRITICAL finding resolution criteria** — one of the following must be true before Step 7:
+- (a) A fix is committed and the PR is merged.
+- (b) The finding is out of scope for this milestone — a rationale comment exists on the filed GitHub issue.
+- (c) The EL explicitly accepts it as a known gap — an EL comment exists on the filed GitHub issue.
+"Filed" without one of these three verdicts does not satisfy the gate.
+
+**Gate:** All CRITICAL findings resolved (per criteria) and filed as GitHub issues before
+Step 7. All HIGH findings filed as GitHub issues before Step 7. MEDIUM and LOW at PM Agent
+discretion.
 
 ### Step 7 — Independent Review Agent
 
