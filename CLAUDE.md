@@ -383,6 +383,12 @@ Local ruff is pinned to the same version as CI (`ruff==0.7.2` in `requirements.t
 there is no environment difference that would cause CI to catch what local missed.
 Near-miss record: NM-016 (`docs/process/near-miss-registry.md`).
 
+**Frontend pre-push build gate — mandatory before any `git push` touching files under `frontend/src/`.**
+Before pushing any branch that modifies files under `frontend/src/`, run:
+`cd frontend && npm run build`
+Must exit 0. TypeScript errors are a compliance finding — 7 TS6133 errors accumulated across M10 PRs without detection because this gate did not exist. CI is a confirmation, not a discovery mechanism.
+Near-miss record: SCAN-024 (M10 exit — TS6133 findings found at compliance scan, not at push time).
+
 **Tests are not optional.**
 The backtesting infrastructure is the most important test suite.
 Unit and integration tests are table stakes. A feature is not done
