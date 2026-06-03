@@ -1681,6 +1681,71 @@ Filed against Issue #634 (Demo 3 readiness). ADR-005 amendment tracked as M10 fo
 
 ---
 
+## NM-031 — Demo Review Files Named with Descriptive Suffixes Instead of Canonical Convention (Reactive)
+
+**Date:** 2026-06-02
+**Milestone:** M10 — Engine Integrity and Instrument Delivery
+**Detected by:** Engineering Lead, post-session review
+**Severity:** Low
+
+### What happened
+
+Two Independent Review documents were saved into `docs/demo/m10/reviews/` with non-canonical
+filenames:
+
+- `2026-06-02-v0.10-demo3-ir.md` (PR #618, pre-gate triage review)
+- `2026-06-02-v0.10-demo3-screenshot-ir.md` (PR #649, canonical Step 7 review)
+
+The demo preparation standard (`docs/process/demo-preparation-standard.md §Folder Structure`)
+defines the canonical name as `YYYY-MM-DD-v{version}-stakeholder-review.md` — the same
+pattern used in M8 (`2026-05-18-v0.8.0-stakeholder-review.md`). Neither M10 file followed
+this pattern. The CLAUDE.md pre-creation checklist (`docs/CLAUDE.md §Canonical Artifact
+Locations`) requires running `find docs/demo/ -name "*stakeholder-review*"` before creating
+a new review document to confirm naming convention — this check was not run.
+
+An additional gap: the pre-gate triage review and the canonical Step 7 review were given
+similar descriptive names with no clear convention distinguishing them. Future readers
+could not determine which was the authoritative Step 7 review.
+
+### What was at risk
+
+**Discoverability.** The canonical Step 7 review is the permanent milestone artifact
+referenced in process documents and future session context. A non-canonical name breaks
+lookup by pattern (`find docs/demo/ -name "*stakeholder-review*"`) — the standard
+discoverability mechanism from CLAUDE.md §Canonical Artifact Locations. This is the same
+risk class documented in CLAUDE.md (the STD-REVIEW-003 incident).
+
+**Process ambiguity.** With two similarly-named files in the same folder, neither clearly
+identified as pre-gate vs. canonical, future agents activating for a new demo cycle would
+not know which file was the authoritative Step 7 review. The pre-creation check would
+return two results, neither matching the canonical suffix.
+
+### What caught it
+
+Engineering Lead review of the M10 review folder after the stakeholder session, comparing
+the M10 filenames against the M8 canonical reference (`2026-05-18-v0.8.0-stakeholder-review.md`).
+
+### Process improvement
+
+**Fix applied (this PR):** Both M10 files renamed to canonical convention:
+- `2026-06-02-v0.10-demo3-screenshot-ir.md` → `2026-06-02-v0.10.0-stakeholder-review.md`
+- `2026-06-02-v0.10-demo3-ir.md` → `2026-06-02-v0.10.0-pre-gate-triage.md`
+A header note was added to the pre-gate triage file identifying it as non-canonical.
+
+**Standard update:** `demo-preparation-standard.md §Folder Structure` updated with:
+(1) explicit naming rule with mandatory pre-creation `find` command;
+(2) canonical suffix definitions (`-stakeholder-review.md` for Step 7, `-pre-gate-triage.md`
+for pre-gate work);
+(3) prohibition on descriptive suffixes in place of canonical names;
+(4) M8 file as the canonical reference instance.
+
+**Root cause:** The demo preparation standard stated the canonical filename in the folder
+diagram but did not include a pre-creation check step, a find command, or a prohibition on
+descriptive suffixes. The distinction between pre-gate triage and canonical Step 7 review
+was not captured in naming guidance at all.
+
+---
+
 ## Registry Maintenance
 
 ### How to add an entry
