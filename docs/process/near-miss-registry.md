@@ -1549,6 +1549,138 @@ FA and QA Lead notified in `docs/process/agents.md` working agreement updates be
 
 ---
 
+## NM-028 — IR-004 Trajectory Tick Year Test Was a Silent No-Op for One Milestone (Reactive)
+
+**Date:** 2026-06-02
+**Milestone:** M10 — Engine Integrity and Instrument Delivery
+**Detected by:** CI failure after PR #639 wired trajectory re-fetch — the test now ran its real assertion and failed
+**Severity:** Medium — the test passed CI for one milestone without measuring anything; the feature it guards (start_year seeding trajectory tick labels) was unverified throughout that period
+
+### What happened
+
+IR-004 (`start_year input seeds trajectory tick year labels`) was authored in M10 as part of the Greece integration suite. It contained a guard:
+
+```js
+const hasSvg = await svg.isVisible({ timeout: 3_000 }).catch(() => false);
+if (!hasSvg) return;
+```
+
+Before PR #639, trajectory was never re-fetched after step advances (the trajectory useEffect depended only on `[scenarioId]`, not `[scenarioId, currentStep]`). At step 0, no trajectory fetch occurs (API returns 409 — no snapshots yet). The SVG chart had no data and was not visible. Every CI run hit the guard, returned early, and the test recorded as passed. The feature under test — that `start_year` actually seeds the trajectory date labels — was never evaluated.
+
+After PR #639 wired the re-fetch (adding `currentStep` to the dependency array), the trajectory loaded after step advance, the SVG became visible, the guard was satisfied, and the assertion ran for the first time — immediately failing.
+
+### What was at risk
+
+**False CI gate.** IR-004 was listed as a passing test in the Greece integration suite. Any regression in the `start_year → effective_from → tick label` pipeline would have passed CI silently. The feature could have broken without detection.
+
+**Pattern recurrence.** This is the third instance of a no-op guard masking a non-measurement: NM-027 (AC-007/AC-008), and now NM-028 (IR-004). Each time, the guard was correct at authorship (the component was not yet wired), but the guard was not removed when the wire-up PR merged.
+
+### What caught it
+
+CI failure after PR #639. Not a proactive process check. A passing test that had been no-op started failing only because the underlying component was finally connected to real data.
+
+### Process improvement
+
+**Root cause:** The no-op guard activation check documented in the QA Lead working agreement (from NM-027) was not run at the PR #639 merge boundary. The check exists in the working agreement but was not executed.
+
+**Fix:** The QA Lead working agreement already requires this check (added after NM-027). The gap is not in the rule — it is in execution. The rule must be applied to every PR that wires a previously-unconnected component, including PRs that fix data pipelines rather than add new testids.
+
+**Additional fix:** IR-004 now uses `page.waitForFunction` (polling the browser DOM directly) and `page.waitForResponse` to guarantee the trajectory is loaded before the assertion runs. The silent-no-op path has been replaced with a meaningful assertion. Filed against Issue #634 (Demo 3 readiness).
+
+---
+
+## NM-029 — GovernanceModule Event_Type Contract: Unit Tests Provided False Positive Coverage (Reactive)
+
+**Date:** 2026-06-02
+**Milestone:** M10 — Engine Integrity and Instrument Delivery
+**Detected by:** Demo 3 screenshots showing flat governance composite and no governance MDA alert; root cause investigation during PR #639
+**Severity:** High — 25 governance unit tests passed throughout development; the interface they were supposed to guard had the wrong contract for its entire existence; the bug was invisible until a full end-to-end demo run
+
+### What happened
+
+`GovernanceModule._SUBSCRIBED_EVENTS` and `GOVERNANCE_ELASTICITY_REGISTRY` used bare instrument name strings:
+- `"imf_program_acceptance"` (wrong)
+- `"emergency_declaration"` (wrong)
+
+`EmergencyPolicyInput.to_events()` emits `"emergency_policy_{instrument.value}"`:
+- `"emergency_policy_imf_program_acceptance"` (correct)
+- `"emergency_policy_emergency_declaration"` (correct)
+
+`test_governance_module.py` contains 25 tests. Every test that exercised governance elasticity built synthetic events manually with hardcoded `event_type` strings — exactly the wrong strings that were in the module. The tests were internally consistent but systematically wrong. They never called `EmergencyPolicyInput.to_events()`. They never crossed the interface boundary between the input adapter and the subscribing module.
+
+Result: zero emergency events ever reached the governance elasticity registry during live simulation. Governance composite was flat at 0.5210 across all steps. MDA-GOV-DEMOCRACY-FLOOR never fired. The Demo 3 thesis (emergency_declaration → democratic_quality_score breach → governance MDA warning) was silent.
+
+EcologicalModule has the same structural vulnerability: its unit tests also use synthetic events. It was not confirmed whether its `event_type` strings are correct — that is a separate audit required.
+
+### What was at risk
+
+**Demo 3 failure.** The four-step Argentina scenario was the primary demo delivery for M10. With governance flat and no governance MDA alert, the demo thesis was broken. The screenshots that triggered investigation showed "No trajectory data" — the governance bug contributed to the appearance of a completely non-functional instrument cluster.
+
+**Systematic false confidence.** The 25 passing unit tests implied the governance module was correct. Any engineer reading the test results would reasonably conclude the module was validated. The bug could have persisted into M11 if Demo 3 had been deferred.
+
+### What caught it
+
+Demo 3 screenshot execution in PR #639's preceding session. Visual inspection of screenshot outputs showed governance composite flatline and missing MDA alert. Root cause investigation traced it to the event_type mismatch. Not caught by the test suite.
+
+### Process improvement
+
+**Root cause:** No integration test crossing the `EmergencyPolicyInput.to_events()` → subscribing module boundary. Unit tests for subscriber modules use synthetic events rather than calling the actual input adapter. This creates a coverage gap at the exact interface where the contract violation lived.
+
+**Required fix:** An integration test must assert that for each `SimulationInput` subclass, the `event_type` strings it emits via `to_events()` are present in the `get_subscribed_events()` list of each module that declares it subscribes to those types. This test must be added before M11 exit. It is the process gate that closes this gap.
+
+**Secondary fix:** A cross-reference comment in each subscribing module's `_SUBSCRIBED_EVENTS` definition, citing the input class that emits the event type, so a reader can trace the contract without running the integration test. (Added to `GovernanceModule` and `EcologicalModule` in PR #639.)
+
+**Scope note:** EcologicalModule unit tests have the same structural pattern. Confirm its event_type strings against its input adapters during the integration test implementation.
+
+Filed against Issue #634 (Demo 3 readiness). Integration test tracked as M10 follow-up.
+
+---
+
+## NM-030 — EcologicalModule Temporal Guard Silently Blocked Retroactive CO2 Proximity Analysis (Reactive)
+
+**Date:** 2026-06-02
+**Milestone:** M10 — Engine Integrity and Instrument Delivery
+**Detected by:** Demo 3 screenshots showing ecological composite 1.0557 from step 1 (correct) — investigation of the boundary constant fetch pathway revealed the temporal guard issue during root cause analysis
+**Severity:** Medium — pre-2009 backtesting scenarios silently omitted CO2 planetary boundary proximity indicators; the omission was logged at WARNING level but not surfaced to users; the simulation appeared to run normally
+
+### What happened
+
+`_compute_proximity_indicators()` in `EcologicalModule` guarded proximity computation with:
+
+```python
+if effective_from is not None and timestep < effective_from:
+    _log.warning("[SIM-INTEGRITY] Boundary constant '%s' not active at timestep...")
+    continue
+```
+
+The CO2 planetary boundary constant has `effective_from = 2009-09-24` (date of Rockström 2009 publication). The Argentina backtesting scenario starts 2001-01-01. For every step from 2001 to 2009, `timestep < effective_from` evaluated to True and proximity computation was skipped.
+
+The CO2 350 ppm planetary boundary is a physical threshold derived from pre-industrial atmospheric concentrations — it predates its scientific naming by decades. Applying it retroactively to 2001 data is analytically valid. But the code treated publication date as an applicability gate, blocking all pre-2009 backtesting.
+
+A parallel bug: `_fetch_active_boundary_constants` in `scenarios.py` queried with `WHERE effective_from <= $scenario_timestep`. For a 2001 scenario, no boundary constants were returned at all. The module received an empty boundary dict and produced no proximity indicators, silently.
+
+### What was at risk
+
+**Silent output omission.** Argentina Demo 3 at step 1 showed ecological composite 1.0557, which requires CO2 proximity to exceed 1.0. If the temporal guard had blocked this correctly, the ecological composite would have been None for all pre-2009 steps — but no error would be shown. The demo would have shown an ecological null with no explanation.
+
+**Retroactive analysis invalidation.** Any historical backtesting scenario before 2009 would silently omit CO2 proximity. This is the core backtesting use case for M10. The gap was invisible: the module ran, produced no proximity output, and logged a WARNING that no one reads in normal operation.
+
+### What caught it
+
+Root cause investigation during PR #639 demo debugging. The ecological composite value of 1.0557 at step 1 was correct (Argentina seed data causes immediate CO2 overshoot). Tracing why this worked correctly revealed the retroactive flag was needed. Cross-checking with the API-level boundary constant fetch revealed the second bug.
+
+### Process improvement
+
+**Root cause:** The `retroactive` concept — some planetary boundaries are physical thresholds applicable retroactively, others are new methodologies not applicable before their publication — was not modelled in the data structure. A single temporal guard treated all boundaries identically. The distinction was in the module docstring but not in the code.
+
+**Fix:** Added per-constant `retroactive: bool` field to `_PROXIMITY_INDICATOR_CONFIG`. CO2 = `True` (physical threshold, valid for pre-publication backtesting). Land use = `False` (Richardson 2023, genuinely new methodology not applicable before 2023). `_fetch_active_boundary_constants` changed to `WHERE effective_from <= NOW()` — retroactive analysis always applies currently-known physical boundaries.
+
+**Process fix:** The `retroactive` distinction should be documented in `docs/DATA_STANDARDS.md §Confidence Tier System` alongside the boundary constant definitions. Any future planetary boundary constant must explicitly declare its retroactive applicability before being added to `_PROXIMITY_INDICATOR_CONFIG`. The decision record for `_fetch_active_boundary_constants` semantic change should be captured in ADR-005 (Amendment 4 candidate).
+
+Filed against Issue #634 (Demo 3 readiness). ADR-005 amendment tracked as M10 follow-up.
+
+---
+
 ## Registry Maintenance
 
 ### How to add an entry
