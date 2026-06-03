@@ -626,7 +626,12 @@ def _compute_pmm_for_step(
             floor_value = Decimal(str(row["floor_value"]))
             approach_pct = Decimal(str(row["approach_pct"]))
             op = str(row.get("comparison_operator", "lte"))
-            margins.append(_pmm_indicator_margin(current, floor_value, approach_pct, op))
+            margin = _pmm_indicator_margin(current, floor_value, approach_pct, op)
+            # Skip thresholds already in breach (margin == 0). Breached thresholds
+            # are captured by MDA alerts; PMM measures remaining headroom on
+            # thresholds not yet crossed. If all thresholds are breached, return None.
+            if margin > Decimal("0"):
+                margins.append(margin)
 
     if not margins:
         return None
