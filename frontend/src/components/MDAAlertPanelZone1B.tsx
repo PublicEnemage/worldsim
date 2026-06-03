@@ -12,7 +12,6 @@
  *
  * Implements: ADR-008 Decision 5, FA brief §Layout and Viewport (UD-F1 compact row format)
  */
-import React from "react";
 import { useScenarioStepStore, type Zone1BAlert } from "../store/scenarioStepStore";
 
 // ---------------------------------------------------------------------------

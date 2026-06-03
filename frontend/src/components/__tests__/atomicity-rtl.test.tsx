@@ -28,7 +28,6 @@
  * Source: docs/frontend/fa-brief-m9-instrument-cluster.md §Named Acceptance Criteria
  *         Issue #459 — QA Lead acceptance tests
  */
-import React from "react";
 import { render, screen, act, cleanup } from "@testing-library/react";
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import { useScenarioStepStore } from "../../store/scenarioStepStore";

@@ -21,7 +21,7 @@
  * on currentStep + store.trajectory. Null at step 0 or when no MDA
  * thresholds have matching indicator data for the step.
  */
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { InstrumentCluster, LAYOUT, useViewportBreakpoint } from "./InstrumentCluster";
 import { MDAAlertPanelZone1B } from "./MDAAlertPanelZone1B";
 import { PMMWidgetZone1C } from "./PMMWidgetZone1C";

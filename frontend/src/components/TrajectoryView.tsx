@@ -5,7 +5,7 @@
  * Design decisions: DD-012 (Zustand atom), DD-013 (divergence fill), DD-014 (step annotation).
  * Framework colors: frameworkColors.ts (UX Designer ruling, MV-001 closed 2026-05-23).
  */
-import React, { useMemo, useLayoutEffect, useRef } from "react";
+import { useMemo, useLayoutEffect, useRef } from "react";
 import {
   ComposedChart,
   Line,
@@ -214,42 +214,6 @@ function CustomStepTick({ x = 0, y = 0, payload, data, entityIds }: CustomTickPr
 // Confidence badge — rendered as SVG <text> adjacent to rightmost data point
 // Position: curve-face, 4px right of rightmost non-null point (UD-R3 / UD-F2)
 // ---------------------------------------------------------------------------
-
-interface ConfidenceBadgeProps {
-  data: MergedStepDatum[];
-  framework: FrameworkKey;
-  chartWidth: number;
-  chartHeight: number;
-}
-
-function ConfidenceBadge({ data, framework, chartWidth }: ConfidenceBadgeProps) {
-  const lastPoint = [...data]
-    .reverse()
-    .find((d) => d[`${framework}_active` as keyof MergedStepDatum] !== null);
-
-  if (!lastPoint) return null;
-
-  const tier = lastPoint[`${framework}_confidence_tier` as keyof MergedStepDatum] as number;
-  if (!getConfidenceBadgeVisible(tier)) return null;
-
-  // Approximate x position: step_index / step_count fraction of chart width
-  const stepCount = data.length;
-  const stepFraction = (lastPoint.step_index - 1) / Math.max(stepCount - 1, 1);
-  const xPos = 40 + stepFraction * (chartWidth - 60); // rough margin offset
-
-  return (
-    <text
-      x={xPos + 4}
-      y={20}
-      fontSize={11}
-      fill={FRAMEWORK_COLORS[framework]}
-      fillOpacity={0.8}
-      style={{ userSelect: "none", pointerEvents: "none" }}
-    >
-      (exp)
-    </text>
-  );
-}
 
 // ---------------------------------------------------------------------------
 // TrajectoryView legend formatter
