@@ -220,15 +220,27 @@ Audit above is complete.**
    checklist Issue. Milestones with no frontend deliverables may skip this step with a
    one-line note confirming that no UI changes were made.
 
-4. **Socratic Agent TEST session completed.** The Engineering Lead has demonstrated
+4. **Demo cycle complete (even-numbered milestones only).** All nine steps of
+   `docs/process/demo-preparation-standard.md` are complete: screenshots captured,
+   internal team review (Step 6b) findings resolved per gate, Independent Review
+   Agent (Step 7) findings triaged, all CRITICAL and HIGH findings filed as GitHub
+   issues, and the stakeholder session (Step 9) has occurred. Odd-numbered milestones
+   skip this step with a one-line note on the exit checklist confirming no demo was
+   scheduled. If the stakeholder session is explicitly deferred, record the rationale
+   and deferral date as a comment on the exit checklist issue.
+   Note: the canonical ordering of this step relative to step 5 (Socratic Agent TEST)
+   is being formalized in Issue #664. Until that issue closes, the demo cycle must
+   complete within the same milestone as the TEST — sequencing is at EL discretion.
+
+5. **Socratic Agent TEST session completed.** The Engineering Lead has demonstrated
    genuine understanding of the milestone's architectural contributions. This is not
    a formality — it is the checkpoint that ensures the codebase remains governable.
 
-5. **Release tag created.** Tag the merge commit with semantic versioning:
+6. **Release tag created.** Tag the merge commit with semantic versioning:
    `v0.N.0` for Milestones 0 through 4 (pre-release). Tag message includes a brief
    description of what the milestone delivered.
 
-6. **Changelog entry written.** Append a milestone summary to `CHANGELOG.md` (create
+7. **Changelog entry written.** Append a milestone summary to `CHANGELOG.md` (create
    if this is the first milestone). Format:
    ```
    ## v0.N.0 — Milestone N: Theme Name (YYYY-MM-DD)
@@ -240,7 +252,7 @@ Audit above is complete.**
    - [one-line summary of open finding count by severity]
    ```
 
-7. **Milestone metadata alignment check.** Before the next milestone creation
+8. **Milestone metadata alignment check.** Before the next milestone creation
    ceremony, verify all four artifacts have been updated to reflect this milestone
    as complete and the next as current:
    - GitHub milestone description updated to reflect what shipped and any explicit
@@ -250,9 +262,9 @@ Audit above is complete.**
    - `CLAUDE.md §Milestone Roadmap` updated to show the next milestone as Current
    - `docs/roadmap/worldsim-roadmap.md` revision header updated; scope deferrals
      noted with dated rationale
-   Any misalignment found must be corrected before step 8. (Issue #561)
+   Any misalignment found must be corrected before step 9. (Issue #561)
 
-8. **Next milestone creation ceremony triggered.** Unless this is the final milestone,
+9. **Next milestone creation ceremony triggered.** Unless this is the final milestone,
    immediately initiate the creation ceremony for Milestone N+1. Do not leave a gap
    between milestones — the gap is where work loses coherence and Issues accumulate
    without context.
