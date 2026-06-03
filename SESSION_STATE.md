@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-02 (PRs #649/#650/#651 merged — Demo 3 screenshot IR review; PMM breach-exclusion fix; Zone 1B responsive columnWidth; Step 9 stakeholder demo confirmed; issue #652 filed)**
+**Last updated: 2026-06-02 (PRs #654/#655/#656 merged — narration legibility rewrite; NARRATION-RULING-1 codified; demo review naming consistency NM-031; stakeholder screen recording complete)**
 **Current milestone:** M10 — Engine Integrity and Instrument Delivery (M9 formally closed; M10 active)
 
 ---
@@ -82,9 +82,11 @@ No open PRs — board clear as of 2026-06-02 (post PR #651 merge).
 
 | PR | Title | Date |
 |---|---|---|
+| #656 | docs(process): demo review naming consistency — NM-031 | 2026-06-02 |
+| #655 | docs(ux): NARRATION-RULING-1 — institutionalize three-layer narration structure | 2026-06-02 |
+| #654 | docs(demo): narration legibility rewrite — umbrella + synthesis across all Section 2 steps (closes #652) | 2026-06-02 |
 | #651 | fix(zone1b): pass responsive columnWidth to MDAAlertPanelZone1B (closes #647) | 2026-06-02 |
 | #650 | fix(pmm): skip breached thresholds — PMM measures remaining headroom (closes #648) | 2026-06-02 |
-| #649 | docs(demo): Step 7 screenshot IR — Demo 3 five-frame review; IR-S7-001 through IR-S7-005 | 2026-06-02 |
 | #645 | docs(demo): Step 4 narration — honest scope framing replaces false recovery claim | 2026-06-02 |
 | #640 | docs(process): NM-028/029/030 — Demo 3 near-miss filings | 2026-06-02 |
 | #639 | fix(demo3): four CRITICAL blocking bugs — trajectory re-fetch, governance event mismatch, ecological temporal guard, boundary constant fetch | 2026-06-02 |
@@ -293,6 +295,9 @@ All Horizon:Immediate issues are now closed. M8 feature-complete.
 
 | Decision | Rationale | Date |
 |---|---|---|
+| Stakeholder screen recording complete (2026-06-02) | EL ran the demo manually via `./scripts/demo.sh` + QuickTime at 1440×900 using the updated `docs/demo/stakeholder-walkthrough.md` script (PR #654). No Playwright re-run required — narration changes are in the script, not the application UI. | 2026-06-02 |
+| NARRATION-RULING-1 codified — PR #655 (closes #652 process hardening) | Three-layer narration structure (umbrella → facts → synthesis) added as §16 to `docs/ux/standards.md`. Step 5c self-check added to `docs/process/demo-preparation-standard.md` — gates each milestone's walkthrough against NARRATION-RULING-1 before the IR Agent sees it. Prevents presenter-skill dependency for the "so what" at each demo step. | 2026-06-02 |
+| Demo review naming consistency — NM-031, PR #656 | M10 review files renamed to canonical convention: `demo3-screenshot-ir.md` → `2026-06-02-v0.10.0-stakeholder-review.md`; `demo3-ir.md` → `2026-06-02-v0.10.0-pre-gate-triage.md`. Demo prep standard strengthened with explicit naming rule, mandatory pre-creation `find` command, canonical suffix definitions. Root cause: standard stated the pattern in a folder diagram but had no enforcement step. | 2026-06-02 |
 | Demo 3 Step 9 complete — stakeholder demo session confirmed end-to-end (PRs #649–#651) | Playwright demo spec ran at 1440×900 (1 passed, 4.3m). Five frames captured. PMM trajectory API confirmed: Steps 0–1 = 0.2857 (governance headroom ≈ 0.29, CO2 breach excluded), Step 2 = 0.4286 (↑ Kirchner improvement), Steps 3–4 = None (governance threshold breached). Zone 1B full-density cards render at 400px column (WARNING cards legible). Issues #634/#647/#648/#345 closed. Issue #652 filed (narration legibility — umbrella framing and synthesis; M10 Near-Term). | 2026-06-02 |
 | PMM breach-exclusion fix — skip breached thresholds (PR #650, closes #648) | Root cause: ecological CO2 boundary (≥ 1.0) breached from step 0 in Argentina (seed ≈ 1.056); old min(margins) collapsed to 0, masking governance headroom. Fix: `_compute_pmm_for_step` skips thresholds with margin == 0. MDA alerts carry the breach signal; PMM measures remaining headroom on non-breached thresholds. Returns None when all thresholds breached (shown as "—" in UI). 31 unit tests pass; three new tests replace `test_min_across_thresholds` (which encoded the old wrong contract). | 2026-06-02 |
 | Zone 1B responsive columnWidth fix (PR #651, closes #647) | Root cause: `MDAAlertPanelZone1B` hardcoded `columnWidth={240}` in ScenarioInstrumentCluster — always compact (11px, abbreviated labels) regardless of viewport. At 1440×900 the co-primary column is 400px → should be full-density (12px, full severity labels, untruncated names). Fix: exported `LAYOUT` and `useViewportBreakpoint` from InstrumentCluster; ScenarioInstrumentCluster now passes `LAYOUT[bp].coPrimary` as columnWidth. Resolves IR-S7-001 (CRITICAL) from Demo 3 IR review. | 2026-06-02 |
