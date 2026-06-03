@@ -6,8 +6,14 @@ Accepted
 ## Validity Context
 
 **Standards Version:** 2026-04-15 (date standards documents were established)
-**Valid Until:** Milestone 10 — Engine Integrity and Instrument Delivery
+**Valid Until:** Milestone 11 — Engine Investigation and Political Economy
 **License Status:** CURRENT
+
+**Amendment 5 applied:** 2026-06-02 — M10 GovernanceModule Promotion Confirmed.
+GovernanceModule promoted in M10: all five Decision M8-4 criteria met. `"governance"`
+removed from `_UNIMPLEMENTED_FRAMEWORKS`. Normalization obligation satisfied (Decision
+M8-4 Criterion 2). Integration test asserting non-null governance composite score written.
+License renewed through Milestone 11. See Amendment 5 section at end of document.
 
 **Amendment 4 applied:** 2026-05-23 — M9 Exit GovernanceModule Deferral.
 Formal M9 exit assessment: all five GovernanceModule promotion criteria remain at 0/5
@@ -2574,3 +2580,56 @@ be updated in the same commit as the GovernanceModule implementation work begins
 
 No renewal triggers fired during Milestone 9. The ADR remains sound as written through M10.
 Scheduled review at M10 close.
+
+---
+
+## Amendment 5 — M10 GovernanceModule Promotion Confirmed
+
+**Applied:** 2026-06-02
+**Issue:** #556
+**Author:** Engineering Lead
+**Scope:** Validity Context header update; M10 GovernanceModule promotion assessment;
+Decision M8-4 criteria closure; M9 obligations discharged confirmation.
+
+### M10 Exit Assessment — GovernanceModule Promotion Criteria
+
+Decision M8-4 established five promotion criteria for GovernanceModule. At M10 close,
+all five criteria are met:
+
+| Criterion | Status at M10 exit |
+|---|---|
+| 1. Backtesting threshold: governance scores produce backtesting results within the per-indicator error tolerance defined in `docs/DATA_STANDARDS.md §Backtesting Integrity` | **Met** — Argentina 2000–2002 Demo 3 fixture (Issue #553) includes governance axis with live composite score; governance MDA triggered at step 2 via `emergency_declaration` (Issue #615) |
+| 2. ADR amendment accepted formalizing the normalization methodology for governance composite score | **Met** — Normalization methodology resolved in M10 implementation: absolute threshold audit completed per Decision M8-4 obligation; governance composite uses percentile rank (no natural boundary thresholds identified at the specificity required for boundary proximity approach — see Issue #556 implementation notes) |
+| 3. Source field populated for all five indicator keys with `source_registry` draft-certified entry | **Met** — Source registry entries filed as part of GovernanceModule promotion work (Issue #556) |
+| 4. `[SIM-INTEGRITY]` WARNING fires when `compute()` receives unexpected null for any of the five indicator keys | **Met** — Implemented in GovernanceModule M10 promotion (single-entity note exemption fix included; Issue #556) |
+| 5. Integration test asserting that a scenario with real governance data produces a non-null governance composite score | **Met** — Argentina Demo 3 backtesting suite asserts non-null governance composite score across all live steps (Issue #553, PR #553) |
+
+**Outcome:** GovernanceModule promotion complete. `"governance"` removed from
+`_UNIMPLEMENTED_FRAMEWORKS`. Governance axis live as of M10.
+
+### M9 Obligations Discharged
+
+**M9 Governance Normalization Obligation** (carried from Amendment 4): Satisfied.
+Per-indicator absolute threshold audit completed before normalization methodology was
+specified. No boundary-anchored thresholds were found at the precision required for the
+boundary proximity strategy — percentile rank is the correct normalization for governance
+composite at this stage. The audit is documented in Issue #556.
+
+**Decision M8-5 Tooltip Update Obligation** (carried from Amendment 4): Satisfied.
+`_GOVERNANCE_IN_VALIDATION_TOOLTIP` replaced by live composite score in Zone 1D
+`FourFrameworkZone1D.tsx` — the `(in validation)` annotation (IR-005, Issue #499) was
+the transitional form and was removed when the live score was wired in M10.
+
+### Renewal Triggers — No New Triggers Added
+
+No new renewal triggers beyond those established in Decision 6 and prior amendments.
+
+### License Renewal
+
+**Valid Until:** Milestone 11 — Engine Investigation and Political Economy
+**License Status:** CURRENT (renewed at M10 exit, 2026-06-02)
+
+No additional renewal triggers fired during Milestone 10 beyond the GovernanceModule
+promotion formalized in this amendment. ADR-005's core decisions governing the HCL
+output model, MDA threshold architecture, and multi-framework radar chart contract
+remain sound. Scheduled review at M11 close.

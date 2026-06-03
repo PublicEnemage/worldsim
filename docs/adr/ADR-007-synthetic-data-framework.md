@@ -6,8 +6,20 @@ Accepted
 ## Validity Context
 
 **Standards Version:** 2026-05-23
-**Valid Until:** Milestone 10 — Engine Integrity and Instrument Delivery
+**Valid Until:** Milestone 11 — Engine Investigation and Political Economy
 **License Status:** ACCEPTED — 2026-05-23
+
+**M10 exit review:** 2026-06-02 (SCAN-024). No renewal triggers fired during Milestone
+10. The synthetic data framework was not implemented in M10 — no sixth method proposed,
+holdout validation gate unchanged, confidence tier max() arithmetic unchanged, no
+meaninglessness threshold adjustments, no anomaly detection governance changes, no
+`Quantity` schema field renames. The PMM endpoint and trajectory API extensions are
+application-layer outputs that do not alter the `Quantity` schema fields enumerated in
+the renewal triggers. License Status confirmed ACCEPTED. License renewed through
+Milestone 11 — Engine Investigation and Political Economy. M11 political economy module
+will be the first consumer of synthetic data framework contracts for politically sensitive
+indicators — full implementation pressure expected in M11. Next scheduled review at
+Milestone 11 close.
 
 **Panel review:** 2026-05-23 — `docs/adr/reviews/ADR-007-panel-review.md`. Panel:
 Chief Methodologist (consultation complete, PR #373), Data Architect (conditional ✓),

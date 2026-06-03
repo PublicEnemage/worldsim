@@ -6,8 +6,22 @@ Accepted
 ## Validity Context
 
 **Standards Version:** 2026-05-22
-**Valid Until:** Milestone 10 — Engine Integrity and Instrument Delivery (Demo 3)
+**Valid Until:** Milestone 11 — Engine Investigation and Political Economy
 **License Status:** ACCEPTED — 2026-05-22
+
+**M10 exit review:** 2026-06-02 (SCAN-024). No renewal triggers fired during Milestone
+10. All four Zone 1 instruments implemented per ADR-008 spec — implementation of the
+spec is not a trigger. Zone boundaries unchanged. `step_event_label` fix (Issue #395)
+standardised fixture content format; the field name, type, and schema contract are
+unchanged — not a trigger. Column width responsive fix (Issue #647) is an implementation
+detail within the existing ADR-008 layout contract. Simultaneous instrument update
+contract (AC-006 RTL test confirms all Zone 1 instruments update in a single render
+cycle) remains in force and unchanged. No mode transition, A/B comparison, blue/orange
+color, confidence tier visual, or methodology access model changes. License Status
+confirmed ACCEPTED. License renewed through Milestone 11 — Engine Investigation and
+Political Economy. M11 political economy module will introduce new conditionality
+instruments; any control plane or mode 3 changes must be evaluated against ADR-008
+renewal triggers at M11 exit. Next scheduled review at Milestone 11 close.
 
 **Panel (accepted):**
 - UX Designer Agent (C — UX frame and component decisions)

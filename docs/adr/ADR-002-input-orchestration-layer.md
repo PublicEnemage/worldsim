@@ -6,10 +6,25 @@ Accepted
 ## Validity Context
 
 **Standards Version:** 2026-04-15 (date standards documents were established)
-**Valid Until:** Milestone 10 — Engine Integrity and Instrument Delivery
+**Valid Until:** Milestone 11 — Engine Investigation and Political Economy
 **License Status:** CURRENT
 
-**Last Reviewed:** 2026-05-23 — M9 exit review. No renewal triggers fired during
+**Last Reviewed:** 2026-06-02 — M10 exit review (SCAN-024). No renewal triggers fired
+during Milestone 10. GovernanceModule promotion uses existing `ControlInput` types and
+Quantity-delta Event contract — no new input channel types. `EMERGENCY_DECLARATION`
+added to the GovernanceModule's internal `EmergencyInstrument` enum; this is a module-
+internal simulation parameter, not a `ControlInput` type taxonomy addition (the
+orchestration layer's EmergencyPolicyInput already accommodates this via its `instruments`
+field). Argentina 2000–2002 fixture uses existing `EmergencyPolicyInput` and
+`FiscalPolicyInput` types — additive and backward-compatible. PMM endpoint and
+trajectory API extensions are read-path outputs, not input orchestration changes.
+Phase 1 benchmark script introduces no input contract changes. No `ControlInput` type
+taxonomy changes, no audit trail schema requirement changes, no uncertainty
+quantification standard additions affecting how events carry uncertainty metadata.
+License Status confirmed CURRENT. License renewed through Milestone 11 — Engine
+Investigation and Political Economy. Next scheduled review at Milestone 11 close.
+
+**Previously reviewed:** 2026-05-23 — M9 exit review. No renewal triggers fired during
 Milestone 9. M9 was a documentation, standards, and process milestone — no
 `ControlInput` type taxonomy changes, no audit trail schema requirement changes, no
 uncertainty quantification standard additions affecting how events carry uncertainty
@@ -17,7 +32,7 @@ metadata. ADR-007 (Synthetic Data Framework, accepted 2026-05-23) adds `is_synth
 and related fields to `Quantity` — these are Quantity schema extensions, not
 `ControlInput` type additions, and do not trigger this ADR's renewal. License Status
 confirmed CURRENT. License renewed through Milestone 10 — Engine Integrity and
-Instrument Delivery. Next scheduled review at Milestone 10 close.
+Instrument Delivery.
 
 **Previously reviewed:** 2026-05-19 — M8 exit review (SCAN-022). No renewal triggers
 fired during Milestone 8. EcologicalModule and GovernanceModule outputs use the

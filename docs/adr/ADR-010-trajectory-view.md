@@ -6,8 +6,23 @@ Accepted
 ## Validity Context
 
 **Standards Version:** 2026-05-22
-**Valid Until:** Milestone 10 — Engine Integrity and Instrument Delivery (Demo 3)
+**Valid Until:** Milestone 11 — Engine Investigation and Political Economy
 **License Status:** ACCEPTED — 2026-05-22
+
+**M10 exit review:** 2026-06-02 (SCAN-024). No renewal triggers fired during Milestone
+10. TrajectoryView was fully implemented in M10 per ADR-010 decisions — implementation
+of the spec is not a trigger. Recharts/SVG rendering technology unchanged. The
+trajectory API endpoint (`GET /scenarios/{id}/trajectory`) was extended with
+`pmm_value` and `pmm_direction` fields for Zone 1C — these fields are not consumed by
+TrajectoryView and do not change the Zone 1A data contract (trajectory curves,
+confidence tiers, step annotations). Shared Zustand atom state architecture unchanged.
+Confidence tier visual rules (strokeDasharray, strokeOpacity) unchanged. Governance
+null rendered as absent curve, unchanged. No MDA floor overlay, A/B comparison, or
+policy/shock marker changes introduced. Minimum trajectory view width constants
+unchanged. License Status confirmed ACCEPTED. License renewed through Milestone 11 —
+Engine Investigation and Political Economy. If ADR-009 (computation model) results in
+streaming trajectory updates, the shared state architecture trigger must be evaluated.
+Next scheduled review at Milestone 11 close.
 
 **Panel (required for acceptance):**
 - Frontend Architect Agent (C — implementing agent, required per panel composition rule)

@@ -6,16 +6,30 @@ Accepted
 ## Validity Context
 
 **Standards Version:** 2026-04-15 (date standards documents were established)
-**Valid Until:** Milestone 10 — Engine Integrity and Instrument Delivery
+**Valid Until:** Milestone 11 — Engine Investigation and Political Economy
 **License Status:** CURRENT
 
-**Last Reviewed:** 2026-05-23 — M9 exit review. No renewal triggers fired during
+**Last Reviewed:** 2026-06-02 — M10 exit review (SCAN-024). No renewal triggers fired
+during Milestone 10. GovernanceModule promotion (`"governance"` removed from
+`_UNIMPLEMENTED_FRAMEWORKS`) is within the existing `MeasurementFramework` taxonomy
+(GOVERNANCE enum value existed since M6) and uses the existing Quantity-delta Event
+contract. Argentina 2000–2002 fixture uses existing `initial_attributes` wire format.
+PMM endpoint adds `pmm_value`/`pmm_direction` to the trajectory API response — these
+are application-layer fields, not `SimulationEntity.attributes` or `Quantity` type
+changes. Phase 1 benchmark script is a read-only measurement tool with no schema
+changes. No `MeasurementFramework` taxonomy modifications, no `DATA_STANDARDS.md` unit
+standard changes affecting attribute store design, no backtesting integrity rule changes
+requiring state representation changes. License Status confirmed CURRENT. License
+renewed through Milestone 11 — Engine Investigation and Political Economy. Next
+scheduled review at Milestone 11 close.
+
+**Previously reviewed:** 2026-05-23 — M9 exit review. No renewal triggers fired during
 Milestone 9. M9 was a documentation, standards, and process milestone — no simulation
 core data model changes, no `MeasurementFramework` taxonomy changes, no
 `DATA_STANDARDS.md` unit standard changes affecting attribute store design, no
 backtesting integrity rule changes requiring state representation changes. License
 Status confirmed CURRENT. License renewed through Milestone 10 — Engine Integrity and
-Instrument Delivery. Next scheduled review at Milestone 10 close.
+Instrument Delivery.
 
 **Previously reviewed:** 2026-05-19 — M8 exit review (SCAN-022). No renewal triggers
 fired during Milestone 8. M8 EcologicalModule boundary proximity normalization
