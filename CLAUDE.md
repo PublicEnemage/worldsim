@@ -560,6 +560,7 @@ the artifact type and cannot be caught by CI.
 | Module Capability Registry | `docs/scenarios/module-capability-registry.md` | Single file | Updated in place with each milestone |
 | Near-Miss Registry | `docs/process/near-miss-registry.md` | Single file — append NM entries only | Append only; never insert mid-registry |
 | Known Issues Registry | `docs/process/known-issues-registry.md` | Single file — append KI entries only | Append only; never insert mid-registry |
+| Internal Demo Reviews | `docs/demo/{milestone}/reviews/` | `YYYY-MM-DD-vX.X.X-internal-review.md` | New file per demo cycle (even-numbered milestones) |
 
 ### Pre-creation checklist for documents
 
