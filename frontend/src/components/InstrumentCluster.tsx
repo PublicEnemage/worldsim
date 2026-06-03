@@ -12,12 +12,12 @@ import React, { useEffect, useState } from "react";
 import { TrajectoryView } from "./TrajectoryView";
 import { useScenarioStepStore } from "../store/scenarioStepStore";
 
-const LAYOUT = {
+export const LAYOUT = {
   1024: { trajectory: 480, coPrimary: 240, controlPlane: 280 },
   1280: { trajectory: 580, coPrimary: 400, controlPlane: 280 },
 } as const;
 
-function useViewportBreakpoint(): 1024 | 1280 {
+export function useViewportBreakpoint(): 1024 | 1280 {
   const [bp, setBp] = useState<1024 | 1280>(
     window.innerWidth >= 1280 ? 1280 : 1024,
   );

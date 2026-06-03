@@ -22,7 +22,7 @@
  * thresholds have matching indicator data for the step.
  */
 import React, { useEffect, useState } from "react";
-import { InstrumentCluster } from "./InstrumentCluster";
+import { InstrumentCluster, LAYOUT, useViewportBreakpoint } from "./InstrumentCluster";
 import { MDAAlertPanelZone1B } from "./MDAAlertPanelZone1B";
 import { PMMWidgetZone1C } from "./PMMWidgetZone1C";
 import { FourFrameworkZone1D } from "./FourFrameworkZone1D";
@@ -183,6 +183,8 @@ export function ScenarioInstrumentCluster({
   entityIds,
 }: ScenarioInstrumentClusterProps) {
   const store = useScenarioStepStore();
+  const bp = useViewportBreakpoint();
+  const coPrimaryWidth = LAYOUT[bp].coPrimary;
 
   // Fetch lifecycle state for Zone 1D loading/error display (IR-006).
   // Local state — not Zustand — because this is fetch lifecycle, not simulation state.
@@ -279,7 +281,7 @@ export function ScenarioInstrumentCluster({
   return (
     <InstrumentCluster
       entityIds={entityIds}
-      mdaPanel={<MDAAlertPanelZone1B columnWidth={240} />}
+      mdaPanel={<MDAAlertPanelZone1B columnWidth={coPrimaryWidth} />}
       pmmWidget={<PMMWidgetZone1C />}
       fourFramework={
         <FourFrameworkZone1D
