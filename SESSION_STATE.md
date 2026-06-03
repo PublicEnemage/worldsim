@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-02 (PR #658 merged — M10 stakeholder review issue numbers; Demo 3 review artifact complete and consistent with M8 convention)**
+**Last updated: 2026-06-03 (M10 exit ceremony complete — SCAN-024 compliance scan, CHANGELOG v0.10.0, ADR license renewals + Amendment 5, M10 retrospective, #22/#27/#43/#45 deferred to M11, CLAUDE.md frontend pre-push gate added)**
 **Current milestone:** M10 — Engine Integrity and Instrument Delivery (M9 formally closed; M10 active)
 
 ---
@@ -76,17 +76,17 @@ M9 formally closed. Issue #213 (M9 Exit Checklist) closed 2026-05-24. M10 milest
 
 ## Open PRs
 
-No open PRs — board clear as of 2026-06-02 (post PR #651 merge).
+No open PRs — board clear as of 2026-06-03 (post PR #661 merge).
 
 ## Recently Merged PRs (last 5)
 
 | PR | Title | Date |
 |---|---|---|
+| #661 | docs(adr): M10 exit ADR license audit — ADR-001/002/005/007/008/010 renewed to M11; Amendment 5 records GovernanceModule M10 promotion | 2026-06-03 |
+| #660 | chore(m10-exit): SCAN-024 compliance scan + CHANGELOG v0.10.0 — 7 TS6133 errors fixed, ADR renewals flagged | 2026-06-03 |
 | #658 | docs(demo): add issue numbers to M10 stakeholder review findings | 2026-06-02 |
 | #656 | docs(process): demo review naming consistency — NM-031 | 2026-06-02 |
 | #655 | docs(ux): NARRATION-RULING-1 — institutionalize three-layer narration structure | 2026-06-02 |
-| #654 | docs(demo): narration legibility rewrite — umbrella + synthesis across all Section 2 steps (closes #652) | 2026-06-02 |
-| #651 | fix(zone1b): pass responsive columnWidth to MDAAlertPanelZone1B (closes #647) | 2026-06-02 |
 | #645 | docs(demo): Step 4 narration — honest scope framing replaces false recovery claim | 2026-06-02 |
 | #640 | docs(process): NM-028/029/030 — Demo 3 near-miss filings | 2026-06-02 |
 | #639 | fix(demo3): four CRITICAL blocking bugs — trajectory re-fetch, governance event mismatch, ecological temporal guard, boundary constant fetch | 2026-06-02 |
@@ -210,6 +210,10 @@ No open PRs — board clear as of 2026-06-02 (post PR #651 merge).
 | #553 ✅ | feat(fixture): Argentina 2000–2002 second country fixture — IMF debt crisis (Demo 3) | **Closed 2026-06-02** — PR #590 merged. `build_argentina_demo_scenario()`: n_steps=4, EcologicalModule + GovernanceModule, NOAA MLO 2000 CO2 seed, WGI/V-Dem ARG 2000 governance seeds, step_metadata event labels (steps 1–3 SIGNIFICANT). `step_metadata` added to `ScenarioConfigSchema` (was being stripped by Pydantic on POST). Demo script at `backend/scripts/demo_argentina_2001_2002.py`. |
 | #556 ✅ | feat(governance): GovernanceModule M10 promotion — ADR-005 Amendment 4 | **Closed 2026-06-02** — PR #585 merged. All five criteria met. |
 | #569 | test(e2e): AC-009 re-run — Mode 3 advance-step → render ≤ 100ms (hardware baseline) | Deferred M12 — Mode 3 not yet built. Blocked by Mode 3 implementation. |
+| #22 | feat(engine): confidence_tier split — per-indicator separate from composite | **Deferred to M11 (2026-06-03)** — Required by ADR-007 (`is_synthetic`, `synthetic_method` Quantity fields) but ADR-007 framework is not implemented in M10. Rationale comment posted on issue. |
+| #27 | feat(engine): Monte Carlo distribution output — replaces point estimates with scenario bands | **Deferred to M11 (2026-06-03)** — Foundational to ADR-007 No False Precision principle (pessimistic/realistic/optimistic bands). Cannot be scoped before ADR-009 (engine computation model) is accepted; ADR-009 is M11 work. Rationale comment posted on issue. |
+| #43 | feat(engine): backtesting validation harness — model vs. historical divergence scoring | **Deferred to M11 (2026-06-03)** — No Phase 1 baseline benchmarks consumed yet (delivered in M10 but not yet integrated into a validation harness); blocked by sparse matrix proof-of-concept (M11 core deliverable). Rationale comment posted on issue. |
+| #45 | feat(engine): engine fidelity dashboard — model vs. actuals gap visualization | **Deferred to M11 (2026-06-03)** — Downstream of #43 (backtesting harness). Cannot ship a gap visualization before the harness that computes the gaps exists. Rationale comment posted on issue. |
 | #575 ✅ | docs(ux): public advocacy personas — Investigative Journalist, Parliamentary Economist, Civil Society Monitor, Persona 4V | **Closed 2026-06-02** — PR #592 merged. Panel: PO Agent (R), UX Designer (C), Development Economist (C), Political Economist (C), Customer Agent (C). Four additions: Persona 6 (Farida Haidari, journalist, Dawn/Pakistan), Persona 7 (James Ochieng, Kenya PBO), Persona 8 (Abena Osei, SEND Ghana), Persona 4V (Dr. Priya Krishnaswamy, CDS/JNU). Primary Cases 6 (Pakistan flood + IMF combined shock), 7 (Kenya committee brief), 8 (Ghana accountability gap), Persona 4V marquee case (The Wardha Divergence). Retrospective entry state extended to cover accountability tracking sub-mode (no 7th state). Customer Agent finding: integrated observed-actuals input (Persona 8 accountability use case) is not a current platform capability — flagged in Persona 8 failure mode and Primary Case 8 exit criteria; roadmap item. |
 | #574 | Epic: Vision-to-Architecture Bridge — personas → user experiences → technical concepts | **Filed 2026-06-01** — Three child issues: #575 ✅ (personas extension, closed PR #592), #576 ✅ (user experiences for second ring, closed PR #594), #577 (Phase 3 DIC technical concept review — unblocked). No active horizon assignment — EL to prioritize M10 or M11. |
 | #577 | docs(ux): Phase 3 DIC technical concept review — [Phase-3-TBD] stories from Issue #576 | **ARCH-REVIEW-006 complete (PR #601, 2026-06-02). 11 child issues filed #603–#614 (2026-06-02).** 16 blindspots classified: 1 Immediate, 12 Near-Term, 3 Long-Term. One Immediate blocker: CM must author vocabulary mapping standard (#603, AR-006-B-007) before any US-043 implementation begins. Full findings: `docs/architecture/reviews/ARCH-REVIEW-006-milestone10.md`. Tracking comment posted on #577. |
@@ -295,6 +299,11 @@ All Horizon:Immediate issues are now closed. M8 feature-complete.
 
 | Decision | Rationale | Date |
 |---|---|---|
+| CLAUDE.md frontend pre-push gate added (2026-06-03) — retrospective requirement #3 | For any branch modifying files under `frontend/src/`, run `cd frontend && npm run build` before pushing. Must exit 0. Adds a sibling rule to the existing backend pre-push lint gate. Near-miss record: SCAN-024 (7 TS6133 errors accumulated across M10 PRs without detection because this gate did not exist). This was the third blocking requirement from the M10 retrospective posted on Issue #261. | 2026-06-03 |
+| M10 retrospective posted on Issue #261 (2026-06-03) | Three questions answered per CLAUDE.md §Milestone Retrospective Process. Three blocking M11 requirements identified: (1) Playwright E2E regression suite for Zone 1 before any Zone 1 refactor; (2) component rendering test for MDA columnWidth calculation before any Zone 1B layout change; (3) frontend TypeScript build added to pre-push gate (CLAUDE.md updated this session). Retrospective posted as comment on GitHub Issue #261. | 2026-06-03 |
+| ADR license audit complete — all six ADRs extended to M11 (PR #661, 2026-06-03) | ADR-001: no triggers fired (no schema changes in M10). ADR-002: GovernanceModule `EMERGENCY_DECLARATION` is GovernanceModule-internal enum, not a `ControlInput` taxonomy addition — no trigger. ADR-005: Amendment 5 appended — GovernanceModule promotion 5/5 criteria met; M9 normalization obligation discharged; M9 tooltip obligation discharged (IR-005, #499). ADR-007: not implemented in M10, no Quantity schema changes. ADR-008: step_event_label content fix ≠ schema rename; Zone 1 implementation per spec is not a trigger. ADR-010: PMM API extension fields not consumed by TrajectoryView; note that ADR-009 streaming decision may trigger shared state architecture trigger in M11. | 2026-06-03 |
+| Issues #22/#27/#43/#45 re-milestoned to M11 with deferral rationale (2026-06-03) | All four were `horizon:immediate` in M10 but undelivered. #22 (confidence_tier split): requires ADR-007 Quantity fields not yet implemented. #27 (Monte Carlo bands): cannot scope before ADR-009 (engine computation model, M11 core deliverable). #43 (backtesting harness): blocked by sparse matrix proof-of-concept (M11). #45 (fidelity dashboard): downstream of #43. Substantive rationale comments posted on each GitHub issue before re-milestoning. | 2026-06-03 |
+| SCAN-024 compliance scan complete — 7 TS6133 errors fixed, CHANGELOG v0.10.0 merged (PR #660, 2026-06-03) | Ruff: clean (0 violations). TypeScript build: clean post-fix (7 TS6133 unused import errors on M10 new components + dead `ConfidenceBadge` component removed from `TrajectoryView.tsx`; `getConfidenceBadgeVisible()` predicate retained — exported and tested). mypy: not run locally (no venv); CI runs on every PR. SCAN-024 appended to scan-registry.md. ADR renewals flagged for M11. CHANGELOG v0.10.0 entry added. | 2026-06-03 |
 | M10 stakeholder review artifact complete — PR #658 (2026-06-02) | Issue numbers added to all five IR-S7 findings in `docs/demo/m10/reviews/2026-06-02-v0.10.0-stakeholder-review.md`, matching M8 convention. IR-S7-001/002 → #647 (closed, PR #651); IR-S7-003 → #634 (demo umbrella, screenshot-resolution only); IR-S7-004 → #648 (closed, PR #650); IR-S7-005 → #342 (DEMO-001 root cause, M11 Option B). Summary table updated with Issue and Resolution columns. | 2026-06-02 |
 | Stakeholder screen recording complete (2026-06-02) | EL ran the demo manually via `./scripts/demo.sh` + QuickTime at 1440×900 using the updated `docs/demo/stakeholder-walkthrough.md` script (PR #654). No Playwright re-run required — narration changes are in the script, not the application UI. | 2026-06-02 |
 | NARRATION-RULING-1 codified — PR #655 (closes #652 process hardening) | Three-layer narration structure (umbrella → facts → synthesis) added as §16 to `docs/ux/standards.md`. Step 5c self-check added to `docs/process/demo-preparation-standard.md` — gates each milestone's walkthrough against NARRATION-RULING-1 before the IR Agent sees it. Prevents presenter-skill dependency for the "so what" at each demo step. | 2026-06-02 |
@@ -454,10 +463,27 @@ All Horizon:Immediate issues are now closed. M8 feature-complete.
 - Frontend: `useEffect([currentStep, store.trajectory])` in `ScenarioInstrumentCluster` syncs `pmm_value`/`pmm_direction` to Zustand store; `TrajectoryStep` store type extended with `pmm` field
 - 31 unit tests: `backend/tests/unit/test_pmm_computation.py` (3 new breach-exclusion tests replace old `test_min_across_thresholds`)
 
-**ADR-001 + ADR-002 — renewed ✅ (PR #510). Valid Until Milestone 10.**
+**ADR-001 + ADR-002 — renewed ✅ (PR #661). Valid Until Milestone 11.**
 
-- No renewal triggers fired in M9 (documentation-only milestone).
-- M8 exit review entries added (previously missing from SCAN-022 period).
+- No renewal triggers fired in M10. ADR-001: no schema changes. ADR-002: GovernanceModule `EMERGENCY_DECLARATION` is an internal enum, not a ControlInput taxonomy addition.
+- M10 exit review entries added (SCAN-024, 2026-06-03).
+
+**ADR-005 — Amendment 5 appended ✅ (PR #661). Valid Until Milestone 11.**
+
+- GovernanceModule M10 promotion formally recorded: all 5/5 criteria met.
+- M9 obligations discharged: normalization audit complete; tooltip annotation removed (IR-005, #499).
+
+**ADR-007 — renewed ✅ (PR #661). Valid Until Milestone 11.**
+
+- Not implemented in M10. No Quantity schema changes. No triggers fired.
+
+**ADR-008 — renewed ✅ (PR #661). Valid Until Milestone 11.**
+
+- step_event_label content fix ≠ schema rename (trigger requires rename/retype/removal). Zone 1 implementation per spec is not a trigger. AC-006 RTL confirms simultaneous update contract.
+
+**ADR-010 — renewed ✅ (PR #661). Valid Until Milestone 11.**
+
+- PMM API extension fields (`pmm_value`, `pmm_direction`) not consumed by TrajectoryView — Zone 1A data contract unchanged. Note: ADR-009 streaming decision may trigger shared state architecture trigger in M11.
 
 **ADR-005 Amendment 3 — merged ✅ (PR #309). Now live in `docs/adr/ADR-005-human-cost-ledger.md`.**
 
