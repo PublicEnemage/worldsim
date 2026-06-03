@@ -1,7 +1,7 @@
 # CLAUDE.md — WorldSim Project Context
 
 > Last significant revision: 2026-05-30
-> Updated against: M10 kickoff — M9 closed (v0.9.0); M10 current; M11 next; ADR-007 accepted; GovernanceModule #556 in M10; Argentina #553 confirmed; GitHub milestone titles/descriptions corrected
+> Updated against: M11 active — M10 closed (v0.10.0); M11 current; M12 next; ADR-007 accepted; matrix engine investigation is primary M11 objective; political economy module is M11 stretch goal (EL decision 2026-06-03)
 > Previous version context: M9 exit (2026-05-23) — M9 Standards Foundation current, M10 next, ADR-007 forthcoming
 
 ## What This Project Is:
@@ -270,15 +270,22 @@ Detailed domain profiles: `docs/agents/domain-intelligence-council.md`
 
 ## What We Are Building First
 
-M0–M9 complete (v0.1.0–v0.9.0). ADRs 001–007 current.
+M0–M10 complete (v0.1.0–v0.10.0). ADRs 001–007 current.
 See GitHub Releases for full delivery history.
 
-**Milestone 10 — Engine Integrity and Instrument Delivery (Current)**
-- Instrument cluster redesign — all four Zone 1 axes live with real data
-- GovernanceModule promoted — governance axis live (five ADR-005 criteria; Issue #556)
-- PMM (Policy Manoeuvre Margin) live computation
-- Argentina 2000–2002 second country fixture (Demo 3; Issue #553)
-- Phase 1 engine baseline benchmarks — prerequisite for ADR-009 (Issue #514)
+**Milestone 11 — Engine Investigation and Political Economy (Current)**
+
+*Primary objective (M11 exit gate):*
+- ADR-009 authored and accepted — simulation engine computation model
+- Sparse matrix proof-of-concept — matrix engine running alongside iterative engine
+- Phase 2 A/B validation — output equivalence, performance comparison, full backtesting suite
+- Matrix interpretability tooling — contribution tracing, transformation visualization
+
+*Stretch goal (ships if primary is complete with capacity remaining):*
+- Political economy module — political feasibility constraints, conditionality modelling, elite capture dynamics
+- Carries to M12 if not started in M11
+
+M11 closes when the matrix engine investigation track is complete. The political economy module does not block M11 closure. EL decision 2026-06-03.
 
 Each milestone is a vertical slice — working software at every stage,
 not infrastructure waiting for features.
@@ -287,15 +294,16 @@ not infrastructure waiting for features.
 
 ## Milestone Roadmap
 
-M0–M9 complete (v0.1.0–v0.9.0). M10 current. See GitHub Releases for full delivery history.
+M0–M10 complete (v0.1.0–v0.10.0). M11 current. See GitHub Releases for full delivery history.
 
-The full roadmap covering M10 through M13 — milestone deliverables, demo anchors, canonical users served, and the long-term resolution spectrum direction — is maintained at `docs/roadmap/worldsim-roadmap.md`. That document is the canonical reference. The summary below reflects current and next milestone only.
+The full roadmap covering M11 through M13 — milestone deliverables, demo anchors, canonical users served, and the long-term resolution spectrum direction — is maintained at `docs/roadmap/worldsim-roadmap.md`. That document is the canonical reference. The summary below reflects current and next milestone only.
 
-**Milestone 10 — Engine Integrity and Instrument Delivery (Current)**
-Core deliverable: Instrument cluster redesign implemented, all four radar axes live with real data, GovernanceModule promoted, Argentina 2000–2002 second country fixture. Demo 3.
+**Milestone 11 — Engine Investigation and Political Economy (Current)**
+Primary objective: ADR-009 (simulation engine computation model), sparse matrix proof-of-concept, Phase 2 A/B validation, matrix interpretability tooling. No demo. M11 closes when the matrix engine investigation track is complete.
+Stretch goal: Political economy module (conditionality, political feasibility, elite capture) — ships if primary objective is complete with capacity remaining; otherwise carries to M12. EL decision 2026-06-03.
 
-**Milestone 11 — Engine Investigation and Political Economy (Next)**
-Core deliverable: ADR-009 (simulation engine computation model), sparse matrix proof-of-concept, political economy module (conditionality, political feasibility, elite capture). No demo.
+**Milestone 12 — Active Control and External Sector (Next)**
+Core deliverable: Matrix computation engine in production, external sector module, Mode 3 (Active Control). Demo 4.
 
 Full roadmap: `docs/roadmap/worldsim-roadmap.md`
 

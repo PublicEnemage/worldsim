@@ -110,9 +110,13 @@ surface: any milestone entry with UNTRACKED items is an open kickoff gate.
 
 ### Milestone 11 — Engine Investigation and Political Economy *(no demo)*
 
-**Core deliverable:** A complete empirical understanding of the simulation engine's performance characteristics, a proof-of-concept matrix engine running in parallel with the iterative engine, and the political economy module that serves the Argentina and Ukraine/Pakistan marquee cases.
+**Primary objective:** A complete empirical understanding of the simulation engine's performance characteristics and a validated proof-of-concept matrix engine running in parallel with the iterative engine. M11 closes when the matrix engine investigation track is complete — the political economy module does not block M11 closure.
 
-**What ships:**
+**Stretch goal:** Political economy module — political feasibility constraints, conditionality modelling, elite capture dynamics, coalition stability. Ships in M11 if the primary objective is complete with milestone capacity remaining. If not started in M11, carries to M12.
+
+**Rationale (EL decision 2026-06-03):** Both tracks were originally listed as co-equal M11 deliverables. The PM Agent flagged the risk that both cannot realistically ship in the same milestone alongside ADR-009 authoring, which is itself time-intensive research work. The sparse matrix investigation is the foundational architectural decision; the political economy module is additive domain coverage. When scope must be reduced, reduce analytical sophistication before reducing architectural integrity.
+
+**What ships — Primary (M11 exit gate):**
 
 *Matrix engine investigation (Chief Engineer owned):*
 - Phase 1 baseline benchmarks — [moved to M10, Issue #514 (horizon:immediate), per NM-020 2026-05-25; ADR-009 authoring depends on M10 benchmark results before matrix investigation begins]
@@ -121,6 +125,8 @@ surface: any milestone entry with UNTRACKED items is an open kickoff gate.
 - Phase 2 A/B validation — output equivalence to Decimal precision, performance comparison on identical hardware, full backtesting suite passing identically on both engines
 - Matrix interpretability tooling — contribution tracing, transformation visualization, computation anomaly detection (separate alert channel from MDA threshold system)
 - Phase 3 stress test suite — load levels 1x through 1000x on target hardware. Permanent test infrastructure artifact.
+
+**What ships — Stretch goal (ships if primary is complete):**
 
 *Political economy module:*
 - Political feasibility constraints as scenario inputs
@@ -132,7 +138,7 @@ surface: any milestone entry with UNTRACKED items is an open kickoff gate.
 
 **Canonical user primarily served:** The Chief Engineer and Architect Agent — M11 is primarily an internal architectural milestone whose outputs enable M12.
 
-**What M11 does not do:** M11 does not migrate the production engine. The iterative engine remains in production at M11 close. The matrix engine is a validated proof-of-concept, not a replacement. Production migration is M12.
+**What M11 does not do:** M11 does not migrate the production engine. The iterative engine remains in production at M11 close. The matrix engine is a validated proof-of-concept, not a replacement. Production migration is M12. M11 does not guarantee political economy module delivery — that delivery depends on capacity remaining after the primary objective is complete.
 
 ---
 
