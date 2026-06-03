@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-02 (PRs #654/#655/#656 merged — narration legibility rewrite; NARRATION-RULING-1 codified; demo review naming consistency NM-031; stakeholder screen recording complete)**
+**Last updated: 2026-06-02 (PR #658 merged — M10 stakeholder review issue numbers; Demo 3 review artifact complete and consistent with M8 convention)**
 **Current milestone:** M10 — Engine Integrity and Instrument Delivery (M9 formally closed; M10 active)
 
 ---
@@ -82,11 +82,11 @@ No open PRs — board clear as of 2026-06-02 (post PR #651 merge).
 
 | PR | Title | Date |
 |---|---|---|
+| #658 | docs(demo): add issue numbers to M10 stakeholder review findings | 2026-06-02 |
 | #656 | docs(process): demo review naming consistency — NM-031 | 2026-06-02 |
 | #655 | docs(ux): NARRATION-RULING-1 — institutionalize three-layer narration structure | 2026-06-02 |
 | #654 | docs(demo): narration legibility rewrite — umbrella + synthesis across all Section 2 steps (closes #652) | 2026-06-02 |
 | #651 | fix(zone1b): pass responsive columnWidth to MDAAlertPanelZone1B (closes #647) | 2026-06-02 |
-| #650 | fix(pmm): skip breached thresholds — PMM measures remaining headroom (closes #648) | 2026-06-02 |
 | #645 | docs(demo): Step 4 narration — honest scope framing replaces false recovery claim | 2026-06-02 |
 | #640 | docs(process): NM-028/029/030 — Demo 3 near-miss filings | 2026-06-02 |
 | #639 | fix(demo3): four CRITICAL blocking bugs — trajectory re-fetch, governance event mismatch, ecological temporal guard, boundary constant fetch | 2026-06-02 |
@@ -295,6 +295,7 @@ All Horizon:Immediate issues are now closed. M8 feature-complete.
 
 | Decision | Rationale | Date |
 |---|---|---|
+| M10 stakeholder review artifact complete — PR #658 (2026-06-02) | Issue numbers added to all five IR-S7 findings in `docs/demo/m10/reviews/2026-06-02-v0.10.0-stakeholder-review.md`, matching M8 convention. IR-S7-001/002 → #647 (closed, PR #651); IR-S7-003 → #634 (demo umbrella, screenshot-resolution only); IR-S7-004 → #648 (closed, PR #650); IR-S7-005 → #342 (DEMO-001 root cause, M11 Option B). Summary table updated with Issue and Resolution columns. | 2026-06-02 |
 | Stakeholder screen recording complete (2026-06-02) | EL ran the demo manually via `./scripts/demo.sh` + QuickTime at 1440×900 using the updated `docs/demo/stakeholder-walkthrough.md` script (PR #654). No Playwright re-run required — narration changes are in the script, not the application UI. | 2026-06-02 |
 | NARRATION-RULING-1 codified — PR #655 (closes #652 process hardening) | Three-layer narration structure (umbrella → facts → synthesis) added as §16 to `docs/ux/standards.md`. Step 5c self-check added to `docs/process/demo-preparation-standard.md` — gates each milestone's walkthrough against NARRATION-RULING-1 before the IR Agent sees it. Prevents presenter-skill dependency for the "so what" at each demo step. | 2026-06-02 |
 | Demo review naming consistency — NM-031, PR #656 | M10 review files renamed to canonical convention: `demo3-screenshot-ir.md` → `2026-06-02-v0.10.0-stakeholder-review.md`; `demo3-ir.md` → `2026-06-02-v0.10.0-pre-gate-triage.md`. Demo prep standard strengthened with explicit naming rule, mandatory pre-creation `find` command, canonical suffix definitions. Root cause: standard stated the pattern in a folder diagram but had no enforcement step. | 2026-06-02 |
