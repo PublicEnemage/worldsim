@@ -219,6 +219,12 @@ of IMF negotiations. Permission to be direct and critical given explicitly befor
 ### Step 8 — File and triage findings
 
 File DEMO-NNN issues from review output. PM Agent TRIAGE mode on each finding.
+
+**Tracking requirement (M10 forward — Issue #664 Gap 4):** File a GitHub issue for every
+CRITICAL and HIGH finding before the stakeholder session (Step 9). The issue number must
+appear in the review artifact summary table. MEDIUM and LOW findings are filed at PM Agent
+discretion.
+
 Fix CRITICAL items before the stakeholder session.
 HIGH items: acknowledge honestly in narration if unfixed.
 Save review document to `docs/demo/m{N}/reviews/YYYY-MM-DD-v{version}-stakeholder-review.md`.
