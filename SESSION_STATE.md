@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-02 (PR #635 merged — #395/#512/#535/#536/#538/#539/#541/#543 closed; process docs, step annotation standard, Greece fixture, fidelity dashboard)**
+**Last updated: 2026-06-02 (PRs #639 + #640 merged — Demo 3 four CRITICAL bugs fixed, Demo 3 screenshots captured, NM-028/029/030 filed, panel review posted to #634)**
 **Current milestone:** M10 — Engine Integrity and Instrument Delivery (M9 formally closed; M10 active)
 
 ---
@@ -76,12 +76,14 @@ M9 formally closed. Issue #213 (M9 Exit Checklist) closed 2026-05-24. M10 milest
 
 ## Open PRs
 
-No open PRs — board clear as of 2026-06-02 (post PR #635 merge).
+No open PRs — board clear as of 2026-06-02 (post PR #640 merge).
 
 ## Recently Merged PRs (last 5)
 
 | PR | Title | Date |
 |---|---|---|
+| #640 | docs(process): NM-028/029/030 — Demo 3 near-miss filings | 2026-06-02 |
+| #639 | fix(demo3): four CRITICAL blocking bugs — trajectory re-fetch, governance event mismatch, ecological temporal guard, boundary constant fetch | 2026-06-02 |
 | #635 | fix(process): M10 immediate issues — process docs, ADR threshold, PR checklist, step annotation, fidelity labels (closes #395, #512, #535, #536, #538, #539, #541, #543) | 2026-06-02 |
 | #631 | docs(process): agent-raci docs/demo/ ownership + UX/UI standards document (closes #537, #620) | 2026-06-02 |
 | #629 | docs(process): demo preparation standard M10 update — screenshot naming, legibility gate, narration check (closes #379, #628) | 2026-06-02 |
@@ -260,6 +262,7 @@ All Horizon:Immediate issues are now closed. M8 feature-complete.
 
 | Decision | Context | Status |
 |---|---|---|
+| Demo 3 financial narration gap — "financial arc recovered" vs. 0.0000 composite | Financial composite stays at 0.0000 from step 2 (Kirchner GDP +9% recovery not in fixture). Demo narration at step 4 says "financial arc has recovered." Two options: (a) Remove "recovered" from presenter script — narrate flatline as fixture scope gap; (b) Add Kirchner recovery inputs (gdp_growth_change events at steps 3–4, +9% magnitude). UX finding: gap is demo-blocking — a finance minister watching would notice. Decision needed before demo session. | **PENDING EL DECISION** |
 | #221 mean-reversion channel — M10 or M11? | Option B selected 2026-05-30: M11 deferral confirmed. Greece MAGNITUDE fidelity gap at stabilisation cases acknowledged. Demo 3 proceeds without mean-reversion channel. Roadmap updated (hard-constraint language removed; rationale recorded). Decision posted on #261 and #221. | Complete ✅ — 2026-05-30 |
 |---|---|---|
 | Trajectory endpoint implementation | FastAPI route + Pydantic model + normalized_absolute_strategy backend function. All prerequisites complete. May begin. | Ready — unblocked |
@@ -286,6 +289,8 @@ All Horizon:Immediate issues are now closed. M8 feature-complete.
 
 | Decision | Rationale | Date |
 |---|---|---|
+| Demo 3 CRITICAL bug cluster fixed + screenshots captured (PR #639) | Four bugs fixed: (1) `ScenarioInstrumentCluster.tsx` trajectory useEffect depended only on `[scenarioId]` — never re-fetched after step advances; fixed to `[scenarioId, currentStep]` with step-0 guard. (2) `setTrajectory` store action sets `current_step: trajectory.step_count`, clobbering prop-driven step; fixed by immediately re-asserting `currentStep` after `setTrajectory`. (3) GovernanceModule `_SUBSCRIBED_EVENTS` used bare instrument names (`"emergency_declaration"`); `EmergencyPolicyInput.to_events()` emits `"emergency_policy_emergency_declaration"` — corrected throughout module + elasticity registry + unit tests. (4) EcologicalModule temporal guard blocked pre-2009 CO2 proximity for Argentina (2001 start); fixed with per-constant `retroactive` flag; `_fetch_active_boundary_constants` changed to `WHERE effective_from <= NOW()`. Five Demo 3 screenshots captured with real data. Governance MDA-GOV-DEMOCRACY-FLOOR fires at step 3 (DQS 0.665 < 0.70). IR-004 Playwright test fixed: `page.waitForResponse` before `advanceStep`, then `page.waitForFunction` polls DOM for year text. Known gap: financial composite stays 0.0000 from step 2 (Kirchner recovery not in fixture) — narration "financial arc recovered" does not match instrument output; decision required before demo session. | 2026-06-02 |
+| NM-028/029/030 filed + panel review posted (PR #640, comment on #634) | Three near-misses filed: NM-028 (IR-004 silent no-op — hasSvg guard returned early for one milestone; same anti-pattern as NM-027; no-op check not run at wire-up merge boundary); NM-029 (GovernanceModule event_type false positive coverage — 25 unit tests passed with wrong synthetic event_type strings, never crossing EmergencyPolicyInput adapter; highest-severity of the three); NM-030 (EcologicalModule temporal guard silently blocked retroactive CO2 proximity for pre-2009 backtesting without user-visible error). Four-agent panel review (Architect, Frontend Architect, QA Lead, UX Designer) posted to Issue #634. Key panel findings: `setTrajectory` should not set `current_step` (FA — store design flaw, follow-up issue needed); ESLint `exhaustive-deps` rule should be audited and enforced (would have caught the useEffect missing-dependency bug); integration test required for input adapter → subscriber event_type contract; financial 0.0000 vs. "recovered" narration is a demo-blocking UX gap requiring EL decision. | 2026-06-02 |
 | M10 Immediate process sweep complete (PR #635) — 8 issues closed | MILESTONE_RUNBOOK.md table corrected to M0–M13; CONTRIBUTING.md stale develop-branch instructions replaced; ADR threshold criteria table added to CODING_STANDARDS.md; "ADRs Affected" and Playwright phases 3–4 attestation added to PR checklist; Customer Agent added as 13th standing consultation obligation (UX-facing ADRs); step_event_label mandatory field standard added to DATA_STANDARDS.md; Greece fixture annotated with step_metadata; FidelityDashboard M7 labels updated to M11. Remaining M10 Immediate: #261 (exit checklist), #345 (DEMO-004 manual run), #634 (demo prep Steps 2–6, Step 7, 8, 9). | 2026-06-02 |
 | IR review (PR #618) is a pre-gate triage artifact, not the Step 7 review for Issue #634 | The earlier IR review predates UX-RULING-4 and was conducted without screenshots. Step 7 on Issue #634 remains unchecked. The proper Step 7 review requires: Steps 2–6 complete (UX Agent screenshot brief, demo.sh update, Playwright spec update, walkthrough update, screenshot capture), then a fresh IR session with screenshots in UX Agent brief sequence and UX-RULING-4 narration discipline in scope. | 2026-06-02 |
 | docs/demo/ RACI ownership established; UX/UI standards document created (PR #631) | PM Agent is now R on `docs/demo/` — demo preparation is a blocking exit requirement per milestone. `docs/ux/standards.md` created as the canonical consolidated standards document (15 sections, 15 settled decisions). EL sign-off required for any new standard or existing change. UX Designer Agent is R; Frontend Architect Agent is Required C. | 2026-06-02 |
