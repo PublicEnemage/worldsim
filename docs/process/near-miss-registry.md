@@ -1746,6 +1746,89 @@ was not captured in naming guidance at all.
 
 ---
 
+## NM-032 — Demo Screenshot Capture Viewport (1280×720) Mismatches Live Demo and Legibility Gate (1440×900) (Reactive)
+
+**Date:** 2026-06-03
+**Milestone:** M10 — Engine Integrity and Instrument Delivery
+**Detected by:** Engineering Lead — live application comparison against repository artifacts
+**Severity:** High
+
+### What happened
+
+`demo-narrated.spec.ts` captures screenshots at the Playwright config default viewport of
+**1280×720** (`playwright.config.ts` line 15: `viewport: { width: 1280, height: 720 }`).
+The spec has no `page.setViewportSize()` call — it inherits the global default.
+
+The legibility gate (`demo-legibility.spec.ts`) runs every assertion at **1440×900**
+via `page.setViewportSize({ width: 1440, height: 900 })`. The live demo presentation
+runs at the presenter's display width (typically ≥1440px).
+
+This produces a three-way mismatch:
+
+| Layer | Viewport |
+|---|---|
+| Demo screenshot capture (review artifacts) | 1280×720 |
+| Legibility gate (Step 5b) | 1440×900 |
+| Live demo / stakeholder presentation | Presenter display (≥1440px) |
+
+A second gap: `demo-narrated.spec.ts` line 42 still reads
+`SCREENSHOT_DIR = path.resolve(__dirname, "../../../docs/demo/m8/screenshots/")`.
+Step 4 of `demo-preparation-standard.md` requires updating screenshot output paths to
+`docs/demo/m{N}/screenshots/` each milestone. This was not done for M10. The M10
+screenshots in `docs/demo/m10/screenshots/` were captured by an undocumented mechanism,
+not by running the current spec.
+
+### What was at risk
+
+**Review chain integrity.** The IR Agent (Step 7) and the internal panel (Step 6b) reviewed
+1280×720 artifacts. The stakeholder saw a 1440+ wide rendering. Viewport-dependent rendering
+defects are invisible to the review chain. Three findings from this session confirm the
+consequence:
+
+- **DEMO-020** (y-axis glyph clipping, Issue #674): first digit of y-axis tick labels clipped
+  at left component boundary. Invisible at 1280×720; visible at 1440+. Neither the internal
+  panel nor the IR Agent could have found it.
+- **DEMO-018** (CI legend raw variable names, Issue #672): raw Recharts dataKey strings visible
+  in Zone 1A legend. Visibility affected by viewport — not clearly readable at 1280×720.
+- **DEMO-019** (PMM None state, Issue #673): identified only after viewing the live application.
+
+The legibility gate (Step 5b) validates that the application is legible — but the gate's
+1440×900 rendering is never stored as the screenshot artifact. The gate that validates
+quality and the process that produces review artifacts are structurally decoupled. A clean
+legibility gate does not guarantee the screenshots going to the IR are at the validated
+viewport.
+
+### What caught it
+
+Engineering Lead direct comparison of a live application screenshot (captured at presenter
+display width, >1440px) against the repository frame-c artifact. The y-axis clipping in the
+live screenshot was the precipitating observation — the finding was absent from all prior
+review outputs despite being visible and prominent in the live application.
+
+### Process improvement
+
+**Issue #675 filed** for the following required fixes (M11):
+
+1. Add `page.setViewportSize({ width: 1440, height: 900 })` at the start of each screenshot
+   capture block in `demo-narrated.spec.ts`. Do not rely on `playwright.config.ts` default.
+
+2. Update `SCREENSHOT_DIR` in `demo-narrated.spec.ts` to `docs/demo/m{N}/screenshots/` each
+   milestone — treat this as a mandatory Step 4 deliverable with its own checkbox.
+
+3. Update `demo-preparation-standard.md §Step 4` to state explicitly: "Set capture viewport
+   to 1440×900 via `page.setViewportSize()` — do not rely on the playwright.config.ts default."
+
+4. Update `demo-preparation-standard.md §Step 6` to add a pre-capture gate: "Confirm the
+   spec's capture viewport matches the legibility gate viewport (1440×900) before running
+   `./scripts/demo.sh --run`."
+
+**Root cause:** The demo preparation standard established the legibility gate (Step 5b) as a
+quality check but did not specify the capture viewport for Step 6. The implicit assumption was
+that the screenshot spec and the legibility spec used the same viewport. They did not. No
+gate existed to detect the mismatch.
+
+---
+
 ## Registry Maintenance
 
 ### How to add an entry
