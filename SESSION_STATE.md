@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-03 (Step 6b internal team review process documented + M10 inaugural artifact created; Issues #667–#670 filed for DEMO-010/011/013/017 MEDIUM findings; PRs #665 #666 merged)**
+**Last updated: 2026-06-03 (NM-032 screenshot viewport mismatch filed; DEMO-018/019/020 from live app comparison; Issues #672–#675 filed; PR #676 merged)**
 **Current milestone:** M10 — Engine Integrity and Instrument Delivery (M9 formally closed; M10 active)
 
 ---
@@ -76,17 +76,17 @@ M9 formally closed. Issue #213 (M9 Exit Checklist) closed 2026-05-24. M10 milest
 
 ## Open PRs
 
-No open PRs — board clear as of 2026-06-03 (post PR #666 merge).
+No open PRs — board clear as of 2026-06-03 (post PR #676 merge).
 
 ## Recently Merged PRs (last 5)
 
 | PR | Title | Date |
 |---|---|---|
+| #676 | docs(demo): NM-032 + DEMO-018/019/020 — screenshot viewport mismatch and live application findings | 2026-06-03 |
+| #671 | chore(state): SESSION_STATE.md — Step 6b process + M10 internal review complete; Issues #667–#670 filed | 2026-06-03 |
 | #666 | docs(demo): Step 6b internal team review — process + M10 inaugural artifact (closes #663) | 2026-06-03 |
 | #665 | process(demo): remediate Gap 2 + Gap 4 from M10 demo/IR process review | 2026-06-03 |
 | #662 | chore(m10-exit): CLAUDE.md frontend pre-push gate + SESSION_STATE end-of-session update | 2026-06-03 |
-| #661 | docs(adr): M10 exit ADR license audit — ADR-001/002/005/007/008/010 renewed to M11; Amendment 5 records GovernanceModule M10 promotion | 2026-06-03 |
-| #660 | chore(m10-exit): SCAN-024 compliance scan + CHANGELOG v0.10.0 — 7 TS6133 errors fixed, ADR renewals flagged | 2026-06-03 |
 | #658 | docs(demo): add issue numbers to M10 stakeholder review findings | 2026-06-02 |
 | #656 | docs(process): demo review naming consistency — NM-031 | 2026-06-02 |
 | #655 | docs(ux): NARRATION-RULING-1 — institutionalize three-layer narration structure | 2026-06-02 |
@@ -212,6 +212,10 @@ No open PRs — board clear as of 2026-06-03 (post PR #666 merge).
 | #500 ✅ | feat(frontend): Zone 1D loading state skeleton (IR-006) | **Closed** (prior session) — PR #582 merged. |
 | #553 ✅ | feat(fixture): Argentina 2000–2002 second country fixture — IMF debt crisis (Demo 3) | **Closed 2026-06-02** — PR #590 merged. `build_argentina_demo_scenario()`: n_steps=4, EcologicalModule + GovernanceModule, NOAA MLO 2000 CO2 seed, WGI/V-Dem ARG 2000 governance seeds, step_metadata event labels (steps 1–3 SIGNIFICANT). `step_metadata` added to `ScenarioConfigSchema` (was being stripped by Pydantic on POST). Demo script at `backend/scripts/demo_argentina_2001_2002.py`. |
 | #556 ✅ | feat(governance): GovernanceModule M10 promotion — ADR-005 Amendment 4 | **Closed 2026-06-02** — PR #585 merged. All five criteria met. |
+| #675 | fix(demo): demo-narrated.spec.ts captures at 1280×720 — mismatches legibility gate (1440×900) and live demo viewport | **Filed 2026-06-03** — Milestone M11, horizon:near-term. Three required fixes: (1) `page.setViewportSize({ width: 1440, height: 900 })` in demo spec; (2) update `SCREENSHOT_DIR` to `m{N}/screenshots/` each milestone; (3) update demo-preparation-standard Steps 4 and 6 with explicit viewport requirement. Root cause of DEMO-020. NM-032. |
+| #674 | fix(frontend): DEMO-020 — Zone 1A y-axis tick labels clipped at left component boundary | **Filed 2026-06-03** — Milestone M11, horizon:near-term. `margin.left` on `ComposedChart` too narrow for 6-char labels when ecological score >1.0. Fix: increase to 48–56px or format ticks to 4-char precision. Confirm with `demo-legibility.spec.ts` at 1440×900. |
+| #673 | demo: DEMO-019 — PMM None state ("—") has no explanation for non-specialist users | **Filed 2026-06-03** — Milestone M11, horizon:near-term. UX copy change in `PMMWidgetZone1C.tsx`: conditional sub-label when `pmm_value` is null. "All thresholds breached — see alerts" or equivalent. Distinct from DEMO-016 (nonzero PMM precision). |
+| #672 | demo: DEMO-018 — Zone 1A legend shows raw variable names for CI upper bound and active curves | **Filed 2026-06-03** — Milestone M11, horizon:near-term. Pass `legendType="none"` on CI/ghost `<Line>` components or add explicit `name` prop. `getIndicatorDisplayNameAny()` fix (#617) covered AttributeSelector, not Recharts legend derived keys. |
 | #667 | demo: DEMO-010 — M10 screenshots unverified as post-fix state | **Filed 2026-06-03** — Milestone M11, horizon:near-term. Verify whether `docs/demo/m10/screenshots/` files are pre- or post-DEMO-003/005 fix. Attestation required in SEQUENCE.md. |
 | #668 | demo: DEMO-011 — Frame D not re-captured after DEMO-005 fix | **Filed 2026-06-03** — Milestone M11, horizon:near-term. Frame D Zone 1A legend overlap fix (PR #345) may not be reflected in repository artifact. Re-capture or attestation required. |
 | #669 | demo: DEMO-013 — dashed curve convention not narrated in M10 walkthrough | **Filed 2026-06-03** — Milestone M11, horizon:near-term. Screenshot brief §Key Narration Notes #2 requirement unimplemented. Add dashed=projected/solid=historical sentence to Section 2 Step 2. Walkthrough doc only — no implementation required. |
@@ -306,6 +310,7 @@ All Horizon:Immediate issues are now closed. M8 feature-complete.
 
 | Decision | Rationale | Date |
 |---|---|---|
+| NM-032 + DEMO-018/019/020 from live application comparison (PR #676, 2026-06-03) | Engineering Lead compared a live application screenshot at Step 3/4 (>1440px display) against repository artifact frame-c (1280×720 Playwright capture). Three new MEDIUM findings: DEMO-018 (CI legend raw variable names — `getIndicatorDisplayNameAny()` fix covered AttributeSelector, not Recharts legend entries for derived keys; Issue #672), DEMO-019 (PMM "—" None state has no contextual explanation for non-specialists; Issue #673), DEMO-020 (Zone 1A y-axis tick labels clipped at left boundary when ecological score >1.0; `margin.left` too narrow for 6-char labels; invisible at 1280×720; Issue #674). Root cause: demo screenshot spec captures at 1280×720 while legibility gate validates at 1440×900 and live demo presents at ≥1440px — the review chain reviews a different visual artifact than what the stakeholder sees. NM-032 filed. Fix issue #675 (M11): set `page.setViewportSize({ width: 1440, height: 900 })` in demo spec before each capture; update SCREENSHOT_DIR to m10/screenshots/; update demo-preparation-standard Steps 4 and 6 with explicit viewport requirement. | 2026-06-03 |
 | Step 6b internal team review process + M10 inaugural artifact (PR #666, closes #663, 2026-06-03) | Three-tier review structure (self-check → internal panel → IR Agent) documented in `demo-preparation-standard.md`. Step 6b defines the nine-agent panel (FA, UX Designer, UX Design Thinking, PO, Customer, QA Lead, DA, Chief Methodologist, Dev Economist), DEMO-NNN finding format, CRITICAL resolution criteria (a/b/c), and gate definition. Inaugural M10 artifact (`docs/demo/m10/reviews/2026-06-03-v0.10.0-internal-review.md`) produces DEMO-010 through DEMO-017. Four MEDIUM findings filed as #667–#670 (all M11, near-term). Internal Demo Reviews added to CLAUDE.md canonical artifact locations table. | 2026-06-03 |
 | Demo/IR process gaps 2 + 4 remediated (PR #665, 2026-06-03) | Gap 2: demo cycle added as named step 4 of MILESTONE_RUNBOOK.md closure ceremony (even-numbered milestones only). Gap 4: HIGH finding tracking requirement added to Step 8 of `demo-preparation-standard.md` — issue number must appear in review artifact summary table before Step 9. Gaps 1 (severity vocabulary) + 3 (sequencing) filed as Issue #664 for M11. Gap 1 vocabulary corrected in Issue #663 body. | 2026-06-03 |
 | CLAUDE.md frontend pre-push gate added (2026-06-03) — retrospective requirement #3 | For any branch modifying files under `frontend/src/`, run `cd frontend && npm run build` before pushing. Must exit 0. Adds a sibling rule to the existing backend pre-push lint gate. Near-miss record: SCAN-024 (7 TS6133 errors accumulated across M10 PRs without detection because this gate did not exist). This was the third blocking requirement from the M10 retrospective posted on Issue #261. | 2026-06-03 |
