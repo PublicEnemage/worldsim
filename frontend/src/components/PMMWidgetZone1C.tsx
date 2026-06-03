@@ -15,7 +15,6 @@
  *
  * Implements: US-019, US-020, ADR-008 Decision 6
  */
-import React from "react";
 import { useScenarioStepStore } from "../store/scenarioStepStore";
 
 // ---------------------------------------------------------------------------

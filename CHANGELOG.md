@@ -5,6 +5,97 @@ closure ceremony defined in `docs/MILESTONE_RUNBOOK.md`.
 
 ---
 
+## v0.10.0 — Milestone 10: Engine Integrity and Instrument Delivery (2026-06-02)
+
+### Summary
+
+All four Zone 1 instruments live for the first time. GovernanceModule promoted — all five
+ADR-005 promotion criteria met. Argentina 2000–2002 as second country fixture (Demo 3).
+PMM computed end-to-end from engine to Zone 1C. Phase 1 engine baseline benchmarks
+established. NARRATION-RULING-1 codified. Demo 3 stakeholder review complete
+(five findings DEMO-010–014, three resolved before session).
+
+### Delivered
+
+**Zone 1A — TrajectoryView (Issue #460 — PR #460)**
+- `TrajectoryView.tsx` — Recharts `ComposedChart` with shared step axis (ADR-010)
+- Four framework trajectory lines with divergence fill between financial and HDI (DD-013)
+- Step annotation markers (DD-014); confidence badge predicate `getConfidenceBadgeVisible()`
+- Vitest tests: `TrajectoryView.test.ts` — AC-013 confidence tier visibility, step annotation logic
+
+**Zone 1B — MDAAlertPanelZone1B (Issues #461, #495 — PRs #461, #495)**
+- `MDAAlertPanelZone1B.tsx` — severity sort TERMINAL → CRITICAL → WARNING, then step_index ascending (US-014)
+- Compact three-line format at 240px; full-density at 400px+ (US-013); framework source label FIN/HDI/ECO/GOV (US-015)
+- Wired to `GET /measurement-output` after each step advance (IR-001); absent at step 0
+- Responsive columnWidth fix: `columnWidth` passed from `InstrumentCluster` — Issue #647 (PR #651, closed)
+
+**Zone 1C — PMMWidgetZone1C (Issues #462, #496 — PRs #462, #496, #650)**
+- `PMMWidgetZone1C.tsx` — PMM numeric, direction arrow, mode-specific header label (ADR-008 Decision 6)
+- `GET /scenarios/{id}/trajectory` endpoint extended: `pmm_value` and `pmm_direction` embedded per step
+- Breached-threshold fix: breached thresholds excluded from PMM denominator — PMM measures remaining headroom (PR #650)
+- PMM trajectory confirmed: steps 0–1 ≈ 0.2857, step 2 ≈ 0.4286, steps 3–4 = None (Issue #648 closed)
+
+**Zone 1D — FourFrameworkZone1D (Issues #462, #499, #500, #556, #616, #617 — PRs #462, #499–#500, #556, #617)**
+- `FourFrameworkZone1D.tsx` — four-framework current position with composite scores
+- Governance null inline annotation `(in validation)` (IR-005); loading and error states keep rows in DOM (IR-006)
+- Ecological annotation and AttributeSelector display names added for Demo 3 (Issues #616, #617)
+- GovernanceModule promotion: governance axis live with all five ADR-005 criteria met (Issue #556, PR #651 area)
+
+**InstrumentCluster wiring (Issue #463 — PR #463)**
+- `InstrumentCluster.tsx` — Zone 1 composed layout, viewport breakpoint, responsive columnWidth
+- `ScenarioInstrumentCluster.tsx` — wires all four Zone 1 instruments; trajectory fetch on step advance; MDA alert and PMM sync via useEffect
+- `App.tsx` — InstrumentCluster integrated, persistent scenario state, demonstrative entry (IR-003)
+- `start_year` field: seeds trajectory tick date labels (IR-004, Issue #498)
+
+**GovernanceModule promotion — ADR-005 Amendment 4 (Issue #556 — PR #556)**
+- Five promotion criteria met: absolute threshold audit complete, zero-default composite score, single-entity note exemption, EMERGENCY_DECLARATION enum entry, M10 backtesting validation
+- `GOVERNANCE_IN_VALIDATION_LABEL` sentinel replaced by live composite computation
+- ADR-005 Amendment 4 applied 2026-05-23 (single-entity note exemption fix included in M10 implementation)
+
+**Argentina 2000–2002 fixture — Demo 3 (Issue #553 — PR #553)**
+- `tests/fixtures/argentina_2000_scenario.py` — four-step crisis arc with all four Zone 1 axes live
+- `emergency_declaration` at step 2 triggers governance MDA (Issue #615); economic collapse arc with IMF context
+- `tests/backtesting/test_argentina_demo3.py` — Argentina backtesting suite
+
+**Phase 1 engine baseline benchmarks (Issue #514 — PR #514)**
+- `backend/scripts/benchmark_engine.py` — prerequisite benchmarks for ADR-009 (sparse matrix / computation model)
+- Establishes latency baseline for advance-step under load; referenced by M11 ADR-009 scope
+
+**Demo 3 preparation and stakeholder review (Issues #634, #647, #648 — PRs #634, #655, #656, #658)**
+- `docs/demo/m10/` — full Demo 3 artifact set: screenshot-brief, stakeholder-walkthrough, five screenshots, reviews
+- Independent Review Agent: five findings IR-S7-001–005; three resolved before session (IR-S7-001/002 Zone 1B columnWidth, IR-S7-004 PMM breach); two acknowledged (IR-S7-003 screenshot resolution, IR-S7-005 DEMO-001 choropleth scope)
+- NARRATION-RULING-1 (§16 `docs/ux/standards.md`) — three-layer narration structure codified (Issue #652, PR #655)
+- Demo prep standard updated: Step 5a narration instrument check, Step 5b legibility gate, Step 5c self-check, NM-031 naming rule (PR #656)
+- Legibility E2E suites: `demo-legibility.spec.ts`, `demo-advancement-flow.spec.ts` (Issues #376, #377)
+
+**QA and acceptance tests (Issues #459, #568 — PRs #459, #568)**
+- RTL atomicity test AC-006: all four Zone 1 instruments update in one React render cycle
+- ModeIndicator render-cycle test US-026
+- `advance-step-btn` testid for MV-002 perf readiness (Issue #568)
+- `getConfidenceBadgeVisible` predicate tested AC-013
+
+### Architecture Decisions
+
+- **ADR-005 Amendment 4** — GovernanceModule M10 promotion: five criteria met; live governance axis. Applied 2026-05-23 (M9 exit), implemented M10.
+- **ADR-010** — Trajectory view architecture governs Zone 1A implementation: shared step axis, Recharts ComposedChart, divergence fill, confidence badge predicate.
+- **ADR-008** — UX architecture governs Zone 1 layout: four instruments always visible; instrument zone / context zone separation; responsive columnWidth contract.
+
+### Deferred to M11
+
+- ADR-009 (simulation engine computation model) — Phase 1 benchmarks delivered; sparse matrix PoC is M11 scope
+- Political Economy module (conditionality, political feasibility, elite capture) — M11 scope
+- Option B choropleth (scenario-relative color scale) — M11 enhancement; until then UX-RULING-4 narration restriction applies (choropleth is context surface, not change instrument)
+- `gdp_direction_step5_positive` Greece deferred threshold — Issue #221; mean-reversion channel absent from MacroeconomicModule
+- ADR license renewals: ADR-001, ADR-002, ADR-005, ADR-007, ADR-008, ADR-010 (all Valid Until M10; renewal reviews required at M11 kickoff)
+
+### Compliance Posture
+
+- SCAN-024 — Milestone 10 exit gate: **Clean post-fix** (7 TS6133 unused-React-import findings fixed before scan recorded; 0 ruff violations)
+- ADR license audit: six ADRs (ADR-001, ADR-002, ADR-005, ADR-007, ADR-008, ADR-010) require M11 renewal review
+- GovernanceModule promotion exception: approved by Engineering Lead under single-principal governance. No independent review available — see CLAUDE.md §Governance for documented plan.
+
+---
+
 ## v0.8.0 — Milestone 8: Ecological and Governance Frameworks (2026-05-19)
 
 ### Summary

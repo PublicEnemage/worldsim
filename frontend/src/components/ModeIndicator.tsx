@@ -9,7 +9,6 @@
  * Subscribes to useScenarioStepStore. Updates within the same React render
  * cycle as any other Zone 1 instrument (DD-012, US-026 RTL test).
  */
-import React from "react";
 import { useScenarioStepStore } from "../store/scenarioStepStore";
 
 // ---------------------------------------------------------------------------
