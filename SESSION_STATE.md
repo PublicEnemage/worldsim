@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-04 (M11.5 Pillar 1 complete — PR #724 merged: rrweb session recording layer, closes #717; Issue #725 filed: KI-002 mypy fix, M12)**
+**Last updated: 2026-06-04 (M11.5 Pillar 2 complete — PR #727 merged: cold-start usability audit methodology, closes #718; status PROPOSED, joint approval on #718 required before Session 1)**
 **Current milestone:** M11.5 — Usability Validation and Experience Audit (GitHub Milestone 14; North Star: `docs/vision/milestone-11-5-north-star.md`)
 **Previous milestone:** M11 — Engine Investigation and Political Economy (formally closed 2026-06-04, tagged v0.11.0)
 
@@ -77,7 +77,7 @@ M9 formally closed. Issue #213 (M9 Exit Checklist) closed 2026-05-24. M10 milest
 
 ## Open PRs
 
-No open PRs — board clear as of 2026-06-04 (post PR #724 merge).
+No open PRs — board clear as of 2026-06-04 (post PR #727 merge).
 
 ## M11 Work Streams — 2026-06-04 Sprint
 
@@ -107,7 +107,7 @@ No open PRs — board clear as of 2026-06-04 (post PR #724 merge).
 | Issue | Title | Gate |
 |---|---|---|
 | #717 ✅ | Pillar 1 — rrweb session recording integration | **Closed 2026-06-04** — PR #724 merged. `useSessionRecording` hook (rrweb `record()`, `endSession()` POST with once-only guard), `SessionRecordingBanner` (red/green fixed banner), `SessionReplayViewer` (`?replay_session=<id>`), FastAPI `POST/GET/LIST /api/v1/sessions/recording`, session artifact schema v1.0 at `docs/schema/session_recording.yml`, coordinator guide at `docs/ux/usability-sessions/how-to-run-a-session.md`. 14 backend + 9 frontend unit tests. |
-| #718 | Pillar 2 — cold-start usability audit methodology | Blocked by #717; assigned PM + UX Designer + UX Design Thinking + PO Agents |
+| #718 ✅ | Pillar 2 — cold-start usability audit methodology | **Closed 2026-06-04** — PR #727 merged. `docs/ux/usability-sessions/pillar-2-methodology.md`: cold-start protocol, think-aloud schema (5 North Star markers + TRIED/CONCLUDED), facilitation approach, persona sequencing (P2→P1→P5 Priority A; P6/P8 Priority B), session count rationale, trace interpretation, findings classification (CRITICAL/HIGH/MEDIUM/LOW × Discovery/Comprehension/Action), verbatim task prompts for 5 personas. Status: PROPOSED — joint approval on Issue #718 by PM + UD + UT + PO required before Session 1. |
 | #719 | Pillar 3 — session provenance standard and semantic component vocabulary | Must close before any session begins; assigned DA Agent + PM Agent |
 | #720 | Milestone 11.5 Exit Checklist | Blocks milestone closure |
 
@@ -119,6 +119,7 @@ No open PRs — board clear as of 2026-06-04 (post PR #724 merge).
 
 | PR | Title | Date |
 |---|---|---|
+| #727 | docs(ux): Pillar 2 cold-start usability audit methodology — M11.5 (closes #718) | 2026-06-04 |
 | #724 | feat(usability): Pillar 1 rrweb session recording layer — M11.5 (closes #717) | 2026-06-04 |
 | #722 | chore(compliance): M11 exit — ADR renewals, Mermaid diagrams, SCAN-025, KI-002 | 2026-06-04 |
 | #715 | docs(vision): M11.5 North Star — usability validation and experience audit | 2026-06-04 |
