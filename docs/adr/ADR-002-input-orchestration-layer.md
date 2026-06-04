@@ -6,10 +6,12 @@ Accepted
 ## Validity Context
 
 **Standards Version:** 2026-04-15 (date standards documents were established)
-**Valid Until:** Milestone 11 — Engine Investigation and Political Economy
+**Valid Until:** Milestone 11.5 — Usability Validation and Experience Audit
 **License Status:** CURRENT
 
-**Last Reviewed:** 2026-06-02 — M10 exit review (SCAN-024). No renewal triggers fired
+**Last Reviewed:** 2026-06-04 — M11 exit review (SCAN-025). Renewal trigger assessed: `InputSource.CONDITIONALITY` + `constraining_actor_id` / `constraint_mechanism` fields on `ControlInput` and `implementation_capacity` scaling via `get_events()` (G16a, Issue #96/#93) are additive extensions to the existing `ControlInput` taxonomy and audit trail contract. No existing input channel types removed or modified. `CompoundStateCondition` (Issue #157) adds an AND/OR multi-attribute condition evaluator to the contingent trigger path — extends the trigger model without altering the core `ControlInput` → `Event` contract. All new fields default to backward-compatible values (`implementation_capacity=1.0`, `constraining_actor_id=""`). No uncertainty quantification standard changes. License renewed to Milestone 11.5.
+
+**Previously reviewed:** 2026-06-02 — M10 exit review (SCAN-024). No renewal triggers fired
 during Milestone 10. GovernanceModule promotion uses existing `ControlInput` types and
 Quantity-delta Event contract — no new input channel types. `EMERGENCY_DECLARATION`
 added to the GovernanceModule's internal `EmergencyInstrument` enum; this is a module-

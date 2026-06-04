@@ -84,6 +84,60 @@ appropriate if the symptom recurs consistently (three or more times).
 
 ---
 
+## KI-002 — mypy: Python version mismatch (local 3.10 vs project-declared 3.13)
+
+**Date first observed:** 2026-06-04
+**Infrastructure:** mypy static type checker (local development environment)
+**Severity:** Low — CI passes (GitHub Actions runs Python 3.13); local mypy reports a
+pre-existing syntax error that does not reflect a real defect in the codebase
+**Recurrence:** Consistent — reproducible on any development machine running Python < 3.13
+
+### Symptom
+
+Running `cd backend && mypy app/` locally produces:
+
+```
+app/api/scenarios.py:1425: error: syntax error in type comment  [syntax]
+```
+
+The affected line uses PEP 695 type alias syntax (`type CompositeStrategy = Callable[...]`),
+which requires Python 3.13+. When mypy is invoked with a Python interpreter < 3.13, it
+cannot parse the PEP 695 `type` statement and raises a syntax error.
+
+The same error appears on `main` before any M11 changes — confirmed by stashing all M11
+modifications and running mypy. The error is pre-existing and pre-dates M11.
+
+### Trigger condition
+
+mypy's effective Python version is determined by the interpreter it is invoked with.
+When the development machine runs Python 3.10.11 and `python_version` is not pinned in
+`pyproject.toml`'s mypy section, mypy parses the code using 3.10 semantics — which
+do not include PEP 695 type alias syntax.
+
+### Workaround
+
+Two options:
+
+1. **Run mypy via CI** — GitHub Actions runs Python 3.13 and mypy passes there. For the
+   pre-push lint gate, CI is the authoritative pass signal for this specific error.
+
+2. **Invoke mypy with version flag locally:**
+   ```bash
+   cd backend && mypy --python-version 3.13 app/
+   ```
+   This forces 3.13 semantics regardless of the local interpreter version.
+   Note: mypy ≥ 1.5 is required for PEP 695 support.
+
+### Upstream
+
+No upstream issue. PEP 695 is a Python 3.13 language feature; mypy support for it
+requires mypy ≥ 1.5 and a matching `python_version` setting. The long-term resolution
+is to pin `python_version = "3.13"` in the mypy section of `backend/pyproject.toml`
+and ensure all contributors run Python 3.13+ locally. Tracked as a follow-up item
+for M12 environment standardisation.
+
+---
+
 ## Registry Maintenance
 
 ### When to file a Known Issue

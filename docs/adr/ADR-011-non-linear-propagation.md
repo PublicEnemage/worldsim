@@ -3,6 +3,17 @@
 ## Status
 Accepted
 
+**Valid Until:** Milestone 11.5 — Usability Validation and Experience Audit
+**License Status:** CURRENT — Accepted 2026-06-04 (M11 exit review)
+
+**Diagram:** `docs/architecture/ADR-011-propagation-modes.mmd`
+
+**Milestone Review Log:**
+
+| Milestone | Review date | Triggers fired | Action |
+|---|---|---|---|
+| M11 exit | 2026-06-04 | No triggers fired. PropagationMode enum unchanged. No new propagation modes added. Diagram added (`ADR-011-propagation-modes.mmd`). License renewed to M11.5. | CURRENT |
+
 ## Context
 
 The current event propagation engine (ADR-001, Amendment 1) applies a linear

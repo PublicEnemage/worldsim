@@ -6,8 +6,10 @@ Accepted
 ## Validity Context
 
 **Standards Version:** 2026-05-22
-**Valid Until:** Milestone 11 — Engine Investigation and Political Economy
+**Valid Until:** Milestone 11.5 — Usability Validation and Experience Audit
 **License Status:** ACCEPTED — 2026-05-22
+
+**M11 exit review:** 2026-06-04 (SCAN-025). No renewal triggers fired during Milestone 11. No frontend components modified in M11. PoliticalEconomyModule outputs (`legitimacy_index`, `programme_survival_probability`, `elite_capture_divergence`) are engine outputs — their Zone placement is specified in the M11 political economy user stories (Issue #681, PR #713) as Zone 2; no Zone 1 instrument layout changes required. `_steps_projected` envelope field is backend-only. No mode transition, Zone boundary, simultaneous-update contract, or confidence tier visual changes. License renewed to Milestone 11.5. M11.5 usability audit may surface Zone 1 layout findings that trigger a renewal — evaluate at M11.5 exit.
 
 **M10 exit review:** 2026-06-02 (SCAN-024). No renewal triggers fired during Milestone
 10. All four Zone 1 instruments implemented per ADR-008 spec — implementation of the

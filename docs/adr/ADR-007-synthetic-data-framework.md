@@ -15,8 +15,10 @@ Accepted
 ## Validity Context
 
 **Standards Version:** 2026-05-23
-**Valid Until:** Milestone 11 — Engine Investigation and Political Economy
+**Valid Until:** Milestone 11.5 — Usability Validation and Experience Audit
 **License Status:** ACCEPTED — 2026-05-23
+
+**M11 exit review:** 2026-06-04 (SCAN-025). No renewal triggers fired during Milestone 11. The synthetic data framework was not implemented in M11 — ADR-007 `Quantity` schema fields (`is_synthetic`, `synthetic_method`, `comparison_group_id`, `holdout_validated`) were not added to the engine (Issue #22 deferred to M12). PoliticalEconomyModule outputs are formula-based approximations at Tier 3–4, not synthetic data per the ADR-007 method hierarchy. No sixth method proposed, holdout validation gate unchanged, meaninglessness threshold adjustments none. License renewed to Milestone 11.5. Implementation pressure carries to M12.
 
 **M10 exit review:** 2026-06-02 (SCAN-024). No renewal triggers fired during Milestone
 10. The synthetic data framework was not implemented in M10 — no sixth method proposed,
