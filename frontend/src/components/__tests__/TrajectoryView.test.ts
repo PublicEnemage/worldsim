@@ -389,4 +389,29 @@ describe("AC-006 — atomicity: Zustand store single-set() invariant", () => {
 
     expect(useScenarioStepStore.getState().current_step).toBe(3);
   });
+
+  // setTrajectory side-effect removal — Issue #643
+  it("setTrajectory does not mutate current_step", () => {
+    useScenarioStepStore.getState().setScenario("traj-test", 5, "MODE_1");
+    useScenarioStepStore.setState({ current_step: 3 });
+
+    useScenarioStepStore.getState().setTrajectory({
+      scenario_id: "traj-test",
+      entity_id: "ARG",
+      step_count: 5,
+      mda_floors: [],
+      steps: [],
+    });
+
+    expect(useScenarioStepStore.getState().current_step).toBe(3);
+  });
+
+  it("setCurrentStep sets current_step explicitly", () => {
+    useScenarioStepStore.getState().setScenario("traj-test-2", 5, "MODE_1");
+    useScenarioStepStore.setState({ current_step: 0 });
+
+    useScenarioStepStore.getState().setCurrentStep(5);
+
+    expect(useScenarioStepStore.getState().current_step).toBe(5);
+  });
 });
