@@ -130,11 +130,12 @@ artifact:
 
 # ---------------------------------------------------------------------------
 # Linkage to Pillar 3 (Session Provenance Standard)
-# When the Pillar 3 session manifest standard is established (Issue #719),
-# this schema will be extended with a manifest_id field linking the recording
-# artifact to the full session manifest. The session_id already serves as the
-# linking key — manifest_id will be added as a required field in schema
-# version 2.0 once the Pillar 3 standard is ratified.
+# The Pillar 3 session manifest standard is established at:
+#   docs/ux/usability-sessions/pillar-3-provenance.md (Issue #719, v1.0)
+# The session_id is the primary linking key connecting this artifact to the
+# session manifest, think-aloud transcript, coordinator field notes, and
+# findings document. No new field is required — the session_id already serves
+# as the primary key and this schema remains at version 1.0.
 # ---------------------------------------------------------------------------
 
 # ---------------------------------------------------------------------------
