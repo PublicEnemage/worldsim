@@ -74,6 +74,8 @@ interface ScenarioStepState {
     mode: "MODE_1" | "MODE_2" | "MODE_3",
   ) => void;
   setTrajectory: (trajectory: TrajectoryResponse) => void;
+  /** Jump to a specific step — used by scenario re-selection to land on the final step. */
+  setCurrentStep: (step: number) => void;
   setMdaAlerts: (alerts: Zone1BAlert[]) => void;
   /** Set PMM state in a single set() call (DD-012 atomicity). */
   setPmmState: (value: number | null, direction: "up" | "down" | "flat" | null) => void;
@@ -111,9 +113,10 @@ export const useScenarioStepStore = create<ScenarioStepState>((set, get) => ({
   setTrajectory: (trajectory) =>
     set({
       trajectory,
-      current_step: trajectory.step_count,
       computation_state: "complete",
     }),
+
+  setCurrentStep: (step) => set({ current_step: step }),
 
   setMdaAlerts: (alerts) => set({ mda_alerts: alerts }),
 
