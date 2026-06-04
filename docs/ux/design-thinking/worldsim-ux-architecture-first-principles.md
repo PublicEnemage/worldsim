@@ -15,6 +15,14 @@
 >   docs/demo/m8/stakeholder-walkthrough.md,
 >   docs/ux/design-thinking/m8-interaction-model-critique.md,
 >   docs/ux/design-thinking/m8-critique-panel-synthesis.md
+>
+> **Reader Orientation:** This document is the *derivation* of ADR-008, not a separate
+> standard. It derives the five governing premises and the Case A / Case B terminology
+> used throughout ADR-008. Read this document when you need to understand *why* ADR-008
+> was written the way it was. **ADR-008 (`docs/adr/ADR-008-ux-architecture.md`) is the
+> canonical authority** — its Renewal Triggers and Decisions govern what a developer may
+> and may not change. When a change you are making is governed by both documents, check
+> ADR-008's Renewal Triggers first. (DOC-LEGIBILITY-AUDIT-001, Gap 3, 2026-06-03)
 
 ---
 

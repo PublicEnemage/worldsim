@@ -70,8 +70,13 @@ the drawer.
 ### The Case B Finding
 
 The UX Design Thinking Agent critique (PR #355, 2026-05-18) diagnosed this
-inversion and produced a Case B verdict: the architecture requires rethinking
-before M9 implementation begins, not incremental patching after.
+inversion and produced a Case B verdict: *Case B means the architecture requires
+rethinking before implementation begins, not incremental patching after.* (Case A
+would mean incremental improvement is sufficient. Case B requires a principled
+restart. The Case A / Case B terminology originates in
+`docs/ux/design-thinking/worldsim-ux-architecture-first-principles.md` — read
+that document for the full derivation; this ADR is the canonical authority derived
+from it. DOC-LEGIBILITY-AUDIT-001, Gap 2, 2026-06-03.)
 
 The first-principles review (PR #390,
 `docs/ux/design-thinking/worldsim-ux-architecture-first-principles.md`)
