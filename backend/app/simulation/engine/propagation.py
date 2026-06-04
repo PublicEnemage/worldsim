@@ -1,5 +1,5 @@
 """
-Event propagation engine — ADR-001, Amendment 1.
+Event propagation engine — ADR-001, Amendment 1; ADR-011 (non-linear propagation).
 
 Implements the graph traversal that applies Events to SimulationState[T]
 and produces SimulationState[T+1]. This module owns state transitions.
@@ -9,8 +9,13 @@ Architecture contracts (ADR-001):
 - State[T] is never mutated. State[T+1] is constructed fresh.
 - The source entity always receives the full unattenuated delta.
 - Propagation follows PropagationRules hop-by-hop along relationship edges
-  of the specified type, attenuating by (attenuation_factor * edge.weight)
-  at each hop. Attenuation compounds across hops.
+  of the specified type. How the delta changes per hop depends on
+  PropagationRule.propagation_mode (ADR-011):
+    LINEAR    — attenuates by attenuation_factor × weight per hop (existing behaviour).
+    THRESHOLD — same per-hop scale as LINEAR; accumulated delta is only applied to
+                the target if any attribute's |delta| >= rule.threshold.
+    CASCADE   — amplifies by (1/attenuation_factor) × weight per hop, capped so
+                no attribute's |delta| exceeds rule.ceiling × |base delta|.
 - Deltas accumulate additively (by value): multiple events and multiple
   propagation paths to the same entity are summed before being applied.
   confidence_tier uses the lower-of-two rule across accumulated inputs.
@@ -24,6 +29,9 @@ Amendment 1 (SCR-001): _DeltaAccumulator and all delta arithmetic updated
 from dict[str, float] to dict[str, Quantity]. Attenuation scales
 Quantity.value using Decimal arithmetic; confidence_tier propagates via
 the lower-of-two rule. _build_next_state applies STOCK/FLOW semantics.
+
+ADR-011: _propagate_rule dispatches to _attenuate (LINEAR/THRESHOLD) or
+_attenuate_cascade (CASCADE). _threshold_check gates THRESHOLD accumulation.
 """
 
 from __future__ import annotations
@@ -33,6 +41,7 @@ from decimal import Decimal
 
 from app.simulation.engine.models import (
     Event,
+    PropagationMode,
     PropagationRule,
     SimulationEntity,
     SimulationState,
@@ -118,21 +127,28 @@ def _propagate_rule(
     rule: PropagationRule,
     accumulator: _DeltaAccumulator,
 ) -> None:
-    """Traverse the relationship graph for one PropagationRule.
+    """Traverse the relationship graph for one PropagationRule (ADR-011).
 
     Processes hops iteratively. The frontier at each hop carries the
-    already-attenuated delta from the previous hop, so attenuation compounds:
-    a two-hop chain applies (attenuation * weight) twice.
+    delta from the previous hop (attenuated or amplified depending on mode),
+    so effects compound across hops.
 
     Multiple frontier entries may reach the same target entity (converging
     paths). Both contributions are accumulated additively — the engine makes
     no attempt to deduplicate paths.
 
+    Dispatches per PropagationMode (ADR-011):
+      LINEAR    — _attenuate() per hop; always accumulates.
+      THRESHOLD — _attenuate() per hop; only accumulates if computed delta
+                  meets or exceeds rule.threshold (|max attr value| gate).
+      CASCADE   — _attenuate_cascade() per hop (amplifying, ceiling-capped);
+                  always accumulates (no threshold gate).
+
     Args:
         state: Simulation state providing relationship queries.
-        base_delta: Full unattenuated delta from the event source.
+        base_delta: Full unscaled delta from the event source.
         source_entity_id: Entity where this propagation begins.
-        rule: Controls which edge types to traverse and how to attenuate.
+        rule: Controls which edge types to traverse and how to scale.
         accumulator: Mutable accumulator updated in place.
     """
     # frontier: (entity_id, delta_carried_from_previous_hop)
@@ -145,9 +161,25 @@ def _propagate_rule(
             for rel in state.get_relationships_from(entity_id):
                 if rel.relationship_type != rule.relationship_type:
                     continue
-                attenuated = _attenuate(current_delta, rule.attenuation_factor, rel.weight)
-                _accumulate(accumulator, rel.target_id, attenuated)
-                next_frontier.append((rel.target_id, attenuated))
+
+                if rule.propagation_mode == PropagationMode.CASCADE:
+                    next_delta = _attenuate_cascade(
+                        current_delta, base_delta, rule.attenuation_factor,
+                        rel.weight, rule.ceiling,
+                    )
+                    _accumulate(accumulator, rel.target_id, next_delta)
+                elif rule.propagation_mode == PropagationMode.THRESHOLD:
+                    next_delta = _attenuate(current_delta, rule.attenuation_factor, rel.weight)
+                    if _exceeds_threshold(next_delta, rule.threshold):
+                        _accumulate(accumulator, rel.target_id, next_delta)
+                    else:
+                        next_delta = {}  # below threshold — no propagation this edge
+                else:  # LINEAR (default)
+                    next_delta = _attenuate(current_delta, rule.attenuation_factor, rel.weight)
+                    _accumulate(accumulator, rel.target_id, next_delta)
+
+                if next_delta:
+                    next_frontier.append((rel.target_id, next_delta))
 
         frontier = next_frontier
         if not frontier:
@@ -202,6 +234,90 @@ def _attenuate(
         )
         for k, q in delta.items()
     }
+
+
+def _attenuate_cascade(
+    current_delta: dict[str, Quantity],
+    base_delta: dict[str, Quantity],
+    attenuation_factor: float,
+    relationship_weight: float,
+    ceiling: float,
+) -> dict[str, Quantity]:
+    """Scale a delta by one CASCADE hop — amplifying, not decaying (ADR-011).
+
+    The scale per hop is (1 / attenuation_factor) * weight, making CASCADE
+    the inverse of LINEAR attenuation. A rule with attenuation_factor=0.5
+    amplifies by 2× per hop instead of halving.
+
+    The ceiling parameter caps the total accumulated |value| for each attribute
+    relative to the base delta: if |amplified| > ceiling × |base_value|, the
+    amplified value is clamped to ceiling × |base_value| with the sign preserved.
+    This prevents unbounded amplification across multi-hop chains.
+
+    attenuation_factor must be > 0 (enforced by caller contract; 0 would
+    require division by zero). If base_delta does not contain a key present
+    in current_delta, no ceiling is applied for that attribute.
+
+    confidence_tier is preserved: the tier reflects source data quality, not
+    propagation path length.
+
+    Args:
+        current_delta: Delta carried from the previous hop (already amplified).
+        base_delta: Original unscaled delta from the event source — used for ceiling.
+        attenuation_factor: Rule-level per-hop scale in (0.0, 1.0]; inverted for CASCADE.
+        relationship_weight: Edge-level coupling strength in [0.0, 1.0].
+        ceiling: Maximum amplification factor relative to |base delta| per attribute.
+
+    Returns:
+        New dict with each Quantity's value amplified by (1/attenuation_factor) × weight,
+        ceiling-capped per attribute relative to the base delta magnitude.
+    """
+    # Guard: avoid division by zero; propagation should not be called with factor=0
+    safe_factor = attenuation_factor if attenuation_factor > 0.0 else 1.0
+    scale = Decimal(str((1.0 / safe_factor) * relationship_weight))
+    ceiling_d = Decimal(str(ceiling))
+
+    result: dict[str, Quantity] = {}
+    for k, q in current_delta.items():
+        amplified_value = q.value * scale
+        base_q = base_delta.get(k)
+        if base_q is not None:
+            cap = abs(base_q.value) * ceiling_d
+            if abs(amplified_value) > cap and cap > Decimal("0"):
+                sign = Decimal("1") if amplified_value >= 0 else Decimal("-1")
+                amplified_value = cap * sign
+        result[k] = Quantity(
+            value=amplified_value,
+            unit=q.unit,
+            variable_type=q.variable_type,
+            measurement_framework=q.measurement_framework,
+            observation_date=q.observation_date,
+            source_id=q.source_id,
+            confidence_tier=q.confidence_tier,
+        )
+    return result
+
+
+def _exceeds_threshold(delta: dict[str, Quantity], threshold: float) -> bool:
+    """Return True if any attribute's |value| meets or exceeds the threshold (ADR-011).
+
+    Used by THRESHOLD mode to gate propagation: a delta only applies to a
+    target entity if its effect is large enough to cross the tipping point.
+
+    A zero threshold (the default) always returns True — equivalent to LINEAR
+    behavior for callers that do not set a threshold.
+
+    Args:
+        delta: Computed attenuated delta for a target entity.
+        threshold: Minimum |value| required for any single attribute.
+
+    Returns:
+        True if any attribute's absolute value >= threshold; False otherwise.
+    """
+    if threshold == 0.0:
+        return True
+    threshold_d = Decimal(str(threshold))
+    return any(abs(q.value) >= threshold_d for q in delta.values())
 
 
 # INTENT: Add Quantity attribute deltas to the accumulator for one entity,

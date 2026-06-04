@@ -1,5 +1,5 @@
 """
-Simulation core data model — ADR-001, Amendment 1.
+Simulation core data model — ADR-001, Amendment 1; ADR-011 (non-linear propagation).
 
 All entities, relationships, events, and measurement structures that the
 simulation engine operates on. This module has no database or framework
@@ -10,6 +10,10 @@ Amendment 1 (SCR-001): SimulationEntity.attributes changed from
 dict[str, float] to dict[str, Quantity]. Event.affected_attributes
 changed from dict[str, float] to dict[str, Quantity]. See ADR-001
 Amendment 1 for the full renewal record.
+
+ADR-011: PropagationMode enum added. PropagationRule extended with
+propagation_mode, threshold, and ceiling fields. LINEAR remains the
+default — backward compatibility is preserved for all existing callers.
 """
 from __future__ import annotations
 
@@ -39,6 +43,28 @@ class MeasurementFramework(Enum):
     HUMAN_DEVELOPMENT = "human_development"
     ECOLOGICAL = "ecological"
     GOVERNANCE = "governance"
+
+
+class PropagationMode(str, Enum):
+    """How an event propagates through the relationship graph (ADR-011).
+
+    LINEAR   — existing linear diffusion: delta × attenuation_factor × weight
+               per hop. Appropriate for slow-moving structural shocks.
+    THRESHOLD — applies delta only if the computed effect at a target entity
+               exceeds the PropagationRule.threshold floor. Models tipping-point
+               dynamics where small shocks are absorbed without effect.
+    CASCADE  — amplifies delta at each hop using 1/attenuation_factor × weight
+               instead of decaying it, capped at PropagationRule.ceiling times
+               the base delta magnitude. Models self-reinforcing panics and
+               bank-run contagion (Lebanon 2019, Northern Rock 2007).
+
+    LINEAR is the default for all existing PropagationRule instances to preserve
+    backward compatibility — callers that do not set propagation_mode receive
+    unchanged behaviour.
+    """
+    LINEAR = "linear"
+    THRESHOLD = "threshold"
+    CASCADE = "cascade"
 
 
 class ResolutionLevel(Enum):
@@ -117,16 +143,36 @@ class ScenarioConfig:
 
 @dataclass
 class PropagationRule:
-    """How an event propagates along relationships in the graph.
+    """How an event propagates along relationships in the graph (ADR-011).
 
     relationship_type restricts propagation to edges of that type.
-    attenuation_factor determines how much effect diminishes per hop —
-    0.0 means no propagation, 1.0 means no attenuation.
-    max_hops limits propagation depth.
+    attenuation_factor determines how much effect changes per hop:
+      LINEAR mode   — decay: multiplied by attenuation_factor * weight per hop.
+                      0.0 means no propagation, 1.0 means no decay.
+      THRESHOLD mode — same per-hop decay as LINEAR; but the computed delta at
+                      a target is only accumulated if its max |value| across all
+                      affected attributes meets or exceeds `threshold`.
+      CASCADE mode  — amplification: multiplied by (1/attenuation_factor) * weight
+                      per hop (inverse of LINEAR), capped so that no attribute's
+                      accumulated |delta| exceeds `ceiling` × |base delta|.
+
+    propagation_mode defaults to LINEAR — all existing callers retain identical
+    behaviour without modification.
+
+    threshold: THRESHOLD mode only. Minimum |delta| (across any single attribute)
+      required to apply the computed effect to the target entity. Defaults to 0.0
+      (no threshold — equivalent to LINEAR for tipping-point logic).
+
+    ceiling: CASCADE mode only. Maximum amplification factor relative to the base
+      delta magnitude per attribute. Defaults to 1.0 (no amplification beyond base).
+      Set > 1.0 to allow cascade amplification; e.g. 3.0 caps at 3× base magnitude.
     """
-    relationship_type: str   # which edge types carry this event
-    attenuation_factor: float  # effect multiplier per hop, in [0.0, 1.0]
+    relationship_type: str     # which edge types carry this event
+    attenuation_factor: float  # per-hop scale in [0.0, 1.0]
     max_hops: int = 1
+    propagation_mode: PropagationMode = PropagationMode.LINEAR
+    threshold: float = 0.0     # THRESHOLD mode: min |delta| per attribute
+    ceiling: float = 1.0       # CASCADE mode: max amplification vs base delta
 
 
 # ---------------------------------------------------------------------------
