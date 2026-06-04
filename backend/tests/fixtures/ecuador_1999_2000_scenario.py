@@ -136,6 +136,20 @@ def build_ecuador_scenario() -> ScenarioCreateRequest:
         measurement_framework="human_development",
     )
 
+    # Mean-reversion channel seed (ADR-006 Amendment 1 — Issue #221).
+    # Ecuador long-run potential growth: approximately 3% — ECLAC estimate for
+    # Andean economies with oil-dependent structural features. Confidence tier 3:
+    # model estimate from regional literature; subject to calibration (Issue #44).
+    initial_trend_growth = QuantitySchema(
+        value="0.03",
+        unit="ratio",
+        variable_type="ratio",
+        confidence_tier=3,
+        observation_date=date(1999, 1, 1),
+        source_registry_id="ACADEMIC_LITERATURE_ECLAC_ANDEAN_POTENTIAL",
+        measurement_framework="financial",
+    )
+
     return ScenarioCreateRequest(
         name="Ecuador 1999-2000 Dollarization Crisis Backtesting Fixture",
         description=(
@@ -144,9 +158,10 @@ def build_ecuador_scenario() -> ScenarioCreateRequest:
             "to validate step 1 DIRECTION_ONLY GDP contraction and step 2 "
             "'not deeper contraction' thresholds. "
             "Initial state: IMF WEO October 1999 + WDI 1999. "
-            "Dollarization stabilization effects (step 2 recovery to +2.8%) are "
-            "not yet modeled by MacroeconomicModule — StructuralPolicyInput records "
-            "the institutional reform event for future StructuralModule consumption. "
+            "Mean-reversion channel active (ADR-006 Amendment 1): trend_growth=3% seeded. "
+            "Channel provides partial recovery at step 2, but dollarization-driven recovery "
+            "to +2.8% (StructuralPolicyInput) is not yet captured — StructuralModule "
+            "required for full magnitude fidelity. "
             "Known blind spots: oil price recovery channel, monetary credibility "
             "restoration multiplier. See PARAMETER_CALIBRATION_DISCLOSURE."
         ),
@@ -158,6 +173,7 @@ def build_ecuador_scenario() -> ScenarioCreateRequest:
                 "ECU": {
                     "gdp_growth": initial_gdp_growth,
                     "unemployment_rate": initial_unemployment_rate,
+                    "trend_growth": initial_trend_growth,
                 },
             },
         ),

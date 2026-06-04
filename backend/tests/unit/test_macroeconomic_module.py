@@ -1,8 +1,8 @@
-"""Unit tests for MacroeconomicModule — ADR-006 Decisions 8 and 10.
+"""Unit tests for MacroeconomicModule — ADR-006 Decisions 8 and 10; Amendment 1.
 
 Coverage:
   1. Non-country entity → empty result.
-  2. No prior events → empty result.
+  2. No prior events + no trend_growth → empty result.
   3. Regime detection — standard (growth >= 0).
   4. Regime detection — depressed (-0.03 <= growth < 0).
   5. Regime detection — ZLB (growth < -0.03).
@@ -21,6 +21,12 @@ Coverage:
   18. regime_change metadata carries previous/new regime and threshold.
   19. Multiple fiscal events in same step accumulate gdp_delta.
   20. get_subscribed_events returns all expected types.
+  21. Mean-reversion: no trend_growth seeded → no reversion (Amendment 1).
+  22. Mean-reversion: trend_growth seeded + no fiscal events → reversion event emitted.
+  23. Mean-reversion: gdp below trend → reversion_term positive.
+  24. Mean-reversion: gdp above trend → reversion_term negative.
+  25. Mean-reversion: ZLB dampener (0.25) smaller than standard (1.0).
+  26. Mean-reversion: accumulates with fiscal delta.
 """
 from __future__ import annotations
 
@@ -43,6 +49,8 @@ from app.simulation.engine.models import (
 from app.simulation.engine.quantity import Quantity, VariableType
 from app.simulation.modules.macroeconomic.module import (
     FISCAL_MULTIPLIERS,
+    REGIME_DAMPENER,
+    REVERSION_SPEED,
     MacroeconomicModule,
     _detect_regime,
 )
@@ -60,19 +68,29 @@ def _make_state(
     entity_type: str = "country",
     gdp_growth: str = "0",
     prior_events: list[Event] | None = None,
+    trend_growth: str | None = None,
 ) -> SimulationState:
+    base_attrs: dict[str, Quantity] = {}
+    if gdp_growth != "missing":
+        base_attrs["gdp_growth"] = Quantity(
+            value=Decimal(gdp_growth),
+            unit="ratio",
+            variable_type=VariableType.RATIO,
+            measurement_framework=MeasurementFramework.FINANCIAL,
+            confidence_tier=1,
+        )
+    if trend_growth is not None:
+        base_attrs["trend_growth"] = Quantity(
+            value=Decimal(trend_growth),
+            unit="ratio",
+            variable_type=VariableType.RATIO,
+            measurement_framework=MeasurementFramework.FINANCIAL,
+            confidence_tier=3,
+        )
     entity = SimulationEntity(
         id=entity_id,
         entity_type=entity_type,
-        attributes={
-            "gdp_growth": Quantity(
-                value=Decimal(gdp_growth),
-                unit="ratio",
-                variable_type=VariableType.RATIO,
-                measurement_framework=MeasurementFramework.FINANCIAL,
-                confidence_tier=1,
-            )
-        } if gdp_growth != "missing" else {},
+        attributes=base_attrs,
         metadata={},
     )
     return SimulationState(
@@ -538,3 +556,90 @@ def test_macroeconomic_module_logs_debug_on_no_prior_events(
         for r in caplog.records
         if r.levelno == logging.DEBUG
     ), f"Expected DEBUG log naming 'GRC'. Got: {[r.message for r in caplog.records]}"
+
+
+# ---------------------------------------------------------------------------
+# Mean-reversion channel — ADR-006 Amendment 1 (Issue #221)
+# ---------------------------------------------------------------------------
+
+
+def test_mean_reversion_inactive_without_trend_growth_seed() -> None:
+    """Without trend_growth seeded, no events are emitted and no reversion occurs."""
+    state = _make_state(gdp_growth="-0.10", prior_events=[])
+    module = MacroeconomicModule()
+    result = module.compute(state.entities["GRC"], state, _TS)
+    assert result == []
+
+
+def test_mean_reversion_emits_event_without_fiscal_events() -> None:
+    """With trend_growth seeded and no fiscal events, a reversion-only event is emitted."""
+    state = _make_state(gdp_growth="-0.10", trend_growth="0.02", prior_events=[])
+    module = MacroeconomicModule()
+    events = module.compute(state.entities["GRC"], state, _TS)
+    assert len(events) >= 1
+    event_types = [e.event_type for e in events]
+    assert "gdp_growth_change" in event_types
+
+
+def test_mean_reversion_positive_when_gdp_below_trend() -> None:
+    """When current GDP is below trend, reversion term pulls GDP up (positive delta)."""
+    state = _make_state(gdp_growth="-0.10", trend_growth="0.02", prior_events=[])
+    module = MacroeconomicModule()
+    events = module.compute(state.entities["GRC"], state, _TS)
+    gdp_event = next(e for e in events if e.event_type == "gdp_growth_change")
+    # gdp (-0.10) is below trend (0.02) → reversion_term > 0
+    assert gdp_event.affected_attributes["gdp_growth"].value > Decimal("0")
+
+
+def test_mean_reversion_negative_when_gdp_above_trend() -> None:
+    """When current GDP is above trend, reversion term pulls GDP down (negative delta)."""
+    state = _make_state(gdp_growth="0.05", trend_growth="0.02", prior_events=[])
+    module = MacroeconomicModule()
+    events = module.compute(state.entities["GRC"], state, _TS)
+    gdp_event = next(e for e in events if e.event_type == "gdp_growth_change")
+    # gdp (0.05) is above trend (0.02) → reversion_term < 0
+    assert gdp_event.affected_attributes["gdp_growth"].value < Decimal("0")
+
+
+def test_mean_reversion_zlb_dampener_smaller_than_standard() -> None:
+    """ZLB regime dampener (0.25) produces a smaller reversion term than standard (1.0)."""
+    state_zlb = _make_state(gdp_growth="-0.10", trend_growth="0.02", prior_events=[])
+    module = MacroeconomicModule()
+
+    # ZLB case: gdp=-0.10, trend=0.02
+    events_zlb = module.compute(state_zlb.entities["GRC"], state_zlb, _TS)
+    zlb_delta = next(
+        e.affected_attributes["gdp_growth"].value
+        for e in events_zlb if e.event_type == "gdp_growth_change"
+    )
+
+    # Expected ZLB reversion: 0.10 × (0.02 - (-0.10)) × 0.25 = 0.003
+    expected_zlb = REVERSION_SPEED * (Decimal("0.02") - Decimal("-0.10")) * REGIME_DAMPENER["zlb"]
+    assert zlb_delta == expected_zlb
+
+    # Verify ZLB dampener < standard dampener (structural constraint)
+    assert REGIME_DAMPENER["zlb"] < REGIME_DAMPENER["standard"]
+
+
+def test_mean_reversion_accumulates_with_fiscal_delta() -> None:
+    """Reversion term accumulates additively with fiscal GDP delta."""
+    spending_cut = Decimal("-0.05")
+    state = _make_state(
+        gdp_growth="-0.054",  # ZLB regime
+        trend_growth="0.02",
+        prior_events=[_fiscal_spending_event("GRC", str(spending_cut))],
+    )
+    module = MacroeconomicModule()
+    events = module.compute(state.entities["GRC"], state, _TS)
+    gdp_event = next(e for e in events if e.event_type == "gdp_growth_change")
+
+    # fiscal_delta = -0.05 × 2.0 (ZLB) = -0.10
+    # reversion = 0.10 × (0.02 - (-0.054)) × 0.25 = 0.10 × 0.074 × 0.25 = 0.00185
+    fiscal_delta = spending_cut * FISCAL_MULTIPLIERS["zlb"]
+    reversion = (
+        REVERSION_SPEED
+        * (Decimal("0.02") - Decimal("-0.054"))
+        * REGIME_DAMPENER["zlb"]
+    )
+    expected = fiscal_delta + reversion
+    assert gdp_event.affected_attributes["gdp_growth"].value == expected
