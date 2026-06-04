@@ -9,11 +9,8 @@ All tests are pure-Python unit tests with no database or HTTP layer dependency.
 """
 from __future__ import annotations
 
-from dataclasses import replace
 from datetime import datetime
 from decimal import Decimal
-
-import pytest
 
 from app.simulation.engine.models import (
     MeasurementFramework,
@@ -173,7 +170,8 @@ class TestImplementationCapacityScaling:
         assert len(raw) == len(scaled)
         for r, s in zip(raw, scaled, strict=True):
             for k in r.affected_attributes:
-                assert s.affected_attributes[k].value == r.affected_attributes[k].value * Decimal("0.5")
+                expected = r.affected_attributes[k].value * Decimal("0.5")
+                assert s.affected_attributes[k].value == expected
 
     def test_get_events_zero_capacity_zeroes_magnitude(self) -> None:
         """implementation_capacity=0.0 → all event attribute values are zero."""
