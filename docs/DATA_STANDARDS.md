@@ -1643,6 +1643,7 @@ A `source_field_registry` entry must document all of the following:
 | `confidence_tier` | Tier assigned at the field level (may be stricter than source tier) |
 | `transformation_test_id` | Reference to a test that verifies the transformation on a known input/output pair from actual source data. Paper certification without a verification test is not sufficient. |
 | `data_architect_signoff_date` | Date of Data Architect Agent review and sign-off |
+| `dqa_signoff_date` | Date of Data Quality Agent review and sign-off (Issue #300). The Data Quality Agent independently verifies that the transformation formula and confidence tier assignment are consistent with the source documentation before the field is production-certified. Data Architect sign-off certifies the technical mapping; DQA sign-off certifies methodological soundness. Both are required. See `docs/process/agents.md §Data Quality Agent` for the activation protocol and `docs/process/data-quality-agent-prompt.md` for the review prompt. |
 
 ### Chain of Custody Principle
 
