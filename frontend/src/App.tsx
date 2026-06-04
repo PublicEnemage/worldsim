@@ -8,6 +8,9 @@ import { ModeIndicator } from "./components/ModeIndicator";
 import { ScenarioInstrumentCluster } from "./components/ScenarioInstrumentCluster";
 import ScenarioControls from "./components/ScenarioControls";
 import ScenarioPanel from "./components/ScenarioPanel";
+import { SessionRecordingBanner } from "./components/SessionRecordingBanner";
+import { SessionReplayViewer } from "./components/SessionReplayViewer";
+import { useSessionRecording } from "./hooks/useSessionRecording";
 import type { ScenarioDetailResponse } from "./types";
 import "./App.css";
 
@@ -54,6 +57,22 @@ function getUrlScenarioId(): string | null {
 }
 
 export default function App() {
+  // ---------------------------------------------------------------------------
+  // Pillar 1 — M11.5 usability session recording
+  // Active only when ?usability_session=<id> is in the URL. Off by default.
+  // ---------------------------------------------------------------------------
+  const sessionRecording = useSessionRecording();
+
+  // ---------------------------------------------------------------------------
+  // Pillar 1 — replay mode
+  // When ?replay_session=<id> is in the URL, show the replay viewer instead
+  // of the main application. This is a developer/audit tool, not a user feature.
+  // ---------------------------------------------------------------------------
+  const replaySessionId = new URLSearchParams(window.location.search).get("replay_session");
+  if (replaySessionId) {
+    return <SessionReplayViewer sessionId={replaySessionId} />;
+  }
+
   const [attributeName, setAttributeName] = useState(DEFAULT_ATTRIBUTE);
   const [selectedScenarioId, setSelectedScenarioId] = useState<string | null>(null);
   const [selectedScenarioName, setSelectedScenarioName] = useState<string | null>(null);
@@ -160,6 +179,7 @@ export default function App() {
 
   return (
     <div className="app">
+      <SessionRecordingBanner recording={sessionRecording} />
       <header className="app-header">
         <h1 className="app-title">WorldSim</h1>
         <AttributeSelector value={attributeName} onChange={setAttributeName} />

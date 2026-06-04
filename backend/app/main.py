@@ -29,6 +29,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.api.countries import router as countries_router
 from app.api.health import router as health_router
 from app.api.scenarios import router as scenarios_router
+from app.api.sessions import router as sessions_router
 from app.db.connection import close_asyncpg_pool, create_asyncpg_pool
 
 
@@ -69,3 +70,4 @@ _API_PREFIX = "/api/v1"
 app.include_router(health_router, prefix=_API_PREFIX)
 app.include_router(countries_router, prefix=_API_PREFIX)
 app.include_router(scenarios_router, prefix=_API_PREFIX)
+app.include_router(sessions_router, prefix=_API_PREFIX)
