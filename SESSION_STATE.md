@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-04 (M11.5 Pillar 3 complete — PR #730 merged: session provenance standard + semantic component vocabulary, closes #719; all three pre-session gates now closed — #717 ✅ #718 ✅ #719 ✅)**
+**Last updated: 2026-06-04 (M11.5 Session 1 infrastructure validation complete — PR #732 open: sessions.py path fix (parents[3]→parents[2]), Playwright session runner, four Pillar 3 artifacts for 2026-06-04-persona-2-001 (INVALID — cold-start violated; Pillar 1 end-to-end confirmed functional))**
 **Current milestone:** M11.5 — Usability Validation and Experience Audit (GitHub Milestone 14; North Star: `docs/vision/milestone-11-5-north-star.md`)
 **Previous milestone:** M11 — Engine Investigation and Political Economy (formally closed 2026-06-04, tagged v0.11.0)
 
@@ -77,7 +77,9 @@ M9 formally closed. Issue #213 (M9 Exit Checklist) closed 2026-05-24. M10 milest
 
 ## Open PRs
 
-No open PRs — board clear as of 2026-06-04 (post PR #730 merge).
+| PR | Branch | Title | Gate |
+|---|---|---|---|
+| #732 | feat/usability-session-1-infra-validation | feat(ux): M11.5 Session 1 — Pillar 1 infra validation, sessions.py path fix | Merge when CI green |
 
 ## M11 Work Streams — 2026-06-04 Sprint
 
@@ -111,6 +113,8 @@ No open PRs — board clear as of 2026-06-04 (post PR #730 merge).
 | #719 ✅ | Pillar 3 — session provenance standard and semantic component vocabulary | **Closed 2026-06-04** — PR #730 merged. `pillar-3-provenance.md`: manifest schema (app state, agent config, environment, outcome, artifact links), linking protocol (session_id primary key), versioning strategy (same-PR vocabulary update rule). `vocabulary.md`: 16 zone tokens, component + element tables for all current UI components, data-testid cross-refs, v1.0 changelog. `session_recording.yml` Pillar 3 stub resolved. `docs/ux/usability-sessions/manifests/` directory created. |
 | #720 | Milestone 11.5 Exit Checklist | Blocks milestone closure |
 
+**M11.5 Session 1 status:** INVALID infrastructure validation run complete (2026-06-04). Session ID: `2026-06-04-persona-2-001`. Pillar 1 end-to-end confirmed functional (recording banner, End Session, artifact write). Bug fixed: `backend/app/api/sessions.py` `parents[3]→parents[2]` (artifact was writing to unmounted `/sessions/` inside Docker). PR #732 open. All four Pillar 3 artifacts produced in `docs/ux/usability-sessions/`. Next: genuine cold-start Persona 2 session — ID `2026-06-04-persona-2-002`; requires fresh agent with no WorldSim context and a Greece scenario pre-loaded in the database.
+
 **M11 formally closed:** Issue #262 closed 2026-06-04, GitHub Milestone 12 (M11) closed, tagged `v0.11.0`. Compliance gate: SCAN-025 recorded, KI-002 filed (mypy Python version mismatch, pre-existing). ADR license renewals complete (ADR-001/002/005/007/008/010 → M11.5; ADR-011 license section added; ADR-009 diagram added). Socratic Agent TEST complete (in-session 2026-06-04).
 
 **Exit criterion (M11.5):** Can a finance ministry analyst with no prior WorldSim orientation use this tool to produce a finding they could cite in a negotiation?
@@ -119,6 +123,7 @@ No open PRs — board clear as of 2026-06-04 (post PR #730 merge).
 
 | PR | Title | Date |
 |---|---|---|
+| #731 | chore(state): SESSION_STATE.md — Pillar 3 merged (PR #730, closes #719); all pre-session gates closed | 2026-06-04 |
 | #730 | docs(ux): Pillar 3 session provenance standard and component vocabulary — M11.5 (closes #719) | 2026-06-04 |
 | #727 | docs(ux): Pillar 2 cold-start usability audit methodology — M11.5 (closes #718) | 2026-06-04 |
 | #724 | feat(usability): Pillar 1 rrweb session recording layer — M11.5 (closes #717) | 2026-06-04 |
