@@ -1668,6 +1668,16 @@ gate at a threshold set when the first cohort retrofit completes.
 blind code audit. An intent block that describes what the code does rather than what
 it should do is a legibility finding, not a passing annotation.
 
+**Segregation of duties (Issue #299):** Intent blocks for existing functions must not
+be authored by the same agent who wrote or most recently modified the implementation.
+The authoring agent must not read the implementation body before writing the intent
+block — the independent perspective on what the function *should* do is the primary
+value of the exercise. For new functions, the implementation author writes the intent
+block before writing the body (write-before-implement). For retrofit cohorts, the
+Intent Block Author Agent (see `docs/process/agents.md §Intent Block Author Agent`)
+holds the authorship obligation. A PR in which the implementation author also authors
+the intent block as retrofit violates this rule and must be refactored before merge.
+
 ---
 
 ## Framework Promotion Protocol
