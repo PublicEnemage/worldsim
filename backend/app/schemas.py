@@ -400,6 +400,7 @@ class ScenarioDetailResponse(BaseModel):
     configuration: ScenarioConfigSchema
     scheduled_inputs: list[ScheduledInputSchema]
     temporal_scope_note: str
+    engine_version_hash: str | None = None
 
 
 class RunSummaryResponse(BaseModel):
