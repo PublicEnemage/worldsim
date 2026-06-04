@@ -123,6 +123,21 @@ def build_greece_scenario() -> ScenarioCreateRequest:
         measurement_framework="financial",
     )
 
+    # Mean-reversion channel seed (ADR-006 Amendment 1 — Issue #221).
+    # Greece long-run potential growth: approximately 2% — the pre-crisis
+    # estimate that survived debt restructuring per Blanchard-Leigh (2013)
+    # "Growth Forecast Errors and Fiscal Multipliers" (IMF WP/13/1).
+    # Confidence tier 3: model estimate derived from academic literature.
+    initial_trend_growth = QuantitySchema(
+        value="0.02",
+        unit="ratio",
+        variable_type="ratio",
+        confidence_tier=3,
+        observation_date=date(2010, 1, 1),
+        source_registry_id="ACADEMIC_LITERATURE_BLANCHARD_LEIGH_2013",
+        measurement_framework="financial",
+    )
+
     return ScenarioCreateRequest(
         name="Greece 2010-2015 IMF Program Backtesting Fixture",
         description=(
@@ -156,6 +171,7 @@ def build_greece_scenario() -> ScenarioCreateRequest:
                     "health_expenditure_pct_gdp": initial_health_expenditure,
                     "net_enrollment_secondary": initial_net_enrollment_secondary,
                     "reserve_coverage_months": initial_reserve_coverage_months,
+                    "trend_growth": initial_trend_growth,
                 },
             },
         ),

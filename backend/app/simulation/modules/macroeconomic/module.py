@@ -1,4 +1,4 @@
-"""MacroeconomicModule — ADR-006 Decisions 8 and 10.
+"""MacroeconomicModule — ADR-006 Decisions 8 and 10; Amendment 1 (mean-reversion).
 
 Subscribes to fiscal and monetary policy events from the previous step
 (one-step lag design). Computes GDP growth using regime-dependent fiscal
@@ -9,6 +9,17 @@ Regime-dependent fiscal multipliers (ADR-006 Decision 8):
   standard  (gdp_growth >= 0):         0.5
   depressed (-0.03 <= growth < 0):     1.5
   zlb       (growth < -0.03):          2.0
+
+Mean-reversion channel (ADR-006 Amendment 1 — Issue #221):
+  When an entity has a `trend_growth` attribute seeded, the module applies
+  a reversion term toward that trend at every step, even in the absence of
+  fiscal events. The reversion speed is modulated by regime — deep crisis
+  regimes recover more slowly (Reinhart-Rogoff 2009; Cerra-Saxena 2008).
+
+  reversion_term = REVERSION_SPEED × (trend_growth − gdp_growth) × regime_dampener
+
+  If `trend_growth` is not seeded, the channel is inactive and module
+  behaviour is unchanged from the pre-Amendment-1 design.
 
 Decision 10 constraint: this module is wired in the same commit that
 removes the DemographicModule legacy fiscal_spending_change subscription.
@@ -57,6 +68,23 @@ _TAX_MULTIPLIER_RATIO = Decimal("0.6")
 _SPENDING_INFLATION_COEFF = Decimal("0.5")
 _TAX_INFLATION_COEFF = Decimal("0.3")
 
+# Mean-reversion channel — ADR-006 Amendment 1 (Issue #221).
+# Reversion speed (α): 10% per year — Cerra-Saxena (2008) estimate for
+# developed economies. Calibration to individual country trajectories is
+# deferred to Issue #44 (parameter calibration tier system).
+REVERSION_SPEED = Decimal("0.10")
+
+# Regime dampener: reduces recovery speed in crisis regimes.
+# ZLB = 0.25 — sovereign debt crises have very slow output recovery
+#   (Reinhart-Rogoff 2009: median recovery to pre-crisis output ~7 years).
+# Depressed = 0.50 — moderate crisis, partial recovery channel active.
+# Standard = 1.00 — normal regime, full reversion speed.
+REGIME_DAMPENER: dict[str, Decimal] = {
+    "standard": Decimal("1.00"),
+    "depressed": Decimal("0.50"),
+    "zlb": Decimal("0.25"),
+}
+
 _SUBSCRIBED_EVENTS = frozenset({
     "fiscal_policy_spending_change",
     "fiscal_policy_tax_rate_change",
@@ -94,7 +122,13 @@ class MacroeconomicModule(SimulationModule):
             e for e in state.events
             if e.source_entity_id == entity.id and e.event_type in _SUBSCRIBED_EVENTS
         ]
-        if not prior_events:
+
+        # Mean-reversion channel (ADR-006 Amendment 1): active only when
+        # `trend_growth` is explicitly seeded on the entity. Without it,
+        # behaviour is identical to the pre-Amendment-1 design.
+        trend_growth_qty = entity.get_attribute("trend_growth")
+
+        if not prior_events and trend_growth_qty is None:
             _log.debug(
                 "%s: no subscribed events for entity_id=%r at timestep=%r — returning []",
                 type(self).__name__,
@@ -133,6 +167,15 @@ class MacroeconomicModule(SimulationModule):
             elif event.event_type == "monetary_policy_policy_rate":
                 # Rate cut (negative magnitude) → mild upward inflation pressure.
                 inflation_delta -= magnitude * Decimal("0.1")
+
+        # Apply mean-reversion when trend_growth is seeded (ADR-006 Amendment 1).
+        if trend_growth_qty is not None:
+            dampener = REGIME_DAMPENER[current_regime]
+            reversion_term = (
+                REVERSION_SPEED * (trend_growth_qty.value - current_gdp_growth) * dampener
+            )
+            gdp_delta += reversion_term
+            confidence_tier = max(confidence_tier, trend_growth_qty.confidence_tier)
 
         if gdp_delta == Decimal("0") and fiscal_balance_delta == Decimal("0"):
             return []

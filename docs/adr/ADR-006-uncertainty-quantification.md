@@ -1039,6 +1039,99 @@ updated in the same PR as the distribution-aware MDA pass.
 
 ---
 
+## Amendment 1 — Mean-Reversion Channel (Issue #221, M11)
+
+**Effective date:** 2026-06-03
+**Implemented in:** `app/simulation/modules/macroeconomic/module.py`
+**Closes:** Issue #221
+**Review:** CM (author) + CE (co-author) + EL (accepted 2026-06-03)
+
+### Context
+
+The pure-accumulation model in MacroeconomicModule (Decisions 8 and 10) produced
+a structural fidelity gap: once GDP growth entered contraction, no endogenous
+recovery mechanism existed. Without a positive fiscal injection, the module returned
+`[]` and GDP stayed at the prior step value. This made MAGNITUDE_WITHIN_20PCT on
+the Greece stabilization-period steps structurally impossible regardless of
+parameter calibration, and blocked the ADR-006 Decision 1 Monte Carlo upgrade
+trigger (requires MAGNITUDE_WITHIN_20PCT on both Greece and Argentina).
+
+Empirical basis: Cerra-Saxena (2008) documents that GDP growth rates do recover
+following financial crises, even when output losses are permanent in levels.
+
+### Amendment 1 Decisions
+
+**Amendment 1.1 — Mean-reversion channel architecture**
+
+MacroeconomicModule applies a mean-reversion term toward a country-level
+`trend_growth` attribute at every simulation step, even without incoming fiscal events:
+
+```
+reversion_term = α × (trend_growth − gdp_growth) × regime_dampener
+```
+
+The channel is **opt-in**: it activates only when `trend_growth` is explicitly
+seeded in the entity's initial attributes. Without `trend_growth`, module behaviour
+is identical to the pre-Amendment design.
+
+**Amendment 1.2 — Reversion speed parameter**
+
+`REVERSION_SPEED` (α) = `Decimal("0.10")` per step.
+
+Basis: Cerra-Saxena (2008) estimates mean-reversion speed of approximately 10% per
+year for developed economies following financial crises. Pre-calibration default;
+per-country calibration deferred to Issue #44.
+
+**Amendment 1.3 — Regime dampeners**
+
+| Regime | Dampener | Basis |
+|---|---|---|
+| `standard` (gdp ≥ 0) | 1.00 | Full reversion speed |
+| `depressed` (-0.03 ≤ gdp < 0) | 0.50 | Moderate crisis |
+| `zlb` (gdp < -0.03) | 0.25 | Sovereign debt crises: median 7-year recovery (Reinhart-Rogoff 2009) |
+
+**Amendment 1.4 — Fixture seeds**
+
+`trend_growth` seeded in Greece (2.0%, Blanchard-Leigh 2013) and Ecuador (3.0%,
+ECLAC Andean potential growth) backtesting fixtures. Confidence tier 3 per
+DATA_STANDARDS.md.
+
+**Amendment 1.5 — Calibration gap**
+
+With α = 0.10 and ZLB dampener 0.25, the reversion term is insufficient to
+overcome the Greece model trajectory deficit (step 5 GDP ≈ -40% vs actual +0.7%).
+The Greece `gdp_direction_step5_positive` check remains deferred. The Ecuador
+step 2 `not_deeper_contraction` check passes for the correct reason (endogenous
+reversion). Full magnitude fidelity on both cases requires parameter calibration
+(Issue #44).
+
+### EL Decision — Issue #222 (Contemporaneous Processing Path)
+
+**Decision date:** 2026-06-03
+**Closes:** Issue #222
+
+Issue #222 offered three options for the step-1 lag gap (82% magnitude deviation
+at Argentina 2001 step 1 because the shock fires at step 1 but is processed at step 2):
+
+- **Option A** (bypass lag for initial step): breaks the uniform one-step lag
+  invariant; high architectural risk.
+- **Option B** (revised initial state seeding): conflates the seed baseline with
+  the first-year actual; methodology risk.
+- **Option C** (epistemic position): the one-step lag is a deliberate model of
+  policy transmission delay. Step 1 correctly shows the pre-shock baseline.
+  DIRECTION_ONLY is the epistemically honest threshold for step 1.
+  MAGNITUDE_WITHIN_20PCT applies from step 2 onward where the lag has resolved.
+
+**EL decision: Option C is permanently adopted.**
+
+Rationale: the one-step lag is architecturally fundamental. The Argentina step 2
+result (MAGNITUDE_WITHIN_20PCT at 3.2% deviation) demonstrates the model is correct
+once the lag resolves. Step 1 is an initial condition, not a model failure. The
+step-1 DIRECTION_ONLY threshold is the correct and permanent fidelity standard
+for initial-step assertions across all backtesting fixtures.
+
+---
+
 ## Next ADR
 
 ADR-006 establishes the uncertainty architecture for Milestone 5.
