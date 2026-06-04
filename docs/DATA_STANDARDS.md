@@ -742,7 +742,49 @@ This is not theoretical. It is the reason Python's `decimal` module exists.
 ## Data Provenance Requirements
 
 Every dataset used in WorldSim must have a documented `SourceRegistration`
-before its data can be used in simulation:
+before its data can be used in simulation.
+
+### DataClassification Enum — SA-05 (Issue #46)
+
+**Source:** STD-REVIEW-001 SA-05 (CONVERGENT T1-F19 × T2-F10).
+
+Public reference data and sensitive operational data require different access
+controls, audit requirements, and disclosure policies. The `classification`
+field on every `SourceRegistration` enforces this distinction.
+
+```python
+class DataClassification(Enum):
+    PUBLIC = "public"
+    # Public reference data. permanent_url required and committed to repo.
+    # No access controls beyond repository visibility.
+    # Examples: World Bank Open Data, IMF WEO, UN Population Division, ERA5.
+
+    RESTRICTED = "restricted"
+    # Institutional access required. permanent_url stored in environment
+    # variable (named WORLDSIM_SOURCE_<SOURCE_ID>_URL), not committed.
+    # CI access via secrets. Examples: BIS series requiring subscription,
+    # proprietary sovereign risk indices.
+
+    SENSITIVE = "sensitive"
+    # Operational security data. permanent_url NEVER stored in code or
+    # committed artifacts. Referenced by internal source_id only. Access
+    # logged in audit trail. permanent_url is None in committed code;
+    # populated at runtime from secrets manager.
+    # Applies to: Financial Warfare Module inputs, currency attack
+    # vulnerability component data, SWIFT dependency assessments.
+```
+
+**Classification-level rules:**
+
+| Classification | permanent_url committed? | Access gate | CI access |
+|---|---|---|---|
+| PUBLIC | Yes (required) | None | Open |
+| RESTRICTED | No — env var | Institutional credentials | Secrets |
+| SENSITIVE | Never | Secrets manager only | Secrets + access log |
+
+**CI enforcement:** A test must verify that no SENSITIVE-classified source has a
+non-None `permanent_url` in the committed source registry. See CODING_STANDARDS.md
+§SA-05 test requirement.
 
 ```python
 @dataclass
@@ -752,7 +794,8 @@ class SourceRegistration:
     provider: str                    # institution publishing the data
     dataset_name: str                # specific dataset within provider
     version: str                     # version or release date
-    permanent_url: str               # DOI preferred, stable URL required
+    classification: DataClassification  # REQUIRED — see DataClassification enum
+    permanent_url: str | None        # None for SENSITIVE; DOI preferred for PUBLIC
     access_date: date                # when we accessed this version
     license: str                     # license terms; can we redistribute?
     coverage_start: date
@@ -976,6 +1019,64 @@ Every fidelity report must include:
 2. For DIRECTION_ONLY suites: the false-positive rate statement (see null model table)
 3. For MAGNITUDE suites: the calibration tier justification
 4. At least one human cost indicator threshold (CODING_STANDARDS.md §SA-07)
+
+---
+
+## ModelConfidence Enum — SA-02 (Issue #116, #91)
+
+**Source:** STD-REVIEW-002 SA-02 (CONVERGENT T1-F2 × T2-F5). ARCH-REVIEW-002 BI2-I-06.
+
+`Quantity.confidence_tier` (1–5) measures input data provenance quality. A Tier 1
+input is from a primary source with documented methodology. This is distinct from
+model confidence — how accurately the model's propagation equations have been validated
+against historical outcomes.
+
+These two dimensions must not be conflated. A Tier 1 input fed into an uncalibrated
+model produces output whose data quality tier is 1 but whose model confidence is
+`UNVALIDATED`. Users who interpret `confidence_tier` as output reliability will be
+systematically misled.
+
+Every `backtesting_runs` record must carry a `model_confidence` field of this type.
+
+```python
+class ModelConfidence(str, Enum):
+    UNVALIDATED = "UNVALIDATED"
+    # No historical data used to validate this model relationship.
+    # Parameters are engineering judgment only. DIRECTION_ONLY thresholds
+    # are the only available validation gate.
+
+    DIRECTION_ONLY = "DIRECTION_ONLY"
+    # The model predicts the correct sign (direction) of change.
+    # Magnitude is not validated. False positive rate: 1-in-2^N for N checks.
+    # Does not imply quantitative accuracy.
+
+    MAGNITUDE = "MAGNITUDE"
+    # The model predicts values within ±N% of the historical outturn.
+    # Requires parameter calibration to Tier A or B (CODING_STANDARDS.md §SA-03).
+    # N must be specified and justified.
+
+    CALIBRATED = "CALIBRATED"
+    # Model parameters are calibrated from documented historical estimation.
+    # Calibration source, methodology, and held-out validation period cited
+    # in the backtesting record. Implies MAGNITUDE-level validation.
+```
+
+**Two-field system invariant:**
+
+| Field | What it measures | Who certifies it |
+|---|---|---|
+| `confidence_tier` (1–5) | Input data provenance quality | Data Architect + DQA Agent |
+| `model_confidence` | Model validation level | Chief Methodologist + QA Lead |
+
+**Greece 2010–2012 initial run:** `model_confidence = ModelConfidence.DIRECTION_ONLY`.
+A future MAGNITUDE upgrade requires parameter calibration to Tier A or B per
+CODING_STANDARDS.md §SA-03.
+
+**Test requirement:**
+```python
+def test_greece_backtesting_model_confidence_is_direction_only() -> None:
+    assert record.model_confidence == ModelConfidence.DIRECTION_ONLY
+```
 
 ---
 
@@ -1998,3 +2099,118 @@ Full calibration will implement `horizon_penalty_tier` as a table keyed by
 actual calibrated confidence. The `ia1_disclosure` field will remain but its
 content will shift from a blanket limitation notice to a calibration
 provenance statement.
+
+---
+
+## Human Development Data Sources — SA-03 (Issue #118)
+
+**Source:** STD-REVIEW-002 T1-F3 (Development Economist) — COMPATIBLE finding.
+References ARCH-REVIEW-002 known-gap Issue #87.
+
+Human cost ledger indicators must use the following authoritative sources.
+Any deviation requires Chief Methodologist sign-off and explicit documentation
+of why the canonical source is not available.
+
+### HDI Dimension Sources
+
+| Indicator | Canonical Source | Quality Tier | Notes |
+|---|---|---|---|
+| Life expectancy at birth | WHO Global Health Observatory | Tier 1 | GHO API; vintage support via release date |
+| Expected years of schooling | UNESCO Institute for Statistics | Tier 1 | UIS Data API |
+| Mean years of schooling | UNESCO Institute for Statistics | Tier 1 | UIS Data API |
+| GNI per capita (PPP) | World Bank WDI | Tier 1 | `NY.GNP.PCAP.PP.CD` |
+| HDI composite | UNDP Human Development Reports | Tier 2 | Derived from above; use components where possible |
+
+### Distributional Indicators
+
+| Indicator | Canonical Source | Quality Tier | Notes |
+|---|---|---|---|
+| Income quintile shares | World Bank Poverty and Inequality Platform | Tier 1/2 | Tier depends on survey vintage; document survey year |
+| Gini coefficient | World Bank PIP | Tier 1/2 | Same vintage caveat |
+| Income poverty rate | World Bank PovcalNet | Tier 2 | Use national line where available, $2.15/day as fallback |
+
+### Capability Indicators (Sen Capability Approach)
+
+| Indicator | Canonical Source | Quality Tier | Notes |
+|---|---|---|---|
+| Maternal mortality ratio | WHO GHO | Tier 1 | `MDG_0000000026` |
+| Under-5 mortality rate | UNICEF State of the World's Children | Tier 1 | Cross-check with WHO GHO |
+| Food insecurity rate | FAO FAOSTAT | Tier 1/2 | PoU metric preferred; country-specific survey as Tier 1 where available |
+| Primary school completion rate | UNESCO UIS | Tier 1 | `CR.1` completion rate |
+| Health expenditure (% of GDP) | WHO National Health Accounts | Tier 1 | Current expenditure; `CHE_pc_USD_cap` |
+
+### Confidence Tier Assignment Rules
+
+- **HDI composite indicators:** Default to Tier 3 (the composite aggregation introduces
+  model uncertainty beyond the component data quality).
+- **Income quintile data:** Default to Tier 2. Tier 1 only where survey microdata is
+  directly accessed rather than published summary statistics.
+- **Older-than-5-year data:** Downgrade one tier unless the country context makes
+  older data the authoritative record (e.g., conflict zones with no recent surveys).
+- **Imputed values from UN agencies:** Tier 3 minimum, even if the underlying source
+  is Tier 1 — the imputation step introduces model uncertainty.
+
+### Reference
+
+Every human cost ledger indicator introduced in a new module or backtesting fixture
+must cite the canonical source above in the `SourceRegistration` entry and carry a
+field-level certification per `§Field-Level Data Certification`.
+
+---
+
+## Data Admission Testing Principle — SA-05 (Issue #253)
+
+**Source:** Socratic Agent TEACH session on M7 architecture (2026-05-10).
+
+`source_registry` and field-level certification certify that a source is approved
+and that its fields are mapped correctly. Neither certifies that the data loaded
+from that source in a specific ingestion run is intact and valid.
+
+**No data source may be used in production simulation runs until it has passed
+a defined admission test for that ingestion run.** This is a gate, not a background
+check — it runs at load time, not at source-registration time.
+
+### Required Admission Test Coverage
+
+Every source loaded into a production run must pass all of the following checks:
+
+1. **Schema conformance** — all expected fields are present, none are null where
+   non-null is declared in the `source_field_registry`, and no additional undocumented
+   fields have appeared (schema drift detection).
+
+2. **Range plausibility** — numeric fields fall within the documented plausible range
+   for the indicator. Plausible ranges are declared in the `source_field_registry`
+   as `plausible_min` / `plausible_max`. An out-of-range value is flagged and blocked
+   unless the source's vintage notes explicitly document the extreme value.
+
+3. **Vintage date present** — all backtesting seed data carries a `vintage_date`
+   field. Data without a vintage date may not be used as backtesting seed (see
+   §Backtesting Integrity Rules §Vintage Dating Requirement).
+
+4. **Source identity check** — the data loaded matches the `source_id` declared in
+   the ingestion configuration. A source_id mismatch is a blocking error.
+
+### Test Implementation Pattern
+
+```python
+def admit_source_data(
+    data: dict,
+    source_id: str,
+    source_field_registry: SourceFieldRegistry,
+) -> AdmissionResult:
+    """Run all four admission checks. Raises AdmissionError on any failure.
+    Returns AdmissionResult with per-field results for audit log."""
+    ...
+```
+
+### Relation to Field-Level Certification
+
+Admission testing complements, but does not replace, field-level certification.
+Certification is a one-time design-time gate. Admission testing is a runtime gate
+on each ingestion run. Both are required.
+
+| Gate | Frequency | What it verifies |
+|---|---|---|
+| Source registration | Once per source | Source is approved and documented |
+| Field-level certification | Once per field | Field mapping is tested and signed off |
+| Admission testing | Every ingestion run | This run's data is intact and plausible |

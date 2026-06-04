@@ -2129,3 +2129,170 @@ modified column resolve to existing records in `simulation_entities`.
 This standard cannot prevent direct database access, but establishes a clear rule for
 migration authors. A migration that skips this validation is non-compliant regardless
 of whether the migration succeeds in testing.
+
+---
+
+## Parameter Calibration Tier System — SA-03 (Issue #44)
+
+**Source:** STD-REVIEW-001 SA-03 (CONVERGENT T1-F18 × T2-F2). Chief Methodologist +
+QA Agent.
+
+"Calibrated" in CODING_STANDARDS.md previously had no operational definition. This
+section defines the four-tier calibration system that makes "calibrated" testable and
+auditable.
+
+### Calibration Tiers
+
+**Tier A — Empirically Calibrated**
+
+Parameter estimated from historical data using documented methodology.
+Cross-validated against a held-out period. Residuals analyzed. Fit statistic
+reported (R², RMSE, or equivalent).
+
+Required documentation per parameter:
+- Estimation dataset and vintage date
+- Estimation period and held-out validation period
+- Fit statistic with value
+- Residual analysis summary (heteroskedasticity, autocorrelation checks)
+
+**Tier B — Literature-Grounded**
+
+Parameter value taken from peer-reviewed empirical literature. Citation required.
+
+Required documentation per parameter:
+- Full citation (author, year, DOI)
+- Value used and the literature's reported range
+- Justification for the specific value chosen within the range
+
+**Tier C — Expert Prior**
+
+Parameter set by domain expert judgment where empirical estimation is infeasible.
+
+Required documentation per parameter:
+- Expert basis and domain (which type of expert judgment this reflects)
+- Plausible range (pessimistic, central, optimistic)
+- Sensitivity analysis showing output impact across the plausible range
+
+**Tier D — Placeholder**
+
+Parameter is a directional placeholder pending calibration. Tier D parameters
+represent acknowledged debt and must not appear in production backtesting runs.
+
+Required documentation per parameter:
+- Target calibration tier (A, B, or C)
+- Calibration plan (what data or expertise is required)
+- Milestone by which upgrade is required
+
+### Docstring Annotation Standard
+
+Every module parameter (not local variable) must carry a calibration tier annotation
+in its docstring:
+
+```python
+FISCAL_MULTIPLIER: Decimal = Decimal("0.5")
+# Calibration: Tier B — IMF WP/12/190 (Blanchard & Leigh 2012), p. 17.
+# Literature range: 0.0–1.5. Justification: 0.5 is the central IMF estimate
+# for austerity episodes in advanced economies with high debt-to-GDP ratios.
+```
+
+### CI Test Requirement
+
+A test must verify that no Tier D parameter exists in any module designated for
+production backtesting runs. Tier D parameters are distinguished by the annotation
+string `"Calibration: Tier D"` in the source.
+
+```python
+def test_no_tier_d_parameters_in_production_modules() -> None:
+    """No Tier D placeholder parameters may exist in backtesting-designated modules."""
+    for module_path in BACKTESTING_MODULE_PATHS:
+        src = module_path.read_text()
+        assert "Calibration: Tier D" not in src, (
+            f"Tier D parameter found in {module_path} — upgrade before backtesting use"
+        )
+```
+
+### Cross-Reference
+
+DATA_STANDARDS.md §Backtesting Fidelity Threshold Registry requires MAGNITUDE
+thresholds to cite the parameter calibration tier. If a MAGNITUDE threshold is used
+on an indicator whose driving parameter is Tier C or D, the fidelity report must
+document this explicitly and justify why MAGNITUDE validation is still meaningful.
+
+---
+
+## Monte Carlo and Uncertainty Quantification Standards — SA-17 (Issue #49)
+
+**Source:** STD-REVIEW-001 SA-17 (T2-F3 — QA Agent). COMPATIBLE finding.
+
+CLAUDE.md states outputs are "distributions, not point estimates" and requires
+uncertainty quantification. Without a sample-size standard, a 10-sample run and
+a 10,000-sample run are indistinguishable to any test.
+
+### Minimum Sample Size Requirements
+
+| Context | Minimum Samples | Rationale |
+|---|---|---|
+| Development / unit tests | 100 | Sufficient for directional validation |
+| Integration tests | 500 | Sufficient for distribution shape verification |
+| Backtesting validation | 1,000 | Required for confidence interval reporting |
+| Production scenario output | 5,000 | Required for tail risk assessment (95th/99th percentile) |
+| Publication-quality results | 10,000 | Standard for academic-grade inference |
+
+A test that only checks whether a distribution object exists — without verifying
+the sample count — does not satisfy this standard.
+
+```python
+# Non-compliant — checks existence, not sample count
+assert scenario_output.distribution is not None
+
+# Compliant
+assert len(scenario_output.distribution.samples) >= 1_000  # backtesting context
+```
+
+### Required Distribution Documentation
+
+Every module that produces distributional outputs must document in its docstring:
+
+1. **Distribution family assumed**: Normal, log-normal, fat-tailed (Student-t with df),
+   non-parametric bootstrap
+2. **Justification**: Why this family is appropriate for this indicator
+3. **Validation requirement**: What historical data supports the distribution assumption
+
+### Convergence Test Requirement
+
+Monte Carlo runs in backtesting and production must include a convergence check: run
+the simulation at 50% of the sample target, then at 100%. If the 95th percentile of
+the output distribution changes by more than 5% between the 50% and 100% run, double
+the sample size and re-run. Document the convergence check result in the output metadata.
+
+### Bootstrap Resampling Alternative
+
+Where Monte Carlo is computationally infeasible, bootstrap resampling over the
+historical dataset is an acceptable alternative, with a minimum of 1,000 bootstrap
+samples for backtesting validation. The bootstrap method must be documented with
+the same distribution family and validation criteria as Monte Carlo.
+
+---
+
+## Sensitive Source CI Test Requirement — SA-05 (Issue #46)
+
+**Source:** STD-REVIEW-001 SA-05 (CONVERGENT T1-F19 × T2-F10). See DATA_STANDARDS.md
+§DataClassification Enum for the full classification system.
+
+A CI test must verify that no `SENSITIVE`-classified source has a non-None
+`permanent_url` committed to the repository. A committed permanent_url for a
+SENSITIVE source is a security violation — it exposes the access path for operational
+intelligence data in a public repository.
+
+```python
+def test_no_sensitive_source_has_committed_url() -> None:
+    """SENSITIVE sources must never have a permanent_url in committed code."""
+    for registration in get_all_source_registrations():
+        if registration.classification == DataClassification.SENSITIVE:
+            assert registration.permanent_url is None, (
+                f"SENSITIVE source {registration.source_id!r} has a committed "
+                f"permanent_url — remove it and use secrets manager at runtime"
+            )
+```
+
+This test runs in CI after every commit that touches the source registry.

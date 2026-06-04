@@ -530,6 +530,26 @@ and because the asymmetry we are trying to correct runs one direction. Building
 a tool that helps powerful financial actors identify vulnerable country targets
 would be the exact inversion of the mission.
 
+### Financial Warfare Module Data Classification (SA-05, Issue #46)
+
+Data sources used by the Financial Warfare Module — currency attack vulnerability
+component data, SWIFT dependency assessments, and operational security indices —
+are classified as `SENSITIVE` under the `DataClassification` system defined in
+`DATA_STANDARDS.md §DataClassification Enum`.
+
+`SENSITIVE` classification means:
+- The source's `permanent_url` is never committed to the repository
+- Access is via secrets manager at runtime only
+- All access is logged in an audit trail
+
+This is not a theoretical concern. A public repository entry for "currency attack
+vulnerability index source" reveals that WorldSim models that attack surface and
+indicates which data provider supplies the operational intelligence. That information
+itself is a dual-use signal.
+
+The classification gate is enforced by CI test. See `CODING_STANDARDS.md §Sensitive
+Source CI Test Requirement`.
+
 ---
 
 ## Model Monoculture Risk (Issue #276)
