@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-04 (Session 002 reclassified as developer audit — agent used API spec/curl, not UI navigation. Computer-use session runner built (scripts/run_usability_session.py). Next: Session 003 Persona 2 using computer-use methodology — requires ANTHROPIC_API_KEY.)**
+**Last updated: 2026-06-04 (Session 003 Persona 2 complete — first valid cold-start usability session using Interactive Playwright loop. 5 findings produced (CRITICAL: alert panel non-interactive; HIGH: text illegible + no cohort data; MEDIUM: no map highlight + "see alerts" misdirection). PR #736 merged. Next: Priority A sessions P1 (Programme Analyst) and P5 (Institutional Decision-Maker).)**
 **Current milestone:** M11.5 — Usability Validation and Experience Audit (GitHub Milestone 14; North Star: `docs/vision/milestone-11-5-north-star.md`)
 **Previous milestone:** M11 — Engine Investigation and Political Economy (formally closed 2026-06-04, tagged v0.11.0)
 
@@ -77,7 +77,7 @@ M9 formally closed. Issue #213 (M9 Exit Checklist) closed 2026-05-24. M10 milest
 
 ## Open PRs
 
-No open PRs — board clear as of 2026-06-04 (post PR #733 merge).
+No open PRs — board clear as of 2026-06-04 (post PR #736 merge).
 
 ## M11 Work Streams — 2026-06-04 Sprint
 
@@ -117,33 +117,46 @@ No open PRs — board clear as of 2026-06-04 (post PR #733 merge).
 |---|---|---|---|---|
 | 2026-06-04-persona-2-001 | Persona 2 (infra validation) | NO — cold-start violated | Infrastructure validated; Pillar 1 functional | #732 ✅ |
 | 2026-06-04-persona-2-002 | Persona 2 — Finance Ministry Negotiator | NO — reclassified as developer audit | Agent used API spec + curl instead of navigating UI. Findings are real technical gaps, not usability findings. Superseded by 003. | #733 ✅ |
+| 2026-06-04-persona-2-003 | Persona 2 — Finance Ministry Negotiator | **YES** — genuine cold-start, visual navigation | PARTIALLY MET — agent reached [CONCLUDED:] but ~80% from historical knowledge, ~20% from tool output. Alert panel non-interactive; no cohort data visible. | #736 ✅ |
 
-**Findings from Session 2 (2026-06-04-persona-2-002):**
+**Findings from Session 3 (2026-06-04-persona-2-003) — UI usability findings:**
 
 | Finding | Severity | Dimension | Description |
 |---|---|---|---|
-| FINDING-01 | CRITICAL | Action | Human development indicators frozen at 2010 initial values — human cost ledger produces no output across all 6 simulated years |
-| FINDING-02 | CRITICAL | Discovery | No cohort disaggregation — minimum wage workers, pensioners, youth are invisible to measurement framework |
-| FINDING-03 | HIGH | Comprehension | Composite score discrepancy: /trajectory returns scores; /measurement-output says "not meaningful in single-entity scenarios" |
-| FINDING-04 | HIGH | Action | Conditionality instruments too coarse — wage cut, pensions, privatisation all folded into single spending_change aggregate |
+| FINDING-01 | CRITICAL | Action | TERMINAL alert panel non-interactive — 3 click attempts, zero navigation response or expansion |
+| FINDING-02 | HIGH | Comprehension | Alert text + trajectory chart illegible at 1440×900 — 3-turn disambiguation delay on alert type |
+| FINDING-03 | HIGH | Discovery | No cohort disaggregation visible — CONCLUDED answer was ~80% historical knowledge, not tool output |
+| FINDING-04 | MEDIUM | Discovery | Greece not highlighted on map despite scenario loaded — 3-turn scenario-active uncertainty |
+| FINDING-05 | MEDIUM | Comprehension | "Primary dimension — see alerts" misdirects to non-interactive display panel |
+
+**Findings from Session 2 (2026-06-04-persona-2-002) — backend technical findings (developer audit):**
+
+| Finding | Severity | Dimension | Description |
+|---|---|---|---|
+| FINDING-01 | CRITICAL | Action | Human development indicators frozen at 2010 initial values — human cost ledger produces no output |
+| FINDING-02 | CRITICAL | Discovery | No cohort disaggregation — minimum wage workers, pensioners, youth invisible to measurement framework |
+| FINDING-03 | HIGH | Comprehension | Composite score discrepancy: /trajectory returns scores; /measurement-output says "not meaningful" |
+| FINDING-04 | HIGH | Action | Conditionality instruments too coarse — wage cut, pensions, privatisation all folded into spending_change |
 | FINDING-05 | MEDIUM | Discovery | Counter-scenario creation not discoverable without developer knowledge of POST schema |
 | FINDING-06 | MEDIUM | Comprehension | `indicator_name` null in MDA alert API response |
 
-**One citable finding the agent produced:** MDA-FIN-RESERVES (reserve_coverage_months) breached pre-conditionality (2.0 months vs. 2.5-month floor) — CRITICAL at step 1 (First Memorandum), TERMINAL from step 2 (Second Memorandum). Analytically potent for negotiation: primary constraint is liquidity, not fiscal indiscipline.
+**Exit criterion status:** PARTIALLY MET (session 003) — agent completed task using historical knowledge as substitute for tool output. P1 and P5 sessions required to complete the Priority A set.
 
-**Exit criterion status:** PENDING — session 002 reclassified as developer audit, not a valid usability session. Session 003 (Persona 2, computer-use methodology) is the first genuine usability session.
+**Session runners:**
+- `scripts/run_usability_session_interactive.py` — Interactive Playwright loop (Option 2, default). Start with: `python3 scripts/run_usability_session_interactive.py <session_id> <persona_id> [--scenario <uuid>]`. No API key required. Coordinator reads screenshots via Read tool and writes actions to IPC files.
+- `scripts/run_usability_session.py` — Computer-use runner (Option 1). Requires `ANTHROPIC_API_KEY`. Separate Anthropic API billing.
 
-**Computer-use session runner:** `scripts/run_usability_session.py` — drives Playwright browser via Anthropic API computer-use tool. Agent sees the real rendered React UI, navigates by clicking coordinates. No API access given to the agent. Run with: `python3 scripts/run_usability_session.py 2026-06-04-persona-2-003 persona-2 --scenario 15ce3539-32db-4709-9bbc-1c24cb33f240`. Requires `ANTHROPIC_API_KEY` env var.
+**Priority A sessions remaining:** P1 (Programme Analyst — Lucas Ferreira) and P5 (Institutional Decision-Maker).
 
-**Priority A sessions remaining:** All three — P2 (session 003, computer-use), P1 (Programme Analyst), P5 (Institutional Decision-Maker).
-
-**M12 action items from Session 2 findings:**
-- Human development module must respond to fiscal policy inputs (unemployment elasticity, health expenditure linkage) — FINDING-01
-- Cohort disaggregation: youth unemployment, pensioner poverty, bottom-quintile income share — FINDING-02
-- Remove or caveat composite scores in single-entity scenario trajectory view — FINDING-03
-- Named conditionality instruments: minimum_wage_change_pct, pension_replacement_rate_change_pct, etc. — FINDING-04
-- "Duplicate and modify" action on scenario cards for counter-scenario creation — FINDING-05
-- Populate indicator_name from MDA threshold registry — FINDING-06
+**M12 action items from all sessions:**
+- Make TERMINAL alert panel interactive — click expands to indicator time-series + threshold progression + driver attribution (S003-FINDING-01)
+- Increase alert text font size; add human-readable indicator label alongside technical key (S003-FINDING-02 + S002-FINDING-06)
+- Cohort disaggregation visible in main view: youth unemployment, pensioner poverty, bottom-quintile income share (S003-FINDING-03 + S002-FINDING-02)
+- Highlight active scenario country on map; show active scenario name in persistent header (S003-FINDING-04)
+- Human development module must respond to fiscal policy inputs — unemployment elasticity, health expenditure linkage (S002-FINDING-01)
+- Named conditionality instruments: minimum_wage_change_pct, pension_replacement_rate_change_pct, etc. (S002-FINDING-04)
+- "Duplicate and modify" action on scenario cards for counter-scenario creation (S002-FINDING-05)
+- Remove or caveat composite scores in single-entity scenario trajectory view (S002-FINDING-03)
 
 **M11 formally closed:** Issue #262 closed 2026-06-04, GitHub Milestone 12 (M11) closed, tagged `v0.11.0`. Compliance gate: SCAN-025 recorded, KI-002 filed (mypy Python version mismatch, pre-existing). ADR license renewals complete (ADR-001/002/005/007/008/010 → M11.5; ADR-011 license section added; ADR-009 diagram added). Socratic Agent TEST complete (in-session 2026-06-04).
 
@@ -153,11 +166,11 @@ No open PRs — board clear as of 2026-06-04 (post PR #733 merge).
 
 | PR | Title | Date |
 |---|---|---|
+| #736 | feat(ux): M11.5 session 003 — genuine cold-start Persona 2 visual navigation findings | 2026-06-04 |
+| #735 | feat(ux): computer-use session runner + reclassify session 002 as developer audit | 2026-06-04 |
 | #733 | feat(ux): M11.5 Session 2 — Persona 2 cold-start usability session, 6 findings | 2026-06-04 |
 | #732 | feat(ux): M11.5 Session 1 — Pillar 1 infra validation, sessions.py path fix | 2026-06-04 |
 | #731 | chore(state): SESSION_STATE.md — Pillar 3 merged (PR #730, closes #719); all pre-session gates closed | 2026-06-04 |
-| #730 | docs(ux): Pillar 3 session provenance standard and component vocabulary — M11.5 (closes #719) | 2026-06-04 |
-| #729 | fix(docs): pillar-2-methodology.md header rendering — replace # comment lines with bold subtitle | 2026-06-04 |
 | #727 | docs(ux): Pillar 2 cold-start usability audit methodology — M11.5 (closes #718) | 2026-06-04 |
 | #724 | feat(usability): Pillar 1 rrweb session recording layer — M11.5 (closes #717) | 2026-06-04 |
 | #722 | chore(compliance): M11 exit — ADR renewals, Mermaid diagrams, SCAN-025, KI-002 | 2026-06-04 |
