@@ -229,8 +229,10 @@ class ScenarioRunner(InputOrchestrator):
     ) -> list[Event]:
         """Translate one ControlInput to Events and record it in the audit log.
 
-        Calls control_input.to_events() with the current simulation timestep,
+        Calls control_input.get_events() with the current simulation timestep,
         then appends a ControlInputAuditRecord capturing the full provenance.
+        get_events() applies implementation_capacity scaling (Issue #93) before
+        returning events.
 
         Args:
             control_input: The exogenous input to process.
@@ -242,7 +244,7 @@ class ScenarioRunner(InputOrchestrator):
         from app.simulation.orchestration.audit import ControlInputAuditRecord
 
         now = datetime.now(UTC)
-        events = control_input.to_events(control_input.effective_date or now)
+        events = control_input.get_events(control_input.effective_date or now)
         record = ControlInputAuditRecord(
             record_id=str(uuid.uuid4()),
             scenario_id=self._initial_state.scenario_config.scenario_id,

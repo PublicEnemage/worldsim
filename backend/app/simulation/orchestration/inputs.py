@@ -1,5 +1,7 @@
 """
 Control input types for the Input Orchestration Layer — ADR-002, Amendment 1.
+Political economy extensions: Issue #96 (CONDITIONALITY InputSource),
+Issue #93 (implementation_capacity), Issue #157 (CompoundStateCondition).
 
 ControlInput is the abstract base class for all exogenous inputs injected
 into the simulation. Each concrete subclass represents one category of
@@ -19,13 +21,19 @@ Amendment 1 (SCR-001 / ADR-002 Amendment 1):
   MonetaryVolumeInstrument correspondingly.
 - All to_events() implementations produce Quantity deltas in
   affected_attributes (dict[str, Quantity]), not float deltas.
+
+Political economy extensions (Issue #96, #93, #157):
+- InputSource.CONDITIONALITY encodes externally coerced decisions.
+- ControlInput.implementation_capacity scales event magnitudes to model
+  partial implementation, political feasibility constraints.
+- CompoundStateCondition enables AND/OR multi-attribute trigger logic.
 """
 
 from __future__ import annotations
 
 import uuid
 from abc import ABC, abstractmethod
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from decimal import Decimal
 from enum import Enum
 from typing import TYPE_CHECKING, Any
@@ -48,6 +56,12 @@ class InputSource(Enum):
 
     Recorded in every ControlInputAuditRecord so the provenance of every
     exogenous decision is traceable to its source channel.
+
+    CONDITIONALITY (Issue #96): the decision was made under binding external
+    constraint imposed by another actor (IMF, ECB, creditor bloc). Distinguished
+    from SCENARIO_SCRIPT to record that the policy was not freely chosen.
+    Use constraining_actor_id and constraint_mechanism on the ControlInput to
+    record who imposed the constraint and by what mechanism.
     """
 
     UI = "ui"
@@ -56,6 +70,7 @@ class InputSource(Enum):
     BULK_FEED = "bulk_feed"
     SCENARIO_SCRIPT = "scenario_script"
     CONTINGENT_TRIGGER = "contingent_trigger"
+    CONDITIONALITY = "conditionality"
 
 
 class MonetaryRateInstrument(Enum):
@@ -142,6 +157,13 @@ class ComparisonOperator(Enum):
     EQ = "=="
 
 
+class LogicalOperator(Enum):
+    """Logical operators for CompoundStateCondition evaluation (Issue #157)."""
+
+    AND = "and"
+    OR = "or"
+
+
 # ---------------------------------------------------------------------------
 # Control input base class
 # ---------------------------------------------------------------------------
@@ -173,6 +195,17 @@ class ControlInput(ABC):
         propagation_rules: Rules governing how generated Events propagate
             through the relationship graph. Empty list means the effect
             applies only to the source entity with no graph propagation.
+        implementation_capacity: Political feasibility multiplier in [0.0, 1.0]
+            (Issue #93). Scales event magnitudes from to_events() to model partial
+            implementation, political constraints, and watered-down execution.
+            Default 1.0 preserves existing behaviour — full implementation.
+            0.5 means 50% of the intended policy magnitude is actually transmitted.
+        constraining_actor_id: For InputSource.CONDITIONALITY — the external actor
+            that imposed the constraint (e.g. 'IMF', 'ECB', 'US_TREASURY').
+            Empty string for freely chosen decisions (Issue #96).
+        constraint_mechanism: For InputSource.CONDITIONALITY — how the constraint
+            was applied (e.g. 'ELA_WITHDRAWAL_THREAT', 'DISBURSEMENT_SUSPENSION',
+            'SANCTIONS'). Empty string for non-conditionality inputs (Issue #96).
     """
 
     input_id: str = field(default_factory=lambda: str(uuid.uuid4()))
@@ -184,6 +217,9 @@ class ControlInput(ABC):
     source: InputSource = InputSource.SCENARIO_SCRIPT
     timestamp: datetime = field(default=None)  # type: ignore[assignment]
     propagation_rules: list[PropagationRule] = field(default_factory=list)
+    implementation_capacity: Decimal = Decimal("1.0")
+    constraining_actor_id: str = ""
+    constraint_mechanism: str = ""
 
     @abstractmethod
     def to_events(self, timestep: datetime) -> list[Event]:
@@ -191,6 +227,8 @@ class ControlInput(ABC):
 
         The InputOrchestrator calls this during inject() to convert the
         policy decision into Events the propagation engine can apply.
+        Subclasses must implement this method — do not call it directly;
+        use get_events() to benefit from implementation_capacity scaling.
 
         Args:
             timestep: Current simulation timestep at which the input fires.
@@ -199,6 +237,44 @@ class ControlInput(ABC):
             List of Events representing this input's effect on simulation state.
             May return multiple Events (e.g. TradePolicyInput with retaliation).
         """
+
+    def get_events(self, timestep: datetime) -> list[Event]:
+        """Return scaled events for this control input (Issue #93).
+
+        Calls to_events() and multiplies every affected_attributes Quantity
+        value by implementation_capacity. This models partial implementation,
+        political feasibility constraints, and watered-down policy execution.
+
+        implementation_capacity=1.0 (default) returns events unchanged.
+        implementation_capacity=0.5 halves all event magnitudes.
+        implementation_capacity=0.0 produces zero-magnitude events (no effect).
+
+        Args:
+            timestep: Current simulation timestep at which the input fires.
+
+        Returns:
+            Events with magnitudes scaled by implementation_capacity.
+        """
+        raw_events = self.to_events(timestep)
+        if self.implementation_capacity == Decimal("1.0"):
+            return raw_events
+        scale = self.implementation_capacity
+        scaled: list[Event] = []
+        for evt in raw_events:
+            scaled_attrs = {
+                k: Quantity(
+                    value=q.value * scale,
+                    unit=q.unit,
+                    variable_type=q.variable_type,
+                    measurement_framework=q.measurement_framework,
+                    observation_date=q.observation_date,
+                    source_id=q.source_id,
+                    confidence_tier=q.confidence_tier,
+                )
+                for k, q in evt.affected_attributes.items()
+            }
+            scaled.append(replace(evt, affected_attributes=scaled_attrs))
+        return scaled
 
 
 # ---------------------------------------------------------------------------
@@ -661,6 +737,54 @@ class StateCondition:
 
 
 @dataclass(kw_only=True)
+class CompoundStateCondition:
+    """Multi-attribute AND/OR trigger logic for ContingentInput (Issue #157).
+
+    Enables crisis-realistic compound conditions that single-attribute
+    StateCondition cannot express:
+      - Capital controls fire when BOTH reserves < 3 months AND outflow > 15%
+      - Bank runs accelerate when depositor_confidence < 0.3 OR bank_holiday > 0.5
+      - IMF Article IV intervention when reserves AND current_account AND debt_service
+        all breach thresholds simultaneously
+
+    Conditions are evaluated recursively — a CompoundStateCondition may nest
+    StateCondition instances or other CompoundStateCondition instances.
+
+    Attributes:
+        operator: LogicalOperator.AND (all sub-conditions must hold) or
+                  LogicalOperator.OR (at least one must hold).
+        conditions: List of conditions to evaluate. Must not be empty.
+    """
+
+    operator: LogicalOperator
+    conditions: list[StateCondition | CompoundStateCondition] = field(
+        default_factory=list
+    )
+
+    def is_met(self, state: SimulationState) -> bool:
+        """Evaluate whether this compound condition holds.
+
+        AND: all sub-conditions must return True.
+        OR: at least one sub-condition must return True.
+
+        Short-circuits: AND stops at first False; OR stops at first True.
+        Empty conditions list returns False (conservative — no conditions means
+        unknown state, not satisfied).
+
+        Args:
+            state: Simulation state to evaluate the conditions against.
+
+        Returns:
+            True if the compound condition holds.
+        """
+        if not self.conditions:
+            return False
+        if self.operator == LogicalOperator.AND:
+            return all(c.is_met(state) for c in self.conditions)
+        return any(c.is_met(state) for c in self.conditions)
+
+
+@dataclass(kw_only=True)
 class ContingentInput:
     """A ControlInput that fires automatically when a state condition is met.
 
@@ -683,7 +807,12 @@ class ContingentInput:
     """
 
     contingent_id: str = field(default_factory=lambda: str(uuid.uuid4()))
-    condition: StateCondition = field(default=None)  # type: ignore[assignment]
+    # condition accepts StateCondition (single attribute) or CompoundStateCondition
+    # (multi-attribute AND/OR logic — Issue #157). Backward compatible: existing
+    # callers using StateCondition continue to work unchanged.
+    condition: StateCondition | CompoundStateCondition = field(
+        default=None  # type: ignore[assignment]
+    )
     input: ControlInput = field(default=None)  # type: ignore[assignment]
     cooldown_periods: int = 1
     documented_rationale: str = ""

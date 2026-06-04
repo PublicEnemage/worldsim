@@ -275,7 +275,7 @@ class WebScenarioRunner:
             prior_events = [
                 e
                 for inp in inputs_by_step.get(current_step, [])
-                for e in inp.to_events(current_state.timestep)
+                for e in inp.get_events(current_state.timestep)
             ]
             if prior_events:
                 current_state = replace(current_state, events=prior_events)
