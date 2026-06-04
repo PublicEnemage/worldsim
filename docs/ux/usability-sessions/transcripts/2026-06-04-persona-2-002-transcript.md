@@ -1,7 +1,8 @@
 # Session Transcript — 2026-06-04-persona-2-002
 Persona: Finance Ministry Negotiator — Eleni Papadopoulos
 Use case: IMF loan evaluation
-Session valid: YES — cold-start agent (no prior WorldSim context)
+Session valid: NO — reclassified as developer audit (2026-06-04)
+Reason: Agent was given Bash tool access and queried the OpenAPI spec and backend API directly. Developer-mode discovery, not UI navigation. Genuine usability session is 2026-06-04-persona-2-003.
 
 ---
 

@@ -54,8 +54,8 @@ think_aloud_markers_count:
   GAVE_UP_ON: 0
   TRIED: 8
   CONCLUDED: 1
-session_valid: true
-invalidity_reason: "n/a"
+session_valid: false
+invalidity_reason: "Reclassified as developer audit (2026-06-04). Agent was given Bash tool access and explicit instructions to query the backend API — it consulted the OpenAPI spec and curl'd all endpoints directly rather than navigating the visual interface. This is developer-mode discovery, not user-mode navigation. The cold-start condition was technically met (no WorldSim architectural context provided) but the session methodology was wrong: a Deputy Finance Minister would not read an API spec. Findings from this session are preserved in the findings document under the 'developer audit' label — they identify real technical gaps but cannot be attributed to UI discoverability failures. The genuine cold-start Persona 2 session runs as 2026-06-04-persona-2-003 using the computer-use methodology."
 
 ## Artifact links
 

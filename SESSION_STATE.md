@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-04 (M11.5 Session 2 complete — PR #733 merged: first valid cold-start usability session, Persona 2 Finance Ministry Negotiator, 6 findings (2 CRITICAL, 2 HIGH, 2 MEDIUM). Exit criterion PARTIALLY MET. Priority A sessions: P2 ✅ P1 and P5 remain.)**
+**Last updated: 2026-06-04 (Session 002 reclassified as developer audit — agent used API spec/curl, not UI navigation. Computer-use session runner built (scripts/run_usability_session.py). Next: Session 003 Persona 2 using computer-use methodology — requires ANTHROPIC_API_KEY.)**
 **Current milestone:** M11.5 — Usability Validation and Experience Audit (GitHub Milestone 14; North Star: `docs/vision/milestone-11-5-north-star.md`)
 **Previous milestone:** M11 — Engine Investigation and Political Economy (formally closed 2026-06-04, tagged v0.11.0)
 
@@ -116,7 +116,7 @@ No open PRs — board clear as of 2026-06-04 (post PR #733 merge).
 | Session ID | Persona | Valid | Verdict | PR |
 |---|---|---|---|---|
 | 2026-06-04-persona-2-001 | Persona 2 (infra validation) | NO — cold-start violated | Infrastructure validated; Pillar 1 functional | #732 ✅ |
-| 2026-06-04-persona-2-002 | Persona 2 — Finance Ministry Negotiator | YES | PARTIALLY MET — 1 citable finding; human cost ledger non-functional | #733 ✅ |
+| 2026-06-04-persona-2-002 | Persona 2 — Finance Ministry Negotiator | NO — reclassified as developer audit | Agent used API spec + curl instead of navigating UI. Findings are real technical gaps, not usability findings. Superseded by 003. | #733 ✅ |
 
 **Findings from Session 2 (2026-06-04-persona-2-002):**
 
@@ -131,9 +131,11 @@ No open PRs — board clear as of 2026-06-04 (post PR #733 merge).
 
 **One citable finding the agent produced:** MDA-FIN-RESERVES (reserve_coverage_months) breached pre-conditionality (2.0 months vs. 2.5-month floor) — CRITICAL at step 1 (First Memorandum), TERMINAL from step 2 (Second Memorandum). Analytically potent for negotiation: primary constraint is liquidity, not fiscal indiscipline.
 
-**Exit criterion status:** PARTIALLY MET. The tool functions as a financial stress signal system; it does not yet function as a human cost threshold tool. FINDING-01 and FINDING-02 must be resolved before the exit criterion is fully met.
+**Exit criterion status:** PENDING — session 002 reclassified as developer audit, not a valid usability session. Session 003 (Persona 2, computer-use methodology) is the first genuine usability session.
 
-**Priority A sessions remaining:** Persona 1 (Programme Analyst) and Persona 5 (Institutional Decision-Maker). Same cold-start protocol applies — fresh agent context required for each.
+**Computer-use session runner:** `scripts/run_usability_session.py` — drives Playwright browser via Anthropic API computer-use tool. Agent sees the real rendered React UI, navigates by clicking coordinates. No API access given to the agent. Run with: `python3 scripts/run_usability_session.py 2026-06-04-persona-2-003 persona-2 --scenario 15ce3539-32db-4709-9bbc-1c24cb33f240`. Requires `ANTHROPIC_API_KEY` env var.
+
+**Priority A sessions remaining:** All three — P2 (session 003, computer-use), P1 (Programme Analyst), P5 (Institutional Decision-Maker).
 
 **M12 action items from Session 2 findings:**
 - Human development module must respond to fiscal policy inputs (unemployment elasticity, health expenditure linkage) — FINDING-01
