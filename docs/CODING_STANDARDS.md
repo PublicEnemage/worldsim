@@ -806,6 +806,27 @@ all DIRECTION_ONLY thresholds by chance. A Greece 2010–2012 3-step case has a 
 condition for model confidence.** It asserts directional plausibility; it does not
 validate the model's quantitative accuracy.
 
+Every fidelity report must include the following block verbatim (with template
+variables filled in) in its Known Limitations section (Issue #160). The
+`format_fidelity_report()` function includes this via the
+`parameter_calibration_disclosure` argument — do not remove or abbreviate it:
+
+```
+Statistical power statement:
+- Threshold type: DIRECTION_ONLY (sign check — not magnitude validation)
+- Checks performed: {N} ({indicators} × {steps} steps)
+- False positive rate under null model: {rate:.1%}
+- What PASS validates: The simulation produces the correct sign (direction) for specified indicators
+- What PASS does NOT validate: Quantitative accuracy, magnitude, distributional fit, or endogenous dynamics
+```
+
+Where `{N}` = total number of sign checks, `{rate}` = `(0.5 ** N)` expressed as a
+percentage. For a 6-check case (2 indicators × 3 steps): N=6, rate=1.6%.
+For a 2-check case: N=2, rate=25.0%.
+
+This block must appear in both the printed fidelity report and the JSON artifact
+(Issue #154). A fidelity report that omits it is architecturally incomplete.
+
 **The three-tier threshold hierarchy:**
 
 | Tier | Name | What it checks | When to use |

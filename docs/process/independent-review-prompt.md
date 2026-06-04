@@ -203,6 +203,64 @@ Issues produced by the independent review should be:
 The review output is evidence, not a work order. The Engineering Lead
 decides which issues to act on and when.
 
+### Storage Convention (Issue #234)
+
+Every stakeholder review produces a permanent artifact committed to the repository.
+Canonical location: `docs/demo/{milestone}/reviews/YYYY-MM-DD-vX.X.X-stakeholder-review.md`
+
+Example: `docs/demo/m10/reviews/2026-05-30-v0.10.0-stakeholder-review.md`
+
+This path matches the CLAUDE.md §Canonical Artifact Locations table and the
+`docs/demo/{milestone}/reviews/*-stakeholder-review.md` file ownership row in
+`docs/process/agent-raci.md` (IR Agent holds Responsible).
+
+### Report Template
+
+The review instance writes the findings section. The development instance
+adds issue numbers and status before committing. Template:
+
+```markdown
+# Stakeholder Review — vX.X.X (YYYY-MM-DD)
+
+**Scenario run:** [scenario name and configuration]
+**Reviewer role context:** [persona applied — e.g., Lucas Ferreira, Programme Analyst]
+**Mode exercised:** [Mode 1 / Mode 2 / Mode 3]
+
+## Findings
+
+| # | Area | Finding | Severity | GitHub Issue | Status |
+|---|---|---|---|---|---|
+| 1 | [UI / Data / Narrative / Methodology] | [finding description] | [Critical / Major / Minor / Observation] | #NNN | [Open / Fixed / Won't Fix] |
+
+## What Worked
+
+[Narrative — what the tool communicated clearly and correctly]
+
+## What Confused or Misled
+
+[Narrative — confusion points in the order they occurred; include at what point
+a real user would abandon the task]
+
+## Blocking Items for Next Demo
+
+[List any findings that must be resolved before the next milestone demo]
+```
+
+### Handover Protocol
+
+The two-instance protocol closes the loop between review and development:
+
+1. **Review instance** — runs the scenario, applies the persona, writes findings
+   in the template above. Leaves GitHub Issue column as `UNTRACKED` where not yet filed.
+2. **Development instance** — receives the completed findings section, files GitHub
+   issues for each finding, fills in the Issue column, updates Status for any findings
+   already addressed in the current milestone, and commits the completed artifact to
+   `docs/demo/{milestone}/reviews/`.
+
+The committed artifact is the permanent audit trail of stakeholder feedback alongside
+the code that addresses it. A review that produces findings but no committed artifact
+has not completed the handover.
+
 ---
 
-*Pattern documented from M6 session 2026-05-07. Related issues: #227–#232.*
+*Pattern documented from M6 session 2026-05-07. Related issues: #227–#232, #234.*
