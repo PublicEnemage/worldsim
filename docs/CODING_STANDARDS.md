@@ -1257,6 +1257,30 @@ When a case is ambiguous, PM Agent and Architect Agent jointly own the call. Nei
 agent escalates to EL without first consulting each other. When in doubt, write the ADR —
 the cost of an unnecessary one is an hour; the cost of missing one is weeks of rework.
 
+### Module Behavioral Contract Renewal Trigger (Issue #544)
+
+Any change to a class interface defined by an ADR — including its public methods,
+subscribed events, ABC contract, event emission list, or serialization format — requires
+an ADR amendment committed **in the same PR** as the code change. This is not optional
+and does not require a new ADR number; amendments are appended to the existing ADR.
+
+Affected class types include, but are not limited to:
+- `SimulationModule` subclasses (ADR-001 interface contract)
+- `ControlInput` subclasses (ADR-002 ABC contract)
+- `ScenarioRunner.advance_timestep()` and related engine methods (ADR-004)
+- `BandingEngine` interface (ADR-007)
+- Any class whose interface is explicitly specified in an ADR Decision section
+
+This rule generalizes the ADR-005 Amendment 2 precedent (the `DemographicModule._SUBSCRIBED_EVENTS`
+incident). That amendment was filed retroactively when the pattern was first recognized.
+All ADR-defined interfaces carry the same obligation going forward — a developer who reads
+only the implementing ADR for `ControlInput` (ADR-002) must encounter this rule without
+needing to read ADR-005. This section is that notice.
+
+**How to recognize a behavioral contract change:** if adding, removing, or renaming a method,
+event, or serialization field would break a caller that is written correctly against the current
+ADR spec, it is a behavioral contract change and requires an ADR amendment.
+
 ### Required Sections
 
 ```markdown
@@ -1296,6 +1320,29 @@ Be honest. An ADR that lists no negative consequences is not honest.
 ## Diagram
 Reference to the Mermaid diagram in docs/architecture/.
 ```
+
+### Backtesting Validation Anchor Required for New Composite Scores (Issue #547)
+
+For any ADR introducing a new composite score, composite indicator, or novel measurement
+methodology, the Consequences section must include a named backtesting validation anchor:
+
+```markdown
+## Backtesting Validation Anchor
+Historical case: [Country, time period, documented transition or event]
+Why this case: [Why this case tests the directional behavior of this score]
+Data availability: [Tier N, source, known gaps]
+```
+
+If no case can be named, the ADR must include a Chief Methodologist assessment (signed)
+explaining why no historical case exists and what substitute validation approach will be
+used. An ADR that cannot name a validation anchor and cannot provide a CM-signed substitute
+is not ready for acceptance.
+
+**Rationale:** The backtesting obligation in ADR-005 Decision 5 requires a 4-file case
+registration. That obligation is meaningless if the historical case is selected after
+implementation begins. The case must be identified and validated at design time — in the
+ADR itself — not at test-writing time. Discovery at implementation time is the most expensive
+point to find an absence of valid validation data.
 
 ### The Rejected Alternatives Section Is Mandatory
 
@@ -1374,6 +1421,49 @@ The panel review document is a supplement to the ADR — it is not part of
 the ADR file itself. The ADR file records decisions; the panel review records
 the process by which those decisions were validated. Both are permanent
 artifacts. Do not merge the two.
+
+### Panel Composition Algorithm (Issue #546)
+
+CLAUDE.md §Architecture states "derive the panel composition from `docs/process/agent-raci.md`."
+This algorithm makes that derivation explicit and auditable:
+
+1. **Identify all decision types this ADR touches** — from the 9 decision types in
+   `agent-raci.md §RACI Matrix` (Architectural, UX frame, UX component, Data/schema,
+   Domain/measurement, Process/milestone, Compliance, Demo/stakeholder, Agent activation).
+   An ADR may touch multiple decision types simultaneously.
+
+2. **The panel is the union of all C-holders across all identified decision types.**
+   Take every agent marked C on every applicable decision-type row. The union of those
+   agents is the minimum required panel.
+
+3. **The implementing agent is always added if not already in the union.** The agent
+   who will build against this ADR must have the opportunity to raise feasibility concerns
+   before acceptance.
+
+4. **EL always holds A — invariant.** EL is not a panel member for review purposes;
+   EL accepts the ADR after the panel has reviewed.
+
+5. **When in doubt whether a decision type applies, include rather than exclude.**
+   A panel member who has nothing to contribute passes in one sentence. A missing panel
+   member's concern cannot be retroactively incorporated without a new review cycle.
+
+**Conflict resolution:** When two decision types produce conflicting R assignments in the
+same ADR (e.g., Architect and Data Architect both hold R on different decisions), EL
+resolves the conflict at acceptance. Both agents participate in the panel.
+
+**Pre-panel-review-era note (Issue #542):** ADR-001 through ADR-006 were accepted before
+the formal panel review artifact process was established (adopted at ADR-008 acceptance,
+2026-05-22). These ADRs have no `docs/adr/reviews/ADR-NNN-panel-review.md` artifacts.
+This is a retrospective gap — the decisions are settled. When any of ADR-001 through
+ADR-006 undergoes license renewal, the renewal artifact must include the following
+acknowledgment:
+
+> *"This ADR was accepted in the pre-panel-review era (before ADR-008 established the
+> panel review artifact requirement). This renewal review performs the equivalent of
+> the panel review retrospectively for decisions not yet independently validated under
+> the current process."*
+
+The renewal panel is derived from `agent-raci.md` per the algorithm above.
 
 ---
 

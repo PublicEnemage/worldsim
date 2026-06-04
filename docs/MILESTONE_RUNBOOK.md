@@ -656,6 +656,21 @@ renew to CURRENT before the milestone closes. If the review cannot be
 completed within the milestone, document the UNDER-REVIEW rationale in the
 milestone exit checklist per the Standards License Audit section.
 
+**Pre-panel-review-era acknowledgment (Issue #542):** ADR-001 through ADR-006 were
+accepted before the formal ADR panel review artifact process was established (at ADR-008
+acceptance, 2026-05-22). When any of these ADRs comes up for license renewal, the renewal
+review artifact must include the following acknowledgment verbatim:
+
+> *"This ADR was accepted in the pre-panel-review era (before ADR-008 established the
+> panel review artifact requirement). This renewal review performs the equivalent of
+> the panel review retrospectively for decisions not yet independently validated under
+> the current process."*
+
+The renewal panel composition is derived from `agent-raci.md` per
+`docs/CODING_STANDARDS.md §Panel Composition Algorithm`. This requirement is also
+documented in `CODING_STANDARDS.md §Panel Composition Algorithm` for discoverability
+at ADR authoring time.
+
 ### Step 10 — Scan registry update
 
 Update `docs/compliance/scan-registry.md` to reflect the completed review
