@@ -1,5 +1,14 @@
 # ADR-007: Synthetic Data Framework
 
+> **Reader Orientation:** This ADR defines how WorldSim generates and discloses data when
+> real data is unavailable — the synthetic data framework. Read it when: adding a new synthetic
+> data method, changing how confidence tiers interact with synthetic outputs, modifying what
+> the tool displays or refuses to display for low-quality data, or implementing any data
+> consumer that may encounter synthetic estimates. The most consequential section for most
+> changes is **Section 6 (Meaninglessness Threshold)**, which specifies when the tool must
+> refuse to produce an output rather than produce a misleading one. This ADR is the authority;
+> `docs/DATA_STANDARDS.md §Confidence Tier System` is the companion data quality reference.
+
 ## Status
 Accepted
 

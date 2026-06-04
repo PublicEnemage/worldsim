@@ -4,6 +4,8 @@
 > Updated against: M11 active — M10 closed (v0.10.0); M11 current; M12 next; ADR-007 accepted; matrix engine investigation is primary M11 objective; political economy module is M11 stretch goal (EL decision 2026-06-03)
 > Previous version context: M9 exit (2026-05-23) — M9 Standards Foundation current, M10 next, ADR-007 forthcoming
 
+> **Reader Orientation:** This is the permanent project constitution — read it in full before beginning any session. It contains the mission, architectural commitments, and process rules that govern all work in this repository. Anyone making a change in this codebase, human or agent, must have read this document first. Key must-read sections if time is short: Session Continuity (what to read and in what order), Guiding Principles (the values behind every technical decision), and §Architectural Principles for Claude Code Sessions (process gates including pre-push lint, PR merge gate, and file authority rules that will cause compliance violations if not followed).
+
 ## What This Project Is:
 
 This is an open-source geopolitical-economic simulation platform designed to

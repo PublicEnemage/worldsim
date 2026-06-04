@@ -681,6 +681,268 @@ Legibility is also a prerequisite for the distributed simulation ecosystem (Conc
 
 ---
 
+## Concept 19: The Counter-Negotiation Architecture
+
+### The Instrument Cluster Has an Adversarial Context
+
+The intellectual foundations (Part Five — The Tactical Playbook) describe how the
+analytical asymmetry in sovereign debt negotiations is not merely informational — it is
+actively maintained through a set of identifiable negotiating tactics: anchoring high,
+leverage exploitation, manufactured urgency, information asymmetry as strategy, agenda
+overloading, and bilateral isolation.
+
+WorldSim's response to each of these tactics is not accidental. Each instrument in the
+cluster was designed — whether explicitly or by emergence — to counter a specific tactic.
+The Counter-Negotiation Architecture is the principle that makes this relationship explicit,
+architectural, and testable.
+
+### The Mapping
+
+| Negotiating tactic | WorldSim counter | Mechanism |
+|---|---|---|
+| **Anchoring** | MDA threshold system | The finance ministry arrives with pre-established floors that cannot be moved by an opening position. The MDA alerts fire against absolute thresholds, not relative to the counterparty's opening bid. |
+| **Leverage exploitation** | PMM indicator | Makes the actual BATNA analysis visible — not just "default is catastrophic" but "here is what both trajectories produce across all four frameworks." |
+| **Manufactured urgency** | Mode 2 pre-run analysis | Deliberation has already happened before the deadline is imposed. The pre-run output is a prepared position, not a reactive calculation. |
+| **Information asymmetry** | Open methodology + four-framework simultaneous display | This is the entire WorldSim premise — the tool exists to close this gap. |
+| **Agenda overloading** | Four-framework simultaneous display | All dimensions are processed at once rather than sequentially under pressure. |
+| **Bilateral isolation** | Open-source community of practice + backtesting library | Each negotiation builds on the analytical work of previous ones across many countries. |
+
+### The Architectural Implication
+
+The Counter-Negotiation Architecture is not a feature. It is a design constraint that
+applies to every instrument specification:
+
+1. **Each instrument specification must include a tactical counter assignment** — which
+   tactic or tactics it is designed to counter, and how.
+
+2. **Acceptance criteria must include a tactical scenario test** — can the finance ministry
+   analyst, using this instrument in a live negotiation scenario, access what she needs to
+   resist the assigned tactic? This is different from "does the instrument compute correctly?"
+   It asks whether the instrument's output is actionable under adversarial conditions.
+
+3. **UX copy must be written for an adversarial context** — not "here is the analytical
+   result" but "here is what you need to know before the next move."
+
+This principle does not change what is computed. It changes the design language used to
+specify, test, and document what is computed — from an information architecture vocabulary
+to a tactical readiness vocabulary.
+
+**Authority:** VISION-REVIEW-001, Finding GA-001. Added in M11 per Issue #577.
+
+---
+
+## Concept 20: Instrument Coherence — The Reverse-Triangulation Principle
+
+### Aviation Precedent
+
+In aviation, no single instrument is trusted absolutely. The pilot cross-checks:
+if the attitude indicator says wings level but the turn coordinator shows a turn
+and the directional gyro is spinning, something has failed. The inconsistency is
+the signal. The pilot does not choose which instrument to trust — they investigate
+the contradiction.
+
+WorldSim operates on the same principle. No single framework instrument is trusted
+in isolation. When one framework shows recovery while another shows deterioration,
+the contradiction is not a display artifact to be reconciled by averaging. It is the
+analytically important finding.
+
+### Two Functions
+
+Instrument Coherence serves two functions simultaneously:
+
+**Function 1 — Internal integrity check:** Selective manipulation of any single
+framework output is made visible by its inconsistency with the others. A government
+or institution that presents financial recovery while human development continues to
+deteriorate is contradicted by the instrument cluster itself — the contradiction is
+surfaced as a structural finding, not a side note.
+
+**Function 2 — External verification:** Because the methodology is open, this
+coherence check is available to the research community and civil society — not just
+the parties in the negotiating room. Twenty independently generated analyses that
+identify the same cross-framework inconsistency in the official narrative constitute
+a body of evidence that institutional authority cannot easily dismiss.
+
+### The Architectural Requirement
+
+The instrument cluster must detect and surface cross-framework contradictions. Specifically:
+
+1. **Contradiction detection:** When one framework indicator shows improvement above a
+   threshold while another shows deterioration above a threshold in the same step window,
+   this is a detectable condition. It must be computed, not just visually apparent to
+   a careful observer.
+
+2. **Surfacing the contradiction:** The contradiction must be visible in the instrument
+   cluster output as a named condition — not just as two curves that happen to diverge.
+   The design of the MDA alert panel and the four-framework composite score display
+   must include cross-framework inconsistency as a first-class signal.
+
+3. **Time-horizon sensitivity:** Financial indicators often resolve in years; human
+   development indicators in decades. A short-term financial recovery combined with
+   long-term human development deterioration is a particularly important contradiction
+   class — it represents a trajectory that is "safe" in the negotiating room but
+   catastrophic for the intergenerational account. The contradiction detection must
+   be sensitive to this time-horizon asymmetry.
+
+**Relationship to existing concepts:** Extends Concept 5 (Multi-Currency Measurement
+Framework) and Concept 8 (UX Architecture). The multi-currency framework makes
+simultaneous measurement possible; instrument coherence specifies what happens when
+those simultaneous measurements contradict each other.
+
+**Authority:** VISION-REVIEW-001, Finding CM-001, confirmed by IA-002. The principle
+is named in `docs/vision/worldsim-intellectual-foundations-2026-05-31.md §Part Six`
+as "The Reverse-Triangulation Principle." Added in M11 per Issue #577.
+
+---
+
+## Concept 21: The Public Accountability Architecture
+
+### A Distinct Architectural Layer
+
+WorldSim's primary use case is the finance ministry analyst in the negotiating room
+(Personas 1–5). The theory of change (GPR Network, Jama'ah) depends on a second
+ring of actors who are not in the room: investigative journalists (Persona 6),
+parliamentary economists (Persona 7), civil society monitors (Persona 8), and
+community researchers (Persona 4V).
+
+These actors collectively constitute the public accountability layer — the mechanism
+by which a single negotiation's findings become a body of evidence that changes the
+conditions in which all negotiations occur. They are not secondary users. They are
+the theory of change.
+
+The public accountability layer is architecturally distinct from the primary instrument
+layer in four ways:
+
+| Dimension | Primary instrument layer (P1–P5) | Public accountability layer (P6–P8, P4V) |
+|---|---|---|
+| **Rendering mode** | Technical output — trajectory curves, MDA alerts, radar chart | Plain-language output — community reports, published findings |
+| **Data sources** | Simulation projections | Simulation projections + observed actuals (accountability comparison) |
+| **Primary cognitive task** | Policy analysis and scenario modeling | Accountability verification and public communication |
+| **Output format** | On-screen interactive analysis | Exported documents (HTML → PDF, structured data) |
+
+### Phase-3 User Stories as Expressions of This Layer
+
+The [Phase-3-TBD] user stories from Issue #576 are not isolated features — they are
+implementations of the public accountability layer's requirements:
+
+- **US-042 (Observed-actuals overlay):** The accountability comparison between what
+  was projected and what was observed. The public accountability layer's primary
+  analytical instrument.
+- **US-043 (Community report export):** The export pipeline that makes analysis
+  accessible to non-specialist audiences in publishable format.
+- **US-048 (X-ray structural visualization):** The structural layer view that allows
+  journalists and civil society monitors to trace how outcomes were produced.
+
+### The Architectural Implication
+
+Treating these three stories as isolated features risks three architectural outcomes:
+- Inconsistent rendering contracts (each story defines its own output format)
+- Inconsistent data models (each story solves actuals provenance independently)
+- Inconsistent accessibility baselines (each story sets its own plain-language standard)
+
+Treating them as expressions of a single architectural layer produces:
+- A unified plain-language rendering contract governed by
+  `docs/standards/epistemic-disclosure-vocabulary.md`
+- A unified actuals data model governed by
+  `docs/architecture/actuals-overlay-spec.md`
+- A shared export pipeline with pluggable format adapters governed by
+  `docs/architecture/community-report-export-spec.md`
+
+The public accountability layer is the organizing principle that gives these three
+stories architectural coherence.
+
+**Relationship to existing concepts:** Extends Concept 16 (Information Access
+Architecture — role-based output visibility). Role-based visibility governs who sees
+what within the instrument cluster. The public accountability layer governs what is
+exported from the instrument cluster for external publication and verification.
+
+**Authority:** VISION-REVIEW-001, Finding DE-003, confirmed by IA-001. Added in M11
+per Issue #577. Phase-3 implementation documents: `docs/architecture/actuals-overlay-spec.md`,
+`docs/architecture/community-report-export-spec.md`, `docs/ux/zone-2-interaction-standard.md`.
+
+---
+
+## Concept 22: Cross-Case Structural Inference and the GPR Network
+
+### The Point Cloud Argument
+
+One WorldSim deployment produces a cross-section: a two-dimensional slice of one
+country's trajectory under one programme design. The analytical findings are locally
+valid. They do not reveal whether the pattern is systemic.
+
+The GPR network theory of change (intellectual foundations, Part Seven) requires a
+different kind of output: the point cloud. A network of WorldSim deployments — with a
+shared backtesting library, coordinated case development, and cross-country normalization
+— produces three-dimensional structural maps. The Greek fiscal multiplier anomaly becomes
+a data point in a pattern that includes Argentina, Lebanon, Thailand, Ecuador, and dozens
+of other cases. The structural feature becomes visible precisely because the point cloud
+has sufficient density to distinguish signal from noise.
+
+### Why This Is Architecturally Distinct from Per-Country Backtesting
+
+Concept 14 (Distributed Simulation Ecosystem) describes how WorldSim deployments can
+federate — sharing entity templates, backtesting fixtures, and calibration data across
+a community network.
+
+Federation is necessary but not sufficient for the GPR network. Cross-case structural
+inference requires additional architectural capabilities:
+
+1. **Cross-country normalization:** Per-country backtesting uses country-specific
+   baselines. Structural comparison across countries requires normalized indicator
+   scales, comparable elasticity estimates, and comparable time horizons. A fiscal
+   multiplier anomaly in Greece and a fiscal multiplier anomaly in Argentina must be
+   expressed in a common unit before they can be identified as instances of the same
+   structural pattern.
+
+2. **Cross-case query semantics:** The backtesting library must support queries of the
+   form "find all cases where [pattern P] appears in the [indicator I] trajectory across
+   [scenario type S]" — not just "retrieve the backtesting record for country C." This
+   requires a query layer that operates across case boundaries.
+
+3. **Structural pattern indexing:** For cross-case queries to be computationally feasible
+   at the scale of a GPR network (tens to hundreds of country deployments), the backtesting
+   library must index structural patterns — not just store time-series records.
+
+### The Current Backtesting Architecture and the Gap
+
+The current backtesting infrastructure (Concept 3 — The Iterative Engine) is designed
+for per-country validation: does the model produce outputs consistent with historical
+data for a specific country? This is the right first architecture. It validates the
+model before the network is built.
+
+The gap is that the per-country architecture does not naturally extend to cross-case
+inference. A collection of per-country backtesting records is not a structural database
+— it is a set of independently structured time-series that share no common normalization
+or indexing scheme.
+
+Designing the cross-case query layer is an M12+ deliverable — the network must reach
+sufficient density before the structural patterns are statistically meaningful. But the
+backtesting data model must be designed with cross-case normalization in mind from the
+current milestone onward. A data model redesign at M12 to accommodate cross-case
+inference would require reprocessing all existing backtesting records.
+
+### The Architectural Decision Required
+
+Before the backtesting library expands significantly, a decision is required on the
+normalization approach:
+- Indicator normalization (z-score, percentile rank, or domain-specific normalization
+  per indicator type)
+- Elasticity normalization (log-ratio or multiplicative scaling for cross-country
+  comparability)
+- Time horizon normalization (fixed-window or event-relative alignment)
+
+This decision should be deferred to the period when the first cross-case query is
+actually needed (M12) — but the backtesting data model must reserve the fields required
+for normalization metadata from the current milestone.
+
+**Relationship to existing concepts:** Extends Concept 14 (Distributed Simulation
+Ecosystem) and Concept 3 (The Iterative Engine and Why Its Replacement Requires
+Deliberate Care).
+
+**Authority:** VISION-REVIEW-001, Finding GA-002, confirmed by CM-002. Added in M11
+per Issue #577.
+
+---
+
 ## Epilogue: What This Document Is Not
 
 This document does not replace the ADRs. The ADRs are the authoritative architectural decisions — immutable once accepted, amended through formal documented processes. This document explains the reasoning that produced those decisions and the mental models that make them legible.
