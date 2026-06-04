@@ -19,7 +19,7 @@ from pydantic import BaseModel, field_validator
 
 router = APIRouter(prefix="/sessions", tags=["sessions"])
 
-_SESSIONS_DIR = Path(__file__).parents[3] / "sessions"
+_SESSIONS_DIR = Path(__file__).parents[2] / "sessions"
 _SESSION_ID_RE = re.compile(r"^[a-zA-Z0-9][a-zA-Z0-9_-]{0,63}$")
 
 
