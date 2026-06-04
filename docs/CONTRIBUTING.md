@@ -304,7 +304,21 @@ before implementation begins. The process:
 4. The Architect Agent consults `docs/process/agent-raci.md` to derive the panel
 5. The implementing agent must be in the panel — this is not optional
 6. The Architect Agent drafts the ADR; the panel reviews; the Engineering Lead signs off
-7. Status moves to ACCEPTED; the backlog entry is updated
+7. Status moves to Accepted; License Status is set to CURRENT; the backlog entry is updated
+
+**ADR Status vs. License Status** — these are two distinct fields (Issue #57):
+
+- **Status: DRAFT** — the ADR is being written. Set this when the ADR file is first
+  created. A DRAFT ADR has no License Status. It may not be used as the basis for
+  implementation, and no dependent ADR may reach Accepted status while its parent
+  remains DRAFT.
+- **Status: Accepted** — the Engineering Lead has accepted the design decisions.
+  Set at step 7 above. Acceptance assigns the initial License Status of CURRENT.
+- **License Status** (CURRENT / UNDER-REVIEW / SUPERSEDED / REVOKED) — tracks
+  validity of an accepted ADR against current standards. Only applies after Accepted.
+
+New ADRs must open with `Status: DRAFT` in their header. The full lifecycle is
+defined in `docs/MILESTONE_RUNBOOK.md §Architecture License Framework`.
 
 The Architecture Backlog (`docs/architecture/backlog.md`) is the authoritative
 source for ADR numbers and status. Do not assign ADR numbers informally.

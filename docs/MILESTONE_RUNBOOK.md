@@ -363,6 +363,44 @@ debt when the standards it was written against have since changed — it may
 describe a valid implementation path that now violates a standard that didn't
 exist when it was written.
 
+### ADR Status Lifecycle
+
+ADR **Status** is a workflow state that tracks where an ADR is in the
+authoring and acceptance process. It is distinct from **License Status**,
+which applies only to accepted ADRs and tracks the ongoing validity of their
+design decisions.
+
+**DRAFT** — The ADR is being written. It has been assigned a number from the
+Architecture Backlog (`docs/architecture/backlog.md`) but has not yet been
+accepted by the Engineering Lead. Draft ADRs may not be used as the basis for
+implementation, and no dependent ADR may reference a DRAFT ADR. Draft work
+may proceed alongside DRAFT parent ADRs, but no ADR may reach Accepted status
+while a parent it depends on remains in DRAFT.
+
+**Accepted** — The Engineering Lead has reviewed the ADR and accepted its
+design decisions. Acceptance triggers the assignment of an initial License
+Status (always CURRENT at acceptance). No implementation of a significant
+feature may begin without an Accepted ADR.
+
+The full ADR lifecycle is:
+
+```
+Status: DRAFT  →  (EL accepts)  →  Status: Accepted
+                                         │
+                                         ▼
+                                   License: CURRENT
+                                         │
+                             ┌───────────┼───────────┐
+                             ▼           ▼           ▼
+                       UNDER-REVIEW  SUPERSEDED   REVOKED
+```
+
+License Status transitions are governed by the Renewal Triggers and License
+States defined below. An ADR moves from License CURRENT to UNDER-REVIEW when
+a renewal trigger fires; from UNDER-REVIEW back to CURRENT when the review is
+complete; to SUPERSEDED when a newer ADR replaces it; and to REVOKED when
+the architecture it describes must not be used.
+
 ### License States
 
 **CURRENT** — The ADR was written against standards that remain in force. It
@@ -424,8 +462,8 @@ The practical consequence: if an Architecture Review moves ADR-001 to
 UNDER-REVIEW pending a standards update, any ADR that references ADR-001's
 data model (e.g., an ADR defining how the Macroeconomic Module uses
 `SimulationEntity.attributes`) must wait until ADR-001 is renewed to CURRENT
-before it can be finalized and accepted. Draft work may proceed, but no ADR
-may reach Accepted status while its parent is UNDER-REVIEW.
+before it can be finalized and accepted. Work in DRAFT status may proceed, but no ADR may reach Accepted status
+while its parent is UNDER-REVIEW.
 
 ---
 
