@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-03 (M11 board cleanup complete — 45 stale M9/M10 issues re-milestoned; Issue #40 reopened; elite capture #679 filed)**
+**Last updated: 2026-06-04 (M11 sprint complete — G14–G16b merged: CI fix, ADR-011 non-linear propagation, political economy orchestration, PoliticalEconomyModule; PRs #702–#705)**
 **Current milestone:** M11 — Engine Investigation and Political Economy (M10 formally closed 2026-06-03)
 
 ---
@@ -76,17 +76,32 @@ M9 formally closed. Issue #213 (M9 Exit Checklist) closed 2026-05-24. M10 milest
 
 ## Open PRs
 
-No open PRs — board clear as of 2026-06-03 (post PR #676 merge).
+No open PRs — board clear as of 2026-06-04 (post PR #705 merge).
+
+## M11 Work Streams — 2026-06-04 Sprint
+
+16-group sprint targeting 113 open M10/M11 issues. Groups G14–G16b completed this session.
+
+| Group | PR | Issues Closed | Description |
+|---|---|---|---|
+| G14 (CI fix) | #702 ✅ | — | Fix `test_build_greece_scenario_has_five_initial_attributes` broken by trend_growth seed added in prior session |
+| G15 | #703 ✅ | #40 #29 | ADR-011 non-linear propagation — PropagationMode enum (LINEAR/THRESHOLD/CASCADE), per-rule mode selection, cascade-validation-report.md, ADR-011 panel review |
+| G16a | #704 ✅ | #96 #93 #157 | Political economy orchestration — InputSource.CONDITIONALITY + constraining fields, implementation_capacity scaling via get_events(), CompoundStateCondition AND/OR logic |
+| G16b | #705 ✅ | #156 #159 #272 #273 #679 | PoliticalEconomyModule — legitimacy dynamics (fragility amplifier ×1.5 below 0.5 threshold), programme survival probability (DIRECTION_ONLY, tier 4), elite capture divergence (HUMAN_DEVELOPMENT framework), PoliticalContext schema, WebScenarioRunner integration, conditionality_decomposer |
+
+**Political economy module ships as M11 stretch goal (EL decision 2026-06-03).** ADR-011 (non-linear propagation) is the first M11 ADR accepted.
+
+**M11 primary objective (matrix engine investigation) status:** Pending — ADR-009, sparse matrix proof-of-concept, Phase 2 A/B validation, and matrix interpretability tooling not yet started. Engine baseline benchmarks in place (PR #565, M10). Next session: ADR-009 authoring.
 
 ## Recently Merged PRs (last 5)
 
 | PR | Title | Date |
 |---|---|---|
+| #705 | feat(political-economy): PoliticalEconomyModule — legitimacy, survival, elite capture — closes #156 #159 #272 #273 #679 | 2026-06-04 |
+| #704 | feat(orchestration): political economy constraints — closes #96 #93 #157 | 2026-06-04 |
+| #703 | feat(engine): non-linear propagation — THRESHOLD and CASCADE modes — closes #40 #29 | 2026-06-04 |
+| #702 | test(fixtures): fix Greece attribute count test for trend_growth seed | 2026-06-04 |
 | #676 | docs(demo): NM-032 + DEMO-018/019/020 — screenshot viewport mismatch and live application findings | 2026-06-03 |
-| #671 | chore(state): SESSION_STATE.md — Step 6b process + M10 internal review complete; Issues #667–#670 filed | 2026-06-03 |
-| #666 | docs(demo): Step 6b internal team review — process + M10 inaugural artifact (closes #663) | 2026-06-03 |
-| #665 | process(demo): remediate Gap 2 + Gap 4 from M10 demo/IR process review | 2026-06-03 |
-| #662 | chore(m10-exit): CLAUDE.md frontend pre-push gate + SESSION_STATE end-of-session update | 2026-06-03 |
 | #658 | docs(demo): add issue numbers to M10 stakeholder review findings | 2026-06-02 |
 | #656 | docs(process): demo review naming consistency — NM-031 | 2026-06-02 |
 | #655 | docs(ux): NARRATION-RULING-1 — institutionalize three-layer narration structure | 2026-06-02 |
