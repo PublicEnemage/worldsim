@@ -532,6 +532,75 @@ would be the exact inversion of the mission.
 
 ---
 
+## Model Monoculture Risk (Issue #276)
+
+**Source:** Domain Intelligence Council blind interview finding, 2026-05-11.
+Chief Methodologist (unprompted). Carries forward CLAUDE.md §Blindspots are documented,
+not hidden and §No False Precision.
+
+### The Risk
+
+WorldSim is designed to give vulnerable actors the same quality of analytical
+capability that sophisticated institutions currently reserve for themselves. If
+WorldSim achieves institutional adoption, a second-order risk emerges: IMF
+counterparty teams will learn the model's parameterization and optimize
+conditionality proposals against the model's known blindspots rather than against
+underlying economic reality.
+
+When all parties in a negotiation use the same analytical model, the model's
+assumptions become negotiated reality rather than analytical inputs. The model
+then provides worse-than-random guidance on the scenarios where it matters most
+— because those scenarios will have been specifically constructed to look
+favorable under WorldSim's measurement framework while the mechanisms the model
+does not capture are doing the real work.
+
+### WorldSim's Position
+
+**WorldSim is designed to be one analytical instrument among many — not a
+definitive arbiter.**
+
+A finance ministry using WorldSim as its sole analytical tool has not leveled
+the playing field. It has traded one form of analytical dependency for another.
+The tool's value is in structured reasoning alongside other instruments, not in
+replacing independent judgment or expert domain knowledge.
+
+**Methodological diversity is a defense.** A ministry that uses WorldSim
+alongside its own economic team's models, regional peer comparisons, and
+independent expert review is more robust to WorldSim's blindspots than one
+that treats WorldSim outputs as authoritative. The project actively encourages
+this multi-instrument approach.
+
+**Challenging the model is not a failure — it is the intended use.** The
+public methodology documentation exists precisely so that any counterparty,
+critic, or domain expert can inspect, challenge, and improve the model's
+parameterization. A methodology that cannot be publicly challenged cannot be
+trusted. The open-source commitment is a methodological transparency commitment,
+not just an access commitment.
+
+### What the Project Does
+
+1. **Public parameterization disclosure.** Every module documents what it
+   models, what it does not model, and what class of scenarios would cause it
+   to produce misleading outputs. This is a first-class output, not a disclaimer.
+
+2. **Declared Blindspots registry.** Known model limitations are documented
+   explicitly in §Declared Blindspots and surfaced to users — not buried in
+   methodology appendices.
+
+3. **Technical Steering Committee mandate.** The TSC (M13 milestone target)
+   owns the monitoring and response framework for parameterization gaming risk.
+   If systematic optimization against WorldSim's blindspots is detected in
+   real-world conditionality proposals, the TSC has authority to update the
+   model's measurement framework to close the exploited gap.
+
+4. **Goodhart's Law acknowledgment.** WorldSim's own outputs are subject to
+   Goodhart's Law: once a model becomes a target, it ceases to be a good measure.
+   The project will not pretend otherwise. The response to this risk is
+   methodological pluralism and continuous improvement, not claims of model
+   immunity.
+
+---
+
 ## Output Use in Live Decision Contexts (SA-10)
 
 **Source:** STD-REVIEW-002 T1-F10. Issue #125.
