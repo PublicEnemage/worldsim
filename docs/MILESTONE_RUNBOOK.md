@@ -262,9 +262,19 @@ Audit above is complete.**
    - `CLAUDE.md §Milestone Roadmap` updated to show the next milestone as Current
    - `docs/roadmap/worldsim-roadmap.md` revision header updated; scope deferrals
      noted with dated rationale
-   Any misalignment found must be corrected before step 9. (Issue #561)
+   Any misalignment found must be corrected before step 10. (Issue #561)
 
-9. **Next milestone creation ceremony triggered.** Unless this is the final milestone,
+9. **RACI completeness check.** (Issue #527) For each agent with Status: Active or
+   Defined-inactive in `docs/process/agents.md`, verify that it has at least one R row
+   in the file ownership table in `docs/process/agent-raci.md §File Ownership`. For
+   each newly Proposed agent, verify that a RACI stub (at minimum a single-row table
+   entry with a note) is filed. Any active agent without an R row is a file authority
+   gap — file an issue before milestone close and record the issue number as a comment
+   on the exit checklist. This check is a milestone exit gate item, not a mid-milestone
+   check. PM Agent HORIZON step 5 (FILE AUTHORITY AUDIT) covers per-PR violations;
+   this step covers structural gaps in the ownership table itself.
+
+10. **Next milestone creation ceremony triggered.** Unless this is the final milestone,
    immediately initiate the creation ceremony for Milestone N+1. Do not leave a gap
    between milestones — the gap is where work loses coherence and Issues accumulate
    without context.

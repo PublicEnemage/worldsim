@@ -575,6 +575,16 @@ finalized — not afterward.
 | `docs/customer/` | CU | EL | Customer Agent output directory: Layer 3 usability assessments (AUDIT mode), institutional adoption pathway documents (ADOPTION mode), customer voice briefs (BRIEF mode) |
 | `docs/process/intent-block-author-prompt.md` | PM | EL | Activation prompt for IB Agent; PM owns as part of agent process infrastructure |
 | `docs/process/data-quality-agent-prompt.md` | PM | EL | Activation prompt for DQ Agent; PM owns as part of agent process infrastructure |
+| `docs/ux/design-thinking/` | UT | UD | UX Design Thinking Agent produces first-principles derivation and critique artifacts in this directory; UX Designer consulted on outputs that affect design decisions (Issue #528) |
+| `docs/demo/{milestone}/reviews/*-stakeholder-review.md` | IR | PM | Independent Review Agent is the author of record for Step 7 stakeholder review artifacts; PM owns the demo cycle and receives IR output for triage (Issue #528) |
+| `docs/compliance/security-reviews/` | Sr | EL, PI | Security & Review Agent produces vulnerability audit and dual-use review reports here; EL informed of all reports; PI consulted when a report produces a SCAN-entry finding (Issue #528) |
+
+**Socratic Agent (So) — explicitly excluded from file ownership (Issue #528):**
+The Socratic Agent produces understanding, not documents. Its outputs are delivered
+conversationally to the Engineering Lead and do not persist as authored files in the
+repository. No R row is required and none will be added. This exclusion is intentional
+and permanent — if the Socratic Agent is ever extended to produce persistent artifacts,
+a file ownership row must be added at that time.
 
 ### The Near-Miss That Created This Rule
 
