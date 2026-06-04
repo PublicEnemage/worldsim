@@ -127,6 +127,7 @@ Update `demo-narrated.spec.ts` for the current milestone:
 - Key frame capture points (per UX Agent brief)
 - Narration strings for new features (ecological axis, governance null, PMM widget state)
 - Screenshot output paths pointing to `docs/demo/m{N}/screenshots/`
+- **Capture viewport — mandatory:** At the top of the test body, add `await page.setViewportSize({ width: 1440, height: 900 })` before `page.goto()`. Do NOT rely on the `playwright.config.ts` default (1280×720). The capture viewport must match the legibility gate (1440×900) and the presenter display. Root cause of NM-032 (DEMO-020 invisible to review chain at 1280×720). Issue #675.
 
 ### Step 5 — Update `docs/demo/stakeholder-walkthrough.md`
 
@@ -196,6 +197,9 @@ that presents instrument output without framing or implication, introducing
 presenter-skill dependency for the "so what" the audience needs.
 
 ### Step 6 — Run the demo and capture screenshots
+
+**Pre-capture gate — viewport confirmation (M10 forward — Issue #675):**
+Before running, confirm that `demo-narrated.spec.ts` contains `page.setViewportSize({ width: 1440, height: 900 })` before the first `page.goto()`. If absent, add it (Step 4 requirement). Capturing at 1280×720 (the playwright.config.ts default) means the review chain sees a rendering the stakeholder will not — viewport-dependent defects are invisible. This gate exists because NM-032 was not caught by either the internal panel or the IR Agent because of this mismatch.
 
 ```bash
 ./scripts/demo.sh          # Start stack, run migrations, seed data
