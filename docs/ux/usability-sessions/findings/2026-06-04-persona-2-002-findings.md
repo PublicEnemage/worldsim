@@ -1,17 +1,19 @@
 # Findings — 2026-06-04-persona-2-002
 
 **Session ID:** 2026-06-04-persona-2-002  
-**Session valid:** YES  
+**Session valid:** NO — reclassified as developer audit (2026-06-04)  
 **Persona:** Finance Ministry Negotiator — Eleni Papadopoulos (persona-2)  
 **Use case:** IMF loan evaluation  
 **Authors:** UX Designer Agent, PM Agent  
 **Written:** 2026-06-04  
 
+> **Reclassification notice (2026-06-04):** This session was initially recorded as a valid usability session but has been reclassified as a **developer audit**. The agent was given Bash tool access and instructed to query the backend API — it read the OpenAPI spec and curl'd measurement-output endpoints directly rather than navigating the visual interface. A Deputy Finance Minister would not do this. The findings below are technically accurate (the gaps are real) but were discovered through backend API access, not through UI navigation. They cannot be attributed to UI discoverability failures. The genuine cold-start Persona 2 usability session is **2026-06-04-persona-2-003**, run using the computer-use methodology (agent sees and clicks the real rendered UI).
+
 ---
 
-## Summary
+## Summary (Developer Audit)
 
-The primary M11.5 exit criterion — "Can a finance ministry analyst with no prior WorldSim orientation use this tool to produce a finding they could cite in a negotiation?" — is **partially met**. The agent produced one citable finding (reserve coverage breach pre-conditionality; TERMINAL by 2012). The primary task — identifying human cost threshold crossings by conditionality term — **could not be completed**. Six findings documented below.
+A backend API exploration of the Greece 2010–2015 scenario under the Persona 2 use case (IMF loan evaluation) identified six gaps in the simulation output layer. These are technical findings, not usability findings. They are preserved here because the gaps are real and should drive M12 implementation work.
 
 ---
 
