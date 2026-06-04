@@ -194,6 +194,8 @@ def test_scenario_response_with_description() -> None:
 
 
 def test_scenario_detail_response_fields() -> None:
+    from app.schemas import build_temporal_scope_note
+
     detail = ScenarioDetailResponse(
         scenario_id="abc",
         name="Greece test",
@@ -203,13 +205,18 @@ def test_scenario_detail_response_fields() -> None:
         created_at="2026-04-23T10:00:00+00:00",
         configuration=ScenarioConfigSchema(entities=["GRC"], n_steps=3),
         scheduled_inputs=[],
+        temporal_scope_note=build_temporal_scope_note(3, "annual", None),
     )
     assert detail.configuration.entities == ["GRC"]
     assert detail.configuration.n_steps == 3
     assert detail.scheduled_inputs == []
+    assert "3 annual" in detail.temporal_scope_note
+    assert "intergenerational" in detail.temporal_scope_note
 
 
 def test_scenario_detail_response_with_inputs() -> None:
+    from app.schemas import build_temporal_scope_note
+
     detail = ScenarioDetailResponse(
         scenario_id="abc",
         name="Test",
@@ -225,6 +232,7 @@ def test_scenario_detail_response_with_inputs() -> None:
                 input_data={"k": "v"},
             )
         ],
+        temporal_scope_note=build_temporal_scope_note(2, "annual", "2010-01-01"),
     )
     assert len(detail.scheduled_inputs) == 1
     assert detail.scheduled_inputs[0].input_type == "FiscalPolicyInput"

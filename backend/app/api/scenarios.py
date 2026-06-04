@@ -60,6 +60,7 @@ from app.schemas import (
     TrajectoryFrameworkPoint,
     TrajectoryResponse,
     TrajectoryStep,
+    build_temporal_scope_note,
 )
 from app.simulation.mda_checker import alerts_from_events_snapshot
 from app.simulation.repositories.quantity_serde import IA1_CANONICAL_PHRASE
@@ -303,6 +304,9 @@ def _build_detail_response(
         created_at=created_at_str,
         configuration=config,
         scheduled_inputs=scheduled,
+        temporal_scope_note=build_temporal_scope_note(
+            config.n_steps, config.timestep_label, config.start_date
+        ),
     )
 
 
