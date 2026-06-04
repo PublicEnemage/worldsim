@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-04 (M11 sprint continued — G19 #147/#152/#36-DB delivered (PR #710); G20 #151/#154/#155 delivered (PR #711); 31 new unit tests; 1062 total unit tests passing)**
+**Last updated: 2026-06-04 (M11 sprint closed — #681 political economy user stories authored (PR #713); 17 near-term issues re-milestoned M11→M12; M11 exit checklist #262 is the remaining M11 gate)**
 **Current milestone:** M11 — Engine Investigation and Political Economy (M10 formally closed 2026-06-03)
 
 ---
@@ -76,7 +76,7 @@ M9 formally closed. Issue #213 (M9 Exit Checklist) closed 2026-05-24. M10 milest
 
 ## Open PRs
 
-No open PRs — board clear as of 2026-06-04 (post PR #711 merge).
+No open PRs — board clear as of 2026-06-04 (post PR #713 merge).
 
 ## M11 Work Streams — 2026-06-04 Sprint
 
@@ -91,6 +91,7 @@ No open PRs — board clear as of 2026-06-04 (post PR #711 merge).
 | G17 | #707 ✅ | #215 #404 | Matrix engine (ADR-009 accepted 2026-06-03): `matrix_propagation.py` (propagate_matrix, LINEAR/THRESHOLD/CASCADE modes, Decimal↔float64 via str, semantic divergences documented), `matrix_tools.py` (trace_propagation, visualize_weight_matrix, profile_propagation), `test_equivalence_harness.py` (14 tests, ADR-009 §Decision 2 gate 1e-10 on all Quantity.value), `scripts/benchmark_phase2.py` (iterative vs matrix A/B report, §Decision 3 MC gate 1000×15 steps) |
 | G19 | #710 ✅ | #147 #152 #36-DB | entity_state_snapshot JSONB on tombstones (populated at DELETE with last snapshot.state_data); engine_version_hash TEXT on scenarios (populated with `_GIT_COMMIT_HASH` at creation, returned by GET /scenarios/{id}); git_commit_hash ORM schema drift fix on ScenarioDeletedTombstone; MDA-DEBT-FOREIGN-CURRENCY-ROLLOVER threshold (foreign_currency_pct ≥ 0.60, gte, Tier 3) seeded in migration a4f2b6d8e1c9; 25 unit tests in `test_g19_tombstone_snapshot_engine_hash.py` |
 | G20 | #711 ✅ | #151 #154 #155 | STATE_DATA_ENVELOPE_VERSION bumped "2"→"3"; `_steps_projected` added to state_data envelope at write time (records projection horizon for output-layer effective_tier computation); IA1_CANONICAL_PHRASE extended with horizon degradation schedule (+1 tier per 5 steps, capped at Tier 5); ADR-001 IA-1 marked RESOLVED (M11); `write_fidelity_artifact()` added to fidelity_report.py (JSON artifact {case_id}-{date}-{sha8}.json, CI upload-artifact@v4); `POST /scenarios/restore` endpoint (reconstructs tombstone into pending scenario, name-conflict safe, version-gate via check_reconstruction_compatibility()); 31 unit tests in `test_g20_horizon_degradation_restore.py`; 1062 total unit tests passing |
+| G21 (docs) | #713 ✅ | #681 | Political economy module user stories — `docs/ux/user-stories-political-economy-m11.md`; 20 Given/When/Then stories across 11 groups: PoliticalContext configuration, implementation_capacity scaling, legitimacy seeding, social response events (fragility amplifier), conditionality structured inputs, conditionality decomposition, programme survival probability, CompoundStateCondition QA contract, elite capture coefficient, distributional divergence Zone 2 placement, Argentina backtesting DIRECTION_ONLY validation; all stories `[pytest]` / `[Playwright]` / `[Manual]` tagged; retrospective spec against G16a/G16b (PRs #703/#705) |
 
 **Political economy module ships as M11 stretch goal (EL decision 2026-06-03).** ADR-011 (non-linear propagation) is the first M11 ADR accepted.
 
@@ -100,6 +101,7 @@ No open PRs — board clear as of 2026-06-04 (post PR #711 merge).
 
 | PR | Title | Date |
 |---|---|---|
+| #713 | docs(ux): political economy module user stories — M11 Issue #681 | 2026-06-04 |
 | #711 | feat(simulation): G20 — horizon degradation envelope, fidelity artifact, restore endpoint — closes #151 #154 #155 | 2026-06-04 |
 | #710 | feat(simulation): G19 — tombstone entity_state_snapshot, engine_version_hash, debt MDA threshold — closes #147 #152 #36-DB | 2026-06-04 |
 | #707 | feat(engine): matrix computation engine — ADR-009 parallel run, equivalence harness, interpretability tools, Phase 2 A/B benchmark — closes #215 #404 | 2026-06-04 |
@@ -331,6 +333,7 @@ All Horizon:Immediate issues are now closed. M8 feature-complete.
 
 | Decision | Rationale | Date |
 |---|---|---|
+| M11 near-term issues re-milestoned to M12 + #681 political economy user stories authored (2026-06-04) | Two actions: (1) 17 open M11 near-term issues re-milestoned to M12 (GitHub milestone 13): #30 #43 #45 #92 #95 #102 #103 #259 #271 #274 #275 #392 #393 #644 #13 #22 #27. These are backlog/enhancement items not required for M11 closure; they carry to M12 alongside Mode 3 and external sector module work. (2) #681 (political economy module user stories) authored as retrospective specification against delivered G16a/G16b implementation. 20 Given/When/Then stories across 11 groups. Closes #681. PR #713 merged. M11 remaining gate: exit checklist #262 only. | 2026-06-04 |
 | M11 board cleanup — 45 stale issues re-milestoned; Issue #40 reopened; elite capture #679 filed (2026-06-03) | Three actions: (1) PM HORIZON Step 6 gap filed — elite capture dynamics (#679, M11, enhancement, horizon:near-term) was a named roadmap deliverable with no tracking issue. Issue body defines scope (capture coefficient per sector/cohort, distributional divergence in human cost ledger, Argentina backtesting validation), dependencies (conditionality modelling, political feasibility constraints), and CM acceptance gate. (2) Issue #40 reopened — closure comment incorrectly equated the Human Cost Ledger ADR-005 (accepted, CLAUDE.md current) with the Non-Linear Propagation Architecture ADR that #40 actually tracked (never authored). Non-linear propagation ADR does not exist; Issue #29 (implementation) remains open on M11. Corrective comment posted explaining conflation. Re-milestoned to M11. (3) Batch re-milestoning: 22 open M9 issues and 22 open M10 issues moved to M11 (#30 #89 #102 #184 #349 #393 #513 #522–#529 #540 #542–#547 #574 + M9: #13 #49 #57 #98 #100 #121 #125 #127 #128 #158 #234 #252 #253 #258 #259 #276 #286 #299 #300 #374 #375 #412); #451 (Mode 1 COMPARE_VIEW) re-milestoned to M12 — Mode 1 is M12 territory. None of these represented missed M10/M9 core deliverables — all are backlog process, standards, and enhancement items. | 2026-06-03 |
 | M10 FULLY CLOSED — Socratic Agent TEST complete (2026-06-03) | Socratic Agent TEST conducted at high-level architectural level (EL preference: no implementation-level detail). Three areas confirmed: (1) GovernanceModule promotion — null/tentative display → active threshold monitoring and full MDA alert participation; (2) PMM "—" at Step 3 Argentina — no policy headroom when all thresholds breached (governance floor + ecological boundary simultaneously); (3) Argentina fixture — Platform Principle validated, second country required no new engine modes or scenario-specific code, only new data inputs. Mental model confirmed sound. Comment posted on Issue #261. Issue #261 closed. M11 is now the active milestone. | 2026-06-03 |
 | NM-032 + DEMO-018/019/020 from live application comparison (PR #676, 2026-06-03) | Engineering Lead compared a live application screenshot at Step 3/4 (>1440px display) against repository artifact frame-c (1280×720 Playwright capture). Three new MEDIUM findings: DEMO-018 (CI legend raw variable names — `getIndicatorDisplayNameAny()` fix covered AttributeSelector, not Recharts legend entries for derived keys; Issue #672), DEMO-019 (PMM "—" None state has no contextual explanation for non-specialists; Issue #673), DEMO-020 (Zone 1A y-axis tick labels clipped at left boundary when ecological score >1.0; `margin.left` too narrow for 6-char labels; invisible at 1280×720; Issue #674). Root cause: demo screenshot spec captures at 1280×720 while legibility gate validates at 1440×900 and live demo presents at ≥1440px — the review chain reviews a different visual artifact than what the stakeholder sees. NM-032 filed. Fix issue #675 (M11): set `page.setViewportSize({ width: 1440, height: 900 })` in demo spec before each capture; update SCREENSHOT_DIR to m10/screenshots/; update demo-preparation-standard Steps 4 and 6 with explicit viewport requirement. | 2026-06-03 |
