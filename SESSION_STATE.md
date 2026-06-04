@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-04 (M11 sprint complete — G14–G16b merged: CI fix, ADR-011 non-linear propagation, political economy orchestration, PoliticalEconomyModule; PRs #702–#705)**
+**Last updated: 2026-06-04 (M11 sprint continued — G17 matrix engine delivered: ADR-009 accepted, sparse matrix engine, equivalence harness, interpretability tooling, Phase 2 A/B benchmark; PR #707; Issues #215 #404 closed)**
 **Current milestone:** M11 — Engine Investigation and Political Economy (M10 formally closed 2026-06-03)
 
 ---
@@ -88,15 +88,17 @@ No open PRs — board clear as of 2026-06-04 (post PR #705 merge).
 | G15 | #703 ✅ | #40 #29 | ADR-011 non-linear propagation — PropagationMode enum (LINEAR/THRESHOLD/CASCADE), per-rule mode selection, cascade-validation-report.md, ADR-011 panel review |
 | G16a | #704 ✅ | #96 #93 #157 | Political economy orchestration — InputSource.CONDITIONALITY + constraining fields, implementation_capacity scaling via get_events(), CompoundStateCondition AND/OR logic |
 | G16b | #705 ✅ | #156 #159 #272 #273 #679 | PoliticalEconomyModule — legitimacy dynamics (fragility amplifier ×1.5 below 0.5 threshold), programme survival probability (DIRECTION_ONLY, tier 4), elite capture divergence (HUMAN_DEVELOPMENT framework), PoliticalContext schema, WebScenarioRunner integration, conditionality_decomposer |
+| G17 | #707 ✅ | #215 #404 | Matrix engine (ADR-009 accepted 2026-06-03): `matrix_propagation.py` (propagate_matrix, LINEAR/THRESHOLD/CASCADE modes, Decimal↔float64 via str, semantic divergences documented), `matrix_tools.py` (trace_propagation, visualize_weight_matrix, profile_propagation), `test_equivalence_harness.py` (14 tests, ADR-009 §Decision 2 gate 1e-10 on all Quantity.value), `scripts/benchmark_phase2.py` (iterative vs matrix A/B report, §Decision 3 MC gate 1000×15 steps) |
 
 **Political economy module ships as M11 stretch goal (EL decision 2026-06-03).** ADR-011 (non-linear propagation) is the first M11 ADR accepted.
 
-**M11 primary objective (matrix engine investigation) status:** Pending — ADR-009, sparse matrix proof-of-concept, Phase 2 A/B validation, and matrix interpretability tooling not yet started. Engine baseline benchmarks in place (PR #565, M10). Next session: ADR-009 authoring.
+**M11 primary objective (matrix engine investigation) status:** COMPLETE — ADR-009 accepted 2026-06-03, sparse matrix proof-of-concept delivered, Phase 2 A/B benchmark delivered, matrix interpretability tooling delivered. All four §Decision 4 deliverables complete. PR #707 merged 2026-06-04. Issues #215 and #404 closed.
 
 ## Recently Merged PRs (last 5)
 
 | PR | Title | Date |
 |---|---|---|
+| #707 | feat(engine): matrix computation engine — ADR-009 parallel run, equivalence harness, interpretability tools, Phase 2 A/B benchmark — closes #215 #404 | 2026-06-04 |
 | #705 | feat(political-economy): PoliticalEconomyModule — legitimacy, survival, elite capture — closes #156 #159 #272 #273 #679 | 2026-06-04 |
 | #704 | feat(orchestration): political economy constraints — closes #96 #93 #157 | 2026-06-04 |
 | #703 | feat(engine): non-linear propagation — THRESHOLD and CASCADE modes — closes #40 #29 | 2026-06-04 |
