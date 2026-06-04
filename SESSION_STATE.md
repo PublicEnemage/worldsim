@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-04 (M11 sprint continued — G17 matrix engine delivered: ADR-009 accepted, sparse matrix engine, equivalence harness, interpretability tooling, Phase 2 A/B benchmark; PR #707; Issues #215 #404 closed)**
+**Last updated: 2026-06-04 (M11 sprint continued — G19 #147/#152/#36-DB delivered (PR #710); G20 #151/#154/#155 delivered (PR #711); 31 new unit tests; 1062 total unit tests passing)**
 **Current milestone:** M11 — Engine Investigation and Political Economy (M10 formally closed 2026-06-03)
 
 ---
@@ -76,7 +76,7 @@ M9 formally closed. Issue #213 (M9 Exit Checklist) closed 2026-05-24. M10 milest
 
 ## Open PRs
 
-No open PRs — board clear as of 2026-06-04 (post PR #705 merge).
+No open PRs — board clear as of 2026-06-04 (post PR #711 merge).
 
 ## M11 Work Streams — 2026-06-04 Sprint
 
@@ -89,6 +89,8 @@ No open PRs — board clear as of 2026-06-04 (post PR #705 merge).
 | G16a | #704 ✅ | #96 #93 #157 | Political economy orchestration — InputSource.CONDITIONALITY + constraining fields, implementation_capacity scaling via get_events(), CompoundStateCondition AND/OR logic |
 | G16b | #705 ✅ | #156 #159 #272 #273 #679 | PoliticalEconomyModule — legitimacy dynamics (fragility amplifier ×1.5 below 0.5 threshold), programme survival probability (DIRECTION_ONLY, tier 4), elite capture divergence (HUMAN_DEVELOPMENT framework), PoliticalContext schema, WebScenarioRunner integration, conditionality_decomposer |
 | G17 | #707 ✅ | #215 #404 | Matrix engine (ADR-009 accepted 2026-06-03): `matrix_propagation.py` (propagate_matrix, LINEAR/THRESHOLD/CASCADE modes, Decimal↔float64 via str, semantic divergences documented), `matrix_tools.py` (trace_propagation, visualize_weight_matrix, profile_propagation), `test_equivalence_harness.py` (14 tests, ADR-009 §Decision 2 gate 1e-10 on all Quantity.value), `scripts/benchmark_phase2.py` (iterative vs matrix A/B report, §Decision 3 MC gate 1000×15 steps) |
+| G19 | #710 ✅ | #147 #152 #36-DB | entity_state_snapshot JSONB on tombstones (populated at DELETE with last snapshot.state_data); engine_version_hash TEXT on scenarios (populated with `_GIT_COMMIT_HASH` at creation, returned by GET /scenarios/{id}); git_commit_hash ORM schema drift fix on ScenarioDeletedTombstone; MDA-DEBT-FOREIGN-CURRENCY-ROLLOVER threshold (foreign_currency_pct ≥ 0.60, gte, Tier 3) seeded in migration a4f2b6d8e1c9; 25 unit tests in `test_g19_tombstone_snapshot_engine_hash.py` |
+| G20 | #711 ✅ | #151 #154 #155 | STATE_DATA_ENVELOPE_VERSION bumped "2"→"3"; `_steps_projected` added to state_data envelope at write time (records projection horizon for output-layer effective_tier computation); IA1_CANONICAL_PHRASE extended with horizon degradation schedule (+1 tier per 5 steps, capped at Tier 5); ADR-001 IA-1 marked RESOLVED (M11); `write_fidelity_artifact()` added to fidelity_report.py (JSON artifact {case_id}-{date}-{sha8}.json, CI upload-artifact@v4); `POST /scenarios/restore` endpoint (reconstructs tombstone into pending scenario, name-conflict safe, version-gate via check_reconstruction_compatibility()); 31 unit tests in `test_g20_horizon_degradation_restore.py`; 1062 total unit tests passing |
 
 **Political economy module ships as M11 stretch goal (EL decision 2026-06-03).** ADR-011 (non-linear propagation) is the first M11 ADR accepted.
 
@@ -98,6 +100,8 @@ No open PRs — board clear as of 2026-06-04 (post PR #705 merge).
 
 | PR | Title | Date |
 |---|---|---|
+| #711 | feat(simulation): G20 — horizon degradation envelope, fidelity artifact, restore endpoint — closes #151 #154 #155 | 2026-06-04 |
+| #710 | feat(simulation): G19 — tombstone entity_state_snapshot, engine_version_hash, debt MDA threshold — closes #147 #152 #36-DB | 2026-06-04 |
 | #707 | feat(engine): matrix computation engine — ADR-009 parallel run, equivalence harness, interpretability tools, Phase 2 A/B benchmark — closes #215 #404 | 2026-06-04 |
 | #705 | feat(political-economy): PoliticalEconomyModule — legitimacy, survival, elite capture — closes #156 #159 #272 #273 #679 | 2026-06-04 |
 | #704 | feat(orchestration): political economy constraints — closes #96 #93 #157 | 2026-06-04 |
