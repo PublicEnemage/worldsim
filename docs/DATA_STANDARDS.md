@@ -916,6 +916,110 @@ For sources that do not support vintage retrieval, use the following handling:
 
 ---
 
+## Backtesting Fidelity Threshold Registry (SA-08)
+
+**Source:** STD-REVIEW-002 T1-F8 / T2-F3 / T1-F11 — convergent finding. Issue #123.
+
+This section defines the canonical threshold types and their evaluation semantics.
+All backtesting cases must use these definitions — do not reimplement threshold
+evaluation logic in individual fixture files.
+
+### DIRECTION_ONLY
+
+Sign-of-change check only. A simulated value and actual value both negative (or both
+positive) constitutes a pass regardless of magnitude.
+
+**Canonical evaluator** (must be imported by all backtesting cases, not reimplemented):
+
+```python
+def evaluate_direction_only_threshold(
+    attribute: str,
+    simulated_values: list[Decimal],
+    actual_values: list[Decimal],
+) -> bool:
+    return all((s < 0) == (a < 0) for s, a in zip(simulated_values, actual_values))
+```
+
+**False-positive rate table (null model):**
+
+| Independent DIRECTION_ONLY indicators | Probability all pass by chance |
+|---|---|
+| 1 | 50% |
+| 2 | 25% |
+| 3 | 12.5% |
+| 4 | 6.25% |
+| 5 | 3.125% |
+
+**Minimum threshold:** A DIRECTION_ONLY suite must have at least 4 independent indicators
+for the false-positive rate to fall below 6.25%. Suites with fewer than 4 indicators must
+include the statistical power statement verbatim in `ia1_disclosure`.
+
+### MAGNITUDE_WITHIN_PCT
+
+Value within ±N% of historical outturn. N must be explicitly specified in the fixture
+and justified against the calibration tier of the model for that indicator.
+
+Requires parameter calibration to Tier A or B (Issue #44) before use. Do not use
+MAGNITUDE thresholds on uncalibrated indicators — a tight MAGNITUDE threshold on an
+uncalibrated model is more misleading than a DIRECTION_ONLY threshold.
+
+### DISTRIBUTION_COMBINED
+
+Simulated distribution overlaps with historical distribution. Requires uncertainty
+quantification to be validated before use. Not available until ADR-007 band outputs
+are in production.
+
+### Required `ia1_disclosure` Content
+
+Every fidelity report must include:
+1. The threshold type used for each indicator
+2. For DIRECTION_ONLY suites: the false-positive rate statement (see null model table)
+3. For MAGNITUDE suites: the calibration tier justification
+4. At least one human cost indicator threshold (CODING_STANDARDS.md §SA-07)
+
+---
+
+## MDA Threshold Tier Upgrade Evidence Criteria
+
+**Source:** ADR-005 Decision 3 gap — threshold upgrade criteria undefined. Issue #173.
+
+ADR-005 Decision 3 states that MDA thresholds ship at Tier 3 confidence and may be
+upgraded to Tier 2 "when backtesting cases provide enough historical breach evidence."
+This section defines what constitutes sufficient evidence.
+
+### Tier 3 → Tier 2 Upgrade Criteria
+
+A threshold may be upgraded from Tier 3 to Tier 2 when all four criteria are met:
+
+1. **Minimum backtesting case count:** At least 2 independent historical cases (different
+   countries or different crisis episodes) where the threshold was crossed and the
+   consequence the threshold describes was observed.
+
+2. **Breach sensitivity requirement:** The threshold correctly identifies ≥ 75% of
+   documented historical breaches in the backtesting corpus. A threshold that misses
+   more than 25% of known breach episodes is not validated.
+
+3. **False positive ceiling:** The threshold fires on ≤ 20% of non-breach historical
+   periods. A threshold with a false positive rate above 20% is generating noise, not
+   signal.
+
+4. **Review documentation:** The upgrade must be documented in
+   `docs/methodology/mda-calibration.md` (create if absent) with the specific cases
+   used, the sensitivity and false positive measurements, and the approval authority
+   (Engineering Lead or Chief Methodologist for domain-specific thresholds).
+
+### Tier 2 → Tier 1 Upgrade Criteria
+
+Not currently defined. Tier 1 MDA thresholds require external validation by domain
+experts outside the project (Technical Steering Committee scope, M13+).
+
+### Governance
+
+MDA threshold tier upgrades are logged in `docs/methodology/mda-calibration.md`.
+No threshold may be silently upgraded — the calibration document is the audit trail.
+
+---
+
 ## Scenario Fixture Step Annotation
 
 **Authority:** EL Decision 1 (2026-05-21, Premise 3); PR #390 Gap 1B; Issue #395.
