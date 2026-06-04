@@ -213,6 +213,12 @@ The Zone 1 instruments load with Argentina data.
 > What you are about to see is not a chart of history — it is the instrument
 > cluster reading that scenario forward, one step at a time.
 
+**Curve convention (DEMO-013 — required before any quantitative reading):** When Zone 1A loads, point briefly to the curve style:
+
+> The dashed curves are projected — model output from the scenario. The solid portion, where it appears, is the historical basis for the calibration you are seeing. You are looking at both at once: what happened, and what the model says would follow from the inputs we gave it.
+
+Do not skip this sentence even if the audience seems technically sophisticated. It prevents the audience from treating forward projection as historical fact.
+
 **Cognitive purpose:** Establish that scenarios are structured, not arbitrary.
 The historical events — the programme conditions, the default, the emergency
 declaration — are the inputs. What the simulation does with them is the output.
@@ -268,6 +274,18 @@ while the governance curve remains flat near the breach floor.
 >
 > Financial recovery and institutional recovery are not the same event. No
 > single-axis measurement tool can show you both simultaneously. This one does.
+>
+> Now look at the human development curve. It is tracking below its pre-crisis
+> level and has not recovered with GDP. That curve represents what the adjustment
+> period did to the capabilities of Argentina's population — health access,
+> education enrollment, the social mobility of the cohorts who were children in
+> 2001 and 2002. Those cohorts absorbed the cost of the convertibility collapse.
+> They are visible in this instrument as a trajectory that lags the financial
+> recovery by years.
+>
+> A negotiation that optimises for the financial curve alone is not seeing the
+> full picture. This tool shows all four simultaneously. That is the capability
+> gap we are closing.
 >
 > And the next panel puts a specific, citeable number on what you just saw.
 

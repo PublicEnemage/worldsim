@@ -39,7 +39,7 @@ import { test, expect } from "@playwright/test";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const SPEAK_SCRIPT = path.resolve(__dirname, "../../../scripts/speak.sh");
-const SCREENSHOT_DIR = path.resolve(__dirname, "../../../docs/demo/m8/screenshots/");
+const SCREENSHOT_DIR = path.resolve(__dirname, "../../../docs/demo/m10/screenshots/");
 
 // Ensure screenshot directory exists (created by PR #334; guard against clean clones).
 fs.mkdirSync(SCREENSHOT_DIR, { recursive: true });
@@ -97,6 +97,10 @@ test(
   { tag: ["@demo"] },
   async ({ page }) => {
     test.setTimeout(20 * 60 * 1000);
+
+    // Match legibility gate and live demo viewport — NM-032 / Issue #675.
+    // Do NOT rely on playwright.config.ts default (1280×720).
+    await page.setViewportSize({ width: 1440, height: 900 });
 
     // ── STEP 1: Map loads ────────────────────────────────────────────────────
 
