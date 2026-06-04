@@ -46,6 +46,15 @@ export function getPmmArrow(direction: "up" | "down" | "flat" | null): string {
 }
 
 /**
+ * Returns the plain-language note shown when PMM is None due to all thresholds breached.
+ * Empty string when PMM has a value — note is suppressed.
+ * DEMO-019: distinguishes "margin fully exhausted" from "not computed" / "not applicable".
+ */
+export function getPmmBreachedNote(pmmValue: number | null): string {
+  return pmmValue === null ? "All thresholds breached — see alerts" : "";
+}
+
+/**
  * Returns the CSS color for the direction arrow.
  * Green-family avoided (CVD constraint from MV-001 — teal only for ecological).
  */
@@ -72,6 +81,7 @@ export function PMMWidgetZone1C({
   const label = getPmmLabel(mode);
   const arrow = getPmmArrow(pmm_direction);
   const arrowColor = getPmmArrowColor(pmm_direction);
+  const breachedNote = getPmmBreachedNote(pmm_value);
   const isPending = computation_state === "computing";
 
   const formattedValue =
@@ -135,6 +145,16 @@ export function PMMWidgetZone1C({
           {arrow}
         </span>
       </div>
+
+      {/* Contextual note when all thresholds are breached (pmm_value === null) */}
+      {breachedNote && !isPending && (
+        <div
+          data-testid="pmm-breached-note"
+          style={{ fontSize: 10, color: "#cc0000", marginTop: 4, lineHeight: 1.3 }}
+        >
+          {breachedNote}
+        </div>
+      )}
 
       {/* Pending label — Mode 3 computation in flight */}
       {isPending && (

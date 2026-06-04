@@ -328,7 +328,12 @@ export function TrajectoryView({
             height={60}
           />
 
-          <YAxis domain={[0, 1]} tick={{ fontSize: 11 }} width={32} />
+          <YAxis
+            domain={[0, "auto"]}
+            tick={{ fontSize: 11 }}
+            width={44}
+            tickFormatter={(v: number) => v.toFixed(2)}
+          />
 
           <Tooltip
             formatter={(value, name) => {
@@ -356,6 +361,7 @@ export function TrajectoryView({
               stroke="none"
               isAnimationActive={false}
               connectNulls={CONNECT_NULLS}
+              legendType="none"
             />
           ))}
 
@@ -370,6 +376,7 @@ export function TrajectoryView({
               stroke="none"
               isAnimationActive={false}
               connectNulls={CONNECT_NULLS}
+              legendType="none"
             />
           ))}
 
@@ -403,6 +410,7 @@ export function TrajectoryView({
                   connectNulls={CONNECT_NULLS}
                   name={`${legendFormatter(fw, "percentile_rank")} (baseline)` as never}
                   isAnimationActive={false}
+                  legendType="none"
                 />
               );
             })}

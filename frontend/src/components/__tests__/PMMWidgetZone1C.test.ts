@@ -14,6 +14,7 @@ import {
   getPmmLabel,
   getPmmArrow,
   getPmmArrowColor,
+  getPmmBreachedNote,
   PMM_LABELS,
 } from "../PMMWidgetZone1C";
 
@@ -125,5 +126,27 @@ describe("getPmmArrowColor: direction to color", () => {
     // null direction carries no directional meaning so it must not imply improvement
     expect(color).not.toBe("#1A8FA0");
     expect(color).not.toBe("#2271B3");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// getPmmBreachedNote — DEMO-019 contextual note for None state
+// ---------------------------------------------------------------------------
+
+describe("getPmmBreachedNote: None-state intelligibility", () => {
+  it("returns plain-language note when pmm_value is null", () => {
+    const note = getPmmBreachedNote(null);
+    expect(note).toBeTruthy();
+    expect(note).toContain("breached");
+  });
+
+  it("returns empty string when pmm_value is a number", () => {
+    expect(getPmmBreachedNote(0.42)).toBe("");
+    expect(getPmmBreachedNote(0)).toBe("");
+  });
+
+  it("note does not contain raw field names or internal identifiers", () => {
+    const note = getPmmBreachedNote(null);
+    expect(note).not.toMatch(/pmm_value|policy_margin|null|undefined/);
   });
 });
