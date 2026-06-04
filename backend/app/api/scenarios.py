@@ -307,6 +307,7 @@ def _build_detail_response(
         temporal_scope_note=build_temporal_scope_note(
             config.n_steps, config.timestep_label, config.start_date
         ),
+        engine_version_hash=row.get("engine_version_hash"),
     )
 
 
@@ -335,14 +336,18 @@ async def create_scenario(
     async with conn.transaction():
         row = await conn.fetchrow(
             """
-            INSERT INTO scenarios (scenario_id, name, description, status, configuration, version)
-            VALUES ($1, $2, $3, 'pending', $4, 1)
-            RETURNING scenario_id, name, description, status, version, created_at
+            INSERT INTO scenarios
+                (scenario_id, name, description, status,
+                 configuration, version, engine_version_hash)
+            VALUES ($1, $2, $3, 'pending', $4, 1, $5)
+            RETURNING scenario_id, name, description, status,
+                      version, created_at, engine_version_hash
             """,
             scenario_id,
             req.name,
             req.description,
             json.dumps(config_json),
+            _GIT_COMMIT_HASH,
         )
 
         for si in req.scheduled_inputs:
@@ -976,7 +981,8 @@ async def get_scenario(
     """Return full scenario detail including configuration and scheduled inputs."""
     row = await conn.fetchrow(
         """
-        SELECT scenario_id, name, description, status, version, created_at, configuration
+        SELECT scenario_id, name, description, status, version, created_at,
+               configuration, engine_version_hash
         FROM scenarios
         WHERE scenario_id = $1
         """,
@@ -1053,13 +1059,31 @@ async def delete_scenario(
             for r in input_rows
         ]
 
+        snap_row = await conn.fetchrow(
+            """
+            SELECT state_data FROM scenario_state_snapshots
+            WHERE scenario_id = $1
+            ORDER BY step DESC
+            LIMIT 1
+            """,
+            scenario_id,
+        )
+        if snap_row is not None:
+            snap_raw = snap_row["state_data"]
+            if isinstance(snap_raw, str):
+                snap_raw = json.loads(snap_raw)
+            entity_state_snap: str | None = json.dumps(snap_raw)
+        else:
+            entity_state_snap = None
+
         await conn.execute(
             """
             INSERT INTO scenario_deleted_tombstones
                 (scenario_id, name, configuration, scheduled_inputs,
                  engine_version, git_commit_hash,
+                 entity_state_snapshot,
                  original_created_at, deleted_at, deleted_by)
-            VALUES ($1, $2, $3, $4, $5, $6, $7, NOW(), $8)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, NOW(), $9)
             """,
             scenario_id,
             row["name"],
@@ -1067,6 +1091,7 @@ async def delete_scenario(
             json.dumps(scheduled_inputs_snap),
             _ENGINE_VERSION,
             _GIT_COMMIT_HASH,
+            entity_state_snap,
             row["created_at"],
             "api",
         )

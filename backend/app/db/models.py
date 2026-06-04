@@ -312,6 +312,7 @@ class Scenario(Base):
         DateTime(timezone=True), nullable=False, server_default=func.now()
     )
     version: Mapped[int] = mapped_column(Integer, nullable=False, server_default="1")
+    engine_version_hash: Mapped[str | None] = mapped_column(Text, nullable=True)
 
     scheduled_inputs: Mapped[list[ScenarioScheduledInput]] = relationship(
         "ScenarioScheduledInput", back_populates="scenario", cascade="all, delete-orphan"
@@ -410,6 +411,8 @@ class ScenarioDeletedTombstone(Base):
     configuration: Mapped[dict[str, Any]] = mapped_column(JSONB, nullable=False)
     scheduled_inputs: Mapped[list[Any]] = mapped_column(JSONB, nullable=False)
     engine_version: Mapped[str] = mapped_column(Text, nullable=False)
+    git_commit_hash: Mapped[str | None] = mapped_column(Text, nullable=True)
+    entity_state_snapshot: Mapped[dict[str, Any] | None] = mapped_column(JSONB, nullable=True)
     original_created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), nullable=False
     )
