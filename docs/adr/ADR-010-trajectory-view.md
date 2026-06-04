@@ -6,8 +6,10 @@ Accepted
 ## Validity Context
 
 **Standards Version:** 2026-05-22
-**Valid Until:** Milestone 11 — Engine Investigation and Political Economy
+**Valid Until:** Milestone 11.5 — Usability Validation and Experience Audit
 **License Status:** ACCEPTED — 2026-05-22
+
+**M11 exit review:** 2026-06-04 (SCAN-025). No renewal triggers fired during Milestone 11. No TrajectoryView component changes in M11. Matrix engine proof-of-concept runs alongside the iterative engine — no streaming trajectory update architecture introduced; shared Zustand atom state architecture unchanged. `_steps_projected` field is in the backend snapshot envelope, not in the trajectory API response. ADR-009 Decision 4 defers matrix production use to M12; the streaming trigger noted at M10 exit still does not apply. License renewed to Milestone 11.5. M11.5 usability audit may surface trajectory legibility findings — evaluate at M11.5 exit.
 
 **M10 exit review:** 2026-06-02 (SCAN-024). No renewal triggers fired during Milestone
 10. TrajectoryView was fully implemented in M10 per ADR-010 decisions — implementation

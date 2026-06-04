@@ -1,0 +1,19 @@
+flowchart TD
+    PR[PropagationRule\npropagation_mode field] --> LIN[LINEAR\ndefault · backward compatible]
+    PR --> THR[THRESHOLD\ntipping-point gate]
+    PR --> CAS[CASCADE\nself-reinforcing amplification]
+
+    LIN --> L1["delta × attenuation × weight\napplied unconditionally"]
+    THR --> T1{"|delta| ≥ threshold?"}
+    T1 -->|Yes| T2[Accumulate at target]
+    T1 -->|No| T3[Absorbed · no effect]
+    CAS --> C1["delta × (1/attenuation) × weight\namplified per hop"]
+    C1 --> C2{"|result| > ceiling × base?"}
+    C2 -->|Yes| C3[Clamp to ceiling × base]
+    C2 -->|No| C4[Accumulate amplified delta]
+
+    subgraph Selection
+        LIN --- EX1[Trade · IMF conditionality]
+        THR --- EX2[Social legitimacy\nTrade bloc contagion]
+        CAS --- EX3[Banking contagion\nCurrency peg collapse\nDebt spiral]
+    end

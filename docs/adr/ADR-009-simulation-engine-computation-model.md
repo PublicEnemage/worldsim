@@ -17,6 +17,8 @@ Accepted
 **Valid Until:** Milestone 12 — Active Control and External Sector
 **License Status:** CURRENT — Accepted 2026-06-03
 
+**Diagram:** `docs/architecture/ADR-009-engine-computation-model.mmd` (added M11 exit, SCAN-025).
+
 **Panel review:** 2026-06-03 — `docs/adr/reviews/ADR-009-panel-review.md`
 Panel: Chief Engineer (C — performance and transition strategy), Chief Methodologist
 (C — precision boundary and equivalence testing), Engineering Lead (A — accepted

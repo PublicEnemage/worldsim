@@ -6,8 +6,10 @@ Accepted
 ## Validity Context
 
 **Standards Version:** 2026-04-15 (date standards documents were established)
-**Valid Until:** Milestone 11 — Engine Investigation and Political Economy
+**Valid Until:** Milestone 11.5 — Usability Validation and Experience Audit
 **License Status:** CURRENT
+
+**M11 exit review:** 2026-06-04 (SCAN-025). No renewal triggers fired during Milestone 11. `elite_capture_divergence` events are emitted into `MeasurementFramework.HUMAN_DEVELOPMENT` — an existing framework; no taxonomy modification. `programme_survival_probability` is a `MeasurementFramework.GOVERNANCE` stock — existing framework. No changes to `CohortSpec` segmentation axes, `MDASeverity` enum, or MDA threshold table schema. New MDA threshold (DEBT-FOREIGN-CURRENCY-ROLLOVER) uses existing row format. License renewed to Milestone 11.5.
 
 **Amendment 5 applied:** 2026-06-02 — M10 GovernanceModule Promotion Confirmed.
 GovernanceModule promoted in M10: all five Decision M8-4 criteria met. `"governance"`

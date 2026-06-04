@@ -6,10 +6,12 @@ Accepted
 ## Validity Context
 
 **Standards Version:** 2026-04-15 (date standards documents were established)
-**Valid Until:** Milestone 11 — Engine Investigation and Political Economy
+**Valid Until:** Milestone 11.5 — Usability Validation and Experience Audit
 **License Status:** CURRENT
 
-**Last Reviewed:** 2026-06-02 — M10 exit review (SCAN-024). No renewal triggers fired
+**Last Reviewed:** 2026-06-04 — M11 exit review (SCAN-025). No renewal triggers fired during Milestone 11. PoliticalEconomyModule uses existing `MeasurementFramework.GOVERNANCE` and `HUMAN_DEVELOPMENT` enum values; `legitimacy_index` and `elite_capture_coefficient` are standard Quantity attributes on `SimulationEntity.attributes`. `_steps_projected` field added to state_data envelope (snapshot JSONB — application layer, not Quantity type). Matrix engine uses identical Quantity types and Event contracts — equivalence harness confirms 1e-10 agreement. `InputSource.CONDITIONALITY` and `CompoundStateCondition` extend the orchestration layer (ADR-002 territory), not the core data model. No `MeasurementFramework` taxonomy modifications, no `DATA_STANDARDS.md` unit standard changes affecting attribute store design. License renewed to Milestone 11.5.
+
+**Previously reviewed:** 2026-06-02 — M10 exit review (SCAN-024). No renewal triggers fired
 during Milestone 10. GovernanceModule promotion (`"governance"` removed from
 `_UNIMPLEMENTED_FRAMEWORKS`) is within the existing `MeasurementFramework` taxonomy
 (GOVERNANCE enum value existed since M6) and uses the existing Quantity-delta Event

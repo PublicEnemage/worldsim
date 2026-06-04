@@ -1,0 +1,16 @@
+flowchart TD
+    SC[Scenario Config] --> IT[Iterative Engine\nper-entity loop]
+    SC --> MX[Matrix Engine\nmatrix multiply]
+
+    IT -->|Events list| EH[Equivalence Harness\n14 tests · 1e-10 tolerance]
+    MX -->|Events list| EH
+
+    EH -->|PASS: outputs agree| AB[A/B Benchmark\nbenchmark_phase2.py]
+    EH -->|FAIL: semantic divergence| DOC[Documented Divergence\nCASCADE ceiling · THRESHOLD gate]
+
+    AB --> DEC{Decision Gate\nADR-009 §Decision 4}
+    DEC -->|Matrix faster\nand trustworthy| PROD[Matrix engine\nto production\nM12 scope]
+    DEC -->|No clear win| KEEP[Iterative engine\nremains default]
+
+    IT --> IT2[Interpretability\ntrace_propagation\nvisualize_weight_matrix]
+    MX --> IT2
