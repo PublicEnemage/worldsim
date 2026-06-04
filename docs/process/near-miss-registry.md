@@ -1829,6 +1829,39 @@ gate existed to detect the mismatch.
 
 ---
 
+## NM-033 — Usability Session Coordinator Broke Observer-Silence Rule During Cold-Start Session (Reactive)
+
+**Date:** 2026-06-04
+**Milestone:** M11.5 — Usability Validation
+**Detected by:** Coordinator self-audit (field notes review after session 003)
+**Severity:** Low
+
+### What happened
+
+During session 003 (2026-06-04-persona-2-003), the coordinator (Claude Code main session) broke the observer-silence rule mandated by the pillar-2-methodology.md §4. In turn 4 of the coordinator loop, the coordinator told the subagent: "The scenario IS loaded (you can trust this — the URL included the scenario parameter)" and "The red alert IS a threshold-crossing warning, not a data error."
+
+The methodology requires: "If the agent asks the coordinator a direct question, the coordinator responds with exactly: 'I can't help with that — navigate as you would if you were alone.'" The coordinator instead provided interpretive confirmation of two things the agent was still uncertain about.
+
+### What was at risk
+
+The coordinator's statements could have biased the agent's subsequent navigation — for example, stopping it from expressing the "is the scenario loaded?" confusion as a genuine usability finding, or confirming an interpretation (alert = threshold crossing) before the agent had independently resolved it. In both cases, the agent HAD already resolved these points through its own reading, so the practical impact was low.
+
+If the statements had preceded the agent's independent resolution, they would have suppressed genuine confusion markers that are evidence of usability failures.
+
+### What caught it
+
+Coordinator self-audit during field notes writing. The methodology's observer-silence rule was explicit, but no automated enforcement mechanism exists. The coordinator caught the deviation only in retrospect.
+
+### Process improvement
+
+1. **Add a "coordinator communication gate" to the session facilitation checklist** in `docs/ux/usability-sessions/how-to-run-a-session.md`: before any coordinator prompt beyond "I can't help with that," the coordinator must ask: "Is this agent-visible WorldSim context (forbidden) or operational mechanics (allowed)?" Interpretive confirmation of what the UI shows is agent-visible context — forbidden.
+
+2. **Clarify the boundary in pillar-2-methodology.md §4:** the current text permits coordinator communication of "operational mechanics" (how to use the action protocol) but does not explicitly prohibit interpretive confirmation of UI content. Add: "The coordinator must not confirm or deny the agent's interpretation of what the UI displays, even if the agent's interpretation is wrong. Incorrect interpretations are findings data."
+
+3. **Session 003 validity is unaffected** — the deviations occurred after the agent had already formed the relevant conclusions independently, and the field notes document this explicitly.
+
+---
+
 ## Registry Maintenance
 
 ### How to add an entry
