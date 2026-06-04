@@ -43,7 +43,11 @@ IA1_CANONICAL_PHRASE: str = (
     "MAGNITUDE_WITHIN_20PCT validation exists for at least two independent "
     "historical cases. All outputs should be interpreted as structured reasoning "
     "tools, not predictions. Verify against current data before consequential "
-    "use."
+    "use. "
+    "Horizon degradation schedule: confidence_tier degrades by +1 for every "
+    "5 projection steps beyond the baseline, capped at Tier 5. The "
+    "_steps_projected field in each snapshot state_data envelope records the "
+    "projection distance used when computing effective_tier at the output layer."
 )
 
 
@@ -75,9 +79,11 @@ _ENVELOPE_VERSION = "1"
 # ---------------------------------------------------------------------------
 
 # "2" adds _modules_active list to the top-level state_data envelope.
+# "3" adds _steps_projected int to record projection horizon at write time
+#     (Issue #151 — horizon degradation; resolves ADR-001 Amendment 1 IA-1).
 # Increment when M4+ modules add structural fields that change snapshot
 # interpretation. See ARCH-REVIEW-003 BI3-I-02 and Issue #145.
-STATE_DATA_ENVELOPE_VERSION = "2"
+STATE_DATA_ENVELOPE_VERSION = "3"
 
 
 def quantity_to_jsonb_envelope(q: Quantity) -> dict[str, Any]:

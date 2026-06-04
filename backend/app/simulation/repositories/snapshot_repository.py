@@ -66,7 +66,9 @@ class ScenarioSnapshotRepository:
         Args:
             conn: asyncpg connection. Not closed by this method.
             scenario_id: FK to scenarios.scenario_id.
-            step: Step index (0 = initial state).
+            step: Step index (0 = initial state). Used as steps_projected in
+                the state_data envelope — the output layer reads this to apply
+                effective_tier horizon degradation (Issue #151, ADR-001 IA-1).
             timestep: Simulation time for this step.
             state: Full SimulationState at this step.
             modules_active: Names of domain modules that contributed to this
@@ -77,7 +79,7 @@ class ScenarioSnapshotRepository:
         """
         disclosure = IA1_CANONICAL_PHRASE
         validate_ia1_disclosure(disclosure)
-        state_data = _serialize_state(state, modules_active or [])
+        state_data = _serialize_state(state, modules_active or [], steps_projected=step)
         events_json = json.dumps(events_snapshot) if events_snapshot is not None else None
 
         await conn.execute(
@@ -105,12 +107,16 @@ class ScenarioSnapshotRepository:
 def _serialize_state(
     state: SimulationState,
     modules_active: list[str],
+    steps_projected: int = 0,
 ) -> dict[str, object]:
-    """Serialize a SimulationState to the v2 state_data JSONB envelope format.
+    """Serialize a SimulationState to the v3 state_data JSONB envelope format.
 
     Top-level keys:
-      _envelope_version — STATE_DATA_ENVELOPE_VERSION ("2")
+      _envelope_version — STATE_DATA_ENVELOPE_VERSION ("3")
       _modules_active   — list of domain module names that contributed
+      _steps_projected  — projection horizon in steps (= step index); used by
+                          the output layer to apply effective_tier horizon
+                          degradation (Issue #151, ADR-001 Amendment 1 IA-1)
       <entity_id>       — dict[attr_key → SA-09 Quantity envelope]
 
     Metadata keys use underscore prefix to distinguish them from entity IDs.
@@ -120,6 +126,7 @@ def _serialize_state(
     data: dict[str, object] = {
         "_envelope_version": STATE_DATA_ENVELOPE_VERSION,
         "_modules_active": modules_active,
+        "_steps_projected": steps_projected,
     }
     for entity_id, entity in state.entities.items():
         data[entity_id] = {

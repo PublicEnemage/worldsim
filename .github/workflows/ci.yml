@@ -142,6 +142,15 @@ jobs:
           cd backend
           pytest -m backtesting --tb=short -v
 
+      - name: Upload fidelity report artifacts (Issue #154)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: fidelity-reports-${{ github.run_id }}
+          path: backend/tests/backtesting/reports/
+          retention-days: 90
+          if-no-files-found: ignore
+
   # ---------------------------------------------------------------------------
   # Playwright E2E job — M4 retrospective hard gate (Issue #190)
   #
