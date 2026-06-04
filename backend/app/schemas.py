@@ -368,6 +368,25 @@ class ScenarioCreateRequest(BaseModel):
     scheduled_inputs: list[ScheduledInputSchema] = []
 
 
+class ScenarioRestoreRequest(BaseModel):
+    """Request body for POST /scenarios/restore (Issue #155)."""
+
+    model_config = ConfigDict(from_attributes=True)
+
+    tombstone_id: str
+
+
+class ScenarioRestoreResponse(BaseModel):
+    """Response from POST /scenarios/restore."""
+
+    model_config = ConfigDict(from_attributes=True)
+
+    scenario_id: str
+    name: str
+    status: str
+    restored_from_tombstone_id: str
+
+
 class ScenarioResponse(BaseModel):
     """Scenario summary — list and create responses."""
 

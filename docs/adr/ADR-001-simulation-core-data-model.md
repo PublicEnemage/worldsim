@@ -302,9 +302,13 @@ mixed-type (ARCH-4 disposition from SCR-001, approved by Engineering Lead).
 
 ### Known Limitations at Amendment Time
 
-**IA-1:** Confidence tier does not degrade with projection horizon. A 30-year
-forward projection retains the tier of its historical input. Time-horizon
-degradation is Milestone 3 scope.
+**IA-1 — RESOLVED (M11, Issue #151):** Confidence tier horizon degradation is
+implemented at the output layer via `effective_tier(source_tier, horizon_steps)`
+in `app/api/scenarios.py` and recorded in each snapshot's `_steps_projected`
+envelope field. Schedule: +1 tier per 5 projection steps, capped at Tier 5.
+`IA1_CANONICAL_PHRASE` in `quantity_serde.py` documents the schedule verbatim.
+The `_steps_projected` key was added in state_data envelope version "3"
+(`STATE_DATA_ENVELOPE_VERSION`). Closed by Issue #151 (ARCH-REVIEW-003 BI3-N-01).
 
 **CM-1:** The lower-of-two rule overstates uncertainty when inputs are
 independent and mutually corroborating. This is accepted — overstatement

@@ -1,13 +1,18 @@
 """Fidelity report formatter for WorldSim backtesting runs.
 
-Produces a human-readable report for CI log output. The report is printed
-regardless of pass/fail so that fidelity data appears in every CI execution
-and can be tracked across milestones.
+Produces a human-readable report for CI log output and a JSON artifact for
+cross-run fidelity tracking. The report is printed regardless of pass/fail so
+that fidelity data appears in every CI execution and can be tracked across
+milestones.
 """
 from __future__ import annotations
 
+import json
+import os
+import subprocess
 from datetime import datetime, timezone
 from decimal import Decimal
+from pathlib import Path
 from typing import Any
 
 
@@ -126,6 +131,85 @@ def format_fidelity_report(
     ]
 
     return "\n".join(lines)
+
+
+def _resolve_commit_sha() -> str:
+    """Return the current git commit SHA-1, or 'unknown' if unavailable."""
+    try:
+        result = subprocess.check_output(  # noqa: S603
+            ["git", "rev-parse", "HEAD"],  # noqa: S607
+            stderr=subprocess.DEVNULL,
+            timeout=3,
+        )
+        return result.decode().strip()
+    except Exception:  # noqa: BLE001
+        return os.environ.get("GITHUB_SHA", "unknown")
+
+
+def write_fidelity_artifact(
+    case_id: str,
+    thresholds_met: dict[str, bool],
+    engine_version: str = "0.3.0",
+    deferred_thresholds: dict[str, str] | None = None,
+    extra_results: list[dict[str, Any]] | None = None,
+) -> Path:
+    """Write a JSON fidelity artifact for cross-run tracking (Issue #154).
+
+    Artifact format:
+      case_id       — backtesting case identifier (e.g. 'greece_2010_2012')
+      run_date      — ISO-8601 date of this CI run
+      commit_sha    — full git SHA-1 of HEAD
+      engine_version — semantic version string from _ENGINE_VERSION
+      thresholds    — list of threshold IDs checked
+      results       — list of {threshold_id, passed, note} records
+      overall       — "PASS" or "FAIL"
+
+    Written to tests/backtesting/reports/{case_id}-{date}-{sha8}.json.
+    The reports/ directory is created if it doesn't exist.
+
+    Args:
+        case_id: Short identifier for the backtesting case, used in filename
+            and artifact metadata (e.g. 'greece_2010_2012').
+        thresholds_met: Dict mapping threshold_name → bool.
+        engine_version: Semantic version of the simulation engine.
+        deferred_thresholds: Deferred (non-blocking) threshold names → status.
+        extra_results: Additional result dicts to include verbatim.
+
+    Returns:
+        Path of the written artifact file.
+    """
+    commit_sha = _resolve_commit_sha()
+    run_date = datetime.now(timezone.utc).strftime("%Y-%m-%d")  # noqa: UP017
+    sha8 = commit_sha[:8] if commit_sha != "unknown" else "unknown"
+    filename = f"{case_id}-{run_date}-{sha8}.json"
+
+    reports_dir = Path(__file__).parent / "reports"
+    reports_dir.mkdir(exist_ok=True)
+    artifact_path = reports_dir / filename
+
+    all_passed = all(thresholds_met.values())
+    results: list[dict[str, Any]] = [
+        {"threshold_id": name, "passed": passed, "note": None}
+        for name, passed in sorted(thresholds_met.items())
+    ]
+    if deferred_thresholds:
+        for name, status in sorted(deferred_thresholds.items()):
+            results.append({"threshold_id": name, "passed": None, "note": f"DEFERRED: {status}"})
+    if extra_results:
+        results.extend(extra_results)
+
+    artifact: dict[str, Any] = {
+        "case_id": case_id,
+        "run_date": run_date,
+        "commit_sha": commit_sha,
+        "engine_version": engine_version,
+        "thresholds": sorted(thresholds_met.keys()),
+        "results": results,
+        "overall": "PASS" if all_passed else "FAIL",
+    }
+
+    artifact_path.write_text(json.dumps(artifact, indent=2))
+    return artifact_path
 
 
 def _extract_gdp_value(

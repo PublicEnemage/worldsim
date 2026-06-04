@@ -55,6 +55,8 @@ from app.schemas import (
     ScenarioCreateRequest,
     ScenarioDetailResponse,
     ScenarioResponse,
+    ScenarioRestoreRequest,
+    ScenarioRestoreResponse,
     ScheduledInputSchema,
     SnapshotRecord,
     TrajectoryFrameworkPoint,
@@ -1102,6 +1104,106 @@ async def delete_scenario(
         )
 
     return Response(status_code=204)
+
+
+# ---------------------------------------------------------------------------
+# POST /scenarios/restore — Issue #155
+# ---------------------------------------------------------------------------
+
+
+@router.post("/scenarios/restore", response_model=ScenarioRestoreResponse, status_code=201)
+async def restore_scenario(
+    req: ScenarioRestoreRequest,
+    conn: Annotated[asyncpg.Connection, Depends(get_db)],
+) -> ScenarioRestoreResponse:
+    """Reconstruct a scenario from a deleted tombstone into the live scenarios table.
+
+    Creates a new scenario in 'pending' status using the tombstoned configuration
+    and scheduled_inputs. The restored scenario starts at step 0 — the caller
+    re-advances if desired. Does NOT require entity state (Issue #147 provides
+    that for full SA-11 restoration; this endpoint covers configuration restoration).
+
+    Returns 404 if tombstone_id not found.
+    Returns 409 if the engine version stored in the tombstone is incompatible
+        with the live engine and force_audit_override is not set.
+
+    Name conflict: if a scenario with the tombstone's original name already exists
+    in the scenarios table, the restored scenario is named '{name} (restored)'.
+    """
+    tombstone = await conn.fetchrow(
+        """
+        SELECT scenario_id, name, configuration, scheduled_inputs,
+               engine_version, git_commit_hash
+        FROM scenario_deleted_tombstones
+        WHERE scenario_id = $1
+        """,
+        req.tombstone_id,
+    )
+    if tombstone is None:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Tombstone '{req.tombstone_id}' not found.",
+        )
+
+    check_reconstruction_compatibility(
+        tombstone_engine_version=tombstone["engine_version"],
+        tombstone_git_commit_hash=tombstone["git_commit_hash"],
+    )
+
+    cfg_raw = tombstone["configuration"]
+    if isinstance(cfg_raw, str):
+        cfg_raw = json.loads(cfg_raw)
+
+    inputs_raw = tombstone["scheduled_inputs"]
+    if isinstance(inputs_raw, str):
+        inputs_raw = json.loads(inputs_raw)
+
+    # Resolve name — append "(restored)" suffix if the original name is taken.
+    original_name: str = tombstone["name"]
+    existing = await conn.fetchval(
+        "SELECT 1 FROM scenarios WHERE name = $1 LIMIT 1",
+        original_name,
+    )
+    restored_name = f"{original_name} (restored)" if existing else original_name
+
+    new_scenario_id = str(uuid.uuid4())
+
+    async with conn.transaction():
+        await conn.execute(
+            """
+            INSERT INTO scenarios
+                (scenario_id, name, description, status,
+                 configuration, version, engine_version_hash)
+            VALUES ($1, $2, NULL, 'pending', $3, 1, $4)
+            """,
+            new_scenario_id,
+            restored_name,
+            json.dumps(cfg_raw),
+            _GIT_COMMIT_HASH,
+        )
+
+        for inp in (inputs_raw if isinstance(inputs_raw, list) else []):
+            if not isinstance(inp, dict):
+                continue
+            await conn.execute(
+                """
+                INSERT INTO scenario_scheduled_inputs
+                    (id, scenario_id, step, input_type, input_data)
+                VALUES ($1, $2, $3, $4, $5)
+                """,
+                str(uuid.uuid4()),
+                new_scenario_id,
+                int(inp.get("step", 0)),
+                str(inp.get("input_type", "")),
+                json.dumps(inp.get("input_data", {})),
+            )
+
+    return ScenarioRestoreResponse(
+        scenario_id=new_scenario_id,
+        name=restored_name,
+        status="pending",
+        restored_from_tombstone_id=req.tombstone_id,
+    )
 
 
 # ---------------------------------------------------------------------------

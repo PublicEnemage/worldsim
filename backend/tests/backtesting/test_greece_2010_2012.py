@@ -33,6 +33,7 @@ from tests.backtesting.fidelity_report import (
     _extract_health_expenditure_value,
     _extract_unemployment_value,
     format_fidelity_report,
+    write_fidelity_artifact,
 )
 from tests.fixtures.greece_2010_2012_actuals import (
     ACTUALS,
@@ -225,6 +226,12 @@ async def test_greece_2010_2012_direction_only_fidelity(
             deferred_thresholds=deferred_thresholds,
         )
         print(f"\n{report}")
+        artifact_path = write_fidelity_artifact(
+            case_id="greece_2010_2015",
+            thresholds_met=thresholds_met,
+            deferred_thresholds=deferred_thresholds,
+        )
+        print(f"\nFidelity artifact written: {artifact_path}")
         print(f"\nECOLOGICAL: {ECOLOGICAL_COMPOSITE_DISCLOSURE}")
 
         # Assert all thresholds pass

@@ -472,8 +472,8 @@ def test_validate_ia1_disclosure_accepts_valid_text() -> None:
 
 
 @pytest.mark.asyncio
-async def test_snapshot_state_data_has_envelope_version_2() -> None:
-    """Issue #145: top-level state_data _envelope_version must be '2'."""
+async def test_snapshot_state_data_has_envelope_version_3() -> None:
+    """Issue #151: top-level state_data _envelope_version must be '3' (adds _steps_projected)."""
     conn = MagicMock()
     conn.execute = AsyncMock(return_value="INSERT 1")
 
@@ -483,9 +483,11 @@ async def test_snapshot_state_data_has_envelope_version_2() -> None:
     await repo.write_snapshot(conn, "s-1", 0, ts, state)
 
     parsed = json.loads(conn.execute.call_args.args[5])
-    assert parsed["_envelope_version"] == "2", (
-        f"Expected state_data _envelope_version '2', got {parsed.get('_envelope_version')!r}"
+    assert parsed["_envelope_version"] == "3", (
+        f"Expected state_data _envelope_version '3', got {parsed.get('_envelope_version')!r}"
     )
+    assert "_steps_projected" in parsed, "v3 envelope must include _steps_projected"
+    assert isinstance(parsed["_steps_projected"], int)
 
 
 @pytest.mark.asyncio

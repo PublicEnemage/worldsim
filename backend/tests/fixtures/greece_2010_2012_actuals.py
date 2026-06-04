@@ -60,7 +60,11 @@ IA1_DISCLOSURE: str = (
     "MAGNITUDE_WITHIN_20PCT validation exists for at least two independent "
     "historical cases. All outputs should be interpreted as structured reasoning "
     "tools, not predictions. Verify against current data before consequential "
-    "use."
+    "use. "
+    "Horizon degradation schedule: confidence_tier degrades by +1 for every "
+    "5 projection steps beyond the baseline, capped at Tier 5. The "
+    "_steps_projected field in each snapshot state_data envelope records the "
+    "projection distance used when computing effective_tier at the output layer."
 )
 
 PARAMETER_CALIBRATION_DISCLOSURE: str = (
