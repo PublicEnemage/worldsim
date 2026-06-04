@@ -9,7 +9,7 @@ This is a living document. It is updated whenever a new module is implemented
 or an existing module's capabilities change. The registry is dated so that
 readers can assess whether it reflects the current codebase.
 
-**Last updated:** 2026-06-04 (Amendment 8 — ADR-011 non-linear propagation)
+**Last updated:** 2026-06-04 (Amendment 9 — Political Economy Module: legitimacy dynamics, programme survival, elite capture)
 **Current milestone:** Milestone 11 — Engine Investigation and Political Economy
 
 ---
@@ -237,9 +237,6 @@ web-accessible scenario execution with snapshot storage and comparative output.
 - **Distributional comparison** — `DeltaRecord.delta` is a Decimal point
   estimate; no variance, percentile range, or confidence interval on deltas
 
-- **Political context in scenario configuration** — no legitimacy initial state,
-  electoral calendar, or coalition stability fields (Issue #156)
-
 ### Backtesting Infrastructure (ADR-004 Decision 3)
 
 Added in Milestone 3. Backtesting is a CI build gate — a failure in the
@@ -349,6 +346,51 @@ trade weights in response to policy changes.
 - Diplomatic channel quality
 - Information environment integrity
 - Escalation and de-escalation dynamics
+
+### Political Economy Module (Implemented — Milestone 11)
+
+Opt-in via `modules_config: {"political_economy": {"enabled": true}}`.
+Implements three foundational political economy capabilities.
+Formula-based approximations calibrated against Greece, Argentina, Ecuador
+programme failure cases. Full statistical calibration deferred to Issue #44.
+
+**Can model:**
+- **Legitimacy dynamics** (Issue #156, #159): fiscal spending cuts and tax
+  increases erode `legitimacy_index` proportional to their magnitude and to
+  current fragility (fragility amplifier ×1.5 when legitimacy < 0.5, from
+  Przeworski et al. 2000). Emergency policy events (capital controls, bank
+  holidays, emergency declarations) cause immediate shocks. Emits
+  `legitimacy_change` events consumed by downstream modules.
+- **Programme survival probability** (Issue #273): annual probability that
+  the current policy programme survives long enough for stabilisation
+  benefits to materialise. Formula: `base_survival × (1 + sensitivity ×
+  (legitimacy - 0.5))`, clamped to [0.01, 0.99]. DIRECTION_ONLY — not
+  magnitude. Full calibration pending Issue #44.
+- **Elite capture divergence** (Issue #679): fiscal_delta × elite capture
+  coefficient = divergence between elite and non-elite cohort outcomes.
+  Emitted as `elite_capture_divergence` (HUMAN_DEVELOPMENT framework) for
+  the Human Cost Ledger. Default coefficient 0.30 (Argentina 2001–2002
+  distributional analysis, Lustig 2001); overridable per entity.
+- **Political context seeding** (Issue #156): `political_context` in
+  `ScenarioConfigSchema` seeds `legitimacy_index`, `government_approval_rating`,
+  `coalition_seat_margin`, `months_to_next_election`, and
+  `civil_society_organization_strength` as scenario-level initial state.
+- **Political feasibility modifier** (Issue #156): `legitimacy_index` scales
+  `ControlInput.implementation_capacity` for scenario inputs (formula:
+  `0.5 + 0.5 × legitimacy`, floor 0.5). A government at 0.6 legitimacy
+  implements ~80% of intended fiscal adjustment.
+- **Conditionality decomposer** (Issue #272): `decompose_conditionality()`
+  attributes per-term fiscal costs by `constraining_actor_id` (IMF, ECB)
+  and `constraint_mechanism` across CONDITIONALITY-sourced inputs.
+
+**Cannot currently model:**
+- Electoral cycle effects on implementation timing (months_to_next_election
+  is seeded but not yet wired to a dynamics model)
+- Coalition fragility from seat margin (stored, not yet modelled)
+- Civil society mobilisation as a legitimacy recovery mechanism
+- Quantitative statistical calibration of legitimacy erosion elasticity
+  (Issue #44 — formula-based approximation only)
+- Distributional breakdown below national aggregate (sub-cohort elite capture)
 
 ### Ecological Module (Implemented — Initial, Milestone 6)
 

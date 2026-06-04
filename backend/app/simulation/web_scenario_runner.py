@@ -29,13 +29,14 @@ from typing import TYPE_CHECKING, Any
 
 import asyncpg  # noqa: TCH002 — used in method signatures at runtime
 
-from app.schemas import MDAThresholdRecord, ScenarioConfigSchema
+from app.schemas import MDAThresholdRecord, QuantitySchema, ScenarioConfigSchema
 from app.simulation.mda_checker import MDAChecker, alerts_to_events_snapshot
 from app.simulation.modules.demographic.cohort import generate_cohort_specs
 from app.simulation.modules.demographic.module import DemographicModule
 from app.simulation.modules.ecological.module import EcologicalModule
 from app.simulation.modules.governance.module import GovernanceModule
 from app.simulation.modules.macroeconomic.module import MacroeconomicModule
+from app.simulation.modules.political_economy.module import PoliticalEconomyModule
 from app.simulation.orchestration.inputs import (
     EmergencyInstrument,
     EmergencyPolicyInput,
@@ -238,6 +239,19 @@ class WebScenarioRunner:
         # both for prior-step event restoration and for the next-step advance.
         inputs_by_step = await _load_scheduled_inputs(conn, scenario_id, config.entities)
 
+        # Scale implementation_capacity by political feasibility when legitimacy_index is set.
+        feasibility = _political_feasibility_modifier(config)
+        if feasibility < Decimal("1.0"):
+            inputs_by_step = {
+                step: [
+                    replace(inp, implementation_capacity=min(
+                        inp.implementation_capacity, feasibility
+                    ))
+                    for inp in inps
+                ]
+                for step, inps in inputs_by_step.items()
+            }
+
         if current_step < 0:
             # No snapshots — initialise step 0 then advance to step 1
             base_timestep = _base_timestep(config)
@@ -247,6 +261,7 @@ class WebScenarioRunner:
             )
             _apply_initial_overrides(current_state, config)
             _inject_cohort_entities(current_state, config)
+            _apply_political_context(current_state, config)
             await snap_repo.write_snapshot(conn, scenario_id, 0, base_timestep, current_state)
             current_step = 0
 
@@ -377,8 +392,24 @@ class WebScenarioRunner:
         # Inject cohort entities if demographic resolution is configured.
         _inject_cohort_entities(initial_state, config)
 
+        # Seed political context attributes (legitimacy_index) onto country entities.
+        _apply_political_context(initial_state, config)
+
         # Load scheduled inputs grouped by step
         inputs_by_step = await _load_scheduled_inputs(conn, scenario_id, config.entities)
+
+        # Scale implementation_capacity by political feasibility when legitimacy_index is set.
+        feasibility = _political_feasibility_modifier(config)
+        if feasibility < Decimal("1.0"):
+            inputs_by_step = {
+                step: [
+                    replace(inp, implementation_capacity=min(
+                        inp.implementation_capacity, feasibility
+                    ))
+                    for inp in inps
+                ]
+                for step, inps in inputs_by_step.items()
+            }
 
         # Load MDA thresholds once for the full run.
         thresholds = await _load_mda_thresholds(conn)
@@ -493,6 +524,9 @@ def _build_active_modules(config: ScenarioConfigSchema) -> list[SimulationModule
     eco = _build_ecological_module(config)
     if eco is not None:
         modules.append(eco)
+    pe = _build_political_economy_module(config)
+    if pe is not None:
+        modules.append(pe)
     return modules
 
 
@@ -520,6 +554,70 @@ def _build_ecological_module(config: ScenarioConfigSchema) -> EcologicalModule |
     if not eco_cfg.get("enabled"):
         return None
     return EcologicalModule()
+
+
+def _build_political_economy_module(
+    config: ScenarioConfigSchema,
+) -> PoliticalEconomyModule | None:
+    """Return a PoliticalEconomyModule if political economy resolution is active."""
+    pe_cfg: dict[str, Any] = config.modules_config.get("political_economy", {})
+    if not pe_cfg.get("enabled"):
+        return None
+    return PoliticalEconomyModule()
+
+
+def _apply_political_context(
+    state: SimulationState,
+    config: ScenarioConfigSchema,
+) -> None:
+    """Seed political context attributes onto country entities.
+
+    When political_context.legitimacy_index is set, seeds it as the entity's
+    legitimacy_index attribute if not already provided via initial_attributes.
+    This makes the value available to PoliticalEconomyModule on step 1 without
+    requiring explicit per-entity attribute listing in the scenario config.
+    """
+    pc = config.political_context
+    if pc is None or pc.legitimacy_index is None:
+        return
+
+    legitimacy_qty = quantity_from_schema(
+        QuantitySchema(
+            value=str(pc.legitimacy_index),
+            unit="ratio_0_1",
+            variable_type="stock",
+            confidence_tier=3,
+            measurement_framework="governance",
+        )
+    )
+
+    for entity in state.entities.values():
+        if entity.entity_type != "country":
+            continue
+        if entity.get_attribute("legitimacy_index") is None:
+            entity.set_attribute("legitimacy_index", legitimacy_qty)
+
+
+def _political_feasibility_modifier(config: ScenarioConfigSchema) -> Decimal:
+    """Compute the political feasibility scaling factor from legitimacy_index.
+
+    When political_context.legitimacy_index is set, returns a modifier that
+    scales ControlInput.implementation_capacity down proportionally to reflect
+    that a government with lower legitimacy implements less of its intended
+    fiscal policy than one with full political authority.
+
+    Formula: 0.5 + 0.5 × legitimacy — ranges from 0.5 at legitimacy=0 to
+    1.0 at legitimacy=1.0. The 0.5 floor reflects that even a government
+    with zero legitimacy partially executes fiscal measures under external
+    creditor pressure (Greece 2010–2012 precedent).
+
+    Returns 1.0 when no political_context or legitimacy_index is configured
+    — no change to existing behaviour.
+    """
+    pc = config.political_context
+    if pc is None or pc.legitimacy_index is None:
+        return Decimal("1.0")
+    return Decimal("0.5") + Decimal("0.5") * pc.legitimacy_index
 
 
 async def _load_scheduled_inputs(
