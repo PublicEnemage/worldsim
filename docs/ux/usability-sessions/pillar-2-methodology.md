@@ -1,11 +1,13 @@
 # Pillar 2 — Cold-Start Usability Audit Methodology
-# M11.5 Usability Validation and Experience Audit
-#
-# Authors: UX Design Thinking Agent (§2–4), Product Owner Agent (§5–6),
-#          UX Designer Agent (§7–8), PM Agent (§1, §9)
-# Status: PROPOSED — awaiting joint approval (see §9)
-# Issue: #718
-# Version: 1.0 (2026-06-04)
+
+**Milestone 11.5 — Usability Validation and Experience Audit**
+
+| | |
+|---|---|
+| Authors | UX Design Thinking Agent (§2–4), Product Owner Agent (§5–6), UX Designer Agent (§7–8), PM Agent (§1, §9) |
+| Status | PROPOSED — awaiting joint approval (see §9) |
+| Issue | #718 |
+| Version | 1.0 (2026-06-04) |
 
 ---
 
