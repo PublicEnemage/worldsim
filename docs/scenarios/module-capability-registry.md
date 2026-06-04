@@ -9,8 +9,8 @@ This is a living document. It is updated whenever a new module is implemented
 or an existing module's capabilities change. The registry is dated so that
 readers can assess whether it reflects the current codebase.
 
-**Last updated:** 2026-05-10 (Amendment 7 — M7 exit)
-**Current milestone:** Milestone 7 — Technical Foundation (M6 complete)
+**Last updated:** 2026-06-04 (Amendment 8 — ADR-011 non-linear propagation)
+**Current milestone:** Milestone 11 — Engine Investigation and Political Economy
 
 ---
 
@@ -81,29 +81,37 @@ of entities.
 - Relationship attributes beyond weight (e.g. tariff rate, debt maturity profile)
 - Relationship-level metadata (data source, vintage date)
 
-### Event Propagation (ADR-001, Amendment 1)
+### Event Propagation (ADR-001, Amendment 1; ADR-011)
 
 The simulation can propagate typed `Quantity` attribute deltas through the
 relationship graph (SCR-001). All event deltas are `Quantity` instances carrying
 `variable_type`, `confidence_tier`, and optional provenance fields.
 
 **Can model:**
-- Hop-by-hop attenuation: `delta.value × attenuation_factor × edge.weight` per hop
+- Hop-by-hop attenuation: `delta × attenuation_factor × weight` per hop (LINEAR mode)
 - Compound attenuation across multiple hops
 - Additive accumulation from multiple propagation paths to the same entity
   (FLOW, RATIO, DIMENSIONLESS variable types)
 - STOCK delta semantics: STOCK deltas replace the existing value (no accumulation)
 - Multiple propagation rules per event (different relationship types, different
-  attenuation factors)
+  attenuation factors, different propagation modes)
 - Events that propagate along specific relationship types only
 - Max_hops limiting propagation depth
 - Confidence tier propagation: lower-of-two rule (max tier) through accumulation
+- **THRESHOLD propagation** (ADR-011, Issue #29): tipping-point dynamics — delta is
+  only applied to a target entity if its |magnitude| meets or exceeds a configurable
+  threshold. Models legitimacy collapse, reserve adequacy tipping points.
+- **CASCADE propagation** (ADR-011, Issue #29): self-reinforcing amplification — delta
+  amplifies by `(1/attenuation_factor) × weight` per hop (inverse of LINEAR), capped
+  at `ceiling × |base delta|` per attribute. Models bank-run contagion, currency-peg
+  collapse, and debt spiral dynamics. Default `ceiling=1.0` requires explicit opt-in.
 
 **Cannot currently model:**
-- Non-linear propagation (threshold effects, saturation)
 - Asymmetric propagation (different behaviour in different directions)
 - Relationship weight updating based on event history
 - Feedback loops within a single timestep (propagation is one-pass)
+- Multi-entity CASCADE calibrated parameters (Lebanon, Thailand multi-entity graphs
+  are M12 deliverables — see `docs/backtesting/cascade-validation-report.md §5`)
 
 ### Input Orchestration (ADR-002)
 
