@@ -478,11 +478,19 @@ threshold effects are not yet modelled.
 - Policy optimisation — endogenous response is partial; social and political
   feedback absent
 - Crisis threshold predictions — no threshold dynamics within current engine
-- Subnational or community-level impacts — Level 1 nation-state resolution
-  only; country averages conceal regional and community differentiation
-  (ARCH-REVIEW-003 BI3-N-08)
-- Intergenerational effects (annual timesteps; long-horizon consequences
-  outside modelled window)
+- **Subnational or community-level impacts** — Level 1 nation-state resolution
+  only; country averages conceal regional and community differentiation.
+  All scenario API outputs carry a `resolution_disclaimer` field stating this
+  limitation explicitly (Issue #100, #158 / ARCH-REVIEW-002 BI2-N-09,
+  ARCH-REVIEW-003 BI3-N-08). Rural clinic closures, island emigration,
+  regional unemployment differentials — these dynamics are structurally
+  invisible at Level 1 and cannot be inferred from national aggregates.
+- **Intergenerational and long-horizon effects** — annual-timestep scenarios
+  model N steps from a start date; consequences compounding over 20–30 years
+  (education truncation, working-age emigration, pension restructuring) are
+  outside the modeled window. All scenario detail responses carry a
+  `temporal_scope_note` field stating the modeled window explicitly (Issue #98
+  / ARCH-REVIEW-002 BI2-N-07).
 - Risk-adjusted scenario comparison (no variance or distributional output;
   `DeltaRecord.delta` is a point estimate only)
 - Full ecological or governance composite scores — both modules are initial

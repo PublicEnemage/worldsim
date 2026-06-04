@@ -325,6 +325,7 @@ endpoints:
             step: {type: integer}
             input_type: {type: string}
             input_data: {type: object}
+        temporal_scope_note: {type: string, description: "Generated from n_steps + timestep_label + start_date. States the modeled window and notes that intergenerational / long-horizon consequences are outside it. Issue #98 / ARCH-REVIEW-002 BI2-N-07."}
       status_404: "Scenario not found"
     db_reads: [scenarios, scenario_scheduled_inputs]
 
@@ -379,6 +380,8 @@ endpoints:
         steps_remaining: {type: integer}
         final_status: {type: string, values: ["running", "completed"]}
         is_complete: {type: boolean}
+        resolution_level: {type: integer, description: "Always 1 for current scenarios — nation-state Level 1 resolution. Issue #158 / ARCH-REVIEW-002 BI2-N-09."}
+        resolution_disclaimer: {type: string, description: "Static disclaimer: subnational/community impacts not representable at Level 1 resolution. Issue #158."}
       status_404: "Scenario not found"
       status_409: "Scenario is already completed"
     db_reads: [scenarios, scenario_state_snapshots, simulation_entities, mda_thresholds]
@@ -407,6 +410,7 @@ endpoints:
               Full state_data JSONB. Top-level keys: entity_id strings +
               _envelope_version + _modules_active. See database.yml state_data.
           modules_active: {type: "string[]"}
+          resolution_disclaimer: {type: string, description: "Static Level 1 resolution disclaimer. Issue #100 / ARCH-REVIEW-002 BI2-N-09."}
       status_404: "Scenario not found"
     db_reads: [scenarios, scenario_state_snapshots]
 

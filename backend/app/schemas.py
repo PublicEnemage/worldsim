@@ -15,6 +15,36 @@ from typing import Any
 from pydantic import BaseModel, ConfigDict, field_serializer, field_validator
 
 # ---------------------------------------------------------------------------
+# Output disclaimer constants — Issue #98, #100, #158
+# ---------------------------------------------------------------------------
+
+# Level 1 resolution disclaimer: static for all current scenarios.
+# Subnational / community impacts are structurally invisible at nation-state
+# aggregation. ARCH-REVIEW-002 BI2-N-09, ARCH-REVIEW-003 BI3-N-08.
+RESOLUTION_DISCLAIMER_L1: str = (
+    "Outputs represent national-level aggregates (Level 1 resolution). "
+    "Subnational, community, and regional impacts are not representable "
+    "at this resolution. Differential impact across regions, income cohorts, "
+    "or demographic groups requires Level 2–4 resolution, which is not "
+    "available in this scenario. "
+    "See docs/scenarios/module-capability-registry.md for interpretation guidance."
+)
+
+RESOLUTION_LEVEL_CURRENT: int = 1
+
+
+def build_temporal_scope_note(n_steps: int, timestep_label: str, start_date: object) -> str:
+    """Generate temporal scope note from scenario config. Issue #98."""
+    start_str = str(start_date) if start_date is not None else "the configured start date"
+    return (
+        f"This scenario models {n_steps} {timestep_label} timestep(s) from {start_str}. "
+        "Consequences that compound over longer time horizons — including intergenerational "
+        "capability losses, long-run debt sustainability, and ecological system responses — "
+        "are outside the modeled window and are not represented in this output."
+    )
+
+
+# ---------------------------------------------------------------------------
 # Trajectory endpoint schemas — Issue #458
 # ---------------------------------------------------------------------------
 
@@ -315,7 +345,12 @@ class ScenarioResponse(BaseModel):
 
 
 class ScenarioDetailResponse(BaseModel):
-    """Full scenario record including configuration and scheduled inputs."""
+    """Full scenario record including configuration and scheduled inputs.
+
+    `temporal_scope_note` is generated from scenario configuration and surfaces
+    the intergenerational / long-horizon limitation per ARCH-REVIEW-002 BI2-N-07
+    (Issue #98). Computed at response time — not stored in the database.
+    """
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -327,6 +362,7 @@ class ScenarioDetailResponse(BaseModel):
     created_at: str
     configuration: ScenarioConfigSchema
     scheduled_inputs: list[ScheduledInputSchema]
+    temporal_scope_note: str
 
 
 class RunSummaryResponse(BaseModel):
@@ -346,6 +382,9 @@ class SnapshotRecord(BaseModel):
     `modules_active` lists the domain modules that contributed to this snapshot.
     Empty list for all M3 snapshots (no domain modules implemented). Populated
     in M4+ from the `_modules_active` key in state_data. See Issue #145, #146.
+
+    `resolution_disclaimer` surfaces the Level 1 resolution limitation per
+    ARCH-REVIEW-002 BI2-N-09 (Issue #100, #158). Static for all current scenarios.
     """
 
     model_config = ConfigDict(from_attributes=True)
@@ -355,10 +394,16 @@ class SnapshotRecord(BaseModel):
     timestep: str
     state_data: dict[str, Any]
     modules_active: list[str] = []
+    resolution_disclaimer: str = RESOLUTION_DISCLAIMER_L1
 
 
 class AdvanceResponse(BaseModel):
-    """Response from POST /scenarios/{id}/advance — ADR-004 Decision 4."""
+    """Response from POST /scenarios/{id}/advance — ADR-004 Decision 4.
+
+    `resolution_level` and `resolution_disclaimer` surface the Level 1
+    resolution limitation per ARCH-REVIEW-002 BI2-N-09 and ARCH-REVIEW-003
+    BI3-N-08 (Issue #158). Static for all current scenarios.
+    """
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -367,6 +412,8 @@ class AdvanceResponse(BaseModel):
     steps_remaining: int
     final_status: str
     is_complete: bool
+    resolution_level: int = RESOLUTION_LEVEL_CURRENT
+    resolution_disclaimer: str = RESOLUTION_DISCLAIMER_L1
 
 
 # ---------------------------------------------------------------------------
