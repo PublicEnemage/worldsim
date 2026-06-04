@@ -199,17 +199,23 @@ class ScenarioRunner(InputOrchestrator):
         Advances n_steps times from the initial state. At each step, fires
         scheduled inputs, evaluates contingents, runs modules, and propagates.
 
+        Multi-period inputs (duration_periods > 1) are expanded here: an input
+        scheduled at step S with duration_periods=3 produces continuation entries
+        at steps S+1 and S+2. The magnitude at each continuation step is scaled
+        by the input's decay_function (Issue #31).
+
         Returns:
             List of SimulationStates of length n_steps + 1. Index 0 is the
             initial state. Index i is the state after i steps have been taken.
         """
+        expanded = _expand_multi_period_inputs(self._scheduled_inputs, self._n_steps)
         history: list[SimulationState] = [self._initial_state]
         current_state = self._initial_state
 
         for step_index in range(1, self._n_steps + 1):
             step_inputs = [
                 inp
-                for (idx, inp) in self._scheduled_inputs
+                for (idx, inp) in expanded
                 if idx == step_index
             ]
             current_state = self.advance_timestep(
@@ -376,6 +382,75 @@ class ScenarioRunner(InputOrchestrator):
 # ---------------------------------------------------------------------------
 # Private helpers
 # ---------------------------------------------------------------------------
+
+
+def _period_scale(decay_function: str, period: int, duration_periods: int) -> float:
+    """Compute the magnitude scale factor for a continuation period.
+
+    period is 1-indexed (period=1 is the original injection, period=2 is the
+    first continuation, etc.). Callers only invoke this for period >= 2.
+
+    decay_function values:
+      "constant"         — returns 1.0 for all periods.
+      "linear_decay"     — linearly decreasing: 1 - (period-1)/duration_periods.
+                           Period 1 = 1.0, last period ≈ 0 (never exactly 0).
+      "exponential_decay"— halves each period: 0.5^(period-1).
+
+    Args:
+        decay_function: Decay schedule name.
+        period: 1-indexed period number.
+        duration_periods: Total duration in periods.
+
+    Returns:
+        Multiplicative scale factor in (0.0, 1.0].
+    """
+    if decay_function == "linear_decay":
+        scale = 1.0 - (period - 1) / max(duration_periods, 1)
+        return max(scale, 0.0)
+    if decay_function == "exponential_decay":
+        return 0.5 ** (period - 1)
+    return 1.0  # "constant" and any unrecognised value
+
+
+def _expand_multi_period_inputs(
+    scheduled_inputs: list[tuple[int, ControlInput]],
+    n_steps: int,
+) -> list[tuple[int, ControlInput]]:
+    """Expand multi-period inputs into their full continuation schedule.
+
+    For each (step, input) where input.duration_periods > 1, generates
+    additional (step + period - 1, scaled_input) entries for periods 2..N,
+    clamped to steps <= n_steps.
+
+    The continuation input has the same fields as the original but with
+    implementation_capacity multiplied by the period-specific decay factor.
+    input_id is preserved — the audit log can group continuations by the
+    originating input_id.
+
+    Args:
+        scheduled_inputs: Original (step_index, ControlInput) pairs.
+        n_steps: Total scenario steps — continuations beyond this are dropped.
+
+    Returns:
+        Expanded list including all original entries plus continuations.
+    """
+    from decimal import Decimal as _Decimal
+
+    expanded: list[tuple[int, ControlInput]] = list(scheduled_inputs)
+
+    for orig_step, inp in scheduled_inputs:
+        if inp.duration_periods <= 1:
+            continue
+        for period in range(2, inp.duration_periods + 1):
+            target_step = orig_step + period - 1
+            if target_step > n_steps:
+                break
+            scale = _period_scale(inp.decay_function, period, inp.duration_periods)
+            new_capacity = inp.implementation_capacity * _Decimal(str(round(scale, 10)))
+            continuation = dataclasses.replace(inp, implementation_capacity=new_capacity)
+            expanded.append((target_step, continuation))
+
+    return expanded
 
 
 def _advance_timestep(current: datetime, delta: timedelta | None) -> datetime:
