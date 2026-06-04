@@ -5,9 +5,9 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-04 (M11.5 milestone established — North Star document merged (PR #715); GitHub Milestone 14 created; Issues #717/#718/#719/#720 filed)**
-**Current milestone:** M11 — Engine Investigation and Political Economy (M10 formally closed 2026-06-03)
-**Next milestone:** M11.5 — Usability Validation and Experience Audit (GitHub Milestone 14; North Star: \`docs/vision/milestone-11-5-north-star.md\`)
+**Last updated: 2026-06-04 (M11 formally closed — Issue #262 closed, GitHub Milestone 12 closed, tagged v0.11.0, PR #722 merged: ADR renewals, SCAN-025, KI-002)**
+**Current milestone:** M11.5 — Usability Validation and Experience Audit (GitHub Milestone 14; North Star: `docs/vision/milestone-11-5-north-star.md`)
+**Previous milestone:** M11 — Engine Investigation and Political Economy (formally closed 2026-06-04, tagged v0.11.0)
 
 ---
 
@@ -77,7 +77,7 @@ M9 formally closed. Issue #213 (M9 Exit Checklist) closed 2026-05-24. M10 milest
 
 ## Open PRs
 
-No open PRs — board clear as of 2026-06-04 (post PR #715 merge).
+No open PRs — board clear as of 2026-06-04 (post PR #722 merge).
 
 ## M11 Work Streams — 2026-06-04 Sprint
 
@@ -111,12 +111,15 @@ No open PRs — board clear as of 2026-06-04 (post PR #715 merge).
 | #719 | Pillar 3 — session provenance standard and semantic component vocabulary | Must close before any session begins; assigned DA Agent + PM Agent |
 | #720 | Milestone 11.5 Exit Checklist | Blocks milestone closure |
 
-**Exit criterion:** Can a finance ministry analyst with no prior WorldSim orientation use this tool to produce a finding they could cite in a negotiation? — ADR-009 accepted 2026-06-03, sparse matrix proof-of-concept delivered, Phase 2 A/B benchmark delivered, matrix interpretability tooling delivered. All four §Decision 4 deliverables complete. PR #707 merged 2026-06-04. Issues #215 and #404 closed.
+**M11 formally closed:** Issue #262 closed 2026-06-04, GitHub Milestone 12 (M11) closed, tagged `v0.11.0`. Compliance gate: SCAN-025 recorded, KI-002 filed (mypy Python version mismatch, pre-existing). ADR license renewals complete (ADR-001/002/005/007/008/010 → M11.5; ADR-011 license section added; ADR-009 diagram added). Socratic Agent TEST complete (in-session 2026-06-04).
+
+**Exit criterion (M11.5):** Can a finance ministry analyst with no prior WorldSim orientation use this tool to produce a finding they could cite in a negotiation?
 
 ## Recently Merged PRs (last 5)
 
 | PR | Title | Date |
 |---|---|---|
+| #722 | chore(compliance): M11 exit — ADR renewals, Mermaid diagrams, SCAN-025, KI-002 | 2026-06-04 |
 | #715 | docs(vision): M11.5 North Star — usability validation and experience audit | 2026-06-04 |
 | #713 | docs(ux): political economy module user stories — M11 Issue #681 | 2026-06-04 |
 | #711 | feat(simulation): G20 — horizon degradation envelope, fidelity artifact, restore endpoint — closes #151 #154 #155 | 2026-06-04 |
