@@ -32,8 +32,10 @@ Initial state sources — Issue #149:
 from __future__ import annotations
 
 from datetime import date
+from decimal import Decimal
 
 from app.schemas import (
+    PoliticalContext,
     QuantitySchema,
     ScenarioConfigSchema,
     ScenarioCreateRequest,
@@ -351,13 +353,45 @@ def build_greece_demo_scenario() -> ScenarioCreateRequest:
         "democratic_quality_score": initial_democratic_quality,
     }
 
+    # Greece 2010 political context (Issue #156):
+    # Government approval: Eurobarometer 73 (Spring 2010) — PASOK approval ~42%.
+    # Coalition seat margin: PASOK held 160/300 seats → majority margin of 10 seats.
+    # Months to next election: Parliamentary term to Oct 2012 → ~32 months from Jan 2010.
+    # Civil society: CIVICUS 2010 — moderate organizational strength (0.50).
+    # Legitimacy index: composite estimate at programme entry — 0.60 (functional
+    # but below the stability threshold; Eurobarometer + V-Dem calibration).
+    initial_elite_capture_coefficient = QuantitySchema(
+        value="0.35",
+        unit="ratio",
+        variable_type="ratio",
+        confidence_tier=4,
+        observation_date=date(2010, 1, 1),
+        source_registry_id="ACADEMIC_LITERATURE_LUSTIG_2001",
+        measurement_framework="governance",
+    )
+
+    updated_grc_attrs = {
+        **updated_grc_attrs,
+        "elite_capture_coefficient": initial_elite_capture_coefficient,
+    }
+
+    greece_political_context = PoliticalContext(
+        government_approval_rating=Decimal("0.42"),
+        coalition_seat_margin=10,
+        months_to_next_election=32,
+        civil_society_organization_strength=Decimal("0.50"),
+        legitimacy_index=Decimal("0.60"),
+    )
+
     demo_config = base.configuration.model_copy(
         update={
             "modules_config": {
                 "ecological": {"enabled": True},
                 "governance": {"enabled": True},
+                "political_economy": {"enabled": True},
             },
             "initial_attributes": {"GRC": updated_grc_attrs},
+            "political_context": greece_political_context,
         }
     )
 

@@ -281,6 +281,32 @@ class HealthResponse(BaseModel):
 # ---------------------------------------------------------------------------
 
 
+class PoliticalContext(BaseModel):
+    """Initial political environment for a scenario (Issue #156).
+
+    Encodes the political conditions that govern implementation feasibility.
+    When present, WebScenarioRunner reads legitimacy_index to compute a
+    political_feasibility_modifier that scales ControlInput magnitudes —
+    a government with 40% approval implementing 8% GDP cuts transmits
+    less of the intended policy than one with 70% approval.
+
+    All fields are optional for backward compatibility. When absent, no
+    political feasibility modifier is applied and behaviour is identical
+    to pre-M11 runs.
+
+    Sources for Greece 2010 values: Eurobarometer 73 (Spring 2010) for
+    government_approval_rating; ELSTAT/Kathimerini for coalition_seat_margin;
+    IDEA electoral calendar for months_to_next_election; CIVICUS Civil
+    Society Index for civil_society_organization_strength.
+    """
+
+    government_approval_rating: Decimal | None = None     # 0.0–1.0
+    coalition_seat_margin: int | None = None              # legislative majority margin
+    months_to_next_election: int | None = None
+    civil_society_organization_strength: Decimal | None = None  # 0.0–1.0
+    legitimacy_index: Decimal | None = None               # composite 0.0–1.0
+
+
 class ScenarioConfigSchema(BaseModel):
     """Scenario configuration payload.
 
@@ -297,6 +323,10 @@ class ScenarioConfigSchema(BaseModel):
         "ROUTINE") and optional `label` (str, max 32 chars). Absent keys default
         to ROUTINE. Consumed by the trajectory endpoint for step_significance and
         step_event_label fields (ADR-010 Decision 7).
+    `political_context` — optional initial political environment (Issue #156).
+        When present, legitimacy_index scales ControlInput implementation
+        capacity and social response events are generated for high-impact
+        ControlInputs when social_response_enabled is set in modules_config.
     """
 
     model_config = ConfigDict(from_attributes=True)
@@ -308,6 +338,7 @@ class ScenarioConfigSchema(BaseModel):
     modules_config: dict[str, Any] = {}
     start_date: date | None = None
     step_metadata: dict[str, Any] = {}
+    political_context: PoliticalContext | None = None
 
 
 class ScheduledInputSchema(BaseModel):
