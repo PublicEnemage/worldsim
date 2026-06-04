@@ -5,8 +5,9 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-04 (M11 sprint closed — #681 political economy user stories authored (PR #713); 17 near-term issues re-milestoned M11→M12; M11 exit checklist #262 is the remaining M11 gate)**
+**Last updated: 2026-06-04 (M11.5 milestone established — North Star document merged (PR #715); GitHub Milestone 14 created; Issues #717/#718/#719/#720 filed)**
 **Current milestone:** M11 — Engine Investigation and Political Economy (M10 formally closed 2026-06-03)
+**Next milestone:** M11.5 — Usability Validation and Experience Audit (GitHub Milestone 14; North Star: \`docs/vision/milestone-11-5-north-star.md\`)
 
 ---
 
@@ -76,7 +77,7 @@ M9 formally closed. Issue #213 (M9 Exit Checklist) closed 2026-05-24. M10 milest
 
 ## Open PRs
 
-No open PRs — board clear as of 2026-06-04 (post PR #713 merge).
+No open PRs — board clear as of 2026-06-04 (post PR #715 merge).
 
 ## M11 Work Streams — 2026-06-04 Sprint
 
@@ -95,12 +96,28 @@ No open PRs — board clear as of 2026-06-04 (post PR #713 merge).
 
 **Political economy module ships as M11 stretch goal (EL decision 2026-06-03).** ADR-011 (non-linear propagation) is the first M11 ADR accepted.
 
-**M11 primary objective (matrix engine investigation) status:** COMPLETE — ADR-009 accepted 2026-06-03, sparse matrix proof-of-concept delivered, Phase 2 A/B benchmark delivered, matrix interpretability tooling delivered. All four §Decision 4 deliverables complete. PR #707 merged 2026-06-04. Issues #215 and #404 closed.
+**M11 primary objective (matrix engine investigation) status:** COMPLETE
+
+---
+
+## Open Issues — M11.5 (Usability Validation and Experience Audit)
+
+**North Star:** `docs/vision/milestone-11-5-north-star.md` | **GitHub Milestone:** 14
+
+| Issue | Title | Gate |
+|---|---|---|
+| #717 | Pillar 1 — rrweb session recording integration | Must close before any session begins; assigned FA Agent + DA Agent |
+| #718 | Pillar 2 — cold-start usability audit methodology | Blocked by #717; assigned PM + UX Designer + UX Design Thinking + PO Agents |
+| #719 | Pillar 3 — session provenance standard and semantic component vocabulary | Must close before any session begins; assigned DA Agent + PM Agent |
+| #720 | Milestone 11.5 Exit Checklist | Blocks milestone closure |
+
+**Exit criterion:** Can a finance ministry analyst with no prior WorldSim orientation use this tool to produce a finding they could cite in a negotiation? — ADR-009 accepted 2026-06-03, sparse matrix proof-of-concept delivered, Phase 2 A/B benchmark delivered, matrix interpretability tooling delivered. All four §Decision 4 deliverables complete. PR #707 merged 2026-06-04. Issues #215 and #404 closed.
 
 ## Recently Merged PRs (last 5)
 
 | PR | Title | Date |
 |---|---|---|
+| #715 | docs(vision): M11.5 North Star — usability validation and experience audit | 2026-06-04 |
 | #713 | docs(ux): political economy module user stories — M11 Issue #681 | 2026-06-04 |
 | #711 | feat(simulation): G20 — horizon degradation envelope, fidelity artifact, restore endpoint — closes #151 #154 #155 | 2026-06-04 |
 | #710 | feat(simulation): G19 — tombstone entity_state_snapshot, engine_version_hash, debt MDA threshold — closes #147 #152 #36-DB | 2026-06-04 |
@@ -333,6 +350,7 @@ All Horizon:Immediate issues are now closed. M8 feature-complete.
 
 | Decision | Rationale | Date |
 |---|---|---|
+| Milestone 11.5 established — usability validation milestone between M11 and M12 (2026-06-04) | GitHub Milestone 14 created: "Milestone 11.5 — Usability Validation and Experience Audit". North Star document merged as `docs/vision/milestone-11-5-north-star.md` (PR #715) — governing intent document, no prescription of methodology. Four issues filed: #717 (Pillar 1 — rrweb session recording, engineering prerequisite, FA Agent + DA Agent), #718 (Pillar 2 — cold-start usability audit methodology, PM + UX Designer + UX Design Thinking + PO Agents), #719 (Pillar 3 — session provenance standard and semantic component vocabulary, DA Agent + PM Agent), #720 (exit checklist). Gate sequence: #717 and #719 must close before #718 methodology is approved; #718 must close before any session begins. Exit criterion: can a finance ministry analyst with no prior WorldSim orientation produce a finding they could cite in a negotiation? | 2026-06-04 |
 | M11 near-term issues re-milestoned to M12 + #681 political economy user stories authored (2026-06-04) | Two actions: (1) 17 open M11 near-term issues re-milestoned to M12 (GitHub milestone 13): #30 #43 #45 #92 #95 #102 #103 #259 #271 #274 #275 #392 #393 #644 #13 #22 #27. These are backlog/enhancement items not required for M11 closure; they carry to M12 alongside Mode 3 and external sector module work. (2) #681 (political economy module user stories) authored as retrospective specification against delivered G16a/G16b implementation. 20 Given/When/Then stories across 11 groups. Closes #681. PR #713 merged. M11 remaining gate: exit checklist #262 only. | 2026-06-04 |
 | M11 board cleanup — 45 stale issues re-milestoned; Issue #40 reopened; elite capture #679 filed (2026-06-03) | Three actions: (1) PM HORIZON Step 6 gap filed — elite capture dynamics (#679, M11, enhancement, horizon:near-term) was a named roadmap deliverable with no tracking issue. Issue body defines scope (capture coefficient per sector/cohort, distributional divergence in human cost ledger, Argentina backtesting validation), dependencies (conditionality modelling, political feasibility constraints), and CM acceptance gate. (2) Issue #40 reopened — closure comment incorrectly equated the Human Cost Ledger ADR-005 (accepted, CLAUDE.md current) with the Non-Linear Propagation Architecture ADR that #40 actually tracked (never authored). Non-linear propagation ADR does not exist; Issue #29 (implementation) remains open on M11. Corrective comment posted explaining conflation. Re-milestoned to M11. (3) Batch re-milestoning: 22 open M9 issues and 22 open M10 issues moved to M11 (#30 #89 #102 #184 #349 #393 #513 #522–#529 #540 #542–#547 #574 + M9: #13 #49 #57 #98 #100 #121 #125 #127 #128 #158 #234 #252 #253 #258 #259 #276 #286 #299 #300 #374 #375 #412); #451 (Mode 1 COMPARE_VIEW) re-milestoned to M12 — Mode 1 is M12 territory. None of these represented missed M10/M9 core deliverables — all are backlog process, standards, and enhancement items. | 2026-06-03 |
 | M10 FULLY CLOSED — Socratic Agent TEST complete (2026-06-03) | Socratic Agent TEST conducted at high-level architectural level (EL preference: no implementation-level detail). Three areas confirmed: (1) GovernanceModule promotion — null/tentative display → active threshold monitoring and full MDA alert participation; (2) PMM "—" at Step 3 Argentina — no policy headroom when all thresholds breached (governance floor + ecological boundary simultaneously); (3) Argentina fixture — Platform Principle validated, second country required no new engine modes or scenario-specific code, only new data inputs. Mental model confirmed sound. Comment posted on Issue #261. Issue #261 closed. M11 is now the active milestone. | 2026-06-03 |
