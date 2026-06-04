@@ -532,6 +532,84 @@ would be the exact inversion of the mission.
 
 ---
 
+## Output Use in Live Decision Contexts (SA-10)
+
+**Source:** STD-REVIEW-002 T1-F10. Issue #125.
+
+WorldSim is intended for use in active negotiations, ministerial briefings, and
+policy analysis. Before outputs enter those contexts, the following disclosures are
+required.
+
+### Required Disclosures
+
+Any WorldSim output used in a live decision context — negotiation, ministerial
+briefing, parliamentary testimony, or media briefing — must carry:
+
+1. **Scenario analysis label:** "This is a scenario analysis, not a prediction."
+2. **Confidence basis:** The model confidence level (DIRECTION_ONLY / MAGNITUDE /
+   CALIBRATED) for each indicator presented.
+3. **DIRECTION_ONLY disclosure** where applicable: "A DIRECTION_ONLY result
+   validates the direction of change, not the magnitude. The probability that all
+   direction checks pass under an uncalibrated null model is 1-in-2^N, where N is
+   the number of steps checked."
+
+### What the Simulation Does Not Claim
+
+WorldSim outputs are structured reasoning aids. They do not predict outcomes. They
+do not constitute IMF or World Bank policy advice. They do not represent the position
+of any government or institution. The model's known limitations and blindspots are
+documented in `docs/POLICY.md §Declared Blindspots` and must be made available to
+any party using the outputs in a decision context.
+
+### Geopolitical Use Sensitivity
+
+Outputs related to currency attack vulnerability, sanctions exposure, and financial
+warfare modules carry an additional required disclosure: "This output describes
+defensive situational awareness. It must not be used to plan or execute financial
+attacks against third parties."
+
+This requirement is a permanent feature of the dual-use framework, not a temporary
+restriction. See `docs/POLICY.md §Dual-Use Position`.
+
+---
+
+## Scenario Data Retention (SA-06)
+
+**Source:** STD-REVIEW-002 T1-F6. Issue #121.
+
+### Retention Principles
+
+Scenario configurations (entities, n_steps, scheduled inputs) are treated as research
+artifacts, not transient session data. Scenario state snapshots carrying `ia1_disclosure`
+records represent a commitment to an epistemic position at a point in time. Their
+destruction removes the audit trail of what the model said and when.
+
+### Soft Delete as Default
+
+The public WorldSim API offers soft-delete (marking scenarios as archived) rather than
+hard delete as the default operation. A soft-deleted scenario is not visible in normal
+listings but its configuration and snapshot records remain recoverable.
+
+### Hard Delete
+
+Hard delete (permanent removal) requires operator-level authorization and is logged as
+an audit event. End users do not have hard-delete access through the public API.
+
+### Minimum Retention Period
+
+Scenario records are retained for a minimum of 30 days after soft-delete. Permanent
+retention is offered for scenarios explicitly archived by the user. This minimum may
+be extended by institutional agreements with finance ministries or partner organizations.
+
+### Rationale
+
+The STD-REVIEW-002 CONFLICT C-1 (DELETE CASCADE audit trail destruction) is resolved
+by Option A: soft delete as the default path. Hard delete removes the audit trail of
+what the model produced and when — in a tool used for consequential decision support,
+that audit trail is a methodological commitment, not an implementation detail.
+
+---
+
 ## Challenge and Correction Process
 
 ### How to Challenge Any Position in This Document

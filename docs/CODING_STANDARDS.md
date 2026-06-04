@@ -1843,3 +1843,168 @@ The compliance scan is a secondary enforcement layer, not the primary one. The
 primary gate lives in `Quantity.__init__` or a module-level validator that checks
 the unit string against the canonical vocabulary before the `Quantity` is
 constructed.
+
+---
+
+## Simulation Lifecycle State Machine (SA-04)
+
+**Source:** STD-REVIEW-002 T1-F4 / T2-F2 — convergent finding. Issue #119.
+
+Every scenario has a lifecycle status field. Valid statuses and valid transitions are
+defined here and must not be implemented ad hoc in individual modules.
+
+### Valid Statuses
+
+| Status | Meaning |
+|---|---|
+| `pending` | Created, not yet executed |
+| `running` | Execution in progress |
+| `completed` | Execution finished without error |
+| `failed` | Execution raised an unhandled exception or pre-execution validation failed |
+
+### Valid Transitions
+
+- `pending → running` — execution begins
+- `running → completed` — execution finishes without error
+- `running → failed` — execution raises an unhandled exception
+- `pending → failed` — pre-execution validation fails at runtime
+
+Any transition not in this list is invalid and must raise a `StateTransitionError`.
+
+### Immutability Rule
+
+Scenario configuration (entities, n_steps, timestep_label, initial_attributes,
+scheduled_inputs) is frozen when status transitions from `pending` to `running`.
+Any PATCH that attempts to modify configuration fields when status is not `pending`
+must return HTTP 422.
+
+### Required Tests
+
+```python
+def test_scenario_create_starts_as_pending() -> None: ...
+def test_scenario_run_transitions_to_running() -> None: ...
+def test_scenario_complete_transitions_to_completed() -> None: ...
+def test_scenario_patch_rejected_when_running() -> None: ...
+def test_scenario_pending_to_failed_on_runtime_validation() -> None: ...
+```
+
+These five tests are required for any implementation of the scenario execution path.
+They gate Issue #111 (WebScenarioRunner) and any future execution engine changes.
+
+---
+
+## Human Cost Indicator Backtesting Requirement (SA-07)
+
+**Source:** STD-REVIEW-002 T1-F7. Issue #122. Extends `§Backtesting Tests` rule 5.
+
+Every backtesting case must include at least one human development indicator with
+a defined DIRECTION_ONLY or MAGNITUDE threshold. A backtesting suite that validates
+only macroeconomic indicators (GDP, inflation, exchange rate) without any human
+cost indicator is incomplete and must not be marked as passing.
+
+### Required Human Cost Indicators by Case
+
+**Greece 2010–2015:**
+- Life expectancy at birth — direction: negative expected over 2010–2012
+- Unemployment rate — direction: positive expected
+- At least one distributional indicator (Gini coefficient or income quintile share) — direction: worsening expected
+
+**Argentina 2001–2004:**
+- Unemployment rate — direction: positive expected through 2002 crisis peak
+- Poverty headcount ratio — direction: positive expected 2001–2002
+- Child mortality rate — direction: negative expected (worsening) 2001–2002
+
+DIRECTION_ONLY is acceptable for initial backtesting runs. MAGNITUDE thresholds are
+required when historical data with sub-annual resolution is available.
+
+A case that passes GDP contraction thresholds but carries zero human cost thresholds
+is architecturally incomplete (ARCH-REVIEW-002 BI2-I-02, Issue #87). Human cost
+indicators are not optional validation surface — they are the primary purpose of the tool.
+
+---
+
+## Snapshot Serialization Standard (SA-12)
+
+**Source:** STD-REVIEW-002 T2-F7. Issue #127.
+
+Every `Quantity` stored as JSONB in a `scenario_state_snapshots.state_data` record
+must round-trip without data loss through the following chain:
+
+```
+Quantity (Python) → json.dumps() → JSONB column → json.loads() → Quantity (Python)
+```
+
+### Required Round-Trip Test
+
+The following test is required for any implementation of the snapshot persistence path:
+
+```python
+def test_quantity_snapshot_round_trip() -> None:
+    original = Quantity(
+        value=Decimal("12345.67"),
+        unit="USD_2015",
+        variable_type="stock",
+        confidence_tier=3,
+    )
+    envelope = quantity_to_jsonb_envelope(original)
+    serialized = json.dumps(envelope)
+    deserialized = json.loads(serialized)
+    restored = quantity_from_jsonb(deserialized)
+    assert restored.value == original.value
+    assert restored.unit == original.unit
+    assert restored.confidence_tier == original.confidence_tier
+    assert restored.observation_date == original.observation_date
+```
+
+### Failure Modes This Test Must Catch
+
+- `observation_date` type: stored as ISO string, must restore as `date` object (not string)
+- `value` type: must restore as `Decimal` (not float, not string coercion artifact)
+- `variable_type`: must restore as the correct enum member, not raw string
+
+Any snapshot persistence implementation that does not include this test is non-compliant.
+
+---
+
+## JSONB Migration Validation Rule (SA-13)
+
+**Source:** STD-REVIEW-002 T2-F10. Issue #128.
+
+Migrations that modify JSONB column content — including `simulation_entities.attributes`,
+`scenario.configuration`, and `scenario_state_snapshots.state_data` — must include a
+validation step confirming all affected rows parse correctly after the migration.
+
+### Minimum Validation
+
+```sql
+SELECT COUNT(*) FROM <table> WHERE <jsonb_column> IS NOT NULL;
+```
+
+This must return the expected row count after the migration, confirming no rows were
+silently dropped or corrupted.
+
+### Structural Modification Validation
+
+For migrations that modify JSONB structure (field renames, type changes), the validation
+step must additionally confirm that the modified fields are present and correctly typed
+in a sample of rows:
+
+```python
+# Post-migration validation sample (required in migration test)
+rows = await conn.fetch("SELECT attributes FROM simulation_entities LIMIT 100")
+for row in rows:
+    attrs = row["attributes"]
+    assert isinstance(attrs, dict), f"attributes is not a dict: {type(attrs)}"
+    # Assert expected key structure here
+```
+
+### Entity Reference Integrity
+
+JSONB configuration columns that contain entity references must not be modified via
+direct SQL outside of the application layer. Migrations that modify JSONB entity
+references must include a validation step confirming all entity_id values in the
+modified column resolve to existing records in `simulation_entities`.
+
+This standard cannot prevent direct database access, but establishes a clear rule for
+migration authors. A migration that skips this validation is non-compliant regardless
+of whether the migration succeeds in testing.
