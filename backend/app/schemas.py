@@ -327,6 +327,11 @@ class ScenarioConfigSchema(BaseModel):
         When present, legitimacy_index scales ControlInput implementation
         capacity and social response events are generated for high-impact
         ControlInputs when social_response_enabled is set in modules_config.
+    `n_runs` — number of Monte Carlo runs (Issue #89). Default 1 (deterministic).
+        Values > 1 signal distributional output; the schema accepts the field so
+        MC support can be added without a breaking schema change. MC sampling
+        itself is not yet implemented — n_runs > 1 is recorded but produces
+        a single deterministic trajectory until ADR-007 MC support ships.
     """
 
     model_config = ConfigDict(from_attributes=True)
@@ -339,6 +344,7 @@ class ScenarioConfigSchema(BaseModel):
     start_date: date | None = None
     step_metadata: dict[str, Any] = {}
     political_context: PoliticalContext | None = None
+    n_runs: int = 1
 
 
 class ScheduledInputSchema(BaseModel):

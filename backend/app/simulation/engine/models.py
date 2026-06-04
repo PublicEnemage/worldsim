@@ -176,6 +176,59 @@ class PropagationRule:
 
 
 # ---------------------------------------------------------------------------
+# Debt structure (Issue #36 — Intergenerational Advocate ARCH-REVIEW-001)
+# ---------------------------------------------------------------------------
+
+
+@dataclass
+class DebtProfile:
+    """Structured debt composition for an entity.
+
+    Captures six dimensions that determine vulnerability profile beyond the
+    simple debt/GDP ratio. Japan at 253% (yen-denominated, domestically held)
+    and Vietnam at 37% (with significant foreign-currency components) have
+    entirely different crisis dynamics — this dataclass makes that distinction
+    computable.
+
+    All fields are fractions (0.0 to 1.0) except where noted.
+
+    Attributes:
+        total_pct_gdp: Total public debt as fraction of GDP (e.g. 0.85 = 85%).
+        foreign_currency_pct: Share of debt denominated in foreign currency.
+            The 'original sin' dimension — foreign-currency debt cannot be
+            inflated away and creates acute rollover risk under FX pressure.
+            MDA threshold: > 0.60 flags elevated rollover risk.
+        short_term_pct: Share of debt maturing within 12 months. Measures
+            rollover cliff risk.
+        domestic_holder_pct: Share held by domestic investors (banks,
+            pension funds, central bank). Higher = less vulnerable to
+            foreign capital exit.
+        multilateral_pct: Share owed to multilateral creditors (IMF, World
+            Bank, regional MDBs). Distinct restructuring dynamics — preferred
+            creditor status limits haircut exposure.
+        interest_service_pct_revenue: Debt service as fraction of government
+            revenue. The fiscal sustainability measure — stock matters less
+            than the income it consumes.
+    """
+
+    total_pct_gdp: Decimal
+    foreign_currency_pct: Decimal
+    short_term_pct: Decimal
+    domestic_holder_pct: Decimal
+    multilateral_pct: Decimal
+    interest_service_pct_revenue: Decimal
+
+    # Threshold at which foreign_currency_pct triggers MDA elevated rollover risk
+    FOREIGN_CURRENCY_MDA_THRESHOLD: Decimal = field(
+        default=Decimal("0.60"), init=False, repr=False, compare=False
+    )
+
+    def is_elevated_rollover_risk(self) -> bool:
+        """Return True if foreign currency debt share exceeds MDA threshold."""
+        return self.foreign_currency_pct > self.FOREIGN_CURRENCY_MDA_THRESHOLD
+
+
+# ---------------------------------------------------------------------------
 # Core entities
 # ---------------------------------------------------------------------------
 
@@ -204,9 +257,34 @@ class SimulationEntity:
     metadata: dict[str, Any]              # non-simulation data
     parent_id: str | None = None      # enclosing entity for hierarchical resolution
     geometry: Geometry | None = None  # spatial reference, populated in Milestone 2
+    debt_profile: DebtProfile | None = None  # Issue #36 — structured debt composition
+
+    # Mapping from debt_profile.* attribute keys to DebtProfile field names.
+    # Used by get_attribute() to expose debt structure as Quantity attributes
+    # for MDA threshold evaluation without duplicating storage.
+    _DEBT_PROFILE_ATTR_MAP: dict[str, str] = field(
+        default_factory=lambda: {
+            "debt_profile.total_pct_gdp": "total_pct_gdp",
+            "debt_profile.foreign_currency_pct": "foreign_currency_pct",
+            "debt_profile.short_term_pct": "short_term_pct",
+            "debt_profile.domestic_holder_pct": "domestic_holder_pct",
+            "debt_profile.multilateral_pct": "multilateral_pct",
+            "debt_profile.interest_service_pct_revenue": "interest_service_pct_revenue",
+        },
+        init=False,
+        repr=False,
+        compare=False,
+    )
 
     def get_attribute(self, key: str) -> Quantity | None:
         """Return an attribute Quantity, or None if not present.
+
+        Supports two key namespaces:
+          - Direct entity attributes: keys in self.attributes.
+          - Debt profile sub-keys: `"debt_profile.<field>"` keys expose
+            DebtProfile fields as RATIO Quantities when debt_profile is set.
+            This allows MDA thresholds to evaluate debt structure via the
+            same indicator_key mechanism used for all other thresholds.
 
         Args:
             key: Attribute key to look up.
@@ -215,6 +293,15 @@ class SimulationEntity:
             Quantity for the key, or None if the key is absent.
             Use get_attribute_value() for numeric comparison operations.
         """
+        if key in self._DEBT_PROFILE_ATTR_MAP and self.debt_profile is not None:
+            field_name = self._DEBT_PROFILE_ATTR_MAP[key]
+            value = getattr(self.debt_profile, field_name)
+            return Quantity(
+                value=value,
+                unit="ratio",
+                variable_type=VariableType.RATIO,
+                confidence_tier=2,
+            )
         return self.attributes.get(key)
 
     def get_attribute_value(self, key: str, default: Decimal = Decimal("0")) -> Decimal:
@@ -224,7 +311,7 @@ class SimulationEntity:
         Returns Decimal, which is comparable to float via standard Python
         arithmetic and pytest.approx.
         """
-        q = self.attributes.get(key)
+        q = self.get_attribute(key)
         if q is None:
             return default
         return q.value

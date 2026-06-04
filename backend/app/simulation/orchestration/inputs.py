@@ -2,6 +2,8 @@
 Control input types for the Input Orchestration Layer — ADR-002, Amendment 1.
 Political economy extensions: Issue #96 (CONDITIONALITY InputSource),
 Issue #93 (implementation_capacity), Issue #157 (CompoundStateCondition).
+Issue #31 (multi-step duration_periods + decay_function on ControlInput base).
+Issue #33 (CapitalFlowInput, DFICommitmentInput, ActorType enum).
 
 ControlInput is the abstract base class for all exogenous inputs injected
 into the simulation. Each concrete subclass represents one category of
@@ -49,6 +51,42 @@ if TYPE_CHECKING:
 # ---------------------------------------------------------------------------
 # Enumerations
 # ---------------------------------------------------------------------------
+
+
+class ActorType(Enum):
+    """Type of actor authorising a ControlInput (Issue #33).
+
+    Extends the actor model beyond government and central bank actors to
+    include private capital, development finance, and sovereign investment
+    — the primary channels through which capital flows into and out of
+    developing economies.
+    """
+
+    GOVERNMENT = "government"
+    CENTRAL_BANK = "central_bank"
+    PRIVATE_INVESTOR = "private_investor"
+    DFI = "dfi"
+    SOVEREIGN_INVESTOR = "sovereign_investor"
+    MULTILATERAL = "multilateral"
+
+
+class CapitalFlowType(Enum):
+    """Category of private capital flow for CapitalFlowInput (Issue #33)."""
+
+    FDI = "fdi"
+    PORTFOLIO_INVESTMENT = "portfolio_investment"
+    SOVEREIGN_DEBT = "sovereign_debt"
+    REMITTANCE = "remittance"
+
+
+class DFIInstrumentType(Enum):
+    """Development Finance Institution instrument types (Issue #33)."""
+
+    GUARANTEE = "guarantee"
+    EQUITY_INVESTMENT = "equity_investment"
+    TECHNICAL_ASSISTANCE = "technical_assistance"
+    CONCESSIONAL_LOAN = "concessional_loan"
+    MDB_BUDGET_SUPPORT = "mdb_budget_support"
 
 
 class InputSource(Enum):
@@ -206,11 +244,26 @@ class ControlInput(ABC):
         constraint_mechanism: For InputSource.CONDITIONALITY — how the constraint
             was applied (e.g. 'ELA_WITHDRAWAL_THREAT', 'DISBURSEMENT_SUSPENSION',
             'SANCTIONS'). Empty string for non-conditionality inputs (Issue #96).
+        duration_periods: Number of simulation timesteps this input remains active
+            (Issue #31). Default 1 (one-shot). Values > 1 cause the orchestrator
+            to re-inject the input for the subsequent `duration_periods - 1` steps.
+            The ScenarioRunner expands multi-duration inputs at run() time;
+            the WebScenarioRunner requires duration rows pre-created in
+            scenario_scheduled_inputs.
+        decay_function: How the effect magnitude changes across duration_periods
+            (Issue #31). One of:
+              "constant"           — same magnitude every period (default)
+              "linear_decay"       — linearly decreasing: scale = 1 - (p-1)/n
+              "exponential_decay"  — halves each period: scale = 0.5^(p-1)
+            Ignored when duration_periods == 1.
+        actor_type: Structured actor category from ActorType enum (Issue #33).
+            Complements the free-text actor_role field.
     """
 
     input_id: str = field(default_factory=lambda: str(uuid.uuid4()))
     actor_id: str = ""
     actor_role: str = ""
+    actor_type: ActorType | None = None
     target_entity: str = ""
     effective_date: datetime = field(default=None)  # type: ignore[assignment]
     justification: str = ""
@@ -220,6 +273,8 @@ class ControlInput(ABC):
     implementation_capacity: Decimal = Decimal("1.0")
     constraining_actor_id: str = ""
     constraint_mechanism: str = ""
+    duration_periods: int = 1
+    decay_function: str = "constant"
 
     @abstractmethod
     def to_events(self, timestep: datetime) -> list[Event]:
@@ -296,12 +351,10 @@ class MonetaryRateInput(ControlInput):
     Attributes:
         instrument: The rate instrument being adjusted.
         value: Magnitude and direction of the change as a Decimal fraction.
-        duration_periods: Timesteps this input remains in force.
     """
 
     instrument: MonetaryRateInstrument = MonetaryRateInstrument.POLICY_RATE
     value: Decimal = Decimal("0")
-    duration_periods: int = 1
 
     def to_events(self, timestep: datetime) -> list[Event]:
         """Translate to a monetary rate Event targeting the source entity.
@@ -354,12 +407,10 @@ class MonetaryVolumeInput(ControlInput):
     Attributes:
         instrument: The volume instrument being adjusted.
         value: Monetary volume of the action as a MonetaryValue.
-        duration_periods: Timesteps this input remains in force.
     """
 
     instrument: MonetaryVolumeInstrument = MonetaryVolumeInstrument.ASSET_PURCHASE
     value: MonetaryValue = field(default=None)  # type: ignore[assignment]
-    duration_periods: int = 1
 
     def to_events(self, timestep: datetime) -> list[Event]:
         """Translate to a monetary volume Event targeting the source entity.
@@ -674,6 +725,142 @@ class StructuralPolicyInput(ControlInput):
                     "affected_sector": self.affected_sector,
                     "parameters": self.parameters,
                     "implementation_years": self.implementation_years,
+                },
+            )
+        ]
+
+
+# ---------------------------------------------------------------------------
+# Private capital inputs (Issue #33 — Investment Agent RISK-TOLERANT)
+# ---------------------------------------------------------------------------
+
+
+@dataclass(kw_only=True)
+class CapitalFlowInput(ControlInput):
+    """A private or sovereign capital flow event.
+
+    Models the capital movements that are the primary transmission mechanism
+    for financial shocks in developing economies: FDI, portfolio flows, and
+    sovereign debt market transactions. Unlike government policy instruments,
+    these flows originate from actors outside the sovereign government.
+
+    Attributes:
+        flow_type: Category of capital movement (FDI, portfolio, sovereign debt,
+            remittance).
+        volume: Signed Decimal — positive = inflow, negative = outflow. Units
+            are % of GDP (RATIO) for cross-country comparability.
+        counterpart_entity: Optional ISO entity ID of the counterpart actor
+            (e.g. the investing country or institution).
+    """
+
+    flow_type: CapitalFlowType = CapitalFlowType.FDI
+    volume: Decimal = Decimal("0")
+    counterpart_entity: str = ""
+
+    def to_events(self, timestep: datetime) -> list[Event]:
+        """Translate to capital flow Events affecting fdi_stock, portfolio_flows,
+        or reserve_adequacy depending on flow_type.
+
+        Args:
+            timestep: Simulation timestep at which this input fires.
+
+        Returns:
+            Single-element list containing the capital flow Event.
+        """
+        from app.simulation.engine.models import Event, MeasurementFramework
+
+        # Attribute targets per flow type
+        _ATTR_MAP: dict[CapitalFlowType, str] = {
+            CapitalFlowType.FDI: "fdi_stock",
+            CapitalFlowType.PORTFOLIO_INVESTMENT: "portfolio_flows",
+            CapitalFlowType.SOVEREIGN_DEBT: "reserve_adequacy",
+            CapitalFlowType.REMITTANCE: "portfolio_flows",
+        }
+        attribute_key = _ATTR_MAP[self.flow_type]
+
+        delta = Quantity(
+            value=self.volume,
+            unit="pct_gdp",
+            variable_type=VariableType.FLOW,
+            measurement_framework=MeasurementFramework.FINANCIAL,
+            confidence_tier=2,
+        )
+        return [
+            Event(
+                event_id=f"{self.input_id}-capital-0",
+                source_entity_id=self.target_entity,
+                event_type=f"capital_flow_{self.flow_type.value}",
+                affected_attributes={attribute_key: delta},
+                propagation_rules=self.propagation_rules,
+                timestep_originated=timestep,
+                framework=MeasurementFramework.FINANCIAL,
+                metadata={
+                    "control_input_id": self.input_id,
+                    "actor_id": self.actor_id,
+                    "flow_type": self.flow_type.value,
+                    "counterpart_entity": self.counterpart_entity,
+                },
+            )
+        ]
+
+
+@dataclass(kw_only=True)
+class DFICommitmentInput(ControlInput):
+    """A Development Finance Institution commitment.
+
+    Covers IFC, MIGA, bilateral DFI, and MDB instruments — the concessional
+    and guarantee mechanisms through which public development finance is
+    channelled. Distinguished from private capital flows by the actor type
+    (DFI) and the instrument type (guarantee, equity, concessional loan, etc.).
+
+    Attributes:
+        instrument: DFI instrument type (guarantee, equity, concessional loan, etc.).
+        volume: Committed amount as % of GDP (RATIO). Positive = commitment inflow.
+        dfi_actor: Optional ISO or institution ID of the DFI (e.g. 'IFC', 'AfDB').
+        disbursement_schedule_years: Number of years over which the commitment
+            is expected to disburse. Informational — does not drive re-injection
+            (use duration_periods for sustained multi-step effects).
+    """
+
+    instrument: DFIInstrumentType = DFIInstrumentType.GUARANTEE
+    volume: Decimal = Decimal("0")
+    dfi_actor: str = ""
+    disbursement_schedule_years: int = 1
+
+    def to_events(self, timestep: datetime) -> list[Event]:
+        """Translate to DFI commitment Events affecting fdi_stock and
+        infrastructure-related attributes.
+
+        Args:
+            timestep: Simulation timestep at which this input fires.
+
+        Returns:
+            Single-element list containing the DFI commitment Event.
+        """
+        from app.simulation.engine.models import Event, MeasurementFramework
+
+        delta = Quantity(
+            value=self.volume,
+            unit="pct_gdp",
+            variable_type=VariableType.FLOW,
+            measurement_framework=MeasurementFramework.FINANCIAL,
+            confidence_tier=2,
+        )
+        return [
+            Event(
+                event_id=f"{self.input_id}-dfi-0",
+                source_entity_id=self.target_entity,
+                event_type=f"dfi_commitment_{self.instrument.value}",
+                affected_attributes={"fdi_stock": delta},
+                propagation_rules=self.propagation_rules,
+                timestep_originated=timestep,
+                framework=MeasurementFramework.FINANCIAL,
+                metadata={
+                    "control_input_id": self.input_id,
+                    "actor_id": self.actor_id,
+                    "dfi_actor": self.dfi_actor,
+                    "instrument": self.instrument.value,
+                    "disbursement_schedule_years": self.disbursement_schedule_years,
                 },
             )
         ]
