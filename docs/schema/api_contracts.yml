@@ -631,3 +631,145 @@ endpoints:
       - "financial framework includes all untagged attributes (backward-compat rule)"
       - "composite_score is null when single_entity_warning=true for financial and human_development — percentile rank requires ≥2 entities"
       - "db_reads includes simulation_reference_constants for ecological effective-at-simulation-time boundary constant query"
+
+  # ---------------------------------------------------------------------------
+  # Causal Graph (US-048 — X-Ray Interactive Graph)
+  # ---------------------------------------------------------------------------
+  - method: GET
+    path: "/scenarios/{scenario_id}/causal-graph"
+    summary: >
+      Causal graph for a scenario at a given step. Returns nodes (indicators) and
+      directed edges (propagation relationships with elasticity weights). Used by
+      the Zone 2 X-ray interactive graph. Does not route through the simulation
+      computation path — reads from the engine's propagation registry at the
+      specified step. Authority: ARCH-REVIEW-006 AR-006-B-013/014, Issue #611.
+    auth: none
+    path_params:
+      scenario_id: {type: string, format: uuid, description: "Scenario UUID"}
+    query_params:
+      - name: step
+        type: integer
+        required: true
+        description: "Step index (0-based). Graph weights may vary by step if elasticities are dynamic."
+    response:
+      status: 200
+      body:
+        scenario_id: {type: string, format: uuid}
+        step: {type: integer}
+        nodes:
+          type: array
+          description: "One entry per indicator present in the causal graph at this step."
+          items:
+            indicator_key: {type: string, example: "gdp_growth_rate"}
+            framework: {type: string, example: "financial", description: "Framework the indicator belongs to"}
+            label_en: {type: string, description: "Human-readable indicator name"}
+            current_value:
+              type: "string|null"
+              description: "Decimal as string. Indicator value at this step. null if not computed."
+            confidence_tier:
+              type: integer
+              description: "Data confidence tier (1–5) for this indicator at this step."
+        edges:
+          type: array
+          description: >
+            Directed propagation edges. Each edge represents a modelled causal
+            relationship between two indicators. Cross-framework edges (e.g.,
+            fiscal → education → human capability) are included.
+          items:
+            source_indicator_key: {type: string}
+            target_indicator_key: {type: string}
+            weight:
+              type: string
+              description: "Elasticity estimate as Decimal string. Signed: positive = same-direction, negative = inverse."
+            direction:
+              type: string
+              enum: [unidirectional, bidirectional]
+              description: "Whether the relationship models a reverse effect from target back to source."
+            edge_confidence_tier:
+              type: integer
+              description: >
+                Confidence tier (1–5) of the elasticity estimate for this edge.
+                Reflects literature source quality, not indicator data quality.
+                Tier 1/2: high-quality meta-analysis or replicated empirical study.
+                Tier 4/5: rough model estimate or expert prior with limited literature backing.
+                Required field — must not be omitted. A missing tier implies equal certainty
+                across all edges, which is a No False Precision violation
+                (ARCH-REVIEW-006 AR-006-B-013).
+            is_cross_framework:
+              type: boolean
+              description: >
+                True when source and target belong to different frameworks (e.g.,
+                fiscal pressure → education spending → human capability).
+                Frontend must visually differentiate cross-framework edges with
+                lower edge_confidence_tier using reduced weight or opacity
+                (ARCH-REVIEW-006 AR-006-B-014).
+      status_400: "step parameter missing or not a valid integer"
+      status_404: "Scenario not found; or no causal graph registered for this scenario"
+    db_reads: [scenarios, propagation_registry]
+    notes:
+      - "This endpoint does NOT route through the simulation computation path. It reads from the engine's propagation registry (static at scenario creation time, updated if elasticities are dynamic)."
+      - "edge_confidence_tier is a required field. Omitting it is a schema violation."
+      - "is_cross_framework=true edges must be visually differentiated in the frontend by edge_confidence_tier (weight, opacity, or dash style)."
+      - "Zone 2 view model: Option A (Switchable Zone 2) — EL decision 2026-06-03, ARCH-REVIEW-006 AR-006-B-012."
+      - "Authority: ARCH-REVIEW-006 AR-006-B-013/014; Issue #611."
+
+  # ---------------------------------------------------------------------------
+  # Observed Actuals Overlay (US-042 — Accountability Tracking)
+  # ---------------------------------------------------------------------------
+  - method: GET
+    path: "/scenarios/{scenario_id}/actuals"
+    summary: >
+      Observed actuals series for a scenario entity. Returns external observations
+      (IMF Article IV, HIPC tracker, government self-reports) as a distinct series
+      for overlay on the Zone 1 trajectory view. Does NOT route through the simulation
+      engine. Authority: ARCH-REVIEW-006 AR-006-B-004/005/006, AR-006-C-001, Issue #604.
+    auth: none
+    path_params:
+      scenario_id: {type: string, format: uuid}
+    query_params:
+      - name: entity_id
+        type: string
+        required: true
+        description: "ISO 3166-1 alpha-3 entity ID"
+    response:
+      status: 200
+      body:
+        scenario_id: {type: string, format: uuid}
+        entity_id: {type: string}
+        confound_annotation:
+          type: string
+          required: true
+          description: >
+            Non-null, non-empty confound disclosure. Canonical text:
+            "Divergence between projected and observed outcomes may reflect factors
+            unrelated to the policy scenario modelled, including external shocks,
+            data revision, and implementation variance. Causal attribution to policy
+            choices alone is not supported by this comparison."
+            May not be null, empty, or absent — API layer enforcement
+            (ARCH-REVIEW-006 AR-006-B-005; EL decision Option B 2026-06-03).
+        series:
+          type: array
+          description: "One entry per indicator with registered actuals data."
+          items:
+            indicator_key: {type: string}
+            framework: {type: string}
+            observations:
+              type: array
+              description: >
+                Sparse observations. Not every step is guaranteed to have an entry.
+                Gaps must be rendered as broken lines — no interpolation.
+              items:
+                step_year: {type: integer, description: "Calendar year of the observation"}
+                value: {type: string, description: "Decimal as string"}
+                unit: {type: string}
+                confidence_tier: {type: integer}
+                source_name: {type: string, description: "Human-readable source name for tooltip"}
+                vintage_date: {type: string, format: date, description: "Date observation was published/retrieved"}
+      status_404: "Scenario not found; or no actuals registered for this entity"
+    db_reads: [scenarios, observed_actuals, source_registry, simulation_entities]
+    notes:
+      - "This endpoint does NOT route through the simulation computation path (AR-006-C-001 — engine/overlay separation, non-negotiable)."
+      - "confound_annotation is a required non-null field — null or empty is a validation failure."
+      - "Human development indicator actuals receive no secondary-tier or optional treatment (AR-006-B-006)."
+      - "Sparse observations: frontend must render broken lines for gaps, not interpolated segments."
+      - "Authority: ARCH-REVIEW-006 AR-006-B-004/005/006; Issues #604, #605, #607."
