@@ -1,0 +1,145 @@
+# Session Recording Artifact Schema — M11.5 Pillar 1
+# Data Architect Agent — schema version 1.0 (2026-06-04)
+#
+# Governs the structure of JSON files written to backend/sessions/ by the
+# POST /api/v1/sessions/recording endpoint. Every field in this document has
+# a corresponding Pydantic model in backend/app/api/sessions.py. Drift between
+# this schema and the Python model is a compliance violation.
+#
+# Storage: backend/sessions/<session_id>.json (gitignored; local artifact only)
+# Linkage: session_id connects the recording artifact to the session manifest
+# (Pillar 3, when that standard is established).
+#
+# schema_version must be incremented whenever a BREAKING change is made to the
+# artifact structure. Additive changes (new optional fields) do not require a
+# version bump but must be documented here.
+
+schema_version: "1.0"
+
+artifact:
+  session_id:
+    type: string
+    format: "^[a-zA-Z0-9][a-zA-Z0-9_-]{0,63}$"
+    description: >
+      Human-readable session identifier assigned by the session coordinator.
+      Recommended format: YYYY-MM-DD-<persona-id>-<sequence>.
+      Example: 2026-06-04-persona-1-001
+    required: true
+
+  created_at:
+    type: string
+    format: ISO8601 (UTC)
+    description: >
+      Timestamp when the artifact was written to disk by the backend.
+      Server-generated; not provided by the client.
+    required: true
+
+  started_at:
+    type: string
+    format: ISO8601 (UTC)
+    description: >
+      Timestamp when the rrweb recording started in the browser.
+      Client-provided; captured by useSessionRecording on mount.
+    required: true
+
+  ended_at:
+    type: string
+    format: ISO8601 (UTC)
+    description: >
+      Timestamp when the recording was stopped and saved (End Session click).
+      Client-provided; captured at endSession() invocation.
+    required: true
+
+  metadata:
+    type: object
+    required: true
+    fields:
+      app_version:
+        type: string
+        description: WorldSim semantic version at time of session (e.g. v0.11.0)
+        required: true
+
+      git_commit:
+        type: string
+        description: >
+          8-character git commit SHA of the running frontend build.
+          "unknown" if not injected at build time (development mode).
+        required: true
+
+      persona_id:
+        type: string
+        description: >
+          Identifier of the persona embodied by the agent conducting the session.
+          Supplied via ?persona= URL parameter by the session coordinator.
+          Example: persona-1, persona-4v
+        required: true
+
+      canonical_use_case:
+        type: string
+        description: >
+          Label for the canonical use case the agent was attempting.
+          Supplied via ?use_case= URL parameter.
+          Example: IMF loan evaluation
+        required: true
+
+      cold_start:
+        type: boolean
+        description: >
+          Always true for M11.5 sessions. Indicates the agent had no prior
+          WorldSim orientation before the session began.
+        required: true
+
+      viewport_width:
+        type: integer
+        description: Browser viewport width in CSS pixels at session start.
+        required: true
+
+      viewport_height:
+        type: integer
+        description: Browser viewport height in CSS pixels at session start.
+        required: true
+
+      user_agent:
+        type: string
+        description: navigator.userAgent string from the recording browser.
+        required: true
+
+  events:
+    type: array
+    items: rrweb eventWithTime object
+    description: >
+      Full sequence of rrweb DOM mutation, input, scroll, mouse, and viewport
+      events captured during the session. Opaque to the schema layer — typed
+      as list[Any] in Python and object[] in TypeScript. The rrweb event
+      schema is defined by the rrweb project (version 2.0.1, MIT license).
+    required: true
+
+  event_count:
+    type: integer
+    description: >
+      len(events). Redundant but useful for list summaries without deserializing
+      the full events array. Must equal len(events) — enforced by the API client.
+    required: true
+
+  duration_ms:
+    type: integer
+    description: >
+      Session duration in milliseconds: ended_at - started_at.
+      Computed client-side before saving. Zero indicates a recording error.
+    required: true
+
+# ---------------------------------------------------------------------------
+# Linkage to Pillar 3 (Session Provenance Standard)
+# When the Pillar 3 session manifest standard is established (Issue #719),
+# this schema will be extended with a manifest_id field linking the recording
+# artifact to the full session manifest. The session_id already serves as the
+# linking key — manifest_id will be added as a required field in schema
+# version 2.0 once the Pillar 3 standard is ratified.
+# ---------------------------------------------------------------------------
+
+# ---------------------------------------------------------------------------
+# Replay protocol
+# Load artifact from GET /api/v1/sessions/recording/<session_id>
+# Open http://localhost:5173/?replay_session=<session_id> in a browser
+# The SessionReplayViewer component fetches and replays the session.
+# ---------------------------------------------------------------------------

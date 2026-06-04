@@ -41,3 +41,4 @@ Thumbs.db
 htmlcov/
 .pytest_cache/
 claude_setup.sh
+backend/sessions/*.json
