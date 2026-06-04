@@ -228,13 +228,18 @@ Audit above is complete.**
    skip this step with a one-line note on the exit checklist confirming no demo was
    scheduled. If the stakeholder session is explicitly deferred, record the rationale
    and deferral date as a comment on the exit checklist issue.
-   Note: the canonical ordering of this step relative to step 5 (Socratic Agent TEST)
-   is being formalized in Issue #664. Until that issue closes, the demo cycle must
-   complete within the same milestone as the TEST — sequencing is at EL discretion.
 
 5. **Socratic Agent TEST session completed.** The Engineering Lead has demonstrated
    genuine understanding of the milestone's architectural contributions. This is not
    a formality — it is the checkpoint that ensures the codebase remains governable.
+
+   **Ordering rule (Issue #664 Gap 3):** Step 5 occurs after step 4 (stakeholder
+   session). The Socratic Agent TEST is the Engineering Lead's demonstration of
+   architectural understanding; the demo stakeholder session is one of the inputs
+   that should inform it. If the stakeholder session surfaces a critical architectural
+   misunderstanding, the TEST must cover it — which is only possible if the session
+   occurs first. Odd-numbered milestones (no demo) are exempt from this dependency
+   and may run the TEST at any point after the exit checklist is confirmed.
 
 6. **Release tag created.** Tag the merge commit with semantic versioning:
    `v0.N.0` for Milestones 0 through 4 (pre-release). Tag message includes a brief
