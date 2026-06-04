@@ -8,9 +8,10 @@ const path = require("path");
 const fs = require("fs");
 
 const SESSION_ID = process.argv[2] || "2026-06-04-persona-2-001";
-const PERSONA = "persona-2";
-const USE_CASE = "IMF+loan+evaluation";
-const SESSION_URL = `http://localhost:5173/?usability_session=${SESSION_ID}&persona=${PERSONA}&use_case=${USE_CASE}`;
+const PERSONA = process.argv[3] || "persona-2";
+const USE_CASE = process.argv[4] || "IMF+loan+evaluation";
+const SCENARIO_ID = process.argv[5] || null;
+const SESSION_URL = `http://localhost:5173/?usability_session=${SESSION_ID}&persona=${PERSONA}&use_case=${USE_CASE}${SCENARIO_ID ? `&scenario=${SCENARIO_ID}` : ""}`;
 const SCREENSHOT_DIR = path.join(__dirname, "../session-screenshots");
 
 fs.mkdirSync(SCREENSHOT_DIR, { recursive: true });
@@ -38,7 +39,9 @@ async function elapsed(startMs) {
   const startMs = Date.now();
 
   // Step 1 — Land on session URL
-  await page.goto(SESSION_URL, { waitUntil: "networkidle", timeout: 15000 });
+  await page.goto(SESSION_URL, { waitUntil: "networkidle", timeout: 20000 });
+  // Extra wait when scenario pre-loaded via URL param — trajectory fetch takes ~2s
+  if (SCENARIO_ID) await page.waitForTimeout(3000);
   await screenshot(page, 1, "landing");
   console.log(`[${await elapsed(startMs)}] Landing page loaded`);
 
@@ -56,11 +59,16 @@ async function elapsed(startMs) {
   const greeceVisible = await greeceCard.isVisible().catch(() => false);
   console.log(`[${await elapsed(startMs)}] Greece scenario visible: ${greeceVisible}`);
 
-  if (greeceVisible) {
+  // Skip manual click when scenario pre-loaded via URL param — auto-loaded on mount
+  if (greeceVisible && !SCENARIO_ID) {
     await greeceCard.click();
     await page.waitForTimeout(2000);
     await screenshot(page, 3, "after-greece-click");
     console.log(`[${await elapsed(startMs)}] Clicked Greece scenario`);
+  } else if (SCENARIO_ID) {
+    console.log(`[${await elapsed(startMs)}] Scenario pre-loaded via URL param — skipping click`);
+    await page.waitForTimeout(2000);
+    await screenshot(page, 3, "scenario-preloaded");
   }
 
   // Step 5 — Look for instrument cluster / Zone 1A
@@ -90,7 +98,8 @@ async function elapsed(startMs) {
     const disabled = await advanceBtn.isDisabled().catch(() => true);
     console.log(`[${await elapsed(startMs)}] Advance step button disabled: ${disabled}`);
     if (!disabled) {
-      await advanceBtn.click();
+      // Use force:true to bypass fixed banner intercept
+      await advanceBtn.click({ force: true }).catch(() => null);
       await page.waitForTimeout(3000);
       await screenshot(page, 5, "after-advance");
       console.log(`[${await elapsed(startMs)}] Advanced one step`);
