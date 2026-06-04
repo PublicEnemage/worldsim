@@ -211,6 +211,16 @@ Audit above is complete.**
    The scan was run against all new code in the milestone. Findings from the scan are
    either remediated or tracked as open Issues with appropriate labels.
 
+2a. **Fidelity dashboard audit (Issue #513).** For each structural gap card in the
+   fidelity dashboard that carries a milestone deferral label (e.g. "DEFERRED TO M7"):
+   verify the referenced milestone is still open and in the future. Any card referencing
+   a completed milestone must be updated to the current target milestone or removed if
+   the gap has been resolved. A stale deferral label means the fidelity dashboard is
+   reporting a gap that has either been resolved (invisible fix) or repeatedly deferred
+   without explicit re-targeting (accountability gap). Both are findings. Record the
+   audit result as a comment on the exit checklist Issue — either "all fidelity gap
+   cards verified against open future milestones" or a list of cards updated and why.
+
 3. **Frontend smoke test completed (milestones with frontend deliverables).** Before
    closing a milestone, manually verify in the browser that every frontend feature
    delivered in the milestone is reachable from the UI. Specifically: can a user access

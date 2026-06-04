@@ -9,6 +9,29 @@
 
 ---
 
+## Milestone Registry (Issue #412)
+
+**This table is the single source of truth for milestone number, canonical title, and core deliverable.** GitHub milestone titles must match the Title column exactly. When a milestone is renamed, update this table and the GitHub milestone title in the same operation — not as a follow-up. Drift between this table and GitHub is a compliance finding.
+
+| Milestone | Canonical Title | Core Deliverable | Status |
+|---|---|---|---|
+| M0 | Foundation | Simulation engine core, data architecture, PostGIS | Complete |
+| M1 | Simulation Core | Event propagation, control inputs, entity model | Complete |
+| M2 | Geospatial Foundation | MapLibre frontend, choropleth, territorial validation | Complete |
+| M3 | Scenario Engine | Multi-step scenarios, snapshots, API, comparative output | Complete |
+| M4 | Human Cost Ledger | DemographicModule, cohort tracking, human development axis | Complete |
+| M5 | Calibration and Uncertainty | MacroeconomicModule, banding engine, confidence tiers | Complete |
+| M6 | Backtesting Coverage Expansion | Greece fixture, Argentina fixture, fidelity framework | Complete |
+| M7 | Technical Foundation | EcologicalModule, GovernanceModule, MDA system | Complete |
+| M8 | Ecological and Governance Frameworks | Instrument cluster design, four-framework UX | Complete |
+| M9 | Standards Foundation | Standards framework, compliance scan, UX architecture | Complete |
+| M10 | Engine Integrity and Instrument Delivery | TrajectoryView, PMM, MDA alerts, matrix investigation groundwork | Complete |
+| M11 | Engine Investigation and Political Economy | ADR-009, sparse matrix PoC, Phase 2 A/B validation | Current |
+| M12 | Active Control and External Sector | Matrix engine production, external sector module, Mode 3 | Next |
+| M13 | Methodology Publication | External release preparation, methodology documentation | Planned |
+
+---
+
 ## Where We Are
 
 WorldSim v0.8.0 is released. Eight milestones of foundational work are complete: the simulation engine, the data architecture, the backtesting infrastructure, the four-framework measurement system (financial, human development, ecological, governance), the Greece 2010–2015 and Argentina 2001–2002 backtesting fixtures, the multi-agent development team, the governance and compliance framework, and the UX design foundation.

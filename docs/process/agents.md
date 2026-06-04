@@ -78,6 +78,10 @@ Operating modes:
 
   **Cadence:** HORIZON is run at two fixed points per milestone: (1) the milestone creation ceremony (immediately after the new milestone's scope is defined in GitHub), and (2) the milestone midpoint (approximately halfway through the milestone's expected duration, as recorded in `SESSION_STATE.md`). PM Agent holds R for scheduling both sweeps. EL holds A for approving any scope changes the sweep surfaces. A HORIZON sweep may also be triggered ad hoc when scope drift is suspected, but the two fixed points are non-negotiable regardless of ad hoc sweeps.
 
+  8. DUAL-USE COVERAGE CHECK — for each PR merged since the last HORIZON sweep that added or significantly modified a new analytical capability: verify either (a) the Security Agent was consulted on dual-use concerns in the PR discussion, or (b) confirm the capability is not a dual-use surface based on the criteria in `docs/process/agents.md §Security and Review Agent §Persona`. Any new analytical capability without documented dual-use review is flagged to EL. (Issue #529)
+
+  A capability counts as "new analytical capability" if it: (1) introduces a new measurement framework or indicator, (2) exposes a new pattern of country vulnerability or exploitability, (3) adds a new scenario output type that could be repurposed to identify attack vectors, or (4) introduces new methodology disclosure that reveals calibration parameters. Infrastructure changes, documentation updates, and process changes are not analytical capabilities and do not require dual-use review. When in doubt, flag to the Security Agent — the cost of a false positive is one review; the cost of a false negative is a mission violation.
+
   **Note — RACI completeness (Issue #527):** Step 5 above (FILE AUTHORITY AUDIT) covers per-PR file authority violations retroactively. It does not cover structural gaps in the ownership table — specifically, active agents that have no R row at all. That structural check is a milestone exit gate item (see `docs/MILESTONE_RUNBOOK.md §Milestone Closure Ceremony step 9`), not a HORIZON sweep item. Do not fold the structural completeness check into HORIZON — it belongs at exit, where the full agent roster for the closing milestone can be assessed against the table as a whole.
 - **FOCUS:** One action and one reason. No list. No context.
 - **EXECUTE:** Execute a named task directly — file issues, update trackers, run mechanical operations as instructed.
@@ -425,6 +429,8 @@ Audits for vulnerabilities, dependency issues, data handling problems. Specifica
 Dual-use check: Is this feature more useful for executing financial attacks than for defending against them? If yes, it is out of scope for WorldSim — see CLAUDE.md §Guiding Principles ("Defense, Not Offense").
 
 **Relationships:** Reviews Implementation Agent output before merge for security-sensitive features. Reports directly to Engineering Lead for dual-use concerns.
+
+**Note — HORIZON step 8 (Issue #529):** PM Agent HORIZON sweep step 8 is a retroactive dual-use coverage check: for each PR merged since the last HORIZON sweep that added a new analytical capability, PM Agent verifies that the Security Agent was consulted or documents that the capability is not a dual-use surface. This retroactive check does not replace implementation-time dual-use review — it is the safety net for cases where the implementing agent did not recognize the dual-use surface. The Security Agent should continue to be activated at implementation time whenever an activation trigger fires. The HORIZON step ensures that missed activations are caught at sweep time rather than at stakeholder session time.
 
 ---
 
