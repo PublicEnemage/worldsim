@@ -172,19 +172,25 @@ surface: any milestone entry with UNTRACKED items is an open kickoff gate.
 **What ships:**
 
 *Matrix engine migration:*
-- Production migration — iterative engine retired after Phase 2 equivalence confirmed across full backtesting suite
-- Cloud compute path scoped — infrastructure design documented, pricing model proposed for high-resolution institutional use cases
+- Production migration — iterative engine retired after Phase 2 equivalence confirmed across full backtesting suite → Issue #749 (horizon:immediate)
+- Cloud compute path scoped — infrastructure design documented, pricing model proposed for high-resolution institutional use cases → Issue #750 (horizon:immediate)
 
 *External sector module:*
-- Bilateral trade shock as standard scheduled input type — enables Canadian steel tariff scenarios and similar trade policy cases
-- Commodity price shock as global parameter propagating through relationship graph — enables Hormuz closure, multi-country cascade scenarios
-- Multi-scenario comparison lifted beyond two-scenario limit — enables Kenya budget planning with three competing proposals
+- Bilateral trade shock as standard scheduled input type — enables Canadian steel tariff scenarios and similar trade policy cases → Issue #751 (horizon:immediate)
+- Commodity price shock as global parameter propagating through relationship graph — enables Hormuz closure, multi-country cascade scenarios → Issue #752 (horizon:immediate)
+- Multi-scenario comparison lifted beyond two-scenario limit — enables Kenya budget planning with three competing proposals → Issue #394 (horizon:near-term)
 
 *Mode 3 active control:*
-- Policy instrument inputs with live trajectory response and automatic A/B comparison
-- Multi-country scenario configuration
+- Policy instrument inputs with live trajectory response and automatic A/B comparison → Issue #753 (horizon:immediate)
+- Multi-country scenario configuration → Issue #754 (horizon:immediate)
 
-**Demo:** Demo 4 at M12 close. A Jordanian finance ministry analyst runs a Strait of Hormuz closure scenario on a standard laptop. The democratization mission made concrete.
+*UX prerequisites (from M11.5 exit findings — added 2026-06-05):*
+- Persistent scenario identity header → Issue #744 (horizon:immediate)
+- Interactive alert panel with drill-in → Issue #745 (horizon:immediate)
+- Mode 2 fiscal multiplier parameter input → Issue #746 (horizon:immediate)
+- Zone 1 cohort disaggregation → Issue #747 (horizon:immediate)
+
+**Demo:** Demo 4 at M12 close. A Jordanian finance ministry analyst runs a Strait of Hormuz closure scenario on a standard laptop. The democratization mission made concrete. → Issue #755 (horizon:immediate)
 
 **Canonical user primarily served:** Persona 2 (Finance Ministry Negotiator) in Mode 3 active control — in a global south context rather than European.
 
