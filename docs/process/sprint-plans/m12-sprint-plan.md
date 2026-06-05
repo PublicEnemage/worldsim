@@ -47,9 +47,11 @@ All four Wave 1 groups can be worked and merged in any order. No group depends o
 - Four cohort indicators in Zone 1 with value + direction + tier, alongside composites
 - Cold-start agent can identify loaded scenario in turn 1 from screenshot alone
 
+**Execution narrative:** Frontend-only PR with no backend changes. Two new components: `ScenarioIdentityHeader` (Zone 0 banner: Scenario / Entity / Status) and `CohortIndicatorsPanel` (Zone 1A strip with 4 HD indicators, polarity-aware direction arrows, confidence tier badges). Atomic `hdState` pattern (single useState) prevents stale-closure on current→prev indicator swap. Choropleth amber highlight layer added on active scenario entity. 28 unit tests across `formatStatus`, `computeDirection`, `directionGlyph`, `formatIndicatorValue`. Build gate clean. Zero backend changes required — measurement-output API already surfaced the HD data.
+
 ---
 
-### G2 — Alert panel drill-in: #745
+### G2 — Alert panel drill-in: #745 ✓ DONE (2026-06-05, PR #764)
 
 **Why own group:** Alert panel expansion is architecturally distinct from display additions — it introduces click state, expansion behaviour, and possibly alert API enrichment. Different component, different interaction model. The backend surface is narrow (ensure `indicator_name` is non-null in alert response; `/trajectory` already provides the time-series data).
 
@@ -62,6 +64,8 @@ All four Wave 1 groups can be worked and merged in any order. No group depends o
 - Human-readable indicator name always present
 - "See alerts" text in zone-1d navigates to alert detail for that framework's primary alert
 - Alert text legible at 1440×900
+
+**Execution narrative:** Backend + frontend change. Backend: `indicator_name: str` added to `MDAAlert` schema — always non-null, title-cased from `indicator_key` via `_indicator_name()` helper, persisted in `events_snapshot` JSONB with fallback reconstruction for historical snapshots. Frontend: `Zone1BAlert` store type extended with `indicator_name`, `floor_value`, `current_value`, `approach_pct_remaining`, `consecutive_breach_steps`. Alert rows made clickable (toggle on/off); `focusedAlertMdaId` local state in `ScenarioInstrumentCluster` (UI state, not simulation state) wired to both Zone 1B and Zone 1D. `AlertDetailPanel` renders inline below the list: indicator display name (frontend registry overrides backend title-case), SVG sparkline of framework composite score trajectory with dashed MDA floor line and crossing step marker, value snapshot grid. Zone 1D gets "Primary dimension — see alerts →" button per framework row. `buildSparklinePoints` pure function + 7 new tests; 170 total tests passing.
 
 ---
 
