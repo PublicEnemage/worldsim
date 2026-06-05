@@ -2,9 +2,9 @@ name: WorldSim CI
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [ main, develop, release/m* ]
   pull_request:
-    branches: [ main ]
+    branches: [ main, release/m* ]
 
 jobs:
   # ---------------------------------------------------------------------------
