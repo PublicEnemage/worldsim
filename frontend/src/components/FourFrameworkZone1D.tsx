@@ -16,6 +16,7 @@
 import React from "react";
 import { useScenarioStepStore } from "../store/scenarioStepStore";
 import { FRAMEWORK_COLORS } from "../constants/frameworkColors";
+import { sortAlerts } from "./MDAAlertPanelZone1B";
 
 // ---------------------------------------------------------------------------
 // Exported constants and pure functions (tested by FourFrameworkZone1D.test.ts)
@@ -64,6 +65,8 @@ interface FourFrameworkZone1DProps {
   isLoading?: boolean;
   /** True if the trajectory fetch failed (IR-006). */
   isError?: boolean;
+  /** Called when the user clicks "see alerts →" for a framework (#745). */
+  onSelectFrameworkAlert?: (mdaId: string) => void;
 }
 
 const CONTAINER_STYLE: React.CSSProperties = {
@@ -79,8 +82,17 @@ export function FourFrameworkZone1D({
   "data-testid": dataTestId = "zone-1d-four-framework",
   isLoading = false,
   isError = false,
+  onSelectFrameworkAlert,
 }: FourFrameworkZone1DProps) {
-  const { trajectory, current_step } = useScenarioStepStore();
+  const { trajectory, current_step, mda_alerts } = useScenarioStepStore();
+
+  // Top alert per framework for the "see alerts →" navigation link (#745)
+  const topAlertByFramework: Record<string, string> = {};
+  for (const alert of sortAlerts(mda_alerts)) {
+    if (!(alert.framework in topAlertByFramework)) {
+      topAlertByFramework[alert.framework] = alert.mda_id;
+    }
+  }
 
   const currentStepData = trajectory?.steps.find(
     (s) => s.step_index === current_step,
@@ -174,22 +186,44 @@ export function FourFrameworkZone1D({
               opacity: isNull ? 0.6 : 1,
             }}
           >
-            <span
-              data-testid={`framework-label-${key}`}
-              style={{
-                fontSize: 11,
-                color: "#555",
-                fontWeight: 500,
-              }}
-            >
-              {displayLabel}
-              {key === "ecological" && (
-                <span
-                  data-testid="ecological-boundary-note"
-                  style={{ display: "block", fontSize: 9, color: "#888", fontWeight: 400 }}
+            <span style={{ display: "flex", flexDirection: "column", gap: 1 }}>
+              <span
+                data-testid={`framework-label-${key}`}
+                style={{
+                  fontSize: 11,
+                  color: "#555",
+                  fontWeight: 500,
+                }}
+              >
+                {displayLabel}
+                {key === "ecological" && (
+                  <span
+                    data-testid="ecological-boundary-note"
+                    style={{ display: "block", fontSize: 9, color: "#888", fontWeight: 400 }}
+                  >
+                    1.0 = boundary
+                  </span>
+                )}
+              </span>
+              {/* "Primary dimension — see alerts →" navigation link (#745) */}
+              {topAlertByFramework[key] && onSelectFrameworkAlert && (
+                <button
+                  data-testid={`see-alerts-${key}`}
+                  onClick={() => onSelectFrameworkAlert(topAlertByFramework[key])}
+                  style={{
+                    background: "none",
+                    border: "none",
+                    padding: 0,
+                    cursor: "pointer",
+                    color: "#cc0000",
+                    fontSize: 9,
+                    textAlign: "left",
+                    fontWeight: 600,
+                    letterSpacing: 0.2,
+                  }}
                 >
-                  1.0 = boundary
-                </span>
+                  Primary dimension — see alerts →
+                </button>
               )}
             </span>
 

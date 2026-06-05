@@ -15,6 +15,9 @@
     "Bash(grep *)",
     "Bash(until *)",
     "Bash(python3 *)",
-    "Bash(python *)"
+    "Bash(python *)",
+    "Bash(source *)",
+    "Bash(/opt/homebrew/bin/python3* *)",
+    "Bash(/usr/local/bin/python3* *)"
   ]
 }

@@ -304,6 +304,7 @@ def test_alerts_to_events_snapshot_event_id() -> None:
         mda_id="MDA-FIN-RESERVES",
         entity_id="GRC",
         indicator_key="reserve_coverage_months",
+        indicator_name="Reserve Coverage Months",
         severity=MDASeverity.CRITICAL,
         floor_value="2.5",
         current_value="2.0",
@@ -327,6 +328,7 @@ def test_alerts_from_events_snapshot_round_trip() -> None:
         mda_id="MDA-FIN-RESERVES",
         entity_id="GRC",
         indicator_key="reserve_coverage_months",
+        indicator_name="Reserve Coverage Months",
         severity=MDASeverity.TERMINAL,
         floor_value="2.5",
         current_value="1.8",
@@ -339,6 +341,7 @@ def test_alerts_from_events_snapshot_round_trip() -> None:
     assert recovered[0].severity == MDASeverity.TERMINAL
     assert recovered[0].consecutive_breach_steps == 2
     assert recovered[0].mda_id == "MDA-FIN-RESERVES"
+    assert recovered[0].indicator_name == "Reserve Coverage Months"
 
 
 # ---------------------------------------------------------------------------

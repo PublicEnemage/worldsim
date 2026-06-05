@@ -109,6 +109,7 @@ class MDAChecker:
                         mda_id=threshold.mda_id,
                         entity_id=entity_id,
                         indicator_key=threshold.indicator_key,
+                        indicator_name=_indicator_name(threshold.indicator_key),
                         severity=severity,
                         floor_value=str(floor),
                         current_value=str(current),
@@ -150,6 +151,7 @@ def alerts_to_events_snapshot(
             "mda_id": alert.mda_id,
             "entity_id": alert.entity_id,
             "indicator_key": alert.indicator_key,
+            "indicator_name": alert.indicator_name,
             "severity": alert.severity.value,
             "floor_value": alert.floor_value,
             "current_value": alert.current_value,
@@ -182,11 +184,13 @@ def alerts_from_events_snapshot(
         if entity_id is not None and evt.get("entity_id") != entity_id:
             continue
         try:
+            key = evt["indicator_key"]
             alerts.append(
                 MDAAlert(
                     mda_id=evt["mda_id"],
                     entity_id=evt["entity_id"],
-                    indicator_key=evt["indicator_key"],
+                    indicator_key=key,
+                    indicator_name=evt.get("indicator_name") or _indicator_name(key),
                     severity=MDASeverity(evt["severity"]),
                     floor_value=evt["floor_value"],
                     current_value=evt["current_value"],
@@ -202,6 +206,15 @@ def alerts_from_events_snapshot(
 # ---------------------------------------------------------------------------
 # Private helpers
 # ---------------------------------------------------------------------------
+
+
+def _indicator_name(indicator_key: str) -> str:
+    """Convert snake_case indicator key to a human-readable title-case string.
+
+    Frontend display-name registries produce more precise labels; this provides
+    a reliable non-null baseline so indicator_name is never null in the API response.
+    """
+    return indicator_key.replace("_", " ").title()
 
 
 def _build_prior_counts(
