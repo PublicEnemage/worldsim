@@ -17,6 +17,7 @@
     "Bash(python3 *)",
     "Bash(python *)",
     "Bash(source *)",
+    "Bash(command *)",
     "Bash(/opt/homebrew/bin/python3* *)",
     "Bash(/usr/local/bin/python3* *)"
   ]
