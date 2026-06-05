@@ -26,8 +26,10 @@ import { InstrumentCluster, LAYOUT, useViewportBreakpoint } from "./InstrumentCl
 import { MDAAlertPanelZone1B } from "./MDAAlertPanelZone1B";
 import { PMMWidgetZone1C } from "./PMMWidgetZone1C";
 import { FourFrameworkZone1D } from "./FourFrameworkZone1D";
+import { CohortIndicatorsPanel } from "./CohortIndicatorsPanel";
 import { useScenarioStepStore } from "../store/scenarioStepStore";
 import type { TrajectoryResponse, TrajectoryFrameworkPoint, Zone1BAlert } from "../store/scenarioStepStore";
+import type { QuantitySchema } from "../types";
 
 const API_BASE = "http://localhost:8000/api/v1";
 
@@ -191,6 +193,13 @@ export function ScenarioInstrumentCluster({
   const [trajectoryLoading, setTrajectoryLoading] = useState(false);
   const [trajectoryError, setTrajectoryError] = useState(false);
 
+  // Human development indicators for CohortIndicatorsPanel (Issue #747).
+  // Single state object ensures current→prev swap is atomic (avoids stale closure).
+  const [hdState, setHdState] = useState<{
+    current: Record<string, QuantitySchema> | null;
+    prev: Record<string, QuantitySchema> | null;
+  }>({ current: null, prev: null });
+
   // Initialise store when scenario changes
   useEffect(() => {
     store.setScenario(scenarioId, stepCount, "MODE_1");
@@ -264,9 +273,29 @@ export function ScenarioInstrumentCluster({
       .then((raw) => {
         if (cancelled || !raw) return;
         store.setMdaAlerts(parseMdaAlerts(raw));
+
+        // Extract human development indicators for cohort panel (Issue #747).
+        // indicators is Record<string, QuantitySchema | Record<string, QuantitySchema>>;
+        // only flat (non-nested) entries are QuantitySchema — nested cohort objects are skipped.
+        const hdOutput = raw.outputs["human_development"];
+        if (hdOutput) {
+          const flat: Record<string, QuantitySchema> = {};
+          for (const [k, v] of Object.entries(hdOutput.indicators)) {
+            if (
+              v !== null &&
+              typeof v === "object" &&
+              "value" in v &&
+              typeof (v as { value: unknown }).value === "string"
+            ) {
+              flat[k] = v as QuantitySchema;
+            }
+          }
+          // Atomic current→prev swap via functional updater — avoids stale closure
+          setHdState((s) => ({ prev: s.current, current: flat }));
+        }
       })
       .catch(() => {
-        // Non-fatal — Zone 1B remains in previous state
+        // Non-fatal — Zone 1B and cohort panel remain in previous state
       });
 
     return () => {
@@ -283,6 +312,12 @@ export function ScenarioInstrumentCluster({
         <FourFrameworkZone1D
           isLoading={trajectoryLoading}
           isError={trajectoryError}
+        />
+      }
+      cohortPanel={
+        <CohortIndicatorsPanel
+          indicators={hdState.current}
+          prevIndicators={hdState.prev}
         />
       }
     />

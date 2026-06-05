@@ -5,6 +5,7 @@ import DeltaChoropleth from "./components/DeltaChoropleth";
 import EntityDetailDrawer from "./components/EntityDetailDrawer";
 import FidelityDashboard from "./components/FidelityDashboard";
 import { ModeIndicator } from "./components/ModeIndicator";
+import { ScenarioIdentityHeader } from "./components/ScenarioIdentityHeader";
 import { ScenarioInstrumentCluster } from "./components/ScenarioInstrumentCluster";
 import ScenarioControls from "./components/ScenarioControls";
 import ScenarioPanel from "./components/ScenarioPanel";
@@ -83,6 +84,8 @@ export default function App() {
   const [panelOpen, setPanelOpen] = useState(false);
   const [fidelityOpen, setFidelityOpen] = useState(false);
   const [selectedEntityId, setSelectedEntityId] = useState<string | null>(null);
+  // Primary entity for the active scenario — used by ScenarioIdentityHeader and choropleth highlight (#744)
+  const [activeEntityId, setActiveEntityId] = useState<string | null>(null);
   // Incremented on every advance — ScenarioPanel watches this to refresh the list.
   const [scenarioListVersion, setScenarioListVersion] = useState(0);
 
@@ -99,6 +102,7 @@ export default function App() {
     setSelectedScenarioSteps(totalSteps);
     setCurrentStep(null);
     setSelectedEntityId(null);
+    setActiveEntityId(null);
     writeStoredScenario({ id, name, totalSteps });
   };
 
@@ -151,9 +155,8 @@ export default function App() {
       setAttributeName(key);
   }, [setSelectedEntityId, setAttributeName]);
 
-  // When a scenario is selected, check if it's already completed and fast-forward
-  // currentStep to its final step — ScenarioControls won't emit onStepChange for
-  // a scenario that was completed before this session.
+  // When a scenario is selected: fast-forward currentStep if already completed,
+  // and extract the primary entity for the identity header + choropleth highlight (#744).
   useEffect(() => {
     if (!selectedScenarioId) return;
 
@@ -165,9 +168,12 @@ export default function App() {
         if (detail.status === "completed") {
           setCurrentStep(detail.configuration.n_steps);
         }
+        // Set primary entity for identity header and choropleth highlight
+        const primaryEntity = detail.configuration.entities?.[0] ?? null;
+        setActiveEntityId(primaryEntity);
       })
       .catch(() => {
-        // Non-fatal — currentStep stays at whatever handleSelectScenario set
+        // Non-fatal — currentStep and activeEntityId stay at previous values
       });
 
     return () => {
@@ -235,6 +241,16 @@ export default function App() {
       {fidelityOpen && <FidelityDashboard />}
 
       <main className="app-main" style={{ position: "relative" }}>
+        {/* Scenario identity header — always visible when scenario active (Issue #744, GAP-02) */}
+        {selectedScenarioId && selectedScenarioName && (
+          <ScenarioIdentityHeader
+            scenarioName={selectedScenarioName}
+            entityId={activeEntityId}
+            currentStep={currentStep}
+            totalSteps={selectedScenarioSteps}
+          />
+        )}
+
         {/* Instrument cluster — primary viewport when a scenario is active (CLAUDE.md UX commitment 1) */}
         {selectedScenarioId && (
           <div style={{ overflowX: "auto", background: "#fafafa", borderBottom: "1px solid #e8e8e8" }}>
@@ -261,6 +277,7 @@ export default function App() {
             scenarioId={selectedScenarioId}
             currentStep={currentStep}
             onEntityClick={selectedScenarioId ? handleEntityClick : undefined}
+            activeEntityId={activeEntityId}
           />
         )}
 
