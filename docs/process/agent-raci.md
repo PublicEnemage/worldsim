@@ -566,6 +566,8 @@ finalized — not afterward.
 | `docs/compliance/` (other files) | EL | Sr, Ar | Sr consulted on security findings; Ar on compliance-architecture intersections |
 | `docs/demo/` | PM | CU, UD | PM owns demo preparation sequence and walkthrough documents; Customer Agent consulted on Layer 3 usability framing; UX Designer consulted when demo content involves zone or hierarchy decisions (UX-RULING-4). Demo preparation is a blocking exit requirement per milestone — a demo preparation issue must be filed and linked in the milestone exit checklist before the checklist closes. (Issue #537) |
 | `docs/roadmap/` | PM | EL, Ar | EL holds A on roadmap decisions; Ar consulted on milestone architecture |
+| `docs/process/sprint-plans/` | PM | EL | PM produces sprint plan documents; EL approves before implementation begins. BPO, FA, CE, and Ar are consulted during plan production per `docs/process/sprint-planning-sop.md` but do not hold R. |
+| `docs/process/sprint-planning-sop.md` | PM | EL | PM owns sprint planning process; EL approves SOP changes |
 | `docs/data-sources/` | DA | DI (CM) | Chief Methodologist consulted on approved-source methodology changes |
 | `docs/standards/` | EL | Ar, PM | Standards documents; Ar and PM consulted on process-affecting changes |
 | `docs/CONTRIBUTING.md` | EL | PM, Ar | Process-affecting changes require PM and Architect review |

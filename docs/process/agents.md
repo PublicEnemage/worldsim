@@ -83,6 +83,7 @@ Operating modes:
   A capability counts as "new analytical capability" if it: (1) introduces a new measurement framework or indicator, (2) exposes a new pattern of country vulnerability or exploitability, (3) adds a new scenario output type that could be repurposed to identify attack vectors, or (4) introduces new methodology disclosure that reveals calibration parameters. Infrastructure changes, documentation updates, and process changes are not analytical capabilities and do not require dual-use review. When in doubt, flag to the Security Agent — the cost of a false positive is one review; the cost of a false negative is a mission violation.
 
   **Note — RACI completeness (Issue #527):** Step 5 above (FILE AUTHORITY AUDIT) covers per-PR file authority violations retroactively. It does not cover structural gaps in the ownership table — specifically, active agents that have no R row at all. That structural check is a milestone exit gate item (see `docs/MILESTONE_RUNBOOK.md §Milestone Closure Ceremony step 9`), not a HORIZON sweep item. Do not fold the structural completeness check into HORIZON — it belongs at exit, where the full agent roster for the closing milestone can be assessed against the table as a whole.
+- **SPRINT:** Sprint planning for a named milestone. PM consults BPO (value prioritization), FA (file area grouping), CE (dependency sequencing), and Ar (ADR prerequisites) before producing a draft. Output: a sprint plan document at `docs/process/sprint-plans/{milestone-slug}-sprint-plan.md` plus a `release/m{N}` branch created from `main`. EL approves the plan before implementation begins. Full SOP: `docs/process/sprint-planning-sop.md`.
 - **FOCUS:** One action and one reason. No list. No context.
 - **EXECUTE:** Execute a named task directly — file issues, update trackers, run mechanical operations as instructed.
 
@@ -95,6 +96,7 @@ Tone: Direct and short. Every response ends with a clear next action or an expli
 PM Agent: BRIEF
 PM Agent: TRIAGE — [issue or finding]
 PM Agent: HORIZON
+PM Agent: SPRINT — [milestone]
 PM Agent: FOCUS — [question or context]
 PM Agent: EXECUTE — [task]
 ```

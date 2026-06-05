@@ -1,8 +1,8 @@
 # CLAUDE.md — WorldSim Project Context
 
-> Last significant revision: 2026-05-30
-> Updated against: M11 active — M10 closed (v0.10.0); M11 current; M12 next; ADR-007 accepted; matrix engine investigation is primary M11 objective; political economy module is M11 stretch goal (EL decision 2026-06-03)
-> Previous version context: M9 exit (2026-05-23) — M9 Standards Foundation current, M10 next, ADR-007 forthcoming
+> Last significant revision: 2026-06-05
+> Updated against: M12 active — M11 closed (v0.11.0); release branch workflow added; PM Agent SPRINT mode added; sprint planning SOP codified (docs/process/sprint-planning-sop.md); .claude/settings.json pre-approved tool patterns added
+> Previous version context: 2026-05-30 — M11 active; matrix engine investigation primary M11 objective; political economy module M11 stretch goal (EL decision 2026-06-03)
 
 > **Reader Orientation:** This is the permanent project constitution — read it in full before beginning any session. It contains the mission, architectural commitments, and process rules that govern all work in this repository. Anyone making a change in this codebase, human or agent, must have read this document first. Key must-read sections if time is short: Session Continuity (what to read and in what order), Guiding Principles (the values behind every technical decision), and §Architectural Principles for Claude Code Sessions (process gates including pre-push lint, PR merge gate, and file authority rules that will cause compliance violations if not followed).
 
@@ -371,11 +371,18 @@ If the fix requires waiting for an upstream vendor → Known Issue.
 Known Issues are filed in `docs/process/known-issues-registry.md`.
 
 **PR merge gate — mandatory pause before next task.**
-After opening any PR, Claude Code must stop all git operations and file edits,
-report the PR URL, and explicitly hand off: *"Please merge when CI is green and
-confirm back — I'll pull main before continuing."* No next task begins, no files
-are edited, and no git commands run until the user confirms the merge and Claude
-Code has executed `git pull origin main`.
+After opening any PR targeting `main`, Claude Code must stop all git operations
+and file edits, report the PR URL, and explicitly hand off: *"Please merge when
+CI is green and confirm back — I'll pull main before continuing."* No next task
+begins, no files are edited, and no git commands run until the user confirms the
+merge and Claude Code has executed `git pull origin main`.
+
+**Exception — PRs targeting a release branch (`release/m{N}`).** Release branch
+PRs are pre-authorized for autonomous merge. Claude Code polls `gh pr checks`
+until the `changes` status check passes, then executes `gh pr merge <number>
+--merge` and pulls from the release branch without waiting for user confirmation.
+`release/m{N}` is an unprotected integration branch — admin bypass is not
+required. See §Release Branch Workflow below.
 
 **Exception — `SESSION_STATE.md`-only PRs.** End-of-session state updates that
 touch only `SESSION_STATE.md` are pre-authorized for auto-merge. Claude Code will
@@ -383,6 +390,27 @@ poll `gh pr checks` until the `changes` status check passes, then execute
 `gh pr merge <number> --admin --merge` and `git pull origin main` without waiting
 for user confirmation. If the PR contains any file other than `SESSION_STATE.md`,
 the standard gate applies regardless of the other file's content.
+
+**Release Branch Workflow.**
+Each milestone has a release branch (`release/m{N}`) cut from `main` at
+milestone kickoff by the PM Agent as part of sprint planning. All feature work
+during the milestone uses this pattern:
+
+1. Cut feature branch from `release/m{N}`: `git checkout -b feat/g1-xxx release/m12`
+2. Implement, run pre-push gates (lint, build), push feature branch
+3. Open PR targeting `release/m{N}` (not `main`)
+4. Poll CI; merge autonomously once `changes` passes: `gh pr merge <number> --merge`
+5. Pull from release branch: `git pull origin release/m{N}`
+6. Continue with next feature branch
+
+At milestone close, EL performs one admin bypass: `release/m{N}` → `main`.
+The release branch is never merged to `main` by Claude Code — that merge is
+always the Engineering Lead's action.
+
+`SESSION_STATE.md` updates during an active milestone target the release branch
+and follow the same autonomous merge rule as above (no `--admin` needed since
+the branch is unprotected). The auto-merge exception's `--admin` flag is needed
+only when the PR targets `main`.
 
 **Backend pre-push lint gate — mandatory before any `git push` touching Python files.**
 Before pushing any branch that modifies files under `backend/`, run:
