@@ -1,3 +1,4 @@
+from app.simulation.engine.matrix_propagation import propagate_matrix as propagate
 from app.simulation.engine.models import (
     Event,
     Geometry,
@@ -11,7 +12,6 @@ from app.simulation.engine.models import (
     SimulationModule,
     SimulationState,
 )
-from app.simulation.engine.propagation import propagate
 from app.simulation.engine.quantity import MonetaryValue, Quantity, VariableType
 
 __all__ = [
