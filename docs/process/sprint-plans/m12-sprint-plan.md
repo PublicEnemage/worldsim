@@ -133,6 +133,11 @@ All four Wave 1 groups can be worked and merged in any order. No group depends o
 
 **Gates:** G6, G8.
 
+**Riders (ship in same PR):**
+- #27 — Document calibration basis for propagation attenuation parameters (G5 introduces new propagation routing; document attenuation calibration here)
+- #92 — Greece 2010 fixture: bond yields, CDS proxy, credit tier (financial data useful for external sector backtesting)
+- #275 — Ecological-to-financial transmission calibration (resource export revenue channel feeds directly into commodity price shock)
+
 ---
 
 ### G7 — Cloud compute path doc: #750
@@ -149,6 +154,27 @@ All four Wave 1 groups can be worked and merged in any order. No group depends o
 
 ---
 
+### G9 — Political economy module: #392
+
+**Why own group:** M11 stretch goal explicitly deferred to M12 (CLAUDE.md: "carries to M12. EL decision 2026-06-03"). Models political feasibility constraints, conditionality, and elite capture dynamics — the gap exposed by Argentina and Ukraine/Pakistan marquee cases. Runs in parallel with G5/G7: requires only G4 (matrix engine in production), no dependency on external sector.
+
+**ADR prerequisite:** Political economy module introduces a new module boundary. ARCH-007 (ADR-013) must be authored and accepted before any implementation merges. Panel: Architect Agent (author), Political Economist, Chief Methodologist, Engineering Lead.
+
+**Shared files:** New `political_economy.py` module, `scenario_schemas.py` (conditionality input type), human cost ledger (political feasibility constraints on welfare outputs). Single test file.
+
+**Tests:** Conditionality constraint activation (feasibility gate blocks instrument below threshold). Elite capture channel unit test (benefit distribution shifts toward upper quintile under capture condition). Argentina fixture directional validation (political constraints tighten before default). Pakistan fixture directional validation (conditionality acceptance triggers programme sequence).
+
+**Acceptance gates:**
+- Political feasibility constraint accepted by scenario creation API
+- Conditionality modelling produces distinct trajectory from unconstrained baseline
+- Elite capture reduces bottom-quintile welfare transfer within 2 steps
+- Argentina and Ukraine/Pakistan marquee cases run without errors
+- Political economy ADR accepted before implementation merges
+
+**Gates:** G8 (Demo 4 benefits from political economy realism in Jordan scenario).
+
+---
+
 ## Wave 3 — After G3 + G4 + G5
 
 ### G6a — Multi-country scenario backend: #754
@@ -157,15 +183,19 @@ All four Wave 1 groups can be worked and merged in any order. No group depends o
 
 **Shared files:** `scenarios.py` API endpoint, `scenario_schemas.py` (`entity_ids` field), DB migration (entity membership, relationship edges), `simulation_runner.py` (multi-entity loop), choropleth component (highlight multiple active entities simultaneously), scenario identity header (#744) extended to list all active entities.
 
-**Tests:** API test (multi-entity creation, relationship seeding). 2-entity step advance performance gate (≤ 1.5× single-entity wall time on matrix engine). Synthetic relationship weight edge case (missing edges → Tier 4 weight, flagged).
+**Tests:** API test (multi-entity creation, relationship seeding). 2-entity step advance performance gate (≤ 1.5× single-entity wall time on matrix engine). Synthetic relationship weight edge case (missing edges → Tier 4 weight, flagged). Multi-country validation suite design document (covers statistical validity requirements beyond 2-step single-country pass).
 
 **Acceptance gates:**
 - Scenario creation API accepts `entity_ids: list[str]` (minimum 1, up to 5)
 - Each entity independently seeded from source registry
 - Commodity price shock (#752) distributes to all entities in one step
-- Choropleth highlights all active entities
+- Choropleth highlights all active entities with absolute MDA threshold overlay markers
 - Demo 4 Jordan scenario runs with 2 entities (Jordan + commodity reference)
 - Performance gate: 2-entity step ≤ 1.5× single-entity on matrix engine
+
+**Riders (ship in same PR):**
+- #103 — Multi-country validation suite design (design doc for statistical validity of multi-country backtesting; ships in same PR as the backend it validates)
+- #153 — Absolute threshold overlay in DeltaChoropleth (G6a already touches choropleth for multi-entity highlight; MDA threshold markers are the natural addition)
 
 ---
 
@@ -173,19 +203,30 @@ All four Wave 1 groups can be worked and merged in any order. No group depends o
 
 **Why own group (second half of G6):** Frontend-heavy. Activates `zone-control-plane`. Depends on G6a (multi-entity backend) and G3 (fiscal multiplier as first instrument). ADR-008 reserved the control plane layout zone — verify whether Mode 3 interaction model is covered or requires an ADR amendment before implementation begins.
 
+**Prerequisites before implementation begins (in order):**
+1. **#613 — CE branch-and-recompute assessment** (Chief Engineer must post assessment to issue #613 covering: mid-run serialization capability, scenario object model recommendation, estimated scope, ADR-009 implications). This assessment must exist before G6b enters scoping.
+2. **#614 — Mode 3 interaction spec** (blocked by #613; interaction design covering recompute loading state, ghost baseline behaviour, error state, and explicit latency budget must precede Mode 3 Zustand store design).
+
 **Shared files:** `zone-control-plane` component (new), `App.tsx` (mode routing and mode indicator), `TrajectoryView.tsx` (A/B baseline vs. modified display — builds on G3's overlay work), `zone-1d` human cost delta display, mode indicator component.
 
-**ADR prerequisite:** Confirm ADR-008 covers Mode 3 interaction model sufficiently, or file an amendment before implementation begins.
+**ADR prerequisite:** Confirm ADR-008 covers Mode 3 interaction model sufficiently (Decision 10 covers live A/B UX; #613 assessment may identify engine-layer ADR amendment need), or file amendment before implementation begins.
 
-**Tests:** Playwright E2E — parameter change → trajectory recompute → both curves visible → delta in zone-1d, on Greece fixture. Mode 3 → Mode 1 → Mode 3 roundtrip without losing scenario. Performance: parameter change → update ≤ 100ms on ProBook i5-8265U (MV-002 Mode 3 gate).
+**Tests:** Playwright E2E — parameter change → trajectory recompute → both curves visible → delta in zone-1d, on Greece fixture. Mode 3 → Mode 1 → Mode 3 roundtrip without losing scenario. Performance: parameter change → update ≤ 100ms on ProBook i5-8265U (MV-002 Mode 3 gate, #569). Reversibility classification: recoverable vs. irreversible output appears in zone-1d. Mode 1 → Mode 2 transition preserves current step position.
 
 **Acceptance gates:**
 - `zone-control-plane` renders at least two configurable policy instruments without scroll
-- Parameter change → trajectory update ≤ 100ms on ProBook
+- Parameter change → trajectory update ≤ 100ms on ProBook (MV-002 gate, #569)
 - Baseline and modified trajectories simultaneously visible with legend
-- Human cost delta visible in zone-1d within same update cycle
+- Human cost delta visible in zone-1d within same update cycle, including reversibility classification (#271)
 - A/B comparison is default when parameter changed (no manual enable)
 - Mode 3 reachable from Mode 1 and Mode 2 without losing loaded scenario
+- Mode 1 → Mode 2 transition preserves step position (#393)
+- Threshold-crossing markers flag when delta crosses MDA boundary (#97)
+
+**Riders (ship in same PR):**
+- #97 — Threshold-crossing markers in comparative output (MDA thresholds are Mode 3's primary guard)
+- #271 — Reversibility classification for simulation outputs (recoverable vs. irreversible in zone-1d)
+- #393 — Mode 1 → Mode 2 transition preserves step position (mode transitions resolved in G6b)
 
 ---
 
@@ -217,6 +258,17 @@ All four Wave 1 groups can be worked and merged in any order. No group depends o
 | #725 | Backend dep — mypy pin | One-line change; rider on any backend PR |
 | #644 | Frontend tooling — ESLint audit | Standalone; between any two frontend waves |
 | #394 | Multi-scenario comparison (>2) | Builds on G6a; treat as Wave 3 if capacity allows |
+| #13 | Compliance — dataclass attribute docs (CF-001-F06) | Compliance:deferred minor; rider on any backend PR |
+| #28 | Backend — cohort disaggregation architecture stubs | Income quintile × age band placeholders; standalone backend PR |
+| #30 | Backend — stock vs. flow variable distinction | Entity attribute model integrity; standalone backend PR |
+| #34 | Backend — investment climate state variables | Risk premium, credit spread, FDI stock, capital flow velocity; standalone backend PR |
+| #43 | Standards — split data_quality_tier into confidence_tier | Touches schema and data layer; standalone PR |
+| #45 | Standards — human development indicator standards, HCL effect size | Documentation + schema; standalone PR |
+| #90 | API — multi-attribute comparison endpoint | Return all attribute deltas in a single compare call; standalone backend PR |
+| #95 | Docs — ecological backtesting case planning | Pure documentation; no blockers |
+| #99 | API — trajectory comparison endpoint | Attribute values at all steps for two scenarios in one call; standalone backend PR |
+| #259 | Docs — CTO legibility metrics dashboard | Process/standards documentation |
+| #451 | UX — Mode 1 COMPARE_VIEW entry point spec | Comparable-case comparison spec; feeds Mode 1 analytical depth |
 
 ---
 
@@ -224,14 +276,14 @@ All four Wave 1 groups can be worked and merged in any order. No group depends o
 
 ```
 Wave 1 (parallel):   G1 · G2 · G3 · G4
-Wave 2:              G5 (needs G4) · G7 (needs G4)
-Wave 3:              G6a (needs G3 + G4 + G5) → G6b (needs G6a)
-Wave 4:              G8 (needs G1–G6 all merged)
+Wave 2:              G5 (needs G4) · G7 (needs G4) · G9 (needs G4)
+Wave 3:              G6a (needs G3 + G4 + G5) → G6b (needs G6a + #613 + #614)
+Wave 4:              G8 (needs G1–G6 + G9 all merged)
 ```
 
 **Critical path:** G4 → G5 → G6a → G6b → G8
 
-G1, G2, and G3 run on the parallel track. They must merge before G8 (Demo 4 requires instrument cluster and Mode 2) and before G6b (fiscal multiplier is Mode 3's first instrument).
+G1, G2, and G3 run on the parallel track. They must merge before G8 (Demo 4 requires instrument cluster and Mode 2) and before G6b (fiscal multiplier is Mode 3's first instrument). G9 (political economy) must merge before G8 (Demo 4 Jordan scenario benefits from political economy realism). #613 CE assessment must complete before G6b implementation begins.
 
 ---
 
@@ -239,6 +291,7 @@ G1, G2, and G3 run on the parallel track. They must merge before G8 (Demo 4 requ
 
 | Group | ADR requirement |
 |---|---|
-| G5 | External sector module ADR — new module boundary. Must be authored and accepted before G5 implementation merges. Check `docs/architecture/backlog.md` for next number. |
-| G6b | Confirm ADR-008 covers Mode 3 interaction model, or file amendment. Before G6b implementation begins. |
+| G5 | External sector module ADR — ARCH-006 (ADR-012). Must be authored and accepted before G5 implementation merges. On critical path. |
+| G6b | Confirm ADR-008 covers Mode 3 interaction model (Decision 10 covers live A/B UX). #613 CE assessment may surface engine-layer ADR amendment need — resolve before G6b implementation begins. |
+| G9 | Political economy module ADR — ARCH-007 (ADR-013). Must be authored and accepted before G9 implementation merges. Panel: Architect Agent, Political Economist, Chief Methodologist, Engineering Lead. |
 | All others | No ADR prerequisite. |
