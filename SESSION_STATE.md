@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-05 (M12 kickoff complete — PR #756 merged. 7 untracked roadmap deliverables filed (#749–#755), roadmap fully linked. Three open EL actions from HORIZON sweep: acknowledge #744–#747 as scope additions; decision on #725/#644 milestone assignment; NM registry delegation rule clarification.)**
+**Last updated: 2026-06-05 (NM-034 filed — PR #759 merged. PI Agent activated; NM registry no-delegation rule recorded as institutional memory. All three HORIZON sweep EL actions resolved: #744–#747 scope acknowledged; #725/#644 keep-as-is; RACI amended PR #758 + NM-034 PR #759.)**
 **Current milestone:** M12 — Active Control and External Sector (GitHub Milestone 13)
 **Previous milestone:** M11.5 — Usability Validation and Experience Audit (formally closed 2026-06-04; Issue #720 closed; GitHub Milestone 14 closed)
 
@@ -120,10 +120,10 @@ No open PRs — board clear as of 2026-06-04 (post PR #742 merge).
 | #394 | platform: multi-scenario comparison (>2 scenarios) | M12 roadmap §External sector module | near-term |
 | #263 | Milestone 12 Exit Checklist | Blocks M12 closure | immediate |
 
-**HORIZON sweep findings requiring EL action:**
-- Formally acknowledge #744–#747 as scope additions to M12 (from M11.5 findings, not in original roadmap)
-- #725 (mypy pin) and #644 (ESLint audit) on M12 board but not M12 scope — recommend moving off milestone
-- Near-miss registry filing pattern (NM entries written outside PI Agent role) — clarify delegation or amend file ownership table
+**HORIZON sweep findings — all resolved (2026-06-05):**
+- #744–#747 scope additions acknowledged (EL decision: no changes needed)
+- #725 (mypy pin) and #644 (ESLint audit): keep on M12 board (EL decision: keep as is)
+- NM registry delegation rule: RACI amended PR #758 (no-delegation clause); NM-034 filed PR #759 (PI Agent author-of-record pattern documented as institutional memory)
 
 ---
 
@@ -237,6 +237,9 @@ No open PRs — board clear as of 2026-06-04 (post PR #742 merge).
 
 | PR | Title | Date |
 |---|---|---|
+| #759 | process(integrity): NM-034 — PM Agent filed NM entries without PI activation | 2026-06-05 |
+| #758 | process(raci): NM registry no-delegation clause — PI Agent activation required before any NM entry | 2026-06-05 |
+| #756 | docs(roadmap): M12 scope linkage — all deliverables linked to GitHub issues (#749–#755) | 2026-06-05 |
 | #742 | docs(ux): M11.5 tertiary deliverable — feature catalogue with per-capability discoverability | 2026-06-04 |
 | #741 | docs(ux): M11.5 Priority A synthesis — cross-session findings, ranked M12 actions, exit verdict | 2026-06-04 |
 | #740 | chore(state): SESSION_STATE.md — M11.5 Priority A sessions complete (PRs #736/#738/#739) | 2026-06-04 |
