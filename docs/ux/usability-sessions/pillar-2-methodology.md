@@ -154,6 +154,23 @@ information visible" — the verdict matters for findings classification.
 
 ## §4 — Session Facilitation Approach (UX Design Thinking Agent)
 
+### Session runner (updated 2026-06-05)
+
+Two session runners exist. The **Interactive Playwright loop** is the canonical default:
+
+| Runner | Script | Requirement | When to use |
+|---|---|---|---|
+| Interactive Playwright loop | `scripts/run_usability_session_interactive.py` | Python + Playwright only; no API key | **Default.** Claude Code drives the browser via Playwright in the same terminal session. Think-aloud is produced inline. Artifact handoff is manual (coordinator saves transcript). |
+| Computer-use runner | `scripts/run_usability_session.py` | `ANTHROPIC_API_KEY` + Anthropic API credits | When you need a fully autonomous headless run without coordinator involvement. Requires API credits — not free. |
+
+**The Interactive Playwright loop is the default because:**
+- Requires no API key or credits — accessible to any contributor
+- Claude Code controls the browser directly via Playwright, producing the think-aloud transcript inline
+- The coordinator can observe in real time and take field notes
+- Sessions completed in M11.5 all used this runner
+
+The computer-use runner exists for fully automated batch runs when API access is available; it is not the canonical method and should not be assumed as the default by future coordinators.
+
 ### Before the session
 
 1. Coordinator assigns a session ID in the format `YYYY-MM-DD-<persona-id>-<seq>`.

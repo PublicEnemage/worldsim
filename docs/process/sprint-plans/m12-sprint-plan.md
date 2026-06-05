@@ -33,7 +33,7 @@ Groups are organized by shared file areas and dependency chains. A group is one 
 
 All four Wave 1 groups can be worked and merged in any order. No group depends on another within this wave.
 
-### G1 — Instrument cluster display: #744 + #747
+### G1 — Instrument cluster display: #744 + #747 ✓ DONE (2026-06-05, PR #762)
 
 **Why grouped:** Both are frontend-only additions to the Zone 1 component area. Existing `/measurement-output` already surfaces the cohort data; these issues add display. No backend changes. Sharing a PR reduces context switching across the same component tree.
 
