@@ -16,6 +16,7 @@ import {
   getNegotiationLabel,
   formatAlertText,
   truncateIndicatorName,
+  buildSparklinePoints,
   SEVERITY_ORDER,
   FRAMEWORK_ABBREV,
 } from "../MDAAlertPanelZone1B";
@@ -31,10 +32,15 @@ function makeAlert(
   return {
     mda_id: `mda-${overrides.severity}-${overrides.step_index}`,
     indicator_key: "poverty_headcount",
+    indicator_name: "Poverty Headcount",
     framework: "human_development",
     cohort: "bottom_quintile",
     confidence_tier: 2,
     causal_attribution: null,
+    floor_value: "0.2000",
+    current_value: "0.1800",
+    approach_pct_remaining: "-0.1000",
+    consecutive_breach_steps: 1,
     ...overrides,
   };
 }
@@ -258,5 +264,64 @@ describe("truncateIndicatorName: 22-char limit with ellipsis", () => {
     const name = "social_cohesion_index_long";
     const result = truncateIndicatorName(name, 22);
     expect(name.startsWith(result.slice(0, -1))).toBe(true);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// buildSparklinePoints — SVG polyline coordinates for AlertDetailPanel (#745)
+// ---------------------------------------------------------------------------
+
+describe("buildSparklinePoints: SVG polyline generation", () => {
+  it("returns null when fewer than 2 non-null scores", () => {
+    expect(buildSparklinePoints([], 200, 56)).toBeNull();
+    expect(buildSparklinePoints([null], 200, 56)).toBeNull();
+    expect(buildSparklinePoints([0.5], 200, 56)).toBeNull();
+  });
+
+  it("returns null when only one finite score among nulls", () => {
+    expect(buildSparklinePoints([null, 0.5, null], 200, 56)).toBeNull();
+  });
+
+  it("returns a non-empty string for 2+ non-null scores", () => {
+    const result = buildSparklinePoints([0.3, 0.5, 0.7], 200, 56);
+    expect(result).not.toBeNull();
+    expect(typeof result).toBe("string");
+    expect(result!.length).toBeGreaterThan(0);
+  });
+
+  it("output contains comma-separated coordinate pairs", () => {
+    const result = buildSparklinePoints([0.3, 0.6], 200, 56);
+    expect(result).not.toBeNull();
+    const pairs = result!.split(" ");
+    expect(pairs.length).toBeGreaterThanOrEqual(2);
+    for (const pair of pairs) {
+      expect(pair).toMatch(/^\d+\.\d,\d+\.\d$/);
+    }
+  });
+
+  it("null scores are skipped — not represented as a point", () => {
+    const withNulls = buildSparklinePoints([0.3, null, 0.6], 200, 56);
+    const withoutNulls = buildSparklinePoints([0.3, 0.6], 200, 56);
+    // Skipping a null mid-series means fewer points than all-filled series of same length
+    expect(withNulls!.split(" ").length).toBeLessThan(
+      buildSparklinePoints([0.3, 0.5, 0.6], 200, 56)!.split(" ").length,
+    );
+    // Two-point result should equal the all-non-null 2-point case
+    expect(withNulls).toBe(withoutNulls);
+  });
+
+  it("all-zero scores produce valid points (not NaN)", () => {
+    const result = buildSparklinePoints([0, 0, 0], 200, 56);
+    expect(result).not.toBeNull();
+    expect(result).not.toContain("NaN");
+  });
+
+  it("points respect padding — x starts at padding, not 0", () => {
+    const padding = 4;
+    const result = buildSparklinePoints([0.3, 0.6], 200, 56, padding);
+    expect(result).not.toBeNull();
+    const firstPair = result!.split(" ")[0];
+    const x = parseFloat(firstPair.split(",")[0]);
+    expect(x).toBeCloseTo(padding, 0);
   });
 });

@@ -122,6 +122,7 @@ interface RawMDAAlert {
   mda_id: string;
   entity_id: string;
   indicator_key: string;
+  indicator_name?: string;
   severity: "WARNING" | "CRITICAL" | "TERMINAL";
   floor_value: string;
   current_value: string;
@@ -152,15 +153,23 @@ function parseMdaAlerts(raw: RawMultiFrameworkOutput): Zone1BAlert[] {
         typeof (indicator as { confidence_tier: unknown }).confidence_tier === "number"
           ? (indicator as { confidence_tier: number }).confidence_tier
           : 2;
+      const indicator_name =
+        alert.indicator_name ??
+        alert.indicator_key.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
       alerts.push({
         mda_id: alert.mda_id,
         indicator_key: alert.indicator_key,
+        indicator_name,
         framework,
         severity: alert.severity,
         step_index: raw.step_index,
         cohort: null,
         causal_attribution: null,
         confidence_tier,
+        floor_value: alert.floor_value,
+        current_value: alert.current_value,
+        approach_pct_remaining: alert.approach_pct_remaining,
+        consecutive_breach_steps: alert.consecutive_breach_steps,
       });
     }
   }
@@ -199,6 +208,10 @@ export function ScenarioInstrumentCluster({
     current: Record<string, QuantitySchema> | null;
     prev: Record<string, QuantitySchema> | null;
   }>({ current: null, prev: null });
+
+  // Alert drill-in selection — UI state, not simulation state (#745).
+  // Shared between Zone 1B (displays detail) and Zone 1D ("see alerts" navigation).
+  const [focusedAlertMdaId, setFocusedAlertMdaId] = useState<string | null>(null);
 
   // Initialise store when scenario changes
   useEffect(() => {
@@ -306,12 +319,19 @@ export function ScenarioInstrumentCluster({
   return (
     <InstrumentCluster
       entityIds={entityIds}
-      mdaPanel={<MDAAlertPanelZone1B columnWidth={coPrimaryWidth} />}
+      mdaPanel={
+        <MDAAlertPanelZone1B
+          columnWidth={coPrimaryWidth}
+          focusedAlertMdaId={focusedAlertMdaId}
+          onSelectAlert={setFocusedAlertMdaId}
+        />
+      }
       pmmWidget={<PMMWidgetZone1C />}
       fourFramework={
         <FourFrameworkZone1D
           isLoading={trajectoryLoading}
           isError={trajectoryError}
+          onSelectFrameworkAlert={setFocusedAlertMdaId}
         />
       }
       cohortPanel={

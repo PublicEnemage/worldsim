@@ -47,12 +47,22 @@ export interface TrajectoryResponse {
 export interface Zone1BAlert {
   mda_id: string;
   indicator_key: string;
+  /** Human-readable indicator name — title-cased from backend; frontend registry may override. */
+  indicator_name: string;
   framework: string;
   severity: "WARNING" | "CRITICAL" | "TERMINAL";
   step_index: number;
   cohort: string | null;
   confidence_tier: number;
   causal_attribution: string | null;
+  /** Threshold value (Decimal as string) for the breached/approached indicator. */
+  floor_value: string;
+  /** Current indicator value (Decimal as string) at the step of this alert. */
+  current_value: string;
+  /** Remaining approach headroom (Decimal as string; negative = breached). */
+  approach_pct_remaining: string;
+  /** Number of consecutive steps in breach (≥2 → TERMINAL). */
+  consecutive_breach_steps: number;
 }
 
 interface ScenarioStepState {

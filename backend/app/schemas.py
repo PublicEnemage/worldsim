@@ -562,6 +562,9 @@ class MDAAlert(BaseModel):
     floor_value, current_value, and approach_pct_remaining are strings
     (Decimal serialized as str) — consistent with the float prohibition
     throughout the API layer (ADR-003 Decision 2).
+
+    indicator_name is always populated — title-case of indicator_key.
+    Frontend display-name registries may override this with more precise labels.
     """
 
     model_config = ConfigDict(from_attributes=True)
@@ -569,6 +572,7 @@ class MDAAlert(BaseModel):
     mda_id: str
     entity_id: str
     indicator_key: str
+    indicator_name: str
     severity: MDASeverity
     floor_value: str
     current_value: str
