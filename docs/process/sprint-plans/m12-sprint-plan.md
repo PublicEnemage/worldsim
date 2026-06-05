@@ -91,7 +91,7 @@ All four Wave 1 groups can be worked and merged in any order. No group depends o
 
 ---
 
-### G4 — Matrix engine production migration: #749
+### G4 — Matrix engine production migration: #749 ✓ DONE (2026-06-05, PR #769)
 
 **Why own group:** Major backend-only architectural change. Promotes `propagate_matrix()` to the default call site, demotes iterative engine. The full backtesting suite is the test — no new test files needed, but all existing backtesting assertions must pass against the matrix engine before this merges.
 
@@ -107,6 +107,8 @@ All four Wave 1 groups can be worked and merged in any order. No group depends o
 - ADR-009 updated to IMPLEMENTED
 
 **Gates:** G5, G6, G7, G8 — everything downstream runs on the production engine.
+
+**Execution narrative:** Backend-only change. `ScenarioRunner.tick()` local import swapped from `propagate` (iterative) to `propagate_matrix`; the stale `from propagation import propagate` line removed. No try/except wrapper — any matrix engine failure surfaces immediately to the caller (no silent fallback). `engine/__init__.py` `propagate` export aliased to `propagate_matrix` so existing callers using the package-level name continue to work unchanged. `matrix_propagation.py` module docstring updated to production status. ADR-009 status updated from Accepted to IMPLEMENTED; Amendment 1 appended recording retirement decision, EL sign-off (@PublicEnemage, 2026-06-05), parallel-run window completion (M11, PR #707), and iterative engine retention rationale (helpers `_accumulate` + `_build_next_state` still imported — extraction deferred). I001 import-order violations from G3 test functions fixed. 6 new unit tests: package alias assertion (`engine.propagate is propagate_matrix`), call-site spy via monkeypatch, smoke advance (timestep advances correctly), entity preservation, no-change attribute invariant, and no-fallback guarantee.
 
 ---
 
