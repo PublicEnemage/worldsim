@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-04 (Session 003 Persona 2 complete — first valid cold-start usability session using Interactive Playwright loop. 5 findings produced (CRITICAL: alert panel non-interactive; HIGH: text illegible + no cohort data; MEDIUM: no map highlight + "see alerts" misdirection). PR #736 merged. Next: Priority A sessions P1 (Programme Analyst) and P5 (Institutional Decision-Maker).)**
+**Last updated: 2026-06-04 (M11.5 Priority A sessions complete — all three Priority A cold-start sessions finished (P2 S003, P1-001, P5-001). PRs #736/#738/#739 merged. Cross-session pattern confirmed: active scenario not identifiable from main viewport — severity escalates P2 MEDIUM → P1 HIGH → P5 CRITICAL. Next: M11.5 findings synthesis report + Issue #720 exit checklist assessment.)**
 **Current milestone:** M11.5 — Usability Validation and Experience Audit (GitHub Milestone 14; North Star: `docs/vision/milestone-11-5-north-star.md`)
 **Previous milestone:** M11 — Engine Investigation and Political Economy (formally closed 2026-06-04, tagged v0.11.0)
 
@@ -77,7 +77,7 @@ M9 formally closed. Issue #213 (M9 Exit Checklist) closed 2026-05-24. M10 milest
 
 ## Open PRs
 
-No open PRs — board clear as of 2026-06-04 (post PR #736 merge).
+No open PRs — board clear as of 2026-06-04 (post PR #739 merge).
 
 ## M11 Work Streams — 2026-06-04 Sprint
 
@@ -118,6 +118,8 @@ No open PRs — board clear as of 2026-06-04 (post PR #736 merge).
 | 2026-06-04-persona-2-001 | Persona 2 (infra validation) | NO — cold-start violated | Infrastructure validated; Pillar 1 functional | #732 ✅ |
 | 2026-06-04-persona-2-002 | Persona 2 — Finance Ministry Negotiator | NO — reclassified as developer audit | Agent used API spec + curl instead of navigating UI. Findings are real technical gaps, not usability findings. Superseded by 003. | #733 ✅ |
 | 2026-06-04-persona-2-003 | Persona 2 — Finance Ministry Negotiator | **YES** — genuine cold-start, visual navigation | PARTIALLY MET — agent reached [CONCLUDED:] but ~80% from historical knowledge, ~20% from tool output. Alert panel non-interactive; no cohort data visible. | #736 ✅ |
+| 2026-06-04-persona-1-001 | Persona 1 — Programme Analyst (Lucas Ferreira) | **YES** — genuine cold-start, visual navigation | NOT MET — fiscal multiplier parameter absent; alert non-interactive; no disaggregated indicators; 5 actions, 0 visible responses. | #738 ✅ |
+| 2026-06-04-persona-5-001 | Persona 5 — Institutional Decision-Maker (Executive Director, IMF) | **YES** — genuine cold-start, visual navigation | PARTIALLY MET — reframed task from tradeoff to joint design failure; reached [CONCLUDED:] in 3 turns. Scenario identity unconfirmed (CRITICAL GAP); financial trajectory possibly incomplete; composite scores uninterpretable. | #739 ✅ |
 
 **Findings from Session 3 (2026-06-04-persona-2-003) — UI usability findings:**
 
@@ -128,6 +130,24 @@ No open PRs — board clear as of 2026-06-04 (post PR #736 merge).
 | FINDING-03 | HIGH | Discovery | No cohort disaggregation visible — CONCLUDED answer was ~80% historical knowledge, not tool output |
 | FINDING-04 | MEDIUM | Discovery | Greece not highlighted on map despite scenario loaded — 3-turn scenario-active uncertainty |
 | FINDING-05 | MEDIUM | Comprehension | "Primary dimension — see alerts" misdirects to non-interactive display panel |
+
+**Findings from Session P1-001 (2026-06-04-persona-1-001) — UI usability findings:**
+
+| Finding | Severity | Dimension | Description |
+|---|---|---|---|
+| FINDING-01 | CRITICAL | Action | Fiscal multiplier parameter absent — no UI path to configure or compare 0.5 vs 1.5 multiplier |
+| FINDING-02 | CRITICAL | Action | Alert panel non-interactive — replication of S003-FINDING-01; confirmed persona-independent |
+| FINDING-03 | HIGH | Discovery | Poverty headcount and health system capacity not surfaced as named indicators anywhere |
+| FINDING-04 | HIGH | Comprehension | Active scenario not identifiable — scenario/task mismatch risk; never resolved in 5 turns |
+| FINDING-05 | MEDIUM | Action | Zone-1a and zone-1d both show composites only; no sub-indicator drill-in |
+
+**Findings from Session P5-001 (2026-06-04-persona-5-001) — UI usability findings:**
+
+| Finding | Severity | Dimension | Description |
+|---|---|---|---|
+| FINDING-01 | HIGH | Comprehension | Financial trajectory completeness — agent concluded "no recovery" but Greece historically achieved primary surplus 2014; links to Issue #221 |
+| FINDING-02 | CRITICAL | Discovery | Active scenario identification — named "CRITICAL GAP" before concluding; severity escalation confirmed across all 3 Priority A sessions |
+| FINDING-03 | MEDIUM | Comprehension | Composite score interpretability — Financial ~0.58, Human Development ~2.73 uninterpretable without scale, baseline, or direction indicator |
 
 **Findings from Session 2 (2026-06-04-persona-2-002) — backend technical findings (developer audit):**
 
@@ -140,13 +160,21 @@ No open PRs — board clear as of 2026-06-04 (post PR #736 merge).
 | FINDING-05 | MEDIUM | Discovery | Counter-scenario creation not discoverable without developer knowledge of POST schema |
 | FINDING-06 | MEDIUM | Comprehension | `indicator_name` null in MDA alert API response |
 
-**Exit criterion status:** PARTIALLY MET (session 003) — agent completed task using historical knowledge as substitute for tool output. P1 and P5 sessions required to complete the Priority A set.
+**Exit criterion status — all three Priority A sessions complete:**
+
+| Session | Persona | Verdict |
+|---|---|---|
+| 2026-06-04-persona-2-003 | Finance Ministry Negotiator | PARTIALLY MET — ~80% historical knowledge, ~20% tool output |
+| 2026-06-04-persona-1-001 | Programme Analyst | NOT MET — fiscal multiplier parameter absent; 0 visible UI responses |
+| 2026-06-04-persona-5-001 | Institutional Decision-Maker | PARTIALLY MET — concluded in 3 turns; scenario identity and trajectory completeness unconfirmed |
+
+**Cross-session pattern — the one finding present across ALL three Priority A sessions:** Active scenario cannot be confirmed from the main viewport. Severity: MEDIUM (P2) → HIGH (P1) → CRITICAL (P5). This is the minimum fix required before any Priority A use case can be considered served.
 
 **Session runners:**
 - `scripts/run_usability_session_interactive.py` — Interactive Playwright loop (Option 2, default). Start with: `python3 scripts/run_usability_session_interactive.py <session_id> <persona_id> [--scenario <uuid>]`. No API key required. Coordinator reads screenshots via Read tool and writes actions to IPC files.
 - `scripts/run_usability_session.py` — Computer-use runner (Option 1). Requires `ANTHROPIC_API_KEY`. Separate Anthropic API billing.
 
-**Priority A sessions remaining:** P1 (Programme Analyst — Lucas Ferreira) and P5 (Institutional Decision-Maker).
+**Priority A sessions:** COMPLETE (P2 S003 ✅, P1-001 ✅, P5-001 ✅). Priority B sessions (P6 Civic Researcher, P8 Community Leader) are next if EL authorises.
 
 **M12 action items from all sessions:**
 - Make TERMINAL alert panel interactive — click expands to indicator time-series + threshold progression + driver attribution (S003-FINDING-01)
@@ -157,6 +185,12 @@ No open PRs — board clear as of 2026-06-04 (post PR #736 merge).
 - Named conditionality instruments: minimum_wage_change_pct, pension_replacement_rate_change_pct, etc. (S002-FINDING-04)
 - "Duplicate and modify" action on scenario cards for counter-scenario creation (S002-FINDING-05)
 - Remove or caveat composite scores in single-entity scenario trajectory view (S002-FINDING-03)
+- Fiscal multiplier parameter input in scenario configuration — 0.5 vs 1.5 comparison (P1-FINDING-01)
+- Side-by-side or overlaid scenario comparison for parameter sensitivity analysis (P1-FINDING-01)
+- Poverty headcount and health system capacity as named, disaggregated output indicators (P1-FINDING-03)
+- Active scenario name + country in persistent main viewport header (P1-FINDING-04, P5-FINDING-02, S003-FINDING-04) — this is the cross-session universal finding
+- Financial trajectory must show full arc including partial recovery; incomplete trajectories must be labelled (P5-FINDING-01; links to Issue #221 mean-reversion channel)
+- Each composite score in zone-1d must show: current value, direction indicator (↑↓), scale tooltip; plain-language label for non-economist users (P5-FINDING-03)
 
 **M11 formally closed:** Issue #262 closed 2026-06-04, GitHub Milestone 12 (M11) closed, tagged `v0.11.0`. Compliance gate: SCAN-025 recorded, KI-002 filed (mypy Python version mismatch, pre-existing). ADR license renewals complete (ADR-001/002/005/007/008/010 → M11.5; ADR-011 license section added; ADR-009 diagram added). Socratic Agent TEST complete (in-session 2026-06-04).
 
@@ -166,6 +200,9 @@ No open PRs — board clear as of 2026-06-04 (post PR #736 merge).
 
 | PR | Title | Date |
 |---|---|---|
+| #739 | ux(pillar-2): Session P5-001 — Persona 5 cold-start findings (Executive board briefing) | 2026-06-04 |
+| #738 | feat(ux): session P1-001 Persona 1 findings — fiscal multiplier analysis NOT MET | 2026-06-04 |
+| #737 | chore(state): SESSION_STATE.md — session 003 Persona 2 complete; Priority A sessions P1/P5 next | 2026-06-04 |
 | #736 | feat(ux): M11.5 session 003 — genuine cold-start Persona 2 visual navigation findings | 2026-06-04 |
 | #735 | feat(ux): computer-use session runner + reclassify session 002 as developer audit | 2026-06-04 |
 | #733 | feat(ux): M11.5 Session 2 — Persona 2 cold-start usability session, 6 findings | 2026-06-04 |
