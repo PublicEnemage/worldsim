@@ -69,7 +69,7 @@ All four Wave 1 groups can be worked and merged in any order. No group depends o
 
 ---
 
-### G3 — Mode 2 fiscal multiplier: #746
+### G3 — Mode 2 fiscal multiplier: #746 ✓ DONE (2026-06-05, PR #767)
 
 **Why own group:** Has both backend schema changes (new `fiscal_multiplier` field) and a significant frontend addition (overlay comparison in `TrajectoryView.tsx`). Backend work is isolated to scenario creation path. This is the entry point for Mode 2 — keeping it separate from G1/G2 prevents a single large PR from mixing three concerns.
 
@@ -86,6 +86,8 @@ All four Wave 1 groups can be worked and merged in any order. No group depends o
 - Poverty headcount and health system capacity respond to multiplier change
 
 **Gates:** G6b (#753 Mode 3) — fiscal multiplier is Mode 3's first instrument.
+
+**Execution narrative:** Backend + frontend change. Backend: `fiscal_multiplier: float` added to `ScenarioConfigSchema` with Pydantic `Field(ge=0.1, le=3.0)`, default 1.0. `MacroeconomicModule.__init__()` now accepts `fiscal_multiplier_override: float = 1.0`, stored as `Decimal` and applied to both spending and tax multiplier paths (`FISCAL_MULTIPLIERS[regime] * override`). `_build_active_modules()` passes `config.fiscal_multiplier` through — no modules_config indirection. Frontend: fiscal multiplier range slider (0.1–3.0, step 0.1) added to scenario creation form with orange highlight and "Mode 2" indicator when override is active. `ScenarioIdentityHeader` gains `fiscalMultiplier` prop and `formatMultiplierLabel()` pure function — shows "Mode: 2 (Fiscal ×N.N)" in the persistent identity strip when override ≠ 1.0. `TrajectoryView` now shows baseline overlay when `mode === "MODE_2" || mode === "MODE_3"` (previously MODE_3 only), with legend entries in MODE_2. `ScenarioInstrumentCluster` accepts `comparisonScenarioId` prop — fetches that scenario's trajectory and stores as `baseline_trajectory`; sets MODE_2 when `fiscalMultiplier ≠ 1.0`. `App.tsx` extracts `fiscal_multiplier` from scenario detail and wires through. 7 new backend unit tests (schema validation, module constructor, `_build_active_modules` wiring); 8 new frontend unit tests (`formatMultiplierLabel`). 177 total frontend tests passing, ruff + build gate clean.
 
 ---
 
