@@ -548,7 +548,7 @@ finalized — not afterward.
 | `.github/` | EL | Ar | CI/CD pipeline changes require Architect review |
 | `docs/process/agents.md` | PM | EL | Agent persona definitions; EL approves new agent additions |
 | `docs/process/agent-raci.md` | PM | EL, Ar | RACI matrix; Architect consulted when decision-type grounding changes. Any addition to or change of decision-type grounding text (rows in the RACI matrix) triggers Required C (Ar) — "addition" qualifies, not only "change." (NM-021) |
-| `docs/process/near-miss-registry.md` | PI | EL | PI files entries; EL informed of High severity entries; PM informed of all entries (I) |
+| `docs/process/near-miss-registry.md` | PI | EL | PI files entries; EL informed of High severity entries; PM informed of all entries (I). **No delegation:** PM Agent does not have authority to file NM entries without PI Agent activation — PI Agent must be activated before any entry is written, regardless of severity. EL decision 2026-06-05. |
 | `docs/process/known-issues-registry.md` | PI | EL | PI files entries; EL informed of Medium/High severity entries; PM informed of all entries (I) |
 | `docs/schema/api_contracts.yml` | DA | Ar | Ar consulted when response shape changes (API response shape is Architect territory) |
 | `docs/schema/database.yml` | DA | Ar, QA | Ar consulted on schema shape; QA consulted on CI enforcement gates |
