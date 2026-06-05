@@ -34,10 +34,13 @@ from app.simulation.mda_checker import MDAChecker, alerts_to_events_snapshot
 from app.simulation.modules.demographic.cohort import generate_cohort_specs
 from app.simulation.modules.demographic.module import DemographicModule
 from app.simulation.modules.ecological.module import EcologicalModule
+from app.simulation.modules.external_sector.module import ExternalSectorModule
 from app.simulation.modules.governance.module import GovernanceModule
 from app.simulation.modules.macroeconomic.module import MacroeconomicModule
 from app.simulation.modules.political_economy.module import PoliticalEconomyModule
 from app.simulation.orchestration.inputs import (
+    BilateralTradeShock,
+    CommodityCategory,
     EmergencyInstrument,
     EmergencyPolicyInput,
     FiscalInstrument,
@@ -529,6 +532,9 @@ def _build_active_modules(config: ScenarioConfigSchema) -> list[SimulationModule
     pe = _build_political_economy_module(config)
     if pe is not None:
         modules.append(pe)
+    ext = _build_external_sector_module(config)
+    if ext is not None:
+        modules.append(ext)
     return modules
 
 
@@ -556,6 +562,18 @@ def _build_ecological_module(config: ScenarioConfigSchema) -> EcologicalModule |
     if not eco_cfg.get("enabled"):
         return None
     return EcologicalModule()
+
+
+def _build_external_sector_module(
+    config: ScenarioConfigSchema,
+) -> ExternalSectorModule | None:
+    """Return an ExternalSectorModule when commodity price shocks are configured."""
+    if not config.commodity_price_shocks:
+        return None
+    return ExternalSectorModule(
+        commodity_price_shocks=config.commodity_price_shocks,
+        start_date=config.start_date,
+    )
 
 
 def _build_political_economy_module(
@@ -711,10 +729,21 @@ def _deserialize_control_input(
             implementation_years=int(data.get("implementation_years", 1)),
             source=InputSource.SCENARIO_SCRIPT,
         )
+    if input_type == "BilateralTradeShock":
+        return BilateralTradeShock(
+            target_entity=target_entity,
+            source_entity_id=str(data.get("source_entity_id", "")),
+            commodity_category=CommodityCategory(
+                data.get("commodity_category", "fuel")
+            ),
+            magnitude=Decimal(str(data.get("magnitude", "0"))),
+            trade_channel=str(data.get("trade_channel", "import_price")),
+            source=InputSource.SCENARIO_SCRIPT,
+        )
     raise ValueError(
         f"Unknown ControlInput type: {input_type!r}. "
         "Supported: FiscalPolicyInput, EmergencyPolicyInput, TradePolicyInput, "
-        "MonetaryRateInput, StructuralPolicyInput."
+        "MonetaryRateInput, StructuralPolicyInput, BilateralTradeShock."
     )
 
 

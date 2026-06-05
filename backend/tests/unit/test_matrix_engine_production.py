@@ -64,7 +64,7 @@ def _make_state(entity_id: str = "GRC", **attrs: float) -> SimulationState:
             start_date=_BASE_DATE,
             end_date=_BASE_DATE + _STEP_DELTA * 5,
         ),
-        resolution_config=ResolutionConfig(),
+        resolution=ResolutionConfig(),
     )
 
 
@@ -101,9 +101,7 @@ class _NullModule(SimulationModule):
 
 
 def test_runner_tick_uses_matrix_engine_via_exception(monkeypatch: pytest.MonkeyPatch) -> None:
-    """Verify ScenarioRunner.tick() calls propagate_matrix by patching it and confirming
-    the call is intercepted — any call to the iterative engine would produce different
-    behaviour (or no intercept)."""
+    """Verify ScenarioRunner.advance_timestep() calls propagate_matrix, not iterative."""
     import app.simulation.engine.matrix_propagation as matrix_mod  # noqa: PLC0415
 
     call_count = [0]
@@ -116,37 +114,45 @@ def test_runner_tick_uses_matrix_engine_via_exception(monkeypatch: pytest.Monkey
     monkeypatch.setattr(matrix_mod, "propagate_matrix", _spy)
 
     state = _make_state(gdp_growth=0.02)
+    modules = [_NullModule()]
     runner = ScenarioRunner(
         initial_state=state,
+        scheduled_inputs=[],
+        modules=modules,
+        n_steps=1,
         session_id="test-spy",
         timestep_delta=_STEP_DELTA,
         audit_log=AuditLog(),
     )
-    runner.tick(state, modules=[_NullModule()], scheduled_inputs=[])
+    runner.advance_timestep(current_state=state, modules=modules, scheduled_inputs=[])
 
-    # If runner.tick() uses propagate_matrix, the spy was called.
-    # If it used the iterative propagate instead, call_count would be 0.
     assert call_count[0] == 1, (
-        "propagate_matrix was not called by runner.tick() — "
+        "propagate_matrix was not called by advance_timestep() — "
         "iterative engine may still be the call site"
     )
 
 
 # ---------------------------------------------------------------------------
-# 3. Smoke test — tick() produces a valid State[T+1]
+# 3. Smoke test — advance_timestep() produces a valid State[T+1]
 # ---------------------------------------------------------------------------
 
 
 def test_runner_tick_advances_timestep() -> None:
-    """ScenarioRunner.tick() must advance timestep by exactly one step delta."""
+    """ScenarioRunner.advance_timestep() must advance timestep by exactly one step delta."""
     state = _make_state(gdp_growth=0.02)
+    modules = [_NullModule()]
     runner = ScenarioRunner(
         initial_state=state,
+        scheduled_inputs=[],
+        modules=modules,
+        n_steps=1,
         session_id="test-smoke",
         timestep_delta=_STEP_DELTA,
         audit_log=AuditLog(),
     )
-    next_state = runner.tick(state, modules=[_NullModule()], scheduled_inputs=[])
+    next_state = runner.advance_timestep(
+        current_state=state, modules=modules, scheduled_inputs=[]
+    )
     expected_ts = _BASE_DATE + _STEP_DELTA
     assert next_state.timestep == expected_ts
 
@@ -154,26 +160,38 @@ def test_runner_tick_advances_timestep() -> None:
 def test_runner_tick_preserves_entities() -> None:
     """State[T+1] must contain the same entities as State[T] (no entity loss)."""
     state = _make_state("GRC", gdp_growth=0.02, unemployment_rate=0.12)
+    modules = [_NullModule()]
     runner = ScenarioRunner(
         initial_state=state,
+        scheduled_inputs=[],
+        modules=modules,
+        n_steps=1,
         session_id="test-preserve",
         timestep_delta=_STEP_DELTA,
         audit_log=AuditLog(),
     )
-    next_state = runner.tick(state, modules=[_NullModule()], scheduled_inputs=[])
+    next_state = runner.advance_timestep(
+        current_state=state, modules=modules, scheduled_inputs=[]
+    )
     assert "GRC" in next_state.entities
 
 
 def test_runner_tick_no_event_produces_unchanged_attributes() -> None:
     """When no events are generated, entity attributes must be unchanged at T+1."""
     state = _make_state("GRC", gdp_growth=0.02)
+    modules = [_NullModule()]
     runner = ScenarioRunner(
         initial_state=state,
+        scheduled_inputs=[],
+        modules=modules,
+        n_steps=1,
         session_id="test-nochange",
         timestep_delta=_STEP_DELTA,
         audit_log=AuditLog(),
     )
-    next_state = runner.tick(state, modules=[_NullModule()], scheduled_inputs=[])
+    next_state = runner.advance_timestep(
+        current_state=state, modules=modules, scheduled_inputs=[]
+    )
     grc_t1 = next_state.entities["GRC"]
     assert grc_t1.attributes["gdp_growth"].value == Decimal("0.02")
 
@@ -193,12 +211,17 @@ def test_matrix_engine_exception_propagates(monkeypatch: pytest.MonkeyPatch) -> 
     monkeypatch.setattr(matrix_mod, "propagate_matrix", _raise)
 
     state = _make_state("GRC", gdp_growth=0.02)
+    modules = [_NullModule()]
     runner = ScenarioRunner(
         initial_state=state,
+        scheduled_inputs=[],
+        modules=modules,
+        n_steps=1,
         session_id="test-nofallback",
         timestep_delta=_STEP_DELTA,
         audit_log=AuditLog(),
     )
-    # The RuntimeError must propagate — no catch-and-fallback in runner.tick()
     with pytest.raises(RuntimeError, match="matrix engine simulated failure"):
-        runner.tick(state, modules=[_NullModule()], scheduled_inputs=[])
+        runner.advance_timestep(
+            current_state=state, modules=modules, scheduled_inputs=[]
+        )
