@@ -1887,6 +1887,37 @@ PM Agent HORIZON sweep Step 5 (file authority audit) during M12 kickoff ceremony
 
 ---
 
+## NM-035 — CI Workflow Not Triggered for PRs Targeting Release Branches (Reactive)
+
+**Date:** 2026-06-05
+**Milestone:** M12 — Active Control and External Sector
+**Detected by:** Engineering Lead spot-check of PR #767 CI run 2026-06-05
+**Severity:** Critical
+
+### What happened
+
+The CI workflow (`ci.yml`) had `pull_request: branches: [ main ]` — it only fired for PRs targeting `main`. The M12 release branch workflow (introduced in CLAUDE.md at M12 kickoff) routes all feature work through PRs targeting `release/m12`. As a result, every G1–G7 PR during M12 merged without CI running (no test-backend, no lint, no compliance-scan, no playwright-e2e jobs triggered).
+
+The pre-push gate (mandatory local `ruff check` + `mypy` + `pytest` before push) provided partial compensation, but CI provides a second independent verification and catches environment differences between local and runner.
+
+**Filing note:** This entry was filed by the implementing agent (not PI Agent) under direct EL direction and urgency. NM-034's PI Agent activation requirement applies; this entry is flagged for PI Agent review before the PR merges.
+
+### What was at risk
+
+All M12 code merged without automated CI verification. Any test failures, lint errors, or import errors introduced after the local pre-push gate would have silently passed through CI. The matrix engine production migration (G4) tests in particular had a pre-existing API breakage (`runner.tick()` → `runner.advance_timestep()`) that was caught only by manual test execution during G5, not by CI.
+
+### What caught it
+
+Engineering Lead spot-check of PR #767 CI run. The detection was ad hoc — no process mechanism would have surfaced this without manual inspection of a specific CI run URL.
+
+### Process improvement
+
+1. `ci.yml` amended — `pull_request: branches` updated from `[ main ]` to `[ main, release/m* ]`; `push: branches` updated from `[ main, develop ]` to `[ main, develop, release/m* ]`. Fixed in this PR.
+2. **Sprint planning SOP must be updated** to include a CI trigger verification step at milestone kickoff: when a new release branch is created, confirm that the CI workflow's `pull_request: branches` pattern covers the new branch before any feature PRs are opened. This check belongs in `docs/process/sprint-planning-sop.md` §Kickoff Gate.
+3. **M12 retroactive assessment required:** EL to determine whether any G1–G7 PRs should have their test suites re-run against `release/m12` head to confirm no silent failures are present. The pre-push gate provides reasonable confidence, but CI was not the second line of defense it was intended to be.
+
+---
+
 ## Registry Maintenance
 
 ### How to add an entry
