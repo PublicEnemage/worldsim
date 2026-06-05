@@ -15,6 +15,8 @@ interface Props {
   entityId: string | null;
   currentStep: number | null;
   totalSteps: number;
+  /** Mode 2 fiscal multiplier override (Issue #746). Shown when present and ≠ 1.0. */
+  fiscalMultiplier?: number | null;
 }
 
 /** Status segment displayed at the right of the identity strip. */
@@ -24,10 +26,18 @@ export function formatStatus(currentStep: number | null, totalSteps: number): st
   return `Step ${currentStep} of ${totalSteps}`;
 }
 
-export function ScenarioIdentityHeader({ scenarioName, entityId, currentStep, totalSteps }: Props) {
+/** Returns the multiplier label string for the header strip, or null when no override is active. */
+export function formatMultiplierLabel(fiscalMultiplier: number | null | undefined): string | null {
+  if (fiscalMultiplier == null || fiscalMultiplier === 1.0) return null;
+  return `Fiscal ×${fiscalMultiplier.toFixed(1)}`;
+}
+
+export function ScenarioIdentityHeader({ scenarioName, entityId, currentStep, totalSteps, fiscalMultiplier }: Props) {
+  const multiplierLabel = formatMultiplierLabel(fiscalMultiplier);
   const parts: string[] = [
     `Scenario: ${scenarioName}`,
     entityId ? `Entity: ${entityId}` : "",
+    multiplierLabel ? `Mode: 2 (${multiplierLabel})` : "",
     `Status: ${formatStatus(currentStep, totalSteps)}`,
   ].filter(Boolean);
 

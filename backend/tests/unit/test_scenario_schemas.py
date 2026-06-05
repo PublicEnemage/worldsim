@@ -370,6 +370,81 @@ def test_invalid_step_error_lists_out_of_range_values() -> None:
     assert "5" in detail
 
 
+# ---------------------------------------------------------------------------
+# fiscal_multiplier — Mode 2 parameter (Issue #746)
+# ---------------------------------------------------------------------------
+
+
+def test_fiscal_multiplier_default_is_1() -> None:
+    cfg = ScenarioConfigSchema(entities=["GRC"], n_steps=3)
+    assert cfg.fiscal_multiplier == 1.0
+
+
+def test_fiscal_multiplier_minimum_valid() -> None:
+    cfg = ScenarioConfigSchema(entities=["GRC"], n_steps=3, fiscal_multiplier=0.1)
+    assert cfg.fiscal_multiplier == pytest.approx(0.1)
+
+
+def test_fiscal_multiplier_maximum_valid() -> None:
+    cfg = ScenarioConfigSchema(entities=["GRC"], n_steps=3, fiscal_multiplier=3.0)
+    assert cfg.fiscal_multiplier == pytest.approx(3.0)
+
+
+def test_fiscal_multiplier_midrange_valid() -> None:
+    cfg = ScenarioConfigSchema(entities=["GRC"], n_steps=3, fiscal_multiplier=1.5)
+    assert cfg.fiscal_multiplier == pytest.approx(1.5)
+
+
+def test_fiscal_multiplier_below_minimum_rejected() -> None:
+    from pydantic import ValidationError
+    with pytest.raises(ValidationError):
+        ScenarioConfigSchema(entities=["GRC"], n_steps=3, fiscal_multiplier=0.09)
+
+
+def test_fiscal_multiplier_above_maximum_rejected() -> None:
+    from pydantic import ValidationError
+    with pytest.raises(ValidationError):
+        ScenarioConfigSchema(entities=["GRC"], n_steps=3, fiscal_multiplier=3.1)
+
+
+def test_fiscal_multiplier_zero_rejected() -> None:
+    from pydantic import ValidationError
+    with pytest.raises(ValidationError):
+        ScenarioConfigSchema(entities=["GRC"], n_steps=3, fiscal_multiplier=0.0)
+
+
+# ---------------------------------------------------------------------------
+# fiscal_multiplier propagation — MacroeconomicModule (Issue #746)
+# ---------------------------------------------------------------------------
+
+
+def test_macroeconomic_module_default_multiplier_is_1() -> None:
+    """MacroeconomicModule defaults to fiscal_multiplier_override=1.0."""
+    from decimal import Decimal
+    from app.simulation.modules.macroeconomic.module import MacroeconomicModule
+    m = MacroeconomicModule()
+    assert m._fiscal_multiplier_override == Decimal("1.0")
+
+
+def test_macroeconomic_module_accepts_multiplier_override() -> None:
+    """MacroeconomicModule stores the override as a Decimal."""
+    from decimal import Decimal
+    from app.simulation.modules.macroeconomic.module import MacroeconomicModule
+    m = MacroeconomicModule(fiscal_multiplier_override=2.0)
+    assert m._fiscal_multiplier_override == Decimal("2.0")
+
+
+def test_build_active_modules_passes_fiscal_multiplier() -> None:
+    """_build_active_modules creates MacroeconomicModule with correct override."""
+    from decimal import Decimal
+    from app.simulation.web_scenario_runner import _build_active_modules
+    from app.simulation.modules.macroeconomic.module import MacroeconomicModule
+    cfg = ScenarioConfigSchema(entities=["GRC"], n_steps=3, fiscal_multiplier=1.5)
+    modules = _build_active_modules(cfg)
+    macro = next(m for m in modules if isinstance(m, MacroeconomicModule))
+    assert macro._fiscal_multiplier_override == Decimal("1.5")
+
+
 def test_empty_name_rejected() -> None:
     """_validate_create_request rejects an empty or whitespace-only name."""
     req = ScenarioCreateRequest(

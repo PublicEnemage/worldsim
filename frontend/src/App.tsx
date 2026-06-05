@@ -88,6 +88,8 @@ export default function App() {
   const [activeEntityId, setActiveEntityId] = useState<string | null>(null);
   // Incremented on every advance — ScenarioPanel watches this to refresh the list.
   const [scenarioListVersion, setScenarioListVersion] = useState(0);
+  // Mode 2 fiscal multiplier for the active scenario (Issue #746)
+  const [activeFiscalMultiplier, setActiveFiscalMultiplier] = useState<number | null>(null);
 
   const handleStepChange = (step: number, _isComplete: boolean) => {
     // Always set — never reset to null on completion so EntityDetailDrawer
@@ -103,6 +105,7 @@ export default function App() {
     setCurrentStep(null);
     setSelectedEntityId(null);
     setActiveEntityId(null);
+    setActiveFiscalMultiplier(null);
     writeStoredScenario({ id, name, totalSteps });
   };
 
@@ -171,6 +174,8 @@ export default function App() {
         // Set primary entity for identity header and choropleth highlight
         const primaryEntity = detail.configuration.entities?.[0] ?? null;
         setActiveEntityId(primaryEntity);
+        // Extract fiscal multiplier for Mode 2 display (Issue #746)
+        setActiveFiscalMultiplier(detail.configuration.fiscal_multiplier ?? null);
       })
       .catch(() => {
         // Non-fatal — currentStep and activeEntityId stay at previous values
@@ -248,6 +253,7 @@ export default function App() {
             entityId={activeEntityId}
             currentStep={currentStep}
             totalSteps={selectedScenarioSteps}
+            fiscalMultiplier={activeFiscalMultiplier}
           />
         )}
 
@@ -258,6 +264,8 @@ export default function App() {
               scenarioId={selectedScenarioId}
               stepCount={selectedScenarioSteps}
               currentStep={currentStep ?? 0}
+              comparisonScenarioId={compareMode ? secondScenarioId : null}
+              fiscalMultiplier={activeFiscalMultiplier}
             />
           </div>
         )}
