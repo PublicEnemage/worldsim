@@ -193,6 +193,10 @@ def _validate_create_request(req: ScenarioCreateRequest) -> None:
     if not req.name.strip():
         errors.append("name must not be empty.")
 
+    n_entities = len(req.configuration.entities)
+    if n_entities < 1 or n_entities > 5:
+        errors.append(f"entities must contain 1–5 entity IDs (got {n_entities}).")
+
     n = req.configuration.n_steps
     if n < 1 or n > 100:
         errors.append(f"n_steps must be between 1 and 100 (got {n}).")
@@ -394,7 +398,13 @@ async def list_scenarios(
 # ---------------------------------------------------------------------------
 
 
-def _compute_delta(value_a: str, value_b: str, tier_a: int, tier_b: int) -> DeltaRecord:
+def _compute_delta(
+    value_a: str,
+    value_b: str,
+    tier_a: int,
+    tier_b: int,
+    threshold_value: str | None = None,
+) -> DeltaRecord:
     from decimal import Decimal  # noqa: PLC0415
 
     dec_a = Decimal(value_a)
@@ -406,12 +416,19 @@ def _compute_delta(value_a: str, value_b: str, tier_a: int, tier_b: int) -> Delt
         direction = "decrease"
     else:
         direction = "unchanged"
+
+    threshold_crossed: bool | None = None
+    if threshold_value is not None:
+        thr = Decimal(threshold_value)
+        threshold_crossed = (dec_a < thr) != (dec_b < thr)
+
     return DeltaRecord(
         value_a=value_a,
         value_b=value_b,
         delta=str(delta),
         direction=direction,
         confidence_tier=max(tier_a, tier_b),
+        threshold_crossed=threshold_crossed,
     )
 
 
@@ -422,6 +439,7 @@ async def compare_scenarios(
     scenario_b: str,
     attr: str | None = None,
     step: int | None = None,
+    threshold_value: str | None = None,
 ) -> CompareResponse:
     """Return attribute deltas between two scenarios.
 
@@ -432,6 +450,10 @@ async def compare_scenarios(
     `step` — when provided, both scenarios must have a snapshot at exactly
     that step. Returns 404 identifying which scenario is missing the step.
     When omitted, compares the final (highest-step) snapshot of each scenario.
+
+    `threshold_value` — when provided (as a numeric string), each DeltaRecord
+    includes `threshold_crossed: bool` indicating whether the delta crossed this
+    absolute value boundary (value_a and value_b on opposite sides). Issue #153.
 
     Returns 404 if either scenario is not found.
     Returns 404 if `step` is provided and either scenario has no snapshot at
@@ -532,6 +554,7 @@ async def compare_scenarios(
                     val_b,
                     int(a_env.get("confidence_tier", 5)),
                     int(b_env.get("confidence_tier", 5)),
+                    threshold_value=threshold_value,
                 )
             except Exception:  # noqa: BLE001 S112
                 continue

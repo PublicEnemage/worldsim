@@ -84,8 +84,8 @@ export default function App() {
   const [panelOpen, setPanelOpen] = useState(false);
   const [fidelityOpen, setFidelityOpen] = useState(false);
   const [selectedEntityId, setSelectedEntityId] = useState<string | null>(null);
-  // Primary entity for the active scenario — used by ScenarioIdentityHeader and choropleth highlight (#744)
-  const [activeEntityId, setActiveEntityId] = useState<string | null>(null);
+  // All active entities for the scenario — used by ScenarioIdentityHeader and choropleth highlight (#754)
+  const [activeEntityIds, setActiveEntityIds] = useState<string[]>([]);
   // Incremented on every advance — ScenarioPanel watches this to refresh the list.
   const [scenarioListVersion, setScenarioListVersion] = useState(0);
   // Mode 2 fiscal multiplier for the active scenario (Issue #746)
@@ -104,7 +104,7 @@ export default function App() {
     setSelectedScenarioSteps(totalSteps);
     setCurrentStep(null);
     setSelectedEntityId(null);
-    setActiveEntityId(null);
+    setActiveEntityIds([]);
     setActiveFiscalMultiplier(null);
     writeStoredScenario({ id, name, totalSteps });
   };
@@ -171,9 +171,8 @@ export default function App() {
         if (detail.status === "completed") {
           setCurrentStep(detail.configuration.n_steps);
         }
-        // Set primary entity for identity header and choropleth highlight
-        const primaryEntity = detail.configuration.entities?.[0] ?? null;
-        setActiveEntityId(primaryEntity);
+        // Set all active entities for identity header and choropleth highlight (#754)
+        setActiveEntityIds(detail.configuration.entities ?? []);
         // Extract fiscal multiplier for Mode 2 display (Issue #746)
         setActiveFiscalMultiplier(detail.configuration.fiscal_multiplier ?? null);
       })
@@ -250,7 +249,7 @@ export default function App() {
         {selectedScenarioId && selectedScenarioName && (
           <ScenarioIdentityHeader
             scenarioName={selectedScenarioName}
-            entityId={activeEntityId}
+            entityIds={activeEntityIds}
             currentStep={currentStep}
             totalSteps={selectedScenarioSteps}
             fiscalMultiplier={activeFiscalMultiplier}
@@ -285,7 +284,7 @@ export default function App() {
             scenarioId={selectedScenarioId}
             currentStep={currentStep}
             onEntityClick={selectedScenarioId ? handleEntityClick : undefined}
-            activeEntityId={activeEntityId}
+            activeEntityIds={activeEntityIds}
           />
         )}
 

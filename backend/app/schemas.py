@@ -514,6 +514,9 @@ class DeltaRecord(BaseModel):
     `delta` = str(Decimal(value_b) - Decimal(value_a)).
     `direction` is 'increase', 'decrease', or 'unchanged'.
     `confidence_tier` is max(tier_a, tier_b) — lower-of-two rule.
+    `threshold_crossed` is True when the delta crosses a caller-supplied absolute
+    threshold (i.e. value_a is on one side and value_b is on the other), None when
+    no threshold was requested (Issue #153, G6a rider).
     """
 
     model_config = ConfigDict(from_attributes=True)
@@ -523,6 +526,7 @@ class DeltaRecord(BaseModel):
     delta: str
     direction: str
     confidence_tier: int
+    threshold_crossed: bool | None = None
 
 
 class CompareResponse(BaseModel):

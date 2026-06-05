@@ -9,7 +9,7 @@
  * Playwright E2E tests covering DOM assertions live in tests/e2e/.
  */
 import { describe, it, expect } from "vitest";
-import { formatStatus, formatMultiplierLabel } from "../ScenarioIdentityHeader";
+import { formatStatus, formatMultiplierLabel, formatEntityLabel } from "../ScenarioIdentityHeader";
 
 // ---------------------------------------------------------------------------
 // formatStatus — step-to-label mapping
@@ -84,5 +84,39 @@ describe("formatMultiplierLabel", () => {
     const label = formatMultiplierLabel(1.5);
     expect(label).toContain("×1.5");
     expect(label).not.toContain("×1.50");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// formatEntityLabel — multi-entity identity display (#754)
+// ---------------------------------------------------------------------------
+
+describe("formatEntityLabel", () => {
+  it("empty array → empty string", () => {
+    expect(formatEntityLabel([])).toBe("");
+  });
+
+  it("single entity → 'Entity: GRC'", () => {
+    expect(formatEntityLabel(["GRC"])).toBe("Entity: GRC");
+  });
+
+  it("two entities → 'Entities: JOR, SAU'", () => {
+    expect(formatEntityLabel(["JOR", "SAU"])).toBe("Entities: JOR, SAU");
+  });
+
+  it("three entities → plural label with all IDs", () => {
+    const label = formatEntityLabel(["GRC", "DEU", "FRA"]);
+    expect(label).toMatch(/^Entities:/);
+    expect(label).toContain("GRC");
+    expect(label).toContain("DEU");
+    expect(label).toContain("FRA");
+  });
+
+  it("single entity uses singular 'Entity:' not 'Entities:'", () => {
+    expect(formatEntityLabel(["GRC"])).not.toContain("Entities:");
+  });
+
+  it("two entities uses plural 'Entities:' not 'Entity:'", () => {
+    expect(formatEntityLabel(["GRC", "DEU"])).not.toMatch(/^Entity:/);
   });
 });
