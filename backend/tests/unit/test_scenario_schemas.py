@@ -421,6 +421,7 @@ def test_fiscal_multiplier_zero_rejected() -> None:
 def test_macroeconomic_module_default_multiplier_is_1() -> None:
     """MacroeconomicModule defaults to fiscal_multiplier_override=1.0."""
     from decimal import Decimal
+
     from app.simulation.modules.macroeconomic.module import MacroeconomicModule
     m = MacroeconomicModule()
     assert m._fiscal_multiplier_override == Decimal("1.0")
@@ -429,6 +430,7 @@ def test_macroeconomic_module_default_multiplier_is_1() -> None:
 def test_macroeconomic_module_accepts_multiplier_override() -> None:
     """MacroeconomicModule stores the override as a Decimal."""
     from decimal import Decimal
+
     from app.simulation.modules.macroeconomic.module import MacroeconomicModule
     m = MacroeconomicModule(fiscal_multiplier_override=2.0)
     assert m._fiscal_multiplier_override == Decimal("2.0")
@@ -437,8 +439,9 @@ def test_macroeconomic_module_accepts_multiplier_override() -> None:
 def test_build_active_modules_passes_fiscal_multiplier() -> None:
     """_build_active_modules creates MacroeconomicModule with correct override."""
     from decimal import Decimal
-    from app.simulation.web_scenario_runner import _build_active_modules
+
     from app.simulation.modules.macroeconomic.module import MacroeconomicModule
+    from app.simulation.web_scenario_runner import _build_active_modules
     cfg = ScenarioConfigSchema(entities=["GRC"], n_steps=3, fiscal_multiplier=1.5)
     modules = _build_active_modules(cfg)
     macro = next(m for m in modules if isinstance(m, MacroeconomicModule))
