@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-04 (M11.5 Priority A sessions complete — all three Priority A cold-start sessions finished (P2 S003, P1-001, P5-001). PRs #736/#738/#739 merged. Cross-session pattern confirmed: active scenario not identifiable from main viewport — severity escalates P2 MEDIUM → P1 HIGH → P5 CRITICAL. Next: M11.5 findings synthesis report + Issue #720 exit checklist assessment.)**
+**Last updated: 2026-06-04 (M11.5 agent work complete — all deliverables shipped (PRs #741/#742). Priority A synthesis, feature catalogue, and exit checklist assessment posted on Issue #720. Verdict: NOT READY — EVIDENCE COMPLETE. Remaining gates: EL review of findings + M12 priority issues filed + Issue #720 closed.)**
 **Current milestone:** M11.5 — Usability Validation and Experience Audit (GitHub Milestone 14; North Star: `docs/vision/milestone-11-5-north-star.md`)
 **Previous milestone:** M11 — Engine Investigation and Political Economy (formally closed 2026-06-04, tagged v0.11.0)
 
@@ -77,7 +77,7 @@ M9 formally closed. Issue #213 (M9 Exit Checklist) closed 2026-05-24. M10 milest
 
 ## Open PRs
 
-No open PRs — board clear as of 2026-06-04 (post PR #739 merge).
+No open PRs — board clear as of 2026-06-04 (post PR #742 merge).
 
 ## M11 Work Streams — 2026-06-04 Sprint
 
@@ -196,10 +196,23 @@ No open PRs — board clear as of 2026-06-04 (post PR #739 merge).
 
 **Exit criterion (M11.5):** Can a finance ministry analyst with no prior WorldSim orientation use this tool to produce a finding they could cite in a negotiation?
 
+**M11.5 agent deliverables — COMPLETE:**
+- Priority A synthesis: `docs/ux/usability-sessions/synthesis/2026-06-04-priority-a-synthesis.md` (PR #741) — 11 findings ranked, M12 action table, exit verdict
+- Feature catalogue: `docs/ux/usability-sessions/synthesis/2026-06-04-feature-catalogue.md` (PR #742) — all v0.11.0 capabilities with per-capability discoverability verdict
+- Exit checklist assessment: Issue #720 comment (2026-06-04) — all completable gates closed; EL review is the remaining gate
+
+**Remaining exit gates (EL action required):**
+- EL reviews findings and confirms exit criterion verdict (NOT READY — EVIDENCE COMPLETE)
+- M12 issues filed for minimum viable scope (synthesis Ranks 1–4: scenario identity header, interactive alert, fiscal multiplier UI, cohort disaggregation)
+- Issue #720 closed; GitHub Milestone 14 (M11.5) closed
+
 ## Recently Merged PRs (last 5)
 
 | PR | Title | Date |
 |---|---|---|
+| #742 | docs(ux): M11.5 tertiary deliverable — feature catalogue with per-capability discoverability | 2026-06-04 |
+| #741 | docs(ux): M11.5 Priority A synthesis — cross-session findings, ranked M12 actions, exit verdict | 2026-06-04 |
+| #740 | chore(state): SESSION_STATE.md — M11.5 Priority A sessions complete (PRs #736/#738/#739) | 2026-06-04 |
 | #739 | ux(pillar-2): Session P5-001 — Persona 5 cold-start findings (Executive board briefing) | 2026-06-04 |
 | #738 | feat(ux): session P1-001 Persona 1 findings — fiscal multiplier analysis NOT MET | 2026-06-04 |
 | #737 | chore(state): SESSION_STATE.md — session 003 Persona 2 complete; Priority A sessions P1/P5 next | 2026-06-04 |
