@@ -5,9 +5,9 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-04 (M11.5 agent work complete — all deliverables shipped (PRs #741/#742). Priority A synthesis, feature catalogue, and exit checklist assessment posted on Issue #720. Verdict: NOT READY — EVIDENCE COMPLETE. Remaining gates: EL review of findings + M12 priority issues filed + Issue #720 closed.)**
-**Current milestone:** M11.5 — Usability Validation and Experience Audit (GitHub Milestone 14; North Star: `docs/vision/milestone-11-5-north-star.md`)
-**Previous milestone:** M11 — Engine Investigation and Political Economy (formally closed 2026-06-04, tagged v0.11.0)
+**Last updated: 2026-06-04 (M11.5 formally closed — Issue #720 closed, GitHub Milestone 14 closed. Exit verdict: NOT READY — EVIDENCE COMPLETE. M12 blocking issues filed: #744 #745 #746 #747. Current milestone: M12 — Active Control and External Sector.)**
+**Current milestone:** M12 — Active Control and External Sector (GitHub Milestone 13)
+**Previous milestone:** M11.5 — Usability Validation and Experience Audit (formally closed 2026-06-04; Issue #720 closed; GitHub Milestone 14 closed)
 
 ---
 
@@ -100,16 +100,30 @@ No open PRs — board clear as of 2026-06-04 (post PR #742 merge).
 
 ---
 
-## Open Issues — M11.5 (Usability Validation and Experience Audit)
+## Open Issues — M12 (Active Control and External Sector)
 
-**North Star:** `docs/vision/milestone-11-5-north-star.md` | **GitHub Milestone:** 14
+**GitHub Milestone:** 13 | **M11.5 blocking gaps now in M12 scope:**
+
+| Issue | Title | Source |
+|---|---|---|
+| #744 | feat(ux): persistent scenario identity header | M11.5 GAP-02 — universal (all 3 Priority A sessions) |
+| #745 | feat(ux): MDA alert panel interactive | M11.5 GAP-01 — 2 of 3 Priority A sessions |
+| #746 | feat(ux): Mode 2 fiscal multiplier parameter input | M11.5 GAP-03 — P1 NOT MET |
+| #747 | feat(ux): Zone 1 cohort disaggregation | M11.5 GAP-04 — 2 of 3 Priority A sessions |
+| #263 | Milestone 12 Exit Checklist | Blocks M12 closure |
+
+---
+
+## Closed — M11.5 (Usability Validation and Experience Audit)
+
+**Formally closed: 2026-06-04** | **North Star:** `docs/vision/milestone-11-5-north-star.md` | **GitHub Milestone:** 14 (closed)
 
 | Issue | Title | Gate |
 |---|---|---|
 | #717 ✅ | Pillar 1 — rrweb session recording integration | **Closed 2026-06-04** — PR #724 merged. `useSessionRecording` hook (rrweb `record()`, `endSession()` POST with once-only guard), `SessionRecordingBanner` (red/green fixed banner), `SessionReplayViewer` (`?replay_session=<id>`), FastAPI `POST/GET/LIST /api/v1/sessions/recording`, session artifact schema v1.0 at `docs/schema/session_recording.yml`, coordinator guide at `docs/ux/usability-sessions/how-to-run-a-session.md`. 14 backend + 9 frontend unit tests. |
 | #718 ✅ | Pillar 2 — cold-start usability audit methodology | **Closed 2026-06-04** — PR #727 merged. `docs/ux/usability-sessions/pillar-2-methodology.md`: cold-start protocol, think-aloud schema (5 North Star markers + TRIED/CONCLUDED), facilitation approach, persona sequencing (P2→P1→P5 Priority A; P6/P8 Priority B), session count rationale, trace interpretation, findings classification (CRITICAL/HIGH/MEDIUM/LOW × Discovery/Comprehension/Action), verbatim task prompts for 5 personas. Status: PROPOSED — joint approval on Issue #718 by PM + UD + UT + PO required before Session 1. |
 | #719 ✅ | Pillar 3 — session provenance standard and semantic component vocabulary | **Closed 2026-06-04** — PR #730 merged. `pillar-3-provenance.md`: manifest schema (app state, agent config, environment, outcome, artifact links), linking protocol (session_id primary key), versioning strategy (same-PR vocabulary update rule). `vocabulary.md`: 16 zone tokens, component + element tables for all current UI components, data-testid cross-refs, v1.0 changelog. `session_recording.yml` Pillar 3 stub resolved. `docs/ux/usability-sessions/manifests/` directory created. |
-| #720 | Milestone 11.5 Exit Checklist | Blocks milestone closure |
+| #720 ✅ | Milestone 11.5 Exit Checklist | **Closed 2026-06-04** — exit verdict NOT READY — EVIDENCE COMPLETE; M12 blocking issues #744–#747 filed |
 
 **M11.5 Session Status:**
 
