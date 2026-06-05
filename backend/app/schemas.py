@@ -12,7 +12,7 @@ from decimal import Decimal
 from enum import Enum
 from typing import Any
 
-from pydantic import BaseModel, ConfigDict, field_serializer, field_validator
+from pydantic import BaseModel, ConfigDict, Field, field_serializer, field_validator
 
 # ---------------------------------------------------------------------------
 # Output disclaimer constants — Issue #98, #100, #158
@@ -332,6 +332,9 @@ class ScenarioConfigSchema(BaseModel):
         MC support can be added without a breaking schema change. MC sampling
         itself is not yet implemented — n_runs > 1 is recorded but produces
         a single deterministic trajectory until ADR-007 MC support ships.
+    `fiscal_multiplier` — Mode 2 parameter (Issue #746). Scales the regime-dependent
+        fiscal multiplier applied in MacroeconomicModule. Default 1.0 (no scaling).
+        Range 0.1–3.0; values outside this range are rejected at validation.
     """
 
     model_config = ConfigDict(from_attributes=True)
@@ -345,6 +348,7 @@ class ScenarioConfigSchema(BaseModel):
     step_metadata: dict[str, Any] = {}
     political_context: PoliticalContext | None = None
     n_runs: int = 1
+    fiscal_multiplier: float = Field(default=1.0, ge=0.1, le=3.0)
 
 
 class ScheduledInputSchema(BaseModel):

@@ -514,7 +514,9 @@ def _build_active_modules(config: ScenarioConfigSchema) -> list[SimulationModule
     GovernanceModule, and EcologicalModule are conditionally active based on
     modules_config.
     """
-    modules: list[SimulationModule] = [MacroeconomicModule()]
+    modules: list[SimulationModule] = [
+        MacroeconomicModule(fiscal_multiplier_override=config.fiscal_multiplier),
+    ]
     demo = _build_demographic_module(config)
     if demo is not None:
         modules.append(demo)

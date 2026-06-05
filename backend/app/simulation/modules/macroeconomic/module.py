@@ -107,7 +107,13 @@ class MacroeconomicModule(SimulationModule):
     Processes fiscal and monetary policy events from the prior step.
     Applies regime-dependent fiscal multipliers and emits gdp_growth_change
     and (on regime transition) regime_change events.
+
+    fiscal_multiplier_override scales the regime-specific multiplier (Issue #746).
+    Default 1.0 leaves existing behaviour unchanged.
     """
+
+    def __init__(self, fiscal_multiplier_override: float = 1.0) -> None:
+        self._fiscal_multiplier_override = Decimal(str(fiscal_multiplier_override))
 
     def compute(
         self,
@@ -153,13 +159,17 @@ class MacroeconomicModule(SimulationModule):
             confidence_tier = max(confidence_tier, event_tier)
 
             if event.event_type == "fiscal_policy_spending_change":
-                multiplier = FISCAL_MULTIPLIERS[current_regime]
+                multiplier = FISCAL_MULTIPLIERS[current_regime] * self._fiscal_multiplier_override
                 gdp_delta += magnitude * multiplier
                 fiscal_balance_delta -= magnitude
                 inflation_delta += magnitude * _SPENDING_INFLATION_COEFF
 
             elif event.event_type == "fiscal_policy_tax_rate_change":
-                multiplier = FISCAL_MULTIPLIERS[current_regime] * _TAX_MULTIPLIER_RATIO
+                multiplier = (
+                    FISCAL_MULTIPLIERS[current_regime]
+                    * _TAX_MULTIPLIER_RATIO
+                    * self._fiscal_multiplier_override
+                )
                 gdp_delta -= magnitude * multiplier
                 fiscal_balance_delta += magnitude
                 inflation_delta += magnitude * _TAX_INFLATION_COEFF

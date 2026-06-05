@@ -3,12 +3,13 @@
  *
  * Covers:
  *   #744 — persistent scenario identity header; formatStatus pure function
+ *   #746 — formatMultiplierLabel: Mode 2 fiscal multiplier display
  *
- * These are unit tests of the pure function exported from ScenarioIdentityHeader.tsx.
+ * These are unit tests of the pure functions exported from ScenarioIdentityHeader.tsx.
  * Playwright E2E tests covering DOM assertions live in tests/e2e/.
  */
 import { describe, it, expect } from "vitest";
-import { formatStatus } from "../ScenarioIdentityHeader";
+import { formatStatus, formatMultiplierLabel } from "../ScenarioIdentityHeader";
 
 // ---------------------------------------------------------------------------
 // formatStatus — step-to-label mapping
@@ -43,5 +44,45 @@ describe("formatStatus", () => {
   it("does not include raw null in output", () => {
     const s = formatStatus(null, 5);
     expect(s).not.toContain("null");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// formatMultiplierLabel — Mode 2 fiscal multiplier strip label (#746)
+// ---------------------------------------------------------------------------
+
+describe("formatMultiplierLabel", () => {
+  it("returns null when fiscalMultiplier is null", () => {
+    expect(formatMultiplierLabel(null)).toBeNull();
+  });
+
+  it("returns null when fiscalMultiplier is undefined", () => {
+    expect(formatMultiplierLabel(undefined)).toBeNull();
+  });
+
+  it("returns null when fiscalMultiplier is exactly 1.0 (no override)", () => {
+    expect(formatMultiplierLabel(1.0)).toBeNull();
+  });
+
+  it("returns label when multiplier is 2.0", () => {
+    const label = formatMultiplierLabel(2.0);
+    expect(label).not.toBeNull();
+    expect(label).toContain("×2.0");
+  });
+
+  it("returns label when multiplier is 0.5", () => {
+    const label = formatMultiplierLabel(0.5);
+    expect(label).not.toBeNull();
+    expect(label).toContain("×0.5");
+  });
+
+  it("label contains 'Fiscal' keyword", () => {
+    expect(formatMultiplierLabel(1.5)).toContain("Fiscal");
+  });
+
+  it("label rounds to one decimal place — 1.50 → '×1.5'", () => {
+    const label = formatMultiplierLabel(1.5);
+    expect(label).toContain("×1.5");
+    expect(label).not.toContain("×1.50");
   });
 });

@@ -263,7 +263,7 @@ export function TrajectoryView({
     return mergeTrajectories(trajectory, baseline_trajectory);
   }, [trajectory, baseline_trajectory]);
 
-  const showBaseline = mode === "MODE_3" && baseline_trajectory !== null;
+  const showBaseline = (mode === "MODE_2" || mode === "MODE_3") && baseline_trajectory !== null;
 
   // Performance mark for AC-007 / MV-002. Fires once when trajectory data first
   // arrives: measures from post-DOM-update to post-paint via requestAnimationFrame.
@@ -394,7 +394,7 @@ export function TrajectoryView({
               />
             ))}
 
-          {/* Baseline ghost Lines (Mode 3) */}
+          {/* Baseline ghost Lines (Mode 2 and Mode 3) */}
           {showBaseline &&
             FRAMEWORKS.map((fw) => {
               const isDashed = isSingleEntity && (fw === "financial" || fw === "human_development");
@@ -410,7 +410,7 @@ export function TrajectoryView({
                   connectNulls={CONNECT_NULLS}
                   name={`${legendFormatter(fw, "percentile_rank")} (baseline)` as never}
                   isAnimationActive={false}
-                  legendType="none"
+                  legendType={mode === "MODE_2" ? "line" : "none"}
                 />
               );
             })}

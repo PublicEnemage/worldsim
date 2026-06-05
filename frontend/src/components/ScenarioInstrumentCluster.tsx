@@ -185,6 +185,11 @@ interface ScenarioInstrumentClusterProps {
   stepCount: number;
   currentStep: number;
   entityIds?: string[];
+  /** Mode 2 — ID of the comparison (baseline) scenario. When set, its trajectory is
+   *  fetched and stored as baseline_trajectory so TrajectoryView renders the overlay. */
+  comparisonScenarioId?: string | null;
+  /** Mode 2 fiscal multiplier for the active scenario — displayed in identity header. */
+  fiscalMultiplier?: number | null;
 }
 
 export function ScenarioInstrumentCluster({
@@ -192,6 +197,8 @@ export function ScenarioInstrumentCluster({
   stepCount,
   currentStep,
   entityIds,
+  comparisonScenarioId,
+  fiscalMultiplier,
 }: ScenarioInstrumentClusterProps) {
   const store = useScenarioStepStore();
   const bp = useViewportBreakpoint();
@@ -213,10 +220,11 @@ export function ScenarioInstrumentCluster({
   // Shared between Zone 1B (displays detail) and Zone 1D ("see alerts" navigation).
   const [focusedAlertMdaId, setFocusedAlertMdaId] = useState<string | null>(null);
 
-  // Initialise store when scenario changes
+  // Initialise store when scenario changes — MODE_2 when fiscal multiplier override is active
   useEffect(() => {
-    store.setScenario(scenarioId, stepCount, "MODE_1");
-  }, [scenarioId, stepCount]);
+    const mode = fiscalMultiplier != null && fiscalMultiplier !== 1.0 ? "MODE_2" : "MODE_1";
+    store.setScenario(scenarioId, stepCount, mode);
+  }, [scenarioId, stepCount, fiscalMultiplier]);
 
   // Keep current_step in sync with ScenarioControls (prop-driven)
   useEffect(() => {
@@ -270,6 +278,27 @@ export function ScenarioInstrumentCluster({
       store.setPmmState(null, null);
     }
   }, [currentStep, store.trajectory]);
+
+  // Fetch comparison scenario trajectory for Mode 2 overlay (#746).
+  // When comparisonScenarioId changes, fetch its latest trajectory and store as baseline.
+  // Clears baseline when comparisonScenarioId is removed.
+  useEffect(() => {
+    if (!comparisonScenarioId) {
+      useScenarioStepStore.setState({ baseline_trajectory: null });
+      return;
+    }
+    let cancelled = false;
+    fetch(`${API_BASE}/scenarios/${encodeURIComponent(comparisonScenarioId)}/trajectory`)
+      .then((res) => (res.ok ? (res.json() as Promise<RawTrajectoryResponse>) : null))
+      .then((raw) => {
+        if (cancelled || !raw) return;
+        useScenarioStepStore.setState({ baseline_trajectory: parseTrajectoryResponse(raw) });
+      })
+      .catch(() => {
+        // Non-fatal — baseline overlay stays absent
+      });
+    return () => { cancelled = true; };
+  }, [comparisonScenarioId]);
 
   // Fetch MDA alerts from measurement-output after each step advance (IR-001).
   // Entity ID comes from the trajectory response already fetched above.
