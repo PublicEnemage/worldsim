@@ -142,7 +142,7 @@ All four Wave 1 groups can be worked and merged in any order. No group depends o
 
 ---
 
-### G7 — Cloud compute path doc: #750
+### G7 — Cloud compute path doc: #750 ✓ DONE (2026-06-05, PR #774)
 
 **Why own group:** Pure documentation. No code. Writes `docs/architecture/cloud-compute-path.md` (new file). Can be done any time after G4 merges — needs real matrix engine performance numbers to cite accurately.
 
@@ -153,6 +153,8 @@ All four Wave 1 groups can be worked and merged in any order. No group depends o
 **Acceptance gates:**
 - Document covers: what triggers cloud need, minimum viable laptop config, cloud provider options with pricing, self-hosted alternative
 - Equitable Build Process constraint confirmed: standard single-country scenario stays within 8GB/4-core envelope
+
+**Execution narrative:** Documentation-only PR. New file `docs/architecture/cloud-compute-path.md` authored by Chief Engineer Agent, grounded in Phase 1 baseline benchmarks (ProBook i5-8265U, 8 GiB RAM). Explicitly confirms the Equitable Build Process constraint: standard single-country scenario (1,000 MC runs, 10–30 steps) completes in < 200 ms of compute on a constrained laptop — cloud is not required for the canonical user. Three cloud-need trigger conditions defined with quantified thresholds: entity/relationship density (> ~500 entities or dense graph taking > 30 s/run), MC ensemble size > 10,000 runs, and full backtesting suite. Pricing at three tiers across AWS, GCP, Azure, and Hetzner (Hetzner highlighted as 4–5× cheaper for resource-constrained institutions). Self-hosted deployment instructions including air-gapped deployment for security-isolated central bank environments. No backend or frontend changes; no test gate needed.
 
 ---
 
