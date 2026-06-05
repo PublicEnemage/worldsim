@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-05 (M12 kickoff complete — PM Agent HORIZON sweep run. 7 untracked roadmap deliverables filed as issues (#749–#755). Roadmap updated with issue links per Scope Linkage Requirement. Full M12 issue board now tracked.)**
+**Last updated: 2026-06-05 (M12 kickoff complete — PR #756 merged. 7 untracked roadmap deliverables filed (#749–#755), roadmap fully linked. Three open EL actions from HORIZON sweep: acknowledge #744–#747 as scope additions; decision on #725/#644 milestone assignment; NM registry delegation rule clarification.)**
 **Current milestone:** M12 — Active Control and External Sector (GitHub Milestone 13)
 **Previous milestone:** M11.5 — Usability Validation and Experience Audit (formally closed 2026-06-04; Issue #720 closed; GitHub Milestone 14 closed)
 
