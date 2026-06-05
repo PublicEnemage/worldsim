@@ -1862,6 +1862,31 @@ Coordinator self-audit during field notes writing. The methodology's observer-si
 
 ---
 
+## NM-034 — PM Agent / Coordinator Filed Near-Miss Registry Entries Without PI Agent Activation (Reactive)
+
+**Date:** 2026-06-05
+**Milestone:** M12 — Active Control and External Sector (detected during M12 kickoff HORIZON sweep)
+**Detected by:** PM Agent HORIZON sweep 2026-06-05 (Step 5 — File Authority Audit)
+**Severity:** Low
+
+### What happened
+
+In multiple sessions (most recently NM-033 in PR #736, 2026-06-04), the coordinator / PM Agent role filed entries to `docs/process/near-miss-registry.md` directly without activating PI Agent. The file ownership table in `docs/process/agent-raci.md` assigns R to PI Agent for the near-miss registry; PM Agent holds I (informed). No explicit prohibition of delegation existed in the table prior to PR #758.
+
+### What was at risk
+
+The author-of-record principle for the near-miss registry. PI Agent's role includes applying the internal/external categorization test (near-miss vs. Known Issue) and verifying that named process improvements are real and trackable — not just recording incidents. PM Agent filing directly bypasses this verification step. If an entry had been miscategorized (e.g., an external infrastructure failure filed as a near-miss, producing a process improvement recommendation against something that cannot be redesigned), no PI review would have caught it before the entry became permanent institutional memory.
+
+### What caught it
+
+PM Agent HORIZON sweep Step 5 (file authority audit) during M12 kickoff ceremony, 2026-06-05. The pattern was identified retroactively across M11.5 sessions; NM-033 was the most recent instance. The HORIZON sweep's explicit file authority check created the surface on which the retroactive pattern became visible.
+
+### Process improvement
+
+`docs/process/agent-raci.md` amended in PR #758 (2026-06-05) — a no-delegation clause was added explicitly to the NM registry row: "**No delegation:** PM Agent does not have authority to file NM entries without PI Agent activation — PI Agent must be activated before any entry is written, regardless of severity. EL decision 2026-06-05." This makes the constraint explicit and checkable in the file ownership table rather than depending on agents inferring it from the R/I assignment alone.
+
+---
+
 ## Registry Maintenance
 
 ### How to add an entry
