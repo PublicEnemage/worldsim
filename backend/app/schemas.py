@@ -307,6 +307,29 @@ class PoliticalContext(BaseModel):
     legitimacy_index: Decimal | None = None               # composite 0.0–1.0
 
 
+class CommodityShockConfig(BaseModel):
+    """A global commodity price shock applied to all scenario entities (Issue #752, ADR-012).
+
+    Effects are distributed proportionally to each entity's
+    `commodity_import_dependency_{commodity_category}` attribute value.
+    Entities with no dependency attribute receive zero shock.
+
+    All synthetic dependency coefficients must be flagged at indicator level
+    as Tier 3 per DATA_STANDARDS.md §Confidence Tier System.
+    """
+
+    model_config = ConfigDict(from_attributes=True)
+
+    commodity_category: str
+    magnitude: Decimal
+    start_step: int = 0
+    duration_steps: int = 1
+
+    @field_serializer("magnitude")
+    def _serialize_magnitude(self, v: Decimal) -> str:
+        return str(v)
+
+
 class ScenarioConfigSchema(BaseModel):
     """Scenario configuration payload.
 
@@ -335,6 +358,8 @@ class ScenarioConfigSchema(BaseModel):
     `fiscal_multiplier` — Mode 2 parameter (Issue #746). Scales the regime-dependent
         fiscal multiplier applied in MacroeconomicModule. Default 1.0 (no scaling).
         Range 0.1–3.0; values outside this range are rejected at validation.
+    `commodity_price_shocks` — global commodity shocks distributed to all entities by
+        import dependency (Issue #752, ADR-012). Default empty (no shocks).
     """
 
     model_config = ConfigDict(from_attributes=True)
@@ -349,6 +374,7 @@ class ScenarioConfigSchema(BaseModel):
     political_context: PoliticalContext | None = None
     n_runs: int = 1
     fiscal_multiplier: float = Field(default=1.0, ge=0.1, le=3.0)
+    commodity_price_shocks: list[CommodityShockConfig] = []
 
 
 class ScheduledInputSchema(BaseModel):
