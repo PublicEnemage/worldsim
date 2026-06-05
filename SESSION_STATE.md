@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-04 (M11.5 formally closed — Issue #720 closed, GitHub Milestone 14 closed. Exit verdict: NOT READY — EVIDENCE COMPLETE. M12 blocking issues filed: #744 #745 #746 #747. Current milestone: M12 — Active Control and External Sector.)**
+**Last updated: 2026-06-05 (M12 kickoff complete — PM Agent HORIZON sweep run. 7 untracked roadmap deliverables filed as issues (#749–#755). Roadmap updated with issue links per Scope Linkage Requirement. Full M12 issue board now tracked.)**
 **Current milestone:** M12 — Active Control and External Sector (GitHub Milestone 13)
 **Previous milestone:** M11.5 — Usability Validation and Experience Audit (formally closed 2026-06-04; Issue #720 closed; GitHub Milestone 14 closed)
 
@@ -102,15 +102,28 @@ No open PRs — board clear as of 2026-06-04 (post PR #742 merge).
 
 ## Open Issues — M12 (Active Control and External Sector)
 
-**GitHub Milestone:** 13 | **M11.5 blocking gaps now in M12 scope:**
+**GitHub Milestone:** 13 | **HORIZON sweep:** 2026-06-05 (milestone creation ceremony)
 
-| Issue | Title | Source |
-|---|---|---|
-| #744 | feat(ux): persistent scenario identity header | M11.5 GAP-02 — universal (all 3 Priority A sessions) |
-| #745 | feat(ux): MDA alert panel interactive | M11.5 GAP-01 — 2 of 3 Priority A sessions |
-| #746 | feat(ux): Mode 2 fiscal multiplier parameter input | M11.5 GAP-03 — P1 NOT MET |
-| #747 | feat(ux): Zone 1 cohort disaggregation | M11.5 GAP-04 — 2 of 3 Priority A sessions |
-| #263 | Milestone 12 Exit Checklist | Blocks M12 closure |
+| Issue | Title | Source | horizon |
+|---|---|---|---|
+| #744 | feat(ux): persistent scenario identity header | M11.5 GAP-02 — universal | immediate |
+| #745 | feat(ux): MDA alert panel interactive | M11.5 GAP-01 — 2 of 3 sessions | immediate |
+| #746 | feat(ux): Mode 2 fiscal multiplier parameter input | M11.5 GAP-03 — P1 NOT MET | immediate |
+| #747 | feat(ux): Zone 1 cohort disaggregation | M11.5 GAP-04 — 2 of 3 sessions | immediate |
+| #749 | feat(engine): matrix engine production migration | M12 roadmap §Matrix engine migration | immediate |
+| #750 | docs(arch): cloud compute path scoping | M12 roadmap §Matrix engine migration | immediate |
+| #751 | feat(engine): bilateral trade shock input type | M12 roadmap §External sector module | immediate |
+| #752 | feat(engine): commodity price shock global parameter | M12 roadmap §External sector module | immediate |
+| #753 | feat(frontend): Mode 3 Active Control | M12 roadmap §Mode 3 active control | immediate |
+| #754 | feat(engine): multi-country scenario configuration | M12 roadmap §Mode 3 active control | immediate |
+| #755 | docs(demo): Demo 4 preparation | M12 roadmap §Demo — compliance gate | immediate |
+| #394 | platform: multi-scenario comparison (>2 scenarios) | M12 roadmap §External sector module | near-term |
+| #263 | Milestone 12 Exit Checklist | Blocks M12 closure | immediate |
+
+**HORIZON sweep findings requiring EL action:**
+- Formally acknowledge #744–#747 as scope additions to M12 (from M11.5 findings, not in original roadmap)
+- #725 (mypy pin) and #644 (ESLint audit) on M12 board but not M12 scope — recommend moving off milestone
+- Near-miss registry filing pattern (NM entries written outside PI Agent role) — clarify delegation or amend file ownership table
 
 ---
 
