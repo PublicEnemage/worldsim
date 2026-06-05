@@ -114,11 +114,11 @@ All four Wave 1 groups can be worked and merged in any order. No group depends o
 
 ## Wave 2 — After G4
 
-### G5 — External sector module: #751 + #752
+### G5 — External sector module: #751 + #752 ✓ DONE (2026-06-05, PR #773)
 
 **Why grouped:** `BilateralTradeShock` (#751) lays the propagation routing infrastructure; `CommodityPriceShock` (#752) extends it for global-parameter distribution. Writing both together avoids two separate migrations to the same schema tables and two separate additions to the same input-type dispatch logic. #751 is a blocking prerequisite for #752.
 
-**ADR prerequisite:** External sector module ADR must be authored and accepted before any implementation merges. Check `docs/architecture/backlog.md` for next available number and assign before drafting.
+**ADR prerequisite:** ADR-012 authored and accepted by EL 2026-06-05 (ARCH-006, `docs/adr/ADR-012-external-sector-module.md`).
 
 **Shared files:** New `external_sector.py` module, `scenario_schemas.py` (new scheduled input types), DB migration, relationship graph traversal in propagation layer, human cost linkage (bottom-quintile consumption channel for both shock types). Single test file covers both shock types.
 
@@ -137,6 +137,8 @@ All four Wave 1 groups can be worked and merged in any order. No group depends o
 - #27 — Document calibration basis for propagation attenuation parameters (G5 introduces new propagation routing; document attenuation calibration here)
 - #92 — Greece 2010 fixture: bond yields, CDS proxy, credit tier (financial data useful for external sector backtesting)
 - #275 — Ecological-to-financial transmission calibration (resource export revenue channel feeds directly into commodity price shock)
+
+**Execution narrative:** Backend-only PR. Two new shock types implementing ADR-012's external sector module boundary. `BilateralTradeShock` (new `ControlInput` subclass in `orchestration/inputs.py`): entity-targeted bilateral import price shock generating two events per ADR-012 Decision 4 — one Financial (`import_price_inflation`) and one Human Development (`bottom_quintile_consumption_capacity`), with no cross-framework conversion. `_HCL_TRANSMISSION_FACTOR = Decimal("0.3")` encodes the 30% pass-through from import price to bottom-quintile consumption capacity within 1 step (Issue #275 calibration basis). `CommodityCategory` enum (FUEL/FOOD/METALS/OTHER) in `inputs.py`. `ExternalSectorModule` (new `SimulationModule` subclass, `modules/external_sector/module.py`): distributes global commodity price shocks to all entities proportional to `commodity_import_dependency_{category}` entity attribute; fires only within `start_step`/`duration_steps` window; returns empty list when dependency attribute is absent or zero. `CommodityShockConfig` Pydantic schema added to `schemas.py`; `commodity_price_shocks: list[CommodityShockConfig] = []` field on `ScenarioConfigSchema`. Both types wired into `web_scenario_runner`: `ExternalSectorModule` added to `_build_active_modules()`; `BilateralTradeShock` added to `_deserialize_control_input()`. 16 new unit tests in `test_external_sector.py` covering propagation, HCL transmission (-0.06 = -0.20 × 0.3), zero-dependency no-op, step-range firing, confidence tier 3, and deserialization. Also fixes pre-existing G4 test breakage in `test_matrix_engine_production.py`: `ScenarioRunner.tick()` → `advance_timestep(current_state, modules, scheduled_inputs)` with updated constructor signature (6 test fixes). 1108 total unit tests passing. CI: test-backend ✓, lint ✓, compliance-scan ✓.
 
 ---
 
