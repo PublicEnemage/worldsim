@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-05 (M12 sprint G1–G7 + G6b complete — PRs #762–#775 + #778 merged. G6b (Mode 3 Active Control, Issue #753) shipped: POST /branch + /rebranch endpoints, ControlPlane component, recompute badge, streaming step reveal, threshold-crossing markers (rider #97), reversibility classification (rider #271). 16 backend + 12 frontend unit tests + 2 Playwright E2E tests. mypy KI-002 confirmed pre-existing — not introduced by G6b.)**
+**Last updated: 2026-06-06 (M12 Wave C complete — NB-7 #788, NB-6 #789, NB-4 #790 merged. NB-7: Mode 1 COMPARE_VIEW spec complete in information-hierarchy.md — inline fixture picker, single-call API design decision, US-049 user story (Andreas Stefanidis / Persona 3). NB-6: ESLint audit complete — 0 errors target met across all frontend files; App.tsx rules-of-hooks structural fix (early return moved after all hooks), react-refresh/only-export-components + react-hooks/refs + react-hooks/set-state-in-effect suppressions across 15 files. NB-4: Four investment climate state variables (sovereign_risk_premium, fdi_stock_pct_gdp, portfolio_flow_velocity, credit_rating_score) seeded for GRC and ARG demo entities with AttributeType tags and historical sources; 41-test NB-4 suite + backtesting fixtures count test updated (6→10 attributes). G8 (Demo 4, Issue #755) unblocked.)**
 **Current milestone:** M12 — Active Control and External Sector (GitHub Milestone 13)
 **Previous milestone:** M11.5 — Usability Validation and Experience Audit (formally closed 2026-06-04; Issue #720 closed; GitHub Milestone 14 closed)
 
@@ -77,7 +77,7 @@ M9 formally closed. Issue #213 (M9 Exit Checklist) closed 2026-05-24. M10 milest
 
 ## Open PRs
 
-No open PRs — board clear as of 2026-06-04 (post PR #742 merge).
+No open PRs — board clear as of 2026-06-06 (post PR #790 merge).
 
 ## M11 Work Streams — 2026-06-04 Sprint
 
@@ -145,14 +145,18 @@ CI hotfix: NM-035 filed; `ci.yml` PR trigger updated to include `release/m*` (PR
 | G6a — Multi-country backend | #775 | #754 #103 | ✓ DONE |
 | G6b — Mode 3 Active Control | #778 | #753 | ✓ DONE |
 | G7 — Cloud compute path doc | #774 | #750 | ✓ DONE |
-| G8 — Demo 4 preparation | — | #755 | Not started |
+| G8 — Demo 4 preparation | — | #755 | UNBLOCKED (Wave C complete 2026-06-06) |
 | G9 — Political economy module | — | ADR-013 | BLOCKED — ADR-013 not yet authored |
+| NB-7 — Mode 1 COMPARE_VIEW spec | #788 ✓ | #451 | ✓ DONE 2026-06-06 |
+| NB-6 — ESLint audit | #789 ✓ | #644 | ✓ DONE 2026-06-06 |
+| NB-4 — Investment climate variables | #790 ✓ | #34 | ✓ DONE 2026-06-06 |
 
 **Open tasks before next session:**
 - PI Agent review of NM-035 (filed by implementing agent under EL direction; requires PI author-of-record review)
 - ARCH-007 (ADR-013 backlog entry) — GitHub issue for TBD field not yet filed
 - Phase 2 A/B report: `docs/architecture/performance/phase2-ab-comparison.md` still PENDING
 - Cohort entity reconstruction gap: `_reconstruct_state_from_snapshot()` silently drops cohort entities (identified by CE assessment #613) — tracking issue not yet filed; blocks G8/Demo 4 if cohort disaggregation is in scope
+- G8 (Demo 4, Issue #755) — next work stream; all Wave C blockers cleared
 
 ---
 
@@ -266,6 +270,9 @@ CI hotfix: NM-035 filed; `ci.yml` PR trigger updated to include `release/m*` (PR
 
 | PR | Title | Date |
 |---|---|---|
+| #790 | fix(tests): NB-4 investment climate — GRC/ARG fixtures + 41 unit tests + backtesting count fix (closes #34) | 2026-06-06 |
+| #789 | fix(frontend): NB-6 ESLint audit — 0-error target, rules-of-hooks structural fix, 15-file suppressions (closes #644) | 2026-06-06 |
+| #788 | docs(ux): NB-7 Mode 1 COMPARE_VIEW spec — inline picker, single-call API, US-049 (closes #451) | 2026-06-06 |
 | #778 | feat(mode3): G6b — Mode 3 Active Control branch-and-recompute (closes #753) | 2026-06-05 |
 | #775 | feat(engine): G6a — multi-country scenario backend, threshold_crossed, multi-entity choropleth + identity header | 2026-06-05 |
 | #774 | docs(arch): G7 — cloud compute path document (closes #750) | 2026-06-05 |
