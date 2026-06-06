@@ -90,6 +90,8 @@ export default function App() {
   const [scenarioListVersion, setScenarioListVersion] = useState(0);
   // Mode 2 fiscal multiplier for the active scenario (Issue #746)
   const [activeFiscalMultiplier, setActiveFiscalMultiplier] = useState<number | null>(null);
+  // Mode 3 Active Control toggle (G6b, Issue #753)
+  const [mode3Active, setMode3Active] = useState(false);
 
   const handleStepChange = (step: number, _isComplete: boolean) => {
     // Always set — never reset to null on completion so EntityDetailDrawer
@@ -106,6 +108,7 @@ export default function App() {
     setSelectedEntityId(null);
     setActiveEntityIds([]);
     setActiveFiscalMultiplier(null);
+    setMode3Active(false);
     writeStoredScenario({ id, name, totalSteps });
   };
 
@@ -223,6 +226,22 @@ export default function App() {
               </span>
             )}
             <ModeIndicator />
+            <button
+              data-testid="mode3-toggle"
+              onClick={() => setMode3Active((v) => !v)}
+              style={{
+                fontSize: 11,
+                padding: "3px 8px",
+                background: mode3Active ? "#8b5cf6" : "transparent",
+                color: mode3Active ? "#fff" : "#8b5cf6",
+                border: "1px solid #8b5cf6",
+                borderRadius: 4,
+                cursor: "pointer",
+                fontWeight: 600,
+              }}
+            >
+              Mode 3
+            </button>
             <ScenarioControls
               scenarioId={selectedScenarioId}
               totalSteps={selectedScenarioSteps}
@@ -265,6 +284,7 @@ export default function App() {
               currentStep={currentStep ?? 0}
               comparisonScenarioId={compareMode ? secondScenarioId : null}
               fiscalMultiplier={activeFiscalMultiplier}
+              mode3Active={mode3Active}
             />
           </div>
         )}

@@ -394,6 +394,41 @@ export function TrajectoryView({
               />
             ))}
 
+          {/* Rider #97 — threshold-crossing markers in Mode 3 comparison.
+              Vertical lines at steps where the active trajectory crosses an MDA floor
+              that the baseline did not cross (or vice versa). Only ecological floor
+              is defined in composite score space (1.0 boundary). */}
+          {showBaseline &&
+            trajectory.mda_floors
+              .filter((f) => f.framework === "ecological")
+              .flatMap((floor) =>
+                mergedData
+                  .filter((d) => {
+                    const active = d.ecological_active;
+                    const baseline = d.ecological_baseline;
+                    if (active === null || baseline === null) return false;
+                    const activeBreached = active >= floor.floor_value;
+                    const baselineBreached = baseline >= floor.floor_value;
+                    return activeBreached !== baselineBreached;
+                  })
+                  .map((d) => (
+                    <ReferenceLine
+                      key={`threshold-cross-${floor.framework}-step${d.step_index}`}
+                      x={d.step_index}
+                      stroke={FRAMEWORK_COLORS.ecological}
+                      strokeDasharray="4 2"
+                      strokeOpacity={0.8}
+                      strokeWidth={1.5}
+                      label={{
+                        value: "⚠ threshold",
+                        fontSize: 9,
+                        fill: FRAMEWORK_COLORS.ecological,
+                        position: "top",
+                      }}
+                    />
+                  )),
+              )}
+
           {/* Baseline ghost Lines (Mode 2 and Mode 3) */}
           {showBaseline &&
             FRAMEWORKS.map((fw) => {

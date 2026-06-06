@@ -42,6 +42,8 @@ from fastapi import APIRouter, Depends, HTTPException, Response
 from app.api.deps import get_db  # noqa: TCH001 — used as Depends(get_db) at runtime
 from app.schemas import (
     AdvanceResponse,
+    BranchRequest,
+    BranchResponse,
     CompareResponse,
     DeltaRecord,
     FrameworkOutput,
@@ -50,6 +52,7 @@ from app.schemas import (
     MultiFrameworkOutput,
     PMMRecord,
     QuantitySchema,
+    RebranchRequest,
     RunSummaryResponse,
     ScenarioConfigSchema,
     ScenarioCreateRequest,
@@ -1226,6 +1229,209 @@ async def restore_scenario(
         name=restored_name,
         status="pending",
         restored_from_tombstone_id=req.tombstone_id,
+    )
+
+
+# ---------------------------------------------------------------------------
+# POST /scenarios/{scenario_id}/branch — G6b Mode 3 Active Control
+# ---------------------------------------------------------------------------
+
+
+@router.post("/scenarios/{scenario_id}/branch", response_model=BranchResponse, status_code=201)
+async def branch_scenario(
+    scenario_id: str,
+    req: BranchRequest,
+    conn: Annotated[asyncpg.Connection, Depends(get_db)],
+) -> BranchResponse:
+    """Create a branch scenario from an existing baseline at a specific step.
+
+    Copies the baseline scenario's configuration (with an updated fiscal_multiplier)
+    and snapshots 0..branch_from_step into a new scenario in 'pending' status.
+    The caller then advances the branch via POST /scenarios/{branch_id}/advance
+    to recompute forward steps with the new parameter value.
+
+    Implements the Mode 3 branch-and-recompute pattern from mode3-interaction-spec.md §2.
+    The baseline scenario is never mutated. G6b (Issue #753).
+
+    Returns 404 if the baseline scenario is not found.
+    Returns 404 if no snapshot exists at branch_from_step.
+    """
+    row = await conn.fetchrow(
+        "SELECT scenario_id, name, configuration FROM scenarios WHERE scenario_id = $1",
+        scenario_id,
+    )
+    if row is None:
+        raise HTTPException(status_code=404, detail=f"Scenario '{scenario_id}' not found.")
+
+    cfg_raw = row["configuration"]
+    if isinstance(cfg_raw, str):
+        cfg_raw = json.loads(cfg_raw)
+
+    snap_check = await conn.fetchrow(
+        "SELECT step FROM scenario_state_snapshots WHERE scenario_id = $1 AND step = $2",
+        scenario_id,
+        req.branch_from_step,
+    )
+    if snap_check is None:
+        raise HTTPException(
+            status_code=404,
+            detail=(
+                f"No snapshot at step {req.branch_from_step} for scenario '{scenario_id}'. "
+                "Advance the scenario to this step before branching."
+            ),
+        )
+
+    cfg_raw["fiscal_multiplier"] = req.fiscal_multiplier
+    branch_config = ScenarioConfigSchema(**cfg_raw)
+    n_steps: int = branch_config.n_steps
+
+    branch_id = str(uuid.uuid4())
+    branch_name = f"{row['name']} [branch]"
+
+    async with conn.transaction():
+        await conn.execute(
+            """
+            INSERT INTO scenarios
+                (scenario_id, name, description, status,
+                 configuration, version, engine_version_hash)
+            VALUES ($1, $2, NULL, 'pending', $3, 1, $4)
+            """,
+            branch_id,
+            branch_name,
+            json.dumps(branch_config.model_dump(mode="json")),
+            _GIT_COMMIT_HASH,
+        )
+
+        input_rows = await conn.fetch(
+            """
+            SELECT step, input_type, input_data FROM scenario_scheduled_inputs
+            WHERE scenario_id = $1 AND step <= $2
+            ORDER BY step, created_at
+            """,
+            scenario_id,
+            req.branch_from_step,
+        )
+        for inp in input_rows:
+            idata = inp["input_data"]
+            if isinstance(idata, str):
+                idata = json.loads(idata)
+            await conn.execute(
+                """
+                INSERT INTO scenario_scheduled_inputs
+                    (id, scenario_id, step, input_type, input_data)
+                VALUES ($1, $2, $3, $4, $5)
+                """,
+                str(uuid.uuid4()),
+                branch_id,
+                inp["step"],
+                inp["input_type"],
+                json.dumps(idata),
+            )
+
+        snapshot_rows = await conn.fetch(
+            """
+            SELECT step, timestep, state_data, events_snapshot
+            FROM scenario_state_snapshots
+            WHERE scenario_id = $1 AND step <= $2
+            ORDER BY step ASC
+            """,
+            scenario_id,
+            req.branch_from_step,
+        )
+        for snap in snapshot_rows:
+            state_raw = snap["state_data"]
+            if isinstance(state_raw, str):
+                state_raw = json.loads(state_raw)
+            events_raw = snap["events_snapshot"]
+            if isinstance(events_raw, str):
+                events_raw = json.loads(events_raw)
+            await conn.execute(
+                """
+                INSERT INTO scenario_state_snapshots
+                    (scenario_id, step, timestep, state_data, events_snapshot)
+                VALUES ($1, $2, $3, $4, $5)
+                """,
+                branch_id,
+                snap["step"],
+                snap["timestep"],
+                json.dumps(state_raw),
+                json.dumps(events_raw) if events_raw is not None else None,
+            )
+
+    return BranchResponse(
+        branch_scenario_id=branch_id,
+        branch_from_step=req.branch_from_step,
+        n_steps=n_steps,
+    )
+
+
+# ---------------------------------------------------------------------------
+# POST /scenarios/{scenario_id}/rebranch — G6b Mode 3 re-branch (Issue #753)
+# ---------------------------------------------------------------------------
+
+
+@router.post("/scenarios/{scenario_id}/rebranch", response_model=BranchResponse, status_code=200)
+async def rebranch_scenario(
+    scenario_id: str,
+    req: RebranchRequest,
+    conn: Annotated[asyncpg.Connection, Depends(get_db)],
+) -> BranchResponse:
+    """Apply a new parameter change to an existing branch scenario.
+
+    Deletes snapshots from from_step onward, updates fiscal_multiplier in config,
+    and resets status to 'pending' so the branch can advance from from_step.
+    Implements the re-branch accumulation model from mode3-interaction-spec.md §5:
+    the active trajectory accumulates all control inputs; the comparison always
+    answers "what is the total effect of all my control inputs?"
+
+    Returns 404 if the scenario is not found.
+    Returns 404 if no snapshot exists at from_step (can't recompute from there).
+    """
+    row = await conn.fetchrow(
+        "SELECT scenario_id, configuration FROM scenarios WHERE scenario_id = $1",
+        scenario_id,
+    )
+    if row is None:
+        raise HTTPException(status_code=404, detail=f"Scenario '{scenario_id}' not found.")
+
+    snap_check = await conn.fetchrow(
+        "SELECT step FROM scenario_state_snapshots WHERE scenario_id = $1 AND step = $2",
+        scenario_id,
+        req.from_step,
+    )
+    if snap_check is None:
+        raise HTTPException(
+            status_code=404,
+            detail=(
+                f"No snapshot at step {req.from_step} for scenario '{scenario_id}'. "
+                "Cannot re-branch from a step with no snapshot."
+            ),
+        )
+
+    cfg_raw = row["configuration"]
+    if isinstance(cfg_raw, str):
+        cfg_raw = json.loads(cfg_raw)
+    cfg_raw["fiscal_multiplier"] = req.fiscal_multiplier
+    branch_config = ScenarioConfigSchema(**cfg_raw)
+    n_steps: int = branch_config.n_steps
+
+    async with conn.transaction():
+        await conn.execute(
+            "DELETE FROM scenario_state_snapshots WHERE scenario_id = $1 AND step > $2",
+            scenario_id,
+            req.from_step,
+        )
+        await conn.execute(
+            "UPDATE scenarios SET status = 'pending', configuration = $1, updated_at = NOW() "
+            "WHERE scenario_id = $2",
+            json.dumps(branch_config.model_dump(mode="json")),
+            scenario_id,
+        )
+
+    return BranchResponse(
+        branch_scenario_id=scenario_id,
+        branch_from_step=req.from_step,
+        n_steps=n_steps,
     )
 
 
