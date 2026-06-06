@@ -33,6 +33,7 @@ import asyncpg  # noqa: TCH002 — used in method signatures at runtime
 from app.simulation.repositories.quantity_serde import (
     IA1_CANONICAL_PHRASE,
     STATE_DATA_ENVELOPE_VERSION,
+    cohort_profile_to_jsonb,
     quantity_to_jsonb_envelope,
     validate_ia1_disclosure,
 )
@@ -129,8 +130,14 @@ def _serialize_state(
         "_steps_projected": steps_projected,
     }
     for entity_id, entity in state.entities.items():
-        data[entity_id] = {
+        entity_data: dict[str, object] = {
             attr_key: quantity_to_jsonb_envelope(qty)
             for attr_key, qty in entity.attributes.items()
         }
+        if entity.cohort_profiles is not None:
+            entity_data["_cohort_profiles"] = {
+                cohort_key: cohort_profile_to_jsonb(profile)
+                for cohort_key, profile in entity.cohort_profiles.items()
+            }
+        data[entity_id] = entity_data
     return data

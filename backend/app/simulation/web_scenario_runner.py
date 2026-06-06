@@ -54,7 +54,11 @@ from app.simulation.orchestration.inputs import (
     TradePolicyInput,
 )
 from app.simulation.orchestration.runner import ScenarioRunner
-from app.simulation.repositories.quantity_serde import quantity_from_jsonb, quantity_from_schema
+from app.simulation.repositories.quantity_serde import (
+    cohort_profile_from_jsonb,
+    quantity_from_jsonb,
+    quantity_from_schema,
+)
 from app.simulation.repositories.snapshot_repository import ScenarioSnapshotRepository
 from app.simulation.repositories.state_repository import (
     SimulationStateRepository,
@@ -854,8 +858,18 @@ async def _reconstruct_state_from_snapshot(
             meta_raw = json.loads(meta_raw)
 
         attributes = {}
+        cohort_profiles = None
         if isinstance(attr_data, dict):
+            raw_cohort = attr_data.get("_cohort_profiles")
+            if isinstance(raw_cohort, dict):
+                cohort_profiles = {
+                    cohort_key: cohort_profile_from_jsonb(profile_data)
+                    for cohort_key, profile_data in raw_cohort.items()
+                    if isinstance(profile_data, dict)
+                }
             for attr_key, envelope in attr_data.items():
+                if attr_key.startswith("_"):
+                    continue
                 if isinstance(envelope, dict):
                     try:
                         attributes[attr_key] = quantity_from_jsonb(envelope)
@@ -875,6 +889,7 @@ async def _reconstruct_state_from_snapshot(
             entity_type=meta_row["entity_type"],
             attributes=attributes,
             metadata=meta_raw,
+            cohort_profiles=cohort_profiles or None,
         )
 
     scenario_cfg = ScenarioConfig(

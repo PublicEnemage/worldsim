@@ -26,10 +26,10 @@ from decimal import Decimal
 from typing import TYPE_CHECKING, Any
 
 from app.schemas import QuantitySchema
-from app.simulation.engine.quantity import Quantity, VariableType
+from app.simulation.engine.quantity import AttributeType, Quantity, VariableType
 
 if TYPE_CHECKING:
-    from app.simulation.engine.models import MeasurementFramework
+    from app.simulation.engine.models import CohortProfile, MeasurementFramework
 
 # ---------------------------------------------------------------------------
 # IA-1 canonical text — SA-01
@@ -95,7 +95,7 @@ def quantity_to_jsonb_envelope(q: Quantity) -> dict[str, Any]:
     """
     from app.simulation.engine.models import MeasurementFramework  # noqa: PLC0415
 
-    return {
+    envelope: dict[str, Any] = {
         "_envelope_version": _ENVELOPE_VERSION,
         "value": str(q.value),
         "unit": q.unit,
@@ -111,6 +111,11 @@ def quantity_to_jsonb_envelope(q: Quantity) -> dict[str, Any]:
             else None
         ),
     }
+    if q.attribute_type is not None:
+        envelope["attribute_type"] = q.attribute_type.value
+    if q.stock_flow_identity:
+        envelope["stock_flow_identity"] = True
+    return envelope
 
 
 def quantity_from_schema(schema: QuantitySchema) -> Quantity:
@@ -133,6 +138,13 @@ def quantity_from_schema(schema: QuantitySchema) -> Quantity:
     except ValueError:
         vt = VariableType.DIMENSIONLESS
 
+    at: AttributeType | None = None
+    if schema.attribute_type is not None:
+        try:
+            at = AttributeType(schema.attribute_type)
+        except ValueError:
+            at = None
+
     return Quantity(
         value=Decimal(schema.value),
         unit=schema.unit,
@@ -141,6 +153,8 @@ def quantity_from_schema(schema: QuantitySchema) -> Quantity:
         observation_date=schema.observation_date,
         source_id=schema.source_registry_id,
         measurement_framework=mf,
+        attribute_type=at,
+        stock_flow_identity=schema.stock_flow_identity,
     )
 
 
@@ -150,3 +164,51 @@ def quantity_from_jsonb(data: dict[str, Any]) -> Quantity:
     Convenience wrapper: QuantitySchema.from_jsonb() → quantity_from_schema().
     """
     return quantity_from_schema(QuantitySchema.from_jsonb(data))
+
+
+# ---------------------------------------------------------------------------
+# CohortProfile serde — ADR-001 Amendment 2, Issue #28
+# ---------------------------------------------------------------------------
+
+
+def cohort_profile_to_jsonb(profile: CohortProfile) -> dict[str, Any]:
+    """Serialize a CohortProfile to a JSONB-safe dict.
+
+    Each attribute in the profile is serialized with quantity_to_jsonb_envelope.
+    The result is stored as the value of the "_cohort_profiles" sub-key within
+    an entity's state_data block.
+
+    Args:
+        profile: A CohortProfile instance.
+
+    Returns:
+        Dict mapping attribute_key → SA-09 Quantity envelope.
+    """
+    return {
+        attr_key: quantity_to_jsonb_envelope(qty)
+        for attr_key, qty in profile.attributes.items()
+    }
+
+
+def cohort_profile_from_jsonb(data: dict[str, Any]) -> CohortProfile:
+    """Deserialize a JSONB dict to a CohortProfile.
+
+    Inverse of cohort_profile_to_jsonb. Unknown or malformed envelope keys
+    are silently skipped (same defensive pattern as _reconstruct_state_from_snapshot).
+
+    Args:
+        data: Dict mapping attribute_key → SA-09 Quantity envelope.
+
+    Returns:
+        CohortProfile with deserialized attributes.
+    """
+    import contextlib  # noqa: PLC0415
+
+    from app.simulation.engine.models import CohortProfile  # noqa: PLC0415
+
+    attributes: dict[str, Quantity] = {}
+    for attr_key, envelope in data.items():
+        if isinstance(envelope, dict):
+            with contextlib.suppress(ValueError, KeyError):
+                attributes[attr_key] = quantity_from_jsonb(envelope)
+    return CohortProfile(attributes=attributes)
