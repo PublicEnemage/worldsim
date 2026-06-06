@@ -42,7 +42,7 @@ test("re-select completed scenario → drawer shows output without advance click
     await nextStepBtn.click();
     await expect(page.getByText(`Step ${step} / 3`)).toBeVisible({ timeout: 15_000 });
   }
-  await expect(page.getByText(/Complete/)).toBeVisible();
+  await expect(page.getByText(/— Complete/)).toBeVisible();
 
   // ── Create scenario B and select it ─────────────────────────────────────────
 

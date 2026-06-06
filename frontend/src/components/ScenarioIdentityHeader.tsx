@@ -12,7 +12,8 @@
 
 interface Props {
   scenarioName: string;
-  entityId: string | null;
+  /** All active entity IDs for the scenario (Issue #754). Replaces single entityId. */
+  entityIds: string[];
   currentStep: number | null;
   totalSteps: number;
   /** Mode 2 fiscal multiplier override (Issue #746). Shown when present and ≠ 1.0. */
@@ -26,17 +27,25 @@ export function formatStatus(currentStep: number | null, totalSteps: number): st
   return `Step ${currentStep} of ${totalSteps}`;
 }
 
+/** Returns the entity label segment for the header strip (Issue #754). */
+export function formatEntityLabel(entityIds: string[]): string {
+  if (entityIds.length === 0) return "";
+  if (entityIds.length === 1) return `Entity: ${entityIds[0]}`;
+  return `Entities: ${entityIds.join(", ")}`;
+}
+
 /** Returns the multiplier label string for the header strip, or null when no override is active. */
 export function formatMultiplierLabel(fiscalMultiplier: number | null | undefined): string | null {
   if (fiscalMultiplier == null || fiscalMultiplier === 1.0) return null;
   return `Fiscal ×${fiscalMultiplier.toFixed(1)}`;
 }
 
-export function ScenarioIdentityHeader({ scenarioName, entityId, currentStep, totalSteps, fiscalMultiplier }: Props) {
+export function ScenarioIdentityHeader({ scenarioName, entityIds, currentStep, totalSteps, fiscalMultiplier }: Props) {
   const multiplierLabel = formatMultiplierLabel(fiscalMultiplier);
+  const entityLabel = formatEntityLabel(entityIds);
   const parts: string[] = [
     `Scenario: ${scenarioName}`,
-    entityId ? `Entity: ${entityId}` : "",
+    entityLabel,
     multiplierLabel ? `Mode: 2 (${multiplierLabel})` : "",
     `Status: ${formatStatus(currentStep, totalSteps)}`,
   ].filter(Boolean);

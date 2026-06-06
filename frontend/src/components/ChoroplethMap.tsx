@@ -17,8 +17,8 @@ interface Props {
   scenarioId?: string | null;
   currentStep?: number | null;
   onEntityClick?: (entityId: string) => void;
-  /** Active scenario entity — highlighted with a distinct border (Issue #744). */
-  activeEntityId?: string | null;
+  /** All active scenario entities — highlighted with distinct borders (Issue #754). */
+  activeEntityIds?: string[];
 }
 
 // INTENT: Compute five breakpoints [p0, p25, p50, p75, p100] from feature
@@ -78,7 +78,7 @@ function computeSteps(features: GeoJSONFeatureCollection["features"]): number[] 
   return raw;
 }
 
-export default function ChoroplethMap({ attributeName, title, scenarioId, currentStep, onEntityClick, activeEntityId }: Props) {
+export default function ChoroplethMap({ attributeName, title, scenarioId, currentStep, onEntityClick, activeEntityIds = [] }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<maplibregl.Map | null>(null);
   const popupRef = useRef<maplibregl.Popup | null>(null);
@@ -172,13 +172,15 @@ export default function ChoroplethMap({ attributeName, title, scenarioId, curren
           },
         });
 
-        // Active entity highlight layer — amber border on the scenario's primary country (#744)
+        // Active entity highlight layer — amber border on all scenario entities (#754)
         if (map.getLayer(HIGHLIGHT_LAYER_ID)) map.removeLayer(HIGHLIGHT_LAYER_ID);
         map.addLayer({
           id: HIGHLIGHT_LAYER_ID,
           type: "line",
           source: SOURCE_ID,
-          filter: ["==", ["get", "entity_id"], activeEntityId ?? ""],
+          filter: activeEntityIds.length > 0
+            ? ["in", ["get", "entity_id"], ["literal", activeEntityIds]]
+            : ["==", ["get", "entity_id"], ""],
           paint: {
             "line-color": "#f59e0b",
             "line-width": 3,
@@ -240,14 +242,19 @@ export default function ChoroplethMap({ attributeName, title, scenarioId, curren
     });
   }, [attributeName, title, scenarioId, currentStep]);
 
-  // Update active-entity highlight filter when activeEntityId changes independently
+  // Update active-entity highlight filter when activeEntityIds changes independently
   // of a data reload (e.g. user selects a different scenario without changing attribute).
   useEffect(() => {
     const map = mapRef.current;
     if (!map || !map.isStyleLoaded()) return;
     if (!map.getLayer(HIGHLIGHT_LAYER_ID)) return;
-    map.setFilter(HIGHLIGHT_LAYER_ID, ["==", ["get", "entity_id"], activeEntityId ?? ""]);
-  }, [activeEntityId]);
+    map.setFilter(
+      HIGHLIGHT_LAYER_ID,
+      activeEntityIds.length > 0
+        ? ["in", ["get", "entity_id"], ["literal", activeEntityIds]]
+        : ["==", ["get", "entity_id"], ""],
+    );
+  }, [activeEntityIds]);
 
   return (
     <div
