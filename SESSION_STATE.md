@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-05 (M12 sprint G1–G7 complete — PRs #762–#775 merged. NM-035 (CI trigger missing for release branches) filed + ci.yml hotfix merged PR #772. ADR-012 accepted by EL. G6a Playwright E2E strict-mode fix committed. Sprint plan execution narratives complete for all groups.)**
+**Last updated: 2026-06-05 (M12 sprint G1–G7 + G6b complete — PRs #762–#775 + #778 merged. G6b (Mode 3 Active Control, Issue #753) shipped: POST /branch + /rebranch endpoints, ControlPlane component, recompute badge, streaming step reveal, threshold-crossing markers (rider #97), reversibility classification (rider #271). 16 backend + 12 frontend unit tests + 2 Playwright E2E tests. mypy KI-002 confirmed pre-existing — not introduced by G6b.)**
 **Current milestone:** M12 — Active Control and External Sector (GitHub Milestone 13)
 **Previous milestone:** M11.5 — Usability Validation and Experience Audit (formally closed 2026-06-04; Issue #720 closed; GitHub Milestone 14 closed)
 
@@ -143,7 +143,7 @@ CI hotfix: NM-035 filed; `ci.yml` PR trigger updated to include `release/m*` (PR
 | G4 — Matrix engine production | #769 | #749 | ✓ DONE |
 | G5 — External sector module | #773 | #751 #752 | ✓ DONE (ADR-012 accepted by EL 2026-06-05) |
 | G6a — Multi-country backend | #775 | #754 #103 | ✓ DONE |
-| G6b — Mode 3 Active Control | — | #753 | BLOCKED — #613 CE assessment + #614 interaction spec required |
+| G6b — Mode 3 Active Control | #778 | #753 | ✓ DONE |
 | G7 — Cloud compute path doc | #774 | #750 | ✓ DONE |
 | G8 — Demo 4 preparation | — | #755 | Not started |
 | G9 — Political economy module | — | ADR-013 | BLOCKED — ADR-013 not yet authored |
@@ -152,6 +152,7 @@ CI hotfix: NM-035 filed; `ci.yml` PR trigger updated to include `release/m*` (PR
 - PI Agent review of NM-035 (filed by implementing agent under EL direction; requires PI author-of-record review)
 - ARCH-007 (ADR-013 backlog entry) — GitHub issue for TBD field not yet filed
 - Phase 2 A/B report: `docs/architecture/performance/phase2-ab-comparison.md` still PENDING
+- Cohort entity reconstruction gap: `_reconstruct_state_from_snapshot()` silently drops cohort entities (identified by CE assessment #613) — tracking issue not yet filed; blocks G8/Demo 4 if cohort disaggregation is in scope
 
 ---
 
@@ -265,6 +266,7 @@ CI hotfix: NM-035 filed; `ci.yml` PR trigger updated to include `release/m*` (PR
 
 | PR | Title | Date |
 |---|---|---|
+| #778 | feat(mode3): G6b — Mode 3 Active Control branch-and-recompute (closes #753) | 2026-06-05 |
 | #775 | feat(engine): G6a — multi-country scenario backend, threshold_crossed, multi-entity choropleth + identity header | 2026-06-05 |
 | #774 | docs(arch): G7 — cloud compute path document (closes #750) | 2026-06-05 |
 | #773 | feat(engine): G5 — external sector module: BilateralTradeShock + CommodityPriceShock (ADR-012) | 2026-06-05 |
