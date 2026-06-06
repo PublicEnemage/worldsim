@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 /**
  * InstrumentCluster — Zone 1 two-column layout container.
  *

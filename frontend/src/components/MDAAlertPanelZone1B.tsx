@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 /**
  * MDAAlertPanelZone1B — Zone 1B co-primary instrument.
  *

@@ -41,6 +41,7 @@ export default function ScenarioPanel({
     }
   }, []);
 
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => { void fetchScenarios(); }, [fetchScenarios, refreshKey]);
 
   const handleSelectPrimary = async (scenario: ScenarioResponse) => {

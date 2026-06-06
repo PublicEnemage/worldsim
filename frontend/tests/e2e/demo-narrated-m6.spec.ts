@@ -43,7 +43,7 @@ function speak(text: string): Promise<void> {
   return new Promise((resolve, reject) => {
     const proc = spawn("bash", [SPEAK_SCRIPT, text], { stdio: "inherit" });
     proc.on("close", (code) => {
-      code === 0 || code === null ? resolve() : reject(new Error(`speak.sh exited ${code}`));
+      if (code === 0 || code === null) { resolve(); } else { reject(new Error(`speak.sh exited ${code}`)); }
     });
     proc.on("error", reject);
   });

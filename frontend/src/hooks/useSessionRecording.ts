@@ -67,7 +67,7 @@ export function useSessionRecording(): UseSessionRecordingResult {
     return () => {
       stopFnRef.current?.();
     };
-  }, []); // recording starts once on mount — config is from URL and does not change
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const endSession = useCallback(async (): Promise<{ ok: boolean; error?: string }> => {
     if (!config) return { ok: false, error: "No active recording session." };

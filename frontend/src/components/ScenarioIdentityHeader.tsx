@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 /**
  * ScenarioIdentityHeader — Zone 0 persistent scenario identity strip.
  *

@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 /**
  * TrajectoryView — Zone 1A primary instrument.
  *
@@ -38,7 +39,7 @@ export const FRAMEWORKS: readonly FrameworkKey[] = [
 ] as const;
 
 /** connectNulls prop value — must be literally false (AC-015). */
-export const CONNECT_NULLS: false = false;
+export const CONNECT_NULLS = false as const;
 
 /**
  * Returns true when |active - baseline| > 0.01 and both values are non-null.

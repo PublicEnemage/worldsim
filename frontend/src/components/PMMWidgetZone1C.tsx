@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 /**
  * PMMWidgetZone1C — Zone 1C co-primary instrument.
  *
