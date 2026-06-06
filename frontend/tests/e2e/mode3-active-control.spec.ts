@@ -55,6 +55,11 @@ test("Mode 3 — enable, apply control change, recompute completes", async ({ pa
   // ScenarioControls.tsx renders "Step {currentStep} / {totalSteps}" — no step-indicator testid.
   await expect(page.getByText("Step 1 / 3")).toBeVisible({ timeout: 15_000 });
 
+  // Close Scenarios panel — ScenarioPanel unmounts, removing its fiscal-multiplier-slider
+  // from the DOM. ControlPlane's slider (data-testid="fiscal-multiplier-slider", step=0.05)
+  // will then be the only instance when Mode 3 is enabled.
+  await page.getByRole("button", { name: /Scenarios/ }).click();
+
   // Enable Mode 3.
   await page.locator('[data-testid="mode3-toggle"]').click();
 
@@ -66,14 +71,19 @@ test("Mode 3 — enable, apply control change, recompute completes", async ({ pa
   });
 
   // Move fiscal multiplier to 1.5 (default is 1.0 — drag or set via evaluate).
-  // Playwright range input: set value and dispatch input event.
-  // ScenarioPanel also has a fiscal-multiplier-slider (step="0.05"); use the
-  // aria-label to select only the ControlPlane slider (aria-label="Fiscal multiplier").
-  const fiscalSlider = page.getByRole("slider", { name: "Fiscal multiplier" });
-  await fiscalSlider.evaluate((el: HTMLInputElement) => {
-    el.value = "1.5";
-    el.dispatchEvent(new Event("input", { bubbles: true }));
-  });
+  // Scenarios panel is closed so only the ControlPlane slider is in the DOM.
+  // Use the native HTMLInputElement property setter so React's onChange fires on
+  // this controlled input (plain el.value = x does not trigger React's event system).
+  await page.locator('[data-testid="fiscal-multiplier-slider"]').evaluate(
+    (el: HTMLInputElement) => {
+      const setter = Object.getOwnPropertyDescriptor(
+        window.HTMLInputElement.prototype, "value"
+      )!.set!;
+      setter.call(el, "1.5");
+      el.dispatchEvent(new Event("input", { bubbles: true }));
+      el.dispatchEvent(new Event("change", { bubbles: true }));
+    },
+  );
 
   // Verify display updated.
   await expect(page.locator('[data-testid="fiscal-multiplier-value"]')).toContainText("1.50");
