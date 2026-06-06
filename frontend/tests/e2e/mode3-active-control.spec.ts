@@ -67,12 +67,13 @@ test("Mode 3 — enable, apply control change, recompute completes", async ({ pa
 
   // Move fiscal multiplier to 1.5 (default is 1.0 — drag or set via evaluate).
   // Playwright range input: set value and dispatch input event.
-  await page.locator('[data-testid="fiscal-multiplier-slider"]').evaluate(
-    (el: HTMLInputElement) => {
-      el.value = "1.5";
-      el.dispatchEvent(new Event("input", { bubbles: true }));
-    },
-  );
+  // ScenarioPanel also has a fiscal-multiplier-slider (step="0.05"); use the
+  // aria-label to select only the ControlPlane slider (aria-label="Fiscal multiplier").
+  const fiscalSlider = page.getByRole("slider", { name: "Fiscal multiplier" });
+  await fiscalSlider.evaluate((el: HTMLInputElement) => {
+    el.value = "1.5";
+    el.dispatchEvent(new Event("input", { bubbles: true }));
+  });
 
   // Verify display updated.
   await expect(page.locator('[data-testid="fiscal-multiplier-value"]')).toContainText("1.50");
