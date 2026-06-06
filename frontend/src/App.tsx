@@ -64,16 +64,6 @@ export default function App() {
   // ---------------------------------------------------------------------------
   const sessionRecording = useSessionRecording();
 
-  // ---------------------------------------------------------------------------
-  // Pillar 1 — replay mode
-  // When ?replay_session=<id> is in the URL, show the replay viewer instead
-  // of the main application. This is a developer/audit tool, not a user feature.
-  // ---------------------------------------------------------------------------
-  const replaySessionId = new URLSearchParams(window.location.search).get("replay_session");
-  if (replaySessionId) {
-    return <SessionReplayViewer sessionId={replaySessionId} />;
-  }
-
   const [attributeName, setAttributeName] = useState(DEFAULT_ATTRIBUTE);
   const [selectedScenarioId, setSelectedScenarioId] = useState<string | null>(null);
   const [selectedScenarioName, setSelectedScenarioName] = useState<string | null>(null);
@@ -93,7 +83,7 @@ export default function App() {
   // Mode 3 Active Control toggle (G6b, Issue #753)
   const [mode3Active, setMode3Active] = useState(false);
 
-  const handleStepChange = (step: number, _isComplete: boolean) => {
+  const handleStepChange = (step: number) => {
     // Always set — never reset to null on completion so EntityDetailDrawer
     // continues showing data at the final step after the scenario is done.
     setCurrentStep(step);
@@ -148,7 +138,7 @@ export default function App() {
     return () => {
       cancelled = true;
     };
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps — intentionally runs once on mount
+  }, []);
 
   // Playwright E2E test seam — DEV mode only, eliminated from production builds.
   // Exposes entity-selection handler so tests can open the drawer without clicking
@@ -187,6 +177,12 @@ export default function App() {
       cancelled = true;
     };
   }, [selectedScenarioId]);
+
+  // Replay mode early return — placed after all hooks so rules-of-hooks is satisfied.
+  const replaySessionId = new URLSearchParams(window.location.search).get("replay_session");
+  if (replaySessionId) {
+    return <SessionReplayViewer sessionId={replaySessionId} />;
+  }
 
   const showDelta = compareMode && selectedScenarioId !== null && secondScenarioId !== null;
 

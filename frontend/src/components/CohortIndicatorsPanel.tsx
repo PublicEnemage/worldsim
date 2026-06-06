@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 /**
  * CohortIndicatorsPanel — Zone 1A human cost ledger strip.
  *

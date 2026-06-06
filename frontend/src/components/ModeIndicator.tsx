@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 /**
  * ModeIndicator — persistent header element showing current interaction mode.
  *

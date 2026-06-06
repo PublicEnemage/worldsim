@@ -291,11 +291,7 @@ test(
     await page.getByRole("button", { name: /Scenarios/ }).click();
     await page.waitForTimeout(600);
 
-    // Enable compare mode via the header checkbox.
-    const compareCheckbox = page.locator('input[type="checkbox"]').filter({
-      has: page.locator(":scope"),
-    }).first();
-    // Use the label text to find it reliably.
+    // Enable compare mode via the header checkbox (label text is reliable across browsers).
     await page.getByText("Compare scenarios").click();
     await page.waitForTimeout(800);
 

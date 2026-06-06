@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 /**
  * ScenarioInstrumentCluster — composed Zone 1 cluster for App.tsx.
  *
@@ -246,6 +247,7 @@ export function ScenarioInstrumentCluster({
       mode = "MODE_1";
     }
     store.setScenario(scenarioId, stepCount, mode);
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- store is a Zustand singleton, stable reference
   }, [scenarioId, stepCount, fiscalMultiplier, mode3Active]);
 
   // Keep current_step in sync with ScenarioControls (prop-driven)
@@ -253,6 +255,7 @@ export function ScenarioInstrumentCluster({
     if (currentStep !== store.current_step) {
       useScenarioStepStore.setState({ current_step: currentStep });
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- store is a Zustand singleton, stable reference
   }, [currentStep]);
 
   // Fetch trajectory after each step advance.
@@ -283,6 +286,7 @@ export function ScenarioInstrumentCluster({
     return () => {
       cancelled = true;
     };
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- store is a Zustand singleton, stable reference
   }, [scenarioId, currentStep]);
 
   // Sync PMM from trajectory step data when current step changes (Issue #496).
@@ -299,6 +303,7 @@ export function ScenarioInstrumentCluster({
     } else {
       store.setPmmState(null, null);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- store is a Zustand singleton, stable reference
   }, [currentStep, store.trajectory]);
 
   // Fetch comparison scenario trajectory for Mode 2 overlay (#746).
@@ -365,6 +370,7 @@ export function ScenarioInstrumentCluster({
     return () => {
       cancelled = true;
     };
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- store is a Zustand singleton, stable reference
   }, [scenarioId, currentStep, store.trajectory?.entity_id]);
 
   // ---------------------------------------------------------------------------

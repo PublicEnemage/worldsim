@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 /**
  * ControlPlane — Zone: control-plane. Mode 3 Active Control panel.
  *

@@ -86,6 +86,7 @@ export default function ChoroplethMap({ attributeName, title, scenarioId, curren
   const [error, setError] = useState<string | null>(null);
 
   // Keep ref current so the map click handler always calls the latest prop
+  // eslint-disable-next-line react-hooks/refs
   onEntityClickRef.current = onEntityClick;
 
   // Initialise the map once
@@ -240,6 +241,7 @@ export default function ChoroplethMap({ attributeName, title, scenarioId, curren
     load().catch(() => {
       setError(`Failed to fetch data for "${attributeName}".`);
     });
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- activeEntityIds handled by separate effect below
   }, [attributeName, title, scenarioId, currentStep]);
 
   // Update active-entity highlight filter when activeEntityIds changes independently

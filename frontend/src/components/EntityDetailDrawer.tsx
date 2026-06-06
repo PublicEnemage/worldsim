@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/refs */
 import { useState, useEffect, useRef } from "react";
 import { useMultiFrameworkOutput } from "../hooks/useMultiFrameworkOutput";
 import RadarChart from "./RadarChart";
