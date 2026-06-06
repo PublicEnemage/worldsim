@@ -41,6 +41,7 @@ function makeAlert(
     current_value: "0.1800",
     approach_pct_remaining: "-0.1000",
     consecutive_breach_steps: 1,
+    recovery_horizon_years: null,
     ...overrides,
   };
 }

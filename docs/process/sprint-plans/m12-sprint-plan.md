@@ -210,24 +210,28 @@ All four Wave 1 groups can be worked and merged in any order. No group depends o
 **Why own group (second half of G6):** Frontend-heavy. Activates `zone-control-plane`. Depends on G6a (multi-entity backend) and G3 (fiscal multiplier as first instrument). ADR-008 reserved the control plane layout zone — verify whether Mode 3 interaction model is covered or requires an ADR amendment before implementation begins.
 
 **Prerequisites before implementation begins (in order):**
-1. **#613 — CE branch-and-recompute assessment** (Chief Engineer must post assessment to issue #613 covering: mid-run serialization capability, scenario object model recommendation, estimated scope, ADR-009 implications). This assessment must exist before G6b enters scoping.
-2. **#614 — Mode 3 interaction spec** (blocked by #613; interaction design covering recompute loading state, ghost baseline behaviour, error state, and explicit latency budget must precede Mode 3 Zustand store design).
+1. **#613 — CE branch-and-recompute assessment** ✓ SATISFIED (2026-06-05) — Chief Engineer posted full assessment confirming: (a) mid-run serialization already implemented via `ScenarioSnapshotRepository.write_snapshot()` + `_reconstruct_state_from_snapshot()`; (b) Model A (new scenario object) recommended — reuses all existing machinery with no ADR-009 implications; (c) two gaps identified: `_reconstruct_state_from_snapshot()` returns `relationships=[]` (needs `_load_relationships()` call in branch path) and cohort entities silently dropped on reconstruction (needs investigation); (d) estimated scope ~1 week.
+2. **#614 — Mode 3 interaction spec** ✓ SATISFIED (2026-06-05, PR #777) — Full spec at `docs/ux/mode3-interaction-spec.md`. Key decisions: (a) latency budget ≤2s for ≤8-step scenario on ProBook replaces "real-time" in US-039; (b) loading state: baseline at 100% opacity throughout recompute, streaming step reveal via 500ms polling, inline recompute badge; (c) ghost baseline `strokeDasharray="4 2"` (distinct from `"8 3"` for confidence-degraded data); (d) re-branch accumulates into existing `branchScenarioId` (consistent with ADR-008 D10); (e) error state: inline badge, baseline restores, no blocking modal; (f) Zustand store contract: `baselineScenarioId`, `branchScenarioId`, `branchFromStep`, `branchStepsComputed`, `recomputeStatus: 'idle'|'pending'|'computing'|'complete'|'failed'`.
 
 **Shared files:** `zone-control-plane` component (new), `App.tsx` (mode routing and mode indicator), `TrajectoryView.tsx` (A/B baseline vs. modified display — builds on G3's overlay work), `zone-1d` human cost delta display, mode indicator component.
 
-**ADR prerequisite:** Confirm ADR-008 covers Mode 3 interaction model sufficiently (Decision 10 covers live A/B UX; #613 assessment may identify engine-layer ADR amendment need), or file amendment before implementation begins.
+**ADR prerequisite:** ADR-008 Decision 10 confirmed sufficient for Mode 3 interaction model (#613 CE assessment found no ADR-009 amendment needed). No new ADR required for G6b.
 
-**Tests:** Playwright E2E — parameter change → trajectory recompute → both curves visible → delta in zone-1d, on Greece fixture. Mode 3 → Mode 1 → Mode 3 roundtrip without losing scenario. Performance: parameter change → update ≤ 100ms on ProBook i5-8265U (MV-002 Mode 3 gate, #569). Reversibility classification: recoverable vs. irreversible output appears in zone-1d. Mode 1 → Mode 2 transition preserves current step position.
+**Tests:** Playwright E2E — parameter change → trajectory recompute → both curves visible → delta in zone-1d, on Greece fixture. Mode 3 → Mode 1 → Mode 3 roundtrip without losing scenario. Performance: branch recompute ≤ 2s wall time for 8-step scenario on ProBook i5-8265U (per mode3-interaction-spec.md, closes #569 scope revision). Reversibility classification: recoverable vs. irreversible output appears in zone-1d. Mode 1 → Mode 2 transition preserves current step position.
 
 **Acceptance gates:**
 - `zone-control-plane` renders at least two configurable policy instruments without scroll
-- Parameter change → trajectory update ≤ 100ms on ProBook (MV-002 gate, #569)
-- Baseline and modified trajectories simultaneously visible with legend
+- Parameter change → branch recompute completes ≤ 2s for 8-step scenario on ProBook (per mode3-interaction-spec.md, closes #569 scope revision; replaces original ≤ 100ms MV-002 gate)
+- Baseline curves remain at 100% opacity and navigable during recompute (no blocking state)
+- Streaming step reveal: branch curves extend step-by-step as recompute progresses (500ms polling)
+- Baseline and modified trajectories simultaneously visible with legend after recompute completes
+- Ghost baseline uses `strokeDasharray="4 2"`, 50% opacity (distinct from confidence-degraded `"8 3"`)
 - Human cost delta visible in zone-1d within same update cycle, including reversibility classification (#271)
 - A/B comparison is default when parameter changed (no manual enable)
 - Mode 3 reachable from Mode 1 and Mode 2 without losing loaded scenario
 - Mode 1 → Mode 2 transition preserves step position (#393)
 - Threshold-crossing markers flag when delta crosses MDA boundary (#97)
+- Error state: inline badge clears on dismiss; baseline fully navigable during error
 
 **Riders (ship in same PR):**
 - #97 — Threshold-crossing markers in comparative output (MDA thresholds are Mode 3's primary guard)

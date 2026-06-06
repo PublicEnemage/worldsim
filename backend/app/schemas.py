@@ -599,6 +599,11 @@ class MDAAlert(BaseModel):
 
     indicator_name is always populated — title-case of indicator_key.
     Frontend display-name registries may override this with more precise labels.
+
+    recovery_horizon_years: None means the threshold models an irreversible
+    transition; an integer means recovery is possible within that many years
+    given appropriate intervention. Source: mda_thresholds.recovery_horizon_years.
+    Rider #271 — reversibility classification.
     """
 
     model_config = ConfigDict(from_attributes=True)
@@ -612,6 +617,7 @@ class MDAAlert(BaseModel):
     current_value: str
     approach_pct_remaining: str
     consecutive_breach_steps: int
+    recovery_horizon_years: int | None = None
 
 
 class FrameworkOutput(BaseModel):
@@ -664,5 +670,64 @@ class MultiFrameworkOutput(BaseModel):
     @field_validator("ia1_disclosure")
     @classmethod
     def _check_ia1_disclosure(cls, v: str) -> str:
-        from app.simulation.repositories.quantity_serde import validate_ia1_disclosure
+        from app.simulation.repositories.quantity_serde import (
+            validate_ia1_disclosure,  # noqa: PLC0415
+        )
         return validate_ia1_disclosure(v)
+
+
+# ---------------------------------------------------------------------------
+# Mode 3 branch schemas — G6b (Issue #753)
+# ---------------------------------------------------------------------------
+
+
+class BranchRequest(BaseModel):
+    """Request body for POST /scenarios/{id}/branch.
+
+    Creates a new branch scenario from an existing baseline at a specific step,
+    with an updated fiscal_multiplier. The baseline's snapshots up to
+    branch_from_step are copied to the branch; the branch then advances forward.
+    """
+
+    fiscal_multiplier: float = Field(
+        default=1.0,
+        ge=0.1,
+        le=3.0,
+        description="New fiscal multiplier for the branch scenario.",
+    )
+    branch_from_step: int = Field(
+        ge=0,
+        description="Step from which to branch. A snapshot must exist at this step.",
+    )
+
+
+class BranchResponse(BaseModel):
+    """Response for POST /scenarios/{id}/branch."""
+
+    branch_scenario_id: str
+    branch_from_step: int
+    n_steps: int
+
+
+class RebranchRequest(BaseModel):
+    """Request body for POST /scenarios/{id}/rebranch.
+
+    Applies a new parameter change to an existing branch scenario. Deletes
+    snapshots from from_step onward so the branch can re-run from that step
+    with an updated fiscal_multiplier. Implements the re-branch accumulation
+    model from mode3-interaction-spec.md §5.
+    """
+
+    fiscal_multiplier: float = Field(
+        default=1.0,
+        ge=0.1,
+        le=3.0,
+        description="Updated fiscal multiplier for the re-branch.",
+    )
+    from_step: int = Field(
+        ge=0,
+        description=(
+            "Step from which to restart recompute."
+            " Snapshots from this step forward are deleted."
+        ),
+    )

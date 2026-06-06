@@ -117,6 +117,7 @@ class MDAChecker:
                             approach_pct_remaining.quantize(Decimal("0.0001"))
                         ),
                         consecutive_breach_steps=consecutive,
+                        recovery_horizon_years=threshold.recovery_horizon_years,
                     )
                 )
 
@@ -157,6 +158,7 @@ def alerts_to_events_snapshot(
             "current_value": alert.current_value,
             "approach_pct_remaining": alert.approach_pct_remaining,
             "consecutive_breach_steps": alert.consecutive_breach_steps,
+            "recovery_horizon_years": alert.recovery_horizon_years,
         }
         for alert in alerts
     ]
@@ -185,6 +187,7 @@ def alerts_from_events_snapshot(
             continue
         try:
             key = evt["indicator_key"]
+            raw_rhy = evt.get("recovery_horizon_years")
             alerts.append(
                 MDAAlert(
                     mda_id=evt["mda_id"],
@@ -196,6 +199,7 @@ def alerts_from_events_snapshot(
                     current_value=evt["current_value"],
                     approach_pct_remaining=evt["approach_pct_remaining"],
                     consecutive_breach_steps=int(evt["consecutive_breach_steps"]),
+                    recovery_horizon_years=int(raw_rhy) if raw_rhy is not None else None,
                 )
             )
         except (KeyError, ValueError):

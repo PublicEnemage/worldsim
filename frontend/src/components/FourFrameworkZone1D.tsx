@@ -55,6 +55,21 @@ export function getScoreClass(score: number | null): "score-value--null" | "scor
   return score === null ? "score-value--null" : "score-value--numeric";
 }
 
+/**
+ * Rider #271 — reversibility classification label.
+ *
+ * recovery_horizon_years === null → "Irreversible"
+ * recovery_horizon_years === integer → "Recoverable (N yrs)"
+ *
+ * Exported for unit testing.
+ */
+export function formatReversibilityLabel(
+  recovery_horizon_years: number | null | undefined,
+): string {
+  if (recovery_horizon_years == null) return "Irreversible";
+  return `Recoverable (${recovery_horizon_years} yrs)`;
+}
+
 // ---------------------------------------------------------------------------
 // FourFrameworkZone1D
 // ---------------------------------------------------------------------------
@@ -84,13 +99,20 @@ export function FourFrameworkZone1D({
   isError = false,
   onSelectFrameworkAlert,
 }: FourFrameworkZone1DProps) {
-  const { trajectory, current_step, mda_alerts } = useScenarioStepStore();
+  const { trajectory, current_step, mda_alerts, mode } = useScenarioStepStore();
 
   // Top alert per framework for the "see alerts →" navigation link (#745)
   const topAlertByFramework: Record<string, string> = {};
+  // Rider #271 — reversibility classification: worst-severity alert per framework
+  const reversibilityByFramework: Record<string, { recovery_horizon_years: number | null }> = {};
   for (const alert of sortAlerts(mda_alerts)) {
     if (!(alert.framework in topAlertByFramework)) {
       topAlertByFramework[alert.framework] = alert.mda_id;
+    }
+    if (!(alert.framework in reversibilityByFramework)) {
+      reversibilityByFramework[alert.framework] = {
+        recovery_horizon_years: alert.recovery_horizon_years,
+      };
     }
   }
 
@@ -224,6 +246,23 @@ export function FourFrameworkZone1D({
                 >
                   Primary dimension — see alerts →
                 </button>
+              )}
+              {/* Rider #271 — reversibility classification badge.
+                  Shown in Mode 3 when there's an active alert for this framework. */}
+              {mode === "MODE_3" && reversibilityByFramework[key] && (
+                <span
+                  data-testid={`reversibility-${key}`}
+                  style={{
+                    fontSize: 9,
+                    fontWeight: 600,
+                    color: reversibilityByFramework[key].recovery_horizon_years == null
+                      ? "#dc2626"
+                      : "#059669",
+                    letterSpacing: 0.2,
+                  }}
+                >
+                  {formatReversibilityLabel(reversibilityByFramework[key].recovery_horizon_years)}
+                </span>
               )}
             </span>
 
