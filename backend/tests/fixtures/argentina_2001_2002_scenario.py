@@ -91,13 +91,79 @@ def build_argentina_scenario() -> ScenarioCreateRequest:
         measurement_framework="human_development",
     )
 
+    # Investment climate state variables — Issue #34, NB-4 (ADR-001 Amendment 2).
+    # Argentina 2000 baseline (scenario initial state reflects end-2000 conditions).
+
+    # JP Morgan EMBI+ spread — Argentina December 2000.
+    # Argentina's EMBI spread reached ~700-750bps in late 2000 after S&P's
+    # negative outlook revision (October 2000). The Blindaje ($39.7bn) in
+    # December 2000 temporarily compressed spreads, but pre-Blindaje close
+    # was ~750bps. Confidence tier 2: market data, JP Morgan index series.
+    initial_sovereign_risk_premium = QuantitySchema(
+        value="0.075",
+        unit="ratio",
+        variable_type="ratio",
+        attribute_type="rate",
+        confidence_tier=2,
+        observation_date=date(2001, 1, 1),
+        source_registry_id="JPMORGAN_EMBI_ARG_2000",
+        measurement_framework="financial",
+    )
+
+    # UNCTAD World Investment Report 2001 — FDI inward stock / GDP for Argentina.
+    # Argentina's inward FDI stock was approximately $67bn against GDP of ~$267bn
+    # (25.1% ratio) at end-2000. Spain, USA, and France were largest investors.
+    # Confidence tier 2: official multilateral statistics, annual vintage.
+    initial_fdi_stock_pct_gdp = QuantitySchema(
+        value="0.251",
+        unit="ratio",
+        variable_type="stock",
+        attribute_type="stock",
+        confidence_tier=2,
+        observation_date=date(2001, 1, 1),
+        source_registry_id="UNCTAD_FDI_STATS_ARG_2000",
+        measurement_framework="financial",
+    )
+
+    # INDEC Balance of Payments 2000 — net portfolio investment / GDP.
+    # Argentina had significant portfolio outflows in 2000 as investor
+    # confidence deteriorated: approximately -$12bn (~-4.5% of GDP).
+    # Confidence tier 2: official national statistics.
+    initial_portfolio_flow_velocity = QuantitySchema(
+        value="-0.045",
+        unit="ratio",
+        variable_type="ratio",
+        attribute_type="flow",
+        confidence_tier=2,
+        observation_date=date(2001, 1, 1),
+        source_registry_id="INDEC_BOP_ARG_2000",
+        measurement_framework="financial",
+    )
+
+    # S&P sovereign credit rating — Argentina January 2001: BB.
+    # Mapped to 0–100 index (AAA=100, D=0) using standard 21-notch linear scale:
+    # BB = 38. Argentina had been downgraded steadily through 2000 and was rated
+    # BB by S&P at the start of 2001, reflecting sub-investment-grade status.
+    # Confidence tier 1: direct observation from rating agency announcement.
+    initial_credit_rating_score = QuantitySchema(
+        value="38.0",
+        unit="index_0_100",
+        variable_type="stock",
+        attribute_type="structural_index",
+        confidence_tier=1,
+        observation_date=date(2001, 1, 1),
+        source_registry_id="SP_SOVEREIGN_RATINGS_ARG_2001",
+        measurement_framework="financial",
+    )
+
     return ScenarioCreateRequest(
         name="Argentina 2001-2002 Currency and Debt Crisis Backtesting Fixture",
         description=(
             "Backtesting fixture for Issue #192. "
             "Reproduces the Argentina 2001–2002 sovereign default and convertibility "
             "collapse to validate DIRECTION_ONLY GDP contraction thresholds. "
-            "Initial state: IMF WEO April 2001 + INDEC EPH October 2000."
+            "Initial state: IMF WEO April 2001 + INDEC EPH October 2000 "
+            "+ investment climate variables NB-4 (Issue #34)."
         ),
         configuration=ScenarioConfigSchema(
             entities=["ARG"],
@@ -107,6 +173,10 @@ def build_argentina_scenario() -> ScenarioCreateRequest:
                 "ARG": {
                     "gdp_growth": initial_gdp_growth,
                     "unemployment_rate": initial_unemployment_rate,
+                    "sovereign_risk_premium": initial_sovereign_risk_premium,
+                    "fdi_stock_pct_gdp": initial_fdi_stock_pct_gdp,
+                    "portfolio_flow_velocity": initial_portfolio_flow_velocity,
+                    "credit_rating_score": initial_credit_rating_score,
                 },
             },
         ),
