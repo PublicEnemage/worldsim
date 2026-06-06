@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-05 (NM-034 filed — PR #759 merged. PI Agent activated; NM registry no-delegation rule recorded as institutional memory. All three HORIZON sweep EL actions resolved: #744–#747 scope acknowledged; #725/#644 keep-as-is; RACI amended PR #758 + NM-034 PR #759.)**
+**Last updated: 2026-06-05 (M12 sprint G1–G7 complete — PRs #762–#775 merged. NM-035 (CI trigger missing for release branches) filed + ci.yml hotfix merged PR #772. ADR-012 accepted by EL. G6a Playwright E2E strict-mode fix committed. Sprint plan execution narratives complete for all groups.)**
 **Current milestone:** M12 — Active Control and External Sector (GitHub Milestone 13)
 **Previous milestone:** M11.5 — Usability Validation and Experience Audit (formally closed 2026-06-04; Issue #720 closed; GitHub Milestone 14 closed)
 
@@ -127,6 +127,33 @@ No open PRs — board clear as of 2026-06-04 (post PR #742 merge).
 
 ---
 
+## M12 Sprint Status — Wave 1 (2026-06-05)
+
+Sprint plan: `docs/process/sprint-plans/m12-sprint-plan.md`
+Release branch: `release/m12`
+CI hotfix: NM-035 filed; `ci.yml` PR trigger updated to include `release/m*` (PR #772). All G1–G7 PRs merged without CI running — EL to determine if re-verification is needed.
+
+| Group | PR | Issues | Status |
+|---|---|---|---|
+| G1 — Instrument cluster display | #762 | #744 #747 | ✓ DONE |
+| G2 — Alert panel drill-in | #764 | #745 | ✓ DONE |
+| G3 — Mode 2 fiscal multiplier | #767 | #746 | ✓ DONE |
+| G4 — Matrix engine production | #769 | #749 | ✓ DONE |
+| G5 — External sector module | #773 | #751 #752 | ✓ DONE (ADR-012 accepted by EL 2026-06-05) |
+| G6a — Multi-country backend | #775 | #754 #103 | ✓ DONE |
+| G6b — Mode 3 Active Control | — | #753 | BLOCKED — #613 CE assessment + #614 interaction spec required |
+| G7 — Cloud compute path doc | #774 | #750 | ✓ DONE |
+| G8 — Demo 4 preparation | — | #755 | Not started |
+| G9 — Political economy module | — | ADR-013 | BLOCKED — ADR-013 not yet authored |
+
+**Open tasks before next session:**
+- EL to determine if any G1–G7 PRs need re-verification (CI was not running at merge time — NM-035)
+- PI Agent review of NM-035 (filed by implementing agent under EL direction; requires PI author-of-record review)
+- ARCH-007 (ADR-013 backlog entry) — GitHub issue for TBD field not yet filed
+- Phase 2 A/B report: `docs/architecture/performance/phase2-ab-comparison.md` still PENDING
+
+---
+
 ## Closed — M11.5 (Usability Validation and Experience Audit)
 
 **Formally closed: 2026-06-04** | **North Star:** `docs/vision/milestone-11-5-north-star.md` | **GitHub Milestone:** 14 (closed)
@@ -237,11 +264,16 @@ No open PRs — board clear as of 2026-06-04 (post PR #742 merge).
 
 | PR | Title | Date |
 |---|---|---|
+| #775 | feat(engine): G6a — multi-country scenario backend, threshold_crossed, multi-entity choropleth + identity header | 2026-06-05 |
+| #774 | docs(arch): G7 — cloud compute path document (closes #750) | 2026-06-05 |
+| #773 | feat(engine): G5 — external sector module: BilateralTradeShock + CommodityPriceShock (ADR-012) | 2026-06-05 |
+| #772 | ci: NM-035 hotfix — add release/m* to ci.yml pull_request and push branch triggers | 2026-06-05 |
+| #769 | feat(engine): G4 — matrix engine production migration (closes #749) | 2026-06-05 |
+| #767 | feat(ux): G3 — Mode 2 fiscal multiplier parameter input (closes #746) | 2026-06-05 |
+| #764 | feat(ux): G2 — MDA alert panel interactive drill-in (closes #745) | 2026-06-05 |
+| #762 | feat(ux): G1 — instrument cluster display + scenario identity header (closes #744 #747) | 2026-06-05 |
 | #759 | process(integrity): NM-034 — PM Agent filed NM entries without PI activation | 2026-06-05 |
 | #758 | process(raci): NM registry no-delegation clause — PI Agent activation required before any NM entry | 2026-06-05 |
-| #756 | docs(roadmap): M12 scope linkage — all deliverables linked to GitHub issues (#749–#755) | 2026-06-05 |
-| #742 | docs(ux): M11.5 tertiary deliverable — feature catalogue with per-capability discoverability | 2026-06-04 |
-| #741 | docs(ux): M11.5 Priority A synthesis — cross-session findings, ranked M12 actions, exit verdict | 2026-06-04 |
 | #740 | chore(state): SESSION_STATE.md — M11.5 Priority A sessions complete (PRs #736/#738/#739) | 2026-06-04 |
 | #739 | ux(pillar-2): Session P5-001 — Persona 5 cold-start findings (Executive board briefing) | 2026-06-04 |
 | #738 | feat(ux): session P1-001 Persona 1 findings — fiscal multiplier analysis NOT MET | 2026-06-04 |
