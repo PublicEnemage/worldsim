@@ -348,6 +348,25 @@ The DeltaChoropleth has no role in Mode 3 comparisons. The comparison in
 active control is always temporal (baseline trajectory vs. live modified
 trajectory), not geographic.
 
+### Zone 1A — Confidence Display
+
+**Binding ruling (DP-1, 2026-06-06):** The confidence band displayed in Zone 1A
+is derived from `uncertainty_range_pct` on the composite Quantity. Rendering rules:
+
+| `uncertainty_range_pct` | Band rendered | Label |
+|---|---|---|
+| ≤ 5 % (Tier 1) | Full opacity confidence band | High confidence |
+| ≤ 15 % (Tier 2) | Full opacity confidence band | Moderate confidence |
+| ≤ 30 % (Tier 3) | Reduced opacity confidence band | Research estimate |
+| ≤ 50 % (Tier 4) | Reduced opacity confidence band | Model estimate |
+| `None` (Tier 5) | **No confidence band rendered** | Directional only — uncertainty not quantified |
+
+When `uncertainty_range_pct = None`:
+- No confidence band is rendered.
+- The trajectory line is rendered with `strokeDasharray="8 3"` (dashed).
+- The label "Directional only — uncertainty not quantified" appears in Zone 1A.
+- The trajectory remains visible (not hidden) — directional information is preserved.
+
 ---
 
 ## Control Plane Reserved Zone

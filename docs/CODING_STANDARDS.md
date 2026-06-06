@@ -2296,3 +2296,39 @@ def test_no_sensitive_source_has_committed_url() -> None:
 ```
 
 This test runs in CI after every commit that touches the source registry.
+
+---
+
+## Human Development Indicator Standards
+
+Every module that emits a Human Cost Ledger (HCL) output must include these
+five fields on each record:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `indicator_key` | `str` | Unique indicator identifier (e.g. `"hdi"`, `"gini"`) |
+| `value` | `Decimal` | Computed value |
+| `unit` | `str` | Unit string (e.g. `"index"`, `"ratio"`, `"years"`) |
+| `cohort_id` | `str \| None` | Demographic cohort this indicator applies to; `None` = aggregate |
+| `confidence_tier` | `int` | 1–5 per the Confidence Tier System |
+
+### Effect Size Thresholds
+
+HCL outputs must report effect size relative to baseline. A change is
+**material** when the absolute delta exceeds these thresholds:
+
+| Indicator class | Materiality threshold |
+|---|---|
+| Index indicators (HDI, GINI) | ≥ 0.02 (2 index points) |
+| Ratio indicators (mortality rate, literacy rate) | ≥ 0.005 (0.5 percentage points) |
+| Year-based indicators (life expectancy, schooling) | ≥ 0.1 years |
+| Population counts | ≥ 1 % of reference population |
+
+### HCL Test Requirements
+
+Every module that writes HCL outputs must have tests that verify:
+
+1. All five required fields are present on every HCL record.
+2. `confidence_tier` matches the source tier of the input data.
+3. At least one cohort-disaggregated record is produced when cohort data is available.
+4. Effect size thresholds are correctly computed (delta vs. baseline step).
