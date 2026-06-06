@@ -9,7 +9,9 @@ Accepted
 **Valid Until:** Milestone 11.5 — Usability Validation and Experience Audit
 **License Status:** CURRENT
 
-**Last Reviewed:** 2026-06-04 — M11 exit review (SCAN-025). No renewal triggers fired during Milestone 11. PoliticalEconomyModule uses existing `MeasurementFramework.GOVERNANCE` and `HUMAN_DEVELOPMENT` enum values; `legitimacy_index` and `elite_capture_coefficient` are standard Quantity attributes on `SimulationEntity.attributes`. `_steps_projected` field added to state_data envelope (snapshot JSONB — application layer, not Quantity type). Matrix engine uses identical Quantity types and Event contracts — equivalence harness confirms 1e-10 agreement. `InputSource.CONDITIONALITY` and `CompoundStateCondition` extend the orchestration layer (ADR-002 territory), not the core data model. No `MeasurementFramework` taxonomy modifications, no `DATA_STANDARDS.md` unit standard changes affecting attribute store design. License renewed to Milestone 11.5.
+**Last Reviewed:** 2026-06-06 — M12 Wave B (Amendment 2). Renewal trigger fired: `SimulationEntity` gains `cohort_profiles` field; `Quantity` gains `attribute_type` and `stock_flow_identity` fields; new `AttributeType` enum and `CohortProfile` dataclass added. Amendment 2 applied — see Amendment 2 section below. License Status renewed to CURRENT. License renewed to Milestone 11.5.
+
+**Previously reviewed:** 2026-06-04 — M11 exit review (SCAN-025). No renewal triggers fired during Milestone 11. PoliticalEconomyModule uses existing `MeasurementFramework.GOVERNANCE` and `HUMAN_DEVELOPMENT` enum values; `legitimacy_index` and `elite_capture_coefficient` are standard Quantity attributes on `SimulationEntity.attributes`. `_steps_projected` field added to state_data envelope (snapshot JSONB — application layer, not Quantity type). Matrix engine uses identical Quantity types and Event contracts — equivalence harness confirms 1e-10 agreement. `InputSource.CONDITIONALITY` and `CompoundStateCondition` extend the orchestration layer (ADR-002 territory), not the core data model. No `MeasurementFramework` taxonomy modifications, no `DATA_STANDARDS.md` unit standard changes affecting attribute store design. License renewed to Milestone 11.5.
 
 **Previously reviewed:** 2026-06-02 — M10 exit review (SCAN-024). No renewal triggers fired
 during Milestone 10. GovernanceModule promotion (`"governance"` removed from
@@ -322,3 +324,98 @@ In addition to original triggers, this amendment adds:
 - `VariableType` enum values modified (STOCK/FLOW/RATIO/DIMENSIONLESS)
 - `propagate_confidence` rule changed to anything other than lower-of-two
 - `Quantity` field contract broken (required fields removed or type changed)
+
+---
+
+## Amendment 2 — Issue #28, Issue #30: CohortProfile and AttributeType
+
+**Date:** 2026-06-06
+**Closes:** Issue #28 (CohortProfile dataclass), Issue #30 (AttributeType enum)
+**Implemented in:** PR closing #28 + #30 (M12 Wave B, branch feat/nb3-entity-model)
+
+### What Changed
+
+**`AttributeType` enum** added to `app/simulation/engine/quantity.py`:
+
+```python
+class AttributeType(str, Enum):
+    STOCK = "stock"
+    FLOW = "flow"
+    STRUCTURAL_INDEX = "structural_index"
+    RATE = "rate"
+```
+
+Economic-semantic classification — complementary to `VariableType`. `VariableType`
+drives propagation behaviour (STOCK replaces, FLOW accumulates). `AttributeType`
+records what the quantity *means* economically (balance-sheet stock, income-statement
+flow, headcount rate, composite index). Both fields can coexist on the same Quantity.
+
+**Two new optional fields on `Quantity`:**
+- `attribute_type: AttributeType | None = None` — economic classification; None when not yet assigned
+- `stock_flow_identity: bool = False` — when True, engine warns if `stock[t+1] ≠ stock[t] + net_flow[t]`
+
+Both fields are **backwards-compatible** — all existing Quantity instances remain valid
+with `attribute_type=None, stock_flow_identity=False`.
+
+**`CohortProfile` dataclass** added to `app/simulation/engine/models.py`:
+
+```python
+@dataclass
+class CohortProfile:
+    attributes: dict[str, Quantity]
+```
+
+Income-quintile or age-band level attribute container for one entity cohort.
+Not a sub-entity — cohort profiles do not participate in the propagation graph.
+
+**`cohort_profiles: dict[str, CohortProfile] | None = None`** field added to
+`SimulationEntity`. Cohort key convention: `"Q1"`–`"Q5"` for income quintiles,
+`"youth_15_24"` etc. for age bands.
+
+**Cohort key convention** (canonical):
+- Income quintiles: `"Q1"` (lowest) through `"Q5"` (highest)
+- Age bands: `"youth_15_24"`, `"prime_25_54"`, `"older_55_64"`, `"senior_65plus"`
+- Cross-dimension: `"Q1_youth_15_24"` (underscore separator)
+
+**JSONB storage path:**
+- `attribute_type` and `stock_flow_identity` added to the SA-09 Quantity envelope.
+  `attribute_type` omitted when None; `stock_flow_identity` omitted when False
+  (wire-space optimisation preserving backwards compatibility with v1 snapshots).
+- `cohort_profiles` stored as `"_cohort_profiles"` sub-key within the entity's block
+  in `scenario_state_snapshots.state_data`. Underscore prefix marks it as metadata,
+  invisible to the compare endpoint's attribute key iteration.
+- Serialised via `cohort_profile_to_jsonb` / `cohort_profile_from_jsonb` in
+  `app/simulation/repositories/quantity_serde.py`.
+- NOT stored in `simulation_entities.attributes` (that column holds entity baseline
+  attributes, not distributional cohort data).
+
+**Snapshot reconstruction** (`web_scenario_runner.py` `_reconstruct_state_from_snapshot`):
+- `_cohort_profiles` popped from `attr_data` before quantity iteration
+- All underscore-prefixed keys skipped in quantity loop (defensive, future-proof)
+- `cohort_profile_from_jsonb` called per cohort; result passed as `cohort_profiles=`
+  to `SimulationEntity` constructor
+
+**Greece M12 seed fixture** (EU-SILC 2010, Tier 2, `source_registry_id="EU_SILC_2010_GRC"`):
+- `Q1.poverty_headcount = 0.201` (RATE, dimensionless)
+- `Q5.poverty_headcount = 0.065` (RATE, dimensionless)
+- `Q1.unemployment_rate = 0.18` (RATE, dimensionless)
+
+### Known Limitations at Amendment Time
+
+**CP-1:** `CohortProfile` is a distributional data container only. Cohort profiles
+do not participate in the propagation graph — modules cannot emit Events that target
+a cohort profile, only cohort entities (the existing `GRC:CHT:...` entity injection
+pattern from ADR-005). Full distributional-level propagation (Q1 attributes respond
+differently to fiscal shocks than Q5) is deferred to a future amendment.
+
+**CP-2:** `stock_flow_identity` flag records intent but enforcement (the actual
+engine warning) is not yet wired into the propagation engine. Flag is stored and
+round-trips through JSONB; engine enforcement is an M13 obligation.
+
+### Renewal Triggers Added
+
+In addition to triggers from Amendments 1 and original ADR, this amendment adds:
+- `AttributeType` enum values modified or removed
+- `CohortProfile.attributes` field contract broken
+- Cohort key convention changed without migration path
+- `_cohort_profiles` JSONB storage key renamed without migration

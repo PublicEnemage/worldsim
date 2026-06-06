@@ -1,5 +1,5 @@
 """
-Simulation core data model — ADR-001, Amendment 1; ADR-011 (non-linear propagation).
+Simulation core data model — ADR-001, Amendments 1 and 2; ADR-011.
 
 All entities, relationships, events, and measurement structures that the
 simulation engine operates on. This module has no database or framework
@@ -10,6 +10,12 @@ Amendment 1 (SCR-001): SimulationEntity.attributes changed from
 dict[str, float] to dict[str, Quantity]. Event.affected_attributes
 changed from dict[str, float] to dict[str, Quantity]. See ADR-001
 Amendment 1 for the full renewal record.
+
+Amendment 2 (Issue #28, Issue #30): CohortProfile type added for income-
+quintile-level disaggregation. SimulationEntity gains optional
+cohort_profiles field (None at Level 1, populated at Level 4+). AttributeType
+enum added to quantity.py for economic-semantic classification. See ADR-001
+Amendment 2 for the full record.
 
 ADR-011: PropagationMode enum added. PropagationRule extended with
 propagation_mode, threshold, and ceiling fields. LINEAR remains the
@@ -259,6 +265,41 @@ class DebtProfile:
 
 
 # ---------------------------------------------------------------------------
+# Cohort disaggregation — ADR-001 Amendment 2, Issue #28
+# ---------------------------------------------------------------------------
+
+
+@dataclass
+class CohortProfile:
+    """Income-quintile or age-band level attribute container for one entity cohort.
+
+    CohortProfile is the Level 4 sub-entity structure — it holds Quantity
+    attributes measured at the cohort level rather than the national aggregate.
+    The parent SimulationEntity holds national aggregates in its attributes dict;
+    CohortProfile holds the disaggregated view for one cohort segment.
+
+    Key convention (ADR-001 Amendment 2):
+        Income quintiles: "Q1" (bottom 20%) through "Q5" (top 20%).
+        Age bands: "youth_15_24", "prime_25_54", "older_55_64", "senior_65plus".
+        Combined: compound keys are not used at Level 4 stub — use a single
+        dimension per profile key for legibility.
+
+    confidence_tier inheritance rule (ADR-001 Amendment 2):
+        Each Quantity in attributes carries its own confidence_tier, sourced
+        from the cohort-level data directly (not inherited from the parent
+        entity's aggregate tier). Eurostat EU-SILC cohort data is Tier 2;
+        synthetic cohort estimates are Tier 4.
+
+    Attributes:
+        attributes: Cohort-level simulation state variables as Quantity instances.
+            Same structure as SimulationEntity.attributes — attribute key maps to
+            a typed Quantity carrying value, unit, variable_type, and provenance.
+    """
+
+    attributes: dict[str, Quantity]
+
+
+# ---------------------------------------------------------------------------
 # Core entities
 # ---------------------------------------------------------------------------
 
@@ -294,6 +335,11 @@ class SimulationEntity:
         geometry: Spatial reference for the entity; populated in Milestone 2.
         debt_profile: Structured debt composition (Issue #36). Exposes six
             debt-structure dimensions via the get_attribute() namespace.
+        cohort_profiles: Income-quintile and age-band level attribute containers
+            (ADR-001 Amendment 2, Issue #28). None at Level 1 (national aggregate);
+            populated at Level 4+ when cohort-level data is available. Keys follow
+            the convention "Q1"–"Q5" for income quintiles, "youth_15_24" for age
+            bands. Stored in state_data JSONB under "_cohort_profiles" sub-key.
     """
     id: str
     entity_type: str
@@ -302,6 +348,7 @@ class SimulationEntity:
     parent_id: str | None = None
     geometry: Geometry | None = None
     debt_profile: DebtProfile | None = None
+    cohort_profiles: dict[str, CohortProfile] | None = None
 
     # Mapping from debt_profile.* attribute keys to DebtProfile field names.
     # Used by get_attribute() to expose debt structure as Quantity attributes

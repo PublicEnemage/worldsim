@@ -126,6 +126,8 @@ def _build_entity(row: Any) -> SimulationEntity:  # noqa: ANN401 — asyncpg Rec
     attributes: dict[str, Quantity] = {}
     if isinstance(attrs_raw, dict):
         for key, val in attrs_raw.items():
+            if key.startswith("_"):
+                continue
             if isinstance(val, dict):
                 with contextlib.suppress(ValueError, KeyError):
                     attributes[key] = quantity_from_jsonb(val)

@@ -175,6 +175,8 @@ class QuantitySchema(BaseModel):
     observation_date: date | None = None
     source_registry_id: str | None = None
     measurement_framework: str | None = None
+    attribute_type: str | None = None
+    stock_flow_identity: bool = False
 
     @field_serializer("observation_date")
     def _serialize_date(self, v: date | None) -> str | None:
@@ -210,6 +212,8 @@ class QuantitySchema(BaseModel):
             observation_date=obs_date,
             source_registry_id=data.get("source_registry_id"),
             measurement_framework=data.get("measurement_framework"),
+            attribute_type=data.get("attribute_type"),
+            stock_flow_identity=bool(data.get("stock_flow_identity", False)),
         )
 
 

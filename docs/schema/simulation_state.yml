@@ -12,8 +12,10 @@
 #   backend/app/simulation/repositories/quantity_serde.py — serialisation contracts
 
 ---
-schema_version: "1.0"
-captured: "2026-04-26"
+schema_version: "1.1"
+captured: "2026-06-06"
+amendments:
+  - "Amendment 2 (Issue #28, Issue #30): AttributeType enum, CohortProfile dataclass, cohort_profiles field on SimulationEntity, attribute_type and stock_flow_identity fields on Quantity"
 
 # ---------------------------------------------------------------------------
 # VariableType
@@ -52,6 +54,43 @@ VariableType:
         The classification describes storage behaviour, not significance.
         A capability index is DIMENSIONLESS and a primary output with equal
         display weight to financial indicators.
+
+# ---------------------------------------------------------------------------
+# AttributeType
+# ---------------------------------------------------------------------------
+AttributeType:
+  type: enum
+  module: app.simulation.engine.quantity
+  description: >
+    Economic-semantic classification of a Quantity (ADR-001 Amendment 2, Issue #30).
+    Complementary to VariableType — VariableType drives propagation behaviour;
+    AttributeType records economic meaning. Both can coexist on the same Quantity.
+    Optional: defaults to None when classification is not relevant or not yet assigned.
+  values:
+    STOCK:
+      value: "stock"
+      description: >
+        Level at a point in time (economic balance sheet sense).
+        Examples: debt outstanding, foreign exchange reserves, forest cover.
+        Distinct from VariableType.STOCK — an economic STOCK may use
+        VariableType.STOCK, RATIO, or DIMENSIONLESS depending on unit.
+    FLOW:
+      value: "flow"
+      description: >
+        Change over a period (economic income statement sense).
+        Examples: GDP, exports, government revenue, remittances.
+    STRUCTURAL_INDEX:
+      value: "structural_index"
+      description: >
+        A composite or index capturing institutional or structural capacity.
+        Examples: press_freedom_index, rule_of_law_percentile, HDI component.
+        Not derived from a simple ratio of two commensurable quantities.
+    RATE:
+      value: "rate"
+      description: >
+        A ratio or proportional measure. Examples: unemployment_rate,
+        poverty_headcount, inflation_rate, interest_rate.
+        Dimensionally a fraction (often per-annum or headcount proportion).
 
 # ---------------------------------------------------------------------------
 # MeasurementFramework
@@ -133,6 +172,21 @@ Quantity:
         Data quality tier per DATA_STANDARDS.md. 1=highest, 5=lowest.
         Tier propagation: max() of all contributing tiers (lower-of-two rule).
         DO NOT use the default 1 for ingested data — set explicitly at ingestion.
+    attribute_type:
+      type: "AttributeType | None"
+      default: null
+      description: >
+        Economic-semantic classification (ADR-001 Amendment 2, Issue #30).
+        Optional — None when not yet classified. Serialised to JSONB as
+        "attribute_type" key (string value) when not None; omitted when None.
+    stock_flow_identity:
+      type: bool
+      default: false
+      description: >
+        When True, the engine warns if stock[t+1] ≠ stock[t] + net_flow[t].
+        Set on stock-flow identity pairs where integrity checking is meaningful.
+        Serialised to JSONB as "stock_flow_identity": true only when True;
+        omitted from envelope when False (wire-space optimisation).
   methods:
     propagate_confidence:
       signature: "propagate_confidence(*quantities: Quantity) -> int"
@@ -168,6 +222,43 @@ MonetaryValue:
       type: str
       default: ""
       values: ["official", "parallel", "ppp", "fixed"]
+
+# ---------------------------------------------------------------------------
+# CohortProfile
+# ---------------------------------------------------------------------------
+CohortProfile:
+  type: dataclass
+  module: app.simulation.engine.models
+  description: >
+    Income-quintile or age-band level attribute container for one entity cohort
+    (ADR-001 Amendment 2, Issue #28). Stored on SimulationEntity.cohort_profiles
+    under a cohort key string. Each CohortProfile holds the same attribute
+    structure as SimulationEntity.attributes — Quantity instances keyed by
+    attribute name. Not a sub-entity: cohort profiles do not participate in
+    the propagation graph; they are read-only distributional data.
+  fields:
+    attributes:
+      type: "dict[str, Quantity]"
+      description: >
+        Cohort-level simulation state variables as Quantity instances.
+        Same structure as SimulationEntity.attributes — attribute_key maps to
+        a typed Quantity. At M12 seeding, relevant keys include:
+        poverty_headcount (RATE), unemployment_rate (RATE).
+  cohort_key_convention: >
+    Income quintiles: "Q1" (lowest) through "Q5" (highest).
+    Age bands: "youth_15_24", "prime_25_54", "older_55_64", "senior_65plus".
+    Keys are case-sensitive. Multiple dimensions can be combined with underscore:
+    "Q1_youth_15_24" (income-quintile × age-band intersection).
+  jsonb_storage: >
+    Serialised to the "_cohort_profiles" sub-key of the entity's block in
+    scenario_state_snapshots.state_data (snapshot path) via
+    cohort_profile_to_jsonb() / cohort_profile_from_jsonb() in quantity_serde.py.
+    Underscore prefix marks it as metadata, invisible to the compare endpoint's
+    entity attribute iteration. NOT stored in simulation_entities.attributes.
+  seed_reference: >
+    Greece (GRC) M12 seed: Q1 poverty_headcount=0.201, Q5 poverty_headcount=0.065,
+    Q1 unemployment_rate=0.18 (EU-SILC 2010, Tier 2).
+    Seed fixture: backend/tests/unit/test_nb3_entity_model.py
 
 # ---------------------------------------------------------------------------
 # SimulationEntity
@@ -214,6 +305,15 @@ SimulationEntity:
       type: "Geometry | None"
       default: null
       description: Spatial reference. Populated from DB in Milestone 2+.
+    cohort_profiles:
+      type: "dict[str, CohortProfile] | None"
+      default: null
+      description: >
+        Income-quintile or age-band level distributional data (ADR-001 Amendment 2,
+        Issue #28). None when no cohort data is available for this entity.
+        Cohort key convention: "Q1"–"Q5" for income quintiles, "youth_15_24" etc.
+        for age bands. Serialised under "_cohort_profiles" in snapshot state_data;
+        NOT loaded from simulation_entities.attributes (that column has no cohort data).
   key_methods:
     get_attribute:
       signature: "(key: str) -> Quantity | None"
@@ -641,12 +741,28 @@ quantity_serde:
       source_registry_id: "str or null"
       measurement_framework: "enum.value string or null  — e.g. 'human_development'"
       _envelope_version: "'1'  — always set in simulation layer output"
+      attribute_type: "AttributeType.value string — omitted when None (Amendment 2)"
+      stock_flow_identity: "true — omitted from envelope when False (Amendment 2)"
   quantity_from_jsonb:
     input_handling:
       value: "Decimal(str(raw_value))  — handles int, float, str, Decimal inputs"
       variable_type: "VariableType(raw_string)"
       measurement_framework: "MeasurementFramework(raw_string) if present, else None"
       confidence_tier: "int(raw) — required field"
+      attribute_type: "AttributeType(raw_string) if present, else None — unknown strings → None"
+      stock_flow_identity: "bool(data.get('stock_flow_identity', False))"
+  cohort_serde:
+    cohort_profile_to_jsonb:
+      description: >
+        Serialises a CohortProfile to dict[attr_key → SA-09 envelope].
+        Stored as the value under a cohort_key within "_cohort_profiles".
+    cohort_profile_from_jsonb:
+      description: >
+        Inverse of cohort_profile_to_jsonb. Malformed envelope keys silently
+        skipped (contextlib.suppress). Returns CohortProfile with deserialized
+        Quantity attributes.
+    storage_path: >
+      entity_block["_cohort_profiles"][cohort_key][attr_key] → SA-09 Quantity envelope
   ia1_disclosure:
     constant_name: IA1_CANONICAL_PHRASE
     description: >
