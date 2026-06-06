@@ -131,7 +131,9 @@ No open PRs — board clear as of 2026-06-04 (post PR #742 merge).
 
 Sprint plan: `docs/process/sprint-plans/m12-sprint-plan.md`
 Release branch: `release/m12`
-CI hotfix: NM-035 filed; `ci.yml` PR trigger updated to include `release/m*` (PR #772). All G1–G7 PRs merged without CI running — EL to determine if re-verification is needed.
+CI hotfix: NM-035 filed; `ci.yml` PR trigger updated to include `release/m*` (PR #772). `workflow_dispatch` + `force_backtesting` input added (PR #776). All G1–G7 PRs verified — backtesting suite passed on `release/m12` (run 27049255730, 2026-06-05).
+
+**EL decision (2026-06-05):** Re-verification not required for unit/integration/E2E (covered by PR #775 CI). Backtesting gap closed via manual `workflow_dispatch` on `release/m12` — all jobs green including backtesting (53s) and Playwright E2E (3m23s). Fidelity report artifact uploaded. EL satisfied.
 
 | Group | PR | Issues | Status |
 |---|---|---|---|
@@ -147,7 +149,6 @@ CI hotfix: NM-035 filed; `ci.yml` PR trigger updated to include `release/m*` (PR
 | G9 — Political economy module | — | ADR-013 | BLOCKED — ADR-013 not yet authored |
 
 **Open tasks before next session:**
-- EL to determine if any G1–G7 PRs need re-verification (CI was not running at merge time — NM-035)
 - PI Agent review of NM-035 (filed by implementing agent under EL direction; requires PI author-of-record review)
 - ARCH-007 (ADR-013 backlog entry) — GitHub issue for TBD field not yet filed
 - Phase 2 A/B report: `docs/architecture/performance/phase2-ab-comparison.md` still PENDING
