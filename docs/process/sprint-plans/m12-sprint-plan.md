@@ -322,7 +322,7 @@ The 14 near-term backlog items are grouped by shared file areas, dependency chai
 
 ### Group Definitions
 
-#### NB-1 — Standards Foundation *(docs only, zero code risk)*
+#### NB-1 — Standards Foundation *(docs only, zero code risk)* ✓ DONE (2026-06-06, PR #782)
 
 **Issues:** #43 + #45  
 **Why together:** Both amend `CODING_STANDARDS.md` and `DATA_STANDARDS.md`. Neither touches code. Closing them first means subsequent code PRs (NB-3, NB-4) can be documented against the finalized standard rather than a draft.  
@@ -330,13 +330,17 @@ The 14 near-term backlog items are grouped by shared file areas, dependency chai
 **ADR prerequisite:** None — docs only.  
 **Gate before starting:** Chief Methodologist Tier 5 null-sentinel clause adopted (see Panel Decision DP-1).
 
-#### NB-2 — Quick Riders *(one PR, minimal diff)*
+**Execution narrative:** Docs-only PR. Three files changed: `DATA_STANDARDS.md` (Tier 1–4 numeric bounds for `uncertainty_range_pct` plus Tier 5 null-sentinel clause; propagation taint rule: any input `None` → composite `None`), `CODING_STANDARDS.md` (Human Development Indicator Standards section: 5 required HCL fields, effect size thresholds, 4 test requirements), `ux/information-hierarchy.md` (Zone 1A confidence display ruling: Tier 5 → "Directional only", dashed `strokeDasharray="8 3"`). All three DP-1 rulings implemented verbatim. Zero backend changes.
+
+#### NB-2 — Quick Riders *(one PR, minimal diff)* ✓ DONE (2026-06-06, PR #785, closes #13)
 
 **Issues:** #725 + #13  
 **Why together:** Both are tiny, low-risk backend-only changes. `pyproject.toml` one-liner (#725) and Google-style `Attributes:` section reformatting across six dataclasses in `models.py` (#13). Single PR closes two open compliance/environment items.  
 **No dependencies** on NB-1 or any other group.
 
-#### NB-3 — Entity Attribute Model Foundation
+**Execution narrative:** Backend-only PR. One file changed: `backend/app/simulation/engine/models.py` — six dataclasses converted from inline `# field comment` pattern to Google-style `Attributes:` sections: `Geometry`, `ScenarioConfig`, `PropagationRule`, `SimulationEntity`, `Relationship`, `Event`. `DebtProfile` was already compliant and left unchanged. #725 (mypy pin) descoped from this PR — addressed separately in KI-002 (pre-existing issue, not introduced here).
+
+#### NB-3 — Entity Attribute Model Foundation ✓ DONE (2026-06-06, PR #786, closes #28 + #30)
 
 **Issues:** #30 + #28  
 **Sequencing within PR:** `AttributeType` enum (#30) defined first; `CohortProfile` type (#28) references it. Both ship in one PR.  
@@ -347,6 +351,8 @@ The 14 near-term backlog items are grouped by shared file areas, dependency chai
 **CE constraint:** All new fields `Optional` with `None` defaults — no existing seed script may require modification.  
 **Prerequisite:** NB-1 merged (so new attribute definitions are documented against finalized confidence tier standard).
 
+**Execution narrative:** 10 files changed, 767 insertions. `quantity.py`: `AttributeType` enum (STOCK/FLOW/STRUCTURAL_INDEX/RATE), `attribute_type: AttributeType | None = None` and `stock_flow_identity: bool = False` fields on `Quantity` — both backwards-compatible, wire-space-efficient (omitted from JSONB envelope when None/False). `models.py`: `CohortProfile` dataclass (`attributes: dict[str, Quantity]`), `cohort_profiles: dict[str, CohortProfile] | None = None` on `SimulationEntity`, module docstring updated. `schemas.py`: `attribute_type` and `stock_flow_identity` fields on `QuantitySchema` with `from_jsonb` update. `quantity_serde.py`: extended `quantity_to_jsonb_envelope`, `quantity_from_schema`, added `cohort_profile_to_jsonb` / `cohort_profile_from_jsonb`. `snapshot_repository.py`: serialises `cohort_profiles` under `_cohort_profiles` sub-key in entity block. `web_scenario_runner.py` (`_reconstruct_state_from_snapshot`): pops `_cohort_profiles` before quantity loop; skips all underscore-prefixed keys (defensive). `state_repository.py` (`_build_entity`): skips underscore-prefixed keys (defensive parity). `ADR-001-simulation-core-data-model.md`: Amendment 2 section added; Last Reviewed updated. `simulation_state.yml`: schema v1.1 — `AttributeType` enum, `CohortProfile` type, `cohort_profiles` field on `SimulationEntity`, new Quantity fields, cohort serde section. `test_nb3_entity_model.py`: 30 unit tests, all passing. Greece M12 seed: Q1 poverty_headcount=0.201 (EU-SILC 2010, Tier 2), Q5=0.065, Q1 unemployment_rate=0.18. CE constraint satisfied: zero existing seed scripts required modification.
+
 #### NB-4 — Investment Climate State Variables
 
 **Issues:** #34  
@@ -354,12 +360,14 @@ The 14 near-term backlog items are grouped by shared file areas, dependency chai
 **Prerequisite:** NB-3 merged (so new attributes are typed with `AttributeType` from #30).  
 **AttributeType tagging:** All four new attributes (`sovereign_risk_premium`, `fdi_stock_pct_gdp`, `portfolio_flow_velocity`, `credit_rating_score`) tagged at definition with the `AttributeType` enum from #30.
 
-#### NB-5 — Comparison API Pair
+#### NB-5 — Comparison API Pair ✓ DONE (2026-06-06, PR #784, closes #90 + #99)
 
 **Issues:** #90 + #99  
 **Why together:** Both extend `GET /api/v1/scenarios/compare`. The multi-attribute endpoint (#90) and trajectory comparison endpoint (#99) share DB query patterns and are the API foundation that NB-7 (#451 spec) and eventually NB-8 (#394) need.  
 **No prerequisite** on NB-1–4 (API-only; no entity model dependency).  
 **Schema update:** `api_contracts.yml` updated in same PR with both new endpoint shapes.
+
+**Execution narrative:** Backend + schema PR. `scenarios.py`: `GET /api/v1/scenarios/compare` extended with `?include_trajectory=true` param; returns per-step `TrajectoryCompareStep` array alongside the existing per-attribute comparison. All-attributes compare endpoint (`GET /api/v1/scenarios/compare/all`) added. `schemas.py`: `TrajectoryCompareStep` (step, timestep, entity_id, attribute_key, baseline_value, compare_value, delta, baseline_tier, compare_tier) and `TrajectoryCompareResponse` schemas added. `api_contracts.yml` updated with both endpoint shapes. `test_compare_api.py`: integration tests for trajectory endpoint and all-attributes endpoint. `CompareResponse` docstring updated with all-attributes behaviour note.
 
 #### NB-6 — Frontend Tooling Gate
 
@@ -385,29 +393,31 @@ The 14 near-term backlog items are grouped by shared file areas, dependency chai
 - UX Designer: N>2 UX ruling issued (zone hierarchy for N curves, style vocabulary that does not collide with ghost baseline or confidence-degraded dashes, cognitive load ceiling on N)
 - Customer Agent: AUDIT complete for Persona 2 (90-second gate) and Persona 5 (5-minute gate) against the N>2 UX ruling
 
-#### NB-9 — Pure Docs *(can run in any wave)*
+#### NB-9 — Pure Docs *(can run in any wave)* ✓ DONE (2026-06-06, PR #783, closes #95 + #259)
 
 **Issues:** #95 + #259  
 **#95 (ecological backtesting case planning):** Standalone documentation — identify the historical ecological case (Brazil Amazon deforestation 2000–2010; Ethiopia drought 2002–2004; Philippines Hainan 2013–2015 are candidates), specify data sources, initial state ecological attributes, fidelity thresholds, and ControlInput sequence. Ecological Economist consultation recommended before authoring. Produces a GitHub Issue for the ecological backtesting case implementation in a later milestone.  
 **#259 (CTO legibility metrics dashboard):** All four prerequisites confirmed CLOSED (#255 ✅ #256 ✅ #257 ✅ #258 ✅). Can proceed. Requires a new CI step computing radon/sonarjs Tier 1 metrics — test on free-tier runner before committing. Produces a CI step and legibility section in the milestone exit checklist.  
 **No prerequisites** on any other NB group.
 
+**Execution narrative:** Pure docs PR. `docs/backtesting/ecological-backtesting-cases.md`: ecological backtesting case planning document (Ecological Economist consultation completed); Brazil Amazon deforestation 2000–2010 selected as primary case. `docs/process/legibility-metrics.md`: CTO legibility metrics dashboard specification — radon/sonarjs Tier 1 metrics CI step design and milestone exit checklist integration. Note: PR #783 was opened from branch `feat/nb2-riders` (naming collision during parallel Wave A execution) but contains correct NB-9 content.
+
 ### Execution Wave Sequence
 
 ```
-Wave A (parallel — start immediately):
-  NB-1  Standards foundation (#43 + #45) — blocks NB-3
-  NB-2  Quick riders (#725 + #13)
-  NB-5  Comparison API (#90 + #99) — blocks NB-7
-  NB-9  Pure docs (#95 + #259)
+Wave A (parallel — COMPLETE 2026-06-06):
+  NB-1  Standards foundation (#43 + #45) ✓ PR #782
+  NB-2  Quick riders (#725 + #13)        ✓ PR #785 (closes #13; #725 descoped → KI-002)
+  NB-5  Comparison API (#90 + #99)       ✓ PR #784
+  NB-9  Pure docs (#95 + #259)           ✓ PR #783
 
-Wave B (after NB-1 merged):
-  NB-3  Entity attribute model (#30 + #28 + ADR-001 Amendment + Greece cohort seed)
+Wave B (after NB-1 merged — COMPLETE 2026-06-06):
+  NB-3  Entity attribute model (#30 + #28 + ADR-001 Amendment + Greece cohort seed) ✓ PR #786
 
-Wave C (after NB-3 merged; NB-5 and NB-6 independent):
+Wave C (after NB-3 merged; NB-5 and NB-6 independent — IN PROGRESS):
   NB-4  Investment climate state variables (#34)
   NB-6  ESLint audit (#644)         ← can also run in Wave A if preferred
-  NB-7  Mode 1 spec (#451)          ← after NB-5 merged
+  NB-7  Mode 1 spec (#451)          ← after NB-5 merged ✓
 
 Wave D (after NB-5 + NB-6 + NB-7 all merged):
   NB-8  DEFERRED TO M13
