@@ -534,6 +534,8 @@ class CompareResponse(BaseModel):
 
     `deltas` maps entity_id → attribute_key → DeltaRecord.
     Only entities and attributes present in both snapshots are included.
+    When `attr` is omitted, ALL shared attributes across all shared entities are
+    returned in a single call (Issue #90). Pass `attr` to filter to one key.
     """
 
     model_config = ConfigDict(from_attributes=True)
@@ -543,6 +545,47 @@ class CompareResponse(BaseModel):
     step_a: int
     step_b: int
     deltas: dict[str, dict[str, DeltaRecord]]
+
+
+# ---------------------------------------------------------------------------
+# Trajectory comparison schemas — Issue #99
+# ---------------------------------------------------------------------------
+
+
+class TrajectoryCompareStep(BaseModel):
+    """One aligned step in a trajectory comparison.
+
+    `value_a` and `value_b` are the attribute values (Decimal as string) at
+    this step for scenario_a and scenario_b respectively. `delta` = value_b -
+    value_a as a Decimal string. `direction` is 'increase', 'decrease', or
+    'unchanged'. All fields are None when the attribute is absent in either
+    snapshot at this step.
+    """
+
+    model_config = ConfigDict(from_attributes=True)
+
+    step: int
+    value_a: str | None = None
+    value_b: str | None = None
+    delta: str | None = None
+    direction: str | None = None
+
+
+class TrajectoryCompareResponse(BaseModel):
+    """Per-step attribute trajectory delta between two scenarios — Issue #99.
+
+    `steps` contains one entry per shared step (both scenarios have a snapshot),
+    sorted ascending by step number. Only steps where both scenarios have a
+    snapshot AND the attribute is present in at least one entity are included.
+    `attribute` is the attribute key that was queried.
+    """
+
+    model_config = ConfigDict(from_attributes=True)
+
+    scenario_a_id: str
+    scenario_b_id: str
+    attribute: str
+    steps: list[TrajectoryCompareStep]
 
 
 # ---------------------------------------------------------------------------
