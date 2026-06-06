@@ -1,9 +1,10 @@
 """Scenario endpoints — ADR-004 Decisions 1, 2, 4, and 5; ADR-005 Decision 2.
 
-Nine endpoints covering scenario configuration lifecycle, execution, and HCL output:
+Ten endpoints covering scenario configuration lifecycle, execution, and HCL output:
   POST   /scenarios                                        — create scenario (status: pending)
   GET    /scenarios                                        — list all scenarios (created_at desc)
   GET    /scenarios/compare         — snapshot delta; optional step alignment (ADR-004 D5)
+  GET    /scenarios/compare/trajectory — per-step attribute trajectory delta (Issue #99)
   GET    /scenarios/{scenario_id}                          — full detail with scheduled inputs
   DELETE /scenarios/{scenario_id}                          — tombstone + cascade delete, returns 204
   POST   /scenarios/{scenario_id}/run                      — execute pending scenario to completion
@@ -62,6 +63,8 @@ from app.schemas import (
     ScenarioRestoreResponse,
     ScheduledInputSchema,
     SnapshotRecord,
+    TrajectoryCompareResponse,
+    TrajectoryCompareStep,
     TrajectoryFrameworkPoint,
     TrajectoryResponse,
     TrajectoryStep,
@@ -448,7 +451,12 @@ async def compare_scenarios(
 
     Computes delta = value_b - value_a for each shared entity and attribute.
     Only entities and attributes present in both snapshots are included.
-    Filter to a single attribute with `attr`. ADR-004 Decision 5.
+
+    All-attributes mode (Issue #90, ARCH-REVIEW-002 BI2-I-05): when `attr` is
+    omitted, ALL shared attributes across ALL shared entities are returned in a
+    single call. This satisfies the multi-framework comparison requirement — a
+    scenario that improves GDP while worsening unemployment is fully visible
+    without N serial calls. Pass `attr` to filter the response to one key.
 
     `step` — when provided, both scenarios must have a snapshot at exactly
     that step. Returns 404 identifying which scenario is missing the step.
@@ -571,6 +579,139 @@ async def compare_scenarios(
         step_a=snap_a["step"],
         step_b=snap_b["step"],
         deltas=deltas,
+    )
+
+
+# ---------------------------------------------------------------------------
+# GET /scenarios/compare/trajectory — Issue #99
+# ---------------------------------------------------------------------------
+
+
+@router.get("/scenarios/compare/trajectory", response_model=TrajectoryCompareResponse)
+async def compare_scenarios_trajectory(
+    conn: Annotated[asyncpg.Connection, Depends(get_db)],
+    scenario_a: str,
+    scenario_b: str,
+    attribute: str,
+) -> TrajectoryCompareResponse:
+    """Return per-step attribute delta between two scenarios across all shared steps.
+
+    Fetches all snapshots for both scenarios, aligns by step number, and returns
+    the attribute value from each scenario at each shared step alongside the
+    computed delta. The attribute is located by iterating shared entities and
+    finding the first entity that has the attribute key in both snapshots at that
+    step. When no entity carries the attribute at a given step, the step entry
+    carries null values and delta.
+
+    This endpoint enables trajectory analysis without N serial calls — the client
+    receives the full time-series of value_a, value_b, and delta in one response.
+    Cumulative welfare computation (integral of delta over all steps) is a single
+    client-side sum (Issue #99, ARCH-REVIEW-002 BI2-N-08).
+
+    Returns 404 if either scenario is not found.
+    Returns 409 if either scenario has no snapshots yet.
+    """
+    for sid in (scenario_a, scenario_b):
+        row = await conn.fetchrow(
+            "SELECT scenario_id FROM scenarios WHERE scenario_id = $1", sid
+        )
+        if row is None:
+            raise HTTPException(
+                status_code=404, detail=f"Scenario '{sid}' not found."
+            )
+
+    rows_a = await conn.fetch(
+        "SELECT step, state_data FROM scenario_state_snapshots "
+        "WHERE scenario_id = $1 ORDER BY step ASC",
+        scenario_a,
+    )
+    rows_b = await conn.fetch(
+        "SELECT step, state_data FROM scenario_state_snapshots "
+        "WHERE scenario_id = $1 ORDER BY step ASC",
+        scenario_b,
+    )
+
+    if not rows_a:
+        raise HTTPException(
+            status_code=409,
+            detail=f"Scenario '{scenario_a}' has no snapshots. Run it first.",
+        )
+    if not rows_b:
+        raise HTTPException(
+            status_code=409,
+            detail=f"Scenario '{scenario_b}' has no snapshots. Run it first.",
+        )
+
+    def _parse_state(raw: object) -> dict[str, Any]:
+        if isinstance(raw, str):
+            return json.loads(raw)  # type: ignore[no-any-return]
+        return raw  # type: ignore[return-value]
+
+    map_a: dict[int, dict[str, Any]] = {
+        int(r["step"]): _parse_state(r["state_data"]) for r in rows_a
+    }
+    map_b: dict[int, dict[str, Any]] = {
+        int(r["step"]): _parse_state(r["state_data"]) for r in rows_b
+    }
+
+    shared_steps = sorted(set(map_a) & set(map_b))
+
+    steps: list[TrajectoryCompareStep] = []
+    for step_num in shared_steps:
+        state_a_step = map_a[step_num]
+        state_b_step = map_b[step_num]
+
+        val_a: str | None = None
+        val_b: str | None = None
+
+        # Find the first entity that carries the attribute in snapshot A.
+        for eid in sorted(set(state_a_step) & set(state_b_step)):
+            attrs_a = state_a_step.get(eid)
+            attrs_b = state_b_step.get(eid)
+            if not isinstance(attrs_a, dict) or not isinstance(attrs_b, dict):
+                continue
+            env_a = attrs_a.get(attribute)
+            env_b = attrs_b.get(attribute)
+            if env_a is not None and isinstance(env_a, dict):
+                val_a = str(env_a.get("value", ""))
+            if env_b is not None and isinstance(env_b, dict):
+                val_b = str(env_b.get("value", ""))
+            if val_a is not None or val_b is not None:
+                break
+
+        delta_str: str | None = None
+        direction: str | None = None
+        if val_a is not None and val_b is not None:
+            try:
+                from decimal import Decimal as _Dec  # noqa: PLC0415
+                d_a = _Dec(val_a)
+                d_b = _Dec(val_b)
+                diff = d_b - d_a
+                delta_str = str(diff)
+                if diff > 0:
+                    direction = "increase"
+                elif diff < 0:
+                    direction = "decrease"
+                else:
+                    direction = "unchanged"
+            except Exception:  # noqa: BLE001 S110
+                pass  # non-numeric attribute value — leave delta null
+
+        steps.append(
+            TrajectoryCompareStep(
+                step=step_num,
+                value_a=val_a,
+                value_b=val_b,
+                delta=delta_str,
+                direction=direction,
+            )
+        )
+
+    return TrajectoryCompareResponse(
+        scenario_a_id=scenario_a,
+        scenario_b_id=scenario_b,
+        attribute=attribute,
+        steps=steps,
     )
 
 
