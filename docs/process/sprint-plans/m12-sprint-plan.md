@@ -181,7 +181,7 @@ All four Wave 1 groups can be worked and merged in any order. No group depends o
 
 ## Wave 3 — After G3 + G4 + G5
 
-### G6a — Multi-country scenario backend: #754
+### G6a — Multi-country scenario backend: #754 ✓ DONE (2026-06-05, PR #775)
 
 **Why own group (first half of G6):** Backend-heavy. Adds `entity_ids: list[str]` to scenario creation, seeds multiple entities independently, populates relationship edges at creation, passes multi-entity runs through the matrix engine. The choropleth multi-entity highlight is a small frontend touch that ships in this PR rather than creating a micro-PR later.
 
@@ -200,6 +200,8 @@ All four Wave 1 groups can be worked and merged in any order. No group depends o
 **Riders (ship in same PR):**
 - #103 — Multi-country validation suite design (design doc for statistical validity of multi-country backtesting; ships in same PR as the backend it validates)
 - #153 — Absolute threshold overlay in DeltaChoropleth (G6a already touches choropleth for multi-entity highlight; MDA threshold markers are the natural addition)
+
+**Execution narrative:** Full-stack PR. Backend: `scenarios.py` API extended with `entity_ids: list[str]` (1–5 entities, validated with descriptive error on 0 or >5) and `threshold_value: str | None` query param on `/compare` endpoint wired to new `threshold_crossed: bool | None` field in `DeltaRecord`. `state_repository.py` extended with `_load_relationships()`: queries `relationships` DB table for real edges between scenario entities; synthetic Tier 4 trade edges (weight=0.1) injected for all missing ordered pairs so multi-entity propagation is never blocked by absent relationship data — `synthetic: True` and `confidence_tier: 4` in edge attributes. `DeltaRecord.threshold_crossed` computed as `(dec_a < thr) != (dec_b < thr)` — True when value_a and value_b are on opposite sides of the threshold (correct for MDA boundary detection). Frontend: `ChoroplethMap` multi-entity highlight — MapLibre layer filter changed from `["==", "entity_id", id]` to `["in", ["get", "entity_id"], ["literal", ids]]` for multi-entity highlight; empty-array case explicitly returns no-match expression. `ScenarioIdentityHeader` extended: `entityId: string | null` → `entityIds: string[]`; exported `formatEntityLabel()` pure function renders "Entity: GRC" (1 entity) vs "Entities: JOR, SAU" (plural). `App.tsx` updated to propagate `activeEntityIds: string[]` from scenario detail `configuration.entities` array. Rider #103: `docs/architecture/multi-country-validation-suite-design.md` — statistical validity analysis (2-data-point = 25% false-positive; 8-point = 0.4%), Ireland/Portugal/Cyprus backtesting fixture priority order, M12/M13 implementation phases. 18 new unit tests in `test_g6a_multi_country.py` covering entity count validation, `threshold_crossed` logic (None/False/True), relationship loading (real edges, synthetic injection, no-duplicate invariant for real pairs, 3-entity = 6 ordered pairs), and confidence tier. 6 new `ScenarioIdentityHeader` unit tests covering `formatEntityLabel` for 0/1/2/3 entities. Playwright E2E fix: `getByText(/Complete/)` → `getByText(/— Complete/)` in two spec files (strict mode violation from `ScenarioIdentityHeader` rendering "Status: Complete (3 steps)"). CI: test-frontend ✓, test-backend ✓, lint ✓, playwright ✓.
 
 ---
 
