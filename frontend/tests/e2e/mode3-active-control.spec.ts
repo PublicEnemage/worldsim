@@ -52,15 +52,16 @@ test("Mode 3 — enable, apply control change, recompute completes", async ({ pa
   await advanceBtn.click();
 
   // Wait for step indicator to show Step 1.
-  await expect(page.locator('[data-testid="step-indicator"]')).toContainText("1", {
-    timeout: 15_000,
-  });
+  // ScenarioControls.tsx renders "Step {currentStep} / {totalSteps}" — no step-indicator testid.
+  await expect(page.getByText("Step 1 / 3")).toBeVisible({ timeout: 15_000 });
 
   // Enable Mode 3.
   await page.locator('[data-testid="mode3-toggle"]').click();
 
-  // ControlPlane should appear.
-  await expect(page.locator('[data-testid="zone-control-plane"]')).toBeVisible({
+  // ControlPlane should appear. zone-control-plane resolves to 2 elements (InstrumentCluster
+  // always renders a reserved zone; ControlPlane adds a second). Use apply-control-change,
+  // which only exists inside ControlPlane and is always rendered when ControlPlane is mounted.
+  await expect(page.locator('[data-testid="apply-control-change"]')).toBeVisible({
     timeout: 3_000,
   });
 
@@ -127,14 +128,16 @@ test("Mode 3 toggle resets to idle when scenario changes", async ({ page }) => {
   await page.locator(".scenario-row").filter({ hasText: scenarioA })
     .getByTitle("Select as primary scenario").click();
   await page.locator('[data-testid="mode3-toggle"]').click();
-  await expect(page.locator('[data-testid="zone-control-plane"]')).toBeVisible({
+  // apply-control-change is unambiguous: only exists inside ControlPlane (not in the
+  // always-rendered InstrumentCluster zone-control-plane div that causes strict-mode violation).
+  await expect(page.locator('[data-testid="apply-control-change"]')).toBeVisible({
     timeout: 3_000,
   });
 
   // Select scenario B — Mode 3 should turn off (mode3Active resets in handleSelectScenario).
   await page.locator(".scenario-row").filter({ hasText: scenarioB })
     .getByTitle("Select as primary scenario").click();
-  await expect(page.locator('[data-testid="zone-control-plane"]')).not.toBeVisible({
+  await expect(page.locator('[data-testid="apply-control-change"]')).not.toBeVisible({
     timeout: 3_000,
   });
 });
