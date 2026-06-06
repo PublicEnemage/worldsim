@@ -31,12 +31,12 @@ test("Mode 3 — enable, apply control change, recompute completes", async ({ pa
   await page.locator(".scenario-btn--create").click();
 
   // Wait for scenario row.
-  await page.locator(".scenario-list-row").filter({ hasText: scenarioName }).waitFor({
+  await page.locator(".scenario-row").filter({ hasText: scenarioName }).waitFor({
     timeout: 10_000,
   });
 
   // Select the scenario.
-  await page.locator(".scenario-list-row").filter({ hasText: scenarioName }).click();
+  await page.locator(".scenario-row").filter({ hasText: scenarioName }).click();
 
   // Advance one step so branch_from_step = 0 is valid.
   const advanceBtn = page.getByRole("button", { name: /Advance/ });
@@ -104,26 +104,26 @@ test("Mode 3 toggle resets to idle when scenario changes", async ({ page }) => {
   // Create scenario A.
   await page.locator('input[placeholder="Scenario name"]').fill(scenarioA);
   await page.locator(".scenario-btn--create").click();
-  await page.locator(".scenario-list-row").filter({ hasText: scenarioA }).waitFor({
+  await page.locator(".scenario-row").filter({ hasText: scenarioA }).waitFor({
     timeout: 10_000,
   });
 
   // Create scenario B.
   await page.locator('input[placeholder="Scenario name"]').fill(scenarioB);
   await page.locator(".scenario-btn--create").click();
-  await page.locator(".scenario-list-row").filter({ hasText: scenarioB }).waitFor({
+  await page.locator(".scenario-row").filter({ hasText: scenarioB }).waitFor({
     timeout: 10_000,
   });
 
   // Select scenario A, enable Mode 3.
-  await page.locator(".scenario-list-row").filter({ hasText: scenarioA }).click();
+  await page.locator(".scenario-row").filter({ hasText: scenarioA }).click();
   await page.locator('[data-testid="mode3-toggle"]').click();
   await expect(page.locator('[data-testid="zone-control-plane"]')).toBeVisible({
     timeout: 3_000,
   });
 
   // Select scenario B — Mode 3 should turn off (mode3Active resets in handleSelectScenario).
-  await page.locator(".scenario-list-row").filter({ hasText: scenarioB }).click();
+  await page.locator(".scenario-row").filter({ hasText: scenarioB }).click();
   await expect(page.locator('[data-testid="zone-control-plane"]')).not.toBeVisible({
     timeout: 3_000,
   });
