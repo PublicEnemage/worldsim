@@ -1152,3 +1152,4 @@ Phase 3 inputs for the DIC architectural review.
 | H — Backtesting Step 5 | Mode 1 | COMPLETE | Divergence explainability (assumption visible) | US-047 [Near-Term-Gap] |
 | H — Backtesting Step 6 | Mode 1 | COMPLETE | Trajectory data export | US-046 [Near-Term-Gap] |
 | H — Backtesting Step 7 | [Phase-3-TBD] | XRAY_LAYER | Structural dependency visualization | US-048 [Phase-3-TBD] |
+| Mode 1 COMPARE_VIEW | Mode 1 | COMPARE_VIEW | Inline fixture picker + dual-curve trajectory view + delta MDA panel | US-049 (closes #451) |

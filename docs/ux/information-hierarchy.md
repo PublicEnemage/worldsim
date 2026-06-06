@@ -1,8 +1,8 @@
 # Information Hierarchy — WorldSim Dashboard
 
-> Last significant revision: 2026-05-22
-> Updated against: ADR-008 (UX Architecture — Instrument Cluster, Viewport, Interaction Model) and ADR-010 (Trajectory View as Primary Instrument), both accepted 2026-05-22
-> Previous version context: Pre-Case B verdict — instruments in Zone 2/3 drawer, choropleth in primary viewport
+> Last significant revision: 2026-06-06
+> Updated against: NB-7 (Mode 1 COMPARE_VIEW spec — entry point, API design decision, Persona 3 user story; closes Issue #451)
+> Previous version context: 2026-05-22 — ADR-008 and ADR-010 accepted; instruments in Zone 1; choropleth navigable context
 
 > Owned by the UX Designer Agent. This document defines the visual weight
 > and disclosure depth of every element on the WorldSim dashboard. It is
@@ -10,9 +10,9 @@
 > and progressive disclosure. When a proposed component placement conflicts
 > with this hierarchy, this document governs — not implementation convenience.
 >
-> Last updated: 2026-05-21 (EL Decisions 1/2/3 — per-mode cognitive tasks,
-> instrument cluster as primary viewport, comparison mode conditional,
-> control plane reserved zone; closes Issue #365).
+> Last updated: 2026-06-06 (NB-7 — Mode 1 COMPARE_VIEW spec completed; entry point
+> resolved to inline fixture picker in Zone 2 scenario browser; single-call API design
+> decision documented; US-049 Persona 3 user story added; closes Issue #451).
 
 ---
 
@@ -279,33 +279,107 @@ Zone 3: System status, data source registry, configuration.
 The comparison surface is context-dependent. EL Decision 3 (Issue #364)
 establishes a conditional rule across all three modes.
 
-**Mode 1 — Replay (comparable-case comparison):** *(entry point spec deferred to M10 — Issue #451)*
+**Mode 1 — Replay (comparable-case comparison):** *(spec complete — NB-7, closes Issue #451)*
 
-Zone 1: Two historical entity trajectory curves on the shared step axis, aligned
-by programme step (ADR-010 Decision 11). The primary question is "does this
-trajectory pattern match a recognizable historical precursor?" The political
-advisor (Persona 3) needs to compare the current case against a second historical
-fixture to build the pattern-recognition argument. The trajectory view rendering
-layer is Mode 1 comparison-ready (ADR-010 Decision 11; FA brief §UD-R2 tick
-format). What is not yet specced is the entry point — the UX mechanism by which
-a second historical fixture is selected. Options to be resolved at M10:
+The primary cognitive task in Mode 1 comparison is pattern recognition: does
+the current historical trajectory match a recognizable structural precursor?
+Persona 3 (Andreas Stefanidis, political advisor) needs to place two historical
+trajectories on the same step axis and identify where they diverge — and where
+they do not.
 
-- A "Compare against…" action in the Zone 2 scenario / fixture browser
-- A secondary entity selector in the persistent header (mode-conditional)
-- A fixture picker modal invoked from Zone 1
+**Zone 1:**
 
-Zone 2: Entry point for selecting the comparison fixture. Full specification is
-M10 scope.
+Two historical entity trajectory curves on the shared step axis, aligned by
+`step_index` from the API response (ADR-010 Decision 11; FA brief §UD-R2 tick
+format). The rendering rules:
 
-Zone 3: Methodology disclosures for both entities.
+- **Baseline curve** (primary fixture): solid line, 100% opacity, 2px stroke.
+  Values drawn from `steps[].baseline_value` in the `TrajectoryCompareResponse`.
+- **Comparison curve** (secondary fixture): ghost curve, 50% opacity,
+  `strokeDasharray="4 2"`, 1px stroke. Values drawn from
+  `steps[].compare_value` in the `TrajectoryCompareResponse`.
+- Step axis uses `steps[].step_index` as the shared alignment axis. Calendar
+  dates (`steps[].timestep`) appear as step axis annotations for SIGNIFICANT
+  steps, consistent with Mode 1 single-trajectory rendering.
+- MDA floor lines overlaid as horizontal dashed threshold lines on both curves.
+- Divergence fill region (5–10% opacity) between baseline and comparison curves
+  where they separate — rendered automatically when both curves are present.
 
-The DeltaChoropleth has no role in Mode 1 comparisons. Mode 1 comparison is
-always temporal — two historical trajectories on the same step axis — not
-geographic.
+**Zone 1A — Delta MDA Alert Panel:**
 
-*Note: M9 partially serves Persona 3 (Andreas Stefanidis) in Mode 1. Step axis
-annotations (US-005) and declarative alert language (US-016) provide sufficient
-orientation. The comparable-case comparison surface is M10 scope (Issue #451).*
+When COMPARE_VIEW is active in Mode 1, the MDA alert panel shows a delta view:
+which alerts fire in the primary fixture but not the comparison fixture (and vice
+versa). Alert rows that fire in both are shown once, with a "both" indicator.
+Alert rows that are fixture-specific carry a label: "primary only" or "comparison
+only." This is the structural pattern signal — if the same alert fires in both
+fixtures at the same step, the pattern is robust; if it fires only in the primary,
+the structural condition is not shared.
+
+**Zone 2 — Inline Fixture Picker (entry point):**
+
+The entry point for Mode 1 COMPARE_VIEW is a "Compare against…" button in the
+Zone 2 scenario / fixture browser. This button is visible whenever the active
+mode is Mode 1 and a fixture is loaded. Selecting it does not open a modal —
+it expands an inline list of available scenarios and fixtures within the Zone 2
+panel. The user selects the second fixture from this inline list. Selecting a
+fixture sets `compare_scenario_id` and enters COMPARE_VIEW. No navigation away
+from the instrument cluster is required.
+
+Exit: an "×" (close comparison) control within the Zone 2 panel clears
+`compare_scenario_id` and returns to single-trajectory Mode 1 view.
+
+**Zone 3:** Methodology disclosures for both fixtures.
+
+**API design decision (resolved NB-5, closes Issue #451):**
+
+The Mode 1 comparison uses a **single API call**, not two separate trajectory
+fetches:
+
+```
+GET /api/v1/scenarios/compare?include_trajectory=true&scenario_id=A&compare_scenario_id=B
+```
+
+This returns a `TrajectoryCompareResponse` with a `steps` array of
+`TrajectoryCompareStep` objects, each providing:
+`step_index, timestep, entity_id, attribute_key, baseline_value, compare_value,
+delta, baseline_tier, compare_tier`.
+
+**Rationale for single call over dual call:** Both trajectories share the same
+step alignment logic. A single call guarantees that `step_index` values are
+aligned server-side before the response is returned — eliminating the client-side
+alignment problem that would arise if two separate trajectory calls returned
+different step ranges or different `timestep` values for the same conceptual step.
+The `delta` field is also computed server-side, removing the need for client-side
+subtraction and the rounding risk associated with it. The dual-call pattern was
+explicitly considered and rejected during NB-5 implementation (PR #784).
+
+**DeltaChoropleth:** The DeltaChoropleth has no role in Mode 1 comparisons.
+Mode 1 comparison is always temporal — two historical trajectories on the same
+step axis — not geographic.
+
+**User story (US-049):**
+
+```
+US-049: Political advisor compares Greece 2010 trajectory against Argentina 2001 precursor
+Actor: Andreas Stefanidis — Political Advisor
+Mode: Mode 1 (Replay)
+Entry state: Greece 2010-2012 fixture loaded, step 0 visible, single-trajectory view
+
+Given the Greece 2010-2012 historical fixture is loaded in Mode 1 and the Zone 2
+  scenario browser is visible
+When Andreas clicks "Compare against…" in the Zone 2 fixture browser, the inline
+  fixture list expands, and he selects "Argentina 2001-2002"
+Then (a) the trajectory view renders two curves — solid for Greece (baseline),
+  ghost (50% opacity, strokeDasharray="4 2") for Argentina (comparison);
+  (b) the step axis aligns both curves by step_index with calendar date annotations
+  for significant steps on each fixture;
+  (c) the Zone 1A delta MDA alert panel shows which alerts are "primary only"
+  (Greece), "comparison only" (Argentina), or "both";
+  (d) the divergence fill region appears between the curves at steps where
+  composite scores diverge;
+  (e) the Zone 2 panel shows an "×" control to exit COMPARE_VIEW
+Tag: [Playwright]
+```
 
 **Mode 2 — Single-entity scenarios:**
 
