@@ -11,8 +11,25 @@
  * The test uses data-testid anchors defined in ControlPlane.tsx and
  * ScenarioInstrumentCluster.tsx. It does not assert exact numeric output,
  * only that the UI state transitions correctly (idle → computing → complete).
+ *
+ * Selector notes (mirrors greece-integration.spec.ts createAndSelectScenario):
+ *   - Scenario row is .scenario-row (not .scenario-list-row)
+ *   - Selection requires clicking the "Select as primary scenario" button inside
+ *     the row, not the outer row div (no onClick on the outer div)
+ *   - Advance button is labeled "Next Step" (not "Advance")
  */
 import { test, expect } from "@playwright/test";
+
+async function createAndSelectScenario(
+  page: import("@playwright/test").Page,
+  name: string,
+) {
+  await page.locator('input[placeholder="Scenario name"]').fill(name);
+  await page.locator(".scenario-btn--create").click();
+  const row = page.locator(".scenario-row").filter({ hasText: name });
+  await expect(row).toBeVisible({ timeout: 10_000 });
+  await row.getByTitle("Select as primary scenario").click();
+}
 
 test("Mode 3 — enable, apply control change, recompute completes", async ({ page }) => {
   const scenarioName = `E2E-Mode3-${Date.now()}`;
@@ -25,21 +42,12 @@ test("Mode 3 — enable, apply control change, recompute completes", async ({ pa
     { timeout: 10_000 },
   );
 
-  // Open scenarios panel and create scenario.
+  // Open scenarios panel and create + select scenario.
   await page.getByRole("button", { name: /Scenarios/ }).click();
-  await page.locator('input[placeholder="Scenario name"]').fill(scenarioName);
-  await page.locator(".scenario-btn--create").click();
-
-  // Wait for scenario row.
-  await page.locator(".scenario-row").filter({ hasText: scenarioName }).waitFor({
-    timeout: 10_000,
-  });
-
-  // Select the scenario.
-  await page.locator(".scenario-row").filter({ hasText: scenarioName }).click();
+  await createAndSelectScenario(page, scenarioName);
 
   // Advance one step so branch_from_step = 0 is valid.
-  const advanceBtn = page.getByRole("button", { name: /Advance/ });
+  const advanceBtn = page.getByRole("button", { name: /Next Step/ });
   await advanceBtn.waitFor({ timeout: 10_000 });
   await advanceBtn.click();
 
@@ -116,14 +124,16 @@ test("Mode 3 toggle resets to idle when scenario changes", async ({ page }) => {
   });
 
   // Select scenario A, enable Mode 3.
-  await page.locator(".scenario-row").filter({ hasText: scenarioA }).click();
+  await page.locator(".scenario-row").filter({ hasText: scenarioA })
+    .getByTitle("Select as primary scenario").click();
   await page.locator('[data-testid="mode3-toggle"]').click();
   await expect(page.locator('[data-testid="zone-control-plane"]')).toBeVisible({
     timeout: 3_000,
   });
 
   // Select scenario B — Mode 3 should turn off (mode3Active resets in handleSelectScenario).
-  await page.locator(".scenario-row").filter({ hasText: scenarioB }).click();
+  await page.locator(".scenario-row").filter({ hasText: scenarioB })
+    .getByTitle("Select as primary scenario").click();
   await expect(page.locator('[data-testid="zone-control-plane"]')).not.toBeVisible({
     timeout: 3_000,
   });
