@@ -1918,6 +1918,43 @@ Engineering Lead spot-check of PR #767 CI run. The detection was ad hoc — no p
 
 ---
 
+## NM-036 — Branch Snapshot Copy Omitted ia1_disclosure — NOT NULL Violation in Mode 3 Golden Path (Reactive)
+
+**Date:** 2026-06-06
+**Milestone:** M12 — Active Control and External Sector
+**Detected by:** Playwright E2E test `mode3-active-control.spec.ts` — CI run 27077377687 (PR #794); DB error surfaced via "⚠ Recompute failed" badge
+**Severity:** Critical
+
+### What happened
+
+The `POST /scenarios/{scenario_id}/branch` endpoint (G6b, PR #778) copies snapshots from the baseline scenario into the new branch scenario. The INSERT into `scenario_state_snapshots` omitted `ia1_disclosure`, which has a NOT NULL constraint. Every call to the branch endpoint failed with a PostgreSQL integrity error:
+
+```
+null value in column "ia1_disclosure" of relation "scenario_state_snapshots" violates not-null constraint
+```
+
+The Mode 3 golden path (create scenario → advance → enable Mode 3 → Apply Change) was broken from the moment the branch endpoint shipped.
+
+### What was at risk
+
+The entire Mode 3 Active Control feature (Issue #753, G6b) was non-functional. Any user attempting the Mode 3 golden path would see "⚠ Recompute failed" immediately. The feature was shipped in PR #778 (merged 2026-06-05) and would have been discovered during G8 (Demo 4) preparation or user testing — not at merge time.
+
+### What caught it
+
+Playwright E2E test `mode3-active-control.spec.ts` (PR #794), which exercised the Mode 3 golden path end-to-end for the first time in CI. The test was first written as part of G6b (PR #778) but had selector bugs that prevented it from reaching the branch call. The PR #794 remediation cycle fixed those bugs, and the newly-functional test immediately exposed the backend failure.
+
+There was no unit or integration test for the branch endpoint that would have caught the missing column. The backend test suite did not cover the full branch-and-advance cycle against a real database.
+
+### Process improvement
+
+1. **Immediate fix:** `ia1_disclosure` added to the snapshot SELECT and INSERT in `branch_scenario` (backend/app/api/scenarios.py). Fixed in PR #794.
+
+2. **Integration test gap:** The branch endpoint had no integration test covering snapshot copy integrity. The backend integration test suite (`tests/integration/`) should include a test that: (a) creates a scenario, (b) advances at least one step, (c) calls the branch endpoint, and (d) confirms the branch scenario's snapshot rows are complete (including `ia1_disclosure`). Filing as a test gap for the test suite.
+
+3. **NOT NULL column coverage rule:** When a new NOT NULL column is added to `scenario_state_snapshots` or any other snapshot table, all INSERT paths into that table must be audited before the migration ships. This includes: `snapshot_repository.py` (primary advance path), `branch_scenario` (branch copy path), `rebranch_scenario` (re-branch path), and any future restore or import paths. The audit must be documented as a checklist item in the PR that introduces the column.
+
+---
+
 ## Registry Maintenance
 
 ### How to add an entry
