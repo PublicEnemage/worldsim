@@ -353,12 +353,14 @@ The 14 near-term backlog items are grouped by shared file areas, dependency chai
 
 **Execution narrative:** 10 files changed, 767 insertions. `quantity.py`: `AttributeType` enum (STOCK/FLOW/STRUCTURAL_INDEX/RATE), `attribute_type: AttributeType | None = None` and `stock_flow_identity: bool = False` fields on `Quantity` — both backwards-compatible, wire-space-efficient (omitted from JSONB envelope when None/False). `models.py`: `CohortProfile` dataclass (`attributes: dict[str, Quantity]`), `cohort_profiles: dict[str, CohortProfile] | None = None` on `SimulationEntity`, module docstring updated. `schemas.py`: `attribute_type` and `stock_flow_identity` fields on `QuantitySchema` with `from_jsonb` update. `quantity_serde.py`: extended `quantity_to_jsonb_envelope`, `quantity_from_schema`, added `cohort_profile_to_jsonb` / `cohort_profile_from_jsonb`. `snapshot_repository.py`: serialises `cohort_profiles` under `_cohort_profiles` sub-key in entity block. `web_scenario_runner.py` (`_reconstruct_state_from_snapshot`): pops `_cohort_profiles` before quantity loop; skips all underscore-prefixed keys (defensive). `state_repository.py` (`_build_entity`): skips underscore-prefixed keys (defensive parity). `ADR-001-simulation-core-data-model.md`: Amendment 2 section added; Last Reviewed updated. `simulation_state.yml`: schema v1.1 — `AttributeType` enum, `CohortProfile` type, `cohort_profiles` field on `SimulationEntity`, new Quantity fields, cohort serde section. `test_nb3_entity_model.py`: 30 unit tests, all passing. Greece M12 seed: Q1 poverty_headcount=0.201 (EU-SILC 2010, Tier 2), Q5=0.065, Q1 unemployment_rate=0.18. CE constraint satisfied: zero existing seed scripts required modification.
 
-#### NB-4 — Investment Climate State Variables
+#### NB-4 — Investment Climate State Variables ✓ DONE (2026-06-06, PR #790, closes #34)
 
 **Issues:** #34  
 **Why separate from NB-3:** Requires sourcing real seed data from World Bank/IMF IFS for ten demo entities, a ContingentInput example, and a documented feedback relationship narrative. Heavier than pure type-stub work.  
 **Prerequisite:** NB-3 merged (so new attributes are typed with `AttributeType` from #30).  
 **AttributeType tagging:** All four new attributes (`sovereign_risk_premium`, `fdi_stock_pct_gdp`, `portfolio_flow_velocity`, `credit_rating_score`) tagged at definition with the `AttributeType` enum from #30.
+
+**Execution narrative:** Backend-only PR (3 files: 2 fixture updates, 1 new test file). Four investment climate state variables added to both demo entity fixtures with real historical seed data and `AttributeType` tags: `sovereign_risk_premium` (RATE), `fdi_stock_pct_gdp` (STOCK), `portfolio_flow_velocity` (FLOW), `credit_rating_score` (STRUCTURAL_INDEX). Greece 2010 (GRC) seeds: ECB SDW spread 300bps, UNCTAD FDI 10.5% GDP, IMF BOP portfolio -8% GDP, S&P BBB+=55/100. Argentina 2001 (ARG) seeds: EMBI+ spread 750bps, UNCTAD FDI 25.1% GDP, INDEC BOP portfolio -4.5% GDP, S&P BB=38/100. Cross-fixture invariants: ARG spread > GRC spread; ARG credit score < GRC credit score; both entities have negative portfolio velocity (capital outflow). 41 unit tests in `test_nb4_investment_climate.py`, all passing. Ruff + mypy clean.
 
 #### NB-5 — Comparison API Pair ✓ DONE (2026-06-06, PR #784, closes #90 + #99)
 
@@ -369,19 +371,23 @@ The 14 near-term backlog items are grouped by shared file areas, dependency chai
 
 **Execution narrative:** Backend + schema PR. `scenarios.py`: `GET /api/v1/scenarios/compare` extended with `?include_trajectory=true` param; returns per-step `TrajectoryCompareStep` array alongside the existing per-attribute comparison. All-attributes compare endpoint (`GET /api/v1/scenarios/compare/all`) added. `schemas.py`: `TrajectoryCompareStep` (step, timestep, entity_id, attribute_key, baseline_value, compare_value, delta, baseline_tier, compare_tier) and `TrajectoryCompareResponse` schemas added. `api_contracts.yml` updated with both endpoint shapes. `test_compare_api.py`: integration tests for trajectory endpoint and all-attributes endpoint. `CompareResponse` docstring updated with all-attributes behaviour note.
 
-#### NB-6 — Frontend Tooling Gate
+#### NB-6 — Frontend Tooling Gate ✓ DONE (2026-06-06, PR #789, closes #644)
 
 **Issues:** #644  
 **Scope:** Enable `react-hooks/exhaustive-deps` in ESLint config; audit all `useEffect`, `useCallback`, `useMemo` hooks across `ScenarioInstrumentCluster.tsx`, `FourFrameworkZone1D.tsx`, `MDAAlertPanelZone1B.tsx`, and any other file with hooks; fix or explicitly suppress with justification comment each violation.  
 **Why before NB-8:** NB-8 (#394) is a large frontend feature with new hooks. Better to have `exhaustive-deps` enforced before writing new code than to inherit a hook debt from NB-8's implementation.  
 **No hard prerequisite**, but sequence before NB-8.
 
-#### NB-7 — Mode 1 Comparison Spec
+**Execution narrative:** Frontend-only PR (24 files). Full ESLint audit found 80 violations across 13 source files and 5 E2E test files. No config changes — all fixes at call site. Key issues resolved: (1) `rules-of-hooks` structural violation in `App.tsx` — early replay-mode return on line 72 came before all `useState`/`useEffect` declarations; moved to after all hooks. (2) `react-refresh/only-export-components` in 10 files exporting helpers alongside components (tested pure functions); suppressed with file-level `/* eslint-disable */`. (3) `react-hooks/refs` in 3 files using stabilized-callback pattern; suppressed inline and file-level. (4) `react-hooks/set-state-in-effect` in 3 files; suppressed. (5) `exhaustive-deps` warnings in ChoroplethMap (separate effect handles activeEntityIds) and ScenarioInstrumentCluster (Zustand singleton store). (6) `no-unused-expressions` ternary pattern in 4 E2E `speak()` functions; converted to if-else. Removed unused `advanceStep` function and `compareCheckbox` assignment. Fixed `CONNECT_NULLS: false = false` → `false as const`. Result: 0 errors, 0 warnings. `npm run build` gate clean (TypeScript).
+
+#### NB-7 — Mode 1 Comparison Spec ✓ DONE (2026-06-06, PR #788, closes #451)
 
 **Issues:** #451  
 **What it is:** UX spec document (`information-hierarchy.md §COMPARE_VIEW` Mode 1 block completed), backend extension design decision (single API call vs. dual call — resolves the open question in the issue body), and one user story in the Andreas Stefanidis (Persona 3) format. **Not an implementation PR.**  
 **Prerequisite:** NB-5 merged — the "single call or dual call" API design decision in #451 requires knowing what NB-5 (#90 + #99) built so the spec does not contradict the implementation.  
 **EL-endorsed scope (panel decision DP-3):** #451 ships in M12 as spec only. #394 (implementation) defers to M13. #451 is the specification prerequisite for M13's NB-8 implementation.
+
+**Execution narrative:** Docs-only PR (2 files). `information-hierarchy.md`: Mode 1 COMPARE_VIEW block fully specified — Zone 1 dual-curve rendering rules (baseline solid / comparison ghost at 50% opacity, `strokeDasharray="4 2"`), Zone 1A delta MDA alert panel ("primary only" / "comparison only" / "both"), Zone 2 inline fixture picker entry point (not a modal; expands inline within Zone 2 scenario browser), Zone 3 methodology disclosures for both fixtures. API design decision documented: single call `GET /api/v1/scenarios/compare?include_trajectory=true` over dual-call (rationale: server-side step alignment, `delta` computed server-side, no client rounding risk). US-049 user story added (Andreas Stefanidis / Persona 3, `[Playwright]` tag). `user-journeys.md`: US-049 row added to Journey Dependency Map.
 
 #### NB-8 — Multi-Scenario Comparison (>2) — DEFERRED TO M13
 
@@ -414,10 +420,10 @@ Wave A (parallel — COMPLETE 2026-06-06):
 Wave B (after NB-1 merged — COMPLETE 2026-06-06):
   NB-3  Entity attribute model (#30 + #28 + ADR-001 Amendment + Greece cohort seed) ✓ PR #786
 
-Wave C (after NB-3 merged; NB-5 and NB-6 independent — IN PROGRESS):
-  NB-4  Investment climate state variables (#34)
-  NB-6  ESLint audit (#644)         ← can also run in Wave A if preferred
-  NB-7  Mode 1 spec (#451)          ← after NB-5 merged ✓
+Wave C (after NB-3 merged; NB-5 and NB-6 independent — COMPLETE 2026-06-06):
+  NB-4  Investment climate state variables (#34)  ✓ PR #790
+  NB-6  ESLint audit (#644)                       ✓ PR #789
+  NB-7  Mode 1 spec (#451)                        ✓ PR #788
 
 Wave D (after NB-5 + NB-6 + NB-7 all merged):
   NB-8  DEFERRED TO M13
