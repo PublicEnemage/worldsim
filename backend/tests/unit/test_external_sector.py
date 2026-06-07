@@ -183,11 +183,16 @@ def test_commodity_shock_distributes_to_entity_with_dependency() -> None:
     state = _state({"JOR": entity}, step=1)
     events = mod.compute(entity, state, state.timestep)
     fin = [e for e in events if e.framework == MeasurementFramework.FINANCIAL]
-    assert len(fin) == 1
+    # Two FINANCIAL events per shock: import_price_inflation and reserve_coverage_months
+    assert len(fin) == 2
+    price_event = next(e for e in fin if "import_price_inflation" in e.affected_attributes)
+    reserve_event = next(e for e in fin if "reserve_coverage_months" in e.affected_attributes)
     # 0.40 dependency × 0.20 shock = 0.08
-    assert fin[0].affected_attributes["import_price_inflation"].value == pytest.approx(
+    assert price_event.affected_attributes["import_price_inflation"].value == pytest.approx(
         Decimal("0.08"), abs=Decimal("0.001")
     )
+    # Reserve depletion is negative (outflow)
+    assert reserve_event.affected_attributes["reserve_coverage_months"].value < Decimal("0")
 
 
 def test_commodity_shock_hcl_effect_within_2_steps() -> None:

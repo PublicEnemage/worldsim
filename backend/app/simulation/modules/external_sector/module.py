@@ -20,6 +20,18 @@ All generated events are flagged confidence_tier=3 for Jordan Demo 4 where
 import dependency coefficients are synthetic estimates. When real import
 dependency data is available, the entity attribute's own confidence_tier
 should propagate to the generated event (deferred to Issue #275 calibration).
+
+Per commodity shock, three events are emitted per entity per active step:
+  1. import_price_inflation (FINANCIAL) — trade balance pressure indicator.
+  2. bottom_quintile_consumption_capacity (HUMAN_DEVELOPMENT) — HCL transmission.
+  3. reserve_coverage_months (FINANCIAL) — reserve depletion channel.
+
+Reserve depletion channel: higher import costs increase foreign exchange
+outflows, depleting the central bank's import-cover reserve buffer.
+The _RESERVE_BURN_RATE coefficient maps import-cost pressure (dep × magnitude)
+to months of reserve drawdown per annual step. Calibrated to produce the Demo 4
+narrative arc (JOR reserves approach CRITICAL floor by step 5). This is a
+simplified linear approximation; full calibration deferred to Issue #275.
 """
 from __future__ import annotations
 
@@ -48,6 +60,15 @@ _log = logging.getLogger(__name__)
 # consumption within one step. Consistent with BilateralTradeShock constant.
 # Calibration basis: Issue #275. Simplified constant until calibrated.
 _HCL_TRANSMISSION_FACTOR = Decimal("0.3")
+
+# Months of reserve drawdown per unit of commodity import cost pressure per step.
+# Formula: reserve_depletion = dep_coefficient × shock_magnitude × _RESERVE_BURN_RATE
+# Calibrated so JOR (dep=0.42, fuel shock 0.25) crosses the CRITICAL floor (2.5 months)
+# from 7.1 months by step 5 (Demo 4 narrative: "Reserve drawdown critical" at step 5).
+# One-step lag: events generated at step N apply to state N+1; coefficient 8.5 is derived
+# from the constraint reserves_step5 < 2.5 with JOR fuel+food dual-shock from steps 1-4.
+# Simplified linear approximation. Full calibration deferred to Issue #275.
+_RESERVE_BURN_RATE = Decimal("8.5")
 
 _DAYS_PER_STEP = 365
 
@@ -124,6 +145,16 @@ class ExternalSectorModule(SimulationModule):
                 measurement_framework=MeasurementFramework.HUMAN_DEVELOPMENT,
                 confidence_tier=3,
             )
+            # Reserve depletion: higher import costs drain foreign exchange reserves.
+            # Negative FLOW delta on reserve_coverage_months (additive per propagation
+            # engine FLOW semantics — reduces the existing stock each step).
+            reserve_delta = Quantity(
+                value=-(effect * _RESERVE_BURN_RATE),
+                unit="months",
+                variable_type=VariableType.FLOW,
+                measurement_framework=MeasurementFramework.FINANCIAL,
+                confidence_tier=3,
+            )
 
             events.append(
                 Event(
@@ -154,6 +185,23 @@ class ExternalSectorModule(SimulationModule):
                     metadata={
                         "commodity_category": shock.commodity_category,
                         "dependency_coefficient": str(dep_qty.value),
+                    },
+                )
+            )
+            events.append(
+                Event(
+                    event_id=f"{base_id}-cps-rsv",
+                    source_entity_id=entity.id,
+                    event_type=f"commodity_price_shock_{shock.commodity_category}_reserve",
+                    affected_attributes={"reserve_coverage_months": reserve_delta},
+                    propagation_rules=[],
+                    timestep_originated=timestep,
+                    framework=MeasurementFramework.FINANCIAL,
+                    metadata={
+                        "commodity_category": shock.commodity_category,
+                        "dependency_coefficient": str(dep_qty.value),
+                        "reserve_burn_rate": str(_RESERVE_BURN_RATE),
+                        "synthetic_tier3": True,
                     },
                 )
             )
