@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-06 (Wave C complete + three pre-next-session tasks done. PR #794 merged. (1) Mode 3 E2E: mode3-active-control.spec.ts fixed — 6 selector/logic bugs found and resolved across multiple CI iterations; also found and fixed ia1_disclosure NOT NULL backend bug in branch_scenario endpoint (NM-036 filed). (2) ARCH-007: Issue #792 filed, ADR-013 assigned in backlog.md. (3) Cohort reconstruction fix: _inject_cohort_entities called after _reconstruct_state_from_snapshot in web_scenario_runner.py; 12 regression tests in test_cohort_reconstruction.py. G8 (Demo 4, Issue #755) now fully unblocked — awaiting EL verdict on scope.)**
+**Last updated: 2026-06-07 (G8 Demo 4 complete. PR #796 merged to release/m12. Jordan/Egypt Strait of Hormuz scenario: jordan_hormuz_scenario.py (JOR+EGY, 8 steps, fuel/food commodity shocks), demo_hormuz_jordan.py, docs/demo/m12/screenshot-brief.md (5 frames: instrument, escalation, divergence thesis, Mode 3 steering, all four axes), 67 unit tests. Two-entity scenario activates all four composite scores (Issue #193 guard lifted). G9 deferred to M13 (EL decision: option B). Wave C completed this session (NB-7, NB-6, NB-4, Mode 3 E2E + ia1_disclosure fix NM-036, cohort reconstruction fix, ARCH-007/ADR-013 filed). Internal demo from release/m12 is next.)**
 **Current milestone:** M12 — Active Control and External Sector (GitHub Milestone 13)
 **Previous milestone:** M11.5 — Usability Validation and Experience Audit (formally closed 2026-06-04; Issue #720 closed; GitHub Milestone 14 closed)
 
@@ -77,7 +77,7 @@ M9 formally closed. Issue #213 (M9 Exit Checklist) closed 2026-05-24. M10 milest
 
 ## Open PRs
 
-No open PRs — board clear as of 2026-06-06 (post PR #794 merge).
+No open PRs — board clear as of 2026-06-07 (post PR #796 merge).
 
 ## M11 Work Streams — 2026-06-04 Sprint
 
@@ -145,27 +145,23 @@ CI hotfix: NM-035 filed; `ci.yml` PR trigger updated to include `release/m*` (PR
 | G6a — Multi-country backend | #775 | #754 #103 | ✓ DONE |
 | G6b — Mode 3 Active Control | #778 | #753 | ✓ DONE |
 | G7 — Cloud compute path doc | #774 | #750 | ✓ DONE |
-| G8 — Demo 4 preparation | — | #755 | UNBLOCKED (Wave C complete 2026-06-06) |
-| G9 — Political economy module | — | ADR-013 | BLOCKED — ADR-013 not yet authored |
-| NB-7 — Mode 1 COMPARE_VIEW spec | #788 ✓ | #451 | ✓ DONE 2026-06-06 |
-| NB-6 — ESLint audit | #789 ✓ | #644 | ✓ DONE 2026-06-06 |
-| NB-4 — Investment climate variables | #790 ✓ | #34 | ✓ DONE 2026-06-06 |
-| Mode 3 E2E + backend fix | #794 ✓ | — | ✓ DONE 2026-06-06 (ia1_disclosure bug + 6 selector bugs; NM-036) |
-| Cohort reconstruction fix | — | #793 | ✓ DONE 2026-06-06 (web_scenario_runner.py + 12 tests) |
-| ARCH-007 / ADR-013 | #792 | — | ✓ DONE 2026-06-06 (backlog.md updated; ADR-013 assigned) |
+| NB-7 — Mode 1 COMPARE_VIEW spec | #788 | #451 | ✓ DONE |
+| NB-6 — ESLint audit (react-hooks/react-refresh) | #789 | #644 | ✓ DONE |
+| NB-4 — Investment climate state variables | #790 | #34 | ✓ DONE |
+| Mode 3 E2E fix + ia1_disclosure + cohort gap | #794 | #793 | ✓ DONE (NM-036 filed) |
+| G8 — Demo 4 preparation | #796 | #755 | ✓ DONE 2026-06-07 (Jordan/Egypt Hormuz; PR #796) |
+| G9 — Political economy module | — | ADR-013 | DEFERRED TO M13 (EL decision 2026-06-07: option B) |
 
-**Open tasks — completed before session close:**
-- ✅ PI Agent review of NM-035: all three process improvements confirmed closed (PI review complete 2026-06-06)
-- ✅ ARCH-007: Issue #792 filed; ADR-013 assigned in `docs/architecture/backlog.md`
-- ✅ Cohort entity reconstruction gap: `_inject_cohort_entities()` added after `_reconstruct_state_from_snapshot()` in `web_scenario_runner.py:289`; 12 regression tests in `test_cohort_reconstruction.py`
-- ✅ Mode 3 E2E (PR #794): mode3-active-control.spec.ts — 6 bugs fixed (wrong CSS class, select button, button label, step indicator testid, zone-control-plane duplication, fiscal-multiplier-slider duplication + React setter); plus ia1_disclosure NOT NULL bug in branch_scenario endpoint (NM-036 filed); all 66 Playwright tests passing
-- Phase 2 A/B report: `docs/architecture/performance/phase2-ab-comparison.md` still PENDING — deferred
+**Awaiting EL action:**
+- Internal demo from `release/m12` — all agents as participants; use `demo_hormuz_jordan.py` + live UI; surface issues before `release/m12` → `main` merge
+- Merge `release/m12` → `main` (EL admin action) after internal demo + any issue fixes
+- IR review from `main` (new session, fresh agent)
+- Stakeholder demo from `main`
 
-**Awaiting EL decision:**
-- G8 (Demo 4, Issue #755) scope — EL to give verdict; PM Agent panel (UX Designer + Business PO leading) recommended if holistic Demo 4 planning is desired
-- M12 feature inventory for demo-ability — PM Agent to build once EL endorses Demo 4 panel approach
-- Internal demo from `release/m12` (agent participants, surface issues pre-merge)
-- IR/stakeholder demo from `main` after milestone close merge
+**Pending process items:**
+- NM-037 filing — merge-before-all-CI protocol gap: PR #796 merged while backtesting was still running (CLAUDE.md "polls until `changes` passes" is technically compliant but creates a window; all checks ultimately passed, no damage)
+- Phase 2 A/B report: `docs/architecture/performance/phase2-ab-comparison.md` — PENDING (deferred multiple sessions)
+- NM-036 process improvement 2: branch snapshot endpoint integration test — not yet implemented
 
 ---
 
@@ -279,10 +275,13 @@ CI hotfix: NM-035 filed; `ci.yml` PR trigger updated to include `release/m*` (PR
 
 | PR | Title | Date |
 |---|---|---|
-| #794 | fix(e2e+api): Mode 3 E2E — 6 selector bugs + ia1_disclosure NOT NULL in branch_scenario endpoint (NM-036) | 2026-06-06 |
-| #790 | fix(tests): NB-4 investment climate — GRC/ARG fixtures + 41 unit tests + backtesting count fix (closes #34) | 2026-06-06 |
-| #789 | fix(frontend): NB-6 ESLint audit — 0-error target, rules-of-hooks structural fix, 15-file suppressions (closes #644) | 2026-06-06 |
-| #788 | docs(ux): NB-7 Mode 1 COMPARE_VIEW spec — inline picker, single-call API, US-049 (closes #451) | 2026-06-06 |
+| #796 | feat(demo): G8 — Jordan/Egypt Hormuz Demo 4 (closes #755) | 2026-06-07 |
+| #795 | chore(state): SESSION_STATE.md — NM-036 ia1_disclosure branch snapshot | 2026-06-07 |
+| #794 | fix(e2e+engine): Mode 3 E2E selector fix + ia1_disclosure copy + cohort reconstruction gap (closes #793) | 2026-06-07 |
+| #791 | chore(state): SESSION_STATE.md — Wave C complete (NB-4/NB-6/NB-7 merged) | 2026-06-07 |
+| #790 | feat(engine): NB-4 — investment climate state variables: sovereign_risk_premium, fdi_stock_pct_gdp, portfolio_flow_velocity, credit_rating_score (closes #34) | 2026-06-07 |
+| #789 | fix(frontend): NB-6 — ESLint audit: 80 violations in react-hooks, react-refresh, no-unused-expressions (closes #644) | 2026-06-07 |
+| #788 | docs(ux): NB-7 — Mode 1 COMPARE_VIEW spec: entry point, API design, Persona 3 user story (closes #451) | 2026-06-07 |
 | #778 | feat(mode3): G6b — Mode 3 Active Control branch-and-recompute (closes #753) | 2026-06-05 |
 | #775 | feat(engine): G6a — multi-country scenario backend, threshold_crossed, multi-entity choropleth + identity header | 2026-06-05 |
 | #774 | docs(arch): G7 — cloud compute path document (closes #750) | 2026-06-05 |
