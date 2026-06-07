@@ -289,6 +289,9 @@ class WebScenarioRunner:
             current_state = await _reconstruct_state_from_snapshot(
                 conn, scenario_id, row["name"], state_raw, snap_row["timestep"],
             )
+            # Cohort entities are not persisted in simulation_entities; re-inject
+            # them so DemographicModule sees a complete entity set at every step.
+            _inject_cohort_entities(current_state, config)
             # _reconstruct_state_from_snapshot always returns events=[].
             # Restore the scheduled inputs that fired at current_step as synthetic
             # prior events so MacroeconomicModule's one-step lag design sees them

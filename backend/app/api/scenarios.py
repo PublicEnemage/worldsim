@@ -1471,7 +1471,7 @@ async def branch_scenario(
 
         snapshot_rows = await conn.fetch(
             """
-            SELECT step, timestep, state_data, events_snapshot
+            SELECT step, timestep, state_data, events_snapshot, ia1_disclosure
             FROM scenario_state_snapshots
             WHERE scenario_id = $1 AND step <= $2
             ORDER BY step ASC
@@ -1489,14 +1489,15 @@ async def branch_scenario(
             await conn.execute(
                 """
                 INSERT INTO scenario_state_snapshots
-                    (scenario_id, step, timestep, state_data, events_snapshot)
-                VALUES ($1, $2, $3, $4, $5)
+                    (scenario_id, step, timestep, state_data, events_snapshot, ia1_disclosure)
+                VALUES ($1, $2, $3, $4, $5, $6)
                 """,
                 branch_id,
                 snap["step"],
                 snap["timestep"],
                 json.dumps(state_raw),
                 json.dumps(events_raw) if events_raw is not None else None,
+                snap["ia1_disclosure"],
             )
 
     return BranchResponse(
