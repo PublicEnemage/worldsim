@@ -165,7 +165,9 @@ def _format_months(value_str: str | None) -> str:
     if value_str is None:
         return "—"
     try:
-        return f"{float(value_str):.1f}mo"
+        # Floor at 0: negative reserves mean depleted (reserves exhausted, not negative).
+        # Engine does not enforce non-negativity — Issue #803.
+        return f"{max(0.0, float(value_str)):.1f}mo"
     except (ValueError, TypeError):
         return "—"
 
@@ -325,7 +327,10 @@ def _print_divergence_narrative(
 
 
 async def _run_demo() -> None:
+    from app.db.connection import create_asyncpg_pool
     from app.main import app as _app
+
+    await create_asyncpg_pool()
 
     _print_header()
 

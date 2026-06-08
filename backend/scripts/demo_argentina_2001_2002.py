@@ -266,7 +266,10 @@ def _print_divergence_narrative(outputs: list[dict[str, Any]]) -> None:
 
 
 async def _run_demo() -> None:
+    from app.db.connection import create_asyncpg_pool
     from app.main import app as _app
+
+    await create_asyncpg_pool()
 
     _print_header()
 
