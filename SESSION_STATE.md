@@ -150,16 +150,29 @@ CI hotfix: NM-035 filed; `ci.yml` PR trigger updated to include `release/m*` (PR
 | NB-4 — Investment climate state variables | #790 | #34 | ✓ DONE |
 | Mode 3 E2E fix + ia1_disclosure + cohort gap | #794 | #793 | ✓ DONE (NM-036 filed) |
 | G8 — Demo 4 preparation | #796 | #755 | ✓ DONE 2026-06-07 (Jordan/Egypt Hormuz; PR #796) |
+| G8b — Demo 4 critical fixes | #798 | DEMO4-001 DEMO4-002 | ✓ DONE 2026-06-07 (reserves + unemployment unfrozen; NM-037 NM-038 filed; Issue #799 opened) |
+| G8c — Internal review artifact | #801 | — | ✓ DONE 2026-06-07 (`docs/demo/m12/reviews/2026-06-07-v0.12.0-internal-review.md`; 9 findings) |
 | G9 — Political economy module | — | ADR-013 | DEFERRED TO M13 (EL decision 2026-06-07: option B) |
 
+**Internal demo — COMPLETE (command-line phase)**
+- `demo_hormuz_jordan.py` run from `release/m12` post-PR-#798. Scenario `937a7999-ce59-4e3f-bc12-100f0912327a`.
+- JOR reserves: 7.1→6.2→5.0→3.7→2.5→1.2→0.0→0.0 (CRITICAL MDA step 5 ✓)
+- JOR unemployment: 17.77%→18.26% spike at step 5 (fiscal cut Okun's law signal ✓)
+- EGY reserves: 5.3→4.8→3.9→2.9→2.0→1.1→0.1→0.1 (CRITICAL MDA step 5 ✓)
+- 1292 unit tests pass; ruff clean
+- To run demo: `cd backend && python -m scripts.demo_hormuz_jordan` (suppress SIM-INTEGRITY warnings with `2>/dev/null`)
+
 **Awaiting EL action:**
-- Internal demo from `release/m12` — all agents as participants; use `demo_hormuz_jordan.py` + live UI; surface issues before `release/m12` → `main` merge
-- Merge `release/m12` → `main` (EL admin action) after internal demo + any issue fixes
+- UI screenshot capture at 1440×900 per `docs/demo/m12/screenshot-brief.md` (5 frames) — requires EL browser session
+- Playwright legibility gates: `demo-legibility.spec.ts` and `demo-advancement-flow.spec.ts`
+- Investigate DEMO4-007 (ecological composite 50% drop at step 6) — before Frame E screenshot
+- Decision on DEMO4-005 (add `bottom_quintile_consumption_capacity` to output table before stakeholder demo)
+- Silence DEMO4-006 (`[SIM-INTEGRITY]` warnings) — verify if visible in Playwright screenshot environment
+- Merge `release/m12` → `main` (EL admin action) after screenshot gates clear
 - IR review from `main` (new session, fresh agent)
 - Stakeholder demo from `main`
 
 **Pending process items:**
-- NM-037 filing — merge-before-all-CI protocol gap: PR #796 merged while backtesting was still running (CLAUDE.md "polls until `changes` passes" is technically compliant but creates a window; all checks ultimately passed, no damage)
 - Phase 2 A/B report: `docs/architecture/performance/phase2-ab-comparison.md` — PENDING (deferred multiple sessions)
 - NM-036 process improvement 2: branch snapshot endpoint integration test — not yet implemented
 
