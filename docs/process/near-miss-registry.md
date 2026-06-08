@@ -1955,6 +1955,74 @@ There was no unit or integration test for the branch endpoint that would have ca
 
 ---
 
+## NM-037 — Demo Script Pool Initialization Gap: ASGITransport Does Not Trigger Lifespan (Reactive)
+
+**Date:** 2026-06-07
+**Milestone:** M12 — Active Control and External Sector
+**Detected by:** Demo 4 execution — `RuntimeError: asyncpg pool is not initialised` at `create_asyncpg_pool()` when running `demo_hormuz_jordan.py` in-session
+**Severity:** High
+
+### What happened
+
+Both demo scripts (`demo_hormuz_jordan.py`, `demo_argentina_2001_2002.py`) use `httpx.ASGITransport` to run the FastAPI application in-process without a live server. `ASGITransport` does not trigger FastAPI's `lifespan` context manager, so `create_asyncpg_pool()` (which runs at app startup via lifespan) was never called. The first API call in each demo script immediately failed with `RuntimeError: asyncpg pool is not initialised`.
+
+Both demo scripts had been shipped without ever being executed end-to-end with a live database — the `DATABASE_URL` guard causes them to exit silently without a live DB, which masked the pool initialization gap during development.
+
+### What was at risk
+
+Both demo scripts were non-functional when run against a real database. Demo 3 (M10, Argentina) and Demo 4 (M12, Jordan/Egypt) would have failed at the first API call, producing no demo output. This would have been discovered at demo preparation time — the worst possible moment.
+
+### What caught it
+
+Demo 4 execution attempt during M12 internal demo preparation (2026-06-07 session). The error was immediately surfaced because the session ran with `DATABASE_URL` set.
+
+### Process improvement
+
+1. **Immediate fix:** `await create_asyncpg_pool()` added at the top of `_run_demo()` in both demo scripts (PR #798). This initializes the pool before any ASGITransport request, mirroring what the lifespan handler would have done.
+
+2. **Demo script testing gap:** No CI job exercises demo scripts against a real database. Demo scripts are excluded from the test suite because they require a live DB. At minimum, each demo script should have a unit test that mocks the ASGITransport layer and verifies the `create_asyncpg_pool()` call occurs before the first API request. Filing as a test gap.
+
+3. **ASGITransport lifespan contract:** All future scripts that use `httpx.ASGITransport` against a FastAPI app with lifespan-initialized resources must manually invoke the initialization before the first request. This must be documented in `docs/CONTRIBUTING.md §Demo Scripts` or a similar reference so future demo script authors know the pattern. Filing as a documentation gap.
+
+---
+
+## NM-038 — ExternalSectorModule Emitted Events With No Consumer: Reserves and Unemployment Frozen (Reactive)
+
+**Date:** 2026-06-07
+**Milestone:** M12 — Active Control and External Sector
+**Detected by:** Demo 4 internal review — nine-agent panel; `reserve_coverage_months` and `unemployment_rate` columns frozen across all 8 steps
+**Severity:** Critical
+
+### What happened
+
+`ExternalSectorModule` (ADR-012, PR shipped in M12) emitted `import_price_inflation` events per commodity shock. The demo narrative required reserves to draw down as fuel costs rose — the fixture comment explicitly stated "The Hormuz fuel shock depletes reserves as import costs rise." But no module subscribed to `commodity_price_shock_*` events to translate them into `reserve_coverage_months` changes. The attribute was seeded at scenario creation and never modified.
+
+Similarly, `MacroeconomicModule` computed GDP deltas from fiscal/monetary events but emitted no Okun's law unemployment change. `unemployment_rate` was seeded at scenario start and never modified.
+
+Both attributes appeared frozen across all 8 steps in the demo output, making the primary demo visual argument (reserve drawdown arc, fiscal austerity impact) invisible.
+
+### What was at risk
+
+The Demo 4 primary narrative — "Jordan's reserve trajectory approaching the CRITICAL floor" (Frame C), "Reserve drawdown critical — both economies under stress" (Frame E) — was entirely invisible. The demo would have been presented with flat reserve and unemployment columns, failing to demonstrate the engine's analytical capability. The screenshot brief could not have been satisfied. Demo 4 would have been non-demonstrable.
+
+### What caught it
+
+Internal nine-agent review panel during Demo 4 execution (2026-06-07 session). Both `DEMO4-001 (CRITICAL)` and `DEMO4-002 (CRITICAL)` were identified in the first panel review before any screenshots were captured.
+
+### What was at risk (secondary)
+
+The ExternalSectorModule had been present in the codebase and its test suite passed — the unit tests verified that events were emitted, but no integration test verified that the emitted events produced observable downstream state changes (reserve drawdown, consumption capacity reduction). Tests validated event emission; tests did not validate end-to-end state propagation.
+
+### Process improvement
+
+1. **Immediate fix:** `ExternalSectorModule` now emits a `reserve_coverage_months` depletion event per commodity shock (burn rate coefficient 8.5). `MacroeconomicModule` now emits an `unemployment_rate_change` event via Okun's law (coefficient 0.5) when GDP changes (PR #798).
+
+2. **End-to-end propagation test gap:** Module unit tests verify event emission. No test verifies that emitted events produce observable state changes after propagation. For every new module capability that claims to affect a downstream indicator, there must be an integration test that: (a) runs a 1-step simulation with the module active, (b) asserts the downstream attribute changed in the expected direction. Filing as a test architecture gap.
+
+3. **Demo script acceptance gate:** Before any demo script is merged, it must be executed end-to-end with a live database and the output inspected against the screenshot brief. The current process treats demo scripts as documentation — they must be treated as runnable acceptance tests.
+
+---
+
 ## Registry Maintenance
 
 ### How to add an entry
