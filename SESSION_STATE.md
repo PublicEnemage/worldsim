@@ -162,7 +162,14 @@ CI hotfix: NM-035 filed; `ci.yml` PR trigger updated to include `release/m*` (PR
 - 1292 unit tests pass; ruff clean
 - To run demo: `cd backend && python -m scripts.demo_hormuz_jordan` (suppress SIM-INTEGRITY warnings with `2>/dev/null`)
 
+**Process redesign deliberation — ON MAIN (PR #803, 2026-06-08)**
+- `docs/process/design/2026-06-08-sprint-cadence-acceptance-gates-deliberation.md` — 590 lines
+- Full verbatim deliberation: PI Agent + BPO north star test, PM Agent sequencing proposal (Phase 0 + Phases A–D), 11 north star document gaps with failure mode mapping
+- Status: pre-endorsement — EL endorsement of sequencing plan is the next required action before any implementation begins
+- Also on `release/m12` via PR #802
+
 **Awaiting EL action:**
+- EL endorsement of process redesign sequencing plan (Phase 0 first, or Phases 0+A–D as single sprint?)
 - UI screenshot capture at 1440×900 per `docs/demo/m12/screenshot-brief.md` (5 frames) — requires EL browser session
 - Playwright legibility gates: `demo-legibility.spec.ts` and `demo-advancement-flow.spec.ts`
 - Investigate DEMO4-007 (ecological composite 50% drop at step 6) — before Frame E screenshot
