@@ -34,10 +34,23 @@ ExternalSectorModule demonstration (ADR-012):
   HCL transmission factor 0.3 → bottom-quintile consumption capacity reduced by
   30% of gross shock effect in human_development framework.
 
-Mode 3 steering scenario:
-  Begin at step 3 — what if Jordan secures emergency GCC reserve support?
-  Mode 3 branch: increase fiscal multiplier to 1.3 (demand stimulus via Gulf aid)
-  Branch trajectory shows the reserve pathway with vs. without the intervention.
+Mode 3 steering scenario (Issue #817):
+  The baseline already includes step 3 GCC emergency support (+6% GDP) alongside
+  the IMF program. The Mode 3 question is: "What if that GCC support was 30% more
+  effective — i.e., what if the fiscal multiplier on the Gulf aid was 1.30x rather
+  than the base depressed-regime 1.0x?"
+
+  UI instructions:
+    1. Load the scenario and advance to step 3 (or step 8, then rewind in the UI).
+    2. Click "Mode 3" in the header to open the Active Control panel.
+    3. Set "Fiscal Multiplier" slider to 1.30.
+    4. Set "Branch From Step" slider to 3.
+    5. Click "Apply Change" — the branch runs from step 3 with the GCC aid event
+       amplified by 1.30x. The step-4 austerity cut is NOT in the branch (it was
+       scheduled at step 4 > branch_from_step=3, so it was not copied).
+    6. Zone 1A shows the branch financial composite curve lifting above the baseline —
+       the reserve trajectory diverges upward as the amplified GCC aid reduces
+       the deficit and extends the reserve runway.
 
 Platform principle demonstration:
   The engine, instruments, and UX are invariant between Greece, Argentina, and Jordan.
@@ -75,7 +88,7 @@ _STEP_YEARS = {
 _STEP_LABELS = {
     1: "Hormuz disruption / fuel shock",
     2: "Food supply chain disruption",
-    3: "Dual shock peak / IMF program",
+    3: "Dual shock peak / IMF + GCC",
     4: "IMF conditionality austerity",
     5: "Reserve drawdown critical",
     6: "Hormuz resolution begins",
@@ -113,9 +126,10 @@ def _print_header() -> None:
         "\n  Step 2 (2025): Food supply chain disruption joins."
         "\n    Egypt faces the highest food import exposure (35% — world's largest wheat importer)."
         "\n    Food shock effect: EGY 0.053 / JOR 0.042 per step."
-        "\n  Step 3 (2026): Dual shock peak."
-        "\n    Jordan: IMF program engagement triggered by reserve drawdown."
+        "\n  Step 3 (2026): Dual shock peak — IMF program + GCC emergency support."
+        "\n    Jordan: IMF program engaged; GCC emergency disbursement (+6% GDP) also arrives."
         "\n    Egypt: Emergency declaration — bread subsidy pressure beyond fiscal capacity."
+        "\n    [Mode 3 demo anchor: branch from step 3 at 1.30x to show amplified GCC effect]"
         "\n  Step 4 (2027): IMF conditionality — Jordan austerity during peak shock."
         "\n  Step 5 (2028): Reserve drawdown critical — both economies under stress."
         "\n  Step 6 (2029): Hormuz resolution begins — shocks end."
