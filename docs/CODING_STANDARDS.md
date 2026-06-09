@@ -1304,6 +1304,17 @@ ADR spec, it is a behavioral contract change and requires an ADR amendment.
 
 ### Required Sections
 
+**Canonical template:** `docs/adr/template.md` — use this file as the starting point for all
+new ADRs. It includes the standard sections below plus the Phase 0-encoded `§Persona and UX
+Traceability` section (tier classification, persona trace, UX implication statement, silent
+failure mode, asymmetry assessment, north star test, mission impact statement). ADRs authored
+without using the template must still satisfy all template requirements.
+
+**Tier classification** is a required field in every ADR from Phase 0 forward. Tier 1 (UX
+Designer on panel), Tier 2 (persona trace reviewed by UX Designer), Tier 3 (infrastructure
+forward trace). See `docs/process/design/process-redesign-phase0-ux-traceability-spec.md`
+for the full tier classification criteria.
+
 ```markdown
 # ADR-NNN: Title
 
