@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-05 (NM-034 filed — PR #759 merged. PI Agent activated; NM registry no-delegation rule recorded as institutional memory. All three HORIZON sweep EL actions resolved: #744–#747 scope acknowledged; #725/#644 keep-as-is; RACI amended PR #758 + NM-034 PR #759.)**
+**Last updated: 2026-06-09 (Phase 0 of process redesign sprint complete. PRs #805–#808 merged. Three gaps closed: XD-2 (mission-to-implementation traceability — docs/adr/template.md), XD-1 (minister vs. specialist persona conflict — docs/ux/personas.md §Section 7), FD-1 (north star test as process gate — CLAUDE.md §North Star Test). Phase A sprint entry filed. Awaiting EL endorsement of Phase 0 exit artifact before Phase A opens.)**
 **Current milestone:** M12 — Active Control and External Sector (GitHub Milestone 13)
 **Previous milestone:** M11.5 — Usability Validation and Experience Audit (formally closed 2026-06-04; Issue #720 closed; GitHub Milestone 14 closed)
 
@@ -127,6 +127,36 @@ No open PRs — board clear as of 2026-06-04 (post PR #742 merge).
 
 ---
 
+## Process Redesign Sprint — Phase 0 Status
+
+**Phase 0: UX/Persona Traceability Upstream of ADR Development**  
+**Status:** Steps 1–5 COMPLETE — awaiting EL endorsement (Step 6)
+
+| Step | Agent | Output | PR | Status |
+|---|---|---|---|---|
+| 1 — DIC ROADMAP | Council Orchestrator | 20 binding guardrails + 8-item gap list + Section C requirements | #805 | ✅ Merged |
+| 2 — UX traceability spec | UX Designer | 3-tier ADR classification; 7-element UX implication statement; 4 hard UX invariants; Tension 1 resolution; XD-1 observations | #805 | ✅ Merged |
+| 3a — Persona traceability spec | Business PO | 7-element valid persona trace; 3-tier persona obligation; canonical cohort list; negotiating leverage statement spec | #806 | ✅ Merged |
+| 3b — Persona conflict resolution ruling | Business PO | `docs/ux/personas.md §Section 7` — Closes **XD-1** | #806 | ✅ Merged |
+| 4 — ADR template + canonical placement | Architect Agent | `docs/adr/template.md` + CODING_STANDARDS.md reference — Closes **XD-2** | #807 | ✅ Merged |
+| 5 — North star test process gate | PI Agent | `CLAUDE.md §North Star Test (Process Gate)` — Closes **FD-1**; 4 template enforcement amendments | #808 | ✅ Merged |
+| 6 — EL endorsement | EL | `docs/process/sprint-plans/process-redesign-phase0-exit.md §Part VI` | TBD | ⏳ Awaiting EL |
+
+**Phase A sprint entry filed:** `docs/process/sprint-plans/process-redesign-phaseA-sprint-entry.md` — Opens when EL endorses Phase 0.
+
+**Gaps closed:**
+
+| Gap | Closed by | Location |
+|---|---|---|
+| XD-2 — Mission-to-implementation traceability never required | ADR template (Step 4) | `docs/adr/template.md` |
+| XD-1 — Minister vs. specialist persona conflict unresolved | Persona conflict resolution ruling (Step 3) | `docs/ux/personas.md §Section 7` |
+| FD-1 — North star test has no process home | North star test process gate (Step 5) | `CLAUDE.md §North Star Test (Process Gate)` |
+
+**Awaiting EL action:** EL endorsement of Phase 0 exit artifact — `docs/process/sprint-plans/process-redesign-phase0-exit.md §Part VI`. Phase A cannot open until endorsement is recorded.
+
+---
+
+
 ## Closed — M11.5 (Usability Validation and Experience Audit)
 
 **Formally closed: 2026-06-04** | **North Star:** `docs/vision/milestone-11-5-north-star.md` | **GitHub Milestone:** 14 (closed)
@@ -237,6 +267,10 @@ No open PRs — board clear as of 2026-06-04 (post PR #742 merge).
 
 | PR | Title | Date |
 |---|---|---|
+| #808 | docs(process): Phase 0 Step 5 — north star test process gate (CLAUDE.md) and enforcement review | 2026-06-09 |
+| #807 | docs(process): Phase 0 Step 4 — ADR template with Phase 0 traceability requirements encoded | 2026-06-09 |
+| #806 | docs(process): Phase 0 Step 3 — persona traceability spec and conflict resolution ruling (XD-1) | 2026-06-09 |
+| #805 | docs(process): Phase 0 Steps 1–2 — DIC ROADMAP guardrails and UX traceability specification | 2026-06-09 |
 | #759 | process(integrity): NM-034 — PM Agent filed NM entries without PI activation | 2026-06-05 |
 | #758 | process(raci): NM registry no-delegation clause — PI Agent activation required before any NM entry | 2026-06-05 |
 | #756 | docs(roadmap): M12 scope linkage — all deliverables linked to GitHub issues (#749–#755) | 2026-06-05 |

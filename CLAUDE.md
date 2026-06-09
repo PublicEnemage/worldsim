@@ -475,6 +475,59 @@ contributors on modest hardware can run the complete test suite locally.
 See `docs/CONTRIBUTING.md §Equitable Build Process` for the full numbered
 requirements and implementation guidance.
 
+**ADR template — mandatory starting point for all new ADRs.**
+From Phase 0 forward, all new ADRs must be authored using `docs/adr/template.md` as the
+starting point. The template encodes Phase 0 traceability requirements: tier classification,
+persona trace, UX implication statement, silent failure mode, asymmetry assessment, north
+star test, and mission impact statement. An ADR that cannot satisfy all requirements for its
+tier is not ready for acceptance. The Architect determines tier classification at ADR
+initiation; the UX Designer sign-off is a hard precondition for Tier 1 acceptance — not a
+post-acceptance formality.
+
+**North Star Test (Process Gate)**
+
+The founding document's north star question — "Does this decision make the tool more useful to
+a finance minister sitting across from an IMF negotiating team, in that moment?" — is now a
+formal process artifact, not only an aspiration. This process gate closes gap FD-1: the north
+star test previously had no artifact form, no process home, and no named agent owner.
+
+**North star test artifact form:**
+A written assessment of ≤ one page that answers the north star question for a specific
+deliverable: naming the finance minister scenario (country, context, negotiation moment),
+the concrete capability being evaluated, and whether the capability changes what the minister's
+team can argue at the table. The assessment must be specific — "improves situational awareness"
+is not an answer. "The Zambian ministry analyst can now show that the Chinese bilateral lending
+opacity is a Structural Absence Declaration, not a model gap, and cite this in the restructuring
+session" is an answer.
+
+**Process home:**
+A north star test artifact is a required component of the sprint exit checklist for any sprint
+whose primary deliverable is a user-facing capability. The artifact must be filed before the
+sprint exit gate passes. It is part of the exit artifact, not a separate document. A sprint
+that closes without a north star test artifact on its user-facing capabilities has not
+completed its exit gate — PI Agent blocks exit gate confirmation until the artifact exists.
+
+**Agent authority:**
+- PI Agent holds R for ensuring the north star test artifact exists before a sprint exit gate
+  passes. PI Agent does not author the assessment — PI Agent confirms its existence and that
+  it is specific (not aspirational).
+- Business PO holds R for authoring the north star test artifact, with input from the DIC
+  agent most relevant to the capability being delivered.
+- The north star test artifact for each Tier 1 ADR is Element P-7 of the persona trace
+  (see `docs/adr/template.md §Persona and UX Traceability`). ADR-level north star tests
+  are authored by the ADR panel; sprint-level north star tests are authored by the Business PO.
+
+**What happens if the answer is "no":**
+If the north star test assessment for a sprint deliverable cannot answer the question
+affirmatively — if no concrete minister scenario is improved — the deliverable is not
+mission-complete. PI Agent escalates to Engineering Lead for a scope decision: either the
+scope is modified until the test can be answered, or the deliverable is reclassified as
+infrastructure (Tier 3, which does not require a sprint-level north star test — only a
+forward trace to the downstream capability that will eventually pass the test).
+
+**Template reference:** `docs/adr/template.md §North Star Test` for ADR-level implementation.
+**Phase 0 authority:** `docs/process/sprint-plans/process-redesign-phase0-sprint-entry.md §Output 3`.
+
 ---
 
 ## Standards and Conventions
