@@ -395,6 +395,7 @@ def build_jordan_hormuz_demo_scenario() -> ScenarioCreateRequest:
       - elite_capture_coefficient seeds (JOR: 0.45; EGY: 0.62 — Tier 4 synthetic)
       - political_context for JOR (constitutional monarchy context)
       - step_metadata with SIGNIFICANT/CRITICAL labels for steps 1–6
+      - GCC emergency budget support at step 3 (+6% GDP — Mode 3 demo anchor)
 
     Composite score status (M12):
       Financial       — live (percentile rank; JOR + EGY ≥2 entities, Issue #193)
@@ -405,14 +406,24 @@ def build_jordan_hormuz_demo_scenario() -> ScenarioCreateRequest:
     Step arc:
       Step 1 (2024): Hormuz disruption — fuel shock starts (SIGNIFICANT)
       Step 2 (2025): Food supply chain disruption joins (SIGNIFICANT)
-      Step 3 (2026): Dual shock peak — JOR IMF program / EGY emergency (CRITICAL)
+      Step 3 (2026): Dual shock peak — JOR IMF program + GCC emergency support /
+                     EGY emergency declaration (CRITICAL)
       Step 4 (2027): IMF conditionality — austerity during shock (SIGNIFICANT)
       Step 5 (2028): Reserve drawdown critical — both countries stressed (CRITICAL)
       Step 6 (2029): Hormuz resolution begins — shocks end (SIGNIFICANT)
       Step 7 (2030): Post-shock recovery (ROUTINE — no label)
       Step 8 (2031): Stabilization assessment (ROUTINE — no label)
 
-    References: ADR-012; Issue #793; build_jordan_hormuz_scenario() (base).
+    Mode 3 demo (Issue #817):
+      Branch from step 3 at fiscal_multiplier=1.30.
+      Baseline: Jordan secures initial GCC emergency disbursement (+6% GDP) alongside
+      the IMF program. Mode 3 question: "What if Jordan had negotiated 30% more effective
+      fiscal support?" The branch trajectory shows the reserve arc under 1.30x GCC aid
+      and without the step-4 IMF conditionality austerity cut (not copied to branch since
+      it is at step 4 > branch_from_step=3). This produces a visible trajectory divergence:
+      the financial composite curve lifts away from the baseline in the Zone 1A chart.
+
+    References: ADR-012; Issue #793; Issue #817; build_jordan_hormuz_scenario() (base).
     """
     base = build_jordan_hormuz_scenario()
 
@@ -540,7 +551,7 @@ def build_jordan_hormuz_demo_scenario() -> ScenarioCreateRequest:
     step_metadata = {
         "1": {"significance": "SIGNIFICANT", "label": "Hormuz disruption / fuel shock"},
         "2": {"significance": "SIGNIFICANT", "label": "Food supply chain disruption"},
-        "3": {"significance": "CRITICAL", "label": "Dual shock peak / IMF program"},
+        "3": {"significance": "CRITICAL", "label": "Dual shock peak / IMF + GCC"},
         "4": {"significance": "SIGNIFICANT", "label": "IMF conditionality austerity"},
         "5": {"significance": "CRITICAL", "label": "Reserve drawdown critical"},
         "6": {"significance": "SIGNIFICANT", "label": "Hormuz resolution begins"},
@@ -578,6 +589,27 @@ def build_jordan_hormuz_demo_scenario() -> ScenarioCreateRequest:
         }
     )
 
+    # GCC emergency budget support — Mode 3 demo anchor (Issue #817).
+    # Saudi Arabia and Gulf states historically provide multi-billion emergency packages
+    # to Jordan in sovereign debt stress episodes. $3bn ≈ 6% of Jordan's 2024 GDP ($50bn).
+    # Fires at step 3 alongside IMF program acceptance — the dual support represents the
+    # policy response available to a well-connected MENA sovereign under external pressure.
+    # Confidence tier 4: constructed scenario assumption (no real-data source for this event).
+    # Mode 3 use: branch from step 3 at 1.30x fiscal multiplier amplifies the GCC aid.
+    # The step-4 austerity cut is NOT in the branch (step 4 > branch_from_step=3),
+    # so the branch shows both more GCC support AND no IMF conditionality — the
+    # "negotiated-better-deal" counterfactual. See Issue #817 for the investigation.
+    gcc_emergency_input = ScheduledInputSchema(
+        step=3,
+        input_type="FiscalPolicyInput",
+        input_data={
+            "instrument": "spending_change",
+            "target_entity": "JOR",
+            "value": "0.06",
+            "duration_years": 1,
+        },
+    )
+
     return base.model_copy(update={
         "name": "Jordan/Egypt 2024 Hormuz Demo 4 — Multi-Framework ExternalSector",
         "description": (
@@ -588,8 +620,11 @@ def build_jordan_hormuz_demo_scenario() -> ScenarioCreateRequest:
             "Composite scores live for all four axes (JOR + EGY ≥2 entities, Issue #193). "
             "Egypt (EGY) governance already below MDA-GOV-DEMOCRACY-FLOOR (0.07 < 0.70) "
             "— alert fires from step 1; emergency_declaration at step 3 deepens it. "
-            "Jordan (JOR) reserve pressure drives IMF engagement at step 3. "
-            "Mode 3 steering demonstration: GCC emergency aid branch at step 3. "
+            "Jordan (JOR) reserve pressure drives IMF engagement at step 3; GCC emergency "
+            "budget support (+6% GDP) also fires at step 3 (bilateral sovereign support). "
+            "Mode 3 demo (Issue #817): branch from step 3 at 1.30x fiscal multiplier — "
+            "'what if Jordan secured 30% more GCC support and avoided IMF austerity?' "
+            "Produces visible trajectory divergence from step 4 onward. "
             "Initial state: IMF WEO April 2024 + DOS LFS Q1 2024 (JOR) "
             "+ CAPMAS LFS Q1 2024 (EGY) + WDI 2022 + CBJ 2023 + CBE/IMF 2024 "
             "+ WB 2023 energy trade + WFP 2024 food basket "
@@ -598,4 +633,5 @@ def build_jordan_hormuz_demo_scenario() -> ScenarioCreateRequest:
             "+ V-Dem v14 2023 (democratic_quality: JOR=0.21, EGY=0.07)."
         ),
         "configuration": demo_config,
+        "scheduled_inputs": list(base.scheduled_inputs) + [gcc_emergency_input],
     })

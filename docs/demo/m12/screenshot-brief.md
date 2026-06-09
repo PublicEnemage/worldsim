@@ -120,7 +120,7 @@ divergence readable — JOR and EGY financial composites moving in opposite dire
 despite facing the same global shock.
 
 **Zone 1 requirements:**
-- 1A (Trajectory View): Step 3 labeled "Dual shock peak / IMF program." Two entity
+- 1A (Trajectory View): Step 3 labeled "Dual shock peak / IMF + GCC." Two entity
   trajectory bundles visibly diverging. Jordan financial/reserve curve approaching the
   CRITICAL floor visible in the display. Egypt human_development curve at its steepest
   descent. The divergence between the two entity postures is the dominant compositional
@@ -169,7 +169,7 @@ to avoid the reserve CRITICAL floor?"
   Two trajectories for Jordan: baseline (original) and Mode 3 branch (GCC aid scenario).
   The branch trajectory should show the reserve-linked financial curve diverging
   upward from the baseline — the intervention is visible as a trajectory split.
-  Step annotation "Dual shock peak / IMF program" remains legible.
+  Step annotation "Dual shock peak / IMF + GCC" remains legible.
 - Control Plane Zone: Fiscal multiplier slider at 1.3. "Apply Change" button visible.
   The Mode 3 toggle in its active state. Recompute badge cleared (not "Recomputing...").
 - 1B (MDA Alert Panel): If the branch trajectory clears the reserve CRITICAL threshold,

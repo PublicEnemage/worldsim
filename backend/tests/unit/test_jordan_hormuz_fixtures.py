@@ -704,3 +704,56 @@ def test_demo_inherits_base_scheduled_inputs() -> None:
     assert base_inputs.issubset(demo_inputs), (
         f"Demo scenario is missing base inputs: {base_inputs - demo_inputs}"
     )
+
+
+def test_demo_has_gcc_emergency_spending_at_step3_for_jor() -> None:
+    """Demo adds GCC emergency support at step 3 for JOR — Mode 3 demo anchor (Issue #817).
+
+    The GCC spending event (+6% GDP) is the positive fiscal input that the Mode 3
+    fiscal multiplier amplifies. Without this, branching from step 3 at 1.30x
+    would only amplify the existing austerity cut (negative spending), producing
+    the wrong direction and invisible divergence.
+    """
+    demo = build_jordan_hormuz_demo_scenario()
+    gcc_inputs = [
+        si for si in demo.scheduled_inputs
+        if si.step == 3
+        and si.input_type == "FiscalPolicyInput"
+        and si.input_data.get("instrument") == "spending_change"
+        and si.input_data.get("target_entity") == "JOR"
+    ]
+    assert len(gcc_inputs) == 1
+    gcc = gcc_inputs[0]
+    assert Decimal(gcc.input_data["value"]) > Decimal("0"), (
+        "GCC emergency spending must be positive (stimulus, not austerity)"
+    )
+    assert Decimal(gcc.input_data["value"]) == Decimal("0.06"), (
+        "GCC emergency support must be 6% of GDP (Tier 4 scenario assumption — $3bn / $50bn)"
+    )
+
+
+def test_demo_gcc_input_not_in_base() -> None:
+    """GCC emergency input is demo-only — base fixture has no step-3 fiscal inputs."""
+    base = build_jordan_hormuz_scenario()
+    base_fiscal_step3 = [
+        si for si in base.scheduled_inputs
+        if si.step == 3 and si.input_type == "FiscalPolicyInput"
+    ]
+    assert len(base_fiscal_step3) == 0, (
+        "Base fixture must not have step-3 FiscalPolicyInput — GCC aid is demo-only"
+    )
+
+
+def test_demo_has_four_scheduled_inputs_total() -> None:
+    """Demo has base 3 inputs + 1 GCC input = 4 total scheduled inputs."""
+    demo = build_jordan_hormuz_demo_scenario()
+    assert len(demo.scheduled_inputs) == 4, (
+        f"Demo must have 4 scheduled inputs (3 base + 1 GCC); got {len(demo.scheduled_inputs)}"
+    )
+
+
+def test_demo_step3_label_references_gcc() -> None:
+    """Step 3 label must reference GCC support (updated from 'IMF program' only)."""
+    demo = build_jordan_hormuz_demo_scenario()
+    label = demo.configuration.step_metadata["3"]["label"]
+    assert "GCC" in label, f"Step 3 label must reference GCC: {label!r}"
