@@ -2051,3 +2051,88 @@ indicators, declares its own limitations explicitly, and is optimized for
 the hardware and analytical capacity that resource-constrained finance
 ministries actually have — not for the well-resourced institutions already
 well-served by existing tools.
+
+---
+
+## Section 7 — Persona Conflict Resolution
+
+> **Authored by:** Business PO  
+> **Date:** 2026-06-09  
+> **Phase 0 context:** Output 2 of Phase 0 — closes gap XD-1 (founding document north star figure vs. UX north star canonical user conflict, unreconciled)  
+> **Status:** Authoritative ruling — applies at ADR authorship time and at sprint review time  
+> **Cross-references:** `docs/process/design/process-redesign-phase0-persona-traceability-spec.md`, `docs/ux/north-star.md §The Canonical User`
+
+### The Conflict Being Resolved
+
+The founding document's north star test names "a finance minister of a small, vulnerable country sitting across from an IMF negotiating team" as the reference figure. This is **Persona 5** — Aicha Mbaye, IMF Executive Board Member / Institutional Decision-Maker.
+
+The UX north star names "a debt restructuring specialist at a finance ministry" as the canonical user. This is **Persona 2** — Eleni Papadimitriou, Deputy Director, Ministry of Finance, Finance Ministry Negotiator.
+
+When ADR authorship panels, UX design decisions, and sprint reviews face a choice where serving one persona well means serving the other less well, the question has been resolved differently in different sessions — whichever persona was more convenient for the capability being built. Gap XD-1 names this as a root cause of inconsistent design direction.
+
+This section is the authoritative resolution. It governs any future decision where the two personas' requirements conflict.
+
+---
+
+### The Resolution
+
+#### The personas play different roles in the tool's mission — they are not design competitors
+
+Persona 5 (finance minister) is the **mission beneficiary and north star validation reference**. She is not the operational user of the tool. She benefits when Persona 2 can use the tool effectively on her behalf. The founding document's north star test — "does this make the tool more useful to that person in that moment?" — uses Persona 5 as the evaluation frame, not as the design subject.
+
+Persona 2 (specialist) is the **primary design subject**. She operates the tool. She is in the negotiation room with a tablet. She prepared the analysis the night before. She is citing the finding. The instrument cluster, the information hierarchy, the time constraints, and the alert specificity are all designed for her operational requirements.
+
+This distinction resolves most apparent conflicts before they become genuine design choices: capabilities designed for Persona 2's operational needs automatically serve Persona 5's mission needs through Persona 2's work.
+
+#### When genuine conflict exists: the priority hierarchy
+
+Genuine persona conflict occurs at specific design choices where Persona 2's operational requirement and Persona 5's orientation or trust requirement cannot both be satisfied simultaneously. The three classes of genuine conflict are:
+
+**Class A — Alert panel information density:** Persona 2 needs full citation-quality specificity (indicator, step, cohort, severity, causal attribution). Persona 5 needs a signal-level read (severity direction, plain-language implication) without cognitive overload in a 5-minute demonstration context.
+
+**Ruling on Class A:** Persona 2's citation-quality requirements govern alert panel design. Persona 5's orientation requirement is satisfied by the severity label and indicator name being legible at a glance — which Persona 2's design already requires. The alert panel carries the full information Persona 2 needs; a cold reader (Persona 5) can orient from severity and indicator name alone without processing the full row. No sacrifice of Persona 2's requirements is warranted.
+
+**Class B — Zone 1 primary viewport display:** Persona 2 needs the primary viewport to support her most demanding active-query task in Reactive state. Persona 5 needs to orient to Zone 1 within 60 seconds without prior tool training (Journey D cold-reader requirement).
+
+**Ruling on Class B:** Persona 2's operational requirements govern Zone 1 layout and instrument content. A floor constraint applies: every Zone 1 element must carry a self-describing label and visual treatment that allows a cold observer to read it correctly with one explanatory sentence from a driver. This floor is not a Persona 5 concession at Persona 2's expense — it is a legibility standard that serves both. A Zone 1 element that requires prior training to interpret has also failed Persona 2's criterion for communicating findings to counterparties who were not briefed. The floor and the operational requirement are not in conflict.
+
+**Class C — Uncertainty disclosure format and depth:** Persona 5 in a demonstrative context needs compressed disclosure that fits within a one-sentence finding without triggering confusion. Persona 2 needs sufficient disclosure depth to cite with epistemic precision. (Full resolution in UX Designer Step 2 Tension 1 ruling: confidence tier parenthetical — "(Tier 2 — World Bank WDI)" — satisfies both within the one-sentence finding format.)
+
+**Ruling on Class C:** The Step 2 parenthetical format is adopted as the standard for uncertainty disclosure in compressed contexts. For Tier 3 data, the word "synthetic" must appear verbatim in the parenthetical regardless of which persona is the primary audience. Persona 5's comfort with the disclosure is not a reason to omit or soften it.
+
+#### The north star test reference
+
+The founding document's north star test continues to use Persona 5 as the evaluation reference:
+
+> "Does this decision make the tool more useful to a finance minister sitting across from an IMF negotiating team, in that moment?"
+
+This is the test applied in the Phase 0 exit artifact's north star validation question, in sprint review sign-offs, and in ADR acceptance (Element P-7 of the persona trace). Persona 5 is the north star test reference. Persona 2 is the primary design subject. These are two distinct roles, and both are required.
+
+An ADR or sprint deliverable that serves Persona 2 well (operational, fast, citation-complete) but cannot pass the Persona 5 north star test ("does this help the minister?") has identified a capability that may be technically correct but mission-misaligned. The converse is also true: a deliverable that passes the Persona 5 test aspirationally but is inoperable for Persona 2 in Reactive state has built for the wrong subject.
+
+---
+
+### Priority Summary Table
+
+| Decision domain | Governs | Hard floor |
+|---|---|---|
+| Zone 1 layout and instrument content | Persona 2 (operational requirements in Reactive state) | Zone 1 elements self-describing to cold reader in ≤1 sentence per instrument |
+| Alert panel information density and specificity | Persona 2 (citation-quality requirements) | Severity label and indicator name legible at a glance without full row processing |
+| Information hierarchy zone assignments | Persona 2 via `information-hierarchy.md` | HCL equal visual weight invariant (supersedes both personas — Engineering Lead exception required to modify) |
+| Uncertainty disclosure format | Parenthetical format satisfies both — no conflict | "Synthetic" verbatim for Tier 3 data regardless of persona |
+| Mode 3 and control plane | Persona 2 exclusively — Persona 5 has no Mode 3 journey | Not applicable |
+| North star test reference | Persona 5 — the mission evaluation frame | North star test must be answered for every Tier 1 ADR (Element P-7) |
+
+---
+
+### What This Ruling Does Not Resolve
+
+This ruling does not establish precedence for all nine personas in all conflict scenarios. It resolves the specific XD-1 conflict: founding document north star (Persona 5) vs. UX canonical user (Persona 2). Conflicts involving other persona pairs (e.g., Persona 3 political advisor vs. Persona 2 for Mode 1 comparative case surface; Persona 6 journalist vs. Persona 2 for plain-language alert text) are not addressed here and are left to the relevant ADR authorship panels, informed by the general principle that the tool's primary operational context is sovereign debt negotiation support and persona pairs should be resolved in that direction when in doubt.
+
+---
+
+### Amendment Record
+
+| Date | Amendment | Authority |
+|---|---|---|
+| 2026-06-09 | Initial ruling — Phase 0 Output 2, closes gap XD-1 | Business PO (Phase 0) |
