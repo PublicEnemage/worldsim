@@ -18,6 +18,12 @@ prerequisite-sources:
 > The tier classification section (below) determines which sections are required.
 > Before filling in any section, read `docs/ux/personas.md §Persona Conflict Resolution`
 > to understand the persona priority hierarchy that governs when persona requirements conflict.
+>
+> **Tier reclassification rule:** Deleting sections that the template marks as required for
+> your tier — on the basis that you have reclassified the ADR to a lower tier — requires
+> Architect sign-off recorded in the ADR before those sections are removed. Do not delete
+> required sections without that sign-off. Misclassification to avoid traceability requirements
+> is a process violation.
 
 ---
 
@@ -154,6 +160,9 @@ prerequisite-sources:
 [Named journeys and steps from `user-journeys.md` served or modified. For each: what the user can now do that was previously unavailable or impeded. If closing a `[Near-Term-Gap]` or `[Phase-3-TBD]` item, reference it explicitly.]
 
 **UX Designer sign-off:**  
+This sign-off is a precondition for the acceptance vote. An ADR with an unchecked UX Designer
+sign-off cannot proceed to acceptance vote and cannot be given `Accepted` status.
+
 `[ ]` UX Designer: UX implication statement elements 1–7 confirmed complete. [Date]
 
 ---
@@ -176,6 +185,10 @@ prerequisite-sources:
 ["After accessing this capability, Persona 2 can make the following specific argument: [statement]."]
 
 **UX Designer review:**  
+A Tier 2 ADR that proceeds to acceptance vote without a completed UX Designer sign-off
+confirmation is in violation of the process. PI Agent holds R for blocking the vote if
+sign-off is absent.
+
 `[ ]` UX Designer: Elements P-1–P-5 (and P-6 if applicable) confirmed present and adequate. [Date]  
 Or: "UX Designer review: persona trace incomplete. Missing: [elements]. Blocked from acceptance until remediated."
 
@@ -187,7 +200,10 @@ Or: "UX Designer review: persona trace incomplete. Missing: [elements]. Blocked 
 
 "This ADR does not directly serve a named persona. It enables [capability description], which will serve [Persona N in entry state X, Journey Y Step Z]. The Tier 1/Tier 2 ADR for that capability is [ADR-N / TBD]."
 
-If TBD: note this as an open obligation. The infrastructure capability is not mission-complete until the Tier 1/Tier 2 ADR for the downstream user-facing capability is authored and accepted.
+If TBD: note this as an open obligation and create a GitHub Issue to track it. The infrastructure
+capability is not mission-complete until the Tier 1/Tier 2 ADR for the downstream user-facing
+capability is authored and accepted. Reference the GitHub Issue number in this section so the
+obligation is tracked beyond the ADR document itself.
 
 ---
 
@@ -211,7 +227,7 @@ If TBD: note this as an open obligation. The infrastructure capability is not mi
 
 ## North Star Test
 
-> *Required for Tier 1 ADRs. Recommended for Tier 2. Authority: DIC Roadmap Section C, C-3; CLAUDE.md §North Star Test (Process Gate) once Phase 0 Step 5 is complete.*
+> *Required for Tier 1 ADRs. Encouraged for Tier 2 (not a blocking gate for Tier 2 acceptance, but absence should be explained). Authority: DIC Roadmap Section C, C-3; CLAUDE.md §North Star Test (Process Gate).*
 
 [One paragraph answering: "Does this decision make the tool more useful to a finance minister sitting across from an IMF negotiating team, in that moment?" Name a specific scenario. Name what the minister or her specialist can now do. Name whether this closes an asymmetry gap.]
 
