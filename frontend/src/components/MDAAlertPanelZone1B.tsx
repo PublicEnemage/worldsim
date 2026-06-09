@@ -14,6 +14,7 @@
  *
  * Implements: ADR-008 Decision 5, FA brief §Layout and Viewport (UD-F1 compact row format)
  */
+import { useEffect, useRef } from "react";
 import { useScenarioStepStore, type Zone1BAlert } from "../store/scenarioStepStore";
 import { getIndicatorDisplayNameAny } from "../lib/indicatorDisplayNames";
 
@@ -154,6 +155,13 @@ interface AlertDetailPanelProps {
 function AlertDetailPanel({ alert, onClose }: AlertDetailPanelProps) {
   const { trajectory } = useScenarioStepStore();
   const color = SEVERITY_COLOR[alert.severity];
+  const panelRef = useRef<HTMLDivElement>(null);
+
+  // Scroll into view on mount — Zone 1B is ~135px tall so the detail panel
+  // renders below the fold when 3 alerts already fill the visible area (#814).
+  useEffect(() => {
+    panelRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }, []);
 
   // Human-readable name: frontend registry takes precedence over backend title-case
   const displayName = getIndicatorDisplayNameAny(alert.indicator_key);
@@ -194,6 +202,7 @@ function AlertDetailPanel({ alert, onClose }: AlertDetailPanelProps) {
 
   return (
     <div
+      ref={panelRef}
       data-testid="alert-detail-panel"
       data-alert-id={alert.mda_id}
       style={{
