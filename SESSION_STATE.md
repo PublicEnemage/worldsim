@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-07 (G8 Demo 4 complete. PR #796 merged to release/m12. Jordan/Egypt Strait of Hormuz scenario: jordan_hormuz_scenario.py (JOR+EGY, 8 steps, fuel/food commodity shocks), demo_hormuz_jordan.py, docs/demo/m12/screenshot-brief.md (5 frames: instrument, escalation, divergence thesis, Mode 3 steering, all four axes), 67 unit tests. Two-entity scenario activates all four composite scores (Issue #193 guard lifted). G9 deferred to M13 (EL decision: option B). Wave C completed this session (NB-7, NB-6, NB-4, Mode 3 E2E + ia1_disclosure fix NM-036, cohort reconstruction fix, ARCH-007/ADR-013 filed). Internal demo from release/m12 is next.)**
+**Last updated: 2026-06-09 (Phase 0 of process redesign sprint complete. Steps 1–5 merged to release/m12 via PRs #805–#808. Three gaps closed: XD-2 (mission-to-implementation traceability — docs/adr/template.md), XD-1 (minister vs. specialist persona conflict — docs/ux/personas.md §Section 7), FD-1 (north star test as process gate — CLAUDE.md §North Star Test). Phase A sprint entry filed. Awaiting EL endorsement of Phase 0 exit artifact before Phase A opens.)**
 **Current milestone:** M12 — Active Control and External Sector (GitHub Milestone 13)
 **Previous milestone:** M11.5 — Usability Validation and Experience Audit (formally closed 2026-06-04; Issue #720 closed; GitHub Milestone 14 closed)
 
@@ -154,6 +154,33 @@ CI hotfix: NM-035 filed; `ci.yml` PR trigger updated to include `release/m*` (PR
 | G8c — Internal review artifact | #801 | — | ✓ DONE 2026-06-07 (`docs/demo/m12/reviews/2026-06-07-v0.12.0-internal-review.md`; 9 findings) |
 | G9 — Political economy module | — | ADR-013 | DEFERRED TO M13 (EL decision 2026-06-07: option B) |
 
+## Process Redesign Sprint — Phase 0 Status
+
+**Phase 0: UX/Persona Traceability Upstream of ADR Development**  
+**Status:** Steps 1–5 COMPLETE — awaiting EL endorsement (Step 6)
+
+| Step | Agent | Output | PR | Status |
+|---|---|---|---|---|
+| 1 — DIC ROADMAP | Council Orchestrator | 20 binding guardrails + 8-item gap list + Section C requirements | #805 | ✅ Merged |
+| 2 — UX traceability spec | UX Designer | 3-tier ADR classification; 7-element UX implication statement; 4 hard UX invariants; Tension 1 resolution; XD-1 observations | #805 | ✅ Merged |
+| 3a — Persona traceability spec | Business PO | 7-element valid persona trace; 3-tier persona obligation; canonical cohort list; negotiating leverage statement spec | #806 | ✅ Merged |
+| 3b — Persona conflict resolution ruling | Business PO | `docs/ux/personas.md §Section 7` — Closes **XD-1** | #806 | ✅ Merged |
+| 4 — ADR template + canonical placement | Architect Agent | `docs/adr/template.md` + CODING_STANDARDS.md reference — Closes **XD-2** | #807 | ✅ Merged |
+| 5 — North star test process gate | PI Agent | `CLAUDE.md §North Star Test (Process Gate)` — Closes **FD-1**; 4 template enforcement amendments | #808 | ✅ Merged |
+| 6 — EL endorsement | EL | `docs/process/sprint-plans/process-redesign-phase0-exit.md §Part VI` | TBD | ⏳ Awaiting EL |
+
+**Phase A sprint entry filed:** `docs/process/sprint-plans/process-redesign-phaseA-sprint-entry.md` — Opens when EL endorses Phase 0.
+
+**Gaps closed:**
+
+| Gap | Closed by | Location |
+|---|---|---|
+| XD-2 — Mission-to-implementation traceability never required | ADR template (Step 4) | `docs/adr/template.md` |
+| XD-1 — Minister vs. specialist persona conflict unresolved | Persona conflict resolution ruling (Step 3) | `docs/ux/personas.md §Section 7` |
+| FD-1 — North star test has no process home | North star test process gate (Step 5) | `CLAUDE.md §North Star Test (Process Gate)` |
+
+---
+
 **Internal demo — COMPLETE (command-line phase)**
 - `demo_hormuz_jordan.py` run from `release/m12` post-PR-#798. Scenario `937a7999-ce59-4e3f-bc12-100f0912327a`.
 - JOR reserves: 7.1→6.2→5.0→3.7→2.5→1.2→0.0→0.0 (CRITICAL MDA step 5 ✓)
@@ -169,7 +196,7 @@ CI hotfix: NM-035 filed; `ci.yml` PR trigger updated to include `release/m*` (PR
 - Also on `release/m12` via PR #802
 
 **Awaiting EL action:**
-- EL endorsement of process redesign sequencing plan (Phase 0 first, or Phases 0+A–D as single sprint?)
+- **EL endorsement of Phase 0 exit artifact** — `docs/process/sprint-plans/process-redesign-phase0-exit.md §Part VI`. Phase A cannot open until endorsement is recorded. This is exit gate condition 3.
 - UI screenshot capture at 1440×900 per `docs/demo/m12/screenshot-brief.md` (5 frames) — requires EL browser session
 - Playwright legibility gates: `demo-legibility.spec.ts` and `demo-advancement-flow.spec.ts`
 - Investigate DEMO4-007 (ecological composite 50% drop at step 6) — before Frame E screenshot
@@ -295,6 +322,10 @@ CI hotfix: NM-035 filed; `ci.yml` PR trigger updated to include `release/m*` (PR
 
 | PR | Title | Date |
 |---|---|---|
+| #808 | docs(process): Phase 0 Step 5 — north star test process gate (CLAUDE.md) and enforcement review | 2026-06-09 |
+| #807 | docs(process): Phase 0 Step 4 — ADR template with Phase 0 traceability requirements encoded | 2026-06-09 |
+| #806 | docs(process): Phase 0 Step 3 — persona traceability spec and conflict resolution ruling (XD-1) | 2026-06-09 |
+| #805 | docs(process): Phase 0 Steps 1–2 — DIC ROADMAP guardrails and UX traceability specification | 2026-06-09 |
 | #796 | feat(demo): G8 — Jordan/Egypt Hormuz Demo 4 (closes #755) | 2026-06-07 |
 | #795 | chore(state): SESSION_STATE.md — NM-036 ia1_disclosure branch snapshot | 2026-06-07 |
 | #794 | fix(e2e+engine): Mode 3 E2E selector fix + ia1_disclosure copy + cohort reconstruction gap (closes #793) | 2026-06-07 |
