@@ -47,10 +47,14 @@ Usage:
   cd backend
   DATABASE_URL=postgresql://... python scripts/demo_hormuz_jordan.py
 
+  Pass --keep to skip cleanup and view the scenario in the UI:
+  DATABASE_URL=postgresql://... python scripts/demo_hormuz_jordan.py --keep
+
   Without DATABASE_URL the script skips gracefully with an explanation.
 """
 from __future__ import annotations
 
+import argparse
 import asyncio
 import os
 import sys
@@ -326,7 +330,7 @@ def _print_divergence_narrative(
     print()
 
 
-async def _run_demo() -> None:
+async def _run_demo(*, keep: bool = False) -> None:
     from app.db.connection import create_asyncpg_pool
     from app.main import app as _app
 
@@ -407,16 +411,40 @@ async def _run_demo() -> None:
                 print(f"  {ia1}")
                 print()
 
-        print("Cleaning up demo scenario...")
-        await client.delete(f"/api/v1/scenarios/{scenario_id}")
-        print("Done.")
+        if keep:
+            ui_url = f"http://localhost:5173/?scenario={scenario_id}"
+            print("=" * 80)
+            print("SCENARIO KEPT — skipping cleanup (--keep flag active)")
+            print(f"  Scenario ID : {scenario_id}")
+            print(f"  Open in UI  : {ui_url}")
+            print("=" * 80)
+            print()
+            print("Open the URL above in your browser. The frontend must be running")
+            print("(docker compose up, or npm run dev in frontend/).")
+            print()
+            print("To delete this scenario when you are done:")
+            print(f"  curl -X DELETE http://localhost:8000/api/v1/scenarios/{scenario_id}")
+            print()
+        else:
+            print("Cleaning up demo scenario...")
+            await client.delete(f"/api/v1/scenarios/{scenario_id}")
+            print("Done.")
 
 
 def main() -> None:
     """Run the Jordan/Egypt Demo 4 Strait of Hormuz disruption walkthrough."""
     if not _require_db():
         return
-    asyncio.run(_run_demo())
+    parser = argparse.ArgumentParser(
+        description="WorldSim Demo 4 — Jordan/Egypt Strait of Hormuz disruption."
+    )
+    parser.add_argument(
+        "--keep",
+        action="store_true",
+        help="Skip cleanup after the demo run and print a URL to view the scenario in the UI.",
+    )
+    args = parser.parse_args()
+    asyncio.run(_run_demo(keep=args.keep))
 
 
 if __name__ == "__main__":
