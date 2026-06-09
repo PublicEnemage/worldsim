@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-09 (Phase 0 of process redesign sprint complete. Steps 1–5 merged to release/m12 via PRs #805–#808. Three gaps closed: XD-2 (mission-to-implementation traceability — docs/adr/template.md), XD-1 (minister vs. specialist persona conflict — docs/ux/personas.md §Section 7), FD-1 (north star test as process gate — CLAUDE.md §North Star Test). Phase A sprint entry filed. Awaiting EL endorsement of Phase 0 exit artifact before Phase A opens.)**
+**Last updated: 2026-06-09 (Issue #814 fixed — MDA AlertDetailPanel scroll-into-view on mount; PR #816 merged to release/m12. Root cause: Zone 1B is ~135px tall and 3 TERMINAL alert rows fill the visible area, pushing the detail panel below the fold. Fix: `scrollIntoView({ behavior: "smooth", block: "nearest" })` on AlertDetailPanel mount. Confirmed by EL.)**
 **Current milestone:** M12 — Active Control and External Sector (GitHub Milestone 13)
 **Previous milestone:** M11.5 — Usability Validation and Experience Audit (formally closed 2026-06-04; Issue #720 closed; GitHub Milestone 14 closed)
 
@@ -152,6 +152,7 @@ CI hotfix: NM-035 filed; `ci.yml` PR trigger updated to include `release/m*` (PR
 | G8 — Demo 4 preparation | #796 | #755 | ✓ DONE 2026-06-07 (Jordan/Egypt Hormuz; PR #796) |
 | G8b — Demo 4 critical fixes | #798 | DEMO4-001 DEMO4-002 | ✓ DONE 2026-06-07 (reserves + unemployment unfrozen; NM-037 NM-038 filed; Issue #799 opened) |
 | G8c — Internal review artifact | #801 | — | ✓ DONE 2026-06-07 (`docs/demo/m12/reviews/2026-06-07-v0.12.0-internal-review.md`; 9 findings) |
+| #814 fix — AlertDetailPanel scroll | #816 | #814 | ✓ DONE 2026-06-09 (`scrollIntoView` on mount; Zone 1B 135px → detail panel below fold) |
 | G9 — Political economy module | — | ADR-013 | DEFERRED TO M13 (EL decision 2026-06-07: option B) |
 
 ## Process Redesign Sprint — Phase 0 Status
@@ -322,6 +323,7 @@ CI hotfix: NM-035 filed; `ci.yml` PR trigger updated to include `release/m*` (PR
 
 | PR | Title | Date |
 |---|---|---|
+| #816 | fix(frontend): scroll AlertDetailPanel into view on mount (#814) | 2026-06-09 |
 | #808 | docs(process): Phase 0 Step 5 — north star test process gate (CLAUDE.md) and enforcement review | 2026-06-09 |
 | #807 | docs(process): Phase 0 Step 4 — ADR template with Phase 0 traceability requirements encoded | 2026-06-09 |
 | #806 | docs(process): Phase 0 Step 3 — persona traceability spec and conflict resolution ruling (XD-1) | 2026-06-09 |
