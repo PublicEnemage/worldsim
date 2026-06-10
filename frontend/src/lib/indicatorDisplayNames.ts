@@ -23,6 +23,7 @@ const INDICATOR_DISPLAY_NAMES: Record<string, Record<string, string>> = {
     credit_growth: "Credit Growth",
   },
   human_development: {
+    bottom_quintile_consumption_capacity: "Bottom Quintile Consumption",
     poverty_headcount_ratio: "Poverty Headcount Ratio",
     gini_coefficient: "Gini Coefficient",
     life_expectancy: "Life Expectancy",

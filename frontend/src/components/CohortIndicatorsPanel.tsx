@@ -28,12 +28,14 @@ interface IndicatorConfig {
   direction: "higher_better" | "lower_better";
 }
 
-/** Priority order matches #747 acceptance criteria. */
-const PRIORITY_INDICATORS: IndicatorConfig[] = [
-  { key: "unemployment_rate",       direction: "lower_better"  },
-  { key: "poverty_headcount_ratio", direction: "lower_better"  },
-  { key: "income_share_q1",         direction: "higher_better" },
-  { key: "access_to_healthcare",    direction: "higher_better" },
+/** Priority order: bottom_quintile_consumption_capacity first (primary M12 HCL signal
+ *  from ExternalSectorModule ADR-012). Remainder matches #747 acceptance criteria. */
+export const PRIORITY_INDICATORS: IndicatorConfig[] = [
+  { key: "bottom_quintile_consumption_capacity", direction: "higher_better" },
+  { key: "unemployment_rate",                    direction: "lower_better"  },
+  { key: "poverty_headcount_ratio",              direction: "lower_better"  },
+  { key: "income_share_q1",                      direction: "higher_better" },
+  { key: "access_to_healthcare",                 direction: "higher_better" },
 ];
 
 // ---------------------------------------------------------------------------
