@@ -246,6 +246,13 @@ backend/app/simulation/web_scenario_runner.py (existing)
 
 ---
 
+## Diagram
+
+`docs/architecture/ADR-012-external-sector-module.mmd` — shock propagation architecture:
+BilateralTradeShock (ControlInput path) and CommodityPriceShock (ExternalSectorModule
+path), both generating separate Financial and Human Development Events per the ADR-001
+measurement framework invariant; reserve burn-rate to MDA CRITICAL alert path.
+
 ## References
 
 - Issue #751 — BilateralTradeShock implementation

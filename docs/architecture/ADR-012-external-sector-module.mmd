@@ -1,0 +1,55 @@
+---
+title: ADR-012 External Sector Module — Shock Propagation Architecture
+---
+flowchart TD
+    subgraph INPUTS["External Sector Inputs"]
+        BTS["BilateralTradeShock\n(ControlInput subclass)\nsource_entity → target_entity\ncommodity_category, magnitude"]
+        CPC["CommodityPriceShock\n(ScenarioConfigSchema)\nstart_step, duration_steps\ncommodity_category, magnitude"]
+    end
+
+    subgraph ENTITY["SimulationEntity"]
+        ATTR["commodity_import_dependency_{category}\n(Quantity, RATIO 0–1)\nseeded from source registry"]
+    end
+
+    subgraph ESM["ExternalSectorModule.compute()"]
+        STEP["Determine current step\nfrom (timestep − start_date) / 365"]
+        ACTIVE["Filter: active shocks at current step"]
+        LOOKUP["entity.get_attribute(\n  commodity_import_dependency_{category})"]
+        BURN["reserve_burn_delta =\n  magnitude × import_dependency\n  × burn_coefficient (8.5)"]
+    end
+
+    subgraph ORCH["Orchestration Layer"]
+        DESER["_deserialize_control_input()\n'BilateralTradeShock' → BilateralTradeShock"]
+        TOEV["to_events() → Events\n(bilateral, per-entity-pair)"]
+    end
+
+    subgraph EVENTS["Events Generated (ADR-001 invariant — no cross-framework conversion)"]
+        FIN_E["Financial Event\nimport_price_inflation delta\nMeasurementFramework.FINANCIAL"]
+        HD_E["Human Development Event\nbottom_quintile_consumption_capacity delta\n× HCL_TRANSMISSION_FACTOR (0.3)\nMeasurementFramework.HUMAN_DEVELOPMENT"]
+        RES_E["Financial Event\nreserve_coverage_months delta\nMeasurementFramework.FINANCIAL"]
+    end
+
+    subgraph MDA["MDA Alert Layer"]
+        CRIT["CRITICAL: reserve_coverage_months < 2.5\n(IMF 3-month adequate reserve floor)"]
+    end
+
+    BTS --> DESER --> TOEV --> FIN_E
+    TOEV --> HD_E
+
+    CPC --> ESM
+    ATTR --> LOOKUP
+    STEP --> ACTIVE --> LOOKUP --> BURN
+    BURN --> RES_E
+    BURN --> HD_E
+
+    RES_E --> CRIT
+
+    classDef input fill:#e3f2fd,stroke:#1565c0
+    classDef module fill:#f3e5f5,stroke:#6a1b9a
+    classDef event fill:#e8f5e9,stroke:#2e7d32
+    classDef alert fill:#fce4ec,stroke:#b71c1c
+
+    class BTS,CPC input
+    class ESM,ORCH module
+    class FIN_E,HD_E,RES_E event
+    class MDA,CRIT alert
