@@ -6,10 +6,12 @@ Accepted
 ## Validity Context
 
 **Standards Version:** 2026-04-15 (date standards documents were established)
-**Valid Until:** Milestone 11.5 — Usability Validation and Experience Audit
+**Valid Until:** Milestone 13 — Methodology Publication and Public Launch
 **License Status:** CURRENT
 
-**Last Reviewed:** 2026-06-06 — M12 Wave B (Amendment 2). Renewal trigger fired: `SimulationEntity` gains `cohort_profiles` field; `Quantity` gains `attribute_type` and `stock_flow_identity` fields; new `AttributeType` enum and `CohortProfile` dataclass added. Amendment 2 applied — see Amendment 2 section below. License Status renewed to CURRENT. License renewed to Milestone 11.5.
+**M12 exit review:** 2026-06-10 (SCAN-026). No additional triggers fired after M12 Wave B. ExternalSectorModule generates events on existing `MeasurementFramework.FINANCIAL` and `HUMAN_DEVELOPMENT` Quantity attributes (`reserve_coverage_months`, `bottom_quintile_consumption_capacity`) — no `MeasurementFramework` taxonomy modification. `CohortProfile` fields added in Amendment 2 (Wave B) remain the complete M12 cohort representation change. No `DATA_STANDARDS.md` unit standard changes. License renewed to Milestone 13.
+
+**Previously reviewed:** 2026-06-06 — M12 Wave B (Amendment 2). Renewal trigger fired: `SimulationEntity` gains `cohort_profiles` field; `Quantity` gains `attribute_type` and `stock_flow_identity` fields; new `AttributeType` enum and `CohortProfile` dataclass added. Amendment 2 applied — see Amendment 2 section below. License Status renewed to CURRENT. License renewed to Milestone 11.5.
 
 **Previously reviewed:** 2026-06-04 — M11 exit review (SCAN-025). No renewal triggers fired during Milestone 11. PoliticalEconomyModule uses existing `MeasurementFramework.GOVERNANCE` and `HUMAN_DEVELOPMENT` enum values; `legitimacy_index` and `elite_capture_coefficient` are standard Quantity attributes on `SimulationEntity.attributes`. `_steps_projected` field added to state_data envelope (snapshot JSONB — application layer, not Quantity type). Matrix engine uses identical Quantity types and Event contracts — equivalence harness confirms 1e-10 agreement. `InputSource.CONDITIONALITY` and `CompoundStateCondition` extend the orchestration layer (ADR-002 territory), not the core data model. No `MeasurementFramework` taxonomy modifications, no `DATA_STANDARDS.md` unit standard changes affecting attribute store design. License renewed to Milestone 11.5.
 
