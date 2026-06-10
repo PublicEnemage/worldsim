@@ -6,8 +6,10 @@ Accepted
 ## Validity Context
 
 **Standards Version:** 2026-04-15 (date standards documents were established)
-**Valid Until:** Milestone 11.5 — Usability Validation and Experience Audit
+**Valid Until:** Milestone 13 — Methodology Publication and Public Launch
 **License Status:** CURRENT
+
+**M12 exit review:** 2026-06-10 (SCAN-026). No renewal triggers fired during Milestone 12. `ExternalSectorModule` (ADR-012) generates events on existing `MeasurementFramework.FINANCIAL` and `MeasurementFramework.HUMAN_DEVELOPMENT` attributes (`reserve_coverage_months`, `bottom_quintile_consumption_capacity`) — no `MeasurementFramework` taxonomy modification. `BilateralTradeShock` HCL transmission uses `_HCL_TRANSMISSION_FACTOR` applied to existing `bottom_quintile_consumption_capacity` key — no `CohortSpec` segmentation axis changes, no `MDASeverity` enum changes, no breach-detection logic changes. No radar chart normalization methodology changes. `DemographicModule._SUBSCRIBED_EVENTS` and `GovernanceModule._SUBSCRIBED_EVENTS` unchanged. Elasticity registry unit basis unchanged. License renewed to Milestone 13.
 
 **M11 exit review:** 2026-06-04 (SCAN-025). No renewal triggers fired during Milestone 11. `elite_capture_divergence` events are emitted into `MeasurementFramework.HUMAN_DEVELOPMENT` — an existing framework; no taxonomy modification. `programme_survival_probability` is a `MeasurementFramework.GOVERNANCE` stock — existing framework. No changes to `CohortSpec` segmentation axes, `MDASeverity` enum, or MDA threshold table schema. New MDA threshold (DEBT-FOREIGN-CURRENCY-ROLLOVER) uses existing row format. License renewed to Milestone 11.5.
 
