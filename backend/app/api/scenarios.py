@@ -1901,7 +1901,7 @@ def _boundary_proximity_strategy(
             continue
 
         if is_pre_normalized:
-            score = min(raw_val, Decimal("2.0"))
+            score = max(Decimal("0"), min(raw_val, Decimal("2.0")))
         else:
             boundary_val = boundary_constants[boundary_constant_id]
             if boundary_val == Decimal("0"):
@@ -1912,7 +1912,7 @@ def _boundary_proximity_strategy(
                     indicator_key,
                 )
                 continue
-            score = min(raw_val / boundary_val, Decimal("2.0"))
+            score = max(Decimal("0"), min(raw_val / boundary_val, Decimal("2.0")))
 
         proximity_scores.append(score)
 

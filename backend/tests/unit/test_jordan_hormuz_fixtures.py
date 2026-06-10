@@ -757,3 +757,68 @@ def test_demo_step3_label_references_gcc() -> None:
     demo = build_jordan_hormuz_demo_scenario()
     label = demo.configuration.step_metadata["3"]["label"]
     assert "GCC" in label, f"Step 3 label must reference GCC: {label!r}"
+
+
+# ---------------------------------------------------------------------------
+# Issue #821 — ecological composite fix: land_use_pressure_index seed tests
+# ---------------------------------------------------------------------------
+
+def test_demo_jor_has_land_use_pressure_seed() -> None:
+    """JOR must have land_use_pressure_index seeded to eliminate composite denominator break.
+
+    Without a seed, the indicator first appears in entity.attributes only after the
+    first fiscal event's two-step lag. This causes the ecological composite to halve
+    mid-scenario (DEMO4-007). The seed anchors the composite from step 1.
+    """
+    demo = build_jordan_hormuz_demo_scenario()
+    jor_attrs = demo.configuration.initial_attributes.get("JOR", {})
+    assert "land_use_pressure_index" in jor_attrs, (
+        "JOR must have land_use_pressure_index seeded — required to prevent "
+        "ecological composite denominator break at first fiscal event (Issue #821)"
+    )
+    val = Decimal(jor_attrs["land_use_pressure_index"].value)
+    assert val > Decimal("0"), "JOR land_use_pressure_index must be positive (Issue #821)"
+    assert val == Decimal("0.18"), (
+        "JOR land_use_pressure_index must be 0.18 (FAO GFR 2020 MENA Tier 4 synthetic)"
+    )
+
+
+def test_demo_egy_has_land_use_pressure_seed() -> None:
+    """EGY must have land_use_pressure_index seeded — same denominator-break prevention."""
+    demo = build_jordan_hormuz_demo_scenario()
+    egy_attrs = demo.configuration.initial_attributes.get("EGY", {})
+    assert "land_use_pressure_index" in egy_attrs, (
+        "EGY must have land_use_pressure_index seeded (Issue #821)"
+    )
+    val = Decimal(egy_attrs["land_use_pressure_index"].value)
+    assert val > Decimal("0"), "EGY land_use_pressure_index must be positive (Issue #821)"
+    assert val == Decimal("0.24"), (
+        "EGY land_use_pressure_index must be 0.24 (FAO GFR 2020 MENA Tier 4 synthetic)"
+    )
+
+
+def test_demo_land_use_pressure_is_ecological_framework() -> None:
+    """land_use_pressure_index must be tagged ecological for composite computation."""
+    demo = build_jordan_hormuz_demo_scenario()
+    for entity_id in ("JOR", "EGY"):
+        attrs = demo.configuration.initial_attributes.get(entity_id, {})
+        qty = attrs.get("land_use_pressure_index")
+        assert qty is not None
+        assert qty.measurement_framework == "ecological", (
+            f"{entity_id} land_use_pressure_index must have measurement_framework='ecological'"
+        )
+
+
+def test_demo_land_use_pressure_is_ratio_variable_type() -> None:
+    """land_use_pressure_index must be variable_type=ratio (accumulates via apply_attribute_delta).
+
+    RATIO type means apply_attribute_delta adds delta to existing value, not replaces.
+    """
+    demo = build_jordan_hormuz_demo_scenario()
+    for entity_id in ("JOR", "EGY"):
+        attrs = demo.configuration.initial_attributes.get(entity_id, {})
+        qty = attrs.get("land_use_pressure_index")
+        assert qty is not None
+        assert qty.variable_type == "ratio", (
+            f"{entity_id} land_use_pressure_index must be variable_type='ratio'"
+        )
