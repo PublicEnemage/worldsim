@@ -172,12 +172,12 @@ def _compute_proximity_indicators(
             continue
 
         if is_pre_normalized:
-            proximity = min(stock_val, Decimal("2.0"))
+            proximity = max(Decimal("0"), min(stock_val, Decimal("2.0")))
         else:
             boundary_val = _BOUNDARY_CONSTANT_VALUES.get(constant_id, Decimal("1"))
             if boundary_val == Decimal("0"):
                 continue
-            proximity = min(stock_val / boundary_val, Decimal("2.0"))
+            proximity = max(Decimal("0"), min(stock_val / boundary_val, Decimal("2.0")))
 
         result[output_key] = Quantity(
             value=proximity.quantize(Decimal("0.000001")),

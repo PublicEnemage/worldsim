@@ -440,6 +440,45 @@ def build_jordan_hormuz_demo_scenario() -> ScenarioCreateRequest:
         measurement_framework="ecological",
     )
 
+    # Jordan land use pressure index — Tier 4 synthetic estimate.
+    # FAO Global Forest Resources Assessment 2020 (country profile Jordan): ~40% of
+    # Jordan's agricultural land shows moderate-to-severe degradation; forest cover 1.5%
+    # and declining. World Atlas of Desertification (Cherlet et al. 2018) classifies the
+    # majority of Jordan's non-desert land as under "very high" human footprint pressure.
+    # Anchored against Richardson et al. (2023) Science Advances planetary boundary for
+    # land-system change (25% ice-free land as natural ecosystems).
+    # 0.18 = 18% of safe land-use boundary consumed — defensible lower end for MENA arid
+    # economy with significant soil degradation but minimal large-scale deforestation.
+    # Known calibration gap (Issue #824): this elasticity is calibrated to high-forest-cover
+    # countries; MENA arid transmission runs through soil conservation and irrigation, not
+    # forestry. Magnitude likely overstated for Jordan/Egypt.
+    jor_land_use_pressure = QuantitySchema(
+        value="0.18",
+        unit="ratio_0_1",
+        variable_type="ratio",
+        confidence_tier=4,
+        observation_date=date(2020, 1, 1),
+        source_registry_id="ACADEMIC_LITERATURE_FAO_GFR_2020_FISCAL_LAND_USE",
+        measurement_framework="ecological",
+    )
+
+    # Egypt land use pressure index — Tier 4 synthetic estimate.
+    # FAO GFR 2020 country profile Egypt: Nile delta agricultural land under extreme
+    # intensity (3–4 crops/year in some areas), ~35% salinisation from poor drainage.
+    # World Atlas of Desertification (Cherlet et al. 2018): Egypt's non-delta zone is
+    # hyper-arid with negligible land-system pressure; the delta is the pressure centre.
+    # 0.24 = 24% of safe land-use boundary consumed — within the 0.20–0.28 defensible
+    # range for delta-concentrated intensive agriculture with peripheral desertification.
+    egy_land_use_pressure = QuantitySchema(
+        value="0.24",
+        unit="ratio_0_1",
+        variable_type="ratio",
+        confidence_tier=4,
+        observation_date=date(2020, 1, 1),
+        source_registry_id="ACADEMIC_LITERATURE_FAO_GFR_2020_FISCAL_LAND_USE",
+        measurement_framework="ecological",
+    )
+
     # World Bank WGI 2022 — Rule of Law Percentile Rank for Jordan: 52.4
     # Jordan sits at the 52nd percentile — above the MENA average (38th) but
     # below OECD median (70th). Confidence tier 2 (official multilateral statistics).
@@ -531,6 +570,7 @@ def build_jordan_hormuz_demo_scenario() -> ScenarioCreateRequest:
     updated_jor_attrs = {
         **base.configuration.initial_attributes.get("JOR", {}),
         "co2_concentration_ppm": initial_co2,
+        "land_use_pressure_index": jor_land_use_pressure,
         "rule_of_law_percentile": jor_rule_of_law,
         "democratic_quality_score": jor_democratic_quality,
         "elite_capture_coefficient": jor_elite_capture,
@@ -539,6 +579,7 @@ def build_jordan_hormuz_demo_scenario() -> ScenarioCreateRequest:
     updated_egy_attrs = {
         **base.configuration.initial_attributes.get("EGY", {}),
         "co2_concentration_ppm": initial_co2,
+        "land_use_pressure_index": egy_land_use_pressure,
         "rule_of_law_percentile": egy_rule_of_law,
         "democratic_quality_score": egy_democratic_quality,
         "elite_capture_coefficient": egy_elite_capture,
