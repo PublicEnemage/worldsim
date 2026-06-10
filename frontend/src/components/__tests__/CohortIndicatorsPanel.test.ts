@@ -13,6 +13,7 @@ import {
   computeDirection,
   directionGlyph,
   formatIndicatorValue,
+  PRIORITY_INDICATORS,
 } from "../CohortIndicatorsPanel";
 import type { QuantitySchema } from "../../types";
 
@@ -149,5 +150,42 @@ describe("formatIndicatorValue", () => {
     // value > 1 is not in the fraction conversion range
     const result = formatIndicatorValue(qty("1.5", "fraction"));
     expect(result).not.toContain("%");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// PRIORITY_INDICATORS — Issue #826 (DEMO4-005)
+// ---------------------------------------------------------------------------
+
+describe("PRIORITY_INDICATORS", () => {
+  it("includes bottom_quintile_consumption_capacity (primary M12 HCL signal)", () => {
+    const keys = PRIORITY_INDICATORS.map((i) => i.key);
+    expect(keys).toContain("bottom_quintile_consumption_capacity");
+  });
+
+  it("bottom_quintile_consumption_capacity is first (highest priority)", () => {
+    expect(PRIORITY_INDICATORS[0].key).toBe("bottom_quintile_consumption_capacity");
+  });
+
+  it("bottom_quintile_consumption_capacity polarity is higher_better", () => {
+    const entry = PRIORITY_INDICATORS.find(
+      (i) => i.key === "bottom_quintile_consumption_capacity",
+    );
+    expect(entry?.direction).toBe("higher_better");
+  });
+
+  it("decreasing bottom_quintile_consumption_capacity shows red down arrow", () => {
+    // Confirm the polarity × direction combination produces the expected bad signal.
+    const glyph = directionGlyph("down", "higher_better");
+    expect(glyph).not.toBeNull();
+    expect(glyph!.symbol).toBe("↓");
+    expect(glyph!.color).toBe("#c62828");
+  });
+
+  it("dimensionless unit value displays as decimal (not percentage)", () => {
+    // bottom_quintile_consumption_capacity uses unit="dimensionless"
+    const result = formatIndicatorValue(qty("-0.12", "dimensionless"));
+    expect(result).not.toContain("%");
+    expect(result).toBe("-0.12");
   });
 });
