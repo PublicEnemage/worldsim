@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-09 (Issue #814 fixed — MDA AlertDetailPanel scroll-into-view on mount; PR #816 merged to release/m12. Root cause: Zone 1B is ~135px tall and 3 TERMINAL alert rows fill the visible area, pushing the detail panel below the fold. Fix: `scrollIntoView({ behavior: "smooth", block: "nearest" })` on AlertDetailPanel mount. Confirmed by EL.)**
+**Last updated: 2026-06-10 (ADR license audit complete — PR #832 merged. 7 ADRs renewed to M13: ADR-001/005/011 simple renewals; ADR-002 additive BilateralTradeShock taxonomy extension; ADR-008 Amendment 1 (A/B invocation model: automatic → explicit branch action); ADR-010 Amendment 1 (ghost curve visual spec for Mode 3). SCAN-026 M12 exit gate filed (PR #831); ADR-012 Mermaid diagram added; 0 violations. M12 demo walkthrough, Phase 2 A/B report, NM-036 test — PR #830. All M12 agent deliverables complete. Remaining: Socratic Agent TEST + release/m12 → main — both EL actions.)**
 **Current milestone:** M12 — Active Control and External Sector (GitHub Milestone 13)
 **Previous milestone:** M11.5 — Usability Validation and Experience Audit (formally closed 2026-06-04; Issue #720 closed; GitHub Milestone 14 closed)
 
@@ -154,6 +154,7 @@ CI hotfix: NM-035 filed; `ci.yml` PR trigger updated to include `release/m*` (PR
 | G8c — Internal review artifact | #801 | — | ✓ DONE 2026-06-07 (`docs/demo/m12/reviews/2026-06-07-v0.12.0-internal-review.md`; 9 findings) |
 | #814 fix — AlertDetailPanel scroll | #816 | #814 | ✓ DONE 2026-06-09 (`scrollIntoView` on mount; Zone 1B 135px → detail panel below fold) |
 | G9 — Political economy module | — | ADR-013 | DEFERRED TO M13 (EL decision 2026-06-07: option B) |
+| M12 exit compliance | #830 #831 #832 | SCAN-026 (0 violations), ADR-012 diagram, 7 ADR renewals to M13, demo walkthrough, Phase 2 A/B, NM-036 test | ✓ DONE 2026-06-10 — all M12 agent deliverables complete |
 
 ## Process Redesign Sprint — Phase 0 Status
 
@@ -207,9 +208,7 @@ CI hotfix: NM-035 filed; `ci.yml` PR trigger updated to include `release/m*` (PR
 - IR review from `main` (new session, fresh agent)
 - Stakeholder demo from `main`
 
-**Pending process items:**
-- Phase 2 A/B report: `docs/architecture/performance/phase2-ab-comparison.md` — PENDING (deferred multiple sessions)
-- NM-036 process improvement 2: branch snapshot endpoint integration test — not yet implemented
+**M12 agent deliverables — ALL COMPLETE (2026-06-10)**
 
 ---
 
@@ -323,11 +322,11 @@ CI hotfix: NM-035 filed; `ci.yml` PR trigger updated to include `release/m*` (PR
 
 | PR | Title | Date |
 |---|---|---|
+| #832 | docs(adr): M12 exit license audit — renew ADR-001/002/005/007/008/010/011 to M13 | 2026-06-10 |
+| #831 | docs(compliance): SCAN-026 M12 exit gate + ADR-012 Mermaid diagram (0 violations) | 2026-06-10 |
+| #830 | docs+test: M12 exit artifacts — demo walkthrough, Phase 2 A/B report, NM-036 integration test | 2026-06-10 |
 | #816 | fix(frontend): scroll AlertDetailPanel into view on mount (#814) | 2026-06-09 |
 | #808 | docs(process): Phase 0 Step 5 — north star test process gate (CLAUDE.md) and enforcement review | 2026-06-09 |
-| #807 | docs(process): Phase 0 Step 4 — ADR template with Phase 0 traceability requirements encoded | 2026-06-09 |
-| #806 | docs(process): Phase 0 Step 3 — persona traceability spec and conflict resolution ruling (XD-1) | 2026-06-09 |
-| #805 | docs(process): Phase 0 Steps 1–2 — DIC ROADMAP guardrails and UX traceability specification | 2026-06-09 |
 | #796 | feat(demo): G8 — Jordan/Egypt Hormuz Demo 4 (closes #755) | 2026-06-07 |
 | #795 | chore(state): SESSION_STATE.md — NM-036 ia1_disclosure branch snapshot | 2026-06-07 |
 | #794 | fix(e2e+engine): Mode 3 E2E selector fix + ia1_disclosure copy + cohort reconstruction gap (closes #793) | 2026-06-07 |
