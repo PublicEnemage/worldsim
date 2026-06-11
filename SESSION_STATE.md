@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-10 (Playwright legibility gates passed — 11/11 at 1440×900. Narrated walkthrough run complete — all five Demo 4 frames captured (frame-a through frame-e-step5-divergence.png). demo-narrated.spec.ts app-ready sentinel fixed (worldsim-map → __worldsim_selectEntity). Prior this session: demo.sh + demo-narrated.spec.ts M12 rewrite (PR #838); Mode 3 scenario evaluation panel (PR #833); walkthrough revision PRs #834 #835 #836. All M12 agent deliverables complete. Awaiting EL: release/m12 → main merge, IR review, stakeholder demo.)**
+**Last updated: 2026-06-10 (IR review complete — 13 findings DEMO-039–051 filed in `docs/demo/m12/reviews/2026-06-10-v0.12.0-ir-review.md`; 7 GitHub issues filed (#841–#847); EL decision: IR artifact renamed to ir-review.md, stakeholder-review.md reserved for post-live-demo artifact; CLAUDE.md artifact table split; live stakeholder demo confirmed as M12 closure gate. Prior: release/m12 → main merged (PR #839); NM-039 + demo-preparation-standard updates (PR #840). All M12 agent deliverables complete. Open: DEMO-039 (recapture Frame C), DEMO-041 (walkthrough narration gap for "Exploratory — do not cite"), live stakeholder demo (#843).)**
 **Current milestone:** M12 — Active Control and External Sector (GitHub Milestone 13)
 **Previous milestone:** M11.5 — Usability Validation and Experience Audit (formally closed 2026-06-04; Issue #720 closed; GitHub Milestone 14 closed)
 
@@ -77,7 +77,9 @@ M9 formally closed. Issue #213 (M9 Exit Checklist) closed 2026-05-24. M10 milest
 
 ## Open PRs
 
-No open PRs — board clear as of 2026-06-07 (post PR #796 merge).
+| PR | Title | Status |
+|---|---|---|
+| Open | feat/m12-ir-review-and-stakeholder-demo-planning | Awaiting EL merge |
 
 ## M11 Work Streams — 2026-06-04 Sprint
 
@@ -204,15 +206,12 @@ CI hotfix: NM-035 filed; `ci.yml` PR trigger updated to include `release/m*` (PR
 
 **Awaiting EL action:**
 - **EL endorsement of Phase 0 exit artifact** — `docs/process/sprint-plans/process-redesign-phase0-exit.md §Part VI`. Phase A cannot open until endorsement is recorded. This is exit gate condition 3.
-- ~~UI screenshot capture~~ — **COMPLETE** (2026-06-10): all five frames in `docs/demo/m12/screenshots/` including Frame E (`frame-e-step5-divergence.png`, step 5 branch trajectory at 1.30×)
-- ~~Playwright legibility gates~~ — **PASSED** (2026-06-10): 11/11 at 1440×900 (`demo-legibility.spec.ts` + `demo-advancement-flow.spec.ts`)
-- ~~Investigate DEMO4-007 (ecological composite 50% drop at step 6)~~ — **FIXED prior session**
-- ~~Decision on DEMO4-005 (add `bottom_quintile_consumption_capacity`)~~ — **FIXED prior session**
-- ~~Silence DEMO4-006 (`[SIM-INTEGRITY]` warnings)~~ — **FIXED prior session**
-- ~~DEMO4-010~~ — **FIXED prior session**
-- Merge `release/m12` → `main` (EL admin action) after Playwright gates and Frame E capture clear
-- IR review from `main` (new session, fresh agent) — activate Independent Review Agent post-merge
-- Stakeholder demo from `main`
+- **Live stakeholder demo** (#843) — M12 closure gate (EL decision 2026-06-10). Preconditions: DEMO-039 (#842, Frame C recapture) and DEMO-041 (#841, walkthrough narration gap) must be resolved first. Produces `YYYY-MM-DD-v0.12.0-stakeholder-review.md` artifact.
+- **Merge PR** `feat/m12-ir-review-and-stakeholder-demo-planning` → `main` — IR review artifact, stakeholder-review placeholder, CLAUDE.md artifact table split.
+- ~~UI screenshot capture~~ — **COMPLETE** (2026-06-10): all five frames in `docs/demo/m12/screenshots/` including Frame E
+- ~~Playwright legibility gates~~ — **PASSED** (2026-06-10): 11/11 at 1440×900
+- ~~IR review~~ — **COMPLETE** (2026-06-10): 13 findings DEMO-039–051; `docs/demo/m12/reviews/2026-06-10-v0.12.0-ir-review.md`
+- ~~Merge `release/m12` → `main`~~ — **DONE** (PR #839, 2026-06-10)
 
 **M12 agent deliverables — ALL COMPLETE (2026-06-10)**
 
