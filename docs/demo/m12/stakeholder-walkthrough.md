@@ -202,15 +202,15 @@ The presentation sequence follows the screenshot brief:
 `docs/demo/m12/screenshot-brief.md`.
 
 Do **not** narrate the choropleth as the analytical argument. The choropleth
-is context. Zone 1A (trajectory view) is the instrument.
+is context. The trajectory chart is the instrument.
 
 ---
 
 ### Step 1 — The Map Loads
 
 **What the audience sees:** A world map. Countries rendered as polygons. A
-color gradient over the Middle East and North Africa region. The scenario
-panel is visible on the left.
+color gradient over the Middle East and North Africa region. The instrument
+cluster above the map is unpopulated until a scenario is selected.
 
 **UMBRELLA — What the presenter says:**
 
@@ -275,8 +275,7 @@ between JOR and EGY before they can read the divergence.
 ### Step 3 — Advance Through the Arc (Steps 1 to 3)
 
 **What the audience sees:** The presenter advances to step 3 (2026). The
-trajectory view in Zone 1A shows both entity curves moving. The step label
-reads 3/8, 2026.
+trajectory chart shows both entity curves moving. The step label reads 3/8, 2026.
 
 **UMBRELLA — What the presenter says:**
 
@@ -321,9 +320,9 @@ readable before the specific values are named.
 
 ### Step 4 — The Thesis Frame (Step 3, 2026 — Divergence)
 
-**What the audience sees:** Zone 1A trajectory view at step 3, showing JOR
-reserve curve declining and EGY governance curve in sustained breach. Zone 1B
-MDA alert panel visible.
+**What the audience sees:** The trajectory chart at step 3, showing JOR
+reserve curve declining and EGY governance curve in sustained breach. The
+alert panel is visible alongside it.
 
 This is the presentation sequence's thesis frame — it is shown first in the
 screenshot brief's C → A → B → D → E sequence.
@@ -346,19 +345,19 @@ screenshot brief's C → A → B → D → E sequence.
 
 **FACTS:**
 
-> Zone 1A: Jordan reserve coverage 5.0 months, declining at approximately
-> 1.2 months per step. The CRITICAL floor is 2.5 months — Jordan is three
-> steps from it at current burn rate.
+> The trajectory chart: Jordan reserve coverage 5.0 months, declining at
+> approximately 1.2 months per step. The CRITICAL floor is 2.5 months — Jordan
+> is three steps from it at current burn rate.
 >
 > Egypt democratic quality score: 0.07 at step 1, moving toward 0.03 by step 4
 > as the emergency declaration activates. The governance floor is 0.70. Egypt
 > is not approaching the floor — it is operating at one-tenth of the floor value.
 
-**Pause. Let them read Zone 1B.**
+**Pause. Let them read the alert panel.**
 
-> Zone 1B shows the MDA alert panel. Egypt's governance alert is CRITICAL and
-> has been from step 1. That is not a step 3 finding — it is a pre-existing
-> condition that the Hormuz disruption is deepening.
+> The alert panel shows Egypt's governance alert as CRITICAL from step 1. That
+> is not a step 3 finding — it is a pre-existing condition that the Hormuz
+> disruption is deepening.
 >
 > Jordan's reserve alert is escalating toward CRITICAL, but has not reached it
 > yet at step 3. That is the window the tool is illuminating.
@@ -373,6 +372,13 @@ screenshot brief's C → A → B → D → E sequence.
 >
 > A single-country model would show you one of these. The instrument cluster
 > shows you both, on the same step axis, with the same analytical discipline.
+>
+> One disclosure on the governance alert: it carries an Exploratory confidence
+> tier. The direction of Egypt's governance deterioration is consistent with
+> V-Dem historical data across comparable political contexts. The Exploratory
+> label means the magnitude calibration is pending — not that the finding is
+> invalid. The instrument names what it does not yet know. That is honest
+> analysis, not a weakness in the finding.
 
 **Cognitive purpose:** The thesis frame is the M12 centrepiece. The divergence
 between JOR reserve stress and EGY governance stress is the argument for
@@ -383,9 +389,9 @@ point, not a data display.
 
 ### Step 5 — Reserve CRITICAL Floor (Step 5, 2028)
 
-**What the audience sees:** Zone 1A at step 5 (2028). JOR reserve coverage
-has reached the CRITICAL alert threshold. Zone 1B shows a CRITICAL breach for
-Jordan with consecutive breach count.
+**What the audience sees:** The trajectory chart at step 5 (2028). JOR reserve
+coverage has reached the CRITICAL alert threshold. The alert panel shows a
+CRITICAL breach for Jordan with consecutive breach count.
 
 **UMBRELLA — What the presenter says:**
 
@@ -401,11 +407,11 @@ Jordan with consecutive breach count.
 > capacity to manage currency volatility, service import obligations, and
 > maintain monetary credibility simultaneously is materially constrained.
 >
-> Zone 1B CRITICAL alert: reserve_coverage_months, step 5, first CRITICAL
-> breach. The alert reads the finding, not a prediction.
+> The alert panel shows a CRITICAL alert: reserve_coverage_months, step 5,
+> first CRITICAL breach. The alert reads the finding, not a prediction.
 >
-> Zone 1A also carries a second reading at step 5, on the unemployment
-> curve. At step 4, the GCC emergency support — arriving at step 3 with a
+> The trajectory chart also carries a second reading at step 5, on the
+> unemployment curve. At step 4, the GCC emergency support — arriving at step 3 with a
 > one-step lag — drove unemployment from 17.73% down to 16.59%. At step 5,
 > the IMF conditionality fires with its own one-step lag: the spending
 > reduction scheduled at step 4 hits the growth trajectory, and unemployment
@@ -458,8 +464,9 @@ Then introduce Mode 3 as Act 2.
 ### Step 6 — Act 2: Mode 3 Active Control (Branch from Step 3, 2026)
 
 **What the audience sees:** The Mode 3 control panel is active. The fiscal
-multiplier lever is adjusted to 1.3. Branch anchor is set at step 3. Zone 1A
-shows two trajectories: the baseline Jordan arc and the Mode 3 branch arc.
+multiplier lever is adjusted to 1.3. Branch anchor is set at step 3. The
+trajectory chart shows two trajectories: the baseline Jordan arc and the
+Mode 3 branch arc.
 
 This is the emotional peak of the demonstration. Present it as a question
 being answered in real time.
@@ -495,9 +502,9 @@ being answered in real time.
 **FACTS:**
 
 > Mode 3 active. Fiscal multiplier set to 1.3. Branch anchored at step 3,
-> 2026. The simulation recomputes from the branch point forward. Zone 1A now
-> shows both trajectories simultaneously — the baseline arc and the Mode 3
-> branch arc — on the same step axis.
+> 2026. The simulation recomputes from the branch point forward. The trajectory
+> chart now shows both trajectories simultaneously — the baseline arc and the
+> Mode 3 branch arc — on the same step axis.
 >
 > What the branch represents precisely: the IMF emergency liquidity support
 > accepted at step 3 remains in the branch — Jordan takes the money. The
@@ -561,9 +568,9 @@ what does not diverge. The honest answer is more powerful than the clean story.
 
 ### Step 7 — All Four Axes Live (Step 5, 2028 — Capability Claim)
 
-**What the audience sees:** Zone 1D Multi-Framework Overview at step 5. All
-four composite scores render with live data: Financial (reserve stress),
-Human Development (bottom-quintile consumption under commodity price elevation),
+**What the audience sees:** The four-framework overview at step 5. All four
+composite scores render with live data: Financial (reserve stress), Human
+Development (bottom-quintile consumption under commodity price elevation),
 Ecological (CO2 accumulation, independent of the Hormuz crisis), Governance
 (EGY far below floor; JOR stable).
 
@@ -574,7 +581,7 @@ Ecological (CO2 accumulation, independent of the Hormuz crisis), Governance
 
 **FACTS:**
 
-> Zone 1D shows all four composite scores simultaneously at step 5. Financial:
+> The four-framework overview shows all four composite scores simultaneously at step 5. Financial:
 > reserve-linked divergence between Jordan and Egypt is the primary driver.
 > Human Development: the bottom-quintile consumption capacity indicator —
 > the primary human cost ledger signal — shows the commodity price transmission
@@ -825,7 +832,7 @@ of the tool's current state.
 The ecological framework currently computes planetary boundary proximity
 against CO2 concentration. Land use pressure is in the measurement output but
 does not yet drive the composite score. Ecological consequences visible in
-Zone 1D are real but incomplete. Full multi-boundary ecological composite is
+the four-framework overview are real but incomplete. Full multi-boundary ecological composite is
 on the M13 roadmap.
 
 **The commodity shock transmission is directional, not magnitude-calibrated.**
