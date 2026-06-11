@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-11 (Step 6c gate PASS — PR #880 merged (4 annotation fixes); DEMO-080 accepted as-is by EL (tablet scale, out of scope for 1440×900 demo); Step 9 (live stakeholder demo, #843) UNBLOCKED. Board clear.)**
+**Last updated: 2026-06-11 (Step 9 simulated stakeholder session COMPLETE — north star PASS; stakeholder-review artifact filed (PR #886); screenshots recaptured with PR #880 UI changes (PR #883); two new issues filed: #884 (reserve value not on screen), #885 (Exploratory tier misclassifies baseline observation). #843 (live external session) is the remaining M12 closure gate. Board clear.)**
 **Current milestone:** M12 — Active Control and External Sector (GitHub Milestone 13)
 **Previous milestone:** M11.5 — Usability Validation and Experience Audit (formally closed 2026-06-04; Issue #720 closed; GitHub Milestone 14 closed)
 
@@ -77,7 +77,7 @@ M9 formally closed. Issue #213 (M9 Exit Checklist) closed 2026-05-24. M10 milest
 
 ## Open PRs
 
-No open PRs — board clear as of 2026-06-11 (post PR #880 merge).
+No open PRs — board clear as of 2026-06-11 (post PR #886 merge).
 
 ## M11 Work Streams — 2026-06-04 Sprint
 
@@ -198,7 +198,8 @@ CI hotfix: NM-035 filed; `ci.yml` PR trigger updated to include `release/m*` (PR
 - **Live stakeholder demo** (#843) — M12 closure gate (EL decision 2026-06-10). Pre-demo blockers resolved (PR #854 merged): DEMO-039, DEMO-041, DEMO-052, DEMO-053, DEMO-054 (testMatch guard, PR #857 pending). DEMO-055 (entity narration fix, PR #857 pending). Remaining open: #852 alert panel master-detail UX. Produces `YYYY-MM-DD-v0.12.0-stakeholder-review.md` artifact.
 - **EL endorsement of Phase 0 exit artifact** — `docs/process/sprint-plans/process-redesign-phase0-exit.md §Part VI`. Phase A cannot open until endorsement is recorded. This is exit gate condition 3.
 - ~~Step 6c gate~~ — **PASS (2026-06-11)**: PR #880 resolved DEMO-070/071/081/090; DEMO-080 accepted as-is by EL (tablet scale, out of scope for 1440×900 live demo). Audience simulation review updated. Step 9 unblocked.
-- **Live stakeholder demo** (#843) — M12 closure gate. **Step 9 UNBLOCKED.** All pre-demo fixes complete (PRs #854, #857, #880). #852 deferred to M13. Current scroll-list layout is the live demo state. Produces `YYYY-MM-DD-v0.12.1-stakeholder-review.md` artifact.
+- ~~Step 9 simulated session~~ — **COMPLETE (2026-06-11)**. North star verdict: PASS. Aicha: "The conditionality dispute is about who absorbs the employment cost — the reserve crisis happens either way. That argument is now quantified." Artifact: `docs/demo/m12/reviews/2026-06-11-v0.12.1-stakeholder-review.md` (PR #886). Screenshots recaptured with PR #880 UI changes (PR #883). Two new M13 issues: #884 (reserve value not on screen), #885 (Exploratory tier on baseline vs. projection). Per-entity curves (#845) confirmed as primary unresolved UX gap.
+- **Live external stakeholder session** (#843) — M12 closure gate. **Awaiting EL.** Simulated session validated the demo is ready. Known gaps to manage: #845 (presenter must name curves verbally), #884 (presenter must read reserve value aloud). Produces final `YYYY-MM-DD-v0.12.1-stakeholder-review.md` update when real participants attend.
 - ~~#852~~ — **DEFERRED TO M13** (EL decision 2026-06-11): alert panel master-detail UX requires Frontend architecture review, ADR, UX Designer + Design Thinking agent input.
 - ~~#841 DEMO-041~~ — **CLOSED** (PR #854)
 - ~~#842 DEMO-039~~ — **CLOSED** (PR #854)
@@ -260,6 +261,8 @@ CI hotfix: NM-035 filed; `ci.yml` PR trigger updated to include `release/m*` (PR
 | #53 | feat: information access architecture | near-term |
 | #845 | ux: DEMO-044 — trajectory curves no inline entity labels | near-term |
 | #846 | ux: DEMO-045 — Mode 3 branch comparison values not in instrument | near-term |
+| #884 | ux: reserve_coverage_months value not surfaced as readable metric in instrument cluster | near-term |
+| #885 | ux: Exploratory confidence tier misclassifies baseline observation vs. forward projection | near-term |
 
 ---
 
@@ -373,6 +376,8 @@ CI hotfix: NM-035 filed; `ci.yml` PR trigger updated to include `release/m*` (PR
 
 | PR | Title | Date |
 |---|---|---|
+| #886 | docs(demo): M12 Step 9 stakeholder review — simulated session, north star PASS | 2026-06-11 |
+| #883 | chore(demo): recapture M12 screenshots with PR #880 UI changes | 2026-06-11 |
 | #880 | fix(demo): Step 6c gate — four annotation fixes to unblock Step 9 (closes #879) | 2026-06-11 |
 | #867 | docs(process): Step 6c ordering correction — 6b → 7 → 6c → 9; IR Agent gates persona panel; prerequisite block added to Steps 7 and 6c | 2026-06-11 |
 | #863 | docs(process): Step 6c Audience Simulation Panel — persona-based live demo rehearsal (Personas 1/2/5 in-character; Persona 5 north star gate; Four-Tier Review Structure; M14 forward) | 2026-06-11 |

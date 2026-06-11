@@ -599,4 +599,4 @@ record the demo as complete and cite the stakeholder-review artifact path.
 | M6 | #220 | `docs/demo/m6/reviews/2026-05-07-v0.6.0-stakeholder-review.md` |
 | M8 | #333 | `docs/demo/m8/reviews/2026-05-18-v0.8.0-stakeholder-review.md` |
 | M10 | #261 | `docs/demo/m10/reviews/2026-06-02-v0.10.0-stakeholder-review.md` |
-| M12 | #755 | IR: `docs/demo/m12/reviews/2026-06-10-v0.12.0-ir-review.md` (13 findings DEMO-039–051) — Stakeholder: `PENDING-v0.12.0-stakeholder-review.md` (live demo outstanding, #843) |
+| M12 | #755 | IR: `docs/demo/m12/reviews/2026-06-11-v0.12.1-ir-review.md` (14 findings DEMO-056–069; 3 retracted) — Audience sim: `2026-06-11-v0.12.1-audience-simulation.md` (DEMO-070–096; gate PASS) — Stakeholder: `2026-06-11-v0.12.1-stakeholder-review.md` (simulated session; north star PASS; real external session #843 outstanding) |
