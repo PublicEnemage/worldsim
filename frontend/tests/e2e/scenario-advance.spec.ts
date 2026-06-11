@@ -48,7 +48,7 @@ test("create → advance to completion → entity drawer shows measurement outpu
 
   await nextStepBtn.click();
   await expect(page.getByText("Step 3 / 3")).toBeVisible({ timeout: 15_000 });
-  await expect(page.getByText(/Complete/)).toBeVisible({ timeout: 10_000 });
+  await expect(page.getByText(/— Complete/)).toBeVisible({ timeout: 10_000 });
 
   // Advance button must be disabled after completion.
   await expect(nextStepBtn).toBeDisabled();

@@ -71,6 +71,7 @@ export interface ScenarioConfigSchema {
   initial_attributes: Record<string, unknown>;
   n_steps: number;
   timestep_label: string;
+  fiscal_multiplier?: number;
 }
 
 export interface ScenarioDetailResponse extends ScenarioResponse {

@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 /**
  * ScenarioInstrumentCluster — composed Zone 1 cluster for App.tsx.
  *
@@ -20,14 +21,23 @@
  * embedded in the trajectory response (Issue #496). Synced via useEffect
  * on currentStep + store.trajectory. Null at step 0 or when no MDA
  * thresholds have matching indicator data for the step.
+ *
+ * Mode 3 (G6b, Issue #753): When mode === "MODE_3", the ControlPlane is
+ * rendered below the instrument cluster. Parameter changes trigger a branch
+ * via POST /scenarios/{id}/branch. The advance loop runs step-by-step,
+ * updating branch trajectory after each step (streaming reveal per spec §3b).
+ * The recompute badge in the cluster header shows progress.
  */
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { InstrumentCluster, LAYOUT, useViewportBreakpoint } from "./InstrumentCluster";
 import { MDAAlertPanelZone1B } from "./MDAAlertPanelZone1B";
 import { PMMWidgetZone1C } from "./PMMWidgetZone1C";
 import { FourFrameworkZone1D } from "./FourFrameworkZone1D";
+import { CohortIndicatorsPanel } from "./CohortIndicatorsPanel";
+import { ControlPlane, type Mode3Params } from "./ControlPlane";
 import { useScenarioStepStore } from "../store/scenarioStepStore";
 import type { TrajectoryResponse, TrajectoryFrameworkPoint, Zone1BAlert } from "../store/scenarioStepStore";
+import type { QuantitySchema } from "../types";
 
 const API_BASE = "http://localhost:8000/api/v1";
 
@@ -120,11 +130,13 @@ interface RawMDAAlert {
   mda_id: string;
   entity_id: string;
   indicator_key: string;
+  indicator_name?: string;
   severity: "WARNING" | "CRITICAL" | "TERMINAL";
   floor_value: string;
   current_value: string;
   approach_pct_remaining: string;
   consecutive_breach_steps: number;
+  recovery_horizon_years?: number | null;
 }
 
 interface RawFrameworkOutputForAlerts {
@@ -150,15 +162,24 @@ function parseMdaAlerts(raw: RawMultiFrameworkOutput): Zone1BAlert[] {
         typeof (indicator as { confidence_tier: unknown }).confidence_tier === "number"
           ? (indicator as { confidence_tier: number }).confidence_tier
           : 2;
+      const indicator_name =
+        alert.indicator_name ??
+        alert.indicator_key.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
       alerts.push({
         mda_id: alert.mda_id,
         indicator_key: alert.indicator_key,
+        indicator_name,
         framework,
         severity: alert.severity,
         step_index: raw.step_index,
         cohort: null,
         causal_attribution: null,
         confidence_tier,
+        floor_value: alert.floor_value,
+        current_value: alert.current_value,
+        approach_pct_remaining: alert.approach_pct_remaining,
+        consecutive_breach_steps: alert.consecutive_breach_steps,
+        recovery_horizon_years: alert.recovery_horizon_years ?? null,
       });
     }
   }
@@ -174,6 +195,13 @@ interface ScenarioInstrumentClusterProps {
   stepCount: number;
   currentStep: number;
   entityIds?: string[];
+  /** Mode 2 — ID of the comparison (baseline) scenario. When set, its trajectory is
+   *  fetched and stored as baseline_trajectory so TrajectoryView renders the overlay. */
+  comparisonScenarioId?: string | null;
+  /** Mode 2 fiscal multiplier for the active scenario — displayed in identity header. */
+  fiscalMultiplier?: number | null;
+  /** Mode 3 Active Control — when true, ControlPlane is rendered and branching is enabled. */
+  mode3Active?: boolean;
 }
 
 export function ScenarioInstrumentCluster({
@@ -181,6 +209,9 @@ export function ScenarioInstrumentCluster({
   stepCount,
   currentStep,
   entityIds,
+  comparisonScenarioId,
+  fiscalMultiplier,
+  mode3Active = false,
 }: ScenarioInstrumentClusterProps) {
   const store = useScenarioStepStore();
   const bp = useViewportBreakpoint();
@@ -191,16 +222,40 @@ export function ScenarioInstrumentCluster({
   const [trajectoryLoading, setTrajectoryLoading] = useState(false);
   const [trajectoryError, setTrajectoryError] = useState(false);
 
-  // Initialise store when scenario changes
+  // Human development indicators for CohortIndicatorsPanel (Issue #747).
+  // Single state object ensures current→prev swap is atomic (avoids stale closure).
+  const [hdState, setHdState] = useState<{
+    current: Record<string, QuantitySchema> | null;
+    prev: Record<string, QuantitySchema> | null;
+  }>({ current: null, prev: null });
+
+  // Alert drill-in selection — UI state, not simulation state (#745).
+  // Shared between Zone 1B (displays detail) and Zone 1D ("see alerts" navigation).
+  const [focusedAlertMdaId, setFocusedAlertMdaId] = useState<string | null>(null);
+
+  // Mode 3 branch advance loop — abortController cancels in-flight advances on cleanup.
+  const branchAbortRef = useRef<AbortController | null>(null);
+
+  // Initialise store when scenario changes — MODE_3 when mode3Active; MODE_2 when fiscal multiplier override
   useEffect(() => {
-    store.setScenario(scenarioId, stepCount, "MODE_1");
-  }, [scenarioId, stepCount]);
+    let mode: "MODE_1" | "MODE_2" | "MODE_3";
+    if (mode3Active) {
+      mode = "MODE_3";
+    } else if (fiscalMultiplier != null && fiscalMultiplier !== 1.0) {
+      mode = "MODE_2";
+    } else {
+      mode = "MODE_1";
+    }
+    store.setScenario(scenarioId, stepCount, mode);
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- store is a Zustand singleton, stable reference
+  }, [scenarioId, stepCount, fiscalMultiplier, mode3Active]);
 
   // Keep current_step in sync with ScenarioControls (prop-driven)
   useEffect(() => {
     if (currentStep !== store.current_step) {
       useScenarioStepStore.setState({ current_step: currentStep });
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- store is a Zustand singleton, stable reference
   }, [currentStep]);
 
   // Fetch trajectory after each step advance.
@@ -231,6 +286,7 @@ export function ScenarioInstrumentCluster({
     return () => {
       cancelled = true;
     };
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- store is a Zustand singleton, stable reference
   }, [scenarioId, currentStep]);
 
   // Sync PMM from trajectory step data when current step changes (Issue #496).
@@ -247,7 +303,29 @@ export function ScenarioInstrumentCluster({
     } else {
       store.setPmmState(null, null);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- store is a Zustand singleton, stable reference
   }, [currentStep, store.trajectory]);
+
+  // Fetch comparison scenario trajectory for Mode 2 overlay (#746).
+  // When comparisonScenarioId changes, fetch its latest trajectory and store as baseline.
+  // Clears baseline when comparisonScenarioId is removed.
+  useEffect(() => {
+    if (!comparisonScenarioId) {
+      useScenarioStepStore.setState({ baseline_trajectory: null });
+      return;
+    }
+    let cancelled = false;
+    fetch(`${API_BASE}/scenarios/${encodeURIComponent(comparisonScenarioId)}/trajectory`)
+      .then((res) => (res.ok ? (res.json() as Promise<RawTrajectoryResponse>) : null))
+      .then((raw) => {
+        if (cancelled || !raw) return;
+        useScenarioStepStore.setState({ baseline_trajectory: parseTrajectoryResponse(raw) });
+      })
+      .catch(() => {
+        // Non-fatal — baseline overlay stays absent
+      });
+    return () => { cancelled = true; };
+  }, [comparisonScenarioId]);
 
   // Fetch MDA alerts from measurement-output after each step advance (IR-001).
   // Entity ID comes from the trajectory response already fetched above.
@@ -264,27 +342,247 @@ export function ScenarioInstrumentCluster({
       .then((raw) => {
         if (cancelled || !raw) return;
         store.setMdaAlerts(parseMdaAlerts(raw));
+
+        // Extract human development indicators for cohort panel (Issue #747).
+        // indicators is Record<string, QuantitySchema | Record<string, QuantitySchema>>;
+        // only flat (non-nested) entries are QuantitySchema — nested cohort objects are skipped.
+        const hdOutput = raw.outputs["human_development"];
+        if (hdOutput) {
+          const flat: Record<string, QuantitySchema> = {};
+          for (const [k, v] of Object.entries(hdOutput.indicators)) {
+            if (
+              v !== null &&
+              typeof v === "object" &&
+              "value" in v &&
+              typeof (v as { value: unknown }).value === "string"
+            ) {
+              flat[k] = v as QuantitySchema;
+            }
+          }
+          // Atomic current→prev swap via functional updater — avoids stale closure
+          setHdState((s) => ({ prev: s.current, current: flat }));
+        }
       })
       .catch(() => {
-        // Non-fatal — Zone 1B remains in previous state
+        // Non-fatal — Zone 1B and cohort panel remain in previous state
       });
 
     return () => {
       cancelled = true;
     };
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- store is a Zustand singleton, stable reference
   }, [scenarioId, currentStep, store.trajectory?.entity_id]);
 
-  return (
-    <InstrumentCluster
-      entityIds={entityIds}
-      mdaPanel={<MDAAlertPanelZone1B columnWidth={coPrimaryWidth} />}
-      pmmWidget={<PMMWidgetZone1C />}
-      fourFramework={
-        <FourFrameworkZone1D
-          isLoading={trajectoryLoading}
-          isError={trajectoryError}
-        />
+  // ---------------------------------------------------------------------------
+  // Mode 3 — branch-and-recompute advance loop (G6b, Issue #753)
+  // ---------------------------------------------------------------------------
+
+  const handleApplyControlChange = async (params: Mode3Params) => {
+    // Cancel any in-flight advance loop.
+    branchAbortRef.current?.abort();
+    const abortController = new AbortController();
+    branchAbortRef.current = abortController;
+
+    const { branchScenarioId } = store;
+
+    try {
+      let branchId: string;
+      let fromStep: number;
+      let nSteps: number;
+
+      if (branchScenarioId == null) {
+        // First branch: POST /scenarios/{baselineId}/branch
+        const res = await fetch(
+          `${API_BASE}/scenarios/${encodeURIComponent(scenarioId)}/branch`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              fiscal_multiplier: params.fiscal_multiplier,
+              branch_from_step: params.branch_from_step,
+            }),
+          },
+        );
+        if (!res.ok) throw new Error(`Branch failed: ${res.status}`);
+        const data = (await res.json()) as {
+          branch_scenario_id: string;
+          branch_from_step: number;
+          n_steps: number;
+        };
+        branchId = data.branch_scenario_id;
+        fromStep = data.branch_from_step;
+        nSteps = data.n_steps;
+        // Set baseline trajectory = current scenario's trajectory (lock it in)
+        if (store.trajectory) {
+          useScenarioStepStore.setState({ baseline_trajectory: store.trajectory });
+        }
+        store.initBranch(scenarioId, branchId, fromStep);
+      } else {
+        // Re-branch: POST /scenarios/{branchId}/rebranch
+        const res = await fetch(
+          `${API_BASE}/scenarios/${encodeURIComponent(branchScenarioId)}/rebranch`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              fiscal_multiplier: params.fiscal_multiplier,
+              from_step: params.branch_from_step,
+            }),
+          },
+        );
+        if (!res.ok) throw new Error(`Rebranch failed: ${res.status}`);
+        const data = (await res.json()) as {
+          branch_scenario_id: string;
+          branch_from_step: number;
+          n_steps: number;
+        };
+        branchId = data.branch_scenario_id;
+        fromStep = data.branch_from_step;
+        nSteps = data.n_steps;
+        store.initBranch(
+          store.baselineScenarioId ?? scenarioId,
+          branchId,
+          fromStep,
+        );
       }
-    />
+
+      // Advance loop: run one step at a time, fetch trajectory after each.
+      let stepsComputed = 0;
+      for (let step = fromStep + 1; step <= nSteps; step++) {
+        if (abortController.signal.aborted) return;
+
+        const advRes = await fetch(
+          `${API_BASE}/scenarios/${encodeURIComponent(branchId)}/advance`,
+          { method: "POST" },
+        );
+        if (!advRes.ok) throw new Error(`Advance failed at step ${step}: ${advRes.status}`);
+
+        // Fetch branch trajectory for streaming reveal.
+        const trajRes = await fetch(
+          `${API_BASE}/scenarios/${encodeURIComponent(branchId)}/trajectory`,
+        );
+        if (trajRes.ok) {
+          const raw = (await trajRes.json()) as RawTrajectoryResponse;
+          if (!abortController.signal.aborted) {
+            useScenarioStepStore.setState({ trajectory: parseTrajectoryResponse(raw) });
+          }
+        }
+
+        stepsComputed++;
+        store.updateBranchProgress(stepsComputed);
+      }
+
+      if (!abortController.signal.aborted) {
+        store.setBranchComplete();
+      }
+    } catch {
+      if (!abortController.signal.aborted) {
+        store.setBranchFailed();
+      }
+    }
+  };
+
+  const { recomputeStatus, branchFromStep, branchStepsComputed, step_count, mode } = store;
+  const totalBranchSteps = branchFromStep != null ? step_count - branchFromStep : 0;
+  const isRecomputing = recomputeStatus === "computing" || recomputeStatus === "pending";
+
+  return (
+    <div>
+      {/* Recompute badge — visible during Mode 3 branch recompute (spec §3a). */}
+      {mode === "MODE_3" && (isRecomputing || recomputeStatus === "failed") && (
+        <div
+          data-testid="recompute-badge"
+          style={{
+            padding: "4px 10px",
+            background: recomputeStatus === "failed" ? "#fee2e2" : "#ede9fe",
+            borderBottom: `1px solid ${recomputeStatus === "failed" ? "#fca5a5" : "#c4b5fd"}`,
+            display: "flex",
+            alignItems: "center",
+            gap: 8,
+            fontSize: 11,
+            color: recomputeStatus === "failed" ? "#dc2626" : "#7c3aed",
+            fontWeight: 600,
+          }}
+        >
+          {recomputeStatus === "failed" ? (
+            <>
+              <span style={{ fontSize: 14 }}>⚠</span>
+              <span>Recompute failed</span>
+              <button
+                data-testid="recompute-error-dismiss"
+                onClick={() => store.resetBranch()}
+                style={{
+                  marginLeft: "auto",
+                  background: "none",
+                  border: "none",
+                  cursor: "pointer",
+                  color: "#dc2626",
+                  fontSize: 11,
+                  fontWeight: 600,
+                }}
+              >
+                Dismiss ×
+              </button>
+            </>
+          ) : (
+            <>
+              <span
+                data-testid="recompute-pulse"
+                style={{
+                  display: "inline-block",
+                  width: 8,
+                  height: 8,
+                  borderRadius: "50%",
+                  background: "#7c3aed",
+                  animation: "pulse 1.2s infinite",
+                }}
+              />
+              <span>Recomputing…</span>
+              {totalBranchSteps > 0 && (
+                <span
+                  data-testid="recompute-step-progress"
+                  style={{ fontWeight: 400, color: "#9d78ef" }}
+                >
+                  Computing step {branchStepsComputed + 1} of {totalBranchSteps}
+                </span>
+              )}
+            </>
+          )}
+        </div>
+      )}
+
+      <InstrumentCluster
+        entityIds={entityIds}
+        mdaPanel={
+          <MDAAlertPanelZone1B
+            columnWidth={coPrimaryWidth}
+            focusedAlertMdaId={focusedAlertMdaId}
+            onSelectAlert={setFocusedAlertMdaId}
+          />
+        }
+        pmmWidget={<PMMWidgetZone1C />}
+        fourFramework={
+          <FourFrameworkZone1D
+            isLoading={trajectoryLoading}
+            isError={trajectoryError}
+            onSelectFrameworkAlert={setFocusedAlertMdaId}
+          />
+        }
+        cohortPanel={
+          <CohortIndicatorsPanel
+            indicators={hdState.current}
+            prevIndicators={hdState.prev}
+          />
+        }
+      />
+
+      {/* ControlPlane — rendered in Mode 3 only (G6b, Issue #753). */}
+      {mode === "MODE_3" && (
+        <ControlPlane
+          onApplyChange={handleApplyControlChange}
+          currentStep={currentStep}
+        />
+      )}
+    </div>
   );
 }

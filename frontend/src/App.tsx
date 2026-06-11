@@ -5,6 +5,7 @@ import DeltaChoropleth from "./components/DeltaChoropleth";
 import EntityDetailDrawer from "./components/EntityDetailDrawer";
 import FidelityDashboard from "./components/FidelityDashboard";
 import { ModeIndicator } from "./components/ModeIndicator";
+import { ScenarioIdentityHeader } from "./components/ScenarioIdentityHeader";
 import { ScenarioInstrumentCluster } from "./components/ScenarioInstrumentCluster";
 import ScenarioControls from "./components/ScenarioControls";
 import ScenarioPanel from "./components/ScenarioPanel";
@@ -63,16 +64,6 @@ export default function App() {
   // ---------------------------------------------------------------------------
   const sessionRecording = useSessionRecording();
 
-  // ---------------------------------------------------------------------------
-  // Pillar 1 — replay mode
-  // When ?replay_session=<id> is in the URL, show the replay viewer instead
-  // of the main application. This is a developer/audit tool, not a user feature.
-  // ---------------------------------------------------------------------------
-  const replaySessionId = new URLSearchParams(window.location.search).get("replay_session");
-  if (replaySessionId) {
-    return <SessionReplayViewer sessionId={replaySessionId} />;
-  }
-
   const [attributeName, setAttributeName] = useState(DEFAULT_ATTRIBUTE);
   const [selectedScenarioId, setSelectedScenarioId] = useState<string | null>(null);
   const [selectedScenarioName, setSelectedScenarioName] = useState<string | null>(null);
@@ -83,10 +74,16 @@ export default function App() {
   const [panelOpen, setPanelOpen] = useState(false);
   const [fidelityOpen, setFidelityOpen] = useState(false);
   const [selectedEntityId, setSelectedEntityId] = useState<string | null>(null);
+  // All active entities for the scenario — used by ScenarioIdentityHeader and choropleth highlight (#754)
+  const [activeEntityIds, setActiveEntityIds] = useState<string[]>([]);
   // Incremented on every advance — ScenarioPanel watches this to refresh the list.
   const [scenarioListVersion, setScenarioListVersion] = useState(0);
+  // Mode 2 fiscal multiplier for the active scenario (Issue #746)
+  const [activeFiscalMultiplier, setActiveFiscalMultiplier] = useState<number | null>(null);
+  // Mode 3 Active Control toggle (G6b, Issue #753)
+  const [mode3Active, setMode3Active] = useState(false);
 
-  const handleStepChange = (step: number, _isComplete: boolean) => {
+  const handleStepChange = (step: number) => {
     // Always set — never reset to null on completion so EntityDetailDrawer
     // continues showing data at the final step after the scenario is done.
     setCurrentStep(step);
@@ -99,6 +96,9 @@ export default function App() {
     setSelectedScenarioSteps(totalSteps);
     setCurrentStep(null);
     setSelectedEntityId(null);
+    setActiveEntityIds([]);
+    setActiveFiscalMultiplier(null);
+    setMode3Active(false);
     writeStoredScenario({ id, name, totalSteps });
   };
 
@@ -138,7 +138,7 @@ export default function App() {
     return () => {
       cancelled = true;
     };
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps — intentionally runs once on mount
+  }, []);
 
   // Playwright E2E test seam — DEV mode only, eliminated from production builds.
   // Exposes entity-selection handler so tests can open the drawer without clicking
@@ -151,9 +151,8 @@ export default function App() {
       setAttributeName(key);
   }, [setSelectedEntityId, setAttributeName]);
 
-  // When a scenario is selected, check if it's already completed and fast-forward
-  // currentStep to its final step — ScenarioControls won't emit onStepChange for
-  // a scenario that was completed before this session.
+  // When a scenario is selected: fast-forward currentStep if already completed,
+  // and extract the primary entity for the identity header + choropleth highlight (#744).
   useEffect(() => {
     if (!selectedScenarioId) return;
 
@@ -165,15 +164,25 @@ export default function App() {
         if (detail.status === "completed") {
           setCurrentStep(detail.configuration.n_steps);
         }
+        // Set all active entities for identity header and choropleth highlight (#754)
+        setActiveEntityIds(detail.configuration.entities ?? []);
+        // Extract fiscal multiplier for Mode 2 display (Issue #746)
+        setActiveFiscalMultiplier(detail.configuration.fiscal_multiplier ?? null);
       })
       .catch(() => {
-        // Non-fatal — currentStep stays at whatever handleSelectScenario set
+        // Non-fatal — currentStep and activeEntityId stay at previous values
       });
 
     return () => {
       cancelled = true;
     };
   }, [selectedScenarioId]);
+
+  // Replay mode early return — placed after all hooks so rules-of-hooks is satisfied.
+  const replaySessionId = new URLSearchParams(window.location.search).get("replay_session");
+  if (replaySessionId) {
+    return <SessionReplayViewer sessionId={replaySessionId} />;
+  }
 
   const showDelta = compareMode && selectedScenarioId !== null && secondScenarioId !== null;
 
@@ -213,6 +222,22 @@ export default function App() {
               </span>
             )}
             <ModeIndicator />
+            <button
+              data-testid="mode3-toggle"
+              onClick={() => setMode3Active((v) => !v)}
+              style={{
+                fontSize: 11,
+                padding: "3px 8px",
+                background: mode3Active ? "#8b5cf6" : "transparent",
+                color: mode3Active ? "#fff" : "#8b5cf6",
+                border: "1px solid #8b5cf6",
+                borderRadius: 4,
+                cursor: "pointer",
+                fontWeight: 600,
+              }}
+            >
+              Mode 3
+            </button>
             <ScenarioControls
               scenarioId={selectedScenarioId}
               totalSteps={selectedScenarioSteps}
@@ -235,6 +260,17 @@ export default function App() {
       {fidelityOpen && <FidelityDashboard />}
 
       <main className="app-main" style={{ position: "relative" }}>
+        {/* Scenario identity header — always visible when scenario active (Issue #744, GAP-02) */}
+        {selectedScenarioId && selectedScenarioName && (
+          <ScenarioIdentityHeader
+            scenarioName={selectedScenarioName}
+            entityIds={activeEntityIds}
+            currentStep={currentStep}
+            totalSteps={selectedScenarioSteps}
+            fiscalMultiplier={activeFiscalMultiplier}
+          />
+        )}
+
         {/* Instrument cluster — primary viewport when a scenario is active (CLAUDE.md UX commitment 1) */}
         {selectedScenarioId && (
           <div style={{ overflowX: "auto", background: "#fafafa", borderBottom: "1px solid #e8e8e8" }}>
@@ -242,6 +278,9 @@ export default function App() {
               scenarioId={selectedScenarioId}
               stepCount={selectedScenarioSteps}
               currentStep={currentStep ?? 0}
+              comparisonScenarioId={compareMode ? secondScenarioId : null}
+              fiscalMultiplier={activeFiscalMultiplier}
+              mode3Active={mode3Active}
             />
           </div>
         )}
@@ -261,6 +300,7 @@ export default function App() {
             scenarioId={selectedScenarioId}
             currentStep={currentStep}
             onEntityClick={selectedScenarioId ? handleEntityClick : undefined}
+            activeEntityIds={activeEntityIds}
           />
         )}
 

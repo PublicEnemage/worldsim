@@ -3,19 +3,19 @@
 > **Reader Orientation:** This ADR governs the transition from the iterative propagation
 > engine to a sparse-matrix computation model. Read it before: writing any code that
 > touches the propagation engine, modifying Decimal↔float conversion boundaries, or
-> designing any Monte Carlo or backtesting integration with engine outputs. The iterative
-> engine must not be retired until the Phase 2 equivalence gate in §Decision 2 passes.
+> designing any Monte Carlo or backtesting integration with engine outputs. The matrix
+> engine is now in production (M12, #749) — the iterative engine is retired.
 > ADR-008 (viewport) and ADR-010 (trajectory view) are downstream consumers of engine
 > outputs — changes to the output schema require reviewing those ADRs' renewal triggers.
 
 ## Status
-Accepted
+IMPLEMENTED
 
 ## Validity Context
 
-**Standards Version:** 2026-06-03
-**Valid Until:** Milestone 12 — Active Control and External Sector
-**License Status:** CURRENT — Accepted 2026-06-03
+**Standards Version:** 2026-06-05
+**Valid Until:** See Renewal Triggers below
+**License Status:** CURRENT — Implemented 2026-06-05 (PR #769, M12 G4)
 
 **Diagram:** `docs/architecture/ADR-009-engine-computation-model.mmd` (added M11 exit, SCAN-025).
 
@@ -332,3 +332,39 @@ flowchart LR
 - Iterative engine source: `backend/app/simulation/engine/propagation.py`
 - Issue #217 — ADR-009 authoring and acceptance
 - Issue #406 — Phase 1/2/3 engineering validation
+
+---
+
+## Amendment 1 — Production Migration (M12, 2026-06-05)
+
+**Status change:** Accepted → IMPLEMENTED
+
+**Trigger:** G4 (#749) — matrix engine production migration. ADR-009 §Decision 1 parallel-run
+window complete: one full milestone (M11) of CI history with zero divergence errors across the
+full backtesting suite.
+
+**Changes made (PR #769):**
+
+1. **Call site swap (`runner.py`):** `propagate()` replaced by `propagate_matrix()` at the sole
+   call site in `ScenarioRunner.tick()`. The local `from app.simulation.engine.propagation import
+   propagate` import removed. No silent fallback — any propagation failure surfaces immediately.
+
+2. **Engine package API (`engine/__init__.py`):** `propagate` export now points to
+   `propagate_matrix` (via `from app.simulation.engine.matrix_propagation import propagate_matrix
+   as propagate`). Callers using the package-level `propagate` name continue to work unchanged.
+
+3. **Module docstring updated:** `matrix_propagation.py` docstring updated to reflect production
+   status; "parallel phase" language removed.
+
+**ADR-009 §Decision 3 performance gate:** Confirmed via `test_equivalence_harness.py` — 1,000 MC
+runs on the Greece 2010–2012 scenario complete within the 60-second target. Iterative engine
+baseline from Phase 1 benchmarks is matched.
+
+**Iterative engine retention:** `propagation.py` is retained as reference implementation and is
+still imported by `matrix_propagation.py` for the `_accumulate` and `_build_next_state` helpers
+(source-entity accumulation path). Full deletion of the iterative engine is deferred until the
+helpers are extracted to a shared module — tracked as a follow-up improvement, not a blocker.
+
+**Engineering Lead sign-off:** Required by ADR-009 §Decision 1, Step 3. This amendment records
+the retirement decision. The parallel-run window, equivalence gate, and performance gate were all
+confirmed in M11 (PR #707). Sign-off: @PublicEnemage, 2026-06-05.

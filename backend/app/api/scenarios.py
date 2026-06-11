@@ -1,9 +1,10 @@
 """Scenario endpoints — ADR-004 Decisions 1, 2, 4, and 5; ADR-005 Decision 2.
 
-Nine endpoints covering scenario configuration lifecycle, execution, and HCL output:
+Ten endpoints covering scenario configuration lifecycle, execution, and HCL output:
   POST   /scenarios                                        — create scenario (status: pending)
   GET    /scenarios                                        — list all scenarios (created_at desc)
   GET    /scenarios/compare         — snapshot delta; optional step alignment (ADR-004 D5)
+  GET    /scenarios/compare/trajectory — per-step attribute trajectory delta (Issue #99)
   GET    /scenarios/{scenario_id}                          — full detail with scheduled inputs
   DELETE /scenarios/{scenario_id}                          — tombstone + cascade delete, returns 204
   POST   /scenarios/{scenario_id}/run                      — execute pending scenario to completion
@@ -42,6 +43,8 @@ from fastapi import APIRouter, Depends, HTTPException, Response
 from app.api.deps import get_db  # noqa: TCH001 — used as Depends(get_db) at runtime
 from app.schemas import (
     AdvanceResponse,
+    BranchRequest,
+    BranchResponse,
     CompareResponse,
     DeltaRecord,
     FrameworkOutput,
@@ -50,6 +53,7 @@ from app.schemas import (
     MultiFrameworkOutput,
     PMMRecord,
     QuantitySchema,
+    RebranchRequest,
     RunSummaryResponse,
     ScenarioConfigSchema,
     ScenarioCreateRequest,
@@ -59,6 +63,8 @@ from app.schemas import (
     ScenarioRestoreResponse,
     ScheduledInputSchema,
     SnapshotRecord,
+    TrajectoryCompareResponse,
+    TrajectoryCompareStep,
     TrajectoryFrameworkPoint,
     TrajectoryResponse,
     TrajectoryStep,
@@ -192,6 +198,10 @@ def _validate_create_request(req: ScenarioCreateRequest) -> None:
 
     if not req.name.strip():
         errors.append("name must not be empty.")
+
+    n_entities = len(req.configuration.entities)
+    if n_entities < 1 or n_entities > 5:
+        errors.append(f"entities must contain 1–5 entity IDs (got {n_entities}).")
 
     n = req.configuration.n_steps
     if n < 1 or n > 100:
@@ -394,7 +404,13 @@ async def list_scenarios(
 # ---------------------------------------------------------------------------
 
 
-def _compute_delta(value_a: str, value_b: str, tier_a: int, tier_b: int) -> DeltaRecord:
+def _compute_delta(
+    value_a: str,
+    value_b: str,
+    tier_a: int,
+    tier_b: int,
+    threshold_value: str | None = None,
+) -> DeltaRecord:
     from decimal import Decimal  # noqa: PLC0415
 
     dec_a = Decimal(value_a)
@@ -406,12 +422,19 @@ def _compute_delta(value_a: str, value_b: str, tier_a: int, tier_b: int) -> Delt
         direction = "decrease"
     else:
         direction = "unchanged"
+
+    threshold_crossed: bool | None = None
+    if threshold_value is not None:
+        thr = Decimal(threshold_value)
+        threshold_crossed = (dec_a < thr) != (dec_b < thr)
+
     return DeltaRecord(
         value_a=value_a,
         value_b=value_b,
         delta=str(delta),
         direction=direction,
         confidence_tier=max(tier_a, tier_b),
+        threshold_crossed=threshold_crossed,
     )
 
 
@@ -422,16 +445,26 @@ async def compare_scenarios(
     scenario_b: str,
     attr: str | None = None,
     step: int | None = None,
+    threshold_value: str | None = None,
 ) -> CompareResponse:
     """Return attribute deltas between two scenarios.
 
     Computes delta = value_b - value_a for each shared entity and attribute.
     Only entities and attributes present in both snapshots are included.
-    Filter to a single attribute with `attr`. ADR-004 Decision 5.
+
+    All-attributes mode (Issue #90, ARCH-REVIEW-002 BI2-I-05): when `attr` is
+    omitted, ALL shared attributes across ALL shared entities are returned in a
+    single call. This satisfies the multi-framework comparison requirement — a
+    scenario that improves GDP while worsening unemployment is fully visible
+    without N serial calls. Pass `attr` to filter the response to one key.
 
     `step` — when provided, both scenarios must have a snapshot at exactly
     that step. Returns 404 identifying which scenario is missing the step.
     When omitted, compares the final (highest-step) snapshot of each scenario.
+
+    `threshold_value` — when provided (as a numeric string), each DeltaRecord
+    includes `threshold_crossed: bool` indicating whether the delta crossed this
+    absolute value boundary (value_a and value_b on opposite sides). Issue #153.
 
     Returns 404 if either scenario is not found.
     Returns 404 if `step` is provided and either scenario has no snapshot at
@@ -532,6 +565,7 @@ async def compare_scenarios(
                     val_b,
                     int(a_env.get("confidence_tier", 5)),
                     int(b_env.get("confidence_tier", 5)),
+                    threshold_value=threshold_value,
                 )
             except Exception:  # noqa: BLE001 S112
                 continue
@@ -545,6 +579,139 @@ async def compare_scenarios(
         step_a=snap_a["step"],
         step_b=snap_b["step"],
         deltas=deltas,
+    )
+
+
+# ---------------------------------------------------------------------------
+# GET /scenarios/compare/trajectory — Issue #99
+# ---------------------------------------------------------------------------
+
+
+@router.get("/scenarios/compare/trajectory", response_model=TrajectoryCompareResponse)
+async def compare_scenarios_trajectory(
+    conn: Annotated[asyncpg.Connection, Depends(get_db)],
+    scenario_a: str,
+    scenario_b: str,
+    attribute: str,
+) -> TrajectoryCompareResponse:
+    """Return per-step attribute delta between two scenarios across all shared steps.
+
+    Fetches all snapshots for both scenarios, aligns by step number, and returns
+    the attribute value from each scenario at each shared step alongside the
+    computed delta. The attribute is located by iterating shared entities and
+    finding the first entity that has the attribute key in both snapshots at that
+    step. When no entity carries the attribute at a given step, the step entry
+    carries null values and delta.
+
+    This endpoint enables trajectory analysis without N serial calls — the client
+    receives the full time-series of value_a, value_b, and delta in one response.
+    Cumulative welfare computation (integral of delta over all steps) is a single
+    client-side sum (Issue #99, ARCH-REVIEW-002 BI2-N-08).
+
+    Returns 404 if either scenario is not found.
+    Returns 409 if either scenario has no snapshots yet.
+    """
+    for sid in (scenario_a, scenario_b):
+        row = await conn.fetchrow(
+            "SELECT scenario_id FROM scenarios WHERE scenario_id = $1", sid
+        )
+        if row is None:
+            raise HTTPException(
+                status_code=404, detail=f"Scenario '{sid}' not found."
+            )
+
+    rows_a = await conn.fetch(
+        "SELECT step, state_data FROM scenario_state_snapshots "
+        "WHERE scenario_id = $1 ORDER BY step ASC",
+        scenario_a,
+    )
+    rows_b = await conn.fetch(
+        "SELECT step, state_data FROM scenario_state_snapshots "
+        "WHERE scenario_id = $1 ORDER BY step ASC",
+        scenario_b,
+    )
+
+    if not rows_a:
+        raise HTTPException(
+            status_code=409,
+            detail=f"Scenario '{scenario_a}' has no snapshots. Run it first.",
+        )
+    if not rows_b:
+        raise HTTPException(
+            status_code=409,
+            detail=f"Scenario '{scenario_b}' has no snapshots. Run it first.",
+        )
+
+    def _parse_state(raw: object) -> dict[str, Any]:
+        if isinstance(raw, str):
+            return json.loads(raw)  # type: ignore[no-any-return]
+        return raw  # type: ignore[return-value]
+
+    map_a: dict[int, dict[str, Any]] = {
+        int(r["step"]): _parse_state(r["state_data"]) for r in rows_a
+    }
+    map_b: dict[int, dict[str, Any]] = {
+        int(r["step"]): _parse_state(r["state_data"]) for r in rows_b
+    }
+
+    shared_steps = sorted(set(map_a) & set(map_b))
+
+    steps: list[TrajectoryCompareStep] = []
+    for step_num in shared_steps:
+        state_a_step = map_a[step_num]
+        state_b_step = map_b[step_num]
+
+        val_a: str | None = None
+        val_b: str | None = None
+
+        # Find the first entity that carries the attribute in snapshot A.
+        for eid in sorted(set(state_a_step) & set(state_b_step)):
+            attrs_a = state_a_step.get(eid)
+            attrs_b = state_b_step.get(eid)
+            if not isinstance(attrs_a, dict) or not isinstance(attrs_b, dict):
+                continue
+            env_a = attrs_a.get(attribute)
+            env_b = attrs_b.get(attribute)
+            if env_a is not None and isinstance(env_a, dict):
+                val_a = str(env_a.get("value", ""))
+            if env_b is not None and isinstance(env_b, dict):
+                val_b = str(env_b.get("value", ""))
+            if val_a is not None or val_b is not None:
+                break
+
+        delta_str: str | None = None
+        direction: str | None = None
+        if val_a is not None and val_b is not None:
+            try:
+                from decimal import Decimal as _Dec  # noqa: PLC0415
+                d_a = _Dec(val_a)
+                d_b = _Dec(val_b)
+                diff = d_b - d_a
+                delta_str = str(diff)
+                if diff > 0:
+                    direction = "increase"
+                elif diff < 0:
+                    direction = "decrease"
+                else:
+                    direction = "unchanged"
+            except Exception:  # noqa: BLE001 S110
+                pass  # non-numeric attribute value — leave delta null
+
+        steps.append(
+            TrajectoryCompareStep(
+                step=step_num,
+                value_a=val_a,
+                value_b=val_b,
+                delta=delta_str,
+                direction=direction,
+            )
+        )
+
+    return TrajectoryCompareResponse(
+        scenario_a_id=scenario_a,
+        scenario_b_id=scenario_b,
+        attribute=attribute,
+        steps=steps,
     )
 
 
@@ -1207,6 +1374,210 @@ async def restore_scenario(
 
 
 # ---------------------------------------------------------------------------
+# POST /scenarios/{scenario_id}/branch — G6b Mode 3 Active Control
+# ---------------------------------------------------------------------------
+
+
+@router.post("/scenarios/{scenario_id}/branch", response_model=BranchResponse, status_code=201)
+async def branch_scenario(
+    scenario_id: str,
+    req: BranchRequest,
+    conn: Annotated[asyncpg.Connection, Depends(get_db)],
+) -> BranchResponse:
+    """Create a branch scenario from an existing baseline at a specific step.
+
+    Copies the baseline scenario's configuration (with an updated fiscal_multiplier)
+    and snapshots 0..branch_from_step into a new scenario in 'pending' status.
+    The caller then advances the branch via POST /scenarios/{branch_id}/advance
+    to recompute forward steps with the new parameter value.
+
+    Implements the Mode 3 branch-and-recompute pattern from mode3-interaction-spec.md §2.
+    The baseline scenario is never mutated. G6b (Issue #753).
+
+    Returns 404 if the baseline scenario is not found.
+    Returns 404 if no snapshot exists at branch_from_step.
+    """
+    row = await conn.fetchrow(
+        "SELECT scenario_id, name, configuration FROM scenarios WHERE scenario_id = $1",
+        scenario_id,
+    )
+    if row is None:
+        raise HTTPException(status_code=404, detail=f"Scenario '{scenario_id}' not found.")
+
+    cfg_raw = row["configuration"]
+    if isinstance(cfg_raw, str):
+        cfg_raw = json.loads(cfg_raw)
+
+    snap_check = await conn.fetchrow(
+        "SELECT step FROM scenario_state_snapshots WHERE scenario_id = $1 AND step = $2",
+        scenario_id,
+        req.branch_from_step,
+    )
+    if snap_check is None:
+        raise HTTPException(
+            status_code=404,
+            detail=(
+                f"No snapshot at step {req.branch_from_step} for scenario '{scenario_id}'. "
+                "Advance the scenario to this step before branching."
+            ),
+        )
+
+    cfg_raw["fiscal_multiplier"] = req.fiscal_multiplier
+    branch_config = ScenarioConfigSchema(**cfg_raw)
+    n_steps: int = branch_config.n_steps
+
+    branch_id = str(uuid.uuid4())
+    branch_name = f"{row['name']} [branch]"
+
+    async with conn.transaction():
+        await conn.execute(
+            """
+            INSERT INTO scenarios
+                (scenario_id, name, description, status,
+                 configuration, version, engine_version_hash)
+            VALUES ($1, $2, NULL, 'pending', $3, 1, $4)
+            """,
+            branch_id,
+            branch_name,
+            json.dumps(branch_config.model_dump(mode="json")),
+            _GIT_COMMIT_HASH,
+        )
+
+        input_rows = await conn.fetch(
+            """
+            SELECT step, input_type, input_data FROM scenario_scheduled_inputs
+            WHERE scenario_id = $1 AND step <= $2
+            ORDER BY step, created_at
+            """,
+            scenario_id,
+            req.branch_from_step,
+        )
+        for inp in input_rows:
+            idata = inp["input_data"]
+            if isinstance(idata, str):
+                idata = json.loads(idata)
+            await conn.execute(
+                """
+                INSERT INTO scenario_scheduled_inputs
+                    (id, scenario_id, step, input_type, input_data)
+                VALUES ($1, $2, $3, $4, $5)
+                """,
+                str(uuid.uuid4()),
+                branch_id,
+                inp["step"],
+                inp["input_type"],
+                json.dumps(idata),
+            )
+
+        snapshot_rows = await conn.fetch(
+            """
+            SELECT step, timestep, state_data, events_snapshot, ia1_disclosure
+            FROM scenario_state_snapshots
+            WHERE scenario_id = $1 AND step <= $2
+            ORDER BY step ASC
+            """,
+            scenario_id,
+            req.branch_from_step,
+        )
+        for snap in snapshot_rows:
+            state_raw = snap["state_data"]
+            if isinstance(state_raw, str):
+                state_raw = json.loads(state_raw)
+            events_raw = snap["events_snapshot"]
+            if isinstance(events_raw, str):
+                events_raw = json.loads(events_raw)
+            await conn.execute(
+                """
+                INSERT INTO scenario_state_snapshots
+                    (scenario_id, step, timestep, state_data, events_snapshot, ia1_disclosure)
+                VALUES ($1, $2, $3, $4, $5, $6)
+                """,
+                branch_id,
+                snap["step"],
+                snap["timestep"],
+                json.dumps(state_raw),
+                json.dumps(events_raw) if events_raw is not None else None,
+                snap["ia1_disclosure"],
+            )
+
+    return BranchResponse(
+        branch_scenario_id=branch_id,
+        branch_from_step=req.branch_from_step,
+        n_steps=n_steps,
+    )
+
+
+# ---------------------------------------------------------------------------
+# POST /scenarios/{scenario_id}/rebranch — G6b Mode 3 re-branch (Issue #753)
+# ---------------------------------------------------------------------------
+
+
+@router.post("/scenarios/{scenario_id}/rebranch", response_model=BranchResponse, status_code=200)
+async def rebranch_scenario(
+    scenario_id: str,
+    req: RebranchRequest,
+    conn: Annotated[asyncpg.Connection, Depends(get_db)],
+) -> BranchResponse:
+    """Apply a new parameter change to an existing branch scenario.
+
+    Deletes snapshots from from_step onward, updates fiscal_multiplier in config,
+    and resets status to 'pending' so the branch can advance from from_step.
+    Implements the re-branch accumulation model from mode3-interaction-spec.md §5:
+    the active trajectory accumulates all control inputs; the comparison always
+    answers "what is the total effect of all my control inputs?"
+
+    Returns 404 if the scenario is not found.
+    Returns 404 if no snapshot exists at from_step (can't recompute from there).
+    """
+    row = await conn.fetchrow(
+        "SELECT scenario_id, configuration FROM scenarios WHERE scenario_id = $1",
+        scenario_id,
+    )
+    if row is None:
+        raise HTTPException(status_code=404, detail=f"Scenario '{scenario_id}' not found.")
+
+    snap_check = await conn.fetchrow(
+        "SELECT step FROM scenario_state_snapshots WHERE scenario_id = $1 AND step = $2",
+        scenario_id,
+        req.from_step,
+    )
+    if snap_check is None:
+        raise HTTPException(
+            status_code=404,
+            detail=(
+                f"No snapshot at step {req.from_step} for scenario '{scenario_id}'. "
+                "Cannot re-branch from a step with no snapshot."
+            ),
+        )
+
+    cfg_raw = row["configuration"]
+    if isinstance(cfg_raw, str):
+        cfg_raw = json.loads(cfg_raw)
+    cfg_raw["fiscal_multiplier"] = req.fiscal_multiplier
+    branch_config = ScenarioConfigSchema(**cfg_raw)
+    n_steps: int = branch_config.n_steps
+
+    async with conn.transaction():
+        await conn.execute(
+            "DELETE FROM scenario_state_snapshots WHERE scenario_id = $1 AND step > $2",
+            scenario_id,
+            req.from_step,
+        )
+        await conn.execute(
+            "UPDATE scenarios SET status = 'pending', configuration = $1, updated_at = NOW() "
+            "WHERE scenario_id = $2",
+            json.dumps(branch_config.model_dump(mode="json")),
+            scenario_id,
+        )
+
+    return BranchResponse(
+        branch_scenario_id=scenario_id,
+        branch_from_step=req.from_step,
+        n_steps=n_steps,
+    )
+
+
+# ---------------------------------------------------------------------------
 # POST /scenarios/{scenario_id}/run
 # ---------------------------------------------------------------------------
 
@@ -1530,7 +1901,7 @@ def _boundary_proximity_strategy(
             continue
 
         if is_pre_normalized:
-            score = min(raw_val, Decimal("2.0"))
+            score = max(Decimal("0"), min(raw_val, Decimal("2.0")))
         else:
             boundary_val = boundary_constants[boundary_constant_id]
             if boundary_val == Decimal("0"):
@@ -1541,7 +1912,7 @@ def _boundary_proximity_strategy(
                     indicator_key,
                 )
                 continue
-            score = min(raw_val / boundary_val, Decimal("2.0"))
+            score = max(Decimal("0"), min(raw_val / boundary_val, Decimal("2.0")))
 
         proximity_scores.append(score)
 

@@ -34,10 +34,13 @@ from app.simulation.mda_checker import MDAChecker, alerts_to_events_snapshot
 from app.simulation.modules.demographic.cohort import generate_cohort_specs
 from app.simulation.modules.demographic.module import DemographicModule
 from app.simulation.modules.ecological.module import EcologicalModule
+from app.simulation.modules.external_sector.module import ExternalSectorModule
 from app.simulation.modules.governance.module import GovernanceModule
 from app.simulation.modules.macroeconomic.module import MacroeconomicModule
 from app.simulation.modules.political_economy.module import PoliticalEconomyModule
 from app.simulation.orchestration.inputs import (
+    BilateralTradeShock,
+    CommodityCategory,
     EmergencyInstrument,
     EmergencyPolicyInput,
     FiscalInstrument,
@@ -51,7 +54,11 @@ from app.simulation.orchestration.inputs import (
     TradePolicyInput,
 )
 from app.simulation.orchestration.runner import ScenarioRunner
-from app.simulation.repositories.quantity_serde import quantity_from_jsonb, quantity_from_schema
+from app.simulation.repositories.quantity_serde import (
+    cohort_profile_from_jsonb,
+    quantity_from_jsonb,
+    quantity_from_schema,
+)
 from app.simulation.repositories.snapshot_repository import ScenarioSnapshotRepository
 from app.simulation.repositories.state_repository import (
     SimulationStateRepository,
@@ -282,6 +289,9 @@ class WebScenarioRunner:
             current_state = await _reconstruct_state_from_snapshot(
                 conn, scenario_id, row["name"], state_raw, snap_row["timestep"],
             )
+            # Cohort entities are not persisted in simulation_entities; re-inject
+            # them so DemographicModule sees a complete entity set at every step.
+            _inject_cohort_entities(current_state, config)
             # _reconstruct_state_from_snapshot always returns events=[].
             # Restore the scheduled inputs that fired at current_step as synthetic
             # prior events so MacroeconomicModule's one-step lag design sees them
@@ -514,7 +524,9 @@ def _build_active_modules(config: ScenarioConfigSchema) -> list[SimulationModule
     GovernanceModule, and EcologicalModule are conditionally active based on
     modules_config.
     """
-    modules: list[SimulationModule] = [MacroeconomicModule()]
+    modules: list[SimulationModule] = [
+        MacroeconomicModule(fiscal_multiplier_override=config.fiscal_multiplier),
+    ]
     demo = _build_demographic_module(config)
     if demo is not None:
         modules.append(demo)
@@ -527,6 +539,9 @@ def _build_active_modules(config: ScenarioConfigSchema) -> list[SimulationModule
     pe = _build_political_economy_module(config)
     if pe is not None:
         modules.append(pe)
+    ext = _build_external_sector_module(config)
+    if ext is not None:
+        modules.append(ext)
     return modules
 
 
@@ -554,6 +569,18 @@ def _build_ecological_module(config: ScenarioConfigSchema) -> EcologicalModule |
     if not eco_cfg.get("enabled"):
         return None
     return EcologicalModule()
+
+
+def _build_external_sector_module(
+    config: ScenarioConfigSchema,
+) -> ExternalSectorModule | None:
+    """Return an ExternalSectorModule when commodity price shocks are configured."""
+    if not config.commodity_price_shocks:
+        return None
+    return ExternalSectorModule(
+        commodity_price_shocks=config.commodity_price_shocks,
+        start_date=config.start_date,
+    )
 
 
 def _build_political_economy_module(
@@ -709,10 +736,21 @@ def _deserialize_control_input(
             implementation_years=int(data.get("implementation_years", 1)),
             source=InputSource.SCENARIO_SCRIPT,
         )
+    if input_type == "BilateralTradeShock":
+        return BilateralTradeShock(
+            target_entity=target_entity,
+            source_entity_id=str(data.get("source_entity_id", "")),
+            commodity_category=CommodityCategory(
+                data.get("commodity_category", "fuel")
+            ),
+            magnitude=Decimal(str(data.get("magnitude", "0"))),
+            trade_channel=str(data.get("trade_channel", "import_price")),
+            source=InputSource.SCENARIO_SCRIPT,
+        )
     raise ValueError(
         f"Unknown ControlInput type: {input_type!r}. "
         "Supported: FiscalPolicyInput, EmergencyPolicyInput, TradePolicyInput, "
-        "MonetaryRateInput, StructuralPolicyInput."
+        "MonetaryRateInput, StructuralPolicyInput, BilateralTradeShock."
     )
 
 
@@ -823,8 +861,18 @@ async def _reconstruct_state_from_snapshot(
             meta_raw = json.loads(meta_raw)
 
         attributes = {}
+        cohort_profiles = None
         if isinstance(attr_data, dict):
+            raw_cohort = attr_data.get("_cohort_profiles")
+            if isinstance(raw_cohort, dict):
+                cohort_profiles = {
+                    cohort_key: cohort_profile_from_jsonb(profile_data)
+                    for cohort_key, profile_data in raw_cohort.items()
+                    if isinstance(profile_data, dict)
+                }
             for attr_key, envelope in attr_data.items():
+                if attr_key.startswith("_"):
+                    continue
                 if isinstance(envelope, dict):
                     try:
                         attributes[attr_key] = quantity_from_jsonb(envelope)
@@ -844,6 +892,7 @@ async def _reconstruct_state_from_snapshot(
             entity_type=meta_row["entity_type"],
             attributes=attributes,
             metadata=meta_raw,
+            cohort_profiles=cohort_profiles or None,
         )
 
     scenario_cfg = ScenarioConfig(

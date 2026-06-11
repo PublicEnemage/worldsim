@@ -52,17 +52,6 @@ async function createAndSelectScenario(
   await page.getByRole("button", { name: /Scenarios/ }).click();
 }
 
-async function advanceStep(
-  page: import("@playwright/test").Page,
-  toStep: number,
-  totalSteps: number,
-) {
-  await page.getByRole("button", { name: /Next Step/ }).click();
-  await expect(
-    page.getByText(`Step ${toStep} / ${totalSteps}`),
-  ).toBeVisible({ timeout: 15_000 });
-}
-
 // ---------------------------------------------------------------------------
 // Zone 1 instruments live at every step — full advancement flow
 //

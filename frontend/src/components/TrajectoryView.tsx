@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 /**
  * TrajectoryView — Zone 1A primary instrument.
  *
@@ -38,7 +39,7 @@ export const FRAMEWORKS: readonly FrameworkKey[] = [
 ] as const;
 
 /** connectNulls prop value — must be literally false (AC-015). */
-export const CONNECT_NULLS: false = false;
+export const CONNECT_NULLS = false as const;
 
 /**
  * Returns true when |active - baseline| > 0.01 and both values are non-null.
@@ -263,7 +264,7 @@ export function TrajectoryView({
     return mergeTrajectories(trajectory, baseline_trajectory);
   }, [trajectory, baseline_trajectory]);
 
-  const showBaseline = mode === "MODE_3" && baseline_trajectory !== null;
+  const showBaseline = (mode === "MODE_2" || mode === "MODE_3") && baseline_trajectory !== null;
 
   // Performance mark for AC-007 / MV-002. Fires once when trajectory data first
   // arrives: measures from post-DOM-update to post-paint via requestAnimationFrame.
@@ -394,7 +395,42 @@ export function TrajectoryView({
               />
             ))}
 
-          {/* Baseline ghost Lines (Mode 3) */}
+          {/* Rider #97 — threshold-crossing markers in Mode 3 comparison.
+              Vertical lines at steps where the active trajectory crosses an MDA floor
+              that the baseline did not cross (or vice versa). Only ecological floor
+              is defined in composite score space (1.0 boundary). */}
+          {showBaseline &&
+            trajectory.mda_floors
+              .filter((f) => f.framework === "ecological")
+              .flatMap((floor) =>
+                mergedData
+                  .filter((d) => {
+                    const active = d.ecological_active;
+                    const baseline = d.ecological_baseline;
+                    if (active === null || baseline === null) return false;
+                    const activeBreached = active >= floor.floor_value;
+                    const baselineBreached = baseline >= floor.floor_value;
+                    return activeBreached !== baselineBreached;
+                  })
+                  .map((d) => (
+                    <ReferenceLine
+                      key={`threshold-cross-${floor.framework}-step${d.step_index}`}
+                      x={d.step_index}
+                      stroke={FRAMEWORK_COLORS.ecological}
+                      strokeDasharray="4 2"
+                      strokeOpacity={0.8}
+                      strokeWidth={1.5}
+                      label={{
+                        value: "⚠ threshold",
+                        fontSize: 9,
+                        fill: FRAMEWORK_COLORS.ecological,
+                        position: "top",
+                      }}
+                    />
+                  )),
+              )}
+
+          {/* Baseline ghost Lines (Mode 2 and Mode 3) */}
           {showBaseline &&
             FRAMEWORKS.map((fw) => {
               const isDashed = isSingleEntity && (fw === "financial" || fw === "human_development");
@@ -410,7 +446,7 @@ export function TrajectoryView({
                   connectNulls={CONNECT_NULLS}
                   name={`${legendFormatter(fw, "percentile_rank")} (baseline)` as never}
                   isAnimationActive={false}
-                  legendType="none"
+                  legendType={mode === "MODE_2" ? "line" : "none"}
                 />
               );
             })}

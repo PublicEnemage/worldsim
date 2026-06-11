@@ -1,9 +1,10 @@
 """
 Matrix computation engine — ADR-009 (Simulation Engine Computation Model).
 
-Implements event propagation using NumPy dense matrix operations. Runs
-ALONGSIDE the iterative engine (propagation.py) for the parallel-run phase
-mandated by ADR-009 §Decision 1. Public API is a drop-in mirror of propagate().
+Primary propagation engine as of M12 (#749). Replaces the iterative engine
+(propagation.py) after the ADR-009 §Decision 1 parallel-run phase completed
+with zero divergence across the full backtesting suite for one milestone.
+Public API is a drop-in replacement for propagate().
 
 Mathematical formulation (ADR-009 §Engine Computation Model):
   Weight matrix W (N×N float64):
@@ -70,9 +71,8 @@ _DeltaAccumulator = dict[str, dict[str, Quantity]]
 def propagate_matrix(state: SimulationState, events: list[Event]) -> SimulationState:
     """Apply events to State[T] via matrix operations, return State[T+1].
 
-    Drop-in mirror of propagation.propagate(). Both functions run in CI during
-    the ADR-009 §Decision 1 parallel phase. Output must match propagate()
-    within ADR-009 §Decision 2 tolerance (1e-10 on every Quantity.value)
+    Production propagation engine (M12, #749). Replaces propagation.propagate().
+    Output matches propagate() within ADR-009 §Decision 2 tolerance (1e-10 on every Quantity.value)
     for the equivalence gate to pass.
 
     Args:

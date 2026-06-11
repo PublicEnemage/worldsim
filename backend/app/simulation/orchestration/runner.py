@@ -293,8 +293,6 @@ class ScenarioRunner(InputOrchestrator):
         Returns:
             State[T+1] with all deltas applied and timestep advanced.
         """
-        from app.simulation.engine.propagation import propagate
-
         all_events: list[Event] = []
 
         # Exogenous: inject scheduled inputs
@@ -329,8 +327,12 @@ class ScenarioRunner(InputOrchestrator):
                 )
             seen_event_ids.add(event.event_id)
 
-        # Propagate all events and advance the timestep
-        next_state = propagate(current_state, all_events)
+        # Propagate all events and advance the timestep.
+        # Uses propagate_matrix() — ADR-009 §Decision 1 parallel phase complete;
+        # iterative engine retired as of M12 (#749). Any unexpected failure here
+        # surfaces immediately (no silent fallback to iterative engine).
+        from app.simulation.engine.matrix_propagation import propagate_matrix  # noqa: PLC0415
+        next_state = propagate_matrix(current_state, all_events)
         return dataclasses.replace(
             next_state,
             timestep=_advance_timestep(current_state.timestep, self._timestep_delta),

@@ -259,6 +259,9 @@ endpoints:
     summary: >
       Attribute deltas between two scenarios. delta = value_b - value_a.
       Must appear before /scenarios/{scenario_id} in router registration (FastAPI path ordering).
+      All-attributes mode (Issue #90): when attr is omitted, ALL shared attributes across
+      ALL shared entities are returned in a single call — multi-framework comparison
+      without N serial API calls. Pass attr to filter to a single key.
     auth: none
     query_params:
       - name: scenario_a
@@ -270,13 +273,21 @@ endpoints:
       - name: attr
         type: string
         required: false
-        description: Filter to a single attribute key.
+        description: >
+          Filter to a single attribute key. When omitted, returns all shared
+          attributes across all shared entities (Issue #90, ARCH-REVIEW-002 BI2-I-05).
       - name: step
         type: integer
         required: false
         description: >
           If provided, both scenarios must have a snapshot at this exact step.
           If omitted, uses the latest snapshot for each scenario.
+      - name: threshold_value
+        type: string
+        required: false
+        description: >
+          Optional numeric string. When provided, each DeltaRecord includes
+          threshold_crossed: bool (Issue #153).
     response:
       status: 200
       body:
@@ -293,8 +304,49 @@ endpoints:
             delta: {type: string, description: "Decimal as string; negative for decrease"}
             direction: {type: string, values: ["increase", "decrease", "unchanged"]}
             confidence_tier: {type: integer, description: "max() of both tiers"}
+            threshold_crossed: {type: "bool|null", description: "null when threshold_value not supplied"}
       status_404: "scenario_a or scenario_b not found; or step not found for a scenario"
       status_409: "step omitted and one or both scenarios have no snapshots yet"
+    db_reads: [scenarios, scenario_state_snapshots]
+
+  - method: GET
+    path: /scenarios/compare/trajectory
+    summary: >
+      Per-step attribute trajectory delta between two scenarios — Issue #99,
+      ARCH-REVIEW-002 BI2-N-08. Returns a time series of value_a, value_b,
+      and delta tuples for all steps where both scenarios have snapshots.
+      Enables trajectory analysis and cumulative welfare computation (integral
+      of delta over all steps) in a single API call.
+      Must appear before /scenarios/{scenario_id} in router registration.
+    auth: none
+    query_params:
+      - name: scenario_a
+        type: string
+        required: true
+      - name: scenario_b
+        type: string
+        required: true
+      - name: attribute
+        type: string
+        required: true
+        description: Attribute key to compare across all shared steps.
+    response:
+      status: 200
+      body:
+        scenario_a_id: {type: string}
+        scenario_b_id: {type: string}
+        attribute: {type: string}
+        steps:
+          type: array
+          description: "Sorted ascending by step. One entry per shared step."
+          items:
+            step: {type: integer}
+            value_a: {type: "string|null", description: "Decimal as string; null when attribute absent"}
+            value_b: {type: "string|null", description: "Decimal as string; null when attribute absent"}
+            delta: {type: "string|null", description: "Decimal as string; null when either value absent"}
+            direction: {type: "string|null", values: ["increase", "decrease", "unchanged", null]}
+      status_404: "scenario_a or scenario_b not found"
+      status_409: "one or both scenarios have no snapshots yet"
     db_reads: [scenarios, scenario_state_snapshots]
 
   - method: GET

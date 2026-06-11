@@ -339,11 +339,11 @@ def test_build_greece_scenario_initial_gdp_growth_is_string() -> None:
     assert isinstance(gdp.value, str)
 
 
-def test_build_greece_scenario_has_six_initial_attributes() -> None:
-    """Greece fixture has 6 initial attributes after mean-reversion seed added (Issue #221)."""
+def test_build_greece_scenario_has_ten_initial_attributes() -> None:
+    """Greece fixture has 10 initial attributes after NB-4 investment climate seed (Issue #34)."""
     scenario = build_greece_scenario()
     grc_attrs = scenario.configuration.initial_attributes["GRC"]
-    assert len(grc_attrs) == 6
+    assert len(grc_attrs) == 10
     expected_keys = {
         "gdp_growth",
         "unemployment_rate",
@@ -351,6 +351,10 @@ def test_build_greece_scenario_has_six_initial_attributes() -> None:
         "net_enrollment_secondary",
         "reserve_coverage_months",
         "trend_growth",
+        "sovereign_risk_premium",
+        "fdi_stock_pct_gdp",
+        "portfolio_flow_velocity",
+        "credit_rating_score",
     }
     assert set(grc_attrs.keys()) == expected_keys
 

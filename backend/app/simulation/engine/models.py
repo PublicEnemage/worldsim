@@ -1,5 +1,5 @@
 """
-Simulation core data model — ADR-001, Amendment 1; ADR-011 (non-linear propagation).
+Simulation core data model — ADR-001, Amendments 1 and 2; ADR-011.
 
 All entities, relationships, events, and measurement structures that the
 simulation engine operates on. This module has no database or framework
@@ -10,6 +10,12 @@ Amendment 1 (SCR-001): SimulationEntity.attributes changed from
 dict[str, float] to dict[str, Quantity]. Event.affected_attributes
 changed from dict[str, float] to dict[str, Quantity]. See ADR-001
 Amendment 1 for the full renewal record.
+
+Amendment 2 (Issue #28, Issue #30): CohortProfile type added for income-
+quintile-level disaggregation. SimulationEntity gains optional
+cohort_profiles field (None at Level 1, populated at Level 4+). AttributeType
+enum added to quantity.py for economic-semantic classification. See ADR-001
+Amendment 2 for the full record.
 
 ADR-011: PropagationMode enum added. PropagationRule extended with
 propagation_mode, threshold, and ceiling fields. LINEAR remains the
@@ -94,9 +100,17 @@ class Geometry:
     this as an opaque data holder. PostGIS integration is introduced in
     Milestone 2 — keeping it decoupled here avoids tying the simulation
     layer to the database layer during Milestone 1.
+
+    Attributes:
+        geometry_type: GeoJSON geometry primitive — 'Point', 'Polygon', or
+            'MultiPolygon'.
+        coordinates: GeoJSON coordinates structure. Treated as opaque by the
+            engine; PostGIS consumes it in Milestone 2.
+        crs: Coordinate reference system identifier. Defaults to WGS-84
+            (EPSG:4326).
     """
-    geometry_type: str    # 'Point', 'Polygon', 'MultiPolygon'
-    coordinates: Any      # GeoJSON coordinates structure
+    geometry_type: str
+    coordinates: Any
     crs: str = "EPSG:4326"
 
 
@@ -127,16 +141,27 @@ class ResolutionConfig:
 
 @dataclass
 class ScenarioConfig:
-    """Configuration for a simulation scenario run."""
+    """Configuration for a simulation scenario run.
+
+    Attributes:
+        scenario_id: Unique identifier for this scenario.
+        name: Human-readable display name.
+        description: Free-text description of the scenario.
+        start_date: First timestep of the simulation run.
+        end_date: Last timestep of the simulation run.
+        initial_overrides: Per-entity attribute overrides applied before the
+            first step. Maps entity_id → {attribute_key → override_value}.
+        framework_weights: User-defined weighting across measurement frameworks.
+            Keys are MeasurementFramework values; values sum to 1.0 by convention.
+        metadata: Arbitrary scenario-level metadata (display tags, authorship,
+            etc.) that does not participate in calculations.
+    """
     scenario_id: str
     name: str
     description: str
     start_date: datetime
     end_date: datetime
-    # entity_id -> {attribute_key -> override_value}
     initial_overrides: dict[str, dict[str, float]] = field(default_factory=dict)
-    # user-defined weighting across measurement frameworks
-    # keys are MeasurementFramework values; values sum to 1.0 by convention
     framework_weights: dict[str, float] = field(default_factory=dict)
     metadata: dict[str, Any] = field(default_factory=dict)
 
@@ -166,13 +191,24 @@ class PropagationRule:
     ceiling: CASCADE mode only. Maximum amplification factor relative to the base
       delta magnitude per attribute. Defaults to 1.0 (no amplification beyond base).
       Set > 1.0 to allow cascade amplification; e.g. 3.0 caps at 3× base magnitude.
+
+    Attributes:
+        relationship_type: Edge type that carries this event (e.g. 'trade', 'debt').
+        attenuation_factor: Per-hop scale factor in [0.0, 1.0].
+        max_hops: Maximum number of hops the event may travel. Defaults to 1.
+        propagation_mode: LINEAR (decay), THRESHOLD (conditional decay), or
+            CASCADE (amplification). Defaults to LINEAR.
+        threshold: THRESHOLD mode only — minimum |delta| per attribute required
+            to apply the effect at a target entity. Defaults to 0.0.
+        ceiling: CASCADE mode only — maximum amplification relative to base delta
+            magnitude. Defaults to 1.0 (no amplification).
     """
-    relationship_type: str     # which edge types carry this event
-    attenuation_factor: float  # per-hop scale in [0.0, 1.0]
+    relationship_type: str
+    attenuation_factor: float
     max_hops: int = 1
     propagation_mode: PropagationMode = PropagationMode.LINEAR
-    threshold: float = 0.0     # THRESHOLD mode: min |delta| per attribute
-    ceiling: float = 1.0       # CASCADE mode: max amplification vs base delta
+    threshold: float = 0.0
+    ceiling: float = 1.0
 
 
 # ---------------------------------------------------------------------------
@@ -229,6 +265,41 @@ class DebtProfile:
 
 
 # ---------------------------------------------------------------------------
+# Cohort disaggregation — ADR-001 Amendment 2, Issue #28
+# ---------------------------------------------------------------------------
+
+
+@dataclass
+class CohortProfile:
+    """Income-quintile or age-band level attribute container for one entity cohort.
+
+    CohortProfile is the Level 4 sub-entity structure — it holds Quantity
+    attributes measured at the cohort level rather than the national aggregate.
+    The parent SimulationEntity holds national aggregates in its attributes dict;
+    CohortProfile holds the disaggregated view for one cohort segment.
+
+    Key convention (ADR-001 Amendment 2):
+        Income quintiles: "Q1" (bottom 20%) through "Q5" (top 20%).
+        Age bands: "youth_15_24", "prime_25_54", "older_55_64", "senior_65plus".
+        Combined: compound keys are not used at Level 4 stub — use a single
+        dimension per profile key for legibility.
+
+    confidence_tier inheritance rule (ADR-001 Amendment 2):
+        Each Quantity in attributes carries its own confidence_tier, sourced
+        from the cohort-level data directly (not inherited from the parent
+        entity's aggregate tier). Eurostat EU-SILC cohort data is Tier 2;
+        synthetic cohort estimates are Tier 4.
+
+    Attributes:
+        attributes: Cohort-level simulation state variables as Quantity instances.
+            Same structure as SimulationEntity.attributes — attribute key maps to
+            a typed Quantity carrying value, unit, variable_type, and provenance.
+    """
+
+    attributes: dict[str, Quantity]
+
+
+# ---------------------------------------------------------------------------
 # Core entities
 # ---------------------------------------------------------------------------
 
@@ -250,14 +321,34 @@ class SimulationEntity:
 
     Amendment 1 (SCR-001): attributes changed from dict[str, float] to
     dict[str, Quantity].
+
+    Attributes:
+        id: Unique entity identifier (ISO 3166-1 alpha-3 for country entities).
+        entity_type: Entity class — 'country', 'region', or 'institution'.
+        attributes: Current simulation state variables as Quantity instances.
+            Every attribute carries its unit, variable type, confidence tier,
+            and provenance. Use get_attribute() to retrieve typed Quantities.
+        metadata: Non-simulation data (display names, ISO codes, etc.) that
+            does not participate in calculations.
+        parent_id: Enclosing entity for hierarchical resolution; None for
+            top-level entities.
+        geometry: Spatial reference for the entity; populated in Milestone 2.
+        debt_profile: Structured debt composition (Issue #36). Exposes six
+            debt-structure dimensions via the get_attribute() namespace.
+        cohort_profiles: Income-quintile and age-band level attribute containers
+            (ADR-001 Amendment 2, Issue #28). None at Level 1 (national aggregate);
+            populated at Level 4+ when cohort-level data is available. Keys follow
+            the convention "Q1"–"Q5" for income quintiles, "youth_15_24" for age
+            bands. Stored in state_data JSONB under "_cohort_profiles" sub-key.
     """
     id: str
-    entity_type: str                       # 'country', 'region', 'institution'
-    attributes: dict[str, Quantity]        # current state variables
-    metadata: dict[str, Any]              # non-simulation data
-    parent_id: str | None = None      # enclosing entity for hierarchical resolution
-    geometry: Geometry | None = None  # spatial reference, populated in Milestone 2
-    debt_profile: DebtProfile | None = None  # Issue #36 — structured debt composition
+    entity_type: str
+    attributes: dict[str, Quantity]
+    metadata: dict[str, Any]
+    parent_id: str | None = None
+    geometry: Geometry | None = None
+    debt_profile: DebtProfile | None = None
+    cohort_profiles: dict[str, CohortProfile] | None = None
 
     # Mapping from debt_profile.* attribute keys to DebtProfile field names.
     # Used by get_attribute() to expose debt structure as Quantity attributes
@@ -372,11 +463,20 @@ class Relationship:
     weight graphs). See ARCH-4 in SCR-001 for the rationale.
     attributes uses dict[str, Any] to accommodate mixed relationship data
     (Quantity values and float propagation coefficients).
+
+    Attributes:
+        source_id: ID of the originating entity.
+        target_id: ID of the receiving entity.
+        relationship_type: Edge type — 'trade', 'debt', 'alliance', or 'currency'.
+        weight: Propagation strength in [0.0, 1.0]. Remains float for
+            NumPy-compatible matrix operations (ARCH-4 in SCR-001).
+        attributes: Mixed relationship data (Quantity values and float
+            propagation coefficients).
     """
     source_id: str
     target_id: str
-    relationship_type: str               # 'trade', 'debt', 'alliance', 'currency'
-    weight: float                        # propagation strength, in [0.0, 1.0]
+    relationship_type: str
+    weight: float
     attributes: dict[str, Any] = field(default_factory=dict)
 
 
@@ -396,11 +496,25 @@ class Event:
 
     Amendment 1 (SCR-001): affected_attributes changed from dict[str, float]
     to dict[str, Quantity].
+
+    Attributes:
+        event_id: Unique identifier for this event instance.
+        source_entity_id: ID of the entity that originated the event.
+        event_type: Event class — 'policy_change', 'shock', or
+            'threshold_crossed'.
+        affected_attributes: Map of attribute key → Quantity delta. Each entry
+            is a typed change to be applied to receiving entities.
+        propagation_rules: Determines how far and along which relationship types
+            the event travels beyond the source entity.
+        timestep_originated: Simulation timestep at which this event was generated.
+        framework: Measurement dimension this event belongs to (financial,
+            human_development, ecological, governance).
+        metadata: Arbitrary event metadata for diagnostics and audit trail.
     """
     event_id: str
     source_entity_id: str
-    event_type: str                           # 'policy_change', 'shock', 'threshold_crossed'
-    affected_attributes: dict[str, Quantity]  # attribute key -> Quantity delta
+    event_type: str
+    affected_attributes: dict[str, Quantity]
     propagation_rules: list[PropagationRule]
     timestep_originated: datetime
     framework: MeasurementFramework

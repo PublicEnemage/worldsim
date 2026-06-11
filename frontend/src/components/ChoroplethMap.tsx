@@ -8,6 +8,7 @@ const API_BASE = "http://localhost:8000/api/v1";
 const SOURCE_ID = "worldsim-choropleth";
 const FILL_LAYER_ID = "choropleth-fill";
 const LINE_LAYER_ID = "choropleth-line";
+const HIGHLIGHT_LAYER_ID = "choropleth-active-entity";
 const MAP_STYLE = "https://demotiles.maplibre.org/style.json";
 
 interface Props {
@@ -16,6 +17,8 @@ interface Props {
   scenarioId?: string | null;
   currentStep?: number | null;
   onEntityClick?: (entityId: string) => void;
+  /** All active scenario entities — highlighted with distinct borders (Issue #754). */
+  activeEntityIds?: string[];
 }
 
 // INTENT: Compute five breakpoints [p0, p25, p50, p75, p100] from feature
@@ -75,7 +78,7 @@ function computeSteps(features: GeoJSONFeatureCollection["features"]): number[] 
   return raw;
 }
 
-export default function ChoroplethMap({ attributeName, title, scenarioId, currentStep, onEntityClick }: Props) {
+export default function ChoroplethMap({ attributeName, title, scenarioId, currentStep, onEntityClick, activeEntityIds = [] }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<maplibregl.Map | null>(null);
   const popupRef = useRef<maplibregl.Popup | null>(null);
@@ -83,6 +86,7 @@ export default function ChoroplethMap({ attributeName, title, scenarioId, curren
   const [error, setError] = useState<string | null>(null);
 
   // Keep ref current so the map click handler always calls the latest prop
+  // eslint-disable-next-line react-hooks/refs
   onEntityClickRef.current = onEntityClick;
 
   // Initialise the map once
@@ -169,6 +173,22 @@ export default function ChoroplethMap({ attributeName, title, scenarioId, curren
           },
         });
 
+        // Active entity highlight layer — amber border on all scenario entities (#754)
+        if (map.getLayer(HIGHLIGHT_LAYER_ID)) map.removeLayer(HIGHLIGHT_LAYER_ID);
+        map.addLayer({
+          id: HIGHLIGHT_LAYER_ID,
+          type: "line",
+          source: SOURCE_ID,
+          filter: activeEntityIds.length > 0
+            ? ["in", ["get", "entity_id"], ["literal", activeEntityIds]]
+            : ["==", ["get", "entity_id"], ""],
+          paint: {
+            "line-color": "#f59e0b",
+            "line-width": 3,
+            "line-opacity": 1,
+          },
+        });
+
         // Hover popup
         popupRef.current?.remove();
         const popup = new maplibregl.Popup({
@@ -221,7 +241,22 @@ export default function ChoroplethMap({ attributeName, title, scenarioId, curren
     load().catch(() => {
       setError(`Failed to fetch data for "${attributeName}".`);
     });
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- activeEntityIds handled by separate effect below
   }, [attributeName, title, scenarioId, currentStep]);
+
+  // Update active-entity highlight filter when activeEntityIds changes independently
+  // of a data reload (e.g. user selects a different scenario without changing attribute).
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || !map.isStyleLoaded()) return;
+    if (!map.getLayer(HIGHLIGHT_LAYER_ID)) return;
+    map.setFilter(
+      HIGHLIGHT_LAYER_ID,
+      activeEntityIds.length > 0
+        ? ["in", ["get", "entity_id"], ["literal", activeEntityIds]]
+        : ["==", ["get", "entity_id"], ""],
+    );
+  }, [activeEntityIds]);
 
   return (
     <div

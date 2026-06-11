@@ -1,5 +1,5 @@
 """
-Quantity type system — SCR-001, ADR-001 Amendment 1.
+Quantity type system — SCR-001, ADR-001 Amendment 1; AttributeType ADR-001 Amendment 2.
 
 Every physical and economic measurement in the simulation is a Quantity.
 Never raw float, never raw Decimal without a unit and provenance.
@@ -9,6 +9,17 @@ The VariableType enum determines propagation semantics:
   FLOW   — change over a period; additive accumulation
   RATIO  — dimensionless fraction derived from other quantities; additive
   DIMENSIONLESS — index/score with no natural unit; module-defined update rule
+
+AttributeType (Amendment 2, Issue #30) is a complementary economic-semantic tag:
+  STOCK           — natural capital stock, debt stock, FX reserves (accumulated level)
+  FLOW            — GDP, exports, deficit (change per period)
+  STRUCTURAL_INDEX — governance quality, political stability (index, no natural unit)
+  RATE            — rates per period (inflation rate, unemployment rate)
+
+AttributeType and VariableType are complementary: VariableType drives propagation
+behaviour; AttributeType annotates economic meaning for MDA classification and
+ecological stock-depletion accounting. AttributeType is optional — None when the
+economic class has not been determined.
 
 confidence_tier propagation uses the lower-of-two rule — a deliberately
 conservative policy approximation, not a statistical formula.
@@ -27,6 +38,36 @@ if TYPE_CHECKING:
     from decimal import Decimal
 
     from app.simulation.engine.models import MeasurementFramework
+
+
+class AttributeType(str, Enum):
+    """Economic-semantic classification of simulation attributes (ADR-001 Amendment 2, Issue #30).
+
+    Complements VariableType, which drives propagation behaviour. AttributeType
+    annotates the economic meaning for MDA classification, ecological stock-depletion
+    accounting, and stock-flow identity validation.
+
+    Use AttributeType.STOCK for accumulated levels (forest cover, debt stock, FX reserves).
+    Use AttributeType.FLOW for per-period changes (GDP, exports, fiscal deficit).
+    Use AttributeType.STRUCTURAL_INDEX for quality/governance indexes with no natural unit.
+    Use AttributeType.RATE for rates per period (unemployment rate, inflation rate).
+    """
+
+    STOCK = "stock"
+    """Accumulated level at a point in time. Natural capital stocks, debt outstanding,
+    FX reserves. Stocks can be depleted below irreversible MDA thresholds."""
+
+    FLOW = "flow"
+    """Change or production over a period. GDP, exports, government spending.
+    Flows drive stock updates via the stock-flow identity when stock_flow_identity=True."""
+
+    STRUCTURAL_INDEX = "structural_index"
+    """Quality index or composite score with no natural unit. Political stability,
+    governance effectiveness, V-Dem indicators. Cannot be summed across entities."""
+
+    RATE = "rate"
+    """Rate per unit time. Unemployment rate, inflation rate, GDP growth rate.
+    Expressed as a fraction (0.0–1.0) or annualised percentage."""
 
 
 class VariableType(Enum):
@@ -89,6 +130,11 @@ class Quantity:
             Data Quality Tier System. Defaults to 1 (highest confidence).
             Must be set explicitly at ingestion — do not rely on the default
             for ingested data (ingestion pipeline requirement, SCR-001).
+        attribute_type: Economic-semantic classification (ADR-001 Amendment 2,
+            Issue #30). None when not yet classified. See AttributeType for values.
+        stock_flow_identity: When True, the engine validates that the stock
+            value satisfies stock[t+1] = stock[t] + net_flow[t], surfaced as a
+            warning in Milestone 1. Only meaningful for STOCK attributes.
     """
 
     value: Decimal
@@ -98,6 +144,8 @@ class Quantity:
     observation_date: date | None = None
     source_id: str | None = None
     confidence_tier: int = 1
+    attribute_type: AttributeType | None = None
+    stock_flow_identity: bool = False
 
 
 @dataclass(kw_only=True)

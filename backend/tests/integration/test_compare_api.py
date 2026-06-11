@@ -10,6 +10,10 @@ Covers:
   - GET /scenarios/compare?attr= filters to one attribute
   - GET /choropleth/{attr}/delta returns 404 when no shared attribute in snapshots
   - GET /choropleth/{attr}/delta returns GeoJSONFeatureCollection for valid pair
+  - GET /scenarios/compare/trajectory returns 404 when scenario_a not found (Issue #99)
+  - GET /scenarios/compare/trajectory returns 409 when scenario_a has no snapshots (Issue #99)
+  - GET /scenarios/compare/trajectory returns per-step trajectory for two scenarios (Issue #99)
+  - GET /scenarios/compare/trajectory returns empty steps when no shared steps (Issue #99)
 """
 from __future__ import annotations
 
@@ -301,5 +305,122 @@ async def test_choropleth_delta_missing_snapshot_returns_404(
             params={"scenario_a": sid_a, "scenario_b": sid_b},
         )
         assert res.status_code == 404
+    finally:
+        await _cleanup(db_conn, sid_a, sid_b)
+
+
+# ---------------------------------------------------------------------------
+# GET /scenarios/compare/trajectory — Issue #99
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.asyncio
+async def test_trajectory_compare_scenario_a_not_found_returns_404(
+    client: AsyncClient,
+) -> None:
+    """Unknown scenario_a returns 404."""
+    res = await client.get(
+        "/api/v1/scenarios/compare/trajectory",
+        params={
+            "scenario_a": "no-such-id",
+            "scenario_b": "no-such-id-2",
+            "attribute": "pop",
+        },
+    )
+    assert res.status_code == 404
+
+
+@pytest.mark.asyncio
+async def test_trajectory_compare_no_snapshots_returns_409(
+    client: AsyncClient,
+    db_conn: asyncpg.Connection,
+) -> None:
+    """409 when scenario_a exists but has no snapshots yet."""
+    sid_a = await _insert_scenario(db_conn, status="pending")
+    sid_b = await _insert_scenario(db_conn, status="pending")
+    try:
+        res = await client.get(
+            "/api/v1/scenarios/compare/trajectory",
+            params={"scenario_a": sid_a, "scenario_b": sid_b, "attribute": "pop"},
+        )
+        assert res.status_code == 409
+    finally:
+        await _cleanup(db_conn, sid_a, sid_b)
+
+
+@pytest.mark.asyncio
+async def test_trajectory_compare_happy_path(
+    client: AsyncClient,
+    db_conn: asyncpg.Connection,
+) -> None:
+    """Happy path: two scenarios with matching steps return a trajectory.
+
+    Verifies that:
+    - steps are sorted ascending by step number
+    - value_a, value_b, delta, and direction are correctly computed
+    - the float prohibition holds (delta is a string, not a float)
+    """
+    sid_a = await _insert_scenario(db_conn)
+    sid_b = await _insert_scenario(db_conn)
+    _env_a0 = {"value": "100", "unit": "M", "variable_type": "stock", "confidence_tier": 2}
+    _env_b0 = {"value": "120", "unit": "M", "variable_type": "stock", "confidence_tier": 2}
+    _env_a1 = {"value": "105", "unit": "M", "variable_type": "stock", "confidence_tier": 2}
+    _env_b1 = {"value": "115", "unit": "M", "variable_type": "stock", "confidence_tier": 2}
+    await _insert_snapshot(db_conn, sid_a, 0, {"USA": {"pop": _env_a0}})
+    await _insert_snapshot(db_conn, sid_b, 0, {"USA": {"pop": _env_b0}})
+    await _insert_snapshot(db_conn, sid_a, 1, {"USA": {"pop": _env_a1}})
+    await _insert_snapshot(db_conn, sid_b, 1, {"USA": {"pop": _env_b1}})
+    try:
+        res = await client.get(
+            "/api/v1/scenarios/compare/trajectory",
+            params={"scenario_a": sid_a, "scenario_b": sid_b, "attribute": "pop"},
+        )
+        assert res.status_code == 200
+        body = res.json()
+        assert body["scenario_a_id"] == sid_a
+        assert body["scenario_b_id"] == sid_b
+        assert body["attribute"] == "pop"
+        steps = body["steps"]
+        assert len(steps) == 2
+        # Steps must be sorted ascending
+        assert steps[0]["step"] == 0
+        assert steps[1]["step"] == 1
+        # Step 0: delta = 120 - 100 = 20, direction = increase
+        s0 = steps[0]
+        assert s0["value_a"] == "100"
+        assert s0["value_b"] == "120"
+        assert s0["delta"] == "20"
+        assert s0["direction"] == "increase"
+        assert isinstance(s0["delta"], str)  # float prohibition
+        # Step 1: delta = 115 - 105 = 10, direction = increase
+        s1 = steps[1]
+        assert s1["value_a"] == "105"
+        assert s1["value_b"] == "115"
+        assert s1["delta"] == "10"
+        assert s1["direction"] == "increase"
+    finally:
+        await _cleanup(db_conn, sid_a, sid_b)
+
+
+@pytest.mark.asyncio
+async def test_trajectory_compare_empty_steps_when_no_overlap(
+    client: AsyncClient,
+    db_conn: asyncpg.Connection,
+) -> None:
+    """Returns empty steps list when the two scenarios have no shared step numbers."""
+    sid_a = await _insert_scenario(db_conn)
+    sid_b = await _insert_scenario(db_conn)
+    _env = {"value": "100", "unit": "M", "variable_type": "stock", "confidence_tier": 1}
+    # scenario_a has step 0, scenario_b has step 1 — no overlap
+    await _insert_snapshot(db_conn, sid_a, 0, {"USA": {"pop": _env}})
+    await _insert_snapshot(db_conn, sid_b, 1, {"USA": {"pop": _env}})
+    try:
+        res = await client.get(
+            "/api/v1/scenarios/compare/trajectory",
+            params={"scenario_a": sid_a, "scenario_b": sid_b, "attribute": "pop"},
+        )
+        assert res.status_code == 200
+        body = res.json()
+        assert body["steps"] == []
     finally:
         await _cleanup(db_conn, sid_a, sid_b)

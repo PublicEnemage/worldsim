@@ -144,6 +144,15 @@ class FiscalInstrument(Enum):
     DEBT_ISSUANCE = "debt_issuance"
 
 
+class CommodityCategory(Enum):
+    """Commodity categories for external sector shocks (ADR-012, Issue #751/#752)."""
+
+    FUEL = "fuel"
+    FOOD = "food"
+    METALS = "metals"
+    OTHER = "other"
+
+
 class TradeInstrument(Enum):
     """Trade policy instruments affecting cross-border flows."""
 
@@ -1004,3 +1013,90 @@ class ContingentInput:
     cooldown_periods: int = 1
     documented_rationale: str = ""
     empirical_basis: str = ""
+
+
+# ---------------------------------------------------------------------------
+# External sector inputs (ADR-012, Issue #751)
+# ---------------------------------------------------------------------------
+
+# Fraction of import price shock that reaches bottom-quintile consumption
+# within one simulation step. Approximation calibrated against World Bank
+# food/fuel price transmission studies (2007–2008 crisis). Full calibration
+# deferred to Issue #275.
+_HCL_TRANSMISSION_FACTOR = Decimal("0.3")
+
+
+@dataclass(kw_only=True)
+class BilateralTradeShock(ControlInput):
+    """A bilateral trade disruption injected at a specific simulation step (ADR-012, #751).
+
+    Models: sanctions, bilateral tariff escalation, export channel closures,
+    and any shock originating from a named source entity and landing on a named
+    target entity via their trade relationship.
+
+    Generates two Events:
+      1. Financial: `import_price_inflation` delta on target_entity, FINANCIAL framework.
+      2. Human development: `bottom_quintile_consumption_capacity` delta on target_entity,
+         HUMAN_DEVELOPMENT framework; magnitude = shock * _HCL_TRANSMISSION_FACTOR.
+
+    Attributes:
+        source_entity_id: Entity originating the disruption (e.g. the sanctioning state).
+        commodity_category: Affected commodity category (FUEL, FOOD, METALS, OTHER).
+        magnitude: Positive = import cost increase (price up or volume down).
+            Decimal fraction of baseline import value.
+        trade_channel: "import_price" (default) or "export_revenue".
+    """
+
+    source_entity_id: str = ""
+    commodity_category: CommodityCategory = CommodityCategory.FUEL
+    magnitude: Decimal = Decimal("0")
+    trade_channel: str = "import_price"
+
+    def to_events(self, timestep: datetime) -> list[Event]:
+        from app.simulation.engine.models import Event, MeasurementFramework  # noqa: PLC0415
+
+        fin_delta = Quantity(
+            value=self.magnitude,
+            unit="dimensionless",
+            variable_type=VariableType.FLOW,
+            measurement_framework=MeasurementFramework.FINANCIAL,
+            confidence_tier=3,
+        )
+        hcl_delta = Quantity(
+            value=-(self.magnitude * _HCL_TRANSMISSION_FACTOR),
+            unit="dimensionless",
+            variable_type=VariableType.FLOW,
+            measurement_framework=MeasurementFramework.HUMAN_DEVELOPMENT,
+            confidence_tier=3,
+        )
+        category = self.commodity_category.value
+        return [
+            Event(
+                event_id=f"{self.input_id}-trade-shock-fin-0",
+                source_entity_id=self.source_entity_id or self.target_entity,
+                event_type=f"bilateral_trade_shock_{category}",
+                affected_attributes={"import_price_inflation": fin_delta},
+                propagation_rules=self.propagation_rules,
+                timestep_originated=timestep,
+                framework=MeasurementFramework.FINANCIAL,
+                metadata={
+                    "control_input_id": self.input_id,
+                    "source_entity_id": self.source_entity_id,
+                    "commodity_category": category,
+                    "trade_channel": self.trade_channel,
+                },
+            ),
+            Event(
+                event_id=f"{self.input_id}-trade-shock-hcl-0",
+                source_entity_id=self.source_entity_id or self.target_entity,
+                event_type=f"bilateral_trade_shock_{category}_hcl",
+                affected_attributes={"bottom_quintile_consumption_capacity": hcl_delta},
+                propagation_rules=self.propagation_rules,
+                timestep_originated=timestep,
+                framework=MeasurementFramework.HUMAN_DEVELOPMENT,
+                metadata={
+                    "control_input_id": self.input_id,
+                    "commodity_category": category,
+                },
+            ),
+        ]

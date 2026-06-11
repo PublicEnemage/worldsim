@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-09 (Phase 0 of process redesign sprint complete. PRs #805–#808 merged. Three gaps closed: XD-2 (mission-to-implementation traceability — docs/adr/template.md), XD-1 (minister vs. specialist persona conflict — docs/ux/personas.md §Section 7), FD-1 (north star test as process gate — CLAUDE.md §North Star Test). Phase A sprint entry filed. Awaiting EL endorsement of Phase 0 exit artifact before Phase A opens.)**
+**Last updated: 2026-06-10 (Playwright legibility gates passed — 11/11 at 1440×900. Narrated walkthrough run complete — all five Demo 4 frames captured (frame-a through frame-e-step5-divergence.png). demo-narrated.spec.ts app-ready sentinel fixed (worldsim-map → __worldsim_selectEntity). Prior this session: demo.sh + demo-narrated.spec.ts M12 rewrite (PR #838); Mode 3 scenario evaluation panel (PR #833); walkthrough revision PRs #834 #835 #836. All M12 agent deliverables complete. Awaiting EL: release/m12 → main merge, IR review, stakeholder demo.)**
 **Current milestone:** M12 — Active Control and External Sector (GitHub Milestone 13)
 **Previous milestone:** M11.5 — Usability Validation and Experience Audit (formally closed 2026-06-04; Issue #720 closed; GitHub Milestone 14 closed)
 
@@ -77,7 +77,7 @@ M9 formally closed. Issue #213 (M9 Exit Checklist) closed 2026-05-24. M10 milest
 
 ## Open PRs
 
-No open PRs — board clear as of 2026-06-04 (post PR #742 merge).
+No open PRs — board clear as of 2026-06-07 (post PR #796 merge).
 
 ## M11 Work Streams — 2026-06-04 Sprint
 
@@ -127,6 +127,40 @@ No open PRs — board clear as of 2026-06-04 (post PR #742 merge).
 
 ---
 
+## M12 Sprint Status — Wave 1 (2026-06-05)
+
+Sprint plan: `docs/process/sprint-plans/m12-sprint-plan.md`
+Release branch: `release/m12`
+CI hotfix: NM-035 filed; `ci.yml` PR trigger updated to include `release/m*` (PR #772). `workflow_dispatch` + `force_backtesting` input added (PR #776). All G1–G7 PRs verified — backtesting suite passed on `release/m12` (run 27049255730, 2026-06-05).
+
+**EL decision (2026-06-05):** Re-verification not required for unit/integration/E2E (covered by PR #775 CI). Backtesting gap closed via manual `workflow_dispatch` on `release/m12` — all jobs green including backtesting (53s) and Playwright E2E (3m23s). Fidelity report artifact uploaded. EL satisfied.
+
+| Group | PR | Issues | Status |
+|---|---|---|---|
+| G1 — Instrument cluster display | #762 | #744 #747 | ✓ DONE |
+| G2 — Alert panel drill-in | #764 | #745 | ✓ DONE |
+| G3 — Mode 2 fiscal multiplier | #767 | #746 | ✓ DONE |
+| G4 — Matrix engine production | #769 | #749 | ✓ DONE |
+| G5 — External sector module | #773 | #751 #752 | ✓ DONE (ADR-012 accepted by EL 2026-06-05) |
+| G6a — Multi-country backend | #775 | #754 #103 | ✓ DONE |
+| G6b — Mode 3 Active Control | #778 | #753 | ✓ DONE |
+| G7 — Cloud compute path doc | #774 | #750 | ✓ DONE |
+| NB-7 — Mode 1 COMPARE_VIEW spec | #788 | #451 | ✓ DONE |
+| NB-6 — ESLint audit (react-hooks/react-refresh) | #789 | #644 | ✓ DONE |
+| NB-4 — Investment climate state variables | #790 | #34 | ✓ DONE |
+| Mode 3 E2E fix + ia1_disclosure + cohort gap | #794 | #793 | ✓ DONE (NM-036 filed) |
+| G8 — Demo 4 preparation | #796 | #755 | ✓ DONE 2026-06-07 (Jordan/Egypt Hormuz; PR #796) |
+| G8b — Demo 4 critical fixes | #798 | DEMO4-001 DEMO4-002 | ✓ DONE 2026-06-07 (reserves + unemployment unfrozen; NM-037 NM-038 filed; Issue #799 opened) |
+| G8c — Internal review artifact | #801 | — | ✓ DONE 2026-06-07 (`docs/demo/m12/reviews/2026-06-07-v0.12.0-internal-review.md`; 9 findings) |
+| #814 fix — AlertDetailPanel scroll | #816 | #814 | ✓ DONE 2026-06-09 (`scrollIntoView` on mount; Zone 1B 135px → detail panel below fold) |
+| G9 — Political economy module | — | ADR-013 | DEFERRED TO M13 (EL decision 2026-06-07: option B) |
+| M12 exit compliance | #830 #831 #832 | SCAN-026 (0 violations), ADR-012 diagram, 7 ADR renewals to M13, demo walkthrough, Phase 2 A/B, NM-036 test | ✓ DONE 2026-06-10 — all M12 agent deliverables complete |
+| Mode 3 scenario evaluation | #833 | `docs/demo/m12/reviews/scenario-evaluation-mode3-deliberation.md` + `scenario-evaluation-mode3-recommendation.md` — Dev Economist + Chief Methodologist panel; 4 variant runs (A/B/D); retain current fixture; branch step 3 at 1.30×; reserve invariant documented | ✓ DONE 2026-06-10 |
+| Walkthrough pre-IR revision | #834 | Two-act structure; human moment opening ("There is a room where this happens"); NARRATION-RULING-1 at Steps 3–6; Greece 2014 GDP-vs-human-development asymmetry at Step 7; Argentina MAGNITUDE calibration elevated; Customer Agent accessibility corrections | ✓ DONE 2026-06-10 |
+| Walkthrough conditionality framing | #835 | Step 5 clawback reading (GCC 17.73%→16.59% at step 4; conditionality 16.59%→17.25% at step 5); Step 6 precise branch mechanics ("IMF liquidity stays; austerity does not"); Step 6 reserve invariant caveat (reserves drain identically; "The reserve crisis is survived under better conditions, not avoided") | ✓ DONE 2026-06-10 |
+| Walkthrough Section 4 roadmap | #836 | Feature-list replaced with capability-gaps framing — three gaps (political feasibility, conditionality design, medium-term horizon) each in Umbrella→Fact→Synthesis structure; M14 demo cadence caveat; max length +50% | ✓ DONE 2026-06-10 |
+| Demo prep Steps 3 + 4 | #838 | demo.sh: M12 presenter guide (Jordan/Egypt Hormuz, 22-min two-act timing, reserve invariant caveat, demo-narrated.spec.ts reference); demo-narrated.spec.ts: M12 Playwright narrated spec — 8-step JOR/EGY scenario with commodity_price_shocks + governance seeds, Mode 3 branch at step 3 (1.30× fiscal multiplier), five frame captures at 1440×900 (frame-a–frame-e-step5-divergence.png), no-drawer Zone 1 always-visible UI pattern | ✓ DONE 2026-06-10 |
+
 ## Process Redesign Sprint — Phase 0 Status
 
 **Phase 0: UX/Persona Traceability Upstream of ADR Development**  
@@ -152,10 +186,37 @@ No open PRs — board clear as of 2026-06-04 (post PR #742 merge).
 | XD-1 — Minister vs. specialist persona conflict unresolved | Persona conflict resolution ruling (Step 3) | `docs/ux/personas.md §Section 7` |
 | FD-1 — North star test has no process home | North star test process gate (Step 5) | `CLAUDE.md §North Star Test (Process Gate)` |
 
-**Awaiting EL action:** EL endorsement of Phase 0 exit artifact — `docs/process/sprint-plans/process-redesign-phase0-exit.md §Part VI`. Phase A cannot open until endorsement is recorded.
-
 ---
 
+**Internal demo — COMPLETE (command-line phase)**
+- `demo_hormuz_jordan.py` run from `release/m12` post-PR-#798. Scenario `937a7999-ce59-4e3f-bc12-100f0912327a`.
+- JOR reserves: 7.1→6.2→5.0→3.7→2.5→1.2→0.0→0.0 (CRITICAL MDA step 5 ✓)
+- JOR unemployment: 17.77%→18.26% spike at step 5 (fiscal cut Okun's law signal ✓)
+- EGY reserves: 5.3→4.8→3.9→2.9→2.0→1.1→0.1→0.1 (CRITICAL MDA step 5 ✓)
+- 1292 unit tests pass; ruff clean
+- To run demo: `cd backend && python -m scripts.demo_hormuz_jordan` (suppress SIM-INTEGRITY warnings with `2>/dev/null`)
+
+**Process redesign deliberation — ON MAIN (PR #803, 2026-06-08)**
+- `docs/process/design/2026-06-08-sprint-cadence-acceptance-gates-deliberation.md` — 590 lines
+- Full verbatim deliberation: PI Agent + BPO north star test, PM Agent sequencing proposal (Phase 0 + Phases A–D), 11 north star document gaps with failure mode mapping
+- Status: pre-endorsement — EL endorsement of sequencing plan is the next required action before any implementation begins
+- Also on `release/m12` via PR #802
+
+**Awaiting EL action:**
+- **EL endorsement of Phase 0 exit artifact** — `docs/process/sprint-plans/process-redesign-phase0-exit.md §Part VI`. Phase A cannot open until endorsement is recorded. This is exit gate condition 3.
+- ~~UI screenshot capture~~ — **COMPLETE** (2026-06-10): all five frames in `docs/demo/m12/screenshots/` including Frame E (`frame-e-step5-divergence.png`, step 5 branch trajectory at 1.30×)
+- ~~Playwright legibility gates~~ — **PASSED** (2026-06-10): 11/11 at 1440×900 (`demo-legibility.spec.ts` + `demo-advancement-flow.spec.ts`)
+- ~~Investigate DEMO4-007 (ecological composite 50% drop at step 6)~~ — **FIXED prior session**
+- ~~Decision on DEMO4-005 (add `bottom_quintile_consumption_capacity`)~~ — **FIXED prior session**
+- ~~Silence DEMO4-006 (`[SIM-INTEGRITY]` warnings)~~ — **FIXED prior session**
+- ~~DEMO4-010~~ — **FIXED prior session**
+- Merge `release/m12` → `main` (EL admin action) after Playwright gates and Frame E capture clear
+- IR review from `main` (new session, fresh agent) — activate Independent Review Agent post-merge
+- Stakeholder demo from `main`
+
+**M12 agent deliverables — ALL COMPLETE (2026-06-10)**
+
+---
 
 ## Closed — M11.5 (Usability Validation and Experience Audit)
 
@@ -267,15 +328,33 @@ No open PRs — board clear as of 2026-06-04 (post PR #742 merge).
 
 | PR | Title | Date |
 |---|---|---|
+| #836 | docs(demo): walkthrough Section 4 — capability-gaps reframe (political feasibility, conditionality design, medium-term horizon; M14 cadence caveat) | 2026-06-10 |
+| #835 | docs(demo): walkthrough conditionality framing — clawback reading, branch mechanics, reserve invariant caveat | 2026-06-10 |
+| #834 | docs(demo): walkthrough pre-IR revision — two-act structure, human moment opening, NARRATION-RULING-1, Greece/Argentina framing | 2026-06-10 |
+| #833 | docs(demo): Mode 3 scenario evaluation panel — deliberation + recommendation (retain fixture; branch step 3 at 1.30×) | 2026-06-10 |
+| #832 | docs(adr): M12 exit license audit — renew ADR-001/002/005/007/008/010/011 to M13 | 2026-06-10 |
+| #831 | docs(compliance): SCAN-026 M12 exit gate + ADR-012 Mermaid diagram (0 violations) | 2026-06-10 |
+| #830 | docs+test: M12 exit artifacts — demo walkthrough, Phase 2 A/B report, NM-036 integration test | 2026-06-10 |
+| #816 | fix(frontend): scroll AlertDetailPanel into view on mount (#814) | 2026-06-09 |
 | #808 | docs(process): Phase 0 Step 5 — north star test process gate (CLAUDE.md) and enforcement review | 2026-06-09 |
-| #807 | docs(process): Phase 0 Step 4 — ADR template with Phase 0 traceability requirements encoded | 2026-06-09 |
-| #806 | docs(process): Phase 0 Step 3 — persona traceability spec and conflict resolution ruling (XD-1) | 2026-06-09 |
-| #805 | docs(process): Phase 0 Steps 1–2 — DIC ROADMAP guardrails and UX traceability specification | 2026-06-09 |
+| #796 | feat(demo): G8 — Jordan/Egypt Hormuz Demo 4 (closes #755) | 2026-06-07 |
+| #795 | chore(state): SESSION_STATE.md — NM-036 ia1_disclosure branch snapshot | 2026-06-07 |
+| #794 | fix(e2e+engine): Mode 3 E2E selector fix + ia1_disclosure copy + cohort reconstruction gap (closes #793) | 2026-06-07 |
+| #791 | chore(state): SESSION_STATE.md — Wave C complete (NB-4/NB-6/NB-7 merged) | 2026-06-07 |
+| #790 | feat(engine): NB-4 — investment climate state variables: sovereign_risk_premium, fdi_stock_pct_gdp, portfolio_flow_velocity, credit_rating_score (closes #34) | 2026-06-07 |
+| #789 | fix(frontend): NB-6 — ESLint audit: 80 violations in react-hooks, react-refresh, no-unused-expressions (closes #644) | 2026-06-07 |
+| #788 | docs(ux): NB-7 — Mode 1 COMPARE_VIEW spec: entry point, API design, Persona 3 user story (closes #451) | 2026-06-07 |
+| #778 | feat(mode3): G6b — Mode 3 Active Control branch-and-recompute (closes #753) | 2026-06-05 |
+| #775 | feat(engine): G6a — multi-country scenario backend, threshold_crossed, multi-entity choropleth + identity header | 2026-06-05 |
+| #774 | docs(arch): G7 — cloud compute path document (closes #750) | 2026-06-05 |
+| #773 | feat(engine): G5 — external sector module: BilateralTradeShock + CommodityPriceShock (ADR-012) | 2026-06-05 |
+| #772 | ci: NM-035 hotfix — add release/m* to ci.yml pull_request and push branch triggers | 2026-06-05 |
+| #769 | feat(engine): G4 — matrix engine production migration (closes #749) | 2026-06-05 |
+| #767 | feat(ux): G3 — Mode 2 fiscal multiplier parameter input (closes #746) | 2026-06-05 |
+| #764 | feat(ux): G2 — MDA alert panel interactive drill-in (closes #745) | 2026-06-05 |
+| #762 | feat(ux): G1 — instrument cluster display + scenario identity header (closes #744 #747) | 2026-06-05 |
 | #759 | process(integrity): NM-034 — PM Agent filed NM entries without PI activation | 2026-06-05 |
 | #758 | process(raci): NM registry no-delegation clause — PI Agent activation required before any NM entry | 2026-06-05 |
-| #756 | docs(roadmap): M12 scope linkage — all deliverables linked to GitHub issues (#749–#755) | 2026-06-05 |
-| #742 | docs(ux): M11.5 tertiary deliverable — feature catalogue with per-capability discoverability | 2026-06-04 |
-| #741 | docs(ux): M11.5 Priority A synthesis — cross-session findings, ranked M12 actions, exit verdict | 2026-06-04 |
 | #740 | chore(state): SESSION_STATE.md — M11.5 Priority A sessions complete (PRs #736/#738/#739) | 2026-06-04 |
 | #739 | ux(pillar-2): Session P5-001 — Persona 5 cold-start findings (Executive board briefing) | 2026-06-04 |
 | #738 | feat(ux): session P1-001 Persona 1 findings — fiscal multiplier analysis NOT MET | 2026-06-04 |

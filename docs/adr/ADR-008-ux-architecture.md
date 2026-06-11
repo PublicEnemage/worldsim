@@ -6,10 +6,12 @@ Accepted
 ## Validity Context
 
 **Standards Version:** 2026-05-22
-**Valid Until:** Milestone 11.5 — Usability Validation and Experience Audit
+**Valid Until:** Milestone 13 — Methodology Publication and Public Launch
 **License Status:** ACCEPTED — 2026-05-22
 
-**M11 exit review:** 2026-06-04 (SCAN-025). No renewal triggers fired during Milestone 11. No frontend components modified in M11. PoliticalEconomyModule outputs (`legitimacy_index`, `programme_survival_probability`, `elite_capture_divergence`) are engine outputs — their Zone placement is specified in the M11 political economy user stories (Issue #681, PR #713) as Zone 2; no Zone 1 instrument layout changes required. `_steps_projected` envelope field is backend-only. No mode transition, Zone boundary, simultaneous-update contract, or confidence tier visual changes. License renewed to Milestone 11.5. M11.5 usability audit may surface Zone 1 layout findings that trigger a renewal — evaluate at M11.5 exit.
+**M12 exit review:** 2026-06-10 (SCAN-026). Renewal trigger fired: live A/B comparison invocation model changed. Mode 3 Active Control implements A/B comparison via explicit user branch action (`POST /scenarios/{id}/branch`) rather than automatic triggering on first ControlInput. Amendment 1 appended — documents old contract, new contract, and rationale. Renewal trigger text in §Renewal Triggers updated to reflect new contract. Zone definitions, control plane zone sizing, step axis annotation schema, blue/orange color assignment, confidence tier visual rules, mode transition design, simultaneous instrument update contract, and methodology documentation access model all unchanged. License renewed to Milestone 13.
+
+**Previously reviewed:** 2026-06-04 — M11 exit review (SCAN-025). No renewal triggers fired during Milestone 11. No frontend components modified in M11. PoliticalEconomyModule outputs (`legitimacy_index`, `programme_survival_probability`, `elite_capture_divergence`) are engine outputs — their Zone placement is specified in the M11 political economy user stories (Issue #681, PR #713) as Zone 2; no Zone 1 instrument layout changes required. `_steps_projected` envelope field is backend-only. No mode transition, Zone boundary, simultaneous-update contract, or confidence tier visual changes. License renewed to Milestone 11.5. M11.5 usability audit may surface Zone 1 layout findings that trigger a renewal — evaluate at M11.5 exit.
 
 **M10 exit review:** 2026-06-02 (SCAN-024). No renewal triggers fired during Milestone
 10. All four Zone 1 instruments implemented per ADR-008 spec — implementation of the
@@ -36,8 +38,8 @@ renewal triggers at M11 exit. Next scheduled review at Milestone 11 close.
 - Control plane zone sizing revised or its reserved position moved
 - Step axis annotation schema fields (`effective_from`, `step_event_label`,
   `step_significance`) renamed, typed differently, or removed
-- Live A/B comparison invocation model changed (currently: automatic on first
-  control input — any change to this contract triggers renewal)
+- Live A/B comparison invocation model changed (currently: explicit user branch
+  action via `POST /scenarios/{id}/branch` — any change to this contract triggers renewal)
 - Blue/orange color assignment changed (currently: blue = policy input, orange =
   exogenous shock — cross-layer consistency is a hard contract)
 - Confidence tier visual differentiation rules changed (solid/dashed/opacity
@@ -1029,3 +1031,29 @@ context, and the EntityDetailDrawer. The control plane zone's three modal states
 (empty in Mode 1, scenario configuration in Mode 2, policy instruments and scenario
 shocks forms in Mode 3) are shown as mode-conditional content within a persistent
 layout zone.
+
+---
+
+## Amendment 1 — M12 Mode 3: A/B Comparison Invocation Model (Explicit Branch Action)
+
+**Date:** 2026-06-10
+**Trigger:** Live A/B comparison invocation model changed (§Renewal Triggers)
+**Implemented in:** M12 Mode 3 Active Control — `POST /scenarios/{id}/branch` endpoint
+
+### What Changed
+
+The live A/B comparison invocation model changed from **automatic** (engine-triggered on first ControlInput) to **explicit** (user-triggered branch action via `POST /scenarios/{id}/branch`).
+
+**Old contract (pre-M12):** In Mode 3, A/B comparison was triggered automatically when the user first injected a control input. The engine detected the ControlInput at step N and began rendering the post-input trajectory against the pre-input baseline without explicit user confirmation.
+
+**New contract (M12 forward):** The user explicitly creates a branch by calling `POST /scenarios/{id}/branch` with `branch_from_step` (integer — which step to branch from) and `fiscal_multiplier` (Decimal — the new fiscal parameter for the branch scenario). This creates a branch scenario as a sibling in the database. Zone 1A renders two trajectories simultaneously: (1) the pre-branch trajectory as a ghost curve and (2) the active branch trajectory as the primary curve. The visual specification for the ghost curve is in ADR-010 Amendment 1.
+
+### Why This Change Is Correct
+
+The explicit branch model better serves the Mode 3 cognitive task. An automatic trigger on "first control input" creates a branch without the user choosing the branch point — the branch-from step is implicitly the step at which the first ControlInput fires. The explicit model allows the user to choose the step from which to branch, enabling deliberate "what if I had acted at step 3 instead of step 5?" comparisons.
+
+The explicit model aligns with the "pilot" metaphor: the user decides when to branch, not the engine. A pilot who selects a new heading deliberately is making a different cognitive gesture than a simulator that automatically shows the divergence from any input.
+
+### Impact on Other Decisions
+
+No other ADR-008 decisions are affected. Zone boundaries, step axis annotation, blue/orange color assignment, confidence tier visual rules, mode transition design, and methodology access model are all unchanged. The control plane zone reserved in Mode 3 for the branch action interface was already specified in Decision 9 — the branch UI lives within that reserved zone.

@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 /**
  * InstrumentCluster — Zone 1 two-column layout container.
  *
@@ -36,6 +37,8 @@ interface InstrumentClusterProps {
   mdaPanel?: React.ReactNode;
   pmmWidget?: React.ReactNode;
   fourFramework?: React.ReactNode;
+  /** Human cost ledger strip rendered below Zone 1A trajectory chart (Issue #747). */
+  cohortPanel?: React.ReactNode;
   /** Entity ISO codes for multi-case Mode 1 tick format (UD-R2). */
   entityIds?: string[];
 }
@@ -44,6 +47,7 @@ export function InstrumentCluster({
   mdaPanel,
   pmmWidget,
   fourFramework,
+  cohortPanel,
   entityIds,
 }: InstrumentClusterProps) {
   const { mode } = useScenarioStepStore();
@@ -62,16 +66,17 @@ export function InstrumentCluster({
         overflow: "hidden",
       }}
     >
-      {/* Zone 1A — Trajectory View */}
+      {/* Zone 1A — Trajectory View + Human Cost Ledger strip (Issue #747) */}
       <div
         data-testid="zone-1a-trajectory-container"
-        style={{ gridColumn: 1, gridRow: 1, minWidth: layout.trajectory }}
+        style={{ gridColumn: 1, gridRow: 1, minWidth: layout.trajectory, display: "flex", flexDirection: "column" }}
       >
         <TrajectoryView
           width={layout.trajectory}
           entityIds={entityIds}
           data-testid="zone-1a-trajectory"
         />
+        {cohortPanel}
       </div>
 
       {/* Zone 1B/1C/1D — Co-primary cluster */}
