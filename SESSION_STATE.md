@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-11 (Step 9 simulated stakeholder session COMPLETE — north star PASS; stakeholder-review artifact filed (PR #886); screenshots recaptured with PR #880 UI changes (PR #883); two new issues filed: #884 (reserve value not on screen), #885 (Exploratory tier misclassifies baseline observation). #843 (live external session) is the remaining M12 closure gate. Board clear.)**
+**Last updated: 2026-06-11 (Phase 0 EL endorsement recorded; Phase A open. #843 deferred to M14 (live external demo, repurposed as M14 closure gate). M12 formally complete — exit checklist #263 is the only remaining gate. Board clear.)**
 **Current milestone:** M12 — Active Control and External Sector (GitHub Milestone 13)
 **Previous milestone:** M11.5 — Usability Validation and Experience Audit (formally closed 2026-06-04; Issue #720 closed; GitHub Milestone 14 closed)
 
@@ -105,8 +105,8 @@ No open PRs — board clear as of 2026-06-11 (post PR #886 merge).
 **GitHub Milestone:** 13 | **Status: FULLY EVACUATED (2026-06-11)**
 
 All M12 issues are either closed or migrated. GitHub Milestone 13 has 0 open issues.
-M12 is formally inactive — it will be officially closed once #843 (live stakeholder demo, now M13)
-runs and #263 (exit checklist, now M14) is signed off.
+M12 is formally complete — exit checklist #263 (M14) is the only remaining closure gate.
+#843 (live external demo) deferred to M14 (EL decision 2026-06-11); M12 simulated session stands as M12 demo evidence.
 
 **Issue disposition summary:**
 - All immediate-horizon M12 deliverables shipped (G1–G8, Wave 1 complete)
@@ -155,7 +155,7 @@ CI hotfix: NM-035 filed; `ci.yml` PR trigger updated to include `release/m*` (PR
 ## Process Redesign Sprint — Phase 0 Status
 
 **Phase 0: UX/Persona Traceability Upstream of ADR Development**  
-**Status:** Steps 1–5 COMPLETE — awaiting EL endorsement (Step 6)
+**Status:** COMPLETE — EL endorsement recorded 2026-06-11. Phase A OPEN.
 
 | Step | Agent | Output | PR | Status |
 |---|---|---|---|---|
@@ -165,9 +165,9 @@ CI hotfix: NM-035 filed; `ci.yml` PR trigger updated to include `release/m*` (PR
 | 3b — Persona conflict resolution ruling | Business PO | `docs/ux/personas.md §Section 7` — Closes **XD-1** | #806 | ✅ Merged |
 | 4 — ADR template + canonical placement | Architect Agent | `docs/adr/template.md` + CODING_STANDARDS.md reference — Closes **XD-2** | #807 | ✅ Merged |
 | 5 — North star test process gate | PI Agent | `CLAUDE.md §North Star Test (Process Gate)` — Closes **FD-1**; 4 template enforcement amendments | #808 | ✅ Merged |
-| 6 — EL endorsement | EL | `docs/process/sprint-plans/process-redesign-phase0-exit.md §Part VI` | TBD | ⏳ Awaiting EL |
+| 6 — EL endorsement | EL | `docs/process/sprint-plans/process-redesign-phase0-exit.md §Part VI` | — | ✅ Endorsed 2026-06-11 |
 
-**Phase A sprint entry filed:** `docs/process/sprint-plans/process-redesign-phaseA-sprint-entry.md` — Opens when EL endorses Phase 0.
+**Phase A sprint entry filed:** `docs/process/sprint-plans/process-redesign-phaseA-sprint-entry.md` — **Phase A is now open.**
 
 **Gaps closed:**
 
@@ -194,12 +194,10 @@ CI hotfix: NM-035 filed; `ci.yml` PR trigger updated to include `release/m*` (PR
 - Also on `release/m12` via PR #802
 
 **Awaiting EL action:**
-- **EL endorsement of Phase 0 exit artifact** — `docs/process/sprint-plans/process-redesign-phase0-exit.md §Part VI`. Phase A cannot open until endorsement is recorded. This is exit gate condition 3.
-- **Live stakeholder demo** (#843) — M12 closure gate (EL decision 2026-06-10). Pre-demo blockers resolved (PR #854 merged): DEMO-039, DEMO-041, DEMO-052, DEMO-053, DEMO-054 (testMatch guard, PR #857 pending). DEMO-055 (entity narration fix, PR #857 pending). Remaining open: #852 alert panel master-detail UX. Produces `YYYY-MM-DD-v0.12.0-stakeholder-review.md` artifact.
-- **EL endorsement of Phase 0 exit artifact** — `docs/process/sprint-plans/process-redesign-phase0-exit.md §Part VI`. Phase A cannot open until endorsement is recorded. This is exit gate condition 3.
+- ~~Phase 0 EL endorsement~~ — **RECORDED 2026-06-11** (`docs/process/sprint-plans/process-redesign-phase0-exit.md §Part VI`). XD-1, XD-2, FD-1 closed. **Phase A is now open.** Entry: `docs/process/sprint-plans/process-redesign-phaseA-sprint-entry.md`.
 - ~~Step 6c gate~~ — **PASS (2026-06-11)**: PR #880 resolved DEMO-070/071/081/090; DEMO-080 accepted as-is by EL (tablet scale, out of scope for 1440×900 live demo). Audience simulation review updated. Step 9 unblocked.
 - ~~Step 9 simulated session~~ — **COMPLETE (2026-06-11)**. North star verdict: PASS. Aicha: "The conditionality dispute is about who absorbs the employment cost — the reserve crisis happens either way. That argument is now quantified." Artifact: `docs/demo/m12/reviews/2026-06-11-v0.12.1-stakeholder-review.md` (PR #886). Screenshots recaptured with PR #880 UI changes (PR #883). Two new M13 issues: #884 (reserve value not on screen), #885 (Exploratory tier on baseline vs. projection). Per-entity curves (#845) confirmed as primary unresolved UX gap.
-- **Live external stakeholder session** (#843) — M12 closure gate. **Awaiting EL.** Simulated session validated the demo is ready. Known gaps to manage: #845 (presenter must name curves verbally), #884 (presenter must read reserve value aloud). Produces final `YYYY-MM-DD-v0.12.1-stakeholder-review.md` update when real participants attend.
+- ~~#843 M12 live external demo~~ — **DEFERRED TO M14** (EL decision 2026-06-11). Issue repurposed as M14 closure gate: live stakeholder demo with real external participants, timed to coincide with methodology publication. M12 simulated session (north star PASS) stands as M12 closure evidence. M12 is now formally complete pending only the exit checklist (#263).
 - ~~#852~~ — **DEFERRED TO M13** (EL decision 2026-06-11): alert panel master-detail UX requires Frontend architecture review, ADR, UX Designer + Design Thinking agent input.
 - ~~#841 DEMO-041~~ — **CLOSED** (PR #854)
 - ~~#842 DEMO-039~~ — **CLOSED** (PR #854)
@@ -263,6 +261,7 @@ CI hotfix: NM-035 filed; `ci.yml` PR trigger updated to include `release/m*` (PR
 | #846 | ux: DEMO-045 — Mode 3 branch comparison values not in instrument | near-term |
 | #884 | ux: reserve_coverage_months value not surfaced as readable metric in instrument cluster | near-term |
 | #885 | ux: Exploratory confidence tier misclassifies baseline observation vs. forward projection | near-term |
+| #843 | plan: M14 closure — live stakeholder demo with real external participants (deferred from M12, EL decision 2026-06-11) | immediate |
 
 ---
 
