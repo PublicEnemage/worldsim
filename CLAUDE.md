@@ -652,7 +652,8 @@ the artifact type and cannot be caught by CI.
 | Near-Miss Registry | `docs/process/near-miss-registry.md` | Single file — append NM entries only | Append only; never insert mid-registry |
 | Known Issues Registry | `docs/process/known-issues-registry.md` | Single file — append KI entries only | Append only; never insert mid-registry |
 | Internal Demo Reviews | `docs/demo/{milestone}/reviews/` | `YYYY-MM-DD-vX.X.X-internal-review.md` | New file per demo cycle (even-numbered milestones) |
-| Stakeholder (IR) Reviews | `docs/demo/{milestone}/reviews/` | `YYYY-MM-DD-vX.X.X-stakeholder-review.md` | New file per demo cycle; authored by Independent Review Agent (Step 7); distinct from internal-review.md (Issue #528) |
+| Independent Review (IR) | `docs/demo/{milestone}/reviews/` | `YYYY-MM-DD-vX.X.X-ir-review.md` | Pre-demo quality gate; authored by Independent Review Agent (Step 7); distinct from internal-review.md. EL decision 2026-06-10. |
+| Stakeholder Reviews | `docs/demo/{milestone}/reviews/` | `YYYY-MM-DD-vX.X.X-stakeholder-review.md` | Post-demo artifact; authored after the live stakeholder demo runs; captures attendees, questions raised, and outcome. A placeholder with templated sections is created at milestone close and filled in after the demo. EL decision 2026-06-10. |
 | Security Review Reports | `docs/compliance/security-reviews/` | `YYYY-MM-DD-security-review-[topic].md` | New file per review; authored by Security & Review Agent; topic is a short kebab-case label (e.g., `dual-use-financial-attack-surface`) (Issue #528) |
 
 ### Pre-creation checklist for documents

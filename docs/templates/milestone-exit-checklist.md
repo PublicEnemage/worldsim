@@ -123,6 +123,34 @@ severity thresholds, and disposition record requirements.
 
 ---
 
+## Demo Milestone Requirements (even-numbered milestones only — M6, M8, M10, M12, ...)
+
+*Skip this section entirely for odd-numbered milestones. For even-numbered milestones, all
+checkboxes are required exit gate items unless explicitly deferred with EL rationale.*
+
+**Independent Review (Step 7):**
+- [ ] IR review artifact filed: `docs/demo/m{N}/reviews/YYYY-MM-DD-v{N}-ir-review.md`
+- [ ] All CRITICAL IR findings are either resolved (PR merged) or carry explicit EL deferral
+      rationale as a comment on the filed GitHub issue.
+- [ ] All HIGH IR findings are filed as GitHub issues before the stakeholder session runs.
+
+**Live Stakeholder Demo (Step 9):**
+- [ ] At least one domain expert stakeholder confirmed and present at the session.
+- [ ] Stakeholder review artifact filed: `docs/demo/m{N}/reviews/YYYY-MM-DD-v{N}-stakeholder-review.md`
+      (the `PENDING-v{N}-stakeholder-review.md` placeholder has been renamed and completed).
+- [ ] North star test answered specifically in the stakeholder review — naming the finance
+      minister scenario, the concrete capability evaluated, and whether it changed what the
+      minister's team could argue at the table. "Improves situational awareness" is not an answer.
+- [ ] GitHub issues filed from stakeholder session for any newly identified capability gaps.
+
+**Deferral rule:** If the live stakeholder demo cannot run before milestone close (no stakeholder
+available, pre-demo IR findings unresolved), the EL must explicitly approve deferral as a comment
+on this Issue. The `PENDING-v{N}-stakeholder-review.md` placeholder must exist and GitHub issue
+#NNN tracking the live demo must be open and assigned to the next milestone. A milestone that
+closes without a stakeholder demo or an explicit deferral approval has not completed its exit gate.
+
+---
+
 ## Engineering Lead Sign-off
 
 - [ ] Socratic Agent TEST session completed on Milestone MILESTONE_NUMBER architecture.
