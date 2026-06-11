@@ -17,6 +17,11 @@ import { defineConfig } from "@playwright/test";
 
 export default defineConfig({
   testDir: "./tests/e2e",
+  // Restrict to the current milestone's demo spec only. Without this, any
+  // pattern-based invocation matches all demo-narrated-*.spec.ts files and
+  // triggers concurrent TTS narration from M6/M8/M10/M12 simultaneously.
+  // NM-040 / Issue #855.
+  testMatch: ["**/demo-narrated.spec.ts"],
   timeout: 60_000,
   reporter: [["list"]],
   use: {
