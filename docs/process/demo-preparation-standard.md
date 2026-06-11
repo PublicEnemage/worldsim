@@ -410,6 +410,12 @@ discretion.
 
 ### Step 7 — Independent Review Agent
 
+**Prerequisite — merge `release/m{N}` → `main` first.** Steps 7 and 6c are post-release-merge
+quality gates. The IR Agent and persona panel must review the artifacts as they exist on `main`
+— the branch that represents the shipped milestone state. The Engineering Lead performs the
+admin merge (`release/m{N}` → `main`) before Step 7 is activated. Claude Code does not merge
+release branches to main.
+
 Activate a fresh Claude instance. Follow `docs/process/independent-review-prompt.md` exactly:
 
 - Message 1: context setting (no screenshots yet)
