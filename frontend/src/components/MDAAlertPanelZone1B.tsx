@@ -77,7 +77,7 @@ export function sortAlerts(alerts: Zone1BAlert[]): Zone1BAlert[] {
 export function getNegotiationLabel(tier: number): string {
   if (tier <= 2) return "High confidence — cite directly";
   if (tier === 3) return "Moderate confidence — cite with caveat";
-  return "Exploratory — do not cite";
+  return "Early estimate — confirm before citing";
 }
 
 /**
@@ -515,7 +515,9 @@ function FullDensityAlertRow({ alert, mode, isFocused, onClick }: FullDensityRow
             letterSpacing: 0.5,
           }}
         >
-          {alert.severity}
+          {alert.severity === "TERMINAL"
+            ? `${alert.severity} (threshold crossed)`
+            : alert.severity}
         </span>
         <span
           data-testid="alert-framework-source"
