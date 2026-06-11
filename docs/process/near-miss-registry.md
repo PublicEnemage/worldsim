@@ -2054,6 +2054,37 @@ The first Playwright execution attempt in the session. No downstream artifacts w
 
 ---
 
+## NM-040 — playwright.demo.config.ts Had No testMatch Guard; Pattern Invocation Triggered Concurrent TTS from Four Specs (Reactive)
+
+**Date:** 2026-06-11
+**Milestone:** M12 — Active Control and External Sector
+**Detected by:** M12 pre-demo rehearsal — four overlapping TTS narration streams fired simultaneously
+**Severity:** Medium
+
+### What happened
+
+During M12 pre-demo rehearsal, the narrated spec was invoked using a pattern argument (`npx playwright test --config playwright.demo.config.ts "demo-narrated" --headed`) instead of the full spec path. `playwright.demo.config.ts` had `testDir: "./tests/e2e"` with no `testMatch` restriction, so the pattern matched all four spec files containing "demo-narrated" in their name: `demo-narrated-m6.spec.ts`, `demo-narrated-m8.spec.ts`, `demo-narrated-m10.spec.ts`, and `demo-narrated.spec.ts` (M12). All four ran in parallel. Each spec calls `speak.sh`, producing four concurrent TTS narration streams during what was intended to be a single-spec rehearsal run.
+
+`scripts/demo.sh --run` was already correct — it invokes the spec by full path with `--project=chromium`. The concurrent invocation occurred when bypassing the shell script and running Playwright directly with a pattern.
+
+### What was at risk
+
+A presenter running a rehearsal using the pattern form would hear overlapping narration from M6, M8, M10, and M12 simultaneously — an unrecoverable rehearsal disruption. More critically, a presenter who did not know to use `demo.sh --run` and reached for `npx playwright test ... "demo-narrated"` before a live demo would trigger the same failure in front of stakeholders, with no fast recovery path.
+
+The config offered no protection against the pattern invocation. The correct form was documented in the spec header comment and in `demo.sh`, but was not enforced by the config itself.
+
+### What caught it
+
+Pre-demo rehearsal 2026-06-11. The failure was immediately recognizable (four narrations competing). No live stakeholder was present.
+
+### Process improvement
+
+1. **Immediate fix:** `testMatch: ["**/demo-narrated.spec.ts"]` added to `playwright.demo.config.ts` (PR #857, Issue #855). The config now ignores any spec not matching this pattern regardless of the pattern passed on the command line. Archived specs (`demo-narrated-m6.spec.ts`, etc.) are tested via `playwright.config.ts` (CI), not the demo config.
+
+2. **Root cause:** The config was written to restrict by `testDir` only, relying on correct invocation discipline. The process improvement is to make configs self-protecting: a config whose purpose is to run one specific spec should restrict to that spec by `testMatch`, not rely on callers to provide the correct pattern.
+
+---
+
 ## Registry Maintenance
 
 ### How to add an entry

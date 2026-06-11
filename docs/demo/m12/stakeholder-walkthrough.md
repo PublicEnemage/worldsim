@@ -251,6 +251,11 @@ selector shows step 1 of 8. The step label reads 2024.
 >
 > This is the two-country argument. Watch what happens to each country's
 > trajectory as the same shock accumulates.
+>
+> On the trajectory chart, Jordan's primary curve tracks reserve coverage —
+> it starts healthy and will decline over six steps under fuel import pressure.
+> Egypt's primary curve tracks governance — it starts already far below its
+> minimum floor, before the shock adds a single step of pressure.
 
 **FACTS:**
 
@@ -410,14 +415,14 @@ CRITICAL breach for Jordan with consecutive breach count.
 > The alert panel shows a CRITICAL alert: reserve_coverage_months, step 5,
 > first CRITICAL breach. The alert reads the finding, not a prediction.
 >
-> The trajectory chart also carries a second reading at step 5, on the
+> The trajectory chart also carries a second reading at step 5, on Jordan's
 > unemployment curve. At step 4, the GCC emergency support — arriving at step 3 with a
-> one-step lag — drove unemployment from 17.73% down to 16.59%. At step 5,
+> one-step lag — drove Jordan's unemployment from 17.73% down to 16.59%. At step 5,
 > the IMF conditionality fires with its own one-step lag: the spending
-> reduction scheduled at step 4 hits the growth trajectory, and unemployment
+> reduction scheduled at step 4 hits the growth trajectory, and Jordan's unemployment
 > reverses back to 17.25%. The GCC support improved things. The conditionality
 > clawed back most of the gain within a single step. Both movements are visible
-> on the same curve.
+> on Jordan's curve.
 
 **SYNTHESIS:**
 
@@ -513,10 +518,10 @@ being answered in real time.
 > The branch models "we accept the programme; we negotiate away the spending
 > cut."
 >
-> The primary divergence between the two curves appears at step 5, not step 4.
+> The primary divergence between Jordan's two curves appears at step 5, not step 4.
 > The GCC multiplier alone adds approximately +0.68pp GDP at step 4. The
 > absence of conditionality adds approximately +1.70pp GDP at step 5 — more
-> than twice the multiplier effect. Watch step 5 on the unemployment curves,
+> than twice the multiplier effect. Watch step 5 on Jordan's unemployment curves,
 > not just the GDP curves: the baseline reverses, the branch does not.
 
 **SYNTHESIS:**
@@ -581,13 +586,16 @@ Ecological (CO2 accumulation, independent of the Hormuz crisis), Governance
 
 **FACTS:**
 
-> The four-framework overview shows all four composite scores simultaneously at step 5. Financial:
-> reserve-linked divergence between Jordan and Egypt is the primary driver.
+> The four-framework overview shows all four composite scores simultaneously at step 5,
+> with Jordan and Egypt visible separately in each axis. Financial:
+> Jordan's score reflects reserve-linked stress; Egypt's reflects the food import
+> cost impact — the divergence between them is the primary driver.
 > Human Development: the bottom-quintile consumption capacity indicator —
 > the primary human cost ledger signal — shows the commodity price transmission
-> reaching the most vulnerable income cohort. Ecological: CO2 accumulation
-> continues its trajectory independent of the Hormuz crisis — global carbon
-> dynamics are not paused by a regional commodity shock. Governance: Egypt
+> reaching the most vulnerable income cohort in both countries.
+> Ecological: CO2 accumulation continues its trajectory independent of the Hormuz
+> crisis — global carbon dynamics are not paused by a regional commodity shock;
+> Jordan and Egypt track nearly identically on this axis. Governance: Egypt
 > far below the floor from step 1; Jordan stable on governance while under
 > financial pressure.
 >

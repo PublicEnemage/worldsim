@@ -301,7 +301,11 @@ test(
       "of twenty-five percent sustained over six steps. " +
       "Food supply chains follow in year two. " +
       "Jordan imports forty-two percent of its fuel. Egypt imports thirty-five percent of its food. " +
-      "Same shock. Different import structures. Different crises.",
+      "Same shock. Different import structures. Different crises. " +
+      "On the trajectory chart, Jordan's primary indicator is reserve coverage — " +
+      "it starts at seven point one months and will decline over the arc. " +
+      "Egypt's primary indicator is governance — " +
+      "it starts already far below the minimum floor before the shock begins.",
     );
 
     const scenarioRow = page.locator(".scenario-row").filter({ hasText: DEMO_SCENARIO_NAME });
@@ -330,7 +334,9 @@ test(
       "propagates through the ExternalSector module. " +
       "Look at the four-framework overview — four axes, all live: financial, human development, ecological, governance. " +
       "This is the first demonstration in the tool's history where all four composite scores " +
-      "are computed simultaneously.",
+      "are computed simultaneously. " +
+      "Jordan and Egypt are both present in every axis. " +
+      "Watch the financial axis for Jordan's reserve stress, and the governance axis for Egypt's pre-existing deficit.",
     );
 
     // Frame A: Full Zone 1 instrument cluster at step 1.
@@ -368,7 +374,7 @@ test(
       "GCC partners have provided budget support — three precedents in the last decade. " +
       "This is the thesis frame. " +
       "Jordan reserves: five months, down from seven point one. " +
-      "The reserve curve is burning at approximately one point two months per step. " +
+      "Jordan's reserve curve is burning at approximately one point two months per step. " +
       "Pause here. Read what the instruments are telling you before we test a counter-proposal. " +
       "One note on the governance alert for Egypt: it carries an Exploratory confidence tier. " +
       "The direction of deterioration is consistent with V-Dem historical data. " +
@@ -423,9 +429,9 @@ test(
       "The austerity conditionality at step four does not enter the branch. " +
       "The question being asked is: what does that negotiating outcome cost the IMF, " +
       "and what does it give Jordan? " +
-      "Look at the trajectory chart. The divergence is not yet visible at step three — " +
+      "Look at the trajectory chart. Jordan's baseline and branch curves are not yet diverging at step three — " +
       "the GCC multiplier effect appears at step four. " +
-      "Advance to step five to see where the trajectories separate.",
+      "Advance to step five to see where Jordan's two trajectories separate.",
     );
 
     // Frame D: Mode 3 active, branch anchor visible, step 3.
@@ -452,9 +458,9 @@ test(
       "percent at step four, then conditionality reversed it to seventeen point two " +
       "percent at step five. In the branch, unemployment continues declining. " +
       "One step. One conditionality term. The direction of the unemployment curve reverses. " +
-      "Now look at the reserve curve. " +
-      "Both trajectories reach zero reserves by step seven. " +
-      "Better conditionality terms improved the GDP and unemployment trajectory. " +
+      "Now look at Jordan's reserve curve. " +
+      "Both of Jordan's trajectories — baseline and branch — reach zero reserves by step seven. " +
+      "Better conditionality terms improved Jordan's GDP and unemployment trajectory. " +
       "They did not change Jordan's structural fuel import dependency during a live Hormuz disruption. " +
       "The reserve crisis is survived under better internal conditions. It is not avoided. " +
       "The minister should know this before she uses this finding at the table.",
