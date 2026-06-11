@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-11 (PR #848 merged — IR review artifact, PENDING stakeholder-review placeholder, CLAUDE.md artifact table split, demo-preparation-standard IR/stakeholder distinction, milestone-exit-checklist demo section. Board clear. Open: DEMO-039 (#842 Frame C recapture), DEMO-041 (#841 walkthrough narration gap), live stakeholder demo (#843).)**
+**Last updated: 2026-06-11 (PR #848 merged — IR review artifact, PENDING stakeholder-review placeholder, CLAUDE.md artifact table split, demo-preparation-standard IR/stakeholder distinction, milestone-exit-checklist demo section. EL filed three additional issues: #850 DEMO-052 narration spatial reference, #851 DEMO-053 zone label visibility, #852 alert panel master-detail UX. Board clear. Open: DEMO-039 (#842), DEMO-041 (#841), DEMO-052 (#850), DEMO-053 (#851), #852, live stakeholder demo (#843).)**
 **Current milestone:** M12 — Active Control and External Sector (GitHub Milestone 13)
 **Previous milestone:** M11.5 — Usability Validation and Experience Audit (formally closed 2026-06-04; Issue #720 closed; GitHub Milestone 14 closed)
 
@@ -204,7 +204,11 @@ CI hotfix: NM-035 filed; `ci.yml` PR trigger updated to include `release/m*` (PR
 
 **Awaiting EL action:**
 - **EL endorsement of Phase 0 exit artifact** — `docs/process/sprint-plans/process-redesign-phase0-exit.md §Part VI`. Phase A cannot open until endorsement is recorded. This is exit gate condition 3.
-- **Live stakeholder demo** (#843) — M12 closure gate (EL decision 2026-06-10). Preconditions: DEMO-039 (#842, Frame C recapture) and DEMO-041 (#841, walkthrough narration gap) must be resolved first. Produces `YYYY-MM-DD-v0.12.0-stakeholder-review.md` artifact.
+- **Live stakeholder demo** (#843) — M12 closure gate (EL decision 2026-06-10). Preconditions before demo runs: DEMO-039 (#842 Frame C recapture), DEMO-041 (#841 walkthrough narration gap), DEMO-052 (#850 spatial reference fix), DEMO-053 (#851 zone label narration fix — Path B minimum). Produces `YYYY-MM-DD-v0.12.0-stakeholder-review.md` artifact.
+- **EL issues from walkthrough review (2026-06-11):**
+  - #850 DEMO-052 `documentation` — walkthrough references "panel on left" not visible in rendered layout; blocks live demo
+  - #851 DEMO-053 `enhancement` — zone labels (Zone 1A/1B/1C/1D) in narration not visible in UI; Path B (plain-language narration fix) blocks live demo; Path A (UI labels) is preferred longer-term
+  - #852 `enhancement` — alert panel master-detail UX: TERMINAL alerts not surfaced without scrolling; detail pane appears below fold; requires redesign to first-class instrument layout
 - ~~Merge PR #848~~ — **DONE** (2026-06-11)
 - ~~UI screenshot capture~~ — **COMPLETE** (2026-06-10): all five frames in `docs/demo/m12/screenshots/` including Frame E
 - ~~Playwright legibility gates~~ — **PASSED** (2026-06-10): 11/11 at 1440×900
