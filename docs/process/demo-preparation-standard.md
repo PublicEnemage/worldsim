@@ -1,9 +1,9 @@
 # Demo Preparation Standard
 
 **Established:** 2026-05-18
-**Last revised:** 2026-06-02 (M10 — screenshot naming, legibility gate, narration instrument check, NARRATION-RULING-1 self-check, review naming convention enforcement; closes #379, NM-031)
+**Last revised:** 2026-06-10 (M12 — Step 4 UI architecture rules: no-drawer Zone 1, app-ready sentinel, Mode 3 slider pattern, API scenario creation; Step 5d: Mode 3 branch configuration evaluation; Step 3: ExternalSector reserve invariant mandatory disclosure; NM-039)
 **Cadence:** Every two milestones (M6, M8, M10, M12...)
-**Reference cases:** Issue #220 (M6), Issue #333 (M8), Issue #261 (M10)
+**Reference cases:** Issue #220 (M6), Issue #333 (M8), Issue #261 (M10), Issue #755 (M12)
 
 ---
 
@@ -111,8 +111,23 @@ Save output to `docs/demo/m{N}/screenshot-brief.md`. This is a permanent artifac
 Update the presenter guide section of `demo.sh` to reflect current milestone state: which axes
 are live, which are null, what the honest disclosures are, what the roadmap section says.
 
-Do NOT update the North Star closing (§18:00–19:00). It does not change.
+Do NOT update the North Star closing. It does not change.
 Do NOT update the backtesting credibility section unless new cases were added.
+
+**ExternalSector + Mode 3 reserve invariant — mandatory disclosure (M12 forward):**
+If the demo scenario uses `ExternalSectorModule` (ADR-012) and Mode 3 Active Control
+simultaneously, the honest disclosures section of `demo.sh` MUST include the following caveat:
+
+> *Reserve depletion is identical in the baseline and the Mode 3 branch. Better conditionality
+> terms improve GDP and unemployment trajectories. They do not change the entity's structural
+> import dependency during the external shock. State this explicitly when presenting the
+> Mode 3 comparison — the reserve crisis is survived under better conditions, not avoided.*
+
+This is not optional context — it is the honest answer to what Mode 3 can and cannot change.
+The reserve drawdown curve is driven by `ExternalSectorModule` independently of fiscal policy;
+Mode 3 operates only on the fiscal channel. Omitting this caveat allows a stakeholder to
+incorrectly conclude that better conditionality terms resolve the reserve crisis.
+Documented in Mode 3 scenario evaluation panel deliberation (M12, 2026-06-10).
 
 ### Step 4 — Archive and update the narrated Playwright spec
 
@@ -128,6 +143,73 @@ Update `demo-narrated.spec.ts` for the current milestone:
 - Narration strings for new features (ecological axis, governance null, PMM widget state)
 - Screenshot output paths pointing to `docs/demo/m{N}/screenshots/`
 - **Capture viewport — mandatory:** At the top of the test body, add `await page.setViewportSize({ width: 1440, height: 900 })` before `page.goto()`. Do NOT rely on the `playwright.config.ts` default (1280×720). The capture viewport must match the legibility gate (1440×900) and the presenter display. Root cause of NM-032 (DEMO-020 invisible to review chain at 1280×720). Issue #675.
+
+**App-ready sentinel — mandatory (NM-039):**
+The first `await` after `page.goto("/")` must wait for the application shell to be interactive.
+Use exactly this pattern:
+
+```typescript
+await page.waitForFunction(
+  () => typeof (window as Record<string, unknown>).__worldsim_selectEntity === "function",
+  { timeout: 15_000 },
+);
+```
+
+Do NOT wait for a map container testid (`worldsim-map`, `zone-1a-trajectory-container`, etc.).
+The choropleth testid changes with UI revisions; `zone-1a-trajectory-container` is only present
+after scenario selection, not on initial load. The `__worldsim_selectEntity` function is stable
+across milestone UI changes — it is also the sentinel used by `demo-legibility.spec.ts` and
+`demo-advancement-flow.spec.ts`. Before writing the sentinel, check what those two files use.
+Root cause: NM-039.
+
+**Zone 1 always-visible UI — no-drawer pattern (M10 forward):**
+From M10 onward, Zone 1 instruments (`zone-1a-trajectory-container`, `zone-1b-mda-alerts`,
+`zone-1c-pmm`, `zone-1d-four-framework`) are in the main viewport at all times. Do NOT:
+
+- Call `window.__worldsim_selectEntity(entityId)` to open a drawer for instrument access
+- Wait for `getByLabel("Close drawer")` or click it
+- Use tab buttons inside a drawer to switch framework views
+
+Screenshots are taken of the full viewport — the instrument cluster is always visible.
+The M8 drawer-based pattern (`__worldsim_selectEntity` → drawer opens → tab switch → screenshot → close drawer) is archived in `demo-narrated-m8.spec.ts` and must not be replicated.
+
+**Mode 3 React controlled input — slider pattern:**
+The `fiscal-multiplier-slider` (and any similar React controlled input) cannot be set with
+`fill()` or direct `el.value = "..."`. React intercepts the DOM property write and does not
+fire the synthetic change event. Use the native input setter pattern:
+
+```typescript
+await page.locator('[data-testid="fiscal-multiplier-slider"]').evaluate(
+  (el, value) => {
+    const slider = el as HTMLInputElement;
+    const nativeInputValueSetter = Object.getOwnPropertyDescriptor(
+      window.HTMLInputElement.prototype,
+      "value",
+    )?.set;
+    nativeInputValueSetter?.call(slider, value);
+    slider.dispatchEvent(new Event("input", { bubbles: true }));
+  },
+  "1.30",
+);
+```
+
+Wait for `[data-testid="recompute-badge"]` to disappear and `[data-testid="branch-anchor-label"]`
+to appear before taking the Mode 3 screenshot — the branch trajectory computation is async.
+
+**API scenario creation for complex scenarios:**
+When the demo scenario requires `commodity_price_shocks`, `governance` module seeds, or
+multi-entity initial attributes, create the scenario via `page.request.post()` before opening
+the Scenarios panel — do not use the form UI (`.scenario-btn--create`). The form UI supports
+only the basic configuration. The narrated spec creates the scenario via API, then selects it
+from the panel. The `beforeAll` cleanup deletes stale runs from previous executions by matching
+on the scenario name prefix.
+
+**Frame E placement — at the divergence peak step, not the branch application step:**
+For Mode 3 demos, the final frame must be captured at the step where the branch/baseline
+divergence peaks, not at the step where Mode 3 was applied. For the Jordan/Egypt Hormuz
+fixture, Mode 3 is applied at step 3 but the divergence peaks at step 5 (austerity removal
+lag). Always advance to the peak divergence step before capturing the Mode 3 comparison frame.
+The screenshot brief specifies this step — follow it explicitly.
 
 ### Step 5 — Update `docs/demo/stakeholder-walkthrough.md`
 
@@ -195,6 +277,47 @@ Authority: NARRATION-RULING-1 (`docs/ux/standards.md §16`).
 This check gates against the class of defect documented in Issue #652: narration
 that presents instrument output without framing or implication, introducing
 presenter-skill dependency for the "so what" the audience needs.
+
+### Step 5d — Mode 3 branch configuration evaluation (M12 forward — when Mode 3 is used)
+
+**Applies when:** the demo includes Mode 3 Active Control for the first time, or when the
+demo scenario fixture changes between milestones and the branch configuration has not been
+re-validated against live simulation output.
+
+**Does NOT apply when:** Mode 3 fixture and branch parameters are unchanged from the
+previous demo cycle and no engine changes affect fiscal transmission coefficients.
+
+**Evaluation protocol:**
+
+1. Identify the candidate branch configurations: at minimum, the current fixture (baseline)
+   plus any plausible alternatives (different branch step, multiplier, GCC magnitude, or
+   austerity severity).
+2. Run each configuration as a live simulation — observe step-level GDP, unemployment, and
+   reserve output from the API, not estimated from model formulae.
+3. Document observed step-level output for each option in a deliberation file under
+   `docs/demo/m{N}/reviews/scenario-evaluation-mode3-deliberation.md`.
+4. Two-agent panel: Development Economist Agent + Chief Methodologist Agent. Both must agree
+   on the recommendation before the branch configuration is locked. File the recommendation
+   as `docs/demo/m{N}/reviews/scenario-evaluation-mode3-recommendation.md`.
+
+**What the panel must explicitly address:**
+
+- Which step shows the maximum divergence between baseline and branch trajectories in
+  Zone 1A? (This is the step for Frame E.)
+- Is the reserve depletion curve affected by the branch, or is it driven by ExternalSectorModule
+  independently of fiscal policy? (If the latter, the mandatory disclosure from Step 3 applies.)
+- Is the branch scenario narratively coherent? A branch that removes the IMF entirely (by
+  branching before IMF entry) is a different scenario than "negotiate better conditionality terms."
+  The counterfactual must match what a finance minister can actually argue at the table.
+- Are the observed GDP and unemployment changes consistent with the engine's documented
+  fiscal transmission coefficients? If not, the discrepancy must be explained before proceeding.
+
+**The key rule:** evaluate against live simulation output, not model assumption estimates.
+The M12 Mode 3 evaluation ran four option variants (A/B/D/E) against the live database before
+recommending the current fixture. The panel's deliberation file shows that Option B (higher GCC
+value) tested a different scenario than the 1.30× multiplier — a distinction invisible without
+running both. See `docs/demo/m12/reviews/scenario-evaluation-mode3-deliberation.md` as the
+canonical reference for this step.
 
 ### Step 6 — Run the demo and capture screenshots
 
@@ -325,6 +448,8 @@ Use `scripts/demo.sh` to start the stack before the audience arrives.
 - The roadmap section (past milestones to past tense, next milestone description)
 - The Playwright spec (frame sequence, step count, narration strings)
 - The screenshot brief (UX Agent re-activated fresh for each milestone)
+- The Mode 3 branch configuration (step, multiplier, fixture) — re-validate via Step 5d
+  whenever the demo scenario or engine fiscal transmission changes between cycles
 
 ---
 
@@ -335,3 +460,4 @@ Use `scripts/demo.sh` to start the stack before the audience arrives.
 | M6 | #220 | `docs/demo/m6/reviews/2026-05-07-v0.6.0-stakeholder-review.md` |
 | M8 | #333 | `docs/demo/m8/reviews/2026-05-18-v0.8.0-stakeholder-review.md` |
 | M10 | #261 | `docs/demo/m10/reviews/2026-06-02-v0.10.0-stakeholder-review.md` |
+| M12 | #755 | `docs/demo/m12/reviews/` (IR review pending — M12 merged to main 2026-06-11) |
