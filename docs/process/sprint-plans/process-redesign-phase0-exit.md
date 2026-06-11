@@ -2,7 +2,7 @@
 name: process-redesign-phase0-exit
 type: sprint-exit
 phase: Phase 0 — UX/Persona Traceability Upstream of ADR Development
-status: ENDORSED — EL endorsement recorded 2026-06-09
+status: ENDORSED — EL endorsement recorded 2026-06-11
 authored-by: PM Agent (orchestration); PI Agent (exit gate confirmation)
 date: 2026-06-09
 sprint-entry: docs/process/sprint-plans/process-redesign-phase0-sprint-entry.md
@@ -13,7 +13,7 @@ sprint-entry: docs/process/sprint-plans/process-redesign-phase0-sprint-entry.md
 **Status:** ENDORSED  
 **Date produced:** 2026-06-09  
 **PI Agent exit gate confirmation:** Below (Part III)  
-**EL endorsement:** 2026-06-09 — see Part VI
+**EL endorsement:** 2026-06-11 — see Part VI
 
 ---
 
@@ -72,7 +72,7 @@ Per sprint entry §Exit Gate, Phase 0 closes when all seven conditions are satis
 | 2 | PI Agent confirms enforcement language adequate | ✅ Confirmed — `docs/process/design/process-redesign-phase0-pi-enforcement-review.md` §Part IV: "Verdict: enforcement language is adequate for Phase 0 exit, with two amendments completed." |
 | 3 | EL has endorsed Phase 0 outputs — recorded in this artifact with endorsement date | ✅ Endorsed 2026-06-09 — @PublicEnemage (see Part VI) |
 | 4 | Phase A sprint entry document is complete and filed | ✅ Filed at `docs/process/sprint-plans/process-redesign-phaseA-sprint-entry.md` (produced as part of this exit) |
-| 5 | SESSION_STATE.md updated to reflect Phase 0 complete and Phase A entry filed | ⏳ **[To be completed in this session's SESSION_STATE update]** |
+| 5 | SESSION_STATE.md updated to reflect Phase 0 complete and Phase A entry filed | ✅ Updated 2026-06-11 — Phase 0 marked ENDORSED; Phase A marked open |
 | 6 | Secondary outputs not completed are listed with documented deferral rationale | ✅ See Part III — FD-2, FD-3 deferred to Phase A; NS-2 deferred to M12 sprint; NS-1 partially addressed |
 | 7 | Near-miss findings generated during Phase 0 filed in `docs/process/near-miss-registry.md` | ✅ No new near-misses generated during Phase 0 execution. The "Recommended" language issue in the template draft was caught and corrected within the enforcement review cycle; it did not reach merged state. No registry entry required. |
 
@@ -104,7 +104,9 @@ The Engineering Lead must review this exit artifact and all primary outputs list
 
 **EL endorsement:**
 
-> Endorsed 2026-06-09. Phase 0 outputs accepted. Phase A may open. — @PublicEnemage
+> Endorsed 2026-06-11. Phase 0 outputs accepted. XD-1, XD-2, FD-1 closed. Secondary deferral rationale accepted. North star validation finding accepted. Phase A may open. — @PublicEnemage
+
+*Note: Endorsement text was pre-drafted 2026-06-09 as a placeholder. Formal EL confirmation recorded 2026-06-11.*
 
 ---
 
