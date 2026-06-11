@@ -106,11 +106,12 @@ test(
 
     await page.goto("/");
 
-    // Wait for the base application shell before creating the scenario.
-    // Zone 1 instruments load after scenario selection; wait for the map container.
-    await page.waitForSelector('[data-testid="worldsim-map"], [data-testid="zone-1a-trajectory-container"]', {
-      timeout: 15_000,
-    });
+    // Wait for the application shell to be interactive — same sentinel used
+    // by demo-legibility.spec.ts and demo-advancement-flow.spec.ts.
+    await page.waitForFunction(
+      () => typeof (window as Record<string, unknown>).__worldsim_selectEntity === "function",
+      { timeout: 15_000 },
+    );
 
     // Create the M12 Jordan/Egypt Hormuz demo scenario via API.
     // Matches jordan_hormuz_scenario.py fixture: 8 steps, ExternalSectorModule
