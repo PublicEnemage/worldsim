@@ -1,7 +1,7 @@
 # Demo Preparation Standard
 
 **Established:** 2026-05-18
-**Last revised:** 2026-06-10 (M12 — Step 4 UI architecture rules: no-drawer Zone 1, app-ready sentinel, Mode 3 slider pattern, API scenario creation; Step 5d: Mode 3 branch configuration evaluation; Step 3: ExternalSector reserve invariant mandatory disclosure; NM-039)
+**Last revised:** 2026-06-11 (M13 planning — Step 6c Audience Simulation Panel added: persona-based live demo rehearsal using Personas 1, 2, 5 as in-character audience agents; Persona 5 north star gate blocks Step 7; Four-Tier Review Structure table updated; audience-simulation artifact added to folder structure)
 **Cadence:** Every two milestones (M6, M8, M10, M12...)
 **Reference cases:** Issue #220 (M6), Issue #333 (M8), Issue #261 (M10), Issue #755 (M12)
 
@@ -39,9 +39,13 @@ docs/demo/
       frame-d-<label>.png
       frame-e-<label>.png
     reviews/
-      YYYY-MM-DD-v{version}-stakeholder-review.md   ← canonical Step 7 review
-      YYYY-MM-DD-v{version}-pre-gate-triage.md      ← optional; pre-gate only
-  stakeholder-walkthrough.md       — current version (updated each demo cycle)
+      YYYY-MM-DD-v{version}-internal-review.md     ← Step 6b: nine-agent internal panel
+      YYYY-MM-DD-v{version}-audience-simulation.md ← Step 6c: persona-based audience simulation
+      YYYY-MM-DD-v{version}-ir-review.md           ← Step 7: IR Agent pre-demo quality gate
+      PENDING-v{version}-stakeholder-review.md     ← placeholder created at milestone close
+      YYYY-MM-DD-v{version}-stakeholder-review.md  ← Step 9: filled after live demo runs
+      YYYY-MM-DD-v{version}-pre-gate-triage.md     ← optional; pre-gate only
+  stakeholder-walkthrough.md             — current version (updated each demo cycle)
 ```
 
 **Naming rule — mandatory pre-creation check:**
@@ -75,17 +79,18 @@ are updated in place. They are operational tools, not artifacts.
 
 ---
 
-## Three-Tier Review Structure (M10 forward)
+## Four-Tier Review Structure (M10 forward; Step 6c added M14 forward)
 
-Every demo cycle passes through three review tiers in sequence. No tier may be skipped.
+Every demo cycle passes through four review tiers in sequence. No tier may be skipped.
 
 | Tier | Step | Who | Gate |
 |---|---|---|---|
 | Self-check | 5a / 5b / 5c | Acting agent | Narration instrument check + Playwright legibility + NARRATION-RULING-1 all pass |
-| **Internal team review** | **6b** | **Nine-agent panel (PM Agent orchestrates)** | **All CRITICAL findings resolved + filed; all HIGH findings filed — before Step 7** |
+| **Internal team review** | **6b** | **Nine-agent panel (PM Agent orchestrates)** | **All CRITICAL findings resolved + filed; all HIGH findings filed — before Step 6c** |
+| **Audience simulation** | **6c** | **Persona panel: Personas 1, 2, 5 (PM Agent orchestrates)** | **Persona 5 north star verdict PASS; all CRITICAL persona findings resolved — before Step 7** |
 | Independent review | 7 | Fresh Claude instance (IR Agent) | All CRITICAL and HIGH findings from IR filed as GitHub issues — before Step 9 |
 
-The tiers are sequential and non-negotiable. The IR Agent (Step 7) must not be activated until the Step 6b gate is satisfied. The stakeholder session (Step 9) must not occur until the Step 8 gate is satisfied.
+The tiers are sequential and non-negotiable. The IR Agent (Step 7) must not be activated until the Step 6b and Step 6c gates are both satisfied. The stakeholder session (Step 9) must not occur until the Step 8 gate is satisfied.
 
 ---
 
@@ -402,6 +407,95 @@ last assigned `DEMO-NNN` before beginning aggregation.
 **Gate:** All CRITICAL findings resolved (per criteria) and filed as GitHub issues before
 Step 7. All HIGH findings filed as GitHub issues before Step 7. MEDIUM and LOW at PM Agent
 discretion.
+
+### Step 6c — Audience Simulation Panel (M14 forward)
+
+Activate a persona-based panel after the Step 6b gate is cleared and before the Independent
+Review Agent sees any artifacts. Each panel member is instantiated from their full profile
+in `docs/ux/personas.md` and evaluates the screenshots and walkthrough **in-character** —
+not as an internal quality reviewer, but as an audience member experiencing the demo for
+the first time.
+
+This step tests a different question from Step 6b: not *is the demo technically correct?*
+but *does the presentation arc hold up under the challenges this specific audience would pose?*
+
+**Panel composition:**
+
+| Persona | Who | In-character question |
+|---|---|---|
+| **Persona 1 — Programme Analyst** | Lucas Ferreira, IMF Country Economist | "Does this output carry what I need to defend it in an IMF review board?" |
+| **Persona 2 — Ministry Negotiator** | Eleni Papadimitriou, Deputy Director, Hellenic Ministry of Finance | "Can I retrieve a specific threshold crossing in under 90 seconds in the room?" |
+| **Persona 5 — Institutional Decision-Maker** | Aicha Mbaye, Finance Minister, Senegal | "Does this change my position? Can I state the key finding without asking an economist?" |
+
+**When to add Persona 3:** Add Andreas Stefanidis (Political Advisor) when the demo features
+governance or political economy outputs — specifically when the political feasibility module
+or social dynamics indicators are in scope. Andreas tests whether the governance signal
+is translatable into a political brief without economist mediation.
+
+**Activation:** PM Agent instantiates each persona agent with: (1) the persona's full profile
+from `docs/ux/personas.md` — identity, entry state, trust threshold, failure mode, preferred
+information format; (2) screenshots in UX Agent brief presentation sequence; (3)
+`docs/demo/stakeholder-walkthrough.md`. Each persona agent responds in-character. Findings are
+produced independently, then aggregated by PM Agent — this is not a cross-agent discussion.
+
+**Finding format (per persona):**
+
+```
+[DEMO-NNN]: [one-line title]
+Severity: CRITICAL / HIGH / MEDIUM / LOW
+Persona: [number and name]
+In-character observation: [what this persona would think or say at this moment in the demo]
+Presenter preparation: [the question the presenter must be able to answer]
+Recommendation: [specific artifact change — or "Presenter prep only" if no change needed]
+```
+
+**Finding numbering:** Persona simulation findings continue the `DEMO-NNN` namespace from
+the last number assigned in Step 6b. PM Agent checks the last assigned number before
+beginning aggregation.
+
+**Severity calibration for persona findings:**
+
+| Severity | Meaning |
+|---|---|
+| CRITICAL | A failure that, in-character, causes this persona to close the tool or dismiss the demo (trust threshold breached or failure mode triggered per `docs/ux/personas.md`) |
+| HIGH | A question the presenter cannot currently answer, or a navigation path the persona cannot complete within their stated time window |
+| MEDIUM | An observation that degrades comprehension but does not trigger a failure mode |
+| LOW | A preference or style note that does not affect the persona's ability to use the output |
+
+**North star gate — Persona 5 (mandatory):**
+At the end of Aicha Mbaye's section, the persona agent must produce a mandatory north star verdict:
+
+```
+North star verdict: PASS / FAIL
+Primary finding sentence: "[The single sentence Aicha would take away from this demo,
+  stated without specialist mediation — or CANNOT BE STATED if she cannot articulate it]"
+Gate: Step 7 MAY PROCEED / BLOCKED — [reason if blocked]
+```
+
+The Persona 5 north star verdict gates Step 7. If Aicha cannot articulate the primary
+finding in one sentence without economist interpretation, the walkthrough or narration
+must be revised before the IR Agent is activated. The sentence that passes is also the
+sprint-level north star test artifact for this demo cycle (CLAUDE.md §North Star Test).
+
+**Artifact format** (`YYYY-MM-DD-v{version}-audience-simulation.md` in `docs/demo/m{N}/reviews/`):
+1. One section per persona — each agent's findings in the format above, in-character and unedited.
+2. PM Agent presenter preparation summary: numbered list of questions the presenter must
+   be able to answer, consolidated from all persona findings, ranked by severity.
+3. North star gate declaration: Persona 5 verdict and primary finding sentence, promoted
+   to the summary level for direct reference by PM Agent and EL.
+
+**Gate:** Persona 5 north star verdict is PASS, and all CRITICAL persona findings are
+resolved (same three-condition criteria as Step 6b) before Step 7.
+
+**Naming rule:**
+Before saving, run:
+```bash
+find docs/demo/ -name "*-audience-simulation*"
+```
+Confirm the filename matches `YYYY-MM-DD-v{version}-audience-simulation.md`. The M14
+instance will be the canonical reference for this step.
+
+---
 
 ### Step 7 — Independent Review Agent
 
