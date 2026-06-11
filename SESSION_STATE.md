@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-11 (EL decision: #852 alert panel master-detail UX deferred to M13 — requires Frontend architecture review, ADR update, UX Designer and Design Thinking agent input; current scroll-list layout stays for M12 live demo. M12 open: #843 live stakeholder demo, #263 exit checklist (gates on live demo + Phase 0 EL endorsement). Board otherwise clear.)**
+**Last updated: 2026-06-11 (Milestone reorganisation: M13 renamed to "Political Economy and Instrument Credibility" (GitHub #9, 13 issues); M14 created "Methodology Publication and External Validation" (GitHub #15, 14 issues). M12 (GitHub #13) fully evacuated — 0 open issues. #843 live demo + #852 alert panel UX → M13; #263 exit checklist + near-term issues → M14; #214/#278/#407/#4/#5 parked. M12 formally inactive pending live demo (#843, now M13) and EL Phase 0 endorsement.)**
 **Current milestone:** M12 — Active Control and External Sector (GitHub Milestone 13)
 **Previous milestone:** M11.5 — Usability Validation and Experience Audit (formally closed 2026-06-04; Issue #720 closed; GitHub Milestone 14 closed)
 
@@ -102,28 +102,19 @@ No open PRs — board clear as of 2026-06-11 (post PR #857 merge).
 
 ## Open Issues — M12 (Active Control and External Sector)
 
-**GitHub Milestone:** 13 | **HORIZON sweep:** 2026-06-05 (milestone creation ceremony)
+**GitHub Milestone:** 13 | **Status: FULLY EVACUATED (2026-06-11)**
 
-| Issue | Title | Source | horizon |
-|---|---|---|---|
-| #744 | feat(ux): persistent scenario identity header | M11.5 GAP-02 — universal | immediate |
-| #745 | feat(ux): MDA alert panel interactive | M11.5 GAP-01 — 2 of 3 sessions | immediate |
-| #746 | feat(ux): Mode 2 fiscal multiplier parameter input | M11.5 GAP-03 — P1 NOT MET | immediate |
-| #747 | feat(ux): Zone 1 cohort disaggregation | M11.5 GAP-04 — 2 of 3 sessions | immediate |
-| #749 | feat(engine): matrix engine production migration | M12 roadmap §Matrix engine migration | immediate |
-| #750 | docs(arch): cloud compute path scoping | M12 roadmap §Matrix engine migration | immediate |
-| #751 | feat(engine): bilateral trade shock input type | M12 roadmap §External sector module | immediate |
-| #752 | feat(engine): commodity price shock global parameter | M12 roadmap §External sector module | immediate |
-| #753 | feat(frontend): Mode 3 Active Control | M12 roadmap §Mode 3 active control | immediate |
-| #754 | feat(engine): multi-country scenario configuration | M12 roadmap §Mode 3 active control | immediate |
-| #755 | docs(demo): Demo 4 preparation | M12 roadmap §Demo — compliance gate | immediate |
-| #394 | platform: multi-scenario comparison (>2 scenarios) | M12 roadmap §External sector module | near-term |
-| #263 | Milestone 12 Exit Checklist | Blocks M12 closure | immediate |
+All M12 issues are either closed or migrated. GitHub Milestone 13 has 0 open issues.
+M12 is formally inactive — it will be officially closed once #843 (live stakeholder demo, now M13)
+runs and #263 (exit checklist, now M14) is signed off.
 
-**HORIZON sweep findings — all resolved (2026-06-05):**
-- #744–#747 scope additions acknowledged (EL decision: no changes needed)
-- #725 (mypy pin) and #644 (ESLint audit): keep on M12 board (EL decision: keep as is)
-- NM registry delegation rule: RACI amended PR #758 (no-delegation clause); NM-034 filed PR #759 (PI Agent author-of-record pattern documented as institutional memory)
+**Issue disposition summary:**
+- All immediate-horizon M12 deliverables shipped (G1–G8, Wave 1 complete)
+- #843 live demo → M13 | #852 alert panel UX → M13
+- #263 exit checklist → M14 (open until #843 closes)
+- Near-term issues (#392/#271/#393/#394/#27/#45) → M13
+- Further near-term (#97/#153/#569/#30/#92/#259/#275) → M14
+- Long-term (#214/#278/#407/#4/#5) → parking lot
 
 ---
 
@@ -224,6 +215,51 @@ CI hotfix: NM-035 filed; `ci.yml` PR trigger updated to include `release/m*` (PR
 - ~~Merge `release/m12` → `main`~~ — **DONE** (PR #839, 2026-06-10)
 
 **M12 agent deliverables — ALL COMPLETE (2026-06-10)**
+
+---
+
+## Open Issues — M13 (Political Economy and Instrument Credibility)
+
+**GitHub Milestone:** 9 | **Created:** 2026-06-11 (renamed from "Methodology Publication") | **Target:** Q1 2027
+
+| Issue | Title | Horizon |
+|---|---|---|
+| #843 | plan: M12 closure — live stakeholder demo required before milestone is complete | immediate |
+| #852 | ux: alert panel (Zone 1B) needs master-detail layout | near-term |
+| #392 | arch(m11): political economy constraint modeling | near-term |
+| #393 | ux(mode-transition): Mode 1→2 transition must preserve step position | near-term |
+| #394 | platform: multi-scenario comparison (>2 scenarios) | near-term |
+| #271 | feat(simulation): reversibility classification for simulation outputs | near-term |
+| #45 | standards: human development indicator standards and HCL effect size | near-term |
+| #27 | docs: calibration basis for propagation attenuation parameters | near-term |
+| #22 | feat: uncertainty quantification (distributions not point estimates) | near-term |
+| #102 | feat: distributional scenario comparison with variance and percentile range | near-term |
+| #35 | feat(simulation): dynamic relationship weight updating | near-term |
+| #274 | feat(simulation): 25-year human capital depletion trajectory | near-term |
+
+*Note: #843 (live demo) is the first closure gate for M13. M12 formally closes when #843 and #263 (exit checklist, M14) both close.*
+
+---
+
+## Open Issues — M14 (Methodology Publication and External Validation)
+
+**GitHub Milestone:** 15 | **Created:** 2026-06-11 | **Target:** Q2 2027
+
+| Issue | Title | Horizon |
+|---|---|---|
+| #263 | Milestone 12 Exit Checklist (open until #843 closes) | near-term |
+| #97 | arch(api): threshold-crossing markers in comparative output | near-term |
+| #153 | feat(frontend): absolute threshold overlay on DeltaChoropleth | near-term |
+| #92 | arch(backtesting): Greece 2010 fixture investment climate initial conditions | near-term |
+| #30 | feat: distinguish stock vs. flow variables in entity attribute model | near-term |
+| #259 | standards: CTO legibility metrics dashboard | near-term |
+| #275 | feat(simulation): calibrated ecological-to-financial transmission | near-term |
+| #569 | test(perf): MV-002 Mode 3 re-run hardware validation | near-term |
+| #3 | governance: resolve single-principal separation of duties gap | near-term |
+| #6 | governance: restore branch protection bypass restriction | near-term |
+| #53 | feat: information access architecture | near-term |
+| #845 | ux: DEMO-044 — trajectory curves no inline entity labels | near-term |
+| #846 | ux: DEMO-045 — Mode 3 branch comparison values not in instrument | near-term |
 
 ---
 
