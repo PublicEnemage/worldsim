@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-11 (PR #848 merged — IR review artifact, PENDING stakeholder-review placeholder, CLAUDE.md artifact table split, demo-preparation-standard IR/stakeholder distinction, milestone-exit-checklist demo section. EL filed three additional issues: #850 DEMO-052 narration spatial reference, #851 DEMO-053 zone label visibility, #852 alert panel master-detail UX. Board clear. Open: DEMO-039 (#842), DEMO-041 (#841), DEMO-052 (#850), DEMO-053 (#851), #852, live stakeholder demo (#843).)**
+**Last updated: 2026-06-11 (PR #854 merged — DEMO-039/041/052/053 resolved; all five M12 demo screenshots recaptured at step 3; walkthrough zone label and spatial reference fixes; Exploratory tier disclosure added to Step 4 SYNTHESIS. Issues #841/#842/#850/#851 closed. EL pre-demo rehearsal identified concurrent TTS narration (DEMO-054, #855, root cause: playwright.demo.config.ts no testMatch guard; NM-040 filed) and entity identification gap in narration (DEMO-055, #856). PR #857 open: entity priming language in narration + testMatch guard + NM-040. Open: #852 alert panel master-detail UX, #856 DEMO-055, live stakeholder demo (#843), Phase 0 EL endorsement.)**
 **Current milestone:** M12 — Active Control and External Sector (GitHub Milestone 13)
 **Previous milestone:** M11.5 — Usability Validation and Experience Audit (formally closed 2026-06-04; Issue #720 closed; GitHub Milestone 14 closed)
 
@@ -77,7 +77,9 @@ M9 formally closed. Issue #213 (M9 Exit Checklist) closed 2026-05-24. M10 milest
 
 ## Open PRs
 
-No open PRs — board clear as of 2026-06-11 (post PR #848 merge).
+| PR | Branch | Title | Gate |
+|---|---|---|---|
+| #857 | feat/demo-narration-entity-identity | fix(demo): entity narration identity + testMatch guard + NM-040 | Awaiting CI + EL merge |
 
 ## M11 Work Streams — 2026-06-04 Sprint
 
@@ -204,13 +206,18 @@ CI hotfix: NM-035 filed; `ci.yml` PR trigger updated to include `release/m*` (PR
 
 **Awaiting EL action:**
 - **EL endorsement of Phase 0 exit artifact** — `docs/process/sprint-plans/process-redesign-phase0-exit.md §Part VI`. Phase A cannot open until endorsement is recorded. This is exit gate condition 3.
-- **Live stakeholder demo** (#843) — M12 closure gate (EL decision 2026-06-10). Preconditions before demo runs: DEMO-039 (#842 Frame C recapture), DEMO-041 (#841 walkthrough narration gap), DEMO-052 (#850 spatial reference fix), DEMO-053 (#851 zone label narration fix — Path B minimum). Produces `YYYY-MM-DD-v0.12.0-stakeholder-review.md` artifact.
-- **EL issues from walkthrough review (2026-06-11):**
-  - #850 DEMO-052 `documentation` — walkthrough references "panel on left" not visible in rendered layout; blocks live demo
-  - #851 DEMO-053 `enhancement` — zone labels (Zone 1A/1B/1C/1D) in narration not visible in UI; Path B (plain-language narration fix) blocks live demo; Path A (UI labels) is preferred longer-term
-  - #852 `enhancement` — alert panel master-detail UX: TERMINAL alerts not surfaced without scrolling; detail pane appears below fold; requires redesign to first-class instrument layout
+- **Live stakeholder demo** (#843) — M12 closure gate (EL decision 2026-06-10). Pre-demo blockers resolved (PR #854 merged): DEMO-039, DEMO-041, DEMO-052, DEMO-053, DEMO-054 (testMatch guard, PR #857 pending). DEMO-055 (entity narration fix, PR #857 pending). Remaining open: #852 alert panel master-detail UX. Produces `YYYY-MM-DD-v0.12.0-stakeholder-review.md` artifact.
+- **Merge PR #857** (feat/demo-narration-entity-identity) — entity priming language in narration, testMatch guard, NM-040. CI must pass first.
+- **#852** `enhancement` — alert panel master-detail UX: TERMINAL alerts not surfaced without scrolling; detail pane appears below fold; requires redesign to first-class instrument layout. Tracked at #852.
+- **#855** DEMO-054 `bug` — playwright.demo.config.ts testMatch guard (resolved in PR #857 pending merge).
+- **#856** DEMO-055 `enhancement` — entity identification narration gap (resolved in PR #857 pending merge).
+- ~~#841 DEMO-041~~ — **CLOSED** (PR #854)
+- ~~#842 DEMO-039~~ — **CLOSED** (PR #854)
+- ~~#850 DEMO-052~~ — **CLOSED** (PR #854)
+- ~~#851 DEMO-053~~ — **CLOSED** (PR #854)
 - ~~Merge PR #848~~ — **DONE** (2026-06-11)
-- ~~UI screenshot capture~~ — **COMPLETE** (2026-06-10): all five frames in `docs/demo/m12/screenshots/` including Frame E
+- ~~Merge PR #854~~ — **DONE** (2026-06-11)
+- ~~UI screenshot capture~~ — **COMPLETE** (2026-06-11): all five frames recaptured at correct steps
 - ~~Playwright legibility gates~~ — **PASSED** (2026-06-10): 11/11 at 1440×900
 - ~~IR review~~ — **COMPLETE** (2026-06-10): 13 findings DEMO-039–051; `docs/demo/m12/reviews/2026-06-10-v0.12.0-ir-review.md`
 - ~~Merge `release/m12` → `main`~~ — **DONE** (PR #839, 2026-06-10)
@@ -329,6 +336,8 @@ CI hotfix: NM-035 filed; `ci.yml` PR trigger updated to include `release/m*` (PR
 
 | PR | Title | Date |
 |---|---|---|
+| #854 | fix(demo): pre-demo walkthrough fixes — DEMO-039, DEMO-041, DEMO-052, DEMO-053 | 2026-06-11 |
+| #848 | docs(process): IR/stakeholder review distinction — demo-preparation-standard, exit checklist, CLAUDE.md | 2026-06-11 |
 | #836 | docs(demo): walkthrough Section 4 — capability-gaps reframe (political feasibility, conditionality design, medium-term horizon; M14 cadence caveat) | 2026-06-10 |
 | #835 | docs(demo): walkthrough conditionality framing — clawback reading, branch mechanics, reserve invariant caveat | 2026-06-10 |
 | #834 | docs(demo): walkthrough pre-IR revision — two-act structure, human moment opening, NARRATION-RULING-1, Greece/Argentina framing | 2026-06-10 |
