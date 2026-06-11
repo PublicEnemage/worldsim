@@ -140,6 +140,70 @@ def build_greece_scenario() -> ScenarioCreateRequest:
         measurement_framework="financial",
     )
 
+    # Investment climate state variables — Issue #34, NB-4 (ADR-001 Amendment 2).
+    # All four carry attribute_type tags per the AttributeType enum.
+
+    # ECB Statistical Data Warehouse — 10Y GRC-DEU spread, January 2010 mean.
+    # Spread widened from ~130bps in mid-2009 to ~300bps by January 2010 as
+    # market scrutiny of Greek fiscal accounts intensified ahead of the May
+    # bailout request. Confidence tier 2: official central bank data series.
+    initial_sovereign_risk_premium = QuantitySchema(
+        value="0.030",
+        unit="ratio",
+        variable_type="ratio",
+        attribute_type="rate",
+        confidence_tier=2,
+        observation_date=date(2010, 1, 31),
+        source_registry_id="ECB_SDW_GRC_SPREAD_2010",
+        measurement_framework="financial",
+    )
+
+    # UNCTAD World Investment Report 2010 — FDI inward stock / GDP for Greece.
+    # Greece's inward FDI stock was approximately €23bn against GDP of ~€230bn
+    # (10.5% ratio). Tourism infrastructure and shipping were primary recipients.
+    # Confidence tier 2: official multilateral statistics, annual vintage.
+    initial_fdi_stock_pct_gdp = QuantitySchema(
+        value="0.105",
+        unit="ratio",
+        variable_type="stock",
+        attribute_type="stock",
+        confidence_tier=2,
+        observation_date=date(2010, 1, 1),
+        source_registry_id="UNCTAD_FDI_STATS_GRC_2010",
+        measurement_framework="financial",
+    )
+
+    # IMF Balance of Payments Statistics 2010 — net portfolio investment / GDP.
+    # Greece experienced accelerating portfolio outflows as sovereign spreads
+    # widened: net portfolio investment was approximately -€18bn in 2009 (pre-
+    # programme year), equivalent to ~-8% of GDP. Confidence tier 2.
+    initial_portfolio_flow_velocity = QuantitySchema(
+        value="-0.080",
+        unit="ratio",
+        variable_type="ratio",
+        attribute_type="flow",
+        confidence_tier=2,
+        observation_date=date(2010, 1, 1),
+        source_registry_id="IMF_BOP_GRC_2010",
+        measurement_framework="financial",
+    )
+
+    # S&P sovereign credit rating — Greece January 2010: BBB+.
+    # Mapped to 0–100 index (AAA=100, D=0) using standard 21-notch linear scale:
+    # BBB+ = 55. Greece was downgraded to BB+ (junk) in April 2010 on programme
+    # entry. The January 2010 BBB+ baseline precedes the first IMF step.
+    # Confidence tier 1: direct observation from rating agency announcement.
+    initial_credit_rating_score = QuantitySchema(
+        value="55.0",
+        unit="index_0_100",
+        variable_type="stock",
+        attribute_type="structural_index",
+        confidence_tier=1,
+        observation_date=date(2010, 1, 1),
+        source_registry_id="SP_SOVEREIGN_RATINGS_GRC_2010",
+        measurement_framework="financial",
+    )
+
     return ScenarioCreateRequest(
         name="Greece 2010-2015 IMF Program Backtesting Fixture",
         description=(
@@ -174,6 +238,10 @@ def build_greece_scenario() -> ScenarioCreateRequest:
                     "net_enrollment_secondary": initial_net_enrollment_secondary,
                     "reserve_coverage_months": initial_reserve_coverage_months,
                     "trend_growth": initial_trend_growth,
+                    "sovereign_risk_premium": initial_sovereign_risk_premium,
+                    "fdi_stock_pct_gdp": initial_fdi_stock_pct_gdp,
+                    "portfolio_flow_velocity": initial_portfolio_flow_velocity,
+                    "credit_rating_score": initial_credit_rating_score,
                 },
             },
         ),

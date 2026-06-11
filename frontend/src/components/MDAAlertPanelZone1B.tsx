@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 /**
  * MDAAlertPanelZone1B — Zone 1B co-primary instrument.
  *
@@ -9,10 +10,13 @@
  * - formats alert text per mode (US-016, UX-RULING-1)
  * - shows "Caused by:" causal attribution in Mode 3 only (US-017)
  * - shows negotiation-defensibility label in Mode 2 and 3 (ADR-008 Decision 5)
+ * - clicking any row opens AlertDetailPanel showing sparkline + threshold detail (#745)
  *
  * Implements: ADR-008 Decision 5, FA brief §Layout and Viewport (UD-F1 compact row format)
  */
+import { useEffect, useRef } from "react";
 import { useScenarioStepStore, type Zone1BAlert } from "../store/scenarioStepStore";
+import { getIndicatorDisplayNameAny } from "../lib/indicatorDisplayNames";
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -109,6 +113,245 @@ export function truncateIndicatorName(name: string, maxChars = 22): string {
   return name.slice(0, maxChars - 1) + "…";
 }
 
+/**
+ * Build SVG polyline points for a composite score sparkline.
+ * Returns null if fewer than 2 data points with non-null scores.
+ * Exported for unit tests.
+ */
+export function buildSparklinePoints(
+  scores: (number | null)[],
+  width: number,
+  height: number,
+  padding = 4,
+): string | null {
+  const finite = scores.filter((s) => s !== null) as number[];
+  if (finite.length < 2) return null;
+
+  const usableW = width - padding * 2;
+  const usableH = height - padding * 2;
+  const maxV = Math.max(...finite, 0.01);
+
+  const points = scores
+    .map((s, i) => {
+      if (s === null) return null;
+      const x = padding + (i / (scores.length - 1)) * usableW;
+      const y = padding + (1 - s / maxV) * usableH;
+      return `${x.toFixed(1)},${y.toFixed(1)}`;
+    })
+    .filter(Boolean);
+
+  return points.length >= 2 ? points.join(" ") : null;
+}
+
+// ---------------------------------------------------------------------------
+// AlertDetailPanel — drill-in view for a selected alert (#745)
+// ---------------------------------------------------------------------------
+
+interface AlertDetailPanelProps {
+  alert: Zone1BAlert;
+  onClose: () => void;
+}
+
+function AlertDetailPanel({ alert, onClose }: AlertDetailPanelProps) {
+  const { trajectory } = useScenarioStepStore();
+  const color = SEVERITY_COLOR[alert.severity];
+  const panelRef = useRef<HTMLDivElement>(null);
+
+  // Scroll into view on mount — Zone 1B is ~135px tall so the detail panel
+  // renders below the fold when 3 alerts already fill the visible area (#814).
+  useEffect(() => {
+    panelRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }, []);
+
+  // Human-readable name: frontend registry takes precedence over backend title-case
+  const displayName = getIndicatorDisplayNameAny(alert.indicator_key);
+
+  // Framework composite score time-series from trajectory (already fetched)
+  const scores: (number | null)[] = trajectory
+    ? trajectory.steps.map((s) => s.frameworks[alert.framework]?.composite_score ?? null)
+    : [];
+
+  // MDA floor for this framework (from trajectory mda_floors)
+  const mda_floor = trajectory?.mda_floors.find((f) => f.framework === alert.framework);
+
+  const W = 200;
+  const H = 56;
+  const PADDING = 4;
+
+  const polylinePoints = buildSparklinePoints(scores, W, H, PADDING);
+
+  // Y position of the MDA floor line on the sparkline
+  const floorY = (() => {
+    if (!mda_floor || scores.length === 0) return null;
+    const finite = scores.filter((s) => s !== null) as number[];
+    if (finite.length === 0) return null;
+    const maxV = Math.max(...finite, 0.01);
+    return PADDING + (1 - mda_floor.floor_value / maxV) * (H - PADDING * 2);
+  })();
+
+  // X position of the alert's crossing step
+  const crossingX = (() => {
+    if (!trajectory || scores.length < 2) return null;
+    const idx = trajectory.steps.findIndex((s) => s.step_index === alert.step_index);
+    if (idx < 0) return null;
+    return PADDING + (idx / (scores.length - 1)) * (W - PADDING * 2);
+  })();
+
+  const approachPct = parseFloat(alert.approach_pct_remaining);
+  const isBreached = approachPct <= 0;
+
+  return (
+    <div
+      ref={panelRef}
+      data-testid="alert-detail-panel"
+      data-alert-id={alert.mda_id}
+      style={{
+        background: "#fff",
+        border: `1px solid ${color}`,
+        borderRadius: 4,
+        padding: "8px 10px",
+        fontSize: 11,
+      }}
+    >
+      {/* Header: display name + close button */}
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 6 }}>
+        <div>
+          <span
+            data-testid="detail-indicator-name"
+            style={{ fontWeight: 700, color: "#1a1a2e", fontSize: 12 }}
+          >
+            {displayName}
+          </span>
+          <span
+            style={{
+              marginLeft: 6,
+              background: color,
+              color: "#fff",
+              borderRadius: 3,
+              padding: "1px 5px",
+              fontSize: 10,
+              fontWeight: 700,
+            }}
+          >
+            {alert.severity}
+          </span>
+          <span style={{ marginLeft: 5, color: "#666", fontSize: 10 }}>
+            {FRAMEWORK_ABBREV[alert.framework] ?? alert.framework} · Step {alert.step_index}
+          </span>
+        </div>
+        <button
+          data-testid="detail-close-btn"
+          onClick={onClose}
+          style={{
+            background: "none",
+            border: "none",
+            cursor: "pointer",
+            color: "#aaa",
+            fontSize: 14,
+            lineHeight: 1,
+            padding: "0 2px",
+          }}
+          aria-label="Close detail"
+        >
+          ✕
+        </button>
+      </div>
+
+      {/* Framework composite score sparkline */}
+      {polylinePoints && (
+        <div data-testid="detail-sparkline" style={{ marginBottom: 6 }}>
+          <svg
+            width={W}
+            height={H}
+            style={{ display: "block", overflow: "visible" }}
+            aria-label={`${FRAMEWORK_ABBREV[alert.framework] ?? alert.framework} composite score trajectory`}
+          >
+            {/* MDA floor reference line */}
+            {floorY !== null && (
+              <line
+                data-testid="detail-floor-line"
+                x1={PADDING}
+                y1={floorY}
+                x2={W - PADDING}
+                y2={floorY}
+                stroke={color}
+                strokeWidth={1}
+                strokeDasharray="3 2"
+                opacity={0.8}
+              />
+            )}
+            {/* Score trajectory */}
+            <polyline
+              points={polylinePoints}
+              fill="none"
+              stroke="#2171b5"
+              strokeWidth={1.5}
+              strokeLinejoin="round"
+            />
+            {/* Crossing step marker */}
+            {crossingX !== null && floorY !== null && (
+              <circle
+                data-testid="detail-crossing-marker"
+                cx={crossingX}
+                cy={floorY}
+                r={3}
+                fill={color}
+              />
+            )}
+          </svg>
+          <div style={{ color: "#888", fontSize: 9, marginTop: 1 }}>
+            Framework score · dashed = threshold
+          </div>
+        </div>
+      )}
+
+      {/* Indicator snapshot: current vs floor */}
+      <div
+        data-testid="detail-snapshot"
+        style={{ display: "grid", gridTemplateColumns: "1fr 1fr", columnGap: 8, rowGap: 2 }}
+      >
+        <div>
+          <span style={{ color: "#888" }}>Current </span>
+          <span data-testid="detail-current-value" style={{ fontWeight: 700, color: isBreached ? color : "#333" }}>
+            {parseFloat(alert.current_value).toFixed(3)}
+          </span>
+        </div>
+        <div>
+          <span style={{ color: "#888" }}>Floor </span>
+          <span data-testid="detail-floor-value" style={{ fontWeight: 700, color: "#555" }}>
+            {parseFloat(alert.floor_value).toFixed(3)}
+          </span>
+        </div>
+        <div>
+          <span style={{ color: "#888" }}>Approach </span>
+          <span
+            data-testid="detail-approach-pct"
+            style={{ fontWeight: 700, color: isBreached ? color : "#333" }}
+          >
+            {isBreached ? "BREACHED" : `${(approachPct * 100).toFixed(1)}% remaining`}
+          </span>
+        </div>
+        <div>
+          <span style={{ color: "#888" }}>Consecutive </span>
+          <span data-testid="detail-consecutive" style={{ fontWeight: 700, color: "#555" }}>
+            {alert.consecutive_breach_steps} step{alert.consecutive_breach_steps !== 1 ? "s" : ""}
+          </span>
+        </div>
+      </div>
+
+      {/* Causal attribution — Mode 3 only */}
+      {alert.causal_attribution && (
+        <div
+          data-testid="detail-causal-attribution"
+          style={{ marginTop: 5, color: "#555", fontStyle: "italic" }}
+        >
+          Caused by: {alert.causal_attribution}
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ---------------------------------------------------------------------------
 // Compact row (240px — 1024×768)
 // ---------------------------------------------------------------------------
@@ -116,13 +359,15 @@ export function truncateIndicatorName(name: string, maxChars = 22): string {
 interface CompactRowProps {
   alert: Zone1BAlert;
   mode: "MODE_1" | "MODE_2" | "MODE_3";
+  isFocused: boolean;
+  onClick: () => void;
 }
 
-function CompactAlertRow({ alert, mode }: CompactRowProps) {
+function CompactAlertRow({ alert, mode, isFocused, onClick }: CompactRowProps) {
   const fwAbbrev = FRAMEWORK_ABBREV[alert.framework] ?? alert.framework.toUpperCase().slice(0, 3);
   const sevAbbrev = SEVERITY_ABBREV[alert.severity];
   const color = SEVERITY_COLOR[alert.severity];
-  const bg = SEVERITY_BG[alert.severity];
+  const bg = isFocused ? "#f0f4ff" : SEVERITY_BG[alert.severity];
   const cohortDisplay = alert.cohort
     ? alert.cohort.length > 10
       ? alert.cohort.slice(0, 9) + "…"
@@ -139,6 +384,8 @@ function CompactAlertRow({ alert, mode }: CompactRowProps) {
       data-severity={alert.severity}
       data-framework={alert.framework}
       data-step={alert.step_index}
+      data-focused={isFocused ? "true" : undefined}
+      onClick={onClick}
       style={{
         background: bg,
         borderLeft: `3px solid ${color}`,
@@ -146,6 +393,8 @@ function CompactAlertRow({ alert, mode }: CompactRowProps) {
         padding: "5px 7px",
         fontSize: 11,
         marginBottom: 4,
+        cursor: "pointer",
+        outline: isFocused ? `1px solid ${color}` : undefined,
       }}
     >
       {/* Line 1: severity pill + severity abbrev + framework abbrev */}
@@ -216,10 +465,17 @@ function CompactAlertRow({ alert, mode }: CompactRowProps) {
 // Full-density row (400px — 1280×800)
 // ---------------------------------------------------------------------------
 
-function FullDensityAlertRow({ alert, mode }: CompactRowProps) {
+interface FullDensityRowProps {
+  alert: Zone1BAlert;
+  mode: "MODE_1" | "MODE_2" | "MODE_3";
+  isFocused: boolean;
+  onClick: () => void;
+}
+
+function FullDensityAlertRow({ alert, mode, isFocused, onClick }: FullDensityRowProps) {
   const fwAbbrev = FRAMEWORK_ABBREV[alert.framework] ?? alert.framework.toUpperCase().slice(0, 3);
   const color = SEVERITY_COLOR[alert.severity];
-  const bg = SEVERITY_BG[alert.severity];
+  const bg = isFocused ? "#f0f4ff" : SEVERITY_BG[alert.severity];
   const indicatorFull = alert.indicator_key.replace(/_/g, " ");
   const cohortFull = alert.cohort ?? "all cohorts";
   const alertText = formatAlertText(alert, mode);
@@ -230,6 +486,8 @@ function FullDensityAlertRow({ alert, mode }: CompactRowProps) {
       data-severity={alert.severity}
       data-framework={alert.framework}
       data-step={alert.step_index}
+      data-focused={isFocused ? "true" : undefined}
+      onClick={onClick}
       style={{
         background: bg,
         borderLeft: `3px solid ${color}`,
@@ -237,6 +495,8 @@ function FullDensityAlertRow({ alert, mode }: CompactRowProps) {
         padding: "7px 10px",
         fontSize: 12,
         marginBottom: 5,
+        cursor: "pointer",
+        outline: isFocused ? `1px solid ${color}` : undefined,
       }}
     >
       {/* Severity + framework source */}
@@ -324,11 +584,17 @@ interface MDAAlertPanelZone1BProps {
   /** Column width in px — drives compact vs full-density rendering. */
   columnWidth?: number;
   "data-testid"?: string;
+  /** The mda_id of the currently focused alert (controlled externally — #745). */
+  focusedAlertMdaId?: string | null;
+  /** Called when the user clicks an alert row or closes the detail panel. */
+  onSelectAlert?: (mdaId: string | null) => void;
 }
 
 export function MDAAlertPanelZone1B({
   columnWidth = 240,
   "data-testid": dataTestId = "zone-1b-mda-alerts",
+  focusedAlertMdaId = null,
+  onSelectAlert,
 }: MDAAlertPanelZone1BProps) {
   const { mda_alerts, mode, current_step } = useScenarioStepStore();
 
@@ -337,6 +603,19 @@ export function MDAAlertPanelZone1B({
   const topAlerts = sorted.slice(0, 3);
 
   const isCompact = columnWidth < 320;
+
+  const focusedAlert = focusedAlertMdaId
+    ? mda_alerts.find((a) => a.mda_id === focusedAlertMdaId) ?? null
+    : null;
+
+  const handleRowClick = (alert: Zone1BAlert) => {
+    if (focusedAlertMdaId === alert.mda_id) {
+      // Toggle off — clicking the selected row closes the detail
+      onSelectAlert?.(null);
+    } else {
+      onSelectAlert?.(alert.mda_id);
+    }
+  };
 
   return (
     <div
@@ -364,12 +643,16 @@ export function MDAAlertPanelZone1B({
                 key={`${alert.mda_id}-${alert.step_index}`}
                 alert={alert}
                 mode={mode}
+                isFocused={focusedAlertMdaId === alert.mda_id}
+                onClick={() => handleRowClick(alert)}
               />
             ) : (
               <FullDensityAlertRow
                 key={`${alert.mda_id}-${alert.step_index}`}
                 alert={alert}
                 mode={mode}
+                isFocused={focusedAlertMdaId === alert.mda_id}
+                onClick={() => handleRowClick(alert)}
               />
             ),
           )}
@@ -380,6 +663,14 @@ export function MDAAlertPanelZone1B({
             >
               +{sorted.length - 3} more
             </div>
+          )}
+
+          {/* Inline detail panel for the focused alert */}
+          {focusedAlert && (
+            <AlertDetailPanel
+              alert={focusedAlert}
+              onClose={() => onSelectAlert?.(null)}
+            />
           )}
         </>
       )}

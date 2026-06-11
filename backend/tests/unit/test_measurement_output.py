@@ -158,6 +158,7 @@ def test_mda_alert_decimal_fields_are_strings() -> None:
         mda_id="MDA-001",
         entity_id="GRC",
         indicator_key="poverty_headcount_ratio",
+        indicator_name="Poverty Headcount Ratio",
         severity=MDASeverity.CRITICAL,
         floor_value="0.25",
         current_value="0.31",

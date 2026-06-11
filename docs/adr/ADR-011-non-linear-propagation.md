@@ -3,7 +3,7 @@
 ## Status
 Accepted
 
-**Valid Until:** Milestone 11.5 — Usability Validation and Experience Audit
+**Valid Until:** Milestone 13 — Methodology Publication and Public Launch
 **License Status:** CURRENT — Accepted 2026-06-04 (M11 exit review)
 
 **Diagram:** `docs/architecture/ADR-011-propagation-modes.mmd`
@@ -13,6 +13,7 @@ Accepted
 | Milestone | Review date | Triggers fired | Action |
 |---|---|---|---|
 | M11 exit | 2026-06-04 | No triggers fired. PropagationMode enum unchanged. No new propagation modes added. Diagram added (`ADR-011-propagation-modes.mmd`). License renewed to M11.5. | CURRENT |
+| M12 exit | 2026-06-10 | No triggers fired. `PropagationMode` enum unchanged (`LINEAR`, `THRESHOLD`, `CASCADE`). `BilateralTradeShock` (ADR-012) uses `LINEAR` default — no new propagation modes activated. `ExternalSectorModule.compute()` generates events via the module path, not the `PropagationRule` graph — external sector events bypass the propagation mode selector entirely. License renewed to Milestone 13. | CURRENT |
 
 ## Context
 

@@ -58,6 +58,25 @@ This confirms recording is active. The agent navigates normally.
 The coordinator should be watching (screen share or in-person) and noting the
 think-aloud markers from the agent (see Pillar 2 protocol when established).
 
+### Coordinator communication gate (NM-033)
+
+If the agent asks the coordinator a direct question during the session, the coordinator
+must **stop and classify the question before responding:**
+
+> **Is this about agent-visible WorldSim context (forbidden), or operational mechanics (allowed)?**
+
+- **Agent-visible WorldSim context** (navigation hints, feature location, what a panel means,
+  whether the agent is on the right track) — respond only with: *"I can't help with that —
+  navigate as you would if you were alone."* Never answer, even partially.
+- **Operational mechanics** (is the tool running, is the URL correct, is there a technical error)
+  — you may answer factually without revealing anything about WorldSim's architecture or content.
+
+This gate exists because Session 003 (NM-033) showed that a coordinator answering what
+appeared to be a neutral question ("is the tool working?") can seed enough context to
+break the cold-start condition. When in doubt, treat the question as agent-visible context
+and refuse. The cost of a false positive is one unanswered question; the cost of a false
+negative is an invalid session.
+
 ## Step 5 — End the session
 
 The agent (or coordinator) clicks **End Session** in the red banner.

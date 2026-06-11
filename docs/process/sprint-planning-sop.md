@@ -139,9 +139,10 @@ The sprint plan and the release branch are created at the same time, at mileston
 
 When the sprint plan is approved:
 1. PM Agent creates `release/m{N}` from `main`
-2. Feature branches are cut from `release/m{N}`
-3. Groups are worked in wave order
-4. EL does one admin bypass at milestone close: `release/m{N}` → `main`
+2. **CI trigger verification (mandatory):** Confirm that `.github/workflows/ci.yml` `pull_request: branches` includes `release/m*` (or the specific release branch pattern). If the CI workflow does not cover the new release branch, update it before opening any feature PRs. Root cause: NM-035 — M12 ran 7 groups without CI triggering because this check did not exist.
+3. Feature branches are cut from `release/m{N}`
+4. Groups are worked in wave order
+5. EL does one admin bypass at milestone close: `release/m{N}` → `main`
 
 ---
 

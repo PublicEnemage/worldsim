@@ -817,7 +817,28 @@ Confidence intervals in simulation outputs widen as input data tier decreases.
 This relationship is quantified, not qualitative — a Tier 4 input produces
 wider output uncertainty bands than a Tier 2 input by a documented multiplier.
 
+The `uncertainty_range_pct` field on `Quantity` (type `float | None`) encodes
+this relationship as a machine-readable bound. The lookup table below is the
+authoritative mapping:
+
+| Tier | `uncertainty_range_pct` bound | Display label |
+|------|-------------------------------|---------------|
+| 1 | ≤ 5 % | High confidence |
+| 2 | ≤ 15 % | Moderate confidence |
+| 3 | ≤ 30 % | Research estimate |
+| 4 | ≤ 50 % | Model estimate |
+| 5 | `None` (distribution unknown) | Directional only |
+
+### Propagation Taint Rule
+
+If any input Quantity has `uncertainty_range_pct = None`, the composite output
+also has `uncertainty_range_pct = None`. A None value taints all downstream
+computations. The taint propagates until a new Tier 1–4 source overrides the
+field.
+
 ### Tier 1 — Primary Official Statistics
+
+**Quantitative bound:** uncertainty_range_pct ≤ 5 %
 
 **Definition:** Directly measured data published by authoritative primary
 sources with published methodology.
@@ -833,6 +854,8 @@ finalized and audited.
 
 ### Tier 2 — Derived Official Statistics
 
+**Quantitative bound:** uncertainty_range_pct ≤ 15 %
+
 **Definition:** Calculated from Tier 1 sources by reputable institutions
 using documented, reproducible methodology.
 
@@ -847,6 +870,8 @@ were combined, how.
 
 ### Tier 3 — Research Estimates
 
+**Quantitative bound:** uncertainty_range_pct ≤ 30 %
+
 **Definition:** Published estimates from peer-reviewed academic sources or
 major research institutions with documented methodology and uncertainty ranges.
 
@@ -856,6 +881,8 @@ analysis, GDELT project coded events, Uppsala Conflict Data Program.
 **Weight in simulation:** Weighted by stated uncertainty. Flagged in outputs.
 
 ### Tier 4 — Model Estimates
+
+**Quantitative bound:** uncertainty_range_pct ≤ 50 %
 
 **Definition:** Values produced by other simulation models, including
 WorldSim's own projections. Forward projections. Extrapolations beyond
@@ -870,6 +897,8 @@ and user notification. This prevents circular reasoning from being laundered
 through the tool.
 
 ### Tier 5 — Gap-Filled Values
+
+**Quantitative bound:** uncertainty_range_pct = None — distribution unknown, directional output only
 
 **Definition:** Values produced by interpolation, extrapolation, or regional
 averaging where no source data exists.

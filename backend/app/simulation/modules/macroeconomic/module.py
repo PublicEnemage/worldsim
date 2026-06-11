@@ -63,6 +63,11 @@ _THRESHOLD_ZLB = Decimal("-0.03")       # growth below this → ZLB
 # Tax multiplier is ~60% of spending multiplier (standard macro result).
 _TAX_MULTIPLIER_RATIO = Decimal("0.6")
 
+# Okun's law coefficient: 1pp change in GDP growth → 0.5pp change in unemployment
+# in the opposite direction. Developing-economy calibration (Ball et al. 2019,
+# Loayza & Raddatz 2010). Full calibration deferred to Issue #44.
+OKUN_COEFFICIENT = Decimal("0.5")
+
 # Inflation transmission: spending change → mild demand-side pressure;
 # tax change → mild cost-push pressure.
 _SPENDING_INFLATION_COEFF = Decimal("0.5")
@@ -107,7 +112,13 @@ class MacroeconomicModule(SimulationModule):
     Processes fiscal and monetary policy events from the prior step.
     Applies regime-dependent fiscal multipliers and emits gdp_growth_change
     and (on regime transition) regime_change events.
+
+    fiscal_multiplier_override scales the regime-specific multiplier (Issue #746).
+    Default 1.0 leaves existing behaviour unchanged.
     """
+
+    def __init__(self, fiscal_multiplier_override: float = 1.0) -> None:
+        self._fiscal_multiplier_override = Decimal(str(fiscal_multiplier_override))
 
     def compute(
         self,
@@ -153,13 +164,17 @@ class MacroeconomicModule(SimulationModule):
             confidence_tier = max(confidence_tier, event_tier)
 
             if event.event_type == "fiscal_policy_spending_change":
-                multiplier = FISCAL_MULTIPLIERS[current_regime]
+                multiplier = FISCAL_MULTIPLIERS[current_regime] * self._fiscal_multiplier_override
                 gdp_delta += magnitude * multiplier
                 fiscal_balance_delta -= magnitude
                 inflation_delta += magnitude * _SPENDING_INFLATION_COEFF
 
             elif event.event_type == "fiscal_policy_tax_rate_change":
-                multiplier = FISCAL_MULTIPLIERS[current_regime] * _TAX_MULTIPLIER_RATIO
+                multiplier = (
+                    FISCAL_MULTIPLIERS[current_regime]
+                    * _TAX_MULTIPLIER_RATIO
+                    * self._fiscal_multiplier_override
+                )
                 gdp_delta -= magnitude * multiplier
                 fiscal_balance_delta += magnitude
                 inflation_delta += magnitude * _TAX_INFLATION_COEFF
@@ -197,6 +212,32 @@ class MacroeconomicModule(SimulationModule):
         )
 
         result: list[Event] = [gdp_event]
+
+        # Okun's law: GDP growth change → unemployment rate change (opposite sign).
+        # Emitted as a separate HUMAN_DEVELOPMENT event for framework legibility.
+        unemployment_delta = (-OKUN_COEFFICIENT * gdp_delta).quantize(Decimal("0.000001"))
+        if unemployment_delta != Decimal("0"):
+            result.append(Event(
+                event_id=f"macro-unemp-{entity.id}-{timestep.isoformat()}",
+                source_entity_id=entity.id,
+                event_type="unemployment_rate_change",
+                affected_attributes={
+                    "unemployment_rate": Quantity(
+                        value=unemployment_delta,
+                        unit="ratio",
+                        variable_type=VariableType.RATIO,
+                        measurement_framework=MeasurementFramework.HUMAN_DEVELOPMENT,
+                        confidence_tier=confidence_tier,
+                    ),
+                },
+                propagation_rules=[],
+                timestep_originated=timestep,
+                framework=MeasurementFramework.HUMAN_DEVELOPMENT,
+                metadata={
+                    "okun_gdp_delta": str(gdp_delta),
+                    "okun_coefficient": str(OKUN_COEFFICIENT),
+                },
+            ))
 
         if new_regime != current_regime:
             threshold = (

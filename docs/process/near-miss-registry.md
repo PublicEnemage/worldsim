@@ -1887,6 +1887,142 @@ PM Agent HORIZON sweep Step 5 (file authority audit) during M12 kickoff ceremony
 
 ---
 
+## NM-035 — CI Workflow Not Triggered for PRs Targeting Release Branches (Reactive)
+
+**Date:** 2026-06-05
+**Milestone:** M12 — Active Control and External Sector
+**Detected by:** Engineering Lead spot-check of PR #767 CI run 2026-06-05
+**Severity:** Critical
+
+### What happened
+
+The CI workflow (`ci.yml`) had `pull_request: branches: [ main ]` — it only fired for PRs targeting `main`. The M12 release branch workflow (introduced in CLAUDE.md at M12 kickoff) routes all feature work through PRs targeting `release/m12`. As a result, every G1–G7 PR during M12 merged without CI running (no test-backend, no lint, no compliance-scan, no playwright-e2e jobs triggered).
+
+The pre-push gate (mandatory local `ruff check` + `mypy` + `pytest` before push) provided partial compensation, but CI provides a second independent verification and catches environment differences between local and runner.
+
+**Filing note:** This entry was filed by the implementing agent (not PI Agent) under direct EL direction and urgency. NM-034's PI Agent activation requirement applies; this entry is flagged for PI Agent review before the PR merges.
+
+### What was at risk
+
+All M12 code merged without automated CI verification. Any test failures, lint errors, or import errors introduced after the local pre-push gate would have silently passed through CI. The matrix engine production migration (G4) tests in particular had a pre-existing API breakage (`runner.tick()` → `runner.advance_timestep()`) that was caught only by manual test execution during G5, not by CI.
+
+### What caught it
+
+Engineering Lead spot-check of PR #767 CI run. The detection was ad hoc — no process mechanism would have surfaced this without manual inspection of a specific CI run URL.
+
+### Process improvement
+
+1. `ci.yml` amended — `pull_request: branches` updated from `[ main ]` to `[ main, release/m* ]`; `push: branches` updated from `[ main, develop ]` to `[ main, develop, release/m* ]`. Fixed in this PR.
+2. **Sprint planning SOP must be updated** to include a CI trigger verification step at milestone kickoff: when a new release branch is created, confirm that the CI workflow's `pull_request: branches` pattern covers the new branch before any feature PRs are opened. This check belongs in `docs/process/sprint-planning-sop.md` §Kickoff Gate.
+3. **M12 retroactive assessment required:** EL to determine whether any G1–G7 PRs should have their test suites re-run against `release/m12` head to confirm no silent failures are present. The pre-push gate provides reasonable confidence, but CI was not the second line of defense it was intended to be.
+
+---
+
+## NM-036 — Branch Snapshot Copy Omitted ia1_disclosure — NOT NULL Violation in Mode 3 Golden Path (Reactive)
+
+**Date:** 2026-06-06
+**Milestone:** M12 — Active Control and External Sector
+**Detected by:** Playwright E2E test `mode3-active-control.spec.ts` — CI run 27077377687 (PR #794); DB error surfaced via "⚠ Recompute failed" badge
+**Severity:** Critical
+
+### What happened
+
+The `POST /scenarios/{scenario_id}/branch` endpoint (G6b, PR #778) copies snapshots from the baseline scenario into the new branch scenario. The INSERT into `scenario_state_snapshots` omitted `ia1_disclosure`, which has a NOT NULL constraint. Every call to the branch endpoint failed with a PostgreSQL integrity error:
+
+```
+null value in column "ia1_disclosure" of relation "scenario_state_snapshots" violates not-null constraint
+```
+
+The Mode 3 golden path (create scenario → advance → enable Mode 3 → Apply Change) was broken from the moment the branch endpoint shipped.
+
+### What was at risk
+
+The entire Mode 3 Active Control feature (Issue #753, G6b) was non-functional. Any user attempting the Mode 3 golden path would see "⚠ Recompute failed" immediately. The feature was shipped in PR #778 (merged 2026-06-05) and would have been discovered during G8 (Demo 4) preparation or user testing — not at merge time.
+
+### What caught it
+
+Playwright E2E test `mode3-active-control.spec.ts` (PR #794), which exercised the Mode 3 golden path end-to-end for the first time in CI. The test was first written as part of G6b (PR #778) but had selector bugs that prevented it from reaching the branch call. The PR #794 remediation cycle fixed those bugs, and the newly-functional test immediately exposed the backend failure.
+
+There was no unit or integration test for the branch endpoint that would have caught the missing column. The backend test suite did not cover the full branch-and-advance cycle against a real database.
+
+### Process improvement
+
+1. **Immediate fix:** `ia1_disclosure` added to the snapshot SELECT and INSERT in `branch_scenario` (backend/app/api/scenarios.py). Fixed in PR #794.
+
+2. **Integration test gap:** The branch endpoint had no integration test covering snapshot copy integrity. The backend integration test suite (`tests/integration/`) should include a test that: (a) creates a scenario, (b) advances at least one step, (c) calls the branch endpoint, and (d) confirms the branch scenario's snapshot rows are complete (including `ia1_disclosure`). Filing as a test gap for the test suite.
+
+3. **NOT NULL column coverage rule:** When a new NOT NULL column is added to `scenario_state_snapshots` or any other snapshot table, all INSERT paths into that table must be audited before the migration ships. This includes: `snapshot_repository.py` (primary advance path), `branch_scenario` (branch copy path), `rebranch_scenario` (re-branch path), and any future restore or import paths. The audit must be documented as a checklist item in the PR that introduces the column.
+
+---
+
+## NM-037 — Demo Script Pool Initialization Gap: ASGITransport Does Not Trigger Lifespan (Reactive)
+
+**Date:** 2026-06-07
+**Milestone:** M12 — Active Control and External Sector
+**Detected by:** Demo 4 execution — `RuntimeError: asyncpg pool is not initialised` at `create_asyncpg_pool()` when running `demo_hormuz_jordan.py` in-session
+**Severity:** High
+
+### What happened
+
+Both demo scripts (`demo_hormuz_jordan.py`, `demo_argentina_2001_2002.py`) use `httpx.ASGITransport` to run the FastAPI application in-process without a live server. `ASGITransport` does not trigger FastAPI's `lifespan` context manager, so `create_asyncpg_pool()` (which runs at app startup via lifespan) was never called. The first API call in each demo script immediately failed with `RuntimeError: asyncpg pool is not initialised`.
+
+Both demo scripts had been shipped without ever being executed end-to-end with a live database — the `DATABASE_URL` guard causes them to exit silently without a live DB, which masked the pool initialization gap during development.
+
+### What was at risk
+
+Both demo scripts were non-functional when run against a real database. Demo 3 (M10, Argentina) and Demo 4 (M12, Jordan/Egypt) would have failed at the first API call, producing no demo output. This would have been discovered at demo preparation time — the worst possible moment.
+
+### What caught it
+
+Demo 4 execution attempt during M12 internal demo preparation (2026-06-07 session). The error was immediately surfaced because the session ran with `DATABASE_URL` set.
+
+### Process improvement
+
+1. **Immediate fix:** `await create_asyncpg_pool()` added at the top of `_run_demo()` in both demo scripts (PR #798). This initializes the pool before any ASGITransport request, mirroring what the lifespan handler would have done.
+
+2. **Demo script testing gap:** No CI job exercises demo scripts against a real database. Demo scripts are excluded from the test suite because they require a live DB. At minimum, each demo script should have a unit test that mocks the ASGITransport layer and verifies the `create_asyncpg_pool()` call occurs before the first API request. Filing as a test gap.
+
+3. **ASGITransport lifespan contract:** All future scripts that use `httpx.ASGITransport` against a FastAPI app with lifespan-initialized resources must manually invoke the initialization before the first request. This must be documented in `docs/CONTRIBUTING.md §Demo Scripts` or a similar reference so future demo script authors know the pattern. Filing as a documentation gap.
+
+---
+
+## NM-038 — ExternalSectorModule Emitted Events With No Consumer: Reserves and Unemployment Frozen (Reactive)
+
+**Date:** 2026-06-07
+**Milestone:** M12 — Active Control and External Sector
+**Detected by:** Demo 4 internal review — nine-agent panel; `reserve_coverage_months` and `unemployment_rate` columns frozen across all 8 steps
+**Severity:** Critical
+
+### What happened
+
+`ExternalSectorModule` (ADR-012, PR shipped in M12) emitted `import_price_inflation` events per commodity shock. The demo narrative required reserves to draw down as fuel costs rose — the fixture comment explicitly stated "The Hormuz fuel shock depletes reserves as import costs rise." But no module subscribed to `commodity_price_shock_*` events to translate them into `reserve_coverage_months` changes. The attribute was seeded at scenario creation and never modified.
+
+Similarly, `MacroeconomicModule` computed GDP deltas from fiscal/monetary events but emitted no Okun's law unemployment change. `unemployment_rate` was seeded at scenario start and never modified.
+
+Both attributes appeared frozen across all 8 steps in the demo output, making the primary demo visual argument (reserve drawdown arc, fiscal austerity impact) invisible.
+
+### What was at risk
+
+The Demo 4 primary narrative — "Jordan's reserve trajectory approaching the CRITICAL floor" (Frame C), "Reserve drawdown critical — both economies under stress" (Frame E) — was entirely invisible. The demo would have been presented with flat reserve and unemployment columns, failing to demonstrate the engine's analytical capability. The screenshot brief could not have been satisfied. Demo 4 would have been non-demonstrable.
+
+### What caught it
+
+Internal nine-agent review panel during Demo 4 execution (2026-06-07 session). Both `DEMO4-001 (CRITICAL)` and `DEMO4-002 (CRITICAL)` were identified in the first panel review before any screenshots were captured.
+
+### What was at risk (secondary)
+
+The ExternalSectorModule had been present in the codebase and its test suite passed — the unit tests verified that events were emitted, but no integration test verified that the emitted events produced observable downstream state changes (reserve drawdown, consumption capacity reduction). Tests validated event emission; tests did not validate end-to-end state propagation.
+
+### Process improvement
+
+1. **Immediate fix:** `ExternalSectorModule` now emits a `reserve_coverage_months` depletion event per commodity shock (burn rate coefficient 8.5). `MacroeconomicModule` now emits an `unemployment_rate_change` event via Okun's law (coefficient 0.5) when GDP changes (PR #798).
+
+2. **End-to-end propagation test gap:** Module unit tests verify event emission. No test verifies that emitted events produce observable state changes after propagation. For every new module capability that claims to affect a downstream indicator, there must be an integration test that: (a) runs a 1-step simulation with the module active, (b) asserts the downstream attribute changed in the expected direction. Filing as a test architecture gap.
+
+3. **Demo script acceptance gate:** Before any demo script is merged, it must be executed end-to-end with a live database and the output inspected against the screenshot brief. The current process treats demo scripts as documentation — they must be treated as runnable acceptance tests.
+
+---
+
 ## Registry Maintenance
 
 ### How to add an entry

@@ -12,7 +12,7 @@ from decimal import Decimal
 from enum import Enum
 from typing import Any
 
-from pydantic import BaseModel, ConfigDict, field_serializer, field_validator
+from pydantic import BaseModel, ConfigDict, Field, field_serializer, field_validator
 
 # ---------------------------------------------------------------------------
 # Output disclaimer constants — Issue #98, #100, #158
@@ -175,6 +175,8 @@ class QuantitySchema(BaseModel):
     observation_date: date | None = None
     source_registry_id: str | None = None
     measurement_framework: str | None = None
+    attribute_type: str | None = None
+    stock_flow_identity: bool = False
 
     @field_serializer("observation_date")
     def _serialize_date(self, v: date | None) -> str | None:
@@ -210,6 +212,8 @@ class QuantitySchema(BaseModel):
             observation_date=obs_date,
             source_registry_id=data.get("source_registry_id"),
             measurement_framework=data.get("measurement_framework"),
+            attribute_type=data.get("attribute_type"),
+            stock_flow_identity=bool(data.get("stock_flow_identity", False)),
         )
 
 
@@ -307,6 +311,29 @@ class PoliticalContext(BaseModel):
     legitimacy_index: Decimal | None = None               # composite 0.0–1.0
 
 
+class CommodityShockConfig(BaseModel):
+    """A global commodity price shock applied to all scenario entities (Issue #752, ADR-012).
+
+    Effects are distributed proportionally to each entity's
+    `commodity_import_dependency_{commodity_category}` attribute value.
+    Entities with no dependency attribute receive zero shock.
+
+    All synthetic dependency coefficients must be flagged at indicator level
+    as Tier 3 per DATA_STANDARDS.md §Confidence Tier System.
+    """
+
+    model_config = ConfigDict(from_attributes=True)
+
+    commodity_category: str
+    magnitude: Decimal
+    start_step: int = 0
+    duration_steps: int = 1
+
+    @field_serializer("magnitude")
+    def _serialize_magnitude(self, v: Decimal) -> str:
+        return str(v)
+
+
 class ScenarioConfigSchema(BaseModel):
     """Scenario configuration payload.
 
@@ -332,6 +359,11 @@ class ScenarioConfigSchema(BaseModel):
         MC support can be added without a breaking schema change. MC sampling
         itself is not yet implemented — n_runs > 1 is recorded but produces
         a single deterministic trajectory until ADR-007 MC support ships.
+    `fiscal_multiplier` — Mode 2 parameter (Issue #746). Scales the regime-dependent
+        fiscal multiplier applied in MacroeconomicModule. Default 1.0 (no scaling).
+        Range 0.1–3.0; values outside this range are rejected at validation.
+    `commodity_price_shocks` — global commodity shocks distributed to all entities by
+        import dependency (Issue #752, ADR-012). Default empty (no shocks).
     """
 
     model_config = ConfigDict(from_attributes=True)
@@ -345,6 +377,8 @@ class ScenarioConfigSchema(BaseModel):
     step_metadata: dict[str, Any] = {}
     political_context: PoliticalContext | None = None
     n_runs: int = 1
+    fiscal_multiplier: float = Field(default=1.0, ge=0.1, le=3.0)
+    commodity_price_shocks: list[CommodityShockConfig] = []
 
 
 class ScheduledInputSchema(BaseModel):
@@ -484,6 +518,9 @@ class DeltaRecord(BaseModel):
     `delta` = str(Decimal(value_b) - Decimal(value_a)).
     `direction` is 'increase', 'decrease', or 'unchanged'.
     `confidence_tier` is max(tier_a, tier_b) — lower-of-two rule.
+    `threshold_crossed` is True when the delta crosses a caller-supplied absolute
+    threshold (i.e. value_a is on one side and value_b is on the other), None when
+    no threshold was requested (Issue #153, G6a rider).
     """
 
     model_config = ConfigDict(from_attributes=True)
@@ -493,6 +530,7 @@ class DeltaRecord(BaseModel):
     delta: str
     direction: str
     confidence_tier: int
+    threshold_crossed: bool | None = None
 
 
 class CompareResponse(BaseModel):
@@ -500,6 +538,8 @@ class CompareResponse(BaseModel):
 
     `deltas` maps entity_id → attribute_key → DeltaRecord.
     Only entities and attributes present in both snapshots are included.
+    When `attr` is omitted, ALL shared attributes across all shared entities are
+    returned in a single call (Issue #90). Pass `attr` to filter to one key.
     """
 
     model_config = ConfigDict(from_attributes=True)
@@ -509,6 +549,47 @@ class CompareResponse(BaseModel):
     step_a: int
     step_b: int
     deltas: dict[str, dict[str, DeltaRecord]]
+
+
+# ---------------------------------------------------------------------------
+# Trajectory comparison schemas — Issue #99
+# ---------------------------------------------------------------------------
+
+
+class TrajectoryCompareStep(BaseModel):
+    """One aligned step in a trajectory comparison.
+
+    `value_a` and `value_b` are the attribute values (Decimal as string) at
+    this step for scenario_a and scenario_b respectively. `delta` = value_b -
+    value_a as a Decimal string. `direction` is 'increase', 'decrease', or
+    'unchanged'. All fields are None when the attribute is absent in either
+    snapshot at this step.
+    """
+
+    model_config = ConfigDict(from_attributes=True)
+
+    step: int
+    value_a: str | None = None
+    value_b: str | None = None
+    delta: str | None = None
+    direction: str | None = None
+
+
+class TrajectoryCompareResponse(BaseModel):
+    """Per-step attribute trajectory delta between two scenarios — Issue #99.
+
+    `steps` contains one entry per shared step (both scenarios have a snapshot),
+    sorted ascending by step number. Only steps where both scenarios have a
+    snapshot AND the attribute is present in at least one entity are included.
+    `attribute` is the attribute key that was queried.
+    """
+
+    model_config = ConfigDict(from_attributes=True)
+
+    scenario_a_id: str
+    scenario_b_id: str
+    attribute: str
+    steps: list[TrajectoryCompareStep]
 
 
 # ---------------------------------------------------------------------------
@@ -562,6 +643,14 @@ class MDAAlert(BaseModel):
     floor_value, current_value, and approach_pct_remaining are strings
     (Decimal serialized as str) — consistent with the float prohibition
     throughout the API layer (ADR-003 Decision 2).
+
+    indicator_name is always populated — title-case of indicator_key.
+    Frontend display-name registries may override this with more precise labels.
+
+    recovery_horizon_years: None means the threshold models an irreversible
+    transition; an integer means recovery is possible within that many years
+    given appropriate intervention. Source: mda_thresholds.recovery_horizon_years.
+    Rider #271 — reversibility classification.
     """
 
     model_config = ConfigDict(from_attributes=True)
@@ -569,11 +658,13 @@ class MDAAlert(BaseModel):
     mda_id: str
     entity_id: str
     indicator_key: str
+    indicator_name: str
     severity: MDASeverity
     floor_value: str
     current_value: str
     approach_pct_remaining: str
     consecutive_breach_steps: int
+    recovery_horizon_years: int | None = None
 
 
 class FrameworkOutput(BaseModel):
@@ -626,5 +717,64 @@ class MultiFrameworkOutput(BaseModel):
     @field_validator("ia1_disclosure")
     @classmethod
     def _check_ia1_disclosure(cls, v: str) -> str:
-        from app.simulation.repositories.quantity_serde import validate_ia1_disclosure
+        from app.simulation.repositories.quantity_serde import (
+            validate_ia1_disclosure,  # noqa: PLC0415
+        )
         return validate_ia1_disclosure(v)
+
+
+# ---------------------------------------------------------------------------
+# Mode 3 branch schemas — G6b (Issue #753)
+# ---------------------------------------------------------------------------
+
+
+class BranchRequest(BaseModel):
+    """Request body for POST /scenarios/{id}/branch.
+
+    Creates a new branch scenario from an existing baseline at a specific step,
+    with an updated fiscal_multiplier. The baseline's snapshots up to
+    branch_from_step are copied to the branch; the branch then advances forward.
+    """
+
+    fiscal_multiplier: float = Field(
+        default=1.0,
+        ge=0.1,
+        le=3.0,
+        description="New fiscal multiplier for the branch scenario.",
+    )
+    branch_from_step: int = Field(
+        ge=0,
+        description="Step from which to branch. A snapshot must exist at this step.",
+    )
+
+
+class BranchResponse(BaseModel):
+    """Response for POST /scenarios/{id}/branch."""
+
+    branch_scenario_id: str
+    branch_from_step: int
+    n_steps: int
+
+
+class RebranchRequest(BaseModel):
+    """Request body for POST /scenarios/{id}/rebranch.
+
+    Applies a new parameter change to an existing branch scenario. Deletes
+    snapshots from from_step onward so the branch can re-run from that step
+    with an updated fiscal_multiplier. Implements the re-branch accumulation
+    model from mode3-interaction-spec.md §5.
+    """
+
+    fiscal_multiplier: float = Field(
+        default=1.0,
+        ge=0.1,
+        le=3.0,
+        description="Updated fiscal multiplier for the re-branch.",
+    )
+    from_step: int = Field(
+        ge=0,
+        description=(
+            "Step from which to restart recompute."
+            " Snapshots from this step forward are deleted."
+        ),
+    )

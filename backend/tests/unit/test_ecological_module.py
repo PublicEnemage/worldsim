@@ -158,7 +158,7 @@ def _emergency_event(entity_id: str = "GRC") -> Event:
     )
 
 
-TIMESTEP = datetime(2011, 1, 1, tzinfo=UTC)
+TIMESTEP = datetime(2024, 1, 1, tzinfo=UTC)
 
 # ---------------------------------------------------------------------------
 # Non-country entity
@@ -645,10 +645,13 @@ def _make_state_no_events() -> SimulationState:
 
 def test_co2_proximity_below_boundary() -> None:
     """CO2 concentration below boundary → proximity < 1.0."""
-    entity = _make_entity_with_attrs(co2_concentration_ppm=(Decimal("280"), "ppm"))
+    entity = _make_entity_with_attrs(
+        co2_concentration_ppm=(Decimal("280"), "ppm"),
+        land_use_pressure_index=(Decimal("0.2"), "ratio_0_1"),
+    )
     state = _make_state_no_events()
     module = EcologicalModule()
-    events = module.compute(entity, state, datetime(2010, 1, 1, tzinfo=UTC))
+    events = module.compute(entity, state, TIMESTEP)
     assert len(events) == 1
     proximity = events[0].affected_attributes["planetary_boundary_co2_proximity"]
     # 280 / 350 = 0.8
@@ -657,10 +660,13 @@ def test_co2_proximity_below_boundary() -> None:
 
 def test_co2_proximity_at_boundary() -> None:
     """CO2 concentration exactly at boundary → proximity = 1.0."""
-    entity = _make_entity_with_attrs(co2_concentration_ppm=(Decimal("350"), "ppm"))
+    entity = _make_entity_with_attrs(
+        co2_concentration_ppm=(Decimal("350"), "ppm"),
+        land_use_pressure_index=(Decimal("0.2"), "ratio_0_1"),
+    )
     state = _make_state_no_events()
     module = EcologicalModule()
-    events = module.compute(entity, state, datetime(2010, 1, 1, tzinfo=UTC))
+    events = module.compute(entity, state, TIMESTEP)
     assert len(events) == 1
     proximity = events[0].affected_attributes["planetary_boundary_co2_proximity"]
     assert proximity.value == Decimal("1.000000")
@@ -668,10 +674,13 @@ def test_co2_proximity_at_boundary() -> None:
 
 def test_co2_proximity_above_boundary() -> None:
     """CO2 concentration above boundary → proximity > 1.0."""
-    entity = _make_entity_with_attrs(co2_concentration_ppm=(Decimal("420"), "ppm"))
+    entity = _make_entity_with_attrs(
+        co2_concentration_ppm=(Decimal("420"), "ppm"),
+        land_use_pressure_index=(Decimal("0.2"), "ratio_0_1"),
+    )
     state = _make_state_no_events()
     module = EcologicalModule()
-    events = module.compute(entity, state, datetime(2010, 1, 1, tzinfo=UTC))
+    events = module.compute(entity, state, TIMESTEP)
     assert len(events) == 1
     proximity = events[0].affected_attributes["planetary_boundary_co2_proximity"]
     # 420 / 350 = 1.2
@@ -680,10 +689,13 @@ def test_co2_proximity_above_boundary() -> None:
 
 def test_co2_proximity_capped_at_two() -> None:
     """CO2 concentration far above boundary → proximity capped at 2.0."""
-    entity = _make_entity_with_attrs(co2_concentration_ppm=(Decimal("1400"), "ppm"))
+    entity = _make_entity_with_attrs(
+        co2_concentration_ppm=(Decimal("1400"), "ppm"),
+        land_use_pressure_index=(Decimal("0.2"), "ratio_0_1"),
+    )
     state = _make_state_no_events()
     module = EcologicalModule()
-    events = module.compute(entity, state, datetime(2010, 1, 1, tzinfo=UTC))
+    events = module.compute(entity, state, TIMESTEP)
     assert len(events) == 1
     proximity = events[0].affected_attributes["planetary_boundary_co2_proximity"]
     # 1400 / 350 = 4.0 → capped at 2.0
@@ -698,7 +710,8 @@ def test_land_use_proximity_no_division_by_boundary_value() -> None:
     a double-normalization error. value=0.5 → proximity=0.5, NOT 0.5/0.25=2.0.
     """
     entity = _make_entity_with_attrs(
-        land_use_pressure_index=(Decimal("0.5"), "ratio_0_1")
+        land_use_pressure_index=(Decimal("0.5"), "ratio_0_1"),
+        co2_concentration_ppm=(Decimal("420"), "ppm"),
     )
     state = _make_state_no_events()
     module = EcologicalModule()
@@ -714,7 +727,8 @@ def test_land_use_proximity_no_division_by_boundary_value() -> None:
 def test_land_use_proximity_confidence_tier() -> None:
     """land_use_proximity confidence_tier = max(source=3, boundary=2) = 3."""
     entity = _make_entity_with_attrs(
-        land_use_pressure_index=(Decimal("0.5"), "ratio_0_1")
+        land_use_pressure_index=(Decimal("0.5"), "ratio_0_1"),
+        co2_concentration_ppm=(Decimal("420"), "ppm"),
     )
     state = _make_state_no_events()
     module = EcologicalModule()
@@ -726,10 +740,13 @@ def test_land_use_proximity_confidence_tier() -> None:
 
 def test_co2_proximity_confidence_tier() -> None:
     """co2_proximity confidence_tier = max(source=1, boundary=2) = 2."""
-    entity = _make_entity_with_attrs(co2_concentration_ppm=(Decimal("350"), "ppm"))
+    entity = _make_entity_with_attrs(
+        co2_concentration_ppm=(Decimal("350"), "ppm"),
+        land_use_pressure_index=(Decimal("0.2"), "ratio_0_1"),
+    )
     state = _make_state_no_events()
     module = EcologicalModule()
-    events = module.compute(entity, state, datetime(2010, 1, 1, tzinfo=UTC))
+    events = module.compute(entity, state, TIMESTEP)
     assert len(events) == 1
     proximity = events[0].affected_attributes["planetary_boundary_co2_proximity"]
     assert proximity.confidence_tier == 2

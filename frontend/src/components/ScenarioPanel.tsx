@@ -22,6 +22,7 @@ export default function ScenarioPanel({
   const [listError, setListError] = useState<string | null>(null);
   const [createName, setCreateName] = useState("");
   const [createStartYear, setCreateStartYear] = useState(2020);
+  const [createFiscalMultiplier, setCreateFiscalMultiplier] = useState(1.0);
   const [creating, setCreating] = useState(false);
   const [createSuccess, setCreateSuccess] = useState<string | null>(null);
   const [createError, setCreateError] = useState<string | null>(null);
@@ -40,6 +41,7 @@ export default function ScenarioPanel({
     }
   }, []);
 
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => { void fetchScenarios(); }, [fetchScenarios, refreshKey]);
 
   const handleSelectPrimary = async (scenario: ScenarioResponse) => {
@@ -84,6 +86,7 @@ export default function ScenarioPanel({
             timestep_label: "annual",
             start_date: startDate,
             initial_attributes: {},
+            fiscal_multiplier: createFiscalMultiplier,
           },
           scheduled_inputs: [],
         }),
@@ -93,6 +96,7 @@ export default function ScenarioPanel({
         setCreateSuccess(`"${name}" created.`);
         setCreateName("");
         setCreateStartYear(2020);
+        setCreateFiscalMultiplier(1.0);
         void fetchScenarios();
       } else {
         const body = await res.json().catch(() => ({})) as { detail?: string };
@@ -202,6 +206,38 @@ export default function ScenarioPanel({
               {creating ? "Creating…" : "Create"}
             </button>
           </form>
+          <div className="scenario-fiscal-multiplier" style={{ marginTop: 8 }}>
+            <label style={{ fontSize: 12, display: "flex", alignItems: "center", gap: 8 }}>
+              <span>Fiscal multiplier:</span>
+              <input
+                type="range"
+                min={0.1}
+                max={3.0}
+                step={0.1}
+                value={createFiscalMultiplier}
+                onChange={(e) => setCreateFiscalMultiplier(parseFloat(e.target.value))}
+                disabled={creating}
+                style={{ flexGrow: 1 }}
+                aria-label="Fiscal multiplier"
+                data-testid="fiscal-multiplier-slider"
+              />
+              <span
+                style={{
+                  minWidth: 32,
+                  fontFamily: "monospace",
+                  color: createFiscalMultiplier !== 1.0 ? "#e67e22" : "#888",
+                  fontWeight: createFiscalMultiplier !== 1.0 ? 600 : 400,
+                }}
+              >
+                ×{createFiscalMultiplier.toFixed(1)}
+              </span>
+            </label>
+            {createFiscalMultiplier !== 1.0 && (
+              <div style={{ fontSize: 11, color: "#e67e22", marginTop: 2 }}>
+                Mode 2 — fiscal multiplier override active
+              </div>
+            )}
+          </div>
           {createSuccess && (
             <div className="scenario-panel-success">{createSuccess}</div>
           )}
@@ -209,7 +245,8 @@ export default function ScenarioPanel({
             <div className="scenario-panel-error">{createError}</div>
           )}
           <div className="scenario-create-hint">
-            Creates a GRC scenario with 3 annual steps starting at the given year.
+            Creates a GRC scenario with 3 annual steps starting at the given year. Fiscal
+            multiplier 1.0 = standard; &gt;1.0 = expansionary amplification; &lt;1.0 = contractionary.
           </div>
         </div>
       </div>

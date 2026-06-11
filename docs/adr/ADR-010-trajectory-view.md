@@ -6,10 +6,12 @@ Accepted
 ## Validity Context
 
 **Standards Version:** 2026-05-22
-**Valid Until:** Milestone 11.5 — Usability Validation and Experience Audit
+**Valid Until:** Milestone 13 — Methodology Publication and Public Launch
 **License Status:** ACCEPTED — 2026-05-22
 
-**M11 exit review:** 2026-06-04 (SCAN-025). No renewal triggers fired during Milestone 11. No TrajectoryView component changes in M11. Matrix engine proof-of-concept runs alongside the iterative engine — no streaming trajectory update architecture introduced; shared Zustand atom state architecture unchanged. `_steps_projected` field is in the backend snapshot envelope, not in the trajectory API response. ADR-009 Decision 4 defers matrix production use to M12; the streaming trigger noted at M10 exit still does not apply. License renewed to Milestone 11.5. M11.5 usability audit may surface trajectory legibility findings — evaluate at M11.5 exit.
+**M12 exit review:** 2026-06-10 (SCAN-026). Renewal trigger fired: live A/B comparison visual specification changed. Mode 3 adds a ghost curve for the pre-branch trajectory alongside the active branch trajectory. Ghost curve specification: `strokeOpacity: 0.3`, `strokeDasharray: "4 4"`, same color as active framework curve; divergence fill region between ghost and active (blue/orange per ADR-008 Decision 12, 0.12 opacity). Amendment 1 appended with full ghost curve specification. Renewal trigger text in §Renewal Triggers updated to reflect current invocation model. Rendering technology (Recharts/SVG), trajectory data contract, shared state architecture, confidence tier visual rules, governance null rendering, MDA floor overlay architecture, and policy/shock marker visual all unchanged. License renewed to Milestone 13.
+
+**Previously reviewed:** 2026-06-04 — M11 exit review (SCAN-025). No renewal triggers fired during Milestone 11. No TrajectoryView component changes in M11. Matrix engine proof-of-concept runs alongside the iterative engine — no streaming trajectory update architecture introduced; shared Zustand atom state architecture unchanged. `_steps_projected` field is in the backend snapshot envelope, not in the trajectory API response. ADR-009 Decision 4 defers matrix production use to M12; the streaming trigger noted at M10 exit still does not apply. License renewed to Milestone 11.5. M11.5 usability audit may surface trajectory legibility findings — evaluate at M11.5 exit.
 
 **M10 exit review:** 2026-06-02 (SCAN-024). No renewal triggers fired during Milestone
 10. TrajectoryView was fully implemented in M10 per ADR-010 decisions — implementation
@@ -46,7 +48,7 @@ Next scheduled review at Milestone 11 close.
   vice versa)
 - MDA floor overlay architecture changed (ReferenceLine → alternative)
 - Live A/B comparison visual specification changed (ghost curve opacity,
-  divergence fill approach, or automatic invocation model)
+  divergence fill approach, or explicit branch invocation model)
 - Policy/shock marker visual changed (blue filled circle → other policy
   marker; orange vertical line → other shock marker)
 - Minimum trajectory view width constants revised
@@ -878,3 +880,60 @@ during trajectory re-fetch.
 ## Diagram
 
 Trajectory view component architecture: `docs/architecture/ADR-010-trajectory-view-architecture.mmd`
+
+---
+
+## Amendment 1 — M12 Mode 3: Ghost Curve Visual Specification
+
+**Date:** 2026-06-10
+**Trigger:** Live A/B comparison visual specification changed (§Renewal Triggers)
+**Implemented in:** M12 Mode 3 Active Control — branch/baseline ghost curve display in Zone 1A
+
+### Context
+
+Mode 3 introduces a branch scenario (created via `POST /scenarios/{id}/branch`, see ADR-008 Amendment 1). When a branch is active, Zone 1A must render two trajectories simultaneously: the pre-branch baseline (ghost curve) and the active branch trajectory (primary curve). This amendment specifies the Recharts rendering contract for both curves and the divergence fill region between them.
+
+### Ghost Curve Specification
+
+**Baseline (ghost) trajectory — Recharts `<Line>` props:**
+
+| Prop | Value | Rationale |
+|---|---|---|
+| `strokeOpacity` | `0.3` | Same opacity reduction as Tier 4 confidence — reuses the existing "secondary / lower-confidence" visual register |
+| `strokeDasharray` | `"4 4"` | Same dashed pattern as Tier 3–5 confidence curves — reuses the "uncertainty / non-primary" visual register |
+| `stroke` | Same as active framework curve color | Ghost reads as the same indicator, not a different one |
+| `dot` | `false` | No step markers on ghost curve — reduces visual noise against the primary trajectory |
+| Band fill | Not rendered | Pre-branch uncertainty bands are not shown in Mode 3 — active branch trajectory has primary claim on band visual space |
+
+**Active branch trajectory — Recharts `<Line>` props:**
+
+| Prop | Value | Rationale |
+|---|---|---|
+| `strokeOpacity` | `1.0` | Full opacity — primary curve |
+| `strokeDasharray` | `none` (solid) | Primary trajectory |
+| `stroke` | Framework curve color | Identical to Mode 1/2 rendering |
+
+### Divergence Fill Region
+
+The divergence fill renders between the ghost curve and the active branch trajectory for each framework using a Recharts `<Area>` component with `baseLine` pointing to the ghost curve data series.
+
+**Fill color rules (consistent with ADR-008 Decision 12 blue/orange contract):**
+
+| Branch direction | Fill color | Opacity | Meaning |
+|---|---|---|---|
+| Branch > ghost (improvement) | `#1565C0` (blue) | `0.12` | Branch trajectory above baseline — condition improving |
+| Branch < ghost (deterioration) | `#E65100` (orange) | `0.12` | Branch trajectory below baseline — condition worsening |
+| Branch = ghost (no divergence) | No fill | — | Trajectories identical at this step |
+
+**Temporal scope of fill:**
+- Steps before `branch_from_step`: ghost and active trajectories are identical — no fill rendered
+- Steps at and after `branch_from_step`: fill renders between the two trajectories wherever both have data
+- If the active branch trajectory has fewer computed steps than the ghost: fill stops at the last computed branch step
+
+**Step count mismatch handling:** If the ghost and branch trajectories have different computed step counts (e.g., branch computation is in progress), the `<Area>` fill clips at whichever trajectory ends first. No interpolation — missing steps produce no fill.
+
+### Invocation and Session Lifecycle
+
+- Ghost curve appears when `branch_scenario_id` is present in the session Zustand atom (set by the branch action in the Mode 3 control plane)
+- Ghost curve disappears when the user resets to baseline (branch scenario deleted, `branch_scenario_id` cleared from atom)
+- No ghost curve in Mode 1 or Mode 2 — branch action is Mode 3 only
