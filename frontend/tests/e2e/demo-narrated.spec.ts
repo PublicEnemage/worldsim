@@ -283,7 +283,8 @@ test(
     await speak(
       "This is the WorldSim application. The choropleth behind me shows GDP growth " +
       "rate across the map — geographic context for where we are simulating. " +
-      "The analytical instrument is the panel on the left. " +
+      "The analytical instrument is the cluster of panels above the map — " +
+      "the trajectory chart, the alert panel, and the framework overview. " +
       "The platform is situation-agnostic. The engine is the same as the one that " +
       "ran Greece in 2010 and Argentina in 2001. Today's inputs are Jordan and Egypt " +
       "in 2024, and a disruption in the Strait of Hormuz.",
@@ -327,7 +328,7 @@ test(
     await speak(
       "Step one. Year 2024. The Hormuz disruption begins. The fuel shock " +
       "propagates through the ExternalSector module. " +
-      "Look at Zone 1D — four axes, all live: financial, human development, ecological, governance. " +
+      "Look at the four-framework overview — four axes, all live: financial, human development, ecological, governance. " +
       "This is the first demonstration in the tool's history where all four composite scores " +
       "are computed simultaneously.",
     );
@@ -343,7 +344,7 @@ test(
 
     await speak(
       "Step two. Year 2025. The food supply chain disruption joins the fuel shock. " +
-      "Look at Zone 1B — the MDA alert panel. " +
+      "Look at the alert panel. " +
       "Egypt's governance alert: CRITICAL. Democratic quality score of zero point zero seven " +
       "on the V-Dem Liberal Democracy Index. " +
       "That number is not a step two finding. It was true in 2024. " +
@@ -368,7 +369,10 @@ test(
       "This is the thesis frame. " +
       "Jordan reserves: five months, down from seven point one. " +
       "The reserve curve is burning at approximately one point two months per step. " +
-      "Pause here. Read what the instruments are telling you before we test a counter-proposal.",
+      "Pause here. Read what the instruments are telling you before we test a counter-proposal. " +
+      "One note on the governance alert for Egypt: it carries an Exploratory confidence tier. " +
+      "The direction of deterioration is consistent with V-Dem historical data. " +
+      "The label means magnitude calibration is pending — not that the finding is invalid.",
     );
 
     // Frame C: Step 3 thesis frame — choropleth + Zone 1 showing two entities.
@@ -419,7 +423,7 @@ test(
       "The austerity conditionality at step four does not enter the branch. " +
       "The question being asked is: what does that negotiating outcome cost the IMF, " +
       "and what does it give Jordan? " +
-      "Look at Zone 1A. The divergence is not yet visible at step three — " +
+      "Look at the trajectory chart. The divergence is not yet visible at step three — " +
       "the GCC multiplier effect appears at step four. " +
       "Advance to step five to see where the trajectories separate.",
     );
@@ -441,7 +445,7 @@ test(
 
     await speak(
       "Step five. Year 2028. This is where the divergence peaks. " +
-      "Zone 1A — the trajectory view. Two curves for Jordan GDP: baseline and branch. " +
+      "The trajectory chart — two curves for Jordan GDP: baseline and branch. " +
       "The gap at step five is approximately one point seven percentage points. " +
       "That is the cost of the conditionality. " +
       "Unemployment in the baseline: the GCC support drove it down to sixteen point six " +
@@ -460,7 +464,7 @@ test(
     await page.screenshot({ path: screenshotPath("frame-e-step5-divergence.png") });
 
     await speak(
-      "Zone 1D — all four composite scores at step five, branch trajectory. " +
+      "The four-framework overview — all four composite scores at step five, branch trajectory. " +
       "Financial: Jordan is substantially above Egypt in the branch — the fiscal multiplier " +
       "produced a percentile rank divergence. In the baseline, the two are nearly identical. " +
       "Human Development: bottom-quintile consumption capacity eroded. The branch slows the erosion. " +
