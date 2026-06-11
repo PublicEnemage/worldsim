@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-10 (demo-preparation-standard Steps 3 and 4 complete (PR #838): demo.sh updated with M12 Jordan/Egypt Hormuz presenter guide (22-minute two-act timing, Mode 3 honest disclosures, reserve invariant caveat); demo-narrated.spec.ts rewritten as M12 Playwright narrated spec (8-step Jordan/Egypt scenario, commodity_price_shocks, governance seeds, Mode 3 branch at step 3 with 1.30× multiplier, five frame captures at 1440×900, no-drawer Zone 1 UI). Prior: Mode 3 scenario evaluation panel deliberation + recommendation (PR #833); walkthrough revised — two-act structure + NARRATION-RULING-1 (PR #834), conditionality framing (PR #835), Section 4 (PR #836). All M12 agent deliverables complete. Awaiting EL: Playwright legibility gates, Frame E screenshot capture (live browser), release/m12 → main merge, IR review, stakeholder demo.)**
+**Last updated: 2026-06-10 (Playwright legibility gates passed — 11/11 at 1440×900. Narrated walkthrough run complete — all five Demo 4 frames captured (frame-a through frame-e-step5-divergence.png). demo-narrated.spec.ts app-ready sentinel fixed (worldsim-map → __worldsim_selectEntity). Prior this session: demo.sh + demo-narrated.spec.ts M12 rewrite (PR #838); Mode 3 scenario evaluation panel (PR #833); walkthrough revision PRs #834 #835 #836. All M12 agent deliverables complete. Awaiting EL: release/m12 → main merge, IR review, stakeholder demo.)**
 **Current milestone:** M12 — Active Control and External Sector (GitHub Milestone 13)
 **Previous milestone:** M11.5 — Usability Validation and Experience Audit (formally closed 2026-06-04; Issue #720 closed; GitHub Milestone 14 closed)
 
@@ -204,8 +204,8 @@ CI hotfix: NM-035 filed; `ci.yml` PR trigger updated to include `release/m*` (PR
 
 **Awaiting EL action:**
 - **EL endorsement of Phase 0 exit artifact** — `docs/process/sprint-plans/process-redesign-phase0-exit.md §Part VI`. Phase A cannot open until endorsement is recorded. This is exit gate condition 3.
-- UI screenshot capture at 1440×900 per `docs/demo/m12/screenshot-brief.md` (5 frames) — requires EL browser session; Frame E (`frame-e-step5-divergence.png`, step 5 branch trajectory) is the outstanding capture; spec is now ready (`demo-narrated.spec.ts`)
-- Playwright legibility gates: `demo-legibility.spec.ts` and `demo-advancement-flow.spec.ts` at 1440×900 — run before stakeholder demo
+- ~~UI screenshot capture~~ — **COMPLETE** (2026-06-10): all five frames in `docs/demo/m12/screenshots/` including Frame E (`frame-e-step5-divergence.png`, step 5 branch trajectory at 1.30×)
+- ~~Playwright legibility gates~~ — **PASSED** (2026-06-10): 11/11 at 1440×900 (`demo-legibility.spec.ts` + `demo-advancement-flow.spec.ts`)
 - ~~Investigate DEMO4-007 (ecological composite 50% drop at step 6)~~ — **FIXED prior session**
 - ~~Decision on DEMO4-005 (add `bottom_quintile_consumption_capacity`)~~ — **FIXED prior session**
 - ~~Silence DEMO4-006 (`[SIM-INTEGRITY]` warnings)~~ — **FIXED prior session**
