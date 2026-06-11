@@ -108,42 +108,71 @@ Before presenting Section 2, verify each step's narration satisfies:
 If any step has no umbrella and leads directly with a number, rewrite it.
 If any step has no synthesis and ends on a fact, rewrite it.
 
+### The Two-Act Structure
+
+This demo has two acts. Both must land clearly, or neither lands.
+
+**Act 1 — The baseline reveals the consequence.** The ministry team loads the
+Jordan/Egypt scenario and advances through all eight steps without intervening.
+They watch what the current trajectory produces if the programme is accepted as
+initially structured: reserves drain from 7.1 months to zero by step 7, three
+TERMINAL alerts fire simultaneously, and the human development trajectory does
+not recover alongside the financial indicators. Make this visible before
+introducing Mode 3. The audience must feel the weight of the baseline before
+the counter-proposal is tested.
+
+**Act 2 — Mode 3 tests a counter-proposal.** The ministry team does not accept
+the baseline as inevitable. They branch from step 3 and model what happens if
+GCC emergency support is secured before IMF conditionality locks in at step 4.
+The instrument shows the consequence. Whether it is sufficient is the minister's
+decision. But they can now bring a citable finding to the table.
+
+Do not rush the advance through steps 6–8 at the end of Act 1. That is where
+the baseline consequence becomes undeniable.
+
 ---
 
 ## Section 1 — The Problem (3 minutes)
 
 ### What the Presenter Says
 
-> When the IMF or World Bank walks into a negotiation, they bring an
-> institution. They have programme economists who have modelled this exact
-> country for years. They have historical precedent databases. They have
-> scenario analysis capacity built up over decades, refined by hundreds of
-> programme outcomes. They have seen this before, or something close enough
-> to it that the pattern recognition is there.
+> There is a room where this happens.
 >
-> The finance ministry on the other side of the table is starting from a
-> different position. Their team is smaller. Their analytical infrastructure
-> is thinner. They may have excellent economists — but those economists are
-> also managing a budget process, a parliamentary reporting requirement, and
-> three other crises at the same time. The asymmetry is not in intent. It is
-> in infrastructure.
+> On one side of the table: a team with proprietary models, historical pattern
+> libraries, and decades of institutional memory. They have modelled this
+> country before, or one similar enough that the pattern recognition is
+> immediate. They know the range of outcomes from comparable programmes. They
+> know what went wrong in the analogous case. They have run the scenarios.
 >
-> What that asymmetry produces, in practice, is a gap in the quality of
-> scenario analysis available to each party. The IMF team can model what
-> happens to the fiscal path if growth comes in 1.5 points below projection,
-> or if import prices sustain at 30 percent above baseline. The ministry team
-> is more likely to be working from the IMF's own model outputs, evaluated
-> against their own economic judgment. That judgment is often good. But it
-> is not the same as running the analysis yourself against your own
-> assumptions about what the shock will do.
+> On the other side of the table: a finance ministry team. Two or three
+> economists. Spreadsheets. Public data. Those economists are excellent — but
+> they are also managing a budget cycle, a parliamentary reporting obligation,
+> and three other emergencies simultaneously. The analysis they have is often
+> good. But they are largely evaluating it against their counterpart's model,
+> not their own.
 >
-> WorldSim is an attempt to close that gap. Not to give the ministry team
-> the same institution — that is not possible in a software tool. But to give
-> them the same quality of scenario analysis: historical pattern recognition,
-> human cost consequence modelling, distributional outputs rather than point
-> estimates. Analytical capability that currently costs what sophisticated
-> institutional infrastructure costs, made available as open-source software
-> that runs on a laptop.
+> The minister sitting at that table is making a decision with generational
+> consequences for people who will never know this negotiation happened. The
+> factory worker in Amman. The subsistence farmer whose government just agreed
+> to remove fuel subsidies. The hospital that will lose fifteen percent of its
+> operating budget in year two of the conditionality schedule. None of those
+> people are in the room. The minister is the only person between them and
+> whatever gets decided in the next three hours.
+>
+> That asymmetry — in models, in data, in the ability to run your own scenario
+> against your own assumptions — is not new. It is a structural feature of how
+> consequential economic negotiations have always worked. WorldSim is a direct
+> attempt to change that structure. Not to give the ministry team the same
+> institution — that is not achievable in a software tool. But to give them the
+> same quality of scenario analysis: historical pattern recognition,
+> consequence modelling across financial, human development, and governance
+> dimensions simultaneously, distributional outputs rather than point
+> estimates. Analytical capability that currently requires expensive
+> institutional infrastructure, made available as open-source software that
+> runs on a laptop.
+>
+> What you are about to watch is a finance ministry team — Jordan, 2024, dual
+> commodity shock, IMF negotiation underway — using that capability in real time.
 
 ### What This Establishes
 
@@ -251,15 +280,25 @@ reads 3/8, 2026.
 
 **UMBRELLA — What the presenter says:**
 
-> Before we stop and read any specific number, watch the shape of what is
-> happening. Two countries, one shock, two very different trajectories.
+> Before we stop and read any specific number, let me name the question the
+> Jordanian ministry team is asking at this point.
+>
+> The fuel shock has been running for three years. The reserve buffer has been
+> absorbing it — quietly, without a headline, step by step. The ministry's
+> question is now specific: how much runway is left before the buffer can no
+> longer absorb the import cost increases without forcing a harder structural
+> choice?
+>
+> The instrument gives a specific answer.
 
 **FACTS:**
 
-> By step 3, Jordan's reserve coverage has moved from 7.1 months at step 1
-> to 5.0 months. Egypt's democratic quality score — already at 0.07 at step
-> 1 — has begun a further decline toward the 0.03 range as the government's
-> emergency fiscal response activates.
+> By step 3 (2026), Jordan's reserve coverage has moved from 7.1 months at
+> step 1 to 5.0 months. At the current burn rate — approximately 1.2 months
+> consumed per step — Jordan is three steps from the critical floor. Egypt's
+> democratic quality score — already at 0.07 at step 1 — has begun a further
+> decline toward the 0.03 range as the government's emergency fiscal response
+> activates.
 
 **SYNTHESIS:**
 
@@ -291,10 +330,19 @@ screenshot brief's C → A → B → D → E sequence.
 
 **UMBRELLA — What the presenter says:**
 
-> This is the frame that makes the tool's argument most legible. Step 3, 2026.
-> Jordan's finance ministry is watching its reserve runway compress. Egypt's
-> finance ministry is managing a country in which the governance indicators
-> have been in breach from before the first step arrived.
+> This is the frame that makes the tool's analytical argument legible — but
+> before naming any number, name the question each ministry team is asking.
+>
+> Jordan's team is asking: how many steps remain before the reserve floor
+> changes what interventions are available? Not when do we run out of money —
+> that is a different question. When does the negotiating window narrow? The
+> instrument puts a number on it.
+>
+> Egypt's team is asking a different question entirely — and this is the
+> point of two-country simultaneous modelling. Egypt's governance indicators
+> were already far below the floor before the Hormuz disruption began. The
+> shock is not creating a new problem for Egypt. It is compounding a
+> pre-existing structural condition.
 
 **FACTS:**
 
@@ -372,9 +420,27 @@ this scenario. It must be read as a negotiating asset — specific, nameable,
 and citable — not as a danger warning. The framing should be capability
 analysis throughout.
 
+**Presenter note — Act 1 close:** After Step 5, continue advancing to
+step 7 without stopping for full narration. Let the trajectory view show
+the baseline run to completion. At step 7 (2030), the audience sees three
+TERMINAL alerts active simultaneously: reserve coverage at zero months,
+planetary boundary exceeded, and governance far below floor. Let this
+settle visually, then say:
+
+> "That is the baseline. That is what the programme as initially structured
+> produces over the full eight-year horizon. Reserves depleted. Three
+> simultaneous threshold breaches. The financial trajectory does not produce
+> a corresponding human development recovery. This is what the minister is
+> looking at before she speaks."
+
+Pause. Then: "The ministry team has a different question. They do not accept
+this as inevitable."
+
+Then introduce Mode 3 as Act 2.
+
 ---
 
-### Step 6 — Mode 3 Active Control (Branch from Step 3, 2026)
+### Step 6 — Act 2: Mode 3 Active Control (Branch from Step 3, 2026)
 
 **What the audience sees:** The Mode 3 control panel is active. The fiscal
 multiplier lever is adjusted to 1.3, representing a GCC emergency fiscal
@@ -387,16 +453,31 @@ being answered in real time.
 
 **UMBRELLA — What the presenter says:**
 
-> Until this step, the tool has been reading the trajectory. This step is
-> different. A finance ministry does not only read a trajectory — it steers.
+> Until this step, the instrument has been reading the trajectory. This step
+> is different. The ministry team does not accept the baseline as inevitable.
+> They are testing a counter-proposal.
 >
-> Here is the minister's question: if GCC partners provide emergency fiscal
-> support equivalent to a 30-percent increase in Jordan's effective fiscal
-> capacity, does that buy sufficient reserve runway to avoid the critical
-> floor at step 5?
+> Here is the specific question they are bringing to Mode 3: GCC partners —
+> Saudi Arabia, the UAE, and the Gulf states collectively — have provided
+> emergency financial support packages to Jordan at moments of financial and
+> political crisis before. In 2012 and 2013, following the upheaval of the Arab Spring
+> across the region, Gulf states transferred multi-billion dollar packages to
+> Amman specifically to support budget stability and prevent a deeper fiscal
+> crisis. In 2018, a $2.5 billion package arrived when Jordan faced both a
+> fiscal shortfall and street protests over proposed tax increases. During the
+> 2023 IMF programme negotiations, Gulf contributions formed part of the
+> broader financing arrangement.
 >
-> The minister's team does not have weeks to model this. They may have the
-> length of a phone call.
+> This is not an imaginary intervention. It is a documented pattern in the
+> regional political economy — GCC states using financial transfers to
+> maintain stability in neighbouring countries under pressure. The minister
+> using Mode 3 is not inventing a rescue. They are testing whether a
+> category of support that has happened before, at comparable scale, is
+> sufficient under current conditions to change the trajectory. And
+> specifically: whether securing that support alongside relief from the IMF
+> conditionality terms at step 4 is enough to break the baseline arc.
+>
+> The minister's team may have the length of a phone call to get an answer.
 
 **FACTS:**
 
@@ -408,7 +489,7 @@ being answered in real time.
 **SYNTHESIS:**
 
 > What you are reading is the consequence of the intervention, not a
-> recommendation. The tool does not tell the minister whether to accept the
+> recommendation. The tool does not tell the minister whether to pursue the
 > GCC offer. It shows what the fiscal injection produces under the current
 > model dynamics: where the reserve curve lands at step 5, and whether the
 > critical floor is cleared.
@@ -420,6 +501,14 @@ being answered in real time.
 > previously available only to well-resourced institutional actors — running
 > your own model, against your own assumptions, in the room — is what Mode 3
 > delivers.
+>
+> When the minister's team walks back into the IMF negotiating room, they can
+> now say: "Under our analysis, the programme as structured produces reserve
+> depletion by step 7 and does not recover human development indicators within
+> the eight-year horizon. Here is the modelled trajectory of a
+> counter-proposal. Show us your counter-analysis."
+>
+> That is a different conversation than the one that happened in Athens in 2010.
 
 **Cognitive purpose:** Mode 3 is the north star the entire instrument
 architecture has been designed toward. It must land as the answer to the
@@ -465,19 +554,30 @@ Ecological (CO2 accumulation, independent of the Hormuz crisis), Governance
 
 **SYNTHESIS:**
 
-> This is the first time in WorldSim's demonstration history that all four
-> analytical frameworks have appeared simultaneously with live data. The
-> measurement architecture that has been under development across twelve
-> milestones is now operationally complete for a canonical scenario.
+> For the first time, a finance ministry team can look at a single instrument
+> and see that the financial trajectory is moving in one direction while the
+> human development trajectory is moving in another. Those are not the same
+> event. The four-axis view makes that distinction visible in the moment when
+> the programme is being negotiated — not three years later.
 >
-> The same engine that validated Greece's 2010 austerity and Argentina's 2001
-> default is modelling Jordan and Egypt in 2024 under a commodity price shock.
-> The crisis is different. The geopolitical context is different. The
-> measurement framework and the analytical discipline are identical. That is
-> the platform principle in production.
+> Greece 2014 looked like recovery on GDP. The primary balance targets had
+> been met. The programme was declared on track on the financial axis. That
+> reading was correct.
+>
+> It was not correct on unemployment. It was not correct on child poverty.
+> It was not correct on life expectancy. The IMF published its own assessment
+> of the Greek programme's distributional consequences years after the damage
+> had been done — after the policy window had closed, after a generation had
+> absorbed the consequence. The four-axis view is the instrument that would
+> have made that distinction visible in 2012, when it could still have been
+> argued at the table.
+>
+> That is what this milestone means. Not a feature completion — a capability
+> that changes what a ministry team can see in the room, in the moment when
+> seeing it still matters.
 
 **Cognitive purpose:** The four-axis completion is the M12 milestone claim.
-It should land as a capability milestone, not a feature demonstration. The
+It should land as a ministry capability, not a feature demonstration. The
 audience should leave understanding that the measurement architecture is now
 complete, and that what comes next is additional scenario depth, not
 additional framework construction.
@@ -527,10 +627,20 @@ additional framework construction.
 > GDP contracted for three consecutive years. The simulation correctly predicts
 > contraction at each step and the direction of unemployment movement.
 >
-> **Argentina 2001–2002** — sovereign default and currency crisis following a
-> convertibility peg. The simulation captures the contractionary dynamics.
-> Argentina is also the first case where the simulation has reached MAGNITUDE
-> calibration on year-one contraction — not just direction, but scale.
+> **Argentina 2001–2002** — sovereign default and currency crisis following
+> a convertibility peg collapse. Argentina is the strongest evidential claim
+> in this section, and it warrants the emphasis. The simulation predicted
+> contraction in year one. The economy contracted. The simulation predicted
+> contraction of approximately a specific magnitude. The economy contracted
+> by approximately that magnitude.
+>
+> That is a different standard of evidence than directional accuracy.
+> Directional accuracy means getting the sign right: the model says things
+> get worse, things get worse. Magnitude calibration means getting the scale
+> right: the model says things get worse by roughly this much, and they get
+> worse by roughly that much. Argentina year one is the first case where the
+> simulation has achieved magnitude calibration. The remaining four cases are
+> at directional accuracy only. We are not claiming otherwise.
 >
 > **Lebanon 2019–2020** — a compound crisis: banking system collapse, currency
 > crisis, sovereign debt crisis, and the Beirut port explosion as a compounding
