@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-11 (Step 6c gate fixes merged — PR #880 (closes #879): entity-aware legend labels in TrajectoryView, "Early estimate — confirm before citing" label in MDAAlertPanelZone1B, TERMINAL "(threshold crossed)" suffix, walkthrough Step 7 uncertainty beat + Exploratory callback. Four of five Step 6c CRITICALs resolved (DEMO-070/071/081/090). DEMO-080 (Persona 2, tablet font size) pending EL disposition. Step 9 conditionally unblocked pending EL decision on DEMO-080. Board clear.)**
+**Last updated: 2026-06-11 (Step 6c gate PASS — PR #880 merged (4 annotation fixes); DEMO-080 accepted as-is by EL (tablet scale, out of scope for 1440×900 demo); Step 9 (live stakeholder demo, #843) UNBLOCKED. Board clear.)**
 **Current milestone:** M12 — Active Control and External Sector (GitHub Milestone 13)
 **Previous milestone:** M11.5 — Usability Validation and Experience Audit (formally closed 2026-06-04; Issue #720 closed; GitHub Milestone 14 closed)
 
@@ -197,8 +197,8 @@ CI hotfix: NM-035 filed; `ci.yml` PR trigger updated to include `release/m*` (PR
 - **EL endorsement of Phase 0 exit artifact** — `docs/process/sprint-plans/process-redesign-phase0-exit.md §Part VI`. Phase A cannot open until endorsement is recorded. This is exit gate condition 3.
 - **Live stakeholder demo** (#843) — M12 closure gate (EL decision 2026-06-10). Pre-demo blockers resolved (PR #854 merged): DEMO-039, DEMO-041, DEMO-052, DEMO-053, DEMO-054 (testMatch guard, PR #857 pending). DEMO-055 (entity narration fix, PR #857 pending). Remaining open: #852 alert panel master-detail UX. Produces `YYYY-MM-DD-v0.12.0-stakeholder-review.md` artifact.
 - **EL endorsement of Phase 0 exit artifact** — `docs/process/sprint-plans/process-redesign-phase0-exit.md §Part VI`. Phase A cannot open until endorsement is recorded. This is exit gate condition 3.
-- **Step 6c gate disposition** — 4 of 5 CRITICALs resolved (PR #880): DEMO-070/071/081/090 fixed. **DEMO-080** (Persona 2 — alert text unreadable at tablet) pending EL disposition before Step 9 (live demo) proceeds. EL options: (a) accept as-is (demo runs on 1440×900 laptop, not tablet), (b) file as M13 issue and unblock Step 9, (c) fix now.
-- **Live stakeholder demo** (#843) — M12 closure gate. All pre-demo narration fixes complete (PRs #854, #857, #880). #852 alert panel UX deferred to M13 (EL decision 2026-06-11). Current scroll-list layout is the live demo state. Step 9 blocked pending EL disposition of DEMO-080. Produces `YYYY-MM-DD-v0.12.1-stakeholder-review.md` artifact.
+- ~~Step 6c gate~~ — **PASS (2026-06-11)**: PR #880 resolved DEMO-070/071/081/090; DEMO-080 accepted as-is by EL (tablet scale, out of scope for 1440×900 live demo). Audience simulation review updated. Step 9 unblocked.
+- **Live stakeholder demo** (#843) — M12 closure gate. **Step 9 UNBLOCKED.** All pre-demo fixes complete (PRs #854, #857, #880). #852 deferred to M13. Current scroll-list layout is the live demo state. Produces `YYYY-MM-DD-v0.12.1-stakeholder-review.md` artifact.
 - ~~#852~~ — **DEFERRED TO M13** (EL decision 2026-06-11): alert panel master-detail UX requires Frontend architecture review, ADR, UX Designer + Design Thinking agent input.
 - ~~#841 DEMO-041~~ — **CLOSED** (PR #854)
 - ~~#842 DEMO-039~~ — **CLOSED** (PR #854)
