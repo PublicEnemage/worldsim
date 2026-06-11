@@ -1,7 +1,7 @@
 # Demo Preparation Standard
 
 **Established:** 2026-05-18
-**Last revised:** 2026-06-10 (M12 — Step 4 UI architecture rules: no-drawer Zone 1, app-ready sentinel, Mode 3 slider pattern, API scenario creation; Step 5d: Mode 3 branch configuration evaluation; Step 3: ExternalSector reserve invariant mandatory disclosure; NM-039)
+**Last revised:** 2026-06-10 (M12 — Step 4 UI architecture rules: no-drawer Zone 1, app-ready sentinel, Mode 3 slider pattern, API scenario creation; Step 5d: Mode 3 branch configuration evaluation; Step 3: ExternalSector reserve invariant mandatory disclosure; NM-039; EL decision: IR review renamed ir-review.md, stakeholder-review.md reserved for post-live-demo artifact; Step 9 stakeholder artifact requirement added; folder structure, naming rule, Step 8 save instruction updated)
 **Cadence:** Every two milestones (M6, M8, M10, M12...)
 **Reference cases:** Issue #220 (M6), Issue #333 (M8), Issue #261 (M10), Issue #755 (M12)
 
@@ -30,37 +30,58 @@ All demo artifacts are milestone-versioned. Nothing is overwritten in place.
 ```
 docs/demo/
   m{N}/
-    stakeholder-walkthrough.md     — presenter script for this milestone
-    screenshot-brief.md            — UX Agent frame brief
+    stakeholder-walkthrough.md           — presenter script for this milestone
+    screenshot-brief.md                  — UX Agent frame brief
     screenshots/
       frame-a-<label>.png
       frame-b-<label>.png
-      frame-c-<label>.png          ← thesis frame
+      frame-c-<label>.png                ← thesis frame
       frame-d-<label>.png
       frame-e-<label>.png
     reviews/
-      YYYY-MM-DD-v{version}-stakeholder-review.md   ← canonical Step 7 review
-      YYYY-MM-DD-v{version}-pre-gate-triage.md      ← optional; pre-gate only
-  stakeholder-walkthrough.md       — current version (updated each demo cycle)
+      YYYY-MM-DD-v{version}-ir-review.md           ← Step 7: IR Agent pre-demo quality gate
+      PENDING-v{version}-stakeholder-review.md     ← placeholder created at milestone close
+      YYYY-MM-DD-v{version}-stakeholder-review.md  ← Step 9: filled after live demo runs
+      YYYY-MM-DD-v{version}-pre-gate-triage.md     ← optional; pre-gate only
+  stakeholder-walkthrough.md             — current version (updated each demo cycle)
 ```
 
-**Naming rule — mandatory pre-creation check:**
-Before saving any review document, run:
+**Two distinct review artifacts — mandatory distinction (EL decision 2026-06-10):**
+
+| Artifact | Filename | When created | Who authors |
+|---|---|---|---|
+| IR review | `YYYY-MM-DD-v{version}-ir-review.md` | Step 7 — after screenshots captured | Independent Review Agent (fresh Claude instance) |
+| Stakeholder review | `YYYY-MM-DD-v{version}-stakeholder-review.md` | Step 9 — after live demo runs | Acting agent from session notes |
+
+The IR review is a pre-demo quality gate conducted by a simulated domain expert. The stakeholder
+review is a post-demo artifact capturing what real stakeholders said, asked, and identified.
+These are not the same artifact and must not share a filename. A `PENDING-v{version}-stakeholder-review.md`
+placeholder is created at milestone close (before the live demo runs) and renamed once the
+demo is complete.
+
+**Naming rule — IR review (Step 7):**
+Before saving the IR review, run:
 ```bash
-find docs/demo/ -name "*stakeholder-review*"
+find docs/demo/ -name "*-ir-review*"
 ```
-Confirm the new filename matches the pattern `YYYY-MM-DD-v{version}-stakeholder-review.md`
-exactly — same prefix, same separator style, same suffix. The M8 file
-(`2026-05-18-v0.8.0-stakeholder-review.md`) is the canonical reference instance.
+Confirm the new filename matches `YYYY-MM-DD-v{version}-ir-review.md`. The M12 file
+(`2026-06-10-v0.12.0-ir-review.md`) is the canonical reference instance (first milestone
+to use this naming).
+
+**Naming rule — Stakeholder review (Step 9):**
+Before saving the stakeholder review, run:
+```bash
+find docs/demo/ -name "*-stakeholder-review*"
+```
+Confirm the filename matches `YYYY-MM-DD-v{version}-stakeholder-review.md`. Prior to the
+EL decision (M6, M8, M10), the IR Agent's output was saved under this name — those files
+are historically named correctly for their milestone and must not be renamed. From M12
+forward, `stakeholder-review.md` is post-live-demo only.
 
 **Pre-gate triage reviews** (conducted before screenshots are captured) are a distinct
-artifact from the canonical Step 7 review. If a pre-gate triage IR is run, save it as
+artifact from the Step 7 IR review. If a pre-gate triage IR is run, save it as
 `YYYY-MM-DD-v{version}-pre-gate-triage.md` in the same `reviews/` folder. Add a header
-note identifying it as pre-gate. The canonical Step 7 review must still be conducted
-separately (with screenshots) and saved under the `*-stakeholder-review.md` name. Do not
-use a descriptive suffix (e.g. `demo3-screenshot-ir`, `demo3-ir`) in place of the
-canonical name — the suffix is always `-stakeholder-review.md` for Step 7 and
-`-pre-gate-triage.md` for pre-gate work. NM-031 documents the M10 deviation.
+note identifying it as pre-gate. NM-031 documents the M10 deviation.
 
 Playwright specs are similarly versioned:
 
@@ -424,13 +445,30 @@ discretion.
 
 Fix CRITICAL items before the stakeholder session.
 HIGH items: acknowledge honestly in narration if unfixed.
-Save review document to `docs/demo/m{N}/reviews/YYYY-MM-DD-v{version}-stakeholder-review.md`.
+Save the IR review to `docs/demo/m{N}/reviews/YYYY-MM-DD-v{version}-ir-review.md`.
 
-### Step 9 — Stakeholder session
+Create the stakeholder-review placeholder if it does not already exist:
+`docs/demo/m{N}/reviews/PENDING-v{version}-stakeholder-review.md`
+(Use the template in `docs/templates/` or follow the structure of the M12 instance.)
+
+### Step 9 — Live stakeholder session
 
 Use `docs/demo/m{N}/stakeholder-walkthrough.md` as the presenter script.
 Use `scripts/speak.sh` if text-to-speech narration is needed.
 Use `scripts/demo.sh` to start the stack before the audience arrives.
+
+**Post-session artifact (mandatory):**
+After the session, complete the stakeholder-review placeholder and rename it:
+
+```bash
+mv docs/demo/m{N}/reviews/PENDING-v{version}-stakeholder-review.md \
+   docs/demo/m{N}/reviews/YYYY-MM-DD-v{version}-stakeholder-review.md
+```
+
+Fill in: date, attendees, questions raised, most compelling moment, most questioned element,
+north star test answer (specific — not aspirational), and follow-up actions. File GitHub
+issues for any new capability gaps named by real stakeholders. Update SESSION_STATE.md to
+record the demo as complete and cite the stakeholder-review artifact path.
 
 ---
 
@@ -460,4 +498,4 @@ Use `scripts/demo.sh` to start the stack before the audience arrives.
 | M6 | #220 | `docs/demo/m6/reviews/2026-05-07-v0.6.0-stakeholder-review.md` |
 | M8 | #333 | `docs/demo/m8/reviews/2026-05-18-v0.8.0-stakeholder-review.md` |
 | M10 | #261 | `docs/demo/m10/reviews/2026-06-02-v0.10.0-stakeholder-review.md` |
-| M12 | #755 | `docs/demo/m12/reviews/` (IR review pending — M12 merged to main 2026-06-11) |
+| M12 | #755 | IR: `docs/demo/m12/reviews/2026-06-10-v0.12.0-ir-review.md` (13 findings DEMO-039–051) — Stakeholder: `PENDING-v0.12.0-stakeholder-review.md` (live demo outstanding, #843) |
