@@ -1,9 +1,9 @@
 # Demo Preparation Standard
 
 **Established:** 2026-05-18
-**Last revised:** 2026-06-02 (M10 — screenshot naming, legibility gate, narration instrument check, NARRATION-RULING-1 self-check, review naming convention enforcement; closes #379, NM-031)
+**Last revised:** 2026-06-11 (M13 planning — Step 6c Audience Simulation Panel added: persona-based live demo rehearsal using Personas 1, 2, 5 as in-character audience agents; Persona 5 north star gate blocks Step 7; Four-Tier Review Structure table updated; audience-simulation artifact added to folder structure)
 **Cadence:** Every two milestones (M6, M8, M10, M12...)
-**Reference cases:** Issue #220 (M6), Issue #333 (M8), Issue #261 (M10)
+**Reference cases:** Issue #220 (M6), Issue #333 (M8), Issue #261 (M10), Issue #755 (M12)
 
 ---
 
@@ -39,9 +39,13 @@ docs/demo/
       frame-d-<label>.png
       frame-e-<label>.png
     reviews/
-      YYYY-MM-DD-v{version}-stakeholder-review.md   ← canonical Step 7 review
-      YYYY-MM-DD-v{version}-pre-gate-triage.md      ← optional; pre-gate only
-  stakeholder-walkthrough.md       — current version (updated each demo cycle)
+      YYYY-MM-DD-v{version}-internal-review.md     ← Step 6b: nine-agent internal panel
+      YYYY-MM-DD-v{version}-audience-simulation.md ← Step 6c: persona-based audience simulation
+      YYYY-MM-DD-v{version}-ir-review.md           ← Step 7: IR Agent pre-demo quality gate
+      PENDING-v{version}-stakeholder-review.md     ← placeholder created at milestone close
+      YYYY-MM-DD-v{version}-stakeholder-review.md  ← Step 9: filled after live demo runs
+      YYYY-MM-DD-v{version}-pre-gate-triage.md     ← optional; pre-gate only
+  stakeholder-walkthrough.md             — current version (updated each demo cycle)
 ```
 
 **Naming rule — mandatory pre-creation check:**
@@ -75,17 +79,18 @@ are updated in place. They are operational tools, not artifacts.
 
 ---
 
-## Three-Tier Review Structure (M10 forward)
+## Four-Tier Review Structure (M10 forward; Step 6c added M14 forward)
 
-Every demo cycle passes through three review tiers in sequence. No tier may be skipped.
+Every demo cycle passes through four review tiers in sequence. No tier may be skipped.
 
 | Tier | Step | Who | Gate |
 |---|---|---|---|
 | Self-check | 5a / 5b / 5c | Acting agent | Narration instrument check + Playwright legibility + NARRATION-RULING-1 all pass |
-| **Internal team review** | **6b** | **Nine-agent panel (PM Agent orchestrates)** | **All CRITICAL findings resolved + filed; all HIGH findings filed — before Step 7** |
+| **Internal team review** | **6b** | **Nine-agent panel (PM Agent orchestrates)** | **All CRITICAL findings resolved + filed; all HIGH findings filed — before Step 6c** |
+| **Audience simulation** | **6c** | **Persona panel: Personas 1, 2, 5 (PM Agent orchestrates)** | **Persona 5 north star verdict PASS; all CRITICAL persona findings resolved — before Step 7** |
 | Independent review | 7 | Fresh Claude instance (IR Agent) | All CRITICAL and HIGH findings from IR filed as GitHub issues — before Step 9 |
 
-The tiers are sequential and non-negotiable. The IR Agent (Step 7) must not be activated until the Step 6b gate is satisfied. The stakeholder session (Step 9) must not occur until the Step 8 gate is satisfied.
+The tiers are sequential and non-negotiable. The IR Agent (Step 7) must not be activated until the Step 6b and Step 6c gates are both satisfied. The stakeholder session (Step 9) must not occur until the Step 8 gate is satisfied.
 
 ---
 
@@ -111,8 +116,23 @@ Save output to `docs/demo/m{N}/screenshot-brief.md`. This is a permanent artifac
 Update the presenter guide section of `demo.sh` to reflect current milestone state: which axes
 are live, which are null, what the honest disclosures are, what the roadmap section says.
 
-Do NOT update the North Star closing (§18:00–19:00). It does not change.
+Do NOT update the North Star closing. It does not change.
 Do NOT update the backtesting credibility section unless new cases were added.
+
+**ExternalSector + Mode 3 reserve invariant — mandatory disclosure (M12 forward):**
+If the demo scenario uses `ExternalSectorModule` (ADR-012) and Mode 3 Active Control
+simultaneously, the honest disclosures section of `demo.sh` MUST include the following caveat:
+
+> *Reserve depletion is identical in the baseline and the Mode 3 branch. Better conditionality
+> terms improve GDP and unemployment trajectories. They do not change the entity's structural
+> import dependency during the external shock. State this explicitly when presenting the
+> Mode 3 comparison — the reserve crisis is survived under better conditions, not avoided.*
+
+This is not optional context — it is the honest answer to what Mode 3 can and cannot change.
+The reserve drawdown curve is driven by `ExternalSectorModule` independently of fiscal policy;
+Mode 3 operates only on the fiscal channel. Omitting this caveat allows a stakeholder to
+incorrectly conclude that better conditionality terms resolve the reserve crisis.
+Documented in Mode 3 scenario evaluation panel deliberation (M12, 2026-06-10).
 
 ### Step 4 — Archive and update the narrated Playwright spec
 
@@ -128,6 +148,73 @@ Update `demo-narrated.spec.ts` for the current milestone:
 - Narration strings for new features (ecological axis, governance null, PMM widget state)
 - Screenshot output paths pointing to `docs/demo/m{N}/screenshots/`
 - **Capture viewport — mandatory:** At the top of the test body, add `await page.setViewportSize({ width: 1440, height: 900 })` before `page.goto()`. Do NOT rely on the `playwright.config.ts` default (1280×720). The capture viewport must match the legibility gate (1440×900) and the presenter display. Root cause of NM-032 (DEMO-020 invisible to review chain at 1280×720). Issue #675.
+
+**App-ready sentinel — mandatory (NM-039):**
+The first `await` after `page.goto("/")` must wait for the application shell to be interactive.
+Use exactly this pattern:
+
+```typescript
+await page.waitForFunction(
+  () => typeof (window as Record<string, unknown>).__worldsim_selectEntity === "function",
+  { timeout: 15_000 },
+);
+```
+
+Do NOT wait for a map container testid (`worldsim-map`, `zone-1a-trajectory-container`, etc.).
+The choropleth testid changes with UI revisions; `zone-1a-trajectory-container` is only present
+after scenario selection, not on initial load. The `__worldsim_selectEntity` function is stable
+across milestone UI changes — it is also the sentinel used by `demo-legibility.spec.ts` and
+`demo-advancement-flow.spec.ts`. Before writing the sentinel, check what those two files use.
+Root cause: NM-039.
+
+**Zone 1 always-visible UI — no-drawer pattern (M10 forward):**
+From M10 onward, Zone 1 instruments (`zone-1a-trajectory-container`, `zone-1b-mda-alerts`,
+`zone-1c-pmm`, `zone-1d-four-framework`) are in the main viewport at all times. Do NOT:
+
+- Call `window.__worldsim_selectEntity(entityId)` to open a drawer for instrument access
+- Wait for `getByLabel("Close drawer")` or click it
+- Use tab buttons inside a drawer to switch framework views
+
+Screenshots are taken of the full viewport — the instrument cluster is always visible.
+The M8 drawer-based pattern (`__worldsim_selectEntity` → drawer opens → tab switch → screenshot → close drawer) is archived in `demo-narrated-m8.spec.ts` and must not be replicated.
+
+**Mode 3 React controlled input — slider pattern:**
+The `fiscal-multiplier-slider` (and any similar React controlled input) cannot be set with
+`fill()` or direct `el.value = "..."`. React intercepts the DOM property write and does not
+fire the synthetic change event. Use the native input setter pattern:
+
+```typescript
+await page.locator('[data-testid="fiscal-multiplier-slider"]').evaluate(
+  (el, value) => {
+    const slider = el as HTMLInputElement;
+    const nativeInputValueSetter = Object.getOwnPropertyDescriptor(
+      window.HTMLInputElement.prototype,
+      "value",
+    )?.set;
+    nativeInputValueSetter?.call(slider, value);
+    slider.dispatchEvent(new Event("input", { bubbles: true }));
+  },
+  "1.30",
+);
+```
+
+Wait for `[data-testid="recompute-badge"]` to disappear and `[data-testid="branch-anchor-label"]`
+to appear before taking the Mode 3 screenshot — the branch trajectory computation is async.
+
+**API scenario creation for complex scenarios:**
+When the demo scenario requires `commodity_price_shocks`, `governance` module seeds, or
+multi-entity initial attributes, create the scenario via `page.request.post()` before opening
+the Scenarios panel — do not use the form UI (`.scenario-btn--create`). The form UI supports
+only the basic configuration. The narrated spec creates the scenario via API, then selects it
+from the panel. The `beforeAll` cleanup deletes stale runs from previous executions by matching
+on the scenario name prefix.
+
+**Frame E placement — at the divergence peak step, not the branch application step:**
+For Mode 3 demos, the final frame must be captured at the step where the branch/baseline
+divergence peaks, not at the step where Mode 3 was applied. For the Jordan/Egypt Hormuz
+fixture, Mode 3 is applied at step 3 but the divergence peaks at step 5 (austerity removal
+lag). Always advance to the peak divergence step before capturing the Mode 3 comparison frame.
+The screenshot brief specifies this step — follow it explicitly.
 
 ### Step 5 — Update `docs/demo/stakeholder-walkthrough.md`
 
@@ -195,6 +282,47 @@ Authority: NARRATION-RULING-1 (`docs/ux/standards.md §16`).
 This check gates against the class of defect documented in Issue #652: narration
 that presents instrument output without framing or implication, introducing
 presenter-skill dependency for the "so what" the audience needs.
+
+### Step 5d — Mode 3 branch configuration evaluation (M12 forward — when Mode 3 is used)
+
+**Applies when:** the demo includes Mode 3 Active Control for the first time, or when the
+demo scenario fixture changes between milestones and the branch configuration has not been
+re-validated against live simulation output.
+
+**Does NOT apply when:** Mode 3 fixture and branch parameters are unchanged from the
+previous demo cycle and no engine changes affect fiscal transmission coefficients.
+
+**Evaluation protocol:**
+
+1. Identify the candidate branch configurations: at minimum, the current fixture (baseline)
+   plus any plausible alternatives (different branch step, multiplier, GCC magnitude, or
+   austerity severity).
+2. Run each configuration as a live simulation — observe step-level GDP, unemployment, and
+   reserve output from the API, not estimated from model formulae.
+3. Document observed step-level output for each option in a deliberation file under
+   `docs/demo/m{N}/reviews/scenario-evaluation-mode3-deliberation.md`.
+4. Two-agent panel: Development Economist Agent + Chief Methodologist Agent. Both must agree
+   on the recommendation before the branch configuration is locked. File the recommendation
+   as `docs/demo/m{N}/reviews/scenario-evaluation-mode3-recommendation.md`.
+
+**What the panel must explicitly address:**
+
+- Which step shows the maximum divergence between baseline and branch trajectories in
+  Zone 1A? (This is the step for Frame E.)
+- Is the reserve depletion curve affected by the branch, or is it driven by ExternalSectorModule
+  independently of fiscal policy? (If the latter, the mandatory disclosure from Step 3 applies.)
+- Is the branch scenario narratively coherent? A branch that removes the IMF entirely (by
+  branching before IMF entry) is a different scenario than "negotiate better conditionality terms."
+  The counterfactual must match what a finance minister can actually argue at the table.
+- Are the observed GDP and unemployment changes consistent with the engine's documented
+  fiscal transmission coefficients? If not, the discrepancy must be explained before proceeding.
+
+**The key rule:** evaluate against live simulation output, not model assumption estimates.
+The M12 Mode 3 evaluation ran four option variants (A/B/D/E) against the live database before
+recommending the current fixture. The panel's deliberation file shows that Option B (higher GCC
+value) tested a different scenario than the 1.30× multiplier — a distinction invisible without
+running both. See `docs/demo/m12/reviews/scenario-evaluation-mode3-deliberation.md` as the
+canonical reference for this step.
 
 ### Step 6 — Run the demo and capture screenshots
 
@@ -280,6 +408,95 @@ last assigned `DEMO-NNN` before beginning aggregation.
 Step 7. All HIGH findings filed as GitHub issues before Step 7. MEDIUM and LOW at PM Agent
 discretion.
 
+### Step 6c — Audience Simulation Panel (M14 forward)
+
+Activate a persona-based panel after the Step 6b gate is cleared and before the Independent
+Review Agent sees any artifacts. Each panel member is instantiated from their full profile
+in `docs/ux/personas.md` and evaluates the screenshots and walkthrough **in-character** —
+not as an internal quality reviewer, but as an audience member experiencing the demo for
+the first time.
+
+This step tests a different question from Step 6b: not *is the demo technically correct?*
+but *does the presentation arc hold up under the challenges this specific audience would pose?*
+
+**Panel composition:**
+
+| Persona | Who | In-character question |
+|---|---|---|
+| **Persona 1 — Programme Analyst** | Lucas Ferreira, IMF Country Economist | "Does this output carry what I need to defend it in an IMF review board?" |
+| **Persona 2 — Ministry Negotiator** | Eleni Papadimitriou, Deputy Director, Hellenic Ministry of Finance | "Can I retrieve a specific threshold crossing in under 90 seconds in the room?" |
+| **Persona 5 — Institutional Decision-Maker** | Aicha Mbaye, Finance Minister, Senegal | "Does this change my position? Can I state the key finding without asking an economist?" |
+
+**When to add Persona 3:** Add Andreas Stefanidis (Political Advisor) when the demo features
+governance or political economy outputs — specifically when the political feasibility module
+or social dynamics indicators are in scope. Andreas tests whether the governance signal
+is translatable into a political brief without economist mediation.
+
+**Activation:** PM Agent instantiates each persona agent with: (1) the persona's full profile
+from `docs/ux/personas.md` — identity, entry state, trust threshold, failure mode, preferred
+information format; (2) screenshots in UX Agent brief presentation sequence; (3)
+`docs/demo/stakeholder-walkthrough.md`. Each persona agent responds in-character. Findings are
+produced independently, then aggregated by PM Agent — this is not a cross-agent discussion.
+
+**Finding format (per persona):**
+
+```
+[DEMO-NNN]: [one-line title]
+Severity: CRITICAL / HIGH / MEDIUM / LOW
+Persona: [number and name]
+In-character observation: [what this persona would think or say at this moment in the demo]
+Presenter preparation: [the question the presenter must be able to answer]
+Recommendation: [specific artifact change — or "Presenter prep only" if no change needed]
+```
+
+**Finding numbering:** Persona simulation findings continue the `DEMO-NNN` namespace from
+the last number assigned in Step 6b. PM Agent checks the last assigned number before
+beginning aggregation.
+
+**Severity calibration for persona findings:**
+
+| Severity | Meaning |
+|---|---|
+| CRITICAL | A failure that, in-character, causes this persona to close the tool or dismiss the demo (trust threshold breached or failure mode triggered per `docs/ux/personas.md`) |
+| HIGH | A question the presenter cannot currently answer, or a navigation path the persona cannot complete within their stated time window |
+| MEDIUM | An observation that degrades comprehension but does not trigger a failure mode |
+| LOW | A preference or style note that does not affect the persona's ability to use the output |
+
+**North star gate — Persona 5 (mandatory):**
+At the end of Aicha Mbaye's section, the persona agent must produce a mandatory north star verdict:
+
+```
+North star verdict: PASS / FAIL
+Primary finding sentence: "[The single sentence Aicha would take away from this demo,
+  stated without specialist mediation — or CANNOT BE STATED if she cannot articulate it]"
+Gate: Step 7 MAY PROCEED / BLOCKED — [reason if blocked]
+```
+
+The Persona 5 north star verdict gates Step 7. If Aicha cannot articulate the primary
+finding in one sentence without economist interpretation, the walkthrough or narration
+must be revised before the IR Agent is activated. The sentence that passes is also the
+sprint-level north star test artifact for this demo cycle (CLAUDE.md §North Star Test).
+
+**Artifact format** (`YYYY-MM-DD-v{version}-audience-simulation.md` in `docs/demo/m{N}/reviews/`):
+1. One section per persona — each agent's findings in the format above, in-character and unedited.
+2. PM Agent presenter preparation summary: numbered list of questions the presenter must
+   be able to answer, consolidated from all persona findings, ranked by severity.
+3. North star gate declaration: Persona 5 verdict and primary finding sentence, promoted
+   to the summary level for direct reference by PM Agent and EL.
+
+**Gate:** Persona 5 north star verdict is PASS, and all CRITICAL persona findings are
+resolved (same three-condition criteria as Step 6b) before Step 7.
+
+**Naming rule:**
+Before saving, run:
+```bash
+find docs/demo/ -name "*-audience-simulation*"
+```
+Confirm the filename matches `YYYY-MM-DD-v{version}-audience-simulation.md`. The M14
+instance will be the canonical reference for this step.
+
+---
+
 ### Step 7 — Independent Review Agent
 
 Activate a fresh Claude instance. Follow `docs/process/independent-review-prompt.md` exactly:
@@ -325,6 +542,8 @@ Use `scripts/demo.sh` to start the stack before the audience arrives.
 - The roadmap section (past milestones to past tense, next milestone description)
 - The Playwright spec (frame sequence, step count, narration strings)
 - The screenshot brief (UX Agent re-activated fresh for each milestone)
+- The Mode 3 branch configuration (step, multiplier, fixture) — re-validate via Step 5d
+  whenever the demo scenario or engine fiscal transmission changes between cycles
 
 ---
 
@@ -335,3 +554,4 @@ Use `scripts/demo.sh` to start the stack before the audience arrives.
 | M6 | #220 | `docs/demo/m6/reviews/2026-05-07-v0.6.0-stakeholder-review.md` |
 | M8 | #333 | `docs/demo/m8/reviews/2026-05-18-v0.8.0-stakeholder-review.md` |
 | M10 | #261 | `docs/demo/m10/reviews/2026-06-02-v0.10.0-stakeholder-review.md` |
+| M12 | #755 | `docs/demo/m12/reviews/` (IR review pending — M12 merged to main 2026-06-11) |

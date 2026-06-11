@@ -2023,6 +2023,37 @@ The ExternalSectorModule had been present in the codebase and its test suite pas
 
 ---
 
+## NM-039 — demo-narrated.spec.ts Used Non-Existent testid as App-Ready Sentinel (Reactive)
+
+**Date:** 2026-06-10
+**Milestone:** M12 — Active Control and External Sector
+**Detected by:** First Playwright run of the rewritten M12 narrated spec — `TimeoutError` after 15s
+**Severity:** Medium
+
+### What happened
+
+The rewritten `demo-narrated.spec.ts` (M12) waited for `[data-testid="worldsim-map"]` as the signal that the application shell was ready before creating the demo scenario and opening the Scenarios panel. That testid does not exist in the application — the choropleth container has a different name, and `zone-1a-trajectory-container` is only present after a scenario is selected, not on initial load. The test timed out after 15 seconds on the first run.
+
+The error was caught immediately on the first execution attempt in the same session. The fix was a one-line change: replace `page.waitForSelector(...)` with `page.waitForFunction(() => typeof window.__worldsim_selectEntity === "function")` — the same sentinel used by `demo-legibility.spec.ts` and `demo-advancement-flow.spec.ts`.
+
+### What was at risk
+
+The narrated walkthrough could not run, meaning Frame E (the outstanding screenshot) could not be captured. If the error had not been caught during the same session, the demo-preparation-standard Step 6 would have been blocked without an obvious diagnostic: the test failure message ("waiting for locator to be visible") names the selector but does not explain that it never exists in the DOM.
+
+### What caught it
+
+The first Playwright execution attempt in the session. No downstream artifacts were produced incorrectly — the test failed cleanly before any scenario was created.
+
+### Process improvement
+
+1. **Immediate fix:** `page.waitForSelector(...)` replaced with `page.waitForFunction(__worldsim_selectEntity)` in `demo-narrated.spec.ts` (committed 2026-06-10 on `release/m12`).
+
+2. **Step 4 sentinel rule added** to `docs/process/demo-preparation-standard.md`: the app-ready sentinel for the narrated spec must always be `window.__worldsim_selectEntity`, not a testid. The testid for the choropleth and Zone 1 containers changes as the UI architecture evolves; the JS function is stable across milestone UI changes. The rule is now explicit in Step 4.
+
+3. **Root cause:** The sentinel was written from memory of what the map container might be called, without checking what sentinel the existing legibility and advancement gate specs use. The process improvement is to read the existing specs before writing the new one, not to know the right selector from memory.
+
+---
+
 ## Registry Maintenance
 
 ### How to add an entry
