@@ -1,7 +1,7 @@
 # Demo Preparation Standard
 
 **Established:** 2026-05-18
-**Last revised:** 2026-06-11 (M13 planning — Step 6c Audience Simulation Panel added: persona-based live demo rehearsal using Personas 1, 2, 5 as in-character audience agents; Persona 5 north star gate blocks Step 7; Four-Tier Review Structure table updated; audience-simulation artifact added to folder structure)
+**Last revised:** 2026-06-11 (M13 planning — Step 6c ordering corrected: 6b → 7 → 6c → 9; IR Agent is technical quality gate before persona panel; Step 6c north star gate now blocks Step 9 not Step 7; table and body reordered accordingly)
 **Cadence:** Every two milestones (M6, M8, M10, M12...)
 **Reference cases:** Issue #220 (M6), Issue #333 (M8), Issue #261 (M10), Issue #755 (M12)
 
@@ -86,11 +86,11 @@ Every demo cycle passes through four review tiers in sequence. No tier may be sk
 | Tier | Step | Who | Gate |
 |---|---|---|---|
 | Self-check | 5a / 5b / 5c | Acting agent | Narration instrument check + Playwright legibility + NARRATION-RULING-1 all pass |
-| **Internal team review** | **6b** | **Nine-agent panel (PM Agent orchestrates)** | **All CRITICAL findings resolved + filed; all HIGH findings filed — before Step 6c** |
-| **Audience simulation** | **6c** | **Persona panel: Personas 1, 2, 5 (PM Agent orchestrates)** | **Persona 5 north star verdict PASS; all CRITICAL persona findings resolved — before Step 7** |
-| Independent review | 7 | Fresh Claude instance (IR Agent) | All CRITICAL and HIGH findings from IR filed as GitHub issues — before Step 9 |
+| **Internal team review** | **6b** | **Nine-agent panel (PM Agent orchestrates)** | **All CRITICAL findings resolved + filed; all HIGH findings filed — before Step 7** |
+| Independent review | 7 | Fresh Claude instance (IR Agent) | All CRITICAL and HIGH findings from IR filed as GitHub issues — before Step 6c |
+| **Audience simulation** | **6c** | **Persona panel: Personas 1, 2, 5 (PM Agent orchestrates)** | **Persona 5 north star verdict PASS; all CRITICAL persona findings resolved — before Step 9** |
 
-The tiers are sequential and non-negotiable. The IR Agent (Step 7) must not be activated until the Step 6b and Step 6c gates are both satisfied. The stakeholder session (Step 9) must not occur until the Step 8 gate is satisfied.
+The tiers are sequential and non-negotiable. Step 7 must not be activated until the Step 6b gate is satisfied. Step 6c must not be activated until the Step 7 gate is satisfied. The stakeholder session (Step 9) must not occur until the Step 6c gate is satisfied.
 
 ---
 
@@ -408,16 +408,31 @@ last assigned `DEMO-NNN` before beginning aggregation.
 Step 7. All HIGH findings filed as GitHub issues before Step 7. MEDIUM and LOW at PM Agent
 discretion.
 
+### Step 7 — Independent Review Agent
+
+Activate a fresh Claude instance. Follow `docs/process/independent-review-prompt.md` exactly:
+
+- Message 1: context setting (no screenshots yet)
+- Message 2: attach screenshots in UX Agent brief sequence (C, A, B, D, E), ask four-part review task
+
+The reviewer persona: senior policy analyst, 15 years fiscal adjustment experience, sat on both sides
+of IMF negotiations. Permission to be direct and critical given explicitly before screenshots are shared.
+
+---
+
 ### Step 6c — Audience Simulation Panel (M14 forward — Issue #865)
 
-Activate a persona-based panel after the Step 6b gate is cleared and before the Independent
-Review Agent sees any artifacts. Each panel member is instantiated from their full profile
-in `docs/ux/personas.md` and evaluates the screenshots and walkthrough **in-character** —
-not as an internal quality reviewer, but as an audience member experiencing the demo for
-the first time.
+Activate a persona-based panel after the Step 7 (IR Agent) gate is cleared and before the
+live stakeholder session. Each panel member is instantiated from their full profile in
+`docs/ux/personas.md` and evaluates the screenshots and walkthrough **in-character** — not
+as an internal quality reviewer, but as an audience member experiencing the demo for the
+first time.
 
-This step tests a different question from Step 6b: not *is the demo technically correct?*
+This step tests a different question from Step 7: not *does the demo have technical defects?*
 but *does the presentation arc hold up under the challenges this specific audience would pose?*
+The IR Agent finds what slipped through the internal team. The persona panel evaluates whether
+the technically correct demo lands with the actual audience. Running persona panel after IR
+ensures the panel evaluates the post-fix, technically validated state.
 
 **Panel composition:**
 
@@ -450,7 +465,7 @@ Recommendation: [specific artifact change — or "Presenter prep only" if no cha
 ```
 
 **Finding numbering:** Persona simulation findings continue the `DEMO-NNN` namespace from
-the last number assigned in Step 6b. PM Agent checks the last assigned number before
+the last number assigned in Step 7. PM Agent checks the last assigned number before
 beginning aggregation.
 
 **Severity calibration for persona findings:**
@@ -469,12 +484,12 @@ At the end of Aicha Mbaye's section, the persona agent must produce a mandatory 
 North star verdict: PASS / FAIL
 Primary finding sentence: "[The single sentence Aicha would take away from this demo,
   stated without specialist mediation — or CANNOT BE STATED if she cannot articulate it]"
-Gate: Step 7 MAY PROCEED / BLOCKED — [reason if blocked]
+Gate: Step 9 MAY PROCEED / BLOCKED — [reason if blocked]
 ```
 
-The Persona 5 north star verdict gates Step 7. If Aicha cannot articulate the primary
+The Persona 5 north star verdict gates Step 9. If Aicha cannot articulate the primary
 finding in one sentence without economist interpretation, the walkthrough or narration
-must be revised before the IR Agent is activated. The sentence that passes is also the
+must be revised before the live session runs. The sentence that passes is also the
 sprint-level north star test artifact for this demo cycle (CLAUDE.md §North Star Test).
 
 **Artifact format** (`YYYY-MM-DD-v{version}-audience-simulation.md` in `docs/demo/m{N}/reviews/`):
@@ -485,7 +500,7 @@ sprint-level north star test artifact for this demo cycle (CLAUDE.md §North Sta
    to the summary level for direct reference by PM Agent and EL.
 
 **Gate:** Persona 5 north star verdict is PASS, and all CRITICAL persona findings are
-resolved (same three-condition criteria as Step 6b) before Step 7.
+resolved (same three-condition criteria as Step 6b) before Step 9.
 
 **Naming rule:**
 Before saving, run:
@@ -494,18 +509,6 @@ find docs/demo/ -name "*-audience-simulation*"
 ```
 Confirm the filename matches `YYYY-MM-DD-v{version}-audience-simulation.md`. The M14
 instance will be the canonical reference for this step.
-
----
-
-### Step 7 — Independent Review Agent
-
-Activate a fresh Claude instance. Follow `docs/process/independent-review-prompt.md` exactly:
-
-- Message 1: context setting (no screenshots yet)
-- Message 2: attach screenshots in UX Agent brief sequence (C, A, B, D, E), ask four-part review task
-
-The reviewer persona: senior policy analyst, 15 years fiscal adjustment experience, sat on both sides
-of IMF negotiations. Permission to be direct and critical given explicitly before screenshots are shared.
 
 ### Step 8 — File and triage findings
 
