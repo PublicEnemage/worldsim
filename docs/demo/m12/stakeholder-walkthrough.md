@@ -601,9 +601,30 @@ Ecological (CO2 accumulation, independent of the Hormuz crisis), Governance
 >
 > No axis is null. No axis is dashed. All four frameworks are live and
 > concurrent.
+>
+> Uncertainty calibration: the confidence tier for each framework is visible in
+> the MDA alert panel. Tier 1–2 findings are cite-ready. Tier 3 carries a
+> caveat. Tier 4–5 are early estimates requiring confirmation before citing. The
+> trajectory view renders confidence interval bands as shaded regions around each
+> curve when CI calibration data is loaded; in this demo, the confidence tier
+> labels are the active uncertainty representation.
+
+**[PRESENTER BEAT — point to the MDA alert panel]** Read one alert's confidence
+tier label aloud. For Egypt's governance alert, read: "Early estimate — confirm
+before citing." Explain: that is the instrument naming what it does not yet know.
+It is honest analysis, not a weakness in the finding. The ministry team sees the
+confidence tier before they cite the finding at the table.
 
 **SYNTHESIS:**
 
+> Returning to the Exploratory disclosure from Step 4: Egypt's governance alert
+> carried that label then, and it holds now in the four-axis view. The direction
+> of deterioration is calibrated to V-Dem historical patterns. The magnitude is
+> pending further validation. When the ministry team runs this scenario with their
+> own calibration data, the Exploratory label is the honest marker of exactly what
+> they need to provide. The instrument does not hide what it does not know — it
+> names it, so the ministry team can act on it.
+>
 > For the first time, a finance ministry team can look at a single instrument
 > and see that the financial trajectory is moving in one direction while the
 > human development trajectory is moving in another. Those are not the same

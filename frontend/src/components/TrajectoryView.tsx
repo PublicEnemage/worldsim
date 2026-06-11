@@ -220,7 +220,11 @@ function CustomStepTick({ x = 0, y = 0, payload, data, entityIds }: CustomTickPr
 // TrajectoryView legend formatter
 // ---------------------------------------------------------------------------
 
-function legendFormatter(framework: FrameworkKey, scoringBasis: string): string {
+function legendFormatter(
+  framework: FrameworkKey,
+  scoringBasis: string,
+  entityIds?: string[],
+): string {
   const names: Record<FrameworkKey, string> = {
     financial: "Financial",
     human_development: "Human Development",
@@ -230,6 +234,9 @@ function legendFormatter(framework: FrameworkKey, scoringBasis: string): string 
   const base = names[framework];
   if (scoringBasis === "normalized_absolute") {
     return `${base} (single-country index)`;
+  }
+  if (entityIds && entityIds.length === 2) {
+    return `${base} (${entityIds[0]} · ${entityIds[1]})`;
   }
   return base;
 }
@@ -466,13 +473,28 @@ export function TrajectoryView({
                 strokeDasharray={isDashed ? "8 3" : undefined}
                 dot={false}
                 connectNulls={CONNECT_NULLS}
-                name={legendFormatter(fw, scoringBasis) as never}
+                name={legendFormatter(fw, scoringBasis, entityIds) as never}
                 isAnimationActive={false}
               />
             );
           })}
         </ComposedChart>
       </ResponsiveContainer>
+
+      {/* Multi-entity composite note — shown when two entities present */}
+      {!isSingleEntity && entityIds && entityIds.length === 2 && (
+        <div
+          style={{
+            fontSize: 11,
+            color: "#888",
+            marginTop: 4,
+            padding: "4px 8px",
+            borderLeft: "2px solid #ddd",
+          }}
+        >
+          Each curve is a framework composite across {entityIds[0]} and {entityIds[1]}. Both entities contribute to each trajectory.
+        </div>
+      )}
 
       {/* Single-entity methodology note (Zone 3, Path A — EL Decision B) */}
       {isSingleEntity && (
