@@ -403,17 +403,32 @@ Jordan with consecutive breach count.
 >
 > Zone 1B CRITICAL alert: reserve_coverage_months, step 5, first CRITICAL
 > breach. The alert reads the finding, not a prediction.
+>
+> Zone 1A also carries a second reading at step 5, on the unemployment
+> curve. At step 4, the GCC emergency support — arriving at step 3 with a
+> one-step lag — drove unemployment from 17.73% down to 16.59%. At step 5,
+> the IMF conditionality fires with its own one-step lag: the spending
+> reduction scheduled at step 4 hits the growth trajectory, and unemployment
+> reverses back to 17.25%. The GCC support improved things. The conditionality
+> clawed back most of the gain within a single step. Both movements are visible
+> on the same curve.
 
 **SYNTHESIS:**
 
-> Read this alert as a sentence the finance minister can take into a cabinet
-> meeting: "As of 2028, under the current trajectory, Jordan's reserve
-> coverage reaches the critical threshold. This is the step at which the
-> margin for negotiation narrows sharply."
+> Read the reserve alert as a sentence the finance minister can take into a
+> cabinet meeting: "As of 2028, under the current trajectory, Jordan's reserve
+> coverage reaches the critical threshold. This is the step at which the margin
+> for negotiation narrows sharply."
 >
-> A finding you can cite is a finding you can use. The alert is specific
-> enough for a technical briefing. It is also legible to a cabinet minister
-> who has not read the methodology.
+> Read the unemployment curve as a second sentence: "The GCC support package
+> improved our employment trajectory. The conditionality attached to the IMF
+> programme reversed most of that improvement in one year." Both findings are
+> specific, citable, and visible on the same instrument.
+>
+> These two readings together are why Mode 3 matters. The minister does not
+> need to choose between "accept the IMF programme" and "reject it." She can
+> ask a more precise question: which part of the conditionality is producing
+> this cost, and is there a negotiated alternative?
 
 **Cognitive purpose:** The MDA alert is the primary instrument output for
 this scenario. It must be read as a negotiating asset — specific, nameable,
@@ -443,10 +458,8 @@ Then introduce Mode 3 as Act 2.
 ### Step 6 — Act 2: Mode 3 Active Control (Branch from Step 3, 2026)
 
 **What the audience sees:** The Mode 3 control panel is active. The fiscal
-multiplier lever is adjusted to 1.3, representing a GCC emergency fiscal
-injection equivalent to a 30-percent increase in effective fiscal capacity.
-Branch anchor is set at step 3. Zone 1A shows two trajectories: the baseline
-Jordan reserve arc and the Mode 3 branch arc.
+multiplier lever is adjusted to 1.3. Branch anchor is set at step 3. Zone 1A
+shows two trajectories: the baseline Jordan arc and the Mode 3 branch arc.
 
 This is the emotional peak of the demonstration. Present it as a question
 being answered in real time.
@@ -485,14 +498,34 @@ being answered in real time.
 > 2026. The simulation recomputes from the branch point forward. Zone 1A now
 > shows both trajectories simultaneously — the baseline arc and the Mode 3
 > branch arc — on the same step axis.
+>
+> What the branch represents precisely: the IMF emergency liquidity support
+> accepted at step 3 remains in the branch — Jordan takes the money. The
+> fiscal austerity conditionality scheduled at step 4 does not: it fires after
+> the branch point and is not carried into the branch's forward trajectory.
+> The branch models "we accept the programme; we negotiate away the spending
+> cut."
+>
+> The primary divergence between the two curves appears at step 5, not step 4.
+> The GCC multiplier alone adds approximately +0.68pp GDP at step 4. The
+> absence of conditionality adds approximately +1.70pp GDP at step 5 — more
+> than twice the multiplier effect. Watch step 5 on the unemployment curves,
+> not just the GDP curves: the baseline reverses, the branch does not.
 
 **SYNTHESIS:**
 
 > What you are reading is the consequence of the intervention, not a
-> recommendation. The tool does not tell the minister whether to pursue the
-> GCC offer. It shows what the fiscal injection produces under the current
-> model dynamics: where the reserve curve lands at step 5, and whether the
-> critical floor is cleared.
+> recommendation. The tool does not tell the minister whether to push back
+> on conditionality. It shows what removing the austerity requirement
+> produces: the unemployment and GDP trajectory in the branch versus the
+> baseline where conditionality fires and claws back the GCC improvement.
+>
+> Note what the branch does not change: the reserve trajectory. Both curves
+> — baseline and branch — show Jordan's reserve coverage reaching zero by
+> step 7. Better conditionality terms improve the human cost trajectory. They
+> do not solve the structural import dependency. The reserve crisis is survived
+> under better conditions, not avoided. The minister should know this before
+> she uses this finding.
 >
 > Whether that consequence is sufficient is the minister's decision. That
 > decision is better made with this analysis than without it.
@@ -505,8 +538,9 @@ being answered in real time.
 > When the minister's team walks back into the IMF negotiating room, they can
 > now say: "Under our analysis, the programme as structured produces reserve
 > depletion by step 7 and does not recover human development indicators within
-> the eight-year horizon. Here is the modelled trajectory of a
-> counter-proposal. Show us your counter-analysis."
+> the eight-year horizon. Here is the modelled trajectory of a counter-proposal
+> — same emergency support, negotiated conditionality. Show us your
+> counter-analysis."
 >
 > That is a different conversation than the one that happened in Athens in 2010.
 
@@ -516,11 +550,12 @@ capability gap framed in Section 1: the ministry team can now run the analysis
 themselves, against their own assumptions, with the same analytical discipline
 their counterparts bring.
 
-Do not oversell the branch result. If the Mode 3 trajectory clears the
-critical floor, read the result factually. If it does not fully clear the
-floor, that is equally important information — the minister learns the
-intervention is insufficient at these parameters before going back to the
-GCC with a counter-proposal.
+Do not oversell the branch result. The reserve depletion is identical in both
+trajectories — the branch does not rescue Jordan from the import dependency
+crisis. Read the branch result honestly: the divergence is on the human cost
+indicators (unemployment, GDP), not on reserve coverage. Name the divergence
+where it actually appears — step 5 onward on the unemployment curve — and name
+what does not diverge. The honest answer is more powerful than the clean story.
 
 ---
 
