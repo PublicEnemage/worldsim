@@ -105,7 +105,7 @@ No open PRs — board clear as of 2026-06-11 (post PR #886 merge).
 **GitHub Milestone:** 13 | **Status: FULLY EVACUATED (2026-06-11)**
 
 All M12 issues are either closed or migrated. GitHub Milestone 13 has 0 open issues.
-M12 is formally complete — exit checklist #263 (M14) is the only remaining closure gate.
+M12 is formally complete — exit checklist #263 (M12) is the only remaining closure gate.
 #843 (live external demo) deferred to M14 (EL decision 2026-06-11); M12 simulated session stands as M12 demo evidence.
 
 **Issue disposition summary:**
