@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-11 (Milestone reorganisation: M13 renamed to "Political Economy and Instrument Credibility" (GitHub #9, 13 issues); M14 created "Methodology Publication and External Validation" (GitHub #15, 14 issues). M12 (GitHub #13) fully evacuated — 0 open issues. #843 live demo + #852 alert panel UX → M13; #263 exit checklist + near-term issues → M14; #214/#278/#407/#4/#5 parked. M12 formally inactive pending live demo (#843, now M13) and EL Phase 0 endorsement.)**
+**Last updated: 2026-06-11 (Correction: #263 M12 Exit Checklist moved back to M12 (GitHub #13) — was mistakenly placed in M14 during milestone reorg. M12 has 1 open issue (#263); remains open until #843 (live demo, M13) closes and Phase 0 EL endorsement is recorded. M14 corrected to 13 issues.)**
 **Current milestone:** M12 — Active Control and External Sector (GitHub Milestone 13)
 **Previous milestone:** M11.5 — Usability Validation and Experience Audit (formally closed 2026-06-04; Issue #720 closed; GitHub Milestone 14 closed)
 
@@ -111,7 +111,7 @@ runs and #263 (exit checklist, now M14) is signed off.
 **Issue disposition summary:**
 - All immediate-horizon M12 deliverables shipped (G1–G8, Wave 1 complete)
 - #843 live demo → M13 | #852 alert panel UX → M13
-- #263 exit checklist → M14 (open until #843 closes)
+- **#263 exit checklist → M12** (corrected 2026-06-11; gates on #843 + Phase 0 endorsement)
 - Near-term issues (#392/#271/#393/#394/#27/#45) → M13
 - Further near-term (#97/#153/#569/#30/#92/#259/#275) → M14
 - Long-term (#214/#278/#407/#4/#5) → parking lot
@@ -237,7 +237,7 @@ CI hotfix: NM-035 filed; `ci.yml` PR trigger updated to include `release/m*` (PR
 | #35 | feat(simulation): dynamic relationship weight updating | near-term |
 | #274 | feat(simulation): 25-year human capital depletion trajectory | near-term |
 
-*Note: #843 (live demo) is the first closure gate for M13. M12 formally closes when #843 and #263 (exit checklist, M14) both close.*
+*Note: #843 (live demo, M13) is the first gate. M12 formally closes when #843 closes and #263 (M12 exit checklist) is signed off.*
 
 ---
 
@@ -247,7 +247,6 @@ CI hotfix: NM-035 filed; `ci.yml` PR trigger updated to include `release/m*` (PR
 
 | Issue | Title | Horizon |
 |---|---|---|
-| #263 | Milestone 12 Exit Checklist (open until #843 closes) | near-term |
 | #97 | arch(api): threshold-crossing markers in comparative output | near-term |
 | #153 | feat(frontend): absolute threshold overlay on DeltaChoropleth | near-term |
 | #92 | arch(backtesting): Greece 2010 fixture investment climate initial conditions | near-term |
