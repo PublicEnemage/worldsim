@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-11 (M13 planning — Step 6c Audience Simulation Panel established in demo-preparation-standard.md (PRs #863/#866/#867 merged to release/m12); ordering corrected to 6b → 7 → 6c → 9. #263 M12 Exit Checklist corrected back to M12 (GitHub #13) — was mistakenly placed in M14; PR #862. All M12 agent deliverables complete. Awaiting EL: release/m12 → main merge (PR #868), IR review (Step 7), Step 6c panel, Phase 0 endorsement.)**
+**Last updated: 2026-06-11 (Step 6c gate fixes merged — PR #880 (closes #879): entity-aware legend labels in TrajectoryView, "Early estimate — confirm before citing" label in MDAAlertPanelZone1B, TERMINAL "(threshold crossed)" suffix, walkthrough Step 7 uncertainty beat + Exploratory callback. Four of five Step 6c CRITICALs resolved (DEMO-070/071/081/090). DEMO-080 (Persona 2, tablet font size) pending EL disposition. Step 9 conditionally unblocked pending EL decision on DEMO-080. Board clear.)**
 **Current milestone:** M12 — Active Control and External Sector (GitHub Milestone 13)
 **Previous milestone:** M11.5 — Usability Validation and Experience Audit (formally closed 2026-06-04; Issue #720 closed; GitHub Milestone 14 closed)
 
@@ -77,7 +77,7 @@ M9 formally closed. Issue #213 (M9 Exit Checklist) closed 2026-05-24. M10 milest
 
 ## Open PRs
 
-No open PRs — board clear as of 2026-06-11 (post PR #857 merge).
+No open PRs — board clear as of 2026-06-11 (post PR #880 merge).
 
 ## M11 Work Streams — 2026-06-04 Sprint
 
@@ -197,7 +197,8 @@ CI hotfix: NM-035 filed; `ci.yml` PR trigger updated to include `release/m*` (PR
 - **EL endorsement of Phase 0 exit artifact** — `docs/process/sprint-plans/process-redesign-phase0-exit.md §Part VI`. Phase A cannot open until endorsement is recorded. This is exit gate condition 3.
 - **Live stakeholder demo** (#843) — M12 closure gate (EL decision 2026-06-10). Pre-demo blockers resolved (PR #854 merged): DEMO-039, DEMO-041, DEMO-052, DEMO-053, DEMO-054 (testMatch guard, PR #857 pending). DEMO-055 (entity narration fix, PR #857 pending). Remaining open: #852 alert panel master-detail UX. Produces `YYYY-MM-DD-v0.12.0-stakeholder-review.md` artifact.
 - **EL endorsement of Phase 0 exit artifact** — `docs/process/sprint-plans/process-redesign-phase0-exit.md §Part VI`. Phase A cannot open until endorsement is recorded. This is exit gate condition 3.
-- **Live stakeholder demo** (#843) — M12 closure gate. All pre-demo narration fixes complete (PRs #854, #857). #852 alert panel UX deferred to M13 (EL decision 2026-06-11). Current scroll-list layout is the live demo state. Produces `YYYY-MM-DD-v0.12.0-stakeholder-review.md` artifact.
+- **Step 6c gate disposition** — 4 of 5 CRITICALs resolved (PR #880): DEMO-070/071/081/090 fixed. **DEMO-080** (Persona 2 — alert text unreadable at tablet) pending EL disposition before Step 9 (live demo) proceeds. EL options: (a) accept as-is (demo runs on 1440×900 laptop, not tablet), (b) file as M13 issue and unblock Step 9, (c) fix now.
+- **Live stakeholder demo** (#843) — M12 closure gate. All pre-demo narration fixes complete (PRs #854, #857, #880). #852 alert panel UX deferred to M13 (EL decision 2026-06-11). Current scroll-list layout is the live demo state. Step 9 blocked pending EL disposition of DEMO-080. Produces `YYYY-MM-DD-v0.12.1-stakeholder-review.md` artifact.
 - ~~#852~~ — **DEFERRED TO M13** (EL decision 2026-06-11): alert panel master-detail UX requires Frontend architecture review, ADR, UX Designer + Design Thinking agent input.
 - ~~#841 DEMO-041~~ — **CLOSED** (PR #854)
 - ~~#842 DEMO-039~~ — **CLOSED** (PR #854)
@@ -372,6 +373,7 @@ CI hotfix: NM-035 filed; `ci.yml` PR trigger updated to include `release/m*` (PR
 
 | PR | Title | Date |
 |---|---|---|
+| #880 | fix(demo): Step 6c gate — four annotation fixes to unblock Step 9 (closes #879) | 2026-06-11 |
 | #867 | docs(process): Step 6c ordering correction — 6b → 7 → 6c → 9; IR Agent gates persona panel; prerequisite block added to Steps 7 and 6c | 2026-06-11 |
 | #863 | docs(process): Step 6c Audience Simulation Panel — persona-based live demo rehearsal (Personas 1/2/5 in-character; Persona 5 north star gate; Four-Tier Review Structure; M14 forward) | 2026-06-11 |
 | #862 | chore(state): SESSION_STATE.md — #263 corrected back to M12 (EL correction 2026-06-11) | 2026-06-11 |
