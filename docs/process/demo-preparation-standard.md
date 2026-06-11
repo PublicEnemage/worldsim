@@ -408,7 +408,7 @@ last assigned `DEMO-NNN` before beginning aggregation.
 Step 7. All HIGH findings filed as GitHub issues before Step 7. MEDIUM and LOW at PM Agent
 discretion.
 
-### Step 6c — Audience Simulation Panel (M14 forward)
+### Step 6c — Audience Simulation Panel (M14 forward — Issue #865)
 
 Activate a persona-based panel after the Step 6b gate is cleared and before the Independent
 Review Agent sees any artifacts. Each panel member is instantiated from their full profile
