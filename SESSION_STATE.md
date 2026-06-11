@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-10 (ADR license audit complete — PR #832 merged. 7 ADRs renewed to M13: ADR-001/005/011 simple renewals; ADR-002 additive BilateralTradeShock taxonomy extension; ADR-008 Amendment 1 (A/B invocation model: automatic → explicit branch action); ADR-010 Amendment 1 (ghost curve visual spec for Mode 3). SCAN-026 M12 exit gate filed (PR #831); ADR-012 Mermaid diagram added; 0 violations. M12 demo walkthrough, Phase 2 A/B report, NM-036 test — PR #830. All M12 agent deliverables complete. Remaining: Socratic Agent TEST + release/m12 → main — both EL actions.)**
+**Last updated: 2026-06-10 (demo-preparation-standard Steps 3 and 4 complete (PR #838): demo.sh updated with M12 Jordan/Egypt Hormuz presenter guide (22-minute two-act timing, Mode 3 honest disclosures, reserve invariant caveat); demo-narrated.spec.ts rewritten as M12 Playwright narrated spec (8-step Jordan/Egypt scenario, commodity_price_shocks, governance seeds, Mode 3 branch at step 3 with 1.30× multiplier, five frame captures at 1440×900, no-drawer Zone 1 UI). Prior: Mode 3 scenario evaluation panel deliberation + recommendation (PR #833); walkthrough revised — two-act structure + NARRATION-RULING-1 (PR #834), conditionality framing (PR #835), Section 4 (PR #836). All M12 agent deliverables complete. Awaiting EL: Playwright legibility gates, Frame E screenshot capture (live browser), release/m12 → main merge, IR review, stakeholder demo.)**
 **Current milestone:** M12 — Active Control and External Sector (GitHub Milestone 13)
 **Previous milestone:** M11.5 — Usability Validation and Experience Audit (formally closed 2026-06-04; Issue #720 closed; GitHub Milestone 14 closed)
 
@@ -155,6 +155,11 @@ CI hotfix: NM-035 filed; `ci.yml` PR trigger updated to include `release/m*` (PR
 | #814 fix — AlertDetailPanel scroll | #816 | #814 | ✓ DONE 2026-06-09 (`scrollIntoView` on mount; Zone 1B 135px → detail panel below fold) |
 | G9 — Political economy module | — | ADR-013 | DEFERRED TO M13 (EL decision 2026-06-07: option B) |
 | M12 exit compliance | #830 #831 #832 | SCAN-026 (0 violations), ADR-012 diagram, 7 ADR renewals to M13, demo walkthrough, Phase 2 A/B, NM-036 test | ✓ DONE 2026-06-10 — all M12 agent deliverables complete |
+| Mode 3 scenario evaluation | #833 | `docs/demo/m12/reviews/scenario-evaluation-mode3-deliberation.md` + `scenario-evaluation-mode3-recommendation.md` — Dev Economist + Chief Methodologist panel; 4 variant runs (A/B/D); retain current fixture; branch step 3 at 1.30×; reserve invariant documented | ✓ DONE 2026-06-10 |
+| Walkthrough pre-IR revision | #834 | Two-act structure; human moment opening ("There is a room where this happens"); NARRATION-RULING-1 at Steps 3–6; Greece 2014 GDP-vs-human-development asymmetry at Step 7; Argentina MAGNITUDE calibration elevated; Customer Agent accessibility corrections | ✓ DONE 2026-06-10 |
+| Walkthrough conditionality framing | #835 | Step 5 clawback reading (GCC 17.73%→16.59% at step 4; conditionality 16.59%→17.25% at step 5); Step 6 precise branch mechanics ("IMF liquidity stays; austerity does not"); Step 6 reserve invariant caveat (reserves drain identically; "The reserve crisis is survived under better conditions, not avoided") | ✓ DONE 2026-06-10 |
+| Walkthrough Section 4 roadmap | #836 | Feature-list replaced with capability-gaps framing — three gaps (political feasibility, conditionality design, medium-term horizon) each in Umbrella→Fact→Synthesis structure; M14 demo cadence caveat; max length +50% | ✓ DONE 2026-06-10 |
+| Demo prep Steps 3 + 4 | #838 | demo.sh: M12 presenter guide (Jordan/Egypt Hormuz, 22-min two-act timing, reserve invariant caveat, demo-narrated.spec.ts reference); demo-narrated.spec.ts: M12 Playwright narrated spec — 8-step JOR/EGY scenario with commodity_price_shocks + governance seeds, Mode 3 branch at step 3 (1.30× fiscal multiplier), five frame captures at 1440×900 (frame-a–frame-e-step5-divergence.png), no-drawer Zone 1 always-visible UI pattern | ✓ DONE 2026-06-10 |
 
 ## Process Redesign Sprint — Phase 0 Status
 
@@ -199,13 +204,14 @@ CI hotfix: NM-035 filed; `ci.yml` PR trigger updated to include `release/m*` (PR
 
 **Awaiting EL action:**
 - **EL endorsement of Phase 0 exit artifact** — `docs/process/sprint-plans/process-redesign-phase0-exit.md §Part VI`. Phase A cannot open until endorsement is recorded. This is exit gate condition 3.
-- UI screenshot capture at 1440×900 per `docs/demo/m12/screenshot-brief.md` (5 frames) — requires EL browser session
-- Playwright legibility gates: `demo-legibility.spec.ts` and `demo-advancement-flow.spec.ts`
-- Investigate DEMO4-007 (ecological composite 50% drop at step 6) — before Frame E screenshot
-- Decision on DEMO4-005 (add `bottom_quintile_consumption_capacity` to output table before stakeholder demo)
-- Silence DEMO4-006 (`[SIM-INTEGRITY]` warnings) — verify if visible in Playwright screenshot environment
-- Merge `release/m12` → `main` (EL admin action) after screenshot gates clear
-- IR review from `main` (new session, fresh agent)
+- UI screenshot capture at 1440×900 per `docs/demo/m12/screenshot-brief.md` (5 frames) — requires EL browser session; Frame E (`frame-e-step5-divergence.png`, step 5 branch trajectory) is the outstanding capture; spec is now ready (`demo-narrated.spec.ts`)
+- Playwright legibility gates: `demo-legibility.spec.ts` and `demo-advancement-flow.spec.ts` at 1440×900 — run before stakeholder demo
+- ~~Investigate DEMO4-007 (ecological composite 50% drop at step 6)~~ — **FIXED prior session**
+- ~~Decision on DEMO4-005 (add `bottom_quintile_consumption_capacity`)~~ — **FIXED prior session**
+- ~~Silence DEMO4-006 (`[SIM-INTEGRITY]` warnings)~~ — **FIXED prior session**
+- ~~DEMO4-010~~ — **FIXED prior session**
+- Merge `release/m12` → `main` (EL admin action) after Playwright gates and Frame E capture clear
+- IR review from `main` (new session, fresh agent) — activate Independent Review Agent post-merge
 - Stakeholder demo from `main`
 
 **M12 agent deliverables — ALL COMPLETE (2026-06-10)**
@@ -322,6 +328,10 @@ CI hotfix: NM-035 filed; `ci.yml` PR trigger updated to include `release/m*` (PR
 
 | PR | Title | Date |
 |---|---|---|
+| #836 | docs(demo): walkthrough Section 4 — capability-gaps reframe (political feasibility, conditionality design, medium-term horizon; M14 cadence caveat) | 2026-06-10 |
+| #835 | docs(demo): walkthrough conditionality framing — clawback reading, branch mechanics, reserve invariant caveat | 2026-06-10 |
+| #834 | docs(demo): walkthrough pre-IR revision — two-act structure, human moment opening, NARRATION-RULING-1, Greece/Argentina framing | 2026-06-10 |
+| #833 | docs(demo): Mode 3 scenario evaluation panel — deliberation + recommendation (retain fixture; branch step 3 at 1.30×) | 2026-06-10 |
 | #832 | docs(adr): M12 exit license audit — renew ADR-001/002/005/007/008/010/011 to M13 | 2026-06-10 |
 | #831 | docs(compliance): SCAN-026 M12 exit gate + ADR-012 Mermaid diagram (0 violations) | 2026-06-10 |
 | #830 | docs+test: M12 exit artifacts — demo walkthrough, Phase 2 A/B report, NM-036 integration test | 2026-06-10 |
