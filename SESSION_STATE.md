@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-11 (PR #857 merged — DEMO-054/055 resolved; entity priming language in narration + playwright.demo.config.ts testMatch guard + NM-040. Issues #855/#856 closed. M12 board audit: #814/#752/#99/#103 closed (resolved by earlier M12 PRs, missed by GitHub auto-close). M12 milestone: 14 open issues remaining, all horizon:near-term or known-gap except #263 exit checklist. Board clear. Open: #852 alert panel UX, #843 live stakeholder demo, #263 exit checklist, Phase 0 EL endorsement.)**
+**Last updated: 2026-06-11 (EL decision: #852 alert panel master-detail UX deferred to M13 — requires Frontend architecture review, ADR update, UX Designer and Design Thinking agent input; current scroll-list layout stays for M12 live demo. M12 open: #843 live stakeholder demo, #263 exit checklist (gates on live demo + Phase 0 EL endorsement). Board otherwise clear.)**
 **Current milestone:** M12 — Active Control and External Sector (GitHub Milestone 13)
 **Previous milestone:** M11.5 — Usability Validation and Experience Audit (formally closed 2026-06-04; Issue #720 closed; GitHub Milestone 14 closed)
 
@@ -206,8 +206,8 @@ CI hotfix: NM-035 filed; `ci.yml` PR trigger updated to include `release/m*` (PR
 - **EL endorsement of Phase 0 exit artifact** — `docs/process/sprint-plans/process-redesign-phase0-exit.md §Part VI`. Phase A cannot open until endorsement is recorded. This is exit gate condition 3.
 - **Live stakeholder demo** (#843) — M12 closure gate (EL decision 2026-06-10). Pre-demo blockers resolved (PR #854 merged): DEMO-039, DEMO-041, DEMO-052, DEMO-053, DEMO-054 (testMatch guard, PR #857 pending). DEMO-055 (entity narration fix, PR #857 pending). Remaining open: #852 alert panel master-detail UX. Produces `YYYY-MM-DD-v0.12.0-stakeholder-review.md` artifact.
 - **EL endorsement of Phase 0 exit artifact** — `docs/process/sprint-plans/process-redesign-phase0-exit.md §Part VI`. Phase A cannot open until endorsement is recorded. This is exit gate condition 3.
-- **Live stakeholder demo** (#843) — M12 closure gate. All pre-demo narration fixes complete (PRs #854, #857). Remaining open UX issue: #852 alert panel master-detail. Produces `YYYY-MM-DD-v0.12.0-stakeholder-review.md` artifact.
-- **#852** `enhancement` — alert panel master-detail UX: TERMINAL alerts not surfaced without scrolling; detail pane appears below fold; requires redesign to first-class instrument layout.
+- **Live stakeholder demo** (#843) — M12 closure gate. All pre-demo narration fixes complete (PRs #854, #857). #852 alert panel UX deferred to M13 (EL decision 2026-06-11). Current scroll-list layout is the live demo state. Produces `YYYY-MM-DD-v0.12.0-stakeholder-review.md` artifact.
+- ~~#852~~ — **DEFERRED TO M13** (EL decision 2026-06-11): alert panel master-detail UX requires Frontend architecture review, ADR, UX Designer + Design Thinking agent input.
 - ~~#841 DEMO-041~~ — **CLOSED** (PR #854)
 - ~~#842 DEMO-039~~ — **CLOSED** (PR #854)
 - ~~#850 DEMO-052~~ — **CLOSED** (PR #854)
