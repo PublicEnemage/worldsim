@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-10 (Playwright legibility gates passed — 11/11 at 1440×900. Narrated walkthrough run complete — all five Demo 4 frames captured (frame-a through frame-e-step5-divergence.png). demo-narrated.spec.ts app-ready sentinel fixed (worldsim-map → __worldsim_selectEntity). Prior this session: demo.sh + demo-narrated.spec.ts M12 rewrite (PR #838); Mode 3 scenario evaluation panel (PR #833); walkthrough revision PRs #834 #835 #836. All M12 agent deliverables complete. Awaiting EL: release/m12 → main merge, IR review, stakeholder demo.)**
+**Last updated: 2026-06-11 (M13 planning — Step 6c Audience Simulation Panel established in demo-preparation-standard.md (PR #863 merged to release/m12). Persona-based panel (Personas 1, 2, 5) evaluates demo in-character as live audience; Persona 5 north star verdict gates Step 7 and doubles as sprint north star test artifact. Applies M14 forward. Prior this session: four pre-demo fixes PR #854; entity priming + testMatch guard PR #857; NM-040 filed; M12 issue audit (4 closed, #852 deferred to M13); milestone reorg (M13 renamed, M14 created, 21 issues migrated). All M12 agent deliverables complete. Awaiting EL: release/m12 → main merge, IR review, stakeholder demo (#843), Phase 0 endorsement.)**
 **Current milestone:** M12 — Active Control and External Sector (GitHub Milestone 13)
 **Previous milestone:** M11.5 — Usability Validation and Experience Audit (formally closed 2026-06-04; Issue #720 closed; GitHub Milestone 14 closed)
 
@@ -328,6 +328,10 @@ CI hotfix: NM-035 filed; `ci.yml` PR trigger updated to include `release/m*` (PR
 
 | PR | Title | Date |
 |---|---|---|
+| #863 | docs(process): Step 6c Audience Simulation Panel — persona-based live demo rehearsal (Personas 1/2/5 in-character; Persona 5 north star gate; Four-Tier Review Structure; M14 forward) | 2026-06-11 |
+| #862 | chore(state): SESSION_STATE.md — #263 corrected back to M12 (EL correction 2026-06-11) | 2026-06-11 |
+| #857 | fix(demo): DEMO-054 testMatch guard + DEMO-055 entity priming and attributed curve references (NM-040) | 2026-06-11 |
+| #854 | fix(demo): DEMO-041/052/053 pre-demo fixes — confidence tier disclosure, spatial reference, zone label → plain language | 2026-06-11 |
 | #836 | docs(demo): walkthrough Section 4 — capability-gaps reframe (political feasibility, conditionality design, medium-term horizon; M14 cadence caveat) | 2026-06-10 |
 | #835 | docs(demo): walkthrough conditionality framing — clawback reading, branch mechanics, reserve invariant caveat | 2026-06-10 |
 | #834 | docs(demo): walkthrough pre-IR revision — two-act structure, human moment opening, NARRATION-RULING-1, Greece/Argentina framing | 2026-06-10 |
