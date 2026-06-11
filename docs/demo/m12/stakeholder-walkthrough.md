@@ -726,31 +726,40 @@ additional framework construction.
 
 ## Section 4 — What Is Being Built (4 minutes)
 
-> The roadmap is best understood as a sequence of expanding analytical
-> capability — each milestone extending what can be seen and acted on.
+> Milestones 1 through 12 are complete. What you have seen today is the
+> platform at the limit of what it can honestly claim — a citable human cost
+> finding and a testable counter-proposal. Three questions a sophisticated
+> negotiator would ask in that room remain unanswerable with M12 alone. M13
+> addresses each directly.
 >
-> Milestones 1 through 12 are complete. The platform today runs a validated
-> computation engine, models two-country simultaneous scenarios with live
-> commodity shock transmission through the External Sector Module, renders
-> all four measurement frameworks simultaneously, and gives the ministry team
-> a live steering interface through Mode 3 Active Control.
+> **The political feasibility gap.** The analysis shows what the
+> counter-proposal produces if implemented at full capacity. It does not show
+> whether it can be implemented. A government under pressure — with street
+> protests, a fractious parliament, existing public commitments to the
+> programme — may not be able to deliver the fiscal path the analysis
+> supports. M13's Political Economy Module introduces programme survival
+> probability. The question shifts from "what does this policy produce?" to
+> "can this government actually deliver it?"
 >
-> Milestone 13 is next: the Political Economy Module. Conditionality
-> modelling, political feasibility constraints, elite capture dynamics.
-> The analytical gap we are closing in M13 is between what the model
-> predicts and what is actually feasible to implement given the political
-> economy of the country in question. A fiscal path that is technically
-> sound but politically impossible is not a useful output. M13 addresses
-> that.
+> **The conditionality design gap.** Today's analysis treats conditionality
+> as binary: accept the IMF terms or remove them. Real negotiations are more
+> granular — phasing, sequencing, social spending carve-outs, structural
+> benchmarks rather than quantitative targets. M13 introduces conditionality
+> design modelling, making alternative programme structures comparable on the
+> same instrument. The minister's team can ask which design achieves the
+> IMF's debt sustainability objective while keeping the human cost trajectory
+> above the floor — rather than accepting or rejecting the package wholesale.
 >
-> Beyond M13: resolution spectrum expansion, multi-region cascade modelling,
-> and the formal backtesting data partnership programme — opening the
-> validation layer to external domain reviewers with historical data authority
-> we do not have ourselves.
+> **The medium-term horizon gap.** The current simulation covers 8 steps —
+> the commodity shock arc. The IMF's strongest counter-argument is about what
+> happens in years 9 through 15: whether avoiding austerity now risks a
+> harder debt crisis later. M13 makes that trade-off examinable rather than
+> leaving it as an assertion the minister's team cannot refute.
 >
-> The sequencing is deliberate. Measurement architecture first. Steering
-> capability second. Political feasibility modelling third. Each layer builds
-> on validated foundations.
+> One honest note on timing: the stakeholder demo cadence is every two
+> milestones. The next demo reflects M14 capability. M13 is the foundation;
+> M14 is when the political economy layer will be fully demonstrable in a
+> live scenario.
 
 ---
 
