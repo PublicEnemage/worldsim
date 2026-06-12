@@ -34,7 +34,7 @@ classification trigger per the template.
 
 ## Status
 
-`Proposed`
+`Accepted`
 
 ---
 
@@ -42,7 +42,7 @@ classification trigger per the template.
 
 **Standards Version:** 2026-06-12
 **Valid Until:** M14 close, or when any of the renewal triggers below occur
-**License Status:** `PROPOSED` — panel review pending
+**License Status:** `ACCEPTED` — EL acceptance recorded 2026-06-12 (PR #916)
 
 **Panel:**
 - Architect Agent (R — authorship, interface contracts)

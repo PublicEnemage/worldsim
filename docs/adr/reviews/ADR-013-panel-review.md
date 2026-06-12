@@ -119,6 +119,6 @@ requirement, not a post-implementation task.
 | Architect Agent | APPROVE | 2026-06-12 |
 | Political Economist | APPROVE | 2026-06-12 |
 | Chief Methodologist | APPROVE (conditional — calibration-basis.md update before G6) | 2026-06-12 |
-| Engineering Lead | **PENDING** | — |
+| Engineering Lead | **ACCEPT** | 2026-06-12 |
 
-**ADR status:** Remains `Proposed` until Engineering Lead vote is recorded.
+**ADR status:** `Accepted` — EL acceptance recorded 2026-06-12 (PR #916). G6 (#392) is now unblocked. Chief Methodologist pre-G6 condition remains in effect: `docs/methodology/calibration-basis.md` must document political economy calibration basis before G6 implementation begins.
