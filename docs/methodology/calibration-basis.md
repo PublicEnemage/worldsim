@@ -128,6 +128,120 @@ empirical trade weight data from UN Comtrade or IMF DOTS when available.
 
 ---
 
+## Political Economy Parameters (ADR-013)
+
+These parameters govern the PoliticalEconomyModule (M13 G6). All are Tier 3 —
+formula-based approximations calibrated against historical programme failure cases.
+
+### `LEGITIMACY_EROSION_ELASTICITY` — Fiscal adjustment → legitimacy erosion rate
+
+**Location:** `backend/app/simulation/modules/political_economy/module.py`
+
+**Value:** `0.08` (8% of |fiscal_delta| reduces legitimacy_index per step)
+
+**Basis:** Greece 2010–2012 calibration: cumulative −25 percentage point fiscal
+adjustment produced approximately −0.20 decline in government approval proxy
+over three years (Eurobarometer time-series). Elasticity ≈ 0.08/year at
+standard regime; conservative lower bound used.
+
+**Calibration status:** Tier 3 CALIBRATED (single-case, Greece 2010–2012). Generalisability
+to non-Eurozone economies is uncertain. The FRAGILITY_AMPLIFIER (×1.5 below 0.5 legitimacy)
+is supported by Przeworski et al. (2000) nonlinear collapse dynamics.
+
+---
+
+### `EMERGENCY_EROSION_FACTOR` — Emergency policy event → immediate legitimacy shock
+
+**Location:** `backend/app/simulation/modules/political_economy/module.py`
+
+**Value:** `0.10` (10% immediate legitimacy reduction per emergency event)
+
+**Basis:** Lebanon 2019 (bank holiday, capital controls) and Argentina 2001
+(emergency declaration, debt default) observations. Both cases showed rapid,
+discrete legitimacy shocks at emergency event announcement distinct from the
+gradual erosion under fiscal adjustment. Magnitude estimate: 10% per event.
+
+**Calibration status:** Tier 3 PLACEHOLDER. Calibrated from two cases. Full
+cross-country calibration deferred to Issue #44.
+
+---
+
+### `_BASE_ANNUAL_SURVIVAL` — Programme survival probability base rate
+
+**Location:** `backend/app/simulation/modules/political_economy/module.py`
+
+**Value:** `0.70`
+
+**Basis:** Historical programme failure data (ADR-013 §Known Limitations):
+- Greece: three programme adjustments over five years (2010–2015)
+- Argentina 2001: programme collapse in year 3
+- Ecuador 2000: programme abandoned after one year
+
+Base annual survival ≈ 0.70 (geometric mean across three cases). These are
+middle-income countries with IMF programme history; low-income country dynamics
+are not captured by this estimate (see ADR-013 §Known Limitations).
+
+**Calibration status:** Tier 3 CALIBRATED on three cases. Programme survival
+probability is labelled "formula-calibrated estimate" in all disclosures.
+Full calibration against a larger historical dataset is deferred to Issue #44.
+
+---
+
+### `_LEGITIMACY_SURVIVAL_SENSITIVITY` — Legitimacy → survival probability sensitivity
+
+**Location:** `backend/app/simulation/modules/political_economy/module.py`
+
+**Value:** `1.50`
+
+**Basis:** Historical programme failure timing relative to protest intensity
+proxies (Acemoglu & Robinson 2005, "Economic Origins of Dictatorship and
+Democracy"; Blyth 2013, "Austerity: The History of a Dangerous Idea").
+Each 0.10 point decline in legitimacy_index reduces annual survival
+probability by approximately 0.105 (base × sensitivity × 0.10 = 0.70 × 1.50 × 0.10).
+Value set to 1.50 (rather than the initial 0.80) so that legitimacy=0.0 yields
+survival probability below PROGRAMME_SURVIVAL_FLOOR (0.25), making PE-001 MDA alert
+reachable via the formula without external override (AC-3 of intent document
+ADR-013-2026-06-12-political-economy-integration.md).
+
+**Calibration status:** Tier 3 PLACEHOLDER. Issue #44 calibration required
+for Tier 2 promotion.
+
+---
+
+### `PROGRAMME_SURVIVAL_FLOOR` — MDA threshold for political viability
+
+**Location:** `backend/app/simulation/modules/political_economy/module.py`
+
+**Value:** `0.25`
+
+**Basis:** ADR-013 §Decision 1. The 0.25 floor corresponds to conditions
+observed in historically failed programmes (Greece 2015 Syriza referendum,
+Argentina 2001 default declaration, Ecuador 2000). At survival probability
+below 0.25, historical precedent shows programme collapse becomes the
+dominant outcome. MDA-PE-001 fires at this floor.
+
+**Calibration status:** Tier 3. Based on three historical cases. The floor
+must not be changed without an ADR amendment per ADR-013 §Decision 1.
+
+---
+
+### `_DEFAULT_ELITE_CAPTURE_COEFFICIENT` — Default elite benefit capture share
+
+**Location:** `backend/app/simulation/modules/political_economy/module.py`
+
+**Value:** `0.30`
+
+**Basis:** Argentina 2001–2002 distributional analysis (Lustig 2001, "Crisis
+and Poverty in Argentina"). Elite cohorts (top decile) captured approximately
+30% of fiscal adjustment benefits above their population weight during the
+crisis. Used as the default when `elite_capture_coefficient` entity attribute
+is absent.
+
+**Calibration status:** Tier 3 PLACEHOLDER. Country-specific coefficients from
+World Bank Inequality surveys are the calibration target (Issue #44).
+
+---
+
 ## Relationship to Issue #44 (Full Calibration Tier System)
 
 Issue #44 tracks the full calibration tier system for all propagation parameters.

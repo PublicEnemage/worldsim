@@ -24,7 +24,7 @@ from app.simulation.engine.quantity import (
 class TestVariableType:
     def test_all_four_types_present(self) -> None:
         values = {vt.value for vt in VariableType}
-        assert values == {"stock", "flow", "ratio", "dimensionless"}
+        assert values == {"stock", "flow", "ratio", "dimensionless", "probability"}
 
     def test_stock_is_distinct_from_flow(self) -> None:
         assert VariableType.STOCK != VariableType.FLOW

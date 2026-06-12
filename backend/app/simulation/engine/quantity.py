@@ -106,6 +106,12 @@ class VariableType(Enum):
     with equal display weight to financial indicators — the classification does
     not diminish this."""
 
+    PROBABILITY = "probability"
+    """Probability value in [0.0, 1.0]. Replaces the current attribute value
+    each step (same propagation semantics as STOCK — absolute replacement, not
+    additive accumulation). Used for programme_survival_probability and similar
+    point-in-time probability estimates (ADR-013)."""
+
 
 @dataclass(kw_only=True)
 class Quantity:
