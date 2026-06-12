@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-12 (M13 kickoff complete — release/m13 cut; sprint plan + entry doc EL-approved (PR #911); Wave 1 implementation open)**
+**Last updated: 2026-06-12 (M13 Wave 1 implementation complete — G1–G4 merged (#913–#915, #914); G5 ADR-013 PR #916 open awaiting EL acceptance vote)**
 **Current milestone:** M13 — Political Economy and Instrument Credibility (GitHub Milestone 9)
 **Previous milestone:** M12 — Active Control and External Sector (formally closed 2026-06-11; Issue #263 closed; GitHub Milestone 13 closed; tagged v0.12.1)
 
@@ -13,7 +13,7 @@
 
 ## Active Work Streams — M13
 
-**Kickoff complete 2026-06-12. EL approval recorded 2026-06-12 (PR #911).** Wave 1 implementation is open. Intent documents must be filed before each group's implementation PR opens (Phase A lifecycle).
+**Kickoff complete 2026-06-12. EL approval recorded 2026-06-12 (PR #911).** Wave 1 implementation complete 2026-06-12.
 
 **M13 kickoff status:**
 1. ✅ PM Agent cuts `release/m13` from `main` — DONE 2026-06-12
@@ -25,26 +25,31 @@
 7. ✅ Sprint entry document filed — `docs/process/sprint-plans/m13-sprint-1-entry.md` — EL-approved 2026-06-12
 8. ✅ Sprint plan EL approval — **recorded 2026-06-12 (PR #911)**
 
-**Next actions (any order, Wave 1 groups are parallel):**
-- G5: Architect Agent begins ADR-013 authorship (#792) — critical path
-- G1: Author intent doc → QA tests → implement (#872, #874)
-- G2: Author intent doc → QA tests → implement (#871, #873, #875, #876)
-- G3: Author intent doc → QA tests → implement (#799)
-- G4: Author intent doc → implement (#27, #822, #847)
+**Wave 1 completion status:**
+- ✅ G3 (#799): Reserves non-negativity floor — merged to release/m13 (PR #912)
+- ✅ G1 (#872, #874): DEMO legibility fixes — merged (PR #913)
+- ✅ G4 (#27, #822, #847): Documentation — merged (PR #915)
+- ✅ G2 (#871, #873, #875, #876): DEMO trajectory/Mode 3 — merged (PR #914); 4 fixes: DEMO-059 PMM scale note, DEMO-062 Zone 1D entity label, DEMO-063 inline entity labels, DEMO-064 Mode 3 comparison readout
+- 🔄 G5 (#792): ADR-013 — PR #916 open, 3-of-4 panel votes (Architect APPROVE, Political Economist APPROVE, Chief Methodologist APPROVE conditional); **EL acceptance vote required**
+
+**Next action:**
+- EL reviews ADR-013 and records acceptance vote on PR #916
+- After EL acceptance: G6 (#392) political economy integration becomes unblocked
+- Chief Methodologist pre-G6 condition: `docs/methodology/calibration-basis.md` must document political economy calibration basis before G6 begins (already partially completed in PR #912/wave 1 documentation work — verify coverage before G6 opens)
 
 ### Sprint Group Status
 
 | Group | Issues | Wave | ADR gate | Status |
 |---|---|---|---|---|
-| G1 — DEMO legibility | #872, #874 | Wave 1 | None | **OPEN — intent doc required first** |
-| G2 — DEMO trajectory/Mode 3 | #871, #873, #875, #876 | Wave 1 | None | **OPEN — intent doc required first** |
-| G3 — Engine fix (reserves floor) | #799 | Wave 1 | None | **OPEN — intent doc required first** |
-| G4 — Documentation | #27, #822, #847 | Wave 1 | None | **OPEN — intent doc required first** |
-| G5 — ADR-013 authorship | #792 | Wave 1 | N/A | **OPEN — begin immediately** |
-| G6 — Political economy integration | #392 | Wave 2 | BLOCKED_ADR — ADR-013 | BLOCKED |
+| G1 — DEMO legibility | #872, #874 | Wave 1 | None | ✅ MERGED 2026-06-12 (PR #913) |
+| G2 — DEMO trajectory/Mode 3 | #871, #873, #875, #876 | Wave 1 | None | ✅ MERGED 2026-06-12 (PR #914) |
+| G3 — Engine fix (reserves floor) | #799 | Wave 1 | None | ✅ MERGED 2026-06-12 (PR #912) |
+| G4 — Documentation | #27, #822, #847 | Wave 1 | None | ✅ MERGED 2026-06-12 (PR #915) |
+| G5 — ADR-013 authorship | #792 | Wave 1 | N/A | 🔄 PR #916 OPEN — EL acceptance vote pending |
+| G6 — Political economy integration | #392 | Wave 2 | BLOCKED_ADR — ADR-013 | BLOCKED — unblocked when EL accepts ADR-013 |
 | G7 — Alert panel master-detail | #852 | Blocked | BLOCKED_ADR — #908 ADR | BLOCKED |
 
-**Critical path:** G5 (ADR-013 authorship, #792) → G6 (political economy integration, #392)
+**Critical path:** G5 (ADR-013 EL acceptance, PR #916) → G6 (political economy integration, #392)
 
 ### Near-Term Backlog (M13 board, not in sprint waves)
 #22, #35, #45, #102, #271, #274, #393, #394, #823, #824, #837 — revisit at M13 midpoint HORIZON sweep.
@@ -58,6 +63,11 @@
 | #909 ✅ | feat(m13): kickoff — sprint plan, entry doc, ADR backlog | release/m13 | Merged 2026-06-12 |
 | #910 ✅ | chore(state): M13 kickoff session state | release/m13 | Merged 2026-06-12 |
 | #911 ✅ | feat(m13): EL approval recorded — sprint plan + entry doc | release/m13 | Merged 2026-06-12 |
+| #912 ✅ | feat(g3): reserves non-negativity floor | release/m13 | Merged 2026-06-12 |
+| #913 ✅ | fix(g1): DEMO legibility fixes — DEMO-060 DEMO-061 | release/m13 | Merged 2026-06-12 |
+| #914 ✅ | feat(g2): DEMO trajectory and Mode 3 comparison display | release/m13 | Merged 2026-06-12 |
+| #915 ✅ | docs(g4): calibration basis, stakeholder walkthrough, data standards | release/m13 | Merged 2026-06-12 |
+| #916 🔄 | docs(adr): ADR-013 political economy module boundary (#792) | release/m13 | **OPEN — EL acceptance vote required** |
 
 ## M11 Work Streams — 2026-06-04 Sprint
 
