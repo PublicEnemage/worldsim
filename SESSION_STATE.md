@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-12 (Fresh session audit pass 2: four gaps fixed — #843 milestone corrected M13→M14; process redesign deliberation status note updated (Phase 0 endorsed, no longer blocking); M13 kickoff prerequisites expanded with #264 exit checklist and Phase A parallel-track note; #264 added to M13 issue table; recently merged PRs updated through #894.)**
+**Last updated: 2026-06-12 (Milestone reference audit: README.md/CLAUDE.md/roadmap.md updated from M8–M11 era to M13 active (PR #896). All three files now correctly reflect M13 as current, M12 as closed (v0.12.1), and M14 as planned. roadmap.md M13 title corrected to "Political Economy and Instrument Credibility"; M14 section added.)**
 **Current milestone:** M13 — Political Economy and Instrument Credibility (GitHub Milestone 9)
 **Previous milestone:** M12 — Active Control and External Sector (formally closed 2026-06-11; Issue #263 closed; GitHub Milestone 13 closed; tagged v0.12.1)
 
@@ -340,6 +340,8 @@ CI hotfix: NM-035 filed; `ci.yml` PR trigger updated to include `release/m*` (PR
 
 | PR | Title | Date |
 |---|---|---|
+| #896 | docs(roadmap): update milestone references from M8/M11 era to M13 active — README, CLAUDE.md, roadmap.md | 2026-06-12 |
+| #895 | chore(state): SESSION_STATE.md — fresh session audit pass 2 (four gaps fixed) | 2026-06-12 |
 | #894 | chore(state): SESSION_STATE.md — issue triage: #865/#844 closed; 9 unmilestoned issues assigned to M13/M14 | 2026-06-12 |
 | #893 | chore(state): SESSION_STATE.md — M13 kickoff prerequisites, stale M8/M9 work-stream text replaced | 2026-06-12 |
 | #892 | chore(state): SESSION_STATE.md — M13 now active; M12 block marked CLOSED; GitHub Milestone 13 closed | 2026-06-11 |
