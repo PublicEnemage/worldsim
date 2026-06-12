@@ -665,7 +665,15 @@ PO: STORIES [scope]
 PO: PRIORITIZE
 PO: DEMO REVIEW [milestone]
 PO: BRIEF
+PO: ACCEPT — [intent document path or PR number]
 ```
+
+`PO: ACCEPT` executes the Business PO Validate step (Step 5 of the Agent Execution Lifecycle)
+for a specific implementation. The Business PO reads the intent document, identifies the work
+type (frontend, backend, documentation, analytics), follows the per-type verification protocol
+in `docs/process/acceptance-protocol.md`, and produces a written verdict artifact. A verdict
+without the per-type passing checklist complete is a rejection. Rejection produces a rejection
+artifact at `docs/process/rejections/REJECT-NNN-YYYY-MM-DD-short-description.md`.
 
 ### Working Agreement
 

@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-12 (Process Redesign Phase A complete — EL endorsed PR #900; execution lifecycle, intent template, rejection artifact, Layer 3 gate (FD-2), Kryptonite constraint (FD-3) all encoded in CLAUDE.md; Phase B now open.)**
+**Last updated: 2026-06-12 (Process Redesign Phase B complete — acceptance-protocol.md filed; per-work-type verification criteria + exception path authored; ACCEPT mode added to agents.md §Business PO; Sprint Exit Gate added to sprint-planning-sop.md; Phase B exit artifact + Phase C sprint entry filed. Awaiting EL endorsement.)**
 **Current milestone:** M13 — Political Economy and Instrument Credibility (GitHub Milestone 9)
 **Previous milestone:** M12 — Active Control and External Sector (formally closed 2026-06-11; Issue #263 closed; GitHub Milestone 13 closed; tagged v0.12.1)
 
@@ -118,7 +118,9 @@ CI hotfix: NM-035 filed; `ci.yml` PR trigger updated to include `release/m*` (PR
 | 5 — Enforcement review + exit artifact | PI Agent + PM Agent | `docs/process/sprint-plans/process-redesign-phaseA-exit.md` | #900 | ✅ Merged 2026-06-12 |
 | 6 — EL endorsement | EL | `docs/process/sprint-plans/process-redesign-phaseA-exit.md §Part VII` | #900 | ✅ Endorsed 2026-06-12 |
 
-**Phase B sprint entry filed:** `docs/process/sprint-plans/process-redesign-phaseB-sprint-entry.md` — **Phase B is now open.**
+**Phase B sprint entry filed:** `docs/process/sprint-plans/process-redesign-phaseB-sprint-entry.md` — **Phase B outputs filed 2026-06-12. Awaiting EL endorsement.**
+
+**Phase C sprint entry filed:** `docs/process/sprint-plans/process-redesign-phaseC-sprint-entry.md` — **Phase C opens when EL endorses Phase B.**
 
 **Gaps closed by Phase A:**
 
@@ -129,6 +131,25 @@ CI hotfix: NM-035 filed; `ci.yml` PR trigger updated to include `release/m*` (PR
 | **FD-2** — Layer 3 self-interpreting output has no process owner | Customer Agent Layer 3 gate at Validate step | `CLAUDE.md §Agent Execution Lifecycle — Layer 3 Quality Gate` |
 | **FD-3** — Kryptonite frame never governs tradeoffs | Kryptonite design constraint at Intent authorship + Validate | `CLAUDE.md §Agent Execution Lifecycle — Kryptonite Design Constraint` |
 | Intent document format gap — no standard for Implementation Intent | Canonical template with observable application state + Kryptonite check | `docs/process/intent-template.md` |
+
+## Process Redesign Sprint — Phase B Status
+
+**Phase B: Business PO Acceptance Protocol**
+**Status:** OUTPUTS FILED 2026-06-12 — awaiting EL endorsement (PR pending).
+
+| Step | Agent | Output | Status |
+|---|---|---|---|
+| 1 — Per-work-type verification criteria (frontend, backend, docs, analytics) | Business PO | `docs/process/acceptance-protocol.md §Part 1` | ✅ Filed 2026-06-12 |
+| 2 — Exception path specification + enforcement review | PI Agent | `docs/process/acceptance-protocol.md §Part 2` | ✅ Filed 2026-06-12 |
+| 2b — ACCEPT mode in agents.md §Business PO | Business PO | `docs/process/agents.md §Business Product Owner Agent` | ✅ Filed 2026-06-12 |
+| 2c — Sprint Exit Gate in sprint-planning-sop.md | PM Agent | `docs/process/sprint-planning-sop.md §Sprint Exit Gate` | ✅ Filed 2026-06-12 |
+| 3 — Phase B exit artifact + Phase C sprint entry | PM Agent | `docs/process/sprint-plans/process-redesign-phaseB-exit.md`; `docs/process/sprint-plans/process-redesign-phaseC-sprint-entry.md` | ✅ Filed 2026-06-12 |
+| 4 — EL endorsement | EL | `docs/process/sprint-plans/process-redesign-phaseB-exit.md §Part VII` | ⏳ Pending |
+
+**What Phase B produced:**
+- **`docs/process/acceptance-protocol.md`** — per-type verification checklists (frontend, backend, docs, analytics); DEMO4 class check explicit in backend protocol; asymmetry test operationalizes FD-3 at Validate step; Customer Agent Layer 3 as precondition (not follow-up); rejection artifact triggers + format + re-acceptance process + EL exception path; PI enforcement review embedded
+- **`docs/process/agents.md` amendment** — `PO: ACCEPT` activation mode with canonical protocol reference
+- **`docs/process/sprint-planning-sop.md` amendment** — §Sprint Exit Gate: exit conditions, agent responsibilities at exit, what "CI green" does not substitute for, sprint exit artifact format
 
 ---
 
@@ -173,7 +194,8 @@ CI hotfix: NM-035 filed; `ci.yml` PR trigger updated to include `release/m*` (PR
 
 **Awaiting EL action:**
 - ~~Phase 0 EL endorsement~~ — **RECORDED 2026-06-11** (`docs/process/sprint-plans/process-redesign-phase0-exit.md §Part VI`). XD-1, XD-2, FD-1 closed.
-- ~~Phase A EL endorsement~~ — **RECORDED 2026-06-12** (PR #900; `docs/process/sprint-plans/process-redesign-phaseA-exit.md §Part VII`). Execution lifecycle gap, FD-2, FD-3 closed. **Phase B is now open.** Entry: `docs/process/sprint-plans/process-redesign-phaseB-sprint-entry.md`.
+- ~~Phase A EL endorsement~~ — **RECORDED 2026-06-12** (PR #900; `docs/process/sprint-plans/process-redesign-phaseA-exit.md §Part VII`). Execution lifecycle gap, FD-2, FD-3 closed. **Phase B outputs filed.** Entry: `docs/process/sprint-plans/process-redesign-phaseB-sprint-entry.md`.
+- **Phase B EL endorsement** — **PENDING** (`docs/process/sprint-plans/process-redesign-phaseB-exit.md §Part VII`). Acceptance protocol, per-type verification criteria, exception path, ACCEPT mode in agents.md, Sprint Exit Gate in SOP all filed. Review and endorse when ready. Phase C entry filed at `docs/process/sprint-plans/process-redesign-phaseC-sprint-entry.md`.
 - ~~Step 6c gate~~ — **PASS (2026-06-11)**: PR #880 resolved DEMO-070/071/081/090; DEMO-080 accepted as-is by EL (tablet scale, out of scope for 1440×900 live demo). Audience simulation review updated. Step 9 unblocked.
 - ~~Step 9 simulated session~~ — **COMPLETE (2026-06-11)**. North star verdict: PASS. Aicha: "The conditionality dispute is about who absorbs the employment cost — the reserve crisis happens either way. That argument is now quantified." Artifact: `docs/demo/m12/reviews/2026-06-11-v0.12.1-stakeholder-review.md` (PR #886). Screenshots recaptured with PR #880 UI changes (PR #883). Two new M13 issues: #884 (reserve value not on screen), #885 (Exploratory tier on baseline vs. projection). Per-entity curves (#845) confirmed as primary unresolved UX gap.
 - ~~#843 M12 live external demo~~ — **DEFERRED TO M14** (EL decision 2026-06-11). Issue repurposed as M14 closure gate: live stakeholder demo with real external participants, timed to coincide with methodology publication. M12 simulated session (north star PASS) stands as M12 closure evidence. M12 is now formally complete pending only the exit checklist (#263).
