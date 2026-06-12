@@ -14,17 +14,18 @@ import { TrajectoryView } from "./TrajectoryView";
 import { useScenarioStepStore } from "../store/scenarioStepStore";
 
 export const LAYOUT = {
-  1024: { trajectory: 480, coPrimary: 240, controlPlane: 280 },
-  1280: { trajectory: 580, coPrimary: 400, controlPlane: 280 },
+  1024: { trajectory: 480, coPrimary: 240, controlPlane: 280, chartHeight: 300 },
+  1280: { trajectory: 580, coPrimary: 400, controlPlane: 280, chartHeight: 320 },
+  1440: { trajectory: 680, coPrimary: 400, controlPlane: 280, chartHeight: 380 },
 } as const;
 
-export function useViewportBreakpoint(): 1024 | 1280 {
-  const [bp, setBp] = useState<1024 | 1280>(
-    window.innerWidth >= 1280 ? 1280 : 1024,
+export function useViewportBreakpoint(): 1024 | 1280 | 1440 {
+  const [bp, setBp] = useState<1024 | 1280 | 1440>(
+    window.innerWidth >= 1440 ? 1440 : window.innerWidth >= 1280 ? 1280 : 1024,
   );
   useEffect(() => {
     function update() {
-      setBp(window.innerWidth >= 1280 ? 1280 : 1024);
+      setBp(window.innerWidth >= 1440 ? 1440 : window.innerWidth >= 1280 ? 1280 : 1024);
     }
     window.addEventListener("resize", update);
     return () => window.removeEventListener("resize", update);
@@ -41,6 +42,8 @@ interface InstrumentClusterProps {
   cohortPanel?: React.ReactNode;
   /** Entity ISO codes for multi-case Mode 1 tick format (UD-R2). */
   entityIds?: string[];
+  /** Override chart height (px) — defaults to LAYOUT[bp].chartHeight. */
+  chartHeight?: number;
 }
 
 export function InstrumentCluster({
@@ -49,10 +52,12 @@ export function InstrumentCluster({
   fourFramework,
   cohortPanel,
   entityIds,
+  chartHeight: chartHeightProp,
 }: InstrumentClusterProps) {
   const { mode } = useScenarioStepStore();
   const bp = useViewportBreakpoint();
   const layout = LAYOUT[bp];
+  const chartHeight = chartHeightProp ?? layout.chartHeight;
 
   const isMode3 = mode === "MODE_3";
 
@@ -69,10 +74,11 @@ export function InstrumentCluster({
       {/* Zone 1A — Trajectory View + Human Cost Ledger strip (Issue #747) */}
       <div
         data-testid="zone-1a-trajectory-container"
-        style={{ gridColumn: 1, gridRow: 1, minWidth: layout.trajectory, display: "flex", flexDirection: "column" }}
+        style={{ gridColumn: 1, gridRow: 1, minWidth: layout.trajectory, minHeight: chartHeight, display: "flex", flexDirection: "column" }}
       >
         <TrajectoryView
           width={layout.trajectory}
+          height={chartHeight}
           entityIds={entityIds}
           data-testid="zone-1a-trajectory"
         />
@@ -91,7 +97,8 @@ export function InstrumentCluster({
       >
         {/* Zone 1B — MDA Alert Panel (~45% of column height) */}
         {/* data-testid lives on MDAAlertPanelZone1B root — not duplicated here */}
-        <div style={{ flex: "0 0 45%", overflow: "hidden" }}>
+        {/* overflow:auto (not hidden) so MDAAlertPanelZone1B scroll is not clipped (DEMO-060) */}
+        <div style={{ flex: "0 0 45%", overflow: "auto" }}>
           {mdaPanel ?? (
             <div style={{ color: "#bbb", fontSize: 12, padding: 8 }}>
               MDA Alert Panel (Zone 1B)

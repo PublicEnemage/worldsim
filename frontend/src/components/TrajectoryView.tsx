@@ -248,6 +248,8 @@ function legendFormatter(
 interface TrajectoryViewProps {
   /** Width of the trajectory view zone in px (480 at 1024×768, 580 at 1280×800). */
   width?: number;
+  /** Chart height in px — defaults to 300. Increased at 1440px viewport (DEMO-061). */
+  height?: number;
   /** Entity ISO 3166-1 alpha-3 codes — provide two for multi-case Mode 1. */
   entityIds?: string[];
   /** test-id for AC-006 DOM assertions. */
@@ -260,6 +262,7 @@ interface TrajectoryViewProps {
 
 export function TrajectoryView({
   width,
+  height = 300,
   entityIds,
   "data-testid": dataTestId = "zone-1a-trajectory",
 }: TrajectoryViewProps) {
@@ -318,7 +321,7 @@ export function TrajectoryView({
       data-current-step={current_step}
       style={{ width: width ?? 480, position: "relative" }}
     >
-      <ResponsiveContainer width="100%" height={300}>
+      <ResponsiveContainer width="100%" height={height}>
         <ComposedChart
           data={mergedData}
           margin={{ top: 16, right: 24, bottom: 48, left: 8 }}
