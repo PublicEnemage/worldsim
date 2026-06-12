@@ -556,6 +556,16 @@ being answered in real time.
 >
 > That is a different conversation than the one that happened in Athens in 2010.
 
+**[PRESENTER NOTE — Irreversible badge]** In Mode 3, the four-framework
+overview (Zone 1D) may display a small label reading "Irreversible" next to
+a framework score when that framework has an active MDA alert. This label
+means: the recovery horizon for the breached threshold exceeds the projection
+window — this capability loss cannot be reversed by any scenario pathway within
+this analysis. If an audience member asks what "Irreversible" means, use this
+language verbatim. A badge reading "Recoverable (N yrs)" means the breach is
+temporary: given intervention, the model estimates recovery within N years.
+Both labels are interpretable without specialist mediation.
+
 **Cognitive purpose:** Mode 3 is the north star the entire instrument
 architecture has been designed toward. It must land as the answer to the
 capability gap framed in Section 1: the ministry team can now run the analysis
