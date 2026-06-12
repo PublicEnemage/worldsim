@@ -205,7 +205,7 @@ echo "          '\"We accept the programme. We negotiate away the spending cut.\
 echo "          $(bold 'PAUSE. Read Zone 1A — step 5 is where the divergence peaks.')"
 echo "          '$(bold 'Primary divergence at step 5:') +1.70pp GDP. Unemployment does not reverse.'"
 echo "          'The reserve curve: identical in baseline and branch. Both reach zero by step 7.'"
-echo "          '$(bold 'The reserve crisis is survived under better conditions, not avoided.'"
+echo "          '$(bold 'The reserve crisis is survived under better conditions, not avoided.')'"
 echo "          'The minister should know this before she uses this finding.'"
 echo "          'That is a different conversation than the one that happened in Athens in 2010.'"
 echo ""
