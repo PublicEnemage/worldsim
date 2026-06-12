@@ -3,7 +3,7 @@
 > This file is the single source of truth for ADR number assignment.
 > No ADR number may be used in any issue title, document, or code comment
 > before it appears in this table with status ASSIGNED.
-> Last updated: 2026-06-05
+> Last updated: 2026-06-12
 
 ## Process
 
@@ -70,4 +70,5 @@ the current session does not automatically take priority over an older pending e
 | ARCH-004 | #366 | Trajectory view as primary instrument | 2026-05-21 | ACCEPTED — ADR-010 | 10 | M9 | Accepted 2026-05-22. Panel: FA (conditional ✓), UX Designer (conditional ✓), CM (conditional ✓), Engineering Lead (accepted ✓). 4 INCORPORATE items applied and approved. FA brief required before implementation. |
 | ARCH-005 | #40 | Non-linear propagation architecture — THRESHOLD and CASCADE modes | 2026-06-04 | ACCEPTED — ADR-011 | 11 | M11 | Closes #40 and #29. Accepted 2026-06-04. Panel: CE (accepted ✓), CM (accepted ✓), SD (accepted ✓), EL (accepted ✓). A/B validation report: `docs/backtesting/cascade-validation-report.md`. Panel review: `docs/adr/reviews/ADR-011-panel-review.md`. |
 | ARCH-006 | #751 + #752 | External sector module — new module boundary (G5: BilateralTradeShock + CommodityPriceShock) | 2026-06-05 | ACCEPTED — ADR-012 | 12 | M12 | Panel: Architect Agent (author), CE (C), CM (C), Development Economist (C), EL (accepted ✓ 2026-06-05). G5 PR #773 merged to release/m12 2026-06-05. |
-| ARCH-007 | #792 | Political economy module — new module boundary (G9: conditionality, political feasibility, elite capture) | 2026-06-05 | ASSIGNED — ADR-013 | 13 | M12 | Required for G9. Parallel track to G5. Panel: Architect Agent (author), Political Economist, Chief Methodologist, Engineering Lead. Do not begin G9 implementation until ACCEPTED. |
+| ARCH-007 | #792 | Political economy module — new module boundary (G9: conditionality, political feasibility, elite capture) | 2026-06-05 | ASSIGNED — ADR-013 | 13 | M12→M13 | Required for G9 (deferred to M13). Panel: Architect Agent (author), Political Economist, Chief Methodologist, Engineering Lead. Do not begin G9 implementation until ACCEPTED. |
+| ARCH-008 | #908 | Alert panel (Zone 1B) master-detail UX architecture | 2026-06-12 | PENDING_NUMBER | — | M13 | Required before #852 implementation (EL decision 2026-06-11). Panel (per frontend architecture type): Architect Agent (author), Frontend Architect Agent, UX Designer Agent, Engineering Lead. UX Designer + Design Thinking agent input required per EL decision. |
