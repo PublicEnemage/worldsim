@@ -216,6 +216,7 @@ export function ScenarioInstrumentCluster({
   const store = useScenarioStepStore();
   const bp = useViewportBreakpoint();
   const coPrimaryWidth = LAYOUT[bp].coPrimary;
+  const chartHeight = LAYOUT[bp].chartHeight;
 
   // Fetch lifecycle state for Zone 1D loading/error display (IR-006).
   // Local state — not Zustand — because this is fetch lifecycle, not simulation state.
@@ -553,6 +554,7 @@ export function ScenarioInstrumentCluster({
 
       <InstrumentCluster
         entityIds={entityIds}
+        chartHeight={chartHeight}
         mdaPanel={
           <MDAAlertPanelZone1B
             columnWidth={coPrimaryWidth}
