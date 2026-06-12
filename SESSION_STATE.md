@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-12 (M13 Wave 2 complete — G6 (#392) political economy integration merged PR #919; G1–G6 all closed; G7 (#852) blocked on ADR)**
+**Last updated: 2026-06-12 (M13 Wave 2 complete — G6 (#392) BPO ACCEPT recorded; #392 closed; G7 (#852) blocked on ADR)**
 **Current milestone:** M13 — Political Economy and Instrument Credibility (GitHub Milestone 9)
 **Previous milestone:** M12 — Active Control and External Sector (formally closed 2026-06-11; Issue #263 closed; GitHub Milestone 13 closed; tagged v0.12.1)
 
@@ -37,11 +37,16 @@
   - Intent document: `docs/process/intents/ADR-013-2026-06-12-political-economy-integration.md`
   - 26 tests AC-1–AC-6; 1334 unit tests passing
   - Calibration basis political economy section complete (sensitivity 0.80→1.50 for AC-3)
-  - BPO Step 5 Validate: outstanding (next session action)
+  - ✅ BPO Step 5 Validate: ACCEPT — 2026-06-12 (see intent document §8)
+    - Scenario d5e10fce, GRC, legitimacy_index=0.4, political_economy enabled
+    - `outputs.political_economy` confirmed as top-level framework key at step 1
+    - `programme_survival_probability = 0.59500` at step 1 (absent at step 0 — DEMO4 PASS)
+    - `composite_score = "0.5650"` at step 1
+    - Customer Agent Layer 3: PASS (MDA alert pathway present; indicator self-describing)
+    - Analytical intent: Persona 2 can cite programme survival probability as quantified political feasibility constraint
+    - #392 closed (issue closed as part of BPO acceptance)
 
 **Next action:**
-- G6 (#392) political economy integration — COMPLETE (PR #919, merged 2026-06-12)
-- Business PO Step 5 Validate required: confirm `political_economy` appears as top-level framework key in measurement output response for a seeded scenario; confirm `programme_survival_probability` visible in trajectory response when `legitimacy_index` seeded
 - G7 (#852) alert panel master-detail UX — blocked on ADR (#908 PENDING_NUMBER in backlog); next sprint blocker
 
 ### Sprint Group Status
@@ -53,10 +58,10 @@
 | G3 — Engine fix (reserves floor) | #799 | Wave 1 | None | ✅ MERGED 2026-06-12 (PR #912) |
 | G4 — Documentation | #27, #822, #847 | Wave 1 | None | ✅ MERGED 2026-06-12 (PR #915) |
 | G5 — ADR-013 authorship | #792 | Wave 1 | N/A | ✅ ACCEPTED 2026-06-12 (PR #916) |
-| G6 — Political economy integration | #392 | Wave 2 | ADR-013 ✅ | ✅ MERGED 2026-06-12 (PR #919) — BPO Validate pending |
+| G6 — Political economy integration | #392 | Wave 2 | ADR-013 ✅ | ✅ COMPLETE 2026-06-12 (PR #919, BPO ACCEPT, #392 closed) |
 | G7 — Alert panel master-detail | #852 | Blocked | BLOCKED_ADR — #908 ADR | BLOCKED |
 
-**Critical path:** G7 (alert panel UX, #852) — blocked on ADR #908; BPO G6 Validate outstanding
+**Critical path:** G7 (alert panel UX, #852) — blocked on ADR #908; G6 BPO ACCEPT complete (2026-06-12)
 
 ### Near-Term Backlog (M13 board, not in sprint waves)
 #22, #35, #45, #102, #271, #274, #393, #394, #823, #824, #837 — revisit at M13 midpoint HORIZON sweep.
@@ -349,7 +354,7 @@ CI hotfix: NM-035 filed; `ci.yml` PR trigger updated to include `release/m*` (PR
 | #824 | fix(engine): MENA arid-economy elasticity calibration for land_use_pressure | near-term | |
 | #837 | feat(demo): configuration-driven demo scripts | near-term | |
 | #847 | ux: DEMO-046 — Human Development 'Irreversible' label uncontextualized in narration | near-term | |
-| #392 | arch(m11): political economy constraint modeling | near-term | |
+| ~~#392~~ | ~~arch(m11): political economy constraint modeling~~ | — | **CLOSED 2026-06-12** — BPO ACCEPT on G6 political economy integration |
 | #393 | ux(mode-transition): Mode 1→2 transition must preserve step position | near-term | |
 | #394 | platform: multi-scenario comparison (>2 scenarios) | near-term | |
 | #271 | feat(simulation): reversibility classification for simulation outputs | near-term | |
