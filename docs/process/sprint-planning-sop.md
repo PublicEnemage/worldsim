@@ -159,6 +159,90 @@ Sprint plan documents are not silently overwritten. Changes are visible through 
 
 ---
 
+## Sprint Entry Gate
+
+*Authority: Phase C output (2026-06-12).
+Changes to this section require PI Agent review and EL endorsement.*
+
+A sprint does not open when issues exist and a sprint plan is drafted. A sprint opens when
+the following conditions are all confirmed. Confirmation is recorded in the sprint entry
+document at `docs/process/sprint-plans/{milestone-slug}-sprint-{N}-entry.md`.
+
+### Entry Conditions
+
+1. **Sprint entry document filed and EL-approved.** The PM Agent fills out the sprint entry
+   template (`docs/process/sprint-plans/templates/sprint-entry-template.md`) and files it at
+   the canonical location. The EL approves the entry document before any implementation PR
+   opens — either by adding the `el-approved` date in the frontmatter or confirming approval
+   on the exit checklist issue. An implementation PR opened before entry document approval is
+   a process deviation.
+
+2. **Release branch exists with CI trigger verified.** `release/m{N}` is cut from `main` and
+   the `.github/workflows/ci.yml` `pull_request: branches` includes `release/m*`. This check
+   is recorded in the entry document Section 2.1. Root cause: NM-035 — M12 ran 7 groups
+   without CI triggering because this check did not exist before.
+
+3. **ADR prerequisites clear for groups opening in this sprint.** For each sprint group
+   marked `BLOCKED_ADR` in the sprint plan, the required ADR must be accepted before the
+   group's implementation PR opens. Groups with unresolved ADR prerequisites do not open.
+   This is recorded in the entry document Section 4.
+
+4. **Intent document filed for each user-facing deliverable.** For each deliverable whose
+   primary output is user-facing (frontend feature, backend capability, documentation,
+   analytics output), an intent document is filed at
+   `docs/process/intents/ADR-NNN-YYYY-MM-DD-short-name.md` before the implementation PR
+   opens. The intent document completeness gate: the QA Lead can write a test from it without
+   reading implementation code. (Authority: CLAUDE.md §Agent Execution Lifecycle Step 1)
+
+5. **QA test file authored for each user-facing deliverable before implementation begins.**
+   The QA Lead writes tests from the intent document's acceptance criteria before any
+   implementation code is written. The test file is on record before the implementing agent
+   begins implementation work on the deliverable. (Authority: CLAUDE.md §Agent Execution
+   Lifecycle Step 2)
+
+### Who Confirms the Sprint Entry Gate
+
+| Role | Responsibility at entry |
+|---|---|
+| PM Agent | Files sprint entry template; confirms all five conditions are satisfied; routes to EL for approval |
+| QA Lead Agent | Consulted on the test authorship invariant — confirms tests can be authored from the intent document and that they are authored before implementation |
+| PI Agent | Files a near-miss immediately if a sprint begins implementation without a complete entry document |
+| Engineering Lead | Approves the sprint entry document before implementation begins |
+
+### What "The Sprint Plan Is Approved" Does Not Substitute For
+
+- An approved sprint plan does not substitute for a filed sprint entry document.
+- EL approval of the sprint plan does not substitute for EL approval of the sprint entry document.
+- The sprint plan describes what will be built; the sprint entry document confirms the
+  preconditions under which building may begin are satisfied.
+
+These are sequential, not parallel. Sprint plan approval is a prerequisite for the entry
+document; it does not replace it.
+
+### Infrastructure Sprint Exception
+
+If a sprint's primary deliverables are infrastructure (no user-facing outputs), the PM Agent
+declares "infrastructure sprint" in the sprint entry document Section 2. In that case:
+- Intent document gate (condition 4) does not apply
+- QA test authorship gate (condition 5) does not apply
+- Business PO acceptance is not required at exit for those deliverables
+- Customer Agent Layer 3 assessment is not required at exit
+
+The PI Agent reviews this declaration at the exit gate. If any declared-infrastructure
+deliverable produces user-visible output, it is not infrastructure and the gates apply
+retroactively. PI Agent files a near-miss for any infrastructure declaration that was
+incorrect.
+
+### Sprint Entry Artifact
+
+The sprint entry artifact is the proof that all entry conditions were confirmed before
+implementation began. It is filed at
+`docs/process/sprint-plans/{milestone-slug}-sprint-{N}-entry.md`.
+
+Template: `docs/process/sprint-plans/templates/sprint-entry-template.md`
+
+---
+
 ## Sprint Exit Gate
 
 *Authority: `docs/process/acceptance-protocol.md` (Phase B output).
@@ -215,13 +299,20 @@ Business PO acceptance confirms mission alignment. Both are required before spri
 
 The sprint exit artifact is the proof that all exit conditions were satisfied. For process
 redesign sprints, see the phase exit document pattern (e.g., `process-redesign-phaseA-exit.md`).
-For M{N} milestone sprints, the sprint exit artifact is the milestone exit checklist issue
-comment on GitHub, which must include:
+For M{N} milestone sprints, the sprint exit artifact is a sprint exit document filed at
+`docs/process/sprint-plans/{milestone-slug}-sprint-{N}-exit.md` using the template at
+`docs/process/sprint-plans/templates/sprint-exit-template.md`. The document must include:
 
 - [ ] All implementation groups merged; CI green on release branch
 - [ ] Business PO ACCEPT verdict filed for each user-facing deliverable (or EL exception on record)
 - [ ] Customer Agent Layer 3 assessment on record for Persona 2/3/5 deliverables
 - [ ] No open rejection artifacts
-- [ ] PI Agent sprint exit confirmation
+- [ ] PI Agent sprint exit confirmation (Section 5 of the exit template)
 
-The PI Agent reviews this checklist before confirming exit.
+The PI Agent reviews this document and records the confirmation in Section 5 before the sprint
+exit checklist issue closes. The milestone exit checklist issue comment on GitHub references
+the sprint exit document — it does not replace it.
+
+*Updated 2026-06-12 per Phase C: sprint exit is now a standalone filed document, not only an
+issue comment. Prior sprints that used issue comments as their sole exit record are
+grandfathered; Phase C applies to M13 and subsequent milestones.*
