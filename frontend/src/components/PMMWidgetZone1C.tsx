@@ -147,6 +147,14 @@ export function PMMWidgetZone1C({
         </span>
       </div>
 
+      {/* Scale reference — lower value = more constrained policy space (DEMO-059) */}
+      <div
+        data-testid="pmm-scale-note"
+        style={{ fontSize: 9, color: "#aaa", marginTop: 4, lineHeight: 1.3 }}
+      >
+        ↓ lower = more constrained
+      </div>
+
       {/* Contextual note when all thresholds are breached (pmm_value === null) */}
       {breachedNote && !isPending && (
         <div

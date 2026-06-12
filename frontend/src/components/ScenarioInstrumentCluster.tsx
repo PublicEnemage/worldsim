@@ -551,6 +551,54 @@ export function ScenarioInstrumentCluster({
         </div>
       )}
 
+      {/* Mode 3 comparison readout — shows labeled baseline vs. branch values (DEMO-064).
+          Visible when branch is applied and recompute has completed. */}
+      {mode === "MODE_3" && branchFromStep !== null && !isRecomputing && recomputeStatus !== "failed" && (() => {
+        const currentStepIdx = store.current_step;
+        const activeStep = store.trajectory?.steps.find(s => s.step_index === currentStepIdx);
+        const baseStep = store.baseline_trajectory?.steps.find(s => s.step_index === currentStepIdx);
+        const activeScore = activeStep?.frameworks["financial"]?.composite_score ?? null;
+        const baseScore = baseStep?.frameworks["financial"]?.composite_score ?? null;
+        if (activeScore === null && baseScore === null) return null;
+        const delta = activeScore !== null && baseScore !== null ? activeScore - baseScore : null;
+        return (
+          <div
+            data-testid="mode3-comparison-readout"
+            style={{
+              padding: "4px 10px",
+              background: "#f8f4ff",
+              borderBottom: "1px solid #e9d5ff",
+              display: "flex",
+              alignItems: "center",
+              gap: 16,
+              fontSize: 11,
+              color: "#444",
+            }}
+          >
+            <span style={{ fontWeight: 600, color: "#7c3aed", fontSize: 10, letterSpacing: 0.2 }}>
+              Financial (step {currentStepIdx})
+            </span>
+            <span>
+              Baseline:{" "}
+              <span data-testid="mode3-baseline-value" style={{ fontWeight: 700 }}>
+                {baseScore !== null ? baseScore.toFixed(2) : "—"}
+              </span>
+            </span>
+            <span>
+              Branch:{" "}
+              <span data-testid="mode3-branch-value" style={{ fontWeight: 700 }}>
+                {activeScore !== null ? activeScore.toFixed(2) : "—"}
+              </span>
+            </span>
+            {delta !== null && (
+              <span style={{ color: delta > 0 ? "#2271B3" : "#cc0000", fontWeight: 700 }}>
+                {delta > 0 ? "+" : ""}{delta.toFixed(2)}
+              </span>
+            )}
+          </div>
+        );
+      })()}
+
       <InstrumentCluster
         entityIds={entityIds}
         mdaPanel={
@@ -566,6 +614,7 @@ export function ScenarioInstrumentCluster({
             isLoading={trajectoryLoading}
             isError={trajectoryError}
             onSelectFrameworkAlert={setFocusedAlertMdaId}
+            entityIds={entityIds}
           />
         }
         cohortPanel={

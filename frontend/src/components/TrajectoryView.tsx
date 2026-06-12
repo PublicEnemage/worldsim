@@ -481,6 +481,48 @@ export function TrajectoryView({
         </ComposedChart>
       </ResponsiveContainer>
 
+      {/* Inline entity labels — at right edge of chart area (DEMO-063).
+          Lets audience identify entities without consulting the legend. */}
+      {entityIds && entityIds.length >= 2 && (
+        <div
+          data-testid="entity-labels-overlay"
+          style={{
+            position: "absolute",
+            top: 20,
+            right: 28,
+            display: "flex",
+            flexDirection: "column",
+            gap: 3,
+            pointerEvents: "none",
+          }}
+        >
+          <span
+            data-testid="entity-label-0"
+            style={{
+              fontSize: 9,
+              fontWeight: 700,
+              color: FRAMEWORK_COLORS.financial,
+              background: "rgba(255,255,255,0.85)",
+              padding: "1px 3px",
+            }}
+          >
+            {entityIds[0]}
+          </span>
+          <span
+            data-testid="entity-label-1"
+            style={{
+              fontSize: 9,
+              fontWeight: 700,
+              color: FRAMEWORK_COLORS.ecological,
+              background: "rgba(255,255,255,0.85)",
+              padding: "1px 3px",
+            }}
+          >
+            {entityIds[1]}
+          </span>
+        </div>
+      )}
+
       {/* Multi-entity composite note — shown when two entities present */}
       {!isSingleEntity && entityIds && entityIds.length === 2 && (
         <div
