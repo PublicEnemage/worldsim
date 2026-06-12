@@ -54,6 +54,39 @@ action before closing — not optional.
 | Architecture | Relevant ADR in `docs/adr/` |
 | Standards / Compliance | `docs/CODING_STANDARDS.md`, `docs/compliance/scan-registry.md` |
 
+### Entry and Exit Invariants
+
+*Authority: Phase D of the Process Redesign Sequence (2026-06-12).
+Changes to this section require PI Agent review and EL endorsement.*
+
+**Sprint entry invariant — implementation may not begin without a filed, EL-approved entry document.**
+
+The PM Agent may not authorize implementation to begin — and no implementing agent may open an implementation PR — without a sprint entry document filed and EL-approved. The document must satisfy all five entry conditions in `docs/process/sprint-planning-sop.md §Sprint Entry Gate`. If implementation begins without a complete entry document, the PI Agent files a near-miss in the same session — not after the sprint closes — regardless of whether implementation ultimately succeeds.
+
+This is a hard stop, not guidance. An implementation PR opened before the entry document is filed and EL-approved is a process deviation of the same severity as pushing code without running the pre-push lint gate.
+
+Template: `docs/process/sprint-plans/templates/sprint-entry-template.md`
+Reference: `docs/process/sprint-planning-sop.md §Sprint Entry Gate`
+
+**Sprint exit invariant — a sprint does not close when issues are closed and CI is green.**
+
+A sprint closes when:
+1. Business PO acceptance is recorded for every user-facing deliverable (ACCEPT verdict or EL exception on record)
+2. Customer Agent Layer 3 assessment is on record for any deliverable serving Personas 2, 3, or 5
+3. No open rejection artifacts remain unresolved
+4. PI Agent confirms all exit conditions are satisfied and records confirmation in the sprint exit document
+
+CI green and issue closure are necessary but not sufficient. The PI Agent blocks sprint exit confirmation until all conditions are met. A sprint that closes with outstanding rejections or missing Business PO verdicts has not exited — it has been abandoned without a record.
+
+Template: `docs/process/sprint-plans/templates/sprint-exit-template.md`
+Reference: `docs/process/sprint-planning-sop.md §Sprint Exit Gate`
+
+**"If it isn't written down, it doesn't exist."**
+
+An intent document that exists in session context but has not been filed at `docs/process/intents/` does not satisfy the entry gate. A Business PO verdict delivered verbally but not as a filed artifact does not satisfy the exit gate. A sprint entry document that exists as a draft but has not been committed and referenced in `SESSION_STATE.md` does not satisfy the entry gate.
+
+These gates are satisfied by artifacts in the repository — not by session memory, not by agent confidence that the conditions are met, and not by knowledge that the equivalent work was done informally. If the artifact does not exist in the repository, the condition is not satisfied.
+
 ---
 
 ## Guiding Principles
