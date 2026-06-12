@@ -5,9 +5,9 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-11 (Demo screen recording captured and uploaded to v0.12.1 release. demo.sh syntax fix (PR #890). M12 formally complete — exit checklist #263 is the only remaining gate. Board clear.)**
-**Current milestone:** M12 — Active Control and External Sector (GitHub Milestone 13)
-**Previous milestone:** M11.5 — Usability Validation and Experience Audit (formally closed 2026-06-04; Issue #720 closed; GitHub Milestone 14 closed)
+**Last updated: 2026-06-11 (M12 CLOSED. #263 closed; GitHub Milestone 13 closed. Six DEMO issues (#871–#876) deferred to M13. Board clear — M13 is the active milestone.)**
+**Current milestone:** M13 — Political Economy and Instrument Credibility (GitHub Milestone 9)
+**Previous milestone:** M12 — Active Control and External Sector (formally closed 2026-06-11; Issue #263 closed; GitHub Milestone 13 closed; tagged v0.12.1)
 
 ---
 
@@ -102,10 +102,11 @@ No open PRs — board clear as of 2026-06-11 (post PR #886 merge).
 
 ## Open Issues — M12 (Active Control and External Sector)
 
-**GitHub Milestone:** 13 | **Status: FULLY EVACUATED (2026-06-11)**
+**GitHub Milestone:** 13 | **Status: CLOSED (2026-06-11)**
 
-All M12 issues are either closed or migrated. GitHub Milestone 13 has 0 open issues.
-M12 is formally complete — exit checklist #263 (M12) is the only remaining closure gate.
+All M12 issues closed or migrated. GitHub Milestone 13 closed 2026-06-11.
+Exit checklist #263 closed 2026-06-11 — full sign-off comment on the issue.
+Six DEMO issues (#871–#876, DEMO-059–064) deferred to M13 with rationale (north star PASS; gaps documented in stakeholder review).
 #843 (live external demo) deferred to M14 (EL decision 2026-06-11); M12 simulated session stands as M12 demo evidence.
 **Demo screen recording uploaded to GitHub release v0.12.1** — https://github.com/PublicEnemage/worldsim/releases/tag/v0.12.1 (2026-06-11)
 
