@@ -83,6 +83,8 @@ interface FourFrameworkZone1DProps {
   isError?: boolean;
   /** Called when the user clicks "see alerts →" for a framework (#745). */
   onSelectFrameworkAlert?: (mdaId: string) => void;
+  /** Entity ISO codes — when two provided, shows entity context label (DEMO-062). */
+  entityIds?: string[];
 }
 
 const CONTAINER_STYLE: React.CSSProperties = {
@@ -99,6 +101,7 @@ export function FourFrameworkZone1D({
   isLoading = false,
   isError = false,
   onSelectFrameworkAlert,
+  entityIds,
 }: FourFrameworkZone1DProps) {
   const { trajectory, current_step, mda_alerts, mode } = useScenarioStepStore();
 
@@ -183,6 +186,15 @@ export function FourFrameworkZone1D({
           style={{ fontSize: 9, color: "#aaa", fontStyle: "italic", paddingBottom: 2 }}
         >
           Data unavailable
+        </span>
+      )}
+      {/* Entity context label (DEMO-062) — shows which entities' composite is displayed */}
+      {entityIds && entityIds.length >= 2 && (
+        <span
+          data-testid="zone-1d-primary-entity"
+          style={{ fontSize: 9, color: "#888", paddingBottom: 2 }}
+        >
+          {entityIds[0]} · {entityIds[1]}
         </span>
       )}
       {FRAMEWORK_ORDER.map((key) => {
