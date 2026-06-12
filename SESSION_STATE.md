@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-12 (M13 Wave 1 complete — G1–G5 all closed; ADR-013 accepted 2026-06-12; G6 (#392) unblocked)**
+**Last updated: 2026-06-12 (M13 Wave 2 complete — G6 (#392) political economy integration merged PR #919; G1–G6 all closed; G7 (#852) blocked on ADR)**
 **Current milestone:** M13 — Political Economy and Instrument Credibility (GitHub Milestone 9)
 **Previous milestone:** M12 — Active Control and External Sector (formally closed 2026-06-11; Issue #263 closed; GitHub Milestone 13 closed; tagged v0.12.1)
 
@@ -13,7 +13,7 @@
 
 ## Active Work Streams — M13
 
-**Kickoff complete 2026-06-12. EL approval recorded 2026-06-12 (PR #911).** Wave 1 implementation complete 2026-06-12.
+**Kickoff complete 2026-06-12. EL approval recorded 2026-06-12 (PR #911).** Wave 1 complete 2026-06-12. Wave 2 complete 2026-06-12.
 
 **M13 kickoff status:**
 1. ✅ PM Agent cuts `release/m13` from `main` — DONE 2026-06-12
@@ -32,9 +32,17 @@
 - ✅ G2 (#871, #873, #875, #876): DEMO trajectory/Mode 3 — merged (PR #914); 4 fixes: DEMO-059 PMM scale note, DEMO-062 Zone 1D entity label, DEMO-063 inline entity labels, DEMO-064 Mode 3 comparison readout
 - ✅ G5 (#792): ADR-013 — accepted 2026-06-12 (PR #916); EL acceptance recorded
 
+**Wave 2 completion status:**
+- ✅ G6 (#392): Political economy integration — merged 2026-06-12 (PR #919)
+  - Intent document: `docs/process/intents/ADR-013-2026-06-12-political-economy-integration.md`
+  - 26 tests AC-1–AC-6; 1334 unit tests passing
+  - Calibration basis political economy section complete (sensitivity 0.80→1.50 for AC-3)
+  - BPO Step 5 Validate: outstanding (next session action)
+
 **Next action:**
-- G6 (#392) political economy integration is now unblocked — Wave 2 may begin
-- Pre-G6 blocker (Chief Methodologist conditional): verify `docs/methodology/calibration-basis.md` covers political economy calibration basis before G6 implementation PR opens (file created in Wave 1 — verify political economy section is present)
+- G6 (#392) political economy integration — COMPLETE (PR #919, merged 2026-06-12)
+- Business PO Step 5 Validate required: confirm `political_economy` appears as top-level framework key in measurement output response for a seeded scenario; confirm `programme_survival_probability` visible in trajectory response when `legitimacy_index` seeded
+- G7 (#852) alert panel master-detail UX — blocked on ADR (#908 PENDING_NUMBER in backlog); next sprint blocker
 
 ### Sprint Group Status
 
@@ -45,10 +53,10 @@
 | G3 — Engine fix (reserves floor) | #799 | Wave 1 | None | ✅ MERGED 2026-06-12 (PR #912) |
 | G4 — Documentation | #27, #822, #847 | Wave 1 | None | ✅ MERGED 2026-06-12 (PR #915) |
 | G5 — ADR-013 authorship | #792 | Wave 1 | N/A | ✅ ACCEPTED 2026-06-12 (PR #916) |
-| G6 — Political economy integration | #392 | Wave 2 | ADR-013 ✅ | **UNBLOCKED** — verify calibration-basis.md political economy section before opening impl PR |
+| G6 — Political economy integration | #392 | Wave 2 | ADR-013 ✅ | ✅ MERGED 2026-06-12 (PR #919) — BPO Validate pending |
 | G7 — Alert panel master-detail | #852 | Blocked | BLOCKED_ADR — #908 ADR | BLOCKED |
 
-**Critical path:** G6 (political economy integration, #392) → M13 primary objective
+**Critical path:** G7 (alert panel UX, #852) — blocked on ADR #908; BPO G6 Validate outstanding
 
 ### Near-Term Backlog (M13 board, not in sprint waves)
 #22, #35, #45, #102, #271, #274, #393, #394, #823, #824, #837 — revisit at M13 midpoint HORIZON sweep.
@@ -67,6 +75,7 @@
 | #914 ✅ | feat(g2): DEMO trajectory and Mode 3 comparison display | release/m13 | Merged 2026-06-12 |
 | #915 ✅ | docs(g4): calibration basis, stakeholder walkthrough, data standards | release/m13 | Merged 2026-06-12 |
 | #916 ✅ | docs(adr): ADR-013 political economy module boundary (#792) | release/m13 | Merged 2026-06-12 |
+| #919 ✅ | feat(political-economy): G6 — ADR-013 political economy integration | release/m13 | Merged 2026-06-12 |
 
 ## M11 Work Streams — 2026-06-04 Sprint
 
