@@ -1910,6 +1910,42 @@ composite scores are exempt from the `is_single_entity` guard in
 `app/api/scenarios.py`. See `§is_single_entity guard interaction` in the
 ADR-005 M8 amendment for the full specification.
 
+### IA-1 Disclosure: Ecological Composite Denominator Change on Proximity Indicator Activation
+
+**Issue #822 — M13 G4 documentation requirement**
+
+When the proximity indicator for an ecological boundary first activates
+mid-scenario (i.e., a monitored ecological quantity crosses the measurement
+threshold for the first time during the scenario run), the ecological composite
+score's effective denominator changes. Before activation, the indicator is
+absent from the composite. After activation, it contributes to the
+boundary-normalized score.
+
+This is a **denominator change** in the composite calculation, not a data
+quality event. It has two observable effects:
+
+1. **Score discontinuity:** The ecological composite score may show a step-change
+   at the step of proximity indicator activation that reflects the new indicator
+   entering the composite, not an underlying environmental change of that magnitude.
+   Presenters should be prepared to explain this if an audience observes a sudden
+   change in the ecological score curve at an unexpected step.
+
+2. **Confidence tier impact:** The newly activated proximity indicator carries
+   its own confidence tier (based on data source and projection horizon). If
+   the proximity indicator's confidence tier is lower than the existing
+   ecological composite's tier, the composite's effective tier degrades at the
+   step of activation. This degradation is consistent with IA-1 (Projection
+   Horizon Confidence) but can appear as an unexplained tier change if not
+   disclosed.
+
+**Disclosure requirement:** Any analytical output that reports an ecological
+composite score trajectory spanning a proximity indicator activation step must
+include a notation that the score denominator changed at that step. This is an
+IA-1 disclosure obligation. In demo narration, the presenter should note:
+"The ecological score denominator changed at step N when the [indicator name]
+first entered the measurable range — the step-change reflects the composite
+updating its indicator set, not an abrupt environmental shift."
+
 ### Update Governance
 
 When scientific consensus is revised (new Steffen et al. revision, new
