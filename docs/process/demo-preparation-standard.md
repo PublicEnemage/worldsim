@@ -138,6 +138,13 @@ are live, which are null, what the honest disclosures are, what the roadmap sect
 Do NOT update the North Star closing. It does not change.
 Do NOT update the backtesting credibility section unless new cases were added.
 
+**Syntax validation gate (mandatory — NM-041):**
+After any edit to `scripts/demo.sh`, run:
+```bash
+bash -n scripts/demo.sh
+```
+The command must exit 0 before the file is committed. A syntax error in `demo.sh` makes the entire stack startup sequence inaccessible — the presenter guide, all timed narration cues, and the stack-ready confirmation all live inside this script. Root cause: M12 — a missing `)` closing a `$(bold ...)` command substitution on line 208 was undetected throughout M12 development and only surfaced when attempting to record the post-closure screen recording (PR #890, NM-041).
+
 **ExternalSector + Mode 3 reserve invariant — mandatory disclosure (M12 forward):**
 If the demo scenario uses `ExternalSectorModule` (ADR-012) and Mode 3 Active Control
 simultaneously, the honest disclosures section of `demo.sh` MUST include the following caveat:
@@ -552,6 +559,17 @@ Create the stakeholder-review placeholder if it does not already exist:
 `docs/demo/m{N}/reviews/PENDING-v{version}-stakeholder-review.md`
 (Use the template in `docs/templates/` or follow the structure of the M12 instance.)
 
+**GitHub release page completeness check (mandatory — demo-cycle milestones):**
+Verify the GitHub release page for the current version tag is self-contained. If the current tag is a patch release (`v{N}.{N}.1`) that supersedes an earlier tag (`v{N}.{N}.0`) without a public release page, the patch page must cover the full milestone arc — not just the delta since the prior tag.
+
+Checklist:
+- [ ] Release title includes the milestone name and demo theme
+- [ ] Body documents all major deliverables (not only since last tag)
+- [ ] Demo recording URL is present (add once Step 9b is complete)
+- [ ] Verify with: `gh release view v{N}.{N}.{P}`
+
+If the page is incomplete, use `gh release edit v{N}.{N}.{P} --notes "..."` to rewrite it before Step 9. Reference: v0.12.1 release page was rewritten at M12 exit after it was found to describe only the patch delta; no v0.12.0 release page existed (PR #896 context, M12 exit ceremony gap).
+
 ### Step 9 — Live stakeholder session
 
 Use `docs/demo/m{N}/stakeholder-walkthrough.md` as the presenter script.
@@ -570,6 +588,28 @@ Fill in: date, attendees, questions raised, most compelling moment, most questio
 north star test answer (specific — not aspirational), and follow-up actions. File GitHub
 issues for any new capability gaps named by real stakeholders. Update SESSION_STATE.md to
 record the demo as complete and cite the stakeholder-review artifact path.
+
+### Step 9b — Screen recording and release upload (demo-cycle milestones)
+
+A screen recording of the demo walkthrough is a required artifact for every even-numbered milestone demo cycle. It is the permanent visual record of what the tool could do at that milestone — future sessions, external reviewers, and potential institutional users cannot reconstruct the live application state from screenshots alone.
+
+**When to record:** After all post-Step-9 UI fixes are merged and main is current. The recording reflects the final shipped state, not a rehearsal.
+
+**What to record:** Use `scripts/demo.sh` to start the stack (the presenter guide printout should be visible in the terminal), then `scripts/demo.sh --run` for the Playwright walkthrough. Screen-record from launch through the final Zone 1D composite frame. Audio narration is optional but the terminal presenter guide must be visible during the startup phase so the recording is self-explanatory without live narration.
+
+**Upload and link:**
+```bash
+gh release upload v{N}.{N}.{P} /path/to/recording.mp4
+```
+Then edit the release body to include a direct link:
+```bash
+gh release edit v{N}.{N}.{P} --notes-file /path/to/updated-notes.md
+```
+
+**Record in SESSION_STATE:** Add to the SESSION_STATE M{N} block:
+`**Demo screen recording uploaded to GitHub release v{N}.{N}.{P}** — [URL]`
+
+Reference: M12 screen recording uploaded to `github.com/PublicEnemage/worldsim/releases/tag/v0.12.1` (2026-06-11). Recording was only possible after fixing the demo.sh syntax error (PR #890, NM-041) — the bash -n gate in Step 3 closes this gap for future milestones.
 
 ---
 
