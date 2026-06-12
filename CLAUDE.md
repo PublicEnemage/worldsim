@@ -1,8 +1,8 @@
 # CLAUDE.md — WorldSim Project Context
 
-> Last significant revision: 2026-06-05
-> Updated against: M12 active — M11 closed (v0.11.0); release branch workflow added; PM Agent SPRINT mode added; sprint planning SOP codified (docs/process/sprint-planning-sop.md); .claude/settings.json pre-approved tool patterns added
-> Previous version context: 2026-05-30 — M11 active; matrix engine investigation primary M11 objective; political economy module M11 stretch goal (EL decision 2026-06-03)
+> Last significant revision: 2026-06-12
+> Updated against: M13 active — M12 closed (v0.12.1); matrix engine in production (ADR-009/012); ExternalSectorModule; Mode 3 Active Control; Demo 4 complete; Process Redesign Phase 0 endorsed; Phase A open
+> Previous version context: 2026-06-05 — M12 active; release branch workflow added; PM Agent SPRINT mode added; sprint planning SOP codified; north star test as formal process gate (FD-1 closed)
 
 > **Reader Orientation:** This is the permanent project constitution — read it in full before beginning any session. It contains the mission, architectural commitments, and process rules that govern all work in this repository. Anyone making a change in this codebase, human or agent, must have read this document first. Key must-read sections if time is short: Session Continuity (what to read and in what order), Guiding Principles (the values behind every technical decision), and §Architectural Principles for Claude Code Sessions (process gates including pre-push lint, PR merge gate, and file authority rules that will cause compliance violations if not followed).
 
@@ -272,22 +272,19 @@ Detailed domain profiles: `docs/agents/domain-intelligence-council.md`
 
 ## What We Are Building First
 
-M0–M10 complete (v0.1.0–v0.10.0). ADRs 001–007 current.
+M0–M12 complete (v0.1.0–v0.12.1). ADRs 001–012 current.
 See GitHub Releases for full delivery history.
 
-**Milestone 11 — Engine Investigation and Political Economy (Current)**
+**Milestone 13 — Political Economy and Instrument Credibility (Current)**
 
-*Primary objective (M11 exit gate):*
-- ADR-009 authored and accepted — simulation engine computation model
-- Sparse matrix proof-of-concept — matrix engine running alongside iterative engine
-- Phase 2 A/B validation — output equivalence, performance comparison, full backtesting suite
-- Matrix interpretability tooling — contribution tracing, transformation visualization
+*Primary objective (M13 exit gate):*
+- ADR-013 authored and accepted — political economy module boundary
+- Political economy module — conditionality modelling, elite capture dynamics, political feasibility constraints
+- Alert panel UX (Zone 1B) — master-detail layout; ADR and frontend architecture review required before implementation (#852)
+- Instrument legibility improvements — Demo findings DEMO-059–064 resolved
+- Process Redesign Phase A deliverables
 
-*Stretch goal (ships if primary is complete with capacity remaining):*
-- Political economy module — political feasibility constraints, conditionality modelling, elite capture dynamics
-- Carries to M12 if not started in M11
-
-M11 closes when the matrix engine investigation track is complete. The political economy module does not block M11 closure. EL decision 2026-06-03.
+M13 closes when the political economy module is production-ready and instrument credibility meets first-class UX standards for negotiation-room use. Demo 5 is planned for M14.
 
 Each milestone is a vertical slice — working software at every stage,
 not infrastructure waiting for features.
@@ -296,16 +293,15 @@ not infrastructure waiting for features.
 
 ## Milestone Roadmap
 
-M0–M10 complete (v0.1.0–v0.10.0). M11 current. See GitHub Releases for full delivery history.
+M0–M12 complete (v0.1.0–v0.12.1). M13 current. See GitHub Releases for full delivery history.
 
-The full roadmap covering M11 through M13 — milestone deliverables, demo anchors, canonical users served, and the long-term resolution spectrum direction — is maintained at `docs/roadmap/worldsim-roadmap.md`. That document is the canonical reference. The summary below reflects current and next milestone only.
+The full roadmap covering M13 through M14 — milestone deliverables, demo anchors, canonical users served, and the long-term resolution spectrum direction — is maintained at `docs/roadmap/worldsim-roadmap.md`. That document is the canonical reference. The summary below reflects current and next milestone only.
 
-**Milestone 11 — Engine Investigation and Political Economy (Current)**
-Primary objective: ADR-009 (simulation engine computation model), sparse matrix proof-of-concept, Phase 2 A/B validation, matrix interpretability tooling. No demo. M11 closes when the matrix engine investigation track is complete.
-Stretch goal: Political economy module (conditionality, political feasibility, elite capture) — ships if primary objective is complete with capacity remaining; otherwise carries to M12. EL decision 2026-06-03.
+**Milestone 13 — Political Economy and Instrument Credibility (Current)**
+Primary objective: ADR-013 (political economy module boundary), political economy module (conditionality, elite capture, political feasibility), alert panel UX (ADR required), instrument legibility improvements. No demo — Demo 5 at M14.
 
-**Milestone 12 — Active Control and External Sector (Next)**
-Core deliverable: Matrix computation engine in production, external sector module, Mode 3 (Active Control). Demo 4.
+**Milestone 14 — Methodology Publication and External Validation (Next)**
+Core deliverable: Methodology publication, external validation by domain experts, live stakeholder demo with real external participants (#843), Technical Steering Committee formation. Public launch infrastructure.
 
 Full roadmap: `docs/roadmap/worldsim-roadmap.md`
 
