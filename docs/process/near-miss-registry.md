@@ -2085,6 +2085,46 @@ Pre-demo rehearsal 2026-06-11. The failure was immediately recognizable (four na
 
 ---
 
+## NM-041 — demo.sh Syntax Error Undetected Through Full Milestone Lifecycle; Blocked Post-Closure Screen Recording (Reactive)
+
+**Date:** 2026-06-11 (detected) / 2026-06-12 (NM filed)
+**Milestone:** M12 — Active Control and External Sector
+**Detected by:** EL attempting to record a screen capture of the demo after M12 formally closed; terminal printed `unexpected EOF while looking for matching '\''` at line 300 — the script had been running in a malformed quoted context since line 208
+**Severity:** High
+
+### What happened
+
+`scripts/demo.sh` contained a missing `)` closing a `$(bold '...')` command substitution on line 208. The broken line:
+
+```bash
+echo "          '$(bold 'The reserve crisis is survived under better conditions, not avoided.'"
+```
+
+Bash entered a single-quoted context inside the unclosed `$(` and read through to EOF (line 300), producing `unexpected EOF while looking for matching '\''`. The script cannot be executed in this state — `set -euo pipefail` exits immediately on the syntax error, making the presenter guide, stack startup, and all timed narration cues inaccessible.
+
+The syntax error was introduced during M12 development (PR #838, 2026-06-10 — demo prep Step 3). It passed code review, CI, and all M12 exit ceremony steps. It was only caught on 2026-06-11 when the EL attempted to record the demo after the milestone formally closed.
+
+### What was at risk
+
+1. **The screen recording** — the primary immediate consequence. The post-closure recording was only possible after PR #890 (fix) was merged, adding a delay and an extra PR to the exit ceremony.
+
+2. **A live stakeholder session** — if the M12 simulated session had run against the live stack (it ran via the Python demo script `demo_hormuz_jordan.py`, not `demo.sh`), the syntax error would have been invisible until a presenter ran `./scripts/demo.sh` immediately before or during the live demo. Recovery time at that moment: unknown.
+
+3. **Future milestone demos** — `scripts/demo.sh` is updated in-place each milestone. Without a syntax check gate, the same failure class can recur at any demo cycle.
+
+### What caught it
+
+The Engineering Lead — not the process. The M12 demo preparation standard (Step 3, Step 6) instructed the agent to update and run `demo.sh` but contained no syntax validation gate. The internal review, IR Agent, and audience simulation all ran against screenshots — none of them ran `demo.sh` directly. CI does not run `demo.sh`. The syntax error was invisible to every automated and agent-based gate.
+
+### Process improvement
+
+1. **Immediate fix:** PR #890 — missing `)` added on line 208. `bash -n scripts/demo.sh` verified clean.
+
+2. **Structural fix:** `bash -n scripts/demo.sh` added as a mandatory named gate at Step 3 of the Demo Preparation Standard (`docs/process/demo-preparation-standard.md §Step 3 — Syntax validation gate`). The gate runs after any edit to `demo.sh` and must exit 0 before the file is committed. This converts a person-caught gap to a process-caught gate.
+
+3. **Exit ceremony fix:** The milestone exit ceremony (CLAUDE.md §Milestone Exit Ceremony) codified as a named SOP for the first time, closing the broader gap that no formal exit ceremony checklist existed beyond the retrospective. The four exit ceremony steps (open issue audit, milestone reference audit, SESSION_STATE consistency check, fresh session continuity test) ensure the next milestone's session does not inherit stale state.
+
+---
 
 ## Registry Maintenance
 
