@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-11 (Phase 0 EL endorsement recorded; Phase A open. #843 deferred to M14 (live external demo, repurposed as M14 closure gate). M12 formally complete — exit checklist #263 is the only remaining gate. Board clear.)**
+**Last updated: 2026-06-11 (Demo screen recording captured and uploaded to v0.12.1 release. demo.sh syntax fix (PR #890). M12 formally complete — exit checklist #263 is the only remaining gate. Board clear.)**
 **Current milestone:** M12 — Active Control and External Sector (GitHub Milestone 13)
 **Previous milestone:** M11.5 — Usability Validation and Experience Audit (formally closed 2026-06-04; Issue #720 closed; GitHub Milestone 14 closed)
 
@@ -107,6 +107,7 @@ No open PRs — board clear as of 2026-06-11 (post PR #886 merge).
 All M12 issues are either closed or migrated. GitHub Milestone 13 has 0 open issues.
 M12 is formally complete — exit checklist #263 (M12) is the only remaining closure gate.
 #843 (live external demo) deferred to M14 (EL decision 2026-06-11); M12 simulated session stands as M12 demo evidence.
+**Demo screen recording uploaded to GitHub release v0.12.1** — https://github.com/PublicEnemage/worldsim/releases/tag/v0.12.1 (2026-06-11)
 
 **Issue disposition summary:**
 - All immediate-horizon M12 deliverables shipped (G1–G8, Wave 1 complete)
@@ -375,6 +376,10 @@ CI hotfix: NM-035 filed; `ci.yml` PR trigger updated to include `release/m*` (PR
 
 | PR | Title | Date |
 |---|---|---|
+| #890 | fix(demo): close missing ) in bold() call on Step 5 presenter line | 2026-06-11 |
+| #889 | chore(state): fix #263 milestone label — M12 not M14 | 2026-06-11 |
+| #888 | docs(process): Phase 0 EL endorsement recorded 2026-06-11 | 2026-06-11 |
+| #887 | docs(process): demo-preparation-standard M12 reference table — v0.12.1 IR + audience simulation + stakeholder review | 2026-06-11 |
 | #886 | docs(demo): M12 Step 9 stakeholder review — simulated session, north star PASS | 2026-06-11 |
 | #883 | chore(demo): recapture M12 screenshots with PR #880 UI changes | 2026-06-11 |
 | #880 | fix(demo): Step 6c gate — four annotation fixes to unblock Step 9 (closes #879) | 2026-06-11 |
