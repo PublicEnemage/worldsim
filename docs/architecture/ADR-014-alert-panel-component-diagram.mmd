@@ -1,0 +1,43 @@
+---
+title: ADR-014 — Zone 1B Alert Panel Master-Detail Layout
+---
+graph TB
+    subgraph IC["InstrumentCluster (Zone 1B allocation — fixed height)"]
+        direction TB
+
+        subgraph Master["zone-1b-master  [flex: 0 0 auto, ~60% of Zone 1B, overflow-y: auto]"]
+            R1["AlertRow — TERMINAL (severity badge + entity + indicator + step)"]
+            R2["AlertRow — CRITICAL (severity badge + entity + indicator + step)"]
+            R3["AlertRow — WARNING (severity badge + entity + indicator + step)"]
+            More["+N more (scrollable, below visible area)"]
+            R1 --> R2 --> R3 --> More
+        end
+
+        Divider["border-top: 1px solid #eee"]
+
+        subgraph Detail["zone-1b-detail  [flex: 1, always rendered, overflow-y: auto]"]
+            direction TB
+            Cond{focusedAlertMdaId non-null?}
+            Placeholder["Placeholder: 'Select an alert to view details.'"]
+            ADP["AlertDetailPanel\n─────────────────────\n• Indicator display name + severity badge\n• Framework composite score sparkline\n• Current value vs. floor value\n• Approach pct remaining / BREACHED\n• Consecutive breach steps\n• Caused by: [causal_attribution] (Mode 3 only)\n• Negotiation-defensibility label (Mode 2 + 3)\n• Close (×) button"]
+            Cond -- "no" --> Placeholder
+            Cond -- "yes (alert found in store)" --> ADP
+        end
+
+        Master --> Divider --> Detail
+    end
+
+    Store["useScenarioStepStore\n─────────────────────\n• mda_alerts: Zone1BAlert[]\n• mode: MODE_1 | MODE_2 | MODE_3\n• current_step: number\n• trajectory: TrajectoryResponse"]
+
+    Parent["Parent (InstrumentCluster)\n─────────────────────\n• focusedAlertMdaId: string | null\n• onSelectAlert(mdaId): void"]
+
+    Store -->|"mda_alerts, mode, trajectory"| IC
+    Parent -->|"focusedAlertMdaId"| IC
+    IC -->|"onSelectAlert(mdaId | null)"| Parent
+
+    style Master fill:#fff5f5,stroke:#cc0000,stroke-width:1px
+    style Detail fill:#f5f5ff,stroke:#3333cc,stroke-width:1px
+    style ADP fill:#ffffff,stroke:#888888
+    style Placeholder fill:#f9f9f9,stroke:#cccccc,stroke-dasharray:4
+    style Store fill:#f0fff0,stroke:#006600
+    style Parent fill:#fffff0,stroke:#666600
