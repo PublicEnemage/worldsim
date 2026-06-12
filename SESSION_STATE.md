@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-12 (Milestone reference audit: README.md/CLAUDE.md/roadmap.md updated from M8–M11 era to M13 active (PR #896). All three files now correctly reflect M13 as current, M12 as closed (v0.12.1), and M14 as planned. roadmap.md M13 title corrected to "Political Economy and Instrument Credibility"; M14 section added.)**
+**Last updated: 2026-06-12 (SOP improvements from M12 exit session (PR #898): CLAUDE.md §Milestone Exit Ceremony added (4 mandatory steps: open issue audit, milestone reference audit, SESSION_STATE consistency check, fresh session continuity test); demo-preparation-standard.md — bash -n syntax gate (Step 3), release page completeness check (Step 8), screen recording as named deliverable (Step 9b); NM-041 filed (demo.sh syntax error undetected through full M12 lifecycle).)**
 **Current milestone:** M13 — Political Economy and Instrument Credibility (GitHub Milestone 9)
 **Previous milestone:** M12 — Active Control and External Sector (formally closed 2026-06-11; Issue #263 closed; GitHub Milestone 13 closed; tagged v0.12.1)
 
@@ -340,6 +340,8 @@ CI hotfix: NM-035 filed; `ci.yml` PR trigger updated to include `release/m*` (PR
 
 | PR | Title | Date |
 |---|---|---|
+| #898 | docs(process): milestone exit ceremony SOP + demo prep gaps (NM-041) | 2026-06-12 |
+| #897 | chore(state): SESSION_STATE.md — milestone reference audit complete (PR #896) | 2026-06-12 |
 | #896 | docs(roadmap): update milestone references from M8/M11 era to M13 active — README, CLAUDE.md, roadmap.md | 2026-06-12 |
 | #895 | chore(state): SESSION_STATE.md — fresh session audit pass 2 (four gaps fixed) | 2026-06-12 |
 | #894 | chore(state): SESSION_STATE.md — issue triage: #865/#844 closed; 9 unmilestoned issues assigned to M13/M14 | 2026-06-12 |
