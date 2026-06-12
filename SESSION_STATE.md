@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-12 (SESSION_STATE audit fixes: stale M8/M9 sections archived, M13 issue table corrected, kickoff prerequisites block added, #843 dual-listing resolved. EL Socratic TEST recorded on #263.)**
+**Last updated: 2026-06-12 (Issue triage: #865 closed (Step 6c delivered), #844 closed (superseded by #874). 9 unmilestoned issues assigned: #792/#799/#822/#823/#824/#837/#847 → M13; #884/#885 → M14. 46 open issues, 25 M13, 16 M14, 5 parking-lot/no-milestone.)**
 **Current milestone:** M13 — Political Economy and Instrument Credibility (GitHub Milestone 9)
 **Previous milestone:** M12 — Active Control and External Sector (formally closed 2026-06-11; Issue #263 closed; GitHub Milestone 13 closed; tagged v0.12.1)
 
@@ -174,6 +174,8 @@ CI hotfix: NM-035 filed; `ci.yml` PR trigger updated to include `release/m*` (PR
 
 | Issue | Title | Horizon | Notes |
 |---|---|---|---|
+| #792 | docs(adr): ADR-013 — political economy module boundary (G9) | immediate | **M13 prerequisite** — must be ACCEPTED before any G9 implementation begins; check ADR backlog for panel composition |
+| #799 | engine: reserves can go negative — no non-negativity floor on stock attributes | near-term | Bug observed in Demo 4 (JOR step 7: −0.04 months); no milestone/labels assigned until 2026-06-12 triage |
 | #852 | ux: alert panel (Zone 1B) needs master-detail layout | near-term | **ADR required first** — EL decision 2026-06-11: Frontend arch review + ADR + UX Designer + Design Thinking agent before implementation |
 | #871 | fix(demo): DEMO-059 — PMM displays 1.00 → at step 5, contradicts narration | near-term | Deferred from M12 2026-06-11 |
 | #872 | fix(demo): DEMO-060 — CRITICAL FIN alert clipped below panel boundary in Frame E | near-term | Deferred from M12 2026-06-11 |
@@ -181,6 +183,11 @@ CI hotfix: NM-035 filed; `ci.yml` PR trigger updated to include `release/m*` (PR
 | #874 | fix(demo): DEMO-061 — instrument cluster and alert panel unreadable at presentation scale | near-term | Deferred from M12 2026-06-11 |
 | #875 | fix(demo): DEMO-063 — no inline entity labels on trajectory curves | near-term | Deferred from M12 2026-06-11 |
 | #876 | fix(demo): DEMO-064 — Mode 3 branch produces no quantitative comparison output | near-term | Deferred from M12 2026-06-11 |
+| #822 | docs(methodology): ecological composite denominator-change disclosure | near-term | |
+| #823 | arch(methodology): ecological composite dynamic denominator violates time-series | near-term | |
+| #824 | fix(engine): MENA arid-economy elasticity calibration for land_use_pressure | near-term | |
+| #837 | feat(demo): configuration-driven demo scripts | near-term | |
+| #847 | ux: DEMO-046 — Human Development 'Irreversible' label uncontextualized in narration | near-term | |
 | #392 | arch(m11): political economy constraint modeling | near-term | |
 | #393 | ux(mode-transition): Mode 1→2 transition must preserve step position | near-term | |
 | #394 | platform: multi-scenario comparison (>2 scenarios) | near-term | |
