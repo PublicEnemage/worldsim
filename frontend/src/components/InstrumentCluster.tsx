@@ -74,7 +74,7 @@ export function InstrumentCluster({
       {/* Zone 1A — Trajectory View + Human Cost Ledger strip (Issue #747) */}
       <div
         data-testid="zone-1a-trajectory-container"
-        style={{ gridColumn: 1, gridRow: 1, minWidth: layout.trajectory, display: "flex", flexDirection: "column" }}
+        style={{ gridColumn: 1, gridRow: 1, minWidth: layout.trajectory, minHeight: chartHeight, display: "flex", flexDirection: "column" }}
       >
         <TrajectoryView
           width={layout.trajectory}
