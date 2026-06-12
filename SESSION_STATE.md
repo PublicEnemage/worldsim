@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-12 (Process Redesign Phase C complete — EL endorsed PR #904; sprint entry/exit templates, Sprint Entry Gate in SOP, PM Agent + PI Agent sprint boundary obligations active. Phase D now open.)**
+**Last updated: 2026-06-12 (Process Redesign sequence complete — Phase D endorsed PR #906; CLAUDE.md §Entry and Exit Invariants committed; sprint boundary discipline now constitutional. All Phases 0–D closed.)**
 **Current milestone:** M13 — Political Economy and Instrument Credibility (GitHub Milestone 9)
 **Previous milestone:** M12 — Active Control and External Sector (formally closed 2026-06-11; Issue #263 closed; GitHub Milestone 13 closed; tagged v0.12.1)
 
@@ -21,7 +21,7 @@ No active work streams yet. M13 sprint planning has not begun.
 3. ADR-013 status confirmed — deferred from M12 (EL decision 2026-06-07); check ADR backlog for assigned number and panel composition before drafting
 4. EL decision required on #852 sequencing — EL decision 2026-06-11: Frontend architecture review + ADR + UX Designer + Design Thinking agent input required before implementation; do not treat as a direct implementation task
 5. Note: **#264** (M13 Exit Checklist) is the M13 gate issue — it gates formal M13 closure; PM Agent must populate its checklist at sprint start
-6. Note: **Process Redesign Phase A** runs in parallel with M13 implementation — it is NOT a blocking prerequisite; coordinate Phase A alongside sprint planning (entry: `docs/process/sprint-plans/process-redesign-phaseA-sprint-entry.md`)
+6. Note: **Process Redesign Sequence (Phases 0–D) is complete** — all four mechanisms (execution lifecycle, acceptance protocol, sprint cadence, session boundary discipline) are operational and encoded in CLAUDE.md. No further redesign phases.
 
 ---
 
@@ -120,9 +120,9 @@ CI hotfix: NM-035 filed; `ci.yml` PR trigger updated to include `release/m*` (PR
 
 **Phase B complete:** `docs/process/sprint-plans/process-redesign-phaseB-exit.md` — **EL endorsed 2026-06-12 (PR #902). Phase C COMPLETE.**
 
-**Phase C complete:** `docs/process/sprint-plans/process-redesign-phaseC-exit.md` — **EL endorsed 2026-06-12 (PR #904). Phase D NOW OPEN.**
+**Phase C complete:** `docs/process/sprint-plans/process-redesign-phaseC-exit.md` — **EL endorsed 2026-06-12 (PR #904). Phase D COMPLETE.**
 
-**Phase D sprint entry filed:** `docs/process/sprint-plans/process-redesign-phaseD-sprint-entry.md` — **Phase D is open.**
+**Phase D complete:** `docs/process/sprint-plans/process-redesign-phaseD-exit.md` — **EL endorsed 2026-06-12 (PR #906). Process Redesign Sequence (Phases 0–D) CLOSED.**
 
 **Gaps closed by Phase A:**
 
@@ -156,7 +156,7 @@ CI hotfix: NM-035 filed; `ci.yml` PR trigger updated to include `release/m*` (PR
 ## Process Redesign Sprint — Phase C Status
 
 **Phase C: Sprint Cadence Formalization**
-**Status:** COMPLETE — EL endorsement recorded 2026-06-12 (PR #904). Phase D OPEN.
+**Status:** COMPLETE — EL endorsement recorded 2026-06-12 (PR #904). Phase D COMPLETE.
 
 | Step | Agent | Output | PR | Status |
 |---|---|---|---|---|
@@ -173,6 +173,42 @@ CI hotfix: NM-035 filed; `ci.yml` PR trigger updated to include `release/m*` (PR
 - **`docs/process/agents.md` PM Agent amendment** — `§Sprint Boundary Obligations`: sprint entry/exit obligations; EL-approved definition; infrastructure sprint declaration scope
 - **`docs/process/agents.md` PI Agent amendment** — `§Sprint Boundary Enforcement`: unconditional near-miss obligation when sprint opens without entry doc; exit gate confirmation role; what PI Agent does and does not do
 - **`docs/process/sprint-planning-sop.md` amendment** — `§Sprint Entry Gate`: five entry conditions mirroring exit gate; who confirms; infrastructure exception; entry artifact reference; §Sprint Exit Artifact updated to reference filed document over issue comment
+
+---
+
+## Process Redesign Sprint — Phase D Status
+
+**Phase D: Session Boundary Discipline**
+**Status:** COMPLETE — EL endorsement recorded 2026-06-12 (PR #906). Process Redesign Sequence (Phases 0–D) CLOSED.
+
+| Step | Agent | Output | PR | Status |
+|---|---|---|---|---|
+| 1 — CLAUDE.md §Session Continuity amendment — §Entry and Exit Invariants | PI Agent | `CLAUDE.md §Session Continuity — §Entry and Exit Invariants` | #906 | ✅ Merged 2026-06-12 |
+| 2 — PM Agent enforceability review | PM Agent | `docs/process/sprint-plans/process-redesign-phaseD-exit.md §Part III` | #906 | ✅ Merged 2026-06-12 |
+| 3 — Phase D exit artifact | PM Agent | `docs/process/sprint-plans/process-redesign-phaseD-exit.md` | #906 | ✅ Merged 2026-06-12 |
+| 4 — EL endorsement | EL | `docs/process/sprint-plans/process-redesign-phaseD-exit.md §Part VIII` | #906 | ✅ Endorsed 2026-06-12 |
+
+**What Phase D produced:**
+- **`CLAUDE.md §Session Continuity — §Entry and Exit Invariants`** — sprint entry hard stop (PM Agent may not authorize implementation without filed, EL-approved entry document); sprint exit hard stop (CI green + issue closure not sufficient; four named conditions required); "if it isn't written down, it doesn't exist" principle
+- **`docs/process/sprint-plans/process-redesign-phaseD-exit.md`** — Phase D exit artifact with PM Agent enforceability review (Part III); PM Agent verdict: language creates genuine obligations; single-principal circularity is real but bounded (not a drafting gap); sequence closure summary (Part VII)
+
+**Gaps closed by Phase D:**
+
+| Gap | Closed by | Location |
+|---|---|---|
+| CLAUDE.md constitutional gap — sprint entry/exit gates not in primary session reading | §Entry and Exit Invariants in §Session Continuity | `CLAUDE.md §Session Continuity` |
+| Agent session start had no sprint boundary obligation visible | Constitutional hard stop visible at every session start | `CLAUDE.md §Session Continuity — §Entry and Exit Invariants` |
+| "If it isn't written down" had no operational form | Artifact-as-proof principle: session memory ≠ gate satisfaction | `CLAUDE.md §Session Continuity — §Entry and Exit Invariants` |
+
+**Process Redesign Sequence — all four mechanisms operational:**
+
+| Phase | Mechanism | Primary output | Status |
+|---|---|---|---|
+| Phase 0 | UX/persona → ADR traceability | ADR template; persona trace; north star process gate | ✅ Complete |
+| Phase A | Agent execution lifecycle | Five-step lifecycle; rejection artifact spec; Layer 3 gate; Kryptonite constraint | ✅ Complete |
+| Phase B | Business PO acceptance protocol | `acceptance-protocol.md`; ACCEPT mode in agents.md; Sprint Exit Gate in SOP | ✅ Complete |
+| Phase C | Sprint cadence formalization | Sprint entry/exit templates; PM + PI role amendments; Sprint Entry Gate in SOP | ✅ Complete |
+| Phase D | Session boundary discipline | CLAUDE.md §Entry and Exit Invariants | ✅ Complete |
 
 ---
 
@@ -219,6 +255,8 @@ CI hotfix: NM-035 filed; `ci.yml` PR trigger updated to include `release/m*` (PR
 - ~~Phase 0 EL endorsement~~ — **RECORDED 2026-06-11** (`docs/process/sprint-plans/process-redesign-phase0-exit.md §Part VI`). XD-1, XD-2, FD-1 closed.
 - ~~Phase A EL endorsement~~ — **RECORDED 2026-06-12** (PR #900; `docs/process/sprint-plans/process-redesign-phaseA-exit.md §Part VII`). Execution lifecycle gap, FD-2, FD-3 closed. **Phase B outputs filed.** Entry: `docs/process/sprint-plans/process-redesign-phaseB-sprint-entry.md`.
 - ~~Phase B EL endorsement~~ — **RECORDED 2026-06-12** (PR #902; `docs/process/sprint-plans/process-redesign-phaseB-exit.md §Part VII`). Acceptance protocol, ACCEPT mode in agents.md, Sprint Exit Gate in SOP active. **Phase C is now open.** Entry: `docs/process/sprint-plans/process-redesign-phaseC-sprint-entry.md`.
+- ~~Phase C EL endorsement~~ — **RECORDED 2026-06-12** (PR #904; `docs/process/sprint-plans/process-redesign-phaseC-exit.md §Part VII`). Sprint entry/exit templates, Sprint Entry Gate in SOP, PM Agent + PI Agent sprint boundary obligations active. **Phase D complete.**
+- ~~Phase D EL endorsement~~ — **RECORDED 2026-06-12** (PR #906; `docs/process/sprint-plans/process-redesign-phaseD-exit.md §Part VIII`). CLAUDE.md §Entry and Exit Invariants committed. **Process Redesign Sequence (Phases 0–D) CLOSED.**
 - ~~Step 6c gate~~ — **PASS (2026-06-11)**: PR #880 resolved DEMO-070/071/081/090; DEMO-080 accepted as-is by EL (tablet scale, out of scope for 1440×900 live demo). Audience simulation review updated. Step 9 unblocked.
 - ~~Step 9 simulated session~~ — **COMPLETE (2026-06-11)**. North star verdict: PASS. Aicha: "The conditionality dispute is about who absorbs the employment cost — the reserve crisis happens either way. That argument is now quantified." Artifact: `docs/demo/m12/reviews/2026-06-11-v0.12.1-stakeholder-review.md` (PR #886). Screenshots recaptured with PR #880 UI changes (PR #883). Two new M13 issues: #884 (reserve value not on screen), #885 (Exploratory tier on baseline vs. projection). Per-entity curves (#845) confirmed as primary unresolved UX gap.
 - ~~#843 M12 live external demo~~ — **DEFERRED TO M14** (EL decision 2026-06-11). Issue repurposed as M14 closure gate: live stakeholder demo with real external participants, timed to coincide with methodology publication. M12 simulated session (north star PASS) stands as M12 closure evidence. M12 is now formally complete pending only the exit checklist (#263).
