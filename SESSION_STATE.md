@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-12 (SOP improvements from M12 exit session (PR #898): CLAUDE.md §Milestone Exit Ceremony added (4 mandatory steps: open issue audit, milestone reference audit, SESSION_STATE consistency check, fresh session continuity test); demo-preparation-standard.md — bash -n syntax gate (Step 3), release page completeness check (Step 8), screen recording as named deliverable (Step 9b); NM-041 filed (demo.sh syntax error undetected through full M12 lifecycle).)**
+**Last updated: 2026-06-12 (Process Redesign Phase A complete — EL endorsed PR #900; execution lifecycle, intent template, rejection artifact, Layer 3 gate (FD-2), Kryptonite constraint (FD-3) all encoded in CLAUDE.md; Phase B now open.)**
 **Current milestone:** M13 — Political Economy and Instrument Credibility (GitHub Milestone 9)
 **Previous milestone:** M12 — Active Control and External Sector (formally closed 2026-06-11; Issue #263 closed; GitHub Milestone 13 closed; tagged v0.12.1)
 
@@ -107,18 +107,18 @@ CI hotfix: NM-035 filed; `ci.yml` PR trigger updated to include `release/m*` (PR
 ## Process Redesign Sprint — Phase A Status
 
 **Phase A: Agent Execution Lifecycle**
-**Status:** COMPLETE (Steps 1–5) — AWAITING EL ENDORSEMENT (Step 6). Phase B entry filed.
+**Status:** COMPLETE — EL endorsement recorded 2026-06-12 (PR #900). Phase B OPEN.
 
 | Step | Agent | Output | PR | Status |
 |---|---|---|---|---|
-| 1 — Intent document template + observable application state definition | Architect Agent | `docs/process/intent-template.md`; `CLAUDE.md §Agent Execution Lifecycle — Observable Application State` | TBD | ✅ Authored 2026-06-12 |
-| 2 — Rejection artifact specification + enforcement language | PI Agent | `CLAUDE.md §Agent Execution Lifecycle — When Verify or Validate fails` | TBD | ✅ Authored 2026-06-12 |
-| 3 — Validate step + north star integration + Layer 3 gate (FD-2) | Business PO | `CLAUDE.md §Agent Execution Lifecycle — Step 5` and `§Layer 3 Quality Gate` | TBD | ✅ Authored 2026-06-12 |
-| 4 — Complete lifecycle + Kryptonite constraint (FD-3) | Architect Agent | `CLAUDE.md §Agent Execution Lifecycle` (full section) | TBD | ✅ Authored 2026-06-12 |
-| 5 — Enforcement review + exit artifact | PI Agent + PM Agent | `docs/process/sprint-plans/process-redesign-phaseA-exit.md` | TBD | ✅ Authored 2026-06-12 |
-| 6 — EL endorsement | EL | `docs/process/sprint-plans/process-redesign-phaseA-exit.md §Part VII` | — | ⬜ Awaiting EL |
+| 1 — Intent document template + observable application state definition | Architect Agent | `docs/process/intent-template.md`; `CLAUDE.md §Agent Execution Lifecycle — Observable Application State` | #900 | ✅ Merged 2026-06-12 |
+| 2 — Rejection artifact specification + enforcement language | PI Agent | `CLAUDE.md §Agent Execution Lifecycle — When Verify or Validate fails` | #900 | ✅ Merged 2026-06-12 |
+| 3 — Validate step + north star integration + Layer 3 gate (FD-2) | Business PO | `CLAUDE.md §Agent Execution Lifecycle — Step 5` and `§Layer 3 Quality Gate` | #900 | ✅ Merged 2026-06-12 |
+| 4 — Complete lifecycle + Kryptonite constraint (FD-3) | Architect Agent | `CLAUDE.md §Agent Execution Lifecycle` (full section) | #900 | ✅ Merged 2026-06-12 |
+| 5 — Enforcement review + exit artifact | PI Agent + PM Agent | `docs/process/sprint-plans/process-redesign-phaseA-exit.md` | #900 | ✅ Merged 2026-06-12 |
+| 6 — EL endorsement | EL | `docs/process/sprint-plans/process-redesign-phaseA-exit.md §Part VII` | #900 | ✅ Endorsed 2026-06-12 |
 
-**Phase B sprint entry filed:** `docs/process/sprint-plans/process-redesign-phaseB-sprint-entry.md` — **Phase B opens after EL endorses Phase A.**
+**Phase B sprint entry filed:** `docs/process/sprint-plans/process-redesign-phaseB-sprint-entry.md` — **Phase B is now open.**
 
 **Gaps closed by Phase A:**
 
@@ -172,7 +172,8 @@ CI hotfix: NM-035 filed; `ci.yml` PR trigger updated to include `release/m*` (PR
 - Also on `release/m12` via PR #802
 
 **Awaiting EL action:**
-- ~~Phase 0 EL endorsement~~ — **RECORDED 2026-06-11** (`docs/process/sprint-plans/process-redesign-phase0-exit.md §Part VI`). XD-1, XD-2, FD-1 closed. Phase A executed 2026-06-12 — **awaiting EL endorsement.** Entry: `docs/process/sprint-plans/process-redesign-phaseA-sprint-entry.md`.
+- ~~Phase 0 EL endorsement~~ — **RECORDED 2026-06-11** (`docs/process/sprint-plans/process-redesign-phase0-exit.md §Part VI`). XD-1, XD-2, FD-1 closed.
+- ~~Phase A EL endorsement~~ — **RECORDED 2026-06-12** (PR #900; `docs/process/sprint-plans/process-redesign-phaseA-exit.md §Part VII`). Execution lifecycle gap, FD-2, FD-3 closed. **Phase B is now open.** Entry: `docs/process/sprint-plans/process-redesign-phaseB-sprint-entry.md`.
 - ~~Step 6c gate~~ — **PASS (2026-06-11)**: PR #880 resolved DEMO-070/071/081/090; DEMO-080 accepted as-is by EL (tablet scale, out of scope for 1440×900 live demo). Audience simulation review updated. Step 9 unblocked.
 - ~~Step 9 simulated session~~ — **COMPLETE (2026-06-11)**. North star verdict: PASS. Aicha: "The conditionality dispute is about who absorbs the employment cost — the reserve crisis happens either way. That argument is now quantified." Artifact: `docs/demo/m12/reviews/2026-06-11-v0.12.1-stakeholder-review.md` (PR #886). Screenshots recaptured with PR #880 UI changes (PR #883). Two new M13 issues: #884 (reserve value not on screen), #885 (Exploratory tier on baseline vs. projection). Per-entity curves (#845) confirmed as primary unresolved UX gap.
 - ~~#843 M12 live external demo~~ — **DEFERRED TO M14** (EL decision 2026-06-11). Issue repurposed as M14 closure gate: live stakeholder demo with real external participants, timed to coincide with methodology publication. M12 simulated session (north star PASS) stands as M12 closure evidence. M12 is now formally complete pending only the exit checklist (#263).
