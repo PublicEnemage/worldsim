@@ -2,7 +2,7 @@
 name: process-redesign-phaseA-exit
 type: sprint-exit
 phase: Phase A — Agent Execution Lifecycle
-status: AWAITING EL ENDORSEMENT
+status: ENDORSED — EL endorsement recorded 2026-06-12
 authored-by: PM Agent (orchestration); PI Agent (exit gate confirmation + enforcement review)
 date: 2026-06-12
 sprint-entry: docs/process/sprint-plans/process-redesign-phaseA-sprint-entry.md
@@ -11,10 +11,10 @@ phase0-exit: docs/process/sprint-plans/process-redesign-phase0-exit.md
 
 # Phase A Exit Artifact — Agent Execution Lifecycle
 
-**Status:** Awaiting EL endorsement
+**Status:** ENDORSED
 **Date produced:** 2026-06-12
 **PI Agent enforcement review:** Below (Part III)
-**EL endorsement:** Pending — see Part V
+**EL endorsement:** 2026-06-12 — see Part VII
 
 ---
 
@@ -149,12 +149,12 @@ Per `docs/process/sprint-plans/process-redesign-phaseA-sprint-entry.md §Exit Ga
 |---|---|---|
 | 1 | Agent execution lifecycle (five steps, enforcement gates, rejection artifact) encoded in CLAUDE.md | ✅ Confirmed — `CLAUDE.md §Agent Execution Lifecycle` |
 | 2 | PI Agent confirms enforcement language is adequate (obligation, not aspiration) | ✅ Confirmed — Part III Finding 1 |
-| 3 | EL endorses Phase A outputs | ⬜ Pending — Part V |
+| 3 | EL endorses Phase A outputs | ✅ Endorsed 2026-06-12 — Part VII |
 | 4 | Phase B sprint entry document is filed | ✅ Filed — `docs/process/sprint-plans/process-redesign-phaseB-sprint-entry.md` |
-| 5 | SESSION_STATE.md updated to reflect Phase A complete and Phase B entry filed | ⬜ Pending — after EL endorsement |
+| 5 | SESSION_STATE.md updated to reflect Phase A complete and Phase B entry filed | ✅ Updated 2026-06-12 — Phase A ENDORSED; Phase B OPEN |
 | 6 | Any deferred items explicitly listed with rationale | ✅ See Part III Finding 5 — sprint cadence formalization deferred to Phase C |
 
-**Gate status: 4 of 6 conditions confirmed. Awaiting EL endorsement (condition 3) and SESSION_STATE.md update (condition 5, dependent on condition 3).**
+**Gate status: 6 of 6 conditions confirmed. Phase A CLOSED.**
 
 ---
 
@@ -223,8 +223,7 @@ Endorsement constitutes approval that:
 
 **EL endorsement:**
 
-> [Engineering Lead endorsement to be recorded here — date, acceptance statement, and any
-> amendments or conditions.]
+> Endorsed 2026-06-12. Phase A outputs accepted. Execution lifecycle gap, rejection artifact gap, FD-2, and FD-3 closed. PI enforcement review accepted. North star validation finding accepted. Phase B may open. — @PublicEnemage (PR #900 merged)
 
 ---
 

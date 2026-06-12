@@ -1,7 +1,7 @@
 # CLAUDE.md — WorldSim Project Context
 
 > Last significant revision: 2026-06-12
-> Updated against: M13 active — M12 closed (v0.12.1); matrix engine in production (ADR-009/012); ExternalSectorModule; Mode 3 Active Control; Demo 4 complete; Process Redesign Phase 0 endorsed; Phase A open
+> Updated against: M13 active — M12 closed (v0.12.1); matrix engine in production (ADR-009/012); ExternalSectorModule; Mode 3 Active Control; Demo 4 complete; Process Redesign Phase 0 endorsed; Phase A endorsed (2026-06-12); Phase B open
 > Previous version context: 2026-06-05 — M12 active; release branch workflow added; PM Agent SPRINT mode added; sprint planning SOP codified; north star test as formal process gate (FD-1 closed)
 
 > **Reader Orientation:** This is the permanent project constitution — read it in full before beginning any session. It contains the mission, architectural commitments, and process rules that govern all work in this repository. Anyone making a change in this codebase, human or agent, must have read this document first. Key must-read sections if time is short: Session Continuity (what to read and in what order), Guiding Principles (the values behind every technical decision), and §Architectural Principles for Claude Code Sessions (process gates including pre-push lint, PR merge gate, and file authority rules that will cause compliance violations if not followed).
