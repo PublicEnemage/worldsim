@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-12 (M13 Wave 1 implementation complete — G1–G4 merged (#913–#915, #914); G5 ADR-013 PR #916 open awaiting EL acceptance vote)**
+**Last updated: 2026-06-12 (M13 Wave 1 complete — G1–G5 all closed; ADR-013 accepted 2026-06-12; G6 (#392) unblocked)**
 **Current milestone:** M13 — Political Economy and Instrument Credibility (GitHub Milestone 9)
 **Previous milestone:** M12 — Active Control and External Sector (formally closed 2026-06-11; Issue #263 closed; GitHub Milestone 13 closed; tagged v0.12.1)
 
@@ -30,12 +30,11 @@
 - ✅ G1 (#872, #874): DEMO legibility fixes — merged (PR #913)
 - ✅ G4 (#27, #822, #847): Documentation — merged (PR #915)
 - ✅ G2 (#871, #873, #875, #876): DEMO trajectory/Mode 3 — merged (PR #914); 4 fixes: DEMO-059 PMM scale note, DEMO-062 Zone 1D entity label, DEMO-063 inline entity labels, DEMO-064 Mode 3 comparison readout
-- 🔄 G5 (#792): ADR-013 — PR #916 open, 3-of-4 panel votes (Architect APPROVE, Political Economist APPROVE, Chief Methodologist APPROVE conditional); **EL acceptance vote required**
+- ✅ G5 (#792): ADR-013 — accepted 2026-06-12 (PR #916); EL acceptance recorded
 
 **Next action:**
-- EL reviews ADR-013 and records acceptance vote on PR #916
-- After EL acceptance: G6 (#392) political economy integration becomes unblocked
-- Chief Methodologist pre-G6 condition: `docs/methodology/calibration-basis.md` must document political economy calibration basis before G6 begins (already partially completed in PR #912/wave 1 documentation work — verify coverage before G6 opens)
+- G6 (#392) political economy integration is now unblocked — Wave 2 may begin
+- Pre-G6 blocker (Chief Methodologist conditional): verify `docs/methodology/calibration-basis.md` covers political economy calibration basis before G6 implementation PR opens (file created in Wave 1 — verify political economy section is present)
 
 ### Sprint Group Status
 
@@ -45,11 +44,11 @@
 | G2 — DEMO trajectory/Mode 3 | #871, #873, #875, #876 | Wave 1 | None | ✅ MERGED 2026-06-12 (PR #914) |
 | G3 — Engine fix (reserves floor) | #799 | Wave 1 | None | ✅ MERGED 2026-06-12 (PR #912) |
 | G4 — Documentation | #27, #822, #847 | Wave 1 | None | ✅ MERGED 2026-06-12 (PR #915) |
-| G5 — ADR-013 authorship | #792 | Wave 1 | N/A | 🔄 PR #916 OPEN — EL acceptance vote pending |
-| G6 — Political economy integration | #392 | Wave 2 | BLOCKED_ADR — ADR-013 | BLOCKED — unblocked when EL accepts ADR-013 |
+| G5 — ADR-013 authorship | #792 | Wave 1 | N/A | ✅ ACCEPTED 2026-06-12 (PR #916) |
+| G6 — Political economy integration | #392 | Wave 2 | ADR-013 ✅ | **UNBLOCKED** — verify calibration-basis.md political economy section before opening impl PR |
 | G7 — Alert panel master-detail | #852 | Blocked | BLOCKED_ADR — #908 ADR | BLOCKED |
 
-**Critical path:** G5 (ADR-013 EL acceptance, PR #916) → G6 (political economy integration, #392)
+**Critical path:** G6 (political economy integration, #392) → M13 primary objective
 
 ### Near-Term Backlog (M13 board, not in sprint waves)
 #22, #35, #45, #102, #271, #274, #393, #394, #823, #824, #837 — revisit at M13 midpoint HORIZON sweep.
@@ -67,7 +66,7 @@
 | #913 ✅ | fix(g1): DEMO legibility fixes — DEMO-060 DEMO-061 | release/m13 | Merged 2026-06-12 |
 | #914 ✅ | feat(g2): DEMO trajectory and Mode 3 comparison display | release/m13 | Merged 2026-06-12 |
 | #915 ✅ | docs(g4): calibration basis, stakeholder walkthrough, data standards | release/m13 | Merged 2026-06-12 |
-| #916 🔄 | docs(adr): ADR-013 political economy module boundary (#792) | release/m13 | **OPEN — EL acceptance vote required** |
+| #916 ✅ | docs(adr): ADR-013 political economy module boundary (#792) | release/m13 | Merged 2026-06-12 |
 
 ## M11 Work Streams — 2026-06-04 Sprint
 
