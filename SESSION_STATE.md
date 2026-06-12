@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-12 (Process Redesign sequence complete — Phase D endorsed PR #906; CLAUDE.md §Entry and Exit Invariants committed; sprint boundary discipline now constitutional. All Phases 0–D closed.)**
+**Last updated: 2026-06-12 (M13 kickoff complete — release/m13 cut; sprint plan and entry doc filed; ADR backlog updated; EL approval awaited before implementation begins)**
 **Current milestone:** M13 — Political Economy and Instrument Credibility (GitHub Milestone 9)
 **Previous milestone:** M12 — Active Control and External Sector (formally closed 2026-06-11; Issue #263 closed; GitHub Milestone 13 closed; tagged v0.12.1)
 
@@ -13,21 +13,44 @@
 
 ## Active Work Streams — M13
 
-No active work streams yet. M13 sprint planning has not begun.
+**Kickoff complete 2026-06-12.** Sprint plan and entry document filed. Awaiting EL approval before any implementation PR opens (CLAUDE.md §Entry and Exit Invariants — hard stop).
 
-**M13 kickoff prerequisites (must complete before implementation starts):**
-1. PM Agent cuts `release/m13` from `main` per CLAUDE.md §Release Branch Workflow
-2. PM Agent authors `docs/process/sprint-plans/m13-sprint-plan.md`
-3. ADR-013 status confirmed — deferred from M12 (EL decision 2026-06-07); check ADR backlog for assigned number and panel composition before drafting
-4. EL decision required on #852 sequencing — EL decision 2026-06-11: Frontend architecture review + ADR + UX Designer + Design Thinking agent input required before implementation; do not treat as a direct implementation task
-5. Note: **#264** (M13 Exit Checklist) is the M13 gate issue — it gates formal M13 closure; PM Agent must populate its checklist at sprint start
-6. Note: **Process Redesign Sequence (Phases 0–D) is complete** — all four mechanisms (execution lifecycle, acceptance protocol, sprint cadence, session boundary discipline) are operational and encoded in CLAUDE.md. No further redesign phases.
+**M13 kickoff status:**
+1. ✅ PM Agent cuts `release/m13` from `main` — DONE 2026-06-12
+2. ✅ PM Agent authors `docs/process/sprint-plans/m13-sprint-plan.md` — DONE 2026-06-12
+3. ✅ ADR-013 confirmed ASSIGNED (number 13, panel confirmed) — ready to author; ARCH-007 milestone note updated M12→M13
+4. ✅ #852 sequencing confirmed — blocked on alert panel ADR (new issue #908 filed; ARCH-008 PENDING_NUMBER in backlog)
+5. ✅ #264 (M13 Exit Checklist) — kickoff comment posted
+6. ✅ Process Redesign Sequence (Phases 0–D) — COMPLETE; no further redesign phases
+7. ⏳ Sprint entry document filed — `docs/process/sprint-plans/m13-sprint-1-entry.md` — **awaiting EL approval**
+8. ⏳ Sprint plan EL approval — **awaiting; comment on #264**
+
+**Next required action: EL reviews and approves sprint plan + entry document. No implementation PR opens before EL approval.**
+
+### Sprint Group Status
+
+| Group | Issues | Wave | ADR gate | Status |
+|---|---|---|---|---|
+| G1 — DEMO legibility | #872, #874 | Wave 1 | None | Awaiting EL sprint approval |
+| G2 — DEMO trajectory/Mode 3 | #871, #873, #875, #876 | Wave 1 | None | Awaiting EL sprint approval |
+| G3 — Engine fix (reserves floor) | #799 | Wave 1 | None | Awaiting EL sprint approval |
+| G4 — Documentation | #27, #822, #847 | Wave 1 | None | Awaiting EL sprint approval |
+| G5 — ADR-013 authorship | #792 | Wave 1 | N/A | Awaiting EL sprint approval |
+| G6 — Political economy integration | #392 | Wave 2 | BLOCKED_ADR — ADR-013 | BLOCKED |
+| G7 — Alert panel master-detail | #852 | Blocked | BLOCKED_ADR — #908 ADR | BLOCKED |
+
+**Critical path:** G5 (ADR-013 authorship, #792) → G6 (political economy integration, #392)
+
+### Near-Term Backlog (M13 board, not in sprint waves)
+#22, #35, #45, #102, #271, #274, #393, #394, #823, #824, #837 — revisit at M13 midpoint HORIZON sweep.
 
 ---
 
 ## Open PRs
 
-No open PRs — board clear as of 2026-06-12.
+| PR | Title | Target | Status |
+|---|---|---|---|
+| (opening) | feat(m13): kickoff — sprint plan, entry doc, ADR backlog | release/m13 | Opening 2026-06-12 |
 
 ## M11 Work Streams — 2026-06-04 Sprint
 
