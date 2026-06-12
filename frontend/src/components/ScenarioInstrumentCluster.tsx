@@ -563,12 +563,14 @@ export function ScenarioInstrumentCluster({
           Visible when branch is applied and recompute has completed. */}
       {mode === "MODE_3" && branchFromStep !== null && !isRecomputing && recomputeStatus !== "failed" && (() => {
         const currentStepIdx = store.current_step;
-        const activeStep = store.trajectory?.steps.find(s => s.step_index === currentStepIdx);
-        const baseStep = store.baseline_trajectory?.steps.find(s => s.step_index === currentStepIdx);
+        const activeStep = store.trajectory?.steps.find(s => s.step_index === currentStepIdx)
+          ?? store.trajectory?.steps.at(-1);
+        const baseStep = store.baseline_trajectory?.steps.find(s => s.step_index === currentStepIdx)
+          ?? store.baseline_trajectory?.steps.at(-1);
         const activeScore = activeStep?.frameworks["financial"]?.composite_score ?? null;
         const baseScore = baseStep?.frameworks["financial"]?.composite_score ?? null;
-        if (activeScore === null && baseScore === null) return null;
         const delta = activeScore !== null && baseScore !== null ? activeScore - baseScore : null;
+        const displayStep = activeStep?.step_index ?? baseStep?.step_index ?? currentStepIdx;
         return (
           <div
             data-testid="mode3-comparison-readout"
@@ -584,7 +586,7 @@ export function ScenarioInstrumentCluster({
             }}
           >
             <span style={{ fontWeight: 600, color: "#7c3aed", fontSize: 10, letterSpacing: 0.2 }}>
-              Financial (step {currentStepIdx})
+              Financial (step {displayStep})
             </span>
             <span>
               Baseline:{" "}
