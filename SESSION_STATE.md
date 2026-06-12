@@ -5,79 +5,27 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-11 (M12 CLOSED. #263 closed; GitHub Milestone 13 closed. Six DEMO issues (#871–#876) deferred to M13. Board clear — M13 is the active milestone.)**
+**Last updated: 2026-06-12 (SESSION_STATE audit fixes: stale M8/M9 sections archived, M13 issue table corrected, kickoff prerequisites block added, #843 dual-listing resolved. EL Socratic TEST recorded on #263.)**
 **Current milestone:** M13 — Political Economy and Instrument Credibility (GitHub Milestone 9)
 **Previous milestone:** M12 — Active Control and External Sector (formally closed 2026-06-11; Issue #263 closed; GitHub Milestone 13 closed; tagged v0.12.1)
 
 ---
 
-## Active Work Streams
+## Active Work Streams — M13
 
-| Stream | Issues | Status | Gate |
-|---|---|---|---|
-| ADR-005 Amendment 3 | #218 ✅ | Merged ✅ (PR #309) | None |
-| Greece fixture extension | #284 ✅ #316 ✅ | Merged ✅ (PR #321) | None |
-| EcologicalModule expansion | #312 ✅ #313 ✅ #314 ✅ | Merged ✅ (PR #324) | None |
-| UI/UX — Area 1 (null governance axis) | #315 ✅ | Merged ✅ (PR #323) | None |
-| UI/UX — Areas 2, 3, 4, 5 | #317 ✅ #318 ✅ #319 ✅ #320 ✅ | Merged ✅ (PR #329) | None |
-| Demo scenario assembly | #269 ✅ | Merged ✅ (PR #328) | None |
-| Intent block retrofit | #287 ✅ | Merged ✅ (PR #291) | None |
-| Frontend Architect M8 brief | #298 ✅ | Merged ✅ (PR #307) | None |
+No active work streams yet. M13 sprint planning has not begun.
 
-**M8 is feature-complete.** All eight work streams closed. Remaining open items are Near-Term horizon.
-
-## Design Foundation Sequence — M9 Gate (Issues #359–#370)
-
-Twelve issues filed 2026-05-19. Must complete before M9 UX implementation begins.
-
-**Step 1 — Immediate (unblocked, runs first):**
-
-| Issue | Title | Milestone | Blocks |
-|---|---|---|---|
-| #359 | CLAUDE.md structural refactor | M9 | #360 #361 #362 #363 |
-| #370 | M8 formal close — retrospective, compliance scan, #209 | M8 | v0.8.0 tag, M9 kickoff |
-
-**Step 2 — Immediate (unblocked after #359):** ✅ COMPLETE
-
-| Issue | Title | Milestone | Blocks |
-|---|---|---|---|
-| #360 ✅ | Agent working agreements (15 agents) | M9 | #369 |
-| #361 ✅ | Synthetic data framework — Chief Methodologist + ADR | M9 | #362 |
-
-**Step 3 — Immediate (requires #359 + #360 + #361):** ✅ COMPLETE
-
-| Issue | Title | Milestone | Blocks |
-|---|---|---|---|
-| #362 ✅ | User persona document (5 personas, marquee cases) | M9 | #363 #367 |
-
-**Step 4 — Immediate (requires #359 + #362):** ✅ COMPLETE — PR #390 merged (closes #363)
-
-| Issue | Title | Milestone | Blocks |
-|---|---|---|---|
-| #363 ✅ | UX first-principles depth — close six gaps | M9 | #364 |
-
-**Step 5 — Near-Term (sequential from here; #365 now unblocked):**
-
-| Issue | Title | Milestone | Blocks |
-|---|---|---|---|
-| #364 ✅ | EL decisions — north-star, viewport, comparison mode | M9 | #365 |
-| #365 ✅ | UX document updates (north-star, info-hierarchy, journeys) | M9 | #366 #368 — PR #399 merged ✅ |
-| #366 ✅ | Trajectory view ADR | M9 | ADR-010 accepted 2026-05-22 — PR #420 |
-| #367 | Persona-anchored IR review re-run (Persona 2) | M9 | #368 |
-| #368 | DEMO issues re-triage #342–#350 | M9 | M9 DEMO sprint scope |
-| #369 ✅ | agent-raci.md — RACI chart for all 15 agents | M9 | Agent governance docs — PR #401 merged ✅ |
-
----
-
-## M9 Human Gates — COMPLETE
-
-M9 formally closed. Issue #213 (M9 Exit Checklist) closed 2026-05-24. M10 milestone created and active.
+**M13 kickoff prerequisites (must complete before implementation starts):**
+1. PM Agent cuts `release/m13` from `main` per CLAUDE.md §Release Branch Workflow
+2. PM Agent authors `docs/process/sprint-plans/m13-sprint-plan.md`
+3. ADR-013 status confirmed — deferred from M12 (EL decision 2026-06-07); check ADR backlog for assigned number and panel composition before drafting
+4. EL decision required on #852 sequencing — EL decision 2026-06-11: Frontend architecture review + ADR + UX Designer + Design Thinking agent input required before implementation; do not treat as a direct implementation task
 
 ---
 
 ## Open PRs
 
-No open PRs — board clear as of 2026-06-11 (post PR #886 merge).
+No open PRs — board clear as of 2026-06-12.
 
 ## M11 Work Streams — 2026-06-04 Sprint
 
@@ -224,22 +172,27 @@ CI hotfix: NM-035 filed; `ci.yml` PR trigger updated to include `release/m*` (PR
 
 **GitHub Milestone:** 9 | **Created:** 2026-06-11 (renamed from "Methodology Publication") | **Target:** Q1 2027
 
-| Issue | Title | Horizon |
-|---|---|---|
-| #843 | plan: M12 closure — live stakeholder demo required before milestone is complete | immediate |
-| #852 | ux: alert panel (Zone 1B) needs master-detail layout | near-term |
-| #392 | arch(m11): political economy constraint modeling | near-term |
-| #393 | ux(mode-transition): Mode 1→2 transition must preserve step position | near-term |
-| #394 | platform: multi-scenario comparison (>2 scenarios) | near-term |
-| #271 | feat(simulation): reversibility classification for simulation outputs | near-term |
-| #45 | standards: human development indicator standards and HCL effect size | near-term |
-| #27 | docs: calibration basis for propagation attenuation parameters | near-term |
-| #22 | feat: uncertainty quantification (distributions not point estimates) | near-term |
-| #102 | feat: distributional scenario comparison with variance and percentile range | near-term |
-| #35 | feat(simulation): dynamic relationship weight updating | near-term |
-| #274 | feat(simulation): 25-year human capital depletion trajectory | near-term |
+| Issue | Title | Horizon | Notes |
+|---|---|---|---|
+| #852 | ux: alert panel (Zone 1B) needs master-detail layout | near-term | **ADR required first** — EL decision 2026-06-11: Frontend arch review + ADR + UX Designer + Design Thinking agent before implementation |
+| #871 | fix(demo): DEMO-059 — PMM displays 1.00 → at step 5, contradicts narration | near-term | Deferred from M12 2026-06-11 |
+| #872 | fix(demo): DEMO-060 — CRITICAL FIN alert clipped below panel boundary in Frame E | near-term | Deferred from M12 2026-06-11 |
+| #873 | fix(demo): DEMO-062 — Zone 1D shows single composite per axis, JOR vs EGY divergence absent | near-term | Deferred from M12 2026-06-11 |
+| #874 | fix(demo): DEMO-061 — instrument cluster and alert panel unreadable at presentation scale | near-term | Deferred from M12 2026-06-11 |
+| #875 | fix(demo): DEMO-063 — no inline entity labels on trajectory curves | near-term | Deferred from M12 2026-06-11 |
+| #876 | fix(demo): DEMO-064 — Mode 3 branch produces no quantitative comparison output | near-term | Deferred from M12 2026-06-11 |
+| #392 | arch(m11): political economy constraint modeling | near-term | |
+| #393 | ux(mode-transition): Mode 1→2 transition must preserve step position | near-term | |
+| #394 | platform: multi-scenario comparison (>2 scenarios) | near-term | |
+| #271 | feat(simulation): reversibility classification for simulation outputs | near-term | |
+| #45 | standards: human development indicator standards and HCL effect size | near-term | |
+| #27 | docs: calibration basis for propagation attenuation parameters | near-term | |
+| #22 | feat: uncertainty quantification (distributions not point estimates) | near-term | |
+| #102 | feat: distributional scenario comparison with variance and percentile range | near-term | |
+| #35 | feat(simulation): dynamic relationship weight updating | near-term | |
+| #274 | feat(simulation): 25-year human capital depletion trajectory | near-term | |
 
-*Note: #843 (live demo, M13) is the first gate. M12 formally closes when #843 closes and #263 (M12 exit checklist) is signed off.*
+*M12 is closed (2026-06-11 — #263 signed off, GitHub Milestone 13 closed). M13 sprint planning has not yet begun — see kickoff prerequisites above.*
 
 ---
 
