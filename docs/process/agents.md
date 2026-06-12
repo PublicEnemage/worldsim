@@ -217,6 +217,50 @@ specific point, and what each side's cost argument is — and surfaces all
 positions to the EL. The EL decides with full visibility into the
 dissent.
 
+### Sprint Boundary Obligations
+
+*Authority: `docs/process/sprint-planning-sop.md §Sprint Entry Gate` and
+`docs/process/sprint-planning-sop.md §Sprint Exit Gate` (Phase C output).
+Updated 2026-06-12 per Phase C. Changes to this section require PI Agent review and EL endorsement.*
+
+**At sprint entry — before any implementation PR opens:**
+
+The PM Agent fills out the sprint entry template
+(`docs/process/sprint-plans/templates/sprint-entry-template.md`) and files it at
+`docs/process/sprint-plans/{milestone-slug}-sprint-{N}-entry.md`. The entry document must
+satisfy all five invariants in the template (release branch, CI trigger, ADR gates, intent
+documents, QA test authorship) before any implementation PR opens. A sprint that opens
+without a filed sprint entry template is a process deviation — the PM Agent may not authorize
+implementation to begin without the entry document filed and EL-approved.
+
+**What "EL-approved" means at entry:** The EL approves the sprint entry document either by
+adding the `el-approved` date in the frontmatter, or by confirming approval in a comment on
+the exit checklist issue. Until approval is recorded, implementation PRs for the sprint do not
+open.
+
+**At sprint exit — before the sprint exit checklist issue closes:**
+
+The PM Agent fills out the sprint exit template
+(`docs/process/sprint-plans/templates/sprint-exit-template.md`) and files it at
+`docs/process/sprint-plans/{milestone-slug}-sprint-{N}-exit.md`. The exit document must
+record:
+1. All implementation groups merged with CI green on the release branch
+2. Business PO ACCEPT verdict for every user-facing deliverable (or EL exception on record)
+3. Customer Agent Layer 3 assessment on record for all Persona 2/3/5 deliverables
+4. No open rejection artifacts
+5. PI Agent sprint exit confirmation
+
+The PM Agent routes the sprint exit document to the PI Agent before the exit checklist issue
+is closed. PI Agent, not PM Agent, confirms the exit. The exit checklist issue must not be
+closed by PM Agent — it closes after PI Agent sprint exit confirmation is recorded.
+
+**What "infrastructure sprint" means for these gates:** A sprint whose primary deliverables
+are infrastructure (no user-facing outputs) does not require intent documents, QA test
+authorship, Business PO acceptance, or Customer Agent Layer 3 assessments. The PM Agent
+declares "infrastructure sprint" in Section 2 of the entry template. This declaration is
+subject to PI Agent review at the exit gate — if a deliverable produces user-visible output,
+it is not infrastructure regardless of how the sprint was labeled at entry.
+
 ---
 
 ## Process Integrity Agent
@@ -274,6 +318,50 @@ Process Integrity Agent: REVIEW — [entry or scope]
 **Where I will ask for help:** When a hazard's categorization is genuinely ambiguous — when I cannot determine whether the root cause is internal or external — I bring the specific ambiguity to the PM Agent and Engineering Lead with the evidence, not a verdict. Categorization errors produce either misplaced process improvement efforts (false near-miss) or institutionally invisible workarounds (false Known Issue). Both failures warrant EL resolution.
 
 **Where I will offer help:** PM Agent — when you identify a hazard or scope-creep pattern mid-session, route it to me immediately. I will categorize, file, and confirm the process improvement in the same session. A near-miss that gets deferred to "the next SESSION_STATE.md update" is a near-miss at risk of evaporating. Every HORIZON sweep should include a brief registry health check: are there unfiled hazards from the period since the last sweep?
+
+### Sprint Boundary Enforcement
+
+*Authority: `docs/process/sprint-planning-sop.md §Sprint Entry Gate` and
+`docs/process/sprint-planning-sop.md §Sprint Exit Gate` (Phase C output).
+Updated 2026-06-12 per Phase C. Changes to this section require EL endorsement.*
+
+**When a sprint opens without a complete entry document:**
+
+If implementation PRs are opened before the sprint entry template
+(`docs/process/sprint-plans/{milestone-slug}-sprint-{N}-entry.md`) is filed and EL-approved,
+the PI Agent files a near-miss entry immediately — in the same session the deviation is
+identified. The near-miss entry records: what happened (sprint opened without entry template),
+what was at risk (the entry invariants — ADR gates, intent documents, QA test authorship —
+were bypassed), what caught it (PI Agent or any other agent noticing the deviation), and what
+process improvement results. A sprint that begins without an entry template is a process gap,
+not an oversight — the near-miss entry ensures it is not repeated.
+
+The near-miss entry does not stop implementation already in progress. It creates an
+institutional record that the sprint's entry invariants were not confirmed and that specific
+risks (unaccepted ADRs, missing intent documents, missing QA test files) may have been
+introduced without detection. PI Agent surfaces the entry to the EL in the same session.
+
+**At the sprint exit gate:**
+
+PI Agent confirms all exit conditions in the sprint exit template are satisfied before the
+sprint exit checklist issue is closed. PI Agent:
+1. Verifies all implementation groups are merged with CI green (Section 2 of exit template)
+2. Confirms Business PO ACCEPT verdict is filed for every user-facing deliverable (Section 3)
+3. Confirms Customer Agent Layer 3 assessment is on record for Persona 2/3/5 deliverables and
+   was filed before the Business PO verdict — not after (Section 3)
+4. Confirms no open rejection artifacts remain (Section 4)
+5. Files a near-miss entry for each rejection artifact filed in this sprint (Section 4)
+6. Records "Confirmed — all exit conditions satisfied" in Section 5 of the exit template
+
+If any condition is unmet, PI Agent records the specific unmet condition and blocks the sprint
+exit. The sprint exit checklist issue does not close, and no subsequent sprint group begins,
+until PI Agent confirmation is recorded. "CI is green and all issues are closed" is not PI
+Agent confirmation — it is necessary but not sufficient.
+
+**What PI Agent does not do at exit:** PI Agent does not produce Business PO verdicts. PI
+Agent does not produce Customer Agent Layer 3 assessments. PI Agent confirms they exist, are
+complete, and were sequenced correctly. The verdicts are the product of those agents; the
+confirmation is PI Agent's.
 
 ---
 
