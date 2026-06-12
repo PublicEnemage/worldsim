@@ -104,10 +104,38 @@ CI hotfix: NM-035 filed; `ci.yml` PR trigger updated to include `release/m*` (PR
 | Walkthrough Section 4 roadmap | #836 | Feature-list replaced with capability-gaps framing — three gaps (political feasibility, conditionality design, medium-term horizon) each in Umbrella→Fact→Synthesis structure; M14 demo cadence caveat; max length +50% | ✓ DONE 2026-06-10 |
 | Demo prep Steps 3 + 4 | #838 | demo.sh: M12 presenter guide (Jordan/Egypt Hormuz, 22-min two-act timing, reserve invariant caveat, demo-narrated.spec.ts reference); demo-narrated.spec.ts: M12 Playwright narrated spec — 8-step JOR/EGY scenario with commodity_price_shocks + governance seeds, Mode 3 branch at step 3 (1.30× fiscal multiplier), five frame captures at 1440×900 (frame-a–frame-e-step5-divergence.png), no-drawer Zone 1 always-visible UI pattern | ✓ DONE 2026-06-10 |
 
+## Process Redesign Sprint — Phase A Status
+
+**Phase A: Agent Execution Lifecycle**
+**Status:** COMPLETE (Steps 1–5) — AWAITING EL ENDORSEMENT (Step 6). Phase B entry filed.
+
+| Step | Agent | Output | PR | Status |
+|---|---|---|---|---|
+| 1 — Intent document template + observable application state definition | Architect Agent | `docs/process/intent-template.md`; `CLAUDE.md §Agent Execution Lifecycle — Observable Application State` | TBD | ✅ Authored 2026-06-12 |
+| 2 — Rejection artifact specification + enforcement language | PI Agent | `CLAUDE.md §Agent Execution Lifecycle — When Verify or Validate fails` | TBD | ✅ Authored 2026-06-12 |
+| 3 — Validate step + north star integration + Layer 3 gate (FD-2) | Business PO | `CLAUDE.md §Agent Execution Lifecycle — Step 5` and `§Layer 3 Quality Gate` | TBD | ✅ Authored 2026-06-12 |
+| 4 — Complete lifecycle + Kryptonite constraint (FD-3) | Architect Agent | `CLAUDE.md §Agent Execution Lifecycle` (full section) | TBD | ✅ Authored 2026-06-12 |
+| 5 — Enforcement review + exit artifact | PI Agent + PM Agent | `docs/process/sprint-plans/process-redesign-phaseA-exit.md` | TBD | ✅ Authored 2026-06-12 |
+| 6 — EL endorsement | EL | `docs/process/sprint-plans/process-redesign-phaseA-exit.md §Part VII` | — | ⬜ Awaiting EL |
+
+**Phase B sprint entry filed:** `docs/process/sprint-plans/process-redesign-phaseB-sprint-entry.md` — **Phase B opens after EL endorses Phase A.**
+
+**Gaps closed by Phase A:**
+
+| Gap | Closed by | Location |
+|---|---|---|
+| Execution lifecycle gap — no gate between "ADR accepted" and "PR merged" | Five-step lifecycle with enforcement gates | `CLAUDE.md §Agent Execution Lifecycle` |
+| Rejection artifact gap — Verify failure had no mandatory consequence | Rejection artifact spec with sprint exit block + near-miss obligation | `CLAUDE.md §Agent Execution Lifecycle — When Verify or Validate fails` |
+| **FD-2** — Layer 3 self-interpreting output has no process owner | Customer Agent Layer 3 gate at Validate step | `CLAUDE.md §Agent Execution Lifecycle — Layer 3 Quality Gate` |
+| **FD-3** — Kryptonite frame never governs tradeoffs | Kryptonite design constraint at Intent authorship + Validate | `CLAUDE.md §Agent Execution Lifecycle — Kryptonite Design Constraint` |
+| Intent document format gap — no standard for Implementation Intent | Canonical template with observable application state + Kryptonite check | `docs/process/intent-template.md` |
+
+---
+
 ## Process Redesign Sprint — Phase 0 Status
 
-**Phase 0: UX/Persona Traceability Upstream of ADR Development**  
-**Status:** COMPLETE — EL endorsement recorded 2026-06-11. Phase A OPEN.
+**Phase 0: UX/Persona Traceability Upstream of ADR Development**
+**Status:** COMPLETE — EL endorsement recorded 2026-06-11.
 
 | Step | Agent | Output | PR | Status |
 |---|---|---|---|---|
@@ -118,8 +146,6 @@ CI hotfix: NM-035 filed; `ci.yml` PR trigger updated to include `release/m*` (PR
 | 4 — ADR template + canonical placement | Architect Agent | `docs/adr/template.md` + CODING_STANDARDS.md reference — Closes **XD-2** | #807 | ✅ Merged |
 | 5 — North star test process gate | PI Agent | `CLAUDE.md §North Star Test (Process Gate)` — Closes **FD-1**; 4 template enforcement amendments | #808 | ✅ Merged |
 | 6 — EL endorsement | EL | `docs/process/sprint-plans/process-redesign-phase0-exit.md §Part VI` | — | ✅ Endorsed 2026-06-11 |
-
-**Phase A sprint entry filed:** `docs/process/sprint-plans/process-redesign-phaseA-sprint-entry.md` — **Phase A is now open.**
 
 **Gaps closed:**
 
@@ -146,7 +172,7 @@ CI hotfix: NM-035 filed; `ci.yml` PR trigger updated to include `release/m*` (PR
 - Also on `release/m12` via PR #802
 
 **Awaiting EL action:**
-- ~~Phase 0 EL endorsement~~ — **RECORDED 2026-06-11** (`docs/process/sprint-plans/process-redesign-phase0-exit.md §Part VI`). XD-1, XD-2, FD-1 closed. **Phase A is now open.** Entry: `docs/process/sprint-plans/process-redesign-phaseA-sprint-entry.md`.
+- ~~Phase 0 EL endorsement~~ — **RECORDED 2026-06-11** (`docs/process/sprint-plans/process-redesign-phase0-exit.md §Part VI`). XD-1, XD-2, FD-1 closed. Phase A executed 2026-06-12 — **awaiting EL endorsement.** Entry: `docs/process/sprint-plans/process-redesign-phaseA-sprint-entry.md`.
 - ~~Step 6c gate~~ — **PASS (2026-06-11)**: PR #880 resolved DEMO-070/071/081/090; DEMO-080 accepted as-is by EL (tablet scale, out of scope for 1440×900 live demo). Audience simulation review updated. Step 9 unblocked.
 - ~~Step 9 simulated session~~ — **COMPLETE (2026-06-11)**. North star verdict: PASS. Aicha: "The conditionality dispute is about who absorbs the employment cost — the reserve crisis happens either way. That argument is now quantified." Artifact: `docs/demo/m12/reviews/2026-06-11-v0.12.1-stakeholder-review.md` (PR #886). Screenshots recaptured with PR #880 UI changes (PR #883). Two new M13 issues: #884 (reserve value not on screen), #885 (Exploratory tier on baseline vs. projection). Per-entity curves (#845) confirmed as primary unresolved UX gap.
 - ~~#843 M12 live external demo~~ — **DEFERRED TO M14** (EL decision 2026-06-11). Issue repurposed as M14 closure gate: live stakeholder demo with real external participants, timed to coincide with methodology publication. M12 simulated session (north star PASS) stands as M12 closure evidence. M12 is now formally complete pending only the exit checklist (#263).
