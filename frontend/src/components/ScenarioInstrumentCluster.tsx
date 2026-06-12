@@ -236,17 +236,25 @@ export function ScenarioInstrumentCluster({
   // Mode 3 branch advance loop — abortController cancels in-flight advances on cleanup.
   const branchAbortRef = useRef<AbortController | null>(null);
 
-  // Initialise store when scenario changes — MODE_3 when mode3Active; MODE_2 when fiscal multiplier override
+  // Track previous scenarioId to distinguish scenario change (full reset) from mode-only change.
+  const prevScenarioIdRef = useRef<string>("");
+
+  // Initialise store when scenario changes (full reset) or update mode without resetting.
+  // setScenario resets trajectory and current_step — calling it on mode changes would drop
+  // the trajectory fetched after step advance and break Mode 3 comparison readout (DEMO-064).
   useEffect(() => {
-    let mode: "MODE_1" | "MODE_2" | "MODE_3";
-    if (mode3Active) {
-      mode = "MODE_3";
-    } else if (fiscalMultiplier != null && fiscalMultiplier !== 1.0) {
-      mode = "MODE_2";
+    const mode: "MODE_1" | "MODE_2" | "MODE_3" = mode3Active
+      ? "MODE_3"
+      : fiscalMultiplier != null && fiscalMultiplier !== 1.0
+        ? "MODE_2"
+        : "MODE_1";
+    if (prevScenarioIdRef.current !== scenarioId) {
+      prevScenarioIdRef.current = scenarioId;
+      store.setScenario(scenarioId, stepCount, mode);
     } else {
-      mode = "MODE_1";
+      // Mode changed for same scenario — preserve trajectory and current_step.
+      useScenarioStepStore.setState({ mode });
     }
-    store.setScenario(scenarioId, stepCount, mode);
   // eslint-disable-next-line react-hooks/exhaustive-deps -- store is a Zustand singleton, stable reference
   }, [scenarioId, stepCount, fiscalMultiplier, mode3Active]);
 

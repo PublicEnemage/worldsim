@@ -281,6 +281,7 @@ export default function App() {
               comparisonScenarioId={compareMode ? secondScenarioId : null}
               fiscalMultiplier={activeFiscalMultiplier}
               mode3Active={mode3Active}
+              entityIds={activeEntityIds}
             />
           </div>
         )}
