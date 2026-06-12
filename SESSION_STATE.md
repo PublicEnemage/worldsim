@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-12 (M13 kickoff complete — release/m13 cut; sprint plan and entry doc filed; ADR backlog updated; EL approval awaited before implementation begins)**
+**Last updated: 2026-06-12 (M13 kickoff complete — release/m13 cut; sprint plan + entry doc EL-approved (PR #911); Wave 1 implementation open)**
 **Current milestone:** M13 — Political Economy and Instrument Credibility (GitHub Milestone 9)
 **Previous milestone:** M12 — Active Control and External Sector (formally closed 2026-06-11; Issue #263 closed; GitHub Milestone 13 closed; tagged v0.12.1)
 
@@ -13,29 +13,34 @@
 
 ## Active Work Streams — M13
 
-**Kickoff complete 2026-06-12.** Sprint plan and entry document filed. Awaiting EL approval before any implementation PR opens (CLAUDE.md §Entry and Exit Invariants — hard stop).
+**Kickoff complete 2026-06-12. EL approval recorded 2026-06-12 (PR #911).** Wave 1 implementation is open. Intent documents must be filed before each group's implementation PR opens (Phase A lifecycle).
 
 **M13 kickoff status:**
 1. ✅ PM Agent cuts `release/m13` from `main` — DONE 2026-06-12
 2. ✅ PM Agent authors `docs/process/sprint-plans/m13-sprint-plan.md` — DONE 2026-06-12
 3. ✅ ADR-013 confirmed ASSIGNED (number 13, panel confirmed) — ready to author; ARCH-007 milestone note updated M12→M13
 4. ✅ #852 sequencing confirmed — blocked on alert panel ADR (new issue #908 filed; ARCH-008 PENDING_NUMBER in backlog)
-5. ✅ #264 (M13 Exit Checklist) — kickoff comment posted
+5. ✅ #264 (M13 Exit Checklist) — kickoff comment posted; EL approval comment posted
 6. ✅ Process Redesign Sequence (Phases 0–D) — COMPLETE; no further redesign phases
-7. ⏳ Sprint entry document filed — `docs/process/sprint-plans/m13-sprint-1-entry.md` — **awaiting EL approval**
-8. ⏳ Sprint plan EL approval — **awaiting; comment on #264**
+7. ✅ Sprint entry document filed — `docs/process/sprint-plans/m13-sprint-1-entry.md` — EL-approved 2026-06-12
+8. ✅ Sprint plan EL approval — **recorded 2026-06-12 (PR #911)**
 
-**Next required action: EL reviews and approves sprint plan + entry document. No implementation PR opens before EL approval.**
+**Next actions (any order, Wave 1 groups are parallel):**
+- G5: Architect Agent begins ADR-013 authorship (#792) — critical path
+- G1: Author intent doc → QA tests → implement (#872, #874)
+- G2: Author intent doc → QA tests → implement (#871, #873, #875, #876)
+- G3: Author intent doc → QA tests → implement (#799)
+- G4: Author intent doc → implement (#27, #822, #847)
 
 ### Sprint Group Status
 
 | Group | Issues | Wave | ADR gate | Status |
 |---|---|---|---|---|
-| G1 — DEMO legibility | #872, #874 | Wave 1 | None | Awaiting EL sprint approval |
-| G2 — DEMO trajectory/Mode 3 | #871, #873, #875, #876 | Wave 1 | None | Awaiting EL sprint approval |
-| G3 — Engine fix (reserves floor) | #799 | Wave 1 | None | Awaiting EL sprint approval |
-| G4 — Documentation | #27, #822, #847 | Wave 1 | None | Awaiting EL sprint approval |
-| G5 — ADR-013 authorship | #792 | Wave 1 | N/A | Awaiting EL sprint approval |
+| G1 — DEMO legibility | #872, #874 | Wave 1 | None | **OPEN — intent doc required first** |
+| G2 — DEMO trajectory/Mode 3 | #871, #873, #875, #876 | Wave 1 | None | **OPEN — intent doc required first** |
+| G3 — Engine fix (reserves floor) | #799 | Wave 1 | None | **OPEN — intent doc required first** |
+| G4 — Documentation | #27, #822, #847 | Wave 1 | None | **OPEN — intent doc required first** |
+| G5 — ADR-013 authorship | #792 | Wave 1 | N/A | **OPEN — begin immediately** |
 | G6 — Political economy integration | #392 | Wave 2 | BLOCKED_ADR — ADR-013 | BLOCKED |
 | G7 — Alert panel master-detail | #852 | Blocked | BLOCKED_ADR — #908 ADR | BLOCKED |
 
@@ -50,7 +55,9 @@
 
 | PR | Title | Target | Status |
 |---|---|---|---|
-| (opening) | feat(m13): kickoff — sprint plan, entry doc, ADR backlog | release/m13 | Opening 2026-06-12 |
+| #909 ✅ | feat(m13): kickoff — sprint plan, entry doc, ADR backlog | release/m13 | Merged 2026-06-12 |
+| #910 ✅ | chore(state): M13 kickoff session state | release/m13 | Merged 2026-06-12 |
+| #911 ✅ | feat(m13): EL approval recorded — sprint plan + entry doc | release/m13 | Merged 2026-06-12 |
 
 ## M11 Work Streams — 2026-06-04 Sprint
 

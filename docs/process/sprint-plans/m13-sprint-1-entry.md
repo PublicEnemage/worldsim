@@ -3,17 +3,17 @@ name: m13-sprint-1-entry
 type: sprint-entry
 milestone: M13 — Political Economy and Instrument Credibility
 sprint-group: G1, G2, G3, G4, G5, G6, G7 (all M13 groups)
-status: Filed — awaiting EL approval before implementation begins
+status: Approved — implementation of Wave 1 groups may begin
 authored-by: PM Agent
 authored-date: 2026-06-12
-el-approved: false
+el-approved: 2026-06-12
 release-branch: release/m13
 sop-reference: docs/process/sprint-planning-sop.md
 ---
 
 # Sprint Entry — M13, Sprint 1
 
-**Status:** Filed — awaiting EL approval before implementation begins
+**Status:** Approved — Wave 1 implementation may begin
 **Date authored:** 2026-06-12
 **Release branch:** `release/m13`
 **Sprint plan:** `docs/process/sprint-plans/m13-sprint-plan.md`
@@ -47,7 +47,7 @@ An unchecked invariant blocks the sprint from opening.*
 - [x] **Release branch exists:** `release/m13` cut from `main` at 2026-06-12
 - [x] **CI trigger verified:** `.github/workflows/ci.yml` `pull_request: branches` includes
   `release/m*` — confirmed 2026-06-12 (pre-existing fix from NM-035)
-- [ ] **Sprint plan EL-approved:** Awaiting EL approval of `docs/process/sprint-plans/m13-sprint-plan.md`
+- [x] **Sprint plan EL-approved:** `docs/process/sprint-plans/m13-sprint-plan.md` approved 2026-06-12
 
 ### 2.2 — ADR prerequisite gate
 
@@ -187,13 +187,15 @@ added (PENDING_NUMBER) at kickoff commit. GitHub issue to be filed for the alert
 
 ## EL Approval Record
 
-**EL approval:** Pending
+**EL approval:** Recorded 2026-06-12
 
 *EL review checklist:*
-- [ ] Groupings are reasonable
-- [ ] Sequencing and wave assignments are correct
-- [ ] No scope items missing from the plan (verify against roadmap and CLAUDE.md)
-- [ ] Structural gates in Section 2.1 are satisfied
+- [x] Groupings are reasonable
+- [x] Sequencing and wave assignments are correct
+- [x] No scope items missing from the plan (verify against roadmap and CLAUDE.md)
+- [x] Structural gates in Section 2.1 are satisfied
 
-> EL approval statement — to be filled at approval time
-> — @PublicEnemage ({date})
+> Sprint plan and entry document approved. Wave 1 groups (G1–G5) may proceed immediately
+> once intent documents are filed per the Phase A execution lifecycle. G6 is blocked on
+> ADR-013 acceptance; G7 is blocked on alert panel ADR (#908) acceptance.
+> — @PublicEnemage (2026-06-12)
