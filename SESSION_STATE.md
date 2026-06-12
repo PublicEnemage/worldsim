@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-12 (M13 Wave 2 complete — G6 (#392) BPO ACCEPT recorded; #392 closed; G7 (#852) blocked on ADR)**
+**Last updated: 2026-06-12 (ADR-014 authored and merged PR #921 — ARCH-008 ASSIGNED; G7 (#852) now blocked on acceptance vote + UX Designer sign-off only)**
 **Current milestone:** M13 — Political Economy and Instrument Credibility (GitHub Milestone 9)
 **Previous milestone:** M12 — Active Control and External Sector (formally closed 2026-06-11; Issue #263 closed; GitHub Milestone 13 closed; tagged v0.12.1)
 
@@ -47,7 +47,7 @@
     - #392 closed (issue closed as part of BPO acceptance)
 
 **Next action:**
-- G7 (#852) alert panel master-detail UX — blocked on ADR (#908 PENDING_NUMBER in backlog); next sprint blocker
+- G7 (#852) alert panel master-detail UX — ADR-014 authored and merged (PR #921); now blocked on EL acceptance vote + UX Designer sign-off on UX implication statement (UX-1 through UX-7). Once accepted, G7 implementation may begin with a sprint entry document.
 
 ### Sprint Group Status
 
@@ -59,9 +59,9 @@
 | G4 — Documentation | #27, #822, #847 | Wave 1 | None | ✅ MERGED 2026-06-12 (PR #915) |
 | G5 — ADR-013 authorship | #792 | Wave 1 | N/A | ✅ ACCEPTED 2026-06-12 (PR #916) |
 | G6 — Political economy integration | #392 | Wave 2 | ADR-013 ✅ | ✅ COMPLETE 2026-06-12 (PR #919, BPO ACCEPT, #392 closed) |
-| G7 — Alert panel master-detail | #852 | Blocked | BLOCKED_ADR — #908 ADR | BLOCKED |
+| G7 — Alert panel master-detail | #852 | Wave 3 | ADR-014 ✅ (proposed) | BLOCKED — pending EL acceptance vote + UX Designer sign-off |
 
-**Critical path:** G7 (alert panel UX, #852) — blocked on ADR #908; G6 BPO ACCEPT complete (2026-06-12)
+**Critical path:** G7 (alert panel UX, #852) — ADR-014 authored (PR #921 merged 2026-06-12); blocked on EL acceptance vote + UX Designer sign-off on UX-1 through UX-7; sprint entry document required before implementation
 
 ### Near-Term Backlog (M13 board, not in sprint waves)
 #22, #35, #45, #102, #271, #274, #393, #394, #823, #824, #837 — revisit at M13 midpoint HORIZON sweep.
@@ -81,6 +81,7 @@
 | #915 ✅ | docs(g4): calibration basis, stakeholder walkthrough, data standards | release/m13 | Merged 2026-06-12 |
 | #916 ✅ | docs(adr): ADR-013 political economy module boundary (#792) | release/m13 | Merged 2026-06-12 |
 | #919 ✅ | feat(political-economy): G6 — ADR-013 political economy integration | release/m13 | Merged 2026-06-12 |
+| #921 ✅ | docs(adr): ADR-014 — alert panel (Zone 1B) master-detail layout (ARCH-008) | release/m13 | Merged 2026-06-12 |
 
 ## M11 Work Streams — 2026-06-04 Sprint
 
