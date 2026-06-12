@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-12 (Issue triage: #865 closed (Step 6c delivered), #844 closed (superseded by #874). 9 unmilestoned issues assigned: #792/#799/#822/#823/#824/#837/#847 → M13; #884/#885 → M14. 46 open issues, 25 M13, 16 M14, 5 parking-lot/no-milestone.)**
+**Last updated: 2026-06-12 (Fresh session audit pass 2: four gaps fixed — #843 milestone corrected M13→M14; process redesign deliberation status note updated (Phase 0 endorsed, no longer blocking); M13 kickoff prerequisites expanded with #264 exit checklist and Phase A parallel-track note; #264 added to M13 issue table; recently merged PRs updated through #894.)**
 **Current milestone:** M13 — Political Economy and Instrument Credibility (GitHub Milestone 9)
 **Previous milestone:** M12 — Active Control and External Sector (formally closed 2026-06-11; Issue #263 closed; GitHub Milestone 13 closed; tagged v0.12.1)
 
@@ -20,6 +20,8 @@ No active work streams yet. M13 sprint planning has not begun.
 2. PM Agent authors `docs/process/sprint-plans/m13-sprint-plan.md`
 3. ADR-013 status confirmed — deferred from M12 (EL decision 2026-06-07); check ADR backlog for assigned number and panel composition before drafting
 4. EL decision required on #852 sequencing — EL decision 2026-06-11: Frontend architecture review + ADR + UX Designer + Design Thinking agent input required before implementation; do not treat as a direct implementation task
+5. Note: **#264** (M13 Exit Checklist) is the M13 gate issue — it gates formal M13 closure; PM Agent must populate its checklist at sprint start
+6. Note: **Process Redesign Phase A** runs in parallel with M13 implementation — it is NOT a blocking prerequisite; coordinate Phase A alongside sprint planning (entry: `docs/process/sprint-plans/process-redesign-phaseA-sprint-entry.md`)
 
 ---
 
@@ -60,7 +62,7 @@ Six DEMO issues (#871–#876, DEMO-059–064) deferred to M13 with rationale (no
 
 **Issue disposition summary:**
 - All immediate-horizon M12 deliverables shipped (G1–G8, Wave 1 complete)
-- #843 live demo → M13 | #852 alert panel UX → M13
+- #843 live demo → M14 | #852 alert panel UX → M13
 - **#263 exit checklist → M12** (corrected 2026-06-11; gates on #843 + Phase 0 endorsement)
 - Near-term issues (#392/#271/#393/#394/#27/#45) → M13
 - Further near-term (#97/#153/#569/#30/#92/#259/#275) → M14
@@ -140,7 +142,7 @@ CI hotfix: NM-035 filed; `ci.yml` PR trigger updated to include `release/m*` (PR
 **Process redesign deliberation — ON MAIN (PR #803, 2026-06-08)**
 - `docs/process/design/2026-06-08-sprint-cadence-acceptance-gates-deliberation.md` — 590 lines
 - Full verbatim deliberation: PI Agent + BPO north star test, PM Agent sequencing proposal (Phase 0 + Phases A–D), 11 north star document gaps with failure mode mapping
-- Status: pre-endorsement — EL endorsement of sequencing plan is the next required action before any implementation begins
+- Status: SUPERSEDED — Phase 0 endorsed 2026-06-11; Phase A is now open (see Phase 0 section above); all implementation gates cleared
 - Also on `release/m12` via PR #802
 
 **Awaiting EL action:**
@@ -174,6 +176,7 @@ CI hotfix: NM-035 filed; `ci.yml` PR trigger updated to include `release/m*` (PR
 
 | Issue | Title | Horizon | Notes |
 |---|---|---|---|
+| #264 | M13 Exit Checklist | immediate | **M13 gate issue** — PM Agent populates at sprint start; must be closed before M13 formally closes |
 | #792 | docs(adr): ADR-013 — political economy module boundary (G9) | immediate | **M13 prerequisite** — must be ACCEPTED before any G9 implementation begins; check ADR backlog for panel composition |
 | #799 | engine: reserves can go negative — no non-negativity floor on stock attributes | near-term | Bug observed in Demo 4 (JOR step 7: −0.04 months); no milestone/labels assigned until 2026-06-12 triage |
 | #852 | ux: alert panel (Zone 1B) needs master-detail layout | near-term | **ADR required first** — EL decision 2026-06-11: Frontend arch review + ADR + UX Designer + Design Thinking agent before implementation |
@@ -337,6 +340,10 @@ CI hotfix: NM-035 filed; `ci.yml` PR trigger updated to include `release/m*` (PR
 
 | PR | Title | Date |
 |---|---|---|
+| #894 | chore(state): SESSION_STATE.md — issue triage: #865/#844 closed; 9 unmilestoned issues assigned to M13/M14 | 2026-06-12 |
+| #893 | chore(state): SESSION_STATE.md — M13 kickoff prerequisites, stale M8/M9 work-stream text replaced | 2026-06-12 |
+| #892 | chore(state): SESSION_STATE.md — M13 now active; M12 block marked CLOSED; GitHub Milestone 13 closed | 2026-06-11 |
+| #891 | chore(state): SESSION_STATE.md — demo recording uploaded to v0.12.1 release | 2026-06-11 |
 | #890 | fix(demo): close missing ) in bold() call on Step 5 presenter line | 2026-06-11 |
 | #889 | chore(state): fix #263 milestone label — M12 not M14 | 2026-06-11 |
 | #888 | docs(process): Phase 0 EL endorsement recorded 2026-06-11 | 2026-06-11 |
