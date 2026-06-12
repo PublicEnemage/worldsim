@@ -2,10 +2,10 @@
 name: m13-sprint-plan
 type: sprint-plan
 milestone: M13 — Political Economy and Instrument Credibility
-status: Draft — awaiting EL approval
+status: Approved
 authored-by: PM Agent
 authored-date: 2026-06-12
-el-approved: false
+el-approved: 2026-06-12
 consulted-agents:
   - Business Product Owner (value prioritization)
   - Frontend Architect (file area grouping)
@@ -374,7 +374,9 @@ G5 should begin immediately and run in parallel with G1–G4.
 
 ## EL Approval Record
 
-**Status:** Pending — no implementation PR may open before EL approves this plan
+**Status:** Approved 2026-06-12
 
-> EL approval statement — to be filled at approval time
-> — @PublicEnemage ({date})
+> Sprint plan approved. Wave 1 groups (G1–G5) may proceed once intent documents are filed
+> per the Phase A execution lifecycle. G6 implementation is blocked pending ADR-013 acceptance.
+> G7 is blocked pending alert panel ADR (#908) acceptance. Critical path is G5 → G6.
+> — @PublicEnemage (2026-06-12)
