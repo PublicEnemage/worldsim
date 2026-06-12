@@ -2,7 +2,7 @@
 name: process-redesign-phaseB-exit
 type: sprint-exit
 phase: Phase B — Business PO Acceptance Protocol
-status: Filed — awaiting EL endorsement
+status: ENDORSED — EL endorsement recorded 2026-06-12
 authored-by: PM Agent (orchestration); PI Agent (exit gate confirmation + enforcement review)
 date: 2026-06-12
 sprint-entry: docs/process/sprint-plans/process-redesign-phaseB-sprint-entry.md
@@ -11,10 +11,10 @@ phaseA-exit: docs/process/sprint-plans/process-redesign-phaseA-exit.md
 
 # Phase B Exit Artifact — Business PO Acceptance Protocol
 
-**Status:** Filed — awaiting EL endorsement
+**Status:** ENDORSED
 **Date produced:** 2026-06-12
 **PI Agent enforcement review:** Below (Part III)
-**EL endorsement:** Pending — see Part VII
+**EL endorsement:** 2026-06-12 — see Part VII
 
 ---
 
@@ -153,12 +153,12 @@ Per `docs/process/sprint-plans/process-redesign-phaseB-sprint-entry.md §Exit Ga
 |---|---|---|
 | 1 | `docs/process/acceptance-protocol.md` filed with per-work-type verification criteria | ✅ Confirmed — all four work types specified |
 | 2 | PI Agent confirms enforcement language is adequate (obligation, not aspiration) | ✅ Confirmed — Part III Findings 1–4 |
-| 3 | EL endorses Phase B outputs | Pending — see Part VII |
+| 3 | EL endorses Phase B outputs | ✅ Endorsed 2026-06-12 — Part VII |
 | 4 | Phase C sprint entry document is filed | ✅ Filed — `docs/process/sprint-plans/process-redesign-phaseC-sprint-entry.md` |
-| 5 | SESSION_STATE.md updated to reflect Phase B complete and Phase C entry filed | Pending — will update with EL endorsement PR |
+| 5 | SESSION_STATE.md updated to reflect Phase B complete and Phase C entry filed | ✅ Updated 2026-06-12 — Phase B ENDORSED; Phase C OPEN |
 | 6 | Any deferred items explicitly listed with rationale | ✅ See Part III Finding 5 — sprint entry gate deferred to Phase C |
 
-**Gate status: 4 of 6 conditions confirmed. Gates 3 and 5 pending EL endorsement.**
+**Gate status: 6 of 6 conditions confirmed. Phase B CLOSED.**
 
 ---
 
@@ -213,7 +213,10 @@ Endorsement constitutes approval that:
 
 **EL endorsement:**
 
-> [Pending — to be recorded when EL reviews this artifact]
+> Endorsed 2026-06-12. Phase B outputs accepted. Per-work-type verification criteria adequate.
+> Exception path accepted. PI enforcement review accepted. North star validation finding accepted.
+> Known limitations acceptable for this phase. Phase C may open.
+> — @PublicEnemage (PR #902 merged)
 
 ---
 

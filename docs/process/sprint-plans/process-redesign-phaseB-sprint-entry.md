@@ -2,7 +2,7 @@
 name: process-redesign-phaseB-sprint-entry
 type: sprint-entry
 phase: Phase B — Business PO Acceptance Protocol
-status: Filed — awaiting Phase A EL endorsement before opening
+status: COMPLETE — Phase B outputs endorsed 2026-06-12 (PR #902)
 authored-by: PM Agent (derived from deliberation document, 2026-06-08, and Phase A outputs)
 authored-date: 2026-06-12
 el-endorsement-required: true
@@ -20,9 +20,9 @@ gates-phases:
 
 # Phase B Sprint Entry — Business PO Acceptance Protocol
 
-**Status:** Filed — awaiting Phase A EL endorsement
+**Status:** COMPLETE — EL endorsement recorded 2026-06-12 (PR #902)
 **Date authored:** 2026-06-12
-**Opens when:** EL endorses Phase A exit artifact (`docs/process/sprint-plans/process-redesign-phaseA-exit.md §Part VII`)
+**Opened:** Phase A EL endorsement confirmed 2026-06-12
 **Deliberation source:** `docs/process/design/2026-06-08-sprint-cadence-acceptance-gates-deliberation.md §Phase B`
 
 ---
