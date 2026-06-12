@@ -467,8 +467,10 @@ def _build_next_state(
 
         if entity_id in accumulator:
             for key, delta in accumulator[entity_id].items():
-                if delta.variable_type == VariableType.STOCK:
-                    # Absolute replacement: delta IS the new value
+                if delta.variable_type in (VariableType.STOCK, VariableType.PROBABILITY):
+                    # Absolute replacement: delta IS the new value.
+                    # PROBABILITY uses replacement semantics identical to STOCK —
+                    # survival probability at step N replaces the prior estimate.
                     new_attrs[key] = delta
                 else:
                     # Additive accumulation for FLOW, RATIO, DIMENSIONLESS

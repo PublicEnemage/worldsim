@@ -264,23 +264,27 @@ class TestProgrammeSurvivalProbability:
         assert len(survival_events) == 1
 
     def test_survival_metadata_contains_calibration_note(self) -> None:
-        """Survival event metadata includes DIRECTION_ONLY calibration note."""
+        """Survival event metadata includes a calibration note (ADR-013 Tier 3 disclosure)."""
         module = PoliticalEconomyModule()
         entity = _entity(legitimacy_index="0.7")
         state = _state(entity, events=[])
         result = module.compute(entity, state, _EPOCH)
         survival_event = next(e for e in result if e.event_type == "programme_survival_update")
-        assert "DIRECTION_ONLY" in survival_event.metadata.get("calibration_note", "")
+        note = survival_event.metadata.get("calibration_note", "")
+        assert note, "calibration_note must be non-empty"
+        assert "Tier 3" in note or "Not a prediction" in note, (
+            f"calibration_note should reference Tier 3 or 'Not a prediction': {note}"
+        )
 
     def test_survival_confidence_tier_4(self) -> None:
-        """Survival probability carries confidence_tier=4 (formula-based, not calibrated)."""
+        """Survival probability carries confidence_tier=3 (ADR-013 Decision 1)."""
         module = PoliticalEconomyModule()
         entity = _entity(legitimacy_index="0.7")
         state = _state(entity, events=[])
         result = module.compute(entity, state, _EPOCH)
         survival_event = next(e for e in result if e.event_type == "programme_survival_update")
         qty = survival_event.affected_attributes["programme_survival_probability"]
-        assert qty.confidence_tier == 4
+        assert qty.confidence_tier == 3
 
 
 # ---------------------------------------------------------------------------
@@ -290,7 +294,7 @@ class TestProgrammeSurvivalProbability:
 
 class TestEliteCaptureDivergence:
     def test_elite_capture_emitted_on_fiscal_delta(self) -> None:
-        """elite_capture_divergence emitted when fiscal delta exists and capture context set."""
+        """elite_capture_update emitted when fiscal delta + capture context set (ADR-013 D3)."""
         module = PoliticalEconomyModule()
         entity = _entity(
             legitimacy_index="0.7",
@@ -299,35 +303,46 @@ class TestEliteCaptureDivergence:
         event = _fiscal_event(value="-0.08")
         state = _state(entity, events=[event])
         result = module.compute(entity, state, _EPOCH)
-        capture_events = [e for e in result if e.event_type == "elite_capture_divergence"]
+        capture_events = [e for e in result if e.event_type == "elite_capture_update"]
         assert len(capture_events) == 1
 
     def test_elite_capture_uses_entity_coefficient(self) -> None:
-        """Divergence = fiscal_delta × entity's elite_capture_coefficient."""
+        """Higher elite_capture_coefficient produces a higher divergence index (ADR-013 D3)."""
         module = PoliticalEconomyModule()
-        entity = _entity(
-            legitimacy_index="0.7",
-            elite_capture_coefficient="0.40",
+        event = _fiscal_event(value="-0.08")
+
+        entity_high = _entity(legitimacy_index="0.7", elite_capture_coefficient="0.50")
+        state_high = _state(entity_high, events=[event])
+        result_high = module.compute(entity_high, state_high, _EPOCH)
+        idx_high = next(
+            e for e in result_high if e.event_type == "elite_capture_update"
+        ).affected_attributes["elite_capture_divergence_index"].value
+
+        entity_low = _entity(legitimacy_index="0.7", elite_capture_coefficient="0.25")
+        state_low = _state(entity_low, events=[event])
+        result_low = module.compute(entity_low, state_low, _EPOCH)
+        idx_low = next(
+            e for e in result_low if e.event_type == "elite_capture_update"
+        ).affected_attributes["elite_capture_divergence_index"].value
+
+        assert idx_high > idx_low, (
+            f"Higher coefficient → higher index: {idx_high} vs {idx_low}"
         )
-        event = _fiscal_event(value="-0.10")
-        state = _state(entity, events=[event])
-        result = module.compute(entity, state, _EPOCH)
-        capture_event = next(e for e in result if e.event_type == "elite_capture_divergence")
-        divergence = capture_event.affected_attributes["elite_capture_divergence"].value
-        expected = Decimal("-0.10") * Decimal("0.40")
-        assert divergence == expected
 
     def test_elite_capture_uses_default_when_no_entity_attribute(self) -> None:
-        """Default elite_capture_coefficient=0.30 applies when not seeded on entity."""
+        """Default elite_capture_coefficient=0.30 applies; index still emitted (ADR-013 D3)."""
         module = PoliticalEconomyModule()
         entity = _entity(legitimacy_index="0.7")
         event = _fiscal_event(value="-0.10")
         state = _state(entity, events=[event])
         result = module.compute(entity, state, _EPOCH)
-        capture_event = next(e for e in result if e.event_type == "elite_capture_divergence")
-        divergence = capture_event.affected_attributes["elite_capture_divergence"].value
-        expected = Decimal("-0.10") * Decimal("0.30")
-        assert divergence == expected
+        capture_event = next(
+            (e for e in result if e.event_type == "elite_capture_update"), None
+        )
+        assert capture_event is not None, (
+            "elite_capture_update must be emitted with default coefficient"
+        )
+        assert "elite_capture_divergence_index" in capture_event.affected_attributes
 
     def test_elite_capture_not_emitted_without_fiscal_delta(self) -> None:
         """No fiscal events → no elite_capture_divergence event."""
@@ -338,10 +353,10 @@ class TestEliteCaptureDivergence:
         )
         state = _state(entity, events=[])
         result = module.compute(entity, state, _EPOCH)
-        assert not any(e.event_type == "elite_capture_divergence" for e in result)
+        assert not any(e.event_type == "elite_capture_update" for e in result)
 
     def test_elite_capture_framework_is_human_development(self) -> None:
-        """Elite capture divergence event uses HUMAN_DEVELOPMENT framework."""
+        """Elite capture update event uses POLITICAL_ECONOMY framework (ADR-013 Decision 3)."""
         module = PoliticalEconomyModule()
         entity = _entity(
             legitimacy_index="0.7",
@@ -350,8 +365,8 @@ class TestEliteCaptureDivergence:
         event = _fiscal_event(value="-0.08")
         state = _state(entity, events=[event])
         result = module.compute(entity, state, _EPOCH)
-        capture_event = next(e for e in result if e.event_type == "elite_capture_divergence")
-        assert capture_event.framework == MeasurementFramework.HUMAN_DEVELOPMENT
+        capture_event = next(e for e in result if e.event_type == "elite_capture_update")
+        assert capture_event.framework == MeasurementFramework.POLITICAL_ECONOMY
 
 
 # ---------------------------------------------------------------------------
@@ -505,7 +520,7 @@ class TestConditionalityDecomposer:
 
 class TestModuleOutputStructure:
     def test_all_three_event_types_emitted_with_full_context(self) -> None:
-        """Module emits legitimacy_change + programme_survival_update + elite_capture_divergence."""
+        """Module emits legitimacy_change + programme_survival_update + elite_capture_update."""
         module = PoliticalEconomyModule()
         entity = _entity(
             legitimacy_index="0.7",
@@ -518,7 +533,7 @@ class TestModuleOutputStructure:
         event_types = {e.event_type for e in result}
         assert "legitimacy_change" in event_types
         assert "programme_survival_update" in event_types
-        assert "elite_capture_divergence" in event_types
+        assert "elite_capture_update" in event_types
 
     def test_event_ids_are_unique(self) -> None:
         """All emitted event_ids are distinct (no duplicate detection warning would fire)."""

@@ -276,7 +276,7 @@ async def test_all_four_frameworks_present_in_response() -> None:
         scenario_id="scen-1", entity_id="GRC", step=1, conn=conn
     )
     assert set(result.outputs.keys()) == {
-        "financial", "human_development", "ecological", "governance"
+        "financial", "human_development", "ecological", "governance", "political_economy",
     }
 
 

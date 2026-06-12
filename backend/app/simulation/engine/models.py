@@ -49,6 +49,7 @@ class MeasurementFramework(Enum):
     HUMAN_DEVELOPMENT = "human_development"
     ECOLOGICAL = "ecological"
     GOVERNANCE = "governance"
+    POLITICAL_ECONOMY = "political_economy"
 
 
 class PropagationMode(str, Enum):

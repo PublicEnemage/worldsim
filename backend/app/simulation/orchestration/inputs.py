@@ -309,7 +309,14 @@ class ControlInput(ABC):
         value by implementation_capacity. This models partial implementation,
         political feasibility constraints, and watered-down policy execution.
 
-        implementation_capacity=1.0 (default) returns events unchanged.
+        For CONDITIONALITY-sourced inputs, injects `constraining_actor_id`,
+        `constraint_mechanism`, and `implementation_capacity` into each event's
+        metadata so the PoliticalEconomyModule can reconstruct per-term
+        conditionality attribution from state.events without needing access
+        to the ControlInput objects directly (ADR-013 Decision 2).
+
+        implementation_capacity=1.0 (default) returns events unchanged (except
+        for conditionality metadata injection, which always occurs).
         implementation_capacity=0.5 halves all event magnitudes.
         implementation_capacity=0.0 produces zero-magnitude events (no effect).
 
@@ -320,8 +327,23 @@ class ControlInput(ABC):
             Events with magnitudes scaled by implementation_capacity.
         """
         raw_events = self.to_events(timestep)
+        is_conditionality = self.source == InputSource.CONDITIONALITY
+
         if self.implementation_capacity == Decimal("1.0"):
-            return raw_events
+            if not is_conditionality:
+                return raw_events
+            # Inject conditionality metadata even at full implementation capacity.
+            return [
+                replace(evt, metadata={
+                    **evt.metadata,
+                    "constraining_actor_id": self.constraining_actor_id,
+                    "constraint_mechanism": self.constraint_mechanism,
+                    "implementation_capacity": str(self.implementation_capacity),
+                    "input_source": self.source.value,
+                })
+                for evt in raw_events
+            ]
+
         scale = self.implementation_capacity
         scaled: list[Event] = []
         for evt in raw_events:
@@ -337,7 +359,18 @@ class ControlInput(ABC):
                 )
                 for k, q in evt.affected_attributes.items()
             }
-            scaled.append(replace(evt, affected_attributes=scaled_attrs))
+            extra_meta: dict[str, Any] = {}
+            if is_conditionality:
+                extra_meta = {
+                    "constraining_actor_id": self.constraining_actor_id,
+                    "constraint_mechanism": self.constraint_mechanism,
+                    "implementation_capacity": str(scale),
+                    "input_source": self.source.value,
+                }
+            scaled.append(replace(evt, affected_attributes=scaled_attrs, metadata={
+                **evt.metadata,
+                **extra_meta,
+            }))
         return scaled
 
 
