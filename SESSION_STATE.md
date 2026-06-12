@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-12 (Process Redesign Phase B complete — EL endorsed PR #902; acceptance-protocol.md, ACCEPT mode in agents.md, Sprint Exit Gate in sprint-planning-sop.md all active. Phase C now open.)**
+**Last updated: 2026-06-12 (Process Redesign Phase C complete — EL endorsed PR #904; sprint entry/exit templates, Sprint Entry Gate in SOP, PM Agent + PI Agent sprint boundary obligations active. Phase D now open.)**
 **Current milestone:** M13 — Political Economy and Instrument Credibility (GitHub Milestone 9)
 **Previous milestone:** M12 — Active Control and External Sector (formally closed 2026-06-11; Issue #263 closed; GitHub Milestone 13 closed; tagged v0.12.1)
 
@@ -118,9 +118,11 @@ CI hotfix: NM-035 filed; `ci.yml` PR trigger updated to include `release/m*` (PR
 | 5 — Enforcement review + exit artifact | PI Agent + PM Agent | `docs/process/sprint-plans/process-redesign-phaseA-exit.md` | #900 | ✅ Merged 2026-06-12 |
 | 6 — EL endorsement | EL | `docs/process/sprint-plans/process-redesign-phaseA-exit.md §Part VII` | #900 | ✅ Endorsed 2026-06-12 |
 
-**Phase B complete:** `docs/process/sprint-plans/process-redesign-phaseB-exit.md` — **EL endorsed 2026-06-12 (PR #902). Phase C NOW OPEN.**
+**Phase B complete:** `docs/process/sprint-plans/process-redesign-phaseB-exit.md` — **EL endorsed 2026-06-12 (PR #902). Phase C COMPLETE.**
 
-**Phase C sprint entry filed:** `docs/process/sprint-plans/process-redesign-phaseC-sprint-entry.md` — **Phase C is open.**
+**Phase C complete:** `docs/process/sprint-plans/process-redesign-phaseC-exit.md` — **EL endorsed 2026-06-12 (PR #904). Phase D NOW OPEN.**
+
+**Phase D sprint entry filed:** `docs/process/sprint-plans/process-redesign-phaseD-sprint-entry.md` — **Phase D is open.**
 
 **Gaps closed by Phase A:**
 
@@ -150,6 +152,27 @@ CI hotfix: NM-035 filed; `ci.yml` PR trigger updated to include `release/m*` (PR
 - **`docs/process/acceptance-protocol.md`** — per-type verification checklists (frontend, backend, docs, analytics); DEMO4 class check explicit in backend protocol; asymmetry test operationalizes FD-3 at Validate step; Customer Agent Layer 3 as precondition (not follow-up); rejection artifact triggers + format + re-acceptance process + EL exception path; PI enforcement review embedded
 - **`docs/process/agents.md` amendment** — `PO: ACCEPT` activation mode with canonical protocol reference
 - **`docs/process/sprint-planning-sop.md` amendment** — §Sprint Exit Gate: exit conditions, agent responsibilities at exit, what "CI green" does not substitute for, sprint exit artifact format
+
+## Process Redesign Sprint — Phase C Status
+
+**Phase C: Sprint Cadence Formalization**
+**Status:** COMPLETE — EL endorsement recorded 2026-06-12 (PR #904). Phase D OPEN.
+
+| Step | Agent | Output | PR | Status |
+|---|---|---|---|---|
+| 1 — Sprint entry + exit document templates | PM Agent | `docs/process/sprint-plans/templates/sprint-entry-template.md`; `docs/process/sprint-plans/templates/sprint-exit-template.md` | #904 | ✅ Merged 2026-06-12 |
+| 2a — PM Agent role amendment (sprint boundary obligations) | PM Agent | `docs/process/agents.md §PM Agent — Sprint Boundary Obligations` | #904 | ✅ Merged 2026-06-12 |
+| 2b — PI Agent role amendment (sprint boundary enforcement) | PI Agent | `docs/process/agents.md §Process Integrity Agent — Sprint Boundary Enforcement` | #904 | ✅ Merged 2026-06-12 |
+| 2c — Sprint Entry Gate in sprint-planning-sop.md | PM Agent | `docs/process/sprint-planning-sop.md §Sprint Entry Gate` | #904 | ✅ Merged 2026-06-12 |
+| 3 — Phase C exit artifact + Phase D sprint entry | PM Agent | `docs/process/sprint-plans/process-redesign-phaseC-exit.md`; `docs/process/sprint-plans/process-redesign-phaseD-sprint-entry.md` | #904 | ✅ Merged 2026-06-12 |
+| 4 — EL endorsement | EL | `docs/process/sprint-plans/process-redesign-phaseC-exit.md §Part VII` | #904 | ✅ Endorsed 2026-06-12 |
+
+**What Phase C produced:**
+- **`docs/process/sprint-plans/templates/sprint-entry-template.md`** — five binary entry invariants (release branch + CI trigger, ADR gates, intent documents, QA test authorship); infrastructure sprint exception; EL approval record
+- **`docs/process/sprint-plans/templates/sprint-exit-template.md`** — per-deliverable Business PO acceptance table; Layer 3 sequencing check (before verdict); PI Agent confirmation as Section 5 named gate
+- **`docs/process/agents.md` PM Agent amendment** — `§Sprint Boundary Obligations`: sprint entry/exit obligations; EL-approved definition; infrastructure sprint declaration scope
+- **`docs/process/agents.md` PI Agent amendment** — `§Sprint Boundary Enforcement`: unconditional near-miss obligation when sprint opens without entry doc; exit gate confirmation role; what PI Agent does and does not do
+- **`docs/process/sprint-planning-sop.md` amendment** — `§Sprint Entry Gate`: five entry conditions mirroring exit gate; who confirms; infrastructure exception; entry artifact reference; §Sprint Exit Artifact updated to reference filed document over issue comment
 
 ---
 
