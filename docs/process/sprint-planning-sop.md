@@ -156,3 +156,72 @@ If scope changes materially after kickoff:
 - EL must confirm any wave reassignment that changes the critical path
 
 Sprint plan documents are not silently overwritten. Changes are visible through the revision markers and git history.
+
+---
+
+## Sprint Exit Gate
+
+*Authority: `docs/process/acceptance-protocol.md` (Phase B output).
+Updated 2026-06-12 per Phase B. Changes to this section require PI Agent review and EL endorsement.*
+
+A sprint does not close when all implementation groups are merged and CI is green. A sprint
+closes when the following conditions are all satisfied:
+
+### Exit Conditions
+
+1. **All implementation groups are merged to the release branch** with CI green on the release
+   branch. This is necessary but not sufficient.
+
+2. **Business PO acceptance is recorded for every user-facing deliverable.** For each sprint
+   group whose primary output is a frontend feature, backend capability, documentation, or
+   analytics output, the Business PO must have executed the Validate step (Step 5 of the Agent
+   Execution Lifecycle) using the per-type verification protocol in
+   `docs/process/acceptance-protocol.md`. The Business PO verdict artifact (ACCEPT or REJECT)
+   must be filed and on record before the sprint exit gate passes.
+
+3. **No open rejections.** If any Business PO verdict is REJECT, the rejection artifact must be
+   resolved — either by re-acceptance (Business PO files re-acceptance verdict) or by EL
+   exception (EL appends exception to rejection artifact). A sprint with an unresolved rejection
+   artifact does not exit.
+
+4. **Customer Agent Layer 3 assessment on record** for any deliverable serving Personas 2, 3,
+   or 5. This is a precondition for the Business PO verdict, but PI Agent confirms it is present
+   before signing off the sprint exit.
+
+5. **PI Agent sprint exit confirmation.** PI Agent reviews the exit conditions and confirms all
+   are satisfied before the sprint exit checklist issue is closed. PI Agent does not produce the
+   verdicts — PI Agent confirms they exist and are complete.
+
+### Who Closes the Sprint Exit Gate
+
+| Role | Responsibility at exit |
+|---|---|
+| Business PO | Produces ACCEPT/REJECT verdicts for all user-facing deliverables |
+| Customer Agent | Produces Layer 3 assessment for Persona 2/3/5 deliverables (before Business PO verdict) |
+| PI Agent | Confirms all exit conditions are satisfied; files near-miss for any rejection; blocks exit if any condition is unmet |
+| Engineering Lead | Approves EL exceptions for any unresolved rejections; closes the milestone exit checklist issue |
+
+### What "CI Green" Does Not Substitute For
+
+- CI green does not substitute for a Business PO ACCEPT verdict.
+- A passing unit test suite does not substitute for the observable application state check.
+- A passing Playwright test does not substitute for the Business PO confirming the named persona
+  can reach the observable state within the P-4 time ceiling.
+
+These checks are complementary, not substitutable. CI confirms implementation correctness.
+Business PO acceptance confirms mission alignment. Both are required before sprint exit.
+
+### Sprint Exit Artifact
+
+The sprint exit artifact is the proof that all exit conditions were satisfied. For process
+redesign sprints, see the phase exit document pattern (e.g., `process-redesign-phaseA-exit.md`).
+For M{N} milestone sprints, the sprint exit artifact is the milestone exit checklist issue
+comment on GitHub, which must include:
+
+- [ ] All implementation groups merged; CI green on release branch
+- [ ] Business PO ACCEPT verdict filed for each user-facing deliverable (or EL exception on record)
+- [ ] Customer Agent Layer 3 assessment on record for Persona 2/3/5 deliverables
+- [ ] No open rejection artifacts
+- [ ] PI Agent sprint exit confirmation
+
+The PI Agent reviews this checklist before confirming exit.
