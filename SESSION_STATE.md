@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-12 (ADR-014 revised PR #923 — persistent-detail model; PR #924 — mock-ups promoted to primary design specification; G7 now blocked on EL acceptance vote + UX Designer sign-off)**
+**Last updated: 2026-06-12 (ADR-014 accepted PR #926 — EL acceptance vote + UX Designer sign-off recorded; G7 (#852) now unblocked — sprint entry document required)**
 **Current milestone:** M13 — Political Economy and Instrument Credibility (GitHub Milestone 9)
 **Previous milestone:** M12 — Active Control and External Sector (formally closed 2026-06-11; Issue #263 closed; GitHub Milestone 13 closed; tagged v0.12.1)
 
@@ -47,7 +47,7 @@
     - #392 closed (issue closed as part of BPO acceptance)
 
 **Next action:**
-- G7 (#852) alert panel UX — ADR-014 complete (PRs #921, #923, #924 merged 2026-06-12); design settled on persistent-detail + scan-only compact list model with mock-ups as primary specification; blocked on EL acceptance vote + UX Designer sign-off on UX implication statement (UX-1 through UX-7). Once accepted, G7 sprint entry document required before implementation begins.
+- G7 (#852) alert panel UX — ADR-014 accepted 2026-06-12 (PR #926). PM Agent to file sprint entry document before implementation begins. Implementing agent: Frontend Architect Agent per ADR-014 panel. Intent document (Step 1) and QA test authorship (Step 2) required before implementation PR opens.
 
 ### Sprint Group Status
 
@@ -59,9 +59,9 @@
 | G4 — Documentation | #27, #822, #847 | Wave 1 | None | ✅ MERGED 2026-06-12 (PR #915) |
 | G5 — ADR-013 authorship | #792 | Wave 1 | N/A | ✅ ACCEPTED 2026-06-12 (PR #916) |
 | G6 — Political economy integration | #392 | Wave 2 | ADR-013 ✅ | ✅ COMPLETE 2026-06-12 (PR #919, BPO ACCEPT, #392 closed) |
-| G7 — Alert panel master-detail | #852 | Wave 3 | ADR-014 ✅ (proposed) | BLOCKED — pending EL acceptance vote + UX Designer sign-off |
+| G7 — Alert panel master-detail | #852 | Wave 3 | ADR-014 ✅ (accepted 2026-06-12) | UNBLOCKED — sprint entry document required before implementation |
 
-**Critical path:** G7 (alert panel UX, #852) — ADR-014 complete: authored (PR #921), revised to persistent-detail model after design deliberation (PR #923), mock-ups promoted to primary design spec (PR #924); all merged 2026-06-12; blocked on EL acceptance vote + UX Designer sign-off on UX-1 through UX-7; sprint entry document required before implementation
+**Critical path:** G7 (alert panel UX, #852) — ADR-014 accepted 2026-06-12 (PR #926; EL acceptance + UX Designer sign-off on UX-1 through UX-7 recorded); sprint entry document required before implementation may begin
 
 ### Near-Term Backlog (M13 board, not in sprint waves)
 #22, #35, #45, #102, #271, #274, #393, #394, #823, #824, #837 — revisit at M13 midpoint HORIZON sweep.
@@ -84,6 +84,7 @@
 | #921 ✅ | docs(adr): ADR-014 — alert panel (Zone 1B) master-detail layout (ARCH-008) | release/m13 | Merged 2026-06-12 |
 | #923 ✅ | docs(adr-014): rewrite — persistent-detail + scan-only compact list model | release/m13 | Merged 2026-06-12 |
 | #924 ✅ | docs(adr-014): promote mock-ups to primary design specification | release/m13 | Merged 2026-06-12 |
+| #926 ✅ | docs(adr-014): accepted — EL acceptance vote 2026-06-12 (ARCH-008) | release/m13 | Merged 2026-06-12 |
 
 ## M11 Work Streams — 2026-06-04 Sprint
 
