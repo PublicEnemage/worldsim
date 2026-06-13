@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-12 (NM-042 process amendment — structured sign-off attestation PR #930; G7 (#852) unblocked; ADR-014 accepted)**
+**Last updated: 2026-06-13 (G7 (#852) alert panel UX — COMPLETE; BPO ACCEPT; #852 closed; Wave 3 complete)**
 **Current milestone:** M13 — Political Economy and Instrument Credibility (GitHub Milestone 9)
 **Previous milestone:** M12 — Active Control and External Sector (formally closed 2026-06-11; Issue #263 closed; GitHub Milestone 13 closed; tagged v0.12.1)
 
@@ -46,8 +46,26 @@
     - Analytical intent: Persona 2 can cite programme survival probability as quantified political feasibility constraint
     - #392 closed (issue closed as part of BPO acceptance)
 
-**Next action:**
-- G7 (#852) alert panel UX — ADR-014 accepted 2026-06-12 (PR #926). PM Agent to file sprint entry document before implementation begins. Implementing agent: Frontend Architect Agent per ADR-014 panel. Intent document (Step 1) and QA test authorship (Step 2) required before implementation PR opens.
+**Wave 3 complete:**
+- ✅ G7 (#852): Alert panel Zone 1B persistent-detail — COMPLETE 2026-06-13 (PR #936, BPO ACCEPT)
+  - Sprint entry: `docs/process/sprint-plans/m13-g7-sprint-entry.md` — EL-approved 2026-06-13 (PR #935)
+  - Intent document: `docs/process/intents/ADR-014-2026-06-13-alert-panel-ux.md`
+  - Step 4 Verify: PASS (2026-06-13, dev server port 5179, Hormuz scenario 558a27fe)
+    - AC-1: zone-1b-top-detail visible at 1440×900 without interaction ✅
+    - AC-2: data-severity="TERMINAL" on top detail slot ✅
+    - AC-3: detail clientHeight > 0 at 1024×768 (98px), 1280×800 (85px), 1440×900 (85px) ✅
+    - AC-5: compact rows cursor:default; click leaves detail unchanged ✅
+    - AC-7: compact row height 24px ≤ 26px limit at 1024×768 ✅
+    - Empty state: "No active threshold breaches." renders ✅
+    - Old mda-alert-row and alert-detail-panel removed ✅
+    - Mode-dependent tense: Mode 2 shows "BREACH PROJECTED" ✅
+  - Step 5 Validate: BPO ACCEPT — 2026-06-13 (see below)
+    - Persona 2 confirmed: open instrument cluster → TERMINAL breach evidence (severity + indicator + current vs. floor + 8 consecutive steps + confidence label) visible in Zone 1B detail slot with zero interactions
+    - Customer Agent Layer 3: PASS — "Reserve coverage has fallen 2.1 months below the CRITICAL threshold. At current draw rate, full depletion occurs in 4 steps." — output is self-interpreting; ministry analyst can cite without mediation
+    - North star: Zambian ministry analyst can read top threshold breach evidence with zero interactions from moment instrument cluster loads — interaction tax eliminated; argument evidence available at creditor-side parity
+    - #852 closed
+
+**Next action:** M13 remaining issues — ADR-013 (#792 closed; G5 DONE) — M13 exit checklist (#264) is the active gate. Next sprint work: near-term backlog (#823, #824, #393, #271) or EL may direct ADR-015 (ecological composite) or issue #884/#885 follow-up from Demo 4 stakeholder review.
 
 ### Sprint Group Status
 
@@ -59,9 +77,9 @@
 | G4 — Documentation | #27, #822, #847 | Wave 1 | None | ✅ MERGED 2026-06-12 (PR #915) |
 | G5 — ADR-013 authorship | #792 | Wave 1 | N/A | ✅ ACCEPTED 2026-06-12 (PR #916) |
 | G6 — Political economy integration | #392 | Wave 2 | ADR-013 ✅ | ✅ COMPLETE 2026-06-12 (PR #919, BPO ACCEPT, #392 closed) |
-| G7 — Alert panel master-detail | #852 | Wave 3 | ADR-014 ✅ (accepted 2026-06-12) | UNBLOCKED — sprint entry document required before implementation |
+| G7 — Alert panel master-detail | #852 | Wave 3 | ADR-014 ✅ (accepted 2026-06-12) | ✅ COMPLETE 2026-06-13 (PR #936, BPO ACCEPT, #852 closed) |
 
-**Critical path:** G7 (alert panel UX, #852) — ADR-014 accepted 2026-06-12 (PR #926; EL acceptance + UX Designer sign-off on UX-1 through UX-7 recorded); sprint entry document required before implementation may begin
+**Critical path:** All G1–G7 waves complete. M13 primary objectives: ADR-013 ✅, G6 ✅, G7 ✅. Remaining M13 work: instrument legibility follow-up (#884/#885), near-term backlog items, M13 exit ceremony (#264).
 
 ### Near-Term Backlog (M13 board, not in sprint waves)
 #22, #35, #45, #102, #271, #274, #393, #394, #823, #824, #837 — revisit at M13 midpoint HORIZON sweep.
@@ -88,6 +106,8 @@
 | #928 ✅ | docs(adr-014): UX Designer independent sign-off — conditional, 3 intent requirements | release/m13 | Merged 2026-06-12 |
 | #929 ✅ | process(nm-042): agent generated UX Designer sign-off without independent review | release/m13 | Merged 2026-06-12 |
 | #930 ✅ | process(nm-042): structured UX Designer sign-off attestation — session context declaration | release/m13 | Merged 2026-06-12 |
+| #935 ✅ | process(g7): EL approval of sprint entry — 2026-06-13 | release/m13 | Merged 2026-06-13 |
+| #936 ✅ | feat(g7): Zone 1B persistent-detail layout — ADR-014 (#852) | release/m13 | Merged 2026-06-13 |
 
 ## M11 Work Streams — 2026-06-04 Sprint
 
@@ -349,7 +369,7 @@ CI hotfix: NM-035 filed; `ci.yml` PR trigger updated to include `release/m*` (PR
 | #264 | M13 Exit Checklist | immediate | **M13 gate issue** — PM Agent populates at sprint start; must be closed before M13 formally closes |
 | #792 | docs(adr): ADR-013 — political economy module boundary (G9) | immediate | **M13 prerequisite** — must be ACCEPTED before any G9 implementation begins; check ADR backlog for panel composition |
 | #799 | engine: reserves can go negative — no non-negativity floor on stock attributes | near-term | Bug observed in Demo 4 (JOR step 7: −0.04 months); no milestone/labels assigned until 2026-06-12 triage |
-| #852 | ux: alert panel (Zone 1B) needs master-detail layout | near-term | **ADR required first** — EL decision 2026-06-11: Frontend arch review + ADR + UX Designer + Design Thinking agent before implementation |
+| ~~#852~~ | ~~ux: alert panel (Zone 1B) needs master-detail layout~~ | — | **CLOSED 2026-06-13** — BPO ACCEPT on G7 Zone 1B persistent-detail layout (PR #936) |
 | #871 | fix(demo): DEMO-059 — PMM displays 1.00 → at step 5, contradicts narration | near-term | Deferred from M12 2026-06-11 |
 | #872 | fix(demo): DEMO-060 — CRITICAL FIN alert clipped below panel boundary in Frame E | near-term | Deferred from M12 2026-06-11 |
 | #873 | fix(demo): DEMO-062 — Zone 1D shows single composite per axis, JOR vs EGY divergence absent | near-term | Deferred from M12 2026-06-11 |
