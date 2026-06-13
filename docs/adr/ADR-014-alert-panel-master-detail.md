@@ -532,7 +532,10 @@ The UX Designer participated in the design deliberation of 2026-06-12 and valida
 persistent-detail model against all four stress-test scenarios. Formal sign-off on this
 revised ADR text is required before the vote.
 
-`[✓]` UX Designer: UX implication statement elements 1–7 confirmed complete. [2026-06-12] — persistent-detail model satisfies UX governing premises 1 and 2; zone assignment correct; falsifiable ACs in UX-3 and UX-6 are Playwright-testable without reading implementation source.
+`[✓]` UX Designer: UX implication statement elements 1–7 confirmed complete. [2026-06-12] Conditional sign-off — substantively correct; three implementation-intent requirements must appear in G7 intent document before implementation PR opens:
+1. **Compact row height constraint** — max 26px per row (single-line truncated) to preserve "top 1–3 visible without scroll" at 1024×768 minimum viewport (UX-1 / information-hierarchy.md §1B).
+2. **Mode-dependent tense in detail slot** — intent document must specify how "BREACHED" / "N% above floor" status language is mode-contextualized per information-hierarchy.md §1B ("Alert tense is mode-dependent") (UX-2).
+3. **Compact row cohort omission** — intent document must explicitly document that compact rows are exempt from information-hierarchy.md §1B "top affected cohort" requirement, with rationale (UX-7). Ruling: compact rows are a severity-rank scan surface, not an evidence surface; the requirement text predates the persistent-detail model and applied to the stacked-list design. Deviation is accepted; must be documented.
 
 ---
 
@@ -715,8 +718,6 @@ alert exploration belongs in Zone 2.
 
 ---
 
----
-
 ## Acceptance Record
 
 **EL Acceptance Vote: ACCEPTED — 2026-06-12**
@@ -725,10 +726,10 @@ alert exploration belongs in Zone 2.
 > No independent review is available at this governance stage. See CLAUDE.md §Governance
 > for the documented plan to address this limitation.*
 
-UX Designer sign-off confirmed on record (2026-06-12) for UX-1 through UX-7.
-Panel: Architect Agent (author), Frontend Architect Agent (consulted), UX Designer Agent (sign-off ✓), Engineering Lead (accepted ✓).
+UX Designer conditional sign-off confirmed on record (2026-06-12) for UX-1 through UX-7. Three implementation-intent requirements attached to sign-off (see §UX Implication Statement — UX Designer sign-off): compact row height constraint; mode-dependent tense in detail slot; compact row cohort omission documentation. These must appear in the G7 implementation intent document before the implementation PR opens.
+Panel: Architect Agent (author), Frontend Architect Agent (consulted), UX Designer Agent (conditional sign-off ✓ 2026-06-12), Engineering Lead (accepted ✓ 2026-06-12).
 Design model validated against four stress-test scenarios in deliberation of 2026-06-12.
-G7 (#852) implementation is now unblocked — sprint entry document required before implementation begins.
+G7 (#852) implementation is now unblocked — sprint entry document required before implementation begins. Three UX sign-off conditions must be resolved in the intent document.
 
 ---
 
