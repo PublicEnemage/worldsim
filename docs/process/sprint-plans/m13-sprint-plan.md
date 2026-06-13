@@ -312,25 +312,84 @@ M13 deliverable and may slip to M14 if the ADR process takes the full milestone.
 
 ---
 
-## Near-Term Backlog — On M13 Board, Not in Sprint Waves
+## Wave 3 — Mid-Milestone (HORIZON Sweep 2026-06-13)
 
-These issues are assigned to M13 but are not in Wave 1 or Wave 2. They will be
-revisited at the M13 midpoint HORIZON sweep.
+All G1–G7 waves complete. HORIZON sweep promoted five issues to G8a and one to G8b.
+Sprint entry: `docs/process/sprint-plans/m13-g8-sprint-entry.md` (PR #939, merged 2026-06-13).
+Awaiting EL approval before any G8 implementation PR opens.
 
-| Issue | Title | Rationale for deferral |
-|---|---|---|
-| #22 | Uncertainty quantification | Major architectural undertaking; blocks on ADR; M14 scope |
-| #27 | Calibration basis docs | In G4 ✓ |
-| #35 | Dynamic relationship weight updating | Significant engine change; ADR required |
-| #45 | Human development indicator standards (SA-04) | Standards work; can ship any point in M13 |
-| #102 | Distributional scenario comparison | Architecture + significant frontend work |
-| #271 | Reversibility classification | Depends on uncertainty quantification direction |
-| #274 | 25-year human capital trajectory | Long-horizon engine feature; M14 scope |
-| #393 | Mode 1→2 step position preservation | UX fix; low complexity; may fit between waves |
-| #394 | Multi-scenario comparison (>2) | Architecture change; ADR required |
-| #823 | Ecological composite denominator | Methodological correctness; no ADR required; mid-milestone |
-| #824 | MENA arid-economy elasticity calibration | Engine calibration; independent; mid-milestone |
-| #837 | Configuration-driven demo scripts | Developer tooling; lowest user-value priority |
+### G8a — Standards, Methodology, and Calibration
+
+**Issues:** #45, #27 residuals (R1–R3), #271 (metadata tag only), #823, #824
+**Type:** Standards update / documentation / backend calibration
+**ADR prerequisite:** None
+**Infrastructure sprint exception:** Applies — no intent documents required
+
+**Issues:**
+- #45: Add HCL output field standards (5 fields, units, effect size thresholds, 4 test
+  requirements) to `CODING_STANDARDS.md`; cross-reference in `DATA_STANDARDS.md`
+- #27 R1: Add Propagation Rules section to `docs/methodology/calibration-basis.md` covering
+  `TARIFF_ATTENUATION = 0.6` / `TARIFF_MAX_HOPS = 2` with PLACEHOLDER declaration
+- #27 R2: Update `backend/scripts/demo_scenario.py` docstring to reference calibration doc
+- #27 R3: Add single-sentence calibration status note to ADR-001 current review entry
+- #271: Add `reversibility` field (`recoverable` / `delayed_recovery` / `irreversible`) to
+  simulation output indicators — **scope-limited to metadata tag only**; no MDA recalibration;
+  no display-layer changes; MDA calibration deferred to M14 as named follow-on
+- #823: Fix ecological composite denominator at scenario initialisation; hold indicator set
+  constant for full run; disclose absent indicators separately
+- #824: Derive biome-specific elasticity for arid/semi-arid economies from FAO GFR arid-country
+  subset; update `ECOLOGICAL_ELASTICITY_REGISTRY` with MENA-calibrated row and source citation
+
+**Domain agent sign-offs required before merge:**
+- #823: Chief Methodologist sign-off on denominator-fixing approach
+- #824: Chief Methodologist + Ecological Economist sign-off on elasticity derivation
+
+**What this gates:** Methodology transparency obligations, calibration credibility for Demo 5
+(Hormuz fixture uses the mis-calibrated MENA elasticity), and HCL test actionability (#45
+closes the SA-04 gap that makes HCL tests unactionable).
+
+---
+
+### G8b — Mode Transition UX
+
+**Issues:** #393
+**Type:** Frontend UX fix
+**ADR prerequisite:** None (mode transition design on record in PR #390 Gap 5)
+**Full Phase A lifecycle required:** Intent document gates implementation
+
+**Why promoted:** The Sri Lanka 2022 marquee case requires a Mode 1 → Mode 2 transition
+within a single session without context reconstruction. Without step-position carry-forward,
+the analyst must manually reconstruct the simulation start point — an interaction tax that
+defeats the 90-second reactive entry ceiling.
+
+**Intent document required at:**
+`docs/process/intents/G8b-2026-06-13-mode-transition-step-preservation.md`
+
+**Acceptance gate (Business PO Validate step):**
+Execute the Sri Lanka 2022 case entry (Mode 1 replay to the shock entry point → Mode 2
+simulation) in a single session without re-entry. Step position preserved; entity
+configuration carried forward; confirmation modal names what is preserved.
+
+**What this gates:** Sri Lanka marquee case execution; Mode 1→2 workflow for the external
+validation audience in M14 Demo 5.
+
+---
+
+## Near-Term Backlog — Deferred to M14
+
+The following issues were on the M13 board but were deferred to M14 at the HORIZON sweep
+(2026-06-13). No further M13 promotion is planned. These are candidates for the M14 sprint
+plan and should be revisited at M14 kickoff.
+
+| Issue | Title | Disposition | Rationale |
+|---|---|---|---|
+| #22 | Uncertainty quantification | **Defer to M14** — primary deliverable candidate | Major ADR-gated architectural undertaking; pairs with methodology publication |
+| #35 | Dynamic relationship weight updating | **Defer to M14** | ADR required; significant engine change; not aligned with M13 focus |
+| #102 | Distributional scenario comparison | **Defer to M14** | Hard dependency on #22 |
+| #274 | 25-year human capital trajectory | **Defer to M14** | Hard dependency on #271 full implementation + backtesting validation |
+| #394 | Multi-scenario comparison (>2 scenarios) | **Defer to M14** | ADR required; architecture change; Kenya TC-3 marquee case |
+| #837 | Configuration-driven demo scripts | **Defer to M14** | Developer tooling; no demo cycle in M13; M14 Demo 5 prep |
+| #271 MDA recalibration | MDA threshold recalibration for irreversible indicators | **Defer to M14** — named follow-on to G8a #271 | Depends on #271 metadata field in production; calibration work scoped for M14 |
 
 ---
 
@@ -339,22 +398,25 @@ revisited at the M13 midpoint HORIZON sweep.
 ```
 Wave 1 (parallel)
 │
-├── G1 — DEMO Legibility (#872, #874)           → no downstream deps
-├── G2 — DEMO Trajectory/Mode 3 (#871,#873,#875,#876) → no downstream deps
-├── G3 — Engine Fix (#799)                       → no downstream deps
-├── G4 — Documentation (#27, #822, #847)         → no downstream deps
+├── G1 — DEMO Legibility (#872, #874)                    → no downstream deps
+├── G2 — DEMO Trajectory/Mode 3 (#871,#873,#875,#876)   → no downstream deps
+├── G3 — Engine Fix (#799)                               → no downstream deps
+├── G4 — Documentation (#27, #822, #847)                 → no downstream deps
 └── G5 — ADR-013 (#792)
          │
          ▼
 Wave 2 (after ADR-013 accepted)
-└── G6 — Political Economy Integration (#392)    → M13 primary deliverable
+└── G6 — Political Economy Integration (#392)            → M13 primary deliverable
 
-Blocked (alert panel ADR required)
-└── G7 — Alert Panel UX (#852)                  → timeline TBD per ADR process
+Wave 3 (HORIZON sweep; after G1–G7 complete; parallel sub-groups)
+├── G7 — Alert Panel UX (#852)                           → COMPLETE 2026-06-13
+├── G8a — Standards/Methodology/Calibration              → no downstream deps within M13
+│         (#45, #27 R1-R3, #271 tag, #823, #824)
+└── G8b — Mode Transition UX (#393)                      → no downstream deps within M13
 ```
 
-**Critical path:** G5 (ADR-013) → G6 (political economy integration)
-G5 should begin immediately and run in parallel with G1–G4.
+**Critical path:** G5 (ADR-013) → G6 (political economy integration) — COMPLETE.
+G8a and G8b have no inter-dependencies and may run in parallel.
 
 ---
 
@@ -362,13 +424,15 @@ G5 should begin immediately and run in parallel with G1–G4.
 
 | Group | Required ADR | Current status | Gate |
 |---|---|---|---|
-| G1 | None | N/A | CLEAR |
-| G2 | None | N/A | CLEAR |
-| G3 | None | N/A | CLEAR |
-| G4 | None | N/A | CLEAR |
-| G5 | ADR-013 (this group is the ADR) | ASSIGNED | CLEAR to author |
-| G6 | ADR-013 | ASSIGNED — not yet accepted | BLOCKED_ADR |
-| G7 | Alert panel ADR | PENDING_NUMBER — no backlog entry yet | BLOCKED_ADR |
+| G1 | None | N/A | ✅ COMPLETE 2026-06-12 |
+| G2 | None | N/A | ✅ COMPLETE 2026-06-12 |
+| G3 | None | N/A | ✅ COMPLETE 2026-06-12 |
+| G4 | None | N/A | ✅ COMPLETE 2026-06-12 |
+| G5 | ADR-013 (this group is the ADR) | ACCEPTED 2026-06-12 (PR #916) | ✅ COMPLETE |
+| G6 | ADR-013 | ACCEPTED 2026-06-12 (PR #916) | ✅ COMPLETE 2026-06-12 |
+| G7 | ADR-014 | ACCEPTED 2026-06-12 (PR #926) | ✅ COMPLETE 2026-06-13 |
+| G8a | None | N/A | CLEAR — awaiting EL sprint entry approval |
+| G8b | None | N/A | CLEAR — awaiting EL sprint entry approval + intent document |
 
 ---
 
