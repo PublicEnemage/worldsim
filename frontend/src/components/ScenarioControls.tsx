@@ -44,7 +44,7 @@ export default function ScenarioControls({ scenarioId, totalSteps, onStepChange 
 
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 12, fontSize: 14 }}>
-      <span style={{ fontWeight: 600 }}>
+      <span data-testid="current-step-display" style={{ fontWeight: 600 }}>
         Step {currentStep} / {totalSteps}
         {isComplete && " — Complete"}
       </span>

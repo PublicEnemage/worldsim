@@ -4,7 +4,7 @@ import ChoroplethMap from "./components/ChoroplethMap";
 import DeltaChoropleth from "./components/DeltaChoropleth";
 import EntityDetailDrawer from "./components/EntityDetailDrawer";
 import FidelityDashboard from "./components/FidelityDashboard";
-import { ModeIndicator } from "./components/ModeIndicator";
+import { ModeSelector } from "./components/ModeSelector";
 import { ScenarioIdentityHeader } from "./components/ScenarioIdentityHeader";
 import { ScenarioInstrumentCluster } from "./components/ScenarioInstrumentCluster";
 import ScenarioControls from "./components/ScenarioControls";
@@ -221,7 +221,7 @@ export default function App() {
                 {selectedScenarioName}
               </span>
             )}
-            <ModeIndicator />
+            <ModeSelector />
             <button
               data-testid="mode3-toggle"
               onClick={() => setMode3Active((v) => !v)}
