@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-12 (ADR-014 authored and merged PR #921 — ARCH-008 ASSIGNED; G7 (#852) now blocked on acceptance vote + UX Designer sign-off only)**
+**Last updated: 2026-06-12 (ADR-014 revised PR #923 — persistent-detail model; PR #924 — mock-ups promoted to primary design specification; G7 now blocked on EL acceptance vote + UX Designer sign-off)**
 **Current milestone:** M13 — Political Economy and Instrument Credibility (GitHub Milestone 9)
 **Previous milestone:** M12 — Active Control and External Sector (formally closed 2026-06-11; Issue #263 closed; GitHub Milestone 13 closed; tagged v0.12.1)
 
@@ -47,7 +47,7 @@
     - #392 closed (issue closed as part of BPO acceptance)
 
 **Next action:**
-- G7 (#852) alert panel master-detail UX — ADR-014 authored and merged (PR #921); now blocked on EL acceptance vote + UX Designer sign-off on UX implication statement (UX-1 through UX-7). Once accepted, G7 implementation may begin with a sprint entry document.
+- G7 (#852) alert panel UX — ADR-014 complete (PRs #921, #923, #924 merged 2026-06-12); design settled on persistent-detail + scan-only compact list model with mock-ups as primary specification; blocked on EL acceptance vote + UX Designer sign-off on UX implication statement (UX-1 through UX-7). Once accepted, G7 sprint entry document required before implementation begins.
 
 ### Sprint Group Status
 
@@ -61,7 +61,7 @@
 | G6 — Political economy integration | #392 | Wave 2 | ADR-013 ✅ | ✅ COMPLETE 2026-06-12 (PR #919, BPO ACCEPT, #392 closed) |
 | G7 — Alert panel master-detail | #852 | Wave 3 | ADR-014 ✅ (proposed) | BLOCKED — pending EL acceptance vote + UX Designer sign-off |
 
-**Critical path:** G7 (alert panel UX, #852) — ADR-014 authored (PR #921 merged 2026-06-12); blocked on EL acceptance vote + UX Designer sign-off on UX-1 through UX-7; sprint entry document required before implementation
+**Critical path:** G7 (alert panel UX, #852) — ADR-014 complete: authored (PR #921), revised to persistent-detail model after design deliberation (PR #923), mock-ups promoted to primary design spec (PR #924); all merged 2026-06-12; blocked on EL acceptance vote + UX Designer sign-off on UX-1 through UX-7; sprint entry document required before implementation
 
 ### Near-Term Backlog (M13 board, not in sprint waves)
 #22, #35, #45, #102, #271, #274, #393, #394, #823, #824, #837 — revisit at M13 midpoint HORIZON sweep.
@@ -82,6 +82,8 @@
 | #916 ✅ | docs(adr): ADR-013 political economy module boundary (#792) | release/m13 | Merged 2026-06-12 |
 | #919 ✅ | feat(political-economy): G6 — ADR-013 political economy integration | release/m13 | Merged 2026-06-12 |
 | #921 ✅ | docs(adr): ADR-014 — alert panel (Zone 1B) master-detail layout (ARCH-008) | release/m13 | Merged 2026-06-12 |
+| #923 ✅ | docs(adr-014): rewrite — persistent-detail + scan-only compact list model | release/m13 | Merged 2026-06-12 |
+| #924 ✅ | docs(adr-014): promote mock-ups to primary design specification | release/m13 | Merged 2026-06-12 |
 
 ## M11 Work Streams — 2026-06-04 Sprint
 
