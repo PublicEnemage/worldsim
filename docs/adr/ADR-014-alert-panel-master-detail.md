@@ -124,6 +124,121 @@ Zone 1B adopts a **persistent-detail + scan-only compact list** layout. The deta
 highest-severity alert is always visible without any user interaction. The compact list below
 it is a scrollable scan surface — informational only, no click targets.
 
+### Design Specification — Visual Mock-ups and Stress-Test Scenarios
+
+The design is specified by its behaviour across four reference scenarios. These mock-ups are
+the primary specification for this ADR — implementation must satisfy all four states. The
+implementation detail in subsequent subsections (layout architecture, height budget, component
+changes) is derived from and must not contradict these scenarios. The acceptance criteria in
+UX-3 and UX-6 are anchored to Scenario B (medium volume, 5 alerts).
+
+**Before — current stacked layout (the problem this ADR resolves):**
+```
+┌──────────────────────────────────────────────┐  ← Zone 1B, overflow:auto
+│ ■ TERM  FIN  reserve coverage   Step 3       │
+│ ■ CRIT  HDI  poverty headcount  Step 2       │  ← 3 rows fill visible area
+│ ■ WARN  GOV  rule of law        Step 4       │
+└──────────────────────────────────────────────┘
+                                                 ↕ SCROLL REQUIRED — not budgeted
+┌──────────────────────────────────────────────┐  ← AlertDetailPanel below fold
+│  Reserve Coverage   TERMINAL                 │
+│  Current: 1.842  Floor: 3.0  BREACHED        │
+│  Consecutive: 2 steps                        │
+└──────────────────────────────────────────────┘
+```
+
+**Scenario A — Low volume (1 alert):**
+```
+┌──────────────────────────────────────────────┐  ← Zone 1B (~135–171px total)
+│ ■ CRITICAL  poverty headcount  HDI           │  ← detail slot: always visible, zero clicks
+│             Step 2 · bottom_quintile         │
+│  Current: 0.312    Floor: 0.28               │
+│  11% above floor  ·  1 consecutive step      │
+│  Moderate confidence — cite with caveat      │
+╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌
+│  No other active alerts.                     │  ← compact sub-zone: empty state
+└──────────────────────────────────────────────┘
+```
+
+**Scenario B — Medium volume (5 alerts: 1 TERMINAL, 2 CRITICAL, 2 WARNING):**
+```
+┌──────────────────────────────────────────────┐
+│ ■ TERMINAL  reserve coverage  FIN            │  ← highest severity; zero clicks to read
+│             Step 3 · all cohorts             │
+│  Current: 1.842    Floor: 3.0                │
+│  BREACHED  ·  2 consecutive steps            │
+│  Moderate confidence — cite with caveat      │
+╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌
+│  CRIT  HDI  poverty headcount      Stp 2     │  ← scan only; no click target; cursor:default
+│  CRIT  ECO  co2 concentration      Stp 3     │
+│  +2 more ↕                                   │
+└──────────────────────────────────────────────┘
+```
+
+**Scenario C — High volume (10 alerts: 2 TERMINAL, 5 CRITICAL, 3 WARNING):**
+```
+┌──────────────────────────────────────────────┐  ← Zone 1B height invariant regardless of volume
+│ ■ TERMINAL  reserve coverage  FIN            │  ← earliest TERMINAL; 4 consecutive steps
+│             Step 1 · all cohorts             │
+│  Current: 1.842    Floor: 3.0                │
+│  BREACHED  ·  4 consecutive steps            │
+│  Moderate confidence — cite with caveat      │
+╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌
+│  TERM  GOV  sovereign default      Stp 2     │  ← 2nd TERMINAL visible in compact
+│  CRIT  HDI  poverty headcount      Stp 2     │
+│  +7 more ↕                                   │
+└──────────────────────────────────────────────┘
+```
+
+*Design property demonstrated by Scenario C:* Zone 1B height is invariant at all alert
+volumes. Ten alerts produce the same Zone 1B footprint as one. The compact sub-zone absorbs
+additional alerts through scroll, not through layout expansion.
+
+**Scenario D — Mode 3 in-flight auto-update (new TERMINAL fires mid-session):**
+
+*Before — analyst reading existing TERMINAL data:*
+```
+┌──────────────────────────────────────────────┐
+│ ■ TERMINAL  reserve coverage  FIN            │
+│             Step 3 · all cohorts             │
+│  Current: 1.842    Floor: 3.0                │
+│  BREACHED  ·  2 consecutive steps            │
+│  Moderate confidence — cite with caveat      │
+╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌
+│  CRIT  HDI  poverty headcount      Stp 2     │
+│  WARN  GOV  rule of law            Stp 4     │
+└──────────────────────────────────────────────┘
+```
+
+*After control input — new higher-priority TERMINAL fires at Step 4:*
+```
+┌──────────────────────────────────────────────┐
+│ ■ TERMINAL  sovereign default  GOV  [NEW]    │  ← auto-updated; [NEW] badge persists
+│             Step 4 · all cohorts             │
+│  Current: 0.08     Floor: 0.10               │
+│  BREACHED  ·  0 consecutive steps            │
+│  High confidence — cite directly             │
+│  Caused by: EmergencyPolicyInput Step 4      │  ← Mode 3 causal attribution
+╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌
+│  TERM  FIN  reserve coverage       Stp 1     │  ← previous top alert; demoted to compact
+│  CRIT  HDI  poverty headcount      Stp 2     │
+│  +1 more ↕                                   │
+└──────────────────────────────────────────────┘
+```
+
+*After analyst scrolls Zone 1B-compact — [NEW] badge clears:*
+```
+┌──────────────────────────────────────────────┐
+│ ■ TERMINAL  sovereign default  GOV           │  ← [NEW] cleared; layout otherwise unchanged
+│             ...                              │
+```
+
+*Design properties demonstrated by Scenario D:* (1) No reflow when detail content changes —
+Zone 1B height is identical across all three states shown. (2) [NEW] badge persists until the
+analyst takes any action within Zone 1B — it is not a flash. (3) There is no ambiguity about
+which alert occupies the detail slot — always the highest-severity, earliest-step alert,
+regardless of what the analyst was previously reading.
+
 ### Layout Architecture
 
 **Zone 1B outer container:**
@@ -255,99 +370,6 @@ consecutive breach step. That is an update to existing evidence, not a new findi
 **`AlertDetailPanel`:** Retained for use in `EntityDetailDrawer` (the drawer uses it independently of Zone 1B). Remove only from `MDAAlertPanelZone1B`. The scroll-into-view `useEffect` in `AlertDetailPanel` (line 162–163) may be removed from the Zone 1B context since it is no longer rendered there; it is retained in the EntityDetailDrawer usage.
 
 **`InstrumentCluster`:** Remove `focusedAlertMdaId` state and `onSelectAlert` handler that were wired to `MDAAlertPanelZone1B`.
-
-### Stress-Test Validation Mock-ups
-
-The following four scenarios were used to validate the design before this ADR was revised.
-They serve as implementation reference and acceptance criteria illustrations.
-
-**Scenario A — Low volume (1 alert):**
-```
-┌──────────────────────────────────────────────┐  ← Zone 1B (~135–171px total)
-│ ■ CRITICAL  poverty headcount  HDI           │  ← detail slot: always visible
-│             Step 2 · bottom_quintile         │
-│  Current: 0.312    Floor: 0.28               │
-│  11% above floor  ·  1 consecutive step      │
-│  Moderate confidence — cite with caveat      │
-╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌
-│  No other active alerts.                     │  ← compact: empty state
-└──────────────────────────────────────────────┘
-```
-
-**Scenario B — Medium volume (5 alerts: 1 TERMINAL, 2 CRITICAL, 2 WARNING):**
-```
-┌──────────────────────────────────────────────┐
-│ ■ TERMINAL  reserve coverage  FIN            │  ← highest severity; zero clicks to read
-│             Step 3 · all cohorts             │
-│  Current: 1.842    Floor: 3.0                │
-│  BREACHED  ·  2 consecutive steps            │
-│  Moderate confidence — cite with caveat      │
-╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌
-│  CRIT  HDI  poverty headcount      Stp 2     │  ← scan only; no click target
-│  CRIT  ECO  co2 concentration      Stp 3     │
-│  +2 more ↕                                   │
-└──────────────────────────────────────────────┘
-```
-
-**Scenario C — High volume (10 alerts: 2 TERMINAL, 5 CRITICAL, 3 WARNING):**
-```
-┌──────────────────────────────────────────────┐  ← Zone 1B height invariant regardless of volume
-│ ■ TERMINAL  reserve coverage  FIN            │  ← earliest TERMINAL; 4 consecutive steps
-│             Step 1 · all cohorts             │
-│  Current: 1.842    Floor: 3.0                │
-│  BREACHED  ·  4 consecutive steps            │
-│  Moderate confidence — cite with caveat      │
-╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌
-│  TERM  GOV  sovereign default      Stp 2     │  ← 2nd TERMINAL visible in compact
-│  CRIT  HDI  poverty headcount      Stp 2     │
-│  +7 more ↕                                   │
-└──────────────────────────────────────────────┘
-```
-
-*Note on high volume:* The analyst can confirm from the compact list that a second TERMINAL
-exists. She does not need to access that second TERMINAL's full detail from Zone 1B — Zone 2
-(FrameworkPanel) is the surface for deliberate alert exploration. Zone 1B's job is to surface
-the most urgent finding immediately; the compact list's job is to confirm the severity ranking
-of the remainder.
-
-**Scenario D — Mode 3 in-flight auto-update (new TERMINAL fires mid-session):**
-
-*Before (analyst reading existing data):*
-```
-┌──────────────────────────────────────────────┐
-│ ■ TERMINAL  reserve coverage  FIN            │
-│             Step 3 · all cohorts             │
-│  Current: 1.842    Floor: 3.0                │
-│  BREACHED  ·  2 consecutive steps            │
-│  Moderate confidence — cite with caveat      │
-╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌
-│  CRIT  HDI  poverty headcount      Stp 2     │
-│  WARN  GOV  rule of law            Stp 4     │
-└──────────────────────────────────────────────┘
-```
-
-*After control input — new higher-priority TERMINAL fires at Step 4:*
-```
-┌──────────────────────────────────────────────┐
-│ ■ TERMINAL  sovereign default  GOV  [NEW]    │  ← auto-updated; [NEW] badge persists
-│             Step 4 · all cohorts             │
-│  Current: 0.08     Floor: 0.10               │
-│  BREACHED  ·  0 consecutive steps            │
-│  High confidence — cite directly             │
-│  Caused by: EmergencyPolicyInput Step 4      │  ← Mode 3 causal attribution
-╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌
-│  TERM  FIN  reserve coverage       Stp 1     │  ← previous top alert; demoted to compact
-│  CRIT  HDI  poverty headcount      Stp 2     │
-│  +1 more ↕                                   │
-└──────────────────────────────────────────────┘
-```
-
-*After analyst scrolls Zone 1B-compact — [NEW] badge clears:*
-```
-┌──────────────────────────────────────────────┐
-│ ■ TERMINAL  sovereign default  GOV           │  ← [NEW] cleared; layout otherwise unchanged
-│             ...                              │
-```
 
 ---
 
