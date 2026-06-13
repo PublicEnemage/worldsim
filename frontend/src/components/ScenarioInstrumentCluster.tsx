@@ -167,6 +167,7 @@ function parseMdaAlerts(raw: RawMultiFrameworkOutput): Zone1BAlert[] {
         alert.indicator_key.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
       alerts.push({
         mda_id: alert.mda_id,
+        entity_id: raw.entity_id,
         indicator_key: alert.indicator_key,
         indicator_name,
         framework,
@@ -229,10 +230,6 @@ export function ScenarioInstrumentCluster({
     current: Record<string, QuantitySchema> | null;
     prev: Record<string, QuantitySchema> | null;
   }>({ current: null, prev: null });
-
-  // Alert drill-in selection — UI state, not simulation state (#745).
-  // Shared between Zone 1B (displays detail) and Zone 1D ("see alerts" navigation).
-  const [focusedAlertMdaId, setFocusedAlertMdaId] = useState<string | null>(null);
 
   // Mode 3 branch advance loop — abortController cancels in-flight advances on cleanup.
   const branchAbortRef = useRef<AbortController | null>(null);
@@ -616,8 +613,6 @@ export function ScenarioInstrumentCluster({
         mdaPanel={
           <MDAAlertPanelZone1B
             columnWidth={coPrimaryWidth}
-            focusedAlertMdaId={focusedAlertMdaId}
-            onSelectAlert={setFocusedAlertMdaId}
           />
         }
         pmmWidget={<PMMWidgetZone1C />}
@@ -625,7 +620,6 @@ export function ScenarioInstrumentCluster({
           <FourFrameworkZone1D
             isLoading={trajectoryLoading}
             isError={trajectoryError}
-            onSelectFrameworkAlert={setFocusedAlertMdaId}
             entityIds={entityIds}
           />
         }

@@ -49,6 +49,8 @@ export interface TrajectoryResponse {
  */
 export interface Zone1BAlert {
   mda_id: string;
+  /** ISO 3166-1 alpha-3 entity code (e.g. "JOR", "EGY"). Used in Zone 1B detail slot header and compact rows. */
+  entity_id: string;
   indicator_key: string;
   /** Human-readable indicator name — title-cased from backend; frontend registry may override. */
   indicator_name: string;
