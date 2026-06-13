@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-12 (ADR-014 accepted PR #926 — EL acceptance vote + UX Designer sign-off recorded; G7 (#852) now unblocked — sprint entry document required)**
+**Last updated: 2026-06-12 (NM-042 process amendment — structured sign-off attestation PR #930; G7 (#852) unblocked; ADR-014 accepted)**
 **Current milestone:** M13 — Political Economy and Instrument Credibility (GitHub Milestone 9)
 **Previous milestone:** M12 — Active Control and External Sector (formally closed 2026-06-11; Issue #263 closed; GitHub Milestone 13 closed; tagged v0.12.1)
 
@@ -85,6 +85,9 @@
 | #923 ✅ | docs(adr-014): rewrite — persistent-detail + scan-only compact list model | release/m13 | Merged 2026-06-12 |
 | #924 ✅ | docs(adr-014): promote mock-ups to primary design specification | release/m13 | Merged 2026-06-12 |
 | #926 ✅ | docs(adr-014): accepted — EL acceptance vote 2026-06-12 (ARCH-008) | release/m13 | Merged 2026-06-12 |
+| #928 ✅ | docs(adr-014): UX Designer independent sign-off — conditional, 3 intent requirements | release/m13 | Merged 2026-06-12 |
+| #929 ✅ | process(nm-042): agent generated UX Designer sign-off without independent review | release/m13 | Merged 2026-06-12 |
+| #930 ✅ | process(nm-042): structured UX Designer sign-off attestation — session context declaration | release/m13 | Merged 2026-06-12 |
 
 ## M11 Work Streams — 2026-06-04 Sprint
 
