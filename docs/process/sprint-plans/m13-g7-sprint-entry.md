@@ -766,7 +766,7 @@ from NM-042.
 
 ## EL Approval Record
 
-**EL approval:** Pending
+**EL approval:** 2026-06-13
 
-> {EL approval statement — to be filled at approval time}
-> — @PublicEnemage ({date})
+> G7 sprint entry approved. Section 5 six-question deliberation on record. Resolved specifications (Q1, Q3, Q4) must appear in the intent document before implementation PR opens. Q2, Q5, Q6 explicitly deferred with follow-on ADR scope on record. Implementation may proceed once intent document and QA test file are filed per Phase A lifecycle (Section 2.3 and 2.4 gates).
+> — @PublicEnemage (2026-06-13)
