@@ -532,10 +532,20 @@ The UX Designer participated in the design deliberation of 2026-06-12 and valida
 persistent-detail model against all four stress-test scenarios. Formal sign-off on this
 revised ADR text is required before the vote.
 
-`[✓]` UX Designer: UX implication statement elements 1–7 confirmed complete. [2026-06-12] Conditional sign-off — substantively correct; three implementation-intent requirements must appear in G7 intent document before implementation PR opens:
-1. **Compact row height constraint** — max 26px per row (single-line truncated) to preserve "top 1–3 visible without scroll" at 1024×768 minimum viewport (UX-1 / information-hierarchy.md §1B).
-2. **Mode-dependent tense in detail slot** — intent document must specify how "BREACHED" / "N% above floor" status language is mode-contextualized per information-hierarchy.md §1B ("Alert tense is mode-dependent") (UX-2).
-3. **Compact row cohort omission** — intent document must explicitly document that compact rows are exempt from information-hierarchy.md §1B "top affected cohort" requirement, with rationale (UX-7). Ruling: compact rows are a severity-rank scan surface, not an evidence surface; the requirement text predates the persistent-detail model and applied to the stacked-list design. Deviation is accepted; must be documented.
+`[✓]` UX Designer sign-off — four-field structured attestation (NM-042)
+
+**Reviewing agent:** UX Designer Agent
+**Session context:** Same session as ADR authorship — acknowledged
+**Governing documents reviewed:** `information-hierarchy.md §Zone 1` (no-interaction guarantee for co-primary instruments); `information-hierarchy.md §1B` (Zone 1B height contract; scan surface vs. evidence surface distinction; alert tense is mode-dependent; top affected cohort requirement); `north-star.md §Primary Cognitive Tasks` (Mode 1/2/3 cognitive task alignment — reactive ceiling governs UX-2 and UX-3); `user-journeys.md §Journey B Step 3` and `§Journey B Step 4` (5-second scan ceiling; argument citation window); `user-journeys.md §Journey C Step 3` (Mode 3 causal attribution entry state); `user-journeys.md §Journey D Step 2` (threshold orientation entry state)
+**Concerns found:** 3 — conditions attached below; sign-off is conditional on all three appearing in the G7 intent document before the implementation PR opens
+
+*Conditional sign-off — substantively correct; three implementation-intent requirements must appear in G7 intent document before implementation PR opens:*
+
+1. **Compact row height constraint** — max 26px per row (single-line truncated) to preserve "top 1–3 visible without scroll" at 1024×768 minimum viewport (UX-1 / `information-hierarchy.md §1B`).
+2. **Mode-dependent tense in detail slot** — intent document must specify how "BREACHED" / "N% above floor" status language is mode-contextualized per `information-hierarchy.md §1B` ("Alert tense is mode-dependent") (UX-2).
+3. **Compact row cohort omission** — intent document must explicitly document that compact rows are exempt from `information-hierarchy.md §1B` "top affected cohort" requirement, with rationale (UX-7). Ruling: compact rows are a severity-rank scan surface, not an evidence surface; the requirement text predates the persistent-detail model and applied to the stacked-list design. Deviation is accepted; must be documented.
+
+[2026-06-12]
 
 ---
 
