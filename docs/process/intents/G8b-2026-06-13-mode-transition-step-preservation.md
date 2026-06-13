@@ -340,7 +340,7 @@ stronger signal than the mode selector for Mode 2 state.
   `ModeTransitionModal` before mode changes.
 
 **QA Lead acknowledgment:**
-`[ ]` QA Lead: Tests for AC-1 through AC-7 authored and filed. [Date]
+`[x]` QA Lead: Tests for AC-1 through AC-7 authored and filed. 2026-06-13
 
 ---
 
