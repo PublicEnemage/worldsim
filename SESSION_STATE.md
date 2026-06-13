@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-13 (G8a — COMPLETE; #27, #45, #271 closed; PR #943 merged)**
+**Last updated: 2026-06-13 (G8a COMPLETE; #823/#824 DIC sign-offs recorded — CM + EE APPROVE; implementation unblocked)**
 **Current milestone:** M13 — Political Economy and Instrument Credibility (GitHub Milestone 9)
 **Previous milestone:** M12 — Active Control and External Sector (formally closed 2026-06-11; Issue #263 closed; GitHub Milestone 13 closed; tagged v0.12.1)
 
@@ -92,8 +92,8 @@
 - ✅ #45 — HCL indicator standards (CODING_STANDARDS.md + DATA_STANDARDS.md) — CLOSED
 - ✅ #27 R1–R3 — Calibration doc residuals (Propagation Rules section + demo docstring + ADR-001 note) — CLOSED
 - ✅ #271 — Reversibility classification metadata tag (ReversibilityClassification enum, REVERSIBILITY_REGISTRY, Quantity field, round-trip serde, 24 tests) — CLOSED
-- 🟡 #823 — Ecological composite fixed denominator (Chief Methodologist sign-off gate before merge)
-- 🟡 #824 — MENA arid-economy elasticity calibration (Chief Methodologist + Ecological Economist sign-off gate before merge)
+- ✅ #823 — Ecological composite fixed denominator — CM APPROVE 2026-06-13 (3 constraints: fix at first call not step 0; zero-indicator → None; audit Greece fixture; implementation unblocked)
+- ✅ #824 — MENA arid-economy elasticity calibration — CM + EE APPROVE 2026-06-13 (binding: −0.04, Tier 3, FAO GFR arid-subset/ICARDA, biome_class `arid_semiarid`, fallback to `high_forest_cover` with WARNING; implementation unblocked)
 
 **G8b — BLOCKED (intent document required):**
 - #393 — Mode 1→2 step position preservation
