@@ -3,17 +3,17 @@ name: m13-g8-sprint-entry
 type: sprint-entry
 milestone: M13 — Political Economy and Instrument Credibility
 sprint-group: G8 (G8a + G8b)
-status: Filed — awaiting EL approval before implementation begins
+status: EL-approved — implementation may begin
 authored-by: PM Agent
 authored-date: 2026-06-13
-el-approved: false
+el-approved: 2026-06-13
 release-branch: release/m13
 sop-reference: docs/process/sprint-planning-sop.md
 ---
 
 # Sprint Entry — M13, G8: Standards, Methodology, Calibration and Mode Transition UX
 
-**Status:** Filed — awaiting EL approval before implementation begins
+**Status:** EL-approved 2026-06-13 — implementation may begin
 **Date authored:** 2026-06-13
 **Release branch:** `release/m13`
 **Sprint plan:** `docs/process/sprint-plans/m13-sprint-plan.md`
@@ -241,7 +241,13 @@ gap) or a known execution gap is the PI Agent's determination to make.
 
 ## EL Approval Record
 
-**EL approval:** Pending
+**EL approval:** 2026-06-13
 
-> {EL approval statement — to be filled at approval time}
-> — @PublicEnemage ({date})
+> G8 sprint entry approved. G8a (standards/methodology/calibration) and G8b (mode transition
+> UX) may proceed. G8a implementation PRs may open immediately — infrastructure sprint
+> exception applies, no intent documents required. G8b implementation is blocked until the
+> intent document is filed at `docs/process/intents/G8b-2026-06-13-mode-transition-step-preservation.md`
+> and QA tests are authored. #271 scope is metadata tag only — no MDA recalibration.
+> Domain agent sign-offs (#823: Chief Methodologist; #824: Chief Methodologist + Ecological
+> Economist) are mandatory before those PRs merge.
+> — @PublicEnemage (2026-06-13)
