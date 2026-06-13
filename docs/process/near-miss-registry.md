@@ -2166,6 +2166,94 @@ The Engineering Lead — not the process. The Phase A execution lifecycle (CLAUD
 
 ---
 
+## NM-043 — G4 Sprint Closed Issue #27 in Session State With Two ACs Unsatisfied; Caught at M13 HORIZON Sweep (Reactive)
+
+**Date:** 2026-06-13
+**Milestone:** M13 — Political Economy and Instrument Credibility
+**Detected by:** PM Agent HORIZON sweep — GitHub issue state inspected against session records; PR #915 diff checked against original issue ACs
+**Severity:** Medium — created documentation debt and a false "done" record in session state; no incorrect analytical outputs produced; caught before downstream work depended on the false closure
+
+### What happened
+
+Issue #27 (calibration basis for propagation attenuation parameters) was included in the G4
+documentation sprint (Wave 1, M13). PR #915 was merged 2026-06-12 and `SESSION_STATE.md` recorded
+G4 as "✅ MERGED 2026-06-12 (PR #915)" with #27 listed as closed.
+
+At the M13 midpoint HORIZON sweep (2026-06-13), the PM Agent inspected the GitHub issue state
+and found #27 still OPEN. Inspection of the PR #915 diff against the original issue ACs
+revealed three unsatisfied conditions:
+
+1. **AC-3 not satisfied:** The demo scenario docstring was not updated to reference
+   `docs/methodology/calibration-basis.md`. `demo_scenario.py` line 229 still reads
+   "See scenario specification for calibration notes" — not a link to the calibration document.
+
+2. **AC-4 not satisfied:** ADR-001 was not updated with a parameter calibration status note.
+   The ADR-001 milestone review entry contains no reference to the calibration document or
+   Issue #44 as the forward calibration vehicle.
+
+3. **Document gap:** `TARIFF_ATTENUATION = 0.6` and `TARIFF_MAX_HOPS = 2` —  the specific
+   parameters the original issue was filed against — are absent from `docs/methodology/calibration-basis.md`.
+   The document's Propagation Network Parameters section covers only the synthetic relationship
+   weight fallback, not the per-rule tariff shock parameters.
+
+The root of the miss: the G4 PR test plan included only three ACs total (one per issue in the
+G4 bundle), and for #27, the PR test plan checked only "AC-2: calibration-basis.md exists with
+≥3 named parameters" — a subset of the original five ACs. AC-3, AC-4, and the TARIFF_ATTENUATION
+gap were not in the PR test plan and were never verified before the issue was marked done.
+
+### What was at risk
+
+**False closure propagating into future sessions.** If the HORIZON sweep had not caught this,
+the G8 sprint (which depends on #27's residuals being accurately scoped) would have opened
+against a SESSION_STATE that said #27 was done. G8a would have proceeded without the
+TARIFF_ATTENUATION calibration entry, the demo docstring link, or the ADR-001 note — all
+three of which are visible to the Demo 5 external audience.
+
+**Specifically:** `TARIFF_ATTENUATION = 0.6` is the exact parameter the original issue was
+filed about. A calibration document created to close #27 that does not document this parameter
+has not actually closed the gap the issue identified. The methodology transparency claim would
+have been false: the calibration document would exist but would not cover the parameter it was
+created to document.
+
+### What caught it
+
+The HORIZON sweep process — not an ad hoc person catch. The M13 sprint plan explicitly
+called for a midpoint HORIZON sweep, and the PM Agent TRIAGE assessment included a GitHub
+issue state inspection step that compared open issues against session records. This is the
+process working as designed.
+
+However, the upstream gap is that the HORIZON sweep only catches this class of error
+retrospectively — one full sprint wave after it occurred. A process gate at the point of
+PR creation would have caught it at lower remediation cost.
+
+### Process improvement
+
+**Immediate (this session):** #27 residuals (R1–R3) added to G8a scope. G8a PR will use
+`Closes #27` when all three residuals are committed. The residuals are documented in
+`docs/process/sprint-plans/m13-g8-sprint-entry.md §3.1`.
+
+**Structural gap identified:** When a sprint group PR closes multiple issues, the PR test
+plan checks a simplified subset of ACs rather than the full original AC set of the constituent
+issues. This is the mechanism by which AC-3 and AC-4 were missed: the G4 PR test plan was
+authored against what the implementing agent intended to deliver, not against what the issues
+required.
+
+**Process improvement required:** Before a sprint group PR is marked ready for review, the
+implementing agent must either: (a) include a check in the PR test plan for every AC of every
+constituent issue, or (b) explicitly note which original ACs are being descoped with rationale
+and EL confirmation. A PR test plan that is a strict subset of the constituent issues' ACs
+without documented descoping is an incomplete test plan.
+
+This improvement applies particularly to documentation and standards sprints, where the
+implementing agent authors their own test plan rather than having it derived from an intent
+document by a separate QA step.
+
+PI Agent determination: this is a near-miss (not a Known Issue). The fix requires a change
+to our own process (PR test plan completeness requirement), not a vendor fix. The gap is
+an absence of a gate — not external infrastructure behaviour.
+
+---
+
 ## Registry Maintenance
 
 ### How to add an entry
