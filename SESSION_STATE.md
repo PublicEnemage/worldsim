@@ -65,7 +65,7 @@
     - North star: Zambian ministry analyst can read top threshold breach evidence with zero interactions from moment instrument cluster loads — interaction tax eliminated; argument evidence available at creditor-side parity
     - #852 closed
 
-**Next action:** G8a COMPLETE (PR #943 merged 2026-06-13). G8b blocked until intent document filed at `docs/process/intents/G8b-2026-06-13-mode-transition-step-preservation.md`. Domain agent sign-offs #823 (CM) and #824 (CM + Ecological Economist) are separate G8a follow-on issues — PRs may open now. PI Agent near-miss determination pending on #27 open/closed discrepancy (§5 of sprint entry).
+**Next action:** G8b QA test authorship COMPLETE (PR #947 merged 2026-06-13). Implementation (Step 3) may now begin: Frontend Architect Agent opens implementation PR for `ModeSelector.tsx`, `ModeTransitionModal.tsx`, `setMode` store action, and `current-step-display` testid in `ScenarioControls.tsx`. G8a domain sign-offs #823/#824 are separate follow-on issues — PRs may open in parallel. PI Agent near-miss determination pending on #27 open/closed discrepancy (§5 of sprint entry).
 
 ### Sprint Group Status
 
@@ -79,7 +79,7 @@
 | G6 — Political economy integration | #392 | Wave 2 | ADR-013 ✅ | ✅ COMPLETE 2026-06-12 (PR #919, BPO ACCEPT, #392 closed) |
 | G7 — Alert panel master-detail | #852 | Wave 3 | ADR-014 ✅ (accepted 2026-06-12) | ✅ COMPLETE 2026-06-13 (PR #936, BPO ACCEPT, #852 closed) |
 | G8a — Standards/methodology/calibration | #45, #27 R1–R3, #271 (tag only), #823, #824 | Wave 3 | None | ✅ COMPLETE 2026-06-13 (PR #943, #27/#45/#271 closed; #823/#824 domain sign-offs pending) |
-| G8b — Mode transition UX | #393 | Wave 3 | None | 🟡 OPEN — intent document required before implementation PR |
+| G8b — Mode transition UX | #393 | Wave 3 | None | 🟡 OPEN — QA tests filed (PR #947); implementation PR next |
 
 **Status:** All G1–G7 complete. G8 open (EL-approved 2026-06-13). M13 primary objectives: ADR-013 ✅, G6 ✅, G7 ✅. G8 closes the remaining M13 near-term backlog. M13 exit ceremony (#264) follows G8 completion.
 
@@ -95,10 +95,13 @@
 - ✅ #823 — Ecological composite fixed denominator — CM APPROVE 2026-06-13 (3 constraints: fix at first call not step 0; zero-indicator → None; audit Greece fixture; implementation unblocked)
 - ✅ #824 — MENA arid-economy elasticity calibration — CM + EE APPROVE 2026-06-13 (binding: −0.04, Tier 3, FAO GFR arid-subset/ICARDA, biome_class `arid_semiarid`, fallback to `high_forest_cover` with WARNING; implementation unblocked)
 
-**G8b — BLOCKED (intent document required):**
+**G8b — OPEN (implementation unblocked):**
 - #393 — Mode 1→2 step position preservation
-  - Intent document path: `docs/process/intents/G8b-2026-06-13-mode-transition-step-preservation.md`
-  - QA test authorship gate follows intent document
+  - Intent document: `docs/process/intents/G8b-2026-06-13-mode-transition-step-preservation.md` — FILED
+  - ✅ QA test authorship (Step 2) — COMPLETE 2026-06-13 (PR #947)
+    - E2E: `frontend/tests/e2e/mode-transition.spec.ts` — AC-1 through AC-7; 8 tests incl. regressions
+    - Unit/RTL: `frontend/src/components/__tests__/mode-selector.test.tsx` — 23 tests; setMode SF-1/SF-2 guards; modal-precedes-mode-change; store atomicity
+  - Step 3 (Implementation): Frontend Architect Agent; files: `ModeSelector.tsx`, `ModeTransitionModal.tsx`, `setMode` store action in `scenarioStepStore.ts`, `data-testid="current-step-display"` in `ScenarioControls.tsx`
   - BPO Validate: Sri Lanka 2022 marquee case (Mode 1 → Mode 2 in single session, no context reconstruction)
 
 **M14 deferrals confirmed (HORIZON sweep 2026-06-13):**
