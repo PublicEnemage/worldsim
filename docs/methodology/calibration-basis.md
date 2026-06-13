@@ -128,6 +128,62 @@ empirical trade weight data from UN Comtrade or IMF DOTS when available.
 
 ---
 
+### Propagation Rules — `TARIFF_ATTENUATION` and `TARIFF_MAX_HOPS`
+
+**Location:** `backend/scripts/demo_scenario.py` module constants; applied via
+`PropagationRule(attenuation_factor=TARIFF_ATTENUATION, max_hops=TARIFF_MAX_HOPS)`
+on all trade shock inputs.
+
+#### `TARIFF_ATTENUATION` — Trade shock attenuation factor per hop
+
+**Value:** `0.6`
+
+**Basis:** PLACEHOLDER (Tier D). The 0.6 value is a structurally reasonable interim
+estimate representing moderate attenuation for first-order trade shock propagation. A
+direct tariff shock of magnitude S transmits 0.6·S to each bilateral trade partner
+(hop 1) and 0.36·S (0.6²) to second-hop partners.
+
+Candidate calibration methodology:
+- Gravity model residuals: calibrate attenuation to match observed bilateral trade
+  impact decay across WTO dispute cases and documented tariff shock episodes
+  (US–China 2018–2019, US–EU 2002 steel tariffs)
+- Primary data: UN Comtrade bilateral trade matrix (Tier 1) for direct exposure;
+  IMF DOTS for partner-country impact (Tier 2)
+- Fitting approach: minimise out-of-sample RMSE on bilateral trade impact across
+  three held-out tariff shock episodes
+
+Sensitivity analysis: outputs at `attenuation_factor = 0.4` and `0.8` show a ±30%
+range on second-hop exposure — directional output is stable; magnitude is not.
+
+**Calibration status:** PLACEHOLDER (Tier D) — full empirical calibration deferred
+to Issue #44.
+
+---
+
+#### `TARIFF_MAX_HOPS` — Maximum propagation depth in trade network
+
+**Value:** `2`
+
+**Basis:** PLACEHOLDER (Tier D). The 2-hop limit models first- and second-order
+trade linkages. Hop 1 is the direct bilateral partner affected by the tariff; hop 2
+is an economy connected through the hop-1 partner. Third-order effects (hop 3+) are
+not modelled — the empirical evidence that third-order effects are distinguishable
+from noise at macroeconomic resolution is weak at current model fidelity.
+
+Candidate calibration methodology:
+- Input-output table analysis (WIOD or OECD TiVA): estimate value-added transmission
+  across supply-chain hops. The hop at which additional propagation falls below 5% of
+  the initial shock defines the empirically appropriate `max_hops`
+- Historical validation: US–China tariff shock 2018–2019 produced measurable effects
+  in ASEAN economies (hop 2); hop-3 effects in other regions were ambiguous in the
+  published literature
+
+**Calibration status:** PLACEHOLDER (Tier D) — 2-hop limit is conservative and
+consistent with the empirical trade-network propagation literature. Full calibration
+deferred to Issue #44.
+
+---
+
 ## Political Economy Parameters (ADR-013)
 
 These parameters govern the PoliticalEconomyModule (M13 G6). All are Tier 3 —

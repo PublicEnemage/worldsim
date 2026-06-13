@@ -1,5 +1,6 @@
 """
-Quantity type system — SCR-001, ADR-001 Amendment 1; AttributeType ADR-001 Amendment 2.
+Quantity type system — SCR-001, ADR-001 Amendment 1; AttributeType ADR-001 Amendment 2;
+ReversibilityClassification Issue #271 (G8a, M13).
 
 Every physical and economic measurement in the simulation is a Quantity.
 Never raw float, never raw Decimal without a unit and provenance.
@@ -15,6 +16,11 @@ AttributeType (Amendment 2, Issue #30) is a complementary economic-semantic tag:
   FLOW            — GDP, exports, deficit (change per period)
   STRUCTURAL_INDEX — governance quality, political stability (index, no natural unit)
   RATE            — rates per period (inflation rate, unemployment rate)
+
+ReversibilityClassification (Issue #271) indicates whether damage from a shock heals:
+  RECOVERABLE      — heals within 1–5 years with policy intervention
+  DELAYED_RECOVERY — partial recovery over 5–15 years; sustained investment required
+  IRREVERSIBLE     — does not recover within policy-relevant time horizons (< 25 years)
 
 AttributeType and VariableType are complementary: VariableType drives propagation
 behaviour; AttributeType annotates economic meaning for MDA classification and
@@ -113,6 +119,41 @@ class VariableType(Enum):
     point-in-time probability estimates (ADR-013)."""
 
 
+class ReversibilityClassification(str, Enum):
+    """Classification of whether damage represented by a simulation indicator heals.
+
+    Distinguishes indicators where the damage caused by a shock recovers with
+    economic stabilisation from indicators where the damage forecloses future
+    options regardless of subsequent recovery.
+
+    Source: Domain Intelligence Council blind interview (2026-05-11), Issue #271.
+    Three of nine DIC members raised the absence of this classification
+    independently. See docs/methodology/calibration-basis.md for the full
+    rationale and REVERSIBILITY_REGISTRY in reversibility.py for the
+    indicator-level assignments.
+
+    The classification is a property of the indicator type, not of the shock
+    magnitude. A recoverable indicator may still cause severe harm; the
+    classification only addresses whether that harm persists after stabilisation.
+    """
+
+    RECOVERABLE = "recoverable"
+    """Damage heals with economic stabilisation and appropriate policy intervention.
+    Typical recovery horizon: 1–5 years. Examples: fiscal balance, FX reserves,
+    GDP growth rate, unemployment rate (structural unemployment excluded)."""
+
+    DELAYED_RECOVERY = "delayed_recovery"
+    """Partial or slow recovery is possible but requires sustained investment and
+    time well beyond the typical programme window. Typical recovery horizon: 5–15 years.
+    Examples: community social capital networks, land-use pressure below tipping point."""
+
+    IRREVERSIBLE = "irreversible"
+    """Damage does not recover within policy-relevant time horizons (< 25 years)
+    regardless of subsequent economic performance. Examples: mortality, permanent
+    emigration of skilled workers, schooling gaps in children who did not complete
+    a grade level, ecosystem stocks that crossed a tipping point."""
+
+
 @dataclass(kw_only=True)
 class Quantity:
     """A typed, attributed measurement carrying value, unit, and provenance.
@@ -152,6 +193,7 @@ class Quantity:
     confidence_tier: int = 1
     attribute_type: AttributeType | None = None
     stock_flow_identity: bool = False
+    reversibility: ReversibilityClassification | None = None
 
 
 @dataclass(kw_only=True)

@@ -2221,6 +2221,14 @@ Every human cost ledger indicator introduced in a new module or backtesting fixt
 must cite the canonical source above in the `SourceRegistration` entry and carry a
 field-level certification per `§Field-Level Data Certification`.
 
+**Implementation standards cross-reference:** `CODING_STANDARDS.md §Human Development
+Indicator Standards` defines the required structural record fields, five required
+content indicators (`capability_loss_index`, `mortality_excess_rate`,
+`education_disruption_years`, `nutrition_deficit_severity`, `healthcare_access_delta`),
+effect size materiality thresholds, and the eight-point test requirement for all
+HCL-producing modules. Both documents are required reading before authoring any
+HCL output.
+
 ---
 
 ## Data Admission Testing Principle — SA-05 (Issue #253)

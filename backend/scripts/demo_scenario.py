@@ -226,7 +226,9 @@ def _build_tariff_input() -> TradePolicyInput:
     """Construct the TradePolicyInput for the US tariff shock.
 
     The input fires at step 1 and propagates through the trade network.
-    See scenario specification for calibration notes.
+    Propagation parameters (TARIFF_ATTENUATION, TARIFF_MAX_HOPS) are documented
+    as PLACEHOLDER (Tier D) in docs/methodology/calibration-basis.md
+    §Propagation Rules. Empirical calibration is deferred to Issue #44.
 
     Returns:
         TradePolicyInput representing the US tariff imposition.
