@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-13 (G8a COMPLETE; #823/#824 DIC sign-offs recorded — CM + EE APPROVE; implementation unblocked)**
+**Last updated: 2026-06-13 (M12 exit ceremony complete; issues #950 + #951 filed on M13 — Zone 1A Y axis legibility + solo-use gate process gap)**
 **Current milestone:** M13 — Political Economy and Instrument Credibility (GitHub Milestone 9)
 **Previous milestone:** M12 — Active Control and External Sector (formally closed 2026-06-11; Issue #263 closed; GitHub Milestone 13 closed; tagged v0.12.1)
 
@@ -418,6 +418,8 @@ CI hotfix: NM-035 filed; `ci.yml` PR trigger updated to include `release/m*` (PR
 | #102 | feat: distributional scenario comparison with variance and percentile range | near-term | |
 | #35 | feat(simulation): dynamic relationship weight updating | near-term | |
 | #274 | feat(simulation): 25-year human capital depletion trajectory | near-term | |
+| #950 | ux: Zone 1A trajectory chart Y axis has no label or unit — composite score scale is uninterpretable without presenter narration | near-term | HIGH — blocks unnarrated solo use; Y axis shows 0.00–1.40 with no label/unit/boundary indicator; refs #951 (solo-use gate) |
+| #951 | process: review protocol blind spot — all M12 reviews conducted in narrated-demo context; solo unnarrated use never tested | near-term | Solo-use gate proposed for Step 6b; Customer Agent designated reviewer; `[SOLO]` tag on findings; CRITICAL/HIGH solo findings block Step 7 |
 
 *M12 is closed (2026-06-11 — #263 signed off, GitHub Milestone 13 closed). M13 sprint planning has not yet begun — see kickoff prerequisites above.*
 
