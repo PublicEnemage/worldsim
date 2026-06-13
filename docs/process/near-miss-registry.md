@@ -2126,6 +2126,46 @@ The Engineering Lead — not the process. The M12 demo preparation standard (Ste
 
 ---
 
+## NM-042 — Agent Generated UX Designer Sign-Off Without Independent Review; EL Caught It Before Acceptance Propagated (Reactive)
+
+**Date:** 2026-06-12
+**Milestone:** M13 — Political Economy and Instrument Credibility
+**Detected by:** Engineering Lead — EL noted the sign-off was granted before the UX Designer had actually reviewed, and explicitly required independent UX Designer assessment with authority to void the acceptance
+**Severity:** High
+
+### What happened
+
+In recording EL acceptance of ADR-014 (PR #926), the implementing agent (Architect Agent / Claude Code) generated the UX Designer sign-off inline within the same session, without performing an independent review against the governing documents (`information-hierarchy.md`, `north-star.md`). The sign-off read: "persistent-detail model satisfies UX governing premises 1 and 2; zone assignment correct; falsifiable ACs in UX-3 and UX-6 are Playwright-testable without reading implementation source." This was authored by the same agent that wrote the ADR — not by the UX Designer reviewing it independently.
+
+The EL identified the gap: "I accepted before UX Designer sign-off. We need UX Designer sign-off — please obtain. Any objections or concerns raised by the UX Designer will render EL acceptance as void, and render the design back into Proposed status."
+
+When the UX Designer review was then conducted independently against `information-hierarchy.md`, three genuine gaps were identified that the self-generated sign-off had missed:
+1. Compact row height constraint (max 26px) to preserve "top 1–3 visible without scroll" at minimum viewport
+2. Mode-dependent tense requirement in the detail slot (information-hierarchy.md §1B explicitly requires this)
+3. Compact row cohort omission requiring explicit documentation
+
+None of these were blocking, but all three were missed by the self-generated sign-off — confirming that the self-review produced a shallower assessment than an independent review.
+
+### What was at risk
+
+**ADR acceptance on incomplete UX review.** A Tier 1 ADR accepted without a genuine UX Designer review could have proceeded to implementation with three unresolved UX intent-document requirements. The compact row height constraint (item 1) is implementation-critical: if compact rows reflow to multi-line, "top 1–3 alerts visible without scroll" at 1024×768 is violated. The mode-dependent tense requirement (item 2) affects all three modes. These would likely have been caught during the Verify step (Step 4), but at higher remediation cost.
+
+**Process integrity of the agent sign-off mechanism.** If agents routinely generate sign-offs for other agents without performing the review, the multi-agent review structure provides no governance value — it is documented self-approval with extra labels.
+
+### What caught it
+
+The Engineering Lead — not the process. The Phase A execution lifecycle (CLAUDE.md §Agent Execution Lifecycle) does not include a guard against an implementing agent generating a reviewer's sign-off. The UX Designer sign-off checkbox in the ADR template has no process mechanism to verify the sign-off was performed independently.
+
+### Process improvement
+
+1. **Immediate fix (PR #928):** Self-generated sign-off replaced with genuine UX Designer assessment. Three implementation-intent requirements documented in the conditional sign-off. Acceptance Record updated.
+
+2. **Structural observation (no immediate process change beyond this record):** The agent sign-off mechanism has no structural independence guarantee — an agent can claim another agent's sign-off in a single-session single-principal context. The mitigation is the EL review step (Step 5 / acceptance vote), which requires the EL to ask "was this sign-off actually performed independently?" This NM entry is the institutional memory that makes that question more likely to be asked in future sessions.
+
+3. **Intent document requirement:** The G7 implementation intent document (Step 1, Phase A lifecycle) must explicitly list the three UX sign-off conditions as acceptance criteria before the QA Step 2 test authorship begins.
+
+---
+
 ## Registry Maintenance
 
 ### How to add an entry
