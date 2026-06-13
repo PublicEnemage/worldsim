@@ -88,12 +88,12 @@ alert text, or indicator display in the running application, that element is out
 scope and must be tracked in a separate G9 issue with a full Phase A lifecycle.
 
 - [x] G8a: Infrastructure sprint exception applied — intent documents not required.
-- [ ] G8b: Intent document required before implementation PR opens — **BLOCKING G8b IMPLEMENTATION**
+- [x] G8b: Intent document filed 2026-06-13 — `docs/process/intents/G8b-2026-06-13-mode-transition-step-preservation.md` — **QA test authorship gate is next block**
 
 | Deliverable | ADR reference | Intent document path | Filed? |
 |---|---|---|---|
 | G8a — #45, #27 R1–R3, #271, #823, #824 | N/A (infrastructure exception) | N/A | N/A — exception applies |
-| G8b — Mode 1→2 step preservation (#393) | N/A (no ADR required) | `docs/process/intents/G8b-2026-06-13-mode-transition-step-preservation.md` | No — must file before G8b PR opens |
+| G8b — Mode 1→2 step preservation (#393) | N/A (no ADR required) | `docs/process/intents/G8b-2026-06-13-mode-transition-step-preservation.md` | **Yes — filed 2026-06-13** |
 
 **G8b intent document minimum content:**
 
