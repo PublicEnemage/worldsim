@@ -357,6 +357,14 @@ test("AC-2: scenario-identity-header retains entity identifiers after Mode 1→2
   const entityTextBefore = await identityHeader.textContent();
   if (!entityTextBefore) return;
 
+  // Extract the entity identifier substring from the header (e.g. "Entity: GRC").
+  // The intent doc AC-2 criterion is that entity identifiers are retained — not that the
+  // full header text is character-for-character identical. The Status portion legitimately
+  // updates (e.g. "Step 2 of 3" → "Complete (3 steps)") as the advance settles; checking
+  // strict equality on the full text would catch that timing delta, not an entity loss.
+  // We extract the non-Status prefix as the stable identifier region to compare.
+  const entityIdentifierRegion = entityTextBefore.split("Status:")[0] ?? entityTextBefore;
+
   const simulationLabel = page.locator('[data-testid="mode-selector-label-MODE_2"]');
   const selectorPresent = await simulationLabel.isVisible({ timeout: 2_000 }).catch(() => false);
   if (!selectorPresent) return;
@@ -375,12 +383,14 @@ test("AC-2: scenario-identity-header retains entity identifiers after Mode 1→2
   await confirmBtn.click();
   await page.waitForTimeout(300);
 
-  // Entity header must still be present and contain the same content
+  // Entity header must still be present and retain the scenario + entity identifiers.
+  // The Status sub-string may update legitimately during advance settling — that is not
+  // an entity loss. We assert the identifier region (Scenario + Entity prefix) is unchanged.
   const headerStillPresent = await identityHeader.isVisible({ timeout: 2_000 }).catch(() => false);
   if (!headerStillPresent) return;
 
   const entityTextAfter = await identityHeader.textContent();
-  expect(entityTextAfter).toBe(entityTextBefore);
+  expect(entityTextAfter).toContain(entityIdentifierRegion.trim());
 
   // No entity re-entry prompt should have appeared between confirm and this assertion
   // Check for any modal or dialog asking for entity re-configuration
