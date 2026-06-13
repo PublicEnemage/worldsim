@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-13 (G7 (#852) alert panel UX — COMPLETE; BPO ACCEPT; #852 closed; Wave 3 complete)**
+**Last updated: 2026-06-13 (G8a — COMPLETE; #27, #45, #271 closed; PR #943 merged)**
 **Current milestone:** M13 — Political Economy and Instrument Credibility (GitHub Milestone 9)
 **Previous milestone:** M12 — Active Control and External Sector (formally closed 2026-06-11; Issue #263 closed; GitHub Milestone 13 closed; tagged v0.12.1)
 
@@ -65,7 +65,7 @@
     - North star: Zambian ministry analyst can read top threshold breach evidence with zero interactions from moment instrument cluster loads — interaction tax eliminated; argument evidence available at creditor-side parity
     - #852 closed
 
-**Next action:** G8 sprint open — EL-approved 2026-06-13 (PR #939). G8a implementation PRs may open immediately. G8b blocked until intent document filed. PI Agent near-miss determination pending on #27 open/closed discrepancy (§5 of sprint entry).
+**Next action:** G8a COMPLETE (PR #943 merged 2026-06-13). G8b blocked until intent document filed at `docs/process/intents/G8b-2026-06-13-mode-transition-step-preservation.md`. Domain agent sign-offs #823 (CM) and #824 (CM + Ecological Economist) are separate G8a follow-on issues — PRs may open now. PI Agent near-miss determination pending on #27 open/closed discrepancy (§5 of sprint entry).
 
 ### Sprint Group Status
 
@@ -78,7 +78,7 @@
 | G5 — ADR-013 authorship | #792 | Wave 1 | N/A | ✅ ACCEPTED 2026-06-12 (PR #916) |
 | G6 — Political economy integration | #392 | Wave 2 | ADR-013 ✅ | ✅ COMPLETE 2026-06-12 (PR #919, BPO ACCEPT, #392 closed) |
 | G7 — Alert panel master-detail | #852 | Wave 3 | ADR-014 ✅ (accepted 2026-06-12) | ✅ COMPLETE 2026-06-13 (PR #936, BPO ACCEPT, #852 closed) |
-| G8a — Standards/methodology/calibration | #45, #27 R1–R3, #271 (tag only), #823, #824 | Wave 3 | None | 🟡 OPEN — EL-approved 2026-06-13; implementation PRs may begin |
+| G8a — Standards/methodology/calibration | #45, #27 R1–R3, #271 (tag only), #823, #824 | Wave 3 | None | ✅ COMPLETE 2026-06-13 (PR #943, #27/#45/#271 closed; #823/#824 domain sign-offs pending) |
 | G8b — Mode transition UX | #393 | Wave 3 | None | 🟡 OPEN — intent document required before implementation PR |
 
 **Status:** All G1–G7 complete. G8 open (EL-approved 2026-06-13). M13 primary objectives: ADR-013 ✅, G6 ✅, G7 ✅. G8 closes the remaining M13 near-term backlog. M13 exit ceremony (#264) follows G8 completion.
@@ -88,12 +88,12 @@
 **Sprint entry:** `docs/process/sprint-plans/m13-g8-sprint-entry.md` — EL-approved 2026-06-13 (PR #939)
 **Sprint plan updated:** `docs/process/sprint-plans/m13-sprint-plan.md` — G8 Wave 3 added (PR #940)
 
-**G8a — OPEN (implementation may begin):**
-- #45 — HCL indicator standards (CODING_STANDARDS.md + DATA_STANDARDS.md)
-- #27 R1–R3 — Calibration doc residuals (Propagation Rules section + demo docstring + ADR-001 note); closes #27
-- #271 — Reversibility classification metadata tag (scope: field on output indicators only; no MDA recalibration; MDA calibration → M14 named follow-on)
-- #823 — Ecological composite fixed denominator (Chief Methodologist sign-off gate before merge)
-- #824 — MENA arid-economy elasticity calibration (Chief Methodologist + Ecological Economist sign-off gate before merge)
+**G8a — COMPLETE (PR #943, merged 2026-06-13):**
+- ✅ #45 — HCL indicator standards (CODING_STANDARDS.md + DATA_STANDARDS.md) — CLOSED
+- ✅ #27 R1–R3 — Calibration doc residuals (Propagation Rules section + demo docstring + ADR-001 note) — CLOSED
+- ✅ #271 — Reversibility classification metadata tag (ReversibilityClassification enum, REVERSIBILITY_REGISTRY, Quantity field, round-trip serde, 24 tests) — CLOSED
+- 🟡 #823 — Ecological composite fixed denominator (Chief Methodologist sign-off gate before merge)
+- 🟡 #824 — MENA arid-economy elasticity calibration (Chief Methodologist + Ecological Economist sign-off gate before merge)
 
 **G8b — BLOCKED (intent document required):**
 - #393 — Mode 1→2 step position preservation
@@ -131,6 +131,7 @@ All near-term issues dispositioned at HORIZON sweep 2026-06-13 — see G8 sprint
 | #930 ✅ | process(nm-042): structured UX Designer sign-off attestation — session context declaration | release/m13 | Merged 2026-06-12 |
 | #935 ✅ | process(g7): EL approval of sprint entry — 2026-06-13 | release/m13 | Merged 2026-06-13 |
 | #936 ✅ | feat(g7): Zone 1B persistent-detail layout — ADR-014 (#852) | release/m13 | Merged 2026-06-13 |
+| #943 ✅ | feat(g8a): close #27 R1-R3, #45, #271 — calibration docs, HCL standards, reversibility schema | release/m13 | Merged 2026-06-13 |
 
 ## M11 Work Streams — 2026-06-04 Sprint
 
@@ -407,9 +408,9 @@ CI hotfix: NM-035 filed; `ci.yml` PR trigger updated to include `release/m*` (PR
 | ~~#392~~ | ~~arch(m11): political economy constraint modeling~~ | — | **CLOSED 2026-06-12** — BPO ACCEPT on G6 political economy integration |
 | #393 | ux(mode-transition): Mode 1→2 transition must preserve step position | near-term | |
 | #394 | platform: multi-scenario comparison (>2 scenarios) | near-term | |
-| #271 | feat(simulation): reversibility classification for simulation outputs | near-term | |
-| #45 | standards: human development indicator standards and HCL effect size | near-term | |
-| #27 | docs: calibration basis for propagation attenuation parameters | near-term | |
+| ~~#271~~ | ~~feat(simulation): reversibility classification for simulation outputs~~ | — | **CLOSED 2026-06-13** — G8a PR #943 |
+| ~~#45~~ | ~~standards: human development indicator standards and HCL effect size~~ | — | **CLOSED 2026-06-13** — G8a PR #943 |
+| ~~#27~~ | ~~docs: calibration basis for propagation attenuation parameters~~ | — | **CLOSED 2026-06-13** — G8a PR #943 (R1–R3 complete) |
 | #22 | feat: uncertainty quantification (distributions not point estimates) | near-term | |
 | #102 | feat: distributional scenario comparison with variance and percentile range | near-term | |
 | #35 | feat(simulation): dynamic relationship weight updating | near-term | |
