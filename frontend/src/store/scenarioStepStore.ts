@@ -128,6 +128,8 @@ interface ScenarioStepState {
   setBranchFailed: () => void;
   /** Reset Mode 3 branch state — called on session exit or scenario change. */
   resetBranch: () => void;
+  /** Set mode only — does not reset current_step or any other state (SF-1 guard, G8b intent §7.1). */
+  setMode: (mode: "MODE_1" | "MODE_2" | "MODE_3") => void;
   reset: () => void;
 }
 
@@ -219,6 +221,8 @@ export const useScenarioStepStore = create<ScenarioStepState>((set, get) => ({
       branchStepsComputed: 0,
       recomputeStatus: "idle",
     }),
+
+  setMode: (mode) => set({ mode }),
 
   reset: () =>
     set({
