@@ -39,19 +39,17 @@ satisfy per `docs/ux/information-hierarchy.md §Zone 1`.
 
 ## Status
 
-`Proposed`
+`Accepted`
 
 ---
 
 ## Validity Context
 
-> *Fill in when the ADR is accepted. Leave blank at Proposed.*
-
 **Standards Version:** 2026-06-12
 **Valid Until:** M14 close, or when Zone 1B height allocation changes by more than 10%, or
 when the top-alert ranking rule changes, or when a new severity level is added
 
-**License Status:** `PROPOSED`
+**License Status:** `ACCEPTED — 2026-06-12`
 
 **Panel:**
 - Architect Agent (R — authorship, component interface contracts, layout architecture)
@@ -534,7 +532,7 @@ The UX Designer participated in the design deliberation of 2026-06-12 and valida
 persistent-detail model against all four stress-test scenarios. Formal sign-off on this
 revised ADR text is required before the vote.
 
-`[ ]` UX Designer: UX implication statement elements 1–7 confirmed complete. [Date]
+`[✓]` UX Designer: UX implication statement elements 1–7 confirmed complete. [2026-06-12] — persistent-detail model satisfies UX governing premises 1 and 2; zone assignment correct; falsifiable ACs in UX-3 and UX-6 are Playwright-testable without reading implementation source.
 
 ---
 
@@ -717,8 +715,24 @@ alert exploration belongs in Zone 2.
 
 ---
 
-*ADR-014 revised 2026-06-12. Original authorship 2026-06-12. Tier 1. Phase 0 encoded.
+---
+
+## Acceptance Record
+
+**EL Acceptance Vote: ACCEPTED — 2026-06-12**
+
+> *This exception was approved by the same individual who holds full repository authority.
+> No independent review is available at this governance stage. See CLAUDE.md §Governance
+> for the documented plan to address this limitation.*
+
+UX Designer sign-off confirmed on record (2026-06-12) for UX-1 through UX-7.
+Panel: Architect Agent (author), Frontend Architect Agent (consulted), UX Designer Agent (sign-off ✓), Engineering Lead (accepted ✓).
+Design model validated against four stress-test scenarios in deliberation of 2026-06-12.
+G7 (#852) implementation is now unblocked — sprint entry document required before implementation begins.
+
+---
+
+*ADR-014 accepted 2026-06-12. Original authorship 2026-06-12. Tier 1. Phase 0 encoded.
 Implements ARCH-008. Design model revised after structured deliberation (UX Designer Agent,
 Design Thinking Agent, Frontend Architect Agent, EL) with four-scenario stress test.
-Gates: G7 (#852) — implementation may not begin until this ADR is Accepted and UX Designer
-sign-off is on record. Template version: 2026-06-09.*
+Template version: 2026-06-09.*
