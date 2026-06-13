@@ -65,7 +65,7 @@
     - North star: Zambian ministry analyst can read top threshold breach evidence with zero interactions from moment instrument cluster loads — interaction tax eliminated; argument evidence available at creditor-side parity
     - #852 closed
 
-**Next action:** M13 remaining issues — ADR-013 (#792 closed; G5 DONE) — M13 exit checklist (#264) is the active gate. Next sprint work: near-term backlog (#823, #824, #393, #271) or EL may direct ADR-015 (ecological composite) or issue #884/#885 follow-up from Demo 4 stakeholder review.
+**Next action:** G8 sprint open — EL-approved 2026-06-13 (PR #939). G8a implementation PRs may open immediately. G8b blocked until intent document filed. PI Agent near-miss determination pending on #27 open/closed discrepancy (§5 of sprint entry).
 
 ### Sprint Group Status
 
@@ -78,11 +78,34 @@
 | G5 — ADR-013 authorship | #792 | Wave 1 | N/A | ✅ ACCEPTED 2026-06-12 (PR #916) |
 | G6 — Political economy integration | #392 | Wave 2 | ADR-013 ✅ | ✅ COMPLETE 2026-06-12 (PR #919, BPO ACCEPT, #392 closed) |
 | G7 — Alert panel master-detail | #852 | Wave 3 | ADR-014 ✅ (accepted 2026-06-12) | ✅ COMPLETE 2026-06-13 (PR #936, BPO ACCEPT, #852 closed) |
+| G8a — Standards/methodology/calibration | #45, #27 R1–R3, #271 (tag only), #823, #824 | Wave 3 | None | 🟡 OPEN — EL-approved 2026-06-13; implementation PRs may begin |
+| G8b — Mode transition UX | #393 | Wave 3 | None | 🟡 OPEN — intent document required before implementation PR |
 
-**Critical path:** All G1–G7 waves complete. M13 primary objectives: ADR-013 ✅, G6 ✅, G7 ✅. Remaining M13 work: instrument legibility follow-up (#884/#885), near-term backlog items, M13 exit ceremony (#264).
+**Status:** All G1–G7 complete. G8 open (EL-approved 2026-06-13). M13 primary objectives: ADR-013 ✅, G6 ✅, G7 ✅. G8 closes the remaining M13 near-term backlog. M13 exit ceremony (#264) follows G8 completion.
+
+### G8 Sprint — Active Work Streams
+
+**Sprint entry:** `docs/process/sprint-plans/m13-g8-sprint-entry.md` — EL-approved 2026-06-13 (PR #939)
+**Sprint plan updated:** `docs/process/sprint-plans/m13-sprint-plan.md` — G8 Wave 3 added (PR #940)
+
+**G8a — OPEN (implementation may begin):**
+- #45 — HCL indicator standards (CODING_STANDARDS.md + DATA_STANDARDS.md)
+- #27 R1–R3 — Calibration doc residuals (Propagation Rules section + demo docstring + ADR-001 note); closes #27
+- #271 — Reversibility classification metadata tag (scope: field on output indicators only; no MDA recalibration; MDA calibration → M14 named follow-on)
+- #823 — Ecological composite fixed denominator (Chief Methodologist sign-off gate before merge)
+- #824 — MENA arid-economy elasticity calibration (Chief Methodologist + Ecological Economist sign-off gate before merge)
+
+**G8b — BLOCKED (intent document required):**
+- #393 — Mode 1→2 step position preservation
+  - Intent document path: `docs/process/intents/G8b-2026-06-13-mode-transition-step-preservation.md`
+  - QA test authorship gate follows intent document
+  - BPO Validate: Sri Lanka 2022 marquee case (Mode 1 → Mode 2 in single session, no context reconstruction)
+
+**M14 deferrals confirmed (HORIZON sweep 2026-06-13):**
+#22 (uncertainty quantification — M14 primary deliverable candidate), #35 (dynamic relationship weights), #102 (distributional comparison), #274 (25-year trajectory), #394 (multi-scenario comparison), #837 (config-driven demo scripts)
 
 ### Near-Term Backlog (M13 board, not in sprint waves)
-#22, #35, #45, #102, #271, #274, #393, #394, #823, #824, #837 — revisit at M13 midpoint HORIZON sweep.
+All near-term issues dispositioned at HORIZON sweep 2026-06-13 — see G8 sprint and M14 deferrals above. No items remain in undispositioned near-term backlog.
 
 ---
 
