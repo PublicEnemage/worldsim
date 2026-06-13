@@ -513,6 +513,30 @@ tier is not ready for acceptance. The Architect determines tier classification a
 initiation; the UX Designer sign-off is a hard precondition for Tier 1 acceptance — not a
 post-acceptance formality.
 
+**UX Designer sign-off — structured attestation required (NM-042).**
+The UX Designer sign-off block in every ADR requires four named fields: Reviewing agent,
+Session context, Governing documents reviewed (named sections — not generic references),
+and Concerns found (explicit count or "None"). A checkbox without all four fields is
+non-compliant — treat it as unsigned.
+
+The `Session context` field has two valid values:
+- `Separate session, EL-triggered YYYY-MM-DD` — independence is structurally asserted; EL
+  accepts at face value.
+- `Same session as ADR authorship — acknowledged` — the analog to initialing "per: [delegate]"
+  on a paper form. Disclosed same-session review is permitted; undisclosed same-session review
+  is a process violation equivalent to a missing sign-off.
+
+**A sign-off marked `Same session as ADR authorship — acknowledged` requires the EL to verify
+governing document citations in the sign-off text before accepting.** Generic references
+("governing premises", "first principles") do not satisfy the citation requirement. Named
+sections (`information-hierarchy.md §1B`, `north-star.md §Primary Cognitive Tasks`) do.
+
+**Absence of a `Session context` declaration is a non-compliant sign-off.** Treat it as
+`Same session as ADR authorship — acknowledged` until a properly declared review is obtained.
+PI Agent holds R for flagging non-compliant sign-offs before the acceptance vote passes.
+
+Near-miss authority: NM-042 (`docs/process/near-miss-registry.md`).
+
 **North Star Test (Process Gate)**
 
 The founding document's north star question — "Does this decision make the tool more useful to

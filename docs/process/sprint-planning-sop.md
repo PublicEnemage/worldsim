@@ -103,6 +103,16 @@ When producing groups, apply these criteria in order:
 
 5. **ADR prerequisites are surfaced explicitly.** Any group requiring an ADR or ADR amendment is marked. The ADR must be accepted before the group's implementation PR merges — not before the group begins, but before it closes.
 
+**UX Designer sign-off session practice for Tier 1 ADRs:** For Tier 1 ADRs, the preferred
+practice is to obtain the UX Designer sign-off in a separate EL-triggered session after the
+ADR is committed as `Proposed`. This eliminates authoring-context bleed — the reviewing agent
+reads the ADR cold, without the authoring session's reasoning in its context window, producing
+a genuinely independent assessment. Same-session sign-offs are permitted for Tier 2 and Tier 3
+ADRs but must be declared `Same session as ADR authorship — acknowledged` in the sign-off block,
+and are subject to additional EL scrutiny on the governing document citations. A same-session
+Tier 1 sign-off without this declaration is non-compliant (NM-042; CLAUDE.md §UX Designer
+sign-off — structured attestation required).
+
 6. **Group size.** A group should be implementable and reviewable in a single PR. If a group grows to more than ~800 lines of diff, consider splitting it at a natural boundary (e.g., G6a backend / G6b frontend). The split must maintain clean ordering — G6a merges before G6b begins.
 
 ---
