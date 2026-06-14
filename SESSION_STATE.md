@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-13 (M12 exit ceremony complete; issues #950 + #951 filed on M13 — Zone 1A Y axis legibility + solo-use gate process gap)**
+**Last updated: 2026-06-13 (G8b COMPLETE — BPO ACCEPT; #393 closed; all G1–G8 complete; M13 exit ceremony next)**
 **Current milestone:** M13 — Political Economy and Instrument Credibility (GitHub Milestone 9)
 **Previous milestone:** M12 — Active Control and External Sector (formally closed 2026-06-11; Issue #263 closed; GitHub Milestone 13 closed; tagged v0.12.1)
 
@@ -65,7 +65,7 @@
     - North star: Zambian ministry analyst can read top threshold breach evidence with zero interactions from moment instrument cluster loads — interaction tax eliminated; argument evidence available at creditor-side parity
     - #852 closed
 
-**Next action:** G8b QA test authorship COMPLETE (PR #947 merged 2026-06-13). Implementation (Step 3) may now begin: Frontend Architect Agent opens implementation PR for `ModeSelector.tsx`, `ModeTransitionModal.tsx`, `setMode` store action, and `current-step-display` testid in `ScenarioControls.tsx`. G8a domain sign-offs #823/#824 are separate follow-on issues — PRs may open in parallel. PI Agent near-miss determination pending on #27 open/closed discrepancy (§5 of sprint entry).
+**Next action:** G8 COMPLETE — G8b BPO ACCEPT 2026-06-13 (#393 closed, PR #954). All M13 sprint groups G1–G8 complete. PI Agent sprint exit confirmation and M13 exit ceremony (#264) are next required actions.
 
 ### Sprint Group Status
 
@@ -79,9 +79,9 @@
 | G6 — Political economy integration | #392 | Wave 2 | ADR-013 ✅ | ✅ COMPLETE 2026-06-12 (PR #919, BPO ACCEPT, #392 closed) |
 | G7 — Alert panel master-detail | #852 | Wave 3 | ADR-014 ✅ (accepted 2026-06-12) | ✅ COMPLETE 2026-06-13 (PR #936, BPO ACCEPT, #852 closed) |
 | G8a — Standards/methodology/calibration | #45, #27 R1–R3, #271 (tag only), #823, #824 | Wave 3 | None | ✅ COMPLETE 2026-06-13 (PR #943, #27/#45/#271 closed; #823/#824 domain sign-offs pending) |
-| G8b — Mode transition UX | #393 | Wave 3 | None | 🟡 OPEN — QA tests filed (PR #947); implementation PR next |
+| G8b — Mode transition UX | #393 | Wave 3 | None | ✅ COMPLETE 2026-06-13 (PR #949, BPO ACCEPT, #393 closed) |
 
-**Status:** All G1–G7 complete. G8 open (EL-approved 2026-06-13). M13 primary objectives: ADR-013 ✅, G6 ✅, G7 ✅. G8 closes the remaining M13 near-term backlog. M13 exit ceremony (#264) follows G8 completion.
+**Status:** All G1–G8 complete. M13 primary objectives: ADR-013 ✅, G6 ✅, G7 ✅, G8 ✅. PI Agent sprint exit confirmation and M13 exit ceremony (#264) are the remaining actions.
 
 ### G8 Sprint — Active Work Streams
 
@@ -95,14 +95,13 @@
 - ✅ #823 — Ecological composite fixed denominator — CM APPROVE 2026-06-13 (3 constraints: fix at first call not step 0; zero-indicator → None; audit Greece fixture; implementation unblocked)
 - ✅ #824 — MENA arid-economy elasticity calibration — CM + EE APPROVE 2026-06-13 (binding: −0.04, Tier 3, FAO GFR arid-subset/ICARDA, biome_class `arid_semiarid`, fallback to `high_forest_cover` with WARNING; implementation unblocked)
 
-**G8b — OPEN (implementation unblocked):**
+**G8b — COMPLETE (PR #949, BPO ACCEPT 2026-06-13, #393 closed):**
 - #393 — Mode 1→2 step position preservation
-  - Intent document: `docs/process/intents/G8b-2026-06-13-mode-transition-step-preservation.md` — FILED
-  - ✅ QA test authorship (Step 2) — COMPLETE 2026-06-13 (PR #947)
-    - E2E: `frontend/tests/e2e/mode-transition.spec.ts` — AC-1 through AC-7; 8 tests incl. regressions
-    - Unit/RTL: `frontend/src/components/__tests__/mode-selector.test.tsx` — 23 tests; setMode SF-1/SF-2 guards; modal-precedes-mode-change; store atomicity
-  - Step 3 (Implementation): Frontend Architect Agent; files: `ModeSelector.tsx`, `ModeTransitionModal.tsx`, `setMode` store action in `scenarioStepStore.ts`, `data-testid="current-step-display"` in `ScenarioControls.tsx`
-  - BPO Validate: Sri Lanka 2022 marquee case (Mode 1 → Mode 2 in single session, no context reconstruction)
+  - Intent document: `docs/process/intents/G8b-2026-06-13-mode-transition-step-preservation.md`
+  - ✅ Step 2 QA: `mode-transition.spec.ts` (9 E2E) + `mode-selector.test.tsx` (31 unit) — PR #947
+  - ✅ Step 3 Implementation: `ModeSelector.tsx`, `ModeTransitionModal.tsx`, `setMode` store action, `current-step-display` testid — PR #949
+  - ✅ Step 4 Verify: 9/9 E2E pass; AC-2 test spec correction (PR #953)
+  - ✅ Step 5 BPO Validate ACCEPT: Sri Lanka 2022 marquee — Mode 1→2 at step 3 in 776ms; step preserved; entity retained; Layer 3 PASS — PR #954
 
 **M14 deferrals confirmed (HORIZON sweep 2026-06-13):**
 #22 (uncertainty quantification — M14 primary deliverable candidate), #35 (dynamic relationship weights), #102 (distributional comparison), #274 (25-year trajectory), #394 (multi-scenario comparison), #837 (config-driven demo scripts)
