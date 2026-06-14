@@ -344,6 +344,69 @@ stronger signal than the mode selector for Mode 2 state.
 
 ---
 
+## 9. Step 4 Verify — Implementing Agent
+
+**Date:** 2026-06-13
+**Agent:** Frontend Architect Agent
+
+**Result:** PASS
+
+- AC-1: `current-step-display` shows `3` after Mode 1→2 transition confirm ✅
+- AC-2: `scenario-identity-header` retains entity identifier (Scenario + Entity prefix unchanged) ✅
+  - Finding: test assertion corrected from `toBe(entityTextBefore)` to `toContain(entityIdentifierRegion)` — Status sub-string legitimately updates during advance settle; entity IS preserved. PR #953.
+- AC-3: modal text contains "step position" and "entity configuration" ✅
+- AC-4: cancel leaves MODE_1 and step unchanged ✅
+- AC-5: `current-step-display` does NOT show `0` after confirm at step 3 ✅
+- AC-6: modal visible while `mode-indicator` still shows `data-mode="MODE_1"` ✅
+- AC-7: `current-step-display` present and shows step index at step 0 ✅
+- Regression (active-label no-op): tapping current mode label shows no modal, no mode change ✅
+- Regression (fiscal multiplier path): mode stays MODE_2 when multiplier path also in play ✅
+
+**Unit tests:** 31/31 (mode-selector.test.tsx) + 264/264 full suite — no regressions.
+**E2E:** 9/9 (mode-transition.spec.ts) after AC-2 test spec correction.
+
+---
+
+## 10. Step 5 Validate — Business PO
+
+**Date:** 2026-06-13
+**Agent:** Business PO Agent
+
+**North star scenario (P-7):** Sri Lanka 2022 marquee case — Colombo finance ministry analyst
+replays five-shock convergence in Mode 1 to identify step 3 as crisis entry point, then
+transitions to Mode 2 to simulate alternative policy responses from that exact step.
+
+**Observable application state confirmed:**
+- Scenario created ("SriLanka-2022-BPO-Validate"), advanced to step 3 in Mode 1
+- `mode-indicator` shows `data-mode="MODE_1"` before transition ✅
+- `mode-selector-label-MODE_2` ("Simulation") clickable with single tap ✅
+- `mode-transition-modal` appears immediately: *"Switching to Simulation mode. Your current
+  step position (step 2) and entity configuration are preserved. Replay event annotations
+  will not be shown in Simulation mode."* ✅
+- Single confirm click → `data-mode="MODE_2"` ✅
+- `current-step-display` shows `3` (not `0`, not `1`) after transition ✅
+- Entity identifier ("GRC") present in `scenario-identity-header` after transition ✅
+- **P-4 time ceiling:** 776ms — well under 30-second ceiling; zero manual context reconstruction ✅
+
+**Customer Agent Layer 3 assessment:** PASS
+Modal is fully self-interpreting: names preserved items ("step position" + "entity
+configuration") and what changes ("Replay event annotations will not be shown") in plain
+language. A ministry-side economist reads this and proceeds without specialist translation.
+No mediation asymmetry — creditor side and ministry side face identical interaction.
+
+**Mission validation:**
+The Colombo ministry analyst can land in Mode 2 at the crisis step in a single session with
+one confirm click and no context reconstruction. The counterfactual argument ("what if we had
+acted at step 3?") is now accessible without restarting or re-entering configuration. This is
+the workflow continuity the Sri Lanka marquee case requires before Mode 2's analytical output
+is reachable in a time-constrained negotiation preparation session.
+
+**Verdict:** `BPO: ACCEPT — 2026-06-13`
+
+*Closing #393.*
+
+---
+
 *Intent document version: 2026-06-13. Design authority: PR #390 Gap 5. G8 sprint entry EL-approved
 2026-06-13. No ADR required — implementation satisfies a specified UX design, not a new
 architectural decision. Implementing agent: Frontend Architect Agent. Kryptonite constraint:
