@@ -3,7 +3,7 @@
 > This file is the single source of truth for ADR number assignment.
 > No ADR number may be used in any issue title, document, or code comment
 > before it appears in this table with status ASSIGNED.
-> Last updated: 2026-06-12
+> Last updated: 2026-06-15
 
 ## Process
 
@@ -72,3 +72,4 @@ the current session does not automatically take priority over an older pending e
 | ARCH-006 | #751 + #752 | External sector module — new module boundary (G5: BilateralTradeShock + CommodityPriceShock) | 2026-06-05 | ACCEPTED — ADR-012 | 12 | M12 | Panel: Architect Agent (author), CE (C), CM (C), Development Economist (C), EL (accepted ✓ 2026-06-05). G5 PR #773 merged to release/m12 2026-06-05. |
 | ARCH-007 | #792 | Political economy module — new module boundary (G9: conditionality, political feasibility, elite capture) | 2026-06-05 | ACCEPTED — ADR-013 — EL accepted 2026-06-12 (PR #916) | 13 | M13 | G6 (#392) now unblocked. Pre-G6 condition: `docs/methodology/calibration-basis.md` political economy section required before G6 begins (Chief Methodologist conditional). Panel review: `docs/adr/reviews/ADR-013-panel-review.md`. |
 | ARCH-008 | #908 | Alert panel (Zone 1B) master-detail UX architecture | 2026-06-12 | ACCEPTED — ADR-014 — EL accepted 2026-06-12 (PR #926) | 14 | M13 | Required before #852 implementation. Panel: Architect Agent (author), Frontend Architect Agent (C), UX Designer Agent (sign-off ✓ 2026-06-12), EL (accepted ✓ 2026-06-12). Persistent-detail + scan-only compact list. G7 (#852) now unblocked — sprint entry document required before implementation. |
+| ARCH-009 | TBD | Model legibility architecture — Evidence Thread Architecture (Zone 1 basis threads, assumption surface, cross-examination mode) | 2026-06-15 | ASSIGNED — ADR-015 | 15 | M14 | Evidence: live UI audit 2026-06-15 (`docs/demo/m14/reviews/2026-06-15-ux-legibility-audit-minister-exercise.md`). Gap taxonomy ML-1 through ML-7 documented. Panel: Architect Agent (author), UX Designer Agent (sign-off required), Frontend Architect Agent (C), Chief Methodologist (C), Development Economist (C), Business PO (C), Engineering Lead (A). 6 pre-implementation decisions required from EL before this ADR can be accepted — see §Decisions Required in ADR-015. |
