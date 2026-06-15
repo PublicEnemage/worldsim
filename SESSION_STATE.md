@@ -11,9 +11,9 @@
 
 ---
 
-## Active Work Streams — M13
+## Closed — M13 Active Work Streams (reference record; all G1–G8 complete)
 
-**Kickoff complete 2026-06-12. EL approval recorded 2026-06-12 (PR #911).** Wave 1 complete 2026-06-12. Wave 2 complete 2026-06-12.
+**Kickoff complete 2026-06-12. Exit ceremony complete 2026-06-15.** Wave 1 complete 2026-06-12. Wave 2 complete 2026-06-12. All sprints complete.
 
 **M13 kickoff status:**
 1. ✅ PM Agent cuts `release/m13` from `main` — DONE 2026-06-12
@@ -65,7 +65,28 @@
     - North star: Zambian ministry analyst can read top threshold breach evidence with zero interactions from moment instrument cluster loads — interaction tax eliminated; argument evidence available at creditor-side parity
     - #852 closed
 
-**Next action:** M13 EXIT CEREMONY COMPLETE 2026-06-15. G8 sprint exit filed (`docs/process/sprint-plans/m13-g8-sprint-exit.md`). All M13 issues dispositioned (11 closed, 9 migrated to M14). Reference docs updated (README, CLAUDE.md, roadmap). Required EL action: merge `release/m13` → `main`, close #264, tag release, close GitHub Milestone 9. M14 kickoff is the next agent action.
+**Next action:** M13 EXIT CEREMONY COMPLETE 2026-06-15. G8 sprint exit filed (`docs/process/sprint-plans/m13-g8-sprint-exit.md`). All M13 issues dispositioned (11 closed, 9 migrated to M14). Reference docs updated (README, CLAUDE.md, roadmap). NM-044 filed (E2E regression gap). Required EL action: merge `release/m13` → `main`, close #264, tag release, close GitHub Milestone 9. M14 kickoff is the next agent action.
+
+### M14 Kickoff Prerequisites (AGENT: read before beginning any M14 work)
+
+**HARD STOP: M14 work may not begin until the EL has merged `release/m13` → `main`.**
+
+The G1–G8 M13 deliverables (political economy module, Zone 1B persistent-detail, mode transition UX, all DEMO fixes, all process redesign phases) are on `release/m13`, NOT on `main`. If you cut `release/m14` from `main` before the EL merge, M14 will branch from an incomplete codebase.
+
+**Verify before doing anything:**
+```bash
+git log origin/main --oneline | head -3
+```
+You must see G1–G8 commits (G8b: "feat(g8b): mode transition...") before proceeding. If you see only process-redesign commits (Phase D was the last to reach main), stop and request EL action.
+
+**M14 kickoff sequence (after EL confirms release/m13 → main merged):**
+1. `git pull origin main` — verify local main is current
+2. PM Agent cuts `release/m14` from `main`: `git checkout -b release/m14 main && git push origin release/m14`
+3. PM Agent authors `docs/process/sprint-plans/m14-sprint-plan.md` — primary objective: methodology publication, external validation, TSC formation, live demo (#843)
+4. EL approves sprint plan
+5. PM Agent files M14 Exit Checklist issue (equivalent to #264 for M13; must reference #843 as M14 closure gate)
+6. PM Agent updates SESSION_STATE.md with M14 kickoff status section
+7. Sprint entry document filed per `docs/process/sprint-planning-sop.md §Sprint Entry Gate`
 
 ### Sprint Group Status
 
@@ -134,6 +155,13 @@ All near-term issues dispositioned at HORIZON sweep 2026-06-13 — see G8 sprint
 | #935 ✅ | process(g7): EL approval of sprint entry — 2026-06-13 | release/m13 | Merged 2026-06-13 |
 | #936 ✅ | feat(g7): Zone 1B persistent-detail layout — ADR-014 (#852) | release/m13 | Merged 2026-06-13 |
 | #943 ✅ | feat(g8a): close #27 R1-R3, #45, #271 — calibration docs, HCL standards, reversibility schema | release/m13 | Merged 2026-06-13 |
+| #947 ✅ | test(g8b): QA Lead — mode transition tests authored before implementation (#393) | release/m13 | Merged 2026-06-13 |
+| #949 ✅ | feat(g8b): mode transition step preservation — ModeSelector, modal, setMode, step display | release/m13 | Merged 2026-06-13 |
+| #953 ✅ | fix(g8b): AC-2 test spec correction — entity identifier containment not strict equality | release/m13 | Merged 2026-06-13 |
+| #954 ✅ | process(g8b): BPO ACCEPT — mode transition step preservation (#393) | release/m13 | Merged 2026-06-13 |
+| #955 ✅ | chore(state): G8b COMPLETE — BPO ACCEPT 2026-06-13; all G1–G8 done; M13 exit next | release/m13 | Merged 2026-06-13 |
+| #956 ✅ | fix(e2e): update Zone 1B and mode-indicator tests for G7/G8b observable state changes (NM-044) | release/m13 | Merged 2026-06-15 |
+| — | chore(m13-exit): M13 exit ceremony — pushed directly to release/m13 (9d86e8e) | release/m13 | Committed 2026-06-15 (no PR — direct push; note process deviation) |
 
 ## M11 Work Streams — 2026-06-04 Sprint
 
