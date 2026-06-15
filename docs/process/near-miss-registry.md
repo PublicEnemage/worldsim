@@ -2254,6 +2254,86 @@ an absence of a gate — not external infrastructure behaviour.
 
 ---
 
+## NM-044 — G7 and G8b Implementation Changed Observable Zone 1B and Mode Indicator State; Pre-Existing E2E Tests Not Updated; Merged With CI playwright-e2e Failing (Reactive)
+
+**Date:** 2026-06-15
+**Milestone:** M13 — Political Economy and Instrument Credibility
+**Detected by:** EL question at M13 exit ceremony — Playwright E2E CI job failure visible on recent PRs
+**Severity:** High — six failing E2E tests committed to release/m13 across multiple CI runs; would mislead future agents about Zone 1B and mode indicator observable state
+
+### What happened
+
+G7 (ADR-014, PR #936) replaced the Zone 1B MDA Alert Panel structure: the old
+`mda-alert-row` and `mda-no-alerts` testids were removed and replaced with
+`zone-1b-top-detail` (always-present persistent-detail slot) and `zone-1b-compact` rows.
+The container overflow model also changed — `zone-1b-mda-alerts` now uses `overflow: hidden`
+as part of the fixed-height persistent-detail design.
+
+G8b (PR #949) replaced `ModeIndicator` with `ModeSelector` in `App.tsx`. `ModeSelector`
+renders all three mode labels inside the `data-testid="mode-indicator"` container. A test
+asserting `toHaveText("Replay")` now receives `"Replay Simulation Active Control"`.
+
+Five pre-existing tests in `demo-advancement-flow.spec.ts`, `demo-legibility.spec.ts`, and
+`greece-integration.spec.ts` checked for the old `mda-alert-row` / `mda-no-alerts` testids
+or the old overflow contract. One test in `greece-integration.spec.ts` used strict `toHaveText`
+on the mode indicator. None were updated when G7 or G8b landed.
+
+The CI `playwright-e2e` job was failing on every CI run from G7 forward. PRs merged because
+the configured merge gate was `changes` (the status check), not `playwright-e2e`.
+
+### What was at risk
+
+- Six false-failing E2E tests remained in the repository for the full duration of G7 and G8b
+- A future implementing agent reading `demo-advancement-flow.spec.ts` would see `mda-no-alerts`
+  testid as the established Zone 1B contract — and implement or test against a removed interface
+- The persistent CI red on `playwright-e2e` created noise that could mask real future regressions
+
+### What caught it
+
+The EL noticed CI was failing on merged PRs and asked why. Caught at M13 exit ceremony
+(2026-06-15) — not at Step 4 Verify when G7 or G8b landed.
+
+This is a person catching what the process missed. The process had two gaps:
+1. Step 4 Verify (implementing agent self-attestation) verified new test cases from the
+   intent document but did not verify the full existing E2E suite still passed.
+2. The PR merge gate (`changes` status check) does not block on `playwright-e2e` failures.
+
+### Process improvement
+
+**Immediate (this session):** Six failing tests fixed in this session (PR on release/m13).
+Updated `demo-advancement-flow.spec.ts`, `demo-legibility.spec.ts`, and
+`greece-integration.spec.ts` to use the G7 Zone 1B testids (`zone-1b-top-detail`) and
+the G8b ModeSelector assertion pattern (`toContainText` instead of `toHaveText` on the
+mode-indicator container).
+
+**Structural gap 1 — Step 4 Verify scope:** The intent document specifies acceptance
+criteria for the *new* behavior. Step 4 Verify verifies those criteria. But it does not
+verify that the full existing E2E suite passes. When an implementation changes observable
+application state (removes or renames testids, changes text content, changes overflow model),
+existing tests that depended on the old state will fail silently at the Verify step.
+
+**Required improvement:** When an intent document's acceptance criteria involve changing
+or removing an observable application state that existing tests may reference, the implementing
+agent must run `npx playwright test` locally at Step 4 and confirm 0 failures across the full
+suite — not only the new test file. A Step 4 Verify that passes its intent-document criteria
+but leaves the overall Playwright suite red is not a complete Step 4 Verify.
+
+**Structural gap 2 — Merge gate configuration:** The `changes` status check is the only
+configured merge gate. `playwright-e2e` failures do not block autonomous PR merge. This means
+E2E regressions can reach the release branch without any agent-level gate catching them.
+
+**Recommended improvement:** Add `playwright-e2e` as a required status check for PRs targeting
+`release/m*` branches, or update the autonomous merge protocol to poll for `playwright-e2e`
+in addition to `changes`. The current design concentrates the CI role on build-time checks
+while treating E2E as advisory. For a codebase where the primary UX quality gate is the
+Playwright suite, this hierarchy is inverted.
+
+PI Agent determination: this is a near-miss (not a Known Issue). Both fixes require changes
+to our own process and configuration — not vendor fixes. The gap is a Step 4 Verify scope
+deficiency and a merge gate configuration gap.
+
+---
+
 ## Registry Maintenance
 
 ### How to add an entry
