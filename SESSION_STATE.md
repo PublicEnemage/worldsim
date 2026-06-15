@@ -5,9 +5,9 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-15 (M13 exit ceremony COMPLETE — all issues dispositioned; reference docs updated; G8 sprint exit filed; #264 pending EL close after release/m13 → main merge)**
+**Last updated: 2026-06-15 (M14 active — ADR-016 authored and merged (PR #964); ARCH-010 assigned; three prerequisite bugs filed (#961 #962 #963); M14 Wave 1/Wave 2 structure in place; EL review of ADR-016 is next gating action)**
 **Current milestone:** M14 — Methodology Publication and External Validation (GitHub Milestone 15)
-**Previous milestone:** M13 — Political Economy and Instrument Credibility (formally closed 2026-06-15; Issue #264 pending close; GitHub Milestone 9 pending close after EL merges release/m13 → main)
+**Previous milestone:** M13 — Political Economy and Instrument Credibility (formally closed 2026-06-15; release/m13 → main merged by EL; #264 closed)
 
 ---
 
@@ -67,28 +67,56 @@
 
 **Next action:** M13 EXIT CEREMONY COMPLETE 2026-06-15. G8 sprint exit filed (`docs/process/sprint-plans/m13-g8-sprint-exit.md`). All M13 issues dispositioned (11 closed, 9 migrated to M14). Reference docs updated (README, CLAUDE.md, roadmap). NM-044 filed (E2E regression gap). Required EL action: merge `release/m13` → `main`, close #264, tag release, close GitHub Milestone 9. M14 kickoff is the next agent action.
 
-### M14 Kickoff Prerequisites (AGENT: read before beginning any M14 work)
+### M14 Kickoff Prerequisites (RESOLVED 2026-06-15)
 
-**HARD STOP: M14 work may not begin until the EL has merged `release/m13` → `main`.**
+**✅ HARD STOP CLEARED:** EL merged `release/m13` → `main` 2026-06-15. All G1–G8 M13 deliverables are on `main`. M14 work may proceed.
 
-The G1–G8 M13 deliverables (political economy module, Zone 1B persistent-detail, mode transition UX, all DEMO fixes, all process redesign phases) are on `release/m13`, NOT on `main`. If you cut `release/m14` from `main` before the EL merge, M14 will branch from an incomplete codebase.
+**M14 kickoff sequence status:**
+1. ✅ `git pull origin main` — confirmed current (PR #957 merge; commit e63828f)
+2. ⬜ PM Agent cuts `release/m14` from `main` — NOT YET DONE (no release/m14 branch exists)
+3. ⬜ PM Agent authors `docs/process/sprint-plans/m14-sprint-plan.md`
+4. ⬜ EL approves sprint plan
+5. ⬜ PM Agent files M14 Exit Checklist issue (must reference #843 as M14 closure gate)
+6. ⬜ Sprint entry document filed per `docs/process/sprint-planning-sop.md §Sprint Entry Gate`
 
-**Verify before doing anything:**
-```bash
-git log origin/main --oneline | head -3
-```
-You must see G1–G8 commits (G8b: "feat(g8b): mode transition...") before proceeding. If you see only process-redesign commits (Phase D was the last to reach main), stop and request EL action.
+**NOTE for next session:** The sprint entry gate is a HARD STOP before implementation begins. The three prerequisite bugs (#961 #962 #963) may be filed and the ADR-016 authorship (documentation-only) may proceed without a sprint entry document — but Wave 1 or Wave 2 *implementation* may not begin until a filed, EL-approved sprint entry document exists. ADR-016 has been authored; it is Proposed. EL acceptance of ADR-016 is the Wave 1 gate.
 
-**M14 kickoff sequence (after EL confirms release/m13 → main merged):**
-1. `git pull origin main` — verify local main is current
-2. PM Agent cuts `release/m14` from `main`: `git checkout -b release/m14 main && git push origin release/m14`
-3. PM Agent authors `docs/process/sprint-plans/m14-sprint-plan.md` — primary objective: methodology publication, external validation, TSC formation, live demo (#843)
-4. EL approves sprint plan
-5. PM Agent files M14 Exit Checklist issue (equivalent to #264 for M13; must reference #843 as M14 closure gate)
-6. PM Agent updates SESSION_STATE.md with M14 kickoff status section
-7. Sprint entry document filed per `docs/process/sprint-planning-sop.md §Sprint Entry Gate`
+---
 
-### Sprint Group Status
+## Open Work Streams — M14 (Active)
+
+**Wave structure (EL decision 2026-06-15):**
+- **Wave 1:** ADR-016 (Scenario Grounding Architecture) — author and EL-accept before Wave 2 begins
+- **Wave 2:** ADR-015 (Evidence Thread Architecture) — moves to Accepted only after Wave 1 complete
+
+**Current state:**
+
+| Item | Status | Next action |
+|---|---|---|
+| Bug #961 — GRC hardcoded in creation form | Filed 2026-06-15 | M14 implementation (requires sprint entry first) |
+| Bug #962 — step counter 'Step 0 / 8' | Filed 2026-06-15 | M14 implementation (requires sprint entry first) |
+| Bug #963 — choropleth raw DB field names | Filed 2026-06-15 | M14 implementation (requires sprint entry first) |
+| ARCH-010 — ADR-016 Scenario Grounding | Added to backlog 2026-06-15 | ASSIGNED; ADR Proposed |
+| ADR-016 — Scenario Grounding Architecture | Proposed (PR #964, merged 2026-06-15) | **EL review and acceptance required** — 5 decisions in §Decisions Required |
+| ADR-015 — Evidence Thread Architecture | Proposed (PR #959, merged 2026-06-15) | Blocked on ADR-016 acceptance (Wave 1 gate) |
+| M14 sprint entry document | NOT FILED | Required before any implementation begins |
+| release/m14 branch | NOT CUT | Required before any feature PRs open |
+| M14 Exit Checklist issue | NOT FILED | Required; must reference #843 |
+
+**ADR-016 §Decisions Required (EL must resolve before Accepted):**
+1. Entity selection scope for M14 (all source registry entities / GRC+JOR+EGY+ZMB / G20+HIPC?)
+2. Component 3 (Fidelity contextualisation) in-scope for M14 or deferred to M15?
+3. API endpoint authority — Chief Engineer owns `/initial-state` and `/data-quality`?
+4. Parameter persistence backward compatibility — Demo 5 scenarios need recreation?
+5. IC-6 (choropleth) disposition — separate Tier 1 ADR / defer M15 / accepted limitation?
+
+**Evidence base for M14 trust architecture (both ADRs):**
+- Part I audit (output legibility): `docs/demo/m14/reviews/2026-06-15-ux-legibility-audit-minister-exercise.md`
+- Part II audit (input confidence): `docs/demo/m14/reviews/2026-06-15-ux-input-confidence-audit-minister-exercise.md`
+
+---
+
+### M13 Sprint Group Status (reference)
 
 | Group | Issues | Wave | ADR gate | Status |
 |---|---|---|---|---|
@@ -136,6 +164,9 @@ All near-term issues dispositioned at HORIZON sweep 2026-06-13 — see G8 sprint
 
 | PR | Title | Target | Status |
 |---|---|---|---|
+| #959 ✅ | docs(m14): UX legibility audit (Part I) + ADR-015 Model Legibility Architecture | main | Merged 2026-06-15 |
+| #960 ✅ | docs(m14): UX input confidence audit (Part II) — IC family + Scenario Grounding framework | main | Merged 2026-06-15 |
+| #964 ✅ | docs(arch): ADR-016 Scenario Grounding Architecture (M14 Wave 1) + ARCH-010 | main | Merged 2026-06-15 |
 | #909 ✅ | feat(m13): kickoff — sprint plan, entry doc, ADR backlog | release/m13 | Merged 2026-06-12 |
 | #910 ✅ | chore(state): M13 kickoff session state | release/m13 | Merged 2026-06-12 |
 | #911 ✅ | feat(m13): EL approval recorded — sprint plan + entry doc | release/m13 | Merged 2026-06-12 |
@@ -457,6 +488,9 @@ CI hotfix: NM-035 filed; `ci.yml` PR trigger updated to include `release/m*` (PR
 | Issue | Title | Horizon | Notes |
 |---|---|---|---|
 | #843 | plan: M14 closure — live stakeholder demo with real external participants (#843) | immediate | **M14 gate issue** — EL decision 2026-06-11 |
+| #961 | bug(frontend): entity hardcoded to GRC in scenario creation form — no entity selection available | immediate | M14 Wave 1 prerequisite bug — filed 2026-06-15 |
+| #962 | bug(frontend): step counter shows 'Step 0 / 8' on completed scenarios loaded via URL param | immediate | M14 housekeeping — filed 2026-06-15 |
+| #963 | bug(frontend): choropleth attribute selector displays raw DB field names as user-facing labels | immediate | M14 housekeeping — filed 2026-06-15 |
 | #97 | arch(api): threshold-crossing markers in comparative output | near-term | |
 | #153 | feat(frontend): absolute threshold overlay on DeltaChoropleth | near-term | |
 | #92 | arch(backtesting): Greece 2010 fixture investment climate initial conditions | near-term | |
