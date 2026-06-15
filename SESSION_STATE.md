@@ -5,9 +5,9 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-13 (G8b COMPLETE — BPO ACCEPT; #393 closed; all G1–G8 complete; M13 exit ceremony next)**
-**Current milestone:** M13 — Political Economy and Instrument Credibility (GitHub Milestone 9)
-**Previous milestone:** M12 — Active Control and External Sector (formally closed 2026-06-11; Issue #263 closed; GitHub Milestone 13 closed; tagged v0.12.1)
+**Last updated: 2026-06-15 (M13 exit ceremony COMPLETE — all issues dispositioned; reference docs updated; G8 sprint exit filed; #264 pending EL close after release/m13 → main merge)**
+**Current milestone:** M14 — Methodology Publication and External Validation (GitHub Milestone 15)
+**Previous milestone:** M13 — Political Economy and Instrument Credibility (formally closed 2026-06-15; Issue #264 pending close; GitHub Milestone 9 pending close after EL merges release/m13 → main)
 
 ---
 
@@ -65,7 +65,7 @@
     - North star: Zambian ministry analyst can read top threshold breach evidence with zero interactions from moment instrument cluster loads — interaction tax eliminated; argument evidence available at creditor-side parity
     - #852 closed
 
-**Next action:** G8 COMPLETE — G8b BPO ACCEPT 2026-06-13 (#393 closed, PR #954). All M13 sprint groups G1–G8 complete. PI Agent sprint exit confirmation and M13 exit ceremony (#264) are next required actions.
+**Next action:** M13 EXIT CEREMONY COMPLETE 2026-06-15. G8 sprint exit filed (`docs/process/sprint-plans/m13-g8-sprint-exit.md`). All M13 issues dispositioned (11 closed, 9 migrated to M14). Reference docs updated (README, CLAUDE.md, roadmap). Required EL action: merge `release/m13` → `main`, close #264, tag release, close GitHub Milestone 9. M14 kickoff is the next agent action.
 
 ### Sprint Group Status
 
@@ -386,65 +386,73 @@ CI hotfix: NM-035 filed; `ci.yml` PR trigger updated to include `release/m*` (PR
 
 ---
 
-## Open Issues — M13 (Political Economy and Instrument Credibility)
+## Closed — M13 (Political Economy and Instrument Credibility)
 
-**GitHub Milestone:** 9 | **Created:** 2026-06-11 (renamed from "Methodology Publication") | **Target:** Q1 2027
+**GitHub Milestone:** 9 | **Formally closed: 2026-06-15** | **Exit ceremony complete 2026-06-15**
 
-| Issue | Title | Horizon | Notes |
-|---|---|---|---|
-| #264 | M13 Exit Checklist | immediate | **M13 gate issue** — PM Agent populates at sprint start; must be closed before M13 formally closes |
-| #792 | docs(adr): ADR-013 — political economy module boundary (G9) | immediate | **M13 prerequisite** — must be ACCEPTED before any G9 implementation begins; check ADR backlog for panel composition |
-| #799 | engine: reserves can go negative — no non-negativity floor on stock attributes | near-term | Bug observed in Demo 4 (JOR step 7: −0.04 months); no milestone/labels assigned until 2026-06-12 triage |
-| ~~#852~~ | ~~ux: alert panel (Zone 1B) needs master-detail layout~~ | — | **CLOSED 2026-06-13** — BPO ACCEPT on G7 Zone 1B persistent-detail layout (PR #936) |
-| #871 | fix(demo): DEMO-059 — PMM displays 1.00 → at step 5, contradicts narration | near-term | Deferred from M12 2026-06-11 |
-| #872 | fix(demo): DEMO-060 — CRITICAL FIN alert clipped below panel boundary in Frame E | near-term | Deferred from M12 2026-06-11 |
-| #873 | fix(demo): DEMO-062 — Zone 1D shows single composite per axis, JOR vs EGY divergence absent | near-term | Deferred from M12 2026-06-11 |
-| #874 | fix(demo): DEMO-061 — instrument cluster and alert panel unreadable at presentation scale | near-term | Deferred from M12 2026-06-11 |
-| #875 | fix(demo): DEMO-063 — no inline entity labels on trajectory curves | near-term | Deferred from M12 2026-06-11 |
-| #876 | fix(demo): DEMO-064 — Mode 3 branch produces no quantitative comparison output | near-term | Deferred from M12 2026-06-11 |
-| #822 | docs(methodology): ecological composite denominator-change disclosure | near-term | |
-| #823 | arch(methodology): ecological composite dynamic denominator violates time-series | near-term | |
-| #824 | fix(engine): MENA arid-economy elasticity calibration for land_use_pressure | near-term | |
-| #837 | feat(demo): configuration-driven demo scripts | near-term | |
-| #847 | ux: DEMO-046 — Human Development 'Irreversible' label uncontextualized in narration | near-term | |
-| ~~#392~~ | ~~arch(m11): political economy constraint modeling~~ | — | **CLOSED 2026-06-12** — BPO ACCEPT on G6 political economy integration |
-| #393 | ux(mode-transition): Mode 1→2 transition must preserve step position | near-term | |
-| #394 | platform: multi-scenario comparison (>2 scenarios) | near-term | |
-| ~~#271~~ | ~~feat(simulation): reversibility classification for simulation outputs~~ | — | **CLOSED 2026-06-13** — G8a PR #943 |
-| ~~#45~~ | ~~standards: human development indicator standards and HCL effect size~~ | — | **CLOSED 2026-06-13** — G8a PR #943 |
-| ~~#27~~ | ~~docs: calibration basis for propagation attenuation parameters~~ | — | **CLOSED 2026-06-13** — G8a PR #943 (R1–R3 complete) |
-| #22 | feat: uncertainty quantification (distributions not point estimates) | near-term | |
-| #102 | feat: distributional scenario comparison with variance and percentile range | near-term | |
-| #35 | feat(simulation): dynamic relationship weight updating | near-term | |
-| #274 | feat(simulation): 25-year human capital depletion trajectory | near-term | |
-| #950 | ux: Zone 1A trajectory chart Y axis has no label or unit — composite score scale is uninterpretable without presenter narration | near-term | HIGH — blocks unnarrated solo use; Y axis shows 0.00–1.40 with no label/unit/boundary indicator; refs #951 (solo-use gate) |
-| #951 | process: review protocol blind spot — all M12 reviews conducted in narrated-demo context; solo unnarrated use never tested | near-term | Solo-use gate proposed for Step 6b; Customer Agent designated reviewer; `[SOLO]` tag on findings; CRITICAL/HIGH solo findings block Step 7 |
-
-*M12 is closed (2026-06-11 — #263 signed off, GitHub Milestone 13 closed). M13 sprint planning has not yet begun — see kickoff prerequisites above.*
+**Exit ceremony disposition summary:**
+- ~~#264~~ — M13 Exit Checklist — **PENDING EL close** (open until EL merges release/m13 → main and closes)
+- ~~#27~~ — calibration basis docs — **CLOSED 2026-06-15** (G8a PR #943; auto-close missed release branch)
+- ~~#45~~ — HCL indicator standards — **CLOSED 2026-06-15** (G8a PR #943; auto-close missed release branch)
+- ~~#271~~ — reversibility classification — **CLOSED 2026-06-15** (G8a PR #943; auto-close missed release branch)
+- ~~#392~~ — political economy constraint modeling — **CLOSED 2026-06-12** (G6 BPO ACCEPT PR #919)
+- ~~#393~~ — Mode 1→2 step position preservation — **CLOSED 2026-06-13** (G8b BPO ACCEPT PR #949)
+- ~~#792~~ — ADR-013 — **CLOSED 2026-06-15** (G5 accepted PR #916; exit ceremony)
+- ~~#799~~ — reserves non-negativity floor — **CLOSED 2026-06-15** (G3 PR #912; exit ceremony)
+- ~~#822~~ — denominator disclosure — **CLOSED 2026-06-15** (G4 PR #915; exit ceremony)
+- ~~#847~~ — DEMO-046 — **CLOSED 2026-06-15** (G4 PR #915; exit ceremony)
+- ~~#852~~ — alert panel Zone 1B — **CLOSED 2026-06-13** (G7 BPO ACCEPT PR #936)
+- ~~#871~~ — DEMO-059 PMM — **CLOSED 2026-06-15** (G2 PR #914; exit ceremony)
+- ~~#872~~ — DEMO-060 alert clip — **CLOSED 2026-06-15** (G1 PR #913; exit ceremony)
+- ~~#873~~ — DEMO-062 Zone 1D — **CLOSED 2026-06-15** (G2 PR #914; exit ceremony)
+- ~~#874~~ — DEMO-061 legibility — **CLOSED 2026-06-15** (G1 PR #913; exit ceremony)
+- ~~#875~~ — DEMO-063 entity labels — **CLOSED 2026-06-15** (G2 PR #914; exit ceremony)
+- ~~#876~~ — DEMO-064 Mode 3 comparison — **CLOSED 2026-06-15** (G2 PR #914; exit ceremony)
+- ~~#908~~ — ADR-014 authorship — **CLOSED 2026-06-15** (ADR-014 accepted PRs #921–#930; exit ceremony)
+- #22 → **MIGRATED M14** (uncertainty quantification — M14 primary deliverable candidate)
+- #35 → **MIGRATED M14** (dynamic relationship weights)
+- #102 → **MIGRATED M14** (distributional scenario comparison)
+- #274 → **MIGRATED M14** (25-year trajectory)
+- #394 → **MIGRATED M14** (multi-scenario comparison)
+- #823 → **MIGRATED M14** (ecological composite denominator fix — DIC approval on record: CM APPROVE)
+- #824 → **MIGRATED M14** (MENA calibration fix — DIC approval on record: CM + EE APPROVE)
+- #837 → **MIGRATED M14** (config-driven demo scripts — HORIZON sweep 2026-06-13)
+- #950 → **MIGRATED M14** (Zone 1A Y axis label — HIGH; part of #845 information architecture work)
+- #951 → **MIGRATED M14** (solo-use review protocol blind spot)
 
 ---
 
 ## Open Issues — M14 (Methodology Publication and External Validation)
 
-**GitHub Milestone:** 15 | **Created:** 2026-06-11 | **Target:** Q2 2027
+**GitHub Milestone:** 15 | **Created:** 2026-06-11 | **Target:** Q2 2027 | **M14 is current milestone**
 
-| Issue | Title | Horizon |
-|---|---|---|
-| #97 | arch(api): threshold-crossing markers in comparative output | near-term |
-| #153 | feat(frontend): absolute threshold overlay on DeltaChoropleth | near-term |
-| #92 | arch(backtesting): Greece 2010 fixture investment climate initial conditions | near-term |
-| #30 | feat: distinguish stock vs. flow variables in entity attribute model | near-term |
-| #259 | standards: CTO legibility metrics dashboard | near-term |
-| #275 | feat(simulation): calibrated ecological-to-financial transmission | near-term |
-| #569 | test(perf): MV-002 Mode 3 re-run hardware validation | near-term |
-| #3 | governance: resolve single-principal separation of duties gap | near-term |
-| #6 | governance: restore branch protection bypass restriction | near-term |
-| #53 | feat: information access architecture | near-term |
-| #845 | ux: DEMO-044 — trajectory curves no inline entity labels | near-term |
-| #846 | ux: DEMO-045 — Mode 3 branch comparison values not in instrument | near-term |
-| #884 | ux: reserve_coverage_months value not surfaced as readable metric in instrument cluster | near-term |
-| #885 | ux: Exploratory confidence tier misclassifies baseline observation vs. forward projection | near-term |
-| #843 | plan: M14 closure — live stakeholder demo with real external participants (deferred from M12, EL decision 2026-06-11) | immediate |
+| Issue | Title | Horizon | Notes |
+|---|---|---|---|
+| #843 | plan: M14 closure — live stakeholder demo with real external participants (#843) | immediate | **M14 gate issue** — EL decision 2026-06-11 |
+| #97 | arch(api): threshold-crossing markers in comparative output | near-term | |
+| #153 | feat(frontend): absolute threshold overlay on DeltaChoropleth | near-term | |
+| #92 | arch(backtesting): Greece 2010 fixture investment climate initial conditions | near-term | |
+| #30 | feat: distinguish stock vs. flow variables in entity attribute model | near-term | |
+| #259 | standards: CTO legibility metrics dashboard | near-term | |
+| #275 | feat(simulation): calibrated ecological-to-financial transmission | near-term | |
+| #569 | test(perf): MV-002 Mode 3 re-run hardware validation | near-term | |
+| #3 | governance: resolve single-principal separation of duties gap | near-term | |
+| #6 | governance: restore branch protection bypass restriction | near-term | |
+| #53 | feat: information access architecture | near-term | |
+| #845 | ux: Zone 1A information architecture — multi-dimensional scenario encoding (frameworks × entities × branches × modes) | near-term | Reframed 2026-06-13; design-first required before implementation |
+| #846 | ux: DEMO-045 — Mode 3 branch comparison values not in instrument | near-term | |
+| #884 | ux: reserve_coverage_months value not surfaced as readable metric in instrument cluster | near-term | |
+| #885 | ux: Exploratory confidence tier misclassifies baseline observation vs. forward projection | near-term | |
+| #22 | feat: uncertainty quantification (distributions not point estimates) | near-term | **M14 primary deliverable candidate** — methodology publication anchor |
+| #35 | feat(simulation): dynamic relationship weight updating | near-term | Migrated from M13 (HORIZON sweep) |
+| #102 | feat: distributional scenario comparison with variance and percentile range | near-term | Migrated from M13 (HORIZON sweep) |
+| #274 | feat(simulation): 25-year human capital depletion trajectory | near-term | Migrated from M13 (HORIZON sweep) |
+| #394 | platform: multi-scenario comparison (>2 scenarios) | near-term | Migrated from M13 (HORIZON sweep) |
+| #823 | arch(methodology): ecological composite dynamic denominator fix | near-term | Migrated from M13; DIC approval on record (CM APPROVE, PR #943); implementation unblocked |
+| #824 | fix(engine): MENA arid-economy elasticity calibration | near-term | Migrated from M13; DIC approval on record (CM + EE APPROVE, PR #943); implementation unblocked |
+| #837 | feat(demo): configuration-driven demo scripts | near-term | Migrated from M13 (HORIZON sweep 2026-06-13) |
+| #950 | ux: Zone 1A trajectory chart Y axis has no label or unit | near-term | Migrated from M13; HIGH; solo-use blocker; part of #845 information architecture work |
+| #951 | process: review protocol blind spot — solo unnarrated use never tested | near-term | Migrated from M13; solo-use gate proposal |
 
 ---
 

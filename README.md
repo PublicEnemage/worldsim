@@ -53,14 +53,15 @@ governance); Mode 3 Active Control enables counter-scenario branching for
 negotiation support.
 
 **This tool is in active pre-release development.** The working software
-described below reflects Milestone 12 (Demo 4 complete — Jordan/Egypt Strait
-of Hormuz scenario). M13 is in active development.
+described below reflects Milestone 13 (political economy module; alert panel
+Zone 1B persistent-detail; instrument legibility improvements; mode transition
+UX; Process Redesign Phases 0–D). M14 is in active development.
 
 ---
 
 ## What's Built
 
-The working system at Milestone 12 (core components — not exhaustive):
+The working system at Milestone 13 (core components — not exhaustive):
 
 - **Simulation engine** — Event-driven graph in Python. The `Quantity` type
   system tracks `value: Decimal`, unit, variable type (STOCK/FLOW/RATIO/
@@ -127,7 +128,7 @@ The working system at Milestone 12 (core components — not exhaustive):
 
 ## Development Status
 
-**Active pre-release development. Demo 4 delivered 2026-06-11. M13 in active development.**
+**Active pre-release development. Demo 4 delivered 2026-06-11. M13 complete. M14 in active development.**
 
 | Milestone | Status | Version | Description |
 |---|---|---|---|
@@ -145,7 +146,8 @@ The working system at Milestone 12 (core components — not exhaustive):
 | M11 — Engine Investigation and Political Economy | ✅ Complete | [v0.11.0](https://github.com/PublicEnemage/worldsim/releases/tag/v0.11.0) | Matrix engine (ADR-009); PoliticalEconomyModule; non-linear propagation (ADR-011); snapshots/restore |
 | M11.5 — Usability Validation | ✅ Complete | — | Priority A usability sessions (3 personas); universal finding; M12 scope filed |
 | M12 — Active Control and External Sector | ✅ Complete | [v0.12.1](https://github.com/PublicEnemage/worldsim/releases/tag/v0.12.1) | Matrix engine production (ADR-012); ExternalSectorModule; Mode 3 Active Control; Demo 4 |
-| M13 — Political Economy and Instrument Credibility | 🔧 In progress | — | ADR-013; political economy integration; alert panel UX; instrument legibility |
+| M13 — Political Economy and Instrument Credibility | ✅ Complete | — | ADR-013/ADR-014; political economy module; alert panel Zone 1B; instrument legibility; mode transition UX; Process Redesign Phases 0–D |
+| M14 — Methodology Publication and External Validation | 🔧 In progress | — | Methodology publication; external validation; live external demo (#843); TSC formation |
 
 Full milestone history: [`CHANGELOG.md`](CHANGELOG.md). Live issue tracker:
 [GitHub Milestones](https://github.com/PublicEnemage/worldsim/milestones).
@@ -153,7 +155,7 @@ Full milestone history: [`CHANGELOG.md`](CHANGELOG.md). Live issue tracker:
 Development uses a structured multi-agent Claude Code workflow: a single
 Engineering Lead working with specialized agents (Architect, Implementation,
 QA, Security, DevOps, and a nine-member Domain Intelligence Council of domain
-experts). External contributor infrastructure is on the M13–M14 roadmap.
+experts). External contributor infrastructure is on the M14+ roadmap.
 
 ---
 
