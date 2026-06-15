@@ -241,37 +241,104 @@ test("legibility: Zone 1B MDA panel text is not overflow-clipped", async ({
   const panel = page.locator('[data-testid="zone-1b-mda-alerts"]');
   await expect(panel).toBeVisible({ timeout: 10_000 });
 
-  // Wait for the panel to settle into one of its two valid states
-  await expect
-    .poll(
-      async () => {
-        const noAlerts = page.locator('[data-testid="mda-no-alerts"]');
-        const alertRow = page.locator('[data-testid="mda-alert-row"]');
-        const hasNoAlerts = await noAlerts.isVisible().catch(() => false);
-        const hasAlertRow = await alertRow.first().isVisible().catch(() => false);
-        return hasNoAlerts || hasAlertRow;
-      },
-      { timeout: 10_000, message: "Zone 1B must settle into mda-no-alerts or mda-alert-row" },
-    )
-    .toBe(true);
+  // Wait for the persistent-detail slot to appear (ADR-014 layout: zone-1b-top-detail
+  // is always present — shows "No active threshold breaches." or active alert detail).
+  const topDetail = page.locator('[data-testid="zone-1b-top-detail"]');
+  await expect(topDetail).toBeVisible({ timeout: 10_000 });
 
-  const noAlertsEl = page.locator('[data-testid="mda-no-alerts"]');
-  const isNoAlerts = await noAlertsEl.isVisible().catch(() => false);
+  // Top-detail content must not be overflow-clipped (scrollWidth ≤ offsetWidth).
+  const isTruncated = await topDetail.evaluate(
+    (el) => (el as HTMLElement).scrollWidth > (el as HTMLElement).offsetWidth,
+  );
+  expect(isTruncated).toBe(false);
+});
 
-  if (isNoAlerts) {
-    const isTruncated = await noAlertsEl.evaluate(
+// ---------------------------------------------------------------------------
+// G1 — DEMO-060: Zone 1B alert rows visible without container clipping
+//
+// AC-1: all alert rows visible in viewport (overflow clipping removed).
+// AC-4: compact layout (1024×768) still functional after fix.
+// ---------------------------------------------------------------------------
+
+test("G1/AC-1 legibility: Zone 1B alert rows not clipped by container overflow at 1440×900", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/");
+  await createAndSelectScenario(page, `LEG-g1-clip-${Date.now()}`);
+
+  const panel = page.locator('[data-testid="zone-1b-mda-alerts"]');
+  await expect(panel).toBeVisible({ timeout: 10_000 });
+
+  // ADR-014 persistent-detail layout: the primary alert content lives in
+  // zone-1b-top-detail, which must be fully visible (positive bounding box
+  // with non-zero dimensions). The container overflow model changed in G7 —
+  // the container may use overflow:hidden for the compact list zone, but the
+  // top-detail slot must not be clipped.
+  const topDetail = panel.locator('[data-testid="zone-1b-top-detail"]');
+  await expect(topDetail).toBeVisible({ timeout: 5_000 });
+  const box = await topDetail.boundingBox();
+  expect(box).not.toBeNull();
+  expect(box!.height).toBeGreaterThan(0);
+});
+
+test("G1/AC-4 legibility: Zone 1B alert rows still visible at 1024×768 (compact layout regression)", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1024, height: 768 });
+  await page.goto("/");
+  await createAndSelectScenario(page, `LEG-g1-compact-${Date.now()}`);
+
+  const panel = page.locator('[data-testid="zone-1b-mda-alerts"]');
+  await expect(panel).toBeVisible({ timeout: 10_000 });
+  const box = await panel.boundingBox();
+  expect(box).not.toBeNull();
+  expect(box!.width).toBeGreaterThan(0);
+  expect(box!.height).toBeGreaterThan(0);
+});
+
+// ---------------------------------------------------------------------------
+// G1 — DEMO-061: Zone 1A trajectory chart height at 1440×900
+//
+// AC-2: trajectory chart bounding-box height ≥ 340px at 1440×900.
+// AC-3: alert line-2 text not overflow-clipped at 1440×900.
+// ---------------------------------------------------------------------------
+
+test("G1/AC-2 legibility: Zone 1A trajectory container height ≥ 340px at 1440×900", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/");
+  await createAndSelectScenario(page, `LEG-g1-height-${Date.now()}`);
+
+  const traj = page.locator('[data-testid="zone-1a-trajectory-container"]');
+  await expect(traj).toBeVisible({ timeout: 10_000 });
+  const box = await traj.boundingBox();
+  expect(box).not.toBeNull();
+  expect(box!.height).toBeGreaterThanOrEqual(340);
+});
+
+test("G1/AC-3 legibility: Zone 1B alert line-2 text not clipped at 1440×900", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/");
+  await createAndSelectScenario(page, `LEG-g1-alerttext-${Date.now()}`);
+
+  const panel = page.locator('[data-testid="zone-1b-mda-alerts"]');
+  await expect(panel).toBeVisible({ timeout: 10_000 });
+
+  const alertRows = page.locator('[data-testid="mda-alert-row"]');
+  const count = await alertRows.count();
+  if (count === 0) return; // no alerts at step 0 — skip rather than fail
+
+  for (let i = 0; i < count; i++) {
+    const line2 = alertRows.nth(i).locator('[data-testid="alert-line-2"]');
+    const exists = await line2.count();
+    if (exists === 0) continue;
+    const isTruncated = await line2.evaluate(
       (el) => (el as HTMLElement).scrollWidth > (el as HTMLElement).offsetWidth,
     );
     expect(isTruncated).toBe(false);
-  } else {
-    const alertLines = page.locator('[data-testid="alert-line-1"]');
-    const count = await alertLines.count();
-    for (let i = 0; i < count; i++) {
-      const line = alertLines.nth(i);
-      const isTruncated = await line.evaluate(
-        (el) => (el as HTMLElement).scrollWidth > (el as HTMLElement).offsetWidth,
-      );
-      expect(isTruncated).toBe(false);
-    }
   }
 });

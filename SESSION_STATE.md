@@ -5,29 +5,163 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-12 (Process Redesign sequence complete — Phase D endorsed PR #906; CLAUDE.md §Entry and Exit Invariants committed; sprint boundary discipline now constitutional. All Phases 0–D closed.)**
-**Current milestone:** M13 — Political Economy and Instrument Credibility (GitHub Milestone 9)
-**Previous milestone:** M12 — Active Control and External Sector (formally closed 2026-06-11; Issue #263 closed; GitHub Milestone 13 closed; tagged v0.12.1)
+**Last updated: 2026-06-15 (M13 exit ceremony COMPLETE — all issues dispositioned; reference docs updated; G8 sprint exit filed; #264 pending EL close after release/m13 → main merge)**
+**Current milestone:** M14 — Methodology Publication and External Validation (GitHub Milestone 15)
+**Previous milestone:** M13 — Political Economy and Instrument Credibility (formally closed 2026-06-15; Issue #264 pending close; GitHub Milestone 9 pending close after EL merges release/m13 → main)
 
 ---
 
-## Active Work Streams — M13
+## Closed — M13 Active Work Streams (reference record; all G1–G8 complete)
 
-No active work streams yet. M13 sprint planning has not begun.
+**Kickoff complete 2026-06-12. Exit ceremony complete 2026-06-15.** Wave 1 complete 2026-06-12. Wave 2 complete 2026-06-12. All sprints complete.
 
-**M13 kickoff prerequisites (must complete before implementation starts):**
-1. PM Agent cuts `release/m13` from `main` per CLAUDE.md §Release Branch Workflow
-2. PM Agent authors `docs/process/sprint-plans/m13-sprint-plan.md`
-3. ADR-013 status confirmed — deferred from M12 (EL decision 2026-06-07); check ADR backlog for assigned number and panel composition before drafting
-4. EL decision required on #852 sequencing — EL decision 2026-06-11: Frontend architecture review + ADR + UX Designer + Design Thinking agent input required before implementation; do not treat as a direct implementation task
-5. Note: **#264** (M13 Exit Checklist) is the M13 gate issue — it gates formal M13 closure; PM Agent must populate its checklist at sprint start
-6. Note: **Process Redesign Sequence (Phases 0–D) is complete** — all four mechanisms (execution lifecycle, acceptance protocol, sprint cadence, session boundary discipline) are operational and encoded in CLAUDE.md. No further redesign phases.
+**M13 kickoff status:**
+1. ✅ PM Agent cuts `release/m13` from `main` — DONE 2026-06-12
+2. ✅ PM Agent authors `docs/process/sprint-plans/m13-sprint-plan.md` — DONE 2026-06-12
+3. ✅ ADR-013 confirmed ASSIGNED (number 13, panel confirmed) — ready to author; ARCH-007 milestone note updated M12→M13
+4. ✅ #852 sequencing confirmed — blocked on alert panel ADR (new issue #908 filed; ARCH-008 PENDING_NUMBER in backlog)
+5. ✅ #264 (M13 Exit Checklist) — kickoff comment posted; EL approval comment posted
+6. ✅ Process Redesign Sequence (Phases 0–D) — COMPLETE; no further redesign phases
+7. ✅ Sprint entry document filed — `docs/process/sprint-plans/m13-sprint-1-entry.md` — EL-approved 2026-06-12
+8. ✅ Sprint plan EL approval — **recorded 2026-06-12 (PR #911)**
+
+**Wave 1 completion status:**
+- ✅ G3 (#799): Reserves non-negativity floor — merged to release/m13 (PR #912)
+- ✅ G1 (#872, #874): DEMO legibility fixes — merged (PR #913)
+- ✅ G4 (#27, #822, #847): Documentation — merged (PR #915)
+- ✅ G2 (#871, #873, #875, #876): DEMO trajectory/Mode 3 — merged (PR #914); 4 fixes: DEMO-059 PMM scale note, DEMO-062 Zone 1D entity label, DEMO-063 inline entity labels, DEMO-064 Mode 3 comparison readout
+- ✅ G5 (#792): ADR-013 — accepted 2026-06-12 (PR #916); EL acceptance recorded
+
+**Wave 2 completion status:**
+- ✅ G6 (#392): Political economy integration — merged 2026-06-12 (PR #919)
+  - Intent document: `docs/process/intents/ADR-013-2026-06-12-political-economy-integration.md`
+  - 26 tests AC-1–AC-6; 1334 unit tests passing
+  - Calibration basis political economy section complete (sensitivity 0.80→1.50 for AC-3)
+  - ✅ BPO Step 5 Validate: ACCEPT — 2026-06-12 (see intent document §8)
+    - Scenario d5e10fce, GRC, legitimacy_index=0.4, political_economy enabled
+    - `outputs.political_economy` confirmed as top-level framework key at step 1
+    - `programme_survival_probability = 0.59500` at step 1 (absent at step 0 — DEMO4 PASS)
+    - `composite_score = "0.5650"` at step 1
+    - Customer Agent Layer 3: PASS (MDA alert pathway present; indicator self-describing)
+    - Analytical intent: Persona 2 can cite programme survival probability as quantified political feasibility constraint
+    - #392 closed (issue closed as part of BPO acceptance)
+
+**Wave 3 complete:**
+- ✅ G7 (#852): Alert panel Zone 1B persistent-detail — COMPLETE 2026-06-13 (PR #936, BPO ACCEPT)
+  - Sprint entry: `docs/process/sprint-plans/m13-g7-sprint-entry.md` — EL-approved 2026-06-13 (PR #935)
+  - Intent document: `docs/process/intents/ADR-014-2026-06-13-alert-panel-ux.md`
+  - Step 4 Verify: PASS (2026-06-13, dev server port 5179, Hormuz scenario 558a27fe)
+    - AC-1: zone-1b-top-detail visible at 1440×900 without interaction ✅
+    - AC-2: data-severity="TERMINAL" on top detail slot ✅
+    - AC-3: detail clientHeight > 0 at 1024×768 (98px), 1280×800 (85px), 1440×900 (85px) ✅
+    - AC-5: compact rows cursor:default; click leaves detail unchanged ✅
+    - AC-7: compact row height 24px ≤ 26px limit at 1024×768 ✅
+    - Empty state: "No active threshold breaches." renders ✅
+    - Old mda-alert-row and alert-detail-panel removed ✅
+    - Mode-dependent tense: Mode 2 shows "BREACH PROJECTED" ✅
+  - Step 5 Validate: BPO ACCEPT — 2026-06-13 (see below)
+    - Persona 2 confirmed: open instrument cluster → TERMINAL breach evidence (severity + indicator + current vs. floor + 8 consecutive steps + confidence label) visible in Zone 1B detail slot with zero interactions
+    - Customer Agent Layer 3: PASS — "Reserve coverage has fallen 2.1 months below the CRITICAL threshold. At current draw rate, full depletion occurs in 4 steps." — output is self-interpreting; ministry analyst can cite without mediation
+    - North star: Zambian ministry analyst can read top threshold breach evidence with zero interactions from moment instrument cluster loads — interaction tax eliminated; argument evidence available at creditor-side parity
+    - #852 closed
+
+**Next action:** M13 EXIT CEREMONY COMPLETE 2026-06-15. G8 sprint exit filed (`docs/process/sprint-plans/m13-g8-sprint-exit.md`). All M13 issues dispositioned (11 closed, 9 migrated to M14). Reference docs updated (README, CLAUDE.md, roadmap). NM-044 filed (E2E regression gap). Required EL action: merge `release/m13` → `main`, close #264, tag release, close GitHub Milestone 9. M14 kickoff is the next agent action.
+
+### M14 Kickoff Prerequisites (AGENT: read before beginning any M14 work)
+
+**HARD STOP: M14 work may not begin until the EL has merged `release/m13` → `main`.**
+
+The G1–G8 M13 deliverables (political economy module, Zone 1B persistent-detail, mode transition UX, all DEMO fixes, all process redesign phases) are on `release/m13`, NOT on `main`. If you cut `release/m14` from `main` before the EL merge, M14 will branch from an incomplete codebase.
+
+**Verify before doing anything:**
+```bash
+git log origin/main --oneline | head -3
+```
+You must see G1–G8 commits (G8b: "feat(g8b): mode transition...") before proceeding. If you see only process-redesign commits (Phase D was the last to reach main), stop and request EL action.
+
+**M14 kickoff sequence (after EL confirms release/m13 → main merged):**
+1. `git pull origin main` — verify local main is current
+2. PM Agent cuts `release/m14` from `main`: `git checkout -b release/m14 main && git push origin release/m14`
+3. PM Agent authors `docs/process/sprint-plans/m14-sprint-plan.md` — primary objective: methodology publication, external validation, TSC formation, live demo (#843)
+4. EL approves sprint plan
+5. PM Agent files M14 Exit Checklist issue (equivalent to #264 for M13; must reference #843 as M14 closure gate)
+6. PM Agent updates SESSION_STATE.md with M14 kickoff status section
+7. Sprint entry document filed per `docs/process/sprint-planning-sop.md §Sprint Entry Gate`
+
+### Sprint Group Status
+
+| Group | Issues | Wave | ADR gate | Status |
+|---|---|---|---|---|
+| G1 — DEMO legibility | #872, #874 | Wave 1 | None | ✅ MERGED 2026-06-12 (PR #913) |
+| G2 — DEMO trajectory/Mode 3 | #871, #873, #875, #876 | Wave 1 | None | ✅ MERGED 2026-06-12 (PR #914) |
+| G3 — Engine fix (reserves floor) | #799 | Wave 1 | None | ✅ MERGED 2026-06-12 (PR #912) |
+| G4 — Documentation | #27, #822, #847 | Wave 1 | None | ✅ MERGED 2026-06-12 (PR #915) |
+| G5 — ADR-013 authorship | #792 | Wave 1 | N/A | ✅ ACCEPTED 2026-06-12 (PR #916) |
+| G6 — Political economy integration | #392 | Wave 2 | ADR-013 ✅ | ✅ COMPLETE 2026-06-12 (PR #919, BPO ACCEPT, #392 closed) |
+| G7 — Alert panel master-detail | #852 | Wave 3 | ADR-014 ✅ (accepted 2026-06-12) | ✅ COMPLETE 2026-06-13 (PR #936, BPO ACCEPT, #852 closed) |
+| G8a — Standards/methodology/calibration | #45, #27 R1–R3, #271 (tag only), #823, #824 | Wave 3 | None | ✅ COMPLETE 2026-06-13 (PR #943, #27/#45/#271 closed; #823/#824 domain sign-offs pending) |
+| G8b — Mode transition UX | #393 | Wave 3 | None | ✅ COMPLETE 2026-06-13 (PR #949, BPO ACCEPT, #393 closed) |
+
+**Status:** All G1–G8 complete. M13 primary objectives: ADR-013 ✅, G6 ✅, G7 ✅, G8 ✅. PI Agent sprint exit confirmation and M13 exit ceremony (#264) are the remaining actions.
+
+### G8 Sprint — Active Work Streams
+
+**Sprint entry:** `docs/process/sprint-plans/m13-g8-sprint-entry.md` — EL-approved 2026-06-13 (PR #939)
+**Sprint plan updated:** `docs/process/sprint-plans/m13-sprint-plan.md` — G8 Wave 3 added (PR #940)
+
+**G8a — COMPLETE (PR #943, merged 2026-06-13):**
+- ✅ #45 — HCL indicator standards (CODING_STANDARDS.md + DATA_STANDARDS.md) — CLOSED
+- ✅ #27 R1–R3 — Calibration doc residuals (Propagation Rules section + demo docstring + ADR-001 note) — CLOSED
+- ✅ #271 — Reversibility classification metadata tag (ReversibilityClassification enum, REVERSIBILITY_REGISTRY, Quantity field, round-trip serde, 24 tests) — CLOSED
+- ✅ #823 — Ecological composite fixed denominator — CM APPROVE 2026-06-13 (3 constraints: fix at first call not step 0; zero-indicator → None; audit Greece fixture; implementation unblocked)
+- ✅ #824 — MENA arid-economy elasticity calibration — CM + EE APPROVE 2026-06-13 (binding: −0.04, Tier 3, FAO GFR arid-subset/ICARDA, biome_class `arid_semiarid`, fallback to `high_forest_cover` with WARNING; implementation unblocked)
+
+**G8b — COMPLETE (PR #949, BPO ACCEPT 2026-06-13, #393 closed):**
+- #393 — Mode 1→2 step position preservation
+  - Intent document: `docs/process/intents/G8b-2026-06-13-mode-transition-step-preservation.md`
+  - ✅ Step 2 QA: `mode-transition.spec.ts` (9 E2E) + `mode-selector.test.tsx` (31 unit) — PR #947
+  - ✅ Step 3 Implementation: `ModeSelector.tsx`, `ModeTransitionModal.tsx`, `setMode` store action, `current-step-display` testid — PR #949
+  - ✅ Step 4 Verify: 9/9 E2E pass; AC-2 test spec correction (PR #953)
+  - ✅ Step 5 BPO Validate ACCEPT: Sri Lanka 2022 marquee — Mode 1→2 at step 3 in 776ms; step preserved; entity retained; Layer 3 PASS — PR #954
+
+**M14 deferrals confirmed (HORIZON sweep 2026-06-13):**
+#22 (uncertainty quantification — M14 primary deliverable candidate), #35 (dynamic relationship weights), #102 (distributional comparison), #274 (25-year trajectory), #394 (multi-scenario comparison), #837 (config-driven demo scripts)
+
+### Near-Term Backlog (M13 board, not in sprint waves)
+All near-term issues dispositioned at HORIZON sweep 2026-06-13 — see G8 sprint and M14 deferrals above. No items remain in undispositioned near-term backlog.
 
 ---
 
 ## Open PRs
 
-No open PRs — board clear as of 2026-06-12.
+| PR | Title | Target | Status |
+|---|---|---|---|
+| #909 ✅ | feat(m13): kickoff — sprint plan, entry doc, ADR backlog | release/m13 | Merged 2026-06-12 |
+| #910 ✅ | chore(state): M13 kickoff session state | release/m13 | Merged 2026-06-12 |
+| #911 ✅ | feat(m13): EL approval recorded — sprint plan + entry doc | release/m13 | Merged 2026-06-12 |
+| #912 ✅ | feat(g3): reserves non-negativity floor | release/m13 | Merged 2026-06-12 |
+| #913 ✅ | fix(g1): DEMO legibility fixes — DEMO-060 DEMO-061 | release/m13 | Merged 2026-06-12 |
+| #914 ✅ | feat(g2): DEMO trajectory and Mode 3 comparison display | release/m13 | Merged 2026-06-12 |
+| #915 ✅ | docs(g4): calibration basis, stakeholder walkthrough, data standards | release/m13 | Merged 2026-06-12 |
+| #916 ✅ | docs(adr): ADR-013 political economy module boundary (#792) | release/m13 | Merged 2026-06-12 |
+| #919 ✅ | feat(political-economy): G6 — ADR-013 political economy integration | release/m13 | Merged 2026-06-12 |
+| #921 ✅ | docs(adr): ADR-014 — alert panel (Zone 1B) master-detail layout (ARCH-008) | release/m13 | Merged 2026-06-12 |
+| #923 ✅ | docs(adr-014): rewrite — persistent-detail + scan-only compact list model | release/m13 | Merged 2026-06-12 |
+| #924 ✅ | docs(adr-014): promote mock-ups to primary design specification | release/m13 | Merged 2026-06-12 |
+| #926 ✅ | docs(adr-014): accepted — EL acceptance vote 2026-06-12 (ARCH-008) | release/m13 | Merged 2026-06-12 |
+| #928 ✅ | docs(adr-014): UX Designer independent sign-off — conditional, 3 intent requirements | release/m13 | Merged 2026-06-12 |
+| #929 ✅ | process(nm-042): agent generated UX Designer sign-off without independent review | release/m13 | Merged 2026-06-12 |
+| #930 ✅ | process(nm-042): structured UX Designer sign-off attestation — session context declaration | release/m13 | Merged 2026-06-12 |
+| #935 ✅ | process(g7): EL approval of sprint entry — 2026-06-13 | release/m13 | Merged 2026-06-13 |
+| #936 ✅ | feat(g7): Zone 1B persistent-detail layout — ADR-014 (#852) | release/m13 | Merged 2026-06-13 |
+| #943 ✅ | feat(g8a): close #27 R1-R3, #45, #271 — calibration docs, HCL standards, reversibility schema | release/m13 | Merged 2026-06-13 |
+| #947 ✅ | test(g8b): QA Lead — mode transition tests authored before implementation (#393) | release/m13 | Merged 2026-06-13 |
+| #949 ✅ | feat(g8b): mode transition step preservation — ModeSelector, modal, setMode, step display | release/m13 | Merged 2026-06-13 |
+| #953 ✅ | fix(g8b): AC-2 test spec correction — entity identifier containment not strict equality | release/m13 | Merged 2026-06-13 |
+| #954 ✅ | process(g8b): BPO ACCEPT — mode transition step preservation (#393) | release/m13 | Merged 2026-06-13 |
+| #955 ✅ | chore(state): G8b COMPLETE — BPO ACCEPT 2026-06-13; all G1–G8 done; M13 exit next | release/m13 | Merged 2026-06-13 |
+| #956 ✅ | fix(e2e): update Zone 1B and mode-indicator tests for G7/G8b observable state changes (NM-044) | release/m13 | Merged 2026-06-15 |
+| — | chore(m13-exit): M13 exit ceremony — pushed directly to release/m13 (9d86e8e) | release/m13 | Committed 2026-06-15 (no PR — direct push; note process deviation) |
 
 ## M11 Work Streams — 2026-06-04 Sprint
 
@@ -280,63 +414,73 @@ CI hotfix: NM-035 filed; `ci.yml` PR trigger updated to include `release/m*` (PR
 
 ---
 
-## Open Issues — M13 (Political Economy and Instrument Credibility)
+## Closed — M13 (Political Economy and Instrument Credibility)
 
-**GitHub Milestone:** 9 | **Created:** 2026-06-11 (renamed from "Methodology Publication") | **Target:** Q1 2027
+**GitHub Milestone:** 9 | **Formally closed: 2026-06-15** | **Exit ceremony complete 2026-06-15**
 
-| Issue | Title | Horizon | Notes |
-|---|---|---|---|
-| #264 | M13 Exit Checklist | immediate | **M13 gate issue** — PM Agent populates at sprint start; must be closed before M13 formally closes |
-| #792 | docs(adr): ADR-013 — political economy module boundary (G9) | immediate | **M13 prerequisite** — must be ACCEPTED before any G9 implementation begins; check ADR backlog for panel composition |
-| #799 | engine: reserves can go negative — no non-negativity floor on stock attributes | near-term | Bug observed in Demo 4 (JOR step 7: −0.04 months); no milestone/labels assigned until 2026-06-12 triage |
-| #852 | ux: alert panel (Zone 1B) needs master-detail layout | near-term | **ADR required first** — EL decision 2026-06-11: Frontend arch review + ADR + UX Designer + Design Thinking agent before implementation |
-| #871 | fix(demo): DEMO-059 — PMM displays 1.00 → at step 5, contradicts narration | near-term | Deferred from M12 2026-06-11 |
-| #872 | fix(demo): DEMO-060 — CRITICAL FIN alert clipped below panel boundary in Frame E | near-term | Deferred from M12 2026-06-11 |
-| #873 | fix(demo): DEMO-062 — Zone 1D shows single composite per axis, JOR vs EGY divergence absent | near-term | Deferred from M12 2026-06-11 |
-| #874 | fix(demo): DEMO-061 — instrument cluster and alert panel unreadable at presentation scale | near-term | Deferred from M12 2026-06-11 |
-| #875 | fix(demo): DEMO-063 — no inline entity labels on trajectory curves | near-term | Deferred from M12 2026-06-11 |
-| #876 | fix(demo): DEMO-064 — Mode 3 branch produces no quantitative comparison output | near-term | Deferred from M12 2026-06-11 |
-| #822 | docs(methodology): ecological composite denominator-change disclosure | near-term | |
-| #823 | arch(methodology): ecological composite dynamic denominator violates time-series | near-term | |
-| #824 | fix(engine): MENA arid-economy elasticity calibration for land_use_pressure | near-term | |
-| #837 | feat(demo): configuration-driven demo scripts | near-term | |
-| #847 | ux: DEMO-046 — Human Development 'Irreversible' label uncontextualized in narration | near-term | |
-| #392 | arch(m11): political economy constraint modeling | near-term | |
-| #393 | ux(mode-transition): Mode 1→2 transition must preserve step position | near-term | |
-| #394 | platform: multi-scenario comparison (>2 scenarios) | near-term | |
-| #271 | feat(simulation): reversibility classification for simulation outputs | near-term | |
-| #45 | standards: human development indicator standards and HCL effect size | near-term | |
-| #27 | docs: calibration basis for propagation attenuation parameters | near-term | |
-| #22 | feat: uncertainty quantification (distributions not point estimates) | near-term | |
-| #102 | feat: distributional scenario comparison with variance and percentile range | near-term | |
-| #35 | feat(simulation): dynamic relationship weight updating | near-term | |
-| #274 | feat(simulation): 25-year human capital depletion trajectory | near-term | |
-
-*M12 is closed (2026-06-11 — #263 signed off, GitHub Milestone 13 closed). M13 sprint planning has not yet begun — see kickoff prerequisites above.*
+**Exit ceremony disposition summary:**
+- ~~#264~~ — M13 Exit Checklist — **PENDING EL close** (open until EL merges release/m13 → main and closes)
+- ~~#27~~ — calibration basis docs — **CLOSED 2026-06-15** (G8a PR #943; auto-close missed release branch)
+- ~~#45~~ — HCL indicator standards — **CLOSED 2026-06-15** (G8a PR #943; auto-close missed release branch)
+- ~~#271~~ — reversibility classification — **CLOSED 2026-06-15** (G8a PR #943; auto-close missed release branch)
+- ~~#392~~ — political economy constraint modeling — **CLOSED 2026-06-12** (G6 BPO ACCEPT PR #919)
+- ~~#393~~ — Mode 1→2 step position preservation — **CLOSED 2026-06-13** (G8b BPO ACCEPT PR #949)
+- ~~#792~~ — ADR-013 — **CLOSED 2026-06-15** (G5 accepted PR #916; exit ceremony)
+- ~~#799~~ — reserves non-negativity floor — **CLOSED 2026-06-15** (G3 PR #912; exit ceremony)
+- ~~#822~~ — denominator disclosure — **CLOSED 2026-06-15** (G4 PR #915; exit ceremony)
+- ~~#847~~ — DEMO-046 — **CLOSED 2026-06-15** (G4 PR #915; exit ceremony)
+- ~~#852~~ — alert panel Zone 1B — **CLOSED 2026-06-13** (G7 BPO ACCEPT PR #936)
+- ~~#871~~ — DEMO-059 PMM — **CLOSED 2026-06-15** (G2 PR #914; exit ceremony)
+- ~~#872~~ — DEMO-060 alert clip — **CLOSED 2026-06-15** (G1 PR #913; exit ceremony)
+- ~~#873~~ — DEMO-062 Zone 1D — **CLOSED 2026-06-15** (G2 PR #914; exit ceremony)
+- ~~#874~~ — DEMO-061 legibility — **CLOSED 2026-06-15** (G1 PR #913; exit ceremony)
+- ~~#875~~ — DEMO-063 entity labels — **CLOSED 2026-06-15** (G2 PR #914; exit ceremony)
+- ~~#876~~ — DEMO-064 Mode 3 comparison — **CLOSED 2026-06-15** (G2 PR #914; exit ceremony)
+- ~~#908~~ — ADR-014 authorship — **CLOSED 2026-06-15** (ADR-014 accepted PRs #921–#930; exit ceremony)
+- #22 → **MIGRATED M14** (uncertainty quantification — M14 primary deliverable candidate)
+- #35 → **MIGRATED M14** (dynamic relationship weights)
+- #102 → **MIGRATED M14** (distributional scenario comparison)
+- #274 → **MIGRATED M14** (25-year trajectory)
+- #394 → **MIGRATED M14** (multi-scenario comparison)
+- #823 → **MIGRATED M14** (ecological composite denominator fix — DIC approval on record: CM APPROVE)
+- #824 → **MIGRATED M14** (MENA calibration fix — DIC approval on record: CM + EE APPROVE)
+- #837 → **MIGRATED M14** (config-driven demo scripts — HORIZON sweep 2026-06-13)
+- #950 → **MIGRATED M14** (Zone 1A Y axis label — HIGH; part of #845 information architecture work)
+- #951 → **MIGRATED M14** (solo-use review protocol blind spot)
 
 ---
 
 ## Open Issues — M14 (Methodology Publication and External Validation)
 
-**GitHub Milestone:** 15 | **Created:** 2026-06-11 | **Target:** Q2 2027
+**GitHub Milestone:** 15 | **Created:** 2026-06-11 | **Target:** Q2 2027 | **M14 is current milestone**
 
-| Issue | Title | Horizon |
-|---|---|---|
-| #97 | arch(api): threshold-crossing markers in comparative output | near-term |
-| #153 | feat(frontend): absolute threshold overlay on DeltaChoropleth | near-term |
-| #92 | arch(backtesting): Greece 2010 fixture investment climate initial conditions | near-term |
-| #30 | feat: distinguish stock vs. flow variables in entity attribute model | near-term |
-| #259 | standards: CTO legibility metrics dashboard | near-term |
-| #275 | feat(simulation): calibrated ecological-to-financial transmission | near-term |
-| #569 | test(perf): MV-002 Mode 3 re-run hardware validation | near-term |
-| #3 | governance: resolve single-principal separation of duties gap | near-term |
-| #6 | governance: restore branch protection bypass restriction | near-term |
-| #53 | feat: information access architecture | near-term |
-| #845 | ux: DEMO-044 — trajectory curves no inline entity labels | near-term |
-| #846 | ux: DEMO-045 — Mode 3 branch comparison values not in instrument | near-term |
-| #884 | ux: reserve_coverage_months value not surfaced as readable metric in instrument cluster | near-term |
-| #885 | ux: Exploratory confidence tier misclassifies baseline observation vs. forward projection | near-term |
-| #843 | plan: M14 closure — live stakeholder demo with real external participants (deferred from M12, EL decision 2026-06-11) | immediate |
+| Issue | Title | Horizon | Notes |
+|---|---|---|---|
+| #843 | plan: M14 closure — live stakeholder demo with real external participants (#843) | immediate | **M14 gate issue** — EL decision 2026-06-11 |
+| #97 | arch(api): threshold-crossing markers in comparative output | near-term | |
+| #153 | feat(frontend): absolute threshold overlay on DeltaChoropleth | near-term | |
+| #92 | arch(backtesting): Greece 2010 fixture investment climate initial conditions | near-term | |
+| #30 | feat: distinguish stock vs. flow variables in entity attribute model | near-term | |
+| #259 | standards: CTO legibility metrics dashboard | near-term | |
+| #275 | feat(simulation): calibrated ecological-to-financial transmission | near-term | |
+| #569 | test(perf): MV-002 Mode 3 re-run hardware validation | near-term | |
+| #3 | governance: resolve single-principal separation of duties gap | near-term | |
+| #6 | governance: restore branch protection bypass restriction | near-term | |
+| #53 | feat: information access architecture | near-term | |
+| #845 | ux: Zone 1A information architecture — multi-dimensional scenario encoding (frameworks × entities × branches × modes) | near-term | Reframed 2026-06-13; design-first required before implementation |
+| #846 | ux: DEMO-045 — Mode 3 branch comparison values not in instrument | near-term | |
+| #884 | ux: reserve_coverage_months value not surfaced as readable metric in instrument cluster | near-term | |
+| #885 | ux: Exploratory confidence tier misclassifies baseline observation vs. forward projection | near-term | |
+| #22 | feat: uncertainty quantification (distributions not point estimates) | near-term | **M14 primary deliverable candidate** — methodology publication anchor |
+| #35 | feat(simulation): dynamic relationship weight updating | near-term | Migrated from M13 (HORIZON sweep) |
+| #102 | feat: distributional scenario comparison with variance and percentile range | near-term | Migrated from M13 (HORIZON sweep) |
+| #274 | feat(simulation): 25-year human capital depletion trajectory | near-term | Migrated from M13 (HORIZON sweep) |
+| #394 | platform: multi-scenario comparison (>2 scenarios) | near-term | Migrated from M13 (HORIZON sweep) |
+| #823 | arch(methodology): ecological composite dynamic denominator fix | near-term | Migrated from M13; DIC approval on record (CM APPROVE, PR #943); implementation unblocked |
+| #824 | fix(engine): MENA arid-economy elasticity calibration | near-term | Migrated from M13; DIC approval on record (CM + EE APPROVE, PR #943); implementation unblocked |
+| #837 | feat(demo): configuration-driven demo scripts | near-term | Migrated from M13 (HORIZON sweep 2026-06-13) |
+| #950 | ux: Zone 1A trajectory chart Y axis has no label or unit | near-term | Migrated from M13; HIGH; solo-use blocker; part of #845 information architecture work |
+| #951 | process: review protocol blind spot — solo unnarrated use never tested | near-term | Migrated from M13; solo-use gate proposal |
 
 ---
 

@@ -166,19 +166,17 @@ test("demo flow: Zone 1B MDA panel is live and non-blank at every step", async (
       timeout: 15_000,
     });
 
-    // Zone 1B must settle into one of the two valid states
+    // Zone 1B must settle into the persistent-detail state (zone-1b-top-detail
+    // always present in the ADR-014 layout — shows empty text or active alert).
     await expect
       .poll(
         async () => {
-          const noAlerts = page.locator('[data-testid="mda-no-alerts"]');
-          const alertRow = page.locator('[data-testid="mda-alert-row"]');
-          const hasNoAlerts = await noAlerts.isVisible().catch(() => false);
-          const hasAlertRow = await alertRow.first().isVisible().catch(() => false);
-          return hasNoAlerts || hasAlertRow;
+          const topDetail = page.locator('[data-testid="zone-1b-top-detail"]');
+          return topDetail.isVisible().catch(() => false);
         },
         {
           timeout: 10_000,
-          message: `Zone 1B must show mda-no-alerts or mda-alert-row at step ${step}`,
+          message: `Zone 1B must show zone-1b-top-detail at step ${step}`,
         },
       )
       .toBe(true);

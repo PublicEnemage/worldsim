@@ -26,7 +26,12 @@ from decimal import Decimal
 from typing import TYPE_CHECKING, Any
 
 from app.schemas import QuantitySchema
-from app.simulation.engine.quantity import AttributeType, Quantity, VariableType
+from app.simulation.engine.quantity import (
+    AttributeType,
+    Quantity,
+    ReversibilityClassification,
+    VariableType,
+)
 
 if TYPE_CHECKING:
     from app.simulation.engine.models import CohortProfile, MeasurementFramework
@@ -115,6 +120,8 @@ def quantity_to_jsonb_envelope(q: Quantity) -> dict[str, Any]:
         envelope["attribute_type"] = q.attribute_type.value
     if q.stock_flow_identity:
         envelope["stock_flow_identity"] = True
+    if q.reversibility is not None:
+        envelope["reversibility"] = q.reversibility.value
     return envelope
 
 
@@ -145,6 +152,13 @@ def quantity_from_schema(schema: QuantitySchema) -> Quantity:
         except ValueError:
             at = None
 
+    rev: ReversibilityClassification | None = None
+    if schema.reversibility is not None:
+        try:
+            rev = ReversibilityClassification(schema.reversibility)
+        except ValueError:
+            rev = None
+
     return Quantity(
         value=Decimal(schema.value),
         unit=schema.unit,
@@ -155,6 +169,7 @@ def quantity_from_schema(schema: QuantitySchema) -> Quantity:
         measurement_framework=mf,
         attribute_type=at,
         stock_flow_identity=schema.stock_flow_identity,
+        reversibility=rev,
     )
 
 

@@ -121,7 +121,9 @@ def make_event(
 class TestMeasurementFramework:
     def test_all_four_frameworks_present(self) -> None:
         values = {f.value for f in MeasurementFramework}
-        assert values == {"financial", "human_development", "ecological", "governance"}
+        assert values == {
+            "financial", "human_development", "ecological", "governance", "political_economy",
+        }
 
     def test_no_implicit_conversion_between_frameworks(self) -> None:
         # frameworks are distinct enum members — equality only holds with itself

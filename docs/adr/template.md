@@ -160,10 +160,16 @@ prerequisite-sources:
 [Named journeys and steps from `user-journeys.md` served or modified. For each: what the user can now do that was previously unavailable or impeded. If closing a `[Near-Term-Gap]` or `[Phase-3-TBD]` item, reference it explicitly.]
 
 **UX Designer sign-off:**  
-This sign-off is a precondition for the acceptance vote. An ADR with an unchecked UX Designer
-sign-off cannot proceed to acceptance vote and cannot be given `Accepted` status.
+This sign-off is a precondition for the acceptance vote. An ADR with an incomplete sign-off
+block cannot proceed to acceptance vote and cannot be given `Accepted` status. All four
+fields below are required — a checkbox without the structured attestation is non-compliant.
 
-`[ ]` UX Designer: UX implication statement elements 1–7 confirmed complete. [Date]
+**Reviewing agent:** [UX Designer Agent]  
+**Session context:** [One of: `Separate session, EL-triggered YYYY-MM-DD` | `Same session as ADR authorship — acknowledged`]  
+**Governing documents reviewed:** [Named sections required — e.g., `information-hierarchy.md §1B`, `north-star.md §Primary Cognitive Tasks`. Generic references ("governing premises") do not satisfy this field.]  
+**Concerns found:** [N — listed below with each concern on its own line | `None`]  
+
+`[ ]` UX Designer sign-off. [Date]
 
 ---
 
@@ -187,7 +193,12 @@ sign-off cannot proceed to acceptance vote and cannot be given `Accepted` status
 **UX Designer review:**  
 A Tier 2 ADR that proceeds to acceptance vote without a completed UX Designer sign-off
 confirmation is in violation of the process. PI Agent holds R for blocking the vote if
-sign-off is absent.
+sign-off is absent. All four fields below are required.
+
+**Reviewing agent:** [UX Designer Agent]  
+**Session context:** [One of: `Separate session, EL-triggered YYYY-MM-DD` | `Same session as ADR authorship — acknowledged`]  
+**Governing documents reviewed:** [Named sections — e.g., `north-star.md §Primary Cognitive Tasks`, `user-journeys.md §Journey B`. Generic references do not satisfy this field.]  
+**Concerns found:** [N — listed below | `None`]  
 
 `[ ]` UX Designer: Elements P-1–P-5 (and P-6 if applicable) confirmed present and adequate. [Date]  
 Or: "UX Designer review: persona trace incomplete. Missing: [elements]. Blocked from acceptance until remediated."

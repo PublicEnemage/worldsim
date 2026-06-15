@@ -1,0 +1,57 @@
+---
+title: ADR-014 — Zone 1B Persistent Alert Detail + Scan-Only Compact List
+---
+graph TB
+    subgraph IC["InstrumentCluster — Zone 1B allocation (fixed height, overflow:hidden)"]
+        direction TB
+
+        subgraph TopDetail["zone-1b-top-detail  [flex: 0 0 auto, ~82px, overflow:hidden]"]
+            direction TB
+            Rank["Ranking: severity DESC → step_index ASC\n→ mda_alerts[0] is always highest priority"]
+            Content["TopAlertDetail\n────────────────────────────────────\n• [SEVERITY pill]  indicator name  FW_ABBREV  [NEW?]\n• cohort subheader (if not 'all cohorts')\n• Current: {value}    Floor: {floor_value}\n• BREACHED | N% above floor  ·  N consecutive step(s)\n• getNegotiationLabel(confidence_tier)\n• Caused by: {causal_attribution}  ← Mode 3 only\n────────────────────────────────────\nNO sparkline (Zone 1A covers trajectory)"]
+            Empty["Empty state: 'No active threshold breaches.'"]
+            Rank --> Content
+            Rank --> Empty
+        end
+
+        Divider["──────────────────────── divider ────────────────────────"]
+
+        subgraph Compact["zone-1b-compact  [flex: 1, overflow-y: auto]"]
+            direction TB
+            CompactRows["CompactAlertList (mda_alerts[1..N])\n────────────────────────────────────\n• SEVERITY_ABBREV  FW_ABBREV  indicator (truncated)  Stp N\n• cursor: default  — NO click handler  — NO hover state\n• Scan surface only; selection not available in Zone 1B\n────────────────────────────────────\n• +N more ↕  (scroll affordance when list overflows)"]
+        end
+
+        TopDetail --> Divider --> Compact
+    end
+
+    subgraph NewBadge["[NEW] badge logic"]
+        direction LR
+        Detect["Detect: mda_alerts[0].mda_id\nchanged between renders?"]
+        Show["showNewBadge = true\n→ badge appears in detail header"]
+        Clear["Cleared on next user interaction\n(scroll in compact OR click in Zone 1B)"]
+        Detect -- "yes (new top alert)" --> Show
+        Show --> Clear
+    end
+
+    Store["useScenarioStepStore\n────────────────────\n• mda_alerts: Zone1BAlert[]\n• mode: MODE_1 | MODE_2 | MODE_3\n• current_step: number"]
+
+    Store -->|"mda_alerts (sorted by severity → step_index)"| IC
+    Store -->|"mode (drives causal attribution display)"| IC
+    Store -->|"mda_alerts[0].mda_id"| NewBadge
+    NewBadge -->|"showNewBadge state"| TopDetail
+
+    subgraph Removed["Removed from Zone 1B (retained elsewhere)"]
+        direction LR
+        FocusedState["focusedAlertMdaId state — REMOVED\n(no user selection in Zone 1B)"]
+        OnSelectAlert["onSelectAlert prop — REMOVED"]
+        Sparkline["Sparkline — REMOVED from Zone 1B\n(retained in EntityDetailDrawer usage)"]
+        ScrollEffect["scrollIntoView useEffect — REMOVED\n(detail no longer below fold)"]
+    end
+
+    style TopDetail fill:#fff5f5,stroke:#cc0000,stroke-width:1.5px
+    style Compact fill:#f5f5ff,stroke:#6666cc,stroke-width:1px
+    style Content fill:#ffffff,stroke:#aaaaaa
+    style Empty fill:#f9f9f9,stroke:#cccccc,stroke-dasharray:4
+    style NewBadge fill:#fffff0,stroke:#aaaa00
+    style Store fill:#f0fff0,stroke:#006600
+    style Removed fill:#f5f5f5,stroke:#aaaaaa,stroke-dasharray:3

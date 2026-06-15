@@ -1,8 +1,8 @@
 # WorldSim Roadmap
 
-> Last significant revision: 2026-06-12
-> Next mandatory review: Milestone 13 close
-> Updated against: M13 kickoff — M12 closed (v0.12.1; Demo 4 complete); M11/M11.5 closed; registry updated through M14; M13 canonical title corrected to Political Economy and Instrument Credibility; "Where We Are" updated from M8/M9 era
+> Last significant revision: 2026-06-15
+> Next mandatory review: Milestone 14 close
+> Updated against: M13 close — political economy module in production; ADR-013/ADR-014 accepted; alert panel Zone 1B persistent-detail; instrument legibility; mode transition UX; Process Redesign Phases 0–D complete; M14 now current
 > Canonical location: `docs/roadmap/worldsim-roadmap.md`
 
 *Note: This document was not updated at M10, M11, M11.5, or M12 close — a gap against the "Roadmap Currency" policy. Updates at those closes are now reflected in the registry and narrative sections.*
@@ -31,18 +31,18 @@
 | M11 | Engine Investigation and Political Economy | ADR-009, sparse matrix PoC, Phase 2 A/B validation, PoliticalEconomyModule | Complete |
 | M11.5 | Usability Validation and Experience Audit | Priority A usability sessions; universal finding; M12 scope filed | Complete |
 | M12 | Active Control and External Sector | Matrix engine production, ExternalSectorModule (ADR-012), Mode 3, Demo 4 | Complete |
-| M13 | Political Economy and Instrument Credibility | ADR-013, political economy integration, alert panel UX, instrument legibility | Current |
-| M14 | Methodology Publication and External Validation | Methodology publication, external validation, live demo, TSC formation | Planned |
+| M13 | Political Economy and Instrument Credibility | ADR-013, political economy integration, ADR-014 alert panel UX, instrument legibility, mode transition UX, Process Redesign Phases 0–D | Complete |
+| M14 | Methodology Publication and External Validation | Methodology publication, external validation, live demo, TSC formation | Current |
 
 ---
 
 ## Where We Are
 
-WorldSim v0.12.1 is released. Thirteen milestones of foundational and delivery work are complete. The simulation engine runs multi-country scenarios with matrix computation. The external sector module enables bilateral trade shocks and commodity price cascades. Mode 3 Active Control lets a finance ministry analyst branch from any simulation step, apply policy instruments, and compare the resulting trajectory against the baseline in real time. All four measurement framework axes are live. Five historical backtesting cases are validated (Greece, Argentina, Lebanon, Thailand, Ecuador). Demo 4 — a Jordan/Egypt Strait of Hormuz closure scenario — has been presented to stakeholders.
+WorldSim v0.12.1+ is released. Fourteen milestones of foundational and delivery work are complete. The simulation engine runs multi-country scenarios with matrix computation. The external sector module enables bilateral trade shocks and commodity price cascades. Mode 3 Active Control lets a finance ministry analyst branch from any simulation step, apply policy instruments, and compare the resulting trajectory against the baseline in real time. All four measurement framework axes are live. The political economy module makes programme survival probability and conditionality dynamics analytically visible. The alert panel (Zone 1B) delivers threshold breach evidence in persistent-detail without interaction. Five historical backtesting cases are validated (Greece, Argentina, Lebanon, Thailand, Ecuador). Demo 4 — a Jordan/Egypt Strait of Hormuz closure scenario — has been presented to stakeholders.
 
-M13 is the transition from demonstration to institutional readiness. The political economy module makes programme feasibility constraints and conditionality design analytically visible. Instrument legibility improvements make the tool credible in a live negotiation room. The alert panel UX makes the threshold crossing story readable without presenter narration.
+M13 is complete. M14 is the transition from institutional readiness to public availability. The methodology publication makes every model relationship, calibration assumption, and known limitation inspectable. External validation by domain experts outside the project provides independent credibility. The live external demo (#843) is the M14 closure gate — the moment the democratization mission becomes operational rather than aspirational.
 
-The three questions a sophisticated negotiator would ask that remain unanswerable today — political feasibility, conditionality design, and medium-term horizon — are M13's primary scope.
+The three questions that drove M13 — political feasibility, conditionality design, and medium-term horizon — are now answerable. M14 asks: can we make that answer credible to the world?
 
 ---
 
@@ -202,7 +202,7 @@ surface: any milestone entry with UNTRACKED items is an open kickoff gate.
 
 ---
 
-### Milestone 13 — Political Economy and Instrument Credibility *(current)*
+### Milestone 13 — Political Economy and Instrument Credibility *(complete)*
 
 **Core deliverable:** The political economy module makes programme feasibility constraints and conditionality design analytically visible. Instrument legibility makes the tool credible in a live negotiation room without a technical presenter.
 
@@ -221,7 +221,7 @@ surface: any milestone entry with UNTRACKED items is an open kickoff gate.
 
 ---
 
-### Milestone 14 — Methodology Publication and External Validation *(planned)*
+### Milestone 14 — Methodology Publication and External Validation *(current)*
 
 **Core deliverable:** WorldSim is ready for institutional adoption. The methodology is published, externally validated, and inspectable by anyone.
 

@@ -167,6 +167,7 @@ function parseMdaAlerts(raw: RawMultiFrameworkOutput): Zone1BAlert[] {
         alert.indicator_key.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
       alerts.push({
         mda_id: alert.mda_id,
+        entity_id: raw.entity_id,
         indicator_key: alert.indicator_key,
         indicator_name,
         framework,
@@ -216,6 +217,7 @@ export function ScenarioInstrumentCluster({
   const store = useScenarioStepStore();
   const bp = useViewportBreakpoint();
   const coPrimaryWidth = LAYOUT[bp].coPrimary;
+  const chartHeight = LAYOUT[bp].chartHeight;
 
   // Fetch lifecycle state for Zone 1D loading/error display (IR-006).
   // Local state — not Zustand — because this is fetch lifecycle, not simulation state.
@@ -229,24 +231,28 @@ export function ScenarioInstrumentCluster({
     prev: Record<string, QuantitySchema> | null;
   }>({ current: null, prev: null });
 
-  // Alert drill-in selection — UI state, not simulation state (#745).
-  // Shared between Zone 1B (displays detail) and Zone 1D ("see alerts" navigation).
-  const [focusedAlertMdaId, setFocusedAlertMdaId] = useState<string | null>(null);
-
   // Mode 3 branch advance loop — abortController cancels in-flight advances on cleanup.
   const branchAbortRef = useRef<AbortController | null>(null);
 
-  // Initialise store when scenario changes — MODE_3 when mode3Active; MODE_2 when fiscal multiplier override
+  // Track previous scenarioId to distinguish scenario change (full reset) from mode-only change.
+  const prevScenarioIdRef = useRef<string>("");
+
+  // Initialise store when scenario changes (full reset) or update mode without resetting.
+  // setScenario resets trajectory and current_step — calling it on mode changes would drop
+  // the trajectory fetched after step advance and break Mode 3 comparison readout (DEMO-064).
   useEffect(() => {
-    let mode: "MODE_1" | "MODE_2" | "MODE_3";
-    if (mode3Active) {
-      mode = "MODE_3";
-    } else if (fiscalMultiplier != null && fiscalMultiplier !== 1.0) {
-      mode = "MODE_2";
+    const mode: "MODE_1" | "MODE_2" | "MODE_3" = mode3Active
+      ? "MODE_3"
+      : fiscalMultiplier != null && fiscalMultiplier !== 1.0
+        ? "MODE_2"
+        : "MODE_1";
+    if (prevScenarioIdRef.current !== scenarioId) {
+      prevScenarioIdRef.current = scenarioId;
+      store.setScenario(scenarioId, stepCount, mode);
     } else {
-      mode = "MODE_1";
+      // Mode changed for same scenario — preserve trajectory and current_step.
+      useScenarioStepStore.setState({ mode });
     }
-    store.setScenario(scenarioId, stepCount, mode);
   // eslint-disable-next-line react-hooks/exhaustive-deps -- store is a Zustand singleton, stable reference
   }, [scenarioId, stepCount, fiscalMultiplier, mode3Active]);
 
@@ -551,13 +557,62 @@ export function ScenarioInstrumentCluster({
         </div>
       )}
 
+      {/* Mode 3 comparison readout — shows labeled baseline vs. branch values (DEMO-064).
+          Visible when branch is applied and recompute has completed. */}
+      {mode === "MODE_3" && branchFromStep !== null && !isRecomputing && recomputeStatus !== "failed" && (() => {
+        const currentStepIdx = store.current_step;
+        const activeStep = store.trajectory?.steps.find(s => s.step_index === currentStepIdx)
+          ?? store.trajectory?.steps.at(-1);
+        const baseStep = store.baseline_trajectory?.steps.find(s => s.step_index === currentStepIdx)
+          ?? store.baseline_trajectory?.steps.at(-1);
+        const activeScore = activeStep?.frameworks["financial"]?.composite_score ?? null;
+        const baseScore = baseStep?.frameworks["financial"]?.composite_score ?? null;
+        const delta = activeScore !== null && baseScore !== null ? activeScore - baseScore : null;
+        const displayStep = activeStep?.step_index ?? baseStep?.step_index ?? currentStepIdx;
+        return (
+          <div
+            data-testid="mode3-comparison-readout"
+            style={{
+              padding: "4px 10px",
+              background: "#f8f4ff",
+              borderBottom: "1px solid #e9d5ff",
+              display: "flex",
+              alignItems: "center",
+              gap: 16,
+              fontSize: 11,
+              color: "#444",
+            }}
+          >
+            <span style={{ fontWeight: 600, color: "#7c3aed", fontSize: 10, letterSpacing: 0.2 }}>
+              Financial (step {displayStep})
+            </span>
+            <span>
+              Baseline:{" "}
+              <span data-testid="mode3-baseline-value" style={{ fontWeight: 700 }}>
+                {baseScore !== null ? baseScore.toFixed(2) : "—"}
+              </span>
+            </span>
+            <span>
+              Branch:{" "}
+              <span data-testid="mode3-branch-value" style={{ fontWeight: 700 }}>
+                {activeScore !== null ? activeScore.toFixed(2) : "—"}
+              </span>
+            </span>
+            {delta !== null && (
+              <span style={{ color: delta > 0 ? "#2271B3" : "#cc0000", fontWeight: 700 }}>
+                {delta > 0 ? "+" : ""}{delta.toFixed(2)}
+              </span>
+            )}
+          </div>
+        );
+      })()}
+
       <InstrumentCluster
         entityIds={entityIds}
+        chartHeight={chartHeight}
         mdaPanel={
           <MDAAlertPanelZone1B
             columnWidth={coPrimaryWidth}
-            focusedAlertMdaId={focusedAlertMdaId}
-            onSelectAlert={setFocusedAlertMdaId}
           />
         }
         pmmWidget={<PMMWidgetZone1C />}
@@ -565,7 +620,7 @@ export function ScenarioInstrumentCluster({
           <FourFrameworkZone1D
             isLoading={trajectoryLoading}
             isError={trajectoryError}
-            onSelectFrameworkAlert={setFocusedAlertMdaId}
+            entityIds={entityIds}
           />
         }
         cohortPanel={

@@ -1,8 +1,8 @@
 # CLAUDE.md — WorldSim Project Context
 
-> Last significant revision: 2026-06-12
-> Updated against: M13 active — M12 closed (v0.12.1); matrix engine in production (ADR-009/012); ExternalSectorModule; Mode 3 Active Control; Demo 4 complete; Process Redesign Phase 0 endorsed; Phase A endorsed (2026-06-12); Phase B open
-> Previous version context: 2026-06-05 — M12 active; release branch workflow added; PM Agent SPRINT mode added; sprint planning SOP codified; north star test as formal process gate (FD-1 closed)
+> Last significant revision: 2026-06-15
+> Updated against: M14 active — M13 closed; political economy module in production (ADR-013); alert panel Zone 1B master-detail (ADR-014); mode transition UX; instrument legibility; Process Redesign Phases 0–D complete
+> Previous version context: 2026-06-12 — M13 active; Process Redesign Phases A–D endorsed; five-step agent execution lifecycle; sprint entry/exit gates; session boundary discipline
 
 > **Reader Orientation:** This is the permanent project constitution — read it in full before beginning any session. It contains the mission, architectural commitments, and process rules that govern all work in this repository. Anyone making a change in this codebase, human or agent, must have read this document first. Key must-read sections if time is short: Session Continuity (what to read and in what order), Guiding Principles (the values behind every technical decision), and §Architectural Principles for Claude Code Sessions (process gates including pre-push lint, PR merge gate, and file authority rules that will cause compliance violations if not followed).
 
@@ -305,19 +305,18 @@ Detailed domain profiles: `docs/agents/domain-intelligence-council.md`
 
 ## What We Are Building First
 
-M0–M12 complete (v0.1.0–v0.12.1). ADRs 001–012 current.
+M0–M13 complete (v0.1.0–v0.12.1+). ADRs 001–014 current.
 See GitHub Releases for full delivery history.
 
-**Milestone 13 — Political Economy and Instrument Credibility (Current)**
+**Milestone 14 — Methodology Publication and External Validation (Current)**
 
-*Primary objective (M13 exit gate):*
-- ADR-013 authored and accepted — political economy module boundary
-- Political economy module — conditionality modelling, elite capture dynamics, political feasibility constraints
-- Alert panel UX (Zone 1B) — master-detail layout; ADR and frontend architecture review required before implementation (#852)
-- Instrument legibility improvements — Demo findings DEMO-059–064 resolved
-- Process Redesign Phase A deliverables
+*Primary objective (M14 exit gate):*
+- Methodology publication — complete documentation of every model relationship, calibration assumption, and known limitation
+- External validation by domain experts outside the project
+- Live stakeholder demo with real external participants (#843) — M14 closure gate
+- Technical Steering Committee formation — first governance actor independent of the Engineering Lead
 
-M13 closes when the political economy module is production-ready and instrument credibility meets first-class UX standards for negotiation-room use. Demo 5 is planned for M14.
+M14 closes when the methodology is published, externally validated, and a live demo has been delivered to real external participants. Demo 5 at M14 close.
 
 Each milestone is a vertical slice — working software at every stage,
 not infrastructure waiting for features.
@@ -326,15 +325,15 @@ not infrastructure waiting for features.
 
 ## Milestone Roadmap
 
-M0–M12 complete (v0.1.0–v0.12.1). M13 current. See GitHub Releases for full delivery history.
+M0–M13 complete (v0.1.0–v0.12.1+). M14 current. See GitHub Releases for full delivery history.
 
-The full roadmap covering M13 through M14 — milestone deliverables, demo anchors, canonical users served, and the long-term resolution spectrum direction — is maintained at `docs/roadmap/worldsim-roadmap.md`. That document is the canonical reference. The summary below reflects current and next milestone only.
+The full roadmap covering M14 and beyond — milestone deliverables, demo anchors, canonical users served, and the long-term resolution spectrum direction — is maintained at `docs/roadmap/worldsim-roadmap.md`. That document is the canonical reference. The summary below reflects current and next milestone only.
 
-**Milestone 13 — Political Economy and Instrument Credibility (Current)**
-Primary objective: ADR-013 (political economy module boundary), political economy module (conditionality, elite capture, political feasibility), alert panel UX (ADR required), instrument legibility improvements. No demo — Demo 5 at M14.
+**Milestone 13 — Political Economy and Instrument Credibility (Complete)**
+Delivered: ADR-013 (political economy module boundary), political economy module (conditionality, elite capture, political feasibility), ADR-014 (alert panel Zone 1B master-detail), instrument legibility (DEMO-059–064), mode transition UX (step preservation), Process Redesign Phases 0–D.
 
-**Milestone 14 — Methodology Publication and External Validation (Next)**
-Core deliverable: Methodology publication, external validation by domain experts, live stakeholder demo with real external participants (#843), Technical Steering Committee formation. Public launch infrastructure.
+**Milestone 14 — Methodology Publication and External Validation (Current)**
+Core deliverable: Methodology publication, external validation by domain experts, live stakeholder demo with real external participants (#843), Technical Steering Committee formation. Demo 5 at M14 close.
 
 Full roadmap: `docs/roadmap/worldsim-roadmap.md`
 
@@ -512,6 +511,30 @@ star test, and mission impact statement. An ADR that cannot satisfy all requirem
 tier is not ready for acceptance. The Architect determines tier classification at ADR
 initiation; the UX Designer sign-off is a hard precondition for Tier 1 acceptance — not a
 post-acceptance formality.
+
+**UX Designer sign-off — structured attestation required (NM-042).**
+The UX Designer sign-off block in every ADR requires four named fields: Reviewing agent,
+Session context, Governing documents reviewed (named sections — not generic references),
+and Concerns found (explicit count or "None"). A checkbox without all four fields is
+non-compliant — treat it as unsigned.
+
+The `Session context` field has two valid values:
+- `Separate session, EL-triggered YYYY-MM-DD` — independence is structurally asserted; EL
+  accepts at face value.
+- `Same session as ADR authorship — acknowledged` — the analog to initialing "per: [delegate]"
+  on a paper form. Disclosed same-session review is permitted; undisclosed same-session review
+  is a process violation equivalent to a missing sign-off.
+
+**A sign-off marked `Same session as ADR authorship — acknowledged` requires the EL to verify
+governing document citations in the sign-off text before accepting.** Generic references
+("governing premises", "first principles") do not satisfy the citation requirement. Named
+sections (`information-hierarchy.md §1B`, `north-star.md §Primary Cognitive Tasks`) do.
+
+**Absence of a `Session context` declaration is a non-compliant sign-off.** Treat it as
+`Same session as ADR authorship — acknowledged` until a properly declared review is obtained.
+PI Agent holds R for flagging non-compliant sign-offs before the acceptance vote passes.
+
+Near-miss authority: NM-042 (`docs/process/near-miss-registry.md`).
 
 **North Star Test (Process Gate)**
 

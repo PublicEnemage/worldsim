@@ -48,6 +48,20 @@ from app.simulation.engine.models import (
 )
 from app.simulation.engine.quantity import Quantity, VariableType
 
+# ---------------------------------------------------------------------------
+# Domain constraint floors
+# ---------------------------------------------------------------------------
+
+# Attributes that must never fall below their floor value after state construction.
+# Physical domain: a stock of foreign exchange reserves or a consumption capacity
+# fraction cannot be negative — depletion bottoms out at zero.
+# Only extend this registry for attributes with a clear physical non-negativity
+# constraint. Trade balances and other signed flows are NOT included.
+_ATTRIBUTE_FLOORS: dict[str, Decimal] = {
+    "reserve_coverage_months": Decimal("0"),
+    "bottom_quintile_consumption_capacity": Decimal("0"),
+}
+
 _log = logging.getLogger(__name__)
 
 # ---------------------------------------------------------------------------
@@ -453,8 +467,10 @@ def _build_next_state(
 
         if entity_id in accumulator:
             for key, delta in accumulator[entity_id].items():
-                if delta.variable_type == VariableType.STOCK:
-                    # Absolute replacement: delta IS the new value
+                if delta.variable_type in (VariableType.STOCK, VariableType.PROBABILITY):
+                    # Absolute replacement: delta IS the new value.
+                    # PROBABILITY uses replacement semantics identical to STOCK —
+                    # survival probability at step N replaces the prior estimate.
                     new_attrs[key] = delta
                 else:
                     # Additive accumulation for FLOW, RATIO, DIMENSIONLESS
@@ -472,6 +488,21 @@ def _build_next_state(
                             confidence_tier=max(
                                 existing.confidence_tier, delta.confidence_tier
                             ),
+                        )
+
+                # Apply domain constraint floor after accumulation or replacement.
+                if key in _ATTRIBUTE_FLOORS:
+                    floor = _ATTRIBUTE_FLOORS[key]
+                    qty = new_attrs[key]
+                    if qty.value < floor:
+                        new_attrs[key] = Quantity(
+                            value=floor,
+                            unit=qty.unit,
+                            variable_type=qty.variable_type,
+                            measurement_framework=qty.measurement_framework,
+                            observation_date=qty.observation_date,
+                            source_id=qty.source_id,
+                            confidence_tier=qty.confidence_tier,
                         )
 
         new_entities[entity_id] = SimulationEntity(

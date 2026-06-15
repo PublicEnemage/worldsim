@@ -31,6 +31,7 @@ function makeAlert(
 ): Zone1BAlert {
   return {
     mda_id: `mda-${overrides.severity}-${overrides.step_index}`,
+    entity_id: "GRC",
     indicator_key: "poverty_headcount",
     indicator_name: "Poverty Headcount",
     framework: "human_development",

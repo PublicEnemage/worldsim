@@ -2312,8 +2312,11 @@ This test runs in CI after every commit that touches the source registry.
 
 ## Human Development Indicator Standards
 
+**Source:** STD-REVIEW-001 SA-04 (CONVERGENT: T1-F2 Development Economist + T2-F8 QA Agent),
+Issue #45. `DATA_STANDARDS.md §Human Development Data Sources` is the companion data reference.
+
 Every module that emits a Human Cost Ledger (HCL) output must include these
-five fields on each record:
+five structural fields on each record:
 
 | Field | Type | Description |
 |-------|------|-------------|
@@ -2323,6 +2326,20 @@ five fields on each record:
 | `cohort_id` | `str \| None` | Demographic cohort this indicator applies to; `None` = aggregate |
 | `confidence_tier` | `int` | 1–5 per the Confidence Tier System |
 
+### Required Content Indicators
+
+Every module that claims to produce HCL outputs must emit **at minimum** the following
+five content indicators, or document in a docstring why a given field is not applicable
+to its scope:
+
+| `indicator_key` | Unit | Source standard | Notes |
+|---|---|---|---|
+| `capability_loss_index` | `dimensionless` [0.0–1.0] | Sen capability approach — document component weights | Aggregate of health, education, economic agency, political participation |
+| `mortality_excess_rate` | `deaths_per_100k` | Age-standardized; document reference population | Excess above pre-shock baseline, not raw rate |
+| `education_disruption_years` | `person_years_per_cohort_member` | Cohort-weighted; document affected cohort definition | Person-years of schooling lost relative to baseline trajectory |
+| `nutrition_deficit_severity` | `ratio` | Document threshold (e.g. WHO caloric minimum) | Fraction of cohort below the declared nutritional threshold |
+| `healthcare_access_delta` | `ratio` | Relative to pre-shock baseline | Signed change in coverage — negative means access declined |
+
 ### Effect Size Thresholds
 
 HCL outputs must report effect size relative to baseline. A change is
@@ -2330,16 +2347,65 @@ HCL outputs must report effect size relative to baseline. A change is
 
 | Indicator class | Materiality threshold |
 |---|---|
-| Index indicators (HDI, GINI) | ≥ 0.02 (2 index points) |
-| Ratio indicators (mortality rate, literacy rate) | ≥ 0.005 (0.5 percentage points) |
-| Year-based indicators (life expectancy, schooling) | ≥ 0.1 years |
-| Population counts | ≥ 1 % of reference population |
+| Index indicators (HDI, GINI, `capability_loss_index`) | Δ ≥ 0.02 (2 index points) |
+| Mortality indicators (`mortality_excess_rate`) | Δ ≥ 5 per 100,000 per year |
+| Year-based indicators (life expectancy, `education_disruption_years`) | Δ ≥ 0.1 years per cohort member |
+| Ratio indicators (`nutrition_deficit_severity`, `healthcare_access_delta`) | Δ ≥ 0.005 (0.5 percentage points) |
+| Population counts | Δ ≥ 1 % of reference population |
 
 ### HCL Test Requirements
 
-Every module that writes HCL outputs must have tests that verify:
+Every module that writes HCL outputs must have tests that verify all eight of the following:
 
-1. All five required fields are present on every HCL record.
+**Structural integrity (record format):**
+1. All five structural fields are present on every HCL record.
 2. `confidence_tier` matches the source tier of the input data.
 3. At least one cohort-disaggregated record is produced when cohort data is available.
-4. Effect size thresholds are correctly computed (delta vs. baseline step).
+4. Effect size thresholds are correctly computed as delta vs. the baseline step.
+
+**Content and behavioral correctness (SA-04):**
+5. A shock of documented magnitude produces HCL output ≥ the minimum effect size
+   threshold for each indicator the module owns. A test that only checks non-null
+   does not satisfy this requirement.
+6. Zero shock produces zero HCL delta — the symmetry test. A module that reports a
+   non-zero HCL delta when no shock was applied has an unconditional baseline leak.
+7. Cohort-disaggregated outputs sum to the aggregate record — the consistency test.
+8. Each HCL output responds in the correct direction: austerity increases `mortality_excess_rate`,
+   decreases `healthcare_access_delta`, decreases `capability_loss_index`. The sign test.
+
+**Failing vs. passing test example (what "not just non-null" means):**
+
+```python
+# INSUFFICIENT — passes even if the module produces a fixed value regardless of shock
+def test_austerity_produces_hcl_output_insufficient():
+    result = run_scenario(austerity_shock)
+    assert result.hcl_indicators["mortality_excess_rate"] is not None  # WRONG GATE
+
+# REQUIRED — test 5: shock of documented magnitude must exceed minimum effect size
+def test_austerity_mortality_exceeds_effect_size_threshold():
+    baseline = run_scenario(no_shock_baseline)
+    austerity = run_scenario(spending_cut_20pct_of_gdp)
+    delta = (
+        austerity.hcl_indicators["mortality_excess_rate"].value
+        - baseline.hcl_indicators["mortality_excess_rate"].value
+    )
+    assert delta >= Decimal("5")  # ≥5 per 100,000 for a 20% GDP spending cut
+
+# REQUIRED — test 6: zero shock produces zero HCL delta
+def test_zero_shock_produces_zero_hcl_delta():
+    baseline_a = run_scenario(no_shock_baseline)
+    baseline_b = run_scenario(no_shock_baseline)
+    assert (
+        baseline_b.hcl_indicators["mortality_excess_rate"].value
+        == baseline_a.hcl_indicators["mortality_excess_rate"].value
+    )
+
+# REQUIRED — test 8: sign test
+def test_austerity_worsens_capability_loss_index():
+    baseline = run_scenario(no_shock_baseline)
+    austerity = run_scenario(spending_cut_20pct_of_gdp)
+    assert (
+        austerity.hcl_indicators["capability_loss_index"].value
+        > baseline.hcl_indicators["capability_loss_index"].value
+    )  # higher value = worse capability (lower capability = higher loss index)
+```

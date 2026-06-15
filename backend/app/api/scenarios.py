@@ -1742,7 +1742,9 @@ _ECOLOGICAL_MANDATORY_NOTE_TEMPLATE = (
     "indicator count; must be re-evaluated when count exceeds five. "
     "Source: simulation_reference_constants table (effective-at-simulation-time)."
 )
-_ALL_FRAMEWORKS = ["financial", "human_development", "ecological", "governance"]
+_ALL_FRAMEWORKS = [
+    "financial", "human_development", "ecological", "governance", "political_economy",
+]
 _SINGLE_ENTITY_NOTE = (
     "Composite score not meaningful in single-entity scenarios — "
     "percentile rank requires at least two entities for comparison."
@@ -1751,7 +1753,9 @@ _SINGLE_ENTITY_NOTE = (
 # because boundary proximity is physically meaningful for a single entity.
 # Governance exempt per ADR-005 Amendment 4 — normalized_absolute is meaningful
 # for single entities (WGI/V-Dem scores are country-level, not relative to peers).
-_SINGLE_ENTITY_GUARD_EXEMPT_FRAMEWORKS: frozenset[str] = frozenset({"ecological", "governance"})
+_SINGLE_ENTITY_GUARD_EXEMPT_FRAMEWORKS: frozenset[str] = frozenset(
+    {"ecological", "governance", "political_economy"}
+)
 # ADR-005 Amendment 3 Decision M8-3: frameworks validated for percentile-rank composite.
 # Governance is absent (M9 deferred — Decision M8-4). Unregistered frameworks fall
 # through to percentile rank with a [SIM-INTEGRITY] WARNING.
@@ -2015,11 +2019,38 @@ def _normalized_absolute_strategy(
     return (sum(scores) / Decimal(len(scores))).quantize(Decimal("0.0001"))
 
 
+def _political_economy_strategy(
+    entity_indicators: dict[str, QuantitySchema],
+    all_entity_attrs: dict[str, dict[str, QuantitySchema]],
+    framework: str,
+    context: dict[str, Any],
+) -> Decimal | None:
+    """Read political economy composite score from pre-computed attribute.
+
+    The PoliticalEconomyModule emits `political_economy_composite_score` as a
+    STOCK attribute each step. This strategy reads it directly rather than
+    re-computing from component indicators, since the module applies the
+    three-input formula defined in ADR-013 Decision 4.
+
+    Returns None when the attribute is absent (module not active or no
+    political economy context seeded for this entity).
+    """
+    qty = entity_indicators.get("political_economy_composite_score")
+    if qty is None:
+        return None
+    try:
+        return Decimal(qty.value).quantize(Decimal("0.0001"))
+    except Exception:  # noqa: BLE001
+        return None
+
+
 # Registered strategies keyed by framework string.
 # Governance registered here per ADR-005 Amendment 4 — M10 promotion (Issue #556).
+# Political economy registered here per ADR-013 — composite score pre-computed by module.
 _COMPOSITE_STRATEGIES: dict[str, CompositeStrategy] = {
     "ecological": _boundary_proximity_strategy,
     "governance": _normalized_absolute_strategy,
+    "political_economy": _political_economy_strategy,
 }
 _DEFAULT_COMPOSITE_STRATEGY: CompositeStrategy = _percentile_rank_strategy
 

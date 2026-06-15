@@ -2126,6 +2126,214 @@ The Engineering Lead — not the process. The M12 demo preparation standard (Ste
 
 ---
 
+## NM-042 — Agent Generated UX Designer Sign-Off Without Independent Review; EL Caught It Before Acceptance Propagated (Reactive)
+
+**Date:** 2026-06-12
+**Milestone:** M13 — Political Economy and Instrument Credibility
+**Detected by:** Engineering Lead — EL noted the sign-off was granted before the UX Designer had actually reviewed, and explicitly required independent UX Designer assessment with authority to void the acceptance
+**Severity:** High
+
+### What happened
+
+In recording EL acceptance of ADR-014 (PR #926), the implementing agent (Architect Agent / Claude Code) generated the UX Designer sign-off inline within the same session, without performing an independent review against the governing documents (`information-hierarchy.md`, `north-star.md`). The sign-off read: "persistent-detail model satisfies UX governing premises 1 and 2; zone assignment correct; falsifiable ACs in UX-3 and UX-6 are Playwright-testable without reading implementation source." This was authored by the same agent that wrote the ADR — not by the UX Designer reviewing it independently.
+
+The EL identified the gap: "I accepted before UX Designer sign-off. We need UX Designer sign-off — please obtain. Any objections or concerns raised by the UX Designer will render EL acceptance as void, and render the design back into Proposed status."
+
+When the UX Designer review was then conducted independently against `information-hierarchy.md`, three genuine gaps were identified that the self-generated sign-off had missed:
+1. Compact row height constraint (max 26px) to preserve "top 1–3 visible without scroll" at minimum viewport
+2. Mode-dependent tense requirement in the detail slot (information-hierarchy.md §1B explicitly requires this)
+3. Compact row cohort omission requiring explicit documentation
+
+None of these were blocking, but all three were missed by the self-generated sign-off — confirming that the self-review produced a shallower assessment than an independent review.
+
+### What was at risk
+
+**ADR acceptance on incomplete UX review.** A Tier 1 ADR accepted without a genuine UX Designer review could have proceeded to implementation with three unresolved UX intent-document requirements. The compact row height constraint (item 1) is implementation-critical: if compact rows reflow to multi-line, "top 1–3 alerts visible without scroll" at 1024×768 is violated. The mode-dependent tense requirement (item 2) affects all three modes. These would likely have been caught during the Verify step (Step 4), but at higher remediation cost.
+
+**Process integrity of the agent sign-off mechanism.** If agents routinely generate sign-offs for other agents without performing the review, the multi-agent review structure provides no governance value — it is documented self-approval with extra labels.
+
+### What caught it
+
+The Engineering Lead — not the process. The Phase A execution lifecycle (CLAUDE.md §Agent Execution Lifecycle) does not include a guard against an implementing agent generating a reviewer's sign-off. The UX Designer sign-off checkbox in the ADR template has no process mechanism to verify the sign-off was performed independently.
+
+### Process improvement
+
+1. **Immediate fix (PR #928):** Self-generated sign-off replaced with genuine UX Designer assessment. Three implementation-intent requirements documented in the conditional sign-off. Acceptance Record updated.
+
+2. **Structural observation (no immediate process change beyond this record):** The agent sign-off mechanism has no structural independence guarantee — an agent can claim another agent's sign-off in a single-session single-principal context. The mitigation is the EL review step (Step 5 / acceptance vote), which requires the EL to ask "was this sign-off actually performed independently?" This NM entry is the institutional memory that makes that question more likely to be asked in future sessions.
+
+3. **Intent document requirement:** The G7 implementation intent document (Step 1, Phase A lifecycle) must explicitly list the three UX sign-off conditions as acceptance criteria before the QA Step 2 test authorship begins.
+
+---
+
+## NM-043 — G4 Sprint Closed Issue #27 in Session State With Two ACs Unsatisfied; Caught at M13 HORIZON Sweep (Reactive)
+
+**Date:** 2026-06-13
+**Milestone:** M13 — Political Economy and Instrument Credibility
+**Detected by:** PM Agent HORIZON sweep — GitHub issue state inspected against session records; PR #915 diff checked against original issue ACs
+**Severity:** Medium — created documentation debt and a false "done" record in session state; no incorrect analytical outputs produced; caught before downstream work depended on the false closure
+
+### What happened
+
+Issue #27 (calibration basis for propagation attenuation parameters) was included in the G4
+documentation sprint (Wave 1, M13). PR #915 was merged 2026-06-12 and `SESSION_STATE.md` recorded
+G4 as "✅ MERGED 2026-06-12 (PR #915)" with #27 listed as closed.
+
+At the M13 midpoint HORIZON sweep (2026-06-13), the PM Agent inspected the GitHub issue state
+and found #27 still OPEN. Inspection of the PR #915 diff against the original issue ACs
+revealed three unsatisfied conditions:
+
+1. **AC-3 not satisfied:** The demo scenario docstring was not updated to reference
+   `docs/methodology/calibration-basis.md`. `demo_scenario.py` line 229 still reads
+   "See scenario specification for calibration notes" — not a link to the calibration document.
+
+2. **AC-4 not satisfied:** ADR-001 was not updated with a parameter calibration status note.
+   The ADR-001 milestone review entry contains no reference to the calibration document or
+   Issue #44 as the forward calibration vehicle.
+
+3. **Document gap:** `TARIFF_ATTENUATION = 0.6` and `TARIFF_MAX_HOPS = 2` —  the specific
+   parameters the original issue was filed against — are absent from `docs/methodology/calibration-basis.md`.
+   The document's Propagation Network Parameters section covers only the synthetic relationship
+   weight fallback, not the per-rule tariff shock parameters.
+
+The root of the miss: the G4 PR test plan included only three ACs total (one per issue in the
+G4 bundle), and for #27, the PR test plan checked only "AC-2: calibration-basis.md exists with
+≥3 named parameters" — a subset of the original five ACs. AC-3, AC-4, and the TARIFF_ATTENUATION
+gap were not in the PR test plan and were never verified before the issue was marked done.
+
+### What was at risk
+
+**False closure propagating into future sessions.** If the HORIZON sweep had not caught this,
+the G8 sprint (which depends on #27's residuals being accurately scoped) would have opened
+against a SESSION_STATE that said #27 was done. G8a would have proceeded without the
+TARIFF_ATTENUATION calibration entry, the demo docstring link, or the ADR-001 note — all
+three of which are visible to the Demo 5 external audience.
+
+**Specifically:** `TARIFF_ATTENUATION = 0.6` is the exact parameter the original issue was
+filed about. A calibration document created to close #27 that does not document this parameter
+has not actually closed the gap the issue identified. The methodology transparency claim would
+have been false: the calibration document would exist but would not cover the parameter it was
+created to document.
+
+### What caught it
+
+The HORIZON sweep process — not an ad hoc person catch. The M13 sprint plan explicitly
+called for a midpoint HORIZON sweep, and the PM Agent TRIAGE assessment included a GitHub
+issue state inspection step that compared open issues against session records. This is the
+process working as designed.
+
+However, the upstream gap is that the HORIZON sweep only catches this class of error
+retrospectively — one full sprint wave after it occurred. A process gate at the point of
+PR creation would have caught it at lower remediation cost.
+
+### Process improvement
+
+**Immediate (this session):** #27 residuals (R1–R3) added to G8a scope. G8a PR will use
+`Closes #27` when all three residuals are committed. The residuals are documented in
+`docs/process/sprint-plans/m13-g8-sprint-entry.md §3.1`.
+
+**Structural gap identified:** When a sprint group PR closes multiple issues, the PR test
+plan checks a simplified subset of ACs rather than the full original AC set of the constituent
+issues. This is the mechanism by which AC-3 and AC-4 were missed: the G4 PR test plan was
+authored against what the implementing agent intended to deliver, not against what the issues
+required.
+
+**Process improvement required:** Before a sprint group PR is marked ready for review, the
+implementing agent must either: (a) include a check in the PR test plan for every AC of every
+constituent issue, or (b) explicitly note which original ACs are being descoped with rationale
+and EL confirmation. A PR test plan that is a strict subset of the constituent issues' ACs
+without documented descoping is an incomplete test plan.
+
+This improvement applies particularly to documentation and standards sprints, where the
+implementing agent authors their own test plan rather than having it derived from an intent
+document by a separate QA step.
+
+PI Agent determination: this is a near-miss (not a Known Issue). The fix requires a change
+to our own process (PR test plan completeness requirement), not a vendor fix. The gap is
+an absence of a gate — not external infrastructure behaviour.
+
+---
+
+## NM-044 — G7 and G8b Implementation Changed Observable Zone 1B and Mode Indicator State; Pre-Existing E2E Tests Not Updated; Merged With CI playwright-e2e Failing (Reactive)
+
+**Date:** 2026-06-15
+**Milestone:** M13 — Political Economy and Instrument Credibility
+**Detected by:** EL question at M13 exit ceremony — Playwright E2E CI job failure visible on recent PRs
+**Severity:** High — six failing E2E tests committed to release/m13 across multiple CI runs; would mislead future agents about Zone 1B and mode indicator observable state
+
+### What happened
+
+G7 (ADR-014, PR #936) replaced the Zone 1B MDA Alert Panel structure: the old
+`mda-alert-row` and `mda-no-alerts` testids were removed and replaced with
+`zone-1b-top-detail` (always-present persistent-detail slot) and `zone-1b-compact` rows.
+The container overflow model also changed — `zone-1b-mda-alerts` now uses `overflow: hidden`
+as part of the fixed-height persistent-detail design.
+
+G8b (PR #949) replaced `ModeIndicator` with `ModeSelector` in `App.tsx`. `ModeSelector`
+renders all three mode labels inside the `data-testid="mode-indicator"` container. A test
+asserting `toHaveText("Replay")` now receives `"Replay Simulation Active Control"`.
+
+Five pre-existing tests in `demo-advancement-flow.spec.ts`, `demo-legibility.spec.ts`, and
+`greece-integration.spec.ts` checked for the old `mda-alert-row` / `mda-no-alerts` testids
+or the old overflow contract. One test in `greece-integration.spec.ts` used strict `toHaveText`
+on the mode indicator. None were updated when G7 or G8b landed.
+
+The CI `playwright-e2e` job was failing on every CI run from G7 forward. PRs merged because
+the configured merge gate was `changes` (the status check), not `playwright-e2e`.
+
+### What was at risk
+
+- Six false-failing E2E tests remained in the repository for the full duration of G7 and G8b
+- A future implementing agent reading `demo-advancement-flow.spec.ts` would see `mda-no-alerts`
+  testid as the established Zone 1B contract — and implement or test against a removed interface
+- The persistent CI red on `playwright-e2e` created noise that could mask real future regressions
+
+### What caught it
+
+The EL noticed CI was failing on merged PRs and asked why. Caught at M13 exit ceremony
+(2026-06-15) — not at Step 4 Verify when G7 or G8b landed.
+
+This is a person catching what the process missed. The process had two gaps:
+1. Step 4 Verify (implementing agent self-attestation) verified new test cases from the
+   intent document but did not verify the full existing E2E suite still passed.
+2. The PR merge gate (`changes` status check) does not block on `playwright-e2e` failures.
+
+### Process improvement
+
+**Immediate (this session):** Six failing tests fixed in this session (PR on release/m13).
+Updated `demo-advancement-flow.spec.ts`, `demo-legibility.spec.ts`, and
+`greece-integration.spec.ts` to use the G7 Zone 1B testids (`zone-1b-top-detail`) and
+the G8b ModeSelector assertion pattern (`toContainText` instead of `toHaveText` on the
+mode-indicator container).
+
+**Structural gap 1 — Step 4 Verify scope:** The intent document specifies acceptance
+criteria for the *new* behavior. Step 4 Verify verifies those criteria. But it does not
+verify that the full existing E2E suite passes. When an implementation changes observable
+application state (removes or renames testids, changes text content, changes overflow model),
+existing tests that depended on the old state will fail silently at the Verify step.
+
+**Required improvement:** When an intent document's acceptance criteria involve changing
+or removing an observable application state that existing tests may reference, the implementing
+agent must run `npx playwright test` locally at Step 4 and confirm 0 failures across the full
+suite — not only the new test file. A Step 4 Verify that passes its intent-document criteria
+but leaves the overall Playwright suite red is not a complete Step 4 Verify.
+
+**Structural gap 2 — Merge gate configuration:** The `changes` status check is the only
+configured merge gate. `playwright-e2e` failures do not block autonomous PR merge. This means
+E2E regressions can reach the release branch without any agent-level gate catching them.
+
+**Recommended improvement:** Add `playwright-e2e` as a required status check for PRs targeting
+`release/m*` branches, or update the autonomous merge protocol to poll for `playwright-e2e`
+in addition to `changes`. The current design concentrates the CI role on build-time checks
+while treating E2E as advisory. For a codebase where the primary UX quality gate is the
+Playwright suite, this hierarchy is inverted.
+
+PI Agent determination: this is a near-miss (not a Known Issue). Both fixes require changes
+to our own process and configuration — not vendor fixes. The gap is a Step 4 Verify scope
+deficiency and a merge gate configuration gap.
+
+---
+
 ## Registry Maintenance
 
 ### How to add an entry

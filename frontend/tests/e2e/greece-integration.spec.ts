@@ -96,12 +96,14 @@ test("Greece step-through: mode indicator shows Replay throughout Mode 1", async
 
   const indicator = page.locator('[data-testid="mode-indicator"]');
   await expect(indicator).toBeVisible({ timeout: 10_000 });
-  await expect(indicator).toHaveText("Replay");
+  // ModeSelector (G8b) renders all three labels inside mode-indicator container;
+  // use toContainText to check the active mode label is present.
+  await expect(indicator).toContainText("Replay");
   await expect(indicator).toHaveAttribute("data-mode", "MODE_1");
 
   // Advance step 1 — mode must remain Replay
   await advanceStep(page, 1, 3);
-  await expect(indicator).toHaveText("Replay");
+  await expect(indicator).toContainText("Replay");
   await expect(indicator).toHaveAttribute("data-mode", "MODE_1");
 });
 
@@ -205,12 +207,11 @@ test("Greece step-through: cluster consistent at all 3 steps", async ({
       page.locator('[data-testid="zone-1d-four-framework"]'),
     ).toBeVisible();
 
-    // Zone 1B must show either the no-alert state or alert rows — never a blank
-    const noAlerts = page.locator('[data-testid="mda-no-alerts"]');
-    const alertRow = page.locator('[data-testid="mda-alert-row"]');
-    const hasNoAlerts = await noAlerts.isVisible().catch(() => false);
-    const hasAlertRow = await alertRow.first().isVisible().catch(() => false);
-    expect(hasNoAlerts || hasAlertRow).toBe(true);
+    // Zone 1B must show the persistent-detail slot — never blank (ADR-014).
+    // zone-1b-top-detail is always present: shows empty text or active alert.
+    const topDetail = page.locator('[data-testid="zone-1b-top-detail"]');
+    const hasTopDetail = await topDetail.isVisible().catch(() => false);
+    expect(hasTopDetail).toBe(true);
 
     // All four framework rows must render
     for (const fw of [
@@ -284,18 +285,15 @@ test("Greece step-through: Zone 1B shows data-driven alert state after advance (
   // Advance to step 1 — measurement-output fetch should fire
   await advanceStep(page, 1, 3);
 
-  // Zone 1B must settle into one of two valid states: no-alerts or alert rows
-  // Use expect.poll to allow for the async fetch to complete
+  // Zone 1B must settle into the persistent-detail state (ADR-014 layout).
+  // zone-1b-top-detail is always present once measurement data loads.
   await expect
     .poll(
       async () => {
-        const noAlerts = page.locator('[data-testid="mda-no-alerts"]');
-        const alertRow = page.locator('[data-testid="mda-alert-row"]');
-        const hasNoAlerts = await noAlerts.isVisible().catch(() => false);
-        const hasAlertRow = await alertRow.first().isVisible().catch(() => false);
-        return hasNoAlerts || hasAlertRow;
+        const topDetail = page.locator('[data-testid="zone-1b-top-detail"]');
+        return topDetail.isVisible().catch(() => false);
       },
-      { timeout: 10_000, message: "Zone 1B must show either no-alerts or alert-row state" }
+      { timeout: 10_000, message: "Zone 1B must show zone-1b-top-detail state after advance" }
     )
     .toBe(true);
 
