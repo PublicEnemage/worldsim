@@ -165,6 +165,7 @@ All near-term issues dispositioned at HORIZON sweep 2026-06-13 — see G8 sprint
 | #964 ✅ | docs(arch): ADR-016 Scenario Grounding Architecture (M14 Wave 1) + ARCH-010 | main | Merged 2026-06-15 |
 | #966 ✅ | fix(adr-016): correct API contract authority — Data Architect Agent not Chief Engineer | main | Merged 2026-06-16 |
 | #967 ✅ | docs(adr-016): EL acceptance — Proposed → Accepted, all decisions recorded | main | Merged 2026-06-16 |
+| — | feat(m14): kickoff — sprint plan + session state — pushed directly to release/m14 (efdb25e) | release/m14 | Committed 2026-06-16 (no PR — direct push; note process deviation; release branch is unprotected) |
 | #909 ✅ | feat(m13): kickoff — sprint plan, entry doc, ADR backlog | release/m13 | Merged 2026-06-12 |
 | #910 ✅ | chore(state): M13 kickoff session state | release/m13 | Merged 2026-06-12 |
 | #911 ✅ | feat(m13): EL approval recorded — sprint plan + entry doc | release/m13 | Merged 2026-06-12 |
