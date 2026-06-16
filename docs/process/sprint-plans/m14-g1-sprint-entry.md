@@ -3,17 +3,17 @@ name: m14-g1-sprint-entry
 type: sprint-entry
 milestone: M14 — Methodology Publication and External Validation
 sprint-group: G1
-status: Filed — EL approval required before implementation PR opens
+status: EL Approved — implementation may begin once intent document and QA tests are filed
 authored-by: PM Agent
 authored-date: 2026-06-16
-el-approved: false
+el-approved: 2026-06-16
 release-branch: release/m14
 sop-reference: docs/process/sprint-planning-sop.md
 ---
 
 # Sprint Entry — M14, G1: Prerequisite Bug Fixes
 
-**Status:** Filed — EL approval required before implementation PR opens
+**Status:** EL Approved 2026-06-16 — implementation may begin once intent document and QA tests are filed
 **Date authored:** 2026-06-16
 **Release branch:** `release/m14`
 **Sprint plan:** `docs/process/sprint-plans/m14-sprint-plan.md` (EL Approved 2026-06-16)
@@ -167,7 +167,7 @@ application states. G1 does not gate G3/G4 — G3 and G6 may proceed in parallel
 
 ## EL Approval Record
 
-**EL approval:** Pending
+**EL approval:** 2026-06-16
 
-> {EL approval statement}
-> — @PublicEnemage ({date})
+> G1 sprint entry approved. Structural gates confirmed clear. Observable application states in Section 3.1 are specific enough to gate QA test authorship. Intent document and QA test file must be filed before implementation PR opens — these remain blocking conditions. Near-miss register call to PI Agent (file authority violation on user-journeys.md, PR #974) noted and accepted. Implementation may proceed once the Step 2 gate is satisfied.
+> — @PublicEnemage (2026-06-16)
