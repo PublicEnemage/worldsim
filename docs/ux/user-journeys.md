@@ -9,9 +9,12 @@
 > the reference for information hierarchy decisions and for evaluating whether
 > a proposed UI change supports or obstructs the user's task.
 >
-> Last updated: 2026-05-21 (EL Decisions 1/2/3 — Journey A Step 3 separated;
-> Journey B extended for Mode 3; Journey C Mode 3 active control added;
-> Journey D demonstrative entry state added; closes Issue #365).
+> Last updated: 2026-06-16 (Gap markers GA-01 and GA-02 added to Journey A
+> Steps 1–2: entity availability / approved source query (Path 1, M15) and
+> ministry-owned data upload (Path 2, M16+). Two new issues required — see
+> gap text for user stories. Previous: 2026-05-21 — EL Decisions 1/2/3;
+> Journey A Step 3 separated; Journey B extended for Mode 3; Journey C Mode 3
+> active control added; Journey D demonstrative entry state added; closes #365).
 
 ---
 
@@ -45,6 +48,88 @@ needs to advance steps or can open results directly.
 *Decision point:* Is there an existing scenario for this proposal? If yes →
 select it (SCENARIO_PRELOADED if completed). If no → create one.
 
+*[Near-Term-Gap] — GA-01: Entity not available in the preloaded set.*
+
+If the entity she needs is not preloaded in the system, the "If no → create
+one" branch fails before it begins. At M14, the preloaded entity set is
+GRC, JOR, EGY, and ZMB (EL decision 2026-06-16). Any country outside these
+four — Pakistan, Kenya, Senegal, Sri Lanka, Ecuador, any country under active
+IMF negotiation that is not in scope — produces a creation form with no
+matching entity, no data quality preview, and no viable scenario starting
+state.
+
+This is the highest-priority data access gap in the preparation journey.
+It is not a calibration gap (the model relationship is not the issue); it is
+a data availability gap (the platform has no starting state for the required
+entity). The user has two options today, both inadequate:
+
+- Use GRC or another in-scope entity as a proxy → produces structurally
+  wrong outputs; the human cost ledger reflects the proxy country's
+  institutional and demographic starting conditions, not the target country's.
+- Abandon the tool for the current negotiation → the mission has failed for
+  this use case.
+
+*Two-path resolution (staged):*
+
+**Path 1 — User-directed query from the approved source network [M15]:**
+The platform already maintains a registered source network
+(`docs/data-sources/approved-sources.md`) covering World Bank Open Data, IMF
+Balance of Payments Statistics, V-Dem, UNCTAD, UN Population Division, WHO
+GHO, and others — all with `coverage_countries`, `simulation_variables`, and
+quality tier declared in `docs/schema/database.yml §source_registry`. Path 1
+extends the scenario creation form to query: "What does our registered source
+network have for this entity and year?" and, where sources have coverage, to
+trigger a data pull at scenario creation time rather than requiring an
+administrator preload cycle.
+
+The data quality preview (ADR-016 Component 1, M14) is the UI surface for
+this: it currently shows what is preloaded; Path 1 extends it to show what is
+available from registered sources and allows the user to initiate the pull.
+The admin process the user described — official source onboarding with
+accepted formats, license verification, `simulation_variables` mapping — is
+already encoded in the source registry. Path 1 completes the circuit at
+scenario creation time rather than requiring an out-of-band admin request.
+
+This closes the entity availability gap for the majority of countries with
+World Bank / IMF coverage. Countries with thin, delayed, or absent public
+data fall back to the ADR-007 synthetic data framework (five-method
+hierarchy: REGIONAL_AVERAGE → SYNTHETIC_COMPARABLE → STRUCTURAL_ABSENCE
+chain), which already handles this case with explicit Tier 3–5 flagging.
+
+*Design requirement:* The data quality preview panel (ADR-016 Component 1
+`[data-testid="data-quality-preview"]`) must distinguish between (a) "loaded
+from preloaded dataset" and (b) "available from registered source — click to
+load." The pull action must complete or provide a visible progress state
+within the 5-minute preparation ceiling.
+
+**Path 2 — Ministry-owned / proprietary data upload [M16+]:**
+See Gap GA-02 at Step 2 below. Path 2 is the subsequent enhancement. Path 1
+is the prerequisite: the ministry must be able to confirm that the publicly
+sourced baseline exists and what tier it carries before uploading proprietary
+overrides that will blend with it.
+
+*Existing artifact links:*
+- `docs/data-sources/approved-sources.md` — canonical approved source list;
+  Path 1's input set
+- `docs/schema/database.yml §source_registry` — `simulation_variables`
+  column is the existing field-to-variable mapping mechanism; `coverage_countries`
+  is the entity availability index
+- `docs/DATA_STANDARDS.md §Confidence Tier System` — governs how pulled data
+  is tiered; user-triggered pulls follow the same rules as admin preloads
+- ADR-007 (ARCH-001) — synthetic data framework; activates when Path 1 finds
+  no public source coverage for a requested entity/year
+- ADR-016 (ARCH-010) — data quality preview and Grounding Strip; the UI home
+  for Path 1's "available / loadable" signal
+- Issue #53 — Information Access Architecture (role-based output visibility);
+  becomes a prerequisite for Path 2's data isolation requirement, not for Path 1
+
+*New issue required:* File a dedicated issue for Path 1 (distinct from Issue
+#53 which concerns RBAC / access control, not data ingestion). Target M15.
+User story: *As Eleni in the Preparatory entry state, I need to search the
+approved source network for any entity's available data before creating a
+scenario, so that I am not limited to four preloaded countries when modeling
+a live negotiation.*
+
 ---
 
 **Step 2 — Configure: model the proposed path**
@@ -57,6 +142,140 @@ terms, and sets the number of steps to match the program horizon (typically
 *Information need:* Confirmation that the scenario was created with the
 correct parameters. The scenario name should reflect the proposal being
 modeled ("IMF Draft 2026-04") for recall during active negotiation.
+
+*[Near-Term-Gap] — GA-02: Starting conditions locked to preloaded data;
+no mechanism to supply ministry-owned or non-public initial state values.*
+
+Even when an entity is available (preloaded or pulled via Path 1 above),
+the starting conditions for every indicator are drawn exclusively from the
+source registry. She cannot override or supplement them with data her
+ministry holds that has not been publicly released or is more current than
+the latest registered source vintage.
+
+In practice, this means:
+- The reserve figure in the simulation is the latest IMF BoP vintage (e.g.,
+  2024-Q1). Her ministry's internal position as of this morning may be 0.4
+  months lower — a difference that changes whether a reserve floor breach
+  occurs at step 2 or step 3.
+- The bilateral lending terms negotiated last month — not yet publicly
+  disclosed — are not in the model. The creditor side knows these terms; her
+  scenario does not reflect them.
+- The draft budget scenario she is carrying into the room (not yet published)
+  cannot be the scenario's starting fiscal position.
+
+The consequence: the simulation models the publicly visible version of her
+country's situation, not what her ministry actually knows. When the output
+cites "Reserve coverage: 3.2 months — IMF BoP 2024-Q1 · T2" and she knows
+the actual position is 2.8 months, she cannot trust the threshold crossing
+timing the tool is showing her. A Layer 3 output that correctly explains
+reserve coverage trajectory is worse than useless if the starting value is
+wrong and she has no way to correct it.
+
+*Two-path resolution (staged):*
+
+**Path 1 — Approved source query [M15, GA-01 above]:**
+Path 1 improves source currency (more recent vintages, more complete coverage
+for more entities) but does not solve the proprietary-data problem. It is a
+prerequisite for Path 2, not a substitute.
+
+**Path 2 — Ministry-owned / proprietary data upload [M16+]:**
+The ministry uploads its own starting values for specific indicators: the
+actual reserve position, the bilateral lending terms, the draft budget
+fiscal position. These values override or supplement the preloaded baseline
+for the duration of the scenario, with full provenance and tier disclosure.
+
+This is the asymmetry reversal the founding document describes: the ministry
+brings data the creditor cannot replicate from public sources, and runs
+scenarios the creditor side cannot run. No other capability delivers this.
+
+*Architecture prerequisites for Path 2:*
+
+1. **New provenance type — `USER_SUPPLIED`:** The ADR-016 provenance enum
+   (`OBSERVED | ESTIMATED_COMPARABLE | SYNTHETIC | STRUCTURAL_ABSENCE`) must
+   be extended with a fifth type: `USER_SUPPLIED`. A user-supplied value
+   carries different trust characteristics from an IMF-observed value and must
+   be displayed distinctly in the Grounding Strip — e.g., "Reserve coverage:
+   2.8 months — Ministry of Finance (internal, 2026-06-15) · user-supplied."
+   The confidence tier for user-supplied data is context-dependent: a ministry
+   uploading its own budget data may justifiably claim T1 for internal purposes,
+   but the tool must display user-supplied data as a distinct provenance class
+   rather than conflating it with institutionally-sourced T1. This is an
+   ADR-016 amendment — not a new ADR — but must be scoped before Path 2
+   implementation begins.
+
+2. **Field mapping UI — the highest Layer 3 risk in Path 2:**
+   The ministry's spreadsheet calls it "FX reserves (USD billions)." WorldSim's
+   canonical variable is `reserve_coverage_months` (unit: months of import
+   cover). The mapping from the ministry's data format to WorldSim's canonical
+   variable must be:
+   (a) Explicit — the user sees "You are mapping: FX reserves (USD billions)
+       → reserve_coverage_months. Conversion: at current import rate of
+       [X USD/month], 4.2 billion USD = 2.8 months."
+   (b) Verified before scenario creation — the transformation must be
+       inspectable and confirmable within the 5-minute Preparatory ceiling.
+       If the mapping takes longer than 5 minutes, the minister will rush or
+       skip it; both produce misconfigured scenarios cited with false confidence.
+   (c) Auditable — the transformation from uploaded value to canonical unit
+       must be stored in the provenance chain (`docs/DATA_STANDARDS.md
+       §Transformation Steps`), not computed silently at render time.
+   The existing `simulation_variables` column in `source_registry` is the
+   field mapping mechanism for admin-registered sources. Path 2 extends this
+   to a user-facing, per-upload mapping step. Structured templates per data
+   category (fiscal, reserve, trade, demographic) should default the common
+   cases so that a 10-variable upload can be mapped in under 5 minutes for
+   well-understood indicator types.
+
+3. **Data isolation — prerequisite from Issue #53:**
+   User-uploaded proprietary data must be isolated to the uploading user's
+   or institution's scenarios. It must not be shared across tenants, must not
+   contaminate the shared source registry, and must not appear in other users'
+   data quality previews. Issue #53's role-based access control architecture
+   is a direct prerequisite for Path 2's data isolation requirement. Path 2
+   cannot ship without Issue #53 resolved.
+
+4. **Scenario reproducibility caveat:**
+   A scenario whose starting conditions include user-supplied data cannot be
+   fully reproduced by a third party. The Grounding Strip must surface this:
+   "This scenario includes ministry-supplied starting values. Reproduction
+   requires the uploaded dataset." This caveat must appear at scenario creation
+   and be carried in any exported output — Persona 1 (Programme Analyst) and
+   Persona 6 (Investigative Journalist) both require reproducibility; they must
+   be warned when a scenario cannot be reproduced from public sources alone.
+
+*Design requirement (5-minute ceiling):*
+The full Path 2 workflow — upload file → map fields → confirm transformation
+→ review provenance display → create scenario — must complete within 5 minutes
+for a ministry analyst who is not a software engineer and is working from a
+standard spreadsheet export format. This is the binding constraint on the
+field mapping UI design. Any mapping workflow that exceeds this ceiling will
+be skipped or rushed, producing misconfigured scenarios.
+
+*Existing artifact links:*
+- `docs/schema/database.yml §source_registry` — `simulation_variables` is the
+  existing field mapping mechanism; `transformations` list in DATA_STANDARDS is
+  the transformation audit trail
+- `docs/DATA_STANDARDS.md §Transformation Steps` — transformation documentation
+  standard; Path 2 uploads must satisfy this standard
+- ADR-016 (ARCH-010) — provenance object; `USER_SUPPLIED` type must be added
+  before Path 2 implementation; amendment to §API contracts
+- ADR-007 (ARCH-001) — synthetic data framework; user-supplied data sits above
+  synthetic in the tier hierarchy but below institutionally-observed; the
+  updated tier stack becomes: observed-public → user-supplied → synthetic →
+  structural-absence
+- Issue #53 — Information Access Architecture; RBAC is a hard prerequisite for
+  Path 2 data isolation; Path 2 must not be scoped without Issue #53 resolved
+- `docs/data-sources/approved-sources.md` — approved source list; Path 2 does
+  not add to this list (ministry data is user-session-scoped, not platform-wide)
+
+*New issue required:* File a dedicated issue for Path 2 (distinct from Issue
+#53 and from the Path 1 issue). Target M16+, design-first (ADR required
+before implementation). The design work — field mapping UX, USER_SUPPLIED
+provenance type, isolation model — should begin in M15 parallel to Path 1
+implementation. User story: *As Eleni in the Preparatory entry state, I need
+to upload my ministry's non-public starting values for specific indicators
+and have them reflect in the scenario's initial state with full provenance
+disclosure, so that my analysis reflects what my government actually knows
+rather than only what has been publicly released.*
 
 ---
 
