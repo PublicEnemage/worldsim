@@ -100,6 +100,7 @@ Run against `CLAUDE.md §Milestone 14` and `docs/roadmap/worldsim-roadmap.md §M
 | G5 — ADR-015 implementation | — | ADR-015 Accepted (G2); sprint entry required | Wave 2 | Evidence Thread Architecture: L0 basis annotations, L1 basis statement surface, L2 evidence chain. Gated on G2. |
 | G6 — Methodology and calibration | #22, #884, #885, #823, #824, #950 | None | Parallel | Uncertainty quantification, reserve_coverage_months, Exploratory tier fix, ecological composite, MENA calibration, Y axis label. Can proceed in parallel with G3/G4. |
 | G7 — Governance | #3, #6 | None | Parallel | TSC formation, branch protection restoration. EL-action items. |
+| G6b — Path 2 design groundwork | #976 | None | Parallel | Design-only (no code). Three artifacts: (1) field mapping UX concept for the 5-minute Preparatory ceiling — UX Designer Agent; (2) `USER_SUPPLIED` provenance type specification as a draft ADR-016 amendment — Architect Agent; (3) data isolation model sketch that Issue #53 must satisfy — Data Architect Agent. No sprint entry document required (no implementation). Artifacts filed in `docs/design/path2-data-upload/` before M14 exit. Unblocks M15 Path 2 design-to-implementation transition. Authority: Customer Agent recommendation 2026-06-16. |
 | G8 — Demo 5 (#843) | #843 | All preceding groups | Exit gate | Methodology publication artifact, external validator engagement, live stakeholder demo with real external participants, stakeholder review artifact (`docs/demo/m14/reviews/`). M14 closure gate. |
 
 ---
@@ -115,10 +116,12 @@ G3 (ADR-016 backend) ──► G4 (ADR-016 frontend) ─────────
                                                                   │
 G6 (methodology / calibration) ─────────────────────────────────┤
                                                                   │
+G6b (Path 2 design groundwork — design only, no code) ──────────┤
+                                                                  │
 G7 (governance) ────────────────────────────────────────────────┘
 ```
 
-No sequential dependency between G1, G2, G3, G6, G7 — these can proceed in parallel after EL approval of this sprint plan. G4 is gated on G3 (API endpoints must exist). G5 is gated on G2 (ADR-015 must be Accepted).
+No sequential dependency between G1, G2, G3, G6, G6b, G7 — these can proceed in parallel after EL approval of this sprint plan. G4 is gated on G3 (API endpoints must exist). G5 is gated on G2 (ADR-015 must be Accepted). G6b produces design artifacts only — no sprint entry document required, no implementation PR opens.
 
 ---
 
