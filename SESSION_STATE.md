@@ -1202,3 +1202,5 @@ At the end of every Claude Code session, update this file:
 5. Update ADR-005 amendment scope if decisions were made
 6. If a new agent was activated or defined this session, verify `docs/process/agents.md` is current before closing
 7. This update is the **last action** of every session before closing
+
+<!-- branch-protection-skip-test: 2026-06-16T16:19:16Z -->
