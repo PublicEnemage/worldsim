@@ -2,10 +2,10 @@
 name: m14-sprint-plan
 type: sprint-plan
 milestone: M14 — Methodology Publication and External Validation
-status: Draft — awaiting EL approval before any implementation PR opens
+status: EL Approved — implementation may begin (sprint entry document required per group)
 authored-by: PM Agent
 authored-date: 2026-06-16
-el-approved: pending
+el-approved: 2026-06-16
 consulted-agents:
   - Business Product Owner (value prioritization and Demo 5 scope)
   - Frontend Architect (component grouping and merge conflict assessment)
@@ -16,7 +16,7 @@ sop-reference: docs/process/sprint-planning-sop.md
 
 # M14 Sprint Plan — Methodology Publication and External Validation
 
-**Status:** Draft — awaiting EL approval before any implementation PR opens
+**Status:** EL Approved 2026-06-16 — implementation may begin; sprint entry document required per group before implementation PR opens
 **Release branch:** `release/m14` (cut from `main` 2026-06-16)
 **Exit checklist issue:** TBD (filed as part of this kickoff sequence)
 **Primary objective:** Methodology publication, external validation by domain experts, live stakeholder demo with real external participants (#843), Technical Steering Committee formation.

@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-16 (Milestone planning panel complete — M15–M18 defined; demo arc through Demo 7; 17 issues reallocated; 5 new issues filed (#986–#990); roadmap + sprint plan updated (G6b/G6c + G7 expanded); Open Issues tables updated for M14/M15/M16/M17. Prior: CI gate + branch naming enforcement complete — Ruleset live (6 required checks); KI-003 filed. EL approval of M14 sprint plan is HARD STOP before implementation.)**
+**Last updated: 2026-06-16 (M14 sprint plan EL APPROVED — implementation unblocked; sprint entry document required per group. Prior this session: milestone planning panel complete — M15–M18 defined; demo arc through Demo 7; 17 issues reallocated; 5 new issues filed (#986–#990); G6b/G6c + G7 expanded; CI gate + Ruleset live; KI-003 filed.)**
 **Current milestone:** M14 — Methodology Publication and External Validation (GitHub Milestone 15)
 **Previous milestone:** M13 — Political Economy and Instrument Credibility (formally closed 2026-06-15; release/m13 → main merged by EL; #264 closed)
 
@@ -101,8 +101,8 @@
 | ADR-016 Component 3 | Deferred to M15 (EL decision 2026-06-16) | — |
 | ADR-016 IC-6 mitigation | Choropleth header label in M14 (EL decision 2026-06-16) | Part of G4 |
 | ADR-015 — Evidence Thread Architecture | Proposed | **EL acceptance is Wave 2 gate** — review §Decisions Required in ADR-015 |
-| M14 sprint plan | ✅ Filed 2026-06-16 — `docs/process/sprint-plans/m14-sprint-plan.md` (G6b/G6c added; G7 expanded to #988/#989) | **EL approval required (HARD STOP)** |
-| release/m14 branch | ✅ Cut 2026-06-16 from main | Ready for feature PRs after EL sprint plan approval |
+| M14 sprint plan | ✅ **EL APPROVED 2026-06-16** — `docs/process/sprint-plans/m14-sprint-plan.md` | Sprint entry document required per group before implementation PR opens |
+| release/m14 branch | ✅ Cut 2026-06-16 from main | Ready for feature PRs — sprint entry document required first |
 | M14 sprint entry document | NOT FILED | Required before implementation (hard stop) |
 | M14 Exit Checklist | ✅ Filed 2026-06-16 — **#968** (closure gate: #843) | Tracks all M14 deliverables |
 | CI merge gate enforcement (#970) | ✅ CLOSED 2026-06-16 | `release-branch-ci-gate` Ruleset (ID 17751852) live — 6 required checks: `changes`, `lint`, `test-backend`, `playwright-e2e`, `compliance-scan`, `branch-naming`; `--admin` removed from SESSION_STATE merge rule |
