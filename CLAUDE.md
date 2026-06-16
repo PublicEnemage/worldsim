@@ -1,7 +1,7 @@
 # CLAUDE.md — WorldSim Project Context
 
-> Last significant revision: 2026-06-15
-> Updated against: M14 active — M13 closed; political economy module in production (ADR-013); alert panel Zone 1B master-detail (ADR-014); mode transition UX; instrument legibility; Process Redesign Phases 0–D complete
+> Last significant revision: 2026-06-16
+> Updated against: M14 active — M13 closed; political economy module in production (ADR-013); alert panel Zone 1B master-detail (ADR-014); mode transition UX; instrument legibility; Process Redesign Phases 0–D complete; insights-log.md added to session reading list; PM Agent insights log obligation added
 > Previous version context: 2026-06-12 — M13 active; Process Redesign Phases A–D endorsed; five-step agent execution lifecycle; sprint entry/exit gates; session boundary discipline
 
 > **Reader Orientation:** This is the permanent project constitution — read it in full before beginning any session. It contains the mission, architectural commitments, and process rules that govern all work in this repository. Anyone making a change in this codebase, human or agent, must have read this document first. Key must-read sections if time is short: Session Continuity (what to read and in what order), Guiding Principles (the values behind every technical decision), and §Architectural Principles for Claude Code Sessions (process gates including pre-push lint, PR merge gate, and file authority rules that will cause compliance violations if not followed).
@@ -36,10 +36,11 @@ Before beginning any task, read these files in order:
 1. `SESSION_STATE.md` — current work streams, open PRs, pending decisions
 2. `docs/process/agents.md` — agent roster, personas, activation protocols
 3. `CLAUDE.md` — permanent constitution, architecture, standards
+4. `docs/insights-log.md` — pre-GitHub inbox; findings, open questions, and insights not yet promoted to issues or near-miss entries
 
 `CLAUDE.md` is the permanent constitution. `SESSION_STATE.md` is the
 current situation report. `docs/process/agents.md` is the canonical home
-for all agent personas. All three are required reading at session start.
+for all agent personas. All four are required reading at session start.
 
 At the end of every session, updating `SESSION_STATE.md` is the last
 action before closing — not optional.
@@ -591,6 +592,34 @@ forward trace to the downstream capability that will eventually pass the test).
 
 **Template reference:** `docs/adr/template.md §North Star Test` for ADR-level implementation.
 **Phase 0 authority:** `docs/process/sprint-plans/process-redesign-phase0-sprint-entry.md §Output 3`.
+
+---
+
+**PM Agent — Insights Log Obligation**
+
+`docs/insights-log.md` is the project's pre-GitHub inbox: a permanent append-only artifact
+for findings, open questions, and insights that arise in agent deliberations or EL observations
+but are not yet ready to become GitHub issues or near-miss entries.
+
+At each HORIZON sweep, the PM Agent must:
+
+1. Read all entries in `docs/insights-log.md` with status `open`
+2. For each open entry, determine whether it is ready to promote or resolve:
+   - **Promote:** File a GitHub issue or near-miss entry; update the log entry status to
+     `promoted → #NNN` (issue) or `promoted → NM-NNN` (near-miss)
+   - **Resolve:** If the finding is no longer actionable or was addressed informally, update
+     status to `resolved — [reason]`
+   - **Hold:** If still open and not yet actionable, leave status `open` — no action required,
+     but the sweep must confirm the decision explicitly
+3. Record in the HORIZON sweep output (sprint plan §HORIZON table) that the insights log was
+   reviewed and state the count of open entries reviewed and dispositioned
+
+New entries are added to `docs/insights-log.md` at any point by any agent or the EL when a
+finding arises in deliberation or observation. Adding to the log does not require a PR — it is
+appended in the same commit as the work that produced the finding.
+
+**File authority:** EL holds R on `docs/insights-log.md` for additions; PM Agent holds R for
+promotion and resolution updates at HORIZON sweep time.
 
 ---
 
