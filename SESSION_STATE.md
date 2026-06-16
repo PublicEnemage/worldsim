@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-16 (G1 sprint entry document filed (PR #993) — awaiting EL approval; intent doc + QA tests required before G1 implementation PR opens. M14 sprint plan EL approved (PR #992). Milestone planning panel complete — M15–M18 defined; demo arc through Demo 7; 17 issues reallocated; 5 new issues (#986–#990).)**
+**Last updated: 2026-06-16 (G1 sprint entry document EL Approved 2026-06-16 (PR #996). Intent doc + QA tests BLOCKING before G1 implementation PR opens. docs/insights-log.md created — pre-GitHub inbox, PM Agent HORIZON obligation added to CLAUDE.md (PR #995). M14 sprint plan EL approved (PR #992). Milestone planning panel complete — M15–M18 defined; demo arc through Demo 7; 17 issues reallocated; 5 new issues (#986–#990).)**
 **Current milestone:** M14 — Methodology Publication and External Validation (GitHub Milestone 15)
 **Previous milestone:** M13 — Political Economy and Instrument Credibility (formally closed 2026-06-15; release/m13 → main merged by EL; #264 closed)
 
@@ -103,7 +103,7 @@
 | ADR-015 — Evidence Thread Architecture | Proposed | **EL acceptance is Wave 2 gate** — review §Decisions Required in ADR-015 |
 | M14 sprint plan | ✅ **EL APPROVED 2026-06-16** — `docs/process/sprint-plans/m14-sprint-plan.md` | Sprint entry document required per group before implementation PR opens |
 | release/m14 branch | ✅ Cut 2026-06-16 from main | Ready for feature PRs — sprint entry document required first |
-| G1 sprint entry document | ✅ Filed 2026-06-16 — `docs/process/sprint-plans/m14-g1-sprint-entry.md` (PR #993) | **Awaiting EL approval**; intent doc + QA tests BLOCKING before implementation PR opens |
+| G1 sprint entry document | ✅ Filed 2026-06-16 — `docs/process/sprint-plans/m14-g1-sprint-entry.md` (PR #993) | **EL Approved 2026-06-16** (PR #996); intent doc + QA tests BLOCKING before implementation PR opens |
 | M14 Exit Checklist | ✅ Filed 2026-06-16 — **#968** (closure gate: #843) | Tracks all M14 deliverables |
 | CI merge gate enforcement (#970) | ✅ CLOSED 2026-06-16 | `release-branch-ci-gate` Ruleset (ID 17751852) live — 6 required checks: `changes`, `lint`, `test-backend`, `playwright-e2e`, `compliance-scan`, `branch-naming`; `--admin` removed from SESSION_STATE merge rule |
 | Branch naming enforcement (#978) | ✅ CLOSED 2026-06-16 | `.github/workflows/branch-naming.yml` (PR #979); KI-003 filed (PR #980) |
