@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-16 (CI gate + branch naming enforcement complete — release-branch-ci-gate Ruleset live (6 required checks); SESSION_STATE auto-merge no longer needs --admin; Journey A gap markers GA-01/GA-02 filed; sprint plan G6b added; Issues #975/#976 filed; KI-003 documented; sprint plan and ADR-015 EL acceptance still pending before implementation begins)**
+**Last updated: 2026-06-16 (Milestone planning panel complete — M15–M18 defined; demo arc through Demo 7; 17 issues reallocated; 5 new issues filed (#986–#990); roadmap + sprint plan updated (G6b/G6c + G7 expanded); Open Issues tables updated for M14/M15/M16/M17. Prior: CI gate + branch naming enforcement complete — Ruleset live (6 required checks); KI-003 filed. EL approval of M14 sprint plan is HARD STOP before implementation.)**
 **Current milestone:** M14 — Methodology Publication and External Validation (GitHub Milestone 15)
 **Previous milestone:** M13 — Political Economy and Instrument Credibility (formally closed 2026-06-15; release/m13 → main merged by EL; #264 closed)
 
@@ -101,15 +101,22 @@
 | ADR-016 Component 3 | Deferred to M15 (EL decision 2026-06-16) | — |
 | ADR-016 IC-6 mitigation | Choropleth header label in M14 (EL decision 2026-06-16) | Part of G4 |
 | ADR-015 — Evidence Thread Architecture | Proposed | **EL acceptance is Wave 2 gate** — review §Decisions Required in ADR-015 |
-| M14 sprint plan | ✅ Filed 2026-06-16 — `docs/process/sprint-plans/m14-sprint-plan.md` (G6b added PR #977) | **EL approval required (HARD STOP)** |
+| M14 sprint plan | ✅ Filed 2026-06-16 — `docs/process/sprint-plans/m14-sprint-plan.md` (G6b/G6c added; G7 expanded to #988/#989) | **EL approval required (HARD STOP)** |
 | release/m14 branch | ✅ Cut 2026-06-16 from main | Ready for feature PRs after EL sprint plan approval |
 | M14 sprint entry document | NOT FILED | Required before implementation (hard stop) |
 | M14 Exit Checklist | ✅ Filed 2026-06-16 — **#968** (closure gate: #843) | Tracks all M14 deliverables |
-| CI merge gate enforcement (#970) | ✅ CLOSED 2026-06-16 | `release-branch-ci-gate` Ruleset (ID 17751852) live — 6 required checks: `changes`, `lint`, `test-backend`, `playwright-e2e`, `compliance-scan`, `branch-naming`; `--admin` removed from SESSION_STATE merge rule; pre-existing `auto-merge-session-state.yml` workflow handles SESSION_STATE→main auto-merge natively |
-| Branch naming enforcement (#978) | ✅ CLOSED 2026-06-16 | `.github/workflows/branch-naming.yml` (PR #979); requires milestone prefix in head branch name (e.g. `feat/m14-g1-xxx`); CLAUDE.md §Release Branch Workflow updated; KI-003 filed (PR #980) |
-| Path 1 — approved source query | ✅ Filed **#975** (M15) | User-directed query from approved source network at scenario creation; extends ADR-016 Component 1; Journey A GA-01 gap marker documents this |
-| Path 2 — proprietary data upload | ✅ Filed **#976** (M16+; design in M14 G6b) | Ministry-owned data upload with field mapping; `USER_SUPPLIED` provenance type; Issue #53 hard prerequisite; Journey A GA-02 gap marker; G6b design artifacts due before M14 exit |
-| Journey A gap markers (GA-01, GA-02) | ✅ Filed 2026-06-16 (PR #974) | `docs/ux/user-journeys.md` — comprehensive two-path data sourcing resolution; links to #975/#976/#53/ADR-016/ADR-007 |
+| CI merge gate enforcement (#970) | ✅ CLOSED 2026-06-16 | `release-branch-ci-gate` Ruleset (ID 17751852) live — 6 required checks: `changes`, `lint`, `test-backend`, `playwright-e2e`, `compliance-scan`, `branch-naming`; `--admin` removed from SESSION_STATE merge rule |
+| Branch naming enforcement (#978) | ✅ CLOSED 2026-06-16 | `.github/workflows/branch-naming.yml` (PR #979); KI-003 filed (PR #980) |
+| Path 1 — approved source query | ✅ Filed **#975** (M15) | Extends ADR-016 Component 1; Journey A GA-01 |
+| Path 2 — proprietary data upload | ✅ Filed **#976** (M16+; design in M14 G6b) | `USER_SUPPLIED` provenance type; #53 prerequisite; Journey A GA-02 |
+| Journey A gap markers (GA-01, GA-02) | ✅ Filed 2026-06-16 (PR #974) | `docs/ux/user-journeys.md` |
+| Milestone planning panel deliberation | ✅ COMPLETE 2026-06-16 | M15–M18 defined; demo arc through Demo 7; 17 issues reallocated; 5 new issues filed (#986–#990); roadmap updated |
+| G6c — Zone 1A Phase 1 design thinking | Added to sprint plan | UX Designer authors design thinking doc; gates M15 Phase 2 |
+| #988 — Goodhart's Law mitigation | ✅ Filed (M14 G7) | TSC monitoring framework for parameterization gaming risk |
+| #989 — Onboarding documentation | ✅ Filed (M14 G7) | Global south analyst onboarding |
+| #986 — Cohort disaggregation on primary surface | ✅ Filed (M15) | M11.5 FINDING-03 gap; Demo 6 prerequisite |
+| #987 — Political risk summary surface (Persona 3) | ✅ Filed (M15) | Plain-language legitimacy dynamics |
+| #990 — Accessibility validation on target hardware | ✅ Filed (M15) | 8GB/4-core laptop gate |
 
 **Evidence base for M14 trust architecture (both ADRs):**
 - Part I audit (output legibility): `docs/demo/m14/reviews/2026-06-15-ux-legibility-audit-minister-exercise.md`
@@ -177,6 +184,14 @@ All near-term issues dispositioned at HORIZON sweep 2026-06-13 — see G8 sprint
 | #966 ✅ | fix(adr-016): correct API contract authority — Data Architect Agent not Chief Engineer | main | Merged 2026-06-16 |
 | #967 ✅ | docs(adr-016): EL acceptance — Proposed → Accepted, all decisions recorded | main | Merged 2026-06-16 |
 | — | feat(m14): kickoff — sprint plan + session state — pushed directly to release/m14 (efdb25e) | release/m14 | Committed 2026-06-16 (no PR — direct push; note process deviation; release branch is unprotected) |
+| #969 ✅ | feat(m14): ADR-016 entity scope EL decision + ARCH-010 review | release/m14 | Merged 2026-06-16 |
+| #972 ✅ | feat(m14): ADR-015 Evidence Thread Architecture + ARCH-009 | release/m14 | Merged 2026-06-16 |
+| #974 ✅ | feat(ux): Journey A gap markers GA-01 GA-02 in user-journeys.md | release/m14 | Merged 2026-06-16 |
+| #977 ✅ | feat(ci): branch-naming milestone prefix enforcement workflow | release/m14 | Merged 2026-06-16 |
+| #979 ✅ | chore(ci): add branch-naming to release-branch-ci-gate Ruleset | release/m14 | Merged 2026-06-16 |
+| #980 ✅ | docs(ki-003): GitHub Rulesets bootstrapping problem | release/m14 | Merged 2026-06-16 |
+| #981 ✅ | chore(state): M14 session state — CI gate, branch naming, Path 1/2, journey markers | release/m14 | Merged 2026-06-16 |
+| TBD | docs(m14): milestone planning — M15–M18 definitions, sprint plan G6b/G6c, roadmap update | release/m14 | Pending — this PR |
 | #909 ✅ | feat(m13): kickoff — sprint plan, entry doc, ADR backlog | release/m13 | Merged 2026-06-12 |
 | #910 ✅ | chore(state): M13 kickoff session state | release/m13 | Merged 2026-06-12 |
 | #911 ✅ | feat(m13): EL approval recorded — sprint plan + entry doc | release/m13 | Merged 2026-06-12 |
@@ -494,40 +509,84 @@ CI hotfix: NM-035 filed; `ci.yml` PR trigger updated to include `release/m*` (PR
 ## Open Issues — M14 (Methodology Publication and External Validation)
 
 **GitHub Milestone:** 15 | **Created:** 2026-06-11 | **Target:** Q2 2027 | **M14 is current milestone**
+*Board trimmed 2026-06-16 — 17 issues moved to M15/M16/M17 per panel deliberation. G6b/G6c added (design-only). #988/#989 filed for G7.*
 
-| Issue | Title | Horizon | Notes |
+| Issue | Title | Group | Notes |
 |---|---|---|---|
-| #843 | plan: M14 closure — live stakeholder demo with real external participants (#843) | immediate | **M14 gate issue** — EL decision 2026-06-11 |
-| #968 | chore(m14): M14 Exit Checklist — Methodology Publication and External Validation | immediate | **M14 exit checklist** — filed 2026-06-16; closure gate: #843 |
-| #961 | bug(frontend): entity hardcoded to GRC in scenario creation form — no entity selection available | immediate | M14 G1 — implement after sprint entry + EL plan approval |
-| #962 | bug(frontend): step counter shows 'Step 0 / 8' on completed scenarios loaded via URL param | immediate | M14 G1 — implement after sprint entry + EL plan approval |
-| #963 | bug(frontend): choropleth attribute selector displays raw DB field names as user-facing labels | immediate | M14 G1 — implement after sprint entry + EL plan approval |
-| #97 | arch(api): threshold-crossing markers in comparative output | near-term | |
-| #153 | feat(frontend): absolute threshold overlay on DeltaChoropleth | near-term | |
-| #92 | arch(backtesting): Greece 2010 fixture investment climate initial conditions | near-term | |
-| #30 | feat: distinguish stock vs. flow variables in entity attribute model | near-term | |
-| #259 | standards: CTO legibility metrics dashboard | near-term | |
-| #275 | feat(simulation): calibrated ecological-to-financial transmission | near-term | |
-| #569 | test(perf): MV-002 Mode 3 re-run hardware validation | near-term | |
-| #3 | governance: resolve single-principal separation of duties gap | near-term | |
-| #6 | governance: restore branch protection bypass restriction | near-term | |
-| #53 | feat: information access architecture | near-term | |
-| #845 | ux: Zone 1A information architecture — multi-dimensional scenario encoding (frameworks × entities × branches × modes) | near-term | Reframed 2026-06-13; design-first required before implementation |
-| #846 | ux: DEMO-045 — Mode 3 branch comparison values not in instrument | near-term | |
-| #884 | ux: reserve_coverage_months value not surfaced as readable metric in instrument cluster | near-term | |
-| #885 | ux: Exploratory confidence tier misclassifies baseline observation vs. forward projection | near-term | |
-| #22 | feat: uncertainty quantification (distributions not point estimates) | near-term | **M14 primary deliverable candidate** — methodology publication anchor |
-| #35 | feat(simulation): dynamic relationship weight updating | near-term | Migrated from M13 (HORIZON sweep) |
-| #102 | feat: distributional scenario comparison with variance and percentile range | near-term | Migrated from M13 (HORIZON sweep) |
-| #274 | feat(simulation): 25-year human capital depletion trajectory | near-term | Migrated from M13 (HORIZON sweep) |
-| #394 | platform: multi-scenario comparison (>2 scenarios) | near-term | Migrated from M13 (HORIZON sweep) |
-| #823 | arch(methodology): ecological composite dynamic denominator fix | near-term | Migrated from M13; DIC approval on record (CM APPROVE, PR #943); implementation unblocked |
-| #824 | fix(engine): MENA arid-economy elasticity calibration | near-term | Migrated from M13; DIC approval on record (CM + EE APPROVE, PR #943); implementation unblocked |
-| #837 | feat(demo): configuration-driven demo scripts | near-term | Migrated from M13 (HORIZON sweep 2026-06-13) |
-| #950 | ux: Zone 1A trajectory chart Y axis has no label or unit | near-term | Migrated from M13; HIGH; solo-use blocker; part of #845 information architecture work |
-| #951 | process: review protocol blind spot — solo unnarrated use never tested | near-term | Migrated from M13; solo-use gate proposal |
-| #975 | feat(data): Path 1 — user-directed query from approved source network at scenario creation | near-term | **M15 target** — extends ADR-016 Component 1; requires approved source network backend; Journey A GA-01 |
-| #976 | feat(data): Path 2 — ministry-owned / proprietary data upload with field mapping and provenance isolation | near-term | **M16+ target, design in M14 G6b** — `USER_SUPPLIED` provenance type (ADR-016 amendment); field mapping UX; Issue #53 hard prerequisite; Journey A GA-02 |
+| #843 | plan: M14 closure — live stakeholder demo with real external participants | G8 | **M14 gate issue** |
+| #968 | chore(m14): M14 Exit Checklist | — | M14 exit checklist; closure gate: #843 |
+| #961 | bug(frontend): entity hardcoded to GRC in scenario creation form | G1 | Implement after EL plan approval |
+| #962 | bug(frontend): step counter shows 'Step 0 / 8' on completed scenarios | G1 | Implement after EL plan approval |
+| #963 | bug(frontend): choropleth attribute selector displays raw DB field names | G1 | Implement after EL plan approval |
+| #884 | ux: reserve_coverage_months not surfaced as readable metric | G6 | |
+| #885 | ux: Exploratory confidence tier misclassifies baseline vs. projection | G6 | |
+| #22 | feat: uncertainty quantification — disclosure layer (Tier tags per indicator) | G6 | Disclosure layer only; full distributional bands → M16 (#22 revisited) |
+| #823 | arch(methodology): ecological composite dynamic denominator fix | G6 | DIC approval on record |
+| #824 | fix(engine): MENA arid-economy elasticity calibration | G6 | DIC approval on record |
+| #950 | ux: Zone 1A trajectory chart Y axis has no label or unit | G6 | HIGH; solo-use blocker |
+| #845 | ux: Zone 1A information architecture — multi-dimensional encoding | G6c | Phase 1 design thinking doc only; Phases 2–4 → M15/M16 |
+| #976 | feat(data): Path 2 — proprietary data upload (design artifacts only) | G6b | Design artifacts in M14; implementation → M16 |
+| #3 | governance: resolve single-principal separation of duties gap | G7 | EL-action |
+| #6 | governance: restore branch protection bypass restriction | G7 | EL-action |
+| #988 | governance: Goodhart's Law mitigation — TSC monitoring framework | G7 | Filed 2026-06-16 |
+| #989 | docs: onboarding documentation for global south finance ministry analysts | G7 | Filed 2026-06-16 |
+
+---
+
+## Open Issues — M15 (Human Cost Architecture)
+
+**GitHub Milestone:** 16 | **Created:** 2026-06-16 | **Status:** Planned — no demo
+*Zone 1A ADR, cohort disaggregation design, Path 1 implementation, accessibility validation. Sets up Demo 6.*
+
+| Issue | Title | Notes |
+|---|---|---|
+| #845 (Ph 2–3) | ux: Zone 1A information architecture — ARCH-REVIEW + ADR Tier 1 | Phase 1 design thinking doc in M14 G6c |
+| #986 | feat(ux): cohort disaggregation on primary surface | Filed 2026-06-16; origin: M11.5 FINDING-03 (HIGH) |
+| #987 | feat(ux): political risk summary surface for Persona 3 | Filed 2026-06-16 |
+| #975 | feat(data): Path 1 — approved source network query at scenario creation | Journey A GA-01; extends ADR-016 Component 1 |
+| #53 | arch: information access architecture (RBAC design) | Prerequisite for Path 2 (#976) implementation in M16 |
+| #846 | ux: DEMO-045 — Mode 3 branch comparison values not in instrument | |
+| #97 | arch(api): threshold-crossing markers in comparative output | |
+| #153 | feat(frontend): absolute threshold overlay on DeltaChoropleth | |
+| #92 | arch(backtesting): Greece 2010 investment climate initial conditions | |
+| #837 | feat(demo): configuration-driven demo scripts | |
+| #259 | standards: CTO legibility metrics dashboard | |
+| #569 | test(perf): MV-002 Mode 3 hardware validation | |
+| #951 | process: solo-use review protocol | |
+| #990 | test: accessibility validation on 8GB/4-core target hardware | Filed 2026-06-16 |
+
+---
+
+## Open Issues — M16 (Distributional Visibility — Demo 6)
+
+**GitHub Milestone:** 17 | **Created:** 2026-06-16 | **Status:** Planned — Demo 6
+*Human cost ledger operationally visible. Cohort-level output, 25-year trajectory, uncertainty bands, ecological transmission.*
+
+| Issue | Title | Notes |
+|---|---|---|
+| #102 | feat: distributional scenario comparison — variance + percentile range | Core Demo 6 capability |
+| #274 | feat(simulation): 25-year human capital depletion trajectory | Core Demo 6 capability |
+| #275 | feat(simulation): calibrated ecological-to-financial transmission | |
+| #22 (full) | feat: uncertainty quantification — full distributional bands | Builds on M14 disclosure layer |
+| #35 | feat(simulation): dynamic relationship weight updating | |
+| #30 | feat: distinguish stock vs. flow variables in entity attribute model | |
+| #976 (impl) | feat(data): Path 2 — proprietary data upload implementation | Design in M14 G6b; #53 resolves in M15 first |
+| #986 (impl) | feat(ux): cohort disaggregation implementation | Design in M15 |
+| #987 (impl) | feat(ux): political risk summary surface implementation | Design in M15 |
+
+---
+
+## Open Issues — M17 (Multi-Scenario Infrastructure)
+
+**GitHub Milestone:** 18 | **Created:** 2026-06-16 | **Status:** Planned — no demo
+*Multi-scenario comparison infrastructure, entity template library. Sets up Demo 7.*
+
+| Issue | Title | Notes |
+|---|---|---|
+| #394 | platform: multi-scenario comparison (>2 scenarios) | Core Demo 7 prerequisite |
+| #407 | arch(vision): simulation resolution spectrum — entity template library | |
+| #5 | Architecture: data marketplace design | |
+| #4 | Data: advanced geocoded dataset integration | |
 
 ---
 
