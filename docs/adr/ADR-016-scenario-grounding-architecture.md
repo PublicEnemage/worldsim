@@ -33,6 +33,12 @@ This ADR introduces a Zone 2 surface (Scenario Grounding Strip) and modifies the
 **Valid Until:** M15 — review required if provenance API contracts change or entity selection is extended beyond the four-entity M14 scope (GRC, JOR, EGY, ZMB)
 **License Status:** `PROPOSED → ACCEPTED` — 2026-06-16
 
+**Amendment record:**
+
+| Date | Amendment | Author | Scope |
+|---|---|---|---|
+| 2026-06-16 | Replace flat `source`/`vintage`/`is_synthetic` fields with structured `provenance` object in both API contracts (`/data-quality` and `/initial-state`). Add tier-typed `provenance_type` enum, `source_url` for observed data, `methodology_reference` for T3/T4/T5. Update Component 2 display spec to render provenance-type-aware rows. | Architect Agent (EL-authorised) | Component 1 API contract, Component 2 API contract and display spec |
+
 **Panel:**
 - Architect Agent (R — author)
 - UX Designer Agent (R — sign-off required before acceptance vote)
@@ -127,21 +133,38 @@ Response:
     {
       "framework": "financial",
       "confidence_tier": 2,
-      "source_institution": "IMF BOP",
-      "data_vintage": "2024-Q1",
-      "is_synthetic": false
+      "provenance": {
+        "provenance_type": "OBSERVED",
+        "source_institution": "IMF",
+        "source_publication": "Balance of Payments Statistics",
+        "dataset_id": "BOP_BCA_GDP",
+        "source_url": "https://data.imf.org/?sk=7a51304b-6426-40c0-83dd-ca473ca1fd52",
+        "vintage": "2024-Q1",
+        "methodology_reference": null
+      }
     },
     {
       "framework": "ecological",
       "confidence_tier": 4,
-      "source_institution": null,
-      "data_vintage": null,
-      "is_synthetic": true,
-      "synthetic_basis": "MENA comparable economies 2022-2023"
+      "provenance": {
+        "provenance_type": "SYNTHETIC",
+        "method": "SYNTHETIC_COMPARABLE",
+        "reference_entities": ["TUN", "MAR", "DZA"],
+        "reference_period": "2018-2023",
+        "source_url": null,
+        "methodology_reference": "docs/methodology/synthetic-data-framework.md §SYNTHETIC_COMPARABLE"
+      }
     }
   ]
 }
 ```
+
+`provenance_type` is one of: `OBSERVED` | `ESTIMATED_COMPARABLE` | `SYNTHETIC` | `STRUCTURAL_ABSENCE`.
+
+For `SYNTHETIC`, `method` must be one of the five named methods from the ADR-007 Synthetic Data Framework — it is not a freeform string. This makes T4 provenance auditable against the defined methodology, not just labelled "synthetic."
+
+`source_url` is null for T3/T4/T5 (no primary source dataset exists). `methodology_reference` is always populated for T3/T4/T5 — it names the document and section governing how the value was derived. The `methodology_reference` is the queryable equivalent of a source URL for synthetic and estimated values: it tells the minister which standard was followed, even when no primary dataset exists.
+
 If no data exists for the entity/year combination, the endpoint returns an empty frameworks array (not a 404) — the frontend must handle this as "no data available."
 
 **IC gaps addressed:** IC-1 (primary), IC-3 (partial — establishes the data tier provenance chain at creation time)
@@ -154,32 +177,36 @@ If no data exists for the entity/year combination, the endpoint returns an empty
 A "Grounding" surface is introduced, accessible at one interaction from the primary viewport (Zone 2). The surface is linked from a "Grounding ▼" button adjacent to the existing "Fidelity ▼" button in Zone 0/Zone 2 entry area. When opened, it shows the model's starting conditions for the active scenario.
 
 **Grounding strip specification:**
-- Displays the scenario's initial state table: for each measurement framework, the top 2–3 component indicator values used to seed the trajectory at step 0, with source citation and data vintage
-- Layout: one card per framework, each card showing indicator rows in the format:
-  `[Indicator name]: [value] [units]   [Source · Vintage · Tier]`
+- Displays the scenario's initial state table: for each measurement framework, the top 2–3 component indicator values used to seed the trajectory at step 0, with full provenance per indicator
+- Layout: one card per framework, each card showing indicator rows. The row rendering differs by `provenance_type`:
+  - **OBSERVED (T1/T2):** `[Indicator name]: [value] [units]   [source_institution →] · [vintage] · T[N]` — `source_institution` renders as a hyperlink using `source_url`. If `dataset_id` is present, it appears as hover text or a secondary label.
+  - **ESTIMATED_COMPARABLE (T3):** `[Indicator name]: [value] [units]   est. from [reference_entities] [reference_period] · T3 · [methodology →]` — `methodology →` links to `methodology_reference`. The word "estimated" appears verbatim.
+  - **SYNTHETIC (T4):** `[Indicator name]: [value] [units]   synthetic · [method] · [reference_entities] [reference_period] · T4 · [methodology →]` — `methodology →` links to `methodology_reference`. The word "synthetic" appears verbatim. `method` is one of the five ADR-007 named methods.
+  - **STRUCTURAL_ABSENCE (T5):** `[Indicator name]: No data — Structural Absence Declaration. Do not interpolate.` — no value, no link. `methodology_reference` is stored in the API response but is not displayed inline; it is accessible via the API for programmatic queries.
+
 - Example:
   ```
   Jordan — Starting conditions at step 0 (2023)
 
   Financial
-    Reserve coverage: 3.2 months    IMF BOP 2024-Q1 · T2
-    Current account: −6.8% GDP      IMF Article IV 2023 · T2
-    Debt service ratio: 18.4%       World Bank 2023 · T2
+    Reserve coverage: 3.2 months    [IMF BOP →] · 2024-Q1 · T2
+    Current account: −6.8% GDP      [IMF Article IV →] · 2023 · T2
+    Debt service ratio: 18.4%       [World Bank →] · 2023 · T2
 
   Human Development
-    Bottom quintile consumption: 0.62 (index)   World Bank WDI 2023 · T3
-    Unemployment: 17.8%                         ILO ILOSTAT 2023 · T2
+    Bottom quintile consumption: 0.62   est. from [EGY, TUN, MAR] 2020-2023 · T3 · [methodology →]
+    Unemployment: 17.8%                 [ILO ILOSTAT →] · 2023 · T2
 
   Political Economy
-    Programme survival probability: 0.67        V-Dem 2023 + political economy module · T3
+    Programme survival probability: 0.67   synthetic · SYNTHETIC_COMPARABLE · [DZA, EGY, MAR] · T3 · [methodology →]
 
   Ecological
-    CO₂ per capita: 3.1 tCO₂eq    synthetic · MENA comparable · T4
+    CO₂ per capita: 3.1 tCO₂eq   synthetic · SYNTHETIC_COMPARABLE · [TUN, MAR, DZA] 2018-2023 · T4 · [methodology →]
   ```
-- Synthetic indicators (T4) display the word "synthetic" verbatim and name the comparable economy or inference basis
-- T5 (Structural Absence Declaration) indicators display: `[indicator name]: No data — Structural Absence Declaration. Do not interpolate.`
+
 - The grounding strip is scenario-contextual — it reflects the active scenario's entity, year, and step 0 values. Switching scenarios updates the grounding strip.
 - The strip shows step 0 values only. It is a "what we started with" surface, not a trajectory tracker (that is Zone 1).
+- The full `provenance` object is always returned by the API, even for T5 indicators. The `methodology_reference` field for T5 allows programmatic audit of which Structural Absence Declarations are in the system and under which methodology standard they were classified.
 
 **API contract for grounding strip:**
 ```
@@ -197,13 +224,71 @@ Response:
           "display_name": "Reserve coverage",
           "value": 3.2,
           "unit": "months",
-          "source": "IMF BOP",
-          "vintage": "2024-Q1",
           "confidence_tier": 2,
-          "is_synthetic": false
+          "provenance": {
+            "provenance_type": "OBSERVED",
+            "source_institution": "IMF",
+            "source_publication": "Balance of Payments Statistics",
+            "dataset_id": "BOP_BCA_GDP",
+            "source_url": "https://data.imf.org/?sk=7a51304b-6426-40c0-83dd-ca473ca1fd52",
+            "vintage": "2024-Q1",
+            "methodology_reference": null
+          }
+        }
+      ]
+    },
+    "ecological": {
+      "indicators": [
+        {
+          "name": "co2_per_capita_tco2eq",
+          "display_name": "CO₂ per capita",
+          "value": 3.1,
+          "unit": "tCO₂eq",
+          "confidence_tier": 4,
+          "provenance": {
+            "provenance_type": "SYNTHETIC",
+            "method": "SYNTHETIC_COMPARABLE",
+            "reference_entities": ["TUN", "MAR", "DZA"],
+            "reference_period": "2018-2023",
+            "source_url": null,
+            "methodology_reference": "docs/methodology/synthetic-data-framework.md §SYNTHETIC_COMPARABLE"
+          }
         }
       ]
     }
+  }
+}
+```
+
+**Provenance object specification — all fields:**
+
+| Field | Present in | Type | Description |
+|---|---|---|---|
+| `provenance_type` | All tiers | string enum | `OBSERVED` \| `ESTIMATED_COMPARABLE` \| `SYNTHETIC` \| `STRUCTURAL_ABSENCE` |
+| `source_institution` | OBSERVED | string | Institution name (e.g., "IMF", "World Bank") |
+| `source_publication` | OBSERVED | string | Publication or dataset name |
+| `dataset_id` | OBSERVED (where available) | string \| null | Series or dataset identifier for programmatic access |
+| `source_url` | OBSERVED | string \| null | Direct URL to the dataset or publication |
+| `vintage` | OBSERVED | string | Period of the data (e.g., "2024-Q1", "2023") |
+| `method` | SYNTHETIC, ESTIMATED_COMPARABLE | string enum | One of the five ADR-007 method names — not freeform |
+| `reference_entities` | SYNTHETIC, ESTIMATED_COMPARABLE | string[] | ISO 3166-1 alpha-3 codes of comparable economies used |
+| `reference_period` | SYNTHETIC, ESTIMATED_COMPARABLE | string | Date range of reference data (e.g., "2018-2023") |
+| `methodology_reference` | SYNTHETIC, ESTIMATED_COMPARABLE, STRUCTURAL_ABSENCE | string | Path + section of the governing methodology document |
+
+`source_url` is null for T3/T4/T5. `methodology_reference` is always populated for T3/T4/T5 and is the queryable equivalent of a source URL for non-observed values: it identifies which documented standard was followed to derive the value. The Data Architect Agent must ensure these fields are stored in the source registry as structured columns, not computed as display strings at request time — they must be queryable independently of the UI rendering layer.
+
+**Structural Absence example:**
+```json
+{
+  "name": "carbon_border_adjustment_exposure",
+  "display_name": "Carbon border adjustment exposure",
+  "value": null,
+  "unit": null,
+  "confidence_tier": 5,
+  "provenance": {
+    "provenance_type": "STRUCTURAL_ABSENCE",
+    "source_url": null,
+    "methodology_reference": "docs/DATA_STANDARDS.md §Structural Absence Declaration"
   }
 }
 ```
@@ -354,9 +439,9 @@ This closes the asymmetry in which the IMF team can challenge the input data and
 This ADR adds the initial state of the Human Development framework (including bottom quintile consumption at step 0) as a required entry in the Grounding strip (Component 2). This increases HCL visibility relative to the previous state (where it was invisible at step 0). HCL parity is maintained and improved — the grounding strip treats Financial, Human Development, Ecological, Governance, and Political Economy frameworks with equal visual weight in the indicator cards. No HCL subordination occurs in any component.
 
 **UX-5 — Uncertainty display specification:**
-- **Data quality preview (Component 1):** Confidence tier appears as T1–T5 label. For T4 entries, the format is: `[framework] — T4 (synthetic — [inference basis])`. The word "synthetic" appears verbatim. For T5, the format is: `[framework] — T5 (no data — Structural Absence)`. The label "Structural Absence" appears verbatim.
-- **Grounding strip (Component 2):** Each indicator row shows the confidence tier as part of the source citation: `[Source · Vintage · T{N}]`. For T4 indicators, the row includes "synthetic" verbatim in the source field. For T5 indicators, the indicator displays: `[indicator name]: No data — Structural Absence Declaration. Do not interpolate.` The phrase "Do not interpolate" appears verbatim.
-- **Fidelity contextualisation (Component 3):** No new confidence tier display. The contextualisation text references the validation status (direction validated / magnitude not validated) in plain language but does not add T1–T5 tier labels to the existing Fidelity panel content.
+- **Data quality preview (Component 1):** Confidence tier appears as T1–T5 label derived from `provenance_type`. For T4 (`SYNTHETIC`): the method name and word "synthetic" appear verbatim. For T5 (`STRUCTURAL_ABSENCE`): the label "Structural Absence" appears verbatim. The framework-level display uses `methodology_reference` as the target of a "methodology →" link for T3/T4/T5 entries. `source_url` is rendered as a link for T1/T2 entries.
+- **Grounding strip (Component 2):** Each indicator row renders per `provenance_type` as specified in §Component 2. For `SYNTHETIC` (T4): the word "synthetic" appears verbatim, the `method` name appears verbatim, `reference_entities` and `reference_period` are shown, and `methodology_reference` is rendered as a clickable "methodology →" link. For `STRUCTURAL_ABSENCE` (T5): the indicator displays `[indicator name]: No data — Structural Absence Declaration. Do not interpolate.` The phrases "Structural Absence Declaration" and "Do not interpolate" appear verbatim. For `OBSERVED` (T1/T2): `source_institution` renders as a hyperlink via `source_url`; `dataset_id` is available as hover text where present.
+- **Fidelity contextualisation (Component 3):** Deferred to M15. No new confidence tier display in M14 scope.
 
 **UX-6 — Irreversibility signal integrity certification:**
 No components of this ADR touch Zone 1 instrument displays, the MDA alert panel, or severity classification. The Grounding strip (Component 2) includes initial state indicator values but does not display severity alerts. TERMINAL/CRITICAL distinction integrity is unaffected by this ADR.
@@ -392,7 +477,9 @@ This sign-off is a precondition for the acceptance vote. All four fields are req
 If the `/api/v1/entities/{entity_id}/data-quality` endpoint is unavailable or returns an error, the creation form must display a visible fallback state — not a silent empty state. Acceptable fallback: "Data quality preview unavailable. You can still create the scenario. Check data tier after creation via Grounding ▼." Unacceptable: no preview with no message (user proceeds assuming data quality was verified). Detection: Playwright test simulates API failure and verifies fallback text is displayed.
 
 **Component 2 (grounding strip):**
-If the `/api/v1/scenarios/{scenario_id}/initial-state` endpoint returns no indicator data (empty frameworks object), the grounding strip must display: "Initial state data not available for this scenario. Scenario may have been created before grounding data was indexed." Unacceptable: empty strip with no message. An empty grounding strip is indistinguishable from a successfully loaded grounding strip with a zero-indicator scenario — the user has no way to know whether the absence of data is correct or a failure. Detection: Playwright test with a scenario_id that has no initial-state data verifies fallback text is displayed.
+If the `/api/v1/scenarios/{scenario_id}/initial-state` endpoint returns no indicator data (empty frameworks object), the grounding strip must display: "Initial state data not available for this scenario. Scenario may have been created before grounding data was indexed." Unacceptable: empty strip with no message.
+
+If an indicator row is present but its `provenance` object is null or missing required fields, the row renders as: `[indicator name]: [value] [units]   [provenance unavailable]` — never silently omitting the provenance slot. A missing provenance object is not the same as a T5 Structural Absence; rendering it as T5 would misrepresent the cause. `[provenance unavailable]` is the distinct fallback. Detection: Playwright test with a mock API response where one indicator has `"provenance": null` verifies the row displays `[provenance unavailable]` rather than crashing, omitting the row, or showing empty provenance fields.
 
 **Component 3 (Fidelity contextualisation):**
 If the analogous-case selection logic fails to identify a matching case (no cases match the active scenario's crisis mechanism), the contextualisation section displays: "No analogous validation case identified for this scenario type. Global backtesting results apply — see validation cases below." Unacceptable: contextualisation section absent from the Fidelity panel when a scenario is loaded (user cannot tell whether the absence is intentional or a loading failure). Detection: the contextualisation section must always render when a scenario is active, even if its content is the fallback message.
