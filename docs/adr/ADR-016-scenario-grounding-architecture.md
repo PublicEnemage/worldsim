@@ -39,7 +39,8 @@ This ADR introduces a Zone 2 surface (Scenario Grounding Strip) and modifies the
 - Architect Agent (R — author)
 - UX Designer Agent (R — sign-off required before acceptance vote)
 - Frontend Architect Agent (C — creation form and grounding strip implementation)
-- Chief Methodologist (C — data provenance API design; analogous-case selection logic for Fidelity contextualisation)
+- Data Architect Agent (C — API contract authority: owns `api_contracts.yml`; `/initial-state` and `/data-quality` schema additions require DA review)
+- Chief Methodologist (C — provenance data content: defines what constitutes a valid source citation and vintage; analogous-case selection logic for Fidelity contextualisation)
 - Business PO (C — validate north star test and Demo 5 scope fitness)
 - Engineering Lead (A — accountable on all ADR decisions)
 
@@ -525,7 +526,7 @@ Which entities must be supported in the entity selector at M14 scope? Options: (
 Is the analogous-case selection logic a required M14 deliverable, or is Component 3 a Wave 2 / M15 feature? The Chief Methodologist must define the similarity logic before Component 3 can be implemented. If the Chief Methodologist cannot deliver this logic within M14 scope, Component 3 should be marked as deferred in this ADR and implemented in M15 under a separate intent document. EL decision required.
 
 **Decision 3 — API endpoint design authority:**
-The two new API endpoints (`/initial-state`, `/data-quality`) are specified at schema level in this ADR. The implementing Backend agent must read `docs/schema/api_contracts.yml` before implementing. If the schema file does not currently include these endpoints, the Backend agent must add them in the same PR as the implementation — schema drift is a compliance violation. EL should confirm whether the Chief Engineer is the owning agent for the API contract for these endpoints.
+The two new API endpoints (`/initial-state`, `/data-quality`) are specified at schema level in this ADR. The implementing Backend agent must read `docs/schema/api_contracts.yml` before implementing. If the schema file does not currently include these endpoints, the Data Architect Agent must add them in the same PR as the implementation — schema drift is a compliance violation. Per `docs/process/agent-raci.md §File Ownership`, `api_contracts.yml` is owned by the Data Architect Agent (R); the Architect Agent is consulted when response shape changes. The Chief Engineer is consulted on implementation-level computational implications (query performance, database access patterns) but does not hold authority over the API contract itself. No EL confirmation required — the RACI is unambiguous.
 
 **Decision 4 — Parameter persistence backward compatibility:**
 How should legacy scenarios (created before this feature) be handled in the parameter display? The specified fallback is "(not recorded — scenario predates parameter persistence)." Is this acceptable UX for the Demo 5 scenario set? If Demo 5 scenarios need clean parameter records, they may need to be recreated after implementation, not just loaded from the existing scenario list. EL decision required before implementation begins.
