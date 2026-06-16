@@ -1,0 +1,56 @@
+name: branch-naming
+
+# Enforces milestone-scoped branch naming for PRs targeting release/m* branches.
+#
+# Problem: sprint group identifiers (G1, G2, …) are reused across every milestone.
+# A branch named feat/g1-bugs is ambiguous — it could belong to M13, M14, or M15.
+# Stale branches from prior milestones create collision and confusion risks.
+#
+# Rule: any branch targeting release/m{N} must contain "m{N}" in its name.
+#   PASS: feat/m14-g1-prerequisite-bugs  → release/m14
+#   FAIL: feat/g1-prerequisite-bugs      → release/m14  (missing m14)
+#   FAIL: feat/m13-g1-prerequisite-bugs  → release/m14  (wrong milestone)
+#
+# The check name "branch-naming" is a required status check in the
+# release-branch-ci-gate Ruleset — a failure blocks the merge server-side.
+
+on:
+  pull_request:
+    branches:
+      - release/m*
+    types: [opened, synchronize, reopened]
+
+jobs:
+  branch-naming:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate milestone prefix in branch name
+        env:
+          TARGET_BRANCH: ${{ github.base_ref }}
+          HEAD_BRANCH: ${{ github.head_ref }}
+        run: |
+          # Extract milestone prefix from target branch: "release/m14" → "m14"
+          MILESTONE="${TARGET_BRANCH##release/}"
+
+          echo "Target branch : $TARGET_BRANCH"
+          echo "Head branch   : $HEAD_BRANCH"
+          echo "Required prefix: $MILESTONE"
+
+          if echo "$HEAD_BRANCH" | grep -qF "$MILESTONE"; then
+            echo ""
+            echo "✓ Branch '$HEAD_BRANCH' contains milestone prefix '$MILESTONE'."
+            exit 0
+          else
+            echo ""
+            echo "✗ Branch '$HEAD_BRANCH' does not include milestone prefix '$MILESTONE'."
+            echo ""
+            echo "  All branches targeting '$TARGET_BRANCH' must contain '$MILESTONE' in their name."
+            echo "  Rename this branch to include the milestone, for example:"
+            echo ""
+            echo "    git branch -m $HEAD_BRANCH ${HEAD_BRANCH/\//\/${MILESTONE}-}"
+            echo ""
+            echo "  Suggested name: $(echo "$HEAD_BRANCH" | sed "s|/|/${MILESTONE}-|")"
+            echo ""
+            echo "  See CLAUDE.md §Release Branch Workflow for the full naming convention."
+            exit 1
+          fi
