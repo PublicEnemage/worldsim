@@ -430,7 +430,11 @@ Each milestone has a release branch (`release/m{N}`) cut from `main` at
 milestone kickoff by the PM Agent as part of sprint planning. All feature work
 during the milestone uses this pattern:
 
-1. Cut feature branch from `release/m{N}`: `git checkout -b feat/g1-xxx release/m12`
+1. Cut feature branch from `release/m{N}` using a **milestone-scoped name**:
+   `git checkout -b feat/m{N}-g{N}-short-description release/m{N}`
+   The branch name must contain the milestone prefix (e.g. `m14`). Sprint group
+   numbers (G1, G2, …) are reused across milestones — `feat/g1-bugs` is ambiguous
+   and will be rejected by the `branch-naming` CI check. Use `feat/m14-g1-bugs`.
 2. Implement, run pre-push gates (lint, build), push feature branch
 3. Open PR targeting `release/m{N}` (not `main`)
 4. Poll CI; merge autonomously once all checks are terminal (pass or skipped, none failed): `gh pr merge <number> --merge`
