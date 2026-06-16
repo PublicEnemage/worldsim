@@ -23,17 +23,15 @@ This ADR introduces a Zone 2 surface (Scenario Grounding Strip) and modifies the
 
 ## Status
 
-`Proposed`
+`Accepted`
 
 ---
 
 ## Validity Context
 
-> *Fill in when the ADR is accepted.*
-
 **Standards Version:** 2026-06-15 (CLAUDE.md) / 2026-06-09 (ADR template)
-**Valid Until:** M15 — review required if provenance API contracts change or entity selection is extended beyond single-entity scenarios
-**License Status:** `PROPOSED` — 2026-06-15
+**Valid Until:** M15 — review required if provenance API contracts change or entity selection is extended beyond the four-entity M14 scope (GRC, JOR, EGY, ZMB)
+**License Status:** `PROPOSED → ACCEPTED` — 2026-06-16
 
 **Panel:**
 - Architect Agent (R — author)
@@ -384,7 +382,7 @@ This sign-off is a precondition for the acceptance vote. All four fields are req
 
 3. **Parameter display — read-only in Mode 2 but future Mode 3 implication:** Component 4 specifies the parameter display as read-only in Mode 2. In Mode 3 (Active Control), parameters may be adjusted in real time. The current spec defers Mode 3 parameter editing to the Mode 3 ADR. The UX Designer confirms this is consistent with the Mode 3 zone reservation (`CLAUDE.md §UX Architectural Commitments §5`) and does not conflict with this ADR. Concern is informational — no blocking issue.
 
-`[ ]` UX Designer sign-off. 2026-06-15
+`[x]` UX Designer sign-off. 2026-06-15
 
 ---
 
@@ -479,7 +477,7 @@ Considered but not preferred. Component 1 alone addresses IC-1 (entity selection
 - Closes IC-1 (entity selection): WorldSim becomes a multi-entity analytical instrument from the creation form for the first time. Demo 5 can use any supported entity, not just GRC.
 - Closes IC-2 (initial state opacity): The human cost ledger baseline (bottom quintile consumption at step 0) becomes visible, enabling the Development Economist's negotiating argument about baseline severity.
 - Closes IC-3 (data provenance): Ministers can respond to input challenges with source citations derived from the tool — within 90 seconds, from Zone 2, without external documentation.
-- Closes IC-4 (Fidelity panel scope mismatch): The Fidelity panel gains scenario-contextual content, reducing the risk that a minister reads model calibration evidence as input data evidence.
+- Partially closes IC-4 (Fidelity panel scope mismatch): Component 3 (Fidelity contextualisation with analogous-case selection) is deferred to M15 (EL Decision 2, 2026-06-16). M14 scope does not include scenario-contextual Fidelity content. IC-4 is acknowledged in the application via a static explanatory header on the Fidelity panel stating that the panel validates model relationships, not input data for the active scenario. Full IC-4 closure deferred to M15.
 - Closes IC-5 (parameter persistence): All scenario parameters become recoverable from the screen for any loaded scenario, including legacy scenarios (where absent values are marked, not omitted).
 - Establishes the backend API infrastructure (`/initial-state`, `/data-quality`) that subsequent capability enhancements (per-cohort initial state disaggregation, Tier 3+ data vintage tracking) can extend without additional ADR scope.
 
@@ -488,7 +486,9 @@ Considered but not preferred. Component 1 alone addresses IC-1 (entity selection
 - Adds two new API endpoints (`/initial-state` and `/data-quality`) that must be populated correctly for every entity-year combination in the source registry. If the source registry is incomplete or inconsistent, the grounding strip may show inaccurate or misleading source attributions — which is worse than showing nothing.
 - The "analogous case" selection logic for Fidelity contextualisation (Component 3) requires Chief Methodologist definition that does not currently exist. If this logic is poorly specified, the contextualisation section may produce misleading similarity assessments.
 - Component 4 (parameter persistence) requires that legacy scenarios (created before this feature) be handled gracefully. "(not recorded)" display is the specified fallback, but it may expose how many current scenarios in the system were created with non-transparent parameters — a visible record of the prior opacity.
-- IC-6 (choropleth disconnect) and IC-7 (field name exposure) are deferred. The choropleth continues to dominate ~55% of the viewport while showing reference-only data until IC-6 is addressed separately.
+- IC-6 (choropleth disconnect) is deferred to M15 (EL Decision 5, 2026-06-16). M14 mitigation: a header label on the choropleth panel explicitly stating that it shows static reference classification data, not active scenario outputs. The choropleth continues to dominate ~55% of the viewport while showing reference-only data — the label mitigates the false affordance but does not resolve the information architecture gap.
+- Component 3 (Fidelity contextualisation) is deferred to M15 (EL Decision 2). The Chief Methodologist analogous-case selection logic is not in M14 scope.
+- IC-7 (field name exposure) addressed separately by prerequisite bugs #962 and #963.
 
 ### Known Limitations
 
@@ -515,25 +515,25 @@ No backtesting validation anchor required for this ADR. The data displayed by th
 
 ---
 
-## Decisions Required
+## EL Decisions — Recorded 2026-06-16
 
-The following decisions must be resolved by the Engineering Lead before this ADR moves from Proposed to Accepted. None of these are implementation decisions — they are scope and methodology commitments that bound what the implementing agent builds.
+All decisions below were resolved by the Engineering Lead on 2026-06-16. These decisions converted this ADR from Proposed to Accepted and bound the M14 implementation scope.
 
-**Decision 1 — Entity selection scope for M14:**
-Which entities must be supported in the entity selector at M14 scope? Options: (a) all entities in the current source registry (may be a small set); (b) GRC + Jordan/Egypt (as seen in current scenario list) + ZMB (Zambia, for the north star test scenario); (c) all G20 + G7 + HIPC entities. The choice determines backend data preparation scope. EL decision required.
+**Decision 1 — Entity selection scope for M14: RESOLVED**
+EL ruling: Entity selector must support **GRC, JOR, EGY, ZMB** (four entities). This covers the Demo 5 north star scenario (Zambia finance ministry), the existing Hormuz fixture (Jordan/Egypt), and the legacy GRC fixture. All four entities must have source registry entries with at least T3 coverage for Financial and Human Development frameworks before the creation form data quality preview can be implemented.
 
-**Decision 2 — Component 3 (Fidelity contextualisation) in-scope for M14:**
-Is the analogous-case selection logic a required M14 deliverable, or is Component 3 a Wave 2 / M15 feature? The Chief Methodologist must define the similarity logic before Component 3 can be implemented. If the Chief Methodologist cannot deliver this logic within M14 scope, Component 3 should be marked as deferred in this ADR and implemented in M15 under a separate intent document. EL decision required.
+**Decision 2 — Component 3 (Fidelity contextualisation) in-scope for M14: RESOLVED**
+EL ruling: **Component 3 is deferred to M15.** The Chief Methodologist analogous-case selection logic is not available within M14 scope. The Fidelity panel receives a static explanatory header in M14 (clarifying that it validates model relationships, not input data for the active scenario) but does not receive scenario-contextual content. Full Component 3 implementation is an M15 deliverable under a separate intent document.
 
-**Decision 3 — API endpoint design authority:**
-The two new API endpoints (`/initial-state`, `/data-quality`) are specified at schema level in this ADR. The implementing Backend agent must read `docs/schema/api_contracts.yml` before implementing. If the schema file does not currently include these endpoints, the Data Architect Agent must add them in the same PR as the implementation — schema drift is a compliance violation. Per `docs/process/agent-raci.md §File Ownership`, `api_contracts.yml` is owned by the Data Architect Agent (R); the Architect Agent is consulted when response shape changes. The Chief Engineer is consulted on implementation-level computational implications (query performance, database access patterns) but does not hold authority over the API contract itself. No EL confirmation required — the RACI is unambiguous.
+**Decision 3 — API endpoint design authority: RESOLVED (RACI — no EL decision required)**
+Resolved by RACI audit (PR #966, 2026-06-16): `api_contracts.yml` is owned by the Data Architect Agent. No EL ruling required. The Data Architect Agent must add `/initial-state` and `/data-quality` to `api_contracts.yml` in the same PR as backend implementation. Chief Engineer consulted on computational implications only.
 
-**Decision 4 — Parameter persistence backward compatibility:**
-How should legacy scenarios (created before this feature) be handled in the parameter display? The specified fallback is "(not recorded — scenario predates parameter persistence)." Is this acceptable UX for the Demo 5 scenario set? If Demo 5 scenarios need clean parameter records, they may need to be recreated after implementation, not just loaded from the existing scenario list. EL decision required before implementation begins.
+**Decision 4 — Parameter persistence backward compatibility: RESOLVED**
+EL ruling: **Use the "(not recorded)" fallback — no scenario recreation required.** The parameter display must show all expected parameter rows; rows with no stored value display "(not recorded — scenario predates parameter persistence)." Demo 5 scenarios will be loaded as-is; the "(not recorded)" label is acceptable UX at Demo 5 and accurately represents the prior opacity.
 
-**Decision 5 — IC-6 (choropleth) scope:**
-The UX Designer raised IC-6 (choropleth visual dominance with reference-only data) as a Tier 1 concern not addressed by this ADR. EL should decide: (a) IC-6 is deferred to M15 as part of a broader Zone 2/Zone 3 layout review; (b) IC-6 requires a separate Tier 1 ADR before ADR-016 implementation begins; (c) IC-6 is accepted as a known limitation explicitly recorded in the documentation visible to Demo 5 participants. This decision bounds whether ADR-016 implementation can begin before IC-6 is addressed.
+**Decision 5 — IC-6 (choropleth) scope: RESOLVED**
+EL ruling: **IC-6 is deferred to M15.** M14 mitigation: add an explicit header label to the choropleth panel stating "Reference data — not scenario outputs." This label mitigates the false affordance without requiring a layout refactor. Full IC-6 resolution (choropleth information architecture, visual weight relative to analytical relevance) is an M15 deliverable.
 
 ---
 
-*ADR-016 authored by Architect Agent, 2026-06-15. Evidence base: `docs/demo/m14/reviews/2026-06-15-ux-input-confidence-audit-minister-exercise.md`. M14 Wave 1. Status: Proposed. EL review and acceptance required before Wave 2 (ADR-015 implementation) begins.*
+*ADR-016 authored by Architect Agent, 2026-06-15. All five decisions resolved by 2026-06-16. Accepted by Engineering Lead 2026-06-16. Evidence base: `docs/demo/m14/reviews/2026-06-15-ux-input-confidence-audit-minister-exercise.md`. M14 Wave 1 — ADR-016 acceptance unblocks ADR-015 Wave 2 implementation.*
