@@ -138,6 +138,77 @@ for M12 environment standardisation.
 
 ---
 
+## KI-003 — GitHub Rulesets: required status check for a not-yet-merged workflow blocks all PRs until the workflow file lands on the base branch
+
+**Date first observed:** 2026-06-16
+**Infrastructure:** GitHub Rulesets (repository rules)
+**Severity:** Medium — blocks all open PRs targeting the protected branch until the workaround is applied; no data loss
+**Recurrence:** Consistent — reproducible any time a new required status check is added to a Ruleset before the corresponding workflow file is merged into the base branch
+
+### Symptom
+
+After adding a new required status check (e.g. `branch-naming`) to a Ruleset targeting
+`release/m*`, any PR whose head branch does not contain the workflow file (`.github/workflows/branch-naming.yml`) receives:
+
+```
+GraphQL: Repository rule violations found
+Required status check "branch-naming" is expected.
+(mergePullRequest)
+```
+
+The check never reports — not as pass, not as fail — because the workflow file does not
+exist on the base branch (`release/m{N}`) at the time the PR's CI runs. GitHub Rulesets
+treat an expected-but-never-reported check as a violation. `gh pr merge --admin` does not
+bypass Ruleset requirements (unlike branch protection `enforce_admins`).
+
+### Trigger condition
+
+The bootstrapping sequence:
+1. Workflow file added to a feature branch (e.g. `feat/m14-g7-branch-naming-enforcement`)
+2. Ruleset updated (server-side, immediately effective) to require the new check
+3. Other open PRs targeting the same release branch have neither the workflow file in
+   their head branch nor on the base branch
+4. Those PRs' CI cannot run the new check → Ruleset blocks their merge
+
+GitHub Actions resolves workflow files from the merge commit (merge of head + base). If
+the workflow file exists in neither the head branch nor the base branch, the check cannot
+run and the Ruleset blocks indefinitely.
+
+### Workaround
+
+**Required sequence when adding a new required CI check:**
+
+1. **Do not add the check to the Ruleset until the workflow file is on the base branch.**
+   Introduce the Ruleset change as the last step, not the first.
+
+   Preferred order:
+   a. Commit the workflow file to a feature branch
+   b. Open and merge that PR (the check runs from the merge commit and passes/skips)
+   c. Only after merge: add the check to the Ruleset via `gh api PUT /rulesets/{id}`
+
+2. **Recovery if the Ruleset was updated before the workflow file merged** (the KI-003
+   scenario):
+   a. Temporarily remove the new check from the Ruleset:
+      ```bash
+      gh api repos/{owner}/{repo}/rulesets/{id} --method PUT --input ruleset-without-check.json
+      ```
+   b. Merge any blocked PRs
+   c. Merge the PR that introduces the workflow file
+   d. Re-add the check to the Ruleset
+
+### Upstream
+
+No upstream issue filed. This is a known limitation of GitHub Rulesets' check resolution
+model — required checks must have previously reported on the base branch for the Ruleset
+to consider them satisfiable. GitHub branch protection rules have the same behaviour.
+The workaround (sequence the Ruleset update after the workflow file merge) fully mitigates
+the issue; no code change is required.
+
+**First observed:** adding `branch-naming` check during Issue #978 implementation
+(2026-06-16). Recovery applied in the same session.
+
+---
+
 ## Registry Maintenance
 
 ### When to file a Known Issue
