@@ -407,17 +407,22 @@ merge and Claude Code has executed `git pull origin main`.
 
 **Exception — PRs targeting a release branch (`release/m{N}`).** Release branch
 PRs are pre-authorized for autonomous merge. Claude Code polls `gh pr checks`
-until the `changes` status check passes, then executes `gh pr merge <number>
---merge` and pulls from the release branch without waiting for user confirmation.
-`release/m{N}` is an unprotected integration branch — admin bypass is not
-required. See §Release Branch Workflow below.
+until all checks have reached a terminal state (pass or skipped — no pending),
+then executes `gh pr merge <number> --merge` only if no check has failed.
+If any check has failed, stop and report to the user — do not attempt the merge.
+`release/m{N}` branches are protected by the `release-branch-ci-gate` Ruleset —
+a failed required check will block the merge at the server regardless.
+See §Release Branch Workflow below.
 
 **Exception — `SESSION_STATE.md`-only PRs.** End-of-session state updates that
 touch only `SESSION_STATE.md` are pre-authorized for auto-merge. Claude Code will
-poll `gh pr checks` until the `changes` status check passes, then execute
-`gh pr merge <number> --admin --merge` and `git pull origin main` without waiting
-for user confirmation. If the PR contains any file other than `SESSION_STATE.md`,
-the standard gate applies regardless of the other file's content.
+poll `gh pr checks` until all checks have reached a terminal state (pass or
+skipped — no pending), then execute `gh pr merge <number> --merge` and
+`git pull origin main` without waiting for user confirmation. SESSION_STATE-only
+PRs touch no frontend or backend files; all path-filtered checks will skip and
+the Ruleset treats skipped as passing — `--admin` is not required and must not
+be used. If the PR contains any file other than `SESSION_STATE.md`, the standard
+gate applies regardless of the other file's content.
 
 **Release Branch Workflow.**
 Each milestone has a release branch (`release/m{N}`) cut from `main` at
@@ -427,7 +432,7 @@ during the milestone uses this pattern:
 1. Cut feature branch from `release/m{N}`: `git checkout -b feat/g1-xxx release/m12`
 2. Implement, run pre-push gates (lint, build), push feature branch
 3. Open PR targeting `release/m{N}` (not `main`)
-4. Poll CI; merge autonomously once `changes` passes: `gh pr merge <number> --merge`
+4. Poll CI; merge autonomously once all checks are terminal (pass or skipped, none failed): `gh pr merge <number> --merge`
 5. Pull from release branch: `git pull origin release/m{N}`
 6. Continue with next feature branch
 
@@ -436,9 +441,9 @@ The release branch is never merged to `main` by Claude Code — that merge is
 always the Engineering Lead's action.
 
 `SESSION_STATE.md` updates during an active milestone target the release branch
-and follow the same autonomous merge rule as above (no `--admin` needed since
-the branch is unprotected). The auto-merge exception's `--admin` flag is needed
-only when the PR targets `main`.
+and follow the same autonomous merge rule as above (no `--admin` needed — the
+`release-branch-ci-gate` Ruleset treats skipped checks as passing, so
+SESSION_STATE-only PRs merge without any bypass flag).
 
 **Backend pre-push lint gate — mandatory before any `git push` touching Python files.**
 Before pushing any branch that modifies files under `backend/`, run:
