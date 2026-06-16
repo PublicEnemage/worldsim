@@ -61,10 +61,12 @@ Run against `CLAUDE.md §Milestone 14` and `docs/roadmap/worldsim-roadmap.md §M
 
 | Roadmap deliverable | Issue | Status |
 |---|---|---|
-| Methodology publication — complete documentation of every model relationship | #22 (uncertainty quantification anchor) | Tracked — G6 |
-| External validation by domain experts | #843 (Demo 5) | Tracked — G8 |
+| Methodology publication — complete documentation of every model relationship | #22 (disclosure layer: confidence tier visible per indicator) | Tracked — G6. Note: full distributional bands → M16. |
+| External validation by domain experts | #843 (Demo 5) | Tracked — G8 (M14 closure gate) |
 | Live stakeholder demo with real external participants | #843 | Tracked — G8 (M14 closure gate) |
 | Technical Steering Committee formation | #3, #6 | Tracked — G7 |
+| Goodhart's Law mitigation design | #988 | Tracked — G7 (filed 2026-06-16) |
+| Onboarding documentation for global south analysts | #989 | Tracked — G7 (filed 2026-06-16) |
 | ADR-016 (Scenario Grounding Architecture) | ARCH-010 | ✅ COMPLETE — Accepted 2026-06-16 |
 | ADR-015 (Evidence Thread Architecture) | ARCH-009 | Pending EL acceptance — Wave 2 gate |
 | Entity selector (IC-1) | #961 | Tracked — G1 |
@@ -75,17 +77,36 @@ Run against `CLAUDE.md §Milestone 14` and `docs/roadmap/worldsim-roadmap.md §M
 | Ecological composite fix | #823 | Tracked — G6 |
 | MENA calibration | #824 | Tracked — G6 |
 | Zone 1A Y axis label | #950 | Tracked — G6 |
+| Zone 1A Phase 1 design thinking | #845 | Tracked — G6c (design-only; Phases 2–4 in M15/M16) |
+| Path 2 design groundwork | #976 (design only) | Tracked — G6b (implementation → M16) |
 
-**Issues flagged for M15 disposition** (not in M14 scope per scope recommendation 2026-06-15 — EL disposition to confirm):
+**Issue disposition — confirmed 2026-06-16 (panel deliberation + EL milestone planning):**
 
 | Issue | Title | Disposition |
 |---|---|---|
-| #53 | Information access architecture | → M15 (large scope, design-first required) |
-| #845 | Zone 1A information architecture | → M15 (design-first required; ADR needed before implementation) |
-| #846 | DEMO-045 Mode 3 branch comparison | → M15 (Mode 3 not a Demo 5 deliverable) |
-| #951 | Solo-use review protocol | → M15 (process artifact; no Demo 5 surface) |
-| #35, #102, #274, #394, #837 | M13 HORIZON sweep migrations | → M15 |
-| #97, #153, #92, #30, #259, #275, #569 | Near-term features (non-Demo-5-critical) | → M15 |
+| #53 | Information access architecture | → M15 ✅ moved |
+| #845 | Zone 1A information architecture | Phase 1 (design thinking doc) stays M14 (G6c); Phases 2–4 → M15/M16 |
+| #846 | DEMO-045 Mode 3 branch comparison | → M15 ✅ moved |
+| #951 | Solo-use review protocol | → M15 ✅ moved |
+| #35 | Dynamic relationship weights | → M16 ✅ moved |
+| #102 | Distributional comparison | → M16 ✅ moved |
+| #274 | 25-year trajectory | → M16 ✅ moved |
+| #394 | Multi-scenario >2 | → M17 ✅ moved |
+| #837 | Config-driven demo scripts | → M15 ✅ moved |
+| #97 | Threshold-crossing markers | → M15 ✅ moved |
+| #153 | Absolute threshold overlay | → M15 ✅ moved |
+| #92 | Greece backtesting expansion | → M15 ✅ moved |
+| #30 | Stock vs. flow variables | → M16 ✅ moved |
+| #259 | CTO legibility metrics | → M15 ✅ moved |
+| #275 | Ecological-to-financial transmission | → M16 ✅ moved |
+| #569 | Mode 3 hardware validation | → M15 ✅ moved |
+| #975 | Path 1 approved source query | → M15 ✅ moved |
+| #976 | Path 2 proprietary data upload | → M16 ✅ moved (G6b design artifacts remain M14) |
+| #988 | Goodhart's Law mitigation | → M14 ✅ filed (G7) |
+| #989 | Onboarding documentation | → M14 ✅ filed (G7) |
+| #990 | Accessibility validation on target hardware | → M15 ✅ filed |
+| #986 | Cohort disaggregation on primary surface | → M15 ✅ filed |
+| #987 | Political risk summary surface (Persona 3) | → M15 ✅ filed |
 
 ---
 
@@ -99,8 +120,10 @@ Run against `CLAUDE.md §Milestone 14` and `docs/roadmap/worldsim-roadmap.md §M
 | G4 — ADR-016 frontend | — | ADR-016 ✅; G3 partial (API must exist) | Wave 2 | Entity selector + data quality preview (Component 1), Grounding strip (Component 2), parameter persistence (Component 4), choropleth header label (IC-6 mitigation), Fidelity static header (IC-4 M14 mitigation). |
 | G5 — ADR-015 implementation | — | ADR-015 Accepted (G2); sprint entry required | Wave 2 | Evidence Thread Architecture: L0 basis annotations, L1 basis statement surface, L2 evidence chain. Gated on G2. |
 | G6 — Methodology and calibration | #22, #884, #885, #823, #824, #950 | None | Parallel | Uncertainty quantification, reserve_coverage_months, Exploratory tier fix, ecological composite, MENA calibration, Y axis label. Can proceed in parallel with G3/G4. |
-| G7 — Governance | #3, #6 | None | Parallel | TSC formation, branch protection restoration. EL-action items. |
-| G6b — Path 2 design groundwork | #976 | None | Parallel | Design-only (no code). Three artifacts: (1) field mapping UX concept for the 5-minute Preparatory ceiling — UX Designer Agent; (2) `USER_SUPPLIED` provenance type specification as a draft ADR-016 amendment — Architect Agent; (3) data isolation model sketch that Issue #53 must satisfy — Data Architect Agent. No sprint entry document required (no implementation). Artifacts filed in `docs/design/path2-data-upload/` before M14 exit. Unblocks M15 Path 2 design-to-implementation transition. Authority: Customer Agent recommendation 2026-06-16. |
+| G7 — Governance | #3, #6, #988, #989 | None | Parallel | TSC formation (#3), branch protection restoration (#6), Goodhart's Law mitigation framework (#988), onboarding documentation for global south analysts (#989). EL-action items for #3/#6/#988; PM Agent leads #989. |
+| G6b — Path 2 design groundwork | #976 | None | Parallel | Design-only (no code). Three artifacts: (1) field mapping UX concept for the 5-minute Preparatory ceiling — UX Designer Agent; (2) `USER_SUPPLIED` provenance type specification as a draft ADR-016 amendment — Architect Agent; (3) data isolation model sketch that Issue #53 must satisfy — Data Architect Agent. No sprint entry document required (no implementation). Artifacts filed in `docs/design/path2-data-upload/` before M14 exit. Unblocks M15 Path 2 design-to-implementation transition. Authority: Customer Agent recommendation 2026-06-16. Note: #976 moved to M16 milestone (implementation); G6b design artifacts remain M14 deliverables. |
+| G6c — Zone 1A Phase 1 design thinking | #845 | None | Parallel | Design-only (no code). UX Designer Agent authors a design thinking document at `docs/ux/design-thinking/zone-1a-information-architecture.md` specifying Zone 1A's primary cognitive task as a Persona 2 question answerable within the mode's time ceiling, for each of Mode 1, Mode 2, and Mode 3. Must address the combinatorial tension: what information does the analyst need per mode, and what lives elsewhere (Zone 1B, Zone 1D, a comparative view)? No sprint entry required. Document gates Phase 2 (Architecture Review) in M15. Must exist before M14 exit. Phases 2–4 of #845 are M15/M16 scope. Authority: EL directive 2026-06-16. |
+| G7 — Governance | #3, #6, #988, #989 | None | Parallel | TSC formation (#3), branch protection restoration (#6), Goodhart's Law mitigation framework (#988), onboarding documentation for global south analysts (#989). EL-action items for #3/#6/#988; PM Agent leads #989. |
 | G8 — Demo 5 (#843) | #843 | All preceding groups | Exit gate | Methodology publication artifact, external validator engagement, live stakeholder demo with real external participants, stakeholder review artifact (`docs/demo/m14/reviews/`). M14 closure gate. |
 
 ---
@@ -118,10 +141,12 @@ G6 (methodology / calibration) ────────────────�
                                                                   │
 G6b (Path 2 design groundwork — design only, no code) ──────────┤
                                                                   │
-G7 (governance) ────────────────────────────────────────────────┘
+G6c (Zone 1A Phase 1 design thinking — design only, no code) ───┤
+                                                                  │
+G7 (governance + onboarding docs) ──────────────────────────────┘
 ```
 
-No sequential dependency between G1, G2, G3, G6, G6b, G7 — these can proceed in parallel after EL approval of this sprint plan. G4 is gated on G3 (API endpoints must exist). G5 is gated on G2 (ADR-015 must be Accepted). G6b produces design artifacts only — no sprint entry document required, no implementation PR opens.
+No sequential dependency between G1, G2, G3, G6, G6b, G6c, G7 — these can proceed in parallel after EL approval of this sprint plan. G4 is gated on G3 (API endpoints must exist). G5 is gated on G2 (ADR-015 must be Accepted). G6b and G6c produce design artifacts only — no sprint entry document required, no implementation PR opens for either.
 
 ---
 
