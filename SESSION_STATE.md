@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-15 (M14 active — ADR-016 authored and merged (PR #964); ARCH-010 assigned; three prerequisite bugs filed (#961 #962 #963); M14 Wave 1/Wave 2 structure in place; EL review of ADR-016 is next gating action)**
+**Last updated: 2026-06-16 (M14 kickoff complete — ADR-016 Accepted (PR #967); release/m14 cut; m14-sprint-plan.md filed; #968 exit checklist filed; sprint entry document and EL approval are next gating actions before implementation begins)**
 **Current milestone:** M14 — Methodology Publication and External Validation (GitHub Milestone 15)
 **Previous milestone:** M13 — Political Economy and Instrument Credibility (formally closed 2026-06-15; release/m13 → main merged by EL; #264 closed)
 
@@ -73,42 +73,38 @@
 
 **M14 kickoff sequence status:**
 1. ✅ `git pull origin main` — confirmed current (PR #957 merge; commit e63828f)
-2. ⬜ PM Agent cuts `release/m14` from `main` — NOT YET DONE (no release/m14 branch exists)
-3. ⬜ PM Agent authors `docs/process/sprint-plans/m14-sprint-plan.md`
-4. ⬜ EL approves sprint plan
-5. ⬜ PM Agent files M14 Exit Checklist issue (must reference #843 as M14 closure gate)
-6. ⬜ Sprint entry document filed per `docs/process/sprint-planning-sop.md §Sprint Entry Gate`
+2. ✅ PM Agent cuts `release/m14` from `main` — DONE 2026-06-16
+3. ✅ PM Agent authors `docs/process/sprint-plans/m14-sprint-plan.md` — DONE 2026-06-16
+4. ⬜ **EL approves sprint plan** — NEXT REQUIRED ACTION before implementation begins
+5. ✅ PM Agent files M14 Exit Checklist issue — DONE 2026-06-16 (**#968**; closure gate: #843)
+6. ⬜ Sprint entry document filed per `docs/process/sprint-planning-sop.md §Sprint Entry Gate` — required before implementation
 
-**NOTE for next session:** The sprint entry gate is a HARD STOP before implementation begins. The three prerequisite bugs (#961 #962 #963) may be filed and the ADR-016 authorship (documentation-only) may proceed without a sprint entry document — but Wave 1 or Wave 2 *implementation* may not begin until a filed, EL-approved sprint entry document exists. ADR-016 has been authored; it is Proposed. EL acceptance of ADR-016 is the Wave 1 gate.
+**HARD STOP:** No implementation PR may open against `release/m14` until the EL has approved the sprint plan and a sprint entry document is filed.
 
 ---
 
 ## Open Work Streams — M14 (Active)
 
 **Wave structure (EL decision 2026-06-15):**
-- **Wave 1:** ADR-016 (Scenario Grounding Architecture) — author and EL-accept before Wave 2 begins
-- **Wave 2:** ADR-015 (Evidence Thread Architecture) — moves to Accepted only after Wave 1 complete
+- **Wave 1 — COMPLETE:** ADR-016 (Scenario Grounding Architecture) — Accepted 2026-06-16 (PR #967)
+- **Wave 2:** ADR-015 (Evidence Thread Architecture) — EL acceptance required, then implementation
 
 **Current state:**
 
 | Item | Status | Next action |
 |---|---|---|
-| Bug #961 — GRC hardcoded in creation form | Filed 2026-06-15 | M14 implementation (requires sprint entry first) |
-| Bug #962 — step counter 'Step 0 / 8' | Filed 2026-06-15 | M14 implementation (requires sprint entry first) |
-| Bug #963 — choropleth raw DB field names | Filed 2026-06-15 | M14 implementation (requires sprint entry first) |
-| ARCH-010 — ADR-016 Scenario Grounding | Added to backlog 2026-06-15 | ASSIGNED; ADR Proposed |
-| ADR-016 — Scenario Grounding Architecture | Proposed (PR #964, merged 2026-06-15) | **EL review and acceptance required** — 5 decisions in §Decisions Required |
-| ADR-015 — Evidence Thread Architecture | Proposed (PR #959, merged 2026-06-15) | Blocked on ADR-016 acceptance (Wave 1 gate) |
-| M14 sprint entry document | NOT FILED | Required before any implementation begins |
-| release/m14 branch | NOT CUT | Required before any feature PRs open |
-| M14 Exit Checklist issue | NOT FILED | Required; must reference #843 |
-
-**ADR-016 §Decisions Required (EL must resolve before Accepted):**
-1. Entity selection scope for M14 (all source registry entities / GRC+JOR+EGY+ZMB / G20+HIPC?)
-2. Component 3 (Fidelity contextualisation) in-scope for M14 or deferred to M15?
-3. API endpoint authority — Chief Engineer owns `/initial-state` and `/data-quality`?
-4. Parameter persistence backward compatibility — Demo 5 scenarios need recreation?
-5. IC-6 (choropleth) disposition — separate Tier 1 ADR / defer M15 / accepted limitation?
+| Bug #961 — GRC hardcoded in creation form | Filed 2026-06-15 | G1 — implement after sprint entry |
+| Bug #962 — step counter 'Step 0 / 8' | Filed 2026-06-15 | G1 — implement after sprint entry |
+| Bug #963 — choropleth raw DB field names | Filed 2026-06-15 | G1 — implement after sprint entry |
+| ARCH-010 / ADR-016 — Scenario Grounding | ✅ ACCEPTED 2026-06-16 (PR #967) | G3/G4 implementation gated on sprint entry |
+| ADR-016 entity scope | GRC, JOR, EGY, ZMB (EL decision 2026-06-16) | — |
+| ADR-016 Component 3 | Deferred to M15 (EL decision 2026-06-16) | — |
+| ADR-016 IC-6 mitigation | Choropleth header label in M14 (EL decision 2026-06-16) | Part of G4 |
+| ADR-015 — Evidence Thread Architecture | Proposed | **EL acceptance is Wave 2 gate** — review §Decisions Required in ADR-015 |
+| M14 sprint plan | ✅ Filed 2026-06-16 — `docs/process/sprint-plans/m14-sprint-plan.md` | **EL approval required (HARD STOP)** |
+| release/m14 branch | ✅ Cut 2026-06-16 from main | Ready for feature PRs after EL sprint plan approval |
+| M14 sprint entry document | NOT FILED | Required before implementation (hard stop) |
+| M14 Exit Checklist | ✅ Filed 2026-06-16 — **#968** (closure gate: #843) | Tracks all M14 deliverables |
 
 **Evidence base for M14 trust architecture (both ADRs):**
 - Part I audit (output legibility): `docs/demo/m14/reviews/2026-06-15-ux-legibility-audit-minister-exercise.md`
@@ -167,6 +163,8 @@ All near-term issues dispositioned at HORIZON sweep 2026-06-13 — see G8 sprint
 | #959 ✅ | docs(m14): UX legibility audit (Part I) + ADR-015 Model Legibility Architecture | main | Merged 2026-06-15 |
 | #960 ✅ | docs(m14): UX input confidence audit (Part II) — IC family + Scenario Grounding framework | main | Merged 2026-06-15 |
 | #964 ✅ | docs(arch): ADR-016 Scenario Grounding Architecture (M14 Wave 1) + ARCH-010 | main | Merged 2026-06-15 |
+| #966 ✅ | fix(adr-016): correct API contract authority — Data Architect Agent not Chief Engineer | main | Merged 2026-06-16 |
+| #967 ✅ | docs(adr-016): EL acceptance — Proposed → Accepted, all decisions recorded | main | Merged 2026-06-16 |
 | #909 ✅ | feat(m13): kickoff — sprint plan, entry doc, ADR backlog | release/m13 | Merged 2026-06-12 |
 | #910 ✅ | chore(state): M13 kickoff session state | release/m13 | Merged 2026-06-12 |
 | #911 ✅ | feat(m13): EL approval recorded — sprint plan + entry doc | release/m13 | Merged 2026-06-12 |
@@ -488,9 +486,10 @@ CI hotfix: NM-035 filed; `ci.yml` PR trigger updated to include `release/m*` (PR
 | Issue | Title | Horizon | Notes |
 |---|---|---|---|
 | #843 | plan: M14 closure — live stakeholder demo with real external participants (#843) | immediate | **M14 gate issue** — EL decision 2026-06-11 |
-| #961 | bug(frontend): entity hardcoded to GRC in scenario creation form — no entity selection available | immediate | M14 Wave 1 prerequisite bug — filed 2026-06-15 |
-| #962 | bug(frontend): step counter shows 'Step 0 / 8' on completed scenarios loaded via URL param | immediate | M14 housekeeping — filed 2026-06-15 |
-| #963 | bug(frontend): choropleth attribute selector displays raw DB field names as user-facing labels | immediate | M14 housekeeping — filed 2026-06-15 |
+| #968 | chore(m14): M14 Exit Checklist — Methodology Publication and External Validation | immediate | **M14 exit checklist** — filed 2026-06-16; closure gate: #843 |
+| #961 | bug(frontend): entity hardcoded to GRC in scenario creation form — no entity selection available | immediate | M14 G1 — implement after sprint entry + EL plan approval |
+| #962 | bug(frontend): step counter shows 'Step 0 / 8' on completed scenarios loaded via URL param | immediate | M14 G1 — implement after sprint entry + EL plan approval |
+| #963 | bug(frontend): choropleth attribute selector displays raw DB field names as user-facing labels | immediate | M14 G1 — implement after sprint entry + EL plan approval |
 | #97 | arch(api): threshold-crossing markers in comparative output | near-term | |
 | #153 | feat(frontend): absolute threshold overlay on DeltaChoropleth | near-term | |
 | #92 | arch(backtesting): Greece 2010 fixture investment climate initial conditions | near-term | |
