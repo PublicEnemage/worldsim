@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-16 (M14 kickoff complete — ADR-016 Accepted (PR #967); release/m14 cut; m14-sprint-plan.md filed; #968 exit checklist filed; sprint entry document and EL approval are next gating actions before implementation begins)**
+**Last updated: 2026-06-16 (CI gate + branch naming enforcement complete — release-branch-ci-gate Ruleset live (6 required checks); SESSION_STATE auto-merge no longer needs --admin; Journey A gap markers GA-01/GA-02 filed; sprint plan G6b added; Issues #975/#976 filed; KI-003 documented; sprint plan and ADR-015 EL acceptance still pending before implementation begins)**
 **Current milestone:** M14 — Methodology Publication and External Validation (GitHub Milestone 15)
 **Previous milestone:** M13 — Political Economy and Instrument Credibility (formally closed 2026-06-15; release/m13 → main merged by EL; #264 closed)
 
@@ -101,10 +101,15 @@
 | ADR-016 Component 3 | Deferred to M15 (EL decision 2026-06-16) | — |
 | ADR-016 IC-6 mitigation | Choropleth header label in M14 (EL decision 2026-06-16) | Part of G4 |
 | ADR-015 — Evidence Thread Architecture | Proposed | **EL acceptance is Wave 2 gate** — review §Decisions Required in ADR-015 |
-| M14 sprint plan | ✅ Filed 2026-06-16 — `docs/process/sprint-plans/m14-sprint-plan.md` | **EL approval required (HARD STOP)** |
+| M14 sprint plan | ✅ Filed 2026-06-16 — `docs/process/sprint-plans/m14-sprint-plan.md` (G6b added PR #977) | **EL approval required (HARD STOP)** |
 | release/m14 branch | ✅ Cut 2026-06-16 from main | Ready for feature PRs after EL sprint plan approval |
 | M14 sprint entry document | NOT FILED | Required before implementation (hard stop) |
 | M14 Exit Checklist | ✅ Filed 2026-06-16 — **#968** (closure gate: #843) | Tracks all M14 deliverables |
+| CI merge gate enforcement (#970) | ✅ CLOSED 2026-06-16 | `release-branch-ci-gate` Ruleset (ID 17751852) live — 6 required checks: `changes`, `lint`, `test-backend`, `playwright-e2e`, `compliance-scan`, `branch-naming`; `--admin` removed from SESSION_STATE merge rule; pre-existing `auto-merge-session-state.yml` workflow handles SESSION_STATE→main auto-merge natively |
+| Branch naming enforcement (#978) | ✅ CLOSED 2026-06-16 | `.github/workflows/branch-naming.yml` (PR #979); requires milestone prefix in head branch name (e.g. `feat/m14-g1-xxx`); CLAUDE.md §Release Branch Workflow updated; KI-003 filed (PR #980) |
+| Path 1 — approved source query | ✅ Filed **#975** (M15) | User-directed query from approved source network at scenario creation; extends ADR-016 Component 1; Journey A GA-01 gap marker documents this |
+| Path 2 — proprietary data upload | ✅ Filed **#976** (M16+; design in M14 G6b) | Ministry-owned data upload with field mapping; `USER_SUPPLIED` provenance type; Issue #53 hard prerequisite; Journey A GA-02 gap marker; G6b design artifacts due before M14 exit |
+| Journey A gap markers (GA-01, GA-02) | ✅ Filed 2026-06-16 (PR #974) | `docs/ux/user-journeys.md` — comprehensive two-path data sourcing resolution; links to #975/#976/#53/ADR-016/ADR-007 |
 
 **Evidence base for M14 trust architecture (both ADRs):**
 - Part I audit (output legibility): `docs/demo/m14/reviews/2026-06-15-ux-legibility-audit-minister-exercise.md`
@@ -160,6 +165,12 @@ All near-term issues dispositioned at HORIZON sweep 2026-06-13 — see G8 sprint
 
 | PR | Title | Target | Status |
 |---|---|---|---|
+| #980 ✅ | docs(process): KI-003 — GitHub Rulesets bootstrap problem for new required checks | release/m14 | Merged 2026-06-16 |
+| #979 ✅ | ci(branch-naming): enforce milestone-scoped branch names for release/m* PRs (#978) | release/m14 | Merged 2026-06-16 |
+| #977 ✅ | docs(m14-sprint-plan): add G6b — Path 2 design groundwork parallel group | release/m14 | Merged 2026-06-16 |
+| #974 ✅ | docs(ux): Journey A gap markers GA-01 + GA-02 — two-path data sourcing resolution | release/m14 | Merged 2026-06-16 |
+| #972 ✅ | docs(process): CI gate enforcement — release-branch-ci-gate Ruleset; remove --admin from SESSION_STATE rule | release/m14 | Merged 2026-06-16 |
+| #969 ✅ | docs(adr-016): provenance amendment — STRUCTURAL_ABSENCE as provenance type, not proxy indicator | main | Merged 2026-06-16 |
 | #959 ✅ | docs(m14): UX legibility audit (Part I) + ADR-015 Model Legibility Architecture | main | Merged 2026-06-15 |
 | #960 ✅ | docs(m14): UX input confidence audit (Part II) — IC family + Scenario Grounding framework | main | Merged 2026-06-15 |
 | #964 ✅ | docs(arch): ADR-016 Scenario Grounding Architecture (M14 Wave 1) + ARCH-010 | main | Merged 2026-06-15 |
@@ -515,6 +526,8 @@ CI hotfix: NM-035 filed; `ci.yml` PR trigger updated to include `release/m*` (PR
 | #837 | feat(demo): configuration-driven demo scripts | near-term | Migrated from M13 (HORIZON sweep 2026-06-13) |
 | #950 | ux: Zone 1A trajectory chart Y axis has no label or unit | near-term | Migrated from M13; HIGH; solo-use blocker; part of #845 information architecture work |
 | #951 | process: review protocol blind spot — solo unnarrated use never tested | near-term | Migrated from M13; solo-use gate proposal |
+| #975 | feat(data): Path 1 — user-directed query from approved source network at scenario creation | near-term | **M15 target** — extends ADR-016 Component 1; requires approved source network backend; Journey A GA-01 |
+| #976 | feat(data): Path 2 — ministry-owned / proprietary data upload with field mapping and provenance isolation | near-term | **M16+ target, design in M14 G6b** — `USER_SUPPLIED` provenance type (ADR-016 amendment); field mapping UX; Issue #53 hard prerequisite; Journey A GA-02 |
 
 ---
 
