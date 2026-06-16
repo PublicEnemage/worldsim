@@ -414,15 +414,16 @@ If any check has failed, stop and report to the user — do not attempt the merg
 a failed required check will block the merge at the server regardless.
 See §Release Branch Workflow below.
 
-**Exception — `SESSION_STATE.md`-only PRs.** End-of-session state updates that
-touch only `SESSION_STATE.md` are pre-authorized for auto-merge. Claude Code will
-poll `gh pr checks` until all checks have reached a terminal state (pass or
-skipped — no pending), then execute `gh pr merge <number> --merge` and
-`git pull origin main` without waiting for user confirmation. SESSION_STATE-only
-PRs touch no frontend or backend files; all path-filtered checks will skip and
-the Ruleset treats skipped as passing — `--admin` is not required and must not
-be used. If the PR contains any file other than `SESSION_STATE.md`, the standard
-gate applies regardless of the other file's content.
+**Exception — `SESSION_STATE.md`-only PRs targeting `main`.** End-of-session
+state updates that touch only `SESSION_STATE.md` and target `main` are handled
+automatically by the `auto-merge-session-state` GitHub Actions workflow
+(`.github/workflows/auto-merge-session-state.yml`). Claude Code must open the
+PR and then stop — do not poll, do not call `gh pr merge`, do not use `--admin`.
+The workflow verifies that `SESSION_STATE.md` is the only changed file, then
+calls `gh pr merge --auto --squash`. All CI jobs are skipped for root-file-only
+changes; GitHub branch protection treats skipped as passing. If the PR contains
+any file other than `SESSION_STATE.md`, the standard gate applies — the workflow
+will not fire and EL must merge manually.
 
 **Release Branch Workflow.**
 Each milestone has a release branch (`release/m{N}`) cut from `main` at
@@ -440,10 +441,12 @@ At milestone close, EL performs one admin bypass: `release/m{N}` → `main`.
 The release branch is never merged to `main` by Claude Code — that merge is
 always the Engineering Lead's action.
 
-`SESSION_STATE.md` updates during an active milestone target the release branch
-and follow the same autonomous merge rule as above (no `--admin` needed — the
-`release-branch-ci-gate` Ruleset treats skipped checks as passing, so
-SESSION_STATE-only PRs merge without any bypass flag).
+`SESSION_STATE.md` updates during an active milestone target the release branch,
+not `main`, and follow the same autonomous merge rule as all release branch PRs:
+poll until all checks are terminal (pass or skipped, none failed), then
+`gh pr merge <number> --merge`. No `--admin` needed — the `release-branch-ci-gate`
+Ruleset treats skipped checks as passing. The `auto-merge-session-state` workflow
+only fires on PRs targeting `main` and does not apply here.
 
 **Backend pre-push lint gate — mandatory before any `git push` touching Python files.**
 Before pushing any branch that modifies files under `backend/`, run:
