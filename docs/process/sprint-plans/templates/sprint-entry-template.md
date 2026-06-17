@@ -68,7 +68,7 @@ check "N/A" and note below.*
 ### 2.3 — Intent document gate
 
 *For each user-facing deliverable in this sprint, an intent document must be filed at
-`docs/process/intents/ADR-NNN-YYYY-MM-DD-short-name.md` before implementation begins.
+`docs/process/intents/M{N}-{G-suffix-or-ADR-NNN}-{YYYY-MM-DD}-{short-name}.md` before implementation begins.
 (Authority: CLAUDE.md §Agent Execution Lifecycle Step 1)*
 
 - [ ] Intent document filed for every user-facing deliverable in this sprint
@@ -94,8 +94,8 @@ acceptance criteria BEFORE implementation code is written.
 
 | Deliverable | Intent document | Test file path | Authored before implementation? |
 |---|---|---|---|
-| {deliverable 1} | `docs/process/intents/{path}` | `{backend or frontend test path}` | {Yes / No — BLOCKING} |
-| {deliverable 2} | `docs/process/intents/{path}` | `{backend or frontend test path}` | {Yes / No — BLOCKING} |
+| {deliverable 1} | `docs/process/intents/{path}` | `frontend/tests/e2e/m{N}-g{N}-{short-name}.spec.ts` or `backend/tests/test_m{N}_g{N}_{short_name}.py` | {Yes / No — BLOCKING} |
+| {deliverable 2} | `docs/process/intents/{path}` | `frontend/tests/e2e/m{N}-g{N}-{short-name}.spec.ts` or `backend/tests/test_m{N}_g{N}_{short_name}.py` | {Yes / No — BLOCKING} |
 
 *If infrastructure sprint: "Infrastructure sprint — no user-facing deliverables — test authorship gate not required for these groups."*
 

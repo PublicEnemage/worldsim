@@ -640,7 +640,7 @@ section require Architect Agent review and EL endorsement.*
 **Step 1 — Intent authorship** (before implementation begins)
 The implementing agent authors an Implementation Intent document using
 `docs/process/intent-template.md` and files it at
-`docs/process/intents/ADR-NNN-YYYY-MM-DD-short-name.md`. The intent document derives the
+`docs/process/intents/M{N}-{G-suffix-or-ADR-NNN}-{YYYY-MM-DD}-{short-name}.md`. The intent document derives the
 implementation's observable application state from the ADR's persona trace and UX implication
 statement elements. Completeness gate: the QA Lead must be able to write a test from the intent
 document without reading any implementation code. An intent document the QA Lead cannot test
@@ -813,7 +813,7 @@ of the implementation? If no — revise until yes.
 | Artifact | Canonical location | Authored by |
 |---|---|---|
 | Intent document template | `docs/process/intent-template.md` | Architect Agent |
-| Implementation Intent documents | `docs/process/intents/ADR-NNN-YYYY-MM-DD-short-name.md` | Implementing agent (per ADR panel) |
+| Implementation Intent documents | `docs/process/intents/M{N}-{G-suffix-or-ADR-NNN}-{YYYY-MM-DD}-{short-name}.md` | Implementing agent (per ADR panel) |
 | Rejection artifacts | `docs/process/rejections/REJECT-NNN-YYYY-MM-DD-short-description.md` | Implementing agent or Business PO |
 | Phase A exit artifact | `docs/process/sprint-plans/process-redesign-phaseA-exit.md` | PM Agent + PI Agent |
 

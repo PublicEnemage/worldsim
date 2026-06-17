@@ -3,7 +3,7 @@ name: m14-g1-sprint-entry
 type: sprint-entry
 milestone: M14 — Methodology Publication and External Validation
 sprint-group: G1
-status: EL Approved — implementation may begin once intent document and QA tests are filed
+status: EL Approved — intent document filed 2026-06-16; QA tests must be authored before implementation PR opens
 authored-by: PM Agent
 authored-date: 2026-06-16
 el-approved: 2026-06-16
@@ -13,7 +13,7 @@ sop-reference: docs/process/sprint-planning-sop.md
 
 # Sprint Entry — M14, G1: Prerequisite Bug Fixes
 
-**Status:** EL Approved 2026-06-16 — implementation may begin once intent document and QA tests are filed
+**Status:** EL Approved 2026-06-16 — intent document filed 2026-06-16; QA tests must be authored before implementation PR opens
 **Date authored:** 2026-06-16
 **Release branch:** `release/m14`
 **Sprint plan:** `docs/process/sprint-plans/m14-sprint-plan.md` (EL Approved 2026-06-16)
@@ -75,13 +75,13 @@ implementation group.
 *An intent document must be filed before any G1 implementation PR opens.
 (Authority: CLAUDE.md §Agent Execution Lifecycle Step 1)*
 
-- [ ] Intent document filed for G1 deliverables — **MUST FILE BEFORE G1 PR OPENS**
+- [x] Intent document filed for G1 deliverables — **FILED 2026-06-16**
 
 | Deliverable | ADR reference | Intent document path | Filed? |
 |---|---|---|---|
-| #961 — Entity selector (GRC hardcoded) | ADR-016 context | `docs/process/intents/G1-2026-06-16-prerequisite-bugs.md` | No — file before PR opens |
-| #962 — Step counter display | None | (same intent document) | No — file before PR opens |
-| #963 — Choropleth attribute labels | None | (same intent document) | No — file before PR opens |
+| #961 — Entity selector (GRC hardcoded) | ADR-016 context | `docs/process/intents/M14-G1-2026-06-16-prerequisite-bugs.md` | ✅ Filed 2026-06-16 |
+| #962 — Step counter display | None | (same intent document) | ✅ Filed 2026-06-16 |
+| #963 — Choropleth attribute labels | None | (same intent document) | ✅ Filed 2026-06-16 |
 
 All three bugs may be covered by a single intent document (`G1-2026-06-16-prerequisite-bugs.md`)
 since they share a PR, a implementing agent, and a sprint group. The intent document must derive
@@ -101,7 +101,7 @@ code is written. (Authority: CLAUDE.md §Agent Execution Lifecycle Step 2)*
 
 | Deliverable | Intent document | Test file path | Authored before implementation? |
 |---|---|---|---|
-| #961 — Entity selector | `docs/process/intents/G1-2026-06-16-prerequisite-bugs.md` | `frontend/tests/g1-prerequisite-bugs.spec.ts` (Playwright) | No — author after intent document, before implementation PR |
+| #961 — Entity selector | `docs/process/intents/M14-G1-2026-06-16-prerequisite-bugs.md` | `frontend/tests/e2e/m14-g1-prerequisite-bugs.spec.ts` (Playwright) | No — author after intent document, before implementation PR |
 | #962 — Step counter | (same) | (same spec file) | No — author after intent document, before implementation PR |
 | #963 — Choropleth labels | (same) | (same spec file) | No — author after intent document, before implementation PR |
 
@@ -143,8 +143,8 @@ application states. G1 does not gate G3/G4 — G3 and G6 may proceed in parallel
 
 **Implementation sequencing for G1:**
 1. EL approves this entry document (this step)
-2. Frontend Architect Agent authors intent document at `docs/process/intents/G1-2026-06-16-prerequisite-bugs.md` — must derive acceptance criteria from Section 3.1 observable application states above
-3. QA Lead Agent authors `frontend/tests/g1-prerequisite-bugs.spec.ts` from intent document before implementation begins
+2. Frontend Architect Agent authors intent document at `docs/process/intents/M14-G1-2026-06-16-prerequisite-bugs.md` — must derive acceptance criteria from Section 3.1 observable application states above
+3. QA Lead Agent authors `frontend/tests/e2e/m14-g1-prerequisite-bugs.spec.ts` from intent document before implementation begins
 4. Implementation PR opens targeting `release/m14` with milestone-scoped branch name (`feat/m14-g1-{description}`)
 5. Implementing agent Step 4 Verify: confirms observable application states present in running application before marking PR ready for review
 6. Business PO Step 5 Validate: opens live application and confirms observable states within the reactive mode time ceiling (90 seconds for Persona 2)
