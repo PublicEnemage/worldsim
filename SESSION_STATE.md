@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-17 (PR #1006 merged — G1 implementation COMPLETE (Steps 3 + 4 done); all 7 ACs pass; entity selector #961, step counter #962, label display #963; Step 4 Verify PASS; pre-existing E2E bug #1007 filed (recompute-badge). Awaiting BPO Step 5 Validate.)**
+**Last updated: 2026-06-17 (G1 COMPLETE — BPO Step 5 ACCEPT; #961/#962/#963 closed; sprint exit filed. G2 COMPLETE — ADR-015 Accepted 2026-06-16 (PR #998); G5 unblocked. Next: G3/G5 sprint entry required before implementation.)**
 **Current milestone:** M14 — Methodology Publication and External Validation (GitHub Milestone 15)
 **Previous milestone:** M13 — Political Economy and Instrument Credibility (formally closed 2026-06-15; release/m13 → main merged by EL; #264 closed)
 
@@ -96,7 +96,7 @@
 | Bug #961 — GRC hardcoded in creation form | ✅ FIXED 2026-06-17 (PR #1006) | BPO Step 5 Validate pending |
 | Bug #962 — step counter 'Step 0 / 8' | ✅ FIXED 2026-06-17 (PR #1006) | BPO Step 5 Validate pending |
 | Bug #963 — choropleth raw DB field names | ✅ FIXED 2026-06-17 (PR #1006) | BPO Step 5 Validate pending |
-| Bug #1007 — recompute-badge not visible after apply-control-change | Filed 2026-06-17 | Pre-existing; discovered during G1 Step 4 Verify; to be addressed in G2 or follow-on |
+| Bug #1007 — recompute-badge not visible after apply-control-change | Filed 2026-06-17 | Pre-existing; discovered during G1 Step 4 Verify; to be addressed in G5 or follow-on |
 | ARCH-010 / ADR-016 — Scenario Grounding | ✅ ACCEPTED 2026-06-16 (PR #967) | G3/G4 implementation gated on sprint entry |
 | ADR-016 entity scope | GRC, JOR, EGY, ZMB (EL decision 2026-06-16) | — |
 | ADR-016 Component 3 | Deferred to M15 (EL decision 2026-06-16) | — |
@@ -109,7 +109,8 @@
 | G1 QA tests (Step 2) | ✅ Filed 2026-06-17 — `frontend/tests/e2e/m14-g1-prerequisite-bugs.spec.ts` (PR #1001) | All 7 ACs covered; entity-selector guard pattern; AC-4/AC-5 API fixture; AC-6 label-scope |
 | G1 implementation (Step 3) | ✅ MERGED 2026-06-17 — PR #1006 → release/m14 | ScenarioPanel entity selector; ScenarioControls initialStep; App.tsx initialStep prop |
 | G1 Step 4 Verify | ✅ PASS 2026-06-17 | 7/7 ACs pass; 4 probes pass; pre-existing #1007 discovered and filed; verdict in intent doc §8 |
-| G1 Step 5 Validate | ⬜ PENDING | **BPO required action** — open live app, confirm Persona 2 observable states per intent doc §3 |
+| G1 Step 5 Validate | ✅ BPO ACCEPT 2026-06-17 | All 3 observable states confirmed; Layer 3 PASS; intent doc §9; sprint exit filed |
+| G2 — ADR-015 acceptance | ✅ COMPLETE 2026-06-16 (PR #998) | EL accepted ADR-015; 6 decisions resolved; Components 1–3 M14; Component 4 → M15. G5 unblocked. No sprint entry/exit doc required (EL-action, no user-facing deliverable). |
 | Intent/test naming convention | ✅ Enforced 2026-06-16 (PR #999) | M{N}-G{N} prefix on intent docs and E2E tests — CLAUDE.md, intent-template.md, sprint-planning-sop.md, sprint-entry-template.md all updated |
 | M14 Exit Checklist | ✅ Filed 2026-06-16 — **#968** (closure gate: #843) | Tracks all M14 deliverables |
 | CI merge gate enforcement (#970) | ✅ CLOSED 2026-06-16 | `release-branch-ci-gate` Ruleset (ID 17751852) live — 6 required checks: `changes`, `lint`, `test-backend`, `playwright-e2e`, `compliance-scan`, `branch-naming`; `--admin` removed from SESSION_STATE merge rule |
