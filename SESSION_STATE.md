@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-16 (PR #999 merged — intent/test naming convention enforced: M{N}-G{N} prefix on intent docs and E2E tests; G1 intent filed at M14-G1-2026-06-16-prerequisite-bugs.md. ADR-015 Accepted — EL decisions recorded (PR #998); #997 filed (Demo 5 scenario scope constraint). G1 sprint entry EL Approved (PR #996). docs/insights-log.md created (PR #995). M14 sprint plan EL approved (PR #992). Milestone planning panel complete — M15–M18 defined.)**
+**Last updated: 2026-06-17 (PR #1001 merged — G1 QA tests authored and filed (Step 2 complete); AC-1–AC-7 in frontend/tests/e2e/m14-g1-prerequisite-bugs.spec.ts; entity-selector guard pattern applied to all ACs; QA Lead acknowledgment recorded in intent doc. G1 implementation PR may now open.)**
 **Current milestone:** M14 — Methodology Publication and External Validation (GitHub Milestone 15)
 **Previous milestone:** M13 — Political Economy and Instrument Credibility (formally closed 2026-06-15; release/m13 → main merged by EL; #264 closed)
 
@@ -103,8 +103,9 @@
 | ADR-015 — Evidence Thread Architecture | ✅ ACCEPTED 2026-06-16 (PR #998) | 6 decisions resolved; Components 1–3 in M14 scope; Component 4 → M15; Demo 5 script constraint → #997 |
 | M14 sprint plan | ✅ **EL APPROVED 2026-06-16** — `docs/process/sprint-plans/m14-sprint-plan.md` | Sprint entry document required per group before implementation PR opens |
 | release/m14 branch | ✅ Cut 2026-06-16 from main | Ready for feature PRs — sprint entry document required first |
-| G1 sprint entry document | ✅ Filed 2026-06-16 — `docs/process/sprint-plans/m14-g1-sprint-entry.md` (PR #993) | **EL Approved 2026-06-16** (PR #996); intent doc ✅ filed (PR #999); **QA tests BLOCKING** before implementation PR opens |
-| G1 intent document | ✅ Filed 2026-06-16 — `docs/process/intents/M14-G1-2026-06-16-prerequisite-bugs.md` (PR #999) | QA Lead must author `frontend/tests/e2e/m14-g1-prerequisite-bugs.spec.ts` (AC-1–AC-7) before G1 implementation PR opens |
+| G1 sprint entry document | ✅ Filed 2026-06-16 — `docs/process/sprint-plans/m14-g1-sprint-entry.md` (PR #993) | **EL Approved 2026-06-16** (PR #996); intent doc ✅ filed (PR #999); QA tests ✅ filed (PR #1001) |
+| G1 intent document | ✅ Filed 2026-06-16 — `docs/process/intents/M14-G1-2026-06-16-prerequisite-bugs.md` (PR #999) | QA Lead acknowledgment ✅ 2026-06-17 — `frontend/tests/e2e/m14-g1-prerequisite-bugs.spec.ts` (AC-1–AC-7); **G1 implementation PR may now open** |
+| G1 QA tests (Step 2) | ✅ Filed 2026-06-17 — `frontend/tests/e2e/m14-g1-prerequisite-bugs.spec.ts` (PR #1001) | All 7 ACs covered; entity-selector guard pattern; AC-4/AC-5 API fixture; AC-6 label-scope; **Step 2 COMPLETE — implementation PR unblocked** |
 | Intent/test naming convention | ✅ Enforced 2026-06-16 (PR #999) | M{N}-G{N} prefix on intent docs and E2E tests — CLAUDE.md, intent-template.md, sprint-planning-sop.md, sprint-entry-template.md all updated |
 | M14 Exit Checklist | ✅ Filed 2026-06-16 — **#968** (closure gate: #843) | Tracks all M14 deliverables |
 | CI merge gate enforcement (#970) | ✅ CLOSED 2026-06-16 | `release-branch-ci-gate` Ruleset (ID 17751852) live — 6 required checks: `changes`, `lint`, `test-backend`, `playwright-e2e`, `compliance-scan`, `branch-naming`; `--admin` removed from SESSION_STATE merge rule |
