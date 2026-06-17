@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import type { AdvanceResponse } from "../types";
 
 const API_BASE = "http://localhost:8000/api/v1";
@@ -6,14 +6,22 @@ const API_BASE = "http://localhost:8000/api/v1";
 interface Props {
   scenarioId: string;
   totalSteps: number;
+  initialStep?: number;
   onStepChange: (step: number, isComplete: boolean) => void;
 }
 
-export default function ScenarioControls({ scenarioId, totalSteps, onStepChange }: Props) {
-  const [currentStep, setCurrentStep] = useState(0);
+export default function ScenarioControls({ scenarioId, totalSteps, initialStep = 0, onStepChange }: Props) {
+  const [currentStep, setCurrentStep] = useState(initialStep);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [isComplete, setIsComplete] = useState(false);
+  const [isComplete, setIsComplete] = useState(initialStep >= totalSteps && totalSteps > 0);
+
+  // Sync internal step when scenario changes or when parent detects a completed
+  // scenario after async fetch (e.g., URL-loaded completed scenario).
+  useEffect(() => {
+    setCurrentStep(initialStep);
+    setIsComplete(initialStep >= totalSteps && totalSteps > 0);
+  }, [scenarioId, initialStep, totalSteps]);
 
   const advance = async () => {
     if (isComplete || loading) return;

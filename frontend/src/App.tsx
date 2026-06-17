@@ -241,6 +241,7 @@ export default function App() {
             <ScenarioControls
               scenarioId={selectedScenarioId}
               totalSteps={selectedScenarioSteps}
+              initialStep={currentStep ?? 0}
               onStepChange={handleStepChange}
             />
           </div>
