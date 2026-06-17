@@ -54,3 +54,18 @@ Each entry has four fields:
 **Source:** NM-042 deliberation
 **Finding:** The agent sign-off mechanism has no structural independence guarantee in a single-session single-principal context — same-session sign-offs are self-reported.
 **Status:** promoted → NM-042 process amendment PR #930
+
+---
+
+**Date:** 2026-06-16
+**Source:** EL review of CLAUDE.md structure
+**Finding:** CLAUDE.md is 1,080 lines / ~9,000 words and mixes constitutional principles with detailed operational procedures; three sections (Agent Execution Lifecycle ~200 lines, Domain Intelligence Council table ~25 lines, Milestone Exit Ceremony + Retrospective ~65 lines) are candidates for extraction into child docs to reduce the file by ~25% without information loss.
+**Status:** open — deferred to M14 sprint close to avoid mid-sprint section citation breaks; planned child docs: `docs/process/agent-execution-lifecycle.md`, `docs/process/milestone-exit-sop.md`
+
+---
+
+**Date:** 2026-06-17
+**Source:** QA Lead + Frontend Architect deliberation during M14-G1 test authorship (PR #1001)
+**Finding:** The intent document template has no Visual Spec section; AC-6 (#963 label scope) required the QA Lead to read `AttributeSelector.tsx` source to resolve a prose ambiguity about whether "no underscore in option text" applied to the full string or only the label portion — a before/after annotated screenshot would have made scope self-answering without any code read.
+**Detail:** The specific failure mode: intent document §3.2 described the correct observable state in prose ("Reserve Coverage (months)") without capturing what the current broken state looked like in the running app. QA Lead had to make a judgment call (label portion vs. full text content including unit metadata), which caused a two-commit fix sequence. A "Visual Spec (before/after)" section in `docs/process/intent-template.md` — optional for backend/infrastructure ACs, encouraged for any AC involving text display, label format, or layout — would eliminate this class of scope ambiguity at authorship time. The ADR is not the right home for this material; the intent document is, because that is where QA-testable observable states are specified.
+**Status:** open
