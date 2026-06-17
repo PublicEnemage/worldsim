@@ -134,6 +134,46 @@ observable characteristic.]
 
 ---
 
+## 4b. Visual Spec (before/after)
+
+> *Required when: any AC in Section 4 involves text display, label format, layout, or visual
+> hierarchy — i.e., when the observable state is a string value, element appearance, or
+> spatial arrangement that a QA reviewer must match exactly.*
+>
+> *Optional when: all ACs are backend-only (API responses, database state, computation outputs)
+> with no text-display component.*
+>
+> *What to provide:* For each display-format AC, show:
+> - **Before** — the current broken or absent state (screenshot, annotated text block, or
+>   wireframe excerpt). Label what is wrong: which string is raw, which element is absent,
+>   which layout is violated.
+> - **After** — the intended fixed state. Label what "done" looks like: the exact string
+>   the option must display, the exact zone the element must occupy, the exact label format.
+>
+> *Why this exists:* Prose descriptions of text display states have an inherent scope ambiguity —
+> "no underscore in option text" does not distinguish label portion from unit metadata. A
+> before/after visual eliminates that ambiguity without requiring the QA Lead to read source
+> code. Authority: insights log entry 2026-06-17; M14-G1 AC-6 incident; #1004.
+>
+> *Format:* Inline fenced text blocks are sufficient when screenshots are unavailable. Mark
+> the bug location explicitly (e.g., `^^^^ THIS IS THE BUG`). A marked-up text block is
+> better than prose; a screenshot is better than a text block.
+
+**AC-N (before):**
+```
+[Paste current broken output here. Annotate the specific wrong string or missing element.]
+```
+
+**AC-N (after):**
+```
+[Paste intended fixed output here. Annotate the specific correct string or present element.]
+```
+
+[Repeat for each display-format AC. Leave this section blank with "N/A — backend only" if
+no AC involves text display, label format, or layout.]
+
+---
+
 ## 5. Kryptonite Constraint Check
 
 > *Authority: CLAUDE.md §Agent Execution Lifecycle — Kryptonite Design Constraint (FD-3).
@@ -176,7 +216,8 @@ Backend pytest: `backend/tests/test_m{N}_g{N}_{short_name}.py`]
 
 ---
 
-*Template version: 2026-06-12. Phase A encoded. Authoring authority: `docs/process/agents.md
-§Architect Agent`. The intent document is the contract; the implementation is the execution.
-A discrepancy between them is a Verify-step failure — not a document-update opportunity.
-For the full lifecycle this template feeds into, see `CLAUDE.md §Agent Execution Lifecycle`.*
+*Template version: 2026-06-17. Phase A encoded; §4b Visual Spec added (#1004). Authoring
+authority: `docs/process/agents.md §Architect Agent`. The intent document is the contract;
+the implementation is the execution. A discrepancy between them is a Verify-step failure —
+not a document-update opportunity. For the full lifecycle this template feeds into, see
+`CLAUDE.md §Agent Execution Lifecycle`.*
