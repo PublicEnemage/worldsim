@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-17 (G3 COMPLETE — BPO Step 5 ACCEPT; reserve_coverage_months CBJ 2023-Q4 T2 confirmed; G4 gate open. G1 COMPLETE 2026-06-17. G2 COMPLETE 2026-06-16. Next: G3 sprint exit + G4 sprint entry required.)**
+**Last updated: 2026-06-17 (G4 sprint entry EL APPROVED 2026-06-17 (PR #1014). G3 COMPLETE. G1 COMPLETE. Next: Frontend Architect Agent authors G4 intent doc; QA Lead authors tests; implementation PR opens.)**
 **Current milestone:** M14 — Methodology Publication and External Validation (GitHub Milestone 15)
 **Previous milestone:** M13 — Political Economy and Instrument Credibility (formally closed 2026-06-15; release/m13 → main merged by EL; #264 closed)
 
@@ -97,7 +97,7 @@
 | Bug #962 — step counter 'Step 0 / 8' | ✅ FIXED 2026-06-17 (PR #1006) | BPO Step 5 Validate pending |
 | Bug #963 — choropleth raw DB field names | ✅ FIXED 2026-06-17 (PR #1006) | BPO Step 5 Validate pending |
 | Bug #1007 — recompute-badge not visible after apply-control-change | Filed 2026-06-17 | Pre-existing; discovered during G1 Step 4 Verify; to be addressed in G5 or follow-on |
-| ARCH-010 / ADR-016 — Scenario Grounding | ✅ ACCEPTED 2026-06-16 (PR #967) | G3 COMPLETE — BPO ACCEPT 2026-06-17; G4 sprint entry required next |
+| ARCH-010 / ADR-016 — Scenario Grounding | ✅ ACCEPTED 2026-06-16 (PR #967) | G3 COMPLETE; G4 sprint entry EL APPROVED 2026-06-17 (PR #1014) |
 | ADR-016 entity scope | GRC, JOR, EGY, ZMB (EL decision 2026-06-16) | — |
 | ADR-016 Component 3 | Deferred to M15 (EL decision 2026-06-16) | — |
 | ADR-016 IC-6 mitigation | Choropleth header label in M14 (EL decision 2026-06-16) | Part of G4 |
@@ -115,6 +115,7 @@
 | G3 implementation (Step 3) | ✅ MERGED 2026-06-17 — PR #1011 → release/m14 | source_registry seed; entity_data_quality_coverage; /data-quality; /initial-state; api_contracts.yml |
 | G3 Step 4 Verify | ✅ PASS 2026-06-17 | 9/9 ACs pass after `alembic upgrade head`; Step 4 note: migration not pre-applied at initial probe (500); verdict in intent doc §8 |
 | G3 Step 5 Validate | ✅ BPO ACCEPT 2026-06-17 | JOR scenario `68b31277` — reserve_coverage_months: 7.1 months · CBJ 2023-Q4 · T2; Persona 2 north star argument enabled; Layer 3 PASS; G4 gate open; intent doc §9 |
+| G4 sprint entry document | ✅ **EL APPROVED 2026-06-17** — `docs/process/sprint-plans/m14-g4-sprint-entry.md` (PR #1014) | Intent doc required next — Frontend Architect Agent authors before implementation PR opens |
 | G2 — ADR-015 acceptance | ✅ COMPLETE 2026-06-16 (PR #998) | EL accepted ADR-015; 6 decisions resolved; Components 1–3 M14; Component 4 → M15. G5 unblocked. No sprint entry/exit doc required (EL-action, no user-facing deliverable). |
 | Intent/test naming convention | ✅ Enforced 2026-06-16 (PR #999) | M{N}-G{N} prefix on intent docs and E2E tests — CLAUDE.md, intent-template.md, sprint-planning-sop.md, sprint-entry-template.md all updated |
 | M14 Exit Checklist | ✅ Filed 2026-06-16 — **#968** (closure gate: #843) | Tracks all M14 deliverables |

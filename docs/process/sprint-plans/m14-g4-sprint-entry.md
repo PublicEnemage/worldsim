@@ -3,10 +3,10 @@ name: m14-g4-sprint-entry
 type: sprint-entry
 milestone: M14 — Methodology Publication and External Validation
 sprint-group: G4
-status: Awaiting EL Approval
+status: EL Approved — 2026-06-17
 authored-by: PM Agent
 authored-date: 2026-06-17
-el-approved: false
+el-approved: 2026-06-17
 release-branch: release/m14
 sop-reference: docs/process/sprint-planning-sop.md
 ---
@@ -259,8 +259,11 @@ safety net). Recorded as institutional learning in intent doc §8.*
 
 ## EL Approval Record
 
-**EL approval:** Pending
+**EL approval:** 2026-06-17
 
-> *(EL to record approval here. Format: "G4 sprint entry approved. [conditions or notes].
-> Implementation may begin. Frontend Architect Agent may open the G4 implementation PR targeting
-> `release/m14` with branch name `feat/m14-g4-adr016-frontend`. — @PublicEnemage (YYYY-MM-DD)")*
+> G4 sprint entry approved. All entry invariants satisfied: release branch exists, CI trigger
+> verified, sprint plan EL-approved, ADR-016 Accepted, G3 gate satisfied (AC-1 and AC-6
+> confirmed in running application). Intent document and QA tests required before
+> implementation PR opens — frontend Architect Agent authors intent doc next, QA Lead authors
+> tests from it before any implementation code is written.
+> — @PublicEnemage (2026-06-17)
