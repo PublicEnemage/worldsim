@@ -299,6 +299,44 @@ The QA Lead should use approach (1) for independence from seed state.
 
 ---
 
+## 8. Step 4 — Verify (2026-06-17)
+
+**Implementing agent:** Frontend Architect Agent
+**Date:** 2026-06-17
+**PR merged:** #1006 → `release/m14`
+
+**Method:** `npx playwright test tests/e2e/m14-g1-prerequisite-bugs.spec.ts` against live
+app (backend :8000 `db:connected`; frontend dev server :5173). Followed by 4 manual
+probing steps via a temporary Playwright spec.
+
+**AC results:**
+
+| AC | Description | Result |
+|---|---|---|
+| AC-1 | entity-selector present with GRC/JOR/EGY/ZMB | ✅ PASS (1.2s) |
+| AC-2 | ZMB selection → API stores `entities[0]==="ZMB"` | ✅ PASS (1.0s) |
+| AC-3 | JOR selection → API stores `entities[0]==="JOR"` | ✅ PASS (693ms) |
+| AC-4 | URL-loaded completed scenario shows Step 3 (not 0) within 3s | ✅ PASS (786ms) |
+| AC-5 | Step display stays at 3 after 1s stability wait (SF-2) | ✅ PASS (808ms) |
+| AC-6 | No underscore in attribute selector option labels | ✅ PASS (3.5s) |
+| AC-7 | reserve_coverage_months option shows "Reserve" without `_` | ✅ PASS (3.6s) |
+
+**Probes beyond the spec:**
+- PROBE 1: Default entity selector value = "GRC" ✅ (preserves prior default)
+- PROBE 2: SF-1 guard — ZMB stored in DB not just UI; `data-scenario-id` on row
+  confirmed; API returns `entities[0]==="ZMB"` with no "GRC" ✅
+- PROBE 3: Switching scenarios resets step counter to 0 ✅ (`useEffect` sync works for
+  manual panel select; advanced A to Step 1, switched to B → "Step 0 / 3")
+- PROBE 4: Entity selector not disabled at rest ✅
+
+**Full suite regression:** 105 pass, 1 fail —
+`demo-trajectory-mode3.spec.ts G2/AC-1` (`recompute-badge` never visible).
+Confirmed pre-existing (predates G1). Bug issue filed: #1007.
+
+**Step 4 verdict: PASS**
+
+---
+
 *Intent document version: 2026-06-16. Sprint entry EL-approved 2026-06-16. No ADR
 required — bug fixes only; ADR-016 entity scope (GRC/JOR/EGY/ZMB) provides context
 for #961 entity list. Implementing agent: Frontend Architect Agent. Kryptonite
