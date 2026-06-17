@@ -14,7 +14,7 @@ prerequisite-sources:
 # Implementation Intent Template — WorldSim
 
 > **How to use this template:**
-> Copy this file to `docs/process/intents/ADR-NNN-YYYY-MM-DD-short-name.md` before
+> Copy this file to `docs/process/intents/M{N}-{G-suffix-or-ADR-NNN}-{YYYY-MM-DD}-{short-name}.md` before
 > implementation begins. The intent document is the contract the implementation must satisfy
 > and the specification the QA Lead writes tests from.
 >
@@ -167,8 +167,8 @@ bounded — this section cannot be left empty or marked N/A.]
 
 **QA Lead:** [Agent name — typically QA Lead Agent]
 **Test authorship deadline:** Before any implementation PR is opened
-**Test file location:** [e.g., `frontend/src/__tests__/feature-name.spec.ts` or
-`backend/tests/test_feature_name.py`]
+**Test file location:** [Playwright E2E: `frontend/tests/e2e/m{N}-g{N}-{short-name}.spec.ts`
+Backend pytest: `backend/tests/test_m{N}_g{N}_{short_name}.py`]
 **Relevant ADR acceptance criteria:** [Reference AC-1 through AC-N from Section 4 above]
 
 **QA Lead acknowledgment:**
