@@ -3,17 +3,17 @@ name: m14-g3-sprint-entry
 type: sprint-entry
 milestone: M14 — Methodology Publication and External Validation
 sprint-group: G3
-status: Filed — awaiting EL approval before implementation begins
+status: EL Approved — 2026-06-17
 authored-by: PM Agent
 authored-date: 2026-06-17
-el-approved: false
+el-approved: 2026-06-17
 release-branch: release/m14
 sop-reference: docs/process/sprint-planning-sop.md
 ---
 
 # Sprint Entry — M14, G3: ADR-016 Backend (Source Registry + Data-Quality + Initial-State)
 
-**Status:** Filed — awaiting EL approval before implementation begins
+**Status:** EL Approved — 2026-06-17
 **Date authored:** 2026-06-17
 **Release branch:** `release/m14`
 **Sprint plan:** `docs/process/sprint-plans/m14-sprint-plan.md` (EL Approved 2026-06-16)
@@ -159,7 +159,7 @@ confidence. Here is our source." G4 displays it; G3 makes it queryable.
 
 | Group | ADR required | ADR status | Implementation may begin? |
 |---|---|---|---|
-| G3 | ADR-016 — Scenario Grounding Architecture | **Accepted 2026-06-16 (PR #967)** | **Yes — after EL approves this entry document and QA test file is authored** |
+| G3 | ADR-016 — Scenario Grounding Architecture | **Accepted 2026-06-16 (PR #967)** | **Yes — EL approved 2026-06-17; QA tests filed PR #1011** |
 
 **Implementation sequencing for G3:**
 
@@ -202,7 +202,12 @@ covered the M13-exit → G1-open window. This sweep covers the G1-exit → G3-op
 
 ## EL Approval Record
 
-**EL approval:** Pending
+**EL approval:** 2026-06-17
 
-> {EL approval statement — to be filled at approval time}
-> — @PublicEnemage ({date})
+> G3 sprint entry approved. All five entry invariants satisfied: release branch exists,
+> CI trigger verified, sprint plan EL-approved, ADR-016 Accepted, intent document filed,
+> QA tests filed (PR #1011). DA review complete — QA tests confirmed schema-correct against
+> ADR-016 API contract; one open item (value field type) flagged for CE to resolve at Step 3.
+> Implementation may begin. Chief Engineer Agent may open the G3 implementation PR targeting
+> `release/m14` with branch name `feat/m14-g3-{description}`.
+> — @PublicEnemage (2026-06-17)
