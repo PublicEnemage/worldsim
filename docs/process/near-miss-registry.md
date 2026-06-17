@@ -2334,6 +2334,56 @@ deficiency and a merge gate configuration gap.
 
 ---
 
+## NM-045 — AC-3 E2E Test Passed on Generic Regex Fallback; Source Citation Field Name Mismatch Reached BPO Validate Undetected (Reactive)
+
+**Date:** 2026-06-17
+**Milestone:** M14 — G4 ADR-016 Frontend
+**Detected by:** Business PO at Step 5 Validate (live application observation)
+**Severity:** High — the Grounding strip rendered without source institution names, silently failing Persona 2's P-6 negotiating leverage without any error or visible signal
+
+### What happened
+
+G4 implemented the Grounding strip (ADR-016 Component 2) with a field name mismatch between the frontend `GroundingIndicator` type and the `/initial-state` API endpoint:
+
+- The API contract (`api_contracts.yml §GET /scenarios/{id}/initial-state`) specifies field names `source` and `vintage` on each `InitialStateIndicator` object.
+- The backend (`grounding.py`) correctly implements `InitialStateIndicator` with `source` and `vintage`.
+- The frontend `GroundingIndicator` type (`types.ts`) declared `source_institution` and `data_vintage` — the field names used by the *separate* `/data-quality` endpoint's `DataQualityFramework` model.
+- `GroundingStrip.tsx` built citation strings from `ind.source_institution` and `ind.data_vintage`, both `undefined` at runtime.
+- Result: every indicator row rendered as `"[display_name]: [value] [unit] · T{N}"` — tier label only; source institution (e.g., "CBJ") and vintage (e.g., "2023-Q4") silently absent.
+
+The Step 4 E2E test for AC-3 used a generic regex fallback `/[·•]\s*\S/` to detect "a citation-like token." This regex matched `· T2` (the tier separator + tier number), passing the test without detecting the missing institution name. The Step 4 self-verify verdict recorded "CBJ citation present ✅" — based on the E2E test result, not direct observation.
+
+The defect reached BPO Step 5 Validate with 9/9 E2E tests green.
+
+### What was at risk
+
+The P-6 negotiating leverage specified in the intent document (§2) required:
+> "The model uses Jordan's reserve coverage as reported by the Central Bank of Jordan — 7.1 months as of Q4 2023. That figure is Tier 2 confidence — observed data, not synthetic. If the creditor side uses a different figure, they need to produce their source. Here is ours."
+
+Without "CBJ" and "2023-Q4" in the strip, this argument was unavailable from the screen. The tool would have shipped with a Grounding strip that displays values but not provenance — precisely the information Persona 2 needs for an input challenge response. The silent failure (no error message, no blank field, just missing citation) would have been indistinguishable from a strip with no citations available.
+
+### What caught it
+
+Business PO Validate step (Step 5) — live application observation. The BPO observed that the Grounding strip text did not contain "CBJ" or "IMF", read the component source (`GroundingStrip.tsx`), and identified the field name mismatch against the API response and the `api_contracts.yml` contract. The rejection artifact (REJECT-001) was filed before any remediation.
+
+This was **not caught by the process** until Step 5. Step 4 (Verify) should have detected it. The gap is in the E2E test assertion design.
+
+### Process improvement
+
+**Immediate fix (REJECT-001 remediation):**
+1. `frontend/src/types.ts` — `GroundingIndicator`: `source_institution` → `source`, `data_vintage` → `vintage`
+2. `frontend/src/components/GroundingStrip.tsx` — `IndicatorRow`: `ind.source_institution` → `ind.source`, `ind.data_vintage` → `ind.vintage`
+3. `frontend/tests/e2e/m14-g4-adr016-frontend.spec.ts` — AC-3 test: remove regex fallback; assert string presence of institution name directly (e.g., `"CBJ"` or `"IMF"`)
+
+**Structural improvement — E2E test assertion design:**
+When an intent document AC specifies a concrete value that must appear in the UI (a source institution name, a specific text string), the E2E test assertion must assert that value by **string match** — not by character class or structural regex. A regex that matches a tier separator `·` is not an assertion that "CBJ" appears. Tests must encode the same specificity as the intent document's observable application state.
+
+**New rule** (logged here pending sprint exit): Any AC that names an expected string value (an institution name, verbatim text) must assert that string verbatim in the test. Generic structural assertions (middle-dot present, non-empty text node) may supplement but must not substitute for named-value assertions. QA Lead is responsible for enforcing this at test authorship time (Step 2).
+
+**Data Architect loop-in:** The EL required Data Architect review of this defect (2026-06-17). Data Architect confirmed: the API contract is authoritative and correct; no schema drift between contract and backend implementation; both endpoints correctly use their respective field names. The fault was exclusively in the frontend type definition copying the wrong endpoint's field names. REJECT-001 documents the DA review requirement and verdict.
+
+---
+
 ## Registry Maintenance
 
 ### How to add an entry

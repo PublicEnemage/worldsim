@@ -92,13 +92,15 @@ export interface DataQualityResponse {
 }
 
 // ADR-016 Component 2 — Initial state (Grounding Strip) response
+// Field names match /initial-state (api_contracts.yml): `source` + `vintage`.
+// Do not use source_institution/data_vintage here — those are /data-quality fields.
 export interface GroundingIndicator {
   name: string;
   display_name: string;
   value: number | null;
   unit: string | null;
-  source_institution: string | null;
-  data_vintage: string | null;
+  source: string | null;
+  vintage: string | null;
   confidence_tier: number | null;
   is_synthetic: boolean;
 }
