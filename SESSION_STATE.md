@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-16 (G1 sprint entry document EL Approved 2026-06-16 (PR #996). Intent doc + QA tests BLOCKING before G1 implementation PR opens. docs/insights-log.md created — pre-GitHub inbox, PM Agent HORIZON obligation added to CLAUDE.md (PR #995). M14 sprint plan EL approved (PR #992). Milestone planning panel complete — M15–M18 defined; demo arc through Demo 7; 17 issues reallocated; 5 new issues (#986–#990).)**
+**Last updated: 2026-06-16 (ADR-015 Accepted — EL decisions recorded (PR #998); #997 filed (Demo 5 scenario scope constraint). G1 sprint entry EL Approved (PR #996). docs/insights-log.md created (PR #995). M14 sprint plan EL approved (PR #992). Milestone planning panel complete — M15–M18 defined.)**
 **Current milestone:** M14 — Methodology Publication and External Validation (GitHub Milestone 15)
 **Previous milestone:** M13 — Political Economy and Instrument Credibility (formally closed 2026-06-15; release/m13 → main merged by EL; #264 closed)
 
@@ -87,7 +87,7 @@
 
 **Wave structure (EL decision 2026-06-15):**
 - **Wave 1 — COMPLETE:** ADR-016 (Scenario Grounding Architecture) — Accepted 2026-06-16 (PR #967)
-- **Wave 2:** ADR-015 (Evidence Thread Architecture) — EL acceptance required, then implementation
+- **Wave 2:** ADR-015 (Evidence Thread Architecture) — ✅ ACCEPTED 2026-06-16 (PR #998); implementation scope: Components 1, 2, 3 (M14); Component 4 deferred to M15
 
 **Current state:**
 
@@ -100,7 +100,7 @@
 | ADR-016 entity scope | GRC, JOR, EGY, ZMB (EL decision 2026-06-16) | — |
 | ADR-016 Component 3 | Deferred to M15 (EL decision 2026-06-16) | — |
 | ADR-016 IC-6 mitigation | Choropleth header label in M14 (EL decision 2026-06-16) | Part of G4 |
-| ADR-015 — Evidence Thread Architecture | Proposed | **EL acceptance is Wave 2 gate** — review §Decisions Required in ADR-015 |
+| ADR-015 — Evidence Thread Architecture | ✅ ACCEPTED 2026-06-16 (PR #998) | 6 decisions resolved; Components 1–3 in M14 scope; Component 4 → M15; Demo 5 script constraint → #997 |
 | M14 sprint plan | ✅ **EL APPROVED 2026-06-16** — `docs/process/sprint-plans/m14-sprint-plan.md` | Sprint entry document required per group before implementation PR opens |
 | release/m14 branch | ✅ Cut 2026-06-16 from main | Ready for feature PRs — sprint entry document required first |
 | G1 sprint entry document | ✅ Filed 2026-06-16 — `docs/process/sprint-plans/m14-g1-sprint-entry.md` (PR #993) | **EL Approved 2026-06-16** (PR #996); intent doc + QA tests BLOCKING before implementation PR opens |
@@ -530,6 +530,7 @@ CI hotfix: NM-035 filed; `ci.yml` PR trigger updated to include `release/m*` (PR
 | #6 | governance: restore branch protection bypass restriction | G7 | EL-action |
 | #988 | governance: Goodhart's Law mitigation — TSC monitoring framework | G7 | Filed 2026-06-16 |
 | #989 | docs: onboarding documentation for global south finance ministry analysts | G7 | Filed 2026-06-16 |
+| #997 | Demo 5 scenario script constraint: challenges must be answerable from ADR-015 Components 1–3 | G8 | EL acknowledgment 2026-06-16; closes when Demo 5 script reviewed against constraint |
 
 ---
 

@@ -1,7 +1,7 @@
 ---
 name: ADR-015-model-legibility-architecture
 type: architecture-decision-record
-version: Proposed
+version: Accepted
 phase0-encoded: true
 authored: 2026-06-15
 ---
@@ -30,7 +30,7 @@ authored: 2026-06-15
 
 ## Status
 
-`Proposed`
+`Accepted`
 
 ---
 
@@ -38,7 +38,7 @@ authored: 2026-06-15
 
 **Standards Version:** 2026-06-15 (CLAUDE.md revision date; CODING_STANDARDS.md current at this date)  
 **Valid Until:** M15 kickoff, or any PR that modifies Zone 1D row structure, the assumption surface, or the cross-examination mode  
-**License Status:** `PROPOSED` — awaiting EL resolution of 6 pre-implementation decisions (listed in §Decisions Required)
+**License Status:** `ACCEPTED` — EL decisions recorded 2026-06-16 (see §Pre-Acceptance Panel Deliberation and §EL Decisions below). M14 implementation scope: Components 1, 2, 3. Component 4 deferred to M15.
 
 **Panel:**
 - Architect Agent (R — author)
@@ -393,4 +393,177 @@ The PMM interpretation anchor (Decision 3) will require Chief Methodologist vali
 
 ---
 
-*ADR-015 authored 2026-06-15. Phase 0 encoded. Evidence base: `docs/demo/m14/reviews/2026-06-15-ux-legibility-audit-minister-exercise.md`. Backlog entry: ARCH-009. Template version: 2026-06-09.*
+## Pre-Acceptance Panel Deliberation — 2026-06-16
+
+**Convened by:** PM Agent (EL directive 2026-06-16)
+**Purpose:** Deliberate on Decisions 2–6 from §Decisions Required and produce consensus recommendations for EL acceptance. Decision 1 (step counter bug) was resolved by the G1 sprint entry (EL-approved 2026-06-16, PR #996) prior to this deliberation.
+
+**Panel composition:**
+
+| Decision | Agents activated |
+|---|---|
+| D2 — Ecological directionality | Chief Methodologist, Ecological Economist, Architect Agent |
+| D3 — PMM interpretation anchor | Chief Methodologist, Business PO |
+| D4 — Political Feasibility Zone 1D row | Political Economist, UX Designer Agent, Architect Agent, Frontend Architect Agent |
+| D5 — Cross-examination scope for M14 | Geopolitical Analyst, Business PO, Customer Agent, Chief Methodologist |
+| D6 — Landing orientation | Business PO, Customer Agent, UX Designer Agent |
+
+---
+
+### Decision 2 — Ecological Directionality Convention
+
+**Chief Methodologist: CHALLENGE → Option A (M14), with M15 mandate for Option B**
+
+The Greece and Hormuz ecological TERMINAL alerts arise from structurally different physical breach mechanisms — one crosses a planetary boundary by exceeding it (emissions overshoot), the other approaches a floor by depleting below it (resource drawdown). Treating these identically at the schema level is a calibration integrity issue: the composite score directionality embeds a model assumption that currently has no explicit documentation trail.
+
+Option B is methodologically correct. However, Option B requires schema changes to `simulation_state.yml`, a database migration, and revised composite score computation logic — scope exceeding M14 capacity given the evidence thread architecture itself is the M14 deliverable. Option A — explicit directional annotation in the L0 basis thread — surfaces the ambiguity rather than hiding it: `[Ecological 1.11 · T3 · ↑ = approaching boundary · pre-cal]`. The annotation makes the convention visible and challengeable, which is honest, even if the underlying schema does not yet distinguish the two breach mechanisms.
+
+Recommendation: adopt Option A for M14 with a forward obligation — Option B schema-level distinction is a blocking prerequisite for the Ecological framework earning a confidence tier above T3. File a GitHub issue for M15.
+
+**Ecological Economist: CHALLENGE → Option A (M14), Option B condition flagged**
+
+The two TERMINAL ecological scenarios represent genuinely different planetary boundary dynamics: transgression of an absolute ceiling (emissions → climate tipping) versus depletion of a resource stock (freshwater, biodiversity). Collapsing these into a single directionality convention obscures information that is ecologically significant. A finance minister assessing ecological risk needs to know which type of boundary is at risk — because the policy responses differ entirely.
+
+Support for Option A as the M14 decision on scope grounds, with one condition: the L0 directional annotation must specify the *type* of ecological breach in human-readable terms, not just a directional arrow. `[↑ = approaching planetary ceiling — climate]` is acceptable. `[↑ = approaching breach]` is not — it conflates both types. The annotation text must distinguish boundary type even where the schema cannot yet. This is achievable in M14 without schema changes.
+
+Forward obligation concurred with Chief Methodologist: Option B as M15 scope item.
+
+**Architect Agent: Option A (M14); Option B as M15 issue**
+
+Option B requires a new field (e.g., `ecological_breach_direction: "ceiling" | "floor"`) in `simulation_state.yml`, a new column or JSONB key in the database, and changes to the composite score computation path — not a display-layer change. M14 bandwidth is consumed by ADR-015's four components; Option B competes directly with G5.
+
+Option A is a frontend annotation change: the L0 annotation template for Ecological rows includes a breach-type label derived from the scenario fixture metadata, which already distinguishes Greece ecological from Hormuz ecological at the scenario level. This is implementable as a mapping from scenario/fixture to breach type label without schema changes.
+
+**Panel consensus on Decision 2:** Option A for M14. Directional annotation must specify breach type (ceiling vs. floor) in human-readable text — not only a directional arrow. Option B schema distinction filed as M15 issue before G5 implementation begins.
+
+---
+
+### Decision 3 — PMM Interpretation Anchor
+
+**Chief Methodologist: Commitment conditional on scope clarity**
+
+The PMM requires a precisely authored interpretation anchor — what does 0.5 mean in policy terms? What does 1.0 mean? What does 1.5 mean? These thresholds represent policy regime positions derived from the calibration cases (primarily IMF programme outcomes, 2000–2020). Commitment to file this anchor as a G6 parallel deliverable is given *if* the anchor is scoped as a one-page policy language document defining: (1) the neutral point and its policy meaning, (2) the upper and lower constraint thresholds, (3) what "pre-calibration" means for users who encounter it.
+
+If the anchor text is expected to carry formal calibration validation against historical cases, that is M15 scope — it requires the backtesting infrastructure to run the PMM against the Greece and Jordan cases and verify the threshold interpretations hold. For M14, the anchor can be authoritative methodology text without full backtesting validation, with a disclosure that backtesting validation is in progress.
+
+Recommendation: Chief Methodologist files interpretation anchor as G6 deliverable (policy language only, no backtesting validation). PMM annotation carries `· pre-cal` until the anchor is filed. Once filed, the L0 annotation is updated to include the anchor reference.
+
+**Business PO: Support Option A with pre-calibration fallback**
+
+For Demo 5, a PMM annotation that reads `[T3 composite · pre-cal — interpretation anchor pending]` is defensible and honest. The ministry analyst can say: "The PMM shows overall macro constraint — we're at the stage where the calibration basis is documented but not yet fully backtested. We can describe what the score direction means in policy terms." This is a stronger Demo 5 position than false precision.
+
+The key Demo 5 requirement is that the PMM label clearly discloses its pre-calibration status — so that a Demo 5 participant who challenges "what does 0.87 mean exactly?" gets an honest answer: "It means the macro environment is moderately constrained — we're completing the calibration documentation."
+
+**Panel consensus on Decision 3:** Chief Methodologist files PMM interpretation anchor as G6 parallel deliverable (policy language, no backtesting validation required for M14). PMM annotation carries `[T3 composite · pre-cal]` until filed. Once filed, annotation is updated to include the anchor reference. Backtesting validation of anchor thresholds is M15 scope.
+
+---
+
+### Decision 4 — Political Feasibility as Zone 1D Fifth Row
+
+**Political Economist: CHALLENGE → Option B (strong)**
+
+`programme_survival_probability` is the most direct output of the political economy module — the indicator that answers "will this programme survive the political environment it's being imposed on?" Placing it in Zone 2 (a drawer, requiring user interaction) means that in the reactive entry state, the most politically critical signal is invisible to the minister's analyst unless she opens a panel. This defeats the central purpose of the political economy module in the negotiating room context.
+
+ADR-013 accepted the political economy module specifically because programme feasibility is a primary mission output — not a secondary analytical note. Relegating the module's primary output to Zone 2 is an architectural contradiction. Option C is not acceptable on mission grounds.
+
+Between Options A and B: if ADR-008 has an "expanding Zone 1D is permitted" clause, as referenced in §Component 3, Option B is the correct path. Filing a formal ADR-008 amendment for adding one conditional row is process overhead disproportionate to the scope of the change.
+
+**UX Designer Agent: Option B, with implementation constraints**
+
+The "instruments always visible" governing premise (CLAUDE.md §UX Architectural Commitments, Premise 2) means primary mission outputs must be in Zone 1. The question is whether a fifth row violates ADR-008 or merely extends it.
+
+ADR-008 defines Zone 1D as "current position across four measurement frameworks." `programme_survival_probability` is not a fifth measurement framework — it is an output of the political economy module most analogous to a cross-framework feasibility index. Its proper categorization is a sub-indicator of the Governance framework's feasibility dimension, not an independent fifth framework. ADR-015 Component 3 positions it as a conditional political economy sub-row beneath the Governance framework row — architecturally within ADR-008's existing authority. No ADR-008 amendment required.
+
+Implementation constraint: the sub-row must not increase Zone 1D total allocated height beyond what fits at 1280×800 without scroll. Frontend Architect Agent must pixel-measure before implementation.
+
+**Architect Agent: Option B, with documentation**
+
+ADR-008 §Zone 1D contains the clause: "The four framework rows represent the current state of each measurement axis. The row count is not architecturally fixed — framework expansion is permitted without amendment provided the instrument cluster's total allocated height is maintained." This clause explicitly anticipates expansion. Adding `programme_survival_probability` as a conditional Governance sub-row falls within this authority. No ADR-008 amendment is required. The ADR-015 acceptance record notes that the Architect Agent confirmed the ADR-008 expansion clause applies, closing the audit trail.
+
+**Frontend Architect Agent: Option B; low-risk implementation**
+
+The `political_economy_module_enabled` flag is already present in the scenario state object consumed by Zone 1D. The row is a new DOM element with a conditional tied to that flag. No layout refactor. Height measurement is required to confirm the additional row fits at 1280×800 — this is a one-hour implementation task, not a scope risk.
+
+**Panel consensus on Decision 4:** Option B — change is within existing ADR-008 authority (expansion clause applies). No formal ADR-008 amendment required. `programme_survival_probability` is positioned as a conditional political economy sub-row within Governance (Zone 1D), not as an independent fifth framework row. Frontend Architect Agent must pixel-measure Zone 1D height at 1280×800 before implementation.
+
+---
+
+### Decision 5 — Cross-Examination Surface Scope for M14
+
+**Geopolitical Analyst: CHALLENGE → Option B, conditional**
+
+The two-interaction minimum from challenge to evidence (P-4) requires the evidence chain to be traversable, not merely visible. L0 annotations (Component 1) make the tier and source visible at zero interaction. The assumption surface (Component 2) makes inputs visible at zero interaction. `programme_survival_probability` in Zone 1D (Component 3) makes political feasibility visible at zero interaction.
+
+Cross-examination mode (Component 4) is the mechanism for reaching composite decomposition — seeing what indicators compose a framework score inline. Under the Demo 5 north star scenario (Zambian Deputy Minister challenged on `programme_survival_probability` and conditionality), Components 1+2+3 together enable the analyst to respond: she sees the survival probability (Component 3), the conditionality assumption (Component 2), and the confidence tier (Component 1). She does not need to decompose the Governance composite for that specific challenge.
+
+Conditional: Option B is acceptable *only if* the Demo 5 facilitator is briefed that cross-examination mode is not available, and the Demo 5 scenario script is designed around challenges answerable from Components 1+2+3. If the Demo 5 scenario script includes a challenge to a composite framework score ("your Governance composite is wrong — what drives it?"), the analyst cannot decompose it without Component 4. This is a Demo 5 exposure the EL must accept or mitigate.
+
+**Business PO: Option B (Components 1, 2, 3)**
+
+The Demo 5 north star scenario — Zambian ministry responds to a conditionality and political feasibility challenge — is satisfiable with Components 1, 2, and 3. The specific argument in P-7 (`programme_survival_probability` + conditionality assumption + survival basis) does not require cross-examination mode.
+
+Component 4 is the most complex to implement, the most complex to test, and the most novel interaction pattern (a mode transformation of the primary viewport). Adding it to M14 scope risks Demo 5 timeline and introduces a new interaction state not yet user-tested. Option C is insufficient: the assumption surface without basis threads (Component 1) means the analyst cannot cite the confidence tier of the outputs she's defending. "The IMF BOP data we used for reserve coverage is Tier 2 — citable directly" requires Component 1 to be visible.
+
+**Customer Agent: Option B — Layer 3 quality assessment**
+
+Components 1, 2, and 3 together deliver the most significant improvement in output interpretability per implementation scope unit:
+
+- Component 1 (L0 annotations): converts every Zone 1D score from "number" to "number with provenance." A number without a source is Layer 2. A number with its tier and source visible is Layer 3.
+- Component 2 (assumption surface): converts the trajectory from "shape" to "shaped by these inputs" — Layer 3 for the input side.
+- Component 3 (`programme_survival_probability`): converts the political economy module from "enabled flag" to "primary output visible in primary viewport" — Layer 3 for political feasibility.
+
+Component 4 (cross-examination mode) is a Layer 3 depth feature — it enables decomposition of composite scores. The right M15 deliverable: once L0 annotations are in place, cross-examination mode becomes the natural next depth capability.
+
+**Chief Methodologist: Option B, with PMM caveat**
+
+Supporting Components 1, 2, 3 for M14. Component 1 partial — the PMM annotation is blocked on Decision 3. If the anchor is filed within G6 scope, the PMM annotation is complete. If not, the PMM row in Component 1 carries pre-calibration disclosure as specified in the Decision 3 consensus. This does not block delivery of Component 1 for the Financial, Governance, Development, and Ecological rows — those four rows can be fully annotated without the PMM anchor. The Ecological annotation additionally carries the breach-type label per Decision 2 consensus.
+
+**Panel consensus on Decision 5:** Option B — Components 1, 2, 3 for M14; Component 4 (cross-examination mode) deferred to M15. Geopolitical Analyst conditional noted and accepted by EL: Demo 5 scenario script must be designed around challenges answerable from Components 1+2+3; no composite score decomposition is scripted (issue #997 filed to track this constraint). Component 4 sprint entry to be filed at M15 kickoff.
+
+---
+
+### Decision 6 — Landing Orientation Scope
+
+**Business PO: Option C**
+
+Demo 5 will be facilitated — participants will not navigate from the bare landing state. The Demo 5 flow starts with a scenario already loaded (the Zambia scenario). #963 (G1, EL-approved) fixes the most visible trust issue — raw DB field names as selectable option text in the choropleth panel. That fix ships before Demo 5 by definition (G1 is the first group).
+
+Full landing orientation — what a user sees on first arrival with no scenario, how they understand what the tool does, how they navigate to scenario creation — is an information architecture question requiring UX design work beyond ADR-015's scope. It is the right opening question for M15 UX design. Option C is the correct disposition.
+
+**Customer Agent: Option C, with one addition**
+
+Supporting Option C. Addition: the G6c Zone 1A Phase 1 design thinking document should include a section on the landing/zero-state experience as a named deliverable, connecting the M14 design artifact to M15 implementation scope. With #961 (entity selector — G1) and #963 (choropleth labels — G1) both fixed, the Demo 5 flow (pre-loaded scenario → instrument cluster read → respond to challenge) is clean without requiring landing orientation work.
+
+**UX Designer Agent: Option C**
+
+Option A is out of scope for M14 on bandwidth grounds. Option B creates a Demo 5 risk if any participant attempts to navigate the tool independently. Option C is correct: fix the egregious display error (#963, G1) and defer the larger landing orientation architecture to M15. The G6c Zone 1A design thinking document is the correct forward trace — landing orientation design is part of the zero-state mode experience that G6c must address.
+
+**Panel consensus on Decision 6:** Option C. #963 (G1, EL-approved) fixes raw DB field names. Full landing orientation deferred to M15. G6c (Zone 1A Phase 1 design thinking document) to include landing/zero-state experience as a named section — this connects the M14 design artifact to the M15 implementation scope.
+
+---
+
+## EL Decisions — Recorded 2026-06-16
+
+All decisions below were resolved by the Engineering Lead on 2026-06-16 following the panel deliberation above. These decisions converted this ADR from Proposed to Accepted and bound the M14 implementation scope.
+
+**Decision 1 — Step counter bug prerequisite: RESOLVED**
+EL ruling: Bug #962 (G1, sprint entry EL-approved 2026-06-16, PR #996) satisfies this prerequisite. ADR-015 implementation is gated on G1 completion — no G5 implementation PR opens before #962 is merged.
+
+**Decision 2 — Ecological directionality convention: RESOLVED (Option A for M14)**
+EL ruling: Option A — explicit directional annotation specifying breach type (ceiling vs. floor) in human-readable text — is adopted for M14. The L0 annotation for Ecological rows must distinguish breach type: `[↑ = approaching planetary ceiling — climate]` not `[↑ = approaching breach]`. Schema-level Option B (field distinguishing ceiling vs. floor breach mechanism) is filed as an M15 issue before G5 implementation begins. The Ecological framework may not earn a confidence tier above T3 until Option B is implemented.
+
+**Decision 3 — PMM interpretation anchor: RESOLVED**
+EL ruling: Chief Methodologist files the PMM interpretation anchor as a G6 parallel deliverable — policy language document defining the neutral point, constraint thresholds, and pre-calibration disclosure language. Backtesting validation of anchor thresholds is M15 scope. Until the anchor is filed, the PMM row in Component 1 carries `[T3 composite · pre-cal]`. Once filed, the L0 annotation is updated to include the anchor reference. This does not block Component 1 delivery for the four framework rows (Financial, Governance, Development, Ecological).
+
+**Decision 4 — Political Feasibility as Zone 1D fifth row: RESOLVED (Option B)**
+EL ruling: Option B — change is within existing ADR-008 expansion clause authority ("The row count is not architecturally fixed — framework expansion is permitted without amendment provided the instrument cluster's total allocated height is maintained"). No formal ADR-008 amendment required. `programme_survival_probability` is positioned as a conditional Governance sub-row, not an independent fifth framework row. Frontend Architect Agent must pixel-measure Zone 1D height at 1280×800 before implementation begins and confirm the row fits without scroll.
+
+**Decision 5 — Cross-examination surface scope for M14: RESOLVED (Option B)**
+EL ruling: Option B — Components 1, 2, and 3 ship for M14. Component 4 (cross-examination mode, composite score decomposition) is deferred to M15. EL explicitly acknowledges the Geopolitical Analyst's conditional: the Demo 5 scenario script must be designed so that all anticipated counterparty challenges are answerable from Components 1+2+3 without requiring composite score decomposition. Issue #997 filed to track this constraint. Component 4 sprint entry to be filed at M15 kickoff.
+
+**Decision 6 — Landing orientation scope: RESOLVED (Option C)**
+EL ruling: Option C. Bug #963 (choropleth attribute selector raw DB field names — G1, EL-approved) is the M14 fix. Full landing orientation is deferred to M15. The G6c Zone 1A Phase 1 design thinking document must include a landing/zero-state experience section as a named deliverable, establishing the forward trace to M15 implementation scope.
+
+---
+
+*ADR-015 authored 2026-06-15. Phase 0 encoded. Accepted by Engineering Lead 2026-06-16. All six pre-implementation decisions resolved 2026-06-16 (see §Pre-Acceptance Panel Deliberation and §EL Decisions above). M14 implementation scope: Components 1, 2, 3. Component 4 deferred to M15 — sprint entry at M15 kickoff. Evidence base: `docs/demo/m14/reviews/2026-06-15-ux-legibility-audit-minister-exercise.md`. Backlog entry: ARCH-009. Template version: 2026-06-09.*
