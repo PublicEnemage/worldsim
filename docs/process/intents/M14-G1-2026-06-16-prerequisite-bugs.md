@@ -337,11 +337,77 @@ Confirmed pre-existing (predates G1). Bug issue filed: #1007.
 
 ---
 
+## 9. Step 5 — Validate (2026-06-17)
+
+**Business PO:** Business Product Owner Agent
+**Date:** 2026-06-17
+**Protocol:** `docs/process/acceptance-protocol.md §1.1 — Frontend Feature`
+**Viewport:** 1440×900
+
+### Customer Agent Layer 3 Assessment (precondition — Persona 2 capability)
+
+**Trigger:** #963 modifies user-facing indicator labels (choropleth attribute selector).
+#962 modifies the step counter status display.
+
+| Fix | Layer 3 trigger | Assessment |
+|---|---|---|
+| #961 entity selector | N/A — form affordance, not an indicator output | N/A |
+| #962 step counter | Step label changed from "Step 0 / 3" to "Step 3 / 3 — Complete" | PASS — "Step 3 / 3 — Complete" is self-interpreting: temporal position + completion status, no mediation required |
+| #963 choropleth labels | Indicator label changed from `reserve_coverage_months` to "Reserve Coverage (months)" | PASS — attribute + unit are interpretable by Persona 2 without mediation; full threshold-level Layer 3 is carried by Zone 1B (ADR-014 G7 M13) already in production |
+
+**Customer Agent Layer 3 verdict: PASS**
+
+### BPO Validation Observations
+
+**Method:** Playwright at 1440×900 (`tests/e2e/bpo-validate-g1.spec.ts`), natural entry state (no
+developer shortcuts). Backend :8000, frontend dev server :5173. All four BPO probe tests pass.
+
+| Probe | Observable state observed | Result |
+|---|---|---|
+| BPO-1 | Entity selector opened via "Scenarios" button → `data-testid="entity-selector"` visible; options = `['GRC','JOR','EGY','ZMB']`; elapsed 1977ms | ✅ |
+| BPO-2 | Selected ZMB, filled name, submitted create form → API response `configuration.entities = ["ZMB"]` (no "GRC") for scenario a8c7899e | ✅ |
+| BPO-3 | URL `/?scenario=caf708cf` (completed, 3 steps) → `data-testid="current-step-display"` = "Step 3 / 3 — Complete" in 1002ms; stability check after 1s = "Step 3 / 3 — Complete" | ✅ |
+| BPO-4 | Choropleth attribute selector: 1 non-entity select found; all 6 visible options have no underscore in label portion ("Economy Tier", "Gdp Usd Millions", "Income Group", etc.); `reserve_coverage_months` not present in default (no scenario) state — AC-6 PASS; AC-7 confirmed at Step 4 Verify | ✅ |
+
+### Passing Checklist (acceptance-protocol.md §1.1)
+
+- [x] Persona 2 reached entity selector (GRC/JOR/EGY/ZMB visible) in 1977ms at 1440×900 — within 90s P-4 ceiling
+- [x] Observable state from §3.1 is visually present: entity selector with 4 options; ZMB create produces ZMB in API; step counter shows "Step 3 / 3 — Complete" on URL load; choropleth labels underscore-free
+- [x] Silent failure absent: ZMB stored in API (not silently defaulting to GRC); step counter stable after 1s (not flickering to 0); labels are label-lookups (not raw key fallbacks with underscores)
+- [x] Customer Agent Layer 3: PASS (on record above)
+- [x] Kryptonite constraint (§5): PASS — entity selector, step counter, and choropleth labels all interpretable by Persona 2 without specialist mediation
+
+### North Star Check (P-7)
+
+The Zambian finance ministry analyst can open WorldSim, click "Scenarios", select "ZMB"
+from the entity dropdown, create a scenario, and have ZMB-calibrated instrument readings
+and threshold alerts — not Greece's. The step counter correctly places the analyst at
+their actual position in the scenario timeline. The choropleth attribute selector shows
+human-readable attribute names. These three fixes remove the barriers that prevented
+existing analytical capability from being applied to the correct entity.
+
+**This is the prerequisite for Demo 5 to demonstrate the tool to real external participants
+representing non-GRC entities.** P-7 PASS.
+
+### Verdict
+
+VALIDATED — 2026-06-17. Persona 2 (Finance Ministry Negotiator / Zambian ministry analyst
+archetype) reached all three observable application states at 1440×900 via natural entry
+navigation. Entity selector shows GRC/JOR/EGY/ZMB (1977ms); ZMB create produces
+`entities[0]==="ZMB"` in API (silent failure SF-1 absent); step counter shows "Step 3 / 3
+— Complete" on URL load in 1002ms and stable after 1s (SF-2 absent); choropleth labels
+underscore-free (SF-3 absent). Customer Agent Layer 3: PASS. Kryptonite check: PASS.
+
+**BPO Step 5 Verdict: ACCEPT**
+
+Issues closed by this validation: **#961, #962, #963**
+
+---
+
 *Intent document version: 2026-06-16. Sprint entry EL-approved 2026-06-16. No ADR
 required — bug fixes only; ADR-016 entity scope (GRC/JOR/EGY/ZMB) provides context
 for #961 entity list. Implementing agent: Frontend Architect Agent. Kryptonite
 constraint: PASS — all three fixes produce directly interpretable UI affordances
 with no specialist mediation required. See CLAUDE.md §Agent Execution Lifecycle for
-the five-step lifecycle this document gates. G1 closes when AC-1 through AC-7 pass
-in the running application and the Business PO validates all three observable
-application states.*
+the five-step lifecycle this document gates. G1 COMPLETE — all 5 steps pass; BPO
+Step 5 ACCEPT recorded 2026-06-17.*
