@@ -824,4 +824,146 @@ endpoints:
       - "confound_annotation is a required non-null field — null or empty is a validation failure."
       - "Human development indicator actuals receive no secondary-tier or optional treatment (AR-006-B-006)."
       - "Sparse observations: frontend must render broken lines for gaps, not interpolated segments."
+
+  # ---------------------------------------------------------------------------
+  # Grounding (ADR-016) — Component 1 and Component 2
+  # ---------------------------------------------------------------------------
+  - method: GET
+    path: "/entities/{entity_id}/data-quality"
+    summary: >
+      Pre-creation data quality preview for an entity and year.
+      Returns per-framework coverage metadata from entity_data_quality_coverage.
+      Returns HTTP 200 with empty frameworks list for entities not in the registry
+      (SF-1 guard — never 404 for an unknown entity_id).
+    auth: none
+    path_params:
+      entity_id:
+        type: string
+        description: "ISO 3166-1 alpha-3 entity identifier (e.g. JOR, ZMB, GRC, EGY)"
+    query_params:
+      - name: year
+        type: integer
+        required: true
+        description: "Scenario start year. Coverage rows are matched by coverage_year_from <= year AND (coverage_year_to IS NULL OR coverage_year_to >= year)."
+    response:
+      status: 200
+      body:
+        entity_id: {type: string, example: "JOR"}
+        year: {type: integer, example: 2024}
+        frameworks:
+          type: array
+          items:
+            framework:
+              type: string
+              description: "Measurement framework key (e.g. financial, human_development, ecological)"
+              example: "financial"
+            confidence_tier:
+              type: integer
+              description: "DATA_STANDARDS.md confidence tier 1–5 (1=highest, 5=lowest)"
+              example: 2
+            source_institution:
+              type: string
+              nullable: true
+              description: "Human-readable source name (e.g. IMF WEO / CBJ). Null when is_synthetic=true and no named source."
+            data_vintage:
+              type: string
+              nullable: true
+              description: "Vintage quarter string (e.g. 2024-Q1). Null when is_synthetic=true and no vintage."
+            is_synthetic:
+              type: boolean
+              description: "True if data was statistically inferred from comparable economies rather than observed."
+            synthetic_basis:
+              type: string
+              nullable: true
+              description: "Description of the inference basis (e.g. 'SADC comparable economies 2022-2023'). Non-null when is_synthetic=true."
+    db_reads: [entity_data_quality_coverage]
+    notes:
+      - "ADR-016 Component 1 — Entity Selection and Pre-Creation Data Quality Preview."
+      - "Source registry seeded for GRC, JOR, EGY, ZMB per ADR-016 §EL Decision 1. All other entity_ids return 200 with empty frameworks."
+      - "Both financial and human_development frameworks must have coverage rows for all four M14 entities at year=2024."
+
+  - method: GET
+    path: "/scenarios/{scenario_id}/initial-state"
+    summary: >
+      Source-cited step-0 indicators for a completed scenario.
+      Reads the step-0 snapshot state_data, parses SA-09 Quantity envelopes,
+      and joins to source_registry for source attribution and vintage.
+      Returns HTTP 200 with empty frameworks dict for scenarios with no
+      source-registry-linked step-0 data (SF-2 guard — never 404 for a
+      scenario that exists but has no grounding data).
+    auth: none
+    path_params:
+      scenario_id:
+        type: string
+        format: uuid
+        description: "Scenario UUID (FK to scenarios.scenario_id)"
+    query_params: []
+    response:
+      status: 200
+      body:
+        scenario_id: {type: string, format: uuid, example: "3fa85f64-5717-4562-b3fc-2c963f66afa6"}
+        entity_id:
+          type: string
+          description: "Primary entity ID extracted from step-0 state_data. Empty string for scenarios with no entity data."
+          example: "JOR"
+        step_0_year:
+          type: integer
+          nullable: true
+          description: "Calendar year of the step-0 snapshot timestep. Null if no snapshot exists."
+          example: 2023
+        frameworks:
+          type: object
+          description: >
+            dict[framework_key, {indicators: [IndicatorObject]}].
+            Empty dict ({}) for scenarios with no source-registry-linked data (SF-2).
+          additionalProperties:
+            type: object
+            properties:
+              indicators:
+                type: array
+                items:
+                  name:
+                    type: string
+                    description: "Attribute key from state_data envelope (e.g. reserve_coverage_months)"
+                    example: "reserve_coverage_months"
+                  display_name:
+                    type: string
+                    description: "Human-readable indicator label for UI display (e.g. 'Reserve coverage')"
+                    example: "Reserve coverage"
+                  value:
+                    type: number
+                    nullable: true
+                    description: "Numeric value (Decimal from SA-09 envelope, returned as float)"
+                    example: 7.1
+                  unit:
+                    type: string
+                    nullable: true
+                    description: "Unit string from SA-09 envelope (e.g. months, ratio)"
+                    example: "months"
+                  source:
+                    type: string
+                    nullable: true
+                    description: "source_registry.provider for the source_registry_id in the envelope. Null if no registry entry."
+                    example: "CBJ"
+                  vintage:
+                    type: string
+                    nullable: true
+                    description: "YYYY-QN derived from source_registry.coverage_end. Null if no registry entry."
+                    example: "2023-Q4"
+                  confidence_tier:
+                    type: integer
+                    description: "DATA_STANDARDS.md confidence tier 1–5 from the SA-09 envelope"
+                    example: 2
+                  is_synthetic:
+                    type: boolean
+                    description: "True if confidence_tier >= 3 (inferred or modeled data)"
+      status_404: "Scenario not found (scenario_id does not exist in scenarios table)"
+    db_reads: [scenarios, scenario_state_snapshots, source_registry]
+    notes:
+      - "ADR-016 Component 2 — Scenario Grounding Strip backend."
+      - "Step-0 snapshot is written by ScenarioSnapshotRepository.write_snapshot() during scenario run. Endpoint reads the first step=0 row ordered by id."
+      - "SA-09 envelope format: _envelope_version, value (str-Decimal), unit, variable_type, confidence_tier, observation_date, source_registry_id, measurement_framework. See quantity_serde.py."
+      - "source and vintage are derived from source_registry.provider and source_registry.coverage_end at read time — not stored in the state_data envelope."
+      - "Persona 2 north star indicator: reserve_coverage_months in the financial framework must have non-null source and vintage (AC-7). This is the specific citation Persona 2 uses in an IMF negotiation input challenge."
+      - "G4 frontend renders each indicator as: '[display_name]: [value] [unit] · [source · vintage · T{N}]' per ADR-016 §Component 2 UX-3."
       - "Authority: ARCH-REVIEW-006 AR-006-B-004/005/006; Issues #604, #605, #607."
