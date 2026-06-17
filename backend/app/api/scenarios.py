@@ -200,8 +200,8 @@ def _validate_create_request(req: ScenarioCreateRequest) -> None:
         errors.append("name must not be empty.")
 
     n_entities = len(req.configuration.entities)
-    if n_entities < 1 or n_entities > 5:
-        errors.append(f"entities must contain 1–5 entity IDs (got {n_entities}).")
+    if n_entities > 5:
+        errors.append(f"entities must contain 0–5 entity IDs (got {n_entities}).")
 
     n = req.configuration.n_steps
     if n < 1 or n > 100:
