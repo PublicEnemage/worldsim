@@ -249,6 +249,39 @@ test.describe("AC-3/AC-7: Grounding strip (JOR scenario fixture)", () => {
   }) => {
     if (!jorScenarioId) return;
 
+    // Route mock: inject a known /initial-state response so AC-3 is independent of
+    // source_registry seeding in the test environment. This directly tests what
+    // REJECT-001 fixed: GroundingStrip.tsx must read ind.source/ind.vintage
+    // (not ind.source_institution/ind.data_vintage). If the field names are wrong,
+    // the citation row will be blank even when the response has "source": "CBJ".
+    await page.route("**/api/v1/scenarios/*/initial-state**", (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          scenario_id: jorScenarioId,
+          entity_id: "JOR",
+          step_0_year: 2023,
+          frameworks: {
+            financial: {
+              indicators: [
+                {
+                  name: "reserve_coverage_months",
+                  display_name: "Reserve coverage",
+                  value: 7.1,
+                  unit: "months",
+                  source: "CBJ",
+                  vintage: "2023-Q4",
+                  confidence_tier: 2,
+                  is_synthetic: false,
+                },
+              ],
+            },
+          },
+        }),
+      }),
+    );
+
     await page.setViewportSize({ width: 1440, height: 900 });
     await page.goto(`/?scenario=${encodeURIComponent(jorScenarioId)}`);
     await waitForAppReady(page);
@@ -258,16 +291,12 @@ test.describe("AC-3/AC-7: Grounding strip (JOR scenario fixture)", () => {
     const strip = page.locator('[data-testid="grounding-strip"]');
     await expect(strip).toBeVisible({ timeout: 4_000 });
 
-    // Wait for the API response to populate the strip. The strip renders "Loading grounding
-    // data…" immediately, then replaces it with indicator rows once the /initial-state
-    // response arrives. Asserting before data arrives produces a false negative.
-    // Known institution names from the JOR /initial-state response (G3-seeded source_registry).
+    // Wait for the mocked response to populate the strip (replaces "Loading grounding data…").
     await expect(strip).not.toContainText("Loading grounding data", { timeout: 8_000 });
 
     const text = await strip.textContent();
-    // AC-3 requires at least one source institution name from the JOR /initial-state response.
-    // Assert by string match only — no generic regex fallback (NM-045: the fallback matched
-    // the tier separator "· T2" and masked a field name mismatch at REJECT-001).
+    // Assert by string match — no generic regex fallback (NM-045: the fallback matched
+    // the tier separator "· T2" and masked the field name mismatch that caused REJECT-001).
     const hasCitation =
       (text ?? "").includes("CBJ") ||
       (text ?? "").includes("IMF") ||
@@ -373,8 +402,10 @@ test.describe("AC-4: Parameter persistence display (completed scenario required)
     // Fiscal multiplier: a decimal number or "(not recorded)" per ADR-016 §EL Decision 4
     expect(/\d+\.\d+/.test(text) || text.includes("(not recorded)")).toBe(true);
 
-    // Base year: four-digit number in range 1900–2100, or "(not recorded)" if absent
-    expect(/\b(19|20|21)\d{2}\b/.test(text) || text.includes("(not recorded)")).toBe(true);
+    // Base year: four-digit number in range 1900–2100, or "(not recorded)" if absent.
+    // No \b word boundary — textContent() concatenates spans without separator, so "2023"
+    // appears as "year2023" where \b before "2" is absent ("r"→"2" are both \w).
+    expect(/(19|20|21)\d{2}/.test(text) || text.includes("(not recorded)")).toBe(true);
 
     // Entity code from the supported set (ADR-016 §EL Decision 1 scope)
     expect(
