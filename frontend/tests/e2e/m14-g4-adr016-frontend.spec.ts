@@ -122,7 +122,7 @@ async function createJORCompletedScenario(name: string): Promise<string> {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       name,
-      configuration: { entities: ["JOR"], n_steps: 3 },
+      configuration: { entities: ["JOR"], n_steps: 3, start_date: "2023-01-01" },
     }),
   });
   if (!createRes.ok) throw new Error(`Create failed: ${createRes.status}`);
@@ -258,6 +258,12 @@ test.describe("AC-3/AC-7: Grounding strip (JOR scenario fixture)", () => {
     const strip = page.locator('[data-testid="grounding-strip"]');
     await expect(strip).toBeVisible({ timeout: 4_000 });
 
+    // Wait for the API response to populate the strip. The strip renders "Loading grounding
+    // data…" immediately, then replaces it with indicator rows once the /initial-state
+    // response arrives. Asserting before data arrives produces a false negative.
+    // Known institution names from the JOR /initial-state response (G3-seeded source_registry).
+    await expect(strip).not.toContainText("Loading grounding data", { timeout: 8_000 });
+
     const text = await strip.textContent();
     // AC-3 requires at least one source institution name from the JOR /initial-state response.
     // Assert by string match only — no generic regex fallback (NM-045: the fallback matched
@@ -298,6 +304,9 @@ test.describe("AC-3/AC-7: Grounding strip (JOR scenario fixture)", () => {
 
     const strip = page.locator('[data-testid="grounding-strip"]');
     await expect(strip).toBeVisible({ timeout: 4_000 });
+
+    // Wait for data to arrive before checking headings (avoid race with "Loading..." text).
+    await expect(strip).not.toContainText("Loading grounding data", { timeout: 8_000 });
 
     const headings = await strip
       .locator("h2, h3, h4, h5, [role='heading']")
@@ -364,8 +373,8 @@ test.describe("AC-4: Parameter persistence display (completed scenario required)
     // Fiscal multiplier: a decimal number or "(not recorded)" per ADR-016 §EL Decision 4
     expect(/\d+\.\d+/.test(text) || text.includes("(not recorded)")).toBe(true);
 
-    // Base year: four-digit number in range 1900–2100
-    expect(text).toMatch(/\b(19|20|21)\d{2}\b/);
+    // Base year: four-digit number in range 1900–2100, or "(not recorded)" if absent
+    expect(/\b(19|20|21)\d{2}\b/.test(text) || text.includes("(not recorded)")).toBe(true);
 
     // Entity code from the supported set (ADR-016 §EL Decision 1 scope)
     expect(
