@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-16 (ADR-015 Accepted — EL decisions recorded (PR #998); #997 filed (Demo 5 scenario scope constraint). G1 sprint entry EL Approved (PR #996). docs/insights-log.md created (PR #995). M14 sprint plan EL approved (PR #992). Milestone planning panel complete — M15–M18 defined.)**
+**Last updated: 2026-06-16 (PR #999 merged — intent/test naming convention enforced: M{N}-G{N} prefix on intent docs and E2E tests; G1 intent filed at M14-G1-2026-06-16-prerequisite-bugs.md. ADR-015 Accepted — EL decisions recorded (PR #998); #997 filed (Demo 5 scenario scope constraint). G1 sprint entry EL Approved (PR #996). docs/insights-log.md created (PR #995). M14 sprint plan EL approved (PR #992). Milestone planning panel complete — M15–M18 defined.)**
 **Current milestone:** M14 — Methodology Publication and External Validation (GitHub Milestone 15)
 **Previous milestone:** M13 — Political Economy and Instrument Credibility (formally closed 2026-06-15; release/m13 → main merged by EL; #264 closed)
 
@@ -93,9 +93,9 @@
 
 | Item | Status | Next action |
 |---|---|---|
-| Bug #961 — GRC hardcoded in creation form | Filed 2026-06-15 | G1 — implement after sprint entry |
-| Bug #962 — step counter 'Step 0 / 8' | Filed 2026-06-15 | G1 — implement after sprint entry |
-| Bug #963 — choropleth raw DB field names | Filed 2026-06-15 | G1 — implement after sprint entry |
+| Bug #961 — GRC hardcoded in creation form | Filed 2026-06-15 | G1 — QA tests (Step 2) blocking before implementation PR opens |
+| Bug #962 — step counter 'Step 0 / 8' | Filed 2026-06-15 | G1 — QA tests (Step 2) blocking before implementation PR opens |
+| Bug #963 — choropleth raw DB field names | Filed 2026-06-15 | G1 — QA tests (Step 2) blocking before implementation PR opens |
 | ARCH-010 / ADR-016 — Scenario Grounding | ✅ ACCEPTED 2026-06-16 (PR #967) | G3/G4 implementation gated on sprint entry |
 | ADR-016 entity scope | GRC, JOR, EGY, ZMB (EL decision 2026-06-16) | — |
 | ADR-016 Component 3 | Deferred to M15 (EL decision 2026-06-16) | — |
@@ -103,7 +103,9 @@
 | ADR-015 — Evidence Thread Architecture | ✅ ACCEPTED 2026-06-16 (PR #998) | 6 decisions resolved; Components 1–3 in M14 scope; Component 4 → M15; Demo 5 script constraint → #997 |
 | M14 sprint plan | ✅ **EL APPROVED 2026-06-16** — `docs/process/sprint-plans/m14-sprint-plan.md` | Sprint entry document required per group before implementation PR opens |
 | release/m14 branch | ✅ Cut 2026-06-16 from main | Ready for feature PRs — sprint entry document required first |
-| G1 sprint entry document | ✅ Filed 2026-06-16 — `docs/process/sprint-plans/m14-g1-sprint-entry.md` (PR #993) | **EL Approved 2026-06-16** (PR #996); intent doc + QA tests BLOCKING before implementation PR opens |
+| G1 sprint entry document | ✅ Filed 2026-06-16 — `docs/process/sprint-plans/m14-g1-sprint-entry.md` (PR #993) | **EL Approved 2026-06-16** (PR #996); intent doc ✅ filed (PR #999); **QA tests BLOCKING** before implementation PR opens |
+| G1 intent document | ✅ Filed 2026-06-16 — `docs/process/intents/M14-G1-2026-06-16-prerequisite-bugs.md` (PR #999) | QA Lead must author `frontend/tests/e2e/m14-g1-prerequisite-bugs.spec.ts` (AC-1–AC-7) before G1 implementation PR opens |
+| Intent/test naming convention | ✅ Enforced 2026-06-16 (PR #999) | M{N}-G{N} prefix on intent docs and E2E tests — CLAUDE.md, intent-template.md, sprint-planning-sop.md, sprint-entry-template.md all updated |
 | M14 Exit Checklist | ✅ Filed 2026-06-16 — **#968** (closure gate: #843) | Tracks all M14 deliverables |
 | CI merge gate enforcement (#970) | ✅ CLOSED 2026-06-16 | `release-branch-ci-gate` Ruleset (ID 17751852) live — 6 required checks: `changes`, `lint`, `test-backend`, `playwright-e2e`, `compliance-scan`, `branch-naming`; `--admin` removed from SESSION_STATE merge rule |
 | Branch naming enforcement (#978) | ✅ CLOSED 2026-06-16 | `.github/workflows/branch-naming.yml` (PR #979); KI-003 filed (PR #980) |
@@ -172,6 +174,7 @@ All near-term issues dispositioned at HORIZON sweep 2026-06-13 — see G8 sprint
 
 | PR | Title | Target | Status |
 |---|---|---|---|
+| #999 ✅ | process(m14-g1): enforce M{N}-G{N} naming for intent docs and E2E tests; file G1 intent | release/m14 | Merged 2026-06-16 |
 | #980 ✅ | docs(process): KI-003 — GitHub Rulesets bootstrap problem for new required checks | release/m14 | Merged 2026-06-16 |
 | #979 ✅ | ci(branch-naming): enforce milestone-scoped branch names for release/m* PRs (#978) | release/m14 | Merged 2026-06-16 |
 | #977 ✅ | docs(m14-sprint-plan): add G6b — Path 2 design groundwork parallel group | release/m14 | Merged 2026-06-16 |
