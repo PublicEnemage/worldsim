@@ -287,7 +287,15 @@ pre-completed scenario to be available at test time. Options:
 The QA Lead should use approach (1) for independence from seed state.
 
 **QA Lead acknowledgment:**
-`[ ]` QA Lead: Tests for AC-1 through AC-7 authored and filed. [Date]
+`[x]` QA Lead: Tests for AC-1 through AC-7 authored and filed. 2026-06-16 (PR #1001)
+
+**Authorship notes:**
+- AC-1, AC-2, AC-3: guard on `entity-selector` testid (absent pre-implementation → no-op)
+- AC-4, AC-5: guard on `entity-selector` testid; fixture via API create + advance ×3 (approach 1)
+- AC-6: guard on `entity-selector` testid; underscore check scoped to label portion (before
+  first `(`) per #963 scope — raw attribute key names as labels, not unit metadata format
+- AC-7: guard on `entity-selector` testid; label-portion check consistent with AC-6
+- All tests are no-ops against pre-implementation code; activate when entity-selector lands
 
 ---
 
