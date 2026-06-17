@@ -25,7 +25,7 @@ sop-reference: docs/process/sprint-planning-sop.md
 
 **Wave structure (EL decision 2026-06-15):**
 - **Wave 1 — COMPLETE:** ADR-016 (Scenario Grounding Architecture) authored and Accepted (2026-06-16, PR #967)
-- **Wave 2:** ADR-015 (Evidence Thread Architecture) — EL acceptance followed by implementation
+- **Wave 2:** ADR-015 (Evidence Thread Architecture) — ✅ ACCEPTED 2026-06-16 (PR #998); implementation scope: Components 1, 2, 3 (M14); Component 4 deferred to M15
 
 ---
 
@@ -68,7 +68,7 @@ Run against `CLAUDE.md §Milestone 14` and `docs/roadmap/worldsim-roadmap.md §M
 | Goodhart's Law mitigation design | #988 | Tracked — G7 (filed 2026-06-16) |
 | Onboarding documentation for global south analysts | #989 | Tracked — G7 (filed 2026-06-16) |
 | ADR-016 (Scenario Grounding Architecture) | ARCH-010 | ✅ COMPLETE — Accepted 2026-06-16 |
-| ADR-015 (Evidence Thread Architecture) | ARCH-009 | Pending EL acceptance — Wave 2 gate |
+| ADR-015 (Evidence Thread Architecture) | ARCH-009 | ✅ COMPLETE — Accepted 2026-06-16 (PR #998); 6 decisions resolved; Components 1–3 M14; Component 4 → M15 |
 | Entity selector (IC-1) | #961 | Tracked — G1 |
 | Step counter fix (IC display) | #962 | Tracked — G1 |
 | Choropleth field name labels (IC-7 related) | #963 | Tracked — G1 |
@@ -115,7 +115,7 @@ Run against `CLAUDE.md §Milestone 14` and `docs/roadmap/worldsim-roadmap.md §M
 | Group | Issues | ADR gate | Wave | Description |
 |---|---|---|---|---|
 | G1 — Prerequisite bugs | #961, #962, #963 | None | Pre-Wave | Entity selector form fix, step counter, choropleth labels. Single PR. Low-risk, high Demo 5 impact. |
-| G2 — ADR-015 acceptance | — | ADR-015 EL review | Wave 2 gate | EL records acceptance of ADR-015 (same pattern as ADR-016). Six pre-implementation decisions in §Decisions Required. EL-action; PM Agent files the acceptance PR. |
+| G2 — ADR-015 acceptance | — | ✅ ADR-015 Accepted | ✅ COMPLETE | ✅ COMPLETE 2026-06-16 (PR #998) — EL accepted ADR-015; 6 pre-implementation decisions resolved; Components 1–3 M14 scope; Component 4 → M15. G5 unblocked. |
 | G3 — ADR-016 backend | — | ADR-016 ✅ | Wave 2 | Source registry population (GRC/JOR/EGY/ZMB), `/data-quality` endpoint, `/initial-state` endpoint. Data Architect updates `api_contracts.yml`. Chief Engineer implements. |
 | G4 — ADR-016 frontend | — | ADR-016 ✅; G3 partial (API must exist) | Wave 2 | Entity selector + data quality preview (Component 1), Grounding strip (Component 2), parameter persistence (Component 4), choropleth header label (IC-6 mitigation), Fidelity static header (IC-4 M14 mitigation). |
 | G5 — ADR-015 implementation | — | ADR-015 Accepted (G2); sprint entry required | Wave 2 | Evidence Thread Architecture: L0 basis annotations, L1 basis statement surface, L2 evidence chain. Gated on G2. |
