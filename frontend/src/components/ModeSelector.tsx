@@ -20,7 +20,11 @@ import { ModeTransitionModal } from "./ModeTransitionModal";
 type Mode = "MODE_1" | "MODE_2" | "MODE_3";
 const MODES: Mode[] = ["MODE_1", "MODE_2", "MODE_3"];
 
-export function ModeSelector() {
+interface ModeSelectorProps {
+  onWrapperClick?: () => void;
+}
+
+export function ModeSelector({ onWrapperClick }: ModeSelectorProps = {}) {
   const { mode, current_step, setMode } = useScenarioStepStore();
   const [pendingMode, setPendingMode] = useState<Mode | null>(null);
 
@@ -48,7 +52,8 @@ export function ModeSelector() {
     <div
       data-testid="mode-indicator"
       data-mode={mode}
-      style={{ position: "relative", display: "inline-flex", gap: 2 }}
+      onClick={onWrapperClick}
+      style={{ position: "relative", display: "inline-flex", gap: 2, cursor: onWrapperClick ? "pointer" : undefined }}
     >
       {MODES.map((m) => {
         const isActive = m === mode;

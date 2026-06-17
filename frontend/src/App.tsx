@@ -6,7 +6,6 @@ import EntityDetailDrawer from "./components/EntityDetailDrawer";
 import FidelityDashboard from "./components/FidelityDashboard";
 import GroundingStrip from "./components/GroundingStrip";
 import { ModeSelector } from "./components/ModeSelector";
-import { ModeIndicator } from "./components/ModeIndicator";
 import ScenarioParameters from "./components/ScenarioParameters";
 import { ScenarioIdentityHeader } from "./components/ScenarioIdentityHeader";
 import { ScenarioInstrumentCluster } from "./components/ScenarioInstrumentCluster";
@@ -249,18 +248,10 @@ export default function App() {
                   {selectedScenarioName}
                 </span>
               )}
-              <ModeSelector />
-              {/* Clickable ModeIndicator opens parameter persistence panel (ADR-016 Component 4) */}
-              <span
-                role="button"
-                tabIndex={0}
-                style={{ cursor: "pointer" }}
-                onClick={() => { setParamsOpen((v) => !v); setGroundingOpen(false); setPanelOpen(false); setFidelityOpen(false); }}
-                onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") setParamsOpen((v) => !v); }}
-                title="Show scenario parameters"
-              >
-                <ModeIndicator />
-              </span>
+              {/* ModeSelector wrapper click opens parameter persistence panel (ADR-016 Component 4) */}
+              <ModeSelector
+                onWrapperClick={() => { setParamsOpen((v) => !v); setGroundingOpen(false); setPanelOpen(false); setFidelityOpen(false); }}
+              />
               <button
                 data-testid="mode3-toggle"
                 onClick={() => setMode3Active((v) => !v)}
