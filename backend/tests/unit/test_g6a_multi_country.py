@@ -3,7 +3,8 @@ G6a — Multi-country scenario backend unit tests (Issue #754, #153).
 
 Tests:
   - _load_relationships: real DB edges loaded; synthetic Tier 4 injected for missing pairs
-  - _validate_create_request: entities list 1–5 enforcement
+  - _validate_create_request: entities list 0–5 enforcement (0 allowed since M14-G3 for
+    no-registry scenario fixture; upper bound 5 unchanged)
   - _compute_delta threshold_crossed field
   - ScenarioIdentityHeader entityIds → single "Entity:" vs plural "Entities:"
   - DeltaRecord threshold_crossed schema field
@@ -51,18 +52,19 @@ def test_validate_accepts_five_entities() -> None:
     _validate_create_request(_make_request(["GRC", "DEU", "FRA", "ITA", "ESP"]))
 
 
-def test_validate_rejects_zero_entities() -> None:
-    from fastapi import HTTPException  # noqa: PLC0415
-    with pytest.raises(HTTPException) as exc:
-        _validate_create_request(_make_request([]))
-    assert "1–5" in str(exc.value.detail)
+def test_validate_accepts_zero_entities() -> None:
+    # M14-G3: entities=[] is now valid — required for the no-registry scenario fixture
+    # used by AC-8 (SF-2 guard: /initial-state returns 200 + empty frameworks, not 404).
+    # Previously rejected; changed when the _validate_create_request lower bound was
+    # removed so that pre-G3 scenario payloads can be created without entity data.
+    _validate_create_request(_make_request([]))
 
 
 def test_validate_rejects_six_entities() -> None:
     from fastapi import HTTPException  # noqa: PLC0415
     with pytest.raises(HTTPException) as exc:
         _validate_create_request(_make_request(["A", "B", "C", "D", "E", "F"]))
-    assert "1–5" in str(exc.value.detail)
+    assert "0–5" in str(exc.value.detail)
 
 
 # ---------------------------------------------------------------------------
