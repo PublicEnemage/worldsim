@@ -4,7 +4,10 @@ import ChoroplethMap from "./components/ChoroplethMap";
 import DeltaChoropleth from "./components/DeltaChoropleth";
 import EntityDetailDrawer from "./components/EntityDetailDrawer";
 import FidelityDashboard from "./components/FidelityDashboard";
+import GroundingStrip from "./components/GroundingStrip";
 import { ModeSelector } from "./components/ModeSelector";
+import { ModeIndicator } from "./components/ModeIndicator";
+import ScenarioParameters from "./components/ScenarioParameters";
 import { ScenarioIdentityHeader } from "./components/ScenarioIdentityHeader";
 import { ScenarioInstrumentCluster } from "./components/ScenarioInstrumentCluster";
 import ScenarioControls from "./components/ScenarioControls";
@@ -73,6 +76,9 @@ export default function App() {
   const [secondScenarioId, setSecondScenarioId] = useState<string | null>(null);
   const [panelOpen, setPanelOpen] = useState(false);
   const [fidelityOpen, setFidelityOpen] = useState(false);
+  const [groundingOpen, setGroundingOpen] = useState(false);
+  const [paramsOpen, setParamsOpen] = useState(false);
+  const [activeScenarioDetail, setActiveScenarioDetail] = useState<ScenarioDetailResponse | null>(null);
   const [selectedEntityId, setSelectedEntityId] = useState<string | null>(null);
   // All active entities for the scenario — used by ScenarioIdentityHeader and choropleth highlight (#754)
   const [activeEntityIds, setActiveEntityIds] = useState<string[]>([]);
@@ -99,6 +105,8 @@ export default function App() {
     setActiveEntityIds([]);
     setActiveFiscalMultiplier(null);
     setMode3Active(false);
+    setActiveScenarioDetail(null);
+    setParamsOpen(false);
     writeStoredScenario({ id, name, totalSteps });
   };
 
@@ -153,6 +161,7 @@ export default function App() {
 
   // When a scenario is selected: fast-forward currentStep if already completed,
   // and extract the primary entity for the identity header + choropleth highlight (#744).
+  // Also stores the full detail for the ScenarioParameters panel (ADR-016 Component 4).
   useEffect(() => {
     if (!selectedScenarioId) return;
 
@@ -168,6 +177,8 @@ export default function App() {
         setActiveEntityIds(detail.configuration.entities ?? []);
         // Extract fiscal multiplier for Mode 2 display (Issue #746)
         setActiveFiscalMultiplier(detail.configuration.fiscal_multiplier ?? null);
+        // Store full detail for ScenarioParameters panel (ADR-016 Component 4)
+        setActiveScenarioDetail(detail);
       })
       .catch(() => {
         // Non-fatal — currentStep and activeEntityId stay at previous values
@@ -203,48 +214,77 @@ export default function App() {
         </label>
         <button
           className={`scenario-toggle-btn${panelOpen ? " scenario-toggle-btn--open" : ""}`}
-          onClick={() => { setPanelOpen((v) => !v); setFidelityOpen(false); }}
+          onClick={() => { setPanelOpen((v) => !v); setFidelityOpen(false); setGroundingOpen(false); setParamsOpen(false); }}
         >
           Scenarios {panelOpen ? "▲" : "▼"}
         </button>
         <button
           className={`scenario-toggle-btn${fidelityOpen ? " scenario-toggle-btn--open" : ""}`}
-          onClick={() => { setFidelityOpen((v) => !v); setPanelOpen(false); }}
+          onClick={() => { setFidelityOpen((v) => !v); setPanelOpen(false); setGroundingOpen(false); setParamsOpen(false); }}
           data-testid="fidelity-toggle"
         >
           Fidelity {fidelityOpen ? "▲" : "▼"}
         </button>
         {selectedScenarioId && (
-          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            {selectedScenarioName && (
-              <span style={{ fontSize: 13, opacity: 0.85, maxWidth: 160, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                {selectedScenarioName}
-              </span>
-            )}
-            <ModeSelector />
+          <>
             <button
-              data-testid="mode3-toggle"
-              onClick={() => setMode3Active((v) => !v)}
+              data-testid="grounding-strip-toggle"
+              onClick={() => { setGroundingOpen((v) => !v); setPanelOpen(false); setFidelityOpen(false); setParamsOpen(false); }}
               style={{
-                fontSize: 11,
-                padding: "3px 8px",
-                background: mode3Active ? "#8b5cf6" : "transparent",
-                color: mode3Active ? "#fff" : "#8b5cf6",
-                border: "1px solid #8b5cf6",
+                padding: "4px 10px",
+                fontSize: 13,
+                background: groundingOpen ? "rgba(255,255,255,0.25)" : "rgba(255,255,255,0.15)",
+                color: "#fff",
+                border: "none",
                 borderRadius: 4,
                 cursor: "pointer",
-                fontWeight: 600,
+                fontWeight: groundingOpen ? 600 : 400,
               }}
             >
-              Mode 3
+              Grounding {groundingOpen ? "▲" : "▼"}
             </button>
-            <ScenarioControls
-              scenarioId={selectedScenarioId}
-              totalSteps={selectedScenarioSteps}
-              initialStep={currentStep ?? 0}
-              onStepChange={handleStepChange}
-            />
-          </div>
+            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+              {selectedScenarioName && (
+                <span style={{ fontSize: 13, opacity: 0.85, maxWidth: 160, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                  {selectedScenarioName}
+                </span>
+              )}
+              <ModeSelector />
+              {/* Clickable ModeIndicator opens parameter persistence panel (ADR-016 Component 4) */}
+              <span
+                role="button"
+                tabIndex={0}
+                style={{ cursor: "pointer" }}
+                onClick={() => { setParamsOpen((v) => !v); setGroundingOpen(false); setPanelOpen(false); setFidelityOpen(false); }}
+                onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") setParamsOpen((v) => !v); }}
+                title="Show scenario parameters"
+              >
+                <ModeIndicator />
+              </span>
+              <button
+                data-testid="mode3-toggle"
+                onClick={() => setMode3Active((v) => !v)}
+                style={{
+                  fontSize: 11,
+                  padding: "3px 8px",
+                  background: mode3Active ? "#8b5cf6" : "transparent",
+                  color: mode3Active ? "#fff" : "#8b5cf6",
+                  border: "1px solid #8b5cf6",
+                  borderRadius: 4,
+                  cursor: "pointer",
+                  fontWeight: 600,
+                }}
+              >
+                Mode 3
+              </button>
+              <ScenarioControls
+                scenarioId={selectedScenarioId}
+                totalSteps={selectedScenarioSteps}
+                initialStep={currentStep ?? 0}
+                onStepChange={handleStepChange}
+              />
+            </div>
+          </>
         )}
       </header>
 
@@ -259,6 +299,12 @@ export default function App() {
       )}
 
       {fidelityOpen && <FidelityDashboard />}
+
+      {groundingOpen && selectedScenarioId && (
+        <GroundingStrip scenarioId={selectedScenarioId} />
+      )}
+
+      {paramsOpen && <ScenarioParameters detail={activeScenarioDetail} />}
 
       <main className="app-main" style={{ position: "relative" }}>
         {/* Scenario identity header — always visible when scenario active (Issue #744, GAP-02) */}
@@ -288,6 +334,7 @@ export default function App() {
         )}
 
         {/* Context layer — choropleth map (navigable context per CLAUDE.md UX commitment 2) */}
+        {/* IC-6 reference header rendered inside ChoroplethMap (ADR-016 §EL Decision 5) */}
         {showDelta ? (
           <DeltaChoropleth
             scenarioAId={selectedScenarioId}

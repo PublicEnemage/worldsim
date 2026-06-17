@@ -264,6 +264,25 @@ export default function ChoroplethMap({ attributeName, title, scenarioId, curren
       data-step={currentStep ?? 0}
       style={{ position: "relative", width: "100%", height: "100%" }}
     >
+      {/* IC-6 mitigation: ADR-016 §EL Decision 5 — verbatim text required, always visible */}
+      <div
+        style={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          right: 0,
+          zIndex: 10,
+          background: "rgba(15,31,51,0.82)",
+          color: "#8aa8c4",
+          fontSize: 11,
+          fontWeight: 600,
+          padding: "4px 12px",
+          letterSpacing: "0.04em",
+          pointerEvents: "none",
+        }}
+      >
+        Reference data — not scenario outputs
+      </div>
       <div ref={containerRef} style={{ width: "100%", height: "100%" }} />
       {error && (
         <div

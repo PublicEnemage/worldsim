@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
+import DataQualityPreview from "./DataQualityPreview";
 import type { ScenarioDetailResponse, ScenarioResponse } from "../types";
 
 const API_BASE = "http://localhost:8000/api/v1";
@@ -221,6 +222,7 @@ export default function ScenarioPanel({
               {creating ? "Creating…" : "Create"}
             </button>
           </form>
+          <DataQualityPreview entityId={createEntity} year={createStartYear} />
           <div className="scenario-fiscal-multiplier" style={{ marginTop: 8 }}>
             <label style={{ fontSize: 12, display: "flex", alignItems: "center", gap: 8 }}>
               <span>Fiscal multiplier:</span>

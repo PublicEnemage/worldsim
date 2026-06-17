@@ -72,6 +72,46 @@ export interface ScenarioConfigSchema {
   n_steps: number;
   timestep_label: string;
   fiscal_multiplier?: number;
+  start_date?: string;
+}
+
+// ADR-016 Component 1 — Data quality preview response
+export interface DataQualityFramework {
+  framework: string;
+  confidence_tier: number;
+  source_institution: string | null;
+  data_vintage: string | null;
+  is_synthetic: boolean;
+  synthetic_basis: string | null;
+}
+
+export interface DataQualityResponse {
+  entity_id: string;
+  year: number;
+  frameworks: DataQualityFramework[];
+}
+
+// ADR-016 Component 2 — Initial state (Grounding Strip) response
+export interface GroundingIndicator {
+  name: string;
+  display_name: string;
+  value: number | null;
+  unit: string | null;
+  source_institution: string | null;
+  data_vintage: string | null;
+  confidence_tier: number | null;
+  is_synthetic: boolean;
+}
+
+export interface GroundingFramework {
+  indicators: GroundingIndicator[];
+}
+
+export interface InitialStateResponse {
+  scenario_id: string;
+  entity_id: string;
+  step_0_year: number | null;
+  frameworks: Record<string, GroundingFramework>;
 }
 
 export interface ScenarioDetailResponse extends ScenarioResponse {
