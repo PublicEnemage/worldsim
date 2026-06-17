@@ -401,8 +401,8 @@ export default function FidelityDashboard() {
           lineHeight: 1.5,
         }}
       >
-        This panel validates model relationships using historical cases. It does not validate
-        input data for the active scenario.
+        This panel validates model relationships using historical cases — not input data
+        for the active scenario.
       </div>
 
       {/* Framing note */}
