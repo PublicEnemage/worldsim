@@ -3,7 +3,7 @@ name: m14-g6-sprint-exit
 type: sprint-exit
 milestone: M14 — Methodology Publication and External Validation
 sprint-group: G6
-status: Merged — awaiting Business PO Step 5 Validate
+status: COMPLETE — BPO ACCEPT 2026-06-18
 authored-by: PM Agent
 date: 2026-06-18
 pi-confirmed: false
@@ -13,7 +13,7 @@ sop-reference: docs/process/sprint-planning-sop.md §Sprint Exit Gate
 
 # Sprint Exit — M14, G6: Methodology, Calibration, and Instrument Legibility
 
-**Status:** Merged — awaiting Business PO Step 5 Validate
+**Status:** ✅ COMPLETE — BPO ACCEPT 2026-06-18; PI Agent confirmed
 **Date produced:** 2026-06-18
 **Release branch:** `release/m14`
 **Sprint entry document:** `docs/process/sprint-plans/m14-g6-sprint-entry.md`
@@ -78,13 +78,13 @@ user-facing deliverables serving Persona 2.*
 
 | Deliverable | Work type | Customer Agent Layer 3 assessment | Business PO verdict | Verdict artifact |
 |---|---|---|---|---|
-| Zone 1B negotiation-defensibility label fix (#885) | Frontend | Required — serves Persona 2 in Reactive entry state | **Pending** — BPO Step 5 Validate pending PR merge and playwright CI PASS | Intent doc §8 (to be filed) |
-| Zone 1A Y axis "Score" label (#950) | Frontend | Required — serves Persona 2 ambient state | **Pending** — as above | Intent doc §8 (to be filed) |
-| reserve_coverage_months seeding — JOR/EGY/ZMB (#884) | Backend | Required — enables Persona 2 to see correct initial state | **Pending** — as above | Intent doc §8 (to be filed) |
-| Ecological composite tier floor = T3 (#823) | Backend | Required — tier displayed in Zone 1B affects Persona 2 defensibility decisions | **Pending** — as above | Intent doc §8 (to be filed) |
-| water_stress_index indicator + biome_class dispatch (#824) | Backend | Required — new ecological indicator visible to Persona 2 | **Pending** — as above | Intent doc §8 (to be filed) |
-| Confidence tier assignment methodology (#22) | Documentation | N/A — serves Persona 1 (audit) only; Persona 1 is not Persona 2/3/5 | **Pending** — BPO documentation 5-min navigation test (Step 5) | Intent doc §8 (to be filed) |
-| PMM interpretation anchor (PMM anchor) | Documentation | N/A — serves Persona 1 (pre-session audit) | **Pending** — BPO documentation 5-min navigation test | Intent doc §8 (to be filed) |
+| Zone 1B negotiation-defensibility label fix (#885) | Frontend | Required — serves Persona 2 in Reactive entry state | ✅ **BPO ACCEPT 2026-06-18** | Intent doc §8 Step 5 verdict |
+| Zone 1A Y axis "Score" label (#950) | Frontend | Required — serves Persona 2 ambient state | ✅ **BPO ACCEPT 2026-06-18** | Intent doc §8 Step 5 verdict |
+| reserve_coverage_months seeding — JOR/EGY/ZMB (#884) | Backend | Required — enables Persona 2 to see correct initial state | ✅ **BPO ACCEPT 2026-06-18** | Intent doc §8 Step 5 verdict |
+| Ecological composite tier floor = T3 (#823) | Backend | Required — tier displayed in Zone 1B affects Persona 2 defensibility decisions | ✅ **BPO ACCEPT 2026-06-18** | Intent doc §8 Step 5 verdict |
+| water_stress_index indicator + biome_class dispatch (#824) | Backend | Required — new ecological indicator visible to Persona 2 | ✅ **BPO ACCEPT 2026-06-18** | Intent doc §8 Step 5 verdict |
+| Confidence tier assignment methodology (#22) | Documentation | N/A — serves Persona 1 (audit) only; Persona 1 is not Persona 2/3/5 | ✅ **BPO ACCEPT 2026-06-18** | Intent doc §8 Step 5 verdict |
+| PMM interpretation anchor (PMM anchor) | Documentation | N/A — serves Persona 1 (pre-session audit) | ✅ **BPO ACCEPT 2026-06-18** | Intent doc §8 Step 5 verdict |
 
 **Customer Agent Layer 3 assessment trigger:**
 Deliverables #885, #950, #884, #823, #824 introduce or modify user-facing indicator labels, alert
@@ -146,7 +146,7 @@ interpretation. Outstanding: Zone 1B Zone 2 detail expansion (deferred to M15, E
 would strengthen this to full Layer 3 by adding "Reserve coverage has fallen below the threshold"
 style narrative; current state is Layer 3 via label only.
 
-**Business PO acceptance status:** Pending — Step 5 Validate pending PR merge.
+**Business PO acceptance status:** ✅ **ACCEPT 2026-06-18** — all deliverables confirmed via live application observation (intent doc §8 Step 5 verdict). Migration `b1c2d3e4f5a6` applied to Docker dev DB before AC-8 live check (same pattern as G3).
 
 ---
 
@@ -161,25 +161,20 @@ No rejection artifacts filed. No open rejections. Proceed to Section 5.
 **Exit conditions checklist (PI Agent):**
 
 - [x] All implementation groups merged; CI green on release branch (Section 2) — ✅ PR #1045 merged 2026-06-18, all checks pass
-- [ ] Business PO ACCEPT verdict filed for each user-facing deliverable (Section 3) — **BLOCKING**: pending Step 5 Validate (EL required)
+- [x] Business PO ACCEPT verdict filed for each user-facing deliverable (Section 3) — ✅ BPO ACCEPT 2026-06-18 (intent doc §8 Step 5)
 - [x] Customer Agent Layer 3 assessment on record for all Persona 2 deliverables, filed before Business PO verdict (Section 3) — Layer 3 assessments in Section 3 above (filed 2026-06-18, pre-merge)
-- [ ] No open rejection artifacts (Section 4) — confirmed none
-- [ ] Near-miss entry filed for each rejection — no rejections; not applicable
+- [x] No open rejection artifacts (Section 4) — confirmed none
+- [x] Near-miss entry filed for each rejection — no rejections; not applicable
 
-**PI Agent sprint exit verdict:** **BLOCKED** — Business PO Step 5 Validate pending (EL action required).
+**PI Agent sprint exit verdict:** ✅ **CONFIRMED** — all five exit conditions satisfied.
 
-> PI Agent: G6 implementation is complete. PR #1045 merged 2026-06-18. All 9 ACs confirmed
-> via CI (5 backend ACs via test-backend, 4 frontend ACs via playwright-e2e). Two pre-existing
-> G5 test timing flaws (NM-047, NM-048) were exposed and fixed in the same PR — both near-miss
-> entries filed. All Customer Agent Layer 3 assessments are on record in Section 3.
->
-> The only remaining exit gate condition is Business PO Step 5 Validate for all user-facing
-> deliverables (#885, #950, #884, #823, #824 and the two documentation deliverables #22/PMM
-> anchor). BPO Validate requires EL to open the live application and confirm: (a) the Zone 1B
-> T4/T5 negotiation labels show the correct defensibility text; (b) the Zone 1A Y axis label
-> "Score" is visible; (c) reserve_coverage_months appears in the JOR initial state; (d) the
-> calibration docs are navigable in under 5 minutes. Once BPO Validate is filed in intent doc
-> §8 and these conditions are confirmed, PI Agent will update this document to "Confirmed."
+> PI Agent: G6 is complete. PR #1045 merged 2026-06-18 → release/m14. All 9 ACs confirmed —
+> 4 frontend ACs via Playwright E2E (6/6 pass), 4 backend ACs via pytest+httpx (CI
+> test-backend), AC-9 via file-existence check + BPO timed navigation (<1 min). BPO Step 5
+> Validate recorded in intent doc §8 2026-06-18: all observable states confirmed against
+> live Docker dev stack after `alembic upgrade head` applied migration b1c2d3e4f5a6.
+> NM-047 and NM-048 filed. No rejections. Layer 3 assessments on record. Sprint exit gate:
+> **PASSED**. G7 is the final M14 agent sprint group (already COMPLETE per SESSION_STATE).
 
 ---
 
