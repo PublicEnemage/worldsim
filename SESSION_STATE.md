@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-18 (G6 sprint entry ✅ EL APPROVED 2026-06-18 (PR #1038) — implementation unblocked. G7 Step 3 Implementation COMPLETE — PR #1037 open → release/m14. 5 docs created: onboarding suite (quick-start, scenario-creation, methodology-overview, data-provenance) + governance/goodharts-law-mitigation. README Getting Started section added. 27/27 automatable ACs pass. Step 4 Verify PASS recorded in intent doc §8. Awaiting CI + BPO Step 5 Validate.)**
+**Last updated: 2026-06-18 (G7 COMPLETE — BPO ACCEPT 2026-06-18. AC-7 timed nav PASS (README → quick-start → data-provenance → Tier 2 explanation, ~2–3 min); AC-4 5 blindspots confirmed; AC-6 4 Goodhart sections confirmed operational; Layer 3 PASS; North star PASS. Sprint exit filed: docs/process/sprint-plans/m14-g7-sprint-exit.md. #988 and #989 ready to close. G6 sprint entry EL-approved 2026-06-18 — implementation unblocked.)**
 **Current milestone:** M14 — Methodology Publication and External Validation (GitHub Milestone 15)
 **Previous milestone:** M13 — Political Economy and Instrument Credibility (formally closed 2026-06-15; release/m13 → main merged by EL; #264 closed)
 
@@ -150,7 +150,7 @@
 | G7 sprint entry document | ✅ **EL APPROVED 2026-06-18** — `docs/process/sprint-plans/m14-g7-sprint-entry.md` | No ADR gate; intent + QA pre-filed; sequencing variance noted (no gate crossed); implementation unblocked |
 | G7 implementation (Step 3) | ✅ PR #1037 open → release/m14 | 5 docs: `docs/onboarding/` (quick-start, scenario-creation, methodology-overview, data-provenance) + `docs/governance/goodharts-law-mitigation.md`; README Getting Started section added; 27/27 automatable ACs pass; lint clean |
 | G7 Step 4 Verify | ✅ PASS 2026-06-18 | AC-1–AC-6 all confirmed via pytest (27 passed, 1 skipped); shell checks pass; Step 4 verdict in intent doc §8; AC-7 manual BPO at Step 5 |
-| G7 Step 5 Validate | ⏳ BPO Step 5 Validate pending | Awaiting CI green on PR #1037 and BPO timed navigation (AC-7: README → quick-start → data-provenance → Tier 2 explanation, ≤5 min) |
+| G7 Step 5 Validate | ✅ BPO ACCEPT 2026-06-18 | AC-7 timed nav PASS (~2–3 min); AC-4 5 blindspots ✅; AC-6 4 sections ✅; Layer 3 PASS; North star PASS; sprint exit filed |
 | #986 — Cohort disaggregation on primary surface | ✅ Filed (M15) | M11.5 FINDING-03 gap; Demo 6 prerequisite |
 | #987 — Political risk summary surface (Persona 3) | ✅ Filed (M15) | Plain-language legitimacy dynamics |
 | #990 — Accessibility validation on target hardware | ✅ Filed (M15) | 8GB/4-core laptop gate |
