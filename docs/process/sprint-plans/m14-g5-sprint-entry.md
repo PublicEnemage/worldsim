@@ -6,14 +6,14 @@ sprint-group: G5
 status: Filed — awaiting EL approval
 authored-by: PM Agent
 authored-date: 2026-06-17
-el-approved: false
+el-approved: 2026-06-17
 release-branch: release/m14
 sop-reference: docs/process/sprint-planning-sop.md
 ---
 
 # Sprint Entry — M14, G5: ADR-015 Evidence Thread Architecture (Components 1, 2, 3)
 
-**Status:** Filed — awaiting EL approval before implementation begins
+**Status:** EL Approved — 2026-06-17
 **Date authored:** 2026-06-17
 **Release branch:** `release/m14`
 **Sprint plan:** `docs/process/sprint-plans/m14-sprint-plan.md` (EL Approved 2026-06-16)
@@ -42,7 +42,7 @@ counter bug — COMPLETE 2026-06-17, PR #1006).*
 | ADR gate | ADR-015 — Evidence Thread Architecture ✅ Accepted 2026-06-16 (PR #998) |
 | G2 gate | G2 COMPLETE ✅ — ADR-015 Accepted 2026-06-16 (PR #998); 6 EL decisions recorded |
 | Decision 1 gate | Step counter bug (#962) FIXED ✅ — G1 COMPLETE 2026-06-17 (PR #1006) |
-| Implementing agent | Frontend Architect Agent (Components 1, 2, 3); Chief Engineer Agent (C — if backend endpoint fields need extension; see §2.2 backend note) |
+| Implementing agent | Frontend Architect Agent (Components 1, 2, 3); Data Architect Agent (C — API field availability assessment and api_contracts.yml; see §2.2 backend note) |
 
 ---
 
@@ -95,10 +95,11 @@ endpoint response:
 
 **The implementing agent must determine at Step 1 (intent authorship) whether Components 1 and
 2 require new fields on existing endpoints.** If they do, those fields must be scoped in the
-intent document and Chief Engineer Agent must confirm feasibility before the implementation PR
-opens. "No new endpoint" does not mean "no backend change" — adding fields to existing
-responses is within scope. The intent document must name the exact API fields consumed for
-each Component.
+intent document and Data Architect Agent must confirm the contract and update `api_contracts.yml`
+before the implementation PR opens. "No new endpoint" does not mean "no backend change" —
+adding fields to existing responses is within scope. The intent document must name the exact
+API fields consumed for each Component. The Data Architect holds R on `api_contracts.yml`;
+no field may be consumed by the frontend without a matching entry in that file.
 
 | Group | Required ADR | ADR status | Decision 1 gate | G4 gate | Gate |
 |---|---|---|---|---|---|
@@ -284,10 +285,9 @@ scope decision explicit in the intent document.
    - **Must complete before Step 3 (any implementation code)**
 3. QA Lead Agent authors `frontend/tests/e2e/m14-g5-adr015-frontend.spec.ts` from intent
    document acceptance criteria — **must complete before Step 4 (implementation)**
-4. If backend API fields are required: Chief Engineer Agent adds fields to existing endpoints
-   in a backend-only PR before or concurrent with the frontend implementation PR. The backend
-   PR gates the frontend Step 3 if any Component 1/2 acceptance criterion depends on the
-   new fields.
+4. If backend API fields are required: Data Architect Agent updates `api_contracts.yml` and
+   coordinates with Chief Engineer Agent on backend implementation. The contract update gates
+   the frontend Step 3 if any Component 1/2 acceptance criterion depends on the new fields.
 5. Frontend Architect Agent implements:
    - Zone 1D L0 annotations on all four framework rows + pre-calibration flag
    - Zone 1B compact row full indicator name display
@@ -325,7 +325,11 @@ applies to every Component in G5.
 
 ## EL Approval Record
 
-**EL approval:** Pending
+**EL approval:** 2026-06-17
 
-> {EL approval statement — to be filled at approval time}
-> — @PublicEnemage ({date})
+> G5 sprint entry approved. All entry invariants satisfied: release branch exists, CI trigger
+> verified, sprint plan EL-approved, ADR-015 Accepted (G2), Decision 1 step counter gate
+> satisfied (G1). Correction recorded: API field assessment consultation is Data Architect
+> (R on api_contracts.yml), not Chief Engineer. Intent document and QA tests required before
+> any implementation PR opens.
+> — @PublicEnemage (2026-06-17)
