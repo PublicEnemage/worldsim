@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-17 (G4 Step 5 Validate BPO ACCEPT — REJECT-001 resolved; PR #1018 merged; G4 COMPLETE. G5 gate open. G3 COMPLETE. G1 COMPLETE.)**
+**Last updated: 2026-06-17 (G5 sprint entry EL-approved 2026-06-17, PR #1023; NM-046 Vite HMR polling fix PR #1021; G4 COMPLETE; G5 Step 1 intent authorship is next action in new session.)**
 **Current milestone:** M14 — Methodology Publication and External Validation (GitHub Milestone 15)
 **Previous milestone:** M13 — Political Economy and Instrument Credibility (formally closed 2026-06-15; release/m13 → main merged by EL; #264 closed)
 
@@ -121,6 +121,10 @@
 | G4 implementation (Step 3) | ✅ MERGED 2026-06-17 — PR #1015 + PR #1016 (AC-5 text fix) → release/m14 | DataQualityPreview, GroundingStrip, ScenarioParameters, IC-4/IC-6 headers, ModeSelector onWrapperClick |
 | G4 Step 4 Verify | ✅ PASS 2026-06-17 | 9/9 ACs pass; AC-5 text fix required (PR #1016); `ModeSelector.onClick` bubbles noted as finding; verdict in intent doc §8 |
 | G4 Step 5 Validate | ✅ BPO ACCEPT 2026-06-17 | REJECT-001 issued (AC-3: GroundingIndicator field name mismatch source_institution→source); Data Architect review confirmed contract correct; fix merged PR #1018; re-validate PASS. Layer 3 PASS. North star PASS. NM-045 filed. G4 COMPLETE. |
+| NM-046 Vite HMR polling fix | ✅ MERGED 2026-06-17 (PR #1021) | `usePolling: true` added to `frontend/vite.config.ts`; resolves macOS Docker inotify gap that caused EL post-G4 visual check to show stale frontend (CBJ absent, 0/0 Ctrl+F). NM-046 filed. EL confirmed CBJ visible after `docker compose restart frontend` + hard refresh. |
+| G5 sprint entry | ✅ **EL APPROVED 2026-06-17** (PR #1022 merge + correction PR #1023) | `docs/process/sprint-plans/m14-g5-sprint-entry.md`; ADR-015 Components 1–3; Data Architect Agent (not Chief Engineer) for API field consultation and `api_contracts.yml`; entry invariant satisfied; implementation unblocked |
+| G5 intent document (Step 1) | ⬜ NOT FILED — to be authored in new session | `docs/process/intents/M14-G5-2026-06-17-adr015-frontend.md`; must be filed before implementation PR opens; trajectory endpoint already has `confidence_tier` + `is_pre_calibration` per framework; source name origin TBD at intent authorship |
+| G5 QA tests (Step 2) | ⬜ NOT FILED — requires completed intent document | `frontend/tests/e2e/m14-g5-adr015-frontend.spec.ts`; authored from observable ACs before any implementation code |
 | G2 — ADR-015 acceptance | ✅ COMPLETE 2026-06-16 (PR #998) | EL accepted ADR-015; 6 decisions resolved; Components 1–3 M14; Component 4 → M15. G5 unblocked. No sprint entry/exit doc required (EL-action, no user-facing deliverable). |
 | Intent/test naming convention | ✅ Enforced 2026-06-16 (PR #999) | M{N}-G{N} prefix on intent docs and E2E tests — CLAUDE.md, intent-template.md, sprint-planning-sop.md, sprint-entry-template.md all updated |
 | M14 Exit Checklist | ✅ Filed 2026-06-16 — **#968** (closure gate: #843) | Tracks all M14 deliverables |
@@ -191,6 +195,9 @@ All near-term issues dispositioned at HORIZON sweep 2026-06-13 — see G8 sprint
 
 | PR | Title | Target | Status |
 |---|---|---|---|
+| #1023 ✅ | process(m14-g5): record EL approval and correct Data Architect consultation role | release/m14 | Merged 2026-06-17 |
+| #1022 ✅ | process(m14-g5): G5 sprint entry — ADR-015 Components 1–3 + SESSION_STATE | release/m14 | Merged 2026-06-17 (EL merge) |
+| #1021 ✅ | fix(vite): usePolling: true for Docker HMR on macOS + NM-046 near-miss registry | release/m14 | Merged 2026-06-17 |
 | #999 ✅ | process(m14-g1): enforce M{N}-G{N} naming for intent docs and E2E tests; file G1 intent | release/m14 | Merged 2026-06-16 |
 | #980 ✅ | docs(process): KI-003 — GitHub Rulesets bootstrap problem for new required checks | release/m14 | Merged 2026-06-16 |
 | #979 ✅ | ci(branch-naming): enforce milestone-scoped branch names for release/m* PRs (#978) | release/m14 | Merged 2026-06-16 |
