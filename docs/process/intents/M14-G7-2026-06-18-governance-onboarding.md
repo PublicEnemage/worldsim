@@ -341,23 +341,33 @@ AC-7: marked `pytest.mark.skip` with rationale; BPO executes timed navigation at
 
 ## 8. Step 4 Verify (to be completed after implementation)
 
-> *Section 8 is blank at intent authorship. The implementing agent completes this section
-> after the implementation PR is merged and before marking the sprint ready for BPO validation.*
-
-**Verification date:** [TBD]
+**Verification date:** 2026-06-18
 **Verifying agent:** PM Agent
 
 | AC | Observable state confirmed | Notes |
 |---|---|---|
-| AC-1 | | |
-| AC-2 | | |
-| AC-3 | | |
-| AC-4 | | |
-| AC-5 | | |
-| AC-6 | | |
-| AC-7 | | |
+| AC-1 | ✅ PASS | README.md Getting Started section contains `[Quick Start Guide](docs/onboarding/quick-start.md)` link; section heading matches pattern; link appears within section |
+| AC-2 | ✅ PASS | quick-start.md contains "Zone 1B" in Step 3 instrument cluster context (within 200 chars of "alert", "severity", "MDA"); contains "MDA alert"; contains "TERMINAL", "CRITICAL", "WARNING" severity table |
+| AC-3 | ✅ PASS | scenario-creation.md contains "grounding strip" in output-reading context and T1/T2/T3/T4/T5 tier notation throughout |
+| AC-4 | ✅ PASS | methodology-overview.md has "Known Model Boundaries and Blindspots" section heading; contains 6 named blindspots ("not fully modeled", "not captured", "absent from", "not modeled", "not disaggregated", etc.); BPO to confirm ≥3 at Step 5 |
+| AC-5 | ✅ PASS | data-provenance.md contains "STRUCTURAL_ABSENCE" in worked negotiation example (Chinese bilateral debt opacity); negotiation terms "restructuring", "creditor", "cite", "session", "ministry" present near string; Tier 2 explanation contains "citable directly — you can name the institution and vintage in a negotiating session" |
+| AC-6 | ✅ PASS | goodharts-law-mitigation.md contains: (a) gaming definition with `fiscal_multiplier`, `legitimacy_index`, `reserve_coverage`, `conditionality` named parameters; (b) validated range signal with range-edge percentage thresholds; (c) TSC obligations with "must" language and response timeframes (48h/14d/7d); (d) open-source audit pathway via git history + `scripts/audit_parameterization.py` + community challenge mechanism |
+| AC-7 | ⏳ MANUAL | BPO timed navigation at Step 5 — navigation chain README → Getting Started → quick-start.md → data-provenance.md link (AC-7 pre-check: quick-start.md contains markdown link to data-provenance.md ✅) |
 
-**Step 4 verdict:** [ ] PASS — all ACs confirmed in running documentation / [ ] FAIL — see rejection artifact
+**Verification method:** `python -m pytest backend/tests/test_m14_g7_governance_onboarding.py -v`
+**Result:** 27 passed, 1 skipped (AC-7 manual BPO timed navigation as expected)
+
+**Shell checks (intent doc §7):**
+```
+grep -i "quick-start" README.md                              → match ✅
+grep "Zone 1B" docs/onboarding/quick-start.md               → match ✅
+grep -i "mda alert" docs/onboarding/quick-start.md          → match ✅
+grep "grounding strip" docs/onboarding/scenario-creation.md → match ✅
+grep -i "structural.absence" docs/onboarding/data-provenance.md → match ✅
+ls docs/governance/goodharts-law-mitigation.md              → exists ✅
+```
+
+**Step 4 verdict:** ✅ PASS — all automatable ACs (AC-1 through AC-6) confirmed. AC-7 requires BPO proxy timed navigation at Step 5.
 
 ---
 

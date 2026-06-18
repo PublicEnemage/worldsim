@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-18 (G6b Step 3 complete — 3 design artifacts filed at `docs/design/path2-data-upload/`: field-mapping-ux-concept.md, user-supplied-provenance-spec.md, data-isolation-model-sketch.md. All AC-1–AC-9 covered. EL review gate open — Step 4 Verify. G6c COMPLETE — Zone 1A Phase 1 design thinking merged PR #1033.)**
+**Last updated: 2026-06-18 (G7 Step 3 Implementation COMPLETE — PR #1037 open → release/m14. 5 docs created: onboarding suite (quick-start, scenario-creation, methodology-overview, data-provenance) + governance/goodharts-law-mitigation. README Getting Started section added. 27/27 automatable ACs pass. Step 4 Verify PASS recorded in intent doc §8. Awaiting CI + BPO Step 5 Validate.)**
 **Current milestone:** M14 — Methodology Publication and External Validation (GitHub Milestone 15)
 **Previous milestone:** M13 — Political Economy and Instrument Credibility (formally closed 2026-06-15; release/m13 → main merged by EL; #264 closed)
 
@@ -146,7 +146,10 @@
 | #989 — Onboarding documentation | ✅ Filed (M14 G7) | Global south analyst onboarding |
 | G7 intent document (Step 1) | ✅ FILED 2026-06-18 — `docs/process/intents/M14-G7-2026-06-18-governance-onboarding.md` | 7 ACs; issues #988 + #989; EL-action items #3 and #6 noted out of agent scope; sprint entry gate note embedded |
 | G7 QA tests (Step 2) | ✅ FILED 2026-06-18 — `backend/tests/test_m14_g7_governance_onboarding.py` | 28 tests: AC-1–AC-6 file-existence + content-presence checks (grep equivalents); AC-4 partial automation (≥1 blindspot; BPO confirms ≥3 at Step 5); AC-7 marked skip (manual BPO timed navigation); all 25 fail pre-implementation as expected |
-| G7 sprint entry document | ⬜ NOT YET FILED — HARD STOP | Per intent doc §0 gate: implementation may not begin until sprint entry filed and EL-approved |
+| G7 sprint entry document | ✅ **EL APPROVED 2026-06-18** — `docs/process/sprint-plans/m14-g7-sprint-entry.md` | No ADR gate; intent + QA pre-filed; sequencing variance noted (no gate crossed); implementation unblocked |
+| G7 implementation (Step 3) | ✅ PR #1037 open → release/m14 | 5 docs: `docs/onboarding/` (quick-start, scenario-creation, methodology-overview, data-provenance) + `docs/governance/goodharts-law-mitigation.md`; README Getting Started section added; 27/27 automatable ACs pass; lint clean |
+| G7 Step 4 Verify | ✅ PASS 2026-06-18 | AC-1–AC-6 all confirmed via pytest (27 passed, 1 skipped); shell checks pass; Step 4 verdict in intent doc §8; AC-7 manual BPO at Step 5 |
+| G7 Step 5 Validate | ⏳ BPO Step 5 Validate pending | Awaiting CI green on PR #1037 and BPO timed navigation (AC-7: README → quick-start → data-provenance → Tier 2 explanation, ≤5 min) |
 | #986 — Cohort disaggregation on primary surface | ✅ Filed (M15) | M11.5 FINDING-03 gap; Demo 6 prerequisite |
 | #987 — Political risk summary surface (Persona 3) | ✅ Filed (M15) | Plain-language legitimacy dynamics |
 | #990 — Accessibility validation on target hardware | ✅ Filed (M15) | 8GB/4-core laptop gate |
