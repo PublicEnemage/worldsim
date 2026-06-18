@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-18 (G5 COMPLETE — Step 3 merged PR #1030, Step 4 Verify PASS 17/17 Playwright, Step 5 BPO ACCEPT, sprint exit filed. G6b design intent filed — `docs/process/intents/M14-G6b-2026-06-18-path2-design-groundwork.md`.)**
+**Last updated: 2026-06-18 (G6c COMPLETE — Zone 1A Phase 1 design thinking document authored and merged PR #1033. AC-1–AC-8 satisfied. Phase 2 Readiness section present. Issue #845 Phase 1 closed. Gates M15 Architecture Review.)**
 **Current milestone:** M14 — Methodology Publication and External Validation (GitHub Milestone 15)
 **Previous milestone:** M13 — Political Economy and Instrument Credibility (formally closed 2026-06-15; release/m13 → main merged by EL; #264 closed)
 
@@ -140,7 +140,7 @@
 | G6b intent document (Step 1) | ✅ FILED 2026-06-18 — `docs/process/intents/M14-G6b-2026-06-18-path2-design-groundwork.md` | 9 ACs across 3 design artifacts; UX Designer (field mapping UX concept), Architect (`USER_SUPPLIED` provenance spec), Data Architect (isolation model sketch); all filed to `docs/design/path2-data-upload/` before M14 exit; EL review gate before sprint exit |
 | Journey A gap markers (GA-01, GA-02) | ✅ Filed 2026-06-16 (PR #974) | `docs/ux/user-journeys.md` |
 | Milestone planning panel deliberation | ✅ COMPLETE 2026-06-16 | M15–M18 defined; demo arc through Demo 7; 17 issues reallocated; 5 new issues filed (#986–#990); roadmap updated |
-| G6c — Zone 1A Phase 1 design thinking | ✅ Intent filed 2026-06-18 — `docs/process/intents/M14-G6c-2026-06-18-zone-1a-design-thinking.md` | UX Designer authors design thinking doc at `docs/ux/design-thinking/zone-1a-information-architecture.md`; 8 ACs; gates M15 Phase 2 Architecture Review |
+| G6c — Zone 1A Phase 1 design thinking | ✅ COMPLETE 2026-06-18 — PR #1033 merged | Intent at `docs/process/intents/M14-G6c-2026-06-18-zone-1a-design-thinking.md`; design doc at `docs/ux/design-thinking/zone-1a-information-architecture.md`; AC-1–AC-8 satisfied; Phase 2 Readiness section present; gates M15 Architecture Review (#845 Phase 1 closed) |
 | #988 — Goodhart's Law mitigation | ✅ Filed (M14 G7) | TSC monitoring framework for parameterization gaming risk |
 | #989 — Onboarding documentation | ✅ Filed (M14 G7) | Global south analyst onboarding |
 | #986 — Cohort disaggregation on primary surface | ✅ Filed (M15) | M11.5 FINDING-03 gap; Demo 6 prerequisite |
