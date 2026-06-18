@@ -689,6 +689,15 @@ EcologicalModule:
           consumed by the entity's land-use change trajectory (0.0–1.0+).
           confidence_tier: 3 (FAO GFR 5-year data; annual interpolation
           required — ADR-005 Amendment B). Source: FAO GFR 2020.
+        water_stress_index: >
+          Quantity(RATIO) — delta to water stress ratio [0.0, 2.0] in boundary-
+          proximity scoring. 1.0 = at-boundary (FAO WASAG 2020). confidence_tier: 3
+          (FAO GFR arid-subset/ICARDA; annual interpolation from 5-year data).
+          BIOME-CLASS RESTRICTION: only emitted for entities with
+          biome_class=arid_semiarid in entity metadata. Entities without
+          biome_class or with biome_class=high_forest_cover receive a WARNING
+          log and no delta. DA-G6-1 decision 2026-06-18. CM+EE approval 2026-06-13.
+          Source: ACADEMIC_LITERATURE_FAO_GFR_ARID_ICARDA_WATER_STRESS.
       metadata_keys: "entity_id"
   elasticity_registry:
     gdp_growth_change → co2_concentration_ppm:
@@ -704,6 +713,15 @@ EcologicalModule:
         land_use_pressure increases (positive delta). Mechanism: reduced
         conservation budget → weakened enforcement → accelerated deforestation.
       source_registry_id: "ACADEMIC_LITERATURE_FAO_GFR_2020_FISCAL_LAND_USE"
+    fiscal_policy_spending_change → water_stress_index (arid_semiarid only):
+      elasticity: "-0.04 RATIO units per unit fiscal change (fraction of GDP)"
+      sign_logic: >
+        Fiscal spending cut (negative magnitude) × negative elasticity →
+        water_stress increases (positive delta). Mechanism: reduced irrigation
+        infrastructure / groundwater management → higher water stress in
+        arid/semi-arid economies. CM+EE approval 2026-06-13.
+        biome_class restriction enforced in module.py dispatch.
+      source_registry_id: "ACADEMIC_LITERATURE_FAO_GFR_ARID_ICARDA_WATER_STRESS"
   notes:
     - >
       EcologicalModule subscribes to gdp_growth_change, which only fires when

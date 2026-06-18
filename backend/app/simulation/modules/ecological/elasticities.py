@@ -113,4 +113,42 @@ ECOLOGICAL_ELASTICITY_REGISTRY: list[EcologicalElasticity] = [
         ),
         source_registry_id="ACADEMIC_LITERATURE_FAO_GFR_2020_FISCAL_LAND_USE",
     ),
+    # Fiscal spending change → water_stress_index (arid_semiarid entities only).
+    # FAO Global Framework for Water Scarcity in Agriculture (WASAG 2020) and
+    # ICARDA (International Center for Agricultural Research in the Dry Areas)
+    # document the link between government water infrastructure investment and
+    # water stress in arid/semi-arid economies: a 1pp-of-GDP reduction in public
+    # agricultural/water spending → 0.04 unit increase in the water stress index
+    # (RATIO, range [0, 2] in boundary-proximity scoring). The mechanism operates
+    # through reduced irrigation infrastructure maintenance, groundwater management
+    # program cuts, and reduced desalination capacity support.
+    #
+    # Elasticity approved: CM + Ecological Economist, 2026-06-13 (M13 G8a deliberation).
+    # Biome-class restriction: ONLY applies to entities with biome_class=arid_semiarid.
+    # For high_forest_cover entities, this elasticity is skipped with a WARNING log.
+    # The module.py dispatch enforces this restriction — this registry entry does not.
+    #
+    # Negative elasticity: fiscal spending cut (negative magnitude) → water stress
+    # increases (positive delta). A spending increase (positive magnitude) → water
+    # stress decreases (negative delta), consistent with conservation investment.
+    # confidence_tier = 3: FAO GFR arid-subset / ICARDA data; annual interpolation
+    # required from 5-year assessment cycles.
+    EcologicalElasticity(
+        event_type="fiscal_policy_spending_change",
+        indicator_key="water_stress_index",
+        elasticity=Decimal("-0.04"),
+        confidence_tier=3,
+        source=(
+            "FAO WASAG (2020): Global Framework on Water Scarcity in Agriculture."
+            " Food and Agriculture Organization, Rome. ICARDA Research Report:"
+            " Water Productivity in Arid Regions (2019), International Center for"
+            " Agricultural Research in the Dry Areas, Beirut. FAO GFR 2020 arid-subset"
+            " analysis (MENA + SSA arid zones, Annex 3: Water Stress Indicators)."
+            " The -0.04 elasticity approximates the water_stress_index increase per"
+            " unit fiscal spending cut (as fraction of GDP) in arid/semi-arid economies."
+            " CM + EE approval recorded 2026-06-13 (M13 G8a). biome_class restriction:"
+            " arid_semiarid entities only; module dispatch enforces this gate."
+        ),
+        source_registry_id="ACADEMIC_LITERATURE_FAO_GFR_ARID_ICARDA_WATER_STRESS",
+    ),
 ]

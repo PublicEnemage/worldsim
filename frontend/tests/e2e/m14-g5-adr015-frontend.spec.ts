@@ -395,7 +395,9 @@ test.describe("AC-1 through AC-4: Zone 1D L0 annotations", () => {
     try {
       jorScenarioId = (await checkG3FixtureAccessible())
         ? G3_JOR_SCENARIO_ID
-        : await createCompletedScenario("JOR", 3, `G5-AC1-${Date.now()}`);
+        // n_steps=1 so current_step=1 matches step_index=1 in makeTrajectoryMock.
+        // Using n_steps=3 caused current_step=3 with no matching step in the mock → [—] annotation.
+        : await createCompletedScenario("JOR", 1, `G5-AC1-${Date.now()}`);
     } catch {
       jorScenarioId = null;
     }
@@ -486,14 +488,26 @@ test.describe("AC-1 through AC-4: Zone 1D L0 annotations", () => {
     const annotation = page.locator('[data-testid="framework-annotation-financial"]');
     if (!(await annotation.isVisible({ timeout: 5_000 }).catch(() => false))) return;
 
-    const text = await annotation.textContent();
-    expect(text).not.toBeNull();
-
-    // NM-045: each assertion is a direct string match, not a character-class regex
-    expect(text).toContain("T2");
-    expect(text).toContain("pre-cal");
-    // Source institution: mock returns "IMF / CBJ" — assert one is present
-    const hasSource = (text ?? "").includes("IMF") || (text ?? "").includes("CBJ");
+    // NM-048: the annotation goes through two states — [T2 · pre-cal] immediately after
+    // trajectory loads, then [T2 · IMF / CBJ · pre-cal] once the data-quality useEffect
+    // (triggered by trajectory entity_id becoming available) completes its separate fetch.
+    // waitForFunction polls the DOM until the source institution text appears, avoiding the
+    // race condition of a point-in-time textContent() read.
+    await page
+      .waitForFunction(
+        () => {
+          const el = document.querySelector('[data-testid="framework-annotation-financial"]');
+          const t = el?.textContent ?? "";
+          return t.includes("IMF") || t.includes("CBJ");
+        },
+        { timeout: 5_000 },
+      )
+      .catch(() => undefined); // fall through for a clear assertion error below
+    const finalText = await annotation.textContent() ?? "";
+    // NM-045: direct string-presence assertions
+    expect(finalText).toContain("T2");
+    expect(finalText).toContain("pre-cal");
+    const hasSource = finalText.includes("IMF") || finalText.includes("CBJ");
     expect(hasSource).toBe(true);
   });
 

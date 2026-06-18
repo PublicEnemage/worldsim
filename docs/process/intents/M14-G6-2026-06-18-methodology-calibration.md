@@ -558,6 +558,48 @@ AC-6 must assert: GRC ecological composite confidence_tier == 3 (not 2).
 
 ---
 
+## 8. Step 4 Verify and Step 5 Validate (Lifecycle Gate Results)
+
+*Filed 2026-06-18 after PR #1045 CI completion.*
+
+### Step 4 — Verify (implementing agent confirms observable application state)
+
+| AC | Verify artifact | Result | Date |
+|---|---|---|---|
+| AC-1 (Zone 1B T4 label: "Model estimate — verify before citing") | Playwright E2E `m14-g6-methodology-calibration.spec.ts` — CI `playwright-e2e` job | **PASS** — PR #1045 CI 2026-06-18 |
+| AC-2 (Zone 1B T5 label: "Synthetic extrapolation — do not cite") | Same spec — route mock tier=5 | **PASS** — PR #1045 CI 2026-06-18 |
+| AC-3 (Zone 1B T1/T2/T3 labels unchanged) | Same spec — tier=1/2/3 mocks | **PASS** — PR #1045 CI 2026-06-18 |
+| AC-4 (Zone 1A "Score" Y axis label visible at 1280×900) | Same spec — viewport check | **PASS** — PR #1045 CI 2026-06-18 |
+| AC-5 (JOR /initial-state returns reserve_coverage_months, variable_type=stock) | pytest+httpx `test_m14_g6_methodology_calibration.py` — `test-backend` CI job | **PASS** — `test-backend: success` PR #1045 CI 2026-06-18 |
+| AC-6 (GRC ecological composite confidence_tier == 3, not 2) | Same file | **PASS** — `test-backend: success` PR #1045 CI 2026-06-18 |
+| AC-7 (zero ecological indicator → null composite, tier unchanged) | Same file | **PASS** — `test-backend: success` PR #1045 CI 2026-06-18 |
+| AC-8 (JOR water_stress_index T3 present at step 1) | Same file | **PASS** — `test-backend: success` PR #1045 CI 2026-06-18 |
+| AC-9 (calibration docs exist and are navigable) | `find docs/calibration/ -type f` — both files found | **PASS** (shell artifact 2026-06-18); BPO 5-min navigation test is Step 5 |
+
+**Pre-push gate compliance confirmed:**
+- `ruff check .` → All checks passed (no violations)
+- `mypy app/` → Pre-existing errors only (none introduced by G6)
+- `npm run build` → 0 TypeScript errors; built in 1.67s
+
+**Note on AC-1–4 verify method:** The G5 test `m14-g5-adr015-frontend.spec.ts` AC-3 had a pre-existing timing-dependent design flaw (step_index/n_steps mismatch, see NM-047). The flaw was exposed by G6 backend timing changes in the first CI run on PR #1045. Fix applied (commit 8657aae): changed `n_steps=3` to `n_steps=1` in the G5 test beforeAll so `current_step=1` matches `step_index=1` in `makeTrajectoryMock`. PR #1045 final CI run (commit 8657aae) produces the AC-1–4 playwright PASS.
+
+**Step 4 verdict: PASS — all 9 acceptance criteria confirmed via CI artifacts.**
+
+### Step 5 — Validate (Business PO confirms mission alignment)
+
+*Step 5 Validate requires EL review and is pending as of this document filing.*
+
+**Validation criteria by work type (per CLAUDE.md §Agent Execution Lifecycle):**
+- Deliverables #885, #950, #884, #823, #824: Business PO opens the live application and
+  confirms named persona (Persona 2) can reach the observable state within the ADR's time
+  ceiling. Customer Agent Layer 3 assessment filed in sprint exit document (Section 3).
+- Deliverables #22, PMM anchor: Business PO confirms a non-author can navigate to the key
+  finding from the document's entry point in under five minutes.
+
+**Step 5 verdict: PENDING — EL Validate required.**
+
+---
+
 ## Appendix: Agent Consultation Record — DA-G6-1, DA-G6-2, CM-G6-1
 
 *All three decisions resolved 2026-06-18 in the same session as this document. The full

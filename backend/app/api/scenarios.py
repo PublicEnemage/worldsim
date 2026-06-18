@@ -725,6 +725,11 @@ _TRAJECTORY_FRAMEWORKS = ["financial", "human_development", "ecological", "gover
 # Minimum confidence tier for the normalized_absolute strategy (CM-R3).
 _NORMALIZED_ABSOLUTE_MIN_TIER = 3
 
+# Minimum confidence tier for the ecological boundary-proximity composite (CM-G6-1).
+# Floor = 3: land_use_pressure_index (T3, FAO GFR 5-yr) and water_stress_index (T3, FAO GFR
+# arid-subset/ICARDA) both contribute. A composite averaging T3 proxies cannot be T2.
+_ECOLOGICAL_MIN_TIER = 3
+
 # ---------------------------------------------------------------------------
 # PMM computation — Issue #496
 # ---------------------------------------------------------------------------
@@ -859,11 +864,20 @@ async def _compute_trajectory_framework_point(
         score = _boundary_proximity_strategy(
             entity_indicators, all_entity_attrs, framework, context
         )
+        indicator_min_tier = min(
+            (
+                qty.confidence_tier
+                for qty in entity_indicators.values()
+                if (qty.measurement_framework or "financial") == framework
+            ),
+            default=_ECOLOGICAL_MIN_TIER,
+        )
+        eco_tier = max(indicator_min_tier, _ECOLOGICAL_MIN_TIER)
         return TrajectoryFrameworkPoint(
             framework=framework,
             composite_score=str(score) if score is not None else None,
             scoring_basis="boundary_proximity",
-            confidence_tier=2,
+            confidence_tier=eco_tier,
         )
 
     # governance — normalized_absolute regardless of entity count (ADR-005 Amendment 4).
