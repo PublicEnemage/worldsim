@@ -120,14 +120,14 @@ source code. For G6 specifically:
 *QA tests must be authored from the intent document's acceptance criteria before implementation
 code is written. (Authority: CLAUDE.md §Agent Execution Lifecycle Step 2)*
 
-- [ ] QA test files authored before any implementation PR is opened — **NOT YET FILED**
+- [x] QA test files authored before any implementation PR is opened — **FILED 2026-06-18**
 
 | Deliverable | Intent document | Test file path | Authored before implementation? |
 |---|---|---|---|
-| Zone 1B label fix (#885) | `docs/process/intents/M14-G6-2026-06-18-methodology-calibration.md` | `frontend/tests/e2e/m14-g6-methodology-calibration.spec.ts` | No — author after intent, before implementation PR |
-| Zone 1A Y axis (#950) | (same intent document) | (same test file) | No — author after intent, before implementation PR |
-| Backend fixes (#884, #823, #824) | (same intent document) | `backend/tests/test_m14_g6_methodology_calibration.py` | No — author after intent, before implementation PR |
-| Documentation (#22, PMM anchor) | (same intent document) | BPO 5-min navigation test at Step 5 | No automated test; BPO validates at Validate step |
+| Zone 1B label fix (#885) | `docs/process/intents/M14-G6-2026-06-18-methodology-calibration.md` | `frontend/tests/e2e/m14-g6-methodology-calibration.spec.ts` | ✅ Yes — authored 2026-06-18 before implementation PR (guard pattern; NM-045 rule applied; AC-1/AC-2/AC-3/AC-4 covered) |
+| Zone 1A Y axis (#950) | (same intent document) | (same test file) | ✅ Yes — authored 2026-06-18 before implementation PR |
+| Backend fixes (#884, #823, #824) | (same intent document) | `backend/tests/test_m14_g6_methodology_calibration.py` | ✅ Yes — authored 2026-06-18 before implementation PR; AC-5/AC-6/AC-7/AC-8 + AC-9 partial file-existence check |
+| Documentation (#22, PMM anchor) | (same intent document) | BPO 5-min navigation test at Step 5 | No automated test; BPO validates at Validate step (AC-9 full) |
 
 ---
 
