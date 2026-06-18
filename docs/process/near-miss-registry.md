@@ -2419,6 +2419,72 @@ EL used Ctrl+F (browser text search) rather than relying on visual scan alone. W
 
 ---
 
+## NM-047 — G5 Playwright AC-3 Test Timing-Dependent; n_steps/step_index Mismatch Passed CI Due to Guard Timeout No-Op (Reactive)
+
+**Date:** 2026-06-18
+**Milestone:** M14 — G6 implementation; pre-existing defect from G5 (PR #1030)
+**Detected by:** G6 CI `playwright-e2e` failure — `m14-g5-adr015-frontend.spec.ts:508 AC-3` failed with "floor" absent from annotation text
+**Severity:** High — pre-existing test was a silent no-op in G5 CI; a real regression in Zone 1D ecological annotation would have passed undetected
+
+### What happened
+
+In G5 (PR #1030), the `m14-g5-adr015-frontend.spec.ts` AC-3 test ("Zone 1D ecological annotation contains 'floor' or 'ceiling'") was written to create a JOR scenario with `n_steps=3`. The `makeTrajectoryMock` helper in the test file provides a mock trajectory with `step_index: 1` only. When the scenario loads, `App.tsx` calls `setCurrentStep(3)` (the last step of a 3-step scenario). `FourFrameworkZone1D.tsx` line 194 does: `steps.find(s => s.step_index === current_step)` — with `current_step=3` and mock only providing `step_index=1`, this returns `undefined`. `currentStepData = null` → `buildFrameworkAnnotation` returns `[—]` → annotation text never contains "floor" or "ceiling."
+
+In G5 CI, the test happened to pass because the Playwright guard timeout (`page.waitForSelector('[data-testid="framework-annotation-ecological"]', {timeout: 5000})`) expired before the loading state resolved. The element is not rendered during loading, so the guard threw, the assertion was never reached, and Playwright marked the test as passed (the `catch` branch was hit, which — depending on the exact test structure — can be a silent no-op). The G6 migration (b1c2d3e4f5a6) altered the backend response timing enough that the element appeared within 5 seconds, the assertion ran, and found `[—]` instead of "approaching resource floor."
+
+### What was at risk
+
+Any regression in the `FourFrameworkZone1D` ecological annotation — including Zone 1D annotation showing `[—]` for all JOR scenarios due to a step-matching bug — would have passed G5 CI. The test existed, was green, and provided zero protection for the feature it purported to cover.
+
+### What caught it
+
+G6 CI failure. The failure was caused by G6 changing backend timing, which accidentally removed the guard-timeout no-op path that had been masking the flawed test design. Without the G6 timing change, the pre-existing defect would have remained undetected until the feature regressed visibly.
+
+### Process improvement
+
+**Immediate fix:** Changed `createCompletedScenario("JOR", 3, ...)` to `createCompletedScenario("JOR", 1, ...)` in the beforeAll of the AC-1–4 describe block (PR #1045, commit 8657aae). With `n_steps=1`, `current_step=1` after scenario load, which matches `step_index=1` in `makeTrajectoryMock`. The `steps.find()` returns the correct mock step and the annotation renders correctly.
+
+**Structural gap — test-mock step alignment:** The `makeTrajectoryMock` helper produces a mock with a single `step_index: 1` entry. Any test that creates a scenario with `n_steps > 1` and then inspects step-dependent UI will silently get `currentStepData = null` for all steps except step 1. This is a category of test design error specific to step-indexed trajectory mocks. No existing check catches it.
+
+**Recommended process addition:** When authoring a Playwright test that inspects step-dependent UI (Zone 1D, Zone 1B per-step indicators, trajectory annotations), the test design checklist should include: "Does the scenario's `n_steps` match the `step_index` values provided by the trajectory mock? Confirm explicitly." This check should be added to the G6 intent document test-design notes (Step 2 gate) as a structural reminder for future trajectory-related E2E tests.
+
+---
+
+## NM-048 — G5 AC-2 Test Read annotation.textContent() Before data-quality Fetch Completed; Source Institution Absent From Point-in-Time Read (Reactive)
+
+**Date:** 2026-06-18
+**Milestone:** M14 — G6 implementation; pre-existing defect from G5 (PR #1030)
+**Detected by:** G6 CI `playwright-e2e` rerun failure — `m14-g5-adr015-frontend.spec.ts:499 AC-2` failed with `expect(false).toBe(true)` (source institution not present in annotation text)
+**Severity:** High — pre-existing test was a silent no-op in G5 CI; source institution field missing from AC-2 assertion would have gone undetected if G6 had not improved timing
+
+### What happened
+
+`FourFrameworkZone1D` renders the L0 annotation in two sequential states:
+1. After trajectory loads: `[T2 · pre-cal]` (no source institution — `dataQuality` is still null)
+2. After `data-quality` fetch completes (triggered by a `useEffect` watching `trajectory.entity_id`): `[T2 · IMF / CBJ · pre-cal]`
+
+The G5 AC-2 test read `annotation.textContent()` once, immediately after `waitForAppReady()`. `waitForAppReady` resolves when `__worldsim_selectEntity` is defined (App mount), which happens before either the trajectory fetch or the data-quality fetch completes. The trajectory fetch fires first; `dataQuality` is still null at the first render. The point-in-time `textContent()` read captured `[T2 · pre-cal]` — the intermediate state — before `data-quality` settled.
+
+In G5 CI (PR #1030), this test was a no-op: the `framework-annotation-financial` element was not visible within the 5-second guard timeout (loading state), so the guard returned early and the assertion never ran. In G6 CI, the backend timing change caused the element to appear within the guard window. The assertion ran and failed because it captured the intermediate annotation state.
+
+### What was at risk
+
+If the source institution is absent from the Zone 1D annotation (because `dataQuality` never loads or loads slowly), a finance ministry analyst sees `[T2 · pre-cal]` instead of `[T2 · IMF / CBJ · pre-cal]`. The assertion was designed to catch this silent degradation. A point-in-time read that races with the `useEffect` cannot reliably detect it — the annotation might look correct on slow runs but fail silently on fast ones.
+
+### What caught it
+
+G6 CI rerun failure. Same exposure mechanism as NM-047 (G6 backend timing change removed the guard-timeout no-op path).
+
+### Process improvement
+
+**Immediate fix:** Replaced `const text = await annotation.textContent()` with `page.waitForFunction(() => { ...return t.includes("IMF") || t.includes("CBJ"); }, {timeout: 5_000})` before reading the final text. `waitForFunction` polls the DOM, giving the `data-quality` useEffect chain time to settle before the assertion reads the annotation. Fix applied in PR #1045, same commit as NM-047 fix plus AC-2 repair.
+
+**Structural gap — two-phase render and point-in-time reads:** Any component that renders in multiple async phases (trajectory → data-quality, or similar two-fetch chains) and is tested with `textContent()` is vulnerable to this race. The test design checklist should include: "Does this component fetch data in two sequential phases? If yes, wait for the final phase to settle before reading text content — use `waitForFunction` or `expect(locator).toContainText()` instead of `textContent()`."
+
+This is a category of test design error specific to multi-fetch render chains. NM-047 and NM-048 are both instances of the same root pattern (timing-dependent test assertion) exposed by the same trigger (G6 backend timing improvement). They differ in mechanism: NM-047 is a step_index mismatch (no data for current step), NM-048 is a two-phase render race (data-quality fetch lags trajectory fetch).
+
+---
+
 ## Registry Maintenance
 
 ### How to add an entry
