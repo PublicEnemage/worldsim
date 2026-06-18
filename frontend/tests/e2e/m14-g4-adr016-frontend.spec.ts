@@ -415,8 +415,10 @@ test.describe("AC-4: Parameter persistence display (completed scenario required)
         text.includes("ZMB"),
     ).toBe(true);
 
-    // Number of steps: positive integer or "(not recorded)"
-    expect(/\b[1-9]\d*\b/.test(text) || text.includes("(not recorded)")).toBe(true);
+    // Number of steps: positive integer or "(not recorded)".
+    // No \b — same textContent concatenation issue as base year ("Steps3Fiscal" has no
+    // word boundary around "3"). Any [1-9]\d* sequence confirms steps are present.
+    expect(/[1-9]\d*/.test(text) || text.includes("(not recorded)")).toBe(true);
   });
 });
 
