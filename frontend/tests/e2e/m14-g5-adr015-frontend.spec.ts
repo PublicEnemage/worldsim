@@ -395,7 +395,9 @@ test.describe("AC-1 through AC-4: Zone 1D L0 annotations", () => {
     try {
       jorScenarioId = (await checkG3FixtureAccessible())
         ? G3_JOR_SCENARIO_ID
-        : await createCompletedScenario("JOR", 3, `G5-AC1-${Date.now()}`);
+        // n_steps=1 so current_step=1 matches step_index=1 in makeTrajectoryMock.
+        // Using n_steps=3 caused current_step=3 with no matching step in the mock → [—] annotation.
+        : await createCompletedScenario("JOR", 1, `G5-AC1-${Date.now()}`);
     } catch {
       jorScenarioId = null;
     }
