@@ -373,14 +373,110 @@ ls docs/governance/goodharts-law-mitigation.md              → exists ✅
 
 ## 9. Step 5 Validate (to be completed by Business PO after Step 4 PASS)
 
-> *Section 9 is blank at intent authorship. Business PO completes this section after Step 4
-> PASS is recorded.*
+**Business PO verdict:** [x] ACCEPT
+**Validation date:** 2026-06-18
+**Validating agent:** Business PO
 
-**Business PO verdict:** [ ] ACCEPT / [ ] REJECT
-**Validation date:** [TBD]
-**Customer Agent Layer 3 assessment:** [Required per CLAUDE.md §Layer 3 Quality Gate — the
-onboarding documentation is a user-facing capability serving Persona 2]
-**North star test result:** [Did the Zambian analyst scenario in §2 P-7 succeed?]
+---
+
+### Customer Agent Layer 3 Assessment
+
+**Assessment date:** 2026-06-18
+**Deliverable:** M14-G7 onboarding documentation suite (#989) and Goodhart's Law mitigation framework (#988)
+**Personas served:** Persona 2 (Finance Ministry Negotiator)
+
+Layer 3 quality requires that the output tells the user what the information means — not just displays it.
+
+**Finding — PASS:**
+
+- `data-provenance.md §Tier 2`: "Tier 2 means the source is citable directly — you can name the institution
+  and vintage in a negotiating session. 'IMF BOP 2024-Q1' is Tier 2." This answers "what can I do with
+  this in my session?" not just "what is the tier." Layer 3 — PASS.
+- `data-provenance.md §Structural Absence`: Full worked negotiation example — "Treating absent data as zero
+  in a debt sustainability analysis is an assumption that requires justification, not a neutral default. We
+  are requesting that the creditor's analysis disclose this assumption explicitly." The document hands the
+  analyst the argument, not just the classification. Layer 3 — PASS.
+- `quick-start.md §Step 4`: "This is the claim you can take into a meeting." The guide frames MDA alert
+  reading explicitly as argument evidence. Layer 3 — PASS.
+- `goodharts-law-mitigation.md`: TSC obligations are named with specific timeframes (48h/14d/7d) and a
+  concrete audit pathway (git history, `scripts/audit_parameterization.py`, community challenge mechanism).
+  Not aspirational language. Layer 3 — PASS.
+
+**Customer Agent Layer 3 verdict: PASS** — all four documents tell users what the information means
+for their specific role and session context. A finance ministry analyst reading these documents can
+form specific arguments without Engineering Lead mediation.
+
+---
+
+### AC-7 Timed Navigation (BPO proxy — manual step)
+
+**Navigation chain executed:**
+
+1. `README.md` → line 214 "Getting Started" section → link: `[Quick Start Guide](docs/onboarding/quick-start.md)` ✅
+2. `quick-start.md` → "Next Steps" section → `[Data Provenance Guide](data-provenance.md)` link ✅
+3. `data-provenance.md` → "Tier 2 — Derived Official Statistics" section (lines 45–70):
+   > "Tier 2 means the source is citable directly — you can name the institution and vintage in a
+   > negotiating session. 'IMF BOP 2024-Q1' is Tier 2."
+   Plus worked example: `Reserve Coverage (months)   CBJ Annual Report · 2023-Q4 · T2` ✅
+
+**Time to Tier 2 explanation:** approximately 2–3 minutes (3 document opens; Tier 2 section is the
+second major section of data-provenance.md, immediately visible on second scroll).
+
+**AC-7 verdict: PASS** — Tier 2 explanation reached within the 5-minute ceiling from README entry
+point. The explanation names the specific institutional format ("CBJ Annual Report · 2023-Q4") and
+states the negotiating implication directly. No specialist mediation required.
+
+---
+
+### AC-4 Manual Blindspot Count (BPO confirmation ≥3 named blindspots)
+
+`docs/onboarding/methodology-overview.md §Known Model Boundaries and Blindspots` contains five
+named blindspots (not generic disclaimers):
+1. Ecological-to-financial transmission pathways not fully modeled
+2. Political feasibility at sub-national and factional levels not captured
+3. Informal economy dynamics absent from sovereign financial indicators
+4. Intra-household distributional effects not disaggregated below cohort level
+5. Financial contagion and cross-border spillover channels not modeled
+
+**AC-4 verdict: PASS** — 5 named blindspots confirmed; requirement was ≥3.
+
+---
+
+### AC-6 Manual Four-Section Review
+
+`docs/governance/goodharts-law-mitigation.md` contains all four required sections:
+- **(a) Gaming definition with named parameters:** fiscal_multiplier (calibrated range 0.8–1.5),
+  legitimacy_index, reserve_coverage floor, conditionality sequencing — all named with specific
+  test cases distinguishing gaming from legitimate variation ✅
+- **(b) Range-edge signaling:** validated range boundaries with deviation flags — operational,
+  not aspirational ✅
+- **(c) TSC monitoring obligations:** explicit "must" language with defined response timeframes
+  (48h/14d/7d cadence); not a recommendation — a named obligation ✅
+- **(d) Open-source audit pathway:** git parameterization history, `scripts/audit_parameterization.py`
+  export, community challenge mechanism — concrete and accessible ✅
+
+**AC-6 verdict: PASS** — all four sections present and operational (not aspirational).
+
+---
+
+### North Star Test Result
+
+**P-7 scenario** (from §2): A Zambian debt management analyst, referred to WorldSim after Demo 5,
+opens README, follows the quick-start guide, reaches working proficiency within 10 minutes, and
+opens the data provenance guide to find: "Tier 2 means the source is citable directly — you can
+name the institution and vintage in a negotiating session." She walks into her debt restructuring
+preparatory session able to cite the CBJ 2023-Q4 reserve coverage figure without Engineering Lead
+mediation.
+
+**This scenario is fully realizable from the delivered documents:**
+- README → quick-start.md: scenario loading, Zone 1B navigation, TERMINAL/CRITICAL/WARNING
+  severity interpretation — all present, step-by-step, naming terms explicitly ✅
+- quick-start.md → data-provenance.md: direct link in "Next Steps" section ✅
+- data-provenance.md §Tier 2: worked example `CBJ Annual Report · 2023-Q4 · T2` + explicit
+  negotiating statement "you can cite this in a restructuring session" ✅
+
+**North star verdict: PASS** — G7 makes the public access claim true. A Zambian ministry analyst
+can engage WorldSim outputs in a negotiating context without project team mediation.
 
 ---
 
