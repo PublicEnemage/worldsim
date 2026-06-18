@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-18 (G7 Step 3 Implementation COMPLETE — PR #1037 open → release/m14. 5 docs created: onboarding suite (quick-start, scenario-creation, methodology-overview, data-provenance) + governance/goodharts-law-mitigation. README Getting Started section added. 27/27 automatable ACs pass. Step 4 Verify PASS recorded in intent doc §8. Awaiting CI + BPO Step 5 Validate.)**
+**Last updated: 2026-06-18 (G6 sprint entry ✅ EL APPROVED 2026-06-18 (PR #1038) — implementation unblocked. G7 Step 3 Implementation COMPLETE — PR #1037 open → release/m14. 5 docs created: onboarding suite (quick-start, scenario-creation, methodology-overview, data-provenance) + governance/goodharts-law-mitigation. README Getting Started section added. 27/27 automatable ACs pass. Step 4 Verify PASS recorded in intent doc §8. Awaiting CI + BPO Step 5 Validate.)**
 **Current milestone:** M14 — Methodology Publication and External Validation (GitHub Milestone 15)
 **Previous milestone:** M13 — Political Economy and Instrument Credibility (formally closed 2026-06-15; release/m13 → main merged by EL; #264 closed)
 
@@ -130,6 +130,7 @@
 | G5 Step 4 Verify | ✅ PASS 2026-06-18 | 17/17 ACs pass; test scenario `1fcc38b9` (JOR, fiscal_multiplier=1.30, 3 steps); data-quality JOR: financial T2·IMF, HD T2·WB, ecological T4, governance T3; verdict in intent doc §8 |
 | G5 Step 5 Validate | ✅ BPO ACCEPT 2026-06-18 | North star: Zambian analyst defends trajectory in restructuring session — L0 annotations answer "where does this number come from?", assumption surface shows Fiscal ×1.30 immediately, PSP visible in Zone 1D; Layer 3 PASS; sprint exit filed |
 | G5 sprint exit document | ✅ FILED 2026-06-18 — `docs/process/sprint-plans/m14-g5-sprint-exit.md` | All exit conditions satisfied; PI Agent confirmed; no rejections; north star test artifact present |
+| G6 sprint entry document | ✅ **EL APPROVED 2026-06-18** — `docs/process/sprint-plans/m14-g6-sprint-entry.md` (PR #1038) | Issues: #885, #950, #884, #823, #824, #22, PMM anchor; QA tests filed 2026-06-18 (E2E + backend, AC-1–AC-9); all entry invariants satisfied; implementation unblocked |
 | G2 — ADR-015 acceptance | ✅ COMPLETE 2026-06-16 (PR #998) | EL accepted ADR-015; 6 decisions resolved; Components 1–3 M14; Component 4 → M15. G5 unblocked. No sprint entry/exit doc required (EL-action, no user-facing deliverable). |
 | Intent/test naming convention | ✅ Enforced 2026-06-16 (PR #999) | M{N}-G{N} prefix on intent docs and E2E tests — CLAUDE.md, intent-template.md, sprint-planning-sop.md, sprint-entry-template.md all updated |
 | M14 Exit Checklist | ✅ Filed 2026-06-16 — **#968** (closure gate: #843) | Tracks all M14 deliverables |

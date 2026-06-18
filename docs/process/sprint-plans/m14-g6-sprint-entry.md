@@ -180,5 +180,5 @@ code is written. (Authority: CLAUDE.md §Agent Execution Lifecycle Step 2)*
 
 **EL approval:** ✅ Approved 2026-06-18
 
-> G6 sprint entry approved. All entry invariants satisfied: release branch exists, CI gate confirmed, sprint plan approved, no ADR prerequisite, intent document filed (DA-G6-1/DA-G6-2/CM-G6-1 resolved), QA tests authored before implementation. G6 implementation PRs may open against `release/m14`.
+> G6 sprint entry approved. All entry invariants satisfied: release branch exists, CI gate confirmed, sprint plan approved, no ADR prerequisite, intent document filed (DA-G6-1/DA-G6-2/CM-G6-1 resolved), QA tests authored before implementation (PR #1038). G6 implementation PRs may open against `release/m14`.
 > — @PublicEnemage (2026-06-18)
