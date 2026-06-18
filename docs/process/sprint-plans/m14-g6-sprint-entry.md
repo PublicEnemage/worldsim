@@ -3,17 +3,17 @@ name: m14-g6-sprint-entry
 type: sprint-entry
 milestone: M14 — Methodology Publication and External Validation
 sprint-group: G6
-status: Filed — awaiting EL approval
+status: EL Approved — implementation may begin
 authored-by: PM Agent
 authored-date: 2026-06-18
-el-approved: false
+el-approved: 2026-06-18
 release-branch: release/m14
 sop-reference: docs/process/sprint-planning-sop.md
 ---
 
 # Sprint Entry — M14, G6: Methodology, Calibration, and Instrument Legibility
 
-**Status:** Filed — awaiting EL approval before implementation begins
+**Status:** EL Approved 2026-06-18 — implementation may begin
 **Date authored:** 2026-06-18
 **Release branch:** `release/m14`
 **Sprint plan:** `docs/process/sprint-plans/m14-sprint-plan.md` (EL Approved 2026-06-16)
@@ -178,7 +178,7 @@ code is written. (Authority: CLAUDE.md §Agent Execution Lifecycle Step 2)*
 
 ## EL Approval Record
 
-**EL approval:** Pending
+**EL approval:** ✅ Approved 2026-06-18
 
-> {EL approval statement — to be filled at approval time}
-> — @PublicEnemage ({date})
+> G6 sprint entry approved. All entry invariants satisfied: release branch exists, CI gate confirmed, sprint plan approved, no ADR prerequisite, intent document filed (DA-G6-1/DA-G6-2/CM-G6-1 resolved), QA tests authored before implementation. G6 implementation PRs may open against `release/m14`.
+> — @PublicEnemage (2026-06-18)
