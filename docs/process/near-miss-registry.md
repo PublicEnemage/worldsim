@@ -2485,6 +2485,50 @@ This is a category of test design error specific to multi-fetch render chains. N
 
 ---
 
+## NM-049 — Docker Dev DB Migration Lag: Alembic Migration Not Applied to Persistent Dev Stack After PR Merge (Reactive)
+
+**Date:** 2026-06-18
+**Milestone:** M14 — G6 BPO Step 5 Validate
+**Detected by:** BPO Step 5 Validate — live API probe for AC-8 (`water_stress_index` in JOR measurement-output) returned empty ecological indicators. Investigated: `biome_class` was null in `simulation_entities` for JOR and ZMB; `alembic_version` in live DB was `a1b3c5d7e9f2` (G3); migration `b1c2d3e4f5a6` (G6) had not been applied.
+**Severity:** Medium — AC-8 was blocked during BPO Validate until the migration was manually applied; if undetected, the BPO would have incorrectly concluded that `water_stress_index` was not functioning in the live application.
+
+### What happened
+
+PR #1045 (G6 implementation) included Alembic migration `b1c2d3e4f5a6` which seeds `biome_class=arid_semiarid` on JOR and ZMB entities and seeds `water_stress_index` as an initial ecological STOCK. The CI `test-backend` job runs `alembic upgrade head` before the test suite (`.github/workflows/ci.yml` line 140), so all backend tests including AC-8 ran against a migrated DB and passed.
+
+The persistent Docker dev stack (`worldsim-api-1`, `worldsim-db-1`) does not auto-apply migrations when a new image or code change is deployed. After PR #1045 merged to `release/m14`, the Docker dev DB remained at version `a1b3c5d7e9f2`. When the BPO opened the live application and probed AC-8 against the live API, the ecological module found `biome_class=null` for JOR, skipped the `water_stress_index` dispatch, and returned empty ecological indicators.
+
+This is the same pattern as the G3 Step 4 Verify note ("migration not pre-applied at initial probe — 500 error"). G3 Step 4 documented the symptom but did not file a near-miss or produce a structural fix. NM-049 closes that gap.
+
+### What was at risk
+
+A BPO Validate step that accepted the live application observation without investigating the empty ecological indicators would have:
+1. Incorrectly concluded that AC-8 passed with empty indicators (false ACCEPT), OR
+2. Incorrectly concluded that AC-8 failed and filed a REJECT-002 (false FAIL requiring remediation of correctly implemented code)
+
+Either outcome would have been wrong. The correct observable state (water_stress_index present with non-null value) is only visible after the migration is applied.
+
+More broadly: any AC that depends on seeded data from an Alembic migration is invisible in the live application until `alembic upgrade head` is run on the dev DB. This is a systemic gap — not specific to G6 — that affects every session where a seeding migration ships.
+
+### What caught it
+
+BPO investigating the empty ecological indicators response rather than accepting it. The BPO checked the live DB with `SELECT ... metadata->>'biome_class'` and confirmed null before applying the migration. If the BPO had stopped at "ecological indicators: []" without investigating, the gap would not have been caught.
+
+### Process improvement
+
+**Immediate fix:** Applied `docker compose exec -T api alembic upgrade head` manually during BPO Validate. Confirmed migration applied; AC-8 PASS.
+
+**Structural gap — no migration application step in dev stack update procedure:** The development workflow has no documented or automated step to apply pending Alembic migrations after pulling new code or merging a PR. The gap is in `docs/CONTRIBUTING.md` (no "after merge, run migrations" step) and the Docker API container entrypoint (does not run `alembic upgrade head` on startup).
+
+**Required process improvement (tracked in GitHub issue — see NM-049 issue):**
+1. Add `alembic upgrade head` to the Docker API container entrypoint so the dev stack self-migrates on restart. This eliminates the manual step entirely.
+2. Add a "after pulling or merging, restart the API container to apply migrations" note to `docs/CONTRIBUTING.md §Development Setup` as a backstop for contributors who do not use the Docker stack.
+3. Add a migration-lag check to the BPO Validate checklist for any sprint group that includes a seeding migration: "Has `alembic upgrade head` been applied to the dev DB? Confirm `alembic_version` matches the latest migration file."
+
+The entrypoint fix (item 1) is the structural countermeasure. Items 2 and 3 are belt-and-suspenders backstops for the transition period until the entrypoint is updated.
+
+---
+
 ## Registry Maintenance
 
 ### How to add an entry
