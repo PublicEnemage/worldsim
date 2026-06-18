@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-18 (G5 Step 1 intent document filed PR #1025; Data Architect decisions DA-G5-1–DA-G5-5 recorded PR #1026; all G5 implementation gates cleared; QA test authorship (Step 2) is next action.)**
+**Last updated: 2026-06-18 (G5 Step 2 QA tests filed — `frontend/tests/e2e/m14-g5-adr015-frontend.spec.ts`; all 14 ACs covered; implementation PR (Step 3) is next action.)**
 **Current milestone:** M14 — Methodology Publication and External Validation (GitHub Milestone 15)
 **Previous milestone:** M13 — Political Economy and Instrument Credibility (formally closed 2026-06-15; release/m13 → main merged by EL; #264 closed)
 
@@ -125,7 +125,7 @@
 | G5 sprint entry | ✅ **EL APPROVED 2026-06-17** (PR #1022 merge + correction PR #1023) | `docs/process/sprint-plans/m14-g5-sprint-entry.md`; ADR-015 Components 1–3; Data Architect Agent (not Chief Engineer) for API field consultation and `api_contracts.yml`; entry invariant satisfied; implementation unblocked |
 | G5 intent document (Step 1) | ✅ FILED 2026-06-18 — PR #1025 merged | `docs/process/intents/M14-G5-2026-06-17-adr015-frontend.md`; 14 ACs across Components 1, 2, 3; observable states, visual specs, NM-045 string-presence rule applied; Data Architect decisions appended PR #1026 |
 | G5 Data Architect decisions | ✅ RECORDED 2026-06-18 — PR #1026 merged | DA-G5-1: /data-quality for source annotation. DA-G5-2: /initial-state null-filtered count. DA-G5-3: `modules_config` path confirmed; ScenarioConfigSchema extension specified. DA-G5-4: Option A (measurement-output) for programme_survival_probability. DA-G5-5: GRC/EGY→ceiling, JOR/ZMB→floor. All implementation gates cleared. |
-| G5 QA tests (Step 2) | ⬜ NOT FILED — intent document now complete | `frontend/tests/e2e/m14-g5-adr015-frontend.spec.ts`; all 14 ACs unblocked (no remaining DA gates); AC-9/10/11 route-mock pattern: intercept measurement-output + scenario detail responses |
+| G5 QA tests (Step 2) | ✅ FILED 2026-06-18 — `frontend/tests/e2e/m14-g5-adr015-frontend.spec.ts` | All 14 ACs covered; NM-045 rule applied throughout; AC-4/8/9/10/11 route-mock pattern; AC-14 format regex accepted per intent doc §7; TypeScript clean (0 errors) |
 | G2 — ADR-015 acceptance | ✅ COMPLETE 2026-06-16 (PR #998) | EL accepted ADR-015; 6 decisions resolved; Components 1–3 M14; Component 4 → M15. G5 unblocked. No sprint entry/exit doc required (EL-action, no user-facing deliverable). |
 | Intent/test naming convention | ✅ Enforced 2026-06-16 (PR #999) | M{N}-G{N} prefix on intent docs and E2E tests — CLAUDE.md, intent-template.md, sprint-planning-sop.md, sprint-entry-template.md all updated |
 | M14 Exit Checklist | ✅ Filed 2026-06-16 — **#968** (closure gate: #843) | Tracks all M14 deliverables |
