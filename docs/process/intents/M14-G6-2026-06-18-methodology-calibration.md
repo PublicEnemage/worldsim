@@ -558,45 +558,36 @@ AC-6 must assert: GRC ecological composite confidence_tier == 3 (not 2).
 
 ---
 
-## Appendix: Open Decisions — Data Architect (DA-G6-1, DA-G6-2) and Chief Methodologist (CM-G6-1)
+## Appendix: Agent Consultation Record — DA-G6-1, DA-G6-2, CM-G6-1
 
-*These decisions must be resolved and recorded here before the backend implementation PR opens.
-The Frontend Architect Agent may proceed with AC-1 through AC-4 (frontend only) independently —
-no DA or CM decision required for those. Authority for this reassignment: G5 sprint entry
-correction PR #1023 ("API field assessment consultation is Data Architect (R on api_contracts.yml),
-not Chief Engineer.").*
+*All three decisions resolved 2026-06-18 in the same session as this document. The full
+confirmed decision text appears in §7 (QA Test Prerequisites) above. Summaries below for
+quick reference.*
 
-**DA-G6-1 — Water stress indicator key for #824 (Data Architect):**
-The MENA calibration adds a water scarcity elasticity to the ecological module. What is the
-canonical `indicator_key` for the water stress indicator? The key must be registered in
-`api_contracts.yml` under the ecological framework's measurement-output response before
-the new `EcologicalElasticity` entry is added to the registry. Options: `water_stress_index`,
-`water_scarcity_ratio`, or a new key. Data Architect updates `api_contracts.yml`; Chief Engineer
-implements the registry entry. Update §3.2 Secondary state D with the confirmed key.
+**DA-G6-1 — RESOLVED (Data Architect, 2026-06-18):**
+Canonical water stress indicator key: `water_stress_index`. Schema files to update in #824 PR:
+`simulation_state.yml` (EcologicalModule affected_attributes) and `api_contracts.yml`
+(measurement-output ecological indicators, `nullable_when: entity biome_class != arid_semiarid`).
+Source to register: `ACADEMIC_LITERATURE_FAO_GFR_ARID_ICARDA_WATER_STRESS`.
 
-**DA-G6-2 — reserve_coverage_months seeding approach for #884 (Data Architect):**
-Two implementation paths: (A) Add a step-0 Quantity entry for reserve_coverage_months in the
-JOR/EGY/ZMB entity seed data (new or amended Alembic migration), with `source_registry_id`
-referencing the entity's financial data source and `measurement_framework=financial`; OR
-(B) Attribute the initial value at scenario creation via the external sector module setup path
-rather than as a delta event. Data Architect decides which approach is consistent with the
-`source_registry` attribution contract and whether `api_contracts.yml` requires any update for
-the `/initial-state` response. Chief Engineer implements the chosen path.
+**DA-G6-2 — RESOLVED (Data Architect, 2026-06-18):**
+reserve_coverage_months seeding: Option A — Alembic seed migration. STOCK with
+`measurement_framework=financial`, `confidence_tier=2`, entity-specific CBJ/CBE values,
+`source_registry_id` referencing existing G3 financial source entries. No `api_contracts.yml`
+change required (contract at line 977 already satisfied). Add note confirming satisfaction.
 
-**CM-G6-1 — Ecological composite minimum tier floor for #823 (Chief Methodologist):**
-The existing governance and financial composites use `_NORMALIZED_ABSOLUTE_MIN_TIER` as a floor.
-For the ecological composite, what is the correct minimum tier floor? Options: T2 (same as the
-current hardcoded value — consistent with existing boundary constant quality), T3 (conservative
-ecological data quality floor), or derive dynamically with no floor. Chief Methodologist records
-the decision here and the calibration rationale. Chief Engineer implements the derivation logic.
-The AC-6 test asserts the expected composite tier for GRC — cannot be authored until this floor
-is confirmed.
+**CM-G6-1 — RESOLVED (Chief Methodologist, 2026-06-18):**
+Ecological composite tier floor = T3. Derivation: `max(indicator_min_tier, 3)`. Hardcoded T2
+in `scenarios.py:866` is incorrect — composite includes T3 land_use_pressure_index and T3
+water_stress_index. AC-6 must assert `confidence_tier == 3` for GRC ecological composite.
+Floor revision to T2 requires ADR-007 panel if indicator quality improves.
 
 ---
 
-*Intent document version: 2026-06-18. Authored by implementing agents (Chief Engineer, Frontend
-Architect, Chief Methodologist) for M14 G6 — Methodology, Calibration, and Instrument Legibility.
+*Intent document version: 2026-06-18, updated 2026-06-18 with resolved agent consultations.
+Authored by implementing agents (Chief Engineer, Frontend Architect, Chief Methodologist)
+for M14 G6 — Methodology, Calibration, and Instrument Legibility.
 Sprint entry: `docs/process/sprint-plans/m14-g6-sprint-entry.md` (EL approval pending).
-CE-G6-1 through CE-G6-3 must be resolved before backend implementation PR opens. AC-1 through
-AC-4 (frontend) may proceed after EL sprint entry approval. Full lifecycle authority:
-`CLAUDE.md §Agent Execution Lifecycle`.*
+DA-G6-1, DA-G6-2, CM-G6-1 resolved — backend implementation PR may open after EL approval.
+AC-1 through AC-4 (frontend) may proceed after EL sprint entry approval. Full lifecycle
+authority: `CLAUDE.md §Agent Execution Lifecycle`.*
