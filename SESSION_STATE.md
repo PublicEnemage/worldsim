@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-18 (G5 BPO Step 5 live validation PASS — Playwright observation, §9 filed in intent doc; G5 PI Agent sprint exit independently confirmed, all 7 conditions verified. G7 COMPLETE — BPO ACCEPT 2026-06-18: AC-7 timed nav PASS (~2–3 min), sprint exit filed (PR #1043). G6b PI Agent sprint exit confirmed (PR #1039). G6 QA tests filed AC-1–AC-9 frontend+backend (PR #1041+#1042); G6 implementation gate open. Next: G6 Step 3 implementation.)**
+**Last updated: 2026-06-18 (G6 MERGED 2026-06-18 — PR #1045 → release/m14, all 9 ACs pass CI. NM-047 (step_index/n_steps mismatch) + NM-048 (data-quality two-phase render race) filed — both pre-existing G5 test flaws exposed by G6 backend timing. G6 Step 4 Verify PASS. G6 Step 5 Validate PENDING — EL BPO action required. Sprint exit doc filed: docs/process/sprint-plans/m14-g6-sprint-exit.md.)**
 **Current milestone:** M14 — Methodology Publication and External Validation (GitHub Milestone 15)
 **Previous milestone:** M13 — Political Economy and Instrument Credibility (formally closed 2026-06-15; release/m13 → main merged by EL; #264 closed)
 
@@ -131,6 +131,10 @@
 | G5 Step 5 Validate | ✅ BPO ACCEPT 2026-06-18 | North star: Zambian analyst defends trajectory in restructuring session — L0 annotations answer "where does this number come from?", assumption surface shows Fiscal ×1.30 immediately, PSP visible in Zone 1D; Layer 3 PASS; sprint exit filed |
 | G5 sprint exit document | ✅ FILED 2026-06-18 — `docs/process/sprint-plans/m14-g5-sprint-exit.md` | All exit conditions satisfied; PI Agent confirmed; no rejections; north star test artifact present |
 | G6 sprint entry document | ✅ **EL APPROVED 2026-06-18** — `docs/process/sprint-plans/m14-g6-sprint-entry.md` (EL approval: PR #1040; QA tests: PR #1041+#1042) | Issues: #885, #950, #884, #823, #824, #22, PMM anchor; QA tests filed 2026-06-18 (E2E + backend, AC-1–AC-9); all entry invariants satisfied; implementation unblocked |
+| G6 implementation (Step 3) | ✅ **MERGED 2026-06-18** — PR #1045 → release/m14 (commit 13a9b83) | Zone 1B negotiation labels (#885), Zone 1A Y axis label (#950), reserve_coverage_months seeding (#884), ecological composite tier floor T3 (#823), water_stress_index + biome_class dispatch (#824), confidence tier methodology doc (#22), PMM interpretation anchor; Alembic migration b1c2d3e4f5a6; pre-push gates: ruff ✓, mypy (pre-existing only) ✓, npm run build ✓ |
+| G6 Step 4 Verify | ✅ **PASS 2026-06-18** | All 9 ACs confirmed via CI: AC-1–4 playwright-e2e (commit 65158f4); AC-5–8 test-backend; AC-9 shell find assertion. NM-047 (step_index/n_steps) + NM-048 (data-quality render race) filed — pre-existing G5 test flaws exposed and fixed in same PR. Verdict in intent doc §8. |
+| G6 Step 5 Validate | **PENDING** — EL BPO action required | BPO must open live application and confirm: Zone 1B T4 "Model estimate"/T5 "Synthetic extrapolation" labels; Zone 1A "Score" Y axis; JOR reserve_coverage_months in initial state; calibration docs navigable <5 min. Customer Agent Layer 3 assessments on record in sprint exit doc §3. |
+| G6 sprint exit document | ✅ Filed 2026-06-18 — `docs/process/sprint-plans/m14-g6-sprint-exit.md` | Section 2 (implementation) COMPLETE; Section 3 (Customer Agent Layer 3) COMPLETE; Section 4 (no rejections) COMPLETE; Section 5 PI Agent BLOCKED pending BPO Step 5 Validate |
 | G2 — ADR-015 acceptance | ✅ COMPLETE 2026-06-16 (PR #998) | EL accepted ADR-015; 6 decisions resolved; Components 1–3 M14; Component 4 → M15. G5 unblocked. No sprint entry/exit doc required (EL-action, no user-facing deliverable). |
 | Intent/test naming convention | ✅ Enforced 2026-06-16 (PR #999) | M{N}-G{N} prefix on intent docs and E2E tests — CLAUDE.md, intent-template.md, sprint-planning-sop.md, sprint-entry-template.md all updated |
 | M14 Exit Checklist | ✅ Filed 2026-06-16 — **#968** (closure gate: #843) | Tracks all M14 deliverables |
@@ -210,6 +214,7 @@ All near-term issues dispositioned at HORIZON sweep 2026-06-13 — see G8 sprint
 
 | PR | Title | Target | Status |
 |---|---|---|---|
+| #1045 ✅ | feat(m14-g6): methodology, calibration, and instrument legibility (#885, #950, #884, #823, #824, #22, PMM anchor) | release/m14 | Merged 2026-06-18 |
 | #1043 ✅ | process(m14-g7): BPO ACCEPT — G7 governance and onboarding documentation | release/m14 | Merged 2026-06-18 |
 | #1042 ✅ | process(m14-g6): QA tests filed + §2.4 gate checked (duplicate merge of #1041 content) | release/m14 | Merged 2026-06-18 |
 | #1041 ✅ | process(m14-g6): QA tests filed + §2.4 gate checked — EL-approved entry complete | release/m14 | Merged 2026-06-18 |
@@ -576,12 +581,12 @@ CI hotfix: NM-035 filed; `ci.yml` PR trigger updated to include `release/m*` (PR
 | #961 | bug(frontend): entity hardcoded to GRC in scenario creation form | G1 | Implement after EL plan approval |
 | #962 | bug(frontend): step counter shows 'Step 0 / 8' on completed scenarios | G1 | Implement after EL plan approval |
 | #963 | bug(frontend): choropleth attribute selector displays raw DB field names | G1 | Implement after EL plan approval |
-| #884 | ux: reserve_coverage_months not surfaced as readable metric | G6 | |
-| #885 | ux: Exploratory confidence tier misclassifies baseline vs. projection | G6 | |
-| #22 | feat: uncertainty quantification — disclosure layer (Tier tags per indicator) | G6 | Disclosure layer only; full distributional bands → M16 (#22 revisited) |
-| #823 | arch(methodology): ecological composite dynamic denominator fix | G6 | DIC approval on record |
-| #824 | fix(engine): MENA arid-economy elasticity calibration | G6 | DIC approval on record |
-| #950 | ux: Zone 1A trajectory chart Y axis has no label or unit | G6 | HIGH; solo-use blocker |
+| #884 | ux: reserve_coverage_months not surfaced as readable metric | G6 | ✅ MERGED PR #1045 — awaiting BPO ACCEPT to close |
+| #885 | ux: Exploratory confidence tier misclassifies baseline vs. projection | G6 | ✅ MERGED PR #1045 — awaiting BPO ACCEPT to close |
+| #22 | feat: uncertainty quantification — disclosure layer (Tier tags per indicator) | G6 | ✅ MERGED PR #1045 — awaiting BPO ACCEPT to close; full distributional bands → M16 |
+| #823 | arch(methodology): ecological composite dynamic denominator fix | G6 | ✅ MERGED PR #1045 — awaiting BPO ACCEPT to close |
+| #824 | fix(engine): MENA arid-economy elasticity calibration | G6 | ✅ MERGED PR #1045 — awaiting BPO ACCEPT to close |
+| #950 | ux: Zone 1A trajectory chart Y axis has no label or unit | G6 | ✅ MERGED PR #1045 — awaiting BPO ACCEPT to close |
 | #845 | ux: Zone 1A information architecture — multi-dimensional encoding | G6c | Phase 1 design thinking doc only; Phases 2–4 → M15/M16 |
 | #976 | feat(data): Path 2 — proprietary data upload (design artifacts only) | G6b | Design artifacts in M14; implementation → M16 |
 | #3 | governance: resolve single-principal separation of duties gap | G7 | EL-action |
