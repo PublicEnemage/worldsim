@@ -2384,6 +2384,41 @@ When an intent document AC specifies a concrete value that must appear in the UI
 
 ---
 
+## NM-046 — Stale Vite Module Cache in Docker Container Masked G4 Fix During Post-Sprint EL Observation (Reactive)
+
+**Date:** 2026-06-17
+**Milestone:** M14 — G4 ADR-016 Frontend (post-sprint-exit visual check)
+**Detected by:** EL — Ctrl+F browser text search for "CBJ" returned 0 results after G4 sprint exit was confirmed
+**Severity:** Medium — could have caused a false re-rejection of G4 based on environment state rather than code state; caught before any rejection artifact was filed
+
+### What happened
+
+After the G4 sprint exit document was confirmed (PR #1020, 2026-06-17), the EL loaded the Hormuz scenario in the live Docker Compose stack to visually verify the Grounding strip source citations. "CBJ" was not visible anywhere in the strip. Ctrl+F browser text search returned 0/0.
+
+The API endpoint (`/initial-state`) was returning `source: "CBJ"` and `vintage: "2023-Q4"` correctly. The source file `frontend/src/components/GroundingStrip.tsx` on disk had the correct field names (`ind.source`, `ind.vintage`) from PR #1018. The Vite dev server logs showed HMR events for `GroundingStrip.tsx` — but those events were from earlier PRs (#1015, #1016), not from PR #1018.
+
+Root cause: Docker on macOS uses a VM (Apple Virtualization Framework / HyperKit). The Linux container's inotify subsystem does not receive file change events from the macOS host filesystem. Vite's default file watcher relies on inotify. Without `usePolling: true` in `vite.config.ts`, file changes made on the host (git pull, PR merge) are visible in the container's mounted volume — the bytes are correct — but Vite's watcher never fires. The browser retains the pre-PR-#1018 compiled module.
+
+The frontend container had been running for 6 days without restart. The G4 CI runs (Playwright E2E) used ephemeral containers with fresh Vite builds each time, so CI correctly verified the fix. The local dev stack was never restarted after PR #1018 merged.
+
+### What was at risk
+
+The EL, observing the live app post-sprint-exit and finding "CBJ" absent, could have concluded the G4 REJECT-001 fix was incomplete or not deployed. A false re-rejection would have re-opened G4, requiring another round of Step 1–5 lifecycle work for a defect that was already fixed. The sprint exit confirmation (already filed, all conditions satisfied) would have been called into question.
+
+### What caught it
+
+EL used Ctrl+F (browser text search) rather than relying on visual scan alone. When EL reported the 0/0 result, the Docker stack's age (6 days) was identified as the likely cause. `docker compose restart frontend` confirmed the hypothesis: CBJ appeared immediately after restart and hard refresh.
+
+### Process improvement
+
+**Immediate fix:** Added `server.watch.usePolling: true` to `frontend/vite.config.ts` (PR filing in progress, 2026-06-17). This is the standard configuration for Vite inside Docker on macOS — it switches from inotify to polling, ensuring file changes from the host are always detected regardless of container age.
+
+**Structural gap:** The Docker Compose `frontend` service has no explicit restart policy and no documented "must restart after source changes" requirement. Contributors running a long-lived stack may silently run stale frontend code after any git pull or PR merge. The `usePolling` fix addresses the majority of cases (HMR fires reliably for future changes), but a container running pre-fix Vite will still be stale until restarted once.
+
+**Reminder added to `docs/CONTRIBUTING.md §Local Development` (deferred to follow-up):** After any `git pull` that changes frontend source files, run `docker compose restart frontend` if the container has been running for more than 24 hours, until `usePolling` is confirmed present in the deployed config.
+
+---
+
 ## Registry Maintenance
 
 ### How to add an entry
