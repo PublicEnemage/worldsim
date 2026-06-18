@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-18 (G7 COMPLETE — BPO ACCEPT 2026-06-18. AC-7 timed nav PASS (README → quick-start → data-provenance → Tier 2 explanation, ~2–3 min); AC-4 5 blindspots confirmed; AC-6 4 Goodhart sections confirmed operational; Layer 3 PASS; North star PASS. Sprint exit filed: docs/process/sprint-plans/m14-g7-sprint-exit.md. #988 and #989 ready to close. G6 sprint entry EL-approved 2026-06-18 — implementation unblocked.)**
+**Last updated: 2026-06-18 (G5 BPO Step 5 live validation PASS — Playwright observation, §9 filed in intent doc; G5 PI Agent sprint exit independently confirmed, all 7 conditions verified. G7 COMPLETE — BPO ACCEPT 2026-06-18: AC-7 timed nav PASS (~2–3 min), sprint exit filed (PR #1043). G6b PI Agent sprint exit confirmed (PR #1039). G6 QA tests filed AC-1–AC-9 frontend+backend (PR #1041+#1042); G6 implementation gate open. Next: G6 Step 3 implementation.)**
 **Current milestone:** M14 — Methodology Publication and External Validation (GitHub Milestone 15)
 **Previous milestone:** M13 — Political Economy and Instrument Credibility (formally closed 2026-06-15; release/m13 → main merged by EL; #264 closed)
 
@@ -130,7 +130,7 @@
 | G5 Step 4 Verify | ✅ PASS 2026-06-18 | 17/17 ACs pass; test scenario `1fcc38b9` (JOR, fiscal_multiplier=1.30, 3 steps); data-quality JOR: financial T2·IMF, HD T2·WB, ecological T4, governance T3; verdict in intent doc §8 |
 | G5 Step 5 Validate | ✅ BPO ACCEPT 2026-06-18 | North star: Zambian analyst defends trajectory in restructuring session — L0 annotations answer "where does this number come from?", assumption surface shows Fiscal ×1.30 immediately, PSP visible in Zone 1D; Layer 3 PASS; sprint exit filed |
 | G5 sprint exit document | ✅ FILED 2026-06-18 — `docs/process/sprint-plans/m14-g5-sprint-exit.md` | All exit conditions satisfied; PI Agent confirmed; no rejections; north star test artifact present |
-| G6 sprint entry document | ✅ **EL APPROVED 2026-06-18** — `docs/process/sprint-plans/m14-g6-sprint-entry.md` (PR #1038) | Issues: #885, #950, #884, #823, #824, #22, PMM anchor; QA tests filed 2026-06-18 (E2E + backend, AC-1–AC-9); all entry invariants satisfied; implementation unblocked |
+| G6 sprint entry document | ✅ **EL APPROVED 2026-06-18** — `docs/process/sprint-plans/m14-g6-sprint-entry.md` (EL approval: PR #1040; QA tests: PR #1041+#1042) | Issues: #885, #950, #884, #823, #824, #22, PMM anchor; QA tests filed 2026-06-18 (E2E + backend, AC-1–AC-9); all entry invariants satisfied; implementation unblocked |
 | G2 — ADR-015 acceptance | ✅ COMPLETE 2026-06-16 (PR #998) | EL accepted ADR-015; 6 decisions resolved; Components 1–3 M14; Component 4 → M15. G5 unblocked. No sprint entry/exit doc required (EL-action, no user-facing deliverable). |
 | Intent/test naming convention | ✅ Enforced 2026-06-16 (PR #999) | M{N}-G{N} prefix on intent docs and E2E tests — CLAUDE.md, intent-template.md, sprint-planning-sop.md, sprint-entry-template.md all updated |
 | M14 Exit Checklist | ✅ Filed 2026-06-16 — **#968** (closure gate: #843) | Tracks all M14 deliverables |
@@ -140,6 +140,7 @@
 | Path 2 — proprietary data upload | ✅ Filed **#976** (M16+; design in M14 G6b) | `USER_SUPPLIED` provenance type; #53 prerequisite; Journey A GA-02 |
 | G6b intent document (Step 1) | ✅ FILED 2026-06-18 — `docs/process/intents/M14-G6b-2026-06-18-path2-design-groundwork.md` | 9 ACs across 3 design artifacts; UX Designer (field mapping UX concept), Architect (`USER_SUPPLIED` provenance spec), Data Architect (isolation model sketch); all filed to `docs/design/path2-data-upload/` before M14 exit; EL review gate before sprint exit |
 | G6b design artifacts (Step 3) | ✅ FILED 2026-06-18 — `docs/design/path2-data-upload/` | AC-1–AC-9 covered: `field-mapping-ux-concept.md` (UX Designer; 5-min workflow, both failure modes, caveat placement), `user-supplied-provenance-spec.md` (Architect; T2 tier, Grounding Strip format, ADR-007 implication, scope boundary), `data-isolation-model-sketch.md` (Data Architect; isolation invariant, 3 failure modes, Issue #53 requirements, out-of-scope list); EL review gate: Step 4 |
+| G6b sprint exit | ✅ FILED 2026-06-18 — `docs/process/sprint-plans/m14-g6b-sprint-exit.md` (PR #1039) | PI Agent confirmed; AC-1–AC-9 PASS; BPO ACCEPT 2026-06-18; north star forward trace: "ministry-supplied reserve figure" argument architecturally specified |
 | Journey A gap markers (GA-01, GA-02) | ✅ Filed 2026-06-16 (PR #974) | `docs/ux/user-journeys.md` |
 | Milestone planning panel deliberation | ✅ COMPLETE 2026-06-16 | M15–M18 defined; demo arc through Demo 7; 17 issues reallocated; 5 new issues filed (#986–#990); roadmap updated |
 | G6c — Zone 1A Phase 1 design thinking | ✅ COMPLETE 2026-06-18 — PR #1033 merged | Intent at `docs/process/intents/M14-G6c-2026-06-18-zone-1a-design-thinking.md`; design doc at `docs/ux/design-thinking/zone-1a-information-architecture.md`; AC-1–AC-8 satisfied; Phase 2 Readiness section present; gates M15 Architecture Review (#845 Phase 1 closed) |
@@ -148,7 +149,7 @@
 | G7 intent document (Step 1) | ✅ FILED 2026-06-18 — `docs/process/intents/M14-G7-2026-06-18-governance-onboarding.md` | 7 ACs; issues #988 + #989; EL-action items #3 and #6 noted out of agent scope; sprint entry gate note embedded |
 | G7 QA tests (Step 2) | ✅ FILED 2026-06-18 — `backend/tests/test_m14_g7_governance_onboarding.py` | 28 tests: AC-1–AC-6 file-existence + content-presence checks (grep equivalents); AC-4 partial automation (≥1 blindspot; BPO confirms ≥3 at Step 5); AC-7 marked skip (manual BPO timed navigation); all 25 fail pre-implementation as expected |
 | G7 sprint entry document | ✅ **EL APPROVED 2026-06-18** — `docs/process/sprint-plans/m14-g7-sprint-entry.md` | No ADR gate; intent + QA pre-filed; sequencing variance noted (no gate crossed); implementation unblocked |
-| G7 implementation (Step 3) | ✅ PR #1037 open → release/m14 | 5 docs: `docs/onboarding/` (quick-start, scenario-creation, methodology-overview, data-provenance) + `docs/governance/goodharts-law-mitigation.md`; README Getting Started section added; 27/27 automatable ACs pass; lint clean |
+| G7 implementation (Step 3) | ✅ MERGED 2026-06-18 (PR #1037) | 5 docs: `docs/onboarding/` (quick-start, scenario-creation, methodology-overview, data-provenance) + `docs/governance/goodharts-law-mitigation.md`; README Getting Started section added; 27/27 automatable ACs pass; lint clean |
 | G7 Step 4 Verify | ✅ PASS 2026-06-18 | AC-1–AC-6 all confirmed via pytest (27 passed, 1 skipped); shell checks pass; Step 4 verdict in intent doc §8; AC-7 manual BPO at Step 5 |
 | G7 Step 5 Validate | ✅ BPO ACCEPT 2026-06-18 | AC-7 timed nav PASS (~2–3 min); AC-4 5 blindspots ✅; AC-6 4 sections ✅; Layer 3 PASS; North star PASS; sprint exit filed |
 | #986 — Cohort disaggregation on primary surface | ✅ Filed (M15) | M11.5 FINDING-03 gap; Demo 6 prerequisite |
@@ -209,6 +210,21 @@ All near-term issues dispositioned at HORIZON sweep 2026-06-13 — see G8 sprint
 
 | PR | Title | Target | Status |
 |---|---|---|---|
+| #1043 ✅ | process(m14-g7): BPO ACCEPT — G7 governance and onboarding documentation | release/m14 | Merged 2026-06-18 |
+| #1042 ✅ | process(m14-g6): QA tests filed + §2.4 gate checked (duplicate merge of #1041 content) | release/m14 | Merged 2026-06-18 |
+| #1041 ✅ | process(m14-g6): QA tests filed + §2.4 gate checked — EL-approved entry complete | release/m14 | Merged 2026-06-18 |
+| #1040 ✅ | process(m14-g6): record EL approval — sprint entry approved 2026-06-18 | release/m14 | Merged 2026-06-18 |
+| #1039 ✅ | process(m14-g6b): PI Agent sprint exit — G6b COMPLETE | release/m14 | Merged 2026-06-18 |
+| #1038 ✗ | process(m14-g6): G6 sprint entry — QA tests filed (closed without merge; superseded by #1041) | release/m14 | Closed 2026-06-18 |
+| #1037 ✅ | docs(m14-g7): governance and onboarding documentation suite (#988, #989) | release/m14 | Merged 2026-06-18 |
+| #1036 ✅ | fix(m14-g6): resolve intent document appendix — DA-G6-1, DA-G6-2, CM-G6-1 confirmed | release/m14 | Merged 2026-06-18 |
+| #1035 ✅ | chore(state): G6c COMPLETE — Zone 1A Phase 1 design thinking merged PR #1033 | release/m14 | Merged 2026-06-18 |
+| #1034 ✅ | design(m14-g6b): Path 2 design artifacts — field mapping UX, USER_SUPPLIED provenance, data isolation | release/m14 | Merged 2026-06-18 |
+| #1033 ✅ | docs(m14-g6c): Zone 1A Phase 1 design thinking — per-mode cognitive questions, breaking points, concrete directions | release/m14 | Merged 2026-06-18 |
+| #1032 ✅ | process(m14-g6b): G6b Step 1 design intent — Path 2 ministry-owned data upload groundwork | release/m14 | Merged 2026-06-18 |
+| #1031 ✅ | process(m14-g5): Step 4 Verify PASS, Step 5 BPO ACCEPT, sprint exit filed | release/m14 | Merged 2026-06-18 |
+| #1030 ✅ | feat(m14-g5): ADR-015 Evidence Thread Architecture — Components 1, 2, 3 | release/m14 | Merged 2026-06-18 |
+| #1029 ✅ | docs(ki-004): Node.js 20 deprecation warning on actions/checkout@v4 and setup-node@v4 | release/m14 | Merged 2026-06-18 |
 | #1026 ✅ | process(m14-g5): record Data Architect decisions DA-G5-1 through DA-G5-5 | release/m14 | Merged 2026-06-18 |
 | #1025 ✅ | feat(m14-g5): G5 Step 1 implementation intent document — ADR-015 Components 1, 2, 3 | release/m14 | Merged 2026-06-18 |
 | #1023 ✅ | process(m14-g5): record EL approval and correct Data Architect consultation role | release/m14 | Merged 2026-06-17 |
@@ -234,7 +250,6 @@ All near-term issues dispositioned at HORIZON sweep 2026-06-13 — see G8 sprint
 | #979 ✅ | chore(ci): add branch-naming to release-branch-ci-gate Ruleset | release/m14 | Merged 2026-06-16 |
 | #980 ✅ | docs(ki-003): GitHub Rulesets bootstrapping problem | release/m14 | Merged 2026-06-16 |
 | #981 ✅ | chore(state): M14 session state — CI gate, branch naming, Path 1/2, journey markers | release/m14 | Merged 2026-06-16 |
-| TBD | docs(m14): milestone planning — M15–M18 definitions, sprint plan G6b/G6c, roadmap update | release/m14 | Pending — this PR |
 | #909 ✅ | feat(m13): kickoff — sprint plan, entry doc, ADR backlog | release/m13 | Merged 2026-06-12 |
 | #910 ✅ | chore(state): M13 kickoff session state | release/m13 | Merged 2026-06-12 |
 | #911 ✅ | feat(m13): EL approval recorded — sprint plan + entry doc | release/m13 | Merged 2026-06-12 |
