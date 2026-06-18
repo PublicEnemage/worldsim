@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-18 (G6c COMPLETE — Zone 1A Phase 1 design thinking document authored and merged PR #1033. AC-1–AC-8 satisfied. Phase 2 Readiness section present. Issue #845 Phase 1 closed. Gates M15 Architecture Review.)**
+**Last updated: 2026-06-18 (G6b Step 3 complete — 3 design artifacts filed at `docs/design/path2-data-upload/`: field-mapping-ux-concept.md, user-supplied-provenance-spec.md, data-isolation-model-sketch.md. All AC-1–AC-9 covered. EL review gate open — Step 4 Verify. G6c COMPLETE — Zone 1A Phase 1 design thinking merged PR #1033.)**
 **Current milestone:** M14 — Methodology Publication and External Validation (GitHub Milestone 15)
 **Previous milestone:** M13 — Political Economy and Instrument Credibility (formally closed 2026-06-15; release/m13 → main merged by EL; #264 closed)
 
@@ -138,11 +138,15 @@
 | Path 1 — approved source query | ✅ Filed **#975** (M15) | Extends ADR-016 Component 1; Journey A GA-01 |
 | Path 2 — proprietary data upload | ✅ Filed **#976** (M16+; design in M14 G6b) | `USER_SUPPLIED` provenance type; #53 prerequisite; Journey A GA-02 |
 | G6b intent document (Step 1) | ✅ FILED 2026-06-18 — `docs/process/intents/M14-G6b-2026-06-18-path2-design-groundwork.md` | 9 ACs across 3 design artifacts; UX Designer (field mapping UX concept), Architect (`USER_SUPPLIED` provenance spec), Data Architect (isolation model sketch); all filed to `docs/design/path2-data-upload/` before M14 exit; EL review gate before sprint exit |
+| G6b design artifacts (Step 3) | ✅ FILED 2026-06-18 — `docs/design/path2-data-upload/` | AC-1–AC-9 covered: `field-mapping-ux-concept.md` (UX Designer; 5-min workflow, both failure modes, caveat placement), `user-supplied-provenance-spec.md` (Architect; T2 tier, Grounding Strip format, ADR-007 implication, scope boundary), `data-isolation-model-sketch.md` (Data Architect; isolation invariant, 3 failure modes, Issue #53 requirements, out-of-scope list); EL review gate: Step 4 |
 | Journey A gap markers (GA-01, GA-02) | ✅ Filed 2026-06-16 (PR #974) | `docs/ux/user-journeys.md` |
 | Milestone planning panel deliberation | ✅ COMPLETE 2026-06-16 | M15–M18 defined; demo arc through Demo 7; 17 issues reallocated; 5 new issues filed (#986–#990); roadmap updated |
 | G6c — Zone 1A Phase 1 design thinking | ✅ COMPLETE 2026-06-18 — PR #1033 merged | Intent at `docs/process/intents/M14-G6c-2026-06-18-zone-1a-design-thinking.md`; design doc at `docs/ux/design-thinking/zone-1a-information-architecture.md`; AC-1–AC-8 satisfied; Phase 2 Readiness section present; gates M15 Architecture Review (#845 Phase 1 closed) |
 | #988 — Goodhart's Law mitigation | ✅ Filed (M14 G7) | TSC monitoring framework for parameterization gaming risk |
 | #989 — Onboarding documentation | ✅ Filed (M14 G7) | Global south analyst onboarding |
+| G7 intent document (Step 1) | ✅ FILED 2026-06-18 — `docs/process/intents/M14-G7-2026-06-18-governance-onboarding.md` | 7 ACs; issues #988 + #989; EL-action items #3 and #6 noted out of agent scope; sprint entry gate note embedded |
+| G7 QA tests (Step 2) | ✅ FILED 2026-06-18 — `backend/tests/test_m14_g7_governance_onboarding.py` | 28 tests: AC-1–AC-6 file-existence + content-presence checks (grep equivalents); AC-4 partial automation (≥1 blindspot; BPO confirms ≥3 at Step 5); AC-7 marked skip (manual BPO timed navigation); all 25 fail pre-implementation as expected |
+| G7 sprint entry document | ⬜ NOT YET FILED — HARD STOP | Per intent doc §0 gate: implementation may not begin until sprint entry filed and EL-approved |
 | #986 — Cohort disaggregation on primary surface | ✅ Filed (M15) | M11.5 FINDING-03 gap; Demo 6 prerequisite |
 | #987 — Political risk summary surface (Persona 3) | ✅ Filed (M15) | Plain-language legitimacy dynamics |
 | #990 — Accessibility validation on target hardware | ✅ Filed (M15) | 8GB/4-core laptop gate |
