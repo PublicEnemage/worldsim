@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-17 (G4 Step 4 Verify PASS — 9/9 ACs confirmed (PRs #1015 + #1016). Step 5 Validate PENDING — awaiting Business PO. G3 COMPLETE. G1 COMPLETE.)**
+**Last updated: 2026-06-17 (G4 Step 5 Validate BPO ACCEPT — REJECT-001 resolved; PR #1018 merged; G4 COMPLETE. G5 gate open. G3 COMPLETE. G1 COMPLETE.)**
 **Current milestone:** M14 — Methodology Publication and External Validation (GitHub Milestone 15)
 **Previous milestone:** M13 — Political Economy and Instrument Credibility (formally closed 2026-06-15; release/m13 → main merged by EL; #264 closed)
 
@@ -120,7 +120,7 @@
 | G4 QA tests (Step 2) | ✅ Filed 2026-06-17 — `frontend/tests/e2e/m14-g4-adr016-frontend.spec.ts` | AC-1–AC-9; guard pattern; AC-8/AC-9 route mocks; authored before implementation |
 | G4 implementation (Step 3) | ✅ MERGED 2026-06-17 — PR #1015 + PR #1016 (AC-5 text fix) → release/m14 | DataQualityPreview, GroundingStrip, ScenarioParameters, IC-4/IC-6 headers, ModeSelector onWrapperClick |
 | G4 Step 4 Verify | ✅ PASS 2026-06-17 | 9/9 ACs pass; AC-5 text fix required (PR #1016); `ModeSelector.onClick` bubbles noted as finding; verdict in intent doc §8 |
-| G4 Step 5 Validate | ⬜ PENDING — Business PO | BPO opens JOR/ZMB scenario, opens Grounding strip, confirms north star argument within 90s; Customer Agent Layer 3 assessment required before verdict |
+| G4 Step 5 Validate | ✅ BPO ACCEPT 2026-06-17 | REJECT-001 issued (AC-3: GroundingIndicator field name mismatch source_institution→source); Data Architect review confirmed contract correct; fix merged PR #1018; re-validate PASS. Layer 3 PASS. North star PASS. NM-045 filed. G4 COMPLETE. |
 | G2 — ADR-015 acceptance | ✅ COMPLETE 2026-06-16 (PR #998) | EL accepted ADR-015; 6 decisions resolved; Components 1–3 M14; Component 4 → M15. G5 unblocked. No sprint entry/exit doc required (EL-action, no user-facing deliverable). |
 | Intent/test naming convention | ✅ Enforced 2026-06-16 (PR #999) | M{N}-G{N} prefix on intent docs and E2E tests — CLAUDE.md, intent-template.md, sprint-planning-sop.md, sprint-entry-template.md all updated |
 | M14 Exit Checklist | ✅ Filed 2026-06-16 — **#968** (closure gate: #843) | Tracks all M14 deliverables |
