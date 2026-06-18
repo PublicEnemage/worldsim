@@ -17,7 +17,7 @@ function IndicatorRow({ ind }: { ind: GroundingIndicator }) {
     ind.value != null
       ? `${ind.value}${ind.unit ? " " + ind.unit : ""}`
       : "—";
-  const citation = [ind.source_institution, ind.data_vintage]
+  const citation = [ind.source, ind.vintage]
     .filter(Boolean)
     .join(" · ");
   const tier = ind.confidence_tier != null ? ` · T${ind.confidence_tier}` : "";
