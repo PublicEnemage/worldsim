@@ -20,6 +20,18 @@ import type { QuantitySchema } from "../types";
 import { getIndicatorDisplayName } from "../lib/indicatorDisplayNames";
 
 // ---------------------------------------------------------------------------
+// Tier meaning labels — ADR-015 §Component 1 §HCL
+// ---------------------------------------------------------------------------
+
+const TIER_MEANING_LABELS: Record<number, string> = {
+  1: "real observed data",
+  2: "official statistics",
+  3: "synthetic",
+  4: "model estimate",
+  5: "synthetic extrapolation",
+};
+
+// ---------------------------------------------------------------------------
 // Cohort indicator configuration
 // ---------------------------------------------------------------------------
 
@@ -174,7 +186,7 @@ export function CohortIndicatorsPanel({ indicators, prevIndicators }: Props) {
                   data-testid={`cohort-tier-${key}`}
                   style={{ fontSize: 8, color: "#aaa", flexShrink: 0 }}
                 >
-                  T{tier}
+                  {`[T${tier} · ${TIER_MEANING_LABELS[tier] ?? "unknown"}]`}
                 </span>
               )}
             </div>

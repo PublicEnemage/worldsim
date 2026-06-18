@@ -370,7 +370,16 @@ endpoints:
           timestep_label: {type: string}
           start_date: {type: "string|null"}
           initial_attributes: {type: object}
-          modules_config: {type: object}
+          fiscal_multiplier: {type: "number|null", description: "Mode 2 fiscal multiplier; 1.0 = default; null = not set"}
+          modules_config:
+            type: object
+            description: >
+              Optional module activation JSONB. DA-G5-3 confirmed paths:
+              political_economy.enabled (boolean) — whether the political economy module is active;
+              political_economy.conditionality_type (string: "standard"|"strict"|"relaxed") — conditionality type.
+            political_economy:
+              enabled: {type: "boolean|null", required: false}
+              conditionality_type: {type: "string|null", values: ["standard", "strict", "relaxed"], required: false}
         scheduled_inputs:
           type: array
           items:
@@ -683,6 +692,7 @@ endpoints:
       - "financial framework includes all untagged attributes (backward-compat rule)"
       - "composite_score is null when single_entity_warning=true for financial and human_development — percentile rank requires ≥2 entities"
       - "db_reads includes simulation_reference_constants for ecological effective-at-simulation-time boundary constant query"
+      - "DA-G5-4 (ADR-015 Component 3): political_economy framework outputs.political_economy.indicators.programme_survival_probability is a QuantitySchema entry (value: Decimal string|null, confidence_tier: 3, unit: 'probability'). Distinct from political_economy.composite_score (3-factor composite from ADR-013). Frontend fetches this via Option A: measurement-output at current step."
 
   # ---------------------------------------------------------------------------
   # Causal Graph (US-048 — X-Ray Interactive Graph)

@@ -73,6 +73,13 @@ export interface ScenarioConfigSchema {
   timestep_label: string;
   fiscal_multiplier?: number;
   start_date?: string;
+  // DA-G5-3: confirmed JSONB paths for political economy module configuration
+  modules_config?: {
+    political_economy?: {
+      enabled?: boolean;
+      conditionality_type?: "standard" | "strict" | "relaxed";
+    };
+  };
 }
 
 // ADR-016 Component 1 — Data quality preview response

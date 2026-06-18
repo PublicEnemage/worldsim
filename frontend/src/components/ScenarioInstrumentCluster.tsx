@@ -37,7 +37,8 @@ import { CohortIndicatorsPanel } from "./CohortIndicatorsPanel";
 import { ControlPlane, type Mode3Params } from "./ControlPlane";
 import { useScenarioStepStore } from "../store/scenarioStepStore";
 import type { TrajectoryResponse, TrajectoryFrameworkPoint, Zone1BAlert } from "../store/scenarioStepStore";
-import type { QuantitySchema } from "../types";
+import type { QuantitySchema, ScenarioDetailResponse } from "../types";
+import type { FrameworkDataQuality } from "./FourFrameworkZone1D";
 
 const API_BASE = "http://localhost:8000/api/v1";
 
@@ -203,6 +204,8 @@ interface ScenarioInstrumentClusterProps {
   fiscalMultiplier?: number | null;
   /** Mode 3 Active Control — when true, ControlPlane is rendered and branching is enabled. */
   mode3Active?: boolean;
+  /** ADR-015 §Component 2+3: scenario detail for AssumptionSurface and PE status. */
+  activeScenarioDetail?: ScenarioDetailResponse | null;
 }
 
 export function ScenarioInstrumentCluster({
@@ -213,6 +216,7 @@ export function ScenarioInstrumentCluster({
   comparisonScenarioId,
   fiscalMultiplier,
   mode3Active = false,
+  activeScenarioDetail,
 }: ScenarioInstrumentClusterProps) {
   const store = useScenarioStepStore();
   const bp = useViewportBreakpoint();
@@ -230,6 +234,14 @@ export function ScenarioInstrumentCluster({
     current: Record<string, QuantitySchema> | null;
     prev: Record<string, QuantitySchema> | null;
   }>({ current: null, prev: null });
+
+  // ADR-015 §Component 1 — data-quality per framework for Zone 1D L0 annotations (DA-G5-1).
+  const [dataQuality, setDataQuality] = useState<Record<string, FrameworkDataQuality> | null>(null);
+
+  // ADR-015 §Component 3 — programme_survival_probability from measurement-output (DA-G5-4 Option A).
+  // undefined = not yet fetched or PE not active; null = PE active but computation failed; string = value.
+  const [pspValue, setPspValue] = useState<string | null | undefined>(undefined);
+  const [pspTier, setPspTier] = useState<number | null>(null);
 
   // Mode 3 branch advance loop — abortController cancels in-flight advances on cleanup.
   const branchAbortRef = useRef<AbortController | null>(null);
@@ -333,6 +345,41 @@ export function ScenarioInstrumentCluster({
     return () => { cancelled = true; };
   }, [comparisonScenarioId]);
 
+  // ADR-015 §Component 1 — fetch data-quality for Zone 1D L0 source annotations (DA-G5-1).
+  // Triggered when entity_id becomes available from the trajectory response.
+  // Source institution is per-entity (not per-step), so one fetch per entity suffices.
+  useEffect(() => {
+    const entityId = store.trajectory?.entity_id;
+    const startYear = activeScenarioDetail?.configuration?.start_date
+      ? parseInt(activeScenarioDetail.configuration.start_date.slice(0, 4), 10)
+      : null;
+    if (!entityId || !startYear) return;
+    let cancelled = false;
+
+    fetch(
+      `${API_BASE}/entities/${encodeURIComponent(entityId)}/data-quality?year=${startYear}`
+    )
+      .then((res) => (res.ok ? (res.json() as Promise<{ frameworks: Array<{ framework: string; source_institution: string | null; data_vintage: string | null; confidence_tier?: number | null }> }>) : null))
+      .then((raw) => {
+        if (cancelled || !raw) return;
+        const byFramework: Record<string, FrameworkDataQuality> = {};
+        for (const fw of raw.frameworks) {
+          byFramework[fw.framework] = {
+            source_institution: fw.source_institution,
+            data_vintage: fw.data_vintage,
+            confidence_tier: fw.confidence_tier ?? null,
+          };
+        }
+        setDataQuality(byFramework);
+      })
+      .catch(() => {
+        // Non-fatal — annotations degrade gracefully (no source name shown)
+      });
+
+    return () => { cancelled = true; };
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- store is a Zustand singleton, stable reference
+  }, [store.trajectory?.entity_id, activeScenarioDetail?.configuration?.start_date]);
+
   // Fetch MDA alerts from measurement-output after each step advance (IR-001).
   // Entity ID comes from the trajectory response already fetched above.
   // Skipped at step 0 — no simulation output exists before the first advance.
@@ -368,6 +415,33 @@ export function ScenarioInstrumentCluster({
           // Atomic current→prev swap via functional updater — avoids stale closure
           setHdState((s) => ({ prev: s.current, current: flat }));
         }
+
+        // ADR-015 §Component 3 — extract programme_survival_probability (DA-G5-4 Option A).
+        const peOutput = raw.outputs["political_economy"];
+        const peEnabled = activeScenarioDetail?.configuration?.modules_config?.political_economy?.enabled;
+        if (peOutput && peEnabled) {
+          const pspEntry = peOutput.indicators["programme_survival_probability"];
+          if (
+            pspEntry !== null &&
+            pspEntry !== undefined &&
+            typeof pspEntry === "object" &&
+            "value" in pspEntry
+          ) {
+            const entry = pspEntry as { value: string | null; confidence_tier?: number | null };
+            setPspValue(entry.value);
+            setPspTier(
+              typeof entry.confidence_tier === "number" ? entry.confidence_tier : null,
+            );
+          } else {
+            // PE enabled but PSP indicator absent from output — treat as computation error
+            setPspValue(null);
+            setPspTier(null);
+          }
+        } else if (!peEnabled) {
+          // PE not enabled — reset PSP state so row is absent
+          setPspValue(undefined);
+          setPspTier(null);
+        }
       })
       .catch(() => {
         // Non-fatal — Zone 1B and cohort panel remain in previous state
@@ -377,7 +451,7 @@ export function ScenarioInstrumentCluster({
       cancelled = true;
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps -- store is a Zustand singleton, stable reference
-  }, [scenarioId, currentStep, store.trajectory?.entity_id]);
+  }, [scenarioId, currentStep, store.trajectory?.entity_id, activeScenarioDetail?.configuration?.modules_config?.political_economy?.enabled]);
 
   // ---------------------------------------------------------------------------
   // Mode 3 — branch-and-recompute advance loop (G6b, Issue #753)
@@ -621,6 +695,10 @@ export function ScenarioInstrumentCluster({
             isLoading={trajectoryLoading}
             isError={trajectoryError}
             entityIds={entityIds}
+            dataQuality={dataQuality}
+            peEnabled={activeScenarioDetail?.configuration?.modules_config?.political_economy?.enabled ?? false}
+            pspValue={pspValue}
+            pspTier={pspTier}
           />
         }
         cohortPanel={

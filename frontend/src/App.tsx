@@ -7,6 +7,7 @@ import FidelityDashboard from "./components/FidelityDashboard";
 import GroundingStrip from "./components/GroundingStrip";
 import { ModeSelector } from "./components/ModeSelector";
 import ScenarioParameters from "./components/ScenarioParameters";
+import { AssumptionSurface } from "./components/AssumptionSurface";
 import { ScenarioIdentityHeader } from "./components/ScenarioIdentityHeader";
 import { ScenarioInstrumentCluster } from "./components/ScenarioInstrumentCluster";
 import ScenarioControls from "./components/ScenarioControls";
@@ -309,6 +310,11 @@ export default function App() {
           />
         )}
 
+        {/* ADR-015 §Component 2 — Assumption surface strip (between Zone 0 and Zone 1) */}
+        {selectedScenarioId && (
+          <AssumptionSurface detail={activeScenarioDetail} />
+        )}
+
         {/* Instrument cluster — primary viewport when a scenario is active (CLAUDE.md UX commitment 1) */}
         {selectedScenarioId && (
           <div style={{ overflowX: "auto", background: "#fafafa", borderBottom: "1px solid #e8e8e8" }}>
@@ -320,6 +326,7 @@ export default function App() {
               fiscalMultiplier={activeFiscalMultiplier}
               mode3Active={mode3Active}
               entityIds={activeEntityIds}
+              activeScenarioDetail={activeScenarioDetail}
             />
           </div>
         )}
