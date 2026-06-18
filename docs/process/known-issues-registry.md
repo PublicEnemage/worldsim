@@ -209,6 +209,60 @@ the issue; no code change is required.
 
 ---
 
+## KI-004 — GitHub Actions: Node.js 20 deprecation warning on `actions/checkout@v4` and `actions/setup-node@v4`
+
+**Date first observed:** 2026-06-18
+**Infrastructure:** GitHub Actions (GitHub-hosted runners)
+**Severity:** Low — warning only; CI continues to pass; no behavioural change
+**Recurrence:** Consistent — appears on every CI run until upstream action versions are updated
+
+### Symptom
+
+Every CI run logs the following warning before the job steps execute:
+
+```
+Warning: Node.js 20 is deprecated. The following actions target Node.js 20 but
+are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-node@v4.
+For more information see:
+https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+```
+
+All jobs pass despite the warning. GitHub's runner infrastructure auto-upgrades the
+actions' runtime from Node.js 20 to Node.js 24 transparently.
+
+### Trigger condition
+
+GitHub Actions deprecated Node.js 20 as a runner runtime (announced 2025-09-19).
+`actions/checkout@v4` and `actions/setup-node@v4` declare a Node.js 20 engine
+internally. GitHub's hosted runners are now Node.js 24; the runtime mismatch
+produces the warning on every run. This is a GitHub infrastructure decision — the
+project has no control over the hosted runner Node.js version.
+
+### Workaround
+
+No action required at this time. GitHub is auto-upgrading the runtime and CI passes.
+
+**When upstream resolves:** The warning will disappear when `actions/checkout` and
+`actions/setup-node` publish new major versions (e.g. `@v5`) with Node.js 24-native
+internals. At that point, update all references in `.github/workflows/ci.yml` and
+`.github/workflows/milestone-automation.yml` from `@v4` to the new version. No other
+change is required.
+
+Affected files (7 references total as of 2026-06-18):
+- `.github/workflows/ci.yml` — 6 uses of `actions/checkout@v4`, 1 use of `actions/setup-node@v4`
+- `.github/workflows/milestone-automation.yml` — 1 use of `actions/checkout@v4`
+
+### Upstream
+
+GitHub announced the deprecation at:
+https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+
+No project-level issue filed. The resolution is a one-line version bump per workflow
+reference once upstream publishes a Node.js 24-native action version. Monitor
+`actions/checkout` and `actions/setup-node` release notes for a `@v5` tag.
+
+---
+
 ## Registry Maintenance
 
 ### When to file a Known Issue
