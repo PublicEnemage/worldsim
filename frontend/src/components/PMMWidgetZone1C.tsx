@@ -147,6 +147,14 @@ export function PMMWidgetZone1C({
         </span>
       </div>
 
+      {/* Pre-calibration annotation — ADR-015 §Component 1 §Zone 1C (Decision 3 placeholder) */}
+      <div
+        data-testid="pmm-annotation"
+        style={{ fontSize: 9, color: "#aaa", marginTop: 2, lineHeight: 1.3 }}
+      >
+        [T3 composite · pre-cal]
+      </div>
+
       {/* Scale reference — lower value = more constrained policy space (DEMO-059) */}
       <div
         data-testid="pmm-scale-note"

@@ -20,7 +20,7 @@
  */
 import { useEffect, useRef, useState } from "react";
 import { useScenarioStepStore, type Zone1BAlert } from "../store/scenarioStepStore";
-import { getIndicatorDisplayNameAny } from "../lib/indicatorDisplayNames";
+import { getIndicatorDisplayNameAny, getIndicatorAbbreviation } from "../lib/indicatorDisplayNames";
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -562,10 +562,7 @@ function CompactAlertList({ alerts, onClearNewBadge }: CompactAlertListProps) {
         const color = SEVERITY_COLOR[alert.severity];
         const sevAbbrev = SEVERITY_ABBREV[alert.severity];
         const fwAbbrev = FRAMEWORK_ABBREV[alert.framework] ?? alert.framework.toUpperCase().slice(0, 3);
-        const indicatorDisplay = truncateIndicatorName(
-          getIndicatorDisplayNameAny(alert.indicator_key),
-          18,
-        );
+        const indicatorDisplay = getIndicatorAbbreviation(alert.indicator_key, 24);
 
         return (
           <div
