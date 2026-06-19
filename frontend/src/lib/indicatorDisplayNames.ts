@@ -89,3 +89,36 @@ export function getIndicatorDisplayNameAny(key: string): string {
   }
   return formatFallback(key);
 }
+
+/**
+ * 24-character abbreviation set for compact Zone 1B alert rows (ADR-015 §Component 1).
+ * Names that already fit within 24 chars use their full display name.
+ * Keys not present fall back to truncateIndicatorName(getIndicatorDisplayNameAny(key), 24).
+ */
+const INDICATOR_ABBREV_24: Record<string, string> = {
+  reserve_coverage_months:              "Reserve Coverage",
+  debt_gdp_ratio:                       "Debt-to-GDP Ratio",
+  poverty_headcount_ratio:              "Poverty Headcount Ratio",
+  food_insecurity_rate:                 "Food Insecurity Rate",
+  health_index:                         "Health Index",
+  planetary_boundary_co2_proximity:     "CO₂ Boundary Proximity",
+  planetary_boundary_land_use_proximity:"Land Use Boundary Prox.",
+  programme_survival_probability:       "Prog. Survival Prob.",
+  unemployment_rate:                    "Unemployment Rate",
+  bottom_quintile_consumption_capacity: "Bottom Quintile Consump.",
+  fiscal_balance_pct_gdp:               "Fiscal Balance % GDP",
+  inflation_rate:                       "Inflation Rate",
+  current_account_balance:              "Current Account Balance",
+  gdp_growth:                           "GDP Growth",
+};
+
+/**
+ * Returns the 24-char compact abbreviation for Zone 1B rows.
+ * Prefers the INDICATOR_ABBREV_24 registry; falls back to a standard truncation.
+ */
+export function getIndicatorAbbreviation(key: string, maxChars = 24): string {
+  if (key in INDICATOR_ABBREV_24) return INDICATOR_ABBREV_24[key];
+  const full = getIndicatorDisplayNameAny(key);
+  if (full.length <= maxChars) return full;
+  return full.slice(0, maxChars - 1) + "…";
+}

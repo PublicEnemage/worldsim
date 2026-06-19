@@ -64,20 +64,29 @@ _SUBSCRIBED_EVENTS = frozenset({
 # variable_type per ADR-005 Amendment B and approved-sources.md:
 #   co2_concentration_ppm — STOCK (level at a point in time)
 #   land_use_pressure_index — RATIO (fraction of boundary threshold)
+#   water_stress_index — RATIO (fraction of water stress threshold; arid_semiarid only)
 _INDICATOR_VARIABLE_TYPES: dict[str, VariableType] = {
     "co2_concentration_ppm": VariableType.STOCK,
     "land_use_pressure_index": VariableType.RATIO,
+    "water_stress_index": VariableType.RATIO,
 }
 
 # Canonical unit strings per DATA_STANDARDS.md §Canonical Unit Registry (Gap 1).
 # co2_concentration_ppm: atmospheric concentration in parts per million.
 # land_use_pressure_index: fraction of planetary boundary threshold consumed (0–1).
+# water_stress_index: water stress ratio [0, 2]; 1.0 = at-boundary (FAO WASAG 2020).
 # Default "ratio_0_1" applies to any future ecological indicator not yet listed here.
 _INDICATOR_UNITS: dict[str, str] = {
     "co2_concentration_ppm": "ppm",
     "land_use_pressure_index": "ratio_0_1",
+    "water_stress_index": "ratio_0_2",
 }
 _DEFAULT_ECOLOGICAL_UNIT = "ratio_0_1"
+
+# Indicators restricted to specific biome classes.
+# The ecological module dispatch checks entity.metadata["biome_class"] before applying.
+# CM+EE approval 2026-06-13: water_stress_index only valid for arid_semiarid entities.
+_ARID_SEMIARID_ONLY_INDICATORS: frozenset[str] = frozenset({"water_stress_index"})
 
 # ---------------------------------------------------------------------------
 # M8 boundary proximity constants — ADR-005 Amendment 3 Decision M8-6
@@ -253,6 +262,8 @@ class EcologicalModule(SimulationModule):
             indicator_deltas: dict[str, Decimal] = {}
             indicator_tiers: dict[str, int] = {}
 
+            entity_biome_class = entity.metadata.get("biome_class", "")
+
             for event in prior_events:
                 magnitude = _extract_magnitude(event)
                 if magnitude is None:
@@ -260,6 +271,20 @@ class EcologicalModule(SimulationModule):
                 event_tier = _event_confidence_tier(event)
                 for row in ECOLOGICAL_ELASTICITY_REGISTRY:
                     if row.event_type != event.event_type:
+                        continue
+                    # Biome-class restriction: arid_semiarid-only indicators are
+                    # skipped for entities without biome_class=arid_semiarid.
+                    if (
+                        row.indicator_key in _ARID_SEMIARID_ONLY_INDICATORS
+                        and entity_biome_class != "arid_semiarid"
+                    ):
+                        _log.warning(
+                            "[SIM-INTEGRITY] Skipping '%s' elasticity for entity_id=%r "
+                            "(biome_class=%r); CM+EE restriction: arid_semiarid only.",
+                            row.indicator_key,
+                            entity.id,
+                            entity_biome_class,
+                        )
                         continue
                     delta = (magnitude * row.elasticity).quantize(Decimal("0.000001"))
                     key = row.indicator_key

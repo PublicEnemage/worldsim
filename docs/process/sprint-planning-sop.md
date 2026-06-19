@@ -200,7 +200,7 @@ document at `docs/process/sprint-plans/{milestone-slug}-sprint-{N}-entry.md`.
 4. **Intent document filed for each user-facing deliverable.** For each deliverable whose
    primary output is user-facing (frontend feature, backend capability, documentation,
    analytics output), an intent document is filed at
-   `docs/process/intents/ADR-NNN-YYYY-MM-DD-short-name.md` before the implementation PR
+   `docs/process/intents/M{N}-{G-suffix-or-ADR-NNN}-{YYYY-MM-DD}-{short-name}.md` before the implementation PR
    opens. The intent document completeness gate: the QA Lead can write a test from it without
    reading implementation code. (Authority: CLAUDE.md §Agent Execution Lifecycle Step 1)
 

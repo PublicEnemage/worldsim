@@ -389,6 +389,22 @@ export default function FidelityDashboard() {
         </div>
       </div>
 
+      {/* IC-4 — static scope contextualisation header (ADR-016 §EL Decision 2) */}
+      <div
+        data-testid="fidelity-contextualisation"
+        style={{
+          padding: "8px 16px",
+          fontSize: 12,
+          color: "#8aa8c4",
+          background: "rgba(18,42,69,0.6)",
+          borderBottom: "1px solid rgba(100,148,200,0.15)",
+          lineHeight: 1.5,
+        }}
+      >
+        This panel validates model relationships using historical cases — not input data
+        for the active scenario.
+      </div>
+
       {/* Framing note */}
       <div
         style={{

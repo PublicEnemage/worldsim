@@ -211,6 +211,22 @@ compromise — it is the source of the tool's credibility.
 
 ---
 
+## Getting Started
+
+New to WorldSim? The onboarding guides are the fastest path to working proficiency:
+
+- **[Quick Start Guide](docs/onboarding/quick-start.md)** — load a scenario and read
+  the instrument cluster in 10 minutes, no prior knowledge required
+- **[Scenario Creation Guide](docs/onboarding/scenario-creation.md)** — understand
+  the Grounding Strip, data quality tiers, and module configuration before running a scenario
+- **[Data Provenance Guide](docs/onboarding/data-provenance.md)** — confidence tiers
+  (T1–T5), Structural Absence Declarations, and how to cite WorldSim outputs in a
+  negotiating context
+- **[Methodology Overview](docs/onboarding/methodology-overview.md)** — what the
+  simulation claims, what it does not claim, and documented model blindspots
+
+---
+
 ## Running Locally
 
 Requires [Docker](https://docs.docker.com/get-docker/) and Docker Compose.

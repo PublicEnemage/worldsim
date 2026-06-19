@@ -20,7 +20,7 @@
  */
 import { useEffect, useRef, useState } from "react";
 import { useScenarioStepStore, type Zone1BAlert } from "../store/scenarioStepStore";
-import { getIndicatorDisplayNameAny } from "../lib/indicatorDisplayNames";
+import { getIndicatorDisplayNameAny, getIndicatorAbbreviation } from "../lib/indicatorDisplayNames";
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -84,7 +84,8 @@ export function sortAlerts(alerts: Zone1BAlert[]): Zone1BAlert[] {
 export function getNegotiationLabel(tier: number): string {
   if (tier <= 2) return "High confidence — cite directly";
   if (tier === 3) return "Moderate confidence — cite with caveat";
-  return "Exploratory — do not cite";
+  if (tier === 4) return "Model estimate — verify before citing";
+  return "Synthetic extrapolation — do not cite";
 }
 
 /**
@@ -505,7 +506,7 @@ function TopAlertDetail({ alert, mode, showNewBadge }: TopAlertDetailProps) {
 
       {/* Negotiation-defensibility label (always shown in detail slot) */}
       <div
-        data-testid="detail-negotiation-label"
+        data-testid="alert-negotiation-label"
         style={{
           color: alert.confidence_tier >= 4 ? "#a06000" : "#555",
           fontSize: 10,
@@ -562,10 +563,7 @@ function CompactAlertList({ alerts, onClearNewBadge }: CompactAlertListProps) {
         const color = SEVERITY_COLOR[alert.severity];
         const sevAbbrev = SEVERITY_ABBREV[alert.severity];
         const fwAbbrev = FRAMEWORK_ABBREV[alert.framework] ?? alert.framework.toUpperCase().slice(0, 3);
-        const indicatorDisplay = truncateIndicatorName(
-          getIndicatorDisplayNameAny(alert.indicator_key),
-          18,
-        );
+        const indicatorDisplay = getIndicatorAbbreviation(alert.indicator_key, 24);
 
         return (
           <div

@@ -1,7 +1,7 @@
 # CLAUDE.md — WorldSim Project Context
 
-> Last significant revision: 2026-06-15
-> Updated against: M14 active — M13 closed; political economy module in production (ADR-013); alert panel Zone 1B master-detail (ADR-014); mode transition UX; instrument legibility; Process Redesign Phases 0–D complete
+> Last significant revision: 2026-06-16
+> Updated against: M14 active — M13 closed; political economy module in production (ADR-013); alert panel Zone 1B master-detail (ADR-014); mode transition UX; instrument legibility; Process Redesign Phases 0–D complete; insights-log.md added to session reading list; PM Agent insights log obligation added
 > Previous version context: 2026-06-12 — M13 active; Process Redesign Phases A–D endorsed; five-step agent execution lifecycle; sprint entry/exit gates; session boundary discipline
 
 > **Reader Orientation:** This is the permanent project constitution — read it in full before beginning any session. It contains the mission, architectural commitments, and process rules that govern all work in this repository. Anyone making a change in this codebase, human or agent, must have read this document first. Key must-read sections if time is short: Session Continuity (what to read and in what order), Guiding Principles (the values behind every technical decision), and §Architectural Principles for Claude Code Sessions (process gates including pre-push lint, PR merge gate, and file authority rules that will cause compliance violations if not followed).
@@ -36,10 +36,11 @@ Before beginning any task, read these files in order:
 1. `SESSION_STATE.md` — current work streams, open PRs, pending decisions
 2. `docs/process/agents.md` — agent roster, personas, activation protocols
 3. `CLAUDE.md` — permanent constitution, architecture, standards
+4. `docs/insights-log.md` — pre-GitHub inbox; findings, open questions, and insights not yet promoted to issues or near-miss entries
 
 `CLAUDE.md` is the permanent constitution. `SESSION_STATE.md` is the
 current situation report. `docs/process/agents.md` is the canonical home
-for all agent personas. All three are required reading at session start.
+for all agent personas. All four are required reading at session start.
 
 At the end of every session, updating `SESSION_STATE.md` is the last
 action before closing — not optional.
@@ -407,27 +408,37 @@ merge and Claude Code has executed `git pull origin main`.
 
 **Exception — PRs targeting a release branch (`release/m{N}`).** Release branch
 PRs are pre-authorized for autonomous merge. Claude Code polls `gh pr checks`
-until the `changes` status check passes, then executes `gh pr merge <number>
---merge` and pulls from the release branch without waiting for user confirmation.
-`release/m{N}` is an unprotected integration branch — admin bypass is not
-required. See §Release Branch Workflow below.
+until all checks have reached a terminal state (pass or skipped — no pending),
+then executes `gh pr merge <number> --merge` only if no check has failed.
+If any check has failed, stop and report to the user — do not attempt the merge.
+`release/m{N}` branches are protected by the `release-branch-ci-gate` Ruleset —
+a failed required check will block the merge at the server regardless.
+See §Release Branch Workflow below.
 
-**Exception — `SESSION_STATE.md`-only PRs.** End-of-session state updates that
-touch only `SESSION_STATE.md` are pre-authorized for auto-merge. Claude Code will
-poll `gh pr checks` until the `changes` status check passes, then execute
-`gh pr merge <number> --admin --merge` and `git pull origin main` without waiting
-for user confirmation. If the PR contains any file other than `SESSION_STATE.md`,
-the standard gate applies regardless of the other file's content.
+**Exception — `SESSION_STATE.md`-only PRs targeting `main`.** End-of-session
+state updates that touch only `SESSION_STATE.md` and target `main` are handled
+automatically by the `auto-merge-session-state` GitHub Actions workflow
+(`.github/workflows/auto-merge-session-state.yml`). Claude Code must open the
+PR and then stop — do not poll, do not call `gh pr merge`, do not use `--admin`.
+The workflow verifies that `SESSION_STATE.md` is the only changed file, then
+calls `gh pr merge --auto --squash`. All CI jobs are skipped for root-file-only
+changes; GitHub branch protection treats skipped as passing. If the PR contains
+any file other than `SESSION_STATE.md`, the standard gate applies — the workflow
+will not fire and EL must merge manually.
 
 **Release Branch Workflow.**
 Each milestone has a release branch (`release/m{N}`) cut from `main` at
 milestone kickoff by the PM Agent as part of sprint planning. All feature work
 during the milestone uses this pattern:
 
-1. Cut feature branch from `release/m{N}`: `git checkout -b feat/g1-xxx release/m12`
+1. Cut feature branch from `release/m{N}` using a **milestone-scoped name**:
+   `git checkout -b feat/m{N}-g{N}-short-description release/m{N}`
+   The branch name must contain the milestone prefix (e.g. `m14`). Sprint group
+   numbers (G1, G2, …) are reused across milestones — `feat/g1-bugs` is ambiguous
+   and will be rejected by the `branch-naming` CI check. Use `feat/m14-g1-bugs`.
 2. Implement, run pre-push gates (lint, build), push feature branch
 3. Open PR targeting `release/m{N}` (not `main`)
-4. Poll CI; merge autonomously once `changes` passes: `gh pr merge <number> --merge`
+4. Poll CI; merge autonomously once all checks are terminal (pass or skipped, none failed): `gh pr merge <number> --merge`
 5. Pull from release branch: `git pull origin release/m{N}`
 6. Continue with next feature branch
 
@@ -435,10 +446,12 @@ At milestone close, EL performs one admin bypass: `release/m{N}` → `main`.
 The release branch is never merged to `main` by Claude Code — that merge is
 always the Engineering Lead's action.
 
-`SESSION_STATE.md` updates during an active milestone target the release branch
-and follow the same autonomous merge rule as above (no `--admin` needed since
-the branch is unprotected). The auto-merge exception's `--admin` flag is needed
-only when the PR targets `main`.
+`SESSION_STATE.md` updates during an active milestone target the release branch,
+not `main`, and follow the same autonomous merge rule as all release branch PRs:
+poll until all checks are terminal (pass or skipped, none failed), then
+`gh pr merge <number> --merge`. No `--admin` needed — the `release-branch-ci-gate`
+Ruleset treats skipped checks as passing. The `auto-merge-session-state` workflow
+only fires on PRs targeting `main` and does not apply here.
 
 **Backend pre-push lint gate — mandatory before any `git push` touching Python files.**
 Before pushing any branch that modifies files under `backend/`, run:
@@ -582,6 +595,34 @@ forward trace to the downstream capability that will eventually pass the test).
 
 ---
 
+**PM Agent — Insights Log Obligation**
+
+`docs/insights-log.md` is the project's pre-GitHub inbox: a permanent append-only artifact
+for findings, open questions, and insights that arise in agent deliberations or EL observations
+but are not yet ready to become GitHub issues or near-miss entries.
+
+At each HORIZON sweep, the PM Agent must:
+
+1. Read all entries in `docs/insights-log.md` with status `open`
+2. For each open entry, determine whether it is ready to promote or resolve:
+   - **Promote:** File a GitHub issue or near-miss entry; update the log entry status to
+     `promoted → #NNN` (issue) or `promoted → NM-NNN` (near-miss)
+   - **Resolve:** If the finding is no longer actionable or was addressed informally, update
+     status to `resolved — [reason]`
+   - **Hold:** If still open and not yet actionable, leave status `open` — no action required,
+     but the sweep must confirm the decision explicitly
+3. Record in the HORIZON sweep output (sprint plan §HORIZON table) that the insights log was
+   reviewed and state the count of open entries reviewed and dispositioned
+
+New entries are added to `docs/insights-log.md` at any point by any agent or the EL when a
+finding arises in deliberation or observation. Adding to the log does not require a PR — it is
+appended in the same commit as the work that produced the finding.
+
+**File authority:** EL holds R on `docs/insights-log.md` for additions; PM Agent holds R for
+promotion and resolution updates at HORIZON sweep time.
+
+---
+
 **Agent Execution Lifecycle**
 
 Every agent implementing a feature — regardless of role — operates within a five-step execution
@@ -599,7 +640,7 @@ section require Architect Agent review and EL endorsement.*
 **Step 1 — Intent authorship** (before implementation begins)
 The implementing agent authors an Implementation Intent document using
 `docs/process/intent-template.md` and files it at
-`docs/process/intents/ADR-NNN-YYYY-MM-DD-short-name.md`. The intent document derives the
+`docs/process/intents/M{N}-{G-suffix-or-ADR-NNN}-{YYYY-MM-DD}-{short-name}.md`. The intent document derives the
 implementation's observable application state from the ADR's persona trace and UX implication
 statement elements. Completeness gate: the QA Lead must be able to write a test from the intent
 document without reading any implementation code. An intent document the QA Lead cannot test
@@ -772,7 +813,7 @@ of the implementation? If no — revise until yes.
 | Artifact | Canonical location | Authored by |
 |---|---|---|
 | Intent document template | `docs/process/intent-template.md` | Architect Agent |
-| Implementation Intent documents | `docs/process/intents/ADR-NNN-YYYY-MM-DD-short-name.md` | Implementing agent (per ADR panel) |
+| Implementation Intent documents | `docs/process/intents/M{N}-{G-suffix-or-ADR-NNN}-{YYYY-MM-DD}-{short-name}.md` | Implementing agent (per ADR panel) |
 | Rejection artifacts | `docs/process/rejections/REJECT-NNN-YYYY-MM-DD-short-description.md` | Implementing agent or Business PO |
 | Phase A exit artifact | `docs/process/sprint-plans/process-redesign-phaseA-exit.md` | PM Agent + PI Agent |
 

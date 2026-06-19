@@ -2334,6 +2334,201 @@ deficiency and a merge gate configuration gap.
 
 ---
 
+## NM-045 — AC-3 E2E Test Passed on Generic Regex Fallback; Source Citation Field Name Mismatch Reached BPO Validate Undetected (Reactive)
+
+**Date:** 2026-06-17
+**Milestone:** M14 — G4 ADR-016 Frontend
+**Detected by:** Business PO at Step 5 Validate (live application observation)
+**Severity:** High — the Grounding strip rendered without source institution names, silently failing Persona 2's P-6 negotiating leverage without any error or visible signal
+
+### What happened
+
+G4 implemented the Grounding strip (ADR-016 Component 2) with a field name mismatch between the frontend `GroundingIndicator` type and the `/initial-state` API endpoint:
+
+- The API contract (`api_contracts.yml §GET /scenarios/{id}/initial-state`) specifies field names `source` and `vintage` on each `InitialStateIndicator` object.
+- The backend (`grounding.py`) correctly implements `InitialStateIndicator` with `source` and `vintage`.
+- The frontend `GroundingIndicator` type (`types.ts`) declared `source_institution` and `data_vintage` — the field names used by the *separate* `/data-quality` endpoint's `DataQualityFramework` model.
+- `GroundingStrip.tsx` built citation strings from `ind.source_institution` and `ind.data_vintage`, both `undefined` at runtime.
+- Result: every indicator row rendered as `"[display_name]: [value] [unit] · T{N}"` — tier label only; source institution (e.g., "CBJ") and vintage (e.g., "2023-Q4") silently absent.
+
+The Step 4 E2E test for AC-3 used a generic regex fallback `/[·•]\s*\S/` to detect "a citation-like token." This regex matched `· T2` (the tier separator + tier number), passing the test without detecting the missing institution name. The Step 4 self-verify verdict recorded "CBJ citation present ✅" — based on the E2E test result, not direct observation.
+
+The defect reached BPO Step 5 Validate with 9/9 E2E tests green.
+
+### What was at risk
+
+The P-6 negotiating leverage specified in the intent document (§2) required:
+> "The model uses Jordan's reserve coverage as reported by the Central Bank of Jordan — 7.1 months as of Q4 2023. That figure is Tier 2 confidence — observed data, not synthetic. If the creditor side uses a different figure, they need to produce their source. Here is ours."
+
+Without "CBJ" and "2023-Q4" in the strip, this argument was unavailable from the screen. The tool would have shipped with a Grounding strip that displays values but not provenance — precisely the information Persona 2 needs for an input challenge response. The silent failure (no error message, no blank field, just missing citation) would have been indistinguishable from a strip with no citations available.
+
+### What caught it
+
+Business PO Validate step (Step 5) — live application observation. The BPO observed that the Grounding strip text did not contain "CBJ" or "IMF", read the component source (`GroundingStrip.tsx`), and identified the field name mismatch against the API response and the `api_contracts.yml` contract. The rejection artifact (REJECT-001) was filed before any remediation.
+
+This was **not caught by the process** until Step 5. Step 4 (Verify) should have detected it. The gap is in the E2E test assertion design.
+
+### Process improvement
+
+**Immediate fix (REJECT-001 remediation):**
+1. `frontend/src/types.ts` — `GroundingIndicator`: `source_institution` → `source`, `data_vintage` → `vintage`
+2. `frontend/src/components/GroundingStrip.tsx` — `IndicatorRow`: `ind.source_institution` → `ind.source`, `ind.data_vintage` → `ind.vintage`
+3. `frontend/tests/e2e/m14-g4-adr016-frontend.spec.ts` — AC-3 test: remove regex fallback; assert string presence of institution name directly (e.g., `"CBJ"` or `"IMF"`)
+
+**Structural improvement — E2E test assertion design:**
+When an intent document AC specifies a concrete value that must appear in the UI (a source institution name, a specific text string), the E2E test assertion must assert that value by **string match** — not by character class or structural regex. A regex that matches a tier separator `·` is not an assertion that "CBJ" appears. Tests must encode the same specificity as the intent document's observable application state.
+
+**New rule** (logged here pending sprint exit): Any AC that names an expected string value (an institution name, verbatim text) must assert that string verbatim in the test. Generic structural assertions (middle-dot present, non-empty text node) may supplement but must not substitute for named-value assertions. QA Lead is responsible for enforcing this at test authorship time (Step 2).
+
+**Data Architect loop-in:** The EL required Data Architect review of this defect (2026-06-17). Data Architect confirmed: the API contract is authoritative and correct; no schema drift between contract and backend implementation; both endpoints correctly use their respective field names. The fault was exclusively in the frontend type definition copying the wrong endpoint's field names. REJECT-001 documents the DA review requirement and verdict.
+
+---
+
+## NM-046 — Stale Vite Module Cache in Docker Container Masked G4 Fix During Post-Sprint EL Observation (Reactive)
+
+**Date:** 2026-06-17
+**Milestone:** M14 — G4 ADR-016 Frontend (post-sprint-exit visual check)
+**Detected by:** EL — Ctrl+F browser text search for "CBJ" returned 0 results after G4 sprint exit was confirmed
+**Severity:** Medium — could have caused a false re-rejection of G4 based on environment state rather than code state; caught before any rejection artifact was filed
+
+### What happened
+
+After the G4 sprint exit document was confirmed (PR #1020, 2026-06-17), the EL loaded the Hormuz scenario in the live Docker Compose stack to visually verify the Grounding strip source citations. "CBJ" was not visible anywhere in the strip. Ctrl+F browser text search returned 0/0.
+
+The API endpoint (`/initial-state`) was returning `source: "CBJ"` and `vintage: "2023-Q4"` correctly. The source file `frontend/src/components/GroundingStrip.tsx` on disk had the correct field names (`ind.source`, `ind.vintage`) from PR #1018. The Vite dev server logs showed HMR events for `GroundingStrip.tsx` — but those events were from earlier PRs (#1015, #1016), not from PR #1018.
+
+Root cause: Docker on macOS uses a VM (Apple Virtualization Framework / HyperKit). The Linux container's inotify subsystem does not receive file change events from the macOS host filesystem. Vite's default file watcher relies on inotify. Without `usePolling: true` in `vite.config.ts`, file changes made on the host (git pull, PR merge) are visible in the container's mounted volume — the bytes are correct — but Vite's watcher never fires. The browser retains the pre-PR-#1018 compiled module.
+
+The frontend container had been running for 6 days without restart. The G4 CI runs (Playwright E2E) used ephemeral containers with fresh Vite builds each time, so CI correctly verified the fix. The local dev stack was never restarted after PR #1018 merged.
+
+### What was at risk
+
+The EL, observing the live app post-sprint-exit and finding "CBJ" absent, could have concluded the G4 REJECT-001 fix was incomplete or not deployed. A false re-rejection would have re-opened G4, requiring another round of Step 1–5 lifecycle work for a defect that was already fixed. The sprint exit confirmation (already filed, all conditions satisfied) would have been called into question.
+
+### What caught it
+
+EL used Ctrl+F (browser text search) rather than relying on visual scan alone. When EL reported the 0/0 result, the Docker stack's age (6 days) was identified as the likely cause. `docker compose restart frontend` confirmed the hypothesis: CBJ appeared immediately after restart and hard refresh.
+
+### Process improvement
+
+**Immediate fix:** Added `server.watch.usePolling: true` to `frontend/vite.config.ts` (PR filing in progress, 2026-06-17). This is the standard configuration for Vite inside Docker on macOS — it switches from inotify to polling, ensuring file changes from the host are always detected regardless of container age.
+
+**Structural gap:** The Docker Compose `frontend` service has no explicit restart policy and no documented "must restart after source changes" requirement. Contributors running a long-lived stack may silently run stale frontend code after any git pull or PR merge. The `usePolling` fix addresses the majority of cases (HMR fires reliably for future changes), but a container running pre-fix Vite will still be stale until restarted once.
+
+**Reminder added to `docs/CONTRIBUTING.md §Local Development` (deferred to follow-up):** After any `git pull` that changes frontend source files, run `docker compose restart frontend` if the container has been running for more than 24 hours, until `usePolling` is confirmed present in the deployed config.
+
+---
+
+## NM-047 — G5 Playwright AC-3 Test Timing-Dependent; n_steps/step_index Mismatch Passed CI Due to Guard Timeout No-Op (Reactive)
+
+**Date:** 2026-06-18
+**Milestone:** M14 — G6 implementation; pre-existing defect from G5 (PR #1030)
+**Detected by:** G6 CI `playwright-e2e` failure — `m14-g5-adr015-frontend.spec.ts:508 AC-3` failed with "floor" absent from annotation text
+**Severity:** High — pre-existing test was a silent no-op in G5 CI; a real regression in Zone 1D ecological annotation would have passed undetected
+
+### What happened
+
+In G5 (PR #1030), the `m14-g5-adr015-frontend.spec.ts` AC-3 test ("Zone 1D ecological annotation contains 'floor' or 'ceiling'") was written to create a JOR scenario with `n_steps=3`. The `makeTrajectoryMock` helper in the test file provides a mock trajectory with `step_index: 1` only. When the scenario loads, `App.tsx` calls `setCurrentStep(3)` (the last step of a 3-step scenario). `FourFrameworkZone1D.tsx` line 194 does: `steps.find(s => s.step_index === current_step)` — with `current_step=3` and mock only providing `step_index=1`, this returns `undefined`. `currentStepData = null` → `buildFrameworkAnnotation` returns `[—]` → annotation text never contains "floor" or "ceiling."
+
+In G5 CI, the test happened to pass because the Playwright guard timeout (`page.waitForSelector('[data-testid="framework-annotation-ecological"]', {timeout: 5000})`) expired before the loading state resolved. The element is not rendered during loading, so the guard threw, the assertion was never reached, and Playwright marked the test as passed (the `catch` branch was hit, which — depending on the exact test structure — can be a silent no-op). The G6 migration (b1c2d3e4f5a6) altered the backend response timing enough that the element appeared within 5 seconds, the assertion ran, and found `[—]` instead of "approaching resource floor."
+
+### What was at risk
+
+Any regression in the `FourFrameworkZone1D` ecological annotation — including Zone 1D annotation showing `[—]` for all JOR scenarios due to a step-matching bug — would have passed G5 CI. The test existed, was green, and provided zero protection for the feature it purported to cover.
+
+### What caught it
+
+G6 CI failure. The failure was caused by G6 changing backend timing, which accidentally removed the guard-timeout no-op path that had been masking the flawed test design. Without the G6 timing change, the pre-existing defect would have remained undetected until the feature regressed visibly.
+
+### Process improvement
+
+**Immediate fix:** Changed `createCompletedScenario("JOR", 3, ...)` to `createCompletedScenario("JOR", 1, ...)` in the beforeAll of the AC-1–4 describe block (PR #1045, commit 8657aae). With `n_steps=1`, `current_step=1` after scenario load, which matches `step_index=1` in `makeTrajectoryMock`. The `steps.find()` returns the correct mock step and the annotation renders correctly.
+
+**Structural gap — test-mock step alignment:** The `makeTrajectoryMock` helper produces a mock with a single `step_index: 1` entry. Any test that creates a scenario with `n_steps > 1` and then inspects step-dependent UI will silently get `currentStepData = null` for all steps except step 1. This is a category of test design error specific to step-indexed trajectory mocks. No existing check catches it.
+
+**Recommended process addition:** When authoring a Playwright test that inspects step-dependent UI (Zone 1D, Zone 1B per-step indicators, trajectory annotations), the test design checklist should include: "Does the scenario's `n_steps` match the `step_index` values provided by the trajectory mock? Confirm explicitly." This check should be added to the G6 intent document test-design notes (Step 2 gate) as a structural reminder for future trajectory-related E2E tests.
+
+---
+
+## NM-048 — G5 AC-2 Test Read annotation.textContent() Before data-quality Fetch Completed; Source Institution Absent From Point-in-Time Read (Reactive)
+
+**Date:** 2026-06-18
+**Milestone:** M14 — G6 implementation; pre-existing defect from G5 (PR #1030)
+**Detected by:** G6 CI `playwright-e2e` rerun failure — `m14-g5-adr015-frontend.spec.ts:499 AC-2` failed with `expect(false).toBe(true)` (source institution not present in annotation text)
+**Severity:** High — pre-existing test was a silent no-op in G5 CI; source institution field missing from AC-2 assertion would have gone undetected if G6 had not improved timing
+
+### What happened
+
+`FourFrameworkZone1D` renders the L0 annotation in two sequential states:
+1. After trajectory loads: `[T2 · pre-cal]` (no source institution — `dataQuality` is still null)
+2. After `data-quality` fetch completes (triggered by a `useEffect` watching `trajectory.entity_id`): `[T2 · IMF / CBJ · pre-cal]`
+
+The G5 AC-2 test read `annotation.textContent()` once, immediately after `waitForAppReady()`. `waitForAppReady` resolves when `__worldsim_selectEntity` is defined (App mount), which happens before either the trajectory fetch or the data-quality fetch completes. The trajectory fetch fires first; `dataQuality` is still null at the first render. The point-in-time `textContent()` read captured `[T2 · pre-cal]` — the intermediate state — before `data-quality` settled.
+
+In G5 CI (PR #1030), this test was a no-op: the `framework-annotation-financial` element was not visible within the 5-second guard timeout (loading state), so the guard returned early and the assertion never ran. In G6 CI, the backend timing change caused the element to appear within the guard window. The assertion ran and failed because it captured the intermediate annotation state.
+
+### What was at risk
+
+If the source institution is absent from the Zone 1D annotation (because `dataQuality` never loads or loads slowly), a finance ministry analyst sees `[T2 · pre-cal]` instead of `[T2 · IMF / CBJ · pre-cal]`. The assertion was designed to catch this silent degradation. A point-in-time read that races with the `useEffect` cannot reliably detect it — the annotation might look correct on slow runs but fail silently on fast ones.
+
+### What caught it
+
+G6 CI rerun failure. Same exposure mechanism as NM-047 (G6 backend timing change removed the guard-timeout no-op path).
+
+### Process improvement
+
+**Immediate fix:** Replaced `const text = await annotation.textContent()` with `page.waitForFunction(() => { ...return t.includes("IMF") || t.includes("CBJ"); }, {timeout: 5_000})` before reading the final text. `waitForFunction` polls the DOM, giving the `data-quality` useEffect chain time to settle before the assertion reads the annotation. Fix applied in PR #1045, same commit as NM-047 fix plus AC-2 repair.
+
+**Structural gap — two-phase render and point-in-time reads:** Any component that renders in multiple async phases (trajectory → data-quality, or similar two-fetch chains) and is tested with `textContent()` is vulnerable to this race. The test design checklist should include: "Does this component fetch data in two sequential phases? If yes, wait for the final phase to settle before reading text content — use `waitForFunction` or `expect(locator).toContainText()` instead of `textContent()`."
+
+This is a category of test design error specific to multi-fetch render chains. NM-047 and NM-048 are both instances of the same root pattern (timing-dependent test assertion) exposed by the same trigger (G6 backend timing improvement). They differ in mechanism: NM-047 is a step_index mismatch (no data for current step), NM-048 is a two-phase render race (data-quality fetch lags trajectory fetch).
+
+---
+
+## NM-049 — Docker Dev DB Migration Lag: Alembic Migration Not Applied to Persistent Dev Stack After PR Merge (Reactive)
+
+**Date:** 2026-06-18
+**Milestone:** M14 — G6 BPO Step 5 Validate
+**Detected by:** BPO Step 5 Validate — live API probe for AC-8 (`water_stress_index` in JOR measurement-output) returned empty ecological indicators. Investigated: `biome_class` was null in `simulation_entities` for JOR and ZMB; `alembic_version` in live DB was `a1b3c5d7e9f2` (G3); migration `b1c2d3e4f5a6` (G6) had not been applied.
+**Severity:** Medium — AC-8 was blocked during BPO Validate until the migration was manually applied; if undetected, the BPO would have incorrectly concluded that `water_stress_index` was not functioning in the live application.
+
+### What happened
+
+PR #1045 (G6 implementation) included Alembic migration `b1c2d3e4f5a6` which seeds `biome_class=arid_semiarid` on JOR and ZMB entities and seeds `water_stress_index` as an initial ecological STOCK. The CI `test-backend` job runs `alembic upgrade head` before the test suite (`.github/workflows/ci.yml` line 140), so all backend tests including AC-8 ran against a migrated DB and passed.
+
+The persistent Docker dev stack (`worldsim-api-1`, `worldsim-db-1`) does not auto-apply migrations when a new image or code change is deployed. After PR #1045 merged to `release/m14`, the Docker dev DB remained at version `a1b3c5d7e9f2`. When the BPO opened the live application and probed AC-8 against the live API, the ecological module found `biome_class=null` for JOR, skipped the `water_stress_index` dispatch, and returned empty ecological indicators.
+
+This is the same pattern as the G3 Step 4 Verify note ("migration not pre-applied at initial probe — 500 error"). G3 Step 4 documented the symptom but did not file a near-miss or produce a structural fix. NM-049 closes that gap.
+
+### What was at risk
+
+A BPO Validate step that accepted the live application observation without investigating the empty ecological indicators would have:
+1. Incorrectly concluded that AC-8 passed with empty indicators (false ACCEPT), OR
+2. Incorrectly concluded that AC-8 failed and filed a REJECT-002 (false FAIL requiring remediation of correctly implemented code)
+
+Either outcome would have been wrong. The correct observable state (water_stress_index present with non-null value) is only visible after the migration is applied.
+
+More broadly: any AC that depends on seeded data from an Alembic migration is invisible in the live application until `alembic upgrade head` is run on the dev DB. This is a systemic gap — not specific to G6 — that affects every session where a seeding migration ships.
+
+### What caught it
+
+BPO investigating the empty ecological indicators response rather than accepting it. The BPO checked the live DB with `SELECT ... metadata->>'biome_class'` and confirmed null before applying the migration. If the BPO had stopped at "ecological indicators: []" without investigating, the gap would not have been caught.
+
+### Process improvement
+
+**Immediate fix:** Applied `docker compose exec -T api alembic upgrade head` manually during BPO Validate. Confirmed migration applied; AC-8 PASS.
+
+**Structural gap — no migration application step in dev stack update procedure:** The development workflow has no documented or automated step to apply pending Alembic migrations after pulling new code or merging a PR. The gap is in `docs/CONTRIBUTING.md` (no "after merge, run migrations" step) and the Docker API container entrypoint (does not run `alembic upgrade head` on startup).
+
+**Required process improvement (tracked in GitHub issue — see NM-049 issue):**
+1. Add `alembic upgrade head` to the Docker API container entrypoint so the dev stack self-migrates on restart. This eliminates the manual step entirely.
+2. Add a "after pulling or merging, restart the API container to apply migrations" note to `docs/CONTRIBUTING.md §Development Setup` as a backstop for contributors who do not use the Docker stack.
+3. Add a migration-lag check to the BPO Validate checklist for any sprint group that includes a seeding migration: "Has `alembic upgrade head` been applied to the dev DB? Confirm `alembic_version` matches the latest migration file."
+
+The entrypoint fix (item 1) is the structural countermeasure. Items 2 and 3 are belt-and-suspenders backstops for the transition period until the entrypoint is updated.
+
+---
+
 ## Registry Maintenance
 
 ### How to add an entry

@@ -138,6 +138,131 @@ for M12 environment standardisation.
 
 ---
 
+## KI-003 — GitHub Rulesets: required status check for a not-yet-merged workflow blocks all PRs until the workflow file lands on the base branch
+
+**Date first observed:** 2026-06-16
+**Infrastructure:** GitHub Rulesets (repository rules)
+**Severity:** Medium — blocks all open PRs targeting the protected branch until the workaround is applied; no data loss
+**Recurrence:** Consistent — reproducible any time a new required status check is added to a Ruleset before the corresponding workflow file is merged into the base branch
+
+### Symptom
+
+After adding a new required status check (e.g. `branch-naming`) to a Ruleset targeting
+`release/m*`, any PR whose head branch does not contain the workflow file (`.github/workflows/branch-naming.yml`) receives:
+
+```
+GraphQL: Repository rule violations found
+Required status check "branch-naming" is expected.
+(mergePullRequest)
+```
+
+The check never reports — not as pass, not as fail — because the workflow file does not
+exist on the base branch (`release/m{N}`) at the time the PR's CI runs. GitHub Rulesets
+treat an expected-but-never-reported check as a violation. `gh pr merge --admin` does not
+bypass Ruleset requirements (unlike branch protection `enforce_admins`).
+
+### Trigger condition
+
+The bootstrapping sequence:
+1. Workflow file added to a feature branch (e.g. `feat/m14-g7-branch-naming-enforcement`)
+2. Ruleset updated (server-side, immediately effective) to require the new check
+3. Other open PRs targeting the same release branch have neither the workflow file in
+   their head branch nor on the base branch
+4. Those PRs' CI cannot run the new check → Ruleset blocks their merge
+
+GitHub Actions resolves workflow files from the merge commit (merge of head + base). If
+the workflow file exists in neither the head branch nor the base branch, the check cannot
+run and the Ruleset blocks indefinitely.
+
+### Workaround
+
+**Required sequence when adding a new required CI check:**
+
+1. **Do not add the check to the Ruleset until the workflow file is on the base branch.**
+   Introduce the Ruleset change as the last step, not the first.
+
+   Preferred order:
+   a. Commit the workflow file to a feature branch
+   b. Open and merge that PR (the check runs from the merge commit and passes/skips)
+   c. Only after merge: add the check to the Ruleset via `gh api PUT /rulesets/{id}`
+
+2. **Recovery if the Ruleset was updated before the workflow file merged** (the KI-003
+   scenario):
+   a. Temporarily remove the new check from the Ruleset:
+      ```bash
+      gh api repos/{owner}/{repo}/rulesets/{id} --method PUT --input ruleset-without-check.json
+      ```
+   b. Merge any blocked PRs
+   c. Merge the PR that introduces the workflow file
+   d. Re-add the check to the Ruleset
+
+### Upstream
+
+No upstream issue filed. This is a known limitation of GitHub Rulesets' check resolution
+model — required checks must have previously reported on the base branch for the Ruleset
+to consider them satisfiable. GitHub branch protection rules have the same behaviour.
+The workaround (sequence the Ruleset update after the workflow file merge) fully mitigates
+the issue; no code change is required.
+
+**First observed:** adding `branch-naming` check during Issue #978 implementation
+(2026-06-16). Recovery applied in the same session.
+
+---
+
+## KI-004 — GitHub Actions: Node.js 20 deprecation warning on `actions/checkout@v4` and `actions/setup-node@v4`
+
+**Date first observed:** 2026-06-18
+**Infrastructure:** GitHub Actions (GitHub-hosted runners)
+**Severity:** Low — warning only; CI continues to pass; no behavioural change
+**Recurrence:** Consistent — appears on every CI run until upstream action versions are updated
+
+### Symptom
+
+Every CI run logs the following warning before the job steps execute:
+
+```
+Warning: Node.js 20 is deprecated. The following actions target Node.js 20 but
+are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-node@v4.
+For more information see:
+https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+```
+
+All jobs pass despite the warning. GitHub's runner infrastructure auto-upgrades the
+actions' runtime from Node.js 20 to Node.js 24 transparently.
+
+### Trigger condition
+
+GitHub Actions deprecated Node.js 20 as a runner runtime (announced 2025-09-19).
+`actions/checkout@v4` and `actions/setup-node@v4` declare a Node.js 20 engine
+internally. GitHub's hosted runners are now Node.js 24; the runtime mismatch
+produces the warning on every run. This is a GitHub infrastructure decision — the
+project has no control over the hosted runner Node.js version.
+
+### Workaround
+
+No action required at this time. GitHub is auto-upgrading the runtime and CI passes.
+
+**When upstream resolves:** The warning will disappear when `actions/checkout` and
+`actions/setup-node` publish new major versions (e.g. `@v5`) with Node.js 24-native
+internals. At that point, update all references in `.github/workflows/ci.yml` and
+`.github/workflows/milestone-automation.yml` from `@v4` to the new version. No other
+change is required.
+
+Affected files (7 references total as of 2026-06-18):
+- `.github/workflows/ci.yml` — 6 uses of `actions/checkout@v4`, 1 use of `actions/setup-node@v4`
+- `.github/workflows/milestone-automation.yml` — 1 use of `actions/checkout@v4`
+
+### Upstream
+
+GitHub announced the deprecation at:
+https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+
+No project-level issue filed. The resolution is a one-line version bump per workflow
+reference once upstream publishes a Node.js 24-native action version. Monitor
+`actions/checkout` and `actions/setup-node` release notes for a `@v5` tag.
+
+---
+
 ## Registry Maintenance
 
 ### When to file a Known Issue

@@ -12,12 +12,66 @@
  * Derives current step scores from trajectory + current_step in the Zustand atom.
  * Atomicity guaranteed by single-store subscription (DD-012, US-023).
  *
- * Implements: US-021, US-022, ADR-008 Decision 7, DD-011
+ * ADR-015 §Component 1: L0 basis annotations on each framework row.
+ * ADR-015 §Component 3: Political Feasibility (programme_survival_probability) row.
+ *
+ * Implements: US-021, US-022, ADR-008 Decision 7, DD-011, ADR-015 Components 1+3
  */
 import React from "react";
 import { useScenarioStepStore } from "../store/scenarioStepStore";
 import { FRAMEWORK_COLORS } from "../constants/frameworkColors";
 import { sortAlerts } from "./MDAAlertPanelZone1B";
+
+// ---------------------------------------------------------------------------
+// ADR-015 §Component 1 — L0 annotation constants and helpers
+// ---------------------------------------------------------------------------
+
+/**
+ * Static ecological breach-type mapping for the four M14 entities.
+ * DA-G5-5: GRC/EGY → ceiling; JOR/ZMB → floor.
+ * M15 schema-level fix will supersede this static mapping.
+ */
+const ECOLOGICAL_BREACH_TYPES: Record<string, { label: string; arrow: string }> = {
+  GRC: { label: "approaching planetary ceiling — climate", arrow: "↑" },
+  EGY: { label: "approaching planetary ceiling — climate", arrow: "↑" },
+  JOR: { label: "approaching resource floor — freshwater", arrow: "↓" },
+  ZMB: { label: "approaching resource floor — freshwater", arrow: "↓" },
+};
+
+/** Data quality info per framework from GET /entities/{id}/data-quality (DA-G5-1). */
+export interface FrameworkDataQuality {
+  source_institution: string | null;
+  data_vintage: string | null;
+  confidence_tier?: number | null;
+}
+
+/**
+ * Build the L0 basis annotation string for a framework row.
+ * Format: [T{N} · {source} · pre-cal] — always shows pre-cal in M14 (ia1_disclosure always set).
+ * Null tier → [—] (ADR-015 §Silent Failure Mode Component 1).
+ * Ecological framework uses the breach-type label from ECOLOGICAL_BREACH_TYPES.
+ */
+export function buildFrameworkAnnotation(
+  fw: string,
+  tier: number | null | undefined,
+  sourceInstitution: string | null,
+  entityId?: string | null,
+): string {
+  if (tier === null || tier === undefined) return "[—]";
+
+  if (fw === "ecological") {
+    const breachInfo = entityId ? (ECOLOGICAL_BREACH_TYPES[entityId] ?? null) : null;
+    if (breachInfo) {
+      return `[T${tier} · ${breachInfo.arrow} ${breachInfo.label} · pre-cal]`;
+    }
+    return `[T${tier} · pre-cal]`;
+  }
+
+  if (sourceInstitution) {
+    return `[T${tier} · ${sourceInstitution} · pre-cal]`;
+  }
+  return `[T${tier} · pre-cal]`;
+}
 
 // ---------------------------------------------------------------------------
 // Exported constants and pure functions (tested by FourFrameworkZone1D.test.ts)
@@ -85,6 +139,19 @@ interface FourFrameworkZone1DProps {
   onSelectFrameworkAlert?: (mdaId: string) => void;
   /** Entity ISO codes — when two provided, shows entity context label (DEMO-062). */
   entityIds?: string[];
+  /** ADR-015 §Component 1: data-quality per framework (DA-G5-1). */
+  dataQuality?: Record<string, FrameworkDataQuality> | null;
+  /** ADR-015 §Component 3: whether political economy module is enabled (DA-G5-3). */
+  peEnabled?: boolean;
+  /**
+   * ADR-015 §Component 3: programme_survival_probability value as Decimal string.
+   * undefined = not fetched / PE disabled (row absent).
+   * null = PE enabled but computation returned null (show error row).
+   * string = valid value (show percentage).
+   */
+  pspValue?: string | null;
+  /** ADR-015 §Component 3: confidence tier of the PSP indicator. */
+  pspTier?: number | null;
 }
 
 const CONTAINER_STYLE: React.CSSProperties = {
@@ -102,6 +169,10 @@ export function FourFrameworkZone1D({
   isError = false,
   onSelectFrameworkAlert,
   entityIds,
+  dataQuality,
+  peEnabled,
+  pspValue,
+  pspTier,
 }: FourFrameworkZone1DProps) {
   const { trajectory, current_step, mda_alerts, mode } = useScenarioStepStore();
 
@@ -169,6 +240,9 @@ export function FourFrameworkZone1D({
     );
   }
 
+  // Primary entity ID for ecological breach type mapping (DA-G5-5).
+  const primaryEntityId = trajectory?.entity_id ?? entityIds?.[0] ?? null;
+
   // Normal render — framework rows always present in DOM regardless of error
   // state (IR-006). Error indicator is inline above the rows so existing
   // testids remain discoverable. When isError=true, trajectory is null so
@@ -205,6 +279,16 @@ export function FourFrameworkZone1D({
         const color = FRAMEWORK_COLORS[key as keyof typeof FRAMEWORK_COLORS] ?? "#888";
         const isNull = score === null;
 
+        // ADR-015 §Component 1 — L0 annotation from trajectory confidence_tier + data-quality source
+        const trajectoryTier = point?.confidence_tier ?? null;
+        const dqFramework = dataQuality?.[key] ?? null;
+        const annotationText = buildFrameworkAnnotation(
+          key,
+          trajectoryTier,
+          dqFramework?.source_institution ?? null,
+          primaryEntityId,
+        );
+
         return (
           <div
             key={key}
@@ -215,13 +299,13 @@ export function FourFrameworkZone1D({
               justifyContent: "space-between",
               borderLeft: `3px solid ${color}`,
               paddingLeft: 6,
-              paddingTop: 3,
-              paddingBottom: 3,
+              paddingTop: 2,
+              paddingBottom: 2,
               borderLeftStyle: isNull ? "dashed" : "solid",
               opacity: isNull ? 0.6 : 1,
             }}
           >
-            <span style={{ display: "flex", flexDirection: "column", gap: 1 }}>
+            <span style={{ display: "flex", flexDirection: "column", gap: 0 }}>
               <span
                 data-testid={`framework-label-${key}`}
                 style={{
@@ -239,6 +323,13 @@ export function FourFrameworkZone1D({
                     1.0 = boundary
                   </span>
                 )}
+              </span>
+              {/* ADR-015 §Component 1 — L0 basis annotation (always visible at zero interaction) */}
+              <span
+                data-testid={`framework-annotation-${key}`}
+                style={{ fontSize: 8, color: "#aaa", lineHeight: 1.2 }}
+              >
+                {annotationText}
               </span>
               {/* "Primary dimension — see alerts →" navigation link (#745) */}
               {topAlertByFramework[key] && onSelectFrameworkAlert && (
@@ -294,6 +385,43 @@ export function FourFrameworkZone1D({
           </div>
         );
       })}
+
+      {/* ADR-015 §Component 3 — Political Feasibility row (programme_survival_probability).
+          Visible only when PE module is enabled. Absent entirely when PE is disabled. */}
+      {peEnabled && (
+        <div
+          data-testid="zone-1d-political-feasibility"
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            borderLeft: "3px solid #7c3aed",
+            paddingLeft: 6,
+            paddingTop: 2,
+            paddingBottom: 2,
+          }}
+        >
+          <span style={{ fontSize: 11, color: "#555", fontWeight: 500 }}>
+            Political Feasibility
+          </span>
+          <span
+            style={{
+              fontSize: 12,
+              fontWeight: 700,
+              color: "#7c3aed",
+              fontVariantNumeric: "tabular-nums",
+            }}
+          >
+            {pspValue === undefined ? (
+              "—"
+            ) : pspValue === null ? (
+              <span style={{ color: "#cc0000", fontSize: 10 }}>— [computation error]</span>
+            ) : (
+              `${(parseFloat(pspValue) * 100).toFixed(0)}% [T${pspTier ?? 3} · political economy module]`
+            )}
+          </span>
+        </div>
+      )}
     </div>
   );
 }

@@ -1,8 +1,8 @@
 # WorldSim Roadmap
 
-> Last significant revision: 2026-06-15
+> Last significant revision: 2026-06-16
 > Next mandatory review: Milestone 14 close
-> Updated against: M13 close — political economy module in production; ADR-013/ADR-014 accepted; alert panel Zone 1B persistent-detail; instrument legibility; mode transition UX; Process Redesign Phases 0–D complete; M14 now current
+> Updated against: M14 milestone planning panel deliberation 2026-06-16 — M15/M16/M17/M18 defined; demo arc extended through Demo 7; issue allocation confirmed across all four milestones; scope gaps closed (#986 cohort disaggregation, #987 political risk surface, #988 Goodhart's Law, #989 onboarding docs, #990 accessibility validation)
 > Canonical location: `docs/roadmap/worldsim-roadmap.md`
 
 *Note: This document was not updated at M10, M11, M11.5, or M12 close — a gap against the "Roadmap Currency" policy. Updates at those closes are now reflected in the registry and narrative sections.*
@@ -33,6 +33,10 @@
 | M12 | Active Control and External Sector | Matrix engine production, ExternalSectorModule (ADR-012), Mode 3, Demo 4 | Complete |
 | M13 | Political Economy and Instrument Credibility | ADR-013, political economy integration, ADR-014 alert panel UX, instrument legibility, mode transition UX, Process Redesign Phases 0–D | Complete |
 | M14 | Methodology Publication and External Validation | Methodology publication, external validation, live demo, TSC formation | Current |
+| M15 | Human Cost Architecture | Zone 1A information architecture (ADR), cohort disaggregation design, political risk surface design, approved-source query (Path 1), accessibility validation | Planned |
+| M16 | Distributional Visibility | Demo 6: cohort-level distributional output, 25-year human capital trajectory, uncertainty quantification as bands, ecological transmission, Path 2 data upload | Planned |
+| M17 | Multi-Scenario Infrastructure | Multi-scenario comparison infrastructure (>2 scenarios), dynamic relationship weights, stock vs. flow at scale, entity template library design | Planned |
+| M18 | Comparative Analysis and Full Argument | Demo 7: multi-scenario comparison with distributional overlay, uncertainty bands, full counter-scenario argument at the negotiating table | Planned |
 
 ---
 
@@ -43,6 +47,8 @@ WorldSim v0.12.1+ is released. Fourteen milestones of foundational and delivery 
 M13 is complete. M14 is the transition from institutional readiness to public availability. The methodology publication makes every model relationship, calibration assumption, and known limitation inspectable. External validation by domain experts outside the project provides independent credibility. The live external demo (#843) is the M14 closure gate — the moment the democratization mission becomes operational rather than aspirational.
 
 The three questions that drove M13 — political feasibility, conditionality design, and medium-term horizon — are now answerable. M14 asks: can we make that answer credible to the world?
+
+M15–M18 are defined and issued-scoped as of 2026-06-16. The roadmap through M18 is directionally committed. The demo arc (Demo 5 through Demo 7) defines the progressive capability story the tool tells to the world across those four milestones.
 
 ---
 
@@ -61,6 +67,24 @@ A finance ministry analyst can open WorldSim, load the Greece 2010–2015 scenar
 The matrix computation engine is in production. The simulation runs multi-country scenarios at scale. A Jordanian finance ministry analyst runs a Strait of Hormuz closure scenario and sees what it means for Jordan's fuel access, food price inflation, and public legitimacy — on a standard laptop, in real time.
 
 The story is the democratization mission made concrete. The tool that showed Greece in Demo 3 now serves the user it was built for — in a scenario no institution has previously given them the analytical tools to navigate.
+
+**Demo 5 — Milestone 14: WorldSim can be trusted.**
+
+The trust architecture is live. A Zambian finance ministry analyst responds to an input challenge at the negotiating table. "Where does that reserve figure come from?" She opens the grounding strip: World Bank WDI, 2023 vintage, Tier 2. "How was the drawdown calculated?" She opens the evidence thread: the methodology is documented, inspectable, and cited. The creditor side cannot challenge the data provenance — because the provenance is on screen.
+
+The story is epistemic credibility. The tool that served the Jordanian analyst in Demo 4 can now be defended under scrutiny — by a minister's team with three economists, against a creditor side with one hundred.
+
+**Demo 6 — Milestone 16: WorldSim shows who bears the cost.**
+
+The human cost ledger is visible. A Senegalese Finance Minister walks into an Article IV consultation. Her team has run the proposed conditionality scenario overnight. On screen: the bottom quintile crosses the poverty threshold at step 2. The 25-year human capital trajectory shows a generation of teachers and doctors leaving the public sector by step 6. The programme survival probability drops to 38% at step 3 — the political feasibility model says the programme collapses before it achieves its fiscal target.
+
+The story is distributional evidence. The argument the ministry team can make is no longer "this is bad in general" — it is "this is bad specifically, for this cohort, at this step, and we have the numbers."
+
+**Demo 7 — Milestone 18: WorldSim shows it didn't have to be this way.**
+
+The counter-scenario comparison is live. A Zambian restructuring team loads three scenarios simultaneously: IMF proposed terms, Zambian counter-proposal, Ghana 2023 restructuring as a regional comparator. The instrument cluster shows overlaid trajectories with uncertainty bands. Under proposed terms: 340,000 additional people below the poverty threshold. Under the counter-proposal: 80,000. The ministry's counter-proposal is now an argument with a specific number differential, a confidence band, and a historical precedent.
+
+The story is the complete analytical stack at the negotiating table: inputs cited, methodology transparent, human cost visible, alternatives compared. The minister's team has parity.
 
 ---
 
@@ -225,19 +249,113 @@ surface: any milestone entry with UNTRACKED items is an open kickoff gate.
 
 **Core deliverable:** WorldSim is ready for institutional adoption. The methodology is published, externally validated, and inspectable by anyone.
 
+**Demo 5 story:** *"The minister's team can now defend their inputs and trace the output reasoning to a published methodology."*
+
 **What ships:**
-- Methodology publication — complete documentation of every model relationship, calibration assumption, and known limitation
-- External validation — methodology reviewed by domain experts outside the project
-- Technical Steering Committee formation — first governance actor independent of the Engineering Lead
-- Goodhart's Law mitigation design — TSC owns the monitoring and response framework for parameterization gaming risk
-- Live stakeholder demo with real external participants — M14 closure gate → Issue #843
-- Public launch infrastructure — onboarding path for global south finance ministry analysts, accessibility validation on target hardware
+- ADR-016 implementation — entity selector, data quality preview, grounding strip (source-cited initial state) → G3/G4 (no standalone issue; tracked in sprint plan)
+- ADR-015 implementation — evidence thread, L0 basis annotations, L1 basis statement, L2 evidence chain → G5 (no standalone issue; tracked in sprint plan)
+- Prerequisite bug fixes — entity selector (#961), step counter (#962), choropleth labels (#963) → Issue #961, #962, #963 (horizon:immediate)
+- Calibration and methodology — reserve_coverage_months (#884), Exploratory tier (#885), ecological composite (#823), MENA calibration (#824), Zone 1A Y axis (#950), confidence tier disclosure (#22 — disclosure layer only; full distributional bands → M16) → Issues #884, #885, #823, #824, #950, #22 (horizon:immediate)
+- TSC formation → Issue #3 (horizon:immediate)
+- Branch protection restoration → Issue #6 (horizon:immediate)
+- Goodhart's Law mitigation design — TSC monitoring framework for parameterization gaming risk → Issue #988 (horizon:immediate)
+- Onboarding documentation for global south finance ministry analysts → Issue #989 (horizon:immediate)
+- Zone 1A Phase 1 design thinking (G6c) — UX Designer document gating M15 architecture review → Issue #845 Phase 1 (horizon:immediate)
+- Path 2 design groundwork (G6b) — field mapping UX, USER_SUPPLIED provenance spec, data isolation sketch → Issue #976 design artifacts (horizon:immediate)
+- Live stakeholder demo with real external participants — M14 closure gate → Issue #843 (horizon:immediate)
 
-**Demo:** Demo 5 at M14 close. The audience shifts from invited stakeholders to the world.
+**Demo:** Demo 5 at M14 close.
 
-**Canonical user primarily served:** All five personas — anchored in the quinoa farmer's government. The tool's public availability is the moment the democratization mission becomes operational rather than aspirational.
+**Canonical user primarily served:** Persona 2 (Finance Ministry Negotiator) in Reactive entry state — the trust architecture makes her inputs defensible at the table.
 
-**What M14 does not do:** M14 does not complete the entity template library. That work begins at M14 and continues beyond it as a permanent capability improvement program.
+**What M14 does not do:** M14 does not surface cohort disaggregation on the primary viewport (M15 design, M16 implementation). M14 does not ship full distributional uncertainty bands (M16). M14 does not enable multi-scenario comparison (M17/M18).
+
+---
+
+### Milestone 15 — Human Cost Architecture *(planned)*
+
+**Core deliverable:** The design and architectural foundation that makes Demo 6 possible. No demo at M15 close — M15 builds what M16 shows.
+
+**What ships:**
+- Zone 1A information architecture — Phase 2 (ARCH-REVIEW with DIC) and Phase 3 (ADR) gating M16 distributional implementation → Issue #845 Phases 2–3 (horizon:immediate)
+- Cohort disaggregation design — specifies how bottom-quintile threshold crossings surface in the primary viewport; may be subsumed into Zone 1A ADR → Issue #986 (horizon:immediate)
+- Political risk summary surface design — plain-language legitimacy dynamics for Persona 3; design and any required ADR → Issue #987 (horizon:immediate)
+- Path 1 — user-directed query from approved source network at scenario creation → Issue #975 (horizon:immediate)
+- Information access architecture (RBAC design) — prerequisite for Path 2 data isolation → Issue #53 (horizon:immediate)
+- Zone 1A Y axis and Mode 3 branch comparison values → Issues #950 (if not completed in M14 G6), #846 (horizon:near-term)
+- Threshold-crossing markers in comparative output → Issue #97 (horizon:near-term)
+- Absolute threshold overlay on DeltaChoropleth → Issue #153 (horizon:near-term)
+- Greece backtesting expansion (investment climate initial conditions) → Issue #92 (horizon:near-term)
+- Config-driven demo scripts → Issue #837 (horizon:near-term)
+- CTO legibility metrics dashboard → Issue #259 (horizon:near-term)
+- Mode 3 hardware validation (MV-002) → Issue #569 (horizon:near-term)
+- Solo-use review protocol → Issue #951 (horizon:near-term)
+- Accessibility validation on target hardware (8GB/4-core) → Issue #990 (horizon:near-term)
+
+**Demo:** None (M15). Demo 6 at M16.
+
+**Canonical user primarily served:** Persona 4 (Academic Researcher, Amara Diallo) and Persona 2 — M15 is the methodology depth and data access milestone that serves both.
+
+**What M15 does not do:** M15 does not implement cohort disaggregation or distributional output (M16). M15 does not implement Path 2 proprietary data upload (requires Issue #53 design decisions from M15 before M16 implementation can begin).
+
+---
+
+### Milestone 16 — Distributional Visibility *(planned)*
+
+**Core deliverable:** The human cost ledger is operationally visible. A finance minister can cite which cohort bears the cost, at which step, with what confidence, against a 25-year horizon. Demo 6 shows this.
+
+**Demo 6 story:** *"Here is who bears the cost — specifically, this cohort, at this step, for this long."*
+
+**What ships:**
+- Cohort disaggregation on primary surface — bottom-quintile threshold crossings visible in primary viewport within 90-second retrieval ceiling → Issue #986 (horizon:immediate)
+- Political risk summary surface for Persona 3 — programme survival probability and legitimacy trajectory in plain language → Issue #987 (horizon:immediate)
+- Distributional scenario comparison — variance and percentile ranges by cohort → Issue #102 (horizon:immediate)
+- 25-year human capital depletion trajectory → Issue #274 (horizon:immediate)
+- Calibrated ecological-to-financial transmission — resource curse → fiscal capacity chain → Issue #275 (horizon:immediate)
+- Uncertainty quantification — full distributional output as scenario bands (builds on ADR-015 evidence thread) → Issue #22 full implementation (horizon:immediate)
+- Dynamic relationship weight updating → Issue #35 (horizon:near-term)
+- Stock vs. flow variable distinction in entity attribute model → Issue #30 (horizon:near-term)
+- Path 2 — ministry-owned proprietary data upload with field mapping (implementation; depends on Issue #53 from M15) → Issue #976 (horizon:near-term)
+
+**Demo:** Demo 6 at M16 close. Senegalese Finance Minister scenario. The human cost argument becomes specific.
+
+**Canonical user primarily served:** Persona 5 (Institutional Decision-Maker, Aicha Mbaye) and Persona 2 — the distributional evidence is what Aicha presents to her cabinet and what Eleni cites at the table.
+
+**What M16 does not do:** M16 does not enable comparison of more than two scenarios simultaneously (M17). M16 does not deliver the entity template library.
+
+---
+
+### Milestone 17 — Multi-Scenario Infrastructure *(planned)*
+
+**Core deliverable:** The comparison infrastructure that makes Demo 7 possible. No demo at M17 close.
+
+**What ships:**
+- Multi-scenario comparison (>2 scenarios) — Kenya budget planning use case → Issue #394 (horizon:immediate)
+- Entity template library — initial templates (transport fuel, food systems) → Issue #407 (horizon:near-term)
+- Data marketplace design — curated dataset registry → Issue #5 (horizon:near-term)
+- Advanced geocoded dataset integration → Issue #4 (horizon:near-term)
+
+**Demo:** None (M17). Demo 7 at M18.
+
+**Canonical user primarily served:** Persona 7 (Parliamentary Economist, James Ochieng) — the multi-scenario comparison enables the independent fiscal analysis his PBO mandate requires.
+
+---
+
+### Milestone 18 — Comparative Analysis and Full Argument *(planned)*
+
+**Core deliverable:** The complete analytical stack at the negotiating table. A finance ministry team can load three scenarios, show who bears the cost under each, compare the distributional outcomes, and cite the counter-proposal with a specific number differential.
+
+**Demo 7 story:** *"Here is what we proposed instead — side by side, with error bars, with human cost consequences."*
+
+**What ships:**
+- Multi-scenario comparison with distributional overlay — three+ scenarios, overlaid trajectories with uncertainty bands → builds on Issue #394
+- Counter-scenario comparison showing distributional differences under each pathway
+- Path 2 full implementation — ministry-owned proprietary data integrated into multi-scenario comparison
+- Entity template library operational — additional countries navigable in comparison
+
+**Demo:** Demo 7 at M18 close. Zambian restructuring team scenario. The ministry team has negotiating parity.
+
+**Canonical user primarily served:** Persona 2 (Finance Ministry Negotiator) and Persona 5 (Institutional Decision-Maker) — the moment the tool's full promise is operationally real.
 
 ---
 

@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-15 (M14 active — ADR-016 authored and merged (PR #964); ARCH-010 assigned; three prerequisite bugs filed (#961 #962 #963); M14 Wave 1/Wave 2 structure in place; EL review of ADR-016 is next gating action)**
+**Last updated: 2026-06-19 (G8 demo cycle Steps 5b/6/6b complete — legibility 10/10 PASS; five screenshots PR #1058; nine-agent internal review + walkthrough fixes PR #1060. Four blocking narration errors corrected (DEMO5-001–004). Steps 7/6c/9 gated on EL.)**
 **Current milestone:** M14 — Methodology Publication and External Validation (GitHub Milestone 15)
 **Previous milestone:** M13 — Political Economy and Instrument Credibility (formally closed 2026-06-15; release/m13 → main merged by EL; #264 closed)
 
@@ -73,42 +73,103 @@
 
 **M14 kickoff sequence status:**
 1. ✅ `git pull origin main` — confirmed current (PR #957 merge; commit e63828f)
-2. ⬜ PM Agent cuts `release/m14` from `main` — NOT YET DONE (no release/m14 branch exists)
-3. ⬜ PM Agent authors `docs/process/sprint-plans/m14-sprint-plan.md`
-4. ⬜ EL approves sprint plan
-5. ⬜ PM Agent files M14 Exit Checklist issue (must reference #843 as M14 closure gate)
-6. ⬜ Sprint entry document filed per `docs/process/sprint-planning-sop.md §Sprint Entry Gate`
+2. ✅ PM Agent cuts `release/m14` from `main` — DONE 2026-06-16
+3. ✅ PM Agent authors `docs/process/sprint-plans/m14-sprint-plan.md` — DONE 2026-06-16
+4. ⬜ **EL approves sprint plan** — NEXT REQUIRED ACTION before implementation begins
+5. ✅ PM Agent files M14 Exit Checklist issue — DONE 2026-06-16 (**#968**; closure gate: #843)
+6. ⬜ Sprint entry document filed per `docs/process/sprint-planning-sop.md §Sprint Entry Gate` — required before implementation
 
-**NOTE for next session:** The sprint entry gate is a HARD STOP before implementation begins. The three prerequisite bugs (#961 #962 #963) may be filed and the ADR-016 authorship (documentation-only) may proceed without a sprint entry document — but Wave 1 or Wave 2 *implementation* may not begin until a filed, EL-approved sprint entry document exists. ADR-016 has been authored; it is Proposed. EL acceptance of ADR-016 is the Wave 1 gate.
+**HARD STOP:** No implementation PR may open against `release/m14` until the EL has approved the sprint plan and a sprint entry document is filed.
 
 ---
 
 ## Open Work Streams — M14 (Active)
 
 **Wave structure (EL decision 2026-06-15):**
-- **Wave 1:** ADR-016 (Scenario Grounding Architecture) — author and EL-accept before Wave 2 begins
-- **Wave 2:** ADR-015 (Evidence Thread Architecture) — moves to Accepted only after Wave 1 complete
+- **Wave 1 — COMPLETE:** ADR-016 (Scenario Grounding Architecture) — Accepted 2026-06-16 (PR #967)
+- **Wave 2:** ADR-015 (Evidence Thread Architecture) — ✅ ACCEPTED 2026-06-16 (PR #998); implementation scope: Components 1, 2, 3 (M14); Component 4 deferred to M15
 
 **Current state:**
 
 | Item | Status | Next action |
 |---|---|---|
-| Bug #961 — GRC hardcoded in creation form | Filed 2026-06-15 | M14 implementation (requires sprint entry first) |
-| Bug #962 — step counter 'Step 0 / 8' | Filed 2026-06-15 | M14 implementation (requires sprint entry first) |
-| Bug #963 — choropleth raw DB field names | Filed 2026-06-15 | M14 implementation (requires sprint entry first) |
-| ARCH-010 — ADR-016 Scenario Grounding | Added to backlog 2026-06-15 | ASSIGNED; ADR Proposed |
-| ADR-016 — Scenario Grounding Architecture | Proposed (PR #964, merged 2026-06-15) | **EL review and acceptance required** — 5 decisions in §Decisions Required |
-| ADR-015 — Evidence Thread Architecture | Proposed (PR #959, merged 2026-06-15) | Blocked on ADR-016 acceptance (Wave 1 gate) |
-| M14 sprint entry document | NOT FILED | Required before any implementation begins |
-| release/m14 branch | NOT CUT | Required before any feature PRs open |
-| M14 Exit Checklist issue | NOT FILED | Required; must reference #843 |
-
-**ADR-016 §Decisions Required (EL must resolve before Accepted):**
-1. Entity selection scope for M14 (all source registry entities / GRC+JOR+EGY+ZMB / G20+HIPC?)
-2. Component 3 (Fidelity contextualisation) in-scope for M14 or deferred to M15?
-3. API endpoint authority — Chief Engineer owns `/initial-state` and `/data-quality`?
-4. Parameter persistence backward compatibility — Demo 5 scenarios need recreation?
-5. IC-6 (choropleth) disposition — separate Tier 1 ADR / defer M15 / accepted limitation?
+| Bug #961 — GRC hardcoded in creation form | ✅ FIXED 2026-06-17 (PR #1006) | BPO Step 5 Validate pending |
+| Bug #962 — step counter 'Step 0 / 8' | ✅ FIXED 2026-06-17 (PR #1006) | BPO Step 5 Validate pending |
+| Bug #963 — choropleth raw DB field names | ✅ FIXED 2026-06-17 (PR #1006) | BPO Step 5 Validate pending |
+| Bug #1007 — recompute-badge not visible after apply-control-change | Filed 2026-06-17 | Pre-existing; discovered during G1 Step 4 Verify; to be addressed in G5 or follow-on |
+| ARCH-010 / ADR-016 — Scenario Grounding | ✅ ACCEPTED 2026-06-16 (PR #967) | G3 COMPLETE; G4 Step 4 PASS; G4 Step 5 PENDING |
+| ADR-016 entity scope | GRC, JOR, EGY, ZMB (EL decision 2026-06-16) | — |
+| ADR-016 Component 3 | Deferred to M15 (EL decision 2026-06-16) | — |
+| ADR-016 IC-6 mitigation | Choropleth header label in M14 (EL decision 2026-06-16) | Part of G4 |
+| ADR-015 — Evidence Thread Architecture | ✅ ACCEPTED 2026-06-16 (PR #998) | 6 decisions resolved; Components 1–3 in M14 scope; Component 4 → M15; Demo 5 script constraint → #997 |
+| M14 sprint plan | ✅ **EL APPROVED 2026-06-16** — `docs/process/sprint-plans/m14-sprint-plan.md` | Sprint entry document required per group before implementation PR opens |
+| release/m14 branch | ✅ Cut 2026-06-16 from main | Ready for feature PRs — sprint entry document required first |
+| G1 sprint entry document | ✅ Filed 2026-06-16 — `docs/process/sprint-plans/m14-g1-sprint-entry.md` (PR #993) | **EL Approved 2026-06-16** (PR #996); intent doc ✅ filed (PR #999); QA tests ✅ filed (PR #1001) |
+| G1 intent document | ✅ Filed 2026-06-16 — `docs/process/intents/M14-G1-2026-06-16-prerequisite-bugs.md` (PR #999) | Step 4 Verify PASS 2026-06-17 — all 7 ACs pass; Step 4 verdict recorded in §8 of intent doc |
+| G1 QA tests (Step 2) | ✅ Filed 2026-06-17 — `frontend/tests/e2e/m14-g1-prerequisite-bugs.spec.ts` (PR #1001) | All 7 ACs covered; entity-selector guard pattern; AC-4/AC-5 API fixture; AC-6 label-scope |
+| G1 implementation (Step 3) | ✅ MERGED 2026-06-17 — PR #1006 → release/m14 | ScenarioPanel entity selector; ScenarioControls initialStep; App.tsx initialStep prop |
+| G1 Step 4 Verify | ✅ PASS 2026-06-17 | 7/7 ACs pass; 4 probes pass; pre-existing #1007 discovered and filed; verdict in intent doc §8 |
+| G1 Step 5 Validate | ✅ BPO ACCEPT 2026-06-17 | All 3 observable states confirmed; Layer 3 PASS; intent doc §9; sprint exit filed |
+| G3 sprint entry | ✅ EL Approved 2026-06-17 — `docs/process/sprint-plans/m14-g3-sprint-entry.md` (PR #1011 merged) | Step 2 QA tests filed before implementation; Step 3 impl merged |
+| G3 QA tests (Step 2) | ✅ Filed 2026-06-17 — `backend/tests/test_m14_g3_adr016_backend.py` (PR #1011) | AC-1–AC-9 pytest+httpx; authored before implementation |
+| G3 implementation (Step 3) | ✅ MERGED 2026-06-17 — PR #1011 → release/m14 | source_registry seed; entity_data_quality_coverage; /data-quality; /initial-state; api_contracts.yml |
+| G3 Step 4 Verify | ✅ PASS 2026-06-17 | 9/9 ACs pass after `alembic upgrade head`; Step 4 note: migration not pre-applied at initial probe (500); verdict in intent doc §8 |
+| G3 Step 5 Validate | ✅ BPO ACCEPT 2026-06-17 | JOR scenario `68b31277` — reserve_coverage_months: 7.1 months · CBJ 2023-Q4 · T2; Persona 2 north star argument enabled; Layer 3 PASS; G4 gate open; intent doc §9 |
+| G4 sprint entry document | ✅ **EL APPROVED 2026-06-17** — `docs/process/sprint-plans/m14-g4-sprint-entry.md` (PR #1014) | — |
+| G4 intent document | ✅ Filed 2026-06-17 — `docs/process/intents/M14-G4-2026-06-17-adr016-frontend.md` | Step 4 Verify PASS 2026-06-17 — 9/9 ACs pass; verdict in intent doc §8 |
+| G4 QA tests (Step 2) | ✅ Filed 2026-06-17 — `frontend/tests/e2e/m14-g4-adr016-frontend.spec.ts` | AC-1–AC-9; guard pattern; AC-8/AC-9 route mocks; authored before implementation |
+| G4 implementation (Step 3) | ✅ MERGED 2026-06-17 — PR #1015 + PR #1016 (AC-5 text fix) → release/m14 | DataQualityPreview, GroundingStrip, ScenarioParameters, IC-4/IC-6 headers, ModeSelector onWrapperClick |
+| G4 Step 4 Verify | ✅ PASS 2026-06-17 | 9/9 ACs pass; AC-5 text fix required (PR #1016); `ModeSelector.onClick` bubbles noted as finding; verdict in intent doc §8 |
+| G4 Step 5 Validate | ✅ BPO ACCEPT 2026-06-17 | REJECT-001 issued (AC-3: GroundingIndicator field name mismatch source_institution→source); Data Architect review confirmed contract correct; fix merged PR #1018; re-validate PASS. Layer 3 PASS. North star PASS. NM-045 filed. G4 COMPLETE. |
+| NM-046 Vite HMR polling fix | ✅ MERGED 2026-06-17 (PR #1021) | `usePolling: true` added to `frontend/vite.config.ts`; resolves macOS Docker inotify gap that caused EL post-G4 visual check to show stale frontend (CBJ absent, 0/0 Ctrl+F). NM-046 filed. EL confirmed CBJ visible after `docker compose restart frontend` + hard refresh. |
+| G5 sprint entry | ✅ **EL APPROVED 2026-06-17** (PR #1022 merge + correction PR #1023) | `docs/process/sprint-plans/m14-g5-sprint-entry.md`; ADR-015 Components 1–3; Data Architect Agent (not Chief Engineer) for API field consultation and `api_contracts.yml`; entry invariant satisfied; implementation unblocked |
+| G5 intent document (Step 1) | ✅ FILED 2026-06-18 — PR #1025 merged | `docs/process/intents/M14-G5-2026-06-17-adr015-frontend.md`; 14 ACs across Components 1, 2, 3; observable states, visual specs, NM-045 string-presence rule applied; Data Architect decisions appended PR #1026 |
+| G5 Data Architect decisions | ✅ RECORDED 2026-06-18 — PR #1026 merged | DA-G5-1: /data-quality for source annotation. DA-G5-2: /initial-state null-filtered count. DA-G5-3: `modules_config` path confirmed; ScenarioConfigSchema extension specified. DA-G5-4: Option A (measurement-output) for programme_survival_probability. DA-G5-5: GRC/EGY→ceiling, JOR/ZMB→floor. All implementation gates cleared. |
+| G5 QA tests (Step 2) | ✅ FILED 2026-06-18 — `frontend/tests/e2e/m14-g5-adr015-frontend.spec.ts` | All 14 ACs covered; NM-045 rule applied throughout; AC-4/8/9/10/11 route-mock pattern; AC-14 format regex accepted per intent doc §7; TypeScript clean (0 errors) |
+| G5 implementation (Step 3) | ✅ MERGED 2026-06-18 — PR #1030 → release/m14 | FourFrameworkZone1D annotations, AssumptionSurface, Political Feasibility row, PMM annotation, HCL tier expansion, Zone 1B full indicator names |
+| G5 Step 4 Verify | ✅ PASS 2026-06-18 | 17/17 ACs pass; test scenario `1fcc38b9` (JOR, fiscal_multiplier=1.30, 3 steps); data-quality JOR: financial T2·IMF, HD T2·WB, ecological T4, governance T3; verdict in intent doc §8 |
+| G5 Step 5 Validate | ✅ BPO ACCEPT 2026-06-18 | North star: Zambian analyst defends trajectory in restructuring session — L0 annotations answer "where does this number come from?", assumption surface shows Fiscal ×1.30 immediately, PSP visible in Zone 1D; Layer 3 PASS; sprint exit filed |
+| G5 sprint exit document | ✅ FILED 2026-06-18 — `docs/process/sprint-plans/m14-g5-sprint-exit.md` | All exit conditions satisfied; PI Agent confirmed; no rejections; north star test artifact present |
+| G6 sprint entry document | ✅ **EL APPROVED 2026-06-18** — `docs/process/sprint-plans/m14-g6-sprint-entry.md` (EL approval: PR #1040; QA tests: PR #1041+#1042) | Issues: #885, #950, #884, #823, #824, #22, PMM anchor; QA tests filed 2026-06-18 (E2E + backend, AC-1–AC-9); all entry invariants satisfied; implementation unblocked |
+| G6 implementation (Step 3) | ✅ **MERGED 2026-06-18** — PR #1045 → release/m14 (commit 13a9b83) | Zone 1B negotiation labels (#885), Zone 1A Y axis label (#950), reserve_coverage_months seeding (#884), ecological composite tier floor T3 (#823), water_stress_index + biome_class dispatch (#824), confidence tier methodology doc (#22), PMM interpretation anchor; Alembic migration b1c2d3e4f5a6; pre-push gates: ruff ✓, mypy (pre-existing only) ✓, npm run build ✓ |
+| G6 Step 4 Verify | ✅ **PASS 2026-06-18** | All 9 ACs confirmed via CI: AC-1–4 playwright-e2e (commit 65158f4); AC-5–8 test-backend; AC-9 shell find assertion. NM-047 (step_index/n_steps) + NM-048 (data-quality render race) filed — pre-existing G5 test flaws exposed and fixed in same PR. Verdict in intent doc §8. |
+| G6 Step 5 Validate | ✅ BPO ACCEPT 2026-06-18 | All 9 ACs confirmed live: Zone 1B T4 "Model estimate"/T5 "Synthetic extrapolation" (Playwright 6/6); Zone 1A "Score" Y axis (Playwright); JOR reserve_coverage_months value=7.1 T2 CBJ (API); GRC ecological T3 (API); water_stress_index=0.82 T3 JOR (post-migration b1c2d3e4f5a6); calibration docs <1 min nav. Sprint exit CONFIRMED. |
+| G6 sprint exit document | ✅ Filed 2026-06-18 — `docs/process/sprint-plans/m14-g6-sprint-exit.md` | Section 2 (implementation) COMPLETE; Section 3 (Customer Agent Layer 3) COMPLETE; Section 4 (no rejections) COMPLETE; Section 5 PI Agent BLOCKED pending BPO Step 5 Validate |
+| G2 — ADR-015 acceptance | ✅ COMPLETE 2026-06-16 (PR #998) | EL accepted ADR-015; 6 decisions resolved; Components 1–3 M14; Component 4 → M15. G5 unblocked. No sprint entry/exit doc required (EL-action, no user-facing deliverable). |
+| Intent/test naming convention | ✅ Enforced 2026-06-16 (PR #999) | M{N}-G{N} prefix on intent docs and E2E tests — CLAUDE.md, intent-template.md, sprint-planning-sop.md, sprint-entry-template.md all updated |
+| M14 Exit Checklist | ✅ Filed 2026-06-16 — **#968** (closure gate: #843) | Tracks all M14 deliverables |
+| CI merge gate enforcement (#970) | ✅ CLOSED 2026-06-16 | `release-branch-ci-gate` Ruleset (ID 17751852) live — 6 required checks: `changes`, `lint`, `test-backend`, `playwright-e2e`, `compliance-scan`, `branch-naming`; `--admin` removed from SESSION_STATE merge rule |
+| Branch naming enforcement (#978) | ✅ CLOSED 2026-06-16 | `.github/workflows/branch-naming.yml` (PR #979); KI-003 filed (PR #980) |
+| Path 1 — approved source query | ✅ Filed **#975** (M15) | Extends ADR-016 Component 1; Journey A GA-01 |
+| Path 2 — proprietary data upload | ✅ Filed **#976** (M16+; design in M14 G6b) | `USER_SUPPLIED` provenance type; #53 prerequisite; Journey A GA-02 |
+| G6b intent document (Step 1) | ✅ FILED 2026-06-18 — `docs/process/intents/M14-G6b-2026-06-18-path2-design-groundwork.md` | 9 ACs across 3 design artifacts; UX Designer (field mapping UX concept), Architect (`USER_SUPPLIED` provenance spec), Data Architect (isolation model sketch); all filed to `docs/design/path2-data-upload/` before M14 exit; EL review gate before sprint exit |
+| G6b design artifacts (Step 3) | ✅ FILED 2026-06-18 — `docs/design/path2-data-upload/` | AC-1–AC-9 covered: `field-mapping-ux-concept.md` (UX Designer; 5-min workflow, both failure modes, caveat placement), `user-supplied-provenance-spec.md` (Architect; T2 tier, Grounding Strip format, ADR-007 implication, scope boundary), `data-isolation-model-sketch.md` (Data Architect; isolation invariant, 3 failure modes, Issue #53 requirements, out-of-scope list); EL review gate: Step 4 |
+| G6b sprint exit | ✅ FILED 2026-06-18 — `docs/process/sprint-plans/m14-g6b-sprint-exit.md` (PR #1039) | PI Agent confirmed; AC-1–AC-9 PASS; BPO ACCEPT 2026-06-18; north star forward trace: "ministry-supplied reserve figure" argument architecturally specified |
+| Journey A gap markers (GA-01, GA-02) | ✅ Filed 2026-06-16 (PR #974) | `docs/ux/user-journeys.md` |
+| Milestone planning panel deliberation | ✅ COMPLETE 2026-06-16 | M15–M18 defined; demo arc through Demo 7; 17 issues reallocated; 5 new issues filed (#986–#990); roadmap updated |
+| G6c — Zone 1A Phase 1 design thinking | ✅ COMPLETE 2026-06-18 — PR #1033 merged | Intent at `docs/process/intents/M14-G6c-2026-06-18-zone-1a-design-thinking.md`; design doc at `docs/ux/design-thinking/zone-1a-information-architecture.md`; AC-1–AC-8 satisfied; BPO ACCEPT 2026-06-18 (intent doc §8); PI Agent sprint exit CONFIRMED (`docs/process/sprint-plans/m14-g6c-sprint-exit.md`); Phase 2 Readiness section present; gates M15 Architecture Review (#845 Phase 1 closed) |
+| #988 — Goodhart's Law mitigation | ✅ Filed (M14 G7) | TSC monitoring framework for parameterization gaming risk |
+| #989 — Onboarding documentation | ✅ Filed (M14 G7) | Global south analyst onboarding |
+| G7 intent document (Step 1) | ✅ FILED 2026-06-18 — `docs/process/intents/M14-G7-2026-06-18-governance-onboarding.md` | 7 ACs; issues #988 + #989; EL-action items #3 and #6 noted out of agent scope; sprint entry gate note embedded |
+| G7 QA tests (Step 2) | ✅ FILED 2026-06-18 — `backend/tests/test_m14_g7_governance_onboarding.py` | 28 tests: AC-1–AC-6 file-existence + content-presence checks (grep equivalents); AC-4 partial automation (≥1 blindspot; BPO confirms ≥3 at Step 5); AC-7 marked skip (manual BPO timed navigation); all 25 fail pre-implementation as expected |
+| G7 sprint entry document | ✅ **EL APPROVED 2026-06-18** — `docs/process/sprint-plans/m14-g7-sprint-entry.md` | No ADR gate; intent + QA pre-filed; sequencing variance noted (no gate crossed); implementation unblocked |
+| G7 implementation (Step 3) | ✅ MERGED 2026-06-18 (PR #1037) | 5 docs: `docs/onboarding/` (quick-start, scenario-creation, methodology-overview, data-provenance) + `docs/governance/goodharts-law-mitigation.md`; README Getting Started section added; 27/27 automatable ACs pass; lint clean |
+| G7 Step 4 Verify | ✅ PASS 2026-06-18 | AC-1–AC-6 all confirmed via pytest (27 passed, 1 skipped); shell checks pass; Step 4 verdict in intent doc §8; AC-7 manual BPO at Step 5 |
+| G7 Step 5 Validate | ✅ BPO ACCEPT 2026-06-18 | AC-7 timed nav PASS (~2–3 min); AC-4 5 blindspots ✅; AC-6 4 sections ✅; Layer 3 PASS; North star PASS; sprint exit filed |
+| #986 — Cohort disaggregation on primary surface | ✅ Filed (M15) | M11.5 FINDING-03 gap; Demo 6 prerequisite |
+| #987 — Political risk summary surface (Persona 3) | ✅ Filed (M15) | Plain-language legitimacy dynamics |
+| #990 — Accessibility validation on target hardware | ✅ Filed (M15) | 8GB/4-core laptop gate |
+| G8 sprint entry document | ✅ **EL APPROVED 2026-06-19** (PR #1054) | `docs/process/sprint-plans/m14-g8-sprint-entry.md`; ZMB only; no Mode 3; reserve challenge → Grounding strip citation; demo prep standard as governing intent doc; implementation unblocked |
+| G8 Step 1 — demo issue filed | ✅ COMPLETE 2026-06-19 | #1055 filed (demo: M14 stakeholder demo preparation — v0.14.0 / Milestone 14) |
+| G8 Step 2 — screenshot brief | ✅ COMPLETE 2026-06-19 (PR #1056) | `docs/demo/m14/screenshot-brief.md`; five frames; thesis frame C (citation at table); ZMB; no Mode 3 |
+| G8 Step 3 — `demo.sh` updated | ✅ COMPLETE 2026-06-19 (PR #1056) | M14 Demo 5 ZMB/no-Mode3; challenge-response framing; honest disclosures; NM-041 `bash -n` gate PASS |
+| G8 Step 4 — `demo-narrated.spec.ts` | ✅ COMPLETE 2026-06-19 (PR #1056) | Rewritten for ZMB ECF; `demo-narrated-m12.spec.ts` archived; NM-039 sentinel; 1440×900 viewport |
+| G8 Step 5 — walkthroughs | ✅ COMPLETE 2026-06-19 (PR #1056) | `docs/demo/m14/stakeholder-walkthrough.md`; root redirect updated; narration checks 5a/5c encoded in walkthrough |
+| G8 Step 5b — legibility gate | ✅ PASS 2026-06-19 | `demo-legibility.spec.ts` 10/10 pass at 1440×900 |
+| G8 Step 5c — NARRATION-RULING-1 | ✅ PASS 2026-06-19 | All 5 presentation steps: Umbrella + Synthesis + Transition verified |
+| G8 Step 6 — screenshot capture | ✅ COMPLETE 2026-06-19 (PR #1058) | Five frames captured; Round 3 spec fixes (ecological disabled, democratic_quality_score=0.80 to reserve top alert slot); Reserve WARNING Current 2.908 / Floor 2.500 visible in Zone 1B detail slot |
+| G8 Step 6b — internal nine-agent review | ✅ COMPLETE 2026-06-19 (PR #1060) | `docs/demo/m14/reviews/2026-06-19-v0.14.0-internal-review.md`; 8 findings; 4 CRITICAL/HIGH blocking walkthrough errors corrected in same PR; Issue #1059 filed (HCL narration M15 scope) |
+| G8 Steps 7/6c/9 — IR + audience sim + live session | ⬜ **GATED: EL merge `release/m14` → `main`** | IR review (fresh instance); Personas 1/2/3/5 audience simulation; live session with real participants (#843) |
 
 **Evidence base for M14 trust architecture (both ADRs):**
 - Part I audit (output legibility): `docs/demo/m14/reviews/2026-06-15-ux-legibility-audit-minister-exercise.md`
@@ -164,9 +225,52 @@ All near-term issues dispositioned at HORIZON sweep 2026-06-13 — see G8 sprint
 
 | PR | Title | Target | Status |
 |---|---|---|---|
+| #1060 ✅ | docs(demo): M14 Demo 5 internal review + walkthrough corrections (DEMO5-001—007) | release/m14 | Merged 2026-06-19 |
+| #1058 ✅ | feat(demo): Round 3 spec fixes — reserve floor visible in Zone 1B detail slot | release/m14 | Merged 2026-06-19 |
+| #1057 ✅ | chore(state): G8 Phase 1 demo prep complete — Steps 2–5 merged PR #1056 | release/m14 | Merged 2026-06-19 |
+| #1056 ✅ | demo(m14-g8): Steps 2–5 Demo 5 prep — ZMB screenshot brief, narrated spec, demo.sh, walkthroughs | release/m14 | Merged 2026-06-19 |
+| #1054 ✅ | process(m14-g8): G8 sprint entry document — Demo 5 preparation and live stakeholder demo | release/m14 | Merged 2026-06-19 |
+| #1045 ✅ | feat(m14-g6): methodology, calibration, and instrument legibility (#885, #950, #884, #823, #824, #22, PMM anchor) | release/m14 | Merged 2026-06-18 |
+| #1043 ✅ | process(m14-g7): BPO ACCEPT — G7 governance and onboarding documentation | release/m14 | Merged 2026-06-18 |
+| #1042 ✅ | process(m14-g6): QA tests filed + §2.4 gate checked (duplicate merge of #1041 content) | release/m14 | Merged 2026-06-18 |
+| #1041 ✅ | process(m14-g6): QA tests filed + §2.4 gate checked — EL-approved entry complete | release/m14 | Merged 2026-06-18 |
+| #1040 ✅ | process(m14-g6): record EL approval — sprint entry approved 2026-06-18 | release/m14 | Merged 2026-06-18 |
+| #1039 ✅ | process(m14-g6b): PI Agent sprint exit — G6b COMPLETE | release/m14 | Merged 2026-06-18 |
+| #1038 ✗ | process(m14-g6): G6 sprint entry — QA tests filed (closed without merge; superseded by #1041) | release/m14 | Closed 2026-06-18 |
+| #1037 ✅ | docs(m14-g7): governance and onboarding documentation suite (#988, #989) | release/m14 | Merged 2026-06-18 |
+| #1036 ✅ | fix(m14-g6): resolve intent document appendix — DA-G6-1, DA-G6-2, CM-G6-1 confirmed | release/m14 | Merged 2026-06-18 |
+| #1035 ✅ | chore(state): G6c COMPLETE — Zone 1A Phase 1 design thinking merged PR #1033 | release/m14 | Merged 2026-06-18 |
+| #1034 ✅ | design(m14-g6b): Path 2 design artifacts — field mapping UX, USER_SUPPLIED provenance, data isolation | release/m14 | Merged 2026-06-18 |
+| #1033 ✅ | docs(m14-g6c): Zone 1A Phase 1 design thinking — per-mode cognitive questions, breaking points, concrete directions | release/m14 | Merged 2026-06-18 |
+| #1032 ✅ | process(m14-g6b): G6b Step 1 design intent — Path 2 ministry-owned data upload groundwork | release/m14 | Merged 2026-06-18 |
+| #1031 ✅ | process(m14-g5): Step 4 Verify PASS, Step 5 BPO ACCEPT, sprint exit filed | release/m14 | Merged 2026-06-18 |
+| #1030 ✅ | feat(m14-g5): ADR-015 Evidence Thread Architecture — Components 1, 2, 3 | release/m14 | Merged 2026-06-18 |
+| #1029 ✅ | docs(ki-004): Node.js 20 deprecation warning on actions/checkout@v4 and setup-node@v4 | release/m14 | Merged 2026-06-18 |
+| #1026 ✅ | process(m14-g5): record Data Architect decisions DA-G5-1 through DA-G5-5 | release/m14 | Merged 2026-06-18 |
+| #1025 ✅ | feat(m14-g5): G5 Step 1 implementation intent document — ADR-015 Components 1, 2, 3 | release/m14 | Merged 2026-06-18 |
+| #1023 ✅ | process(m14-g5): record EL approval and correct Data Architect consultation role | release/m14 | Merged 2026-06-17 |
+| #1022 ✅ | process(m14-g5): G5 sprint entry — ADR-015 Components 1–3 + SESSION_STATE | release/m14 | Merged 2026-06-17 (EL merge) |
+| #1021 ✅ | fix(vite): usePolling: true for Docker HMR on macOS + NM-046 near-miss registry | release/m14 | Merged 2026-06-17 |
+| #999 ✅ | process(m14-g1): enforce M{N}-G{N} naming for intent docs and E2E tests; file G1 intent | release/m14 | Merged 2026-06-16 |
+| #980 ✅ | docs(process): KI-003 — GitHub Rulesets bootstrap problem for new required checks | release/m14 | Merged 2026-06-16 |
+| #979 ✅ | ci(branch-naming): enforce milestone-scoped branch names for release/m* PRs (#978) | release/m14 | Merged 2026-06-16 |
+| #977 ✅ | docs(m14-sprint-plan): add G6b — Path 2 design groundwork parallel group | release/m14 | Merged 2026-06-16 |
+| #974 ✅ | docs(ux): Journey A gap markers GA-01 + GA-02 — two-path data sourcing resolution | release/m14 | Merged 2026-06-16 |
+| #972 ✅ | docs(process): CI gate enforcement — release-branch-ci-gate Ruleset; remove --admin from SESSION_STATE rule | release/m14 | Merged 2026-06-16 |
+| #969 ✅ | docs(adr-016): provenance amendment — STRUCTURAL_ABSENCE as provenance type, not proxy indicator | main | Merged 2026-06-16 |
 | #959 ✅ | docs(m14): UX legibility audit (Part I) + ADR-015 Model Legibility Architecture | main | Merged 2026-06-15 |
 | #960 ✅ | docs(m14): UX input confidence audit (Part II) — IC family + Scenario Grounding framework | main | Merged 2026-06-15 |
 | #964 ✅ | docs(arch): ADR-016 Scenario Grounding Architecture (M14 Wave 1) + ARCH-010 | main | Merged 2026-06-15 |
+| #966 ✅ | fix(adr-016): correct API contract authority — Data Architect Agent not Chief Engineer | main | Merged 2026-06-16 |
+| #967 ✅ | docs(adr-016): EL acceptance — Proposed → Accepted, all decisions recorded | main | Merged 2026-06-16 |
+| — | feat(m14): kickoff — sprint plan + session state — pushed directly to release/m14 (efdb25e) | release/m14 | Committed 2026-06-16 (no PR — direct push; note process deviation; release branch is unprotected) |
+| #969 ✅ | feat(m14): ADR-016 entity scope EL decision + ARCH-010 review | release/m14 | Merged 2026-06-16 |
+| #972 ✅ | feat(m14): ADR-015 Evidence Thread Architecture + ARCH-009 | release/m14 | Merged 2026-06-16 |
+| #974 ✅ | feat(ux): Journey A gap markers GA-01 GA-02 in user-journeys.md | release/m14 | Merged 2026-06-16 |
+| #977 ✅ | feat(ci): branch-naming milestone prefix enforcement workflow | release/m14 | Merged 2026-06-16 |
+| #979 ✅ | chore(ci): add branch-naming to release-branch-ci-gate Ruleset | release/m14 | Merged 2026-06-16 |
+| #980 ✅ | docs(ki-003): GitHub Rulesets bootstrapping problem | release/m14 | Merged 2026-06-16 |
+| #981 ✅ | chore(state): M14 session state — CI gate, branch naming, Path 1/2, journey markers | release/m14 | Merged 2026-06-16 |
 | #909 ✅ | feat(m13): kickoff — sprint plan, entry doc, ADR backlog | release/m13 | Merged 2026-06-12 |
 | #910 ✅ | chore(state): M13 kickoff session state | release/m13 | Merged 2026-06-12 |
 | #911 ✅ | feat(m13): EL approval recorded — sprint plan + entry doc | release/m13 | Merged 2026-06-12 |
@@ -484,37 +588,86 @@ CI hotfix: NM-035 filed; `ci.yml` PR trigger updated to include `release/m*` (PR
 ## Open Issues — M14 (Methodology Publication and External Validation)
 
 **GitHub Milestone:** 15 | **Created:** 2026-06-11 | **Target:** Q2 2027 | **M14 is current milestone**
+*Board trimmed 2026-06-16 — 17 issues moved to M15/M16/M17 per panel deliberation. G6b/G6c added (design-only). #988/#989 filed for G7.*
 
-| Issue | Title | Horizon | Notes |
+| Issue | Title | Group | Notes |
 |---|---|---|---|
-| #843 | plan: M14 closure — live stakeholder demo with real external participants (#843) | immediate | **M14 gate issue** — EL decision 2026-06-11 |
-| #961 | bug(frontend): entity hardcoded to GRC in scenario creation form — no entity selection available | immediate | M14 Wave 1 prerequisite bug — filed 2026-06-15 |
-| #962 | bug(frontend): step counter shows 'Step 0 / 8' on completed scenarios loaded via URL param | immediate | M14 housekeeping — filed 2026-06-15 |
-| #963 | bug(frontend): choropleth attribute selector displays raw DB field names as user-facing labels | immediate | M14 housekeeping — filed 2026-06-15 |
-| #97 | arch(api): threshold-crossing markers in comparative output | near-term | |
-| #153 | feat(frontend): absolute threshold overlay on DeltaChoropleth | near-term | |
-| #92 | arch(backtesting): Greece 2010 fixture investment climate initial conditions | near-term | |
-| #30 | feat: distinguish stock vs. flow variables in entity attribute model | near-term | |
-| #259 | standards: CTO legibility metrics dashboard | near-term | |
-| #275 | feat(simulation): calibrated ecological-to-financial transmission | near-term | |
-| #569 | test(perf): MV-002 Mode 3 re-run hardware validation | near-term | |
-| #3 | governance: resolve single-principal separation of duties gap | near-term | |
-| #6 | governance: restore branch protection bypass restriction | near-term | |
-| #53 | feat: information access architecture | near-term | |
-| #845 | ux: Zone 1A information architecture — multi-dimensional scenario encoding (frameworks × entities × branches × modes) | near-term | Reframed 2026-06-13; design-first required before implementation |
-| #846 | ux: DEMO-045 — Mode 3 branch comparison values not in instrument | near-term | |
-| #884 | ux: reserve_coverage_months value not surfaced as readable metric in instrument cluster | near-term | |
-| #885 | ux: Exploratory confidence tier misclassifies baseline observation vs. forward projection | near-term | |
-| #22 | feat: uncertainty quantification (distributions not point estimates) | near-term | **M14 primary deliverable candidate** — methodology publication anchor |
-| #35 | feat(simulation): dynamic relationship weight updating | near-term | Migrated from M13 (HORIZON sweep) |
-| #102 | feat: distributional scenario comparison with variance and percentile range | near-term | Migrated from M13 (HORIZON sweep) |
-| #274 | feat(simulation): 25-year human capital depletion trajectory | near-term | Migrated from M13 (HORIZON sweep) |
-| #394 | platform: multi-scenario comparison (>2 scenarios) | near-term | Migrated from M13 (HORIZON sweep) |
-| #823 | arch(methodology): ecological composite dynamic denominator fix | near-term | Migrated from M13; DIC approval on record (CM APPROVE, PR #943); implementation unblocked |
-| #824 | fix(engine): MENA arid-economy elasticity calibration | near-term | Migrated from M13; DIC approval on record (CM + EE APPROVE, PR #943); implementation unblocked |
-| #837 | feat(demo): configuration-driven demo scripts | near-term | Migrated from M13 (HORIZON sweep 2026-06-13) |
-| #950 | ux: Zone 1A trajectory chart Y axis has no label or unit | near-term | Migrated from M13; HIGH; solo-use blocker; part of #845 information architecture work |
-| #951 | process: review protocol blind spot — solo unnarrated use never tested | near-term | Migrated from M13; solo-use gate proposal |
+| #843 | plan: M14 closure — live stakeholder demo with real external participants | G8 | **M14 gate issue** |
+| #968 | chore(m14): M14 Exit Checklist | — | M14 exit checklist; closure gate: #843 |
+| #961 | bug(frontend): entity hardcoded to GRC in scenario creation form | G1 | Implement after EL plan approval |
+| #962 | bug(frontend): step counter shows 'Step 0 / 8' on completed scenarios | G1 | Implement after EL plan approval |
+| #963 | bug(frontend): choropleth attribute selector displays raw DB field names | G1 | Implement after EL plan approval |
+| #884 | ux: reserve_coverage_months not surfaced as readable metric | G6 | ✅ MERGED PR #1045 — awaiting BPO ACCEPT to close |
+| #885 | ux: Exploratory confidence tier misclassifies baseline vs. projection | G6 | ✅ MERGED PR #1045 — awaiting BPO ACCEPT to close |
+| #22 | feat: uncertainty quantification — disclosure layer (Tier tags per indicator) | G6 | ✅ MERGED PR #1045 — awaiting BPO ACCEPT to close; full distributional bands → M16 |
+| #823 | arch(methodology): ecological composite dynamic denominator fix | G6 | ✅ MERGED PR #1045 — awaiting BPO ACCEPT to close |
+| #824 | fix(engine): MENA arid-economy elasticity calibration | G6 | ✅ MERGED PR #1045 — awaiting BPO ACCEPT to close |
+| #950 | ux: Zone 1A trajectory chart Y axis has no label or unit | G6 | ✅ MERGED PR #1045 — awaiting BPO ACCEPT to close |
+| #845 | ux: Zone 1A information architecture — multi-dimensional encoding | G6c | Phase 1 design thinking doc only; Phases 2–4 → M15/M16 |
+| #976 | feat(data): Path 2 — proprietary data upload (design artifacts only) | G6b | Design artifacts in M14; implementation → M16 |
+| #3 | governance: resolve single-principal separation of duties gap | G7 | EL-action |
+| #6 | governance: restore branch protection bypass restriction | G7 | EL-action |
+| #988 | governance: Goodhart's Law mitigation — TSC monitoring framework | G7 | Filed 2026-06-16 |
+| #989 | docs: onboarding documentation for global south finance ministry analysts | G7 | Filed 2026-06-16 |
+| #997 ✅ | Demo 5 scenario script constraint: challenges must be answerable from ADR-015 Components 1–3 | G8 | **CLOSED 2026-06-19** — reserve coverage → Grounding strip citation (EL decision); no Component 4 required |
+| #1055 | demo: M14 stakeholder demo preparation — v0.14.0 / Milestone 14 | G8 | Filed 2026-06-19 (Step 1); tracks G8 Phase 1+2 deliverables |
+
+---
+
+## Open Issues — M15 (Human Cost Architecture)
+
+**GitHub Milestone:** 16 | **Created:** 2026-06-16 | **Status:** Planned — no demo
+*Zone 1A ADR, cohort disaggregation design, Path 1 implementation, accessibility validation. Sets up Demo 6.*
+
+| Issue | Title | Notes |
+|---|---|---|
+| #845 (Ph 2–3) | ux: Zone 1A information architecture — ARCH-REVIEW + ADR Tier 1 | Phase 1 design thinking doc in M14 G6c |
+| #986 | feat(ux): cohort disaggregation on primary surface | Filed 2026-06-16; origin: M11.5 FINDING-03 (HIGH) |
+| #987 | feat(ux): political risk summary surface for Persona 3 | Filed 2026-06-16 |
+| #975 | feat(data): Path 1 — approved source network query at scenario creation | Journey A GA-01; extends ADR-016 Component 1 |
+| #53 | arch: information access architecture (RBAC design) | Prerequisite for Path 2 (#976) implementation in M16 |
+| #846 | ux: DEMO-045 — Mode 3 branch comparison values not in instrument | |
+| #97 | arch(api): threshold-crossing markers in comparative output | |
+| #153 | feat(frontend): absolute threshold overlay on DeltaChoropleth | |
+| #92 | arch(backtesting): Greece 2010 investment climate initial conditions | |
+| #837 | feat(demo): configuration-driven demo scripts | |
+| #259 | standards: CTO legibility metrics dashboard | |
+| #569 | test(perf): MV-002 Mode 3 hardware validation | |
+| #951 | process: solo-use review protocol | |
+| #990 | test: accessibility validation on 8GB/4-core target hardware | Filed 2026-06-16 |
+
+---
+
+## Open Issues — M16 (Distributional Visibility — Demo 6)
+
+**GitHub Milestone:** 17 | **Created:** 2026-06-16 | **Status:** Planned — Demo 6
+*Human cost ledger operationally visible. Cohort-level output, 25-year trajectory, uncertainty bands, ecological transmission.*
+
+| Issue | Title | Notes |
+|---|---|---|
+| #102 | feat: distributional scenario comparison — variance + percentile range | Core Demo 6 capability |
+| #274 | feat(simulation): 25-year human capital depletion trajectory | Core Demo 6 capability |
+| #275 | feat(simulation): calibrated ecological-to-financial transmission | |
+| #22 (full) | feat: uncertainty quantification — full distributional bands | Builds on M14 disclosure layer |
+| #35 | feat(simulation): dynamic relationship weight updating | |
+| #30 | feat: distinguish stock vs. flow variables in entity attribute model | |
+| #976 (impl) | feat(data): Path 2 — proprietary data upload implementation | Design in M14 G6b; #53 resolves in M15 first |
+| #986 (impl) | feat(ux): cohort disaggregation implementation | Design in M15 |
+| #987 (impl) | feat(ux): political risk summary surface implementation | Design in M15 |
+
+---
+
+## Open Issues — M17 (Multi-Scenario Infrastructure)
+
+**GitHub Milestone:** 18 | **Created:** 2026-06-16 | **Status:** Planned — no demo
+*Multi-scenario comparison infrastructure, entity template library. Sets up Demo 7.*
+
+| Issue | Title | Notes |
+|---|---|---|
+| #394 | platform: multi-scenario comparison (>2 scenarios) | Core Demo 7 prerequisite |
+| #407 | arch(vision): simulation resolution spectrum — entity template library | |
+| #5 | Architecture: data marketplace design | |
+| #4 | Data: advanced geocoded dataset integration | |
 
 ---
 

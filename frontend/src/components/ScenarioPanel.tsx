@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
+import DataQualityPreview from "./DataQualityPreview";
 import type { ScenarioDetailResponse, ScenarioResponse } from "../types";
 
 const API_BASE = "http://localhost:8000/api/v1";
@@ -21,6 +22,7 @@ export default function ScenarioPanel({
   const [scenarios, setScenarios] = useState<ScenarioResponse[]>([]);
   const [listError, setListError] = useState<string | null>(null);
   const [createName, setCreateName] = useState("");
+  const [createEntity, setCreateEntity] = useState("GRC");
   const [createStartYear, setCreateStartYear] = useState(2020);
   const [createFiscalMultiplier, setCreateFiscalMultiplier] = useState(1.0);
   const [creating, setCreating] = useState(false);
@@ -81,7 +83,7 @@ export default function ScenarioPanel({
           name,
           description: null,
           configuration: {
-            entities: ["GRC"],
+            entities: [createEntity],
             n_steps: 3,
             timestep_label: "annual",
             start_date: startDate,
@@ -142,6 +144,7 @@ export default function ScenarioPanel({
                   <div
                     key={s.scenario_id}
                     className={`scenario-row${isPrimary ? " scenario-row--primary" : ""}${isSecond ? " scenario-row--second" : ""}`}
+                    data-scenario-id={s.scenario_id}
                   >
                     <div className="scenario-row-info">
                       <span className="scenario-row-name">{s.name}</span>
@@ -188,6 +191,19 @@ export default function ScenarioPanel({
               }}
               disabled={creating}
             />
+            <select
+              className="scenario-create-input scenario-create-input--entity"
+              data-testid="entity-selector"
+              value={createEntity}
+              onChange={(e) => setCreateEntity(e.target.value)}
+              disabled={creating}
+              aria-label="Entity"
+            >
+              <option value="GRC">GRC</option>
+              <option value="JOR">JOR</option>
+              <option value="EGY">EGY</option>
+              <option value="ZMB">ZMB</option>
+            </select>
             <input
               className="scenario-create-input scenario-create-input--year"
               type="number"
@@ -206,6 +222,7 @@ export default function ScenarioPanel({
               {creating ? "Creating…" : "Create"}
             </button>
           </form>
+          <DataQualityPreview entityId={createEntity} year={createStartYear} />
           <div className="scenario-fiscal-multiplier" style={{ marginTop: 8 }}>
             <label style={{ fontSize: 12, display: "flex", alignItems: "center", gap: 8 }}>
               <span>Fiscal multiplier:</span>
@@ -245,7 +262,7 @@ export default function ScenarioPanel({
             <div className="scenario-panel-error">{createError}</div>
           )}
           <div className="scenario-create-hint">
-            Creates a GRC scenario with 3 annual steps starting at the given year. Fiscal
+            Creates a scenario with 3 annual steps starting at the given year. Fiscal
             multiplier 1.0 = standard; &gt;1.0 = expansionary amplification; &lt;1.0 = contractionary.
           </div>
         </div>

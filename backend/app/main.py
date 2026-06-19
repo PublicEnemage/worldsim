@@ -27,6 +27,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.countries import router as countries_router
+from app.api.grounding import router as grounding_router
 from app.api.health import router as health_router
 from app.api.scenarios import router as scenarios_router
 from app.api.sessions import router as sessions_router
@@ -71,3 +72,4 @@ app.include_router(health_router, prefix=_API_PREFIX)
 app.include_router(countries_router, prefix=_API_PREFIX)
 app.include_router(scenarios_router, prefix=_API_PREFIX)
 app.include_router(sessions_router, prefix=_API_PREFIX)
+app.include_router(grounding_router, prefix=_API_PREFIX)
