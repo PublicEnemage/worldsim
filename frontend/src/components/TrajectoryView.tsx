@@ -389,6 +389,7 @@ export function TrajectoryView({
             tick={{ fontSize: 11 }}
             width={44}
             tickFormatter={(v: number) => v.toFixed(2)}
+            label={{ value: "Score", angle: -90, position: "insideLeft", fontSize: 10 }}
           />
 
           <Tooltip

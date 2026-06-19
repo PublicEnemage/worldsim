@@ -84,7 +84,8 @@ export function sortAlerts(alerts: Zone1BAlert[]): Zone1BAlert[] {
 export function getNegotiationLabel(tier: number): string {
   if (tier <= 2) return "High confidence — cite directly";
   if (tier === 3) return "Moderate confidence — cite with caveat";
-  return "Exploratory — do not cite";
+  if (tier === 4) return "Model estimate — verify before citing";
+  return "Synthetic extrapolation — do not cite";
 }
 
 /**
@@ -505,7 +506,7 @@ function TopAlertDetail({ alert, mode, showNewBadge }: TopAlertDetailProps) {
 
       {/* Negotiation-defensibility label (always shown in detail slot) */}
       <div
-        data-testid="detail-negotiation-label"
+        data-testid="alert-negotiation-label"
         style={{
           color: alert.confidence_tier >= 4 ? "#a06000" : "#555",
           fontSize: 10,
