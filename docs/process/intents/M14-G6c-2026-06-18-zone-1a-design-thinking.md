@@ -377,3 +377,63 @@ PR). Sprint plan authority: `docs/process/sprint-plans/m14-sprint-plan.md §G6c`
 agent: UX Designer Agent. Document must exist before M14 exit. Architecture Review Facilitator
 confirms Phase 2 readiness at M15 kickoff. Full lifecycle authority: `CLAUDE.md §Agent Execution
 Lifecycle`. Zone 1A implementation is M16 — this document governs Phase 1 only.*
+
+---
+
+## 8. Step 5 — Business PO Validate
+
+**Date:** 2026-06-18
+**Verdict: ACCEPT**
+
+**Documentation Validate criterion applied** (`docs/process/acceptance-protocol.md §Documentation`):
+A non-author (Architecture Review Facilitator) can navigate to the key finding from the
+document's entry point in under five minutes.
+
+**AC-by-AC confirmation:**
+
+| AC | Status | Evidence |
+|---|---|---|
+| AC-1 (Mode 1 question) | ✅ PASS | §Mode 1: "At which step did the first MDA threshold crossing occur — and which framework's trajectory crossed first?" — bounded, specific, one sentence |
+| AC-2 (Mode 2 question) | ✅ PASS | §Mode 2: "After this step advance, does any framework trajectory project a crossing below its MDA floor in the remaining steps?" — mode-specific (step-updated data required), bounded |
+| AC-3 (Mode 3 question + compatibility verdict) | ✅ PASS | §Mode 3: 15-second ceiling stated; explicit incompatibility verdict for N>1; maximum dimensionality named (1 composite line per entity × 2 branches, N≤4) |
+| AC-4 (Breaking points named) | ✅ PASS | §Combinatorial Tension: 3 specific breaking points with named (N, M) values (Mode 3 N=2 M=1 → 16 lines; Mode 1/2 N=3 M=1 → 12 lines; COMPARE_VIEW N=2 M=2 → 16 lines) |
+| AC-5 (Entity dimension homed) | ✅ PASS | §Information Allocation table: entity comparison → Zone 1A composite per entity + Zone 1D + Zone 2B; non-conflict rationale present |
+| AC-6 (Branch dimension homed) | ✅ PASS | §Information Allocation table: M>1 what-if branches → COMPARE_VIEW; non-conflict rationale present |
+| AC-7 (Concrete direction per mode) | ✅ PASS | Named scenarios: Mode 1 (JOR+EGY+ZMB, 3 composite lines); Mode 2 (JOR+EGY at step 4, projected floor crossing visible); Mode 3 (JOR+EGY, fiscal_multiplier=1.30 at step 3, 4 lines: baseline+active per entity) |
+| AC-8 (Phase 2 Readiness section present) | ✅ PASS | §Phase 2 Readiness answers all three gating questions with named section pointers (not "see above") |
+
+**Layer 3 gate:** Not triggered. G6c produces no user-facing indicator label, alert text, or
+confidence tier disclosure.
+
+**North star forward trace (P-7):**
+G6c's north star is a forward trace to Phase 4 (M16 implementation). The design document
+names the specific Persona 2 argument for each mode that will be available after Phase 4:
+
+- **Mode 3 (the binding constraint):** Zambian finance ministry analyst in live negotiation at
+  step 3, JOR+ZMB Mode 3 scenario, fiscal multiplier proposed. Zone 1A shows 4 lines
+  (JOR-baseline ghost, JOR-active solid, ZMB-baseline ghost, ZMB-active solid — all composite).
+  JOR-active diverges upward from JOR-baseline after step 3. Zone 1D shows Financial: +0.04 vs
+  baseline — always visible, no interaction. Argument: "The fiscal multiplier improves the
+  programme composite score — specifically the financial framework — relative to the baseline
+  path." Readable in 15 seconds without specialist mediation. This argument was previously
+  unavailable: the 16-line encoding at N=2+M=2 exceeded the 15-second legibility ceiling and
+  no design direction existed for what Zone 1A would display in this scenario.
+
+The Phase 1 document creates the design foundation from which this argument becomes available.
+The north star test is forward-looking (M16) — confirmed as a forward trace, not a M14 claim.
+
+**Kryptonite check:** Each proposed design direction contains an explicit kryptonite check
+confirming the Zone 1A output will be interpretable by Persona 2 without specialist mediation
+within the mode's time ceiling. All three modes pass.
+
+**Navigation test (documentation criterion):** Architecture Review Facilitator reading
+the document cold can locate: (1) the primary question per mode (§Mode sections), (2) the
+breaking points (§Combinatorial Tension), (3) the information allocation (§Information
+Allocation table), (4) the concrete design directions (§Concrete Design Directions), and
+(5) the Phase 2 gating answers (§Phase 2 Readiness) — all within 5 minutes from the document
+opening. Section headings are explicit; Phase 2 Readiness provides a summary index.
+
+**Sprint exit gate:** AC-1 through AC-8 satisfied. Layer 3 gate not triggered. North star
+forward trace present and specific. G6c is COMPLETE. Issue #845 Phase 1 is closed.
+PI Agent may confirm sprint exit for G6c. M14 exit ceremony prerequisite (document present in
+`release/m14`) is satisfied.
