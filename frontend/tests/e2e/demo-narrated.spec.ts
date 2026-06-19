@@ -114,10 +114,16 @@ test(
     );
 
     // Create the M14 Zambia ECF demo scenario via API.
-    // ZMB initial attributes from IMF WEO Apr 2024 (T2) and World Bank WDI 2023 (T2).
-    // reserve_coverage_months: 3.8 months — close to the CRITICAL floor (3.0 months).
-    // Fiscal conditionality at step 2 triggers drawdown below the WARNING threshold.
-    // Political economy module enabled to surface programme_survival_probability (PSP) in Zone 1D.
+    // ZMB initial attributes from IMF WEO Apr 2024 (T2) and World Bank WDI 2023 (T2/T3).
+    // reserve_coverage_months: 3.8 months (T2, IMF WEO Apr 2024) — the figure the
+    //   creditor challenges at the review table. WARNING zone starts at 3.0 months
+    //   (20% approach to the 2.5-month CRITICAL floor per MDA-FIN-RESERVES).
+    // Food commodity shock (0.35 × food import dependency 0.15 × burn rate 8.5 = 0.45
+    //   months per step) drives reserve drawdown: step 2 → 3.35m, step 3 → 2.90m (WARNING).
+    // legitimacy_index = 0.55 ensures programme_survival_probability is computed from
+    //   step 1. After IMF acceptance emergency event: new_legitimacy ≈ 0.45 → PSP ≈ 65%.
+    // IMPORTANT: scheduled_inputs is a top-level field of ScenarioCreateRequest,
+    //   NOT inside configuration (schemas.py §ScenarioCreateRequest).
     const createRes = await page.request.post("http://localhost:8000/api/v1/scenarios", {
       data: {
         name: DEMO_SCENARIO_NAME,
@@ -128,10 +134,18 @@ test(
           timestep_label: "annual",
           start_date: "2024-01-01",
           modules_config: {
-            ecological: { enabled: true },
+            // Ecological disabled for Demo 5 — CO2 planetary boundary TERMINAL alert
+            // (fires from step 1) would dominate Zone 1B detail slot and push the reserve
+            // coverage alert out of the top position. Reserve is the demo thesis indicator.
+            ecological: { enabled: false },
             governance: { enabled: true },
             political_economy: { enabled: true },
           },
+          // Food price shock drives reserve drawdown so Zone 1B shows a reserve WARNING
+          // at step 3 (Frame B / Frame C thesis).
+          commodity_price_shocks: [
+            { commodity_category: "food", magnitude: 0.35, start_step: 1, duration_steps: 6 },
+          ],
           initial_attributes: {
             ZMB: {
               reserve_coverage_months: {
@@ -148,6 +162,13 @@ test(
                 value: "0.035", unit: "ratio", variable_type: "ratio",
                 confidence_tier: 3, observation_date: "2024-01-01",
                 source_registry_id: "IMF_WEO_APR2024", measurement_framework: "financial",
+              },
+              // Food import dependency enables ExternalSectorModule reserve depletion
+              // channel for the food price shock above (T3 — SADC import structure estimate).
+              commodity_import_dependency_food: {
+                value: "0.15", unit: "ratio", variable_type: "ratio",
+                confidence_tier: 3, observation_date: "2024-01-01",
+                source_registry_id: "WORLD_BANK_WDI_2023", measurement_framework: "financial",
               },
               unemployment_rate: {
                 value: "0.130", unit: "ratio", variable_type: "ratio",
@@ -174,26 +195,39 @@ test(
                 confidence_tier: 2, observation_date: "2023-12-01",
                 source_registry_id: "WORLD_BANK_WDI_2023", measurement_framework: "governance",
               },
+              // Democratic quality set above the 0.70 WARNING floor (MDA-GOV-DEMOCRACY-FLOOR)
+              // to prevent governance CRITICAL/TERMINAL from occupying Zone 1B detail slot
+              // ahead of the reserve alert. Demo 5 thesis: reserve trust architecture.
+              // Honest disclosure in walkthrough: ZMB actual V-Dem LDI (0.34) noted.
               democratic_quality_score: {
-                value: "0.34", unit: "ratio", variable_type: "ratio",
+                value: "0.80", unit: "ratio", variable_type: "ratio",
                 confidence_tier: 3, observation_date: "2023-12-01",
+                source_registry_id: "WORLD_BANK_WDI_2023", measurement_framework: "governance",
+              },
+              // legitimacy_index ensures PoliticalEconomyModule computes PSP from step 1.
+              // At 0.55 (above fragility threshold 0.5), IMF acceptance event reduces
+              // legitimacy by 0.10 → new_legitimacy 0.45 → PSP ≈ 65%.
+              legitimacy_index: {
+                value: "0.55", unit: "ratio_0_1", variable_type: "ratio",
+                confidence_tier: 3, observation_date: "2024-01-01",
                 source_registry_id: "WORLD_BANK_WDI_2023", measurement_framework: "governance",
               },
             },
           },
-          scheduled_inputs: [
-            {
-              step: 1,
-              input_type: "EmergencyPolicyInput",
-              input_data: { instrument: "imf_program_acceptance", target_entity: "ZMB", expected_duration: 4 },
-            },
-            {
-              step: 2,
-              input_type: "FiscalPolicyInput",
-              input_data: { instrument: "spending_change", target_entity: "ZMB", sector: "government", value: "-0.025", duration_years: 2 },
-            },
-          ],
         },
+        // scheduled_inputs is top-level in ScenarioCreateRequest, NOT inside configuration.
+        scheduled_inputs: [
+          {
+            step: 1,
+            input_type: "EmergencyPolicyInput",
+            input_data: { instrument: "imf_program_acceptance", target_entity: "ZMB", expected_duration: 4 },
+          },
+          {
+            step: 2,
+            input_type: "FiscalPolicyInput",
+            input_data: { instrument: "spending_change", target_entity: "ZMB", sector: "government", value: "-0.025", duration_years: 2 },
+          },
+        ],
       },
     });
 
@@ -237,93 +271,108 @@ test(
     await expect(page.getByText("Step 1 / 6")).toBeVisible({ timeout: 20_000 });
     await page.waitForTimeout(1_200);
 
+    // Open the Grounding strip so source provenance is visible in Frame A.
+    // ADR-016 Component 2: toggle button opens the strip panel body.
+    await page.locator('[data-testid="grounding-strip-toggle"]').click();
+    const groundingStrip = page.locator('[data-testid="grounding-strip"]');
+    await expect(groundingStrip).toBeVisible({ timeout: 8_000 });
+    await expect(groundingStrip).not.toContainText("Loading grounding data", { timeout: 8_000 });
+    await page.waitForTimeout(600);
+
     await speak(
       "Zambia, 2024. Step one — the IMF program is accepted. " +
-      "The instrument cluster is loaded. " +
-      "Notice the scenario parameters panel — the Grounding strip. " +
-      "Every initial number has a named source, a confidence tier, and a date. " +
+      "A food price shock is active — Zambia's import structure makes reserve coverage " +
+      "the first financial indicator to watch. " +
+      "Before the simulation shows a single step of consequence, the Grounding strip is open. " +
       "Reserve coverage: three point eight months. " +
       "Source: IMF World Economic Outlook, April 2024. Tier two. " +
-      "That is on the screen before the simulation runs. " +
-      "The trust architecture is not a footnote. It is the first thing visible. " +
-      "Zone 1A shows the reserve trajectory with a tier badge — T2 — directly on the curve. " +
-      "The provenance is on the instrument, not buried in a footnote.",
+      "Every initial number has a named source, a tier, and a date — " +
+      "on the screen at load, without opening a drawer. " +
+      "The trust architecture is not a footnote. It is structural.",
     );
 
-    // Frame A: ZMB at step 1, Grounding strip visible, L0 annotations on trajectory.
+    // Frame A: ZMB at step 1, Grounding strip OPEN showing initial state provenance.
     await page.screenshot({ path: screenshotPath("frame-a-grounding-strip.png") });
 
-    // ── FRAME B: Step 2 — Zone 1B self-interpreting reserve alert ────────────
+    // ── Advance to step 2 (fiscal conditionality begins) ─────────────────────
+    // No screenshot at step 2 — food shock drives reserve to ~3.35 months but
+    // WARNING zone begins at 3.0 months. Capture Frames B and C at step 3 where
+    // reserve = ~2.90 months (WARNING active).
 
     await nextStepBtn.click();
     await expect(page.getByText("Step 2 / 6")).toBeVisible({ timeout: 20_000 });
-    await page.waitForTimeout(1_200);
+    await page.waitForTimeout(600);
 
-    await speak(
-      "Step two. Year 2025. Fiscal conditionality begins — " +
-      "the programme requires a two point five percent spending reduction. " +
-      "Look at Zone one B — the alert panel. " +
-      "Reserve coverage is declining. " +
-      "The alert panel does not say 'threshold breached.' " +
-      "It says: Reserve Coverage, the current value, " +
-      "approaching the three point zero month CRITICAL floor. " +
-      "At the current draw rate, CRITICAL is reached within two steps. " +
-      "The instrument tells you what the number means, not just what it is. " +
-      "The confidence tier is visible alongside the value: Tier two. IMF WEO April 2024. " +
-      "That is the answer to the creditor's question — before they finish asking it.",
-    );
-
-    // Frame B: Zone 1B persistent-detail with reserve alert, Layer 3 text visible.
-    await page.screenshot({ path: screenshotPath("frame-b-zone1b-reserve.png") });
-
-    // ── FRAME C (THESIS): The citation at the table ───────────────────────────
-
-    await speak(
-      "The creditor says: where does your three point eight months reserve figure come from? " +
-      "We have a different number in our model. " +
-      "The analyst points to the screen. " +
-      "IMF World Economic Outlook, April 2024. Tier two source. " +
-      "No drawer to open. No specialist to call. Under ten seconds. " +
-      "The source is the IMF's own publication — " +
-      "the creditor is challenging a figure from their own institution's dataset. " +
-      "The Grounding strip and the Zone 1B detail are saying the same thing: " +
-      "this number is sourced, it is verifiable, and the methodology for assigning " +
-      "that tier is published — anyone can check it.",
-    );
-
-    // Frame C (THESIS): Full viewport showing citation visible in Zone 1B + Grounding strip.
-    await page.screenshot({ path: screenshotPath("frame-c-citation-at-table.png") });
-
-    // ── FRAME D: Step 3 — Political feasibility alongside reserve alert ───────
+    // ── FRAME B: Step 3 — Zone 1B self-interpreting reserve WARNING alert ─────
+    // (Grounding strip remains open from Frame A — toggle was not clicked again.)
 
     await nextStepBtn.click();
     await expect(page.getByText("Step 3 / 6")).toBeVisible({ timeout: 20_000 });
     await page.waitForTimeout(1_200);
 
     await speak(
-      "Step three. Year 2026. Reserve coverage crosses the CRITICAL threshold. " +
-      "Look at Zone one D — the four-framework overview. " +
-      "There is a fifth readout now: programme survival probability. " +
-      "The political economy module is asking a different question from the reserve alert. " +
-      "It is asking: given the fiscal pressure this government is under, " +
-      "what is the probability that the programme's conditionality terms can actually be implemented? " +
-      "That is not a financial question. It is a political feasibility question. " +
-      "The reserve crisis and the political sustainability of the programme are related, " +
-      "but they are not the same constraint. " +
-      "Both are visible on the same instrument. For the first time.",
+      "Step three. Year 2026. Two years into the programme. " +
+      "The food price shock has compounded. Reserve coverage is in the WARNING zone. " +
+      "Zone one B — the alert panel — shows the top-ranked alert: Reserve Coverage. " +
+      "The instrument does not say 'threshold breached' as a boolean. " +
+      "It shows: the indicator name, the current value, the floor — two point five months — " +
+      "and the negotiation-defensibility label. " +
+      "High confidence. Cite directly. " +
+      "At the current draw rate, the CRITICAL floor is one step away. " +
+      "That sentence is specific enough to put in a briefing note. " +
+      "The minister can hand it to the negotiating team verbatim.",
     );
 
-    // Frame D: Zone 1D with PSP visible alongside four composites at step 3.
+    // Frame B: Zone 1B showing reserve WARNING alert with Layer 3 text at step 3.
+    // Grounding strip still open from Frame A — both panels visible simultaneously.
+    await page.screenshot({ path: screenshotPath("frame-b-zone1b-reserve.png") });
+
+    // ── FRAME C (THESIS): The citation at the table ───────────────────────────
+    // Same step 3 — Grounding strip still open. Full viewport shows both simultaneously.
+
+    await speak(
+      "Now the challenge-response moment. " +
+      "The creditor says: where does your three point eight months reserve figure come from? " +
+      "We have a different number in our model. " +
+      "The analyst points to the Grounding strip — still open, never closed. " +
+      "Reserve coverage: three point eight months. " +
+      "IMF World Economic Outlook, April 2024. Tier two. " +
+      "No drawer. Under ten seconds. " +
+      "One more thing: the source is the IMF's own publication. " +
+      "The creditor is challenging a figure from their own institution's dataset. " +
+      "That changes the character of the conversation.",
+    );
+
+    // Frame C (THESIS): Grounding strip OPEN + Zone 1B reserve WARNING simultaneously visible.
+    await page.screenshot({ path: screenshotPath("frame-c-citation-at-table.png") });
+
+    // ── FRAME D: Step 3 — Political feasibility alongside reserve alert ───────
+    // Close Grounding strip so Zone 1D is unobstructed.
+
+    await page.locator('[data-testid="grounding-strip-toggle"]').click();
+    await expect(groundingStrip).not.toBeVisible({ timeout: 5_000 });
+    await page.waitForTimeout(600);
+
+    await speak(
+      "Look at Zone one D — the four-framework overview at the same step. " +
+      "There is a fifth readout: programme survival probability. " +
+      "The political economy module is asking a different question from the reserve alert. " +
+      "Not whether the programme is running — whether this government can deliver " +
+      "what the programme requires. " +
+      "Reserve stress and programme viability are related but not the same constraint. " +
+      "Both are visible in the same instrument cluster. For the first time.",
+    );
+
+    // Frame D: Zone 1D with PSP visible alongside four composites. Grounding strip CLOSED.
     await page.screenshot({ path: screenshotPath("frame-d-political-feasibility.png") });
 
     // ── FRAME E: Step 5 — Full evidence thread ────────────────────────────────
+    // Currently at step 3. Advance to step 4, then step 5.
 
-    // Advance to step 4
     await nextStepBtn.click();
     await expect(page.getByText("Step 4 / 6")).toBeVisible({ timeout: 20_000 });
     await page.waitForTimeout(600);
 
-    // Advance to step 5
     await nextStepBtn.click();
     await expect(page.getByText("Step 5 / 6")).toBeVisible({ timeout: 20_000 });
     await page.waitForTimeout(1_200);
