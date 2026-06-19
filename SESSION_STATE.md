@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-18 (G6 BPO ACCEPT — Step 5 Validate PASS. All 9 ACs confirmed via live app: Playwright 6/6, API probes, migration b1c2d3e4f5a6 applied. Sprint exit CONFIRMED. G6 COMPLETE.)**
+**Last updated: 2026-06-18 (G6 BPO ACCEPT — Step 5 Validate PASS. All 9 ACs confirmed via live app: Playwright 6/6, API probes, migration b1c2d3e4f5a6 applied. Sprint exit CONFIRMED. G6 COMPLETE. NM-049 filed (Docker dev DB migration lag) → #1048 (M15).)**
 **Current milestone:** M14 — Methodology Publication and External Validation (GitHub Milestone 15)
 **Previous milestone:** M13 — Political Economy and Instrument Credibility (formally closed 2026-06-15; release/m13 → main merged by EL; #264 closed)
 
@@ -133,7 +133,7 @@
 | G6 sprint entry document | ✅ **EL APPROVED 2026-06-18** — `docs/process/sprint-plans/m14-g6-sprint-entry.md` (EL approval: PR #1040; QA tests: PR #1041+#1042) | Issues: #885, #950, #884, #823, #824, #22, PMM anchor; QA tests filed 2026-06-18 (E2E + backend, AC-1–AC-9); all entry invariants satisfied; implementation unblocked |
 | G6 implementation (Step 3) | ✅ **MERGED 2026-06-18** — PR #1045 → release/m14 (commit 13a9b83) | Zone 1B negotiation labels (#885), Zone 1A Y axis label (#950), reserve_coverage_months seeding (#884), ecological composite tier floor T3 (#823), water_stress_index + biome_class dispatch (#824), confidence tier methodology doc (#22), PMM interpretation anchor; Alembic migration b1c2d3e4f5a6; pre-push gates: ruff ✓, mypy (pre-existing only) ✓, npm run build ✓ |
 | G6 Step 4 Verify | ✅ **PASS 2026-06-18** | All 9 ACs confirmed via CI: AC-1–4 playwright-e2e (commit 65158f4); AC-5–8 test-backend; AC-9 shell find assertion. NM-047 (step_index/n_steps) + NM-048 (data-quality render race) filed — pre-existing G5 test flaws exposed and fixed in same PR. Verdict in intent doc §8. |
-| G6 Step 5 Validate | ✅ BPO ACCEPT 2026-06-18 | All 9 ACs confirmed live: Zone 1B T4 "Model estimate"/T5 "Synthetic extrapolation" (Playwright 6/6); Zone 1A "Score" Y axis (Playwright); JOR reserve_coverage_months value=7.1 T2 CBJ (API); GRC ecological T3 (API); water_stress_index=0.82 T3 JOR (post-migration b1c2d3e4f5a6); calibration docs <1 min nav. Sprint exit CONFIRMED. |
+| G6 Step 5 Validate | ✅ BPO ACCEPT 2026-06-18 | All 9 ACs confirmed live: Zone 1B T4 "Model estimate"/T5 "Synthetic extrapolation" (Playwright 6/6); Zone 1A "Score" Y axis (Playwright); JOR reserve_coverage_months value=7.1 T2 CBJ (API); GRC ecological T3 (API); water_stress_index=0.82 T3 JOR (post-migration b1c2d3e4f5a6); calibration docs <1 min nav. Sprint exit CONFIRMED. NM-049 filed (Docker dev DB migration lag; PR #1049). |
 | G6 sprint exit document | ✅ Filed 2026-06-18 — `docs/process/sprint-plans/m14-g6-sprint-exit.md` | Section 2 (implementation) COMPLETE; Section 3 (Customer Agent Layer 3) COMPLETE; Section 4 (no rejections) COMPLETE; Section 5 PI Agent BLOCKED pending BPO Step 5 Validate |
 | G2 — ADR-015 acceptance | ✅ COMPLETE 2026-06-16 (PR #998) | EL accepted ADR-015; 6 decisions resolved; Components 1–3 M14; Component 4 → M15. G5 unblocked. No sprint entry/exit doc required (EL-action, no user-facing deliverable). |
 | Intent/test naming convention | ✅ Enforced 2026-06-16 (PR #999) | M{N}-G{N} prefix on intent docs and E2E tests — CLAUDE.md, intent-template.md, sprint-planning-sop.md, sprint-entry-template.md all updated |
@@ -618,6 +618,7 @@ CI hotfix: NM-035 filed; `ci.yml` PR trigger updated to include `release/m*` (PR
 | #569 | test(perf): MV-002 Mode 3 hardware validation | |
 | #951 | process: solo-use review protocol | |
 | #990 | test: accessibility validation on 8GB/4-core target hardware | Filed 2026-06-16 |
+| #1048 | fix(infra): Docker API container does not auto-apply Alembic migrations on startup | NM-049; filed 2026-06-18 |
 
 ---
 
