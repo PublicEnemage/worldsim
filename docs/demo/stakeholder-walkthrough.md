@@ -1,4 +1,13 @@
-# WorldSim Stakeholder Demonstration — Presenter Guide (v0.10.0 / Milestone 10)
+# WorldSim Stakeholder Demonstration — Presenter Guide (v0.14.0 / Milestone 14)
+
+> **This is the current walkthrough — v0.14.0 / Demo 5 (Zambia 2024, IMF ECF Review).**
+> Full presenter guide: `docs/demo/m14/stakeholder-walkthrough.md`
+> Previous version (M12 / Demo 4): `docs/demo/m12/stakeholder-walkthrough.md`
+> Previous version (M10 / Demo 3): see this file's git history (archived below as reference)
+
+---
+
+<!-- M10 content preserved below for historical reference. See m14/ for current guide. -->
 
 > UX Designer Agent — Journey: Stakeholder demonstration walkthrough.
 > Grounded in `docs/ux/north-star.md` §Resolved Design Questions and
