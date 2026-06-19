@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-19 (G8 Phase 1 demo prep — Steps 2–5 merged PR #1056; screenshot brief, demo.sh, demo-narrated.spec.ts, walkthroughs complete. #997 closed. #1055 filed. Step 5b legibility gate + Step 6 screenshot capture next.)**
+**Last updated: 2026-06-19 (G8 demo cycle Steps 5b/6/6b complete — legibility 10/10 PASS; five screenshots PR #1058; nine-agent internal review + walkthrough fixes PR #1060. Four blocking narration errors corrected (DEMO5-001–004). Steps 7/6c/9 gated on EL.)**
 **Current milestone:** M14 — Methodology Publication and External Validation (GitHub Milestone 15)
 **Previous milestone:** M13 — Political Economy and Instrument Credibility (formally closed 2026-06-15; release/m13 → main merged by EL; #264 closed)
 
@@ -165,10 +165,11 @@
 | G8 Step 3 — `demo.sh` updated | ✅ COMPLETE 2026-06-19 (PR #1056) | M14 Demo 5 ZMB/no-Mode3; challenge-response framing; honest disclosures; NM-041 `bash -n` gate PASS |
 | G8 Step 4 — `demo-narrated.spec.ts` | ✅ COMPLETE 2026-06-19 (PR #1056) | Rewritten for ZMB ECF; `demo-narrated-m12.spec.ts` archived; NM-039 sentinel; 1440×900 viewport |
 | G8 Step 5 — walkthroughs | ✅ COMPLETE 2026-06-19 (PR #1056) | `docs/demo/m14/stakeholder-walkthrough.md`; root redirect updated; narration checks 5a/5c encoded in walkthrough |
-| G8 Step 5b — legibility gate | ⬜ NEXT | Run `demo-legibility.spec.ts` at 1440×900 against live stack; must pass before screenshots captured |
-| G8 Step 6 — screenshot capture | ⬜ PENDING Step 5b | Five frames via `demo.sh --run`; verify vs. screenshot brief |
-| G8 Step 6b — internal nine-agent review | ⬜ PENDING Step 6 | PM Agent orchestrates panel; `docs/demo/m14/reviews/YYYY-MM-DD-v0.14.0-internal-review.md` |
-| G8 Steps 7/6c/9 — IR + audience sim + live session | ⬜ **GATED: EL merge `release/m14` → `main`** | IR review (fresh instance); Personas 1/2/3/5 audience simulation; live session with real participants |
+| G8 Step 5b — legibility gate | ✅ PASS 2026-06-19 | `demo-legibility.spec.ts` 10/10 pass at 1440×900 |
+| G8 Step 5c — NARRATION-RULING-1 | ✅ PASS 2026-06-19 | All 5 presentation steps: Umbrella + Synthesis + Transition verified |
+| G8 Step 6 — screenshot capture | ✅ COMPLETE 2026-06-19 (PR #1058) | Five frames captured; Round 3 spec fixes (ecological disabled, democratic_quality_score=0.80 to reserve top alert slot); Reserve WARNING Current 2.908 / Floor 2.500 visible in Zone 1B detail slot |
+| G8 Step 6b — internal nine-agent review | ✅ COMPLETE 2026-06-19 (PR #1060) | `docs/demo/m14/reviews/2026-06-19-v0.14.0-internal-review.md`; 8 findings; 4 CRITICAL/HIGH blocking walkthrough errors corrected in same PR; Issue #1059 filed (HCL narration M15 scope) |
+| G8 Steps 7/6c/9 — IR + audience sim + live session | ⬜ **GATED: EL merge `release/m14` → `main`** | IR review (fresh instance); Personas 1/2/3/5 audience simulation; live session with real participants (#843) |
 
 **Evidence base for M14 trust architecture (both ADRs):**
 - Part I audit (output legibility): `docs/demo/m14/reviews/2026-06-15-ux-legibility-audit-minister-exercise.md`
@@ -224,6 +225,9 @@ All near-term issues dispositioned at HORIZON sweep 2026-06-13 — see G8 sprint
 
 | PR | Title | Target | Status |
 |---|---|---|---|
+| #1060 ✅ | docs(demo): M14 Demo 5 internal review + walkthrough corrections (DEMO5-001—007) | release/m14 | Merged 2026-06-19 |
+| #1058 ✅ | feat(demo): Round 3 spec fixes — reserve floor visible in Zone 1B detail slot | release/m14 | Merged 2026-06-19 |
+| #1057 ✅ | chore(state): G8 Phase 1 demo prep complete — Steps 2–5 merged PR #1056 | release/m14 | Merged 2026-06-19 |
 | #1056 ✅ | demo(m14-g8): Steps 2–5 Demo 5 prep — ZMB screenshot brief, narrated spec, demo.sh, walkthroughs | release/m14 | Merged 2026-06-19 |
 | #1054 ✅ | process(m14-g8): G8 sprint entry document — Demo 5 preparation and live stakeholder demo | release/m14 | Merged 2026-06-19 |
 | #1045 ✅ | feat(m14-g6): methodology, calibration, and instrument legibility (#885, #950, #884, #823, #824, #22, PMM anchor) | release/m14 | Merged 2026-06-18 |
