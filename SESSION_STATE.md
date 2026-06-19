@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-18 (G5 BPO Step 5 live validation PASS — Playwright observation, §9 filed in intent doc; G5 PI Agent sprint exit independently confirmed, all 7 conditions verified. G7 COMPLETE — BPO ACCEPT 2026-06-18: AC-7 timed nav PASS (~2–3 min), sprint exit filed (PR #1043). G6b PI Agent sprint exit confirmed (PR #1039). G6 QA tests filed AC-1–AC-9 frontend+backend (PR #1041+#1042); G6 implementation gate open. Next: G6 Step 3 implementation.)**
+**Last updated: 2026-06-18 (G6c BPO ACCEPT + PI Agent sprint exit confirmed — BPO verdict in intent doc §8; sprint exit at `docs/process/sprint-plans/m14-g6c-sprint-exit.md`. G5 BPO/PI exit confirmed. G7 COMPLETE — BPO ACCEPT (PR #1043). G6b exit confirmed (PR #1039). G6 QA tests filed (PR #1041+#1042); G6 implementation gate open.)**
 **Current milestone:** M14 — Methodology Publication and External Validation (GitHub Milestone 15)
 **Previous milestone:** M13 — Political Economy and Instrument Credibility (formally closed 2026-06-15; release/m13 → main merged by EL; #264 closed)
 
@@ -143,7 +143,7 @@
 | G6b sprint exit | ✅ FILED 2026-06-18 — `docs/process/sprint-plans/m14-g6b-sprint-exit.md` (PR #1039) | PI Agent confirmed; AC-1–AC-9 PASS; BPO ACCEPT 2026-06-18; north star forward trace: "ministry-supplied reserve figure" argument architecturally specified |
 | Journey A gap markers (GA-01, GA-02) | ✅ Filed 2026-06-16 (PR #974) | `docs/ux/user-journeys.md` |
 | Milestone planning panel deliberation | ✅ COMPLETE 2026-06-16 | M15–M18 defined; demo arc through Demo 7; 17 issues reallocated; 5 new issues filed (#986–#990); roadmap updated |
-| G6c — Zone 1A Phase 1 design thinking | ✅ COMPLETE 2026-06-18 — PR #1033 merged | Intent at `docs/process/intents/M14-G6c-2026-06-18-zone-1a-design-thinking.md`; design doc at `docs/ux/design-thinking/zone-1a-information-architecture.md`; AC-1–AC-8 satisfied; Phase 2 Readiness section present; gates M15 Architecture Review (#845 Phase 1 closed) |
+| G6c — Zone 1A Phase 1 design thinking | ✅ COMPLETE 2026-06-18 — PR #1033 merged | Intent at `docs/process/intents/M14-G6c-2026-06-18-zone-1a-design-thinking.md`; design doc at `docs/ux/design-thinking/zone-1a-information-architecture.md`; AC-1–AC-8 satisfied; BPO ACCEPT 2026-06-18 (intent doc §8); PI Agent sprint exit CONFIRMED (`docs/process/sprint-plans/m14-g6c-sprint-exit.md`); Phase 2 Readiness section present; gates M15 Architecture Review (#845 Phase 1 closed) |
 | #988 — Goodhart's Law mitigation | ✅ Filed (M14 G7) | TSC monitoring framework for parameterization gaming risk |
 | #989 — Onboarding documentation | ✅ Filed (M14 G7) | Global south analyst onboarding |
 | G7 intent document (Step 1) | ✅ FILED 2026-06-18 — `docs/process/intents/M14-G7-2026-06-18-governance-onboarding.md` | 7 ACs; issues #988 + #989; EL-action items #3 and #6 noted out of agent scope; sprint entry gate note embedded |
