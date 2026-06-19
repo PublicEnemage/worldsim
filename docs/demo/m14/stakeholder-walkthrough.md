@@ -54,7 +54,7 @@ a challenge-response at the IMF ECF review table, not a counter-proposal branch.
 | Entity | ZMB only (single entity) |
 | Mode 3 | Not in Demo 5 scope |
 | Challenge moment | Reserve coverage data challenged by creditor → analyst responds with Grounding strip citation at zero interaction |
-| Reserve coverage starting value | 3.8 months (IMF WEO Apr 2024, T2) — close to CRITICAL floor (3.0 months) |
+| Reserve coverage starting value | 3.8 months (IMF WEO Apr 2024, T2) — 0.8 months above the 3.0-month WARNING threshold; 1.3 months above the 2.5-month CRITICAL floor |
 
 ### Who Is in the Room
 
@@ -188,30 +188,38 @@ shows..." The instruments carry the argument.
 
 ---
 
-### Step 2 — Frame C: The Citation at the Table (THESIS FRAME) (Step 2, 2025)
+### Step 2 — Frame C: The Citation at the Table (THESIS FRAME) (Step 3, 2026)
 
-**What the audience sees:** Step 2. Fiscal conditionality begins — a 2.5% spending
-reduction. Zone 1B persistent-detail shows the reserve coverage alert with full
-Layer 3 output: indicator name ("Reserve Coverage (months)"), current value, threshold,
-tier label ("T2 · IMF WEO Apr 2024"), and the self-interpreting sentence naming the
-threshold and the time to CRITICAL. The Grounding strip is simultaneously visible.
+**What the audience sees:** Step 3. Year 2026. The food price shock has compounded
+across two steps. Reserve coverage is now 2.9 months — in the WARNING zone (below the
+3.0-month threshold, approaching the 2.5-month CRITICAL floor). Zone 1B persistent-detail
+shows the reserve coverage alert with full Layer 3 output: indicator name ("Reserve
+Coverage (months)"), current value (2.9), floor (2.500), negotiation-defensibility label
+("Moderate confidence — cite with caveat"), and the self-interpreting sentence. The
+Grounding strip is simultaneously visible, showing the initial 3.8-month figure with its
+source citation (IMF WEO Apr 2024, T2).
+
+Note on two distinct display elements:
+- **Grounding strip:** Shows initial input provenance — "T2 · IMF WEO Apr 2024" for the
+  3.8-month starting value. This is the citation that answers the creditor's challenge.
+- **Zone 1B alert:** Shows the negotiation-defensibility label for the computed trajectory
+  value — "Moderate confidence — cite with caveat." This is T3 (the computed step-3
+  reserve value incorporates T3 food import dependency data). The T2 initial input is
+  visible in the Grounding strip; the T3 computed output is labeled in Zone 1B.
+
+The No False Precision principle: both displays are honest about what they are showing.
 
 **What the presenter says:**
 
-> Step two. Year 2025. The IMF program's fiscal conditionality begins. Reserve coverage
-> is declining.
+> Step three. Year 2026. Two years into the programme. The food price shock has
+> compounded. Reserve coverage is in the WARNING zone.
 >
 > This is the moment. The creditor says: "Where does your 3.8 months figure come from?
 > We have a different number in our model."
 >
-> The analyst points to the screen.
+> The analyst points to the Grounding strip — still open, never closed.
 >
-> Zone 1B — the alert panel — shows: Reserve Coverage (months). The tier label:
-> T2 · IMF WEO Apr 2024. The self-interpreting sentence: at the current draw rate,
-> the CRITICAL floor is reached within two steps.
->
-> The Grounding strip in the scenario header is showing the same citation for the
-> initial state.
+> Reserve coverage: 3.8 months. IMF World Economic Outlook, April 2024. Tier two.
 >
 > No drawer. No specialist. Under ten seconds.
 >
@@ -221,9 +229,14 @@ threshold and the time to CRITICAL. The Grounding strip is simultaneously visibl
 
 **PAUSE — let them read Zone 1B and the Grounding strip simultaneously.**
 
-> Read what is on the screen. The indicator name is readable — not a database field.
-> The tier is readable — not a raw number. The direction of risk is named. The
-> self-interpreting sentence tells you what the number means, not just what it is.
+> Zone 1B — the alert panel — shows: Reserve Coverage (months). Current value: 2.9
+> months. Floor: 2.5 months. The negotiation-defensibility label: Moderate confidence
+> — cite with caveat. The self-interpreting sentence: at the current draw rate, the
+> CRITICAL floor is one step away.
+>
+> The indicator name is readable — not a database field. The tier is readable — not a
+> raw number. The direction of risk is named. The self-interpreting sentence tells you
+> what the number means, not just what it is.
 >
 > That is a Layer 3 output. In aviation, the instrument tells you what to do with the
 > reading, not just what the gauge shows. This instrument does the same.
@@ -234,21 +247,20 @@ of Zone 1B and the Grounding strip is the key composition.
 
 ---
 
-### Step 3 — Frame B: Zone 1B in Detail (Step 2 continued)
+### Step 3 — Frame B: Zone 1B in Detail (Step 3 continued)
 
 **What the presenter says:**
 
 > Let me name what you are seeing in that alert slot, because it is specific by design.
 >
 > In M12, that slot showed a tier badge and a raw threshold value. In M14, it shows
-> four things: the indicator name in plain language, the confidence tier as a
-> human-readable label, the current value against the threshold, and the Layer 3
-> sentence.
+> four things: the indicator name in plain language, the negotiation-defensibility label,
+> the current value against the floor, and the Layer 3 sentence.
 >
 > The Layer 3 sentence is not "reserve coverage is low." It is: at the current draw
-> rate, the CRITICAL floor — the minimum adequate reserve benchmark — is reached within
-> two steps. That sentence is specific enough to put in a briefing note. The minister
-> can hand it to the negotiating team verbatim.
+> rate, the CRITICAL floor — 2.5 months — is reached within one step. That sentence is
+> specific enough to put in a briefing note. The minister can hand it to the negotiating
+> team verbatim.
 >
 > This is the difference between a tool that displays data and a tool that builds
 > analytical standing.
@@ -258,12 +270,16 @@ of Zone 1B and the Grounding strip is the key composition.
 ### Step 4 — Frame D: Political Feasibility in the Same View (Step 3, 2026)
 
 **What the audience sees:** Step 3. Zone 1D showing four composites plus PSP
-(`programme_survival_probability`). Zone 1B showing the reserve CRITICAL alert.
-Zone 1A showing the full arc from step 1.
+(`programme_survival_probability`). Zone 1B showing the reserve WARNING alert
+(current 2.9 months / floor 2.5 months / "Moderate confidence — cite with caveat" /
+"CRITICAL floor is one step away"). Zone 1A showing the full arc from step 1.
+The Grounding strip is now closed so Zone 1D is unobstructed.
 
 **What the presenter says:**
 
-> Step three. Year 2026. Reserve coverage crosses the CRITICAL threshold.
+> Step three. Year 2026. Reserve coverage is in the WARNING zone — 2.9 months,
+> with the 2.5-month CRITICAL floor one step away. The instrument names this: "at the
+> current draw rate, the CRITICAL floor is reached in one step."
 >
 > Look at Zone 1D — the four-framework overview. There is a fifth readout: programme
 > survival probability.
@@ -294,6 +310,11 @@ conditionality terms are achievable given the fiscal pressure the country is und
 That is not a political prediction. It is a quantified constraint estimate based on
 the political economy module's assessment of implementation capacity."
 
+**Key narration note on alert status at step 3:** Zone 1B shows WARNING (not CRITICAL)
+at step 3. Reserve = 2.9 months; CRITICAL floor = 2.5 months; WARNING zone = below 3.0.
+The instrument's Layer 3 sentence already names this: "CRITICAL floor is one step away."
+Do not narrate CRITICAL until the audience reaches step 4 (year 2027).
+
 ---
 
 ### Step 5 — Frame E: The Evidence Thread Complete (Step 5, 2028)
@@ -314,12 +335,18 @@ Grounding strip or assumption surface is visible, confirming the source chain.
 > is published and auditable by anyone.
 >
 > I want to name something explicitly about the ecological and governance data you are
-> seeing: they are T4 — Synthetic extrapolation. The tool says "Synthetic extrapolation"
-> in Zone 1B when those indicators appear in an alert. This is not an apology. This is
-> the No False Precision principle in practice. For a country where ecological and
-> governance data are thin, the tool tells you what it knows from measured data and what
-> it inferred from SADC comparable economies. The T2 data stands out by contrast — it
-> is not inflated to cover the T4 gaps.
+> seeing in the Grounding strip: they are T4 — Synthetic extrapolation. That label is
+> in the right column of the strip — it is on the screen, not in a footnote. This is
+> not an apology. This is the No False Precision principle in practice. For a country
+> where ecological and governance data are thin, the tool tells you what it knows from
+> measured data and what it inferred from SADC comparable economies. The T2 data stands
+> out by contrast — it is not inflated to cover the T4 gaps.
+>
+> You will notice the ecological module is not producing alerts in Zone 1B today. I have
+> configured the scenario that way deliberately — a CO2 planetary boundary alert that
+> fires from step one would push the reserve signal out of the primary alert slot. The
+> reserve is the thesis indicator for this demonstration. In a full deployment, ecological
+> alerts would appear in Zone 1B with the same T4 label visible in the alert text.
 >
 > What the ministry team has at the table, at step five, is a traceable chain: from
 > data source through assumptions to output. The creditor can challenge the number.
@@ -600,9 +627,9 @@ Captured to `docs/demo/m14/screenshots/` via `demo-narrated.spec.ts`.
 
 | Presentation order | File | Step | Zone 1 focus | Caption |
 |---|---|---|---|---|
-| 1 — THESIS | `frame-c-citation-at-table.png` | 2 / 6 | Zone 1B + Grounding strip simultaneously visible | Reserve coverage T2 · IMF WEO Apr 2024. The answer on screen before the question finishes. |
+| 1 — THESIS | `frame-c-citation-at-table.png` | 3 / 6 | Zone 1B WARNING + Grounding strip simultaneously visible | Reserve coverage challenge-response at step 3 (2026). Grounding strip cites T2 · IMF WEO Apr 2024. Zone 1B shows "Moderate confidence — cite with caveat." |
 | 2 | `frame-a-grounding-strip.png` | 1 / 6 | Zone 1A L0 annotation + Grounding strip | Zambia at program entry: source, tier, date visible before analysis begins |
-| 3 | `frame-b-zone1b-reserve.png` | 2 / 6 | Zone 1B Layer 3 persistent-detail | Self-interpreting reserve alert: indicator name, tier label, threshold, direction |
+| 3 | `frame-b-zone1b-reserve.png` | 3 / 6 | Zone 1B Layer 3 persistent-detail | Self-interpreting reserve WARNING alert: current 2.9 / floor 2.5 / "CRITICAL floor is one step away" |
 | 4 | `frame-d-political-feasibility.png` | 3 / 6 | Zone 1D: PSP alongside four composites | Programme survival probability live — financial and political constraints on same instrument |
 | 5 | `frame-e-evidence-thread.png` | 5 / 6 | Full instrument cluster: complete arc | Five-step trajectory, all sources named, evidence thread complete |
 
