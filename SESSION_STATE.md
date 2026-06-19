@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-19 (G8 demo cycle Steps 5b/6/6b complete — legibility 10/10 PASS; five screenshots PR #1058; nine-agent internal review + walkthrough fixes PR #1060. Four blocking narration errors corrected (DEMO5-001–004). Steps 7/6c/9 gated on EL.)**
+**Last updated: 2026-06-19 (PR #1062: release/m14 → main merged. NM-050 filed: Step 6c ran before Step 7 — that simulation is invalid and discarded. SESSION_STATE gate notation corrected to preserve 7 → 6c → 9 sequence. Step 7 IR review is next.)**
 **Current milestone:** M14 — Methodology Publication and External Validation (GitHub Milestone 15)
 **Previous milestone:** M13 — Political Economy and Instrument Credibility (formally closed 2026-06-15; release/m13 → main merged by EL; #264 closed)
 
@@ -169,7 +169,9 @@
 | G8 Step 5c — NARRATION-RULING-1 | ✅ PASS 2026-06-19 | All 5 presentation steps: Umbrella + Synthesis + Transition verified |
 | G8 Step 6 — screenshot capture | ✅ COMPLETE 2026-06-19 (PR #1058) | Five frames captured; Round 3 spec fixes (ecological disabled, democratic_quality_score=0.80 to reserve top alert slot); Reserve WARNING Current 2.908 / Floor 2.500 visible in Zone 1B detail slot |
 | G8 Step 6b — internal nine-agent review | ✅ COMPLETE 2026-06-19 (PR #1060) | `docs/demo/m14/reviews/2026-06-19-v0.14.0-internal-review.md`; 8 findings; 4 CRITICAL/HIGH blocking walkthrough errors corrected in same PR; Issue #1059 filed (HCL narration M15 scope) |
-| G8 Steps 7/6c/9 — IR + audience sim + live session | ⬜ **GATED: EL merge `release/m14` → `main`** | IR review (fresh instance); Personas 1/2/3/5 audience simulation; live session with real participants (#843) |
+| G8 Step 7 — IR review | ⬜ **NEXT — merge complete ✅** | Fresh Claude instance; `docs/process/independent-review-prompt.md`; screenshots C→A→B→D→E; NM-050 filed (6c ran before 7 — that simulation is invalid and discarded) |
+| G8 Step 6c — audience simulation | ⬜ GATED: Step 7 complete | Personas 1/2/3/5; screenshots in UX brief sequence; Persona 5 north star verdict mandatory; `docs/demo/m14/reviews/YYYY-MM-DD-v0.14.0-audience-simulation.md` |
+| G8 Step 9 — live stakeholder session | ⬜ GATED: Step 6c north star PASS | #843 — M14 closure gate; `PENDING-v0.14.0-stakeholder-review.md` placeholder to be created at Step 8 |
 
 **Evidence base for M14 trust architecture (both ADRs):**
 - Part I audit (output legibility): `docs/demo/m14/reviews/2026-06-15-ux-legibility-audit-minister-exercise.md`
