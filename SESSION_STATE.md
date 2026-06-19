@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-19 (G6c BPO ACCEPT + PI Agent sprint exit confirmed — intent doc §8; sprint exit at `docs/process/sprint-plans/m14-g6c-sprint-exit.md`. G6 BPO ACCEPT — Step 5 Validate PASS, 9 ACs confirmed, sprint exit CONFIRMED, G6 COMPLETE.)**
+**Last updated: 2026-06-19 (G8 Phase 1 demo prep — Steps 2–5 merged PR #1056; screenshot brief, demo.sh, demo-narrated.spec.ts, walkthroughs complete. #997 closed. #1055 filed. Step 5b legibility gate + Step 6 screenshot capture next.)**
 **Current milestone:** M14 — Methodology Publication and External Validation (GitHub Milestone 15)
 **Previous milestone:** M13 — Political Economy and Instrument Credibility (formally closed 2026-06-15; release/m13 → main merged by EL; #264 closed)
 
@@ -159,6 +159,16 @@
 | #986 — Cohort disaggregation on primary surface | ✅ Filed (M15) | M11.5 FINDING-03 gap; Demo 6 prerequisite |
 | #987 — Political risk summary surface (Persona 3) | ✅ Filed (M15) | Plain-language legitimacy dynamics |
 | #990 — Accessibility validation on target hardware | ✅ Filed (M15) | 8GB/4-core laptop gate |
+| G8 sprint entry document | ✅ **EL APPROVED 2026-06-19** (PR #1054) | `docs/process/sprint-plans/m14-g8-sprint-entry.md`; ZMB only; no Mode 3; reserve challenge → Grounding strip citation; demo prep standard as governing intent doc; implementation unblocked |
+| G8 Step 1 — demo issue filed | ✅ COMPLETE 2026-06-19 | #1055 filed (demo: M14 stakeholder demo preparation — v0.14.0 / Milestone 14) |
+| G8 Step 2 — screenshot brief | ✅ COMPLETE 2026-06-19 (PR #1056) | `docs/demo/m14/screenshot-brief.md`; five frames; thesis frame C (citation at table); ZMB; no Mode 3 |
+| G8 Step 3 — `demo.sh` updated | ✅ COMPLETE 2026-06-19 (PR #1056) | M14 Demo 5 ZMB/no-Mode3; challenge-response framing; honest disclosures; NM-041 `bash -n` gate PASS |
+| G8 Step 4 — `demo-narrated.spec.ts` | ✅ COMPLETE 2026-06-19 (PR #1056) | Rewritten for ZMB ECF; `demo-narrated-m12.spec.ts` archived; NM-039 sentinel; 1440×900 viewport |
+| G8 Step 5 — walkthroughs | ✅ COMPLETE 2026-06-19 (PR #1056) | `docs/demo/m14/stakeholder-walkthrough.md`; root redirect updated; narration checks 5a/5c encoded in walkthrough |
+| G8 Step 5b — legibility gate | ⬜ NEXT | Run `demo-legibility.spec.ts` at 1440×900 against live stack; must pass before screenshots captured |
+| G8 Step 6 — screenshot capture | ⬜ PENDING Step 5b | Five frames via `demo.sh --run`; verify vs. screenshot brief |
+| G8 Step 6b — internal nine-agent review | ⬜ PENDING Step 6 | PM Agent orchestrates panel; `docs/demo/m14/reviews/YYYY-MM-DD-v0.14.0-internal-review.md` |
+| G8 Steps 7/6c/9 — IR + audience sim + live session | ⬜ **GATED: EL merge `release/m14` → `main`** | IR review (fresh instance); Personas 1/2/3/5 audience simulation; live session with real participants |
 
 **Evidence base for M14 trust architecture (both ADRs):**
 - Part I audit (output legibility): `docs/demo/m14/reviews/2026-06-15-ux-legibility-audit-minister-exercise.md`
@@ -214,6 +224,8 @@ All near-term issues dispositioned at HORIZON sweep 2026-06-13 — see G8 sprint
 
 | PR | Title | Target | Status |
 |---|---|---|---|
+| #1056 ✅ | demo(m14-g8): Steps 2–5 Demo 5 prep — ZMB screenshot brief, narrated spec, demo.sh, walkthroughs | release/m14 | Merged 2026-06-19 |
+| #1054 ✅ | process(m14-g8): G8 sprint entry document — Demo 5 preparation and live stakeholder demo | release/m14 | Merged 2026-06-19 |
 | #1045 ✅ | feat(m14-g6): methodology, calibration, and instrument legibility (#885, #950, #884, #823, #824, #22, PMM anchor) | release/m14 | Merged 2026-06-18 |
 | #1043 ✅ | process(m14-g7): BPO ACCEPT — G7 governance and onboarding documentation | release/m14 | Merged 2026-06-18 |
 | #1042 ✅ | process(m14-g6): QA tests filed + §2.4 gate checked (duplicate merge of #1041 content) | release/m14 | Merged 2026-06-18 |
@@ -593,7 +605,8 @@ CI hotfix: NM-035 filed; `ci.yml` PR trigger updated to include `release/m*` (PR
 | #6 | governance: restore branch protection bypass restriction | G7 | EL-action |
 | #988 | governance: Goodhart's Law mitigation — TSC monitoring framework | G7 | Filed 2026-06-16 |
 | #989 | docs: onboarding documentation for global south finance ministry analysts | G7 | Filed 2026-06-16 |
-| #997 | Demo 5 scenario script constraint: challenges must be answerable from ADR-015 Components 1–3 | G8 | EL acknowledgment 2026-06-16; closes when Demo 5 script reviewed against constraint |
+| #997 ✅ | Demo 5 scenario script constraint: challenges must be answerable from ADR-015 Components 1–3 | G8 | **CLOSED 2026-06-19** — reserve coverage → Grounding strip citation (EL decision); no Component 4 required |
+| #1055 | demo: M14 stakeholder demo preparation — v0.14.0 / Milestone 14 | G8 | Filed 2026-06-19 (Step 1); tracks G8 Phase 1+2 deliverables |
 
 ---
 
