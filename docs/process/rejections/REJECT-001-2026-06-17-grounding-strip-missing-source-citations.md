@@ -4,7 +4,7 @@
 **Sprint group:** M14 G4 — ADR-016 Frontend
 **Rejection author:** Business PO
 **Step:** Step 5 (Validate)
-**Resolution status:** Open — remediation in progress
+**Resolution status:** Resolved — PR #1018 merged 2026-06-17; BPO re-validate PASS (intent doc §9); G4 sprint exit confirmed
 
 ---
 
@@ -94,9 +94,9 @@ BPO re-validates: with JOR scenario `68b31277-346e-45dc-9e1e-91e877f6b9fa` loade
 ## Sprint Exit Block
 
 This sprint group (G4) cannot close and no subsequent sprint group (G5+) may begin until:
-- [ ] The field name fix is applied (types.ts + GroundingStrip.tsx)
-- [ ] The AC-3 E2E test is strengthened (string assertion over regex fallback)
-- [ ] BPO re-validates and issues ACCEPT
+- [x] The field name fix is applied (types.ts + GroundingStrip.tsx) — PR #1018 merged 2026-06-17
+- [x] The AC-3 E2E test is strengthened (string assertion over regex fallback) — PR #1018; route mock + named-string assertion
+- [x] BPO re-validates and issues ACCEPT — intent doc §9 BPO ACCEPT 2026-06-17
 
 ---
 
