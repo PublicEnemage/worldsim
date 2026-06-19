@@ -8,8 +8,8 @@
  *
  * Five screenshots per UX Agent brief (docs/demo/m14/screenshot-brief.md):
  *   frame-a-grounding-strip.png        — Step 1, ZMB loaded, Grounding strip + L0 annotations
- *   frame-b-zone1b-reserve.png         — Step 2, Zone 1B self-interpreting reserve alert
- *   frame-c-citation-at-table.png      — Step 2 THESIS: Grounding strip citation answering the challenge
+ *   frame-b-zone1b-reserve.png         — Step 3, Zone 1B self-interpreting reserve alert
+ *   frame-c-citation-at-table.png      — Step 3 THESIS: Grounding strip citation answering the challenge
  *   frame-d-political-feasibility.png  — Step 3, Zone 1D with PSP alongside four composites
  *   frame-e-evidence-thread.png        — Step 5, full arc + evidence thread complete
  *
