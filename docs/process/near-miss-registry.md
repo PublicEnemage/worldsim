@@ -2529,6 +2529,57 @@ The entrypoint fix (item 1) is the structural countermeasure. Items 2 and 3 are 
 
 ---
 
+## NM-050 — Step 6c Audience Simulation Run Before Step 7 IR Review; Simulation Also Conducted Without Screenshots (Reactive)
+
+**Date:** 2026-06-19
+**Milestone:** M14 — G8 demo preparation cycle (Demo 5)
+**Detected by:** EL question about methodology after Step 6c was filed — prompted agent to read `docs/process/demo-preparation-standard.md`, which states explicitly: "Step 6c must not be activated until the Step 7 gate is satisfied."
+**Severity:** Medium — an invalid Step 6c artifact was produced and almost treated as a valid gate. No incorrect code was committed and no live session was affected, but the process gate that ensures the persona panel evaluates the post-IR-fix state was bypassed. Had the EL not questioned the methodology, the invalid 6c would have been filed as the canonical audience simulation artifact.
+
+### What happened
+
+After PR #1062 (release/m14 → main) was merged, the agent immediately ran Step 6c (audience simulation panel) without first completing Step 7 (Independent Review Agent). The documented sequence in `demo-preparation-standard.md §Four-Tier Review Structure` is: 6b → 7 → 6c → 9. The standard states: "Step 6c must not be activated until the Step 7 gate is satisfied. The stakeholder session (Step 9) must not occur until the Step 6c gate is satisfied."
+
+Two defects in the simulation:
+1. **Sequence violation:** Step 6c ran before Step 7. The IR Agent may find issues that require walkthrough or screenshot changes. If those changes are made after 6c, the persona panel evaluated a different demo than what will be presented — defeating the purpose of the gate.
+2. **Methodology defect:** The simulation was conducted entirely from text (walkthrough + scenario knowledge), without showing the persona agents the five captured screenshots. `demo-preparation-standard.md §Step 6c` requires: "PM Agent instantiates each persona agent with: (1) the persona's full profile from `docs/ux/personas.md`; (2) screenshots in UX Agent brief presentation sequence; (3) `docs/demo/stakeholder-walkthrough.md`." Screenshots were absent. Additionally, no Persona 5 north star verdict was produced, which is a mandatory gate output.
+
+### What was at risk
+
+1. An invalid Step 6c artifact filed as the canonical `YYYY-MM-DD-v0.14.0-audience-simulation.md` — a process artifact that future agents would treat as a satisfied gate.
+2. The live stakeholder session (Step 9 — M14 closure gate #843) proceeding without a valid persona panel having evaluated the final IR-corrected demo artifacts. The persona panel's north star gate (Persona 5 PASS/FAIL) is the last quality gate before a real external audience sees the tool.
+3. Persona simulation findings being acted upon before IR findings are known — the IR may identify issues that make persona-level findings irrelevant or that change which issues are CRITICAL.
+
+### What caught it
+
+The EL asked whether the persona panel had seen the screenshots and whether the screenshots were the same ones taken before or after IR findings were addressed. This question prompted the agent to read the demo-preparation-standard.md and discover both defects. The EL's question was the detection mechanism — the process itself did not stop the sequence violation.
+
+### Root cause
+
+The SESSION_STATE notation grouped Steps 7, 6c, and 9 together behind the single gate condition "EL merge release/m14 → main":
+
+```
+| G8 Steps 7/6c/9 — IR + audience sim + live session | ⬜ GATED: EL merge release/m14 → main |
+```
+
+This notation correctly represented the external prerequisite (merge) but suppressed the internal sequential dependency (7 → 6c → 9). Once the merge gate cleared, all three steps appeared co-equal and immediately available. The process document was clear; the SESSION_STATE representation was not.
+
+### Process improvement
+
+**Immediate fix:** The invalid Step 6c simulation output is discarded — it was not committed as an artifact. Step 6c must be re-run after Step 7 is complete, with persona agents reviewing the screenshots in UX Agent brief sequence and a Persona 5 north star verdict produced.
+
+**SESSION_STATE notation fix (this PR):** Replace grouped notation with explicit sequential gates:
+
+```
+| G8 Step 7 — IR review | ⬜ GATED: EL merge complete | Fresh Claude instance; independent-review-prompt.md |
+| G8 Step 6c — audience simulation | ⬜ GATED: Step 7 complete | Personas 1/2/3/5; screenshots in brief sequence; Persona 5 north star verdict |
+| G8 Step 9 — live stakeholder session | ⬜ GATED: Step 6c north star PASS | #843 — M14 closure gate |
+```
+
+**Structural countermeasure — SESSION_STATE demo cycle gate notation standard:** When recording demo preparation steps in SESSION_STATE, each post-merge step must appear as a separate row with its own gate condition naming the prior step as the prerequisite — not grouped behind the merge condition. The merge is a shared prerequisite, not the sequencing signal. This standard applies to all future demo cycles.
+
+---
+
 ## Registry Maintenance
 
 ### How to add an entry
