@@ -32,7 +32,7 @@
 | M11.5 | Usability Validation and Experience Audit | Priority A usability sessions; universal finding; M12 scope filed | Complete |
 | M12 | Active Control and External Sector | Matrix engine production, ExternalSectorModule (ADR-012), Mode 3, Demo 4 | Complete |
 | M13 | Political Economy and Instrument Credibility | ADR-013, political economy integration, ADR-014 alert panel UX, instrument legibility, mode transition UX, Process Redesign Phases 0–D | Complete |
-| M14 | Methodology Publication and External Validation | Methodology publication, external validation, live demo, TSC formation | Current |
+| M14 | Trust Architecture and Instrument Credibility | ADR-016 Grounding strip (source provenance), ADR-015 Evidence thread (Zone 1B credibility), PSP in Zone 1D, methodology foundation docs, Demo 5 | Current |
 | M15 | Human Cost Architecture | Zone 1A information architecture (ADR), cohort disaggregation design, political risk surface design, approved-source query (Path 1), accessibility validation | Planned |
 | M16 | Distributional Visibility | Demo 6: cohort-level distributional output, 25-year human capital trajectory, uncertainty quantification as bands, ecological transmission, Path 2 data upload | Planned |
 | M17 | Multi-Scenario Infrastructure | Multi-scenario comparison infrastructure (>2 scenarios), dynamic relationship weights, stock vs. flow at scale, entity template library design | Planned |
@@ -245,7 +245,7 @@ surface: any milestone entry with UNTRACKED items is an open kickoff gate.
 
 ---
 
-### Milestone 14 — Methodology Publication and External Validation *(current)*
+### Milestone 14 — Trust Architecture and Instrument Credibility *(current)*
 
 **Core deliverable:** WorldSim is ready for institutional adoption. The methodology is published, externally validated, and inspectable by anyone.
 
