@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-20 (G8 Step 7 IR review COMPLETE — PR #1064/#1070; 10 findings; five CRITICAL/HIGH issues filed #1065–#1069. EL decision: IR findings do not gate Demo 5; IR-001–005 deferred to M15. IR-004 Path B (Zone 1D narration correction) applied PR #1071. Issues #1065–#1069 moved to M15 / horizon:near-term. Steps 6c/9 pending EL direction.)**
+**Last updated: 2026-06-20 (G8 Step 6c COMPLETE — PR #1076; four-persona panel; 25 findings DEMO-097–DEMO-121; north star FAIL/BLOCKED. DEMO-099 filed as #1075 (M15). Escalation comments on #1065 and #1069. Step 9 BLOCKED: EL decision required on four CRITICAL findings before Demo 5 proceeds.)**
 **Current milestone:** M14 — Methodology Publication and External Validation (GitHub Milestone 15)
 **Previous milestone:** M13 — Political Economy and Instrument Credibility (formally closed 2026-06-15; release/m13 → main merged by EL; #264 closed)
 
@@ -172,8 +172,10 @@
 | G8 Step 7 — Independent Review | ✅ COMPLETE 2026-06-19/20 (PR #1064 + #1070) | `docs/demo/m14/reviews/2026-06-19-v0.14.0-ir-review.md`; 10 findings (IR-001–IR-010); five CRITICAL/HIGH issues filed (#1065–#1069); three-agent panel (UX Designer, Frontend Architect, Business PO) assessed IR-001 and IR-004 |
 | G8 EL decision — IR issue triage | ✅ RECORDED 2026-06-20 | IR findings do not gate Demo 5. IR-004 Path B (narration correction) applied in M14. IR-001 (#1065), IR-002 (#1066), IR-003 (#1067), IR-004 Path A (#1068), IR-005 (#1069) deferred to M15 with implementation guidance comments. All five issues moved to M15 milestone / `horizon:near-term`. |
 | G8 IR-004 Path B — Zone 1D narration | ✅ COMPLETE 2026-06-20 (PR #1071) | `stakeholder-walkthrough.md` corrected: Zone 1A badge claim → Zone 1D L0 annotation reference (4 locations). Zone 1D already implements correct L0 annotations; walkthrough narration now matches application state. |
-| G8 Step 6c — audience simulation | ⬜ **PENDING EL DIRECTION** | Personas 1/2/3/5 panel; Persona 5 north star verdict mandatory; Demo 5 not a hard M14 gate (EL 2026-06-20); artifact: `docs/demo/m14/reviews/YYYY-MM-DD-v0.14.0-audience-simulation.md` |
-| G8 Step 9 — live stakeholder session | ⬜ **PENDING EL DIRECTION** | #843 — M14 closure gate per CLAUDE.md; Demo 5 timing at EL discretion |
+| G8 Step 6c — audience simulation | ✅ **COMPLETE 2026-06-20** (PR #1076) | `docs/demo/m14/reviews/2026-06-20-v0.14.0-audience-simulation.md`; 25 findings DEMO-097–DEMO-121; 4 CRITICAL; north star verdict: FAIL/BLOCKED |
+| G8 DEMO-099 — PSP Layer 3 sentence gap | ✅ Filed as #1075 (M15) | PSP shows value only; no self-interpreting sentence; political advisor (Andreas) cannot brief Minister from number alone; paired with #1065 (Zone 1B); walkthrough narration path available |
+| G8 Step 6c escalations | ✅ RECORDED 2026-06-20 | #1065 updated: now CRITICAL across 3 personas, north star FAIL; #1069 updated: CRITICAL across 2 personas, north star FAIL; EL exception paths documented on both |
+| G8 Step 9 — live stakeholder session | ⬜ **GATED: EL decisions required** | #843 — M14 closure gate; north star BLOCKED. Two blocking conditions: (1) disambiguate 3.8 vs 2.9 reserve values on-screen or in narration [DEMO-098/#1069]; (2) walkthrough revised to not claim Layer 3 sentence exists [DEMO-097/#1065]. EL exception path: narration-only revisions (no screen change) can re-qualify for north star re-check. DEMO-099 (#1075) and DEMO-100 (Frame C context) also need EL disposition. |
 
 **Evidence base for M14 trust architecture (both ADRs):**
 - Part I audit (output legibility): `docs/demo/m14/reviews/2026-06-15-ux-legibility-audit-minister-exercise.md`
@@ -229,6 +231,7 @@ All near-term issues dispositioned at HORIZON sweep 2026-06-13 — see G8 sprint
 
 | PR | Title | Target | Status |
 |---|---|---|---|
+| #1076 ✅ | demo(m14-g8): Step 6c audience simulation artifact — four-persona panel, north star FAIL/BLOCKED | release/m14 | Merged 2026-06-20 |
 | #1071 ✅ | docs(ir004-path-b): correct Zone 1A badge narration to Zone 1D in walkthrough | release/m14 | Merged 2026-06-20 |
 | #1070 ✅ | docs(ir-review): update IR review findings table with GitHub issue numbers (#1065–#1069) | release/m14 | Merged 2026-06-19 |
 | #1064 ✅ | docs(demo): M14 independent review — 2026-06-19-v0.14.0-ir-review.md | release/m14 | Merged 2026-06-19 |
@@ -642,6 +645,12 @@ CI hotfix: NM-035 filed; `ci.yml` PR trigger updated to include `release/m*` (PR
 | #569 | test(perf): MV-002 Mode 3 hardware validation | |
 | #951 | process: solo-use review protocol | |
 | #990 | test: accessibility validation on 8GB/4-core target hardware | Filed 2026-06-16 |
+| #1065 | ux(zone-1b): Layer 3 trajectory sentence — Zone 1B shows percentage not directive text | IR-001; Step 6c CRITICAL; escalation comment 2026-06-20 |
+| #1066 | ux(zone-1b): suppress "0 consecutive steps" when breach counter is zero | IR-002; Step 6c HIGH |
+| #1067 | demo(screenshots): Frame B and Frame C are the same screenshot | IR-003; Step 6c HIGH |
+| #1068 | ux(zone-1a): L0 badge implementation on Zone 1A trajectory curve | IR-004 Path A; Step 6c HIGH |
+| #1069 | ux(grounding-strip): dual reserve values without disambiguation label | IR-005; Step 6c CRITICAL; escalation comment 2026-06-20 |
+| #1075 | ux(zone-1d): PSP self-interpreting sentence absent — political advisor cannot brief without economist mediation | DEMO-099; Step 6c CRITICAL; Filed 2026-06-20 |
 
 ---
 
