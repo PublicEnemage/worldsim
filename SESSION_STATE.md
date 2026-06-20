@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-20 (G8 Step 6c COMPLETE — PR #1076; four-persona panel; 25 findings DEMO-097–DEMO-121; north star FAIL/BLOCKED. DEMO-099 filed as #1075 (M15). Escalation comments on #1065 and #1069. Step 9 BLOCKED: EL decision required on four CRITICAL findings before Demo 5 proceeds.)**
+**Last updated: 2026-06-20 (G8 honest narration revision COMPLETE — PR #1078. EL decision: accept north star FAIL, retain M15 promises explicitly in narration. North star re-evaluation: PASS (conditional). Step 9 READY — pending EL scheduling of live Demo 5.)**
 **Current milestone:** M14 — Methodology Publication and External Validation (GitHub Milestone 15)
 **Previous milestone:** M13 — Political Economy and Instrument Credibility (formally closed 2026-06-15; release/m13 → main merged by EL; #264 closed)
 
@@ -175,7 +175,10 @@
 | G8 Step 6c — audience simulation | ✅ **COMPLETE 2026-06-20** (PR #1076) | `docs/demo/m14/reviews/2026-06-20-v0.14.0-audience-simulation.md`; 25 findings DEMO-097–DEMO-121; 4 CRITICAL; north star verdict: FAIL/BLOCKED |
 | G8 DEMO-099 — PSP Layer 3 sentence gap | ✅ Filed as #1075 (M15) | PSP shows value only; no self-interpreting sentence; political advisor (Andreas) cannot brief Minister from number alone; paired with #1065 (Zone 1B); walkthrough narration path available |
 | G8 Step 6c escalations | ✅ RECORDED 2026-06-20 | #1065 updated: now CRITICAL across 3 personas, north star FAIL; #1069 updated: CRITICAL across 2 personas, north star FAIL; EL exception paths documented on both |
-| G8 Step 9 — live stakeholder session | ⬜ **GATED: EL decisions required** | #843 — M14 closure gate; north star BLOCKED. Two blocking conditions: (1) disambiguate 3.8 vs 2.9 reserve values on-screen or in narration [DEMO-098/#1069]; (2) walkthrough revised to not claim Layer 3 sentence exists [DEMO-097/#1065]. EL exception path: narration-only revisions (no screen change) can re-qualify for north star re-check. DEMO-099 (#1075) and DEMO-100 (Frame C context) also need EL disposition. |
+| G8 EL decision — north star FAIL acceptance | ✅ RECORDED 2026-06-20 | EL accepted FAIL verdict as honest evidence of M14 underdelivery against Layer 3 / PSP promise. Decision: retain all promises as explicit M15 roadmap items in narration rather than scrubbing or claiming delivery. More honest than a pass achieved by narrowing the claim. |
+| G8 Honest narration revision | ✅ COMPLETE 2026-06-20 (PR #1078) | `stakeholder-walkthrough.md` revised: (1) Layer 3 sentence framed as M15 roadmap commitment throughout; (2) dual reserve values explicitly disambiguated in Frame C narration (3.8=initial entry-state, 2.9=current simulated step 3); (3) PSP 0.65 translated into plain language in Frame D narration; (4) DEMO-100 presenter timing note added (Section 1 must complete before Frame C displayed). |
+| G8 North star re-evaluation | ✅ **PASS** (conditional) | Targeted re-evaluation: revised narration allows Aicha to state primary finding without specialist mediation — presenter explicitly narrates "CRITICAL is one step away" from on-screen data, and disambiguates dual reserve values before she can question them. Condition: revised narration delivered as written. North star gate: **UNBLOCKED**. |
+| G8 Step 9 — live stakeholder session | ⬜ **READY — pending EL scheduling** | #843 — M14 closure gate; north star PASS (conditional on revised narration delivery). EL to schedule Demo 5 and notify participants. DEMO-097–DEMO-100 tracked in M15 (#1065, #1069, #1075); underdelivery acknowledged in narration and on record. |
 
 **Evidence base for M14 trust architecture (both ADRs):**
 - Part I audit (output legibility): `docs/demo/m14/reviews/2026-06-15-ux-legibility-audit-minister-exercise.md`
@@ -231,6 +234,7 @@ All near-term issues dispositioned at HORIZON sweep 2026-06-13 — see G8 sprint
 
 | PR | Title | Target | Status |
 |---|---|---|---|
+| #1078 ✅ | docs(m14-g8): honest narration revision — retain M15 promises, remove false current-delivery claims | release/m14 | Merged 2026-06-20 |
 | #1076 ✅ | demo(m14-g8): Step 6c audience simulation artifact — four-persona panel, north star FAIL/BLOCKED | release/m14 | Merged 2026-06-20 |
 | #1071 ✅ | docs(ir004-path-b): correct Zone 1A badge narration to Zone 1D in walkthrough | release/m14 | Merged 2026-06-20 |
 | #1070 ✅ | docs(ir-review): update IR review findings table with GitHub issue numbers (#1065–#1069) | release/m14 | Merged 2026-06-19 |
