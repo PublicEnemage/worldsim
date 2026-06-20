@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-20 (G8 honest narration revision COMPLETE — PR #1078. EL decision: accept north star FAIL, retain M15 promises explicitly in narration. North star re-evaluation: PASS (conditional). Step 9 READY — pending EL scheduling of live Demo 5.)**
+**Last updated: 2026-06-20 (G8 Step 9 COMPLETE — simulated stakeholder session (PR #1081). North star: PASS (conditional). 8 new findings DEMO-122–129. #843 deferred to M15 (EL decision). Docker containers rebuilding with latest code. M14 exit ceremony is next.)**
 **Current milestone:** M14 — Trust Architecture and Instrument Credibility (GitHub Milestone 15)
 **Previous milestone:** M13 — Political Economy and Instrument Credibility (formally closed 2026-06-15; release/m13 → main merged by EL; #264 closed)
 
@@ -178,7 +178,9 @@
 | G8 EL decision — north star FAIL acceptance | ✅ RECORDED 2026-06-20 | EL accepted FAIL verdict as honest evidence of M14 underdelivery against Layer 3 / PSP promise. Decision: retain all promises as explicit M15 roadmap items in narration rather than scrubbing or claiming delivery. More honest than a pass achieved by narrowing the claim. |
 | G8 Honest narration revision | ✅ COMPLETE 2026-06-20 (PR #1078) | `stakeholder-walkthrough.md` revised: (1) Layer 3 sentence framed as M15 roadmap commitment throughout; (2) dual reserve values explicitly disambiguated in Frame C narration (3.8=initial entry-state, 2.9=current simulated step 3); (3) PSP 0.65 translated into plain language in Frame D narration; (4) DEMO-100 presenter timing note added (Section 1 must complete before Frame C displayed). |
 | G8 North star re-evaluation | ✅ **PASS** (conditional) | Targeted re-evaluation: revised narration allows Aicha to state primary finding without specialist mediation — presenter explicitly narrates "CRITICAL is one step away" from on-screen data, and disambiguates dual reserve values before she can question them. Condition: revised narration delivered as written. North star gate: **UNBLOCKED**. |
-| G8 Step 9 — live stakeholder session | ⬜ **READY — pending EL scheduling** | #843 — M14 closure gate; north star PASS (conditional on revised narration delivery). EL to schedule Demo 5 and notify participants. DEMO-097–DEMO-100 tracked in M15 (#1065, #1069, #1075); underdelivery acknowledged in narration and on record. |
+| G8 Step 9 — simulated stakeholder session | ✅ **COMPLETE 2026-06-20 (PR #1081)** | Simulated session (EL decision: real external participants not yet available; #843 deferred to M15). Four-persona panel: Lucas P1, Eleni P2, Andreas P3, Aicha P5. North star: **PASS (conditional)** — Aicha stated argument: "The figure you are challenging is from your institution's own publication. Our initial conditions are derived from IMF WEO April 2024." 8 new findings DEMO-122–129 (all MEDIUM or LOW). Artifact: `docs/demo/m14/reviews/2026-06-20-v0.14.0-stakeholder-review.md`. |
+| G8 new findings from Step 9 | ⬜ Issues to file | DEMO-122 (Grounding strip "2024-Q1" vs "April 2024" WEO label) → new issue; DEMO-127 (PSP historical calibration anchor absent) → new issue. DEMO-123, DEMO-124, DEMO-129 → walkthrough updates needed before M14 close. DEMO-125/126/128 → confirmed M15 scope (companions to #1065, #1066, #1069). |
+| #843 live external demo | ⬜ **DEFERRED TO M15** (EL decision 2026-06-20) | M14 simulated session accepted as closure evidence; real external participants required in M15. |
 
 **Evidence base for M14 trust architecture (both ADRs):**
 - Part I audit (output legibility): `docs/demo/m14/reviews/2026-06-15-ux-legibility-audit-minister-exercise.md`
@@ -234,6 +236,8 @@ All near-term issues dispositioned at HORIZON sweep 2026-06-13 — see G8 sprint
 
 | PR | Title | Target | Status |
 |---|---|---|---|
+| #1081 ✅ | demo(m14-g8): Step 8 + Step 9 — stakeholder review placeholder and simulated session artifact | release/m14 | Merged 2026-06-20 |
+| #1080 ✅ | chore(m14): rename milestone — "Trust Architecture and Instrument Credibility" | release/m14 | Merged 2026-06-20 |
 | #1078 ✅ | docs(m14-g8): honest narration revision — retain M15 promises, remove false current-delivery claims | release/m14 | Merged 2026-06-20 |
 | #1076 ✅ | demo(m14-g8): Step 6c audience simulation artifact — four-persona panel, north star FAIL/BLOCKED | release/m14 | Merged 2026-06-20 |
 | #1071 ✅ | docs(ir004-path-b): correct Zone 1A badge narration to Zone 1D in walkthrough | release/m14 | Merged 2026-06-20 |
@@ -625,6 +629,9 @@ CI hotfix: NM-035 filed; `ci.yml` PR trigger updated to include `release/m*` (PR
 | #989 | docs: onboarding documentation for global south finance ministry analysts | G7 | Filed 2026-06-16 |
 | #997 ✅ | Demo 5 scenario script constraint: challenges must be answerable from ADR-015 Components 1–3 | G8 | **CLOSED 2026-06-19** — reserve coverage → Grounding strip citation (EL decision); no Component 4 required |
 | #1055 | demo: M14 stakeholder demo preparation — v0.14.0 / Milestone 14 | G8 | Filed 2026-06-19 (Step 1); tracks G8 Phase 1+2 deliverables |
+| #843 | plan: live stakeholder demo with real external participants | G8 | **DEFERRED TO M15** (EL decision 2026-06-20) — M14 simulated session accepted as closure evidence |
+
+**M14 exit ceremony status:** G8 Step 9 COMPLETE. All feature work merged. Docker containers rebuilding with latest release/m14 code. Next: M14 exit ceremony (CLAUDE.md §Milestone Exit Ceremony): Step 1 open issue audit, Step 2 reference audit, Step 3 SESSION_STATE consistency check, Step 4 fresh session continuity test. Then EL merges release/m14 → main, tags v0.14.0, closes #968 + GitHub Milestone 15.
 
 ---
 
