@@ -3,7 +3,7 @@
 [![CI](https://github.com/PublicEnemage/worldsim/actions/workflows/ci.yml/badge.svg)](https://github.com/PublicEnemage/worldsim/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Python 3.12](https://img.shields.io/badge/python-3.12-blue.svg)](https://www.python.org/downloads/release/python-3120/)
-[![Release](https://img.shields.io/badge/release-v0.12.1%20M12%20complete-green)](https://github.com/PublicEnemage/worldsim/releases/tag/v0.12.1)
+[![Release](https://img.shields.io/badge/release-v0.14.0%20M14%20complete-green)](https://github.com/PublicEnemage/worldsim/releases/tag/v0.14.0)
 
 **An open-source geopolitical-economic simulation platform for governments and
 vulnerable actors navigating high-stakes decisions under uncertainty.**
@@ -53,15 +53,16 @@ governance); Mode 3 Active Control enables counter-scenario branching for
 negotiation support.
 
 **This tool is in active pre-release development.** The working software
-described below reflects Milestone 13 (political economy module; alert panel
-Zone 1B persistent-detail; instrument legibility improvements; mode transition
-UX; Process Redesign Phases 0–D). M14 is in active development.
+described below reflects Milestone 14 (ADR-016 Scenario Grounding Architecture;
+ADR-015 Evidence Thread Architecture; methodology foundation documentation;
+governance; Demo 5 — Zambia 2024 IMF ECF programme review, trust architecture
+thesis). M15 is in active development.
 
 ---
 
 ## What's Built
 
-The working system at Milestone 13 (core components — not exhaustive):
+The working system at Milestone 14 (core components — not exhaustive):
 
 - **Simulation engine** — Event-driven graph in Python. The `Quantity` type
   system tracks `value: Decimal`, unit, variable type (STOCK/FLOW/RATIO/
@@ -119,16 +120,19 @@ The working system at Milestone 13 (core components — not exhaustive):
 
 - **Frontend** — React + MapLibre GL choropleth map; scenario panel and step
   controls; instrument cluster (Zone 1A TrajectoryView, Zone 1B MDA Alert Panel
-  with drill-in, Zone 1C PMM widget, Zone 1D four-framework composite display);
-  persistent scenario identity header; Mode 3 Active Control (branch-from-snapshot,
-  fiscal multiplier input, live A/B trajectory comparison); multi-country scenario
-  support; delta choropleth; Playwright E2E suite at 1440×900.
+  with persistent-detail [indicator name, floor, negotiation-defensibility label],
+  Zone 1C PMM widget, Zone 1D four-framework composite display with L0 tier
+  annotations); Grounding strip (source-cited initial state at zero interaction);
+  Assumption Surface (active parameter display); persistent scenario identity
+  header; Mode 3 Active Control (branch-from-snapshot, fiscal multiplier input,
+  live A/B trajectory comparison); multi-country scenario support; delta
+  choropleth; Playwright E2E suite at 1440×900.
 
 ---
 
 ## Development Status
 
-**Active pre-release development. Demo 4 delivered 2026-06-11. M13 complete. M14 in active development.**
+**Active pre-release development. Demo 5 delivered 2026-06-20. M14 complete. M15 in active development.**
 
 | Milestone | Status | Version | Description |
 |---|---|---|---|
@@ -146,8 +150,9 @@ The working system at Milestone 13 (core components — not exhaustive):
 | M11 — Engine Investigation and Political Economy | ✅ Complete | [v0.11.0](https://github.com/PublicEnemage/worldsim/releases/tag/v0.11.0) | Matrix engine (ADR-009); PoliticalEconomyModule; non-linear propagation (ADR-011); snapshots/restore |
 | M11.5 — Usability Validation | ✅ Complete | — | Priority A usability sessions (3 personas); universal finding; M12 scope filed |
 | M12 — Active Control and External Sector | ✅ Complete | [v0.12.1](https://github.com/PublicEnemage/worldsim/releases/tag/v0.12.1) | Matrix engine production (ADR-012); ExternalSectorModule; Mode 3 Active Control; Demo 4 |
-| M13 — Political Economy and Instrument Credibility | ✅ Complete | — | ADR-013/ADR-014; political economy module; alert panel Zone 1B; instrument legibility; mode transition UX; Process Redesign Phases 0–D |
-| M14 — Methodology Publication and External Validation | 🔧 In progress | — | Methodology publication; external validation; live external demo (#843); TSC formation |
+| M13 — Political Economy and Instrument Credibility | ✅ Complete | v0.13.0 | ADR-013/ADR-014; political economy module; alert panel Zone 1B persistent-detail; instrument legibility; mode transition UX; Process Redesign Phases 0–D |
+| M14 — Trust Architecture and Instrument Credibility | ✅ Complete | [v0.14.0](https://github.com/PublicEnemage/worldsim/releases/tag/v0.14.0) | ADR-016 (Scenario Grounding Architecture); ADR-015 (Evidence Thread Architecture); PSP in Zone 1D; methodology foundation docs; governance; Demo 5 |
+| M15 — Human Cost Architecture | 🔧 In progress | — | Zone 1A ADR (Phases 2–4); Layer 3 trajectory sentence; cohort disaggregation design; Path 1 approved source; live external demo (#843); accessibility validation |
 
 Full milestone history: [`CHANGELOG.md`](CHANGELOG.md). Live issue tracker:
 [GitHub Milestones](https://github.com/PublicEnemage/worldsim/milestones).

@@ -5,9 +5,9 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-20 (G8 Step 9 COMPLETE — simulated stakeholder session (PR #1081). North star: PASS (conditional). 8 new findings DEMO-122–129. #843 deferred to M15 (EL decision). Docker containers rebuilding with latest code. M14 exit ceremony is next.)**
-**Current milestone:** M14 — Trust Architecture and Instrument Credibility (GitHub Milestone 15)
-**Previous milestone:** M13 — Political Economy and Instrument Credibility (formally closed 2026-06-15; release/m13 → main merged by EL; #264 closed)
+**Last updated: 2026-06-20 (M14 EXIT CEREMONY COMPLETE — Step 1 (open issue audit clean; #968 only); Step 2 (README, CLAUDE.md, roadmap updated); DEMO-122 → #1083, DEMO-127 → #1084 filed. PENDING EL ACTION: merge release/m14 → main, tag v0.14.0, close #968 + GitHub Milestone 15.)**
+**Current milestone:** M15 — Human Cost Architecture (GitHub Milestone 16)
+**Previous milestone:** M14 — Trust Architecture and Instrument Credibility (exit ceremony complete 2026-06-20; pending EL: release/m14 → main merge, v0.14.0 tag, #968 close)
 
 ---
 
@@ -603,10 +603,23 @@ CI hotfix: NM-035 filed; `ci.yml` PR trigger updated to include `release/m*` (PR
 
 ---
 
-## Open Issues — M14 (Trust Architecture and Instrument Credibility)
+## Closed — M14 (Trust Architecture and Instrument Credibility)
 
-**GitHub Milestone:** 15 | **Created:** 2026-06-11 | **Target:** Q2 2027 | **M14 is current milestone**
-*Board trimmed 2026-06-16 — 17 issues moved to M15/M16/M17 per panel deliberation. G6b/G6c added (design-only). #988/#989 filed for G7.*
+**GitHub Milestone:** 15 | **Created:** 2026-06-11 | **Status: EXIT CEREMONY COMPLETE 2026-06-20** | **Pending EL: release/m14 → main merge, v0.14.0 tag, #968 close**
+
+**Exit ceremony disposition summary:**
+- ~~#884~~ — reserve_coverage_months — **CLOSED 2026-06-20** (G6 BPO ACCEPT PR #1045)
+- ~~#885~~ — Exploratory confidence tier — **CLOSED 2026-06-20** (G6 BPO ACCEPT PR #1045)
+- ~~#950~~ — Zone 1A Y axis label — **CLOSED 2026-06-20** (G6 BPO ACCEPT PR #1045)
+- ~~#823~~ — ecological composite denominator — **CLOSED 2026-06-20** (G6 BPO ACCEPT PR #1045)
+- ~~#824~~ — MENA calibration — **CLOSED 2026-06-20** (G6 BPO ACCEPT PR #1045)
+- ~~#989~~ — onboarding docs — **CLOSED 2026-06-20** (G7 BPO ACCEPT PR #1037)
+- ~~#988~~ — Goodhart's Law mitigation — **CLOSED 2026-06-20** (G7 BPO ACCEPT PR #1037)
+- ~~#1055~~ — demo preparation — **CLOSED 2026-06-20** (Step 9 complete)
+- #843 → **MIGRATED M15** (EL decision 2026-06-20; live external participants in M15)
+- #22 → **MIGRATED M16** (M14 delivered tier tag layer; full distributional bands → M16)
+- #6, #3, #1007, #1004, #845 → **MIGRATED M15**
+- #968 — M14 Exit Checklist — **PENDING EL close** (open until EL merges release/m14 → main)
 
 | Issue | Title | Group | Notes |
 |---|---|---|---|
@@ -662,6 +675,8 @@ CI hotfix: NM-035 filed; `ci.yml` PR trigger updated to include `release/m*` (PR
 | #1068 | ux(zone-1a): L0 badge implementation on Zone 1A trajectory curve | IR-004 Path A; Step 6c HIGH |
 | #1069 | ux(grounding-strip): dual reserve values without disambiguation label | IR-005; Step 6c CRITICAL; escalation comment 2026-06-20 |
 | #1075 | ux(zone-1d): PSP self-interpreting sentence absent — political advisor cannot brief without economist mediation | DEMO-099; Step 6c CRITICAL; Filed 2026-06-20 |
+| #1083 | ux(grounding-strip): date label shows 2024-Q1 but IMF WEO April is Q2 | DEMO-122; Step 9 MEDIUM; Filed 2026-06-20 |
+| #1084 | methodology: PSP has no historical calibration anchor accessible from within the tool | DEMO-127; Step 9 MEDIUM; Filed 2026-06-20 |
 
 ---
 
