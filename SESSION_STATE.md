@@ -5,9 +5,9 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-20 (M14 EXIT CEREMONY COMPLETE — Step 1 (open issue audit clean; #968 only); Step 2 (README, CLAUDE.md, roadmap updated); DEMO-122 → #1083, DEMO-127 → #1084 filed. PENDING EL ACTION: merge release/m14 → main, tag v0.14.0, close #968 + GitHub Milestone 15.)**
+**Last updated: 2026-06-20 (M14 EXIT CEREMONY FULLY COMPLETE — release/m14 merged to main (PR #1086); v0.14.0 release published; GitHub Milestone 15 closed. EL pending: upload Demo 5 QuickTime recording to release page. M15 Human Cost Architecture is now active.)**
 **Current milestone:** M15 — Human Cost Architecture (GitHub Milestone 16)
-**Previous milestone:** M14 — Trust Architecture and Instrument Credibility (exit ceremony complete 2026-06-20; pending EL: release/m14 → main merge, v0.14.0 tag, #968 close)
+**Previous milestone:** M14 — Trust Architecture and Instrument Credibility (FORMALLY CLOSED 2026-06-20; release/m14 → main PR #1086; v0.14.0 at https://github.com/PublicEnemage/worldsim/releases/tag/v0.14.0; #968 closed; GitHub Milestone 15 closed)
 
 ---
 
