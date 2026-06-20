@@ -309,7 +309,7 @@ Detailed domain profiles: `docs/agents/domain-intelligence-council.md`
 M0–M13 complete (v0.1.0–v0.12.1+). ADRs 001–014 current.
 See GitHub Releases for full delivery history.
 
-**Milestone 14 — Methodology Publication and External Validation (Current)**
+**Milestone 14 — Trust Architecture and Instrument Credibility (Current)**
 
 *Primary objective (M14 exit gate):*
 - Methodology publication — complete documentation of every model relationship, calibration assumption, and known limitation
@@ -333,7 +333,7 @@ The full roadmap covering M14 and beyond — milestone deliverables, demo anchor
 **Milestone 13 — Political Economy and Instrument Credibility (Complete)**
 Delivered: ADR-013 (political economy module boundary), political economy module (conditionality, elite capture, political feasibility), ADR-014 (alert panel Zone 1B master-detail), instrument legibility (DEMO-059–064), mode transition UX (step preservation), Process Redesign Phases 0–D.
 
-**Milestone 14 — Methodology Publication and External Validation (Current)**
+**Milestone 14 — Trust Architecture and Instrument Credibility (Current)**
 Core deliverable: Methodology publication, external validation by domain experts, live stakeholder demo with real external participants (#843), Technical Steering Committee formation. Demo 5 at M14 close.
 
 Full roadmap: `docs/roadmap/worldsim-roadmap.md`

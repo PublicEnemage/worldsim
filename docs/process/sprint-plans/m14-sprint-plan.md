@@ -1,7 +1,7 @@
 ---
 name: m14-sprint-plan
 type: sprint-plan
-milestone: M14 — Methodology Publication and External Validation
+milestone: M14 — Trust Architecture and Instrument Credibility
 status: EL Approved — implementation may begin (sprint entry document required per group)
 authored-by: PM Agent
 authored-date: 2026-06-16
@@ -14,7 +14,7 @@ consulted-agents:
 sop-reference: docs/process/sprint-planning-sop.md
 ---
 
-# M14 Sprint Plan — Methodology Publication and External Validation
+# M14 Sprint Plan — Trust Architecture and Instrument Credibility
 
 **Status:** EL Approved 2026-06-16 — implementation may begin; sprint entry document required per group before implementation PR opens
 **Release branch:** `release/m14` (cut from `main` 2026-06-16)

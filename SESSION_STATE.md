@@ -6,7 +6,7 @@
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
 **Last updated: 2026-06-20 (G8 honest narration revision COMPLETE — PR #1078. EL decision: accept north star FAIL, retain M15 promises explicitly in narration. North star re-evaluation: PASS (conditional). Step 9 READY — pending EL scheduling of live Demo 5.)**
-**Current milestone:** M14 — Methodology Publication and External Validation (GitHub Milestone 15)
+**Current milestone:** M14 — Trust Architecture and Instrument Credibility (GitHub Milestone 15)
 **Previous milestone:** M13 — Political Economy and Instrument Credibility (formally closed 2026-06-15; release/m13 → main merged by EL; #264 closed)
 
 ---
@@ -599,7 +599,7 @@ CI hotfix: NM-035 filed; `ci.yml` PR trigger updated to include `release/m*` (PR
 
 ---
 
-## Open Issues — M14 (Methodology Publication and External Validation)
+## Open Issues — M14 (Trust Architecture and Instrument Credibility)
 
 **GitHub Milestone:** 15 | **Created:** 2026-06-11 | **Target:** Q2 2027 | **M14 is current milestone**
 *Board trimmed 2026-06-16 — 17 issues moved to M15/M16/M17 per panel deliberation. G6b/G6c added (design-only). #988/#989 filed for G7.*
