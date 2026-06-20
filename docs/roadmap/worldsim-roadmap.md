@@ -1,8 +1,8 @@
 # WorldSim Roadmap
 
-> Last significant revision: 2026-06-16
-> Next mandatory review: Milestone 14 close
-> Updated against: M14 milestone planning panel deliberation 2026-06-16 — M15/M16/M17/M18 defined; demo arc extended through Demo 7; issue allocation confirmed across all four milestones; scope gaps closed (#986 cohort disaggregation, #987 political risk surface, #988 Goodhart's Law, #989 onboarding docs, #990 accessibility validation)
+> Last significant revision: 2026-06-20
+> Next mandatory review: Milestone 15 close
+> Updated against: M14 close 2026-06-20 — Trust Architecture and Instrument Credibility complete; ADR-016/ADR-015 delivered; Demo 5 (Zambia 2024 IMF ECF); #843 deferred to M15; M15 Human Cost Architecture now current
 > Canonical location: `docs/roadmap/worldsim-roadmap.md`
 
 *Note: This document was not updated at M10, M11, M11.5, or M12 close — a gap against the "Roadmap Currency" policy. Updates at those closes are now reflected in the registry and narrative sections.*
@@ -32,8 +32,8 @@
 | M11.5 | Usability Validation and Experience Audit | Priority A usability sessions; universal finding; M12 scope filed | Complete |
 | M12 | Active Control and External Sector | Matrix engine production, ExternalSectorModule (ADR-012), Mode 3, Demo 4 | Complete |
 | M13 | Political Economy and Instrument Credibility | ADR-013, political economy integration, ADR-014 alert panel UX, instrument legibility, mode transition UX, Process Redesign Phases 0–D | Complete |
-| M14 | Methodology Publication and External Validation | Methodology publication, external validation, live demo, TSC formation | Current |
-| M15 | Human Cost Architecture | Zone 1A information architecture (ADR), cohort disaggregation design, political risk surface design, approved-source query (Path 1), accessibility validation | Planned |
+| M14 | Trust Architecture and Instrument Credibility | ADR-016 Grounding strip (source provenance), ADR-015 Evidence thread (Zone 1B credibility), PSP in Zone 1D, methodology foundation docs, Demo 5 | Complete |
+| M15 | Human Cost Architecture | Zone 1A information architecture (ADR), cohort disaggregation design, Layer 3 trajectory sentence, Path 1 approved source, live external demo (#843) | Current |
 | M16 | Distributional Visibility | Demo 6: cohort-level distributional output, 25-year human capital trajectory, uncertainty quantification as bands, ecological transmission, Path 2 data upload | Planned |
 | M17 | Multi-Scenario Infrastructure | Multi-scenario comparison infrastructure (>2 scenarios), dynamic relationship weights, stock vs. flow at scale, entity template library design | Planned |
 | M18 | Comparative Analysis and Full Argument | Demo 7: multi-scenario comparison with distributional overlay, uncertainty bands, full counter-scenario argument at the negotiating table | Planned |
@@ -42,13 +42,11 @@
 
 ## Where We Are
 
-WorldSim v0.12.1+ is released. Fourteen milestones of foundational and delivery work are complete. The simulation engine runs multi-country scenarios with matrix computation. The external sector module enables bilateral trade shocks and commodity price cascades. Mode 3 Active Control lets a finance ministry analyst branch from any simulation step, apply policy instruments, and compare the resulting trajectory against the baseline in real time. All four measurement framework axes are live. The political economy module makes programme survival probability and conditionality dynamics analytically visible. The alert panel (Zone 1B) delivers threshold breach evidence in persistent-detail without interaction. Five historical backtesting cases are validated (Greece, Argentina, Lebanon, Thailand, Ecuador). Demo 4 — a Jordan/Egypt Strait of Hormuz closure scenario — has been presented to stakeholders.
+WorldSim v0.14.0 is released. Fifteen milestones of foundational and delivery work are complete. The simulation engine runs multi-country scenarios with matrix computation. The external sector module enables bilateral trade shocks and commodity price cascades. Mode 3 Active Control lets a finance ministry analyst branch from any simulation step, apply policy instruments, and compare the resulting trajectory against the baseline in real time. All four measurement framework axes are live. The political economy module makes programme survival probability and conditionality dynamics analytically visible. The alert panel (Zone 1B) delivers threshold breach evidence in persistent-detail, with full indicator names and negotiation-defensibility labels, without interaction. The Grounding strip surfaces source-cited initial state provenance at zero interaction. Five historical backtesting cases are validated (Greece, Argentina, Lebanon, Thailand, Ecuador). Demo 5 — a Zambia 2024 IMF ECF programme review — has been delivered; the reserve challenge-response moment demonstrates that a ministry analyst can cite IMF WEO April 2024 provenance in direct response to a creditor challenge, without navigating away from the instrument cluster.
 
-M13 is complete. M14 is the transition from institutional readiness to public availability. The methodology publication makes every model relationship, calibration assumption, and known limitation inspectable. External validation by domain experts outside the project provides independent credibility. The live external demo (#843) is the M14 closure gate — the moment the democratization mission becomes operational rather than aspirational.
+M14 is complete. The trust architecture thesis is proven: WorldSim can be defended under scrutiny. M15 deepens human cost visibility and delivers the first real external participant engagement (#843, deferred from M14). The three questions that drove M14 — source provenance, methodology transparency, and PSP credibility — are now answered at Layer 2. M15 asks: can we make the human cost argument specific enough to change what a minister's team can argue at the table?
 
-The three questions that drove M13 — political feasibility, conditionality design, and medium-term horizon — are now answerable. M14 asks: can we make that answer credible to the world?
-
-M15–M18 are defined and issued-scoped as of 2026-06-16. The roadmap through M18 is directionally committed. The demo arc (Demo 5 through Demo 7) defines the progressive capability story the tool tells to the world across those four milestones.
+M15–M18 are defined and issued-scoped. The roadmap through M18 is directionally committed. The demo arc (Demo 5 delivered; Demo 6 at M16; Demo 7 at M18) defines the progressive capability story the tool tells to the world.
 
 ---
 
@@ -245,56 +243,63 @@ surface: any milestone entry with UNTRACKED items is an open kickoff gate.
 
 ---
 
-### Milestone 14 — Methodology Publication and External Validation *(current)*
+### Milestone 14 — Trust Architecture and Instrument Credibility *(complete)*
 
-**Core deliverable:** WorldSim is ready for institutional adoption. The methodology is published, externally validated, and inspectable by anyone.
+**Core deliverable:** The trust architecture is live. A ministry analyst can defend her inputs and trace the output reasoning to a published methodology.
 
-**Demo 5 story:** *"The minister's team can now defend their inputs and trace the output reasoning to a published methodology."*
+**Demo 5 story:** *"The figure you are challenging is from your institution's own publication."*
 
-**What ships:**
-- ADR-016 implementation — entity selector, data quality preview, grounding strip (source-cited initial state) → G3/G4 (no standalone issue; tracked in sprint plan)
-- ADR-015 implementation — evidence thread, L0 basis annotations, L1 basis statement, L2 evidence chain → G5 (no standalone issue; tracked in sprint plan)
-- Prerequisite bug fixes — entity selector (#961), step counter (#962), choropleth labels (#963) → Issue #961, #962, #963 (horizon:immediate)
-- Calibration and methodology — reserve_coverage_months (#884), Exploratory tier (#885), ecological composite (#823), MENA calibration (#824), Zone 1A Y axis (#950), confidence tier disclosure (#22 — disclosure layer only; full distributional bands → M16) → Issues #884, #885, #823, #824, #950, #22 (horizon:immediate)
-- TSC formation → Issue #3 (horizon:immediate)
-- Branch protection restoration → Issue #6 (horizon:immediate)
-- Goodhart's Law mitigation design — TSC monitoring framework for parameterization gaming risk → Issue #988 (horizon:immediate)
-- Onboarding documentation for global south finance ministry analysts → Issue #989 (horizon:immediate)
-- Zone 1A Phase 1 design thinking (G6c) — UX Designer document gating M15 architecture review → Issue #845 Phase 1 (horizon:immediate)
-- Path 2 design groundwork (G6b) — field mapping UX, USER_SUPPLIED provenance spec, data isolation sketch → Issue #976 design artifacts (horizon:immediate)
-- Live stakeholder demo with real external participants — M14 closure gate → Issue #843 (horizon:immediate)
+**What shipped:**
+- ADR-016 — Scenario Grounding Architecture: entity selector, data quality preview, Grounding strip (source-cited initial state at zero interaction) — G3/G4
+- ADR-015 — Evidence Thread Architecture: Zone 1B full indicator names + negotiation-defensibility labels + floor distance; Zone 1D L0 tier annotations; Assumption Surface; Political Feasibility row — G5
+- Prerequisite bug fixes — entity selector (#961 closed), step counter (#962 closed), choropleth labels (#963 closed) — G1
+- Calibration and methodology: reserve_coverage_months (#884 closed), Exploratory tier (#885 closed), ecological composite denominator (#823 closed), MENA arid-economy calibration (#824 closed), Zone 1A Y axis (#950 closed), confidence tier disclosure layer (#22 partial — full distributional bands → M16)
+- Goodhart's Law mitigation design — TSC monitoring framework (#988 closed)
+- Onboarding documentation for global south finance ministry analysts (#989 closed)
+- Zone 1A Phase 1 design thinking (G6c) — UX Designer document gating M15 architecture review (#845 Phase 1 delivered)
+- Path 2 design groundwork (G6b) — field mapping UX, USER_SUPPLIED provenance spec, data isolation sketch (#976 design artifacts delivered)
+- Demo 5 delivered 2026-06-20 — Zambia 2024 IMF ECF six-step programme review
 
-**Demo:** Demo 5 at M14 close.
+**What M14 did not do (explicitly deferred):**
+- Layer 3 trajectory sentence in Zone 1B (#1065 → M15) — sentence that says "at the current draw rate, the CRITICAL floor is reached within one step"
+- PSP self-interpreting sentence (#1075 → M15) — Zone 1D shows number only; no narrative translation
+- Live external demo with real participants (#843 → M15) — simulated session accepted as M14 closure evidence (EL decision 2026-06-20)
+- Full distributional uncertainty bands (#22 full → M16)
+
+**Demo:** Demo 5 delivered 2026-06-20 (simulated stakeholder session; real external participants in M15 via #843).
 
 **Canonical user primarily served:** Persona 2 (Finance Ministry Negotiator) in Reactive entry state — the trust architecture makes her inputs defensible at the table.
 
-**What M14 does not do:** M14 does not surface cohort disaggregation on the primary viewport (M15 design, M16 implementation). M14 does not ship full distributional uncertainty bands (M16). M14 does not enable multi-scenario comparison (M17/M18).
-
 ---
 
-### Milestone 15 — Human Cost Architecture *(planned)*
+### Milestone 15 — Human Cost Architecture *(current)*
 
-**Core deliverable:** The design and architectural foundation that makes Demo 6 possible. No demo at M15 close — M15 builds what M16 shows.
+**Core deliverable:** Layer 3 self-interpreting output at the table, and the first live engagement with real external participants. M15 makes the human cost argument specific enough to cite and closes the real-world credibility gate deferred from M14.
 
 **What ships:**
+- Layer 3 trajectory sentence in Zone 1B (#1065) — "at the current draw rate, the CRITICAL floor is reached within one step" — deferred from M14
+- PSP self-interpreting sentence in Zone 1D (#1075) — plain-language translation for political advisor without economist mediation — deferred from M14
 - Zone 1A information architecture — Phase 2 (ARCH-REVIEW with DIC) and Phase 3 (ADR) gating M16 distributional implementation → Issue #845 Phases 2–3 (horizon:immediate)
-- Cohort disaggregation design — specifies how bottom-quintile threshold crossings surface in the primary viewport; may be subsumed into Zone 1A ADR → Issue #986 (horizon:immediate)
-- Political risk summary surface design — plain-language legitimacy dynamics for Persona 3; design and any required ADR → Issue #987 (horizon:immediate)
+- Cohort disaggregation design — specifies how bottom-quintile threshold crossings surface in the primary viewport → Issue #986 (horizon:immediate)
+- Political risk summary surface design — plain-language legitimacy dynamics for Persona 3 → Issue #987 (horizon:immediate)
 - Path 1 — user-directed query from approved source network at scenario creation → Issue #975 (horizon:immediate)
 - Information access architecture (RBAC design) — prerequisite for Path 2 data isolation → Issue #53 (horizon:immediate)
-- Zone 1A Y axis and Mode 3 branch comparison values → Issues #950 (if not completed in M14 G6), #846 (horizon:near-term)
+- Live stakeholder demo with real external participants → Issue #843 (horizon:immediate) — deferred from M14 (EL decision 2026-06-20)
+- Accessibility validation on target hardware (8GB/4-core) → Issue #990 (horizon:immediate)
+- Suppress "0 consecutive steps" counter when zero (#1066) → horizon:near-term
+- Dual reserve value disambiguation label in Grounding strip (#1069) → horizon:near-term
+- Grounding strip date label accuracy (#1083 — "Apr 2024" vs "2024-Q1") → horizon:near-term
+- PSP historical calibration anchor (#1084) → horizon:near-term
+- Mode 3 branch comparison values → Issue #846 (horizon:near-term)
 - Threshold-crossing markers in comparative output → Issue #97 (horizon:near-term)
 - Absolute threshold overlay on DeltaChoropleth → Issue #153 (horizon:near-term)
-- Greece backtesting expansion (investment climate initial conditions) → Issue #92 (horizon:near-term)
+- Greece backtesting expansion → Issue #92 (horizon:near-term)
 - Config-driven demo scripts → Issue #837 (horizon:near-term)
-- CTO legibility metrics dashboard → Issue #259 (horizon:near-term)
-- Mode 3 hardware validation (MV-002) → Issue #569 (horizon:near-term)
 - Solo-use review protocol → Issue #951 (horizon:near-term)
-- Accessibility validation on target hardware (8GB/4-core) → Issue #990 (horizon:near-term)
 
-**Demo:** None (M15). Demo 6 at M16.
+**Demo:** Real external participants via #843 at M15 close. Demo 6 at M16.
 
-**Canonical user primarily served:** Persona 4 (Academic Researcher, Amara Diallo) and Persona 2 — M15 is the methodology depth and data access milestone that serves both.
+**Canonical user primarily served:** Persona 5 (Aicha Mbaye, Finance Minister) and Persona 2 (Finance Ministry Negotiator) — M15 closes the self-interpreting output gap and delivers the first real external participant validation.
 
 **What M15 does not do:** M15 does not implement cohort disaggregation or distributional output (M16). M15 does not implement Path 2 proprietary data upload (requires Issue #53 design decisions from M15 before M16 implementation can begin).
 

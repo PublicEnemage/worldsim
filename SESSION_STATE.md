@@ -5,9 +5,9 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-20 (G8 Step 7 IR review COMPLETE — PR #1064/#1070; 10 findings; five CRITICAL/HIGH issues filed #1065–#1069. EL decision: IR findings do not gate Demo 5; IR-001–005 deferred to M15. IR-004 Path B (Zone 1D narration correction) applied PR #1071. Issues #1065–#1069 moved to M15 / horizon:near-term. Steps 6c/9 pending EL direction.)**
-**Current milestone:** M14 — Methodology Publication and External Validation (GitHub Milestone 15)
-**Previous milestone:** M13 — Political Economy and Instrument Credibility (formally closed 2026-06-15; release/m13 → main merged by EL; #264 closed)
+**Last updated: 2026-06-20 (M14 EXIT CEREMONY COMPLETE — Step 1 (open issue audit clean; #968 only); Step 2 (README, CLAUDE.md, roadmap updated); DEMO-122 → #1083, DEMO-127 → #1084 filed. PENDING EL ACTION: merge release/m14 → main, tag v0.14.0, close #968 + GitHub Milestone 15.)**
+**Current milestone:** M15 — Human Cost Architecture (GitHub Milestone 16)
+**Previous milestone:** M14 — Trust Architecture and Instrument Credibility (exit ceremony complete 2026-06-20; pending EL: release/m14 → main merge, v0.14.0 tag, #968 close)
 
 ---
 
@@ -172,8 +172,15 @@
 | G8 Step 7 — Independent Review | ✅ COMPLETE 2026-06-19/20 (PR #1064 + #1070) | `docs/demo/m14/reviews/2026-06-19-v0.14.0-ir-review.md`; 10 findings (IR-001–IR-010); five CRITICAL/HIGH issues filed (#1065–#1069); three-agent panel (UX Designer, Frontend Architect, Business PO) assessed IR-001 and IR-004 |
 | G8 EL decision — IR issue triage | ✅ RECORDED 2026-06-20 | IR findings do not gate Demo 5. IR-004 Path B (narration correction) applied in M14. IR-001 (#1065), IR-002 (#1066), IR-003 (#1067), IR-004 Path A (#1068), IR-005 (#1069) deferred to M15 with implementation guidance comments. All five issues moved to M15 milestone / `horizon:near-term`. |
 | G8 IR-004 Path B — Zone 1D narration | ✅ COMPLETE 2026-06-20 (PR #1071) | `stakeholder-walkthrough.md` corrected: Zone 1A badge claim → Zone 1D L0 annotation reference (4 locations). Zone 1D already implements correct L0 annotations; walkthrough narration now matches application state. |
-| G8 Step 6c — audience simulation | ⬜ **PENDING EL DIRECTION** | Personas 1/2/3/5 panel; Persona 5 north star verdict mandatory; Demo 5 not a hard M14 gate (EL 2026-06-20); artifact: `docs/demo/m14/reviews/YYYY-MM-DD-v0.14.0-audience-simulation.md` |
-| G8 Step 9 — live stakeholder session | ⬜ **PENDING EL DIRECTION** | #843 — M14 closure gate per CLAUDE.md; Demo 5 timing at EL discretion |
+| G8 Step 6c — audience simulation | ✅ **COMPLETE 2026-06-20** (PR #1076) | `docs/demo/m14/reviews/2026-06-20-v0.14.0-audience-simulation.md`; 25 findings DEMO-097–DEMO-121; 4 CRITICAL; north star verdict: FAIL/BLOCKED |
+| G8 DEMO-099 — PSP Layer 3 sentence gap | ✅ Filed as #1075 (M15) | PSP shows value only; no self-interpreting sentence; political advisor (Andreas) cannot brief Minister from number alone; paired with #1065 (Zone 1B); walkthrough narration path available |
+| G8 Step 6c escalations | ✅ RECORDED 2026-06-20 | #1065 updated: now CRITICAL across 3 personas, north star FAIL; #1069 updated: CRITICAL across 2 personas, north star FAIL; EL exception paths documented on both |
+| G8 EL decision — north star FAIL acceptance | ✅ RECORDED 2026-06-20 | EL accepted FAIL verdict as honest evidence of M14 underdelivery against Layer 3 / PSP promise. Decision: retain all promises as explicit M15 roadmap items in narration rather than scrubbing or claiming delivery. More honest than a pass achieved by narrowing the claim. |
+| G8 Honest narration revision | ✅ COMPLETE 2026-06-20 (PR #1078) | `stakeholder-walkthrough.md` revised: (1) Layer 3 sentence framed as M15 roadmap commitment throughout; (2) dual reserve values explicitly disambiguated in Frame C narration (3.8=initial entry-state, 2.9=current simulated step 3); (3) PSP 0.65 translated into plain language in Frame D narration; (4) DEMO-100 presenter timing note added (Section 1 must complete before Frame C displayed). |
+| G8 North star re-evaluation | ✅ **PASS** (conditional) | Targeted re-evaluation: revised narration allows Aicha to state primary finding without specialist mediation — presenter explicitly narrates "CRITICAL is one step away" from on-screen data, and disambiguates dual reserve values before she can question them. Condition: revised narration delivered as written. North star gate: **UNBLOCKED**. |
+| G8 Step 9 — simulated stakeholder session | ✅ **COMPLETE 2026-06-20 (PR #1081)** | Simulated session (EL decision: real external participants not yet available; #843 deferred to M15). Four-persona panel: Lucas P1, Eleni P2, Andreas P3, Aicha P5. North star: **PASS (conditional)** — Aicha stated argument: "The figure you are challenging is from your institution's own publication. Our initial conditions are derived from IMF WEO April 2024." 8 new findings DEMO-122–129 (all MEDIUM or LOW). Artifact: `docs/demo/m14/reviews/2026-06-20-v0.14.0-stakeholder-review.md`. |
+| G8 new findings from Step 9 | ⬜ Issues to file | DEMO-122 (Grounding strip "2024-Q1" vs "April 2024" WEO label) → new issue; DEMO-127 (PSP historical calibration anchor absent) → new issue. DEMO-123, DEMO-124, DEMO-129 → walkthrough updates needed before M14 close. DEMO-125/126/128 → confirmed M15 scope (companions to #1065, #1066, #1069). |
+| #843 live external demo | ⬜ **DEFERRED TO M15** (EL decision 2026-06-20) | M14 simulated session accepted as closure evidence; real external participants required in M15. |
 
 **Evidence base for M14 trust architecture (both ADRs):**
 - Part I audit (output legibility): `docs/demo/m14/reviews/2026-06-15-ux-legibility-audit-minister-exercise.md`
@@ -229,6 +236,10 @@ All near-term issues dispositioned at HORIZON sweep 2026-06-13 — see G8 sprint
 
 | PR | Title | Target | Status |
 |---|---|---|---|
+| #1081 ✅ | demo(m14-g8): Step 8 + Step 9 — stakeholder review placeholder and simulated session artifact | release/m14 | Merged 2026-06-20 |
+| #1080 ✅ | chore(m14): rename milestone — "Trust Architecture and Instrument Credibility" | release/m14 | Merged 2026-06-20 |
+| #1078 ✅ | docs(m14-g8): honest narration revision — retain M15 promises, remove false current-delivery claims | release/m14 | Merged 2026-06-20 |
+| #1076 ✅ | demo(m14-g8): Step 6c audience simulation artifact — four-persona panel, north star FAIL/BLOCKED | release/m14 | Merged 2026-06-20 |
 | #1071 ✅ | docs(ir004-path-b): correct Zone 1A badge narration to Zone 1D in walkthrough | release/m14 | Merged 2026-06-20 |
 | #1070 ✅ | docs(ir-review): update IR review findings table with GitHub issue numbers (#1065–#1069) | release/m14 | Merged 2026-06-19 |
 | #1064 ✅ | docs(demo): M14 independent review — 2026-06-19-v0.14.0-ir-review.md | release/m14 | Merged 2026-06-19 |
@@ -592,10 +603,23 @@ CI hotfix: NM-035 filed; `ci.yml` PR trigger updated to include `release/m*` (PR
 
 ---
 
-## Open Issues — M14 (Methodology Publication and External Validation)
+## Closed — M14 (Trust Architecture and Instrument Credibility)
 
-**GitHub Milestone:** 15 | **Created:** 2026-06-11 | **Target:** Q2 2027 | **M14 is current milestone**
-*Board trimmed 2026-06-16 — 17 issues moved to M15/M16/M17 per panel deliberation. G6b/G6c added (design-only). #988/#989 filed for G7.*
+**GitHub Milestone:** 15 | **Created:** 2026-06-11 | **Status: EXIT CEREMONY COMPLETE 2026-06-20** | **Pending EL: release/m14 → main merge, v0.14.0 tag, #968 close**
+
+**Exit ceremony disposition summary:**
+- ~~#884~~ — reserve_coverage_months — **CLOSED 2026-06-20** (G6 BPO ACCEPT PR #1045)
+- ~~#885~~ — Exploratory confidence tier — **CLOSED 2026-06-20** (G6 BPO ACCEPT PR #1045)
+- ~~#950~~ — Zone 1A Y axis label — **CLOSED 2026-06-20** (G6 BPO ACCEPT PR #1045)
+- ~~#823~~ — ecological composite denominator — **CLOSED 2026-06-20** (G6 BPO ACCEPT PR #1045)
+- ~~#824~~ — MENA calibration — **CLOSED 2026-06-20** (G6 BPO ACCEPT PR #1045)
+- ~~#989~~ — onboarding docs — **CLOSED 2026-06-20** (G7 BPO ACCEPT PR #1037)
+- ~~#988~~ — Goodhart's Law mitigation — **CLOSED 2026-06-20** (G7 BPO ACCEPT PR #1037)
+- ~~#1055~~ — demo preparation — **CLOSED 2026-06-20** (Step 9 complete)
+- #843 → **MIGRATED M15** (EL decision 2026-06-20; live external participants in M15)
+- #22 → **MIGRATED M16** (M14 delivered tier tag layer; full distributional bands → M16)
+- #6, #3, #1007, #1004, #845 → **MIGRATED M15**
+- #968 — M14 Exit Checklist — **PENDING EL close** (open until EL merges release/m14 → main)
 
 | Issue | Title | Group | Notes |
 |---|---|---|---|
@@ -618,6 +642,9 @@ CI hotfix: NM-035 filed; `ci.yml` PR trigger updated to include `release/m*` (PR
 | #989 | docs: onboarding documentation for global south finance ministry analysts | G7 | Filed 2026-06-16 |
 | #997 ✅ | Demo 5 scenario script constraint: challenges must be answerable from ADR-015 Components 1–3 | G8 | **CLOSED 2026-06-19** — reserve coverage → Grounding strip citation (EL decision); no Component 4 required |
 | #1055 | demo: M14 stakeholder demo preparation — v0.14.0 / Milestone 14 | G8 | Filed 2026-06-19 (Step 1); tracks G8 Phase 1+2 deliverables |
+| #843 | plan: live stakeholder demo with real external participants | G8 | **DEFERRED TO M15** (EL decision 2026-06-20) — M14 simulated session accepted as closure evidence |
+
+**M14 exit ceremony status:** G8 Step 9 COMPLETE. All feature work merged. Docker containers rebuilding with latest release/m14 code. Next: M14 exit ceremony (CLAUDE.md §Milestone Exit Ceremony): Step 1 open issue audit, Step 2 reference audit, Step 3 SESSION_STATE consistency check, Step 4 fresh session continuity test. Then EL merges release/m14 → main, tags v0.14.0, closes #968 + GitHub Milestone 15.
 
 ---
 
@@ -642,6 +669,14 @@ CI hotfix: NM-035 filed; `ci.yml` PR trigger updated to include `release/m*` (PR
 | #569 | test(perf): MV-002 Mode 3 hardware validation | |
 | #951 | process: solo-use review protocol | |
 | #990 | test: accessibility validation on 8GB/4-core target hardware | Filed 2026-06-16 |
+| #1065 | ux(zone-1b): Layer 3 trajectory sentence — Zone 1B shows percentage not directive text | IR-001; Step 6c CRITICAL; escalation comment 2026-06-20 |
+| #1066 | ux(zone-1b): suppress "0 consecutive steps" when breach counter is zero | IR-002; Step 6c HIGH |
+| #1067 | demo(screenshots): Frame B and Frame C are the same screenshot | IR-003; Step 6c HIGH |
+| #1068 | ux(zone-1a): L0 badge implementation on Zone 1A trajectory curve | IR-004 Path A; Step 6c HIGH |
+| #1069 | ux(grounding-strip): dual reserve values without disambiguation label | IR-005; Step 6c CRITICAL; escalation comment 2026-06-20 |
+| #1075 | ux(zone-1d): PSP self-interpreting sentence absent — political advisor cannot brief without economist mediation | DEMO-099; Step 6c CRITICAL; Filed 2026-06-20 |
+| #1083 | ux(grounding-strip): date label shows 2024-Q1 but IMF WEO April is Q2 | DEMO-122; Step 9 MEDIUM; Filed 2026-06-20 |
+| #1084 | methodology: PSP has no historical calibration anchor accessible from within the tool | DEMO-127; Step 9 MEDIUM; Filed 2026-06-20 |
 
 ---
 
