@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-19 (G8 demo cycle Steps 5b/6/6b complete — legibility 10/10 PASS; five screenshots PR #1058; nine-agent internal review + walkthrough fixes PR #1060. Four blocking narration errors corrected (DEMO5-001–004). Steps 7/6c/9 gated on EL.)**
+**Last updated: 2026-06-20 (G8 Step 7 IR review COMPLETE — PR #1064/#1070; 10 findings; five CRITICAL/HIGH issues filed #1065–#1069. EL decision: IR findings do not gate Demo 5; IR-001–005 deferred to M15. IR-004 Path B (Zone 1D narration correction) applied PR #1071. Issues #1065–#1069 moved to M15 / horizon:near-term. Steps 6c/9 pending EL direction.)**
 **Current milestone:** M14 — Methodology Publication and External Validation (GitHub Milestone 15)
 **Previous milestone:** M13 — Political Economy and Instrument Credibility (formally closed 2026-06-15; release/m13 → main merged by EL; #264 closed)
 
@@ -169,7 +169,11 @@
 | G8 Step 5c — NARRATION-RULING-1 | ✅ PASS 2026-06-19 | All 5 presentation steps: Umbrella + Synthesis + Transition verified |
 | G8 Step 6 — screenshot capture | ✅ COMPLETE 2026-06-19 (PR #1058) | Five frames captured; Round 3 spec fixes (ecological disabled, democratic_quality_score=0.80 to reserve top alert slot); Reserve WARNING Current 2.908 / Floor 2.500 visible in Zone 1B detail slot |
 | G8 Step 6b — internal nine-agent review | ✅ COMPLETE 2026-06-19 (PR #1060) | `docs/demo/m14/reviews/2026-06-19-v0.14.0-internal-review.md`; 8 findings; 4 CRITICAL/HIGH blocking walkthrough errors corrected in same PR; Issue #1059 filed (HCL narration M15 scope) |
-| G8 Steps 7/6c/9 — IR + audience sim + live session | ⬜ **GATED: EL merge `release/m14` → `main`** | IR review (fresh instance); Personas 1/2/3/5 audience simulation; live session with real participants (#843) |
+| G8 Step 7 — Independent Review | ✅ COMPLETE 2026-06-19/20 (PR #1064 + #1070) | `docs/demo/m14/reviews/2026-06-19-v0.14.0-ir-review.md`; 10 findings (IR-001–IR-010); five CRITICAL/HIGH issues filed (#1065–#1069); three-agent panel (UX Designer, Frontend Architect, Business PO) assessed IR-001 and IR-004 |
+| G8 EL decision — IR issue triage | ✅ RECORDED 2026-06-20 | IR findings do not gate Demo 5. IR-004 Path B (narration correction) applied in M14. IR-001 (#1065), IR-002 (#1066), IR-003 (#1067), IR-004 Path A (#1068), IR-005 (#1069) deferred to M15 with implementation guidance comments. All five issues moved to M15 milestone / `horizon:near-term`. |
+| G8 IR-004 Path B — Zone 1D narration | ✅ COMPLETE 2026-06-20 (PR #1071) | `stakeholder-walkthrough.md` corrected: Zone 1A badge claim → Zone 1D L0 annotation reference (4 locations). Zone 1D already implements correct L0 annotations; walkthrough narration now matches application state. |
+| G8 Step 6c — audience simulation | ⬜ **PENDING EL DIRECTION** | Personas 1/2/3/5 panel; Persona 5 north star verdict mandatory; Demo 5 not a hard M14 gate (EL 2026-06-20); artifact: `docs/demo/m14/reviews/YYYY-MM-DD-v0.14.0-audience-simulation.md` |
+| G8 Step 9 — live stakeholder session | ⬜ **PENDING EL DIRECTION** | #843 — M14 closure gate per CLAUDE.md; Demo 5 timing at EL discretion |
 
 **Evidence base for M14 trust architecture (both ADRs):**
 - Part I audit (output legibility): `docs/demo/m14/reviews/2026-06-15-ux-legibility-audit-minister-exercise.md`
@@ -225,6 +229,9 @@ All near-term issues dispositioned at HORIZON sweep 2026-06-13 — see G8 sprint
 
 | PR | Title | Target | Status |
 |---|---|---|---|
+| #1071 ✅ | docs(ir004-path-b): correct Zone 1A badge narration to Zone 1D in walkthrough | release/m14 | Merged 2026-06-20 |
+| #1070 ✅ | docs(ir-review): update IR review findings table with GitHub issue numbers (#1065–#1069) | release/m14 | Merged 2026-06-19 |
+| #1064 ✅ | docs(demo): M14 independent review — 2026-06-19-v0.14.0-ir-review.md | release/m14 | Merged 2026-06-19 |
 | #1060 ✅ | docs(demo): M14 Demo 5 internal review + walkthrough corrections (DEMO5-001—007) | release/m14 | Merged 2026-06-19 |
 | #1058 ✅ | feat(demo): Round 3 spec fixes — reserve floor visible in Zone 1B detail slot | release/m14 | Merged 2026-06-19 |
 | #1057 ✅ | chore(state): G8 Phase 1 demo prep complete — Steps 2–5 merged PR #1056 | release/m14 | Merged 2026-06-19 |
