@@ -31,10 +31,15 @@ Three things are live for the first time:
 2. **ADR-015 Evidence thread** — L0 basis annotations (tier badges and source labels)
    are visible in Zone 1D at zero interaction — each framework score shows its data tier
    and source directly below the value. Zone 1B persistent-detail now shows the
-   indicator name (not a raw database field name), human-readable tier label, and a
-   Layer 3 self-interpreting sentence: not just the value, but what the value means and
-   what threshold it is approaching. The L1 assumption surface makes all inputs visible
-   with their tier annotations from the instrument cluster.
+   indicator name (not a raw database field name), the current value against the floor,
+   a human-readable negotiation-defensibility label, and percentage distance above the
+   threshold. The L1 assumption surface makes all inputs visible with their tier
+   annotations from the instrument cluster.
+
+   **M15 roadmap item:** Zone 1B's next addition is the full self-interpreting trajectory
+   sentence — "at the current draw rate, the CRITICAL floor is reached within one step" —
+   the Layer 3 output that names what the number means and what happens next. The
+   architecture is built for it; the sentence itself ships in M15.
 
 3. **Political economy module: programme survival probability (PSP)** — Zone 1D now
    shows a fifth readout alongside the four composites: `programme_survival_probability`.
@@ -44,9 +49,11 @@ Three things are live for the first time:
    now visible on the same instrument simultaneously.
 
 **Architecture change from M12:** Demo 5 is single-entity (ZMB only). No Mode 3 in Demo 5
-scope (EL decision 2026-06-19). Zone 1B persistent-detail now carries the full Layer 3
-output — the alert slot does not require interaction. The demonstration's thesis moment is
-a challenge-response at the IMF ECF review table, not a counter-proposal branch.
+scope (EL decision 2026-06-19). Zone 1B persistent-detail now carries the indicator name,
+current value against floor, and negotiation-defensibility label — the alert slot does not
+require interaction. The full Layer 3 trajectory sentence is the M15 addition. The
+demonstration's thesis moment is a challenge-response at the IMF ECF review table, not a
+counter-proposal branch.
 
 ### EL Scenario Design Decisions (Recorded 2026-06-19)
 
@@ -195,21 +202,27 @@ shows..." The instruments carry the argument.
 **What the audience sees:** Step 3. Year 2026. The food price shock has compounded
 across two steps. Reserve coverage is now 2.9 months — in the WARNING zone (below the
 3.0-month threshold, approaching the 2.5-month CRITICAL floor). Zone 1B persistent-detail
-shows the reserve coverage alert with full Layer 3 output: indicator name ("Reserve
-Coverage (months)"), current value (2.9), floor (2.500), negotiation-defensibility label
-("Moderate confidence — cite with caveat"), and the self-interpreting sentence. The
-Grounding strip is simultaneously visible, showing the initial 3.8-month figure with its
-source citation (IMF WEO Apr 2024, T2).
+shows: indicator name ("Reserve Coverage (months)"), current value (2.9), floor (2.500),
+negotiation-defensibility label ("Moderate confidence — cite with caveat"), and percentage
+distance above floor ("16.3% above floor at step 3"). The Grounding strip is simultaneously
+visible, showing the **initial** 3.8-month entry-state value with its source citation
+(IMF WEO Apr 2024, T2).
 
-Note on two distinct display elements:
-- **Grounding strip:** Shows initial input provenance — "T2 · IMF WEO Apr 2024" for the
-  3.8-month starting value. This is the citation that answers the creditor's challenge.
-- **Zone 1B alert:** Shows the negotiation-defensibility label for the computed trajectory
-  value — "Moderate confidence — cite with caveat." This is T3 (the computed step-3
-  reserve value incorporates T3 food import dependency data). The T2 initial input is
-  visible in the Grounding strip; the T3 computed output is labeled in Zone 1B.
+**Two distinct values are visible simultaneously — both correct:**
+- **Grounding strip, 3.8 months:** The initial reserve coverage at scenario entry (step 1,
+  2024), sourced from IMF WEO Apr 2024. This is the provenance citation that answers
+  "where does your 3.8 figure come from?" It does not change as the simulation advances.
+- **Zone 1B, 2.9 months:** The computed reserve coverage at step 3 (2026), after two
+  steps of food price shock drawdown. This is the current simulated state.
 
-The No False Precision principle: both displays are honest about what they are showing.
+These are not competing numbers — they are two points on the same trajectory. The presenter
+must distinguish them explicitly in narration. See revised script below.
+
+**Presenter timing note (DEMO-100):** Section 1 narration must be fully delivered before
+Frame C appears on screen. Do not project Frame C while narrating "The Room." Keep the
+display on the title slide until the final sentence of Section 1 — "Today we are going
+to show you what that moment looks like when the ministry team has the right tool" — then
+advance to Frame C.
 
 **What the presenter says:**
 
@@ -233,15 +246,30 @@ The No False Precision principle: both displays are honest about what they are s
 
 > Zone 1B — the alert panel — shows: Reserve Coverage (months). Current value: 2.9
 > months. Floor: 2.5 months. The negotiation-defensibility label: Moderate confidence
-> — cite with caveat. The self-interpreting sentence: at the current draw rate, the
-> CRITICAL floor is one step away.
+> — cite with caveat.
 >
-> The indicator name is readable — not a database field. The tier is readable — not a
-> raw number. The direction of risk is named. The self-interpreting sentence tells you
-> what the number means, not just what it is.
+> One thing to name explicitly: two reserve numbers are on screen at once. The Grounding
+> strip shows 3.8 months — that is the initial value at programme entry, sourced from
+> IMF WEO April 2024. That is the number the creditor challenged. Zone 1B shows 2.9
+> months — that is the current simulated state at step three, after two years of food
+> price shock. They are not in conflict. They are two points on the same trajectory:
+> where we started, and where we are.
 >
-> That is a Layer 3 output. In aviation, the instrument tells you what to do with the
-> reading, not just what the gauge shows. This instrument does the same.
+> The indicator name is readable — not a database field. The floor is named. The
+> direction of risk is clear: 16.3% above the CRITICAL floor, in the WARNING zone,
+> moving down.
+>
+> At this step, the analysis tells us: reserve coverage is at 2.9 months, 0.4 months
+> above the CRITICAL floor of 2.5. At the draw rate the food price shock has set,
+> CRITICAL is one step away. That is what the numbers on screen add up to — and in
+> M15, Zone 1B will state that conclusion directly, as a sentence: "at the current draw
+> rate, the CRITICAL floor is reached within one step." That is the Layer 3 output we
+> are building toward. The architecture that makes it possible is live today. The
+> sentence itself ships in M15.
+>
+> In aviation, the instrument tells you what to do with the reading, not just what the
+> gauge shows. M14 gives you the gauge — the indicator, the floor, the direction, the
+> source. M15 makes it speak.
 
 **Cognitive purpose:** Land the thesis. The challenge-response moment is resolved
 before the audience has time to ask whether it would be. The simultaneous visibility
@@ -257,15 +285,21 @@ of Zone 1B and the Grounding strip is the key composition.
 >
 > In M12, that slot showed a tier badge and a raw threshold value. In M14, it shows
 > four things: the indicator name in plain language, the negotiation-defensibility label,
-> the current value against the floor, and the Layer 3 sentence.
+> the current value against the floor, and the percentage distance.
 >
-> The Layer 3 sentence is not "reserve coverage is low." It is: at the current draw
-> rate, the CRITICAL floor — 2.5 months — is reached within one step. That sentence is
-> specific enough to put in a briefing note. The minister can hand it to the negotiating
-> team verbatim.
+> That is the M14 delivery. The M15 addition is the Layer 3 trajectory sentence: at the
+> current draw rate, the CRITICAL floor — 2.5 months — is reached within one step. That
+> sentence is specific enough to put in a briefing note. The architecture to generate
+> and display it is here. The sentence itself is the next roadmap item.
+>
+> What the ministry team can argue from what is on screen today: reserve coverage is in
+> the WARNING zone, the CRITICAL floor is 2.5 months, and the trajectory is downward.
+> What M15 adds is having the instrument state that conclusion explicitly, without the
+> analyst having to narrate it.
 >
 > This is the difference between a tool that displays data and a tool that builds
-> analytical standing.
+> analytical standing. M14 shows the data with source and defensibility label. M15
+> makes the instrument draw the conclusion.
 
 ---
 
@@ -274,14 +308,14 @@ of Zone 1B and the Grounding strip is the key composition.
 **What the audience sees:** Step 3. Zone 1D showing four composites plus PSP
 (`programme_survival_probability`). Zone 1B showing the reserve WARNING alert
 (current 2.9 months / floor 2.5 months / "Moderate confidence — cite with caveat" /
-"CRITICAL floor is one step away"). Zone 1A showing the full arc from step 1.
+"16.3% above floor at step 3"). Zone 1A showing the full arc from step 1.
 The Grounding strip is now closed so Zone 1D is unobstructed.
 
 **What the presenter says:**
 
 > Step three. Year 2026. Reserve coverage is in the WARNING zone — 2.9 months,
-> with the 2.5-month CRITICAL floor one step away. The instrument names this: "at the
-> current draw rate, the CRITICAL floor is reached in one step."
+> 0.4 months above the 2.5-month CRITICAL floor. At the draw rate the food price shock
+> has set, CRITICAL is one step away.
 >
 > Look at Zone 1D — the four-framework overview. There is a fifth readout: programme
 > survival probability.
@@ -292,14 +326,23 @@ The Grounding strip is now closed so Zone 1D is unobstructed.
 > implemented? Not whether the programme is approved. Whether the government can deliver
 > what the approval requires.
 >
-> Reserve stress and programme viability are related — a government with depleting
-> reserves under conditionality is a government under compounding pressure. But they are
-> not the same constraint. The financial composite measures what the trajectory does to
-> financial sustainability. The PSP measures whether the political system can execute
-> the path.
+> The value you are seeing is approximately 0.65. In plain terms: at this level of
+> fiscal pressure and governance quality, the model assesses the programme's
+> conditionality terms as carrying meaningful political execution risk — not a breakdown,
+> but an active constraint running alongside the financial one. A programme with high
+> reserve stress and moderate political execution risk is a programme under compounding
+> pressure on two dimensions simultaneously.
 >
-> Both are now visible in the same instrument cluster, at the same step, in the same
-> moment the minister is looking at the screen.
+> In M15, Zone 1D will add the same Layer 3 treatment to PSP that Zone 1B is building
+> toward for financial indicators — a plain-language sentence that translates the number
+> into a political brief without requiring economist mediation. That is the next roadmap
+> item for the political economy module.
+>
+> Reserve stress and programme viability are related but distinct constraints. The
+> financial composite measures what the trajectory does to financial sustainability.
+> The PSP measures whether the political system can execute the path. Both are now
+> visible in the same instrument cluster, at the same step, in the same moment the
+> minister is looking at the screen.
 >
 > For the first time.
 
@@ -314,8 +357,9 @@ the political economy module's assessment of implementation capacity."
 
 **Key narration note on alert status at step 3:** Zone 1B shows WARNING (not CRITICAL)
 at step 3. Reserve = 2.9 months; CRITICAL floor = 2.5 months; WARNING zone = below 3.0.
-The instrument's Layer 3 sentence already names this: "CRITICAL floor is one step away."
-Do not narrate CRITICAL until the audience reaches step 4 (year 2027).
+The presenter narrates "CRITICAL is one step away" — this is the presenter's analysis
+of the on-screen data, not a sentence rendered by the application. Do not narrate
+CRITICAL until the audience reaches step 4 (year 2027).
 
 ---
 
@@ -440,8 +484,10 @@ team with three economists can defend every number without specialist mediation.
 >
 > **The trust architecture:** ADR-016 Grounding strip brings source provenance to every
 > initial state input. ADR-015 Evidence thread makes the chain from source to output
-> traceable and visible. Zone 1B is Layer 3 — it tells you what the number means,
-> not just what it is.
+> traceable and visible. Zone 1B now shows the indicator name, the floor, and the
+> negotiation-defensibility label — the scaffolding for full Layer 3 output. The
+> trajectory sentence that tells you what to do with the reading is the M15 addition
+> the architecture is designed to receive.
 >
 > **The political economy module:** Programme survival probability is live in Zone 1D.
 > The political feasibility question and the financial trajectory question are on the
