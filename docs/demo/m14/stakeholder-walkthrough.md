@@ -29,7 +29,8 @@ Three things are live for the first time:
    specialist. This is the trust architecture the challenge-response moment requires.
 
 2. **ADR-015 Evidence thread** — L0 basis annotations (tier badges and source labels)
-   appear inline on Zone 1A trajectory curves. Zone 1B persistent-detail now shows the
+   are visible in Zone 1D at zero interaction — each framework score shows its data tier
+   and source directly below the value. Zone 1B persistent-detail now shows the
    indicator name (not a raw database field name), human-readable tier label, and a
    Layer 3 self-interpreting sentence: not just the value, but what the value means and
    what threshold it is approaching. The L1 assumption surface makes all inputs visible
@@ -156,8 +157,9 @@ lives. Do NOT narrate the choropleth as the analytical instrument (UX-RULING-4).
 **What the audience sees:** ZMB at step 1. Four composite scores live. The Grounding
 strip in the scenario parameters area shows: financial T2 (IMF WEO Apr 2024), human
 development T2 (World Bank WDI 2023), ecological T4 (Synthetic extrapolation),
-governance T4 (Synthetic extrapolation). Zone 1A shows the reserve trajectory with
-a T2 basis annotation on the curve.
+governance T4 (Synthetic extrapolation). Zone 1A shows the reserve trajectory.
+Zone 1D shows the four-framework scores, each with an L0 tier annotation always
+visible: Financial T2 (IMF WEO Apr 2024).
 
 **What the presenter says:**
 
@@ -172,9 +174,9 @@ a T2 basis annotation on the curve.
 > That is on the screen. No drawer to open. No panel to navigate. It is the first
 > thing the analyst sees when the scenario loads.
 >
-> Notice the trajectory view above the map. The reserve curve has a small badge: T2.
-> That badge is the L0 basis annotation — the source and tier directly on the
-> instrument, not behind a click.
+> Notice Zone 1D — the four-framework panel. Each framework score shows its tier
+> annotation directly: T2 for the financial dimension, citing the IMF World Economic
+> Outlook. That annotation is always visible at zero interaction.
 >
 > The trust architecture is not a footnote. It is structural.
 
@@ -628,7 +630,7 @@ Captured to `docs/demo/m14/screenshots/` via `demo-narrated.spec.ts`.
 | Presentation order | File | Step | Zone 1 focus | Caption |
 |---|---|---|---|---|
 | 1 — THESIS | `frame-c-citation-at-table.png` | 3 / 6 | Zone 1B WARNING + Grounding strip simultaneously visible | Reserve coverage challenge-response at step 3 (2026). Grounding strip cites T2 · IMF WEO Apr 2024. Zone 1B shows "Moderate confidence — cite with caveat." |
-| 2 | `frame-a-grounding-strip.png` | 1 / 6 | Zone 1A L0 annotation + Grounding strip | Zambia at program entry: source, tier, date visible before analysis begins |
+| 2 | `frame-a-grounding-strip.png` | 1 / 6 | Zone 1D L0 annotation + Grounding strip | Zambia at program entry: source, tier, date visible before analysis begins |
 | 3 | `frame-b-zone1b-reserve.png` | 3 / 6 | Zone 1B Layer 3 persistent-detail | Self-interpreting reserve WARNING alert: current 2.9 / floor 2.5 / "CRITICAL floor is one step away" |
 | 4 | `frame-d-political-feasibility.png` | 3 / 6 | Zone 1D: PSP alongside four composites | Programme survival probability live — financial and political constraints on same instrument |
 | 5 | `frame-e-evidence-thread.png` | 5 / 6 | Full instrument cluster: complete arc | Five-step trajectory, all sources named, evidence thread complete |
