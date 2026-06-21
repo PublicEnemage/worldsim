@@ -5,9 +5,90 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-20 (M14 EXIT CEREMONY FULLY COMPLETE — release/m14 merged to main (PR #1086); v0.14.0 release published; GitHub Milestone 15 closed. EL pending: upload Demo 5 QuickTime recording to release page. M15 Human Cost Architecture is now active.)**
+**Last updated: 2026-06-20 (HORIZON sweep complete — M15 sprint plan filed; release/m15 cut; ARCH-011/ADR-017 entered in backlog; four M15 issues filed (#1088–#1091); insights log entry 6 promoted. HARD STOP: EL approval of m15-sprint-plan.md required before any G-group sprint entry document can be filed.)**
 **Current milestone:** M15 — Human Cost Architecture (GitHub Milestone 16)
 **Previous milestone:** M14 — Trust Architecture and Instrument Credibility (FORMALLY CLOSED 2026-06-20; release/m14 → main PR #1086; v0.14.0 at https://github.com/PublicEnemage/worldsim/releases/tag/v0.14.0; #968 closed; GitHub Milestone 15 closed)
+
+---
+
+## M15 Kickoff Prerequisites
+
+**Release branch:** `release/m15` — ✅ cut from `main` 2026-06-20 (commit 500e50d)
+**Sprint plan:** ✅ filed 2026-06-20 — `docs/process/sprint-plans/m15-sprint-plan.md` (PR pending EL approval)
+
+| Step | Status | Notes |
+|---|---|---|
+| 1. PM Agent cuts `release/m15` from `main` | ✅ DONE 2026-06-20 | `release/m15` at 500e50d |
+| 2. PM Agent authors `m15-sprint-plan.md` | ✅ DONE 2026-06-20 | Filed in PR opening; EL approval pending |
+| 3. EL approves sprint plan | ⬜ **NEXT REQUIRED ACTION** | Hard stop — no sprint entry docs until approved |
+| 4. PM Agent marks ARCH-011 ASSIGNED in backlog | ⬜ At ADR-017 claim time | Added as PENDING_NUMBER; Architect claims when drafting begins |
+| 5. M15 exit checklist issue #984 confirmed | ⬜ EL to confirm | Note: title reads "Milestone 16 Exit Checklist" (GitHub milestone numbering); content is correct |
+
+**HARD STOP:** No implementation PR may open against `release/m15` until the EL has approved the sprint plan.
+
+---
+
+## HORIZON Sweep — 2026-06-20
+
+**Open issues reviewed:** 1 (insights log entry 6 — CLAUDE.md structure)
+**Disposition:**
+- Entry 6 (2026-06-16, CLAUDE.md refactor): **promoted → #1091** — M14 has closed; deferral condition met; issue filed for M15 scope
+- All other entries: previously promoted/resolved; no change
+
+**New issues filed this sweep:**
+| Issue | Title | Trigger |
+|---|---|---|
+| #1088 | docs(demo): walkthrough update — "0 consecutive steps" plain-language (DEMO-123) | Slipped M14 close; required before #843 |
+| #1089 | docs(demo): walkthrough update — Grounding strip persistence note (DEMO-124) | Slipped M14 close; required before #843 |
+| #1090 | docs(demo): walkthrough update — methodology documentation URL (DEMO-129) | Slipped M14 close; required before #843 |
+| #1091 | docs(claude-md): extract Lifecycle/Exit/DIC sections to child docs | Promoted from insights log entry 6 |
+
+**Process gaps identified:**
+- DEMO-123/124/129 walkthrough updates were due "before M14 close" per stakeholder review (session table row 182) but slipped. Filed as M15 issues above. Not a near-miss requiring NM entry — the M14 exit ceremony closed with EL acceptance; these are incremental improvements to walkthrough narration, not defects in the application.
+- Issue #984 title naming discrepancy: "Milestone 16 Exit Checklist" vs. our convention "M15 Exit Checklist". Flagged for EL to confirm or request rename.
+
+---
+
+## Open Issues — M15 (Human Cost Architecture)
+
+**GitHub Milestone:** 16 | **Created:** 2026-06-16 | **Status:** Planned — Demo 6 anchor; #843 is exit gate
+*Zone 1A ADR + Layer 3 self-interpreting outputs + live external demo. Sets up Demo 6.*
+
+| Issue | Title | Group | Notes |
+|---|---|---|---|
+| #1065 | ux(zone-1b): Layer 3 trajectory sentence — Zone 1B | G1 | IR-001; CRITICAL; escalation comment 2026-06-20 |
+| #1066 | ux(zone-1b): suppress "0 consecutive steps" when zero | G1 | IR-002; HIGH |
+| #1067 | demo(screenshots): Frame B and C are same screenshot | G5 | IR-003; HIGH — demo artifact fix |
+| #1068 | ux(zone-1a): L0 badge on Zone 1A trajectory curves | G1 | IR-004 Path A; HIGH |
+| #1069 | ux(grounding-strip): dual reserve values without disambiguation | G1 | IR-005; CRITICAL; escalation comment 2026-06-20 |
+| #1075 | ux(zone-1d): PSP self-interpreting sentence absent | G1 | DEMO-099; CRITICAL |
+| #1083 | ux(grounding-strip): date label "2024-Q1" → "Apr 2024" | G5 | DEMO-122; MEDIUM |
+| #1084 | methodology: PSP historical calibration anchor | G5 | DEMO-127; MEDIUM |
+| #1088 | docs(demo): walkthrough — "0 consecutive steps" plain language | G5 | DEMO-123; MEDIUM; filed 2026-06-20 |
+| #1089 | docs(demo): walkthrough — Grounding strip persistence | G5 | DEMO-124; MEDIUM; filed 2026-06-20 |
+| #1090 | docs(demo): walkthrough — methodology URL | G5 | DEMO-129; LOW; filed 2026-06-20 |
+| #1091 | docs(claude-md): extract Lifecycle/Exit/DIC to child docs | G7 | promoted from insights log entry 6; filed 2026-06-20 |
+| #1048 | infra: Docker API container Alembic migrations (NM-049) | G5 | Pre-existing; NM-049 on record |
+| #1007 | fix: recompute-badge not visible after apply-control-change | G5 | Pre-existing; discovered M14 G4 Step 4 Verify |
+| #1004 | process: Visual Spec section for intent template | G5 | Filed 2026-06-17 |
+| #984 | M15 Exit Checklist | — | immediate \| M15 gate issue (note: title says "Milestone 16" — GitHub milestone numbering) |
+| #990 | test: accessibility validation on 8GB/4-core target hardware | G6 | Filed 2026-06-16 |
+| #987 | feat(ux): political risk summary surface (Persona 3) | G3 | Design in M15; implementation M16 |
+| #986 | feat(ux): cohort disaggregation on primary surface | G3 | Design in M15; implementation M16 |
+| #975 | feat(data): Path 1 — approved source network query | G4 | Journey A GA-01; extends ADR-016 Component 1 |
+| #951 | process: solo-use review protocol | G5 | Migrated from M14 |
+| #846 | ux: DEMO-045 — Mode 3 branch comparison in instrument | G4 | |
+| #845 (Ph 2–4) | ux: Zone 1A information architecture — ADR-017 | G2 | Phase 1 design thinking doc done (M14 G6c) |
+| #843 | plan: live stakeholder demo with real external participants | G8 | **M15 exit gate** — deferred from M14 (EL decision 2026-06-20) |
+| #837 | feat(demo): configuration-driven demo scripts | G5 | |
+| #569 | test(perf): MV-002 Mode 3 hardware validation | G6 | |
+| #53 | arch: RBAC design (prerequisite for Path 2 in M16) | G4 | |
+| #259 | standards: CTO legibility metrics dashboard | G5 | |
+| #153 | feat(frontend): absolute threshold overlay | | |
+| #97 | arch(api): threshold-crossing markers | | |
+| #92 | arch(backtesting): Greece investment climate conditions | | |
+| #6 | governance: branch protection restoration | G7 | EL-action |
+| #3 | governance: single-principal separation of duties | G7 | EL-action |
 
 ---
 
@@ -179,7 +260,7 @@
 | G8 Honest narration revision | ✅ COMPLETE 2026-06-20 (PR #1078) | `stakeholder-walkthrough.md` revised: (1) Layer 3 sentence framed as M15 roadmap commitment throughout; (2) dual reserve values explicitly disambiguated in Frame C narration (3.8=initial entry-state, 2.9=current simulated step 3); (3) PSP 0.65 translated into plain language in Frame D narration; (4) DEMO-100 presenter timing note added (Section 1 must complete before Frame C displayed). |
 | G8 North star re-evaluation | ✅ **PASS** (conditional) | Targeted re-evaluation: revised narration allows Aicha to state primary finding without specialist mediation — presenter explicitly narrates "CRITICAL is one step away" from on-screen data, and disambiguates dual reserve values before she can question them. Condition: revised narration delivered as written. North star gate: **UNBLOCKED**. |
 | G8 Step 9 — simulated stakeholder session | ✅ **COMPLETE 2026-06-20 (PR #1081)** | Simulated session (EL decision: real external participants not yet available; #843 deferred to M15). Four-persona panel: Lucas P1, Eleni P2, Andreas P3, Aicha P5. North star: **PASS (conditional)** — Aicha stated argument: "The figure you are challenging is from your institution's own publication. Our initial conditions are derived from IMF WEO April 2024." 8 new findings DEMO-122–129 (all MEDIUM or LOW). Artifact: `docs/demo/m14/reviews/2026-06-20-v0.14.0-stakeholder-review.md`. |
-| G8 new findings from Step 9 | ⬜ Issues to file | DEMO-122 (Grounding strip "2024-Q1" vs "April 2024" WEO label) → new issue; DEMO-127 (PSP historical calibration anchor absent) → new issue. DEMO-123, DEMO-124, DEMO-129 → walkthrough updates needed before M14 close. DEMO-125/126/128 → confirmed M15 scope (companions to #1065, #1066, #1069). |
+| G8 new findings from Step 9 | ✅ DISPOSITIONED 2026-06-20 | DEMO-122 → #1083; DEMO-127 → #1084; DEMO-123 → #1088; DEMO-124 → #1089; DEMO-129 → #1090 (all M15 scope). DEMO-125/126/128 → confirmed M15 scope (companions to #1065, #1066, #1069). DEMO-123/124/129 slipped M14 close; filed as M15 issues at 2026-06-20 HORIZON sweep. |
 | #843 live external demo | ⬜ **DEFERRED TO M15** (EL decision 2026-06-20) | M14 simulated session accepted as closure evidence; real external participants required in M15. |
 
 **Evidence base for M14 trust architecture (both ADRs):**

@@ -60,7 +60,7 @@ Each entry has four fields:
 **Date:** 2026-06-16
 **Source:** EL review of CLAUDE.md structure
 **Finding:** CLAUDE.md is 1,080 lines / ~9,000 words and mixes constitutional principles with detailed operational procedures; three sections (Agent Execution Lifecycle ~200 lines, Domain Intelligence Council table ~25 lines, Milestone Exit Ceremony + Retrospective ~65 lines) are candidates for extraction into child docs to reduce the file by ~25% without information loss.
-**Status:** open — deferred to M14 sprint close to avoid mid-sprint section citation breaks; planned child docs: `docs/process/agent-execution-lifecycle.md`, `docs/process/milestone-exit-sop.md`
+**Status:** promoted → #1091 (M14 closed 2026-06-20; deferral condition met; issue filed for M15 scope)
 
 ---
 
