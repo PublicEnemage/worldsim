@@ -294,9 +294,30 @@ data-testid="psp-layer3-sentence"
 
 ## 8. Step 4 Verify record
 
-> *To be filled by the implementing agent at Step 4 — Verify.*
+**Verifying agent:** Frontend Architect Agent  
+**Date:** 2026-06-21  
+**Method:** Playwright E2E suite — `frontend/tests/e2e/m15-g1-layer3-ir-fixes.spec.ts`  
+**Dev server:** Docker Vite server (localhost:5173) against live backend (localhost:8000)
 
-`[ ]` Pending implementation and verification.
+**Result: 11/11 ACs PASS**
+
+| AC | Result | Observable state confirmed |
+|---|---|---|
+| AC-1 | PASS | `zone-1b-trajectory-sentence` visible at 1440×900 without scroll when CRITICAL breach active |
+| AC-2 | PASS | Sentence contains numerical reserve value and consecutive step count phrase |
+| AC-3 | PASS | `0 consecutive step` text absent when `consecutive_breach_steps = 0` |
+| AC-4 | PASS | `detail-consecutive` shows accurate count (3) when `consecutive_breach_steps = 3` |
+| AC-5 | PASS | `zone-1a-l0-badge` visible in trajectory at 1440×900, text matches `/T\d/` pattern |
+| AC-6 | PASS | Grounding strip contains "Initial conditions" label adjacent to entry-state reserve value (3.8) |
+| AC-7 | PASS | Grounding strip contains "Current trajectory" label — two value contexts distinguishable |
+| AC-8 | PASS | `psp-layer3-sentence` visible at 1440×900 without scroll when PE enabled |
+| AC-9 | PASS | Sentence contains probability percentage and "programme/chance/remain" contextualisation |
+| AC-10 | PASS | `zone-1b-trajectory-sentence` present with fallback text when `consecutive_breach_steps = null` |
+| AC-11 | PASS | Entry-state label persists in grounding strip when trajectory endpoint fails (500) |
+
+**Implementation note (NM-046):** AC-7 revealed a crash path — `getIndicatorDisplayNameAny(undefined)` reached `formatFallback(undefined)` → TypeError → React tree unmount → toggle button detached. Root cause: QA test mock factory used `alert_id`/`indicator_id` field names (matching the test's `MDAAlert` interface) instead of `mda_id`/`indicator_key` (matching `RawMDAAlert`). Fix: one-line null guard at `getIndicatorDisplayNameAny` entry point (PR #1098, commit `a7c1d67`). NM-046 filed.
+
+`[x]` Step 4 Verify: COMPLETE — all 11 ACs confirmed in running application. 2026-06-21
 
 ---
 
