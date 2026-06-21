@@ -1007,11 +1007,9 @@ test.describe("AC-11: Grounding strip entry-state label persists on trajectory f
 
     const stripText = await strip.textContent() ?? "";
 
-    // Guard: "3.8" must appear to confirm the disambiguation feature has landed
-    if (!stripText.includes("3.8")) return;
-
-    // Entry-state label must still be present even when trajectory is unavailable
-    // (Intent doc AC-11: "The label must remain present even when the simulation value is absent")
+    // Guard: entry-state label must appear to confirm the disambiguation feature has landed
+    // (Guarding on the LABEL, not the value — M14 already shows 3.8 without a label,
+    // so guarding on the value would cause the guard to miss pre-G1 code. NM-045.)
     const hasEntryLabel =
       stripText.includes("initial") ||
       stripText.includes("Initial") ||
@@ -1019,6 +1017,10 @@ test.describe("AC-11: Grounding strip entry-state label persists on trajectory f
       stripText.includes("Entry state") ||
       stripText.includes("step 0") ||
       stripText.includes("Step 0");
+    if (!hasEntryLabel) return;
+
+    // Entry-state label must persist even when trajectory is unavailable
+    // (Intent doc AC-11: "The label must remain present even when the simulation value is absent")
     expect(hasEntryLabel).toBe(true);
 
     // Entry-state value (3.8) must be present — the label provides context for this value
