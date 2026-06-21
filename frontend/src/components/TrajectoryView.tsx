@@ -530,6 +530,51 @@ export function TrajectoryView({
         </ComposedChart>
       </ResponsiveContainer>
 
+      {/* ADR-015 §Component 1 — L0 confidence tier badges on trajectory curves (#1068).
+          One badge per active framework (score non-null), showing T{N} at the right edge.
+          Always visible at zero interaction — not a hover state or tooltip. */}
+      {mergedData.length > 0 && (
+        <div
+          style={{
+            position: "absolute",
+            top: 16,
+            right: 4,
+            display: "flex",
+            flexDirection: "column",
+            gap: 3,
+            pointerEvents: "none",
+            zIndex: 10,
+          }}
+        >
+          {FRAMEWORKS.map((fw) => {
+            const lastStep = mergedData[mergedData.length - 1];
+            const score = lastStep[`${fw}_active` as keyof MergedStepDatum] as number | null;
+            const tier = lastStep[`${fw}_confidence_tier` as keyof MergedStepDatum] as number;
+            if (score === null) return null;
+            const color = FRAMEWORK_COLORS[fw];
+            return (
+              <span
+                key={fw}
+                data-testid="zone-1a-l0-badge"
+                style={{
+                  fontSize: 9,
+                  fontWeight: 700,
+                  color,
+                  background: "rgba(255,255,255,0.92)",
+                  padding: "1px 4px",
+                  borderRadius: 2,
+                  border: `1px solid ${color}`,
+                  lineHeight: 1.4,
+                  whiteSpace: "nowrap",
+                }}
+              >
+                T{tier}
+              </span>
+            );
+          })}
+        </div>
+      )}
+
       {/* Inline entity labels — at right edge of chart area (DEMO-063).
           Lets audience identify entities without consulting the legend. */}
       {entityIds && entityIds.length >= 2 && (

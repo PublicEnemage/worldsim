@@ -66,8 +66,8 @@ export interface Zone1BAlert {
   current_value: string;
   /** Remaining approach headroom (Decimal as string; negative = breached). */
   approach_pct_remaining: string;
-  /** Number of consecutive steps in breach (≥2 → TERMINAL). */
-  consecutive_breach_steps: number;
+  /** Number of consecutive steps in breach (≥2 → TERMINAL). null if computation unavailable. */
+  consecutive_breach_steps: number | null;
   /**
    * Rider #271 — reversibility classification.
    * null = irreversible threshold; integer = recoverable within N years given intervention.
