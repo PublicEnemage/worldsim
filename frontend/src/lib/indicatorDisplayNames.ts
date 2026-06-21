@@ -84,6 +84,7 @@ export function getIndicatorDisplayName(framework: string, key: string): string 
  *  framework blocks, falling back to title-cased key. Used by surfaces that have
  *  the attribute key but not the framework (e.g. AttributeSelector). */
 export function getIndicatorDisplayNameAny(key: string): string {
+  if (!key) return "Indicator"; // defensive: guard against null/undefined (NM-046)
   for (const block of Object.values(INDICATOR_DISPLAY_NAMES)) {
     if (key in block) return block[key];
   }
