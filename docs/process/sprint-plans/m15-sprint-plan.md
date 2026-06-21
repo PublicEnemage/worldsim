@@ -2,10 +2,10 @@
 name: m15-sprint-plan
 type: sprint-plan
 milestone: M15 — Human Cost Architecture
-status: Proposed — awaiting EL approval
+status: EL Approved — implementation may begin (sprint entry document required per group)
 authored-by: PM Agent
 authored-date: 2026-06-20
-el-approved: pending
+el-approved: 2026-06-20
 consulted-agents:
   - Business Product Owner (value prioritization and Demo 6 scope)
   - Frontend Architect (component grouping and ADR-015 Component 4 assessment)
@@ -16,7 +16,7 @@ sop-reference: docs/process/sprint-planning-sop.md
 
 # M15 Sprint Plan — Human Cost Architecture
 
-**Status:** Proposed — awaiting EL approval; HARD STOP on implementation until approved
+**Status:** EL Approved 2026-06-20 — implementation may begin; sprint entry document required per group before implementation PR opens
 **Release branch:** `release/m15` (cut from `main` 2026-06-20 at commit 500e50d)
 **Exit checklist issue:** #984 (note: title reads "Milestone 16 Exit Checklist" — follows GitHub milestone numbering; content is correct for M15)
 **Primary objective:** Zone 1A information architecture ADR + Layer 3 self-interpreting outputs (Zone 1B + Zone 1D) + live stakeholder demo with real external participants (#843) as M15 exit gate.
@@ -180,11 +180,11 @@ CI green and issue closure are necessary but not sufficient. #843 is the primary
 
 1. ✅ PM Agent cuts `release/m15` from `main` — DONE 2026-06-20
 2. ✅ PM Agent authors this sprint plan — DONE 2026-06-20
-3. ⬜ **EL approves sprint plan** — NEXT REQUIRED ACTION before any implementation sprint entry document can be filed
-4. ⬜ PM Agent marks ARCH-011 ASSIGNED in `docs/architecture/backlog.md`; derives panel composition
-5. ⬜ M15 Exit Checklist issue #984 confirmed as M15 gate (note: title says "Milestone 16 Exit Checklist" — EL to confirm this is acceptable or request rename)
+3. ✅ EL approves sprint plan — DONE 2026-06-20
+4. ⬜ PM Agent marks ARCH-011 ASSIGNED in `docs/architecture/backlog.md`; derives panel composition — at ADR-017 authorship time
+5. ✅ M15 Exit Checklist issue #984 renamed to "M15 Exit Checklist — blocks milestone closure" — DONE 2026-06-20
 
-**HARD STOP:** No implementation PR may open against `release/m15` until the EL has approved this sprint plan and a sprint entry document is filed for the relevant group.
+**EL approved 2026-06-20.** No implementation PR may open against `release/m15` until a sprint entry document is filed and EL-approved for the relevant group.
 
 ---
 

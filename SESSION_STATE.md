@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-20 (HORIZON sweep complete — M15 sprint plan filed; release/m15 cut; ARCH-011/ADR-017 entered in backlog; four M15 issues filed (#1088–#1091); insights log entry 6 promoted. HARD STOP: EL approval of m15-sprint-plan.md required before any G-group sprint entry document can be filed.)**
+**Last updated: 2026-06-20 (M15 kickoff COMPLETE — release/m15 live; sprint plan EL-approved; KI-005 permanent fix applied (do_not_enforce_on_create: true); #984 renamed to 'M15 Exit Checklist'; implementation unblocked pending G-group sprint entry documents)**
 **Current milestone:** M15 — Human Cost Architecture (GitHub Milestone 16)
 **Previous milestone:** M14 — Trust Architecture and Instrument Credibility (FORMALLY CLOSED 2026-06-20; release/m14 → main PR #1086; v0.14.0 at https://github.com/PublicEnemage/worldsim/releases/tag/v0.14.0; #968 closed; GitHub Milestone 15 closed)
 
@@ -20,11 +20,12 @@
 |---|---|---|
 | 1. PM Agent cuts `release/m15` from `main` | ✅ DONE 2026-06-20 | `release/m15` at 500e50d |
 | 2. PM Agent authors `m15-sprint-plan.md` | ✅ DONE 2026-06-20 | Filed in PR opening; EL approval pending |
-| 3. EL approves sprint plan | ⬜ **NEXT REQUIRED ACTION** | Hard stop — no sprint entry docs until approved |
+| 3. EL approves sprint plan | ✅ **EL APPROVED 2026-06-20** | `docs/process/sprint-plans/m15-sprint-plan.md` |
 | 4. PM Agent marks ARCH-011 ASSIGNED in backlog | ⬜ At ADR-017 claim time | Added as PENDING_NUMBER; Architect claims when drafting begins |
-| 5. M15 exit checklist issue #984 confirmed | ⬜ EL to confirm | Note: title reads "Milestone 16 Exit Checklist" (GitHub milestone numbering); content is correct |
+| 5. M15 exit checklist issue #984 renamed | ✅ DONE 2026-06-20 | Renamed to "M15 Exit Checklist — blocks milestone closure" |
+| 6. KI-005 permanent fix applied | ✅ DONE 2026-06-20 | `do_not_enforce_on_create: true` on Ruleset 17751852; future release branches need no Ruleset workaround |
 
-**HARD STOP:** No implementation PR may open against `release/m15` until the EL has approved the sprint plan.
+Implementation is now unblocked. A sprint entry document must be filed and EL-approved before any G-group implementation PR opens.
 
 ---
 
