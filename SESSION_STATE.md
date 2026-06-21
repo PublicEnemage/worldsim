@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-21 (M15-G1 COMPLETE through Step 4 Verify — PRs #1095 (sprint entry), #1096 (QA tests), #1097 (implementation), #1098 (indicator_key guard) all merged to release/m15; 11/11 ACs PASS; NM-051 filed; #1065/#1066/#1068/#1069/#1075 closed; Step 5 Validate pending)**
+**Last updated: 2026-06-21 (M15-G1 COMPLETE — BPO Step 5 Validate ACCEPT; sprint exit confirmed; `docs/process/sprint-plans/m15-g1-sprint-exit.md` filed; G8 gate (#843) unblocked)**
 **Current milestone:** M15 — Human Cost Architecture (GitHub Milestone 16)
 **Previous milestone:** M14 — Trust Architecture and Instrument Credibility (FORMALLY CLOSED 2026-06-20; release/m14 → main PR #1086; v0.14.0 at https://github.com/PublicEnemage/worldsim/releases/tag/v0.14.0; #968 closed; GitHub Milestone 15 closed)
 
@@ -108,12 +108,12 @@ Implementation is now unblocked. A sprint entry document must be filed and EL-ap
 | G1 QA tests (Step 2) | ✅ FILED 2026-06-20 — PR #1096 | AC-1–AC-11 authored before implementation; NM-051 prerequisite fix |
 | G1 implementation (Step 3) | ✅ **MERGED 2026-06-21** — PR #1097 + PR #1098 → release/m15 | Five Layer 3 IR fixes: trajectory sentence (AC-1–4), zero-step suppression (AC-5), L0 badges (AC-6), grounding strip disambiguation (AC-7–8), PSP sentence (AC-9–11); null guard for `getIndicatorDisplayNameAny` (PR #1098) |
 | G1 Step 4 Verify | ✅ **PASS 2026-06-21** | 11/11 ACs pass; NM-051 filed (indicator_key crash at Step 4); verdict in intent doc §8 |
-| G1 Step 5 Validate | ⬜ PENDING | Business PO opens live application; Customer Agent Layer 3 assessment required first (Personas 2/5) |
+| G1 Step 5 Validate | ✅ **BPO ACCEPT 2026-06-21** | 11/11 ACs pass live; Customer Agent Layer 3 PASS (all 4 content additions); North star PASS — Aicha can argue reserve criticality, disambiguation, and PSP meaning without specialist mediation; sprint exit filed |
 | NM-051 | ✅ FILED 2026-06-21 | QA mock used alert_id/indicator_id instead of mda_id/indicator_key; undefined key crashed React tree; null guard fix in PR #1098 |
 | #1065/#1066/#1068/#1069/#1075 | ✅ CLOSED 2026-06-21 | All five G1 issues closed on GitHub |
 
-**Next required action:** Step 5 Validate — Business PO must open live application and confirm Persona 2 (Eleni/Aicha) can read Zone 1B trajectory sentence and PSP sentence without specialist mediation within 90-second ceiling; Customer Agent Layer 3 assessment is a required input; then file sprint exit document `docs/process/sprint-plans/m15-g1-sprint-exit.md`.
-**G8 gate status:** G8 (#843 live external demo) may not open until G1 Step 5 Validate is complete.
+**Sprint exit document:** `docs/process/sprint-plans/m15-g1-sprint-exit.md` — PI Agent Confirmed 2026-06-21
+**G8 gate status:** G8 (#843 live external demo) is now UNBLOCKED — G1 Step 5 Validate complete.
 
 ---
 

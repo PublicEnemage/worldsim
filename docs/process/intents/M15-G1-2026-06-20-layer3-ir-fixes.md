@@ -315,7 +315,7 @@ data-testid="psp-layer3-sentence"
 | AC-10 | PASS | `zone-1b-trajectory-sentence` present with fallback text when `consecutive_breach_steps = null` |
 | AC-11 | PASS | Entry-state label persists in grounding strip when trajectory endpoint fails (500) |
 
-**Implementation note (NM-046):** AC-7 revealed a crash path — `getIndicatorDisplayNameAny(undefined)` reached `formatFallback(undefined)` → TypeError → React tree unmount → toggle button detached. Root cause: QA test mock factory used `alert_id`/`indicator_id` field names (matching the test's `MDAAlert` interface) instead of `mda_id`/`indicator_key` (matching `RawMDAAlert`). Fix: one-line null guard at `getIndicatorDisplayNameAny` entry point (PR #1098, commit `a7c1d67`). NM-046 filed.
+**Implementation note (NM-051):** AC-7 revealed a crash path — `getIndicatorDisplayNameAny(undefined)` reached `formatFallback(undefined)` → TypeError → React tree unmount → toggle button detached. Root cause: QA test mock factory used `alert_id`/`indicator_id` field names (matching the test's `MDAAlert` interface) instead of `mda_id`/`indicator_key` (matching `RawMDAAlert`). Fix: one-line null guard at `getIndicatorDisplayNameAny` entry point (PR #1098, commit `a7c1d67`). NM-051 filed.
 
 `[x]` Step 4 Verify: COMPLETE — all 11 ACs confirmed in running application. 2026-06-21
 
@@ -323,6 +323,34 @@ data-testid="psp-layer3-sentence"
 
 ## 9. Step 5 Validate record
 
-> *To be filled by the Business PO at Step 5 — Validate.*
+**Business PO:** Business PO Agent  
+**Date:** 2026-06-21  
+**Method:** Live application (localhost:5173 against localhost:8000) — Playwright E2E suite re-run confirms 11/11 ACs pass in running application; live server inspection of sentence text and PSP sentence content confirms Layer 3 quality.
 
-`[ ]` Pending Business PO validation.
+**Customer Agent Layer 3 assessment:** Filed in sprint exit document `docs/process/sprint-plans/m15-g1-sprint-exit.md §3a` — PASS on all five deliverables (filed before this verdict, per process).
+
+**North Star Test:**
+
+*Scenario: Aicha Diallo (Persona 2 — Zambia Finance Ministry) is in the IMF ECF restructuring session. She has 90 seconds to respond to a creditor challenge across two dimensions: (1) "your reserve position is not as critical as your team is claiming" and (2) "your programme survival estimate is too optimistic — explain the political economy basis."*
+
+*Pre-G1 capability (before this sprint):*
+- Zone 1B showed the top MDA alert severity, current and floor values, and consecutive step count — but no directive sentence. Aicha saw "Current 2.908 / Floor 2.500 · BREACH ACTIVE · 8 consecutive steps" and had to translate this into an argument herself.
+- The PSP row in Zone 1D showed "65% [T3 · political economy module]" — the percentage was visible but the policy meaning ("what does 65% mean for programme continuation?") required Aicha to explain it verbally, with the risk of her phrasing not matching the model's intent.
+- The Grounding strip showed 3.8 months (entry-state) and Zone 1B showed 2.9 months (current) with no labels distinguishing which was the citable source figure and which was the simulation output. DEMO-100 documented that presenters had to interrupt narration to explain the two values.
+- Zone 1A trajectory curves carried no tier badge — the confidence tier of the trajectory itself was not visible without navigating to Zone 1D.
+
+*Post-G1 capability:*
+1. **Zone 1B trajectory sentence:** The screen now reads: "Reserve Coverage (months) has fallen 0.41 below the CRITICAL threshold. Breach active for 8 consecutive steps." Aicha can quote this sentence verbatim in response to the creditor's first challenge — no translation required.
+2. **PSP Layer 3 sentence:** Zone 1D now reads: "Programme survival probability: 65%. This means the programme has a 65% chance of remaining on track through conditionality compliance." In response to the political economy challenge, Aicha states: "The model computes 65% probability of remaining on track through conditionality compliance — that is the programme survival estimate, and you can see it labeled on the screen." No verbal paraphrase of a raw probability required.
+3. **Grounding strip disambiguation:** The Grounding strip now labels "Initial conditions (step 0 · source-cited data): 3.8 months · CBJ 2023-Q4 · T2" and "Current trajectory (step 3 · model output): 2.9 months." The creditor cannot raise "which 3.8?" — the screen already answers it.
+4. **Zone 1A L0 badge:** "[T2]" visible on the financial trajectory curve confirms the trajectory basis tier in the same viewport, consistent with Zone 1D annotation convention.
+
+*Does this change what the minister's team can argue at the table?*
+
+Yes — materially. Before G1, the ministry team could display the data but had to narrate its meaning. After G1, the screen argues the case: the trajectory sentence, the PSP sentence, and the grounding strip labels together constitute a self-evident narrative that can be read without presenter mediation. Demo 6 can now use the application as direct evidence rather than a narrated exhibit.
+
+**Kryptonite Constraint (FD-3):** Satisfied. All five outputs are interpretable by Persona 2 (finance ministry economist) without specialist mediation. The PSP sentence translates 65% into a policy-language statement about conditionality compliance. The trajectory sentence translates the numeric breach into a directive claim. No EL exception required.
+
+**Business PO Validate verdict:** **ACCEPT**
+
+`[x]` Step 5 Validate: COMPLETE — Business PO ACCEPT 2026-06-21. Sprint exit document filed at `docs/process/sprint-plans/m15-g1-sprint-exit.md`.
