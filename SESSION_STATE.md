@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-21 (M15-G1 COMPLETE — BPO Step 5 Validate ACCEPT; sprint exit confirmed; `docs/process/sprint-plans/m15-g1-sprint-exit.md` filed; G8 gate (#843) unblocked)**
+**Last updated: 2026-06-21 (EL architectural decisions: AC-001 private data prohibited, AC-002 synthetic substitution permitted; #976 + #53 closed will-not-implement; #5 + #4 closed no-demand; #35 + #30 → Parking Lot; G4 scope confirmed #975 + ADR-016 C3; constraints.md filed; insights-log entry 7 added — no G-group sprint entry may open until constraint PR is merged)**
 **Current milestone:** M15 — Human Cost Architecture (GitHub Milestone 16)
 **Previous milestone:** M14 — Trust Architecture and Instrument Credibility (FORMALLY CLOSED 2026-06-20; release/m14 → main PR #1086; v0.14.0 at https://github.com/PublicEnemage/worldsim/releases/tag/v0.14.0; #968 closed; GitHub Milestone 15 closed)
 
@@ -83,7 +83,7 @@ Implementation is now unblocked. A sprint entry document must be filed and EL-ap
 | #843 | plan: live stakeholder demo with real external participants | G8 | **M15 exit gate** — deferred from M14 (EL decision 2026-06-20) |
 | #837 | feat(demo): configuration-driven demo scripts | G5 | |
 | #569 | test(perf): MV-002 Mode 3 hardware validation | G6 | |
-| #53 | arch: RBAC design (prerequisite for Path 2 in M16) | G4 | |
+| #53 ✅ | arch: RBAC design (prerequisite for Path 2 in M16) | G4 | ✅ CLOSED 2026-06-21 — will-not-implement (AC-001); #976 permanently closed |
 | #259 | standards: CTO legibility metrics dashboard | G5 | |
 | #153 | feat(frontend): absolute threshold overlay | | |
 | #97 | arch(api): threshold-crossing markers | | |
@@ -114,6 +114,53 @@ Implementation is now unblocked. A sprint entry document must be filed and EL-ap
 
 **Sprint exit document:** `docs/process/sprint-plans/m15-g1-sprint-exit.md` — PI Agent Confirmed 2026-06-21
 **G8 gate status:** G8 (#843 live external demo) is now UNBLOCKED — G1 Step 5 Validate complete.
+
+---
+
+## EL Architectural Decisions — 2026-06-21
+
+**Authority:** Engineering Lead permanent decisions. Recorded by PM Agent.
+**Constraint document:** `docs/architecture/constraints.md`
+
+### AC-001 — Private Data Inputs Are Prohibited (Permanent)
+
+Private, proprietary, or ministry-owned data inputs are architecturally prohibited. The shared public dataset guarantee is the epistemic foundation of WorldSim's negotiating authority — reproducibility by both parties requires both parties to be able to inspect the same public sources. Private inputs sever reproducibility.
+
+**Founding document basis:** `docs/vision/worldsim-founding-document.md §Open Source as Strategy`
+
+**Issue dispositions:**
+
+| Issue | Title | Disposition |
+|---|---|---|
+| #976 ✅ | Path 2 — ministry-owned / proprietary data upload | CLOSED 2026-06-21 — will-not-implement (AC-001); permanent prohibition, not a capacity deferral |
+| #53 ✅ | RBAC design (prerequisite for Path 2) | CLOSED 2026-06-21 — will-not-implement (AC-001); prerequisite for Path 2 which is permanently closed |
+| #5 ✅ | Data marketplace — curated / user-contributed datasets | CLOSED 2026-06-21 — will-not-implement-at-this-stage; no validated real-world demand; re-open trigger: real finance ministry analyst articulates specific dataset need Path 1 cannot satisfy |
+| #4 ✅ | Advanced geocoded dataset integration | CLOSED 2026-06-21 — will-not-implement-at-this-stage; no validated real-world demand; same re-open trigger |
+
+**G4 scope confirmed (post-AC-001):** G4 = #975 (Path 1 approved source network) + ADR-016 Component 3 only. #53 removed from G4 scope.
+
+### AC-002 — Synthetic Substitution from Public Sources Is Permitted with Mandatory Indicator-Level Disclosure
+
+Synthetic estimates from comparable economies, regional distributions, and historical patterns are permitted and required for the democratization mission. Three mandatory conditions: indicator-level disclosure, T3 confidence tier floor, meaninglessness threshold suppression. The sparse-data problem is addressed through ADR-007 and the confidence tier system — not through private uploads.
+
+**Founding document basis:** `docs/vision/worldsim-founding-document.md §Open Source as Strategy`; `CLAUDE.md §Synthetic Data and the Data Inference Layer`
+
+**Future scope:** Methodology audit of ADR-007 against data-sparse countries (Chad, Yemen, Myanmar) — filed as future scope item after ADR-007 is complete; not a new capability; validates the framework against real data-poverty conditions.
+
+### Parking Lot Dispositions (2026-06-21)
+
+| Issue | Title | Disposition |
+|---|---|---|
+| #35 | Dynamic relationship weight updating | Moved to Parking Lot milestone (GitHub milestone #20) — complexity addition; deferred until core capability is battle-tested through real-world use; no trigger condition required |
+| #30 | Stock vs. flow variable distinction | Moved to Parking Lot milestone (GitHub milestone #20) — complexity addition; same deferral basis |
+
+### Insights Log
+
+Entry 7 added to `docs/insights-log.md` (2026-06-21): AC-001 and AC-002 should be reflected in the founding document as explicit permanent governing constraints — flag for EL to author addition to `docs/vision/worldsim-founding-document.md §Open Source as Strategy`.
+
+### Hard Stop
+
+**No G-group sprint entry may be filed or EL-approved until the constraint record PR is merged to `release/m15`.** The constraint record (AC-001, AC-002, issue dispositions) must be on the release branch before any further G-group sprint entries reference G4 scope or open issues.
 
 ---
 
