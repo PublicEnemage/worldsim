@@ -111,15 +111,15 @@ Section 3 below — not from implementation interface.
 *QA tests must be authored from the intent document's acceptance criteria before
 implementation code is written. (Authority: CLAUDE.md §Agent Execution Lifecycle Step 2)*
 
-- [ ] QA test file authored for G1 before implementation begins — **MUST FILE BEFORE G1 PR OPENS**
+- [x] QA test file authored for G1 before implementation begins — filed 2026-06-20 (`frontend/tests/e2e/m15-g1-layer3-ir-fixes.spec.ts`)
 
 | Deliverable | Intent document | Test file path | Authored before implementation? |
 |---|---|---|---|
-| #1065 — Zone 1B sentence | `docs/process/intents/M15-G1-2026-06-20-layer3-ir-fixes.md` | `frontend/tests/e2e/m15-g1-layer3-ir-fixes.spec.ts` | No — author after intent document, before implementation PR |
-| #1066 — Suppress zero steps | (same) | (same spec file) | No — author after intent document, before implementation PR |
-| #1068 — L0 badges | (same) | (same spec file) | No — author after intent document, before implementation PR |
-| #1069 — Grounding strip labels | (same) | (same spec file) | No — author after intent document, before implementation PR |
-| #1075 — PSP sentence | (same) | (same spec file) | No — author after intent document, before implementation PR |
+| #1065 — Zone 1B sentence | `docs/process/intents/M15-G1-2026-06-20-layer3-ir-fixes.md` | `frontend/tests/e2e/m15-g1-layer3-ir-fixes.spec.ts` | **Yes — filed 2026-06-20 (AC-1, AC-2, AC-10)** |
+| #1066 — Suppress zero steps | (same) | (same spec file) | **Yes — filed 2026-06-20 (AC-3, AC-4)** |
+| #1068 — L0 badges | (same) | (same spec file) | **Yes — filed 2026-06-20 (AC-5)** |
+| #1069 — Grounding strip labels | (same) | (same spec file) | **Yes — filed 2026-06-20 (AC-6, AC-7, AC-11)** |
+| #1075 — PSP sentence | (same) | (same spec file) | **Yes — filed 2026-06-20 (AC-8, AC-9)** |
 
 ---
 
