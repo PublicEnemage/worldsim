@@ -2580,6 +2580,52 @@ This notation correctly represented the external prerequisite (merge) but suppre
 
 ---
 
+## NM-051 — QA Test Mock Used Wrong Field Names (alert_id/indicator_id vs mda_id/indicator_key); Undefined Key Crashed React Tree in Step 4 Verify (Reactive)
+
+**Date:** 2026-06-21
+**Milestone:** M15 — G1 Layer 3 IR Fixes
+**Detected by:** Step 4 Verify — Playwright AC-7 timed out after toggle button detached from DOM. Root cause diagnosed by tracing the crash path from `parseMdaAlerts` → `undefined indicator_key` → `getIndicatorDisplayNameAny(undefined)` → `formatFallback(undefined)` → TypeError.
+**Severity:** High — the crash unmounted the entire React tree during Step 4 Verify, preventing AC-7 from verifying that the Grounding strip disambiguation feature was correctly implemented. Without the fix, AC-7 would have appeared as a test failure that incorrectly implied the feature was absent, not that the test mock was malformed.
+
+### What happened
+
+The M15-G1 QA test file (`m15-g1-layer3-ir-fixes.spec.ts`) was authored in Step 2 before implementation. The test's local `MDAAlert` interface and `makeReserveAlert()` factory used field names `alert_id` and `indicator_id`. The production API schema (`RawMDAAlert` in ScenarioInstrumentCluster.tsx) uses `mda_id` and `indicator_key`.
+
+When AC-7 ran with the `measurement-output` route mock intercepting ScenarioInstrumentCluster's fetch, `parseMdaAlerts(raw)` was called with the malformed mock data. It read `alert.indicator_key` (which was `undefined` because the mock used `indicator_id`). The undefined value was stored in the Zone1BAlert at `indicator_key: undefined`. When any of the three Zone 1B rendering paths called `getIndicatorDisplayNameAny(undefined)`, it reached `formatFallback(undefined)` → `undefined.replace(...)` → TypeError. The uncaught error crashed the React component tree, unmounting the application. The `grounding-strip-toggle` button disappeared from the DOM. Playwright retried but could not find the element. After 30 seconds, the test timed out.
+
+### What was at risk
+
+1. **AC-7 false failure:** The timeout looked like a test failure caused by missing implementation, when in fact the Grounding strip disambiguation feature was correctly implemented. A developer reading the CI failure might have concluded the feature needed re-implementation rather than that the mock had wrong field names.
+2. **App crash in production-adjacent scenarios:** Any code path that calls `getIndicatorDisplayNameAny` with a null or undefined key (e.g., a future API change that makes `indicator_key` optional, or a new mock authoring error) would crash the React tree in production. The crash pattern was silent — no error boundary caught it, no log was produced, and the page showed only a partial DOM.
+
+### What caught it
+
+Step 4 Verify execution. The Playwright AC-7 test timed out. The implementing agent traced the failure through the call log (`element was detached from the DOM, retrying`) → investigated the DOM snapshot (`- generic [ref=e3]: "0"` suggesting React tree unmount) → compared AC-6 (passes, no measurement-output mock) with AC-7 (fails, measurement-output mock active) → identified the field name mismatch in the test mock → traced the crash path from `parseMdaAlerts` to `formatFallback(undefined)`.
+
+### Root cause
+
+Two concurrent gaps:
+1. **Test mock field names not validated against API schema.** The Step 2 QA process had no requirement to validate mock factory field names against the production `RawMDAAlert` interface. The test's `MDAAlert` interface was authored independently and used descriptive field names (`alert_id`, `indicator_id`) that seemed reasonable but didn't match the actual API schema.
+2. **`getIndicatorDisplayNameAny` had no null guard.** The function was typed as `key: string` but had no runtime defense against null/undefined. Any falsy key reached `formatFallback(key)` → `key.replace(...)` → TypeError. The typing implied the caller would always provide a valid string, but no contract prevented the crash.
+
+### Process improvement
+
+**Immediate fix (PR #1098, commit `a7c1d67`):** Added a one-line null guard at the entry point of `getIndicatorDisplayNameAny` in `frontend/src/lib/indicatorDisplayNames.ts`:
+```typescript
+if (!key) return "Indicator"; // defensive: guard against null/undefined (NM-051)
+```
+This protects all three Zone 1B rendering call sites (AlertDetailPanel, TopAlertDetail, buildTrajectoryLayerSentence) without individual call-site patching. For all real indicator keys (non-empty strings), behavior is unchanged.
+
+**Structural gap not closed by this entry:** The test mock field name mismatch (alert_id/indicator_id vs mda_id/indicator_key) was NOT fixed in the test file. The mock still uses wrong field names — but the null guard prevents the crash. This leaves the test using semantically incorrect mock data (mda_id is undefined, indicator_key is undefined on the parsed Zone1BAlert). The test passes because:
+- AC-7 guards on the label text ("Initial conditions" / "Current trajectory"), not on mda_id or indicator_key
+- `indicator_name` is a shared field name (present in both interfaces) and provides the display name fallback
+
+A proper fix would update `makeReserveAlert()` to use `mda_id`/`indicator_key`, but this is a Step 2 artifact in a pre-authored test. Fixing it without a rejection artifact would violate the Step 2 → Step 3 authorship boundary. This entry documents the gap; a future QA refactor sprint should align all mock factory field names with the production API schema.
+
+**Countermeasure for Step 2 authorship:** Mock factory field names in Playwright specs should be validated against the production TypeScript interface at Step 2 authorship time. Specifically: any mock that will be intercepted by a component that passes the response to a parsing function (like `parseMdaAlerts`) must use the field names expected by that parsing function, not field names that match the test file's local interface. This is now documented as a QA authorship check at Step 2.
+
+---
+
 ## Registry Maintenance
 
 ### How to add an entry

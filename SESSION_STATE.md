@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-20 (M15 kickoff COMPLETE — release/m15 live; sprint plan EL-approved; KI-005 permanent fix applied (do_not_enforce_on_create: true); #984 renamed to 'M15 Exit Checklist'; implementation unblocked pending G-group sprint entry documents)**
+**Last updated: 2026-06-21 (M15-G1 COMPLETE through Step 4 Verify — PRs #1095 (sprint entry), #1096 (QA tests), #1097 (implementation), #1098 (indicator_key guard) all merged to release/m15; 11/11 ACs PASS; NM-051 filed; #1065/#1066/#1068/#1069/#1075 closed; Step 5 Validate pending)**
 **Current milestone:** M15 — Human Cost Architecture (GitHub Milestone 16)
 **Previous milestone:** M14 — Trust Architecture and Instrument Credibility (FORMALLY CLOSED 2026-06-20; release/m14 → main PR #1086; v0.14.0 at https://github.com/PublicEnemage/worldsim/releases/tag/v0.14.0; #968 closed; GitHub Milestone 15 closed)
 
@@ -57,12 +57,12 @@ Implementation is now unblocked. A sprint entry document must be filed and EL-ap
 
 | Issue | Title | Group | Notes |
 |---|---|---|---|
-| #1065 | ux(zone-1b): Layer 3 trajectory sentence — Zone 1B | G1 | IR-001; CRITICAL; escalation comment 2026-06-20 |
-| #1066 | ux(zone-1b): suppress "0 consecutive steps" when zero | G1 | IR-002; HIGH |
+| #1065 ✅ | ux(zone-1b): Layer 3 trajectory sentence — Zone 1B | G1 | ✅ CLOSED 2026-06-21 — M15-G1 Step 3 COMPLETE (PR #1097) |
+| #1066 ✅ | ux(zone-1b): suppress "0 consecutive steps" when zero | G1 | ✅ CLOSED 2026-06-21 — M15-G1 Step 3 COMPLETE (PR #1097) |
 | #1067 | demo(screenshots): Frame B and C are same screenshot | G5 | IR-003; HIGH — demo artifact fix |
-| #1068 | ux(zone-1a): L0 badge on Zone 1A trajectory curves | G1 | IR-004 Path A; HIGH |
-| #1069 | ux(grounding-strip): dual reserve values without disambiguation | G1 | IR-005; CRITICAL; escalation comment 2026-06-20 |
-| #1075 | ux(zone-1d): PSP self-interpreting sentence absent | G1 | DEMO-099; CRITICAL |
+| #1068 ✅ | ux(zone-1a): L0 badge on Zone 1A trajectory curves | G1 | ✅ CLOSED 2026-06-21 — M15-G1 Step 3 COMPLETE (PR #1097) |
+| #1069 ✅ | ux(grounding-strip): dual reserve values without disambiguation | G1 | ✅ CLOSED 2026-06-21 — M15-G1 Step 3 COMPLETE (PR #1097) |
+| #1075 ✅ | ux(zone-1d): PSP self-interpreting sentence absent | G1 | ✅ CLOSED 2026-06-21 — M15-G1 Step 3 COMPLETE (PR #1097) |
 | #1083 | ux(grounding-strip): date label "2024-Q1" → "Apr 2024" | G5 | DEMO-122; MEDIUM |
 | #1084 | methodology: PSP historical calibration anchor | G5 | DEMO-127; MEDIUM |
 | #1088 | docs(demo): walkthrough — "0 consecutive steps" plain language | G5 | DEMO-123; MEDIUM; filed 2026-06-20 |
@@ -90,6 +90,30 @@ Implementation is now unblocked. A sprint entry document must be filed and EL-ap
 | #92 | arch(backtesting): Greece investment climate conditions | | |
 | #6 | governance: branch protection restoration | G7 | EL-action |
 | #3 | governance: single-principal separation of duties | G7 | EL-action |
+
+---
+
+## Open Work Streams — M15 (Human Cost Architecture)
+
+### M15-G1 — Layer 3 IR Fixes (Step 5 Validate pending)
+
+**Sprint entry:** `docs/process/sprint-plans/m15-g1-sprint-entry.md` — EL-approved 2026-06-20 (PR #1095)
+**Intent document:** `docs/process/intents/M15-G1-2026-06-20-layer3-ir-fixes.md`
+**QA tests (Step 2):** `frontend/tests/e2e/m15-g1-layer3-ir-fixes.spec.ts` — PR #1096 (merged)
+**Issues:** #1065, #1066, #1068, #1069, #1075
+
+| Item | Status | Notes |
+|---|---|---|
+| G1 sprint entry document | ✅ **EL APPROVED 2026-06-20** (PR #1095) | Five entry conditions satisfied; implementation unblocked |
+| G1 QA tests (Step 2) | ✅ FILED 2026-06-20 — PR #1096 | AC-1–AC-11 authored before implementation; NM-051 prerequisite fix |
+| G1 implementation (Step 3) | ✅ **MERGED 2026-06-21** — PR #1097 + PR #1098 → release/m15 | Five Layer 3 IR fixes: trajectory sentence (AC-1–4), zero-step suppression (AC-5), L0 badges (AC-6), grounding strip disambiguation (AC-7–8), PSP sentence (AC-9–11); null guard for `getIndicatorDisplayNameAny` (PR #1098) |
+| G1 Step 4 Verify | ✅ **PASS 2026-06-21** | 11/11 ACs pass; NM-051 filed (indicator_key crash at Step 4); verdict in intent doc §8 |
+| G1 Step 5 Validate | ⬜ PENDING | Business PO opens live application; Customer Agent Layer 3 assessment required first (Personas 2/5) |
+| NM-051 | ✅ FILED 2026-06-21 | QA mock used alert_id/indicator_id instead of mda_id/indicator_key; undefined key crashed React tree; null guard fix in PR #1098 |
+| #1065/#1066/#1068/#1069/#1075 | ✅ CLOSED 2026-06-21 | All five G1 issues closed on GitHub |
+
+**Next required action:** Step 5 Validate — Business PO must open live application and confirm Persona 2 (Eleni/Aicha) can read Zone 1B trajectory sentence and PSP sentence without specialist mediation within 90-second ceiling; Customer Agent Layer 3 assessment is a required input; then file sprint exit document `docs/process/sprint-plans/m15-g1-sprint-exit.md`.
+**G8 gate status:** G8 (#843 live external demo) may not open until G1 Step 5 Validate is complete.
 
 ---
 
@@ -318,6 +342,10 @@ All near-term issues dispositioned at HORIZON sweep 2026-06-13 — see G8 sprint
 
 | PR | Title | Target | Status |
 |---|---|---|---|
+| #1098 ✅ | fix(m15-g1): guard getIndicatorDisplayNameAny against undefined key (NM-051) | release/m15 | Merged 2026-06-21 |
+| #1097 ✅ | feat(m15-g1): Layer 3 IR fixes — trajectory sentence, zero-step suppression, L0 badges, grounding strip disambiguation, PSP sentence | release/m15 | Merged 2026-06-21 |
+| #1096 ✅ | test(m15-g1): QA Lead Steps 1+2 — AC-1–AC-11 authored before implementation | release/m15 | Merged 2026-06-21 |
+| #1095 ✅ | process(m15-g1): sprint entry document — Layer 3 IR fixes (EL-approved) | release/m15 | Merged 2026-06-20 |
 | #1081 ✅ | demo(m14-g8): Step 8 + Step 9 — stakeholder review placeholder and simulated session artifact | release/m14 | Merged 2026-06-20 |
 | #1080 ✅ | chore(m14): rename milestone — "Trust Architecture and Instrument Credibility" | release/m14 | Merged 2026-06-20 |
 | #1078 ✅ | docs(m14-g8): honest narration revision — retain M15 promises, remove false current-delivery claims | release/m14 | Merged 2026-06-20 |
