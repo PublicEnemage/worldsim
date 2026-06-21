@@ -141,6 +141,35 @@ export function formatAlertText(
 }
 
 /**
+ * Build the Zone 1B Layer 3 directive sentence for the top alert (#1065, ADR-015 §Component 4).
+ *
+ * When consecutive_breach_steps is null (computation unavailable), renders a transparent
+ * fallback disclosure rather than an absent element (AC-10 silent-failure rule).
+ */
+export function buildTrajectoryLayerSentence(alert: Zone1BAlert): string {
+  const cbs = alert.consecutive_breach_steps;
+
+  if (cbs === null || cbs === undefined) {
+    return "Trajectory analysis unavailable for this alert.";
+  }
+
+  const displayName = getIndicatorDisplayNameAny(alert.indicator_key);
+  const currentNum = parseFloat(String(alert.current_value));
+  const floorNum = parseFloat(String(alert.floor_value));
+
+  if (!isNaN(currentNum) && !isNaN(floorNum)) {
+    const diff = Math.abs(currentNum - floorNum).toFixed(2);
+    if (currentNum < floorNum) {
+      return `${displayName} has fallen ${diff} below the ${alert.severity} threshold. Breach active for ${cbs} consecutive step${cbs !== 1 ? "s" : ""}.`;
+    }
+    const pctAbove = (((currentNum - floorNum) / floorNum) * 100).toFixed(1);
+    return `${displayName} is approaching the ${alert.severity} threshold (${pctAbove}% above floor). Breach streak: ${cbs} consecutive step${cbs !== 1 ? "s" : ""}.`;
+  }
+
+  return `${displayName}: ${alert.severity} threshold breach active for ${cbs} consecutive step${cbs !== 1 ? "s" : ""}.`;
+}
+
+/**
  * Truncate indicator display name to ≤ maxChars, appending "…" if truncated.
  */
 export function truncateIndicatorName(name: string, maxChars = 22): string {
@@ -358,7 +387,7 @@ export function AlertDetailPanel({ alert, onClose }: AlertDetailPanelProps) {
         <div>
           <span style={{ color: "#888" }}>Consecutive </span>
           <span data-testid="detail-consecutive" style={{ fontWeight: 700, color: "#555" }}>
-            {alert.consecutive_breach_steps} step{alert.consecutive_breach_steps !== 1 ? "s" : ""}
+            {alert.consecutive_breach_steps ?? "—"} step{alert.consecutive_breach_steps !== 1 ? "s" : ""}
           </span>
         </div>
       </div>
@@ -485,7 +514,7 @@ function TopAlertDetail({ alert, mode, showNewBadge }: TopAlertDetailProps) {
         </span>
       </div>
 
-      {/* Status + consecutive steps */}
+      {/* Status + consecutive steps (zero suppressed — #1066) */}
       <div style={{ display: "flex", gap: 8, marginBottom: 2 }}>
         <span
           data-testid="detail-status"
@@ -493,15 +522,19 @@ function TopAlertDetail({ alert, mode, showNewBadge }: TopAlertDetailProps) {
         >
           {statusText}
         </span>
-        <span style={{ color: "#888" }}>·</span>
-        <span>
-          <span
-            data-testid="detail-consecutive"
-            style={{ fontWeight: 700, color: "#555" }}
-          >
-            {alert.consecutive_breach_steps} consecutive step{alert.consecutive_breach_steps !== 1 ? "s" : ""}
-          </span>
-        </span>
+        {alert.consecutive_breach_steps !== null &&
+         alert.consecutive_breach_steps !== undefined &&
+         alert.consecutive_breach_steps > 0 && (
+          <>
+            <span style={{ color: "#888" }}>·</span>
+            <span
+              data-testid="detail-consecutive"
+              style={{ fontWeight: 700, color: "#555" }}
+            >
+              {alert.consecutive_breach_steps} consecutive step{alert.consecutive_breach_steps !== 1 ? "s" : ""}
+            </span>
+          </>
+        )}
       </div>
 
       {/* Negotiation-defensibility label (always shown in detail slot) */}
@@ -513,6 +546,22 @@ function TopAlertDetail({ alert, mode, showNewBadge }: TopAlertDetailProps) {
         }}
       >
         {getNegotiationLabel(alert.confidence_tier)}
+      </div>
+
+      {/* Layer 3 directive sentence (#1065, ADR-015 §Component 4) — always rendered when
+          top alert is present; shows fallback text when trajectory computation unavailable. */}
+      <div
+        data-testid="zone-1b-trajectory-sentence"
+        style={{
+          marginTop: 4,
+          fontSize: 10,
+          color: "#444",
+          lineHeight: 1.4,
+          borderTop: "1px solid rgba(0,0,0,0.06)",
+          paddingTop: 3,
+        }}
+      >
+        {buildTrajectoryLayerSentence(alert)}
       </div>
 
       {/* Causal attribution — Mode 3 only */}

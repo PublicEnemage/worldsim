@@ -136,7 +136,7 @@ interface RawMDAAlert {
   floor_value: string;
   current_value: string;
   approach_pct_remaining: string;
-  consecutive_breach_steps: number;
+  consecutive_breach_steps: number | null;
   recovery_horizon_years?: number | null;
 }
 
