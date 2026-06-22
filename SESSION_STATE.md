@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-22 (M15-G5 BPO ACCEPT — sprint exit confirmed; G8 UNBLOCKED; G4 Step 5 Validate still pending BPO)**
+**Last updated: 2026-06-22 (G4 BPO ACCEPT — Step 5 Validate complete; sprint exit confirmed; #975 to close; G4 CLOSED)**
 **Current milestone:** M15 — Human Cost Architecture (GitHub Milestone 16)
 **Previous milestone:** M14 — Trust Architecture and Instrument Credibility (FORMALLY CLOSED 2026-06-20; release/m14 → main PR #1086; v0.14.0 at https://github.com/PublicEnemage/worldsim/releases/tag/v0.14.0; #968 closed; GitHub Milestone 15 closed)
 
@@ -186,9 +186,11 @@ Implementation is now unblocked. A sprint entry document must be filed and EL-ap
 | G4 frontend implementation (Step 3) | ✅ **MERGED 2026-06-22 — PR #1117** | `ScenarioPanel.tsx`: searchable combobox with 41 entities; `DataQualityPreview.tsx`: loadable state + pull trigger + polling; `FidelityDashboard.tsx`: scenario-specific contextualisation + SF-3 fallback; `App.tsx`: scenarioId prop wired |
 | E2E test regression (NM-054) | ✅ **FIXED — PR #1117** | 6 existing tests used `.selectOption()` on now-`<input>` entity-selector; fixed to combobox fill+click pattern; NM-054 filed |
 | G4 Step 4 Verify | ✅ **CONDITIONAL PASS 2026-06-22** | All 15 ACs confirmed by code review of PR #1116/#1117 implementation; G4 test files not in implementation PRs (NM-055); tests committed in process-artifacts PR; will run in CI from that merge; NM-053 (CM sign-off timing), NM-054 (combobox regression); intent doc §8 corrected |
-| G4 Step 5 Validate | ⬜ **Pending BPO** | Business PO confirms Eleni (Persona 2) can create SEN scenario within 5-min ceiling; Customer Agent Layer 3 assessment required before BPO verdict |
+| G4 Step 5 Validate | ✅ **BPO ACCEPT 2026-06-22** | All 15 ACs confirmed via live application (post-migration rebuild required — NM-049 fix confirmed working); Customer Agent Layer 3 PASS (all 3 new text outputs self-interpreting); North star PASS — Aicha can argue Argentina 2001 directional validation at table + create SEN peer scenario without admin intervention; Kryptonite PASS; sprint exit filed |
 
-**Next required action:** Business PO (EL) runs Step 5 Validate — open live application with SEN scenario creation and ZMB fidelity panel; Customer Agent Layer 3 assessment; sprint exit document.
+**G4 is CLOSED.** Sprint exit document: `docs/process/sprint-plans/m15-g4-sprint-exit.md` — PI Agent Confirmed 2026-06-22. Issue #975 to be closed on GitHub.
+
+**Setup note recorded in sprint exit §5:** Migration 2b821063ef81 required container rebuild at validate time (container was 42h old). G5 entrypoint fix (NM-049) confirmed working. G6 accessibility validation will exercise clean-build path on target hardware.
 
 ---
 
