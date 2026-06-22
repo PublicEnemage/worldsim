@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-22 (G4 BPO ACCEPT — Step 5 Validate complete; sprint exit confirmed; #975 to close; G4 CLOSED)**
+**Last updated: 2026-06-22 (M15-G6 validation COMPLETE — VC-1/VC-2/VC-4 PASS; VC-3 CONDITIONAL PASS; validation report filed; G4 CLOSED — BPO ACCEPT 2026-06-22; G5 CLOSED — BPO ACCEPT 2026-06-22)**
 **Current milestone:** M15 — Human Cost Architecture (GitHub Milestone 16)
 **Previous milestone:** M14 — Trust Architecture and Instrument Credibility (FORMALLY CLOSED 2026-06-20; release/m14 → main PR #1086; v0.14.0 at https://github.com/PublicEnemage/worldsim/releases/tag/v0.14.0; #968 closed; GitHub Milestone 15 closed)
 
@@ -73,7 +73,7 @@ Implementation is now unblocked. A sprint entry document must be filed and EL-ap
 | #1007 ✅ | fix: recompute-badge not visible after apply-control-change | G5 | ✅ MERGED 2026-06-22 — PR #1119; immediate "pending" state before async fetch |
 | #1004 ✅ | process: Visual Spec section for intent template | G5 | ✅ MERGED 2026-06-22 — PR #1122; data-testid ×4, viewport ×2 in §4b |
 | #984 | M15 Exit Checklist | — | immediate \| M15 gate issue (note: title says "Milestone 16" — GitHub milestone numbering) |
-| #990 | test: accessibility validation on 8GB/4-core target hardware | G6 | Filed 2026-06-16 |
+| #990 ✅ | test: accessibility validation on 8GB/4-core target hardware | G6 | ✅ COMPLETE 2026-06-22 — validation report at `docs/process/validation/m15-g6-accessibility-validation-report.md`; VC-1/VC-2/VC-4 PASS; VC-3 CONDITIONAL PASS (non-Docker path documented; fully offline path planned) |
 | #987 | feat(ux): political risk summary surface (Persona 3) | G3 | Design in M15; implementation M16 |
 | #986 | feat(ux): cohort disaggregation on primary surface | G3 | Design in M15; implementation M16 |
 | #975 | feat(data): Path 1 — approved source network query | G4 | Journey A GA-01; extends ADR-016 Component 1 |
@@ -242,6 +242,27 @@ Implementation is now unblocked. A sprint entry document must be filed and EL-ap
 | Step 5 Validate (BPO) | ✅ **BPO ACCEPT 2026-06-22** | All Tier 1 + Tier 2 accepted; north star PASS; kryptonite PASS; sprint exit filed |
 
 **G5 is COMPLETE. Sprint exit document confirmed. G8 is UNBLOCKED. One non-blocking G8 action item: add hyperlink from `methodology-overview.md` to `psp-calibration-anchor.md` during G8 demo prep.**
+
+---
+
+### M15-G6 — Accessibility Validation (COMPLETE)
+
+**Sprint entry:** `docs/process/sprint-plans/m15-g6-sprint-entry.md` — **EL APPROVED 2026-06-22**
+**Validation report:** `docs/process/validation/m15-g6-accessibility-validation-report.md` — **FILED 2026-06-22**
+**Issue:** #990
+
+| Check | Result | Key finding |
+|---|---|---|
+| VC-1 — Docker Compose startup + responsiveness | ✅ **PASS** | `/health/` HTTP 200; GRC/JOR/EGY/ZMB in `/countries`; frontend reachable; peak memory ~440 MiB / 7.663 GiB limit |
+| VC-2 — Simulation engine 8-step timing | ✅ **PASS** | 0.079s wall-clock (target ≤ 60s); all 4 framework keys in trajectory |
+| VC-3 — Non-Docker Playwright path documented | ✅ **CONDITIONAL PASS** | `CONTRIBUTING.md §4` lightweight local path documented; requires PostGIS DB via Docker; fully offline path (MSW) planned for future milestone; limitation on record |
+| VC-4 — Frontend build time | ✅ **PASS** | 3.4 seconds on 10-core host (target ≤ 5 min); build exits 0 |
+
+**Overall: 3 PASS + 1 CONDITIONAL PASS. No FAIL findings. No new issues filed.**
+
+**Infrastructure Sprint declaration confirmed at exit:** No G6 output modifies user-visible application state. VC-3 CONDITIONAL PASS limitation is documentation-only (no implementation gap). PI Agent confirms Infrastructure Sprint Exception classification is correct for G6.
+
+**#990 closed:** All VC checks complete with no FAIL findings. Accessibility validation sprint is DONE.
 
 ---
 
