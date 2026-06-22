@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-22 (M15-G3 BPO ACCEPT — Step 5 Validate complete; sprint exit filed PR #1110; intent doc §8/§9 filed; M16 gates remain (CM, DA, ARF, FA); G2 intent + QA still pending)**
+**Last updated: 2026-06-22 (M15-G4 intent filed — 15 ACs; within-sprint gates resolved: Architect scope confirm, CM analogous-case mapping, DA-G4-1–4; next: QA Lead files both test files; CM sign-off on #975 before Component 3 impl PR review; G2 ADR-017 EL acceptance still pending)**
 **Current milestone:** M15 — Human Cost Architecture (GitHub Milestone 16)
 **Previous milestone:** M14 — Trust Architecture and Instrument Credibility (FORMALLY CLOSED 2026-06-20; release/m14 → main PR #1086; v0.14.0 at https://github.com/PublicEnemage/worldsim/releases/tag/v0.14.0; #968 closed; GitHub Milestone 15 closed)
 
@@ -21,7 +21,7 @@
 | 1. PM Agent cuts `release/m15` from `main` | ✅ DONE 2026-06-20 | `release/m15` at 500e50d |
 | 2. PM Agent authors `m15-sprint-plan.md` | ✅ DONE 2026-06-20 | Filed in PR opening; EL approval pending |
 | 3. EL approves sprint plan | ✅ **EL APPROVED 2026-06-20** | `docs/process/sprint-plans/m15-sprint-plan.md` |
-| 4. PM Agent marks ARCH-011 ASSIGNED in backlog | ⬜ At ADR-017 claim time | Added as PENDING_NUMBER; Architect claims when drafting begins |
+| 4. PM Agent marks ARCH-011 ASSIGNED in backlog | ✅ **DONE 2026-06-22** | ARCH-011 → ASSIGNED — ADR-017 (number 17); updated in this session |
 | 5. M15 exit checklist issue #984 renamed | ✅ DONE 2026-06-20 | Renamed to "M15 Exit Checklist — blocks milestone closure" |
 | 6. KI-005 permanent fix applied | ✅ DONE 2026-06-20 | `do_not_enforce_on_create: true` on Ruleset 17751852; future release branches need no Ruleset workaround |
 
@@ -124,16 +124,18 @@ Implementation is now unblocked. A sprint entry document must be filed and EL-ap
 
 | Item | Status | Notes |
 |---|---|---|
-| G2 sprint entry document | ✅ **EL APPROVED 2026-06-21** (PR #1104) | All entry invariants satisfied; intent + QA gates blocking G2 work until filed |
-| Intent document (Step 1) | ⬜ Not filed — BLOCKING | Must file before Architecture Review begins: `docs/process/intents/M15-G2-2026-06-21-zone-1a-adr.md` |
-| QA test file (Step 2) | ⬜ Not filed — BLOCKING | File-existence + content-presence checks: `backend/tests/test_m15_g2_zone1a_adr.py` |
-| ARCH-011 ASSIGNED in backlog | ⬜ Currently PENDING_NUMBER | Architect Agent marks ASSIGNED with ADR-017 number at authorship start (within-sprint step) |
-| Phase 2 — Architecture Review | ⬜ Not started | ARCH-REVIEW-007-milestone15.md; addresses three Phase 2 readiness questions from Zone 1A design thinking doc |
-| Phase 3 — ADR-017 authorship | ⬜ Not started — gated on ARCH-REVIEW-007 | Tier 1 ADR; UX Designer independent sign-off required (NM-042) |
-| Phase 3 — EL acceptance | ⬜ Not started — gated on ADR-017 draft + panel sign-offs | |
+| G2 sprint entry document | ✅ **EL APPROVED 2026-06-21** (PR #1104) | All entry invariants satisfied |
+| Intent document (Step 1) | ✅ **FILED 2026-06-22** (PR #1107) | `docs/process/intents/M15-G2-2026-06-21-zone-1a-adr.md`; QA Lead checkbox ✅ |
+| QA test file (Step 2) | ✅ **FILED 2026-06-22** (PR #1107) | `backend/tests/test_m15_g2_zone1a_adr.py`; 34 tests AC-1–AC-11 |
+| ARCH-011 ASSIGNED in backlog | ✅ **DONE 2026-06-22** | `docs/architecture/backlog.md` — ASSIGNED — ADR-017 (number 17) |
+| Phase 2 — Architecture Review (ARCH-REVIEW-007) | ✅ **AUTHORED 2026-06-22** | `docs/architecture/reviews/ARCH-REVIEW-007-milestone15.md`; four open questions resolved; binding decisions: Mode 3 composite encoding, COMPARE_VIEW N≤2/fixture, `composite_score` reuse, endpoint label y-offset algorithm |
+| Phase 3 — ADR-017 authorship | ✅ **AUTHORED 2026-06-22** | `docs/adr/ADR-017-zone-1a-information-architecture.md`; Tier 1; 33/34 QA tests pass; Status=Proposed — gated on EL acceptance |
+| QA tests (33/34) | ✅ 33 PASS / 1 EXPECTED FAIL | `test_el_acceptance_status` fails (expected) — passes only after EL changes Status to `Accepted` |
+| Phase 3 — **EL acceptance** | ⬜ **NEXT REQUIRED ACTION** | EL reviews ADR-017, changes `## Status` from `Proposed` to `Accepted`; triggers 34/34 QA pass |
+| Phase 3 — Panel sign-offs review | ⬜ Pending EL acceptance | UX Designer sign-off: same-session acknowledged (NM-042 §Session context); EL must verify §citations |
 | Phase 4 — implementation | ⬜ Out of G2 scope | Separate sprint entry required; may extend to M16 |
 
-**Next required action:** Architect Agent files intent document at `docs/process/intents/M15-G2-2026-06-21-zone-1a-adr.md`. QA Lead files `backend/tests/test_m15_g2_zone1a_adr.py` after intent document. Both must be on release/m15 before Architecture Review begins.
+**Next required action:** EL (Engineering Lead @PublicEnemage) reviews `docs/adr/ADR-017-zone-1a-information-architecture.md` and changes `## Status` from `Proposed` to `Accepted`. PR on `feat/m15-g2-arch-review-adr017` will be opened targeting `release/m15` pending this session's commit. After EL acceptance: sprint exit document, close #845 Phases 2–3.
 
 ---
 
@@ -159,6 +161,27 @@ Implementation is now unblocked. A sprint entry document must be filed and EL-ap
 | Zone 1D layout feasibility (#987) | ⬜ Required before M16 sprint entry | Frontend Architect confirms sub-section fits at 1280×800 without displacing 4-framework rows |
 
 **Sprint exit document:** `docs/process/sprint-plans/m15-g3-sprint-exit.md` — PI Agent Confirmed 2026-06-22 (PR #1110)
+
+---
+
+### M15-G4 — Path 1 + ADR-016 Component 3
+
+**Sprint entry:** `docs/process/sprint-plans/m15-g4-sprint-entry.md` — **EL APPROVED 2026-06-22**
+**Intent document:** `docs/process/intents/M15-G4-2026-06-22-path1-fidelity-contextualisation.md` — **FILED 2026-06-22**
+**Issues:** #975 (Path 1 approved source network query), ADR-016 Component 3 (Fidelity panel contextualisation)
+
+| Item | Status | Notes |
+|---|---|---|
+| G4 sprint entry document | ✅ **EL APPROVED 2026-06-22** | `docs/process/sprint-plans/m15-g4-sprint-entry.md`; all structural gates clear |
+| Architect scope confirmation (#975) | ✅ RESOLVED — intent §Decision Gate 1 | #975 within ADR-016 Component 1 scope; no ADR amendment required; M15 validity review satisfied by intent doc |
+| CM analogous-case selection logic | ✅ RESOLVED — intent §Decision Gate 2 | Rule-based entity→case mapping table: ZMB→ARG, JOR→GRC, EGY→ARG, GRC→GRC, unknown→null; CM sign-off on #975 required before Component 3 impl PR is marked ready for review |
+| Data Architect API decisions (DA-G4-1–4) | ✅ RESOLVED — intent §Decisions Resolved | DA-G4-1: `loadable` field on existing `/data-quality` (not new endpoint); DA-G4-2: async pull job POST+GET; DA-G4-3: api_contracts.yml update in same PR as backend impl; DA-G4-4: new `GET /scenarios/{id}/fidelity-context` endpoint |
+| Intent document (Step 1) | ✅ **FILED 2026-06-22** | `docs/process/intents/M15-G4-2026-06-22-path1-fidelity-contextualisation.md`; 15 ACs; Data Architect + Architect co-authored; within-sprint gates resolved |
+| QA test files (Step 2) | ⬜ Not filed — BLOCKING | `backend/tests/test_m15_g4_path1_fidelity_contextualisation.py` + `frontend/tests/e2e/m15-g4-path1-fidelity-contextualisation.spec.ts`; QA Lead files before implementation |
+| `api_contracts.yml` update | ⬜ Required before frontend impl | DA confirmed in intent §DA-G4-3: update lands in same PR as backend impl |
+| G4 implementation (Step 3) | ⬜ Not started — gated on QA test files | Full-stack: Data Architect (backend) + Frontend Architect (frontend) |
+
+**Next required action:** QA Lead files both test files from intent document ACs before implementation begins.
 
 ---
 
