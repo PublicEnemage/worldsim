@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-22 (M15-G4 intent filed — 15 ACs; within-sprint gates resolved: Architect scope confirm, CM analogous-case mapping, DA-G4-1–4; next: QA Lead files both test files; CM sign-off on #975 before Component 3 impl PR review; G2 ADR-017 EL acceptance still pending)**
+**Last updated: 2026-06-22 (M15-G2 COMPLETE — ADR-017 Accepted 2026-06-22, 34/34 QA pass, sprint exit filed; G4: QA Lead test files pending)**
 **Current milestone:** M15 — Human Cost Architecture (GitHub Milestone 16)
 **Previous milestone:** M14 — Trust Architecture and Instrument Credibility (FORMALLY CLOSED 2026-06-20; release/m14 → main PR #1086; v0.14.0 at https://github.com/PublicEnemage/worldsim/releases/tag/v0.14.0; #968 closed; GitHub Milestone 15 closed)
 
@@ -129,13 +129,14 @@ Implementation is now unblocked. A sprint entry document must be filed and EL-ap
 | QA test file (Step 2) | ✅ **FILED 2026-06-22** (PR #1107) | `backend/tests/test_m15_g2_zone1a_adr.py`; 34 tests AC-1–AC-11 |
 | ARCH-011 ASSIGNED in backlog | ✅ **DONE 2026-06-22** | `docs/architecture/backlog.md` — ASSIGNED — ADR-017 (number 17) |
 | Phase 2 — Architecture Review (ARCH-REVIEW-007) | ✅ **AUTHORED 2026-06-22** | `docs/architecture/reviews/ARCH-REVIEW-007-milestone15.md`; four open questions resolved; binding decisions: Mode 3 composite encoding, COMPARE_VIEW N≤2/fixture, `composite_score` reuse, endpoint label y-offset algorithm |
-| Phase 3 — ADR-017 authorship | ✅ **AUTHORED 2026-06-22** | `docs/adr/ADR-017-zone-1a-information-architecture.md`; Tier 1; 33/34 QA tests pass; Status=Proposed — gated on EL acceptance |
-| QA tests (33/34) | ✅ 33 PASS / 1 EXPECTED FAIL | `test_el_acceptance_status` fails (expected) — passes only after EL changes Status to `Accepted` |
-| Phase 3 — **EL acceptance** | ⬜ **NEXT REQUIRED ACTION** | EL reviews ADR-017, changes `## Status` from `Proposed` to `Accepted`; triggers 34/34 QA pass |
-| Phase 3 — Panel sign-offs review | ⬜ Pending EL acceptance | UX Designer sign-off: same-session acknowledged (NM-042 §Session context); EL must verify §citations |
+| Phase 3 — ADR-017 authorship | ✅ **AUTHORED 2026-06-22** | `docs/adr/ADR-017-zone-1a-information-architecture.md`; Tier 1; full P-1–P-7, UX-1–UX-7, NM-042 sign-off |
+| Encoding mockups | ✅ **MERGED 2026-06-22** — PR #1113 | `docs/ux/mockups/ADR-017-zone-1a-encoding-mockups.html`; 6 SVG panels; referenced from ADR-017 §Visual Mockups as relative hyperlink |
+| Phase 3 — **EL acceptance** | ✅ **ACCEPTED 2026-06-22** — PR #1114 | @PublicEnemage accepted after reviewing mockups; Status → `Accepted`; `test_el_acceptance_status` now passes |
+| QA tests (34/34) | ✅ **34/34 PASS 2026-06-22** | All AC-1–AC-11 pass after PR #1114 merge |
+| Sprint exit document | ✅ **FILED 2026-06-22** | `docs/process/sprint-plans/m15-g2-sprint-exit.md`; PI Agent Confirmed |
 | Phase 4 — implementation | ⬜ Out of G2 scope | Separate sprint entry required; may extend to M16 |
 
-**Next required action:** EL (Engineering Lead @PublicEnemage) reviews `docs/adr/ADR-017-zone-1a-information-architecture.md` and changes `## Status` from `Proposed` to `Accepted`. PR on `feat/m15-g2-arch-review-adr017` will be opened targeting `release/m15` pending this session's commit. After EL acceptance: sprint exit document, close #845 Phases 2–3.
+**G2 is COMPLETE.** Next for #845: Phase 4 implementation sprint entry (separate sprint). Close #845 Phases 2–3 on GitHub.
 
 ---
 
