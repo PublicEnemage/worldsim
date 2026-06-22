@@ -13,12 +13,51 @@ const FRAMEWORK_LABELS: Record<string, string> = {
   political_economy: "Political Economy",
 };
 
+// Month abbreviations for Q1–Q4 (start-of-quarter convention).
+const QUARTER_MONTHS = ["Jan", "Apr", "Jul", "Oct"];
+
+/**
+ * Format a vintage date string for human-readable display.
+ *
+ * "YYYY-QN" → "Mmm YYYY" (e.g., "2024-Q1" → "Jan 2024").
+ * "YYYY-MM-DD" → "Mmm YYYY" via Date parsing.
+ * Anything else is returned unchanged.
+ */
+function formatVintageDate(vintage: string): string {
+  const quarterMatch = vintage.match(/^(\d{4})-Q([1-4])$/i);
+  if (quarterMatch) {
+    const year = quarterMatch[1];
+    const quarter = parseInt(quarterMatch[2], 10);
+    return `${QUARTER_MONTHS[quarter - 1]} ${year}`;
+  }
+  const isoMatch = vintage.match(/^(\d{4})-(\d{2})-\d{2}$/);
+  if (isoMatch) {
+    const d = new Date(`${vintage}T00:00:00Z`);
+    return d.toLocaleDateString("en-US", { month: "short", year: "numeric", timeZone: "UTC" });
+  }
+  return vintage;
+}
+
+/**
+ * Extract the first non-null vintage date across all frameworks and format it.
+ * Returns null if no vintage is available.
+ */
+function extractReferenceDate(frameworks: InitialStateResponse["frameworks"]): string | null {
+  for (const section of Object.values(frameworks)) {
+    for (const ind of section.indicators) {
+      if (ind.vintage) return formatVintageDate(ind.vintage);
+    }
+  }
+  return null;
+}
+
 function IndicatorRow({ ind }: { ind: GroundingIndicator }) {
   const value =
     ind.value != null
       ? `${ind.value}${ind.unit ? " " + ind.unit : ""}`
       : "—";
-  const citation = [ind.source, ind.vintage]
+  const formattedVintage = ind.vintage ? formatVintageDate(ind.vintage) : null;
+  const citation = [ind.source, formattedVintage]
     .filter(Boolean)
     .join(" · ");
   const tier = ind.confidence_tier != null ? ` · T${ind.confidence_tier}` : "";
@@ -167,6 +206,7 @@ export default function GroundingStrip({ scenarioId }: Props) {
 
   const hasData = namedFrameworks.length > 0;
   const hasCurrentData = currentValues !== null && current_step > 0;
+  const referenceDate = data ? extractReferenceDate(data.frameworks) : null;
 
   const sectionHeaderStyle: React.CSSProperties = {
     fontSize: 10,
@@ -202,6 +242,14 @@ export default function GroundingStrip({ scenarioId }: Props) {
           <div style={{ marginBottom: hasCurrentData ? 8 : 0 }}>
             <div style={sectionHeaderStyle}>
               Initial conditions (step 0 · source-cited data)
+              {referenceDate && (
+                <span
+                  data-testid="grounding-strip-date"
+                  style={{ marginLeft: 8, fontWeight: 400, color: "#64748b" }}
+                >
+                  · {referenceDate}
+                </span>
+              )}
             </div>
             {namedFrameworks.map(([key, section]) => {
               const visibleIndicators = section.indicators.filter(
