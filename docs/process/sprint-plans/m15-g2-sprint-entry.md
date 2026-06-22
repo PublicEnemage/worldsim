@@ -3,17 +3,17 @@ name: m15-g2-sprint-entry
 type: sprint-entry
 milestone: M15 — Human Cost Architecture
 sprint-group: G2
-status: Filed — awaiting EL approval before G2 work begins
+status: EL Approved 2026-06-21 — intent document and QA tests must be filed before G2 work begins
 authored-by: PM Agent
 authored-date: 2026-06-21
-el-approved: false
+el-approved: 2026-06-21
 release-branch: release/m15
 sop-reference: docs/process/sprint-planning-sop.md
 ---
 
 # Sprint Entry — M15, G2: Zone 1A Information Architecture ADR
 
-**Status:** Filed — awaiting EL approval before G2 work begins
+**Status:** EL Approved 2026-06-21 — intent document and QA tests must be filed before G2 work begins
 **Date authored:** 2026-06-21
 **Release branch:** `release/m15`
 **Sprint plan:** `docs/process/sprint-plans/m15-sprint-plan.md` (EL Approved 2026-06-20)
@@ -232,7 +232,7 @@ the architectural foundation for Demo 6. G2 does not block G8.
 
 ## EL Approval Record
 
-**EL approval:** Pending
+**EL approval:** 2026-06-21
 
-> {EL approval statement — to be filled at approval time}
-> — @PublicEnemage ({date})
+> G2 sprint entry approved. Structural gates confirmed clear — release branch exists, CI trigger verified, sprint plan EL-approved, constraint record PR #1102 merged. ADR prerequisite gate clear: no external ADR blocks G2; ARCH-011 ASSIGNED is a within-sprint step. Scope correctly bounded to #845 Phases 2–3 (Architecture Review + ADR-017 authorship); Phase 4 implementation is correctly excluded with a separate sprint entry required. Panel composition for ADR-017 (Tier 1) confirmed: Architect Agent (author), UX Designer independent sign-off (NM-042 compliant session context required), Frontend Architect Agent (C), Business PO (C), Customer Agent (Layer 3), Chief Methodologist (C — composite aggregation rule), EL (A). Intent document and QA test file must be filed before Architecture Review begins — these remain blocking conditions.
+> — @PublicEnemage (2026-06-21)
