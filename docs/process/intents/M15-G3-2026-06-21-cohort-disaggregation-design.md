@@ -366,3 +366,92 @@ These are G5 scope. G3 is not responsible for any G5 issues.
 ---
 
 *Intent document version: 2026-06-21. Issues #986 and #987 authorized as M15 G3 parallel track per `docs/process/sprint-plans/m15-sprint-plan.md §Sprint Groups`. No sprint entry document required (design-only; no implementation PR). Implementing agent: UX Designer Agent. Both design documents must exist before M15 exit. Architecture Review Facilitator confirms M16 readiness before any M16 G-group implementation sprint entry is filed for either issue. Full lifecycle authority: `CLAUDE.md §Agent Execution Lifecycle`.*
+
+---
+
+## 8. Step 4 Verify record
+
+**Verifying agent:** UX Designer Agent
+**Date:** 2026-06-22
+**Method:** QA test suite — `backend/tests/test_m15_g3_cohort_political_risk_design.py` (45 tests, AC-1–AC-11); direct document read by verifying agent
+
+> G3 is design-only. The observable application state is the design documents themselves. The
+> verify step confirms: (1) both documents exist at canonical paths, (2) each contains the
+> specified content, and (3) QA tests programmatically confirm document completeness criteria.
+> CI test-backend: PASS on PR #1109 merge commit (2026-06-22).
+
+**Result: 45/45 QA tests PASS; all AC observable states confirmed**
+
+| AC | Result | Observable state confirmed |
+|---|---|---|
+| AC-1 | PASS | `cohort-disaggregation-design.md` §Zone Placement names Zone 1B; references `information-hierarchy.md §Zone 1 / 1B`; names cognitive task "threshold crossing alerts"; confirms placement serves (not conflicts) |
+| AC-2 | PASS | Income quintile (REQUIRED, M16); under-5 and under-18 age cohort (LIMITED, M16); gender cohort deferred M17 with rationale; subnational deferred M17+ with rationale — all tied to Persona 2 negotiating argument |
+| AC-3 | PASS | Three indicators (poverty headcount, school enrollment, child malnutrition); each has cohort dimension, MDA-derived threshold type, severity tier schema; methodological note for CM per indicator |
+| AC-4 | PASS | Literal text block present for ZMB ECF Mode 2 step 2; shows severity badge, plain-language cohort label, plain-language indicator label, threshold proximity sentence, tier label, source citation; max rows (2 at 1440×900, 1 at 1024×768) stated; sort order stated |
+| AC-5 | PASS | Disposition (b) stated explicitly: "Cohort disaggregation proceeds independently of ADR-017"; references `zone-1a-information-architecture.md §Information Allocation`; explicitly states M16 sprint entry does not require ADR-017 acceptance |
+| AC-6 | PASS | "M16 Implementation Gate" section present; 3 named dependencies: CM sign-off, Data Architect DemographicModule confirmation, ARF confirmation; ADR-017 explicitly stated NOT required |
+| AC-7 | PASS | `political-risk-summary-design.md` §Zone Placement names Zone 1D; addresses (a) 30-second ceiling for non-expert and (b) non-conflict check with existing Zone 1D political economy display; states SUPPLEMENTS (not replaces) |
+| AC-8 | PASS | Mode 1, Mode 2, and Mode 3 sections each specify: indicators (PSP REQUIRED, legitimacy REQUIRED, elite capture OPTIONAL), format per indicator, direction labels, update behaviour, empty state |
+| AC-9 | PASS | Literal example present for ZMB ECF step 3, PSP=0.38, legitimacy=0.42, Mode 2; sentence construction rules provided; jargon-eliminated list present |
+| AC-10 | PASS | Explicit 28-second read-through for Andreas Stefanidis (Persona 3, no formal economics training); what he can say in the room stated; 4 jargon terms eliminated with plain-language replacements named |
+| AC-11 | PASS | Explicit disposition (b): no new ADR required; 4-part rationale; escalation path if ARF disagrees; "M16 Implementation Gate" section with 5 named dependencies including #1084 (conditionally required) |
+
+**Silent failure tests (both documents):**
+
+- Cohort (#986): After reading `cohort-disaggregation-design.md`, a QA reviewer CAN complete: "In a ZMB ECF Mode 2 scenario at step 2, Zone 1B shows a 'COHORT IMPACT' sub-section below MDA alerts with at most 2 rows visible, the first showing 'CRITICAL — Bottom income quintile — Poverty headcount — Threshold crossed at step 2 · was 3.8% above floor'." Completable from the document without reading implementation code. **PASS.**
+- Political risk (#987): After reading `political-risk-summary-design.md`, a QA reviewer CAN complete: "In a ZMB ECF Mode 2 scenario at step 3 with PSP=0.38, Zone 1D shows 'Programme survival: CRITICAL (38%) — DECLINING / At this level, historical ECF programmes show abandonment within 3 steps.'" Completable from the document without reading implementation code. **PASS.**
+
+`[x]` Step 4 Verify: COMPLETE — 45/45 QA tests PASS; all 11 ACs confirmed by document read and test suite. 2026-06-22
+
+---
+
+## 9. Step 5 Validate record
+
+**Business PO:** Business PO Agent
+**Date:** 2026-06-22
+**Method:** Direct read of `docs/ux/design-thinking/cohort-disaggregation-design.md` and `docs/ux/design-thinking/political-risk-summary-design.md` on `release/m15` (merged via PR #1109 2026-06-22); confirmed both documents accessible at canonical paths.
+
+**Customer Agent Layer 3 assessment:**
+
+G3 is a design-only deliverable. The Layer 3 check applies to whether the *designs themselves* specify Layer 3 output — i.e., do the designs describe displays that tell the user what the number means, not just the number?
+
+- **Cohort disaggregation (AC-4 display format):** PASS. The specified display shows severity badge (CRITICAL / WARNING / WATCH) + plain-language cohort label ("Bottom income quintile") + plain-language indicator label ("Poverty headcount") + threshold proximity sentence ("Threshold crossed at step 2 · was 3.8% above floor") + source citation. This is Layer 3: the display tells Persona 2 what crossed, which cohort, how far, when, and from where — without requiring her to interpret a raw number. The display eliminates the field key barrier (`hh_exp_q1` → "Bottom income quintile").
+
+- **Political risk summary (AC-9 sentence specification):** PASS. The specified display shows PSP as "Programme survival: CRITICAL (38%) — DECLINING" (replaces "PSP = 0.38"), historical analogue sentence (replaces a bare probability), legitimacy index with direction and floor proximity (replaces "legitimacy_index = 0.42"), and elite capture with plain-language qualifier. All four jargon-elimination steps are documented and confirmed in the 30-second legibility check. Persona 3 (Andreas, no formal economics training) can read and act on the display within 30 seconds without a data economist present.
+
+**Customer Agent Layer 3 verdict: PASS (both designs specify Layer 3 output)**
+
+**North Star Test:**
+
+*Finance ministry team scenario:* Aicha Diallo (Persona 2 — Zambia Finance Ministry negotiator) and Andreas Stefanidis (Persona 3 — Senior Policy Advisor) are in an IMF ECF restructuring session at step 3. ZMB ECF. Two challenges arrive simultaneously:
+
+- Creditor side: "Your distributional impact claims are not substantiated by the model output."
+- Creditor side: "The political economy basis for your programme survival estimate is unclear — 65% of what?"
+
+*Pre-G3 capability (design not yet implemented):* Cohort data exists in the DemographicModule but is invisible at the instrument level — FINDING-03 HIGH (M11.5 Session 3). Aicha must reconstruct the distributional answer from domain knowledge, not tool output. Political risk module outputs (PSP, legitimacy, elite capture) are in Zone 1D as composite scores — Andreas cannot read or act on them without a data economist to translate.
+
+*Post-G3 capability (after M16 implementation from this design):*
+
+1. **Cohort disaggregation (Aicha, Persona 2):** Zone 1B Cohort Impact sub-section shows "CRITICAL — Bottom income quintile — Poverty headcount — Threshold crossed at step 2." Aicha reads this verbatim: "Under current conditionality terms, the bottom income quintile crossed the poverty headcount CRITICAL threshold at step 2. You can see this on the screen." The argument is from instrument output, not domain knowledge. Creditor cannot challenge the source — it is the simulation's output from the agreed data inputs.
+
+2. **Political risk summary (Andreas, Persona 3):** Zone 1D Political Risk sub-section shows "Programme survival: CRITICAL (38%) — DECLINING / At this level, historical ECF programmes show abandonment within 3 steps." Andreas reads this verbatim: "Programme survival is at 38% and declining — that is CRITICAL. At this level, historical ECF programmes show abandonment within 3 steps. You can see this on the screen." No data economist required. The argument names a historical precedent with a specific timeframe.
+
+*Does this design change what the minister's team can argue at the table?*
+
+Yes — materially and for two distinct personas. Both arguments were previously unavailable from instrument output:
+- Cohort data existed in the engine but was invisible at the instrument level (FINDING-03 HIGH, unresolved since M11.5)
+- PSP existed in Zone 1D but required specialist mediation to translate into a policy argument
+
+After M16 implementation from this design, both arguments are available on the primary viewport, zero interactions, within the persona-specific time ceilings (90 seconds for Aicha, 30 seconds for Andreas).
+
+**Kryptonite Constraint (FD-3):** SATISFIED. Both designs explicitly specify plain-language output that eliminates specialist mediation:
+- Cohort: severity badge + plain-language cohort label + threshold proximity sentence (no field keys, no framework composites)
+- Political risk: "Programme survival" replaces PSP, percentage replaces composite_score, historical analogue replaces raw probability, direction label replaces step-over-step arithmetic
+
+Both designs were authored with explicit kryptonite checks (§5 of the intent document) and the legibility check for #987 documents the specific jargon eliminated.
+
+**Business PO Validate verdict: ACCEPT**
+
+*M16 gate status:* G3 exit does NOT clear the M16 implementation gates. Before any M16 sprint entry for #986 or #987 is filed, the following remain REQUIRED: (1) Chief Methodologist sign-off on indicator scope and threshold methodology for #986; (2) CM sign-off on PSP severity tiers and 2pp direction threshold for #987; (3) Data Architect confirmation of DemographicModule cohort field availability for GRC/JOR/EGY/ZMB; (4) Architecture Review Facilitator confirmation AC-1–AC-11 satisfied; (5) Frontend Architect Zone 1D layout feasibility check for #987. These are M16 gate conditions, not M15 exit conditions.
+
+`[x]` Step 5 Validate: COMPLETE — Business PO ACCEPT 2026-06-22. Sprint exit document filed at `docs/process/sprint-plans/m15-g3-sprint-exit.md`.
