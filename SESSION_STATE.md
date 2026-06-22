@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-22 (M15-G2 COMPLETE — ADR-017 Accepted 2026-06-22, 34/34 QA pass, sprint exit filed; G4: QA Lead test files pending)**
+**Last updated: 2026-06-22 (M15-G2 BPO ACCEPT — intent §9 + sprint exit §3 updated; G4: QA Lead test files pending)**
 **Current milestone:** M15 — Human Cost Architecture (GitHub Milestone 16)
 **Previous milestone:** M14 — Trust Architecture and Instrument Credibility (FORMALLY CLOSED 2026-06-20; release/m14 → main PR #1086; v0.14.0 at https://github.com/PublicEnemage/worldsim/releases/tag/v0.14.0; #968 closed; GitHub Milestone 15 closed)
 
@@ -134,9 +134,10 @@ Implementation is now unblocked. A sprint entry document must be filed and EL-ap
 | Phase 3 — **EL acceptance** | ✅ **ACCEPTED 2026-06-22** — PR #1114 | @PublicEnemage accepted after reviewing mockups; Status → `Accepted`; `test_el_acceptance_status` now passes |
 | QA tests (34/34) | ✅ **34/34 PASS 2026-06-22** | All AC-1–AC-11 pass after PR #1114 merge |
 | Sprint exit document | ✅ **FILED 2026-06-22** | `docs/process/sprint-plans/m15-g2-sprint-exit.md`; PI Agent Confirmed |
-| Phase 4 — implementation | ⬜ Out of G2 scope | Separate sprint entry required; may extend to M16 |
+| **Step 5 Validate — BPO ACCEPT** | ✅ **BPO ACCEPT 2026-06-22** | Navigation PASS; kryptonite PASS; north star PASS; Layer 3 N/A (architecture doc). Phase 4 gate: Zone 1D delta annotations required companion. Full verdict: intent §9 + sprint exit §3. |
+| Phase 4 — implementation | ⬜ Out of G2 scope | Separate sprint entry required; may extend to M16. **Phase 4 entry condition:** Zone 1D delta annotations must be in same sprint as Zone 1A composite encoding (per BPO ACCEPT phase 4 gate). |
 
-**G2 is COMPLETE.** Next for #845: Phase 4 implementation sprint entry (separate sprint). Close #845 Phases 2–3 on GitHub.
+**G2 is COMPLETE.** BPO ACCEPT recorded 2026-06-22. Next for #845: Phase 4 implementation sprint entry (separate sprint). Close #845 Phases 2–3 on GitHub.
 
 ---
 
