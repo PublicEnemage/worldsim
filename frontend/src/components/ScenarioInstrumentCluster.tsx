@@ -463,6 +463,10 @@ export function ScenarioInstrumentCluster({
     const abortController = new AbortController();
     branchAbortRef.current = abortController;
 
+    // Signal pending immediately so the badge appears within the 2-second AC-4 ceiling,
+    // before the branch POST returns (which may take several seconds on slow connections).
+    useScenarioStepStore.setState({ recomputeStatus: "pending" });
+
     const { branchScenarioId } = store;
 
     try {
@@ -617,14 +621,20 @@ export function ScenarioInstrumentCluster({
                   animation: "pulse 1.2s infinite",
                 }}
               />
-              <span>Recomputing…</span>
-              {totalBranchSteps > 0 && (
-                <span
-                  data-testid="recompute-step-progress"
-                  style={{ fontWeight: 400, color: "#9d78ef" }}
-                >
-                  Computing step {branchStepsComputed + 1} of {totalBranchSteps}
-                </span>
+              {recomputeStatus === "pending" ? (
+                <span>Recompute pending — advance step to see updated trajectory</span>
+              ) : (
+                <>
+                  <span>Recomputing…</span>
+                  {totalBranchSteps > 0 && (
+                    <span
+                      data-testid="recompute-step-progress"
+                      style={{ fontWeight: 400, color: "#9d78ef" }}
+                    >
+                      Computing step {branchStepsComputed + 1} of {totalBranchSteps}
+                    </span>
+                  )}
+                </>
               )}
             </>
           )}
