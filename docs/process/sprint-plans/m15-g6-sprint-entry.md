@@ -3,10 +3,10 @@ name: m15-g6-sprint-entry
 type: sprint-entry
 milestone: M15 — Human Cost Architecture
 sprint-group: G6
-status: Filed — awaiting EL approval before validation work begins
+status: EL-approved — validation work in progress
 authored-by: PM Agent
 authored-date: 2026-06-22
-el-approved: false
+el-approved: 2026-06-22
 release-branch: release/m15
 sop-reference: docs/process/sprint-planning-sop.md
 ---
@@ -288,7 +288,8 @@ files a near-miss for incorrect infrastructure classification.*
 
 ## EL Approval Record
 
-**EL approval:** Pending
+**EL approval:** 2026-06-22
 
-> {EL approval statement — to be filled at approval time}
+> G6 accessibility validation sprint approved. Scope (VC-1 through VC-4), Infrastructure
+> Sprint Exception, and parallel-track sequencing confirmed. Validation work may begin.
 > — @PublicEnemage (2026-06-22)
