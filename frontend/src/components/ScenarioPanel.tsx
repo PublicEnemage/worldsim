@@ -4,6 +4,23 @@ import type { ScenarioDetailResponse, ScenarioResponse } from "../types";
 
 const API_BASE = "http://localhost:8000/api/v1";
 
+// Entity name mapping for the searchable selector (M15-G4)
+const ENTITY_NAMES: Record<string, string> = {
+  GRC: "Greece", JOR: "Jordan", EGY: "Egypt", ZMB: "Zambia",
+  SEN: "Senegal", GHA: "Ghana", KEN: "Kenya", ETH: "Ethiopia",
+  TZA: "Tanzania", UGA: "Uganda", CMR: "Cameroon", CIV: "Côte d'Ivoire",
+  MOZ: "Mozambique", ZWE: "Zimbabwe", PAK: "Pakistan", BGD: "Bangladesh",
+  NPL: "Nepal", LKA: "Sri Lanka", MMR: "Myanmar", KHM: "Cambodia",
+  LAO: "Laos", IDN: "Indonesia", PHL: "Philippines", VNM: "Vietnam",
+  BRA: "Brazil", ARG: "Argentina", COL: "Colombia", PER: "Peru",
+  ECU: "Ecuador", BOL: "Bolivia", PRY: "Paraguay", URY: "Uruguay",
+  VEN: "Venezuela", LBN: "Lebanon", TUN: "Tunisia", MAR: "Morocco",
+  DZA: "Algeria", SDN: "Sudan", YEM: "Yemen", IRQ: "Iraq",
+  PSE: "Palestine",
+};
+
+const ALL_ENTITIES = Object.keys(ENTITY_NAMES);
+
 interface Props {
   selectedScenarioId: string | null;
   secondScenarioId: string | null;
@@ -23,6 +40,8 @@ export default function ScenarioPanel({
   const [listError, setListError] = useState<string | null>(null);
   const [createName, setCreateName] = useState("");
   const [createEntity, setCreateEntity] = useState("GRC");
+  const [entitySearch, setEntitySearch] = useState("GRC — Greece");
+  const [entityDropdownOpen, setEntityDropdownOpen] = useState(false);
   const [createStartYear, setCreateStartYear] = useState(2020);
   const [createFiscalMultiplier, setCreateFiscalMultiplier] = useState(1.0);
   const [creating, setCreating] = useState(false);
@@ -111,6 +130,11 @@ export default function ScenarioPanel({
     }
   };
 
+  const filteredEntities = ALL_ENTITIES.filter((code) => {
+    const q = entitySearch.toUpperCase();
+    return code.startsWith(q) || (ENTITY_NAMES[code] ?? "").toUpperCase().includes(q);
+  }).slice(0, 10);
+
   return (
     <div className="scenario-panel">
       <div className="scenario-panel-inner">
@@ -191,19 +215,72 @@ export default function ScenarioPanel({
               }}
               disabled={creating}
             />
-            <select
-              className="scenario-create-input scenario-create-input--entity"
-              data-testid="entity-selector"
-              value={createEntity}
-              onChange={(e) => setCreateEntity(e.target.value)}
-              disabled={creating}
-              aria-label="Entity"
-            >
-              <option value="GRC">GRC</option>
-              <option value="JOR">JOR</option>
-              <option value="EGY">EGY</option>
-              <option value="ZMB">ZMB</option>
-            </select>
+
+            {/* Searchable entity selector (M15-G4) */}
+            <div style={{ position: "relative" }}>
+              <input
+                className="scenario-create-input scenario-create-input--entity"
+                data-testid="entity-selector"
+                type="text"
+                placeholder="Entity (e.g. ZMB, SEN)"
+                value={entitySearch}
+                onChange={(e) => {
+                  setEntitySearch(e.target.value);
+                  setEntityDropdownOpen(true);
+                }}
+                onFocus={() => setEntityDropdownOpen(true)}
+                onBlur={() => setTimeout(() => setEntityDropdownOpen(false), 150)}
+                disabled={creating}
+                aria-label="Entity"
+                autoComplete="off"
+              />
+              {entityDropdownOpen && entitySearch.length > 0 && (
+                <div
+                  style={{
+                    position: "absolute",
+                    top: "100%",
+                    left: 0,
+                    right: 0,
+                    background: "#0f1f33",
+                    border: "1px solid rgba(100,148,200,0.3)",
+                    borderRadius: 4,
+                    maxHeight: 160,
+                    overflowY: "auto",
+                    zIndex: 100,
+                  }}
+                >
+                  {filteredEntities.map((code) => (
+                    <div
+                      key={code}
+                      role="option"
+                      data-testid={`entity-option-${code}`}
+                      aria-selected={createEntity === code}
+                      style={{
+                        padding: "4px 8px",
+                        fontSize: 12,
+                        cursor: "pointer",
+                        color: "#cbd5e1",
+                        background: createEntity === code ? "rgba(59,130,246,0.15)" : "transparent",
+                      }}
+                      onMouseDown={() => {
+                        setCreateEntity(code);
+                        setEntitySearch(`${code} — ${ENTITY_NAMES[code] ?? code}`);
+                        setEntityDropdownOpen(false);
+                      }}
+                    >
+                      <span style={{ fontWeight: 700 }}>{code}</span>
+                      {ENTITY_NAMES[code] ? ` — ${ENTITY_NAMES[code]}` : ""}
+                    </div>
+                  ))}
+                  {filteredEntities.length === 0 && (
+                    <div style={{ padding: "4px 8px", fontSize: 12, color: "#64748b" }}>
+                      No matching entities
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+
             <input
               className="scenario-create-input scenario-create-input--year"
               type="number"

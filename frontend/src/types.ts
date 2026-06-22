@@ -90,12 +90,45 @@ export interface DataQualityFramework {
   data_vintage: string | null;
   is_synthetic: boolean;
   synthetic_basis: string | null;
+  loadable: boolean;           // G4: true if registered but not yet pulled
+  load_action_available: boolean; // G4: true when loadable is true
 }
 
 export interface DataQualityResponse {
   entity_id: string;
   year: number;
   frameworks: DataQualityFramework[];
+}
+
+// M15-G4 Path 1 — Pull job and fidelity contextualisation types
+export interface PullJobResponse {
+  job_id: string;
+  entity_id: string;
+  year: number;
+  status: "queued" | "running" | "complete" | "failed";
+}
+
+export interface PullJobStatusResponse {
+  job_id: string;
+  status: "queued" | "running" | "complete" | "failed";
+  frameworks_loaded: string[];
+  error: string | null;
+}
+
+export interface AnalogousCase {
+  case_id: string;
+  case_name: string;
+  mechanism_type: string;
+  mechanism_match: string;
+  directional_accuracy_validated: boolean;
+  magnitude_validated: boolean;
+  use_for: string;
+}
+
+export interface FidelityContextResponse {
+  scenario_id: string;
+  entity_id: string;
+  analogous_case: AnalogousCase | null;
 }
 
 // ADR-016 Component 2 — Initial state (Grounding Strip) response
