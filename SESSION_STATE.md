@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-22 (M15-G4 Step 4 Verify PASS — PRs #1116+#1117 merged; CM sign-off on #975 filed; NM-053/NM-054 filed; G4 Step 5 Validate pending BPO; G5 impl complete pending EL Step 4/5)**
+**Last updated: 2026-06-22 (M15-G4 Step 4 CONDITIONAL PASS — process artifacts committed; NM-053/054/055; CM sign-off #975 filed; G4 Step 5 Validate pending BPO; G5 impl pending EL Step 4/5)**
 **Current milestone:** M15 — Human Cost Architecture (GitHub Milestone 16)
 **Previous milestone:** M14 — Trust Architecture and Instrument Credibility (FORMALLY CLOSED 2026-06-20; release/m14 → main PR #1086; v0.14.0 at https://github.com/PublicEnemage/worldsim/releases/tag/v0.14.0; #968 closed; GitHub Milestone 15 closed)
 
@@ -185,7 +185,7 @@ Implementation is now unblocked. A sprint entry document must be filed and EL-ap
 | G4 backend implementation (Step 3) | ✅ **MERGED 2026-06-22 — PR #1116** | `grounding.py`: `loadable` field, async pull job endpoints, `/fidelity-context` endpoint; `DataPullJob` ORM model; Alembic migration `2b821063ef81` (data_pull_jobs table + SEN seed in source_registry) |
 | G4 frontend implementation (Step 3) | ✅ **MERGED 2026-06-22 — PR #1117** | `ScenarioPanel.tsx`: searchable combobox with 41 entities; `DataQualityPreview.tsx`: loadable state + pull trigger + polling; `FidelityDashboard.tsx`: scenario-specific contextualisation + SF-3 fallback; `App.tsx`: scenarioId prop wired |
 | E2E test regression (NM-054) | ✅ **FIXED — PR #1117** | 6 existing tests used `.selectOption()` on now-`<input>` entity-selector; fixed to combobox fill+click pattern; NM-054 filed |
-| G4 Step 4 Verify | ✅ **PASS 2026-06-22** | All 15 ACs confirmed via CI: `test-backend pass` (PR #1116 job 82762073879) + `playwright-e2e pass` (PR #1117 job 82775180511); intent doc §8 updated; two process deviations: NM-053 (CM sign-off timing), NM-054 (combobox regression) |
+| G4 Step 4 Verify | ✅ **CONDITIONAL PASS 2026-06-22** | All 15 ACs confirmed by code review of PR #1116/#1117 implementation; G4 test files not in implementation PRs (NM-055); tests committed in process-artifacts PR; will run in CI from that merge; NM-053 (CM sign-off timing), NM-054 (combobox regression); intent doc §8 corrected |
 | G4 Step 5 Validate | ⬜ **Pending BPO** | Business PO confirms Eleni (Persona 2) can create SEN scenario within 5-min ceiling; Customer Agent Layer 3 assessment required before BPO verdict |
 
 **Next required action:** Business PO (EL) runs Step 5 Validate — open live application with SEN scenario creation and ZMB fidelity panel; Customer Agent Layer 3 assessment; sprint exit document.
