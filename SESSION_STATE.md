@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-22 (M15-G2 BPO ACCEPT — intent §9 + sprint exit §3 updated; G4: QA Lead test files pending)**
+**Last updated: 2026-06-22 (M15-G5 implementation COMPLETE — all Tier 1 + Tier 2 PRs merged; Step 4 Verify + Step 5 Validate pending EL; G8 gate satisfied by G5 Tier 1)**
 **Current milestone:** M15 — Human Cost Architecture (GitHub Milestone 16)
 **Previous milestone:** M14 — Trust Architecture and Instrument Credibility (FORMALLY CLOSED 2026-06-20; release/m14 → main PR #1086; v0.14.0 at https://github.com/PublicEnemage/worldsim/releases/tag/v0.14.0; #968 closed; GitHub Milestone 15 closed)
 
@@ -59,19 +59,19 @@ Implementation is now unblocked. A sprint entry document must be filed and EL-ap
 |---|---|---|---|
 | #1065 ✅ | ux(zone-1b): Layer 3 trajectory sentence — Zone 1B | G1 | ✅ CLOSED 2026-06-21 — M15-G1 Step 3 COMPLETE (PR #1097) |
 | #1066 ✅ | ux(zone-1b): suppress "0 consecutive steps" when zero | G1 | ✅ CLOSED 2026-06-21 — M15-G1 Step 3 COMPLETE (PR #1097) |
-| #1067 | demo(screenshots): Frame B and C are same screenshot | G5 | IR-003; HIGH — demo artifact fix |
+| #1067 ✅ | demo(screenshots): Frame B and C are same screenshot | G5 | ✅ MERGED 2026-06-22 — PR #1121; frame-b md5 ≠ frame-c md5 (IR-003 guard) |
 | #1068 ✅ | ux(zone-1a): L0 badge on Zone 1A trajectory curves | G1 | ✅ CLOSED 2026-06-21 — M15-G1 Step 3 COMPLETE (PR #1097) |
 | #1069 ✅ | ux(grounding-strip): dual reserve values without disambiguation | G1 | ✅ CLOSED 2026-06-21 — M15-G1 Step 3 COMPLETE (PR #1097) |
 | #1075 ✅ | ux(zone-1d): PSP self-interpreting sentence absent | G1 | ✅ CLOSED 2026-06-21 — M15-G1 Step 3 COMPLETE (PR #1097) |
-| #1083 | ux(grounding-strip): date label "2024-Q1" → "Apr 2024" | G5 | DEMO-122; MEDIUM |
-| #1084 | methodology: PSP historical calibration anchor | G5 | DEMO-127; MEDIUM |
-| #1088 | docs(demo): walkthrough — "0 consecutive steps" plain language | G5 | DEMO-123; MEDIUM; filed 2026-06-20 |
-| #1089 | docs(demo): walkthrough — Grounding strip persistence | G5 | DEMO-124; MEDIUM; filed 2026-06-20 |
-| #1090 | docs(demo): walkthrough — methodology URL | G5 | DEMO-129; LOW; filed 2026-06-20 |
+| #1083 ✅ | ux(grounding-strip): date label "2024-Q1" → "Apr 2024" | G5 | ✅ MERGED 2026-06-22 — PR #1119; formatVintageDate() + grounding-strip-date testid |
+| #1084 ✅ | methodology: PSP historical calibration anchor | G5 | ✅ MERGED 2026-06-22 — PR #1122; Zambia/Ghana ECF, compliance outcomes, public IMF sources |
+| #1088 ✅ | docs(demo): walkthrough — "0 consecutive steps" plain language | G5 | ✅ MERGED 2026-06-22 — PR #1121; DEMO-123 fix: phrase absent |
+| #1089 ✅ | docs(demo): walkthrough — Grounding strip persistence | G5 | ✅ MERGED 2026-06-22 — PR #1121; "entry-state" ×9 in walkthrough |
+| #1090 ✅ | docs(demo): walkthrough — methodology URL | G5 | ✅ MERGED 2026-06-22 — PR #1121; docs/onboarding/methodology-overview.md cited ×5 |
 | #1091 | docs(claude-md): extract Lifecycle/Exit/DIC to child docs | G7 | promoted from insights log entry 6; filed 2026-06-20 |
-| #1048 | infra: Docker API container Alembic migrations (NM-049) | G5 | Pre-existing; NM-049 on record |
-| #1007 | fix: recompute-badge not visible after apply-control-change | G5 | Pre-existing; discovered M14 G4 Step 4 Verify |
-| #1004 | process: Visual Spec section for intent template | G5 | Filed 2026-06-17 |
+| #1048 ✅ | infra: Docker API container Alembic migrations (NM-049) | G5 | ✅ MERGED 2026-06-22 — PR #1123; entrypoint.sh runs alembic upgrade head at startup |
+| #1007 ✅ | fix: recompute-badge not visible after apply-control-change | G5 | ✅ MERGED 2026-06-22 — PR #1119; immediate "pending" state before async fetch |
+| #1004 ✅ | process: Visual Spec section for intent template | G5 | ✅ MERGED 2026-06-22 — PR #1122; data-testid ×4, viewport ×2 in §4b |
 | #984 | M15 Exit Checklist | — | immediate \| M15 gate issue (note: title says "Milestone 16" — GitHub milestone numbering) |
 | #990 | test: accessibility validation on 8GB/4-core target hardware | G6 | Filed 2026-06-16 |
 | #987 | feat(ux): political risk summary surface (Persona 3) | G3 | Design in M15; implementation M16 |
@@ -184,6 +184,38 @@ Implementation is now unblocked. A sprint entry document must be filed and EL-ap
 | G4 implementation (Step 3) | ⬜ Not started — gated on QA test files | Full-stack: Data Architect (backend) + Frontend Architect (frontend) |
 
 **Next required action:** QA Lead files both test files from intent document ACs before implementation begins.
+
+---
+
+### M15-G5 — Process Fixes + Walkthrough Updates (Implementation COMPLETE)
+
+**Sprint entry:** `docs/process/sprint-plans/m15-g5-sprint-entry.md` — **EL APPROVED 2026-06-22**
+**Intent document:** `docs/process/intents/M15-G5-2026-06-22-process-fixes.md` — **FILED 2026-06-22**
+**Issues:** #1007, #1048, #1004, #1067, #1083, #1084, #1088, #1089, #1090
+
+| Item | Status | Notes |
+|---|---|---|
+| G5 sprint entry document | ✅ **EL APPROVED 2026-06-22** | Three-tier structure; Tier 1 gates G8; Tier 2 primary scope; Tier 3 capacity-allowing |
+| Intent document (Step 1) | ✅ **FILED 2026-06-22** | `docs/process/intents/M15-G5-2026-06-22-process-fixes.md`; 13 ACs; 5 agents co-authored |
+| QA test files (Step 2) | ✅ **FILED 2026-06-22** | `frontend/tests/e2e/m15-g5-process-fixes.spec.ts` (AC-1–6); `backend/tests/test_m15_g5_process_fixes.py` (AC-7–13) |
+| **Tier 1 — #1083** (date label) | ✅ **MERGED 2026-06-22** — PR #1119 | `formatVintageDate()` + `extractReferenceDate()` + `data-testid="grounding-strip-date"` in GroundingStrip.tsx |
+| **Tier 1 — #1007** (recompute-badge) | ✅ **MERGED 2026-06-22** — PR #1119 | Immediate `recomputeStatus: "pending"` before async branch POST; kryptonite-compliant badge text |
+| **Tier 1 — #1067** (screenshot fix) | ✅ **MERGED 2026-06-22** — PR #1121 | 5 distinct PNGs in `docs/demo/m15/screenshots/`; frame-b md5 ≠ frame-c md5 |
+| **Tier 1 — #1088** (walkthrough DEMO-123) | ✅ **MERGED 2026-06-22** — PR #1121 | "0 consecutive steps" absent; phrase count = 0 |
+| **Tier 1 — #1089** (walkthrough DEMO-124) | ✅ **MERGED 2026-06-22** — PR #1121 | "entry-state" ×9 in `docs/demo/m15/stakeholder-walkthrough.md` |
+| **Tier 1 — #1090** (walkthrough DEMO-129) | ✅ **MERGED 2026-06-22** — PR #1121 | `docs/onboarding/methodology-overview.md` cited ×5 |
+| **Tier 2 — #1084** (PSP anchor) | ✅ **MERGED 2026-06-22** — PR #1122 | `docs/methodology/psp-calibration-anchor.md`; Zambia 2022 + Ghana 2023 ECF; public IMF sources |
+| **Tier 2 — #1004** (intent template) | ✅ **MERGED 2026-06-22** — PR #1122 | §4b data-testid ×4 (≥2 ✓); viewport ×2 (≥1 ✓) |
+| **Tier 2 — #1048** (Docker migrations) | ✅ **MERGED 2026-06-22** — PR #1123 | `backend/entrypoint.sh` (alembic upgrade head + exec "$@"); Dockerfile uses ENTRYPOINT+CMD |
+| Tier 3 — #837 (demo.sh config-driven) | ⬜ Not started — capacity-allowing | No G8 gate dependency |
+| Tier 3 — #951 (solo-use review protocol) | ⬜ Not started — capacity-allowing | No G8 gate dependency |
+| Tier 3 — #259 (legibility metrics dashboard) | ⬜ Not started — capacity-allowing | No G8 gate dependency |
+| **G8 gate** | ✅ **SATISFIED 2026-06-22** | All 5 Tier 1 items (#1067, #1083, #1088, #1089, #1090) merged to release/m15 — G8 sprint entry may now open |
+| Step 4 Verify | ⬜ Pending EL | Frontend Architect must confirm AC-1–7 observable states in running application before sprint exit |
+| Customer Agent Layer 3 | ⬜ Pending | Required for #1007 and #1083 (Persona 2/5 recompute-badge and date label) |
+| Step 5 Validate (BPO) | ⬜ Pending | Business PO: screenshot distinctness, walkthrough DEMO-123/124/129 fixes, PSP anchor navigability |
+
+**G5 implementation is complete. G8 gate is satisfied. Step 4 Verify, Customer Agent Layer 3, and Step 5 BPO Validate are the remaining exit conditions before the sprint exit document can be filed.**
 
 ---
 
