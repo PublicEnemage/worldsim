@@ -2626,6 +2626,47 @@ A proper fix would update `makeReserveAlert()` to use `mda_id`/`indicator_key`, 
 
 ---
 
+## NM-052 — Pre-Push mypy Gate Non-Executable Locally: No Python 3.13 Venv with Deps; Gate Silently Degraded to CI-Only (Anticipatory)
+
+**Date:** 2026-06-22
+**Milestone:** M15 — G2 QA authorship
+**Detected by:** EL observation during G2 QA authorship session — noted that the pre-push mypy run produced 99 errors, questioned whether errors had accumulated from past work.
+**Severity:** Medium — the mypy gate has been running only in CI, not locally as intended. Real type errors introduced locally would not be caught before push. The gate's stated purpose ("CI is a confirmation, not a discovery mechanism" — CLAUDE.md §Backend pre-push lint gate) has been inverted: CI has been the discovery mechanism.
+
+### What happened
+
+The CLAUDE.md pre-push lint gate requires `cd backend && ruff check . && mypy app/` before any push touching Python files. The intent is to surface type errors locally before pushing, so CI confirms rather than discovers.
+
+The codebase uses Python 3.13 syntax (`type CompositeStrategy = ...` at `app/api/scenarios.py:1814` — PEP 695 type alias statement, introduced at M8). Running `mypy app/` requires Python 3.13. The system Python on the development machine is 3.10, which mypy cannot use to parse the 3.13 syntax — it exits with a single syntax error and checks nothing.
+
+Python 3.13 is available locally (`python3.13`) but has no project dependencies installed. Running `python3.13 -m mypy app/` without deps produces 99 errors: 44 "Class cannot subclass BaseModel (has type Any)" (pydantic absent), 13 `import-not-found` (fastapi, sqlalchemy, numpy absent), 15 "Untyped decorator makes function X untyped" (fastapi router decorators unresolved). None of these are real type errors — they are artifacts of missing dependencies.
+
+CI runs correctly: the `lint` job installs `requirements.txt` under Python 3.13 before running `mypy app/`, so all import-not-found and subclass errors resolve and real type errors would be caught.
+
+There is no documented local dev setup for a Python 3.13 virtual environment with `pip install -r requirements.txt`. The pre-push gate instruction assumes this environment exists but does not specify how to create it. Every local `mypy` run since the Python 3.13 syntax was introduced (M8) has either exited on a syntax error (Python 3.10) or produced 99 false-positive errors (Python 3.13 without deps) — neither run is meaningful.
+
+### What was at risk
+
+A real type error introduced in `app/` would not be caught locally before push. The implementing agent would push, CI would catch the error, and the push would fail at CI — exactly the pattern the pre-push gate was designed to prevent (NM-016, which established the gate). The gate has been providing false confidence: agents who ran it and saw no meaningful output believed the check passed, when in fact the check was not running.
+
+### What caught it
+
+EL observation — questioned the 99 errors during a G2 session. Investigation traced the root cause to the missing Python 3.13 venv. This was caught by a person noticing an anomaly, not by a process check. The process had no mechanism to verify that the pre-push gate was executing in a functional environment.
+
+### Process improvement
+
+**Immediate fix:** CLAUDE.md §Backend pre-push lint gate must be updated to specify the correct invocation: `python3.13 -m venv .venv && source .venv/bin/activate && pip install -r requirements.txt` once at setup, then `cd backend && source .venv/bin/activate && ruff check . && python -m mypy app/`. The gate instruction must name the venv explicitly so agents and contributors can verify they are running in the correct environment.
+
+Alternatively, a `Makefile` target or `just` recipe (`lint`) can encode the correct invocation and be the canonical form referenced in CLAUDE.md, so the gate is a single command rather than a multi-step setup check.
+
+**Structural gap:** There is no `docs/CONTRIBUTING.md` section that documents local Python 3.13 venv setup as a prerequisite for backend development. Anyone following CONTRIBUTING.md can install deps against the system Python but will be unable to run mypy correctly. This gap should be closed in the same PR as the CLAUDE.md update.
+
+**Detection improvement:** The pre-push gate should fail loudly if run in the wrong Python environment. A one-line guard at the top of any lint script — `python --version | grep -q "3.13" || { echo "ERROR: mypy requires Python 3.13"; exit 1; }` — prevents silent non-execution. Until the Makefile/just approach is adopted, this check should be added to any documented pre-push procedure.
+
+**Near-miss lineage:** NM-016 established the backend pre-push mypy gate to prevent type errors from reaching CI. NM-052 establishes that the gate has been non-functional locally since M8 (when Python 3.13 syntax was introduced). The structural fix for NM-016 created the appearance of a gate without the reality of one.
+
+---
+
 ## Registry Maintenance
 
 ### How to add an entry
