@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-21 (M15-G2 sprint entry filed — PR #1104 merged to release/m15; G2 covers Zone 1A information architecture ADR: Phase 2 Architecture Review + Phase 3 ADR-017 authorship + EL acceptance; hard stop cleared by constraint PR #1102; EL approval of G2 entry is next required action)**
+**Last updated: 2026-06-21 (M15-G2 sprint entry EL-approved 2026-06-21; G2 work unblocked pending intent document + QA tests; next action: Architect Agent files intent document at docs/process/intents/M15-G2-2026-06-21-zone-1a-adr.md)**
 **Current milestone:** M15 — Human Cost Architecture (GitHub Milestone 16)
 **Previous milestone:** M14 — Trust Architecture and Instrument Credibility (FORMALLY CLOSED 2026-06-20; release/m14 → main PR #1086; v0.14.0 at https://github.com/PublicEnemage/worldsim/releases/tag/v0.14.0; #968 closed; GitHub Milestone 15 closed)
 
@@ -117,14 +117,14 @@ Implementation is now unblocked. A sprint entry document must be filed and EL-ap
 
 ---
 
-### M15-G2 — Zone 1A Information Architecture ADR (EL approval pending)
+### M15-G2 — Zone 1A Information Architecture ADR
 
-**Sprint entry:** `docs/process/sprint-plans/m15-g2-sprint-entry.md` — Filed 2026-06-21 (PR #1104 merged); **EL approval pending**
+**Sprint entry:** `docs/process/sprint-plans/m15-g2-sprint-entry.md` — **EL APPROVED 2026-06-21** (PR #1104)
 **Issue:** #845 (Phases 2–3 only)
 
 | Item | Status | Notes |
 |---|---|---|
-| G2 sprint entry document | ⬜ **EL APPROVAL PENDING** (PR #1104 merged to release/m15) | Hard stop cleared (constraint PR #1102 merged 2026-06-21); intent + QA gates blocking G2 work until EL approves |
+| G2 sprint entry document | ✅ **EL APPROVED 2026-06-21** (PR #1104) | All entry invariants satisfied; intent + QA gates blocking G2 work until filed |
 | Intent document (Step 1) | ⬜ Not filed — BLOCKING | Must file before Architecture Review begins: `docs/process/intents/M15-G2-2026-06-21-zone-1a-adr.md` |
 | QA test file (Step 2) | ⬜ Not filed — BLOCKING | File-existence + content-presence checks: `backend/tests/test_m15_g2_zone1a_adr.py` |
 | ARCH-011 ASSIGNED in backlog | ⬜ Currently PENDING_NUMBER | Architect Agent marks ASSIGNED with ADR-017 number at authorship start (within-sprint step) |
@@ -133,7 +133,7 @@ Implementation is now unblocked. A sprint entry document must be filed and EL-ap
 | Phase 3 — EL acceptance | ⬜ Not started — gated on ADR-017 draft + panel sign-offs | |
 | Phase 4 — implementation | ⬜ Out of G2 scope | Separate sprint entry required; may extend to M16 |
 
-**Next required action:** EL approves `docs/process/sprint-plans/m15-g2-sprint-entry.md` (PR #1104 now on release/m15). After EL approval: intent document → QA tests → Architecture Review → ADR-017 authorship.
+**Next required action:** Architect Agent files intent document at `docs/process/intents/M15-G2-2026-06-21-zone-1a-adr.md`. QA Lead files `backend/tests/test_m15_g2_zone1a_adr.py` after intent document. Both must be on release/m15 before Architecture Review begins.
 
 ---
 
