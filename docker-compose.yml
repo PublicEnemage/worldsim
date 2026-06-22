@@ -2,9 +2,11 @@
 #
 # Quickstart:
 #   1. docker compose up
-#   2. docker compose exec api alembic upgrade head
-#   3. docker compose exec api python -m app.db.seed.natural_earth_loader
-#   4. open http://localhost:5173
+#   2. docker compose exec api python -m app.db.seed.natural_earth_loader
+#   3. open http://localhost:5173
+#
+# Alembic migrations run automatically at API container startup (entrypoint.sh).
+# No manual migration step required.
 
 services:
   db:
