@@ -424,9 +424,44 @@ class ScenarioDeletedTombstone(Base):
     __table_args__ = (Index("idx_tombstones_deleted_at", "deleted_at"),)
 
 
+class DataPullJob(Base):
+    """Async data pull job — M15-G4 DA-G4-2.
+
+    Tracks the lifecycle of a data pull request triggered from the creation
+    form when a user selects a non-preloaded registered-source entity.
+    Status: queued → running → complete | failed
+    """
+
+    __tablename__ = "data_pull_jobs"
+
+    job_id: Mapped[str] = mapped_column(Text, primary_key=True)
+    entity_id: Mapped[str] = mapped_column(Text, nullable=False)
+    year: Mapped[int] = mapped_column(Integer, nullable=False)
+    status: Mapped[str] = mapped_column(Text, nullable=False, server_default="queued")
+    frameworks_loaded: Mapped[list[str]] = mapped_column(
+        ARRAY(String), nullable=False, server_default="{}"
+    )
+    error: Mapped[str | None] = mapped_column(Text, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, server_default=func.now()
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, server_default=func.now()
+    )
+
+    __table_args__ = (
+        CheckConstraint(
+            "status IN ('queued', 'running', 'complete', 'failed')",
+            name="ck_data_pull_jobs_status",
+        ),
+        Index("idx_data_pull_jobs_entity_year", "entity_id", "year"),
+    )
+
+
 # Expose all models so Alembic env.py can discover them via Base.metadata.
 __all__ = [
     "Base",
+    "DataPullJob",
     "Entity",
     "Relationship",
     "Scenario",

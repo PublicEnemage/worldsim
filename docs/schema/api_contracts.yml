@@ -888,11 +888,19 @@ endpoints:
               type: string
               nullable: true
               description: "Description of the inference basis (e.g. 'SADC comparable economies 2022-2023'). Non-null when is_synthetic=true."
-    db_reads: [entity_data_quality_coverage]
+            loadable:
+              type: boolean
+              description: "True if the entity has registered source coverage in source_registry but data has not yet been pulled into entity_data_quality_coverage. Frontend displays a Load Data action when true."
+            load_action_available:
+              type: boolean
+              description: "True when loadable is true. Signals the frontend to enable the POST /pull trigger."
+    db_reads: [entity_data_quality_coverage, source_registry]
     notes:
       - "ADR-016 Component 1 — Entity Selection and Pre-Creation Data Quality Preview."
-      - "Source registry seeded for GRC, JOR, EGY, ZMB per ADR-016 §EL Decision 1. All other entity_ids return 200 with empty frameworks."
+      - "M15-G4: three-tier response — (1) preloaded entity_data_quality_coverage rows (loadable: false); (2) source_registry registered coverage not yet pulled (loadable: true, load_action_available: true); (3) ADR-007 synthetic fallback (confidence_tier: 4, is_synthetic: true, loadable: false)."
+      - "Source registry seeded for GRC, JOR, EGY, ZMB per ADR-016 §EL Decision 1. SEN seeded in M15-G4 migration (wb_wdi_sen_2022) as non-preloaded registered-source test case."
       - "Both financial and human_development frameworks must have coverage rows for all four M14 entities at year=2024."
+      - "loadable: true signals the frontend to display the Load Data action. load_action_available: true when loadable is true."
 
   - method: GET
     path: "/scenarios/{scenario_id}/initial-state"
@@ -979,3 +987,100 @@ endpoints:
       - "Persona 2 north star indicator: reserve_coverage_months in the financial framework must have non-null source and vintage (AC-7). This is the specific citation Persona 2 uses in an IMF negotiation input challenge."
       - "G4 frontend renders each indicator as: '[display_name]: [value] [unit] · [source · vintage · T{N}]' per ADR-016 §Component 2 UX-3."
       - "Authority: ARCH-REVIEW-006 AR-006-B-004/005/006; Issues #604, #605, #607."
+
+  # ---------------------------------------------------------------------------
+  # Grounding (M15-G4) — DA-G4-2, DA-G4-3, DA-G4-4
+  # ---------------------------------------------------------------------------
+  - method: POST
+    path: "/entities/{entity_id}/pull"
+    summary: >
+      Trigger an async data pull job for a non-preloaded registered-source entity.
+      M15 scope: populates entity_data_quality_coverage from source_registry metadata.
+      Does NOT fetch live data from external APIs (M16+ capability).
+      Status transitions: queued → running → complete | failed.
+    auth: none
+    path_params:
+      entity_id:
+        type: string
+        description: "ISO 3166-1 alpha-3 entity identifier"
+    query_params:
+      - name: year
+        type: integer
+        required: true
+        description: "Scenario start year for which to pull coverage data"
+    response:
+      status: 200
+      body:
+        job_id: {type: string, format: uuid}
+        entity_id: {type: string}
+        year: {type: integer}
+        status: {type: string, enum: [queued, running, complete, failed]}
+    db_reads: [source_registry]
+    db_writes: [data_pull_jobs, entity_data_quality_coverage]
+    notes:
+      - "DA-G4-2: Async pull job pattern. Status transitions: queued → running → complete | failed."
+      - "M15 implementation populates entity_data_quality_coverage from source_registry metadata only."
+      - "Background task runs in FastAPI event loop via asyncio.create_task. Poll GET /pull/{job_id} for completion."
+
+  - method: GET
+    path: "/entities/{entity_id}/pull/{job_id}"
+    summary: >
+      Poll the status of a data pull job.
+    auth: none
+    path_params:
+      entity_id:
+        type: string
+        description: "ISO 3166-1 alpha-3 entity identifier"
+      job_id:
+        type: string
+        format: uuid
+        description: "Pull job UUID returned from POST /pull"
+    query_params: []
+    response:
+      status: 200
+      body:
+        job_id: {type: string, format: uuid}
+        status: {type: string, enum: [queued, running, complete, failed]}
+        frameworks_loaded: {type: "string[]", description: "Frameworks populated on complete status"}
+        error: {type: string, nullable: true, description: "Error message on failed status"}
+      status_404: "Pull job not found for the given entity_id and job_id combination"
+    db_reads: [data_pull_jobs]
+    notes:
+      - "DA-G4-2: Poll this endpoint every 3 seconds until status is complete or failed."
+      - "Returns 404 if job_id not found for the given entity_id."
+      - "On complete: re-fetch GET /entities/{entity_id}/data-quality to see updated loadable=false rows."
+
+  - method: GET
+    path: "/scenarios/{scenario_id}/fidelity-context"
+    summary: >
+      Return the Chief Methodologist analogous-case contextualisation for the active scenario.
+      Returns analogous_case: null for entities not in the CM mapping table (not an error).
+    auth: none
+    path_params:
+      scenario_id:
+        type: string
+        format: uuid
+        description: "Scenario UUID"
+    query_params: []
+    response:
+      status: 200
+      body:
+        scenario_id: {type: string, format: uuid}
+        entity_id: {type: string}
+        analogous_case:
+          type: object
+          nullable: true
+          properties:
+            case_id: {type: string, example: "ARG"}
+            case_name: {type: string, example: "Argentina 2001–2002"}
+            mechanism_type: {type: string}
+            mechanism_match: {type: string}
+            directional_accuracy_validated: {type: boolean}
+            magnitude_validated: {type: boolean}
+            use_for: {type: string}
+      status_404: "Scenario not found (scenario_id does not exist in scenarios table)"
+    db_reads: [scenarios]
+    notes:
+      - "DA-G4-4: Rule-based entity→case mapping (CM Decision Gate 2, M15-G4 intent document)."
+      - "Mapping table: ZMB→ARG (Argentina 2001–2002), JOR→GRC (Greece 2010–2012), EGY→ARG, GRC→GRC. All others→analogous_case: null."
+      - "Returns 404 if scenario_id not found."
