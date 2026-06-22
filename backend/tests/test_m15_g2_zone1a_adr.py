@@ -468,7 +468,7 @@ class TestAC6BacklogAssignment:
         if not _BACKLOG.exists():
             pytest.skip("backlog.md not found")
         text = _text(_BACKLOG)
-        arch_011_lines = [l for l in text.splitlines() if "ARCH-011" in l]
+        arch_011_lines = [ln for ln in text.splitlines() if "ARCH-011" in ln]
         assert arch_011_lines, (
             "docs/architecture/backlog.md must contain an ARCH-011 row. "
             "ARCH-011 was added at M15 kickoff for the Zone 1A ADR. AC-6."
@@ -478,7 +478,7 @@ class TestAC6BacklogAssignment:
         if not _BACKLOG.exists():
             pytest.skip("backlog.md not found")
         text = _text(_BACKLOG)
-        arch_011_lines = [l for l in text.splitlines() if "ARCH-011" in l]
+        arch_011_lines = [ln for ln in text.splitlines() if "ARCH-011" in ln]
         if not arch_011_lines:
             pytest.skip("ARCH-011 row absent — checked by test above")
         arch_011_text = "\n".join(arch_011_lines)
@@ -492,7 +492,7 @@ class TestAC6BacklogAssignment:
         if not _BACKLOG.exists():
             pytest.skip("backlog.md not found")
         text = _text(_BACKLOG)
-        arch_011_lines = [l for l in text.splitlines() if "ARCH-011" in l]
+        arch_011_lines = [ln for ln in text.splitlines() if "ARCH-011" in ln]
         if not arch_011_lines:
             pytest.skip("ARCH-011 row absent — checked by prior test")
         arch_011_text = "\n".join(arch_011_lines)
