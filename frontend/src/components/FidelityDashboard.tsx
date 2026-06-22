@@ -12,7 +12,15 @@
  * Data is hardcoded — this is methodology documentation alongside outputs,
  * not a live status board. Values are sourced from the backtesting_thresholds
  * table migrations (c7e2a9f4d1b8, a3d9e7c2f4b1, and related migrations).
+ *
+ * M15-G4: Added scenarioId prop; fidelity-context API fetch for dynamic
+ * contextualisation (AC-11/12/13 from the intent document).
  */
+
+import { useEffect, useState } from "react";
+import type { FidelityContextResponse, AnalogousCase } from "../types";
+
+const API_BASE = "http://localhost:8000/api/v1";
 
 interface StepResult {
   step: number;
@@ -310,13 +318,78 @@ function CaseRow({ c }: { c: CrisisCase }) {
   );
 }
 
+// ─── M15-G4: Analogous case contextualisation sub-component ──────────────────
+
+function AnalogousCaseSection({ entityId, analogousCase }: {
+  entityId: string;
+  analogousCase: AnalogousCase;
+}) {
+  const validated = analogousCase.directional_accuracy_validated;
+  const magnitudeValidated = analogousCase.magnitude_validated;
+  return (
+    <div>
+      <span style={{ color: "#93c5fd", fontWeight: 600 }}>
+        For your scenario ({entityId}):
+      </span>{" "}
+      The most analogous validation case is{" "}
+      <span style={{ color: "#e2e8f0", fontWeight: 600 }}>
+        {analogousCase.case_name}
+      </span>{" "}
+      ({analogousCase.mechanism_match}){" "}
+      {validated ? (
+        <span style={{ color: "#6ee7b7" }}>
+          Directional accuracy has been validated for this crisis mechanism type (5/5 direction checks passed).
+        </span>
+      ) : (
+        <span style={{ color: "#fbbf24" }}>
+          Directional accuracy not yet validated for this entity type.
+        </span>
+      )}{" "}
+      {magnitudeValidated ? (
+        <span>Magnitude has been validated.</span>
+      ) : (
+        <span style={{ color: "#94a3b8" }}>
+          Magnitude has not been validated at this entity type.
+        </span>
+      )}{" "}
+      <span style={{ color: "#64748b" }}>
+        Use outputs for {analogousCase.use_for}; confirm magnitude estimates with country-specific
+        analysis before citing at a negotiating table.
+      </span>
+    </div>
+  );
+}
+
 // ─── Main component ────────────────────────────────────────────────────────────
 
-export default function FidelityDashboard() {
+interface FidelityDashboardProps {
+  scenarioId: string | null;
+}
+
+export default function FidelityDashboard({ scenarioId }: FidelityDashboardProps) {
   const totalStepChecks = CASES.reduce((n, c) => n + c.steps.length, 0);
   const magnitudePasses = CASES.flatMap((c) =>
     c.steps.filter((s) => s.thresholdType === "MAGNITUDE" && s.status === "PASS"),
   ).length;
+
+  // M15-G4: Fetch scenario-specific fidelity context when a scenario is active
+  const [fidelityContext, setFidelityContext] = useState<FidelityContextResponse | null>(null);
+
+  useEffect(() => {
+    if (!scenarioId) {
+      setFidelityContext(null);
+      return;
+    }
+    let cancelled = false;
+    fetch(`${API_BASE}/scenarios/${encodeURIComponent(scenarioId)}/fidelity-context`)
+      .then((res) => {
+        if (!res.ok) throw new Error(`${res.status}`);
+        return res.json() as Promise<FidelityContextResponse>;
+      })
+      .then((data) => { if (!cancelled) setFidelityContext(data); })
+      .catch(() => { /* silent — static fallback text shows */ });
+    return () => { cancelled = true; };
+  }, [scenarioId]);
 
   return (
     <div
@@ -389,7 +462,7 @@ export default function FidelityDashboard() {
         </div>
       </div>
 
-      {/* IC-4 — static scope contextualisation header (ADR-016 §EL Decision 2) */}
+      {/* IC-4 — contextualisation header; static fallback or scenario-specific (M15-G4) */}
       <div
         data-testid="fidelity-contextualisation"
         style={{
@@ -401,8 +474,19 @@ export default function FidelityDashboard() {
           lineHeight: 1.5,
         }}
       >
-        This panel validates model relationships using historical cases — not input data
-        for the active scenario.
+        {fidelityContext === null ? (
+          // No scenario loaded or still loading — show static fallback
+          "This panel validates model relationships using historical cases — not input data for the active scenario."
+        ) : fidelityContext.analogous_case === null ? (
+          // No analogous case identified — verbatim SF-3 fallback (AC-13)
+          "No analogous validation case identified for this scenario type. Global backtesting results apply — see validation cases below."
+        ) : (
+          // Scenario-specific contextualisation (AC-11/12)
+          <AnalogousCaseSection
+            entityId={fidelityContext.entity_id}
+            analogousCase={fidelityContext.analogous_case}
+          />
+        )}
       </div>
 
       {/* Framing note */}

@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import type { DataQualityResponse, DataQualityFramework } from "../types";
+import { useEffect, useState, useRef } from "react";
+import type { DataQualityResponse, DataQualityFramework, PullJobResponse, PullJobStatusResponse } from "../types";
 
 const API_BASE = "http://localhost:8000/api/v1";
 
@@ -28,7 +28,7 @@ function TierBadge({ tier }: { tier: number }) {
   );
 }
 
-function FrameworkRow({ fw }: { fw: DataQualityFramework }) {
+function FrameworkRow({ fw, onLoad }: { fw: DataQualityFramework; onLoad?: () => void }) {
   const label = FRAMEWORK_LABELS[fw.framework] ?? fw.framework;
   const citation = [fw.source_institution, fw.data_vintage].filter(Boolean).join(" · ");
   return (
@@ -50,6 +50,14 @@ function FrameworkRow({ fw }: { fw: DataQualityFramework }) {
             <span style={{ color: "#f87171" }}>synthetic</span>
             {fw.synthetic_basis ? ` — ${fw.synthetic_basis}` : ""}
           </>
+        ) : fw.loadable ? (
+          <span
+            style={{ color: "#fbbf24", cursor: onLoad ? "pointer" : "default" }}
+            onClick={onLoad}
+            title="Click to load data for this entity"
+          >
+            {citation ? `${citation} · ` : ""}available — click to load
+          </span>
         ) : (
           citation || "—"
         )}
@@ -61,34 +69,98 @@ function FrameworkRow({ fw }: { fw: DataQualityFramework }) {
 interface Props {
   entityId: string;
   year: number;
+  onPullComplete?: () => void;
 }
 
-export default function DataQualityPreview({ entityId, year }: Props) {
+export default function DataQualityPreview({ entityId, year, onPullComplete }: Props) {
   const [data, setData] = useState<DataQualityResponse | null>(null);
   const [unavailable, setUnavailable] = useState(false);
+  const [pulling, setPulling] = useState(false);
+  const [pullStatus, setPullStatus] = useState<string | null>(null);
+  const [pullError, setPullError] = useState<string | null>(null);
+  const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  useEffect(() => {
+  const fetchData = () => {
     if (!entityId || !year) return;
     setData(null);
     setUnavailable(false);
 
-    let cancelled = false;
     fetch(`${API_BASE}/entities/${encodeURIComponent(entityId)}/data-quality?year=${year}`)
       .then((res) => {
         if (!res.ok) throw new Error(`${res.status}`);
         return res.json() as Promise<DataQualityResponse>;
       })
-      .then((body) => {
-        if (!cancelled) setData(body);
-      })
-      .catch(() => {
-        if (!cancelled) setUnavailable(true);
-      });
+      .then((body) => setData(body))
+      .catch(() => setUnavailable(true));
+  };
 
+  useEffect(() => {
+    fetchData();
+    // Cancel any active pull when entity/year changes
+    setPulling(false);
+    setPullStatus(null);
+    setPullError(null);
+    if (pollRef.current) {
+      clearInterval(pollRef.current);
+      pollRef.current = null;
+    }
+  }, [entityId, year]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
     return () => {
-      cancelled = true;
+      if (pollRef.current) clearInterval(pollRef.current);
     };
-  }, [entityId, year]);
+  }, []);
+
+  const handlePull = async () => {
+    if (pulling || !entityId || !year) return;
+    setPulling(true);
+    setPullStatus("queued");
+    setPullError(null);
+
+    try {
+      const res = await fetch(
+        `${API_BASE}/entities/${encodeURIComponent(entityId)}/pull?year=${year}`,
+        { method: "POST" }
+      );
+      if (!res.ok) throw new Error(`Pull request failed: ${res.status}`);
+      const job = await res.json() as PullJobResponse;
+      setPullStatus(job.status);
+
+      // Poll until complete or failed
+      pollRef.current = setInterval(async () => {
+        try {
+          const pollRes = await fetch(
+            `${API_BASE}/entities/${encodeURIComponent(entityId)}/pull/${encodeURIComponent(job.job_id)}`
+          );
+          if (!pollRes.ok) return;
+          const statusData = await pollRes.json() as PullJobStatusResponse;
+          setPullStatus(statusData.status);
+
+          if (statusData.status === "complete") {
+            if (pollRef.current) clearInterval(pollRef.current);
+            pollRef.current = null;
+            setPulling(false);
+            fetchData();
+            onPullComplete?.();
+          } else if (statusData.status === "failed") {
+            if (pollRef.current) clearInterval(pollRef.current);
+            pollRef.current = null;
+            setPulling(false);
+            setPullError(statusData.error ?? "Pull failed");
+          }
+        } catch {
+          // poll errors are transient — continue polling
+        }
+      }, 3000);
+    } catch (err) {
+      setPulling(false);
+      setPullStatus("failed");
+      setPullError(err instanceof Error ? err.message : "Pull failed");
+    }
+  };
+
+  const hasLoadable = data?.frameworks.some((fw) => fw.loadable) ?? false;
 
   return (
     <div
@@ -119,10 +191,75 @@ export default function DataQualityPreview({ entityId, year }: Props) {
             {data.entity_id} · {data.year}
           </div>
           {data.frameworks.map((fw) => (
-            <FrameworkRow key={fw.framework} fw={fw} />
+            <FrameworkRow
+              key={fw.framework}
+              fw={fw}
+              onLoad={fw.loadable ? () => void handlePull() : undefined}
+            />
           ))}
+
+          {hasLoadable && !pulling && pullStatus !== "complete" && (
+            <button
+              data-testid="data-pull-action"
+              onClick={() => void handlePull()}
+              style={{
+                marginTop: 6,
+                fontSize: 11,
+                background: "rgba(59,130,246,0.15)",
+                border: "1px solid rgba(59,130,246,0.4)",
+                borderRadius: 3,
+                color: "#93c5fd",
+                padding: "3px 8px",
+                cursor: "pointer",
+                width: "100%",
+              }}
+            >
+              Load data for {entityId} {year}
+            </button>
+          )}
+
+          {pulling && (
+            <div
+              data-testid="data-pull-progress"
+              style={{
+                marginTop: 6,
+                fontSize: 11,
+                color: "#fbbf24",
+                display: "flex",
+                alignItems: "center",
+                gap: 6,
+              }}
+            >
+              <span
+                style={{
+                  display: "inline-block",
+                  width: 10,
+                  height: 10,
+                  borderRadius: "50%",
+                  border: "2px solid #fbbf24",
+                  borderTopColor: "transparent",
+                  animation: "spin 0.8s linear infinite",
+                }}
+              />
+              Pulling data{pullStatus ? ` — ${pullStatus}` : ""}…
+            </div>
+          )}
+
+          {pullError && (
+            <div style={{ marginTop: 4, fontSize: 11, color: "#f87171" }}>
+              Pull failed: {pullError}
+            </div>
+          )}
+
+          {pullStatus === "complete" && !pulling && (
+            <div style={{ marginTop: 4, fontSize: 11, color: "#6ee7b7" }}>
+              Data loaded ✓
+            </div>
+          )}
         </>
       )}
+
+      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
     </div>
   );
 }

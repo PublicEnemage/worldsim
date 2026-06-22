@@ -290,7 +290,7 @@ export default function App() {
         />
       )}
 
-      {fidelityOpen && <FidelityDashboard />}
+      {fidelityOpen && <FidelityDashboard scenarioId={selectedScenarioId} />}
 
       {groundingOpen && selectedScenarioId && (
         <GroundingStrip scenarioId={selectedScenarioId} />
