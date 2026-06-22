@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-22 (M15-G4 Step 4 CONDITIONAL PASS — process artifacts committed; NM-053/054/055; CM sign-off #975 filed; G4 Step 5 Validate pending BPO; G5 impl pending EL Step 4/5)**
+**Last updated: 2026-06-22 (M15-G5 BPO ACCEPT — sprint exit confirmed; G8 UNBLOCKED; G4 Step 5 Validate still pending BPO)**
 **Current milestone:** M15 — Human Cost Architecture (GitHub Milestone 16)
 **Previous milestone:** M14 — Trust Architecture and Instrument Credibility (FORMALLY CLOSED 2026-06-20; release/m14 → main PR #1086; v0.14.0 at https://github.com/PublicEnemage/worldsim/releases/tag/v0.14.0; #968 closed; GitHub Milestone 15 closed)
 
@@ -192,10 +192,11 @@ Implementation is now unblocked. A sprint entry document must be filed and EL-ap
 
 ---
 
-### M15-G5 — Process Fixes + Walkthrough Updates (Implementation COMPLETE)
+### M15-G5 — Process Fixes + Walkthrough Updates (COMPLETE)
 
 **Sprint entry:** `docs/process/sprint-plans/m15-g5-sprint-entry.md` — **EL APPROVED 2026-06-22**
 **Intent document:** `docs/process/intents/M15-G5-2026-06-22-process-fixes.md` — **FILED 2026-06-22**
+**Sprint exit document:** `docs/process/sprint-plans/m15-g5-sprint-exit.md` — **PI Agent CONFIRMED 2026-06-22**
 **Issues:** #1007, #1048, #1004, #1067, #1083, #1084, #1088, #1089, #1090
 
 | Item | Status | Notes |
@@ -205,22 +206,22 @@ Implementation is now unblocked. A sprint entry document must be filed and EL-ap
 | QA test files (Step 2) | ✅ **FILED 2026-06-22** | `frontend/tests/e2e/m15-g5-process-fixes.spec.ts` (AC-1–6); `backend/tests/test_m15_g5_process_fixes.py` (AC-7–13) |
 | **Tier 1 — #1083** (date label) | ✅ **MERGED 2026-06-22** — PR #1119 | `formatVintageDate()` + `extractReferenceDate()` + `data-testid="grounding-strip-date"` in GroundingStrip.tsx |
 | **Tier 1 — #1007** (recompute-badge) | ✅ **MERGED 2026-06-22** — PR #1119 | Immediate `recomputeStatus: "pending"` before async branch POST; kryptonite-compliant badge text |
-| **Tier 1 — #1067** (screenshot fix) | ✅ **MERGED 2026-06-22** — PR #1121 | 5 distinct PNGs in `docs/demo/m15/screenshots/`; frame-b md5 ≠ frame-c md5 |
+| **Tier 1 — #1067** (screenshot fix) | ✅ **MERGED 2026-06-22** — PR #1121 | 5 distinct PNGs in `docs/demo/m15/screenshots/`; frame-b md5 ≠ frame-c md5 (fab826ed ≠ e30e40b1) |
 | **Tier 1 — #1088** (walkthrough DEMO-123) | ✅ **MERGED 2026-06-22** — PR #1121 | "0 consecutive steps" absent; phrase count = 0 |
 | **Tier 1 — #1089** (walkthrough DEMO-124) | ✅ **MERGED 2026-06-22** — PR #1121 | "entry-state" ×9 in `docs/demo/m15/stakeholder-walkthrough.md` |
 | **Tier 1 — #1090** (walkthrough DEMO-129) | ✅ **MERGED 2026-06-22** — PR #1121 | `docs/onboarding/methodology-overview.md` cited ×5 |
 | **Tier 2 — #1084** (PSP anchor) | ✅ **MERGED 2026-06-22** — PR #1122 | `docs/methodology/psp-calibration-anchor.md`; Zambia 2022 + Ghana 2023 ECF; public IMF sources |
 | **Tier 2 — #1004** (intent template) | ✅ **MERGED 2026-06-22** — PR #1122 | §4b data-testid ×4 (≥2 ✓); viewport ×2 (≥1 ✓) |
 | **Tier 2 — #1048** (Docker migrations) | ✅ **MERGED 2026-06-22** — PR #1123 | `backend/entrypoint.sh` (alembic upgrade head + exec "$@"); Dockerfile uses ENTRYPOINT+CMD |
-| Tier 3 — #837 (demo.sh config-driven) | ⬜ Not started — capacity-allowing | No G8 gate dependency |
-| Tier 3 — #951 (solo-use review protocol) | ⬜ Not started — capacity-allowing | No G8 gate dependency |
-| Tier 3 — #259 (legibility metrics dashboard) | ⬜ Not started — capacity-allowing | No G8 gate dependency |
-| **G8 gate** | ✅ **SATISFIED 2026-06-22** | All 5 Tier 1 items (#1067, #1083, #1088, #1089, #1090) merged to release/m15 — G8 sprint entry may now open |
-| Step 4 Verify | ⬜ Pending EL | Frontend Architect must confirm AC-1–7 observable states in running application before sprint exit |
-| Customer Agent Layer 3 | ⬜ Pending | Required for #1007 and #1083 (Persona 2/5 recompute-badge and date label) |
-| Step 5 Validate (BPO) | ⬜ Pending | Business PO: screenshot distinctness, walkthrough DEMO-123/124/129 fixes, PSP anchor navigability |
+| Tier 3 — #837 (demo.sh config-driven) | ⬜ Not started — capacity-allowing | No G8 gate dependency; remains open |
+| Tier 3 — #951 (solo-use review protocol) | ⬜ Not started — capacity-allowing | Remains open |
+| Tier 3 — #259 (legibility metrics dashboard) | ⬜ Not started — capacity-allowing | Remains open |
+| **G8 gate** | ✅ **SATISFIED 2026-06-22** | All 5 Tier 1 items merged and BPO accepted — G8 sprint entry may now open |
+| Step 4 Verify | ✅ **PASS 2026-06-22** | 13/13 ACs via CI evidence (playwright-e2e + test-backend) + local file checks; intent doc §8 |
+| Customer Agent Layer 3 | ✅ **PASS 2026-06-22** | #1083: "Apr 2024" self-interpreting; #1007: badge text kryptonite-compliant; intent doc §9a |
+| Step 5 Validate (BPO) | ✅ **BPO ACCEPT 2026-06-22** | All Tier 1 + Tier 2 accepted; north star PASS; kryptonite PASS; sprint exit filed |
 
-**G5 implementation is complete. G8 gate is satisfied. Step 4 Verify, Customer Agent Layer 3, and Step 5 BPO Validate are the remaining exit conditions before the sprint exit document can be filed.**
+**G5 is COMPLETE. Sprint exit document confirmed. G8 is UNBLOCKED. One non-blocking G8 action item: add hyperlink from `methodology-overview.md` to `psp-calibration-anchor.md` during G8 demo prep.**
 
 ---
 
