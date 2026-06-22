@@ -2738,6 +2738,52 @@ This is a named discipline step, not a CI gate. It is added to `docs/CONTRIBUTIN
 
 ---
 
+## NM-055 — G4 QA Test Files and Process Documents Not Committed in Implementation PRs
+
+**Date:** 2026-06-22
+**Milestone:** M15 — G4 (Path 1 + ADR-016 Component 3)
+**Detected by:** PI Agent at Step 4 Verify — checking `git ls-files` for G4 test files in `release/m15`
+**Severity:** High — the Step 2 (test authorship before implementation) process requirement was satisfied as a local file operation but not as a committed artifact. CI ran implementation PRs without the G4 tests; the `test-backend pass` and `playwright-e2e pass` in PR #1116 and #1117 CI were NOT running the G4 tests. The Step 4 Verify evidence is code-review-based, not CI-test-based.
+
+### What happened
+
+The M15-G4 implementation produced four process artifacts that were authored in-session but never committed to any branch:
+1. `docs/process/intents/M15-G4-2026-06-22-path1-fidelity-contextualisation.md` (intent document)
+2. `docs/process/sprint-plans/m15-g4-sprint-entry.md` (sprint entry document)
+3. `backend/tests/test_m15_g4_path1_fidelity_contextualisation.py` (G4 backend QA tests, Step 2)
+4. `frontend/tests/e2e/m15-g4-path1-fidelity-contextualisation.spec.ts` (G4 Playwright tests, Step 2)
+
+PR #1116 (backend implementation) contained: `grounding.py`, `models.py`, migration, `api_contracts.yml` — but NOT the test file or process documents.
+PR #1117 (frontend implementation) contained: `App.tsx`, `DataQualityPreview.tsx`, `FidelityDashboard.tsx`, `ScenarioPanel.tsx`, `types.ts`, and regression fixes — but NOT the G4 Playwright test file or process documents.
+
+The `test-backend pass` in PR #1116 CI ran the existing backend test suite without the G4 tests. The `playwright-e2e pass` in PR #1117 CI ran the existing Playwright tests without the G4 tests. Neither CI pass confirms any G4 AC assertion.
+
+### What was at risk
+
+**If undetected until sprint exit:** The G4 sprint exit would have been attempted with no CI-tested G4 test coverage. The implementation could have been validated by Business PO without any automated regression coverage for the new endpoints and UI states. A future PR could break the G4 behavior without any test catching it.
+
+**For the Step 4 Verify record:** The verification artifact claimed in the initial intent doc §8 update was incorrect — it cited CI tests as evidence when those CI tests were not running the G4 assertions. This was caught when the PI Agent checked actual PR file lists against the intent document's test file paths.
+
+### What caught it
+
+PI Agent running `gh pr view 1116 --json files` and `gh pr view 1117 --json files` at Step 4 Verify review time — seeing that the test files were absent from the PR file lists. Also confirmed by `git ls-files --with-tree=origin/release/m15 | grep "m15.g4"` returning only the Alembic migration.
+
+This was caught by a process artifact check, not by CI. CI had no way to report the absence of test files — it simply ran what was there.
+
+### Process improvement
+
+**Immediate:** All four G4 process artifacts committed to `release/m15` in the M15-G4 process-artifacts PR (this entry's PR). Step 4 Verify corrected to reflect code-review-based verification, not CI-test-based. G4 tests will run in CI from this PR's merge forward.
+
+**Root cause:** The implementing agent opened implementation PRs without running the "what files belong in this PR" check. Process documents and QA tests were mentally tracked in session context but not included in the staged commit. No CI gate, pre-push gate, or PR template enforced that the test file and process document were staged alongside the implementation code.
+
+**Recommended fix:** Add a PR description checklist item for implementation PRs: "QA tests for this sprint group are staged and included in this PR (or filed in a preceding PR on the same branch)." This is a manual checklist item — not a CI gate — because CI cannot verify the presence of test files by sprint group. The implementing agent confirms the checklist before marking the PR ready for review.
+
+Additionally: the sprint entry and intent documents should be committed to the feature branch before the implementation PR is opened. These are prerequisites — filing them as local files without committing them to the branch leaves the process requirements unverifiable by anyone reviewing the PR.
+
+**Near-miss lineage:** CLAUDE.md §Agent Execution Lifecycle states "A test authored in the same session as the implementation it covers has not satisfied this step." This near-miss is the flip side: a test authored correctly (before implementation, in a separate step) but never committed is equally non-satisfying. Both patterns defeat the purpose of the Step 2 gate.
+
+---
+
 ## Registry Maintenance
 
 ### How to add an entry

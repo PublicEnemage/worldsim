@@ -379,36 +379,40 @@ Fidelity panel (after G4, with ZMB loaded):
 
 ---
 
-## 8. Step 4 Verify — PASS 2026-06-22
+## 8. Step 4 Verify — PARTIAL 2026-06-22
 
-*Verification artifact: CI test runs for PR #1116 (backend) and PR #1117 (frontend).*
 *Self-attestation limitation applies per CLAUDE.md §Lifecycle (Step 4).*
 
-**Backend verify checkpoints:**
-- [x] AC-7: `curl /api/v1/entities/SEN/data-quality?year=2023` returns `loadable: true` on at least one framework — confirmed by `test-backend pass` in PR #1116 CI run (job 82762073879)
-- [x] AC-8: `curl /api/v1/entities/ZMB/data-quality?year=2024` returns `loadable: false` with confidence_tier set — confirmed same run
-- [x] AC-9: `curl /api/v1/entities/XYZ/data-quality?year=2023` returns `is_synthetic: true` — confirmed same run
-- [x] AC-10: `POST /entities/SEN/pull?year=2023` → job_id; `GET /entities/SEN/pull/{job_id}` → status: complete — confirmed same run
-- [x] AC-14: `curl /api/v1/scenarios/{zmb_id}/fidelity-context` → analogous_case.case_id = "ARG" — confirmed same run
-- [x] AC-15: `curl /api/v1/scenarios/{sen_id}/fidelity-context` → analogous_case: null — confirmed same run
-- [x] All AC-7–AC-10, AC-14–AC-15 backend QA tests pass: `pytest backend/tests/test_m15_g4_path1_fidelity_contextualisation.py -v` — `test-backend pass` in PR #1116 CI
+**Process context:** The G4 QA test files (`backend/tests/test_m15_g4_path1_fidelity_contextualisation.py` and `frontend/tests/e2e/m15-g4-path1-fidelity-contextualisation.spec.ts`) were authored pre-implementation (Step 2) but were **not included in PR #1116 or PR #1117** — they were authored locally and not committed. Consequently, the `test-backend pass` in PR #1116 CI and `playwright-e2e pass` in PR #1117 CI did NOT run the G4 tests. The CI passes reflected existing tests. NM-055 filed for this process gap.
 
-**Frontend verify checkpoints:**
-- [x] AC-1: Dev server running; creation form open; typing "SEN" shows dropdown result — `playwright-e2e pass` in PR #1117 CI run (job 82775180511); m15-g4 spec activated post-implementation
-- [x] AC-2: ZMB selected + year 2024 → preview shows loaded state (no "available" text) — confirmed same run (route mock)
-- [x] AC-3: SEN selected + year 2023 → preview shows "available" or "loadable" text — confirmed same run (route mock)
-- [x] AC-4: Unsupported entity → preview shows "synthetic" or "T4" — confirmed same run (route mock)
-- [x] AC-5: Pull action clicked → progress indicator visible within 5 seconds — confirmed same run (route mock)
-- [x] AC-11: ZMB scenario loaded → Fidelity panel open → `fidelity-contextualisation` visible — confirmed same run (route mock)
-- [x] AC-12: text contains "ZMB" or "Zambia" and "Argentina" or "ARG" — confirmed same run
-- [x] AC-13: SEN scenario (no mapping) → fallback message verbatim present — confirmed same run (route mock)
-- [x] All AC-1–AC-6, AC-11–AC-13 Playwright tests pass: `npx playwright test m15-g4` — `playwright-e2e pass` in PR #1117 CI (149 tests; all pass or skipped)
+The G4 test files are committed to `release/m15` in this PR (the process-artifacts PR). They become active in CI from this PR's merge forward.
+
+**Backend verify checkpoints — based on code review of PR #1116 implementation:**
+- [x] AC-7: `grounding.py get_entity_data_quality()` three-tier fallback queries `source_registry` and sets `loadable=True` for registered non-preloaded entities — confirmed by reading implementation (`backend/app/api/grounding.py`)
+- [x] AC-8: preloaded entity branch queries `entity_data_quality_coverage` and sets `loadable=False` — confirmed by implementation
+- [x] AC-9: ADR-007 synthetic fallback triggered when entity not in `source_registry` — confirmed by implementation (T3/T4 with `is_synthetic=True`)
+- [x] AC-10: `POST /pull` creates `DataPullJob` row and calls `asyncio.create_task(_run_pull_job(...))` — pull job populates `entity_data_quality_coverage` from `source_registry` metadata; `GET /pull/{job_id}` polls DB row status — confirmed by implementation
+- [x] AC-14: `_ANALOGOUS_CASE_MAP` maps "ZMB" → ARG case with `directional_accuracy_validated=True` — confirmed in `grounding.py`
+- [x] AC-15: entities not in `_ANALOGOUS_CASE_MAP` return `FidelityContextResponse(analogous_case=None)` — confirmed by implementation
+- [ ] G4 backend tests run in CI — **NOT YET** (tests were not in PR #1116; will be in CI after this PR merges)
+
+**Frontend verify checkpoints — based on code review of PR #1117 implementation:**
+- [x] AC-1: `ScenarioPanel.tsx` `ENTITY_NAMES` map has 41 entries including SEN; combobox filters on keypress — confirmed by implementation
+- [x] AC-2: `DataQualityPreview.tsx` `FrameworkRow` renders "loaded" state when `loadable=false` — confirmed by implementation
+- [x] AC-3: `FrameworkRow` shows "available — click to load" amber text when `fw.loadable=true` — confirmed by implementation
+- [x] AC-4: ADR-007 synthetic fallback renders "synthetic" text — confirmed by implementation (tier display)
+- [x] AC-5: `data-pull-action` button POST to `/pull`, then 3-second `setInterval` polling, progress indicator `data-testid="data-pull-progress"` — confirmed by implementation
+- [x] AC-11: `FidelityDashboard.tsx` fetches `/fidelity-context` on `scenarioId` change; `AnalogousCaseSection` renders when analogous case found — confirmed by implementation
+- [x] AC-12: `AnalogousCaseSection` renders entity_id + case_name from API response — confirmed by implementation
+- [x] AC-13: null `analogous_case` renders verbatim SF-3 fallback text — confirmed by implementation (static string)
+- [ ] G4 Playwright tests run in CI — **NOT YET** (tests were not in PR #1117; will be in CI after this PR merges)
 
 **Process deviations noted at Step 4 review:**
-- CM sign-off on #975 was filed post-implementation (not pre-implementation per intent §Decision Gate 2). Substantive CM validation preceded implementation via intent document §Decision Gate 2. GitHub comment filed 2026-06-22: https://github.com/PublicEnemage/worldsim/issues/975#issuecomment-4771002251. NM-053 filed.
-- Six existing E2E tests broke at CI due to entity-selector UI contract change (select → combobox). Fixed before PR merge. NM-054 filed.
+- CM sign-off on #975 filed post-implementation (not pre-implementation per intent §Decision Gate 2). Substantive CM validation preceded implementation. GitHub comment: https://github.com/PublicEnemage/worldsim/issues/975#issuecomment-4771002251. NM-053 filed.
+- Six existing E2E tests broke at CI due to entity-selector combobox change. Fixed before PR merge. NM-054 filed.
+- G4 QA test files not committed in implementation PRs. CI confirmation is code-review-based, not test-run-based. NM-055 filed.
 
-**Step 4 verdict: PASS** — All 15 ACs confirmed via CI test artifacts. Two process deviations recorded in NM-053 and NM-054. Step 5 Validate remains for Business PO.
+**Step 4 verdict: CONDITIONAL PASS** — All 15 ACs confirmed by implementation code review. Test runs in CI pending this PR merge. Business PO Validate (Step 5) may begin; the G4 test CI confirmation is a parallel deliverable.
 
 ---
 
