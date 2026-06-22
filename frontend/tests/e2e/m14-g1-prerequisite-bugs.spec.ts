@@ -111,15 +111,11 @@ test("AC-1: entity-selector present with options GRC, JOR, EGY, ZMB", async ({ p
 
   await expect(entitySelector).toBeVisible();
 
-  // Assert all four required entity options are present
-  const optionValues: string[] = await entitySelector
-    .locator("option")
-    .evaluateAll((opts: HTMLOptionElement[]) => opts.map((o) => o.value));
-
-  expect(optionValues).toContain("GRC");
-  expect(optionValues).toContain("JOR");
-  expect(optionValues).toContain("EGY");
-  expect(optionValues).toContain("ZMB");
+  // With the searchable combobox, verify each standard entity option is reachable by typing
+  for (const code of ["GRC", "JOR", "EGY", "ZMB"]) {
+    await entitySelector.fill(code);
+    await expect(page.locator(`[data-testid="entity-option-${code}"]`)).toBeVisible({ timeout: 2_000 });
+  }
 });
 
 // ---------------------------------------------------------------------------
@@ -142,8 +138,9 @@ test("AC-2: selecting ZMB and creating scenario stores ZMB in configuration.enti
 
   const scenarioName = `G1-AC2-ZMB-${Date.now()}`;
 
-  // Select ZMB
-  await entitySelector.selectOption("ZMB");
+  // Select ZMB via combobox
+  await entitySelector.fill("ZMB");
+  await page.locator('[data-testid="entity-option-ZMB"]').click();
   await page.locator('input[placeholder="Scenario name"]').fill(scenarioName);
   await page.locator(".scenario-btn--create").click();
 
@@ -197,8 +194,9 @@ test("AC-3: selecting JOR and creating scenario stores JOR in configuration.enti
 
   const scenarioName = `G1-AC3-JOR-${Date.now()}`;
 
-  // Select JOR
-  await entitySelector.selectOption("JOR");
+  // Select JOR via combobox
+  await entitySelector.fill("JOR");
+  await page.locator('[data-testid="entity-option-JOR"]').click();
   await page.locator('input[placeholder="Scenario name"]').fill(scenarioName);
   await page.locator(".scenario-btn--create").click();
 
