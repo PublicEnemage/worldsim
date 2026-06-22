@@ -194,6 +194,24 @@ Implementation is now unblocked. A sprint entry document must be filed and EL-ap
 
 ---
 
+### M15-G6 — Accessibility Validation
+
+**Sprint entry:** `docs/process/sprint-plans/m15-g6-sprint-entry.md` — **EL APPROVED 2026-06-22** (PR #1126)
+**Issue:** #990 (accessibility validation on 8GB/4-core target hardware)
+
+| Item | Status | Notes |
+|---|---|---|
+| G6 sprint entry document | ✅ **EL APPROVED 2026-06-22** (PR #1126) | Infrastructure Sprint Exception declared; intent/QA gates waived; VC-1–VC-4 observable states specified |
+| G6 validation work (VC-1–VC-4) | ⬜ Not started | Chief Engineer + Frontend Architect Agents; validation report to `docs/process/validation/m15-g6-accessibility-validation-report.md` |
+| VC-1 — Docker Compose stack on target hardware | ⬜ Not started | `docker compose up --build`; health + entities + frontend checks; peak mem ≤ 7GB |
+| VC-2 — 8-step simulation run ≤ 60s | ⬜ Not started | ZMB ECF fixture; all four framework keys in each step response |
+| VC-3 — Playwright non-Docker path documented | ⬜ Not started | `CONTRIBUTING.md` path for running E2E without Docker |
+| VC-4 — Frontend build ≤ 5 minutes | ⬜ Not started | `time npm run build` on target hardware or resource-constrained CI |
+
+**Next required action:** EL to confirm availability of target hardware (HP ProBook or equivalent), then Chief Engineer + Frontend Architect run VC-1–VC-4 checks and author validation report.
+
+---
+
 ### M15-G5 — Process Fixes + Walkthrough Updates (COMPLETE)
 
 **Sprint entry:** `docs/process/sprint-plans/m15-g5-sprint-entry.md` — **EL APPROVED 2026-06-22**
@@ -499,6 +517,8 @@ All near-term issues dispositioned at HORIZON sweep 2026-06-13 — see G8 sprint
 
 | PR | Title | Target | Status |
 |---|---|---|---|
+| #1126 ✅ | process(m15-g6): G6 sprint entry — accessibility validation on target hardware | release/m15 | Merged 2026-06-22 |
+| #1125 ✅ | process(m15-g4): G4 QA tests + process docs + NM-053/054/055 + G5 BPO ACCEPT + SESSION_STATE | release/m15 | Merged 2026-06-22 |
 | #1098 ✅ | fix(m15-g1): guard getIndicatorDisplayNameAny against undefined key (NM-051) | release/m15 | Merged 2026-06-21 |
 | #1097 ✅ | feat(m15-g1): Layer 3 IR fixes — trajectory sentence, zero-step suppression, L0 badges, grounding strip disambiguation, PSP sentence | release/m15 | Merged 2026-06-21 |
 | #1096 ✅ | test(m15-g1): QA Lead Steps 1+2 — AC-1–AC-11 authored before implementation | release/m15 | Merged 2026-06-21 |
