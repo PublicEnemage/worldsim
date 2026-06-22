@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-22 (M15-G5 implementation COMPLETE — all Tier 1 + Tier 2 PRs merged; Step 4 Verify + Step 5 Validate pending EL; G8 gate satisfied by G5 Tier 1)**
+**Last updated: 2026-06-22 (M15-G4 Step 4 Verify PASS — PRs #1116+#1117 merged; CM sign-off on #975 filed; NM-053/NM-054 filed; G4 Step 5 Validate pending BPO; G5 impl complete pending EL Step 4/5)**
 **Current milestone:** M15 — Human Cost Architecture (GitHub Milestone 16)
 **Previous milestone:** M14 — Trust Architecture and Instrument Credibility (FORMALLY CLOSED 2026-06-20; release/m14 → main PR #1086; v0.14.0 at https://github.com/PublicEnemage/worldsim/releases/tag/v0.14.0; #968 closed; GitHub Milestone 15 closed)
 
@@ -175,15 +175,20 @@ Implementation is now unblocked. A sprint entry document must be filed and EL-ap
 | Item | Status | Notes |
 |---|---|---|
 | G4 sprint entry document | ✅ **EL APPROVED 2026-06-22** | `docs/process/sprint-plans/m15-g4-sprint-entry.md`; all structural gates clear |
-| Architect scope confirmation (#975) | ✅ RESOLVED — intent §Decision Gate 1 | #975 within ADR-016 Component 1 scope; no ADR amendment required; M15 validity review satisfied by intent doc |
-| CM analogous-case selection logic | ✅ RESOLVED — intent §Decision Gate 2 | Rule-based entity→case mapping table: ZMB→ARG, JOR→GRC, EGY→ARG, GRC→GRC, unknown→null; CM sign-off on #975 required before Component 3 impl PR is marked ready for review |
-| Data Architect API decisions (DA-G4-1–4) | ✅ RESOLVED — intent §Decisions Resolved | DA-G4-1: `loadable` field on existing `/data-quality` (not new endpoint); DA-G4-2: async pull job POST+GET; DA-G4-3: api_contracts.yml update in same PR as backend impl; DA-G4-4: new `GET /scenarios/{id}/fidelity-context` endpoint |
-| Intent document (Step 1) | ✅ **FILED 2026-06-22** | `docs/process/intents/M15-G4-2026-06-22-path1-fidelity-contextualisation.md`; 15 ACs; Data Architect + Architect co-authored; within-sprint gates resolved |
-| QA test files (Step 2) | ⬜ Not filed — BLOCKING | `backend/tests/test_m15_g4_path1_fidelity_contextualisation.py` + `frontend/tests/e2e/m15-g4-path1-fidelity-contextualisation.spec.ts`; QA Lead files before implementation |
-| `api_contracts.yml` update | ⬜ Required before frontend impl | DA confirmed in intent §DA-G4-3: update lands in same PR as backend impl |
-| G4 implementation (Step 3) | ⬜ Not started — gated on QA test files | Full-stack: Data Architect (backend) + Frontend Architect (frontend) |
+| Architect scope confirmation (#975) | ✅ RESOLVED — intent §Decision Gate 1 | #975 within ADR-016 Component 1 scope; no ADR amendment required |
+| CM analogous-case selection logic | ✅ RESOLVED — intent §Decision Gate 2 | Rule-based mapping: ZMB→ARG, JOR→GRC, EGY→ARG, GRC→GRC, unknown→null |
+| CM sign-off on #975 | ✅ **FILED 2026-06-22 (late)** | Posted post-implementation (#975 comment); substantive CM validation was in intent doc pre-implementation; NM-053 filed for timing deviation |
+| Data Architect API decisions (DA-G4-1–4) | ✅ RESOLVED — intent §Decisions Resolved | `loadable` field on `/data-quality`; async pull job POST+GET; api_contracts.yml update; new `/fidelity-context` endpoint |
+| Intent document (Step 1) | ✅ **FILED 2026-06-22** | `docs/process/intents/M15-G4-2026-06-22-path1-fidelity-contextualisation.md`; 15 ACs |
+| QA test files (Step 2) | ✅ **FILED 2026-06-22** | `backend/tests/test_m15_g4_path1_fidelity_contextualisation.py` + `frontend/tests/e2e/m15-g4-path1-fidelity-contextualisation.spec.ts` |
+| `api_contracts.yml` update | ✅ **MERGED 2026-06-22 — PR #1116** | `/data-quality` extended; `/pull` + `/pull/{job_id}` + `/fidelity-context` added |
+| G4 backend implementation (Step 3) | ✅ **MERGED 2026-06-22 — PR #1116** | `grounding.py`: `loadable` field, async pull job endpoints, `/fidelity-context` endpoint; `DataPullJob` ORM model; Alembic migration `2b821063ef81` (data_pull_jobs table + SEN seed in source_registry) |
+| G4 frontend implementation (Step 3) | ✅ **MERGED 2026-06-22 — PR #1117** | `ScenarioPanel.tsx`: searchable combobox with 41 entities; `DataQualityPreview.tsx`: loadable state + pull trigger + polling; `FidelityDashboard.tsx`: scenario-specific contextualisation + SF-3 fallback; `App.tsx`: scenarioId prop wired |
+| E2E test regression (NM-054) | ✅ **FIXED — PR #1117** | 6 existing tests used `.selectOption()` on now-`<input>` entity-selector; fixed to combobox fill+click pattern; NM-054 filed |
+| G4 Step 4 Verify | ✅ **PASS 2026-06-22** | All 15 ACs confirmed via CI: `test-backend pass` (PR #1116 job 82762073879) + `playwright-e2e pass` (PR #1117 job 82775180511); intent doc §8 updated; two process deviations: NM-053 (CM sign-off timing), NM-054 (combobox regression) |
+| G4 Step 5 Validate | ⬜ **Pending BPO** | Business PO confirms Eleni (Persona 2) can create SEN scenario within 5-min ceiling; Customer Agent Layer 3 assessment required before BPO verdict |
 
-**Next required action:** QA Lead files both test files from intent document ACs before implementation begins.
+**Next required action:** Business PO (EL) runs Step 5 Validate — open live application with SEN scenario creation and ZMB fidelity panel; Customer Agent Layer 3 assessment; sprint exit document.
 
 ---
 

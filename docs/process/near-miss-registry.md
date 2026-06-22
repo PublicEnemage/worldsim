@@ -2667,6 +2667,77 @@ Alternatively, a `Makefile` target or `just` recipe (`lint`) can encode the corr
 
 ---
 
+## NM-053 — CM Sign-Off Artifact Filed Post-Implementation: Component 3 Gate Bypassed
+
+**Date:** 2026-06-22
+**Milestone:** M15 — G4 (Path 1 + ADR-016 Component 3)
+**Detected by:** PI Agent at Step 4 Verify review (reading intent document obligations after implementation was merged)
+**Severity:** Medium — gate bypassed; substantive CM validation was in the intent document so no incorrect methodology was implemented, but the formal artifact requirement was not satisfied before PR #1117 merged
+
+### What happened
+
+The M15-G4 intent document §Decision Gate 2 stated: "The Chief Methodologist must comment on #975 confirming this mapping table before the Component 3 implementation PR is marked ready for review." PR #1117 (frontend G4 implementation including Component 3) was opened and merged on 2026-06-22 without the required GitHub comment on #975.
+
+The CM analogous-case mapping table WAS authored pre-implementation in the intent document (§Decision Gate 2) and the sprint entry was EL-approved before implementation began. The substantive methodological validation preceded the code. The missing artifact was the GitHub issue comment — the formal process record required by the intent document's explicit obligation.
+
+The CM sign-off comment was posted to #975 on 2026-06-22 after the PR merged (https://github.com/PublicEnemage/worldsim/issues/975#issuecomment-4771002251).
+
+### What was at risk
+
+The gate exists to ensure CM validation of the mapping table before code bakes in a static assumption. An incorrect mapping table could be implemented and not caught until the Business PO Validate step. In this instance the risk was low because the mapping table was defined by the CM in the intent document (pre-implementation) and EL-approved. The gap was a missing artifact, not a missing validation.
+
+### What caught it
+
+PI Agent review of intent document obligations during Step 4 Verify analysis (2026-06-22). The omission was identified from reading intent §Decision Gate 2. No person spotted it at implementation time — the process had no mechanism to enforce named pre-implementation artifacts before a PR could be opened.
+
+### Process improvement
+
+**Immediate:** CM sign-off posted post-implementation. No incorrect methodology shipped.
+
+**Structural gap:** Named pre-implementation obligations in intent documents (CM sign-off, Architect sign-off, etc.) have no enforcement mechanism. An implementing agent can open a PR without checking whether all named obligations are satisfied.
+
+**Recommended fix:** Add a pre-implementation obligation checklist to the intent document template (§0 or §1 header): any named pre-implementation obligation (CM sign-off, Architect confirmation, etc.) is an explicit checkbox the implementing agent must verify before opening the implementation PR. A PR description template should include a reference to the intent document's pre-implementation obligations. This is a documentation-level gate — no CI check — but naming it in the PR description makes it an explicit step, not an implicit assumption.
+
+---
+
+## NM-054 — UI Contract Change (select → combobox) Broke Six Existing E2E Tests; Not Caught Pre-Push
+
+**Date:** 2026-06-22
+**Milestone:** M15 — G4 (Path 1 entity selector)
+**Detected by:** CI `playwright-e2e` failure on PR #1117 — 6 tests failed (caught by mandatory CI gate, not by pre-push)
+**Severity:** Low — caught by CI before merge; no incorrect artifact shipped; fixed in the same session
+
+### What happened
+
+M15-G4 replaced the entity selector in `ScenarioPanel.tsx` from a `<select>` element to a searchable combobox `<input>`. Six existing Playwright tests in `m14-g1-prerequisite-bugs.spec.ts` and `m14-g4-adr016-frontend.spec.ts` used `.selectOption()` and child `<option>` queries against `[data-testid="entity-selector"]`. These Playwright APIs fail on `<input>` elements with the error "Element is not a `<select>` element." All six tests failed in CI on PR #1117 with `playwright-e2e fail 6m13s`.
+
+The implementing agent did not audit existing E2E tests for references to the changed component's interaction model before opening the PR. The tests were fixed in the same session and the corrected PR (#1117) passed CI on rerun.
+
+### What was at risk
+
+If PR #1117 had been merged with the failing tests (e.g., using admin bypass), six E2E tests would have been broken in `release/m15`, degrading the CI gate for all subsequent PRs. No incorrect application behavior would have shipped — the tests verify the UI interaction contract, not data correctness. The risk was CI gate degradation, not a mission-critical defect.
+
+### What caught it
+
+CI `playwright-e2e` check on PR #1117 — a mandatory blocking gate for all release branch PRs. The gate is not bypassable without admin action (which requires EL approval per CLAUDE.md §PR merge gate). The process worked as designed. The gap is that the detection happened at CI, not at pre-push time.
+
+### Process improvement
+
+**Why pre-push didn't catch it:** The frontend pre-push gate is `cd frontend && npm run build`. TypeScript compilation confirms type correctness but does not run Playwright tests. A UI contract change that breaks E2E tests passes the build gate and reaches CI unchanged.
+
+**Why running Playwright pre-push is not the fix:** Full Playwright suite takes 6+ minutes and requires a running backend. This is incompatible with the equitable build process constraint (8GB/4-core hardware) and would block rapid iteration. Running the full suite pre-push is not feasible.
+
+**Recommended discipline (not a gate):** When an implementing agent modifies a component's DOM interface (element type change, testid rename, interaction API change — e.g., `<select>` to `<input>`, button text change, `role` change), the implementing agent must:
+1. Grep `frontend/tests/e2e/` for all references to the changed testid or selector
+2. Audit whether any existing test uses the old interaction model (`.selectOption()`, `<option>` queries, `.check()`, etc.)
+3. Update the identified tests before opening the PR
+
+This is a named discipline step, not a CI gate. It is added to `docs/CONTRIBUTING.md §Frontend Implementation` as a requirement for UI contract changes. A future pre-push Playwright smoke test for *only* the files containing the changed testid is a potential improvement but is not required to close this near-miss — the manual audit step is sufficient.
+
+**Near-miss lineage:** SCAN-024 (M10 TS6133) established the `npm run build` pre-push gate for TypeScript type errors. NM-054 establishes that the gate does not cover Playwright E2E regressions from UI contract changes, and introduces a named manual audit step to compensate.
+
+---
+
 ## Registry Maintenance
 
 ### How to add an entry
