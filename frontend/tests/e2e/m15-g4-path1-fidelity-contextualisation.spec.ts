@@ -48,13 +48,13 @@
  * become fully active once G4 implementation lands and CI triggers.
  *
  * Route mocking:
- *   AC-2:  page.route() for /entities/ZMB/data-quality → loadable: false mock
- *   AC-3:  page.route() for /entities/SEN/data-quality → loadable: true mock
- *   AC-4:  page.route() for /entities/*/data-quality → is_synthetic: true mock
- *   AC-5:  page.route() for POST /entities/SEN/pull → queued status mock
- *   AC-6:  page.route() for pull + /trajectory → controlled mocks
- *   AC-11/AC-12: page.route() for /scenarios/*/fidelity-context → ARG mapping
- *   AC-13: page.route() for /scenarios/*/fidelity-context → null analogous_case
+ *   AC-2:  page.route() for /entities/ZMB/data-quality -> loadable: false mock
+ *   AC-3:  page.route() for /entities/SEN/data-quality -> loadable: true mock
+ *   AC-4:  page.route() for /entities/*/data-quality -> is_synthetic: true mock
+ *   AC-5:  page.route() for POST /entities/SEN/pull -> queued status mock
+ *   AC-6:  page.route() for pull + /trajectory -> controlled mocks
+ *   AC-11/AC-12: page.route() for /scenarios/*/fidelity-context -> ARG mapping
+ *   AC-13: page.route() for /scenarios/*/fidelity-context -> null analogous_case
  *
  * testid reference (new for G4):
  *   data-testid="entity-selector"           — entity selector in creation form
