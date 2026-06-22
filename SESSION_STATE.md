@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-21 (M15-G2 sprint entry EL-approved 2026-06-21; G2 work unblocked pending intent document + QA tests; next action: Architect Agent files intent document at docs/process/intents/M15-G2-2026-06-21-zone-1a-adr.md)**
+**Last updated: 2026-06-22 (M15-G3 Step 3 COMPLETE — PR #1109 merged to release/m15; cohort-disaggregation-design.md + political-risk-summary-design.md filed; 45/45 QA tests pass; ARF + CM sign-off required before M16 sprint entry for #986 and #987; G2 intent + QA still pending)**
 **Current milestone:** M15 — Human Cost Architecture (GitHub Milestone 16)
 **Previous milestone:** M14 — Trust Architecture and Instrument Credibility (FORMALLY CLOSED 2026-06-20; release/m14 → main PR #1086; v0.14.0 at https://github.com/PublicEnemage/worldsim/releases/tag/v0.14.0; #968 closed; GitHub Milestone 15 closed)
 
@@ -134,6 +134,30 @@ Implementation is now unblocked. A sprint entry document must be filed and EL-ap
 | Phase 4 — implementation | ⬜ Out of G2 scope | Separate sprint entry required; may extend to M16 |
 
 **Next required action:** Architect Agent files intent document at `docs/process/intents/M15-G2-2026-06-21-zone-1a-adr.md`. QA Lead files `backend/tests/test_m15_g2_zone1a_adr.py` after intent document. Both must be on release/m15 before Architecture Review begins.
+
+---
+
+### M15-G3 — Cohort Disaggregation and Political Risk Summary Design
+
+**Sprint entry:** N/A — design-only; no sprint entry required per `docs/process/sprint-plans/m15-sprint-plan.md §G3`
+**Intent document:** `docs/process/intents/M15-G3-2026-06-21-cohort-disaggregation-design.md` — filed 2026-06-21
+**Issues:** #986 (cohort disaggregation), #987 (political risk summary surface)
+
+| Item | Status | Notes |
+|---|---|---|
+| Intent document | ✅ FILED 2026-06-21 | AC-1–AC-11 with reviewer gates; both issues covered |
+| QA tests | ✅ FILED — PR #1109 | `backend/tests/test_m15_g3_cohort_political_risk_design.py` — 45 tests AC-1–AC-11 |
+| cohort-disaggregation-design.md (Step 3) | ✅ **MERGED 2026-06-22** — PR #1109 → release/m15 | Zone 1B placement; income quintile + age cohort; 3 HCL indicators; MDA-derived thresholds; ADR-017 disposition (b) — independent |
+| political-risk-summary-design.md (Step 3) | ✅ **MERGED 2026-06-22** — PR #1109 → release/m15 | Zone 1D extended; no new ADR required; mode-specific contracts; ZMB ECF step 3 literal example; 30-sec legibility check; #1084 gate |
+| G3 QA: 45/45 pass | ✅ PASS 2026-06-22 | All ACs confirmed via pytest before commit |
+| Chief Methodologist sign-off (#986) | ⬜ Required before M16 sprint entry | Cohort indicator scope + MDA-derived floor methodology (AC-3); comment on #986 |
+| CM sign-off (#987) | ⬜ Required before M16 sprint entry | PSP severity tier thresholds + 2pp direction sensitivity (AC-11); comment on #987 |
+| DemographicModule output verification (#986) | ⬜ Required before M16 sprint entry | Data Architect confirms cohort field availability for GRC/JOR/EGY/ZMB |
+| Architecture Review Facilitator confirmation | ⬜ Required before M16 sprint entry | AC-1–AC-6 (#986) and AC-7–AC-11 (#987); both documents reviewed |
+| Zone 1D layout feasibility (#987) | ⬜ Required before M16 sprint entry | Frontend Architect confirms sub-section fits at 1280×800 without displacing 4-framework rows |
+
+**G3 Step 4 Verify:** N/A — design-only; observable states are the documents themselves; 45/45 QA tests confirm ACs.
+**G3 Step 5 Validate:** Pending — requires ARF confirmation (AC gate) and CM sign-offs before BPO can validate M16 readiness.
 
 ---
 
