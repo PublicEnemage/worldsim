@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-21 (M15-G2 sprint entry EL-approved 2026-06-21; G2 work unblocked pending intent document + QA tests; next action: Architect Agent files intent document at docs/process/intents/M15-G2-2026-06-21-zone-1a-adr.md)**
+**Last updated: 2026-06-22 (M15-G3 BPO ACCEPT — Step 5 Validate complete; sprint exit filed PR #1110; intent doc §8/§9 filed; M16 gates remain (CM, DA, ARF, FA); G2 intent + QA still pending)**
 **Current milestone:** M15 — Human Cost Architecture (GitHub Milestone 16)
 **Previous milestone:** M14 — Trust Architecture and Instrument Credibility (FORMALLY CLOSED 2026-06-20; release/m14 → main PR #1086; v0.14.0 at https://github.com/PublicEnemage/worldsim/releases/tag/v0.14.0; #968 closed; GitHub Milestone 15 closed)
 
@@ -95,7 +95,7 @@ Implementation is now unblocked. A sprint entry document must be filed and EL-ap
 
 ## Open Work Streams — M15 (Human Cost Architecture)
 
-### M15-G1 — Layer 3 IR Fixes (Step 5 Validate pending)
+### M15-G1 — Layer 3 IR Fixes (COMPLETE)
 
 **Sprint entry:** `docs/process/sprint-plans/m15-g1-sprint-entry.md` — EL-approved 2026-06-20 (PR #1095)
 **Intent document:** `docs/process/intents/M15-G1-2026-06-20-layer3-ir-fixes.md`
@@ -134,6 +134,31 @@ Implementation is now unblocked. A sprint entry document must be filed and EL-ap
 | Phase 4 — implementation | ⬜ Out of G2 scope | Separate sprint entry required; may extend to M16 |
 
 **Next required action:** Architect Agent files intent document at `docs/process/intents/M15-G2-2026-06-21-zone-1a-adr.md`. QA Lead files `backend/tests/test_m15_g2_zone1a_adr.py` after intent document. Both must be on release/m15 before Architecture Review begins.
+
+---
+
+### M15-G3 — Cohort Disaggregation and Political Risk Summary Design
+
+**Sprint entry:** N/A — design-only; no sprint entry required per `docs/process/sprint-plans/m15-sprint-plan.md §G3`
+**Intent document:** `docs/process/intents/M15-G3-2026-06-21-cohort-disaggregation-design.md` — filed 2026-06-21
+**Issues:** #986 (cohort disaggregation), #987 (political risk summary surface)
+
+| Item | Status | Notes |
+|---|---|---|
+| Intent document | ✅ FILED 2026-06-21 | AC-1–AC-11 with reviewer gates; both issues covered |
+| QA tests | ✅ FILED — PR #1109 | `backend/tests/test_m15_g3_cohort_political_risk_design.py` — 45 tests AC-1–AC-11 |
+| cohort-disaggregation-design.md (Step 3) | ✅ **MERGED 2026-06-22** — PR #1109 → release/m15 | Zone 1B placement; income quintile + age cohort; 3 HCL indicators; MDA-derived thresholds; ADR-017 disposition (b) — independent |
+| political-risk-summary-design.md (Step 3) | ✅ **MERGED 2026-06-22** — PR #1109 → release/m15 | Zone 1D extended; no new ADR required; mode-specific contracts; ZMB ECF step 3 literal example; 30-sec legibility check; #1084 gate |
+| G3 QA: 45/45 pass | ✅ PASS 2026-06-22 | All ACs confirmed via pytest before commit |
+| G3 Step 4 Verify | ✅ **PASS 2026-06-22** | 45/45 QA tests; all AC-1–AC-11 observable states confirmed by document read; both silent failure tests pass; verdict in intent doc §8 |
+| G3 Step 5 Validate | ✅ **BPO ACCEPT 2026-06-22** | Both designs specify Layer 3 output; North star PASS (Aicha closes FINDING-03 HIGH via cohort rows; Andreas closes PSP mediation gap via political risk sub-section); Kryptonite PASS; sprint exit filed PR #1110 |
+| Chief Methodologist sign-off (#986) | ⬜ Required before M16 sprint entry | Cohort indicator scope + MDA-derived floor methodology (AC-3); comment on #986 |
+| CM sign-off (#987) | ⬜ Required before M16 sprint entry | PSP severity tier thresholds + 2pp direction sensitivity (AC-11); comment on #987 |
+| DemographicModule output verification (#986) | ⬜ Required before M16 sprint entry | Data Architect confirms cohort field availability for GRC/JOR/EGY/ZMB |
+| Architecture Review Facilitator confirmation | ⬜ Required before M16 sprint entry | AC-1–AC-6 (#986) and AC-7–AC-11 (#987); both documents reviewed |
+| Zone 1D layout feasibility (#987) | ⬜ Required before M16 sprint entry | Frontend Architect confirms sub-section fits at 1280×800 without displacing 4-framework rows |
+
+**Sprint exit document:** `docs/process/sprint-plans/m15-g3-sprint-exit.md` — PI Agent Confirmed 2026-06-22 (PR #1110)
 
 ---
 
