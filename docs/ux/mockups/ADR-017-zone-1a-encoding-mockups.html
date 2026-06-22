@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ADR-017 Zone 1A — Encoding Contract Mockups</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#F1F5F9;color:#1E293B;padding:2rem}
+header{max-width:1080px;margin:0 auto 2rem;padding-bottom:1.5rem;border-bottom:2px solid #CBD5E1}
+h1{font-size:1.4rem;font-weight:700;color:#0F172A}
+.subtitle{font-size:.8rem;color:#64748B;margin-top:.2rem}
+.intro{margin-top:.9rem;font-size:.85rem;line-height:1.65;color:#334155;max-width:780px}
+.intro strong{color:#0F172A}
+.grid{max-width:1080px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:1.5rem}
+.card{background:#fff;border:1px solid #E2E8F0;border-radius:8px;padding:1.25rem;box-shadow:0 1px 4px rgba(0,0,0,.05)}
+.tag{display:inline-block;font-size:.68rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:.15rem .5rem;border-radius:3px;margin-bottom:.35rem}
+.tag-m12{background:#EFF6FF;color:#1D4ED8}
+.tag-m3{background:#FEF3C7;color:#92400E}
+.tag-cmp{background:#F0FDF4;color:#15803D}
+.tag-err{background:#FEE2E2;color:#991B1B}
+.tag-z1d{background:#F5F3FF;color:#6D28D9}
+.ctitle{font-size:.95rem;font-weight:600;color:#1E293B}
+.cq{font-size:.76rem;color:#64748B;font-style:italic;margin-top:.2rem;line-height:1.4}
+.chart-wrap{background:#FAFAFA;border:1px solid #E2E8F0;border-radius:5px;margin-top:.8rem;padding:6px;overflow:hidden}
+.chart-wrap svg{width:100%;height:auto;display:block}
+.enc-key{font-size:.73rem;font-weight:600;color:#1E293B;margin-top:.7rem;padding:.35rem .55rem;background:#F1F5F9;border-left:3px solid #3B82F6;border-radius:0 4px 4px 0;line-height:1.5}
+.ceiling{font-size:.7rem;color:#64748B;margin-top:.35rem}
+.ceiling .hot{color:#DC2626;font-weight:700}
+.anns{display:flex;flex-direction:column;gap:.25rem;margin-top:.6rem}
+.ann{display:flex;gap:.4rem;align-items:flex-start;font-size:.73rem;color:#475569;line-height:1.4}
+.dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:3px}
+.leg{display:flex;flex-wrap:wrap;gap:.4rem .8rem;margin-top:.55rem}
+.leg-item{display:flex;align-items:center;gap:.3rem;font-size:.7rem;color:#475569}
+.leg-line{width:22px;height:0;border-top:2.5px solid currentColor;display:inline-block;flex-shrink:0}
+.leg-line.dash{border-style:dashed;opacity:.6}
+hr.section{grid-column:1/-1;border:none;border-top:2px solid #E2E8F0;margin:.5rem 0}
+.section-label{grid-column:1/-1;font-size:.8rem;font-weight:600;color:#64748B;letter-spacing:.08em;text-transform:uppercase;padding:.25rem 0}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>ADR-017 · Zone 1A Encoding Contract — Visual Mockups</h1>
+  <p class="subtitle">M15-G2 · 2026-06-22 · For EL review before acceptance. Open this file in any browser.</p>
+  <p class="intro">
+    Zone 1A is the primary trajectory instrument. ADR-017 defines a <strong>mode-dependent, entity-count-dependent encoding
+    contract</strong> — the visual treatment changes based on (1) which mode is active and (2) how many entities are in the scenario.
+    The six panels below cover every context in the encoding contract table (ADR-017 §Decision).<br><br>
+    <strong>Data note:</strong> All trajectories use representative synthetic data for ZMB (Zambia, blue),
+    JOR (Jordan, amber), GRC (Greece, red). Shape and direction are realistic; exact values are illustrative.
+  </p>
+</header>
+
+<div class="grid" id="root"></div>
+
+<script>
+// ── Chart geometry ──────────────────────────────────────────────────────────
+const C = {
+  W: 460, H: 290,
+  ML: 46, MT: 32, MR: 72, MB: 38,
+  N: 8,
+  get pw(){ return this.W - this.ML - this.MR },
+  get ph(){ return this.H - this.MT - this.MB },
+  x(step){ return this.ML + (step / this.N) * this.pw },
+  y(score){ return this.MT + (1 - score) * this.ph },
+  pts(arr){ return arr.map((s,i)=>`${this.x(i).toFixed(1)},${this.y(s).toFixed(1)}`).join(' ') },
+};
+
+// ── Palette ──────────────────────────────────────────────────────────────────
+const E = { ZMB:'#2563EB', JOR:'#D97706', GRC:'#DC2626' };
+const F = {
+  fin:{ c:'#1D4ED8', n:'Financial' },
+  hd: { c:'#15803D', n:'Human Dev.' },
+  eco:{ c:'#0E7490', n:'Ecological' },
+  gov:{ c:'#7E22CE', n:'Governance' },
+};
+const MDAC = '#EF4444';
+
+// ── Trajectory data (9 points: steps 0–8) ───────────────────────────────────
+const D = {
+  // Case 1 — ZMB single entity, 4 framework lines
+  zmb_fin: [0.52,0.49,0.46,0.42,0.38,0.36,0.35,0.36,0.37],
+  zmb_hd:  [0.65,0.63,0.61,0.58,0.55,0.53,0.51,0.52,0.53],
+  zmb_eco: [0.56,0.55,0.54,0.53,0.52,0.50,0.49,0.49,0.50],
+  zmb_gov: [0.60,0.57,0.53,0.48,0.45,0.42,0.42,0.43,0.43],
+  // Single-entity MDA floor values (per framework)
+  mda1: { fin:0.28, hd:0.35, eco:0.25, gov:0.30 },
+  // Case 2 — multi-entity composite lines
+  zmb:  [0.58,0.55,0.52,0.48,0.45,0.43,0.42,0.43,0.44],
+  jor:  [0.63,0.62,0.61,0.60,0.59,0.58,0.58,0.57,0.57],
+  grc:  [0.57,0.54,0.50,0.46,0.42,0.38,0.35,0.33,0.33],
+  // Multi-entity MDA floors (most restrictive per entity)
+  mdaE: { ZMB:0.30, JOR:0.32, GRC:0.28 },
+  // Case 3 — Mode 3 N=2: ghost vs active
+  // Control input applied at step 3. Paths identical 0–3, diverge from step 4.
+  zmb_ghost:  [0.58,0.55,0.52,0.48,0.44,0.41,0.38,0.36,0.35],
+  zmb_active: [0.58,0.55,0.52,0.48,0.52,0.54,0.55,0.56,0.57],
+  jor_ghost:  [0.63,0.62,0.61,0.60,0.59,0.58,0.58,0.57,0.57],
+  jor_active: [0.63,0.62,0.61,0.60,0.59,0.58,0.58,0.57,0.57],
+  // Case 4 — COMPARE_VIEW: Fixture A (ECF accepted) vs Fixture B (ECF rejected)
+  zmb_a: [0.58,0.55,0.52,0.48,0.45,0.43,0.42,0.43,0.44],
+  zmb_b: [0.58,0.53,0.49,0.43,0.37,0.32,0.28,0.25,0.22],
+  jor_a: [0.63,0.62,0.61,0.60,0.59,0.58,0.58,0.57,0.57],
+  jor_b: [0.63,0.61,0.59,0.57,0.54,0.52,0.51,0.50,0.50],
+};
+
+// ── SVG primitives ───────────────────────────────────────────────────────────
+function line(pts, color, sw=2, dash='', op=1){
+  return `<polyline points="${pts}" fill="none" stroke="${color}" stroke-width="${sw}"
+    stroke-linejoin="round" stroke-linecap="round"
+    ${dash?`stroke-dasharray="${dash}"`:''}
+    ${op<1?`opacity="${op}"`:''}/>`;
+}
+
+function hline(score, color, sw=1, dash='6 3', label=''){
+  const y = C.y(score).toFixed(1);
+  return `<line x1="${C.ML}" y1="${y}" x2="${C.ML+C.pw}" y2="${y}"
+    stroke="${color}" stroke-width="${sw}" stroke-dasharray="${dash}"/>
+    ${label?`<text x="${C.ML+C.pw+3}" y="${(+y+4).toFixed(1)}" font-size="9" fill="${color}">${label}</text>`:''}`;
+}
+
+function epLabel(score, label, color, dy=0, dx=4){
+  const x=(C.x(C.N)+dx).toFixed(1), y=(C.y(score)+dy+4).toFixed(1);
+  return `<text x="${x}" y="${y}" font-size="10" font-weight="600" fill="${color}">${label}</text>`;
+}
+
+function tierBadge(score, tier, color, dy=0){
+  const x=(C.x(C.N)+40).toFixed(1), y=(C.y(score)+dy-7).toFixed(1);
+  return `<rect x="${x}" y="${y}" width="18" height="12" rx="2" fill="${color}" opacity=".15"/>
+    <text x="${(+x+9).toFixed(1)}" y="${(+y+9).toFixed(1)}" font-size="8" text-anchor="middle"
+      fill="${color}" font-weight="700">T${tier}</text>`;
+}
+
+function fillBetween(upper, lower, color, fromStep=0, op=0.13){
+  // Filled region between two score arrays from fromStep onward
+  const pts = [];
+  for(let i=fromStep;i<upper.length;i++)
+    pts.push(`${C.x(i).toFixed(1)},${C.y(upper[i]).toFixed(1)}`);
+  for(let i=lower.length-1;i>=fromStep;i--)
+    pts.push(`${C.x(i).toFixed(1)},${C.y(lower[i]).toFixed(1)}`);
+  return `<polygon points="${pts.join(' ')}" fill="${color}" opacity="${op}"/>`;
+}
+
+function ctrlMarker(step, note){
+  const x = C.x(step).toFixed(1);
+  return `<line x1="${x}" y1="${C.MT}" x2="${x}" y2="${C.MT+C.ph}"
+      stroke="#F59E0B" stroke-width="1.5" stroke-dasharray="4 3" opacity=".85"/>
+    <rect x="${(+x-58).toFixed(1)}" y="${(C.MT-16).toFixed(1)}" width="116" height="14" rx="2" fill="#FFFBEB"/>
+    <text x="${x}" y="${(C.MT-4).toFixed(1)}" text-anchor="middle" font-size="9" fill="#92400E" font-weight="600">${note}</text>`;
+}
+
+function axes(){
+  let out = '';
+  const ticks=[0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9];
+  for(const t of ticks){
+    const y=C.y(t).toFixed(1);
+    out += `<line x1="${C.ML}" y1="${y}" x2="${C.ML+C.pw}" y2="${y}" stroke="#E2E8F0" stroke-width="1"/>
+      <text x="${(C.ML-5).toFixed(1)}" y="${(+y+4).toFixed(1)}" text-anchor="end" font-size="9" fill="#94A3B8">${t.toFixed(1)}</text>`;
+  }
+  out += `<line x1="${C.ML}" y1="${C.MT}" x2="${C.ML}" y2="${C.MT+C.ph}" stroke="#CBD5E1" stroke-width="1"/>
+    <line x1="${C.ML}" y1="${C.MT+C.ph}" x2="${C.ML+C.pw}" y2="${C.MT+C.ph}" stroke="#CBD5E1" stroke-width="1"/>`;
+  for(let s=0;s<=C.N;s+=2){
+    const x=C.x(s).toFixed(1);
+    out += `<text x="${x}" y="${(C.MT+C.ph+16).toFixed(1)}" text-anchor="middle" font-size="9" fill="#94A3B8">${s}</text>`;
+  }
+  out += `<text x="${(C.ML+C.pw/2).toFixed(1)}" y="${(C.H-5).toFixed(1)}" text-anchor="middle" font-size="9" fill="#94A3B8">Step</text>
+    <text x="10" y="${(C.MT+C.ph/2).toFixed(1)}" text-anchor="middle" font-size="9" fill="#94A3B8"
+      transform="rotate(-90,10,${(C.MT+C.ph/2).toFixed(1)})">Score</text>`;
+  return out;
+}
+
+function svg(body, h=C.H){
+  return `<svg viewBox="0 0 ${C.W} ${h}" xmlns="http://www.w3.org/2000/svg">${body}</svg>`;
+}
+
+// ── Per-case chart builders ──────────────────────────────────────────────────
+
+// CASE 1: Mode 1/2, N=1 — 4 framework lines (unchanged current encoding)
+function chart1(){
+  let b = axes();
+  b += hline(D.mda1.eco, F.eco.c, 1, '5 3', 'ECO floor');
+  b += hline(D.mda1.fin, F.fin.c, 1, '5 3', 'FIN floor');
+  b += hline(D.mda1.gov, F.gov.c, 1, '5 3', 'GOV floor');
+  b += hline(D.mda1.hd,  F.hd.c,  1, '5 3', 'HD floor');
+  b += line(C.pts(D.zmb_eco), F.eco.c, 2);
+  b += line(C.pts(D.zmb_gov), F.gov.c, 2);
+  b += line(C.pts(D.zmb_hd),  F.hd.c,  2);
+  b += line(C.pts(D.zmb_fin), F.fin.c, 2.5);
+  // Endpoint labels with y-offsets to avoid collision
+  // At step 8: hd≈0.53, eco≈0.50, gov≈0.43, fin≈0.37 — well spread, no collision
+  b += epLabel(D.zmb_hd[C.N],  'HD',  F.hd.c,  -2);
+  b += epLabel(D.zmb_eco[C.N], 'EC',  F.eco.c,  2);
+  b += epLabel(D.zmb_gov[C.N], 'GV',  F.gov.c,  2);
+  b += epLabel(D.zmb_fin[C.N], 'FIN', F.fin.c,  2);
+  // Annotation arrow from Financial floor to Financial line at step 7
+  const finy = C.y(D.zmb_fin[7]).toFixed(1);
+  const floory = C.y(D.mda1.fin).toFixed(1);
+  const arrowx = C.x(6.5).toFixed(1);
+  b += `<line x1="${arrowx}" y1="${finy}" x2="${arrowx}" y2="${floory}"
+    stroke="${F.fin.c}" stroke-width="1" stroke-dasharray="2 2" opacity=".6"/>
+  <text x="${(+arrowx+4).toFixed(1)}" y="${((+finy+ +floory)/2+4).toFixed(1)}"
+    font-size="9" fill="${F.fin.c}">→ floor</text>`;
+  return svg(b);
+}
+
+// CASE 2: Mode 1/2, N=3 — composite entity lines
+function chart2(){
+  let b = axes();
+  // MDA floors per entity
+  b += hline(D.mdaE.GRC, E.GRC, 1);
+  b += hline(D.mdaE.ZMB, E.ZMB, 1);
+  b += hline(D.mdaE.JOR, E.JOR, 1);
+  // Composite curves
+  b += line(C.pts(D.grc), E.GRC, 2.5);
+  b += line(C.pts(D.zmb), E.ZMB, 2.5);
+  b += line(C.pts(D.jor), E.JOR, 2.5);
+  // Endpoint labels — at step 8: JOR=0.57, ZMB=0.44, GRC=0.33
+  // Well-spaced — no collision offset needed
+  b += epLabel(D.jor[C.N], 'JOR', E.JOR, -2);
+  b += tierBadge(D.jor[C.N], 2, E.JOR, -2);
+  b += epLabel(D.zmb[C.N], 'ZMB', E.ZMB, -2);
+  b += tierBadge(D.zmb[C.N], 3, E.ZMB, -2);
+  b += epLabel(D.grc[C.N], 'GRC', E.GRC, -2);
+  b += tierBadge(D.grc[C.N], 2, E.GRC, -2);
+  // Annotation: confidence tier badge explanation
+  b += `<rect x="${(C.ML+10).toFixed(1)}" y="${(C.MT+4).toFixed(1)}" width="148" height="28" rx="3"
+    fill="white" stroke="#E2E8F0" stroke-width="1" opacity=".9"/>
+  <text x="${(C.ML+18).toFixed(1)}" y="${(C.MT+17).toFixed(1)}" font-size="9" fill="#334155">
+    Tier badge = lowest-confidence
+  </text>
+  <text x="${(C.ML+18).toFixed(1)}" y="${(C.MT+27).toFixed(1)}" font-size="9" fill="#334155">
+    framework in composite (T2/T3)
+  </text>`;
+  return svg(b);
+}
+
+// CASE 3: Mode 3, N=2 — baseline ghost + active solid, divergence fill
+function chart3(){
+  let b = axes();
+  b += ctrlMarker(3, 'Fiscal multiplier applied (step 3)');
+  // Divergence fill — ZMB active is above ghost after step 3
+  b += fillBetween(D.zmb_active, D.zmb_ghost, E.ZMB, 3, 0.14);
+  // MDA floors
+  b += hline(D.mdaE.ZMB, E.ZMB, 1);
+  b += hline(D.mdaE.JOR, E.JOR, 1);
+  // JOR: ghost and active overlap (unaffected)
+  b += line(C.pts(D.jor_ghost),  E.JOR, 1.5, '5 3', 0.45);
+  b += line(C.pts(D.jor_active), E.JOR, 2, '', 1.0);
+  // ZMB: ghost (dashed, faint) and active (solid, full)
+  b += line(C.pts(D.zmb_ghost),  E.ZMB, 1.5, '5 3', 0.45);
+  b += line(C.pts(D.zmb_active), E.ZMB, 2.5, '', 1.0);
+  // Endpoint labels
+  // JOR active≈ghost=0.57 (top), ZMB active=0.57 (very close to JOR — use y-offset)
+  // ZMB ghost=0.35 (well below)
+  b += epLabel(D.jor_active[C.N], 'JOR',      E.JOR, -12);
+  b += epLabel(D.zmb_active[C.N], 'ZMB',      E.ZMB,  4);
+  b += epLabel(D.zmb_ghost[C.N],  '(ghost)',  E.ZMB,  0, 4);
+  // Divergence magnitude annotation mid-chart
+  const ms=6;
+  const mx=C.x(ms).toFixed(1), ay=C.y(D.zmb_active[ms]).toFixed(1), gy=C.y(D.zmb_ghost[ms]).toFixed(1);
+  const midY=(((+ay)+(+gy))/2).toFixed(1);
+  b += `<line x1="${mx}" y1="${ay}" x2="${mx}" y2="${gy}"
+    stroke="${E.ZMB}" stroke-width="1" marker-start="url(#arr)" opacity=".5"/>
+  <rect x="${(+mx+6).toFixed(1)}" y="${(+midY-9).toFixed(1)}" width="56" height="20" rx="3"
+    fill="white" stroke="${E.ZMB}" stroke-width="1" opacity=".9"/>
+  <text x="${(+mx+11).toFixed(1)}" y="${(+midY+1).toFixed(1)}" font-size="9" fill="${E.ZMB}" font-weight="700">+0.22</text>
+  <text x="${(+mx+11).toFixed(1)}" y="${(+midY+11).toFixed(1)}" font-size="8" fill="#64748B">vs baseline</text>`;
+  return svg(b);
+}
+
+// CASE 4: Mode 1, COMPARE_VIEW — N=2/fixture, Fixture A solid vs Fixture B ghost
+function chart4(){
+  let b = axes();
+  // Fill between ZMB-A and ZMB-B (shows program impact for ZMB)
+  b += fillBetween(D.zmb_a, D.zmb_b, E.ZMB, 0, 0.12);
+  // ZMB MDA floor — ZMB-B will breach at step 6
+  b += hline(D.mdaE.ZMB, MDAC, 1.2, '6 3', '← ZMB MDA floor');
+  b += hline(D.mdaE.JOR, E.JOR, 1);
+  // Fixture B (ghost, dashed, 50% opacity)
+  b += line(C.pts(D.jor_b), E.JOR, 1.5, '5 3', 0.5);
+  b += line(C.pts(D.zmb_b), E.ZMB, 1.5, '5 3', 0.5);
+  // Fixture A (solid, full opacity)
+  b += line(C.pts(D.jor_a), E.JOR, 2.5);
+  b += line(C.pts(D.zmb_a), E.ZMB, 2.5);
+  // MDA breach marker on ZMB-B at step 6 (score 0.28 < floor 0.30)
+  const bx=C.x(6).toFixed(1), by=C.y(D.zmb_b[6]).toFixed(1);
+  b += `<circle cx="${bx}" cy="${by}" r="5" fill="${MDAC}" opacity=".25"/>
+  <circle cx="${bx}" cy="${by}" r="3" fill="${MDAC}" opacity=".8"/>
+  <text x="${(+bx+7).toFixed(1)}" y="${(+by+4).toFixed(1)}" font-size="9" fill="${MDAC}" font-weight="700">MDA breach</text>`;
+  // Endpoint labels — at step 8: JOR-A=0.57, JOR-B=0.50, ZMB-A=0.44, ZMB-B=0.22
+  b += epLabel(D.jor_a[C.N], 'JOR-A', E.JOR, -2);
+  b += epLabel(D.jor_b[C.N], 'JOR-B', E.JOR, -2);
+  b += epLabel(D.zmb_a[C.N], 'ZMB-A', E.ZMB, -2);
+  b += epLabel(D.zmb_b[C.N], 'ZMB-B', E.ZMB, -2);
+  // Fixture legend (inset)
+  b += `<rect x="${(C.ML+8).toFixed(1)}" y="${(C.MT+4).toFixed(1)}" width="102" height="32" rx="3"
+    fill="white" stroke="#E2E8F0" stroke-width="1" opacity=".92"/>
+  <line x1="${(C.ML+16).toFixed(1)}" y1="${(C.MT+14).toFixed(1)}" x2="${(C.ML+32).toFixed(1)}" y2="${(C.MT+14).toFixed(1)}"
+    stroke="#334155" stroke-width="2"/>
+  <text x="${(C.ML+36).toFixed(1)}" y="${(C.MT+18).toFixed(1)}" font-size="9" fill="#334155">Fixture A (solid)</text>
+  <line x1="${(C.ML+16).toFixed(1)}" y1="${(C.MT+26).toFixed(1)}" x2="${(C.ML+32).toFixed(1)}" y2="${(C.MT+26).toFixed(1)}"
+    stroke="#64748B" stroke-width="1.5" stroke-dasharray="5 3" opacity=".6"/>
+  <text x="${(C.ML+36).toFixed(1)}" y="${(C.MT+30).toFixed(1)}" font-size="9" fill="#64748B">Fixture B (ghost)</text>`;
+  return svg(b);
+}
+
+// CASE 5: N>4 — legibility-limit notice
+function chart5(){
+  let b = axes();
+  // Dim the chart area
+  b += `<rect x="${C.ML}" y="${C.MT}" width="${C.pw}" height="${C.ph}" fill="white" opacity=".92"/>`;
+  // Notice panel
+  const nw=298, nh=128, nx=(C.W-nw)/2, ny=(C.H-nh)/2;
+  b += `<rect x="${nx.toFixed(1)}" y="${ny.toFixed(1)}" width="${nw}" height="${nh}" rx="6"
+    fill="#FEF2F2" stroke="#FCA5A5" stroke-width="1.5"/>
+  <text x="${(C.W/2).toFixed(1)}" y="${(ny+20).toFixed(1)}" text-anchor="middle" font-size="12"
+    font-weight="700" fill="#991B1B">Zone 1A — Legibility Limit</text>`;
+  const lns=[
+    'Zone 1A shows individual entity trajectories',
+    'for up to 4 entities.',
+    'This scenario contains 7 entities.',
+    '',
+    'Use the entity selector to narrow to ≤ 4,',
+    'or switch to single-entity view.',
+  ];
+  lns.forEach((l,i)=>{
+    b += `<text x="${(C.W/2).toFixed(1)}" y="${(ny+38+i*15).toFixed(1)}"
+      text-anchor="middle" font-size="10" fill="#7F1D1D">${l}</text>`;
+  });
+  // Note: Zone 1B + Zone 1D still render
+  b += `<rect x="${nx.toFixed(1)}" y="${(ny+nh-18).toFixed(1)}" width="${nw}" height="18" rx="0 0 6 6"
+    fill="#FCA5A5" opacity=".3"/>
+  <text x="${(C.W/2).toFixed(1)}" y="${(ny+nh-6).toFixed(1)}" text-anchor="middle"
+    font-size="8.5" fill="#7F1D1D">Zone 1B alerts and Zone 1D position continue to display normally</text>`;
+  return svg(b);
+}
+
+// CASE 6: Zone 1D delta annotations — Mode 3 companion (not a chart; a panel mockup)
+function chart6(){
+  const PW=C.W, RH=44, HDR=30, FTR=20;
+  const rows=[
+    { fw:'Financial',    c:F.fin.c, val:'0.71', delta:'+0.04 vs baseline', dir:1  },
+    { fw:'Human Dev.',   c:F.hd.c,  val:'0.48', delta:'−0.01 vs baseline', dir:-1 },
+    { fw:'Ecological',   c:F.eco.c, val:'0.52', delta:'+0.01 vs baseline', dir:1  },
+    { fw:'Governance',   c:F.gov.c, val:'0.45', delta:'±0.00 vs baseline', dir:0  },
+  ];
+  const totalH = HDR + rows.length * RH + FTR;
+
+  let b=`<rect x="0" y="0" width="${PW}" height="${totalH}" fill="#F8FAFC"/>
+  <rect x="0" y="0" width="${PW}" height="${HDR}" fill="#1E293B"/>
+  <text x="12" y="19" font-size="11" font-weight="700" fill="white">Zone 1D — Four-Framework Position</text>
+  <text x="${PW-10}" y="19" text-anchor="end" font-size="9" fill="#94A3B8">Mode 3 · ZMB · Step 4</text>`;
+
+  rows.forEach((r,i)=>{
+    const ry = HDR + i*RH;
+    const bg = i%2===0?'white':'#F8FAFC';
+    const dc = r.dir>0?'#15803D':r.dir<0?'#DC2626':'#64748B';
+    const arrow = r.dir>0?'▲':r.dir<0?'▼':'●';
+    b += `<rect x="0" y="${ry}" width="${PW}" height="${RH}" fill="${bg}"/>
+    <rect x="0" y="${ry}" width="4" height="${RH}" fill="${r.c}"/>
+    <text x="14" y="${ry+16}" font-size="10" font-weight="600" fill="#1E293B">${r.fw}</text>
+    <text x="14" y="${ry+30}" font-size="19" font-weight="700" fill="${r.c}">${r.val}</text>
+    <rect x="108" y="${ry+8}" width="${PW-120}" height="26" rx="4" fill="${dc}" opacity=".1"/>
+    <text x="116" y="${ry+24}" font-size="11" font-weight="600" fill="${dc}">${r.delta}</text>
+    <text x="${PW-12}" y="${ry+25}" font-size="13" fill="${dc}">${arrow}</text>`;
+  });
+
+  // Footer callout
+  const fy = HDR + rows.length*RH;
+  b += `<rect x="0" y="${fy}" width="${PW}" height="${FTR}" fill="#EFF6FF"/>
+  <text x="10" y="${fy+14}" font-size="8.5" fill="#1D4ED8">
+    Delta annotations = per-framework answer to "which framework moved?" — zero additional interaction
+  </text>`;
+
+  return `<svg viewBox="0 0 ${PW} ${totalH}" xmlns="http://www.w3.org/2000/svg">${b}</svg>`;
+}
+
+// ── Case definitions ──────────────────────────────────────────────────────────
+const CASES = [
+  {
+    tag:'Mode 1 / Mode 2 · N=1', tagClass:'tag-m12',
+    title:'Case 1 — Baseline: 4-Framework Lines (unchanged)',
+    q:'Which framework is approaching its MDA threshold first?',
+    svgFn: chart1,
+    enc:'Color = framework identity. All 4 framework curves visible independently. This encoding is unchanged by ADR-017.',
+    ceil:'30 seconds',
+    hot:false,
+    anns:[
+      {c:F.fin.c, t:'Financial (dark blue) declining steepest — closest to its MDA floor at step 8'},
+      {c:F.gov.c, t:'Governance (purple) declining rapidly — second-closest to floor'},
+      {c:F.hd.c,  t:'Human Dev. (green) highest — HDI trajectory more resilient than financial'},
+      {c:MDAC,    t:'4 separate MDA floor lines (dashed red), one per framework — floor breach legible per-framework'},
+      {c:'#64748B',t:'Endpoint labels: FIN, HD, EC, GV — abbreviations prevent Y-axis clutter; full names in Zone 1B'},
+    ],
+    leg:[
+      {c:F.fin.c,n:'Financial'},
+      {c:F.hd.c, n:'Human Dev.'},
+      {c:F.eco.c,n:'Ecological'},
+      {c:F.gov.c,n:'Governance'},
+      {c:MDAC,   n:'MDA floor',dash:true},
+    ],
+  },
+  {
+    tag:'Mode 1 / Mode 2 · 1 < N ≤ 4', tagClass:'tag-m12',
+    title:'Case 2 — Multi-Entity: One Composite Line per Entity (new)',
+    q:'Which entity has the worst aggregate trajectory? Which entity is closest to a threshold?',
+    svgFn: chart2,
+    enc:'Color = entity identity. Y-position = composite score (engine composite_score field). Endpoint label = ISO 3166-1 alpha-3 code + Tier badge (lowest-confidence framework in composite).',
+    ceil:'30 seconds',
+    hot:false,
+    anns:[
+      {c:E.GRC, t:'GRC (red) steepest decline — most at-risk aggregate trajectory; will cross MDA floor if trend continues'},
+      {c:E.ZMB, t:'ZMB (blue) declining moderately — T3 badge signals one framework has research-estimate data quality'},
+      {c:E.JOR, t:'JOR (amber) most stable — T2 confidence; highest composite at final step'},
+      {c:MDAC,  t:'One MDA floor per entity (most restrictive threshold across 4 frameworks for that entity) — not per-framework here'},
+      {c:'#64748B',t:'Per-framework detail available in Zone 1D (zero interaction) and Zone 2B (one scroll)'},
+    ],
+    leg:[
+      {c:E.ZMB,n:'ZMB composite'},
+      {c:E.JOR,n:'JOR composite'},
+      {c:E.GRC,n:'GRC composite'},
+      {c:MDAC, n:'MDA floor (most restrictive)',dash:true},
+    ],
+  },
+  {
+    tag:'Mode 3 · N ≤ 4', tagClass:'tag-m3',
+    title:'Case 3 — Mode 3: Baseline Ghost + Active Solid (new)',
+    q:'Did this control input move the trajectory toward or away from the MDA threshold?',
+    svgFn: chart3,
+    enc:'Opacity = branch (50% dashed = baseline ghost, 100% solid = active). Color = entity. Divergence fill = magnitude and direction of effect.',
+    ceil:'15 seconds — binding Mode 3 constraint',
+    hot:true,
+    anns:[
+      {c:E.ZMB,  t:'ZMB active (solid blue) turns upward after fiscal multiplier applied at step 3 — improvement of +0.22 by step 6'},
+      {c:E.ZMB+'80',t:'ZMB ghost (50% opacity, dashed) continues pre-control declining path — counterfactual baseline'},
+      {c:'#7BAFD4',t:'Blue fill region = divergence between active and ghost — larger fill = larger effect; positive = helpful'},
+      {c:E.JOR,  t:'JOR active and ghost run identical — the ZMB fiscal multiplier input had no effect on Jordan\'s trajectory'},
+      {c:'#64748B',t:'Zone 1D (always visible below) shows per-framework delta at current step — answers "which framework moved?"'},
+    ],
+    leg:[
+      {c:E.ZMB,n:'ZMB active (100% opacity)'},
+      {c:E.ZMB,n:'ZMB baseline ghost (50%, dashed)',dash:true},
+      {c:E.JOR,n:'JOR active (100% opacity)'},
+      {c:E.JOR,n:'JOR ghost (50%, dashed) — parallel to active',dash:true},
+    ],
+  },
+  {
+    tag:'Mode 1 · COMPARE_VIEW · N ≤ 2/fixture', tagClass:'tag-cmp',
+    title:'Case 4 — COMPARE_VIEW: Fixture A vs Fixture B (new)',
+    q:'How does the accepted ECF program compare to the counterfactual (rejected) path for each entity?',
+    svgFn: chart4,
+    enc:'Opacity = fixture (100% solid = Fixture A / primary, 50% dashed = Fixture B / comparison). Color = entity. Endpoint labels: ENTITY-A / ENTITY-B.',
+    ceil:'30 seconds',
+    hot:false,
+    anns:[
+      {c:E.ZMB,  t:'ZMB-A (ECF Accepted, solid blue) stays above MDA floor — trajectory recovers slightly at step 7'},
+      {c:E.ZMB+'70',t:'ZMB-B (ECF Rejected, ghost blue) breaches MDA floor at step 6 — red dot marks the breach'},
+      {c:MDAC,   t:'MDA floor now in red (most critical threshold) because ZMB-B breaches it — programmatic consequence visible'},
+      {c:E.JOR,  t:'JOR-A and JOR-B diverge modestly — Jordan less sensitive to this program decision'},
+      {c:'#7BAFD4',t:'Blue fill between ZMB-A and ZMB-B shows the stakes of accepting vs rejecting the ECF program for Zambia'},
+    ],
+    leg:[
+      {c:E.ZMB,n:'ZMB-A — Fixture A (solid)'},
+      {c:E.ZMB,n:'ZMB-B — Fixture B (ghost)',dash:true},
+      {c:E.JOR,n:'JOR-A — Fixture A (solid)'},
+      {c:E.JOR,n:'JOR-B — Fixture B (ghost)',dash:true},
+      {c:MDAC, n:'MDA breach',dash:false},
+    ],
+  },
+  {
+    tag:'Any Mode · N > 4', tagClass:'tag-err',
+    title:'Case 5 — Legibility-Limit Notice (N > 4 entities)',
+    q:'(Not applicable — chart replaced by notice; user must use entity selector)',
+    svgFn: chart5,
+    enc:'Zone 1A chart area replaced by a non-dismissible notice. Zone 1B alert panel and Zone 1D four-framework position continue rendering normally.',
+    ceil:'N/A — entity selector action required',
+    hot:false,
+    anns:[
+      {c:'#991B1B',t:'Notice occupies the full Zone 1A chart area — chart is not rendered for N>4'},
+      {c:'#64748B',t:'Scenario entity count shown in notice text — user knows exactly why the chart is absent'},
+      {c:'#64748B',t:'Zone 1B (MDA alerts) and Zone 1D (four-framework rows) continue to provide live instrument data'},
+      {c:'#94A3B8',t:'Entity selector (persistent header) allows the user to narrow to ≤ 4 entities to restore the chart'},
+    ],
+    leg:[],
+  },
+  {
+    tag:'Zone 1D · Mode 3 companion', tagClass:'tag-z1d',
+    title:'Case 6 — Zone 1D Delta Annotations (required Mode 3 companion)',
+    q:'Which framework contributed the direction-of-effect shown in Zone 1A?',
+    svgFn: chart6,
+    enc:'Always-visible in instrument cluster (CLAUDE.md Commitment 2). In Mode 3, each Zone 1D framework row gains a delta annotation showing change vs baseline at the current step. Zero interaction required.',
+    ceil:'Always visible — zero interaction',
+    hot:false,
+    anns:[
+      {c:F.fin.c,t:'Financial +0.04 (green) — largest positive contributor to the composite improvement shown in Zone 1A'},
+      {c:F.hd.c, t:'Human Dev. −0.01 (red) — slight deterioration despite composite improvement; distributional concern visible'},
+      {c:'#64748B',t:'This panel answers "which framework moved?" without Zone 1A needing to carry the full 4-framework trajectory in Mode 3'},
+      {c:'#1D4ED8',t:'Required companion to Case 3 (Mode 3 composite encoding). Without these delta annotations, Zone 1A composite encoding is incomplete.'},
+    ],
+    leg:[],
+  },
+];
+
+// ── Render ────────────────────────────────────────────────────────────────────
+const root = document.getElementById('root');
+
+CASES.forEach(c=>{
+  const card = document.createElement('div');
+  card.className='card';
+
+  const legHTML = c.leg.length ? `<div class="leg">${c.leg.map(l=>
+    `<div class="leg-item"><span class="leg-line${l.dash?' dash':''}" style="color:${l.c};border-color:${l.c}"></span><span>${l.n}</span></div>`
+  ).join('')}</div>` : '';
+
+  const annHTML = `<div class="anns">${c.anns.map(a=>
+    `<div class="ann"><span class="dot" style="background:${a.c}"></span><span>${a.t}</span></div>`
+  ).join('')}</div>`;
+
+  card.innerHTML=`
+    <span class="tag ${c.tagClass}">${c.tag}</span>
+    <div class="ctitle">${c.title}</div>
+    <div class="cq">Primary question: "${c.q}"</div>
+    <div class="chart-wrap"></div>
+    ${legHTML}
+    <div class="enc-key">Encoding: ${c.enc}</div>
+    <div class="ceiling">Time ceiling: <span class="${c.hot?'hot':''}">${c.ceil}</span></div>
+    ${annHTML}
+  `;
+
+  // Insert SVG into chart-wrap
+  card.querySelector('.chart-wrap').innerHTML = c.svgFn();
+  root.appendChild(card);
+});
+
+// ── Section dividers via grid pseudo-elements ─────────────────────────────────
+// Insert section labels between rows
+const cards = root.querySelectorAll('.card');
+// After card[1] (Case 2), before Case 3 — Mode 3 section
+const divM3 = document.createElement('div');
+divM3.className='section-label';
+divM3.textContent='Mode 3 — Real-Time Steering';
+root.insertBefore(divM3, cards[2]);
+
+// After Case 3, before Case 4
+const divCmp = document.createElement('div');
+divCmp.className='section-label';
+divCmp.textContent='Comparative Views';
+root.insertBefore(divCmp, cards[3]);
+
+// After Case 4, before Case 5
+const divEdge = document.createElement('div');
+divEdge.className='section-label';
+divEdge.textContent='Edge Cases + Required Companion';
+root.insertBefore(divEdge, cards[4]);
+</script>
+</body>
+</html>

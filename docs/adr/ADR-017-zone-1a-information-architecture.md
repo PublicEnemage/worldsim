@@ -9,6 +9,7 @@ implementing-agent: Frontend Architect Agent
 sprint: M15-G2
 arch-review: docs/architecture/reviews/ARCH-REVIEW-007-milestone15.md
 phase1-input: docs/ux/design-thinking/zone-1a-information-architecture.md
+visual-mockups: docs/ux/mockups/ADR-017-zone-1a-encoding-mockups.html
 ---
 
 # ADR-017: Zone 1A Information Architecture — Multi-Modal Multi-Entity Encoding Contract
@@ -42,6 +43,25 @@ treatment for the primary instrument per mode; affects the Reactive entry state.
 ## Status
 
 `Proposed`
+
+---
+
+## Visual Mockups
+
+**For EL review before acceptance:** `docs/ux/mockups/ADR-017-zone-1a-encoding-mockups.html`
+
+Open this file in any browser. It renders six SVG chart panels — one for each encoding context in the §Decision table — with annotated call-outs showing which visual channel carries which information, the time ceiling that governs each context, and the primary question each encoding answers. The panels use Zambia (ZMB), Jordan (JOR), and Greece (GRC) with realistic-shaped trajectory data.
+
+Panels in the mockup file:
+
+| Panel | Context | What it shows |
+|---|---|---|
+| Case 1 | Mode 1/2, N=1 (unchanged) | 4 framework lines, 4 MDA floor lines, endpoint abbreviations |
+| Case 2 | Mode 1/2, 1<N≤4 (new) | 1 composite line per entity, Tier badge, per-entity MDA floor |
+| Case 3 | Mode 3, N≤4 (new) | Baseline ghost (50% dashed) + active solid; divergence fill; control input marker |
+| Case 4 | Mode 1 COMPARE\_VIEW, N≤2/fixture (new) | Fixture A solid vs Fixture B ghost; ENTITY-A/ENTITY-B labels; MDA breach marker |
+| Case 5 | Any mode, N>4 (new) | Legibility-limit notice replacing chart area |
+| Case 6 | Zone 1D delta annotations (Mode 3 companion) | Per-framework delta values ("Financial: 0.71, +0.04 vs baseline") at current step |
 
 ---
 
