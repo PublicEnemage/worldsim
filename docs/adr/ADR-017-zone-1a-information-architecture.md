@@ -42,13 +42,13 @@ treatment for the primary instrument per mode; affects the Reactive entry state.
 
 ## Status
 
-`Proposed`
+`Accepted` — EL acceptance recorded 2026-06-22 (@PublicEnemage)
 
 ---
 
 ## Visual Mockups
 
-**For EL review before acceptance:** `docs/ux/mockups/ADR-017-zone-1a-encoding-mockups.html`
+**Visual mockups (open in browser):** [ADR-017-zone-1a-encoding-mockups.html](../ux/mockups/ADR-017-zone-1a-encoding-mockups.html)
 
 Open this file in any browser. It renders six SVG chart panels — one for each encoding context in the §Decision table — with annotated call-outs showing which visual channel carries which information, the time ceiling that governs each context, and the primary question each encoding answers. The panels use Zambia (ZMB), Jordan (JOR), and Greece (GRC) with realistic-shaped trajectory data.
 
@@ -70,7 +70,7 @@ Panels in the mockup file:
 **Standards Version:** 2026-06-20 (CLAUDE.md / CODING_STANDARDS.md used at authorship)
 **Valid Until:** Mode 3 multi-entity implementation complete OR a subsequent ADR supersedes
 the composite encoding decision for Mode 3 single-entity
-**License Status:** `PROPOSED → ACCEPTED` on [date — EL records at acceptance]
+**License Status:** `ACCEPTED` — 2026-06-22
 
 **Panel:**
 - Architect Agent (R — ADR author)
