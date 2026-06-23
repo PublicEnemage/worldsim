@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-22 (M15-G6 validation COMPLETE — VC-1/VC-2/VC-4 PASS; VC-3 CONDITIONAL PASS; validation report filed; G4 CLOSED — BPO ACCEPT 2026-06-22; G5 CLOSED — BPO ACCEPT 2026-06-22)**
+**Last updated: 2026-06-22 (M15-G6 CLOSED — sprint exit filed 2026-06-23; VC-1/VC-2/VC-4 PASS; VC-3 CONDITIONAL PASS; #990 closed; G4 CLOSED — BPO ACCEPT 2026-06-22; G5 CLOSED — BPO ACCEPT 2026-06-22; G8 UNBLOCKED)**
 **Current milestone:** M15 — Human Cost Architecture (GitHub Milestone 16)
 **Previous milestone:** M14 — Trust Architecture and Instrument Credibility (FORMALLY CLOSED 2026-06-20; release/m14 → main PR #1086; v0.14.0 at https://github.com/PublicEnemage/worldsim/releases/tag/v0.14.0; #968 closed; GitHub Milestone 15 closed)
 
@@ -194,24 +194,6 @@ Implementation is now unblocked. A sprint entry document must be filed and EL-ap
 
 ---
 
-### M15-G6 — Accessibility Validation
-
-**Sprint entry:** `docs/process/sprint-plans/m15-g6-sprint-entry.md` — **EL APPROVED 2026-06-22** (PR #1126)
-**Issue:** #990 (accessibility validation on 8GB/4-core target hardware)
-
-| Item | Status | Notes |
-|---|---|---|
-| G6 sprint entry document | ✅ **EL APPROVED 2026-06-22** (PR #1126) | Infrastructure Sprint Exception declared; intent/QA gates waived; VC-1–VC-4 observable states specified |
-| G6 validation work (VC-1–VC-4) | ⬜ Not started | Chief Engineer + Frontend Architect Agents; validation report to `docs/process/validation/m15-g6-accessibility-validation-report.md` |
-| VC-1 — Docker Compose stack on target hardware | ⬜ Not started | `docker compose up --build`; health + entities + frontend checks; peak mem ≤ 7GB |
-| VC-2 — 8-step simulation run ≤ 60s | ⬜ Not started | ZMB ECF fixture; all four framework keys in each step response |
-| VC-3 — Playwright non-Docker path documented | ⬜ Not started | `CONTRIBUTING.md` path for running E2E without Docker |
-| VC-4 — Frontend build ≤ 5 minutes | ⬜ Not started | `time npm run build` on target hardware or resource-constrained CI |
-
-**Next required action:** EL to confirm availability of target hardware (HP ProBook or equivalent), then Chief Engineer + Frontend Architect run VC-1–VC-4 checks and author validation report.
-
----
-
 ### M15-G5 — Process Fixes + Walkthrough Updates (COMPLETE)
 
 **Sprint entry:** `docs/process/sprint-plans/m15-g5-sprint-entry.md` — **EL APPROVED 2026-06-22**
@@ -248,8 +230,9 @@ Implementation is now unblocked. A sprint entry document must be filed and EL-ap
 ### M15-G6 — Accessibility Validation (COMPLETE)
 
 **Sprint entry:** `docs/process/sprint-plans/m15-g6-sprint-entry.md` — **EL APPROVED 2026-06-22**
-**Validation report:** `docs/process/validation/m15-g6-accessibility-validation-report.md` — **FILED 2026-06-22**
-**Issue:** #990
+**Validation report:** `docs/process/validation/m15-g6-accessibility-validation-report.md` — **FILED 2026-06-22** (PR #1128)
+**Sprint exit document:** `docs/process/sprint-plans/m15-g6-sprint-exit.md` — **PI Agent CONFIRMED 2026-06-22** (PR #1131)
+**Issue:** #990 ✅ CLOSED 2026-06-23
 
 | Check | Result | Key finding |
 |---|---|---|
@@ -263,6 +246,8 @@ Implementation is now unblocked. A sprint entry document must be filed and EL-ap
 **Infrastructure Sprint declaration confirmed at exit:** No G6 output modifies user-visible application state. VC-3 CONDITIONAL PASS limitation is documentation-only (no implementation gap). PI Agent confirms Infrastructure Sprint Exception classification is correct for G6.
 
 **#990 closed:** All VC checks complete with no FAIL findings. Accessibility validation sprint is DONE.
+
+**CI note (PR #1128):** Pre-existing AC-4 test failure (`makeTrajectoryMock` null-tier bug, PR #1130) was blocking merge. Root cause: `null ?? 2` collapsed to 2; masked by backend startup failure before PR #1123 (Docker migrations). Fixed 1-line in test helper. PR #1130 merged to release/m15 first; PR #1128 rebased and merged 2026-06-23.
 
 ---
 
