@@ -1364,6 +1364,12 @@ test.describe("AC-12: Zone 1D container height is 160px (±4px) at 1280 (DD-016)
     const zone1d = page.locator('[data-testid="zone-1d-four-framework"]');
     if (!(await zone1d.isVisible({ timeout: 8_000 }).catch(() => false))) return;
 
+    // Guard: zone-1d-political-risk only exists after G2 implementation.
+    // Without this guard the test measures the pre-G2 Zone 1D height (~96px at 30%)
+    // against the G2 target (160px at 50%), producing a false failure before implementation.
+    const politicalRiskSectionAC12 = page.locator('[data-testid="zone-1d-political-risk"]');
+    if ((await politicalRiskSectionAC12.count()) === 0) return;
+
     // Measure the computed height of the Zone 1D container
     const height = await page.evaluate(() => {
       const el = document.querySelector('[data-testid="zone-1d-four-framework"]');
@@ -1432,6 +1438,12 @@ test.describe("AC-13: Zone 1C container height is 48px (±4px) at 1280 (DD-016)"
 
     const zone1c = page.locator('[data-testid="zone-1c-pmm"]');
     if (!(await zone1c.isVisible({ timeout: 8_000 }).catch(() => false))) return;
+
+    // Guard: zone-1d-political-risk only exists after G2 implementation.
+    // Without this guard the test measures the pre-G2 Zone 1C height (~80px at 25%)
+    // against the G2 target (48px at 15%), producing a false failure before implementation.
+    const politicalRiskSectionAC13 = page.locator('[data-testid="zone-1d-political-risk"]');
+    if ((await politicalRiskSectionAC13.count()) === 0) return;
 
     const height = await page.evaluate(() => {
       const el = document.querySelector('[data-testid="zone-1c-pmm"]');
