@@ -11,7 +11,7 @@
  */
 import React, { useEffect, useState } from "react";
 import { TrajectoryView } from "./TrajectoryView";
-import { useScenarioStepStore } from "../store/scenarioStepStore";
+import { useScenarioStepStore, type TrajectoryResponse } from "../store/scenarioStepStore";
 
 export const LAYOUT = {
   1024: { trajectory: 480, coPrimary: 240, controlPlane: 280, chartHeight: 300 },
@@ -44,6 +44,10 @@ interface InstrumentClusterProps {
   entityIds?: string[];
   /** Override chart height (px) — defaults to LAYOUT[bp].chartHeight. */
   chartHeight?: number;
+  /** Phase 4 (ADR-017): per-entity trajectory responses for composite encoding. */
+  entityTrajectories?: Record<string, TrajectoryResponse> | null;
+  /** Phase 4 (ADR-017): per-entity baseline trajectories for Mode 3 ghost paths. */
+  entityBaselineTrajectories?: Record<string, TrajectoryResponse> | null;
 }
 
 export function InstrumentCluster({
@@ -53,6 +57,8 @@ export function InstrumentCluster({
   cohortPanel,
   entityIds,
   chartHeight: chartHeightProp,
+  entityTrajectories,
+  entityBaselineTrajectories,
 }: InstrumentClusterProps) {
   const { mode } = useScenarioStepStore();
   const bp = useViewportBreakpoint();
@@ -80,6 +86,8 @@ export function InstrumentCluster({
           width={layout.trajectory}
           height={chartHeight}
           entityIds={entityIds}
+          entityTrajectories={entityTrajectories}
+          entityBaselineTrajectories={entityBaselineTrajectories}
           data-testid="zone-1a-trajectory"
         />
         {cohortPanel}

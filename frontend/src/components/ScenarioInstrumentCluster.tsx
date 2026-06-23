@@ -243,11 +243,21 @@ export function ScenarioInstrumentCluster({
   const [pspValue, setPspValue] = useState<string | null | undefined>(undefined);
   const [pspTier, setPspTier] = useState<number | null>(null);
 
+  // ADR-017 Phase 4 — per-entity trajectory maps for composite encoding.
+  const [entityTrajectories, setEntityTrajectories] = useState<Record<string, TrajectoryResponse>>({});
+  const [entityBaselineTrajectories, setEntityBaselineTrajectories] = useState<Record<string, TrajectoryResponse>>({});
+
   // Mode 3 branch advance loop — abortController cancels in-flight advances on cleanup.
   const branchAbortRef = useRef<AbortController | null>(null);
 
   // Track previous scenarioId to distinguish scenario change (full reset) from mode-only change.
   const prevScenarioIdRef = useRef<string>("");
+
+  // Track Mode 3 activation to auto-save entity baselines when entering Mode 3.
+  const prevMode3ActiveRef = useRef(false);
+  // Deferred baseline save: when Mode 3 activates before entity trajectories are loaded,
+  // save them on the next entityTrajectories update.
+  const saveBaselineOnNextUpdateRef = useRef(false);
 
   // Initialise store when scenario changes (full reset) or update mode without resetting.
   // setScenario resets trajectory and current_step — calling it on mode changes would drop
@@ -306,6 +316,74 @@ export function ScenarioInstrumentCluster({
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps -- store is a Zustand singleton, stable reference
   }, [scenarioId, currentStep]);
+
+  // ADR-017 Phase 4 — per-entity trajectory fetch for composite encoding (N > 1).
+  // Fetches trajectory for each entity using ?entity_id= query param.
+  // Skipped at step 0 (no snapshots yet) and when only one entity is loaded.
+  useEffect(() => {
+    const ids = entityIds ?? [];
+    if (!scenarioId || currentStep === 0 || ids.length <= 1) return;
+    let cancelled = false;
+
+    Promise.all(
+      ids.map((entityId) =>
+        fetch(
+          `${API_BASE}/scenarios/${encodeURIComponent(scenarioId)}/trajectory?entity_id=${encodeURIComponent(entityId)}`
+        )
+          .then((res) => (res.ok ? (res.json() as Promise<RawTrajectoryResponse>) : null))
+          .then((raw) => (raw ? parseTrajectoryResponse(raw) : null))
+          .catch(() => null)
+      )
+    ).then((trajectories) => {
+      if (cancelled) return;
+      const map: Record<string, TrajectoryResponse> = {};
+      ids.forEach((entityId, i) => {
+        const traj = trajectories[i];
+        if (traj) map[entityId] = traj;
+      });
+      setEntityTrajectories(map);
+    });
+
+    return () => { cancelled = true; };
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- store is a Zustand singleton, stable reference
+  }, [scenarioId, currentStep, entityIds]);
+
+  // ADR-017 Phase 4 — deferred baseline save when entity trajectories arrive after Mode 3 activation.
+  useEffect(() => {
+    if (!saveBaselineOnNextUpdateRef.current) return;
+    if (Object.keys(entityTrajectories).length === 0) return;
+    setEntityBaselineTrajectories({ ...entityTrajectories });
+    saveBaselineOnNextUpdateRef.current = false;
+  }, [entityTrajectories]);
+
+  // ADR-017 Phase 4 — Mode 3 auto-baseline for multi-entity composite encoding.
+  // When entering Mode 3 with N > 1, lock current entity trajectories as baseline
+  // so CompositeChartSVG can render ghost (baseline) + active paths.
+  // N=1 Mode 3: Zustand store's baseline_trajectory handles ghost (set by applyControlInput).
+  useEffect(() => {
+    const ids = entityIds ?? [];
+    if (mode3Active && !prevMode3ActiveRef.current && ids.length > 1) {
+      if (Object.keys(entityTrajectories).length > 0) {
+        setEntityBaselineTrajectories({ ...entityTrajectories });
+      } else {
+        // Entity trajectories not yet loaded — save on next update
+        saveBaselineOnNextUpdateRef.current = true;
+      }
+    }
+    if (!mode3Active) {
+      setEntityBaselineTrajectories({});
+      saveBaselineOnNextUpdateRef.current = false;
+    }
+    prevMode3ActiveRef.current = mode3Active;
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- entityTrajectories dep handled by the deferred-save effect
+  }, [mode3Active, entityIds]);
+
+  // Reset per-entity trajectory state on scenario change.
+  useEffect(() => {
+    setEntityTrajectories({});
+    setEntityBaselineTrajectories({});
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [scenarioId]);
 
   // Sync PMM from trajectory step data when current step changes (Issue #496).
   // PMM is pre-computed per step by the backend; no additional fetch needed.
@@ -694,6 +772,8 @@ export function ScenarioInstrumentCluster({
       <InstrumentCluster
         entityIds={entityIds}
         chartHeight={chartHeight}
+        entityTrajectories={entityTrajectories}
+        entityBaselineTrajectories={entityBaselineTrajectories}
         mdaPanel={
           <MDAAlertPanelZone1B
             columnWidth={coPrimaryWidth}
