@@ -3,7 +3,7 @@
 [![CI](https://github.com/PublicEnemage/worldsim/actions/workflows/ci.yml/badge.svg)](https://github.com/PublicEnemage/worldsim/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Python 3.12](https://img.shields.io/badge/python-3.12-blue.svg)](https://www.python.org/downloads/release/python-3120/)
-[![Release](https://img.shields.io/badge/release-v0.14.0%20M14%20complete-green)](https://github.com/PublicEnemage/worldsim/releases/tag/v0.14.0)
+[![Release](https://img.shields.io/badge/release-v0.15.0%20M15%20complete-green)](https://github.com/PublicEnemage/worldsim/releases/tag/v0.15.0)
 
 **An open-source geopolitical-economic simulation platform for governments and
 vulnerable actors navigating high-stakes decisions under uncertainty.**
@@ -53,16 +53,17 @@ governance); Mode 3 Active Control enables counter-scenario branching for
 negotiation support.
 
 **This tool is in active pre-release development.** The working software
-described below reflects Milestone 14 (ADR-016 Scenario Grounding Architecture;
-ADR-015 Evidence Thread Architecture; methodology foundation documentation;
-governance; Demo 5 — Zambia 2024 IMF ECF programme review, trust architecture
-thesis). M15 is in active development.
+described below reflects Milestone 15 (ADR-017 Zone 1A Information Architecture;
+Layer 3 self-interpreting outputs in Zone 1B and Zone 1D; Path 1 approved source
+network; cohort disaggregation and political risk designs; grounding strip date
+accuracy; accessibility validated on 8GB/4-core target hardware). M16 is in
+active development.
 
 ---
 
 ## What's Built
 
-The working system at Milestone 14 (core components — not exhaustive):
+The working system at Milestone 15 (core components — not exhaustive):
 
 - **Simulation engine** — Event-driven graph in Python. The `Quantity` type
   system tracks `value: Decimal`, unit, variable type (STOCK/FLOW/RATIO/
@@ -132,7 +133,7 @@ The working system at Milestone 14 (core components — not exhaustive):
 
 ## Development Status
 
-**Active pre-release development. Demo 5 delivered 2026-06-20. M14 complete. M15 in active development.**
+**Active pre-release development. Demo 5 delivered 2026-06-20. M15 complete (v0.15.0). M16 in active development.**
 
 | Milestone | Status | Version | Description |
 |---|---|---|---|
@@ -152,7 +153,8 @@ The working system at Milestone 14 (core components — not exhaustive):
 | M12 — Active Control and External Sector | ✅ Complete | [v0.12.1](https://github.com/PublicEnemage/worldsim/releases/tag/v0.12.1) | Matrix engine production (ADR-012); ExternalSectorModule; Mode 3 Active Control; Demo 4 |
 | M13 — Political Economy and Instrument Credibility | ✅ Complete | v0.13.0 | ADR-013/ADR-014; political economy module; alert panel Zone 1B persistent-detail; instrument legibility; mode transition UX; Process Redesign Phases 0–D |
 | M14 — Trust Architecture and Instrument Credibility | ✅ Complete | [v0.14.0](https://github.com/PublicEnemage/worldsim/releases/tag/v0.14.0) | ADR-016 (Scenario Grounding Architecture); ADR-015 (Evidence Thread Architecture); PSP in Zone 1D; methodology foundation docs; governance; Demo 5 |
-| M15 — Human Cost Architecture | 🔧 In progress | — | Zone 1A ADR (Phases 2–4); Layer 3 trajectory sentence; cohort disaggregation design; Path 1 approved source; live external demo (#843); accessibility validation |
+| M15 — Human Cost Architecture | ✅ Complete | [v0.15.0](https://github.com/PublicEnemage/worldsim/releases/tag/v0.15.0) | ADR-017 Zone 1A information architecture; Layer 3 self-interpreting outputs (Zone 1B + Zone 1D); Path 1 approved source network; cohort disaggregation and political risk designs; accessibility validation |
+| M16 — Distributional Visibility | 🔧 In progress | — | Zone 1A implementation (Phase 4); cohort disaggregation on primary surface; political risk summary; live external demo (#843 — exit gate); Demo 6 |
 
 Full milestone history: [`CHANGELOG.md`](CHANGELOG.md). Live issue tracker:
 [GitHub Milestones](https://github.com/PublicEnemage/worldsim/milestones).

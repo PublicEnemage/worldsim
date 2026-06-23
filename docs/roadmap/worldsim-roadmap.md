@@ -1,8 +1,8 @@
 # WorldSim Roadmap
 
-> Last significant revision: 2026-06-20
-> Next mandatory review: Milestone 15 close
-> Updated against: M14 close 2026-06-20 — Trust Architecture and Instrument Credibility complete; ADR-016/ADR-015 delivered; Demo 5 (Zambia 2024 IMF ECF); #843 deferred to M15; M15 Human Cost Architecture now current
+> Last significant revision: 2026-06-23
+> Next mandatory review: Milestone 16 close
+> Updated against: M15 close 2026-06-23 — Human Cost Architecture complete; ADR-017 Zone 1A accepted; Layer 3 self-interpreting outputs delivered; Path 1 approved source network; cohort/political risk designs; accessibility validated; #843 deferred to M16 (EL decision 2026-06-23); M16 Distributional Visibility now current
 > Canonical location: `docs/roadmap/worldsim-roadmap.md`
 
 *Note: This document was not updated at M10, M11, M11.5, or M12 close — a gap against the "Roadmap Currency" policy. Updates at those closes are now reflected in the registry and narrative sections.*
@@ -33,8 +33,8 @@
 | M12 | Active Control and External Sector | Matrix engine production, ExternalSectorModule (ADR-012), Mode 3, Demo 4 | Complete |
 | M13 | Political Economy and Instrument Credibility | ADR-013, political economy integration, ADR-014 alert panel UX, instrument legibility, mode transition UX, Process Redesign Phases 0–D | Complete |
 | M14 | Trust Architecture and Instrument Credibility | ADR-016 Grounding strip (source provenance), ADR-015 Evidence thread (Zone 1B credibility), PSP in Zone 1D, methodology foundation docs, Demo 5 | Complete |
-| M15 | Human Cost Architecture | Zone 1A information architecture (ADR), cohort disaggregation design, Layer 3 trajectory sentence, Path 1 approved source, live external demo (#843) | Current |
-| M16 | Distributional Visibility | Demo 6: cohort-level distributional output, 25-year human capital trajectory, uncertainty quantification as bands, ecological transmission, Path 2 data upload | Planned |
+| M15 | Human Cost Architecture | ADR-017 Zone 1A, Layer 3 self-interpreting outputs, Path 1 approved source, cohort/political risk designs, accessibility validation | Complete |
+| M16 | Distributional Visibility | Demo 6 + live external demo (#843 — exit gate); Zone 1A implementation; cohort disaggregation; political risk summary; distributional output | Current |
 | M17 | Multi-Scenario Infrastructure | Multi-scenario comparison infrastructure (>2 scenarios), dynamic relationship weights, stock vs. flow at scale, entity template library design | Planned |
 | M18 | Comparative Analysis and Full Argument | Demo 7: multi-scenario comparison with distributional overlay, uncertainty bands, full counter-scenario argument at the negotiating table | Planned |
 
@@ -42,11 +42,11 @@
 
 ## Where We Are
 
-WorldSim v0.14.0 is released. Fifteen milestones of foundational and delivery work are complete. The simulation engine runs multi-country scenarios with matrix computation. The external sector module enables bilateral trade shocks and commodity price cascades. Mode 3 Active Control lets a finance ministry analyst branch from any simulation step, apply policy instruments, and compare the resulting trajectory against the baseline in real time. All four measurement framework axes are live. The political economy module makes programme survival probability and conditionality dynamics analytically visible. The alert panel (Zone 1B) delivers threshold breach evidence in persistent-detail, with full indicator names and negotiation-defensibility labels, without interaction. The Grounding strip surfaces source-cited initial state provenance at zero interaction. Five historical backtesting cases are validated (Greece, Argentina, Lebanon, Thailand, Ecuador). Demo 5 — a Zambia 2024 IMF ECF programme review — has been delivered; the reserve challenge-response moment demonstrates that a ministry analyst can cite IMF WEO April 2024 provenance in direct response to a creditor challenge, without navigating away from the instrument cluster.
+WorldSim v0.15.0 is released. Sixteen milestones of foundational and delivery work are complete. The simulation engine runs multi-country scenarios with matrix computation. The external sector module enables bilateral trade shocks and commodity price cascades. Mode 3 Active Control lets a finance ministry analyst branch from any simulation step, apply policy instruments, and compare the resulting trajectory against the baseline in real time. All four measurement framework axes are live. The political economy module makes programme survival probability and conditionality dynamics analytically visible. The alert panel (Zone 1B) delivers threshold breach evidence in persistent-detail with a self-interpreting trajectory sentence — "at the current draw rate, the CRITICAL floor is reached within one step" — without interaction. The Grounding strip surfaces source-cited initial state provenance with date-accurate labels. Path 1 enables a user-directed query from the approved source network at scenario creation. Zone 1A information architecture (ADR-017) is accepted and governs the M16 distributional implementation. Five historical backtesting cases are validated (Greece, Argentina, Lebanon, Thailand, Ecuador). Demo 5 — a Zambia 2024 IMF ECF programme review — has been delivered.
 
-M14 is complete. The trust architecture thesis is proven: WorldSim can be defended under scrutiny. M15 deepens human cost visibility and delivers the first real external participant engagement (#843, deferred from M14). The three questions that drove M14 — source provenance, methodology transparency, and PSP credibility — are now answered at Layer 2. M15 asks: can we make the human cost argument specific enough to change what a minister's team can argue at the table?
+M15 is complete. The human cost argument is now self-interpreting: a finance ministry economist can read what a threshold crossing means without specialist mediation. Zone 1A's architecture is locked. The cohort disaggregation and political risk surface designs are ready for M16 implementation. M15 asks and answers: can we make the human cost argument specific enough to change what a minister's team can argue at the table? Yes — Aicha can cite reserve criticality, PSP trajectory, and Argentina 2001 directional validation without leaving the instrument cluster.
 
-M15–M18 are defined and issued-scoped. The roadmap through M18 is directionally committed. The demo arc (Demo 5 delivered; Demo 6 at M16; Demo 7 at M18) defines the progressive capability story the tool tells to the world.
+M16–M18 are defined and issued-scoped. The roadmap through M18 is directionally committed. The demo arc (Demo 5 delivered; Demo 6 at M16; Demo 7 at M18) defines the progressive capability story the tool tells to the world.
 
 ---
 
@@ -272,55 +272,54 @@ surface: any milestone entry with UNTRACKED items is an open kickoff gate.
 
 ---
 
-### Milestone 15 — Human Cost Architecture *(current)*
+### Milestone 15 — Human Cost Architecture *(complete)*
 
-**Core deliverable:** Layer 3 self-interpreting output at the table, and the first live engagement with real external participants. M15 makes the human cost argument specific enough to cite and closes the real-world credibility gate deferred from M14.
+**Core deliverable:** Layer 3 self-interpreting output at the table, and the architectural foundation for M16 distributional visibility. M15 makes the human cost argument specific enough to cite. Live external engagement deferred to M16 (EL decision 2026-06-23).
 
-**What ships:**
-- Layer 3 trajectory sentence in Zone 1B (#1065) — "at the current draw rate, the CRITICAL floor is reached within one step" — deferred from M14
-- PSP self-interpreting sentence in Zone 1D (#1075) — plain-language translation for political advisor without economist mediation — deferred from M14
-- Zone 1A information architecture — Phase 2 (ARCH-REVIEW with DIC) and Phase 3 (ADR) gating M16 distributional implementation → Issue #845 Phases 2–3 (horizon:immediate)
-- Cohort disaggregation design — specifies how bottom-quintile threshold crossings surface in the primary viewport → Issue #986 (horizon:immediate)
-- Political risk summary surface design — plain-language legitimacy dynamics for Persona 3 → Issue #987 (horizon:immediate)
-- Path 1 — user-directed query from approved source network at scenario creation → Issue #975 (horizon:immediate)
-- Information access architecture (RBAC design) — prerequisite for Path 2 data isolation → Issue #53 (horizon:immediate)
-- Live stakeholder demo with real external participants → Issue #843 (horizon:immediate) — deferred from M14 (EL decision 2026-06-20)
-- Accessibility validation on target hardware (8GB/4-core) → Issue #990 (horizon:immediate)
-- Suppress "0 consecutive steps" counter when zero (#1066) → horizon:near-term
-- Dual reserve value disambiguation label in Grounding strip (#1069) → horizon:near-term
-- Grounding strip date label accuracy (#1083 — "Apr 2024" vs "2024-Q1") → horizon:near-term
-- PSP historical calibration anchor (#1084) → horizon:near-term
-- Mode 3 branch comparison values → Issue #846 (horizon:near-term)
-- Threshold-crossing markers in comparative output → Issue #97 (horizon:near-term)
-- Absolute threshold overlay on DeltaChoropleth → Issue #153 (horizon:near-term)
-- Greece backtesting expansion → Issue #92 (horizon:near-term)
-- Config-driven demo scripts → Issue #837 (horizon:near-term)
-- Solo-use review protocol → Issue #951 (horizon:near-term)
+**What shipped:**
+- ✅ Layer 3 trajectory sentence in Zone 1B (#1065) — "at the current draw rate, the CRITICAL floor is reached within one step"
+- ✅ PSP self-interpreting sentence in Zone 1D (#1075) — plain-language translation without economist mediation
+- ✅ L0 confidence tier badges on Zone 1A trajectory curves (#1068)
+- ✅ Dual reserve value disambiguation in Grounding strip (#1069)
+- ✅ Suppress "0 consecutive steps" counter when zero (#1066)
+- ✅ Grounding strip date label accuracy (#1083 — "Apr 2024" format)
+- ✅ Zone 1A information architecture — ADR-017 accepted; Phase 2 (ARCH-REVIEW-007) + Phase 3 (ADR) complete → #845 Phases 2–3
+- ✅ Cohort disaggregation design (#986) — bottom-quintile threshold crossings in primary viewport; ready for M16 implementation
+- ✅ Political risk summary surface design (#987) — plain-language legitimacy dynamics for Persona 3; ready for M16 implementation
+- ✅ Path 1 — user-directed query from approved source network at scenario creation (#975)
+- ✅ Accessibility validation on target hardware (8GB/4-core): VC-1/VC-2/VC-4 PASS; VC-3 CONDITIONAL PASS (#990)
+- ✅ PSP historical calibration anchor (Zambia/Ghana ECF) (#1084)
+- ✅ Recompute-badge immediate state (#1007); Docker Alembic auto-migration (#1048)
+- ✅ CLAUDE.md extraction to child docs (agent-execution-lifecycle.md + milestone-exit-sop.md; 1,082→800 lines) (#1091)
+- ✅ AC-001 (private data inputs permanently prohibited) + AC-002 (synthetic substitution permitted with disclosure) architectural constraints established
+- ⏭ Live stakeholder demo with real external participants (#843) — deferred to M16 (EL decision 2026-06-23); M16 exit gate
+- ⏭ RBAC design (#53) — permanently closed (AC-001)
 
-**Demo:** Real external participants via #843 at M15 close. Demo 6 at M16.
+**Demo:** Demo 5 delivered 2026-06-20 (Zambia 2024 IMF ECF). Demo 6 at M16 with real external participants.
 
-**Canonical user primarily served:** Persona 5 (Aicha Mbaye, Finance Minister) and Persona 2 (Finance Ministry Negotiator) — M15 closes the self-interpreting output gap and delivers the first real external participant validation.
+**Canonical user primarily served:** Persona 5 (Aicha Mbaye, Finance Minister) and Persona 2 (Finance Ministry Negotiator) — M15 closes the self-interpreting output gap and establishes the Zone 1A architectural foundation for M16 distributional output.
 
-**What M15 does not do:** M15 does not implement cohort disaggregation or distributional output (M16). M15 does not implement Path 2 proprietary data upload (requires Issue #53 design decisions from M15 before M16 implementation can begin).
+**What M15 did not do:** M15 did not implement cohort disaggregation or distributional output on the primary surface (M16 implementation). M15 did not run live external participant engagement (deferred to M16).
 
 ---
 
-### Milestone 16 — Distributional Visibility *(planned)*
+### Milestone 16 — Distributional Visibility *(current)*
 
-**Core deliverable:** The human cost ledger is operationally visible. A finance minister can cite which cohort bears the cost, at which step, with what confidence, against a 25-year horizon. Demo 6 shows this.
+**Core deliverable:** The human cost ledger is operationally visible. A finance minister can cite which cohort bears the cost, at which step, with what confidence, against a 25-year horizon. Demo 6 shows this — with real external participants.
 
 **Demo 6 story:** *"Here is who bears the cost — specifically, this cohort, at this step, for this long."*
 
 **What ships:**
-- Cohort disaggregation on primary surface — bottom-quintile threshold crossings visible in primary viewport within 90-second retrieval ceiling → Issue #986 (horizon:immediate)
-- Political risk summary surface for Persona 3 — programme survival probability and legitimacy trajectory in plain language → Issue #987 (horizon:immediate)
+- Live stakeholder demo with real external participants (#843) — M16 exit gate; deferred from M15 (EL decision 2026-06-23)
+- Zone 1A implementation (Phase 4) — composite encoding in primary viewport (#845); Zone 1D delta annotations in same sprint (BPO phase 4 gate)
+- Cohort disaggregation on primary surface — bottom-quintile threshold crossings visible in primary viewport within 90-second retrieval ceiling → Issue #986 (design complete in M15; horizon:immediate)
+- Political risk summary surface for Persona 3 — programme survival probability and legitimacy trajectory in plain language → Issue #987 (design complete in M15; horizon:immediate)
 - Distributional scenario comparison — variance and percentile ranges by cohort → Issue #102 (horizon:immediate)
 - 25-year human capital depletion trajectory → Issue #274 (horizon:immediate)
 - Calibrated ecological-to-financial transmission — resource curse → fiscal capacity chain → Issue #275 (horizon:immediate)
 - Uncertainty quantification — full distributional output as scenario bands (builds on ADR-015 evidence thread) → Issue #22 full implementation (horizon:immediate)
-- Dynamic relationship weight updating → Issue #35 (horizon:near-term)
-- Stock vs. flow variable distinction in entity attribute model → Issue #30 (horizon:near-term)
-- Path 2 — ministry-owned proprietary data upload with field mapping (implementation; depends on Issue #53 from M15) → Issue #976 (horizon:near-term)
+- Dynamic relationship weight updating → Issue #35 (Parking Lot — deferred until core capability is battle-tested; EL decision 2026-06-21)
+- Stock vs. flow variable distinction in entity attribute model → Issue #30 (Parking Lot — same deferral basis; EL decision 2026-06-21)
 
 **Demo:** Demo 6 at M16 close. Senegalese Finance Minister scenario. The human cost argument becomes specific.
 

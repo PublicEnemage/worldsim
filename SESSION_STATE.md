@@ -5,9 +5,9 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-23 (G8 DEFERRED TO M16 — EL decision; M15 scope-complete; G7 BPO ACCEPT; sprint exit filed; exit ceremony is next)**
-**Current milestone:** M15 — Human Cost Architecture (GitHub Milestone 16)
-**Previous milestone:** M14 — Trust Architecture and Instrument Credibility (FORMALLY CLOSED 2026-06-20; release/m14 → main PR #1086; v0.14.0 at https://github.com/PublicEnemage/worldsim/releases/tag/v0.14.0; #968 closed; GitHub Milestone 15 closed)
+**Last updated: 2026-06-23 (M15 EXIT CEREMONY COMPLETE — v0.15.0; M16 Distributional Visibility now current; #984 closed; #843 exit gate for M16)**
+**Current milestone:** M16 — Distributional Visibility (GitHub Milestone 17)
+**Previous milestone:** M15 — Human Cost Architecture (FORMALLY CLOSED 2026-06-23; release/m15 → main PR #1142; v0.15.0; #984 closed; GitHub Milestone 16 closed)
 
 ---
 
@@ -31,9 +31,9 @@ Implementation is now unblocked. A sprint entry document must be filed and EL-ap
 
 ## Mid-Milestone Main Sync — 2026-06-23
 
-**PR #1133** — EL merged `release/m15` → `main` 2026-06-23. Mid-milestone sync. G1–G6 complete at that point.
-
-**PR #1140** — EL to merge `release/m15` → `main` (open as of 2026-06-23). Captures G7 complete + G8 deferral decision. **M15 scope-complete at this sync. M15 exit ceremony is the next action after #1140 merges.**
+**PR #1133** — EL merged `release/m15` → `main` 2026-06-23. Mid-milestone sync. G1–G6 complete.
+**PR #1140** — EL merged `release/m15` → `main` 2026-06-23. Mid-milestone sync. G7 complete + G8 deferral decision.
+**PR #1142** — EL merged `release/m15` → `main` 2026-06-23. Final M15 sync — exit ceremony artifacts. M15 CLOSED.
 
 **State at sync point:** G1/G2/G3/G4/G5/G6 complete (all sprint exits filed). G7 and G8 sprint entries not yet filed. `release/m15` continues as the active release branch — all future G-group feature work continues to target `release/m15`.
 
@@ -62,9 +62,54 @@ Implementation is now unblocked. A sprint entry document must be filed and EL-ap
 
 ---
 
+## M15 Exit Ceremony — 2026-06-23 (COMPLETE)
+
+**Exit ceremony steps:**
+| Step | Status | Notes |
+|---|---|---|
+| Step 1 — Open issue audit | ✅ COMPLETE | 6 issues closed as delivered; 12 issues migrated to M16; only #984 remained |
+| Step 2 — Milestone reference audit | ✅ COMPLETE | README, CLAUDE.md, roadmap all updated; v0.15.0 release created |
+| Step 3 — SESSION_STATE consistency | ✅ COMPLETE | M16 open issues table added; M15 marked closed; stale roadmap refs (#35/#30 parking lot, Path 2 AC-001) fixed |
+| Step 4 — Fresh session continuity | ✅ COMPLETE | No critical/high gaps; M16 kickoff prerequisites documented; #985 naming note recorded |
+
+**Retrospective (mandatory):**
+1. *Defects that evaded test suite:* The AC-4 mock null bug (`null ?? 2` in `makeTrajectoryMock`) evaded detection for 8 sprints because the test soft-skipped on backend startup failure (NM-056). Fixed in PR #1130. G4 test files were not included in implementation PRs and committed separately (NM-055). CM sign-off on #975 was filed post-implementation (NM-053).
+2. *Process gaps:* (a) Soft-skip pattern masked test failures — now flagged via NM-056 process improvement. (b) QA test files must be in the same PR as implementation (NM-055). (c) CM sign-off must be pre-implementation for analytical scope items (NM-053).
+3. *Testing improvements required before M16 close:* (a) Confirm no active soft-skip patterns in E2E suite before M16 exit. (b) Verify CM and DA sign-off artifacts exist before sprint entry for #986/#987.
+
+**#984 (M15 exit checklist):** Closed at ceremony completion 2026-06-23.
+
+---
+
+## Open Issues — M16 (Distributional Visibility)
+
+**GitHub Milestone:** 17 | **Created:** 2026-06-23 | **Status:** Planned — kickoff prerequisites not yet filed; sprint entry required before G-group implementation begins
+*Zone 1A Phase 4 + cohort disaggregation + political risk surface + live external demo (#843 — exit gate). Demo 6 (Senegalese Finance Minister scenario).*
+
+| Issue | Title | Group | Notes |
+|---|---|---|---|
+| #985 | Milestone 17 Exit Checklist — blocks milestone closure | — | `immediate \| M16 gate issue` (note: title uses GitHub milestone numbering — recommend rename to "M16 Exit Checklist" at kickoff) |
+| #843 | plan: live stakeholder demo with real external participants | G8 (M16) | **M16 exit gate** — deferred from M15 (EL decision 2026-06-23) |
+| #986 | feat(ux): cohort disaggregation on primary surface | — | Design complete M15-G3; implementation M16; CM + DA sign-off required before sprint entry |
+| #987 | feat(ux): political risk summary surface (Persona 3) | — | Design complete M15-G3; implementation M16; CM + DA sign-off required before sprint entry |
+| #845 | ux: Zone 1A information architecture — Phase 4 implementation | — | ADR-017 accepted; Phase 4 entry condition: Zone 1D delta annotations in same sprint |
+| #6 | Governance: branch protection restoration | — | EL-action; dependent on #3 Stage 2 |
+| #3 | Governance: single-principal separation of duties | — | EL-action; Stage 2 trigger: second GitHub account with merge authority |
+
+*All other M15 near-term issues (#846, #837, #951, #569, #259, #153, #97, #92) migrated to M16 at M15 exit ceremony 2026-06-23.*
+
+**M16 kickoff prerequisites (not yet started):**
+- [ ] PM Agent cuts `release/m16` from `main`
+- [ ] PM Agent authors `docs/process/sprint-plans/m16-sprint-plan.md`
+- [ ] EL approves sprint plan
+- [ ] M16 exit checklist issue #985 renamed "M16 Exit Checklist" (recommend)
+- [ ] ARCH-012 assigned in backlog (if Zone 1A Phase 4 requires new ADR review — confirm with Architect)
+
+---
+
 ## Open Issues — M15 (Human Cost Architecture)
 
-**GitHub Milestone:** 16 | **Created:** 2026-06-16 | **Status:** Scope-complete — G1–G7 done; G8 deferred to M16 per EL decision 2026-06-23; exit ceremony is next
+**GitHub Milestone:** 16 | **Closed:** 2026-06-23 | **Status:** FORMALLY CLOSED — v0.15.0; G1–G7 delivered; G8 (#843) deferred to M16; exit ceremony complete
 *Zone 1A ADR + Layer 3 self-interpreting outputs + live external demo. Sets up Demo 6.*
 
 | Issue | Title | Group | Notes |
