@@ -84,12 +84,12 @@ scope and ADR-015 evidence-thread scope.
 *An intent document must be filed before any G1 implementation PR opens.
 (Authority: docs/process/agent-execution-lifecycle.md Step 1)*
 
-- [ ] Intent document filed for G1 deliverables — **MUST FILE BEFORE IMPLEMENTATION PR OPENS**
+- [x] Intent document filed for G1 deliverables — **FILED 2026-06-23**
 
 | Deliverable | ADR reference | Intent document path | Filed? |
 |---|---|---|---|
-| #845 — Zone 1A Phase 4 composite encoding | ADR-017 Decision table | `docs/process/intents/M16-G1-2026-06-23-zone-1a-phase4-composite.md` | No — BLOCKING |
-| #1147 — Zone 1D delta annotations | ADR-017 §Zone 1D Integration; ADR-015 evidence-thread | (same intent document) | No — BLOCKING |
+| #845 — Zone 1A Phase 4 composite encoding | ADR-017 Decision table | `docs/process/intents/M16-G1-2026-06-23-zone-1a-phase4-composite.md` | ✅ Filed 2026-06-23 |
+| #1147 — Zone 1D delta annotations | ADR-017 §Zone 1D Integration; ADR-015 evidence-thread | (same intent document) | ✅ Filed 2026-06-23 |
 
 Both G1 deliverables are covered by a single intent document since they share a PR,
 an implementing agent, and a hard ADR-017 co-dependency (Phase 4 is incomplete without

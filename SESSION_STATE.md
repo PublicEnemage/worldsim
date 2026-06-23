@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-23 (M16 G5 sprint entry filed and EL-approved; G1 QA tests remain the implementation blocker)**
+**Last updated: 2026-06-23 (M16 G1 intent document filed; G5 sprint entry EL-approved; G1 QA tests are the sole implementation blocker)**
 **Current milestone:** M16 — Distributional Visibility (GitHub Milestone 17)
 **Previous milestone:** M15 — Human Cost Architecture (FORMALLY CLOSED 2026-06-23; release/m15 → main PR #1142; v0.15.0; #984 closed; GitHub Milestone 16 closed)
 
@@ -141,7 +141,9 @@ Implementation is now unblocked. A sprint entry document must be filed and EL-ap
 - ✅ #845 milestone corrected to M16 (was M15)
 - ✅ #1147 filed (Zone 1D delta annotations — was UNTRACKED)
 - ✅ ARCH-012: not needed for G1/G2/G3 core deliverables; may be needed for #22 (G4) — confirm at G4 sprint entry
-- ✅ G1 sprint entry filed and **EL-approved 2026-06-23** — `docs/process/sprint-plans/m16-g1-sprint-entry.md`; intent document and QA tests remain blocking before implementation PR opens
+- ✅ G1 sprint entry filed and **EL-approved 2026-06-23** — `docs/process/sprint-plans/m16-g1-sprint-entry.md`
+- ✅ G1 intent document filed 2026-06-23 — `docs/process/intents/M16-G1-2026-06-23-zone-1a-phase4-composite.md`; 12 ACs across #845 and #1147; ADR-017 backtesting validation cases named
+- ⬜ G1 QA tests — **sole remaining blocker** before implementation PR opens: `frontend/tests/e2e/m16-g1-zone-1a-phase4-composite.spec.ts` (AC-1 through AC-12)
 - ⬜ G2 pre-conditions: CM/DA/ARF/FA sign-off requests to be opened on #986 and #987
 - ✅ G5 sprint entry filed and **EL-approved 2026-06-23** — `docs/process/sprint-plans/m16-g5-sprint-entry.md`; #1145 (immediate) + #837/#951/#259 (near-term, capacity-allowing); work may begin
 - ✅ G7 sprint entry filed and **EL-approved 2026-06-23** — `docs/process/sprint-plans/m16-g7-sprint-entry.md`; #3 → #6 dependency declared; actions may begin
