@@ -118,13 +118,13 @@ are the threshold indicator #1163 requested — no separate implementation requi
 *QA tests must be authored from the intent document's acceptance criteria before
 implementation code is written. (Authority: `docs/process/agent-execution-lifecycle.md Step 2`)*
 
-- [ ] QA test files authored for G2 before implementation begins — **PENDING**
+- [x] QA test files authored for G2 before implementation begins — **FILED 2026-06-23**
 
 | Deliverable | Test file path | Authored before implementation? |
 |---|---|---|
-| #986 — Cohort disaggregation (Zone 1B) | `frontend/tests/e2e/m16-g2-distributional-surface.spec.ts` | ⬜ Pending |
-| #987 — Political risk sub-section (Zone 1D) | (same spec file) | ⬜ Pending |
-| G1 test updates (retired testids) | `frontend/tests/e2e/m16-g1-zone-1a-phase4-composite.spec.ts` | ⬜ Pending (G2 PR retires 4 G1 testids — QA Lead must update G1 spec before G2 implementation PR opens) |
+| #986 — Cohort disaggregation (Zone 1B) | `frontend/tests/e2e/m16-g2-distributional-surface.spec.ts` | ✅ Filed 2026-06-23 |
+| #987 — Political risk sub-section (Zone 1D) | (same spec file) | ✅ Filed 2026-06-23 |
+| G1 test updates (retired testids) | `frontend/tests/e2e/m16-g1-zone-1a-phase4-composite.spec.ts` | ✅ Filed 2026-06-23 (AC-7/8/9/10 updated for 4 retired testids) |
 
 **Soft-skip guard (NM-056 follow-up):** The QA test files must contain no `test.skip()` or
 conditional skip patterns. Any test scenario requiring a backend fixture not yet available must

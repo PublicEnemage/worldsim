@@ -566,8 +566,8 @@ replacement testids only — no AC is removed and no coverage is lost.
 | AC-11 (no new endpoint) | Unchanged |
 
 **QA Lead acknowledgment:**
-`[ ]` QA Lead: Tests for AC-1 through AC-14 authored in G2 spec file, and G1 spec file
-updated for 4 retired testids. Both files filed before any G2 implementation PR opens. [Date]
+`[x]` QA Lead: Tests for AC-1 through AC-14 authored in G2 spec file, and G1 spec file
+updated for 4 retired testids. Both files filed before any G2 implementation PR opens. 2026-06-23
 
 ---
 
