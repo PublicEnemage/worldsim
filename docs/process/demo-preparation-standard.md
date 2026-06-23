@@ -434,6 +434,44 @@ last assigned `DEMO-NNN` before beginning aggregation.
 Step 7. All HIGH findings filed as GitHub issues before Step 7. MEDIUM and LOW at PM Agent
 discretion.
 
+#### Solo-Use Gate (mandatory — #951)
+
+The nine-agent Step 6b panel is composed of specialists with institutional memory of the
+codebase. They will apply domain knowledge that real external participants lack, and
+specialist familiarity can suppress findings that a non-specialist would immediately notice.
+The solo-use gate closes this gap structurally.
+
+**Requirement:** At least one Step 6b panel reviewer must evaluate the screenshots
+*without reading the walkthrough first* — in the same condition as a real attendee who
+arrives at the demo without advance preparation. This reviewer is the designated solo-use
+reviewer. Their findings are tagged `[SOLO]` in the finding format.
+
+**Designated solo-use reviewer:** **Customer Agent** (Layer 3 usability — non-specialist
+user without specialist mediation). The Customer Agent is the designated solo-use reviewer
+for every Step 6b panel. Their lens is: "Can a non-specialist user read this output and
+understand what action it implies, without asking an economist to interpret it?"
+
+**Protocol:**
+1. PM Agent provides the Customer Agent with only the screenshots in UX Agent brief
+   presentation sequence — no walkthrough, no framing context, no lens description beyond
+   the solo-use question above.
+2. The Customer Agent produces findings using the standard finding format, tagging each
+   with `[SOLO]`.
+3. After completing solo-use findings, the Customer Agent may receive the walkthrough and
+   produce additional findings under their standard Layer 3 usability lens.
+
+**Blocking criteria for `[SOLO]` findings:** A `[SOLO]`-tagged CRITICAL or HIGH finding
+blocks Step 7 under the same three-condition criteria as all other Step 6b findings — the
+finding must be (a) fixed and merged, (b) scoped out with a GitHub issue and EL rationale,
+or (c) explicitly accepted by EL with a comment on the filed issue. The `[SOLO]` tag does
+not reduce the severity or the blocking criteria — it identifies the reviewer context, not
+a secondary track.
+
+**Rationale:** DEMO4-001 (first instance of un-mediated non-specialist output surfacing to
+real participants without a legibility check) was filed after the M12 demo cycle. The
+solo-use gate is the structural countermeasure. It cannot be satisfied by a specialist
+reviewer who applies domain knowledge before viewing the screenshots.
+
 ### Step 7 — Independent Review Agent
 
 **Prerequisite — merge `release/m{N}` → `main` first.** Steps 7 and 6c are post-release-merge
