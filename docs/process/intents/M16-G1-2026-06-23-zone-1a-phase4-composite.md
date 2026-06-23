@@ -2,7 +2,7 @@
 name: M16-G1-zone-1a-phase4-composite
 type: implementation-intent
 issues: "#845, #1147"
-status: Filed — awaiting QA test authorship before implementation PR opens
+status: QA tests authored 2026-06-23 — implementation PR may now open
 authored-by: Frontend Architect Agent
 authored-date: 2026-06-23
 implementing-agent: Frontend Architect Agent
@@ -431,7 +431,7 @@ explicitly (a skipped test is a silent pass). The M16 sprint exit checklist conf
 soft-skip patterns before #985 closes.
 
 **QA Lead acknowledgment:**
-`[ ]` QA Lead: Tests for AC-1 through AC-12 authored and filed before implementation PR opens. [Date]
+`[x]` QA Lead: Tests for AC-1 through AC-12 authored and filed before implementation PR opens. 2026-06-23
 
 ---
 
