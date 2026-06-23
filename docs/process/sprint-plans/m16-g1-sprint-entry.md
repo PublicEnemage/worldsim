@@ -84,12 +84,12 @@ scope and ADR-015 evidence-thread scope.
 *An intent document must be filed before any G1 implementation PR opens.
 (Authority: docs/process/agent-execution-lifecycle.md Step 1)*
 
-- [ ] Intent document filed for G1 deliverables — **MUST FILE BEFORE IMPLEMENTATION PR OPENS**
+- [x] Intent document filed for G1 deliverables — **FILED 2026-06-23**
 
 | Deliverable | ADR reference | Intent document path | Filed? |
 |---|---|---|---|
-| #845 — Zone 1A Phase 4 composite encoding | ADR-017 Decision table | `docs/process/intents/M16-G1-2026-06-23-zone-1a-phase4-composite.md` | No — BLOCKING |
-| #1147 — Zone 1D delta annotations | ADR-017 §Zone 1D Integration; ADR-015 evidence-thread | (same intent document) | No — BLOCKING |
+| #845 — Zone 1A Phase 4 composite encoding | ADR-017 Decision table | `docs/process/intents/M16-G1-2026-06-23-zone-1a-phase4-composite.md` | ✅ Filed 2026-06-23 |
+| #1147 — Zone 1D delta annotations | ADR-017 §Zone 1D Integration; ADR-015 evidence-thread | (same intent document) | ✅ Filed 2026-06-23 |
 
 Both G1 deliverables are covered by a single intent document since they share a PR,
 an implementing agent, and a hard ADR-017 co-dependency (Phase 4 is incomplete without
@@ -108,12 +108,12 @@ acceptance criteria from the intent document without reading any implementation 
 *QA tests must be authored from the intent document's acceptance criteria before
 implementation code is written. (Authority: docs/process/agent-execution-lifecycle.md Step 2)*
 
-- [ ] QA test file authored for G1 before implementation begins — **MUST FILE BEFORE IMPLEMENTATION PR OPENS**
+- [x] QA test file authored for G1 before implementation begins — **AUTHORED 2026-06-23**
 
 | Deliverable | Intent document | Test file path | Authored before implementation? |
 |---|---|---|---|
-| #845 — Zone 1A Phase 4 composite encoding | `docs/process/intents/M16-G1-2026-06-23-zone-1a-phase4-composite.md` | `frontend/tests/e2e/m16-g1-zone-1a-phase4-composite.spec.ts` | No — BLOCKING |
-| #1147 — Zone 1D delta annotations | (same) | (same spec file) | No — BLOCKING |
+| #845 — Zone 1A Phase 4 composite encoding | `docs/process/intents/M16-G1-2026-06-23-zone-1a-phase4-composite.md` | `frontend/tests/e2e/m16-g1-zone-1a-phase4-composite.spec.ts` | ✅ Yes — 2026-06-23 |
+| #1147 — Zone 1D delta annotations | (same) | (same spec file) | ✅ Yes — 2026-06-23 |
 
 *Soft-skip guard (NM-056 follow-up, M15 retrospective action 3a): the QA test file for G1
 must contain no `test.skip()` or conditional skip patterns. Any skip must produce an
