@@ -106,7 +106,7 @@ Implementation is now unblocked. A sprint entry document must be filed and EL-ap
 
 ## Open Issues — M16 (Distributional Visibility)
 
-**GitHub Milestone:** 17 | **Created:** 2026-06-23 | **Status:** Kickoff complete — G1 QA gate satisfied (PR #1152); G5 COMPLETE (PR #1156 merged 2026-06-23); G1 implementation PR is next action
+**GitHub Milestone:** 17 | **Created:** 2026-06-23 | **Status:** Kickoff complete — G1 QA gate satisfied (PR #1152); G5 CLOSED (exit confirmed PR #1158 merged 2026-06-23); G1 implementation PR is next action
 *Zone 1A Phase 4 + cohort disaggregation + political risk surface + live external demo (#843 — exit gate). Demo 6 (Senegalese Finance Minister scenario).*
 
 | Issue | Title | Group | Notes |
@@ -147,6 +147,7 @@ Implementation is now unblocked. A sprint entry document must be filed and EL-ap
 - ⬜ G2 pre-conditions: CM/DA/ARF/FA sign-off requests to be opened on #986 and #987
 - ✅ G5 sprint entry filed and **EL-approved 2026-06-23** — `docs/process/sprint-plans/m16-g5-sprint-entry.md`; #1145 (immediate) + #837/#951/#259 (near-term, capacity-allowing); work may begin
 - ✅ **G5 COMPLETE 2026-06-23** — PR #1156 merged; all 4 G5 issues delivered (#1145, #837, #951, #259); 18/20 ACs pass (2 skipped Docker-only); M16 demo stubs created at `docs/demo/m16/`; legibility baseline at `docs/standards/legibility-baseline-m16.md`
+- ✅ **G5 sprint exit CONFIRMED 2026-06-23** — BPO ACCEPT (advisory; infrastructure sprint exception); PI confirmed; exit document PR #1158 merged; `docs/process/sprint-plans/m16-g5-sprint-exit.md`
 - ✅ G7 sprint entry filed and **EL-approved 2026-06-23** — `docs/process/sprint-plans/m16-g7-sprint-entry.md`; #3 → #6 dependency declared; actions may begin
 
 ---
