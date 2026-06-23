@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-23 (M16 G1 QA tests authored and merged — PR #1152; G1 implementation PR may now open)**
+**Last updated: 2026-06-23 (M16 G1 implementation complete — PR #1160 merged to release/m16; Step 4 Verify PASS; Step 5 Validate pending BPO)**
 **Current milestone:** M16 — Distributional Visibility (GitHub Milestone 17)
 **Previous milestone:** M15 — Human Cost Architecture (FORMALLY CLOSED 2026-06-23; release/m15 → main PR #1142; v0.15.0; #984 closed; GitHub Milestone 16 closed)
 
@@ -106,7 +106,7 @@ Implementation is now unblocked. A sprint entry document must be filed and EL-ap
 
 ## Open Issues — M16 (Distributional Visibility)
 
-**GitHub Milestone:** 17 | **Created:** 2026-06-23 | **Status:** Kickoff complete — G1 QA gate satisfied (PR #1152); G5 CLOSED (exit confirmed PR #1158 merged 2026-06-23); G1 implementation PR is next action
+**GitHub Milestone:** 17 | **Created:** 2026-06-23 | **Status:** Kickoff complete — G1 implementation MERGED (PR #1160, 2026-06-23); G5 CLOSED; Step 5 Validate pending BPO
 *Zone 1A Phase 4 + cohort disaggregation + political risk surface + live external demo (#843 — exit gate). Demo 6 (Senegalese Finance Minister scenario).*
 
 | Issue | Title | Group | Notes |
@@ -115,8 +115,8 @@ Implementation is now unblocked. A sprint entry document must be filed and EL-ap
 | #843 | plan: live stakeholder demo with real external participants | G8 | **M16 exit gate** — deferred from M15 (EL decision 2026-06-23) |
 | #986 | feat(ux): cohort disaggregation on primary surface | G2 | Design complete M15-G3; CM + DA sign-off required before G2 sprint entry |
 | #987 | feat(ux): political risk summary surface (Persona 3) | G2 | Design complete M15-G3; CM + DA + ARF + FA sign-offs required before G2 sprint entry |
-| #845 | ux: Zone 1A information architecture — Phase 4 implementation | G1 | ADR-017 accepted; milestone corrected to M16 2026-06-23 |
-| #1147 | feat(ux): Zone 1D delta annotations — companion to Zone 1A Phase 4 | G1 | Filed 2026-06-23 — was UNTRACKED; BPO phase 4 gate requires same sprint as #845 |
+| #845 ✅ | ux: Zone 1A information architecture — Phase 4 implementation | G1 | ✅ MERGED 2026-06-23 — PR #1160; Step 4 Verify PASS; Step 5 Validate pending BPO |
+| #1147 ✅ | feat(ux): Zone 1D delta annotations — companion to Zone 1A Phase 4 | G1 | ✅ MERGED 2026-06-23 — PR #1160 (same PR as #845); BPO Validate co-required |
 | #274 | feat(simulation): 25-year human capital depletion trajectory | G3 | CE feasibility assessment required before sprint entry |
 | #275 | feat(simulation): calibrated ecological-to-financial transmission | G4 | Capacity-allowing |
 | #102 | arch(api): distributional scenario comparison variance/percentile | G4 | Capacity-allowing |
@@ -143,7 +143,9 @@ Implementation is now unblocked. A sprint entry document must be filed and EL-ap
 - ✅ ARCH-012: not needed for G1/G2/G3 core deliverables; may be needed for #22 (G4) — confirm at G4 sprint entry
 - ✅ G1 sprint entry filed and **EL-approved 2026-06-23** — `docs/process/sprint-plans/m16-g1-sprint-entry.md`
 - ✅ G1 intent document filed 2026-06-23 — `docs/process/intents/M16-G1-2026-06-23-zone-1a-phase4-composite.md`; 12 ACs across #845 and #1147; ADR-017 backtesting validation cases named
-- ✅ G1 QA tests authored and merged 2026-06-23 — PR #1152; `frontend/tests/e2e/m16-g1-zone-1a-phase4-composite.spec.ts` (AC-1 through AC-12); **G1 implementation PR may now open**
+- ✅ G1 QA tests authored and merged 2026-06-23 — PR #1152; `frontend/tests/e2e/m16-g1-zone-1a-phase4-composite.spec.ts` (AC-1 through AC-12)
+- ✅ **G1 implementation COMPLETE 2026-06-23** — PR #1160 merged to `release/m16`; playwright-e2e PASS; all 12 ACs verified; Step 4 Verify PASS; intent document Step 4 record filed
+- ⬜ **G1 Step 5 Validate PENDING** — BPO must: (1) open ZMB+JOR Mode 3, apply control input, confirm Zone 1A direction-of-effect read within 15 seconds; (2) confirm Zone 1D PSP delta sentence visible at L0 at step ≥1; (3) confirm psp-delta absent at step 0; (4) request Customer Agent Layer 3 assessment; file verdict in `docs/process/intents/M16-G1-2026-06-23-zone-1a-phase4-composite.md §9`
 - ⬜ G2 pre-conditions: CM/DA/ARF/FA sign-off requests to be opened on #986 and #987
 - ✅ G5 sprint entry filed and **EL-approved 2026-06-23** — `docs/process/sprint-plans/m16-g5-sprint-entry.md`; #1145 (immediate) + #837/#951/#259 (near-term, capacity-allowing); work may begin
 - ✅ **G5 COMPLETE 2026-06-23** — PR #1156 merged; all 4 G5 issues delivered (#1145, #837, #951, #259); 18/20 ACs pass (2 skipped Docker-only); M16 demo stubs created at `docs/demo/m16/`; legibility baseline at `docs/standards/legibility-baseline-m16.md`
