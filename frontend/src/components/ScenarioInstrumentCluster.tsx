@@ -30,13 +30,13 @@
  */
 import { useEffect, useRef, useState } from "react";
 import { InstrumentCluster, LAYOUT, useViewportBreakpoint } from "./InstrumentCluster";
-import { MDAAlertPanelZone1B } from "./MDAAlertPanelZone1B";
+import { MDAAlertPanelZone1B, CohortImpactSection } from "./MDAAlertPanelZone1B";
 import { PMMWidgetZone1C } from "./PMMWidgetZone1C";
 import { FourFrameworkZone1D } from "./FourFrameworkZone1D";
 import { CohortIndicatorsPanel } from "./CohortIndicatorsPanel";
 import { ControlPlane, type Mode3Params } from "./ControlPlane";
 import { useScenarioStepStore } from "../store/scenarioStepStore";
-import type { TrajectoryResponse, TrajectoryFrameworkPoint, Zone1BAlert } from "../store/scenarioStepStore";
+import type { TrajectoryResponse, TrajectoryFrameworkPoint, Zone1BAlert, CohortThresholdCrossing } from "../store/scenarioStepStore";
 import type { QuantitySchema, ScenarioDetailResponse } from "../types";
 import type { FrameworkDataQuality } from "./FourFrameworkZone1D";
 
@@ -140,9 +140,22 @@ interface RawMDAAlert {
   recovery_horizon_years?: number | null;
 }
 
+interface RawCohortThresholdCrossing {
+  quintile_key: string;
+  cohort_label: string;
+  indicator_key: string;
+  indicator_label: string;
+  severity: "CRITICAL" | "WARNING" | "WATCH";
+  step_crossed: number;
+  above_floor_pct: string;
+  tier: number;
+  source: string;
+}
+
 interface RawFrameworkOutputForAlerts {
   mda_alerts: RawMDAAlert[];
   indicators: Record<string, unknown>;
+  cohort_threshold_crossings?: RawCohortThresholdCrossing[];
 }
 
 interface RawMultiFrameworkOutput {
@@ -242,6 +255,13 @@ export function ScenarioInstrumentCluster({
   // undefined = not yet fetched or PE not active; null = PE active but computation failed; string = value.
   const [pspValue, setPspValue] = useState<string | null | undefined>(undefined);
   const [pspTier, setPspTier] = useState<number | null>(null);
+
+  // M16-G2 (#987) — political economy indicators for Zone 1D political risk sub-section.
+  const [legitimacyValue, setLegitimacyValue] = useState<string | null | undefined>(undefined);
+  const [legitimacyFloor, setLegitimacyFloor] = useState<string | null>(null);
+  const [legitimacyDirection, setLegitimacyDirection] = useState<string | null>(null);
+  const [eliteCaptureDirection, setEliteCaptureDirection] = useState<string | null>(null);
+  const [eliteCaptureQualifier, setEliteCaptureQualifier] = useState<string | null>(null);
 
   // ADR-017 Phase 4 — per-entity trajectory maps for composite encoding.
   const [entityTrajectories, setEntityTrajectories] = useState<Record<string, TrajectoryResponse>>({});
@@ -494,7 +514,23 @@ export function ScenarioInstrumentCluster({
           setHdState((s) => ({ prev: s.current, current: flat }));
         }
 
+        // M16-G2 (#986) — extract cohort threshold crossings from human_development output.
+        const hdCrossings = (hdOutput?.cohort_threshold_crossings ?? []) as RawCohortThresholdCrossing[];
+        const parsedCrossings: CohortThresholdCrossing[] = hdCrossings.map((c) => ({
+          quintile_key: c.quintile_key,
+          cohort_label: c.cohort_label,
+          indicator_key: c.indicator_key,
+          indicator_label: c.indicator_label,
+          severity: c.severity,
+          step_crossed: c.step_crossed,
+          above_floor_pct: c.above_floor_pct,
+          tier: c.tier,
+          source: c.source,
+        }));
+        store.setCohortThresholdCrossings(parsedCrossings);
+
         // ADR-015 §Component 3 — extract programme_survival_probability (DA-G5-4 Option A).
+        // M16-G2 (#987) — also extract legitimacy_index and elite_capture_divergence.
         const peOutput = raw.outputs["political_economy"];
         const peEnabled = activeScenarioDetail?.configuration?.modules_config?.political_economy?.enabled;
         if (peOutput && peEnabled) {
@@ -511,14 +547,42 @@ export function ScenarioInstrumentCluster({
               typeof entry.confidence_tier === "number" ? entry.confidence_tier : null,
             );
           } else {
-            // PE enabled but PSP indicator absent from output — treat as computation error
             setPspValue(null);
             setPspTier(null);
           }
+
+          // M16-G2 (#987) — legitimacy_index
+          const legEntry = peOutput.indicators["legitimacy_index"];
+          if (legEntry !== null && legEntry !== undefined && typeof legEntry === "object") {
+            const leg = legEntry as { value?: string | null; floor?: string | null; direction?: string | null };
+            setLegitimacyValue(leg.value ?? null);
+            setLegitimacyFloor(leg.floor ?? null);
+            setLegitimacyDirection(leg.direction ?? null);
+          } else {
+            setLegitimacyValue(null);
+            setLegitimacyFloor(null);
+            setLegitimacyDirection(null);
+          }
+
+          // M16-G2 (#987) — elite_capture_divergence
+          const ecEntry = peOutput.indicators["elite_capture_divergence"];
+          if (ecEntry !== null && ecEntry !== undefined && typeof ecEntry === "object") {
+            const ec = ecEntry as { direction?: string | null; qualifier?: string | null };
+            setEliteCaptureDirection(ec.direction ?? null);
+            setEliteCaptureQualifier(ec.qualifier ?? null);
+          } else {
+            setEliteCaptureDirection(null);
+            setEliteCaptureQualifier(null);
+          }
         } else if (!peEnabled) {
-          // PE not enabled — reset PSP state so row is absent
+          // PE not enabled — reset all PE state
           setPspValue(undefined);
           setPspTier(null);
+          setLegitimacyValue(undefined);
+          setLegitimacyFloor(null);
+          setLegitimacyDirection(null);
+          setEliteCaptureDirection(null);
+          setEliteCaptureQualifier(null);
         }
       })
       .catch(() => {
@@ -779,6 +843,7 @@ export function ScenarioInstrumentCluster({
             columnWidth={coPrimaryWidth}
           />
         }
+        zone1bCohortSection={<CohortImpactSection />}
         pmmWidget={<PMMWidgetZone1C />}
         fourFramework={
           <FourFrameworkZone1D
@@ -789,6 +854,11 @@ export function ScenarioInstrumentCluster({
             peEnabled={activeScenarioDetail?.configuration?.modules_config?.political_economy?.enabled ?? false}
             pspValue={pspValue}
             pspTier={pspTier}
+            legitimacyValue={legitimacyValue}
+            legitimacyFloor={legitimacyFloor}
+            legitimacyDirection={legitimacyDirection}
+            eliteCaptureDirection={eliteCaptureDirection}
+            eliteCaptureQualifier={eliteCaptureQualifier}
           />
         }
         cohortPanel={
