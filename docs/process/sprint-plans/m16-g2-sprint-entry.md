@@ -3,10 +3,10 @@ name: m16-g2-sprint-entry
 type: sprint-entry
 milestone: M16 — Distributional Visibility
 sprint-group: G2
-status: Filed — awaiting EL approval before implementation begins
+status: EL Approved 2026-06-23 — QA tests must be filed before implementation PR opens
 authored-by: PM Agent
 authored-date: 2026-06-23
-el-approved: pending
+el-approved: 2026-06-23
 release-branch: release/m16
 sop-reference: docs/process/sprint-planning-sop.md
 ---
@@ -219,7 +219,7 @@ G1, G2, and G3 are all BPO-accepted. G2 merge is a necessary but not sufficient 
 
 ## EL Approval Record
 
-**EL approval:** [PENDING — EL must record approval here before implementation begins]
+**EL approval:** 2026-06-23
 
-> [EL approval statement to be added here]
-> — @PublicEnemage ([date])
+> G2 sprint entry approved. All 6 pre-conditions confirmed satisfied: CM, DA, ARF sign-offs on #986 and #987; FA brief with UX Designer sign-off filed (DD-016). ADR prerequisites clear for all three issues (ADR-014, ADR-017, ADR-015 all accepted; no new ADR required). Observable application states in Section 3.1 are specific enough to gate QA test authorship. Zone 1B 1280 viewport regression (1+1 visible without scroll vs. design spec 2+2) is accepted per UX Designer sign-off in FA brief — named, not hidden. G1 testid retirement requirement (4 testids, QA Lead must update G1 spec before G2 implementation PR opens) noted and accepted as a QA gate condition in Section 2.5. #1163 closes as a consequence of #987 AC-8 — no separate implementation required. G8 gate dependency (#843 may not open until G1+G2+G3 are BPO-accepted) noted. Implementation may proceed once QA tests are authored and filed.
+> — @PublicEnemage (2026-06-23)
