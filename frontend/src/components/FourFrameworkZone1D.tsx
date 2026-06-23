@@ -17,7 +17,7 @@
  *
  * Implements: US-021, US-022, ADR-008 Decision 7, DD-011, ADR-015 Components 1+3
  */
-import React from "react";
+import React, { useRef, useEffect } from "react";
 import { useScenarioStepStore } from "../store/scenarioStepStore";
 import { FRAMEWORK_COLORS } from "../constants/frameworkColors";
 import { sortAlerts } from "./MDAAlertPanelZone1B";
@@ -175,6 +175,21 @@ export function FourFrameworkZone1D({
   pspTier,
 }: FourFrameworkZone1DProps) {
   const { trajectory, current_step, mda_alerts, mode } = useScenarioStepStore();
+
+  // ADR-017 §Zone 1D Integration — step-over-step PSP delta tracking.
+  // prevPspRef holds the PSP value from the previous render cycle.
+  // Read synchronously during render; updated in useEffect (after paint) so
+  // next render sees the previous value as "prev".
+  const prevPspRef = useRef<string | null | undefined>(undefined);
+  const pspDeltaPercent: number | null =
+    pspValue != null && prevPspRef.current != null
+      ? Math.round((parseFloat(pspValue) - parseFloat(prevPspRef.current)) * 100)
+      : null;
+  useEffect(() => {
+    if (pspValue !== undefined) {
+      prevPspRef.current = pspValue;
+    }
+  }, [pspValue]);
 
   // Top alert per framework for the "see alerts →" navigation link (#745)
   const topAlertByFramework: Record<string, string> = {};
@@ -387,6 +402,7 @@ export function FourFrameworkZone1D({
       })}
 
       {/* ADR-015 §Component 3 — Political Feasibility row (programme_survival_probability).
+          ADR-017 §Zone 1D Integration — PSP delta shown inline when prev PSP is known (step ≥ 1).
           Visible only when PE module is enabled. Absent entirely when PE is disabled. */}
       {peEnabled && (
         <div
@@ -406,6 +422,9 @@ export function FourFrameworkZone1D({
           </span>
           <span
             style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 4,
               fontSize: 12,
               fontWeight: 700,
               color: "#7c3aed",
@@ -418,6 +437,21 @@ export function FourFrameworkZone1D({
               <span style={{ color: "#cc0000", fontSize: 10 }}>— [computation error]</span>
             ) : (
               `${(parseFloat(pspValue) * 100).toFixed(0)}% [T${pspTier ?? 3} · political economy module]`
+            )}
+            {/* ADR-017 §Zone 1D Integration — step-over-step delta annotation */}
+            {pspDeltaPercent !== null && (
+              <span
+                data-testid="psp-delta"
+                style={{
+                  fontSize: 10,
+                  fontWeight: 700,
+                  color: pspDeltaPercent < 0 ? "#dc2626" : "#059669",
+                }}
+              >
+                {pspDeltaPercent < 0
+                  ? `↓${Math.abs(pspDeltaPercent)}pp`
+                  : `↑${pspDeltaPercent}pp`}
+              </span>
             )}
           </span>
         </div>
@@ -443,6 +477,29 @@ export function FourFrameworkZone1D({
           ) : (
             `Programme survival probability: ${(parseFloat(pspValue) * 100).toFixed(0)}%. This means the programme has a ${(parseFloat(pspValue) * 100).toFixed(0)}% chance of remaining on track through conditionality compliance.`
           )}
+        </div>
+      )}
+
+      {/* ADR-017 §Zone 1D Integration — PSP delta Layer 3 sentence (#1147).
+          Visible at step ≥ 1 when previous PSP is known. Absent at step 0 or when
+          delta cannot be computed (prev PSP unavailable). */}
+      {peEnabled && pspValue != null && pspDeltaPercent !== null && (
+        <div
+          data-testid="psp-delta-sentence"
+          style={{
+            borderLeft: "3px solid #7c3aed",
+            paddingLeft: 6,
+            paddingTop: 2,
+            paddingBottom: 2,
+            fontSize: 10,
+            color: pspDeltaPercent < 0 ? "#dc2626" : "#059669",
+            lineHeight: 1.4,
+            fontWeight: 500,
+          }}
+        >
+          {pspDeltaPercent === 0
+            ? "programme survival unchanged this step"
+            : `programme survival ${pspDeltaPercent < 0 ? "dropped" : "improved"} ${Math.abs(pspDeltaPercent)} percentage point${Math.abs(pspDeltaPercent) !== 1 ? "s" : ""} this step`}
         </div>
       )}
     </div>

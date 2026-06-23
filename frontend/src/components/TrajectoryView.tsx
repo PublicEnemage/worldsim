@@ -24,6 +24,7 @@ import {
   useScenarioStepStore,
   type TrajectoryStep,
   type TrajectoryResponse,
+  type MDAFloor,
 } from "../store/scenarioStepStore";
 
 // ---------------------------------------------------------------------------
@@ -63,6 +64,41 @@ export function computeDivergenceFill(
  */
 export function getConfidenceBadgeVisible(confidenceTier: number): boolean {
   return confidenceTier >= 4;
+}
+
+// ---------------------------------------------------------------------------
+// Phase 4 — composite encoding constants and helpers (ADR-017 §Decision table)
+// ---------------------------------------------------------------------------
+
+/** Entity color palette indexed by position in entityIds (max 4 entities per ADR-017). */
+const ENTITY_PALETTE: readonly string[] = [
+  FRAMEWORK_COLORS.financial,          // #2271B3 — entity 0
+  FRAMEWORK_COLORS.ecological,         // #1A8FA0 — entity 1
+  FRAMEWORK_COLORS.human_development,  // #D4841A — entity 2
+  FRAMEWORK_COLORS.governance,         // #7B50A8 — entity 3
+] as const;
+
+/** Mean of non-null framework composite_scores at a step. */
+function computeEntityCompositeScore(step: TrajectoryStep): number | null {
+  const scores = Object.values(step.frameworks)
+    .map((fw) => fw.composite_score)
+    .filter((s): s is number => s !== null);
+  if (scores.length === 0) return null;
+  return scores.reduce((a, b) => a + b, 0) / scores.length;
+}
+
+/** Worst (highest-number) confidence tier across all frameworks at a step. */
+function getEntityWorstTier(step: TrajectoryStep): number {
+  const tiers = Object.values(step.frameworks).map((fw) => fw.confidence_tier);
+  if (tiers.length === 0) return 3;
+  return Math.max(...tiers);
+}
+
+/** Lowest non-trivial MDA floor value (0 < value < 1) across all frameworks. */
+function getEntityMdaFloor(mda_floors: MDAFloor[]): number | null {
+  const floors = mda_floors.map((f) => f.floor_value).filter((v) => v > 0 && v < 1.0);
+  if (floors.length === 0) return null;
+  return Math.min(...floors);
 }
 
 // ---------------------------------------------------------------------------
@@ -242,6 +278,240 @@ function legendFormatter(
 }
 
 // ---------------------------------------------------------------------------
+// Phase 4 — composite SVG chart (ADR-017 §Decision table rows N≤4)
+// ---------------------------------------------------------------------------
+
+interface CompositeChartSVGProps {
+  entityCodes: string[];
+  activeTrajectories: Record<string, TrajectoryResponse>;
+  baselineTrajectories: Record<string, TrajectoryResponse>;
+  mode: "MODE_1" | "MODE_2" | "MODE_3";
+  width: number;
+  height: number;
+}
+
+function CompositeChartSVG({
+  entityCodes,
+  activeTrajectories,
+  baselineTrajectories,
+  mode,
+  width,
+  height,
+}: CompositeChartSVGProps) {
+  const MARGIN = { top: 16, right: 60, bottom: 48, left: 44 };
+  const chartW = width - MARGIN.left - MARGIN.right;
+  const chartH = height - MARGIN.top - MARGIN.bottom;
+
+  const refCode = entityCodes.find((c) => activeTrajectories[c]);
+  const refSteps = refCode ? activeTrajectories[refCode].steps : [];
+  const stepIndices = refSteps.map((s) => s.step_index);
+
+  const xScale = (idx: number): number => {
+    if (stepIndices.length <= 1) return MARGIN.left + chartW / 2;
+    const i = stepIndices.indexOf(idx);
+    if (i < 0) return MARGIN.left;
+    return MARGIN.left + (i / (stepIndices.length - 1)) * chartW;
+  };
+
+  const yScale = (score: number): number =>
+    MARGIN.top + (1 - Math.min(1, Math.max(0, score))) * chartH;
+
+  const buildPathD = (steps: TrajectoryStep[]): string => {
+    const pts: string[] = [];
+    for (const step of steps) {
+      const score = computeEntityCompositeScore(step);
+      if (score === null) continue;
+      pts.push(`${xScale(step.step_index).toFixed(1)},${yScale(score).toFixed(1)}`);
+    }
+    return pts.length >= 2 ? "M " + pts.join(" L ") : "";
+  };
+
+  const showBaseline =
+    (mode === "MODE_2" || mode === "MODE_3") &&
+    Object.keys(baselineTrajectories).length > 0;
+
+  // Only render divergence fill when trajectories actually diverge (> 0.001 delta).
+  // This prevents a zero-area fill element that would break bounding-box assertions.
+  const hasDivergence =
+    showBaseline &&
+    entityCodes.some((code) => {
+      const active = activeTrajectories[code];
+      const baseline = baselineTrajectories[code];
+      if (!active || !baseline) return false;
+      const baselineByStep = new Map(baseline.steps.map((s) => [s.step_index, s]));
+      return active.steps.some((step) => {
+        const aScore = computeEntityCompositeScore(step);
+        const bStep = baselineByStep.get(step.step_index);
+        const bScore = bStep ? computeEntityCompositeScore(bStep) : null;
+        return aScore !== null && bScore !== null && Math.abs(aScore - bScore) > 0.001;
+      });
+    });
+
+  const yGridValues = [0, 0.25, 0.5, 0.75, 1.0];
+
+  return (
+    <svg width={width} height={height} style={{ display: "block", overflow: "visible" }}>
+      {/* Y-axis grid and labels */}
+      {yGridValues.map((val) => (
+        <g key={val}>
+          <line
+            x1={MARGIN.left}
+            y1={yScale(val)}
+            x2={MARGIN.left + chartW}
+            y2={yScale(val)}
+            stroke="#f0f0f0"
+            strokeWidth={1}
+          />
+          <text
+            x={MARGIN.left - 4}
+            y={yScale(val)}
+            textAnchor="end"
+            fontSize={9}
+            fill="#888"
+            dy={3}
+          >
+            {val.toFixed(2)}
+          </text>
+        </g>
+      ))}
+
+      {/* X-axis step ticks */}
+      {stepIndices.map((idx) => (
+        <g key={idx} transform={`translate(${xScale(idx)},${MARGIN.top + chartH})`}>
+          <line y1={0} y2={4} stroke="#ccc" strokeWidth={1} />
+          <text y={14} textAnchor="middle" fontSize={9} fill="#888">
+            {`Step ${idx}`}
+          </text>
+        </g>
+      ))}
+
+      {/* Divergence fills — only rendered when hasDivergence */}
+      {hasDivergence &&
+        entityCodes.map((code, i) => {
+          const active = activeTrajectories[code];
+          const baseline = baselineTrajectories[code];
+          if (!active || !baseline) return null;
+          const baselineByStep = new Map(baseline.steps.map((s) => [s.step_index, s]));
+          const fwdPts: string[] = [];
+          const revPts: string[] = [];
+          for (const step of active.steps) {
+            const aScore = computeEntityCompositeScore(step);
+            const bStep = baselineByStep.get(step.step_index);
+            const bScore = bStep ? computeEntityCompositeScore(bStep) : null;
+            if (aScore === null || bScore === null) continue;
+            const x = xScale(step.step_index);
+            fwdPts.push(`${x.toFixed(1)},${yScale(aScore).toFixed(1)}`);
+            revPts.unshift(`${x.toFixed(1)},${yScale(bScore).toFixed(1)}`);
+          }
+          if (fwdPts.length < 2) return null;
+          const fillD = "M " + fwdPts.join(" L ") + " L " + revPts.join(" L ") + " Z";
+          const color = ENTITY_PALETTE[i % ENTITY_PALETTE.length];
+          return (
+            <path
+              key={`fill-${code}`}
+              data-testid="zone-1a-divergence-fill"
+              d={fillD}
+              fill={color}
+              opacity={0.08}
+              stroke="none"
+            />
+          );
+        })}
+
+      {/* MDA floor lines — one per entity (lowest non-trivial floor) */}
+      {entityCodes.map((code, i) => {
+        const active = activeTrajectories[code];
+        if (!active) return null;
+        const floor = getEntityMdaFloor(active.mda_floors);
+        if (floor === null) return null;
+        const color = ENTITY_PALETTE[i % ENTITY_PALETTE.length];
+        return (
+          <line
+            key={`mda-${code}`}
+            data-testid={`zone-1a-mda-floor-${code}`}
+            x1={MARGIN.left}
+            y1={yScale(floor)}
+            x2={MARGIN.left + chartW}
+            y2={yScale(floor)}
+            stroke={color}
+            strokeWidth={1}
+            strokeDasharray="6 3"
+            strokeOpacity={0.6}
+          />
+        );
+      })}
+
+      {/* Baseline ghost paths — Mode 2/3, opacity=0.5 + dasharray (ADR-017) */}
+      {showBaseline &&
+        entityCodes.map((code, i) => {
+          const baseline = baselineTrajectories[code];
+          if (!baseline) return null;
+          const pathD = buildPathD(baseline.steps);
+          if (!pathD) return null;
+          const color = ENTITY_PALETTE[i % ENTITY_PALETTE.length];
+          return (
+            <path
+              key={`ghost-${code}`}
+              d={pathD}
+              stroke={color}
+              strokeWidth={1}
+              opacity={0.5}
+              strokeDasharray="4 2"
+              fill="none"
+            />
+          );
+        })}
+
+      {/* Active composite paths — solid, full opacity */}
+      {entityCodes.map((code, i) => {
+        const active = activeTrajectories[code];
+        if (!active) return null;
+        const pathD = buildPathD(active.steps);
+        if (!pathD) return null;
+        const color = ENTITY_PALETTE[i % ENTITY_PALETTE.length];
+        return (
+          <path
+            key={`active-${code}`}
+            d={pathD}
+            stroke={color}
+            strokeWidth={2}
+            opacity={1}
+            fill="none"
+          />
+        );
+      })}
+
+      {/* Tier badges at right edge of each entity's active curve endpoint */}
+      {entityCodes.map((code, i) => {
+        const active = activeTrajectories[code];
+        if (!active || active.steps.length === 0) return null;
+        const lastStep = active.steps[active.steps.length - 1];
+        const lastScore = computeEntityCompositeScore(lastStep);
+        if (lastScore === null) return null;
+        const tier = getEntityWorstTier(lastStep);
+        const color = ENTITY_PALETTE[i % ENTITY_PALETTE.length];
+        const x = MARGIN.left + chartW + 4;
+        const y = yScale(lastScore);
+        return (
+          <text
+            key={`tier-${code}`}
+            data-testid={`zone-1a-tier-badge-${code}`}
+            x={x}
+            y={y}
+            fontSize={9}
+            fontWeight="bold"
+            fill={color}
+            dominantBaseline="middle"
+          >
+            T{tier}
+          </text>
+        );
+      })}
+    </svg>
+  );
+}
+
+// ---------------------------------------------------------------------------
 // TrajectoryView props
 // ---------------------------------------------------------------------------
 
@@ -252,6 +522,16 @@ interface TrajectoryViewProps {
   height?: number;
   /** Entity ISO 3166-1 alpha-3 codes — provide two for multi-case Mode 1. */
   entityIds?: string[];
+  /**
+   * Phase 4 (ADR-017): per-entity trajectory responses keyed by ISO entity code.
+   * When provided for N>1 entities, composite encoding is used instead of recharts.
+   */
+  entityTrajectories?: Record<string, TrajectoryResponse> | null;
+  /**
+   * Phase 4 (ADR-017): per-entity baseline trajectories for Mode 3 ghost paths.
+   * Keyed by ISO entity code. Empty object or null = no baseline overlay.
+   */
+  entityBaselineTrajectories?: Record<string, TrajectoryResponse> | null;
   /** test-id for AC-006 DOM assertions. */
   "data-testid"?: string;
 }
@@ -264,6 +544,8 @@ export function TrajectoryView({
   width,
   height = 300,
   entityIds,
+  entityTrajectories,
+  entityBaselineTrajectories,
   "data-testid": dataTestId = "zone-1a-trajectory",
 }: TrajectoryViewProps) {
   const { trajectory, baseline_trajectory, current_step, mode } =
@@ -276,9 +558,7 @@ export function TrajectoryView({
 
   const showBaseline = (mode === "MODE_2" || mode === "MODE_3") && baseline_trajectory !== null;
 
-  // Performance mark for AC-007 / MV-002. Fires once when trajectory data first
-  // arrives: measures from post-DOM-update to post-paint via requestAnimationFrame.
-  // Name starts with "trajectory-render" to match the AC-007 assertion.
+  // Performance mark for AC-007 / MV-002.
   const perfMarkFired = useRef(false);
   useLayoutEffect(() => {
     if (mergedData.length === 0 || perfMarkFired.current) return;
@@ -290,12 +570,106 @@ export function TrajectoryView({
     return () => cancelAnimationFrame(raf);
   }, [mergedData.length]);
 
-  // Determine if single-entity scenario (Path A: normalized_absolute scoring)
   const isSingleEntity = mergedData.some(
     (d) => d.financial_scoring_basis === "normalized_absolute",
   );
 
-  if (!trajectory) {
+  // ---------------------------------------------------------------------------
+  // Phase 4 — composite encoding data (ADR-017 §Decision table)
+  // ---------------------------------------------------------------------------
+  const primaryEntityId = entityIds?.[0] ?? null;
+
+  const effectiveActiveTrajectories = useMemo<Record<string, TrajectoryResponse>>(() => {
+    if (entityTrajectories && Object.keys(entityTrajectories).length > 0) return entityTrajectories;
+    if (trajectory && primaryEntityId) return { [primaryEntityId]: trajectory };
+    return {};
+  }, [entityTrajectories, trajectory, primaryEntityId]);
+
+  const effectiveBaselineTrajectories = useMemo<Record<string, TrajectoryResponse>>(() => {
+    if (entityBaselineTrajectories && Object.keys(entityBaselineTrajectories).length > 0) return entityBaselineTrajectories;
+    if (baseline_trajectory && primaryEntityId) return { [primaryEntityId]: baseline_trajectory };
+    return {};
+  }, [entityBaselineTrajectories, baseline_trajectory, primaryEntityId]);
+
+  const entityCount = entityIds?.length ?? 1;
+  const isLegibilityLimit = entityCount > 4;
+  // Composite path: N>1 entities, or N=1 in Mode 3 (ghost+active from store).
+  const useComposite = !isLegibilityLimit && !(entityCount <= 1 && mode !== "MODE_3");
+  const hasCompositeData = Object.keys(effectiveActiveTrajectories).length > 0;
+
+  // Shared entity-labels-overlay — rendered in every path (DEMO-063).
+  // Dynamic: N labels for N entities, indexed by position in entityIds.
+  const entityLabelsOverlay =
+    entityIds && entityIds.length >= 2 ? (
+      <div
+        data-testid="entity-labels-overlay"
+        style={{
+          position: "absolute",
+          top: 4,
+          right: 28,
+          display: "flex",
+          flexDirection: "column",
+          gap: 3,
+          pointerEvents: "none",
+        }}
+      >
+        {entityIds.map((entityId, i) => (
+          <span
+            key={entityId}
+            data-testid={`entity-label-${i}`}
+            style={{
+              fontSize: 9,
+              fontWeight: 700,
+              color: ENTITY_PALETTE[i % ENTITY_PALETTE.length],
+              background: "rgba(255,255,255,0.85)",
+              padding: "1px 3px",
+            }}
+          >
+            {entityId}
+          </span>
+        ))}
+      </div>
+    ) : null;
+
+  // ---------------------------------------------------------------------------
+  // Legibility-limit notice (N > 4)
+  // ---------------------------------------------------------------------------
+  if (isLegibilityLimit) {
+    return (
+      <div
+        data-testid={dataTestId}
+        data-current-step={current_step}
+        style={{ width: width ?? 480, position: "relative" }}
+      >
+        <div
+          data-testid="zone-1a-legibility-limit"
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            color: "#555",
+            fontSize: 12,
+            fontFamily: "monospace",
+            height,
+            padding: "16px 24px",
+            lineHeight: 1.5,
+            textAlign: "center",
+            borderLeft: "3px solid #ddd",
+          }}
+        >
+          Zone 1A shows individual entity trajectories for up to 4 entities. This scenario
+          has {entityCount} entities. Reduce the entity selection to 4 or fewer to see
+          trajectory curves.
+        </div>
+        {entityLabelsOverlay}
+      </div>
+    );
+  }
+
+  // ---------------------------------------------------------------------------
+  // No data placeholder
+  // ---------------------------------------------------------------------------
+  if (!trajectory && !hasCompositeData) {
     return (
       <div
         data-testid={dataTestId}
@@ -316,50 +690,38 @@ export function TrajectoryView({
         >
           No trajectory data
         </div>
-        {/* Entity labels shown even at step 0 — audience sees which entities are loaded (DEMO-063). */}
-        {entityIds && entityIds.length >= 2 && (
-          <div
-            data-testid="entity-labels-overlay"
-            style={{
-              position: "absolute",
-              top: 4,
-              right: 28,
-              display: "flex",
-              flexDirection: "column",
-              gap: 3,
-              pointerEvents: "none",
-            }}
-          >
-            <span
-              data-testid="entity-label-0"
-              style={{
-                fontSize: 9,
-                fontWeight: 700,
-                color: FRAMEWORK_COLORS.financial,
-                background: "rgba(255,255,255,0.85)",
-                padding: "1px 3px",
-              }}
-            >
-              {entityIds[0]}
-            </span>
-            <span
-              data-testid="entity-label-1"
-              style={{
-                fontSize: 9,
-                fontWeight: 700,
-                color: FRAMEWORK_COLORS.ecological,
-                background: "rgba(255,255,255,0.85)",
-                padding: "1px 3px",
-              }}
-            >
-              {entityIds[1]}
-            </span>
-          </div>
-        )}
+        {entityLabelsOverlay}
       </div>
     );
   }
 
+  // ---------------------------------------------------------------------------
+  // Phase 4 composite SVG (N>1 entities, or N=1 in Mode 3)
+  // ---------------------------------------------------------------------------
+  if (useComposite && hasCompositeData) {
+    const entityCodes = entityIds ?? Object.keys(effectiveActiveTrajectories);
+    return (
+      <div
+        data-testid={dataTestId}
+        data-current-step={current_step}
+        style={{ width: width ?? 480, position: "relative" }}
+      >
+        <CompositeChartSVG
+          entityCodes={entityCodes}
+          activeTrajectories={effectiveActiveTrajectories}
+          baselineTrajectories={effectiveBaselineTrajectories}
+          mode={mode}
+          width={width ?? 480}
+          height={height}
+        />
+        {entityLabelsOverlay}
+      </div>
+    );
+  }
+
+  // ---------------------------------------------------------------------------
+  // Existing recharts rendering (N=1, Mode 1/2 — unchanged path)
+  // ---------------------------------------------------------------------------
   return (
     <div
       data-testid={dataTestId}
@@ -407,7 +769,7 @@ export function TrajectoryView({
             formatter={(value) => value}
           />
 
-          {/* Uncertainty band Areas (ADR-007-gated: renders nothing until ci_lower is non-null) */}
+          {/* Uncertainty band Areas (ADR-007-gated) */}
           {FRAMEWORKS.map((fw) => (
             <Area
               key={`${fw}-band`}
@@ -422,7 +784,7 @@ export function TrajectoryView({
             />
           ))}
 
-          {/* Divergence fill Areas (Mode 3 only — always mounted, fillOpacity controls visibility) */}
+          {/* Divergence fill Areas (Mode 3 only) */}
           {FRAMEWORKS.map((fw) => (
             <Area
               key={`${fw}-divergence`}
@@ -437,8 +799,8 @@ export function TrajectoryView({
             />
           ))}
 
-          {/* Ecological WARNING floor at y=1.0 (EL Decision A — only defensible M9 floor) */}
-          {trajectory.mda_floors
+          {/* Ecological WARNING floor */}
+          {trajectory && trajectory.mda_floors
             .filter((f) => f.framework === "ecological" && f.severity === "WARNING")
             .map((floor) => (
               <ReferenceLine
@@ -451,11 +813,8 @@ export function TrajectoryView({
               />
             ))}
 
-          {/* Rider #97 — threshold-crossing markers in Mode 3 comparison.
-              Vertical lines at steps where the active trajectory crosses an MDA floor
-              that the baseline did not cross (or vice versa). Only ecological floor
-              is defined in composite score space (1.0 boundary). */}
-          {showBaseline &&
+          {/* Rider #97 — threshold-crossing markers in Mode 3 */}
+          {showBaseline && trajectory &&
             trajectory.mda_floors
               .filter((f) => f.framework === "ecological")
               .flatMap((floor) =>
@@ -464,9 +823,7 @@ export function TrajectoryView({
                     const active = d.ecological_active;
                     const baseline = d.ecological_baseline;
                     if (active === null || baseline === null) return false;
-                    const activeBreached = active >= floor.floor_value;
-                    const baselineBreached = baseline >= floor.floor_value;
-                    return activeBreached !== baselineBreached;
+                    return (active >= floor.floor_value) !== (baseline >= floor.floor_value);
                   })
                   .map((d) => (
                     <ReferenceLine
@@ -530,9 +887,7 @@ export function TrajectoryView({
         </ComposedChart>
       </ResponsiveContainer>
 
-      {/* ADR-015 §Component 1 — L0 confidence tier badges on trajectory curves (#1068).
-          One badge per active framework (score non-null), showing T{N} at the right edge.
-          Always visible at zero interaction — not a hover state or tooltip. */}
+      {/* ADR-015 §Component 1 — L0 confidence tier badges */}
       {mergedData.length > 0 && (
         <div
           style={{
@@ -575,49 +930,10 @@ export function TrajectoryView({
         </div>
       )}
 
-      {/* Inline entity labels — at right edge of chart area (DEMO-063).
-          Lets audience identify entities without consulting the legend. */}
-      {entityIds && entityIds.length >= 2 && (
-        <div
-          data-testid="entity-labels-overlay"
-          style={{
-            position: "absolute",
-            top: 20,
-            right: 28,
-            display: "flex",
-            flexDirection: "column",
-            gap: 3,
-            pointerEvents: "none",
-          }}
-        >
-          <span
-            data-testid="entity-label-0"
-            style={{
-              fontSize: 9,
-              fontWeight: 700,
-              color: FRAMEWORK_COLORS.financial,
-              background: "rgba(255,255,255,0.85)",
-              padding: "1px 3px",
-            }}
-          >
-            {entityIds[0]}
-          </span>
-          <span
-            data-testid="entity-label-1"
-            style={{
-              fontSize: 9,
-              fontWeight: 700,
-              color: FRAMEWORK_COLORS.ecological,
-              background: "rgba(255,255,255,0.85)",
-              padding: "1px 3px",
-            }}
-          >
-            {entityIds[1]}
-          </span>
-        </div>
-      )}
+      {/* Entity labels overlay — N-entity dynamic (DEMO-063) */}
+      {entityLabelsOverlay}
 
-      {/* Multi-entity composite note — shown when two entities present */}
+      {/* Multi-entity composite note */}
       {!isSingleEntity && entityIds && entityIds.length === 2 && (
         <div
           style={{
