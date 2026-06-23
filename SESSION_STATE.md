@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-23 (G7 FULLY COMPLETE — BPO ACCEPT; sprint exit filed; #1091 closable; cold-read navigability PASS; information loss PASS)**
+**Last updated: 2026-06-23 (G8 DEFERRED TO M16 — EL decision; M15 scope-complete; G7 BPO ACCEPT; sprint exit filed; exit ceremony is next)**
 **Current milestone:** M15 — Human Cost Architecture (GitHub Milestone 16)
 **Previous milestone:** M14 — Trust Architecture and Instrument Credibility (FORMALLY CLOSED 2026-06-20; release/m14 → main PR #1086; v0.14.0 at https://github.com/PublicEnemage/worldsim/releases/tag/v0.14.0; #968 closed; GitHub Milestone 15 closed)
 
@@ -31,7 +31,9 @@ Implementation is now unblocked. A sprint entry document must be filed and EL-ap
 
 ## Mid-Milestone Main Sync — 2026-06-23
 
-**PR #1133** — EL merged `release/m15` → `main` 2026-06-23. This is a mid-milestone sync, not a milestone close. M15 remains active; G8 (#843, live stakeholder demo) is the M15 exit gate.
+**PR #1133** — EL merged `release/m15` → `main` 2026-06-23. Mid-milestone sync. G1–G6 complete at that point.
+
+**PR #1140** — EL to merge `release/m15` → `main` (open as of 2026-06-23). Captures G7 complete + G8 deferral decision. **M15 scope-complete at this sync. M15 exit ceremony is the next action after #1140 merges.**
 
 **State at sync point:** G1/G2/G3/G4/G5/G6 complete (all sprint exits filed). G7 and G8 sprint entries not yet filed. `release/m15` continues as the active release branch — all future G-group feature work continues to target `release/m15`.
 
@@ -62,7 +64,7 @@ Implementation is now unblocked. A sprint entry document must be filed and EL-ap
 
 ## Open Issues — M15 (Human Cost Architecture)
 
-**GitHub Milestone:** 16 | **Created:** 2026-06-16 | **Status:** Planned — Demo 6 anchor; #843 is exit gate
+**GitHub Milestone:** 16 | **Created:** 2026-06-16 | **Status:** Scope-complete — G1–G7 done; G8 deferred to M16 per EL decision 2026-06-23; exit ceremony is next
 *Zone 1A ADR + Layer 3 self-interpreting outputs + live external demo. Sets up Demo 6.*
 
 | Issue | Title | Group | Notes |
@@ -90,7 +92,7 @@ Implementation is now unblocked. A sprint entry document must be filed and EL-ap
 | #951 | process: solo-use review protocol | G5 | Migrated from M14 |
 | #846 | ux: DEMO-045 — Mode 3 branch comparison in instrument | G4 | |
 | #845 (Ph 2–4) | ux: Zone 1A information architecture — ADR-017 | G2 | Phase 1 design thinking doc done (M14 G6c) |
-| #843 | plan: live stakeholder demo with real external participants | G8 | **M15 exit gate** — deferred from M14 (EL decision 2026-06-20) |
+| #843 | plan: live stakeholder demo with real external participants | G8 | **DEFERRED TO M16** — EL decision 2026-06-23; moved to GitHub milestone #17 (M16 — Distributional Visibility); now M16 exit gate |
 | #837 | feat(demo): configuration-driven demo scripts | G5 | |
 | #569 | test(perf): MV-002 Mode 3 hardware validation | G6 | |
 | #53 ✅ | arch: RBAC design (prerequisite for Path 2 in M16) | G4 | ✅ CLOSED 2026-06-21 — will-not-implement (AC-001); #976 permanently closed |
@@ -277,7 +279,27 @@ Implementation is now unblocked. A sprint entry document must be filed and EL-ap
 | #3 — single-principal separation of duties | ⬜ EL-action only | Stage 2 governance: second GitHub account with merge authority |
 | #6 — branch protection restoration | ⬜ EL-action only | Dependent on #3 Stage 2 completion |
 
-**G7 is COMPLETE.** Sprint exit document: `docs/process/sprint-plans/m15-g7-sprint-exit.md` — PI Agent Confirmed 2026-06-23. Issue #1091 closable. EL-action items #3 and #6 remain open (non-blocking).
+**G7 is COMPLETE.** Sprint exit document: `docs/process/sprint-plans/m15-g7-sprint-exit.md` — PI Agent Confirmed 2026-06-23. #1091 closed. EL-action items #3 and #6 remain open (non-blocking).
+
+---
+
+## EL Scope Decision — 2026-06-23 (G8 Deferral)
+
+**Authority:** Engineering Lead scope decision. Recorded by PM Agent.
+
+### G8 Deferral — #843 deferred from M15 to M16
+
+The live stakeholder demo with real external participants (#843) is deferred from M15 to M16 per EL decision 2026-06-23.
+
+**Rationale (EL):** M15 has delivered its full architectural mandate (G1–G7 complete). The demo is a delivery vehicle, not an architectural gate — deferring does not leave architectural debt in M15.
+
+**Dispositions:**
+- #843 moved to GitHub milestone #17 (M16 — Distributional Visibility); comment posted on issue
+- #843 is now the M16 exit gate — M16 sprint plan must designate it as such at kickoff
+- M15 exit gate is now the exit ceremony (#984): open issue audit → milestone reference audit → SESSION_STATE consistency check → fresh session continuity test
+- Sprint plan amended: `docs/process/sprint-plans/m15-sprint-plan.md` (Amendment 2026-06-23)
+
+**M15 status at this decision:** Scope-complete. All implementation work done. Exit ceremony is the only remaining M15 action.
 
 ---
 

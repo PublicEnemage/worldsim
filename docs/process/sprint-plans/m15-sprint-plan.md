@@ -6,8 +6,8 @@ status: EL Approved — implementation may begin (sprint entry document required
 authored-by: PM Agent
 authored-date: 2026-06-20
 el-approved: 2026-06-20
-amended: 2026-06-21
-amendment-authority: EL architectural decisions AC-001 and AC-002
+amended: 2026-06-23
+amendment-authority: EL architectural decisions AC-001 and AC-002; EL G8 deferral decision 2026-06-23
 consulted-agents:
   - Business Product Owner (value prioritization and Demo 6 scope)
   - Frontend Architect (component grouping and ADR-015 Component 4 assessment)
@@ -26,6 +26,11 @@ sop-reference: docs/process/sprint-planning-sop.md
 **M15 exit gate:** #843 — live stakeholder demo with real external participants AND Zone 1A architectural foundation for Demo 6 in place. #984 (exit checklist) closes last.
 
 **CLAUDE.md reference:** "M15 closes with real external participant engagement (#843) and the architectural foundation for Demo 6."
+
+> **Amendment — 2026-06-23 (EL decision — G8 deferral to M16):**
+> - **G8 (#843) deferred to M16.** The live stakeholder demo with real external participants is moved to M16 (GitHub milestone #17 — Distributional Visibility) per EL decision 2026-06-23. M15 is scope-complete. The M15 exit gate is now the exit ceremony completion (#984). #843 GitHub milestone updated to #17.
+> - **M15 exit gate change:** Previous exit gate: #843 live external demo. New exit gate: M15 exit ceremony (#984) — open issue audit, milestone reference audit, SESSION_STATE consistency check, fresh session continuity test. All four steps required before #984 closes.
+> - **M16 G8 note:** #843 is now the M16 exit gate. M16 sprint plan must designate #843 as G-group exit gate at kickoff.
 
 > **Amendment — 2026-06-21 (EL decisions AC-001 and AC-002):**
 > - **AC-001 — Private data inputs are permanently prohibited.** #976 (Path 2) and #53 (RBAC design) are permanently closed — will-not-implement. This is a founding-document constraint, not a capacity deferral. G4 scope is now #975 (Path 1) + ADR-016 Component 3 only. See `docs/architecture/constraints.md §AC-001`.
