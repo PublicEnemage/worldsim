@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-23 (M16 KICKOFF IN PROGRESS — release/m16 cut; sprint plan filed; #985 renamed; #1147 filed; EL approval pending)**
+**Last updated: 2026-06-23 (M16 KICKOFF COMPLETE — release/m16 cut; sprint plan EL-approved PR #1148; G1 sprint entry is next action)**
 **Current milestone:** M16 — Distributional Visibility (GitHub Milestone 17)
 **Previous milestone:** M15 — Human Cost Architecture (FORMALLY CLOSED 2026-06-23; release/m15 → main PR #1142; v0.15.0; #984 closed; GitHub Milestone 16 closed)
 
@@ -106,7 +106,7 @@ Implementation is now unblocked. A sprint entry document must be filed and EL-ap
 
 ## Open Issues — M16 (Distributional Visibility)
 
-**GitHub Milestone:** 17 | **Created:** 2026-06-23 | **Status:** Kickoff in progress — sprint plan filed; awaiting EL approval; sprint entry required before any G-group implementation begins
+**GitHub Milestone:** 17 | **Created:** 2026-06-23 | **Status:** Kickoff complete — sprint plan EL-approved 2026-06-23; G1 sprint entry is next action; G2 pre-conditions to be opened in parallel
 *Zone 1A Phase 4 + cohort disaggregation + political risk surface + live external demo (#843 — exit gate). Demo 6 (Senegalese Finance Minister scenario).*
 
 | Issue | Title | Group | Notes |
@@ -136,7 +136,7 @@ Implementation is now unblocked. A sprint entry document must be filed and EL-ap
 **M16 kickoff status (2026-06-23):**
 - ✅ `release/m16` cut from `main` at commit 07c92b8
 - ✅ `docs/process/sprint-plans/m16-sprint-plan.md` filed
-- ⬜ EL approves sprint plan — PENDING
+- ✅ EL approves sprint plan — **EL APPROVED 2026-06-23** (PR #1148)
 - ✅ #985 renamed "M16 Exit Checklist"
 - ✅ #845 milestone corrected to M16 (was M15)
 - ✅ #1147 filed (Zone 1D delta annotations — was UNTRACKED)

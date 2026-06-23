@@ -2,10 +2,10 @@
 name: m16-sprint-plan
 type: sprint-plan
 milestone: M16 — Distributional Visibility
-status: Filed — awaiting EL approval
+status: EL Approved — implementation may begin (sprint entry document required per group)
 authored-by: PM Agent
 authored-date: 2026-06-23
-el-approved: false
+el-approved: 2026-06-23
 consulted-agents:
   - Business Product Owner (Demo 6 value prioritization; scope cut order)
   - Frontend Architect (zone component grouping; G1/G2 sequencing; Zone 1D layout conflict)
@@ -16,7 +16,7 @@ sop-reference: docs/process/sprint-planning-sop.md
 
 # M16 Sprint Plan — Distributional Visibility
 
-**Status:** Filed — awaiting EL approval; implementation may not begin until EL approves this document
+**Status:** EL Approved 2026-06-23 — implementation may begin; sprint entry document required per group before implementation PR opens
 **Release branch:** `release/m16` (cut from `main` 2026-06-23)
 **Exit checklist issue:** #985 (renamed 2026-06-23 — "M16 Exit Checklist — blocks milestone closure")
 **Primary objective:** Zone 1A Phase 4 composite encoding + distributional surface (cohort disaggregation #986 + political risk #987) + 25-year human capital trajectory (#274) + live stakeholder demo with real external participants (#843 — M16 exit gate). Demo 6: "Here is who bears the cost — specifically, this cohort, at this step, for this long."
@@ -31,7 +31,7 @@ sop-reference: docs/process/sprint-planning-sop.md
 |---|---|---|
 | 1. PM Agent cuts `release/m16` from `main` | ✅ DONE 2026-06-23 | `release/m16` cut from `main` at commit 07c92b8 |
 | 2. PM Agent authors `m16-sprint-plan.md` | ✅ THIS DOCUMENT | Filed 2026-06-23; EL approval pending |
-| 3. EL approves sprint plan | ⬜ PENDING | Required before any G-group sprint entry opens |
+| 3. EL approves sprint plan | ✅ EL APPROVED 2026-06-23 | PR #1148 merged to release/m16 |
 | 4. #985 renamed "M16 Exit Checklist" | ✅ DONE 2026-06-23 | GitHub issue title updated |
 | 5. #845 milestone corrected to M16 | ✅ DONE 2026-06-23 | Was M15 (Phase 4 is M16 scope); corrected |
 | 6. CI trigger verified | ✅ CLEAR | `.github/workflows/ci.yml` `pull_request: branches` includes `release/m*` |
@@ -242,6 +242,6 @@ Per `docs/process/sprint-planning-sop.md §Sprint Entry Gate`, implementation ma
 4. ✅ #845 milestone corrected to M16 (GitHub milestone 17) — DONE 2026-06-23
 5. ✅ #1147 filed — Zone 1D delta annotations (was UNTRACKED) — DONE 2026-06-23
 6. ✅ This sprint plan filed — DONE 2026-06-23
-7. ⬜ EL approves sprint plan — PENDING
+7. ✅ EL approves sprint plan — DONE 2026-06-23 (PR #1148)
 8. ⬜ G2 pre-conditions initiated (CM/DA/ARF/FA sign-off requests opened on #986 and #987) — immediately after EL approval
 9. ⬜ G1 sprint entry filed and EL-approved — G1 is first implementation group
