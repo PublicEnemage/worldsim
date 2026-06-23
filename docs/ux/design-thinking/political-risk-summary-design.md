@@ -398,14 +398,19 @@ The following must be cleared before a M16 sprint entry for #987 implementation 
 
 *(Completed by reviewer at time of review — before any M16 sprint entry for #987 is filed)*
 
-`[ ]` **Chief Methodologist:** PSP severity tier thresholds (CRITICAL < 0.40, WARNING 0.40–0.55,
-WATCH 0.55–0.70) confirmed consistent with historical programme abandonment rates. PSP direction
-change sensitivity threshold (2pp) confirmed or adjusted: ________________. M16 sprint entry for
-#987 may proceed on CM grounds. [Date]
+`[x]` **Chief Methodologist:** PSP severity tier thresholds (CRITICAL < 0.40, WARNING 0.40–0.55,
+WATCH 0.55–0.70) confirmed consistent with historical ECF programme abandonment rates per
+calibration anchor #1084 (Zambia 2022, Ghana 2023). PSP direction change sensitivity threshold
+(2pp) confirmed — no adjustment required. WARNING historical analogue sentence should use
+"within 6 steps" at implementation (not placeholder). M16 sprint entry for #987 may proceed
+on CM grounds. 2026-06-23.
 
-`[ ]` **Architecture Review Facilitator:** AC-7 through AC-11 satisfied. ADR requirement
-disposition confirmed: (b) no new ADR required [or: overturned — new ADR required, conflict
-named: ________________]. M16 sprint entry for #987 may be filed. [Date]
+`[x]` **Architecture Review Facilitator:** AC-7 through AC-11 satisfied. ADR requirement
+disposition confirmed: (b) no new ADR required. #1163 (PSP threshold legibility) is
+substantively resolved by the G2 political risk sub-section design — G2 implementation
+should close #1163. Note: Frontend Architect layout feasibility is a separate pre-condition;
+FA conditional sign-off filed on #987 (2026-06-23). M16 sprint entry for #987 may be filed
+when FA brief is authored and UX-Designer-signed. 2026-06-23.
 
 ---
 

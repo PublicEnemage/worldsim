@@ -106,19 +106,19 @@ Implementation is now unblocked. A sprint entry document must be filed and EL-ap
 
 ## Open Issues — M16 (Distributional Visibility)
 
-**GitHub Milestone:** 17 | **Created:** 2026-06-23 | **Status:** Kickoff complete — G1 BPO ACCEPTED 2026-06-23; G5 CLOSED; G2 pre-conditions open
+**GitHub Milestone:** 17 | **Created:** 2026-06-23 | **Status:** Kickoff complete — G1 BPO ACCEPTED 2026-06-23; G5 CLOSED; G3 sprint entry EL-approved 2026-06-23; G2 pre-conditions open
 *Zone 1A Phase 4 + cohort disaggregation + political risk surface + live external demo (#843 — exit gate). Demo 6 (Senegalese Finance Minister scenario).*
 
 | Issue | Title | Group | Notes |
 |---|---|---|---|
 | #985 | M16 Exit Checklist — blocks milestone closure | — | `immediate \| M16 gate issue` — renamed 2026-06-23 |
 | #843 | plan: live stakeholder demo with real external participants | G8 | **M16 exit gate** — deferred from M15 (EL decision 2026-06-23) |
-| #986 | feat(ux): cohort disaggregation on primary surface | G2 | Design complete M15-G3; CM + DA sign-off required before G2 sprint entry |
-| #987 | feat(ux): political risk summary surface (Persona 3) | G2 | Design complete M15-G3; CM + DA + ARF + FA sign-offs required before G2 sprint entry |
+| #986 | feat(ux): cohort disaggregation on primary surface | G2 | CM ✅ DA ✅ ARF ✅ 2026-06-23; scope restricted to poverty_headcount_ratio Q1/Q2 (DA); FA brief pending |
+| #987 | feat(ux): political risk summary surface (Persona 3) | G2 | CM ✅ ARF ✅ FA conditional ✅ 2026-06-23; FA brief (Zone 1D layout reorganization) required before G2 sprint entry |
+| #1163 | ux(zone-1d): PSP threshold anchor — absolute PSP level legibility for Persona 3 | G2 | In G2 scope — resolved by #987 political risk sub-section (severity-labeled PSP display); G2 implementation closes it |
 | #845 ✅ | ux: Zone 1A information architecture — Phase 4 implementation | G1 | ✅ BPO ACCEPT 2026-06-23 — PR #1160; all 12 ACs PASS; Step 5 Validate COMPLETE |
 | #1147 ✅ | feat(ux): Zone 1D delta annotations — companion to Zone 1A Phase 4 | G1 | ✅ BPO ACCEPT 2026-06-23 — PR #1160; Step 5 Validate COMPLETE (co-accepted with #845) |
 | #1162 | ux(zone-1a): entity attribution in-fill anchor — direct visual link between divergence fill and entity label | G1 follow-up | Filed 2026-06-23 — Customer Agent Layer 3 C1; pre-demo (#843) fix required |
-| #1163 | ux(zone-1d): PSP threshold anchor — absolute PSP level legibility for Persona 3 | G2/G3 | Filed 2026-06-23 — Customer Agent Layer 3 C2; G2 scope; pre-demo (#843) |
 | #274 | feat(simulation): 25-year human capital depletion trajectory | G3 | CE feasibility assessment required before sprint entry |
 | #275 | feat(simulation): calibrated ecological-to-financial transmission | G4 | Capacity-allowing |
 | #102 | arch(api): distributional scenario comparison variance/percentile | G4 | Capacity-allowing |
@@ -148,7 +148,8 @@ Implementation is now unblocked. A sprint entry document must be filed and EL-ap
 - ✅ G1 QA tests authored and merged 2026-06-23 — PR #1152; `frontend/tests/e2e/m16-g1-zone-1a-phase4-composite.spec.ts` (AC-1 through AC-12)
 - ✅ **G1 implementation COMPLETE 2026-06-23** — PR #1160 merged to `release/m16`; playwright-e2e PASS; all 12 ACs verified; Step 4 Verify PASS; intent document Step 4 record filed
 - ✅ **G1 Step 5 Validate COMPLETE 2026-06-23** — BPO ACCEPT; Customer Agent Layer 3 CONDITIONAL PASS (3 named conditions, none blocking); intent document §9 filed; #1162 + #1163 filed as pre-demo follow-ups; C3 scope alignment noted (per-framework delta vs. baseline is G2 scope)
-- ⬜ G2 pre-conditions: CM/DA/ARF/FA sign-off requests to be opened on #986 and #987
+- ✅ **G2 pre-conditions: 5/6 complete 2026-06-23** — CM ✅ #986 + #987; DA ✅ #986 (scope: poverty_headcount_ratio Q1/Q2 only); ARF ✅ #986 + #987; FA conditional ✅ #987 (Zone 1D overflow found; G2 replaces PSP block, does not add). ⬜ Pre-condition 6 (FA brief — Zone 1D layout reorganization 1280: 35/15/50%, 1440: 40/15/45%; UX Designer sign-off) required before G2 sprint entry. #1163 confirmed G2 scope (resolved by #987 political risk sub-section).
+- ✅ G3 sprint entry filed and **EL-approved 2026-06-23** — `docs/process/sprint-plans/m16-g3-sprint-entry.md`; CE Assessment embedded (§2.5): adaptive resolution override required, extend `/simulate` with `projection_steps`, CM review on #274 gates intent ACs, dry-run bounds check required at Step 4 Verify; intent document + QA tests must be filed before implementation PR opens
 - ✅ G5 sprint entry filed and **EL-approved 2026-06-23** — `docs/process/sprint-plans/m16-g5-sprint-entry.md`; #1145 (immediate) + #837/#951/#259 (near-term, capacity-allowing); work may begin
 - ✅ **G5 COMPLETE 2026-06-23** — PR #1156 merged; all 4 G5 issues delivered (#1145, #837, #951, #259); 18/20 ACs pass (2 skipped Docker-only); M16 demo stubs created at `docs/demo/m16/`; legibility baseline at `docs/standards/legibility-baseline-m16.md`
 - ✅ **G5 sprint exit CONFIRMED 2026-06-23** — BPO ACCEPT (advisory; infrastructure sprint exception); PI confirmed; exit document PR #1158 merged; `docs/process/sprint-plans/m16-g5-sprint-exit.md`
