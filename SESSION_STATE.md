@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-22 (M15-G6 CLOSED — sprint exit filed 2026-06-23; VC-1/VC-2/VC-4 PASS; VC-3 CONDITIONAL PASS; #990 closed; G4 CLOSED — BPO ACCEPT 2026-06-22; G5 CLOSED — BPO ACCEPT 2026-06-22; G8 UNBLOCKED)**
+**Last updated: 2026-06-23 (release/m15 → main merged as PR #1133 by EL — mid-milestone sync; G6 CLOSED; NM-056 filed; G8 UNBLOCKED — next sprint)**
 **Current milestone:** M15 — Human Cost Architecture (GitHub Milestone 16)
 **Previous milestone:** M14 — Trust Architecture and Instrument Credibility (FORMALLY CLOSED 2026-06-20; release/m14 → main PR #1086; v0.14.0 at https://github.com/PublicEnemage/worldsim/releases/tag/v0.14.0; #968 closed; GitHub Milestone 15 closed)
 
@@ -26,6 +26,16 @@
 | 6. KI-005 permanent fix applied | ✅ DONE 2026-06-20 | `do_not_enforce_on_create: true` on Ruleset 17751852; future release branches need no Ruleset workaround |
 
 Implementation is now unblocked. A sprint entry document must be filed and EL-approved before any G-group implementation PR opens.
+
+---
+
+## Mid-Milestone Main Sync — 2026-06-23
+
+**PR #1133** — EL merged `release/m15` → `main` 2026-06-23. This is a mid-milestone sync, not a milestone close. M15 remains active; G8 (#843, live stakeholder demo) is the M15 exit gate.
+
+**State at sync point:** G1/G2/G3/G4/G5/G6 complete (all sprint exits filed). G7 and G8 sprint entries not yet filed. `release/m15` continues as the active release branch — all future G-group feature work continues to target `release/m15`.
+
+**NM-056 filed:** E2E test soft-skip masked AC-4 mock bug for 8 sprints. Root cause: `null ?? 2` in `makeTrajectoryMock` + backend startup failure before PR #1123 made tests soft-skip silently. Fixed in PR #1130. Full record: `docs/process/near-miss-registry.md §NM-056`.
 
 ---
 
@@ -245,7 +255,7 @@ Implementation is now unblocked. A sprint entry document must be filed and EL-ap
 
 **Infrastructure Sprint declaration confirmed at exit:** No G6 output modifies user-visible application state. VC-3 CONDITIONAL PASS limitation is documentation-only (no implementation gap). PI Agent confirms Infrastructure Sprint Exception classification is correct for G6.
 
-**#990 closed:** All VC checks complete with no FAIL findings. Accessibility validation sprint is DONE.
+**G6 is CLOSED.** Issue #990 closed 2026-06-23. NM-056 filed for AC-4 soft-skip-masking-mock-bug pattern. CI fix: PR #1130 (null ?? 2 → !== undefined check); validation PR: #1128; sprint exit PR: #1131.
 
 **CI note (PR #1128):** Pre-existing AC-4 test failure (`makeTrajectoryMock` null-tier bug, PR #1130) was blocking merge. Root cause: `null ?? 2` collapsed to 2; masked by backend startup failure before PR #1123 (Docker migrations). Fixed 1-line in test helper. PR #1130 merged to release/m15 first; PR #1128 rebased and merged 2026-06-23.
 
