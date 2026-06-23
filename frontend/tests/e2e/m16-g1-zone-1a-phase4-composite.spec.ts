@@ -858,7 +858,7 @@ test.describe("AC-6: ADR-017 backtesting — Mode 3 ZMB N=1 baseline/active dive
 
     // Guard: zone-1a-divergence-fill (Phase 4 element — absent pre-implementation)
     const fill = page.locator('[data-testid="zone-1a-divergence-fill"]');
-    if (!(await fill.isAttached().catch(() => false))) return;
+    if ((await fill.count()) === 0) return;
     if (!(await fill.isVisible({ timeout: 3_000 }).catch(() => false))) return;
 
     // ADR-017 §Silent Failure Mode 1 validation:
@@ -1231,7 +1231,8 @@ test.describe("AC-11: PSP delta computed client-side — no new backend endpoint
     // Advance to step 1 — this is the moment any new endpoint would be called
     currentPsp = "0.3800";
     const nextStepBtn = page.getByRole("button", { name: /Next Step/ });
-    if (!(await nextStepBtn.isVisible({ timeout: 5_000 }).catch(() => false))) return;
+    // Guard on isEnabled — a disabled button causes a 30-second click timeout (not a no-op).
+    if (!(await nextStepBtn.isEnabled({ timeout: 5_000 }).catch(() => false))) return;
     await nextStepBtn.click();
     await page.waitForTimeout(1_500);
 
@@ -1256,7 +1257,7 @@ test.describe("AC-12: Zone 1A N=4 endpoint label collision — all 4 codes visib
 
   test.beforeAll(async () => {
     try {
-      scenarioId = await createScenario(["ZMB"], 1, `G1-N4-AC12-${Date.now()}`);
+      scenarioId = await createScenario(FOUR_ENTITIES, 1, `G1-N4-AC12-${Date.now()}`);
     } catch {
       scenarioId = null;
     }
