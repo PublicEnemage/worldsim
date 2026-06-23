@@ -75,10 +75,10 @@ new architectural decisions.
 ### 2.3 — Intent document gate
 
 *An intent document must be filed before any G7 implementation PR opens.
-(Authority: CLAUDE.md §Agent Execution Lifecycle Step 1)*
+(Authority: docs/process/agent-execution-lifecycle.md Step 1)*
 
 **Sequencing note:** The intent document and QA test file were authored on 2026-06-18 before
-this sprint entry was filed. This is permitted per CLAUDE.md §Agent Execution Lifecycle Step 1:
+this sprint entry was filed. This is permitted per docs/process/agent-execution-lifecycle.md Step 1:
 "The implementing agent may not open any PR until (1) the sprint entry document is filed and
 EL-approved." No implementation PR has been opened. The intent document §0 contains an explicit
 PI Agent anticipatory near-miss flag covering this sequence. Filing this sprint entry document
@@ -104,7 +104,7 @@ and obtaining EL approval is the remaining gate before any implementation PR ope
 *For G7 documentation deliverables, QA tests take the form of file-system checks and manual
 timed-navigation criteria. No Playwright test suite is required; the acceptance criteria are
 content-presence checks (grep equivalents) and one BPO timed navigation.
-(Authority: CLAUDE.md §Agent Execution Lifecycle Step 2; intent document §7)*
+(Authority: docs/process/agent-execution-lifecycle.md Step 2; intent document §7)*
 
 - [x] QA test file authored before any G7 implementation PR opens
 

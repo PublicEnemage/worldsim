@@ -410,4 +410,4 @@ named: ________________]. M16 sprint entry for #987 may be filed. [Date]
 ---
 
 *Design document version: 2026-06-21. Issue #987. M15 G3 parallel track. Implementation scope:
-M16. UX Designer Agent authored. Full lifecycle authority: `CLAUDE.md §Agent Execution Lifecycle`.*
+M16. UX Designer Agent authored. Full lifecycle authority: `docs/process/agent-execution-lifecycle.md`.*

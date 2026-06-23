@@ -70,7 +70,7 @@ was authored, accepted, and merged 2026-06-12. This gate is now CLEAR.
 
 *Intent document must be filed at `docs/process/intents/ADR-014-YYYY-MM-DD-alert-panel-ux.md`
 before any G7 implementation PR opens.*
-*(Authority: CLAUDE.md §Agent Execution Lifecycle Step 1)*
+*(Authority: docs/process/agent-execution-lifecycle.md Step 1)*
 
 - [ ] Intent document filed for G7 alert panel UX deliverable — **BLOCKING IMPLEMENTATION**
 
@@ -104,7 +104,7 @@ and Q4 memoisation boundary (Frontend Architect additions), must appear in the i
 
 *QA tests must be authored from the intent document's acceptance criteria before implementation
 code is written.*
-*(Authority: CLAUDE.md §Agent Execution Lifecycle Step 2)*
+*(Authority: docs/process/agent-execution-lifecycle.md Step 2)*
 
 - [ ] QA test file authored for G7 before implementation begins — **BLOCKING IMPLEMENTATION**
 

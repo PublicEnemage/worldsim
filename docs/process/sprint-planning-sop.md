@@ -202,7 +202,7 @@ document at `docs/process/sprint-plans/{milestone-slug}-sprint-{N}-entry.md`.
    analytics output), an intent document is filed at
    `docs/process/intents/M{N}-{G-suffix-or-ADR-NNN}-{YYYY-MM-DD}-{short-name}.md` before the implementation PR
    opens. The intent document completeness gate: the QA Lead can write a test from it without
-   reading implementation code. (Authority: CLAUDE.md §Agent Execution Lifecycle Step 1)
+   reading implementation code. (Authority: docs/process/agent-execution-lifecycle.md Step 1)
 
 5. **QA test file authored for each user-facing deliverable before implementation begins.**
    The QA Lead writes tests from the intent document's acceptance criteria before any

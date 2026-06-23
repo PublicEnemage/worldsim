@@ -73,7 +73,7 @@ implementation group.
 ### 2.3 — Intent document gate
 
 *An intent document must be filed before any G1 implementation PR opens.
-(Authority: CLAUDE.md §Agent Execution Lifecycle Step 1)*
+(Authority: docs/process/agent-execution-lifecycle.md Step 1)*
 
 - [x] Intent document filed for G1 deliverables — **FILED 2026-06-16**
 
@@ -95,7 +95,7 @@ code.
 ### 2.4 — QA test authorship gate
 
 *QA tests must be authored from the intent document's acceptance criteria before implementation
-code is written. (Authority: CLAUDE.md §Agent Execution Lifecycle Step 2)*
+code is written. (Authority: docs/process/agent-execution-lifecycle.md Step 2)*
 
 - [ ] QA test file authored for G1 before implementation begins — **MUST FILE BEFORE G1 PR OPENS**
 

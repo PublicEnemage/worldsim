@@ -87,7 +87,7 @@ deliverables within existing architectural boundaries:
 ### 2.3 — Intent document gate
 
 *An intent document must be filed before any G6 implementation PR opens.
-(Authority: CLAUDE.md §Agent Execution Lifecycle Step 1)*
+(Authority: docs/process/agent-execution-lifecycle.md Step 1)*
 
 - [x] Intent document filed for G6 deliverables — filed 2026-06-18 in same session as this entry
 
@@ -118,7 +118,7 @@ source code. For G6 specifically:
 ### 2.4 — QA test authorship gate
 
 *QA tests must be authored from the intent document's acceptance criteria before implementation
-code is written. (Authority: CLAUDE.md §Agent Execution Lifecycle Step 2)*
+code is written. (Authority: docs/process/agent-execution-lifecycle.md Step 2)*
 
 - [x] QA test files authored before any implementation PR is opened — **FILED 2026-06-18**
 

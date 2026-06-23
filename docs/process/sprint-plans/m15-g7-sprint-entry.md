@@ -3,7 +3,7 @@ name: m15-g7-sprint-entry
 type: sprint-entry
 milestone: M15 — Human Cost Architecture
 sprint-group: G7
-status: Filed — awaiting EL approval before extraction begins
+status: EL-approved 2026-06-23 — extraction PR may open
 authored-by: PM Agent
 authored-date: 2026-06-23
 el-approved: false
@@ -13,7 +13,7 @@ sop-reference: docs/process/sprint-planning-sop.md
 
 # Sprint Entry — M15, G7: Process Documentation
 
-**Status:** Filed — awaiting EL approval before extraction begins
+**Status:** EL-approved 2026-06-23 — extraction PR may open
 **Date authored:** 2026-06-23
 **Release branch:** `release/m15`
 **Sprint plan:** `docs/process/sprint-plans/m15-sprint-plan.md` (EL Approved 2026-06-20; amended 2026-06-21)
@@ -110,11 +110,11 @@ the acceptance criteria in Section 3.1.*
 *Test file must be authored from Section 3.1's acceptance criteria before the extraction PR
 opens — not after.*
 
-- [ ] QA test file authored before extraction PR opens — **MUST FILE BEFORE EXTRACTION PR OPENS**
+- [x] QA test file authored before extraction PR opens — **SATISFIED 2026-06-23**
 
 | Deliverable | Specification source | Test file path | Authored before extraction? |
 |---|---|---|---|
-| #1091 — all acceptance criteria | Section 3.1 of this entry document | `backend/tests/test_m15_g7_claude_md_extraction.py` | No — **BLOCKING** |
+| #1091 — all acceptance criteria | Section 3.1 of this entry document | `backend/tests/test_m15_g7_claude_md_extraction.py` | Yes — 21 tests covering AC-1–AC-14; ruff clean; 9 fail pre-extraction as expected |
 
 ---
 
@@ -278,7 +278,8 @@ No additional process gaps identified in the sweep period. G6 accessibility vali
 
 ## EL Approval Record
 
-**EL approval:** Pending
+**EL approval:** ✅ Approved 2026-06-23
 
-> {EL approval statement — to be filled at approval time}
-> — @PublicEnemage ({date})
+> G7 sprint entry approved. QA test gate satisfied (21 tests, AC-1–AC-14, ruff clean).
+> Extraction PR may open. G7 does not gate G8.
+> — @PublicEnemage (2026-06-23)

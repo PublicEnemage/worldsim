@@ -5,7 +5,7 @@
 >
 > **Current state at M4 close: zero automated frontend tests.**
 > The Playwright suite is a hard gate for M5 exit — no M5 work ships without it.
-> See CLAUDE.md §Milestone Retrospective Process for the M4 radar chart incident
+> See docs/process/milestone-exit-sop.md §Milestone Retrospective Process for the M4 radar chart incident
 > that made this a hard gate.
 
 ---
