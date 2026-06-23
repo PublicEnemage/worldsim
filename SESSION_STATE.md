@@ -41,6 +41,29 @@ Implementation is now unblocked. A sprint entry document must be filed and EL-ap
 
 ---
 
+## HORIZON Sweep — 2026-06-23
+
+**Open issues reviewed:** 1 (insights log entry 7 — AC-001/AC-002 founding document addition)
+**Disposition:**
+- Entry 7 (2026-06-21, founding document AC-001/AC-002): **promoted → #1145** — EL-authored documentation task; action is clear and actionable; filed for M16 scope
+
+**New issues filed this sweep:**
+| Issue | Title | Trigger |
+|---|---|---|
+| #1145 | docs(founding): add AC-001 and AC-002 as explicit permanent constraints in founding document | Promoted from insights log entry 7 |
+
+**Process gaps identified:**
+- None. M15 exit ceremony complete; M16 kickoff prerequisites not yet started (release/m16 not cut; sprint plan not filed).
+
+**M16 kickoff status at sweep time:**
+- release/m16 branch: not yet cut
+- m16-sprint-plan.md: not yet filed
+- EL approval: not yet received
+- #985 rename: pending (currently "Milestone 17 Exit Checklist" — recommend rename to "M16 Exit Checklist")
+- ARCH-012 backlog assignment: pending (confirm with Architect whether Zone 1A Phase 4 requires a new ADR review)
+
+---
+
 ## HORIZON Sweep — 2026-06-20
 
 **Open issues reviewed:** 1 (insights log entry 6 — CLAUDE.md structure)
@@ -93,6 +116,7 @@ Implementation is now unblocked. A sprint entry document must be filed and EL-ap
 | #986 | feat(ux): cohort disaggregation on primary surface | — | Design complete M15-G3; implementation M16; CM + DA sign-off required before sprint entry |
 | #987 | feat(ux): political risk summary surface (Persona 3) | — | Design complete M15-G3; implementation M16; CM + DA sign-off required before sprint entry |
 | #845 | ux: Zone 1A information architecture — Phase 4 implementation | — | ADR-017 accepted; Phase 4 entry condition: Zone 1D delta annotations in same sprint |
+| #1145 | docs(founding): add AC-001 and AC-002 as explicit permanent constraints in founding document | — | EL-authored; promoted from insights log entry 7 at HORIZON sweep 2026-06-23 |
 | #6 | Governance: branch protection restoration | — | EL-action; dependent on #3 Stage 2 |
 | #3 | Governance: single-principal separation of duties | — | EL-action; Stage 2 trigger: second GitHub account with merge authority |
 
