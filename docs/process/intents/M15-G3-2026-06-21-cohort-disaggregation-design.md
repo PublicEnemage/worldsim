@@ -359,9 +359,9 @@ These are G5 scope. G3 is not responsible for any G5 issues.
 
 **Review acknowledgments:** (completed at review time)
 
-`[ ]` Chief Methodologist: Cohort indicator scope and threshold basis in `cohort-disaggregation-design.md` confirmed methodologically defensible (AC-3). M16 sprint entry for #986 may proceed on CM grounds. [Date]
+`[x]` Chief Methodologist: Cohort indicator scope (restricted to poverty_headcount_ratio by income quintile Q1/Q2 per DA sign-off) and MDA-derived floor methodology confirmed methodologically defensible (AC-3). Conditions: T3 tier label; Q3–Q5 suppressed as T5. M16 sprint entry for #986 may proceed on CM grounds. 2026-06-23. GitHub: #986 CM comment 2026-06-23.
 
-`[ ]` Architecture Review Facilitator: AC-1 through AC-6 satisfied for `cohort-disaggregation-design.md`; AC-7 through AC-11 satisfied for `political-risk-summary-design.md`. M16 sprint entries for #986 and #987 may be filed — ADR-017 and new-ADR dependencies noted as required by the gate sections. [Date]
+`[x]` Architecture Review Facilitator: AC-1 through AC-6 satisfied for `cohort-disaggregation-design.md`; AC-7 through AC-11 satisfied for `political-risk-summary-design.md`. M16 sprint entries for #986 and #987 may be filed — no ADR-017 dependency (#986), no new ADR required (#987). Additional pre-condition for #987: FA brief (Zone 1D layout reorganization) must be authored and UX-Designer-signed before G2 sprint entry. 2026-06-23. GitHub: #986 ARF comment 2026-06-23; #987 ARF comment 2026-06-23.
 
 ---
 

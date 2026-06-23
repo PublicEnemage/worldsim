@@ -128,7 +128,7 @@ No new ARCH entry required at kickoff. ARCH-012 may be needed for #22 — assess
 | Group | Issues | ADR gate | Wave | Description |
 |---|---|---|---|---|
 | G1 — Zone 1A Phase 4 + Zone 1D Delta | #845 (Phase 4), #1147 | ADR-017 ✅, ADR-015 ✅ | Wave 1 | Zone 1A composite encoding (multi-scenario/multi-entity/L0-badge per ADR-017 Phase 4); Zone 1D delta annotations (step-over-step PSP change, direction, Layer 3 self-interpreting). These two issues are BPO-gated to ship together. |
-| G2 — Distributional Surface | #986, #987 | ADR-017 ✅, ADR-015 ✅ | Wave 2 (after G1 + pre-conditions) | Cohort disaggregation on primary surface (bottom-quintile threshold crossings in Zone 1B/1A area without drawer navigation); political risk summary surface (PSP trajectory + plain-language legitimacy dynamics in Zone 1D). Design complete M15-G3. Pre-conditions required before sprint entry: CM sign-off, DA sign-off, ARF confirmation, Frontend Architect layout feasibility. |
+| G2 — Distributional Surface | #986, #987, #1163 | ADR-017 ✅, ADR-015 ✅ | Wave 2 (after G1 + pre-conditions) | Cohort disaggregation on primary surface (bottom-quintile threshold crossings in Zone 1B; income quintile poverty_headcount_ratio M16 scope per DA sign-off); political risk summary surface (Zone 1D structured display — PSP severity, legitimacy, elite capture divergence in plain language for Persona 3); PSP threshold legibility for Persona 3 (#1163 — resolved by political risk sub-section design; G2 implementation closes it). Design complete M15-G3. |
 | G3 — Demo 6 Infrastructure | #274 | None (CE assessment required) | Wave 2 (parallel with G2 backend) | 25-year human capital depletion trajectory — DemographicModule extension. CE assessment of 100-step computation feasibility on target hardware required before sprint entry. Demo 6 Senegal scenario configuration included as part of this group (data prep, not a separate deliverable — covered by #843 demo preparation). |
 | G4 — Distributional Infrastructure (capacity-allowing) | #102, #275, #22 (scoped) | #22: ADR-007 confirmation required | Wave 3 | Distributional scenario comparison variance/percentile (#102); calibrated ecological-to-financial transmission (#275); uncertainty quantification scoped to distributional bands on cohort output (#22 — full #22 is beyond M16 scope; scope to Demo 6 requirements only). Not Demo 6 critical path — cut here before any other group if capacity is constrained. |
 | G5 — Process + Secondary Features | #837, #951, #1145, #259 | None | Wave 1 (parallel with G1) | Config-driven demo scripts; solo-use review protocol; founding document AC-001/AC-002 addition (EL-authored); CTO legibility metrics dashboard. Process and documentation work — no frontend component conflicts. #1145 is EL-authored (small documentation edit). |
@@ -176,15 +176,16 @@ G1 (Zone 1A Phase 4 + Zone 1D delta) ──────────────�
 
 ## Pre-Conditions for G2 Sprint Entry
 
-These four items must be completed before a G2 sprint entry document is filed. They are best worked in parallel with G1 implementation.
+All six items must be completed before a G2 sprint entry document is filed.
 
-| Pre-condition | Responsible | Target |
+| Pre-condition | Responsible | Status |
 |---|---|---|
-| CM sign-off on #986: cohort indicator scope + MDA-derived floor methodology (AC-3) | Chief Methodologist | Comment on #986 |
-| CM sign-off on #987: PSP severity tier thresholds + 2pp direction sensitivity (AC-11) | Chief Methodologist | Comment on #987 |
-| DA sign-off on #986: DemographicModule cohort field availability for GRC/JOR/EGY/ZMB | Data Architect | Comment on #986 |
-| Architecture Review Facilitator confirmation: AC-1–AC-6 (#986) and AC-7–AC-11 (#987) reviewed | ARF | Comment on both issues |
-| Frontend Architect: Zone 1D layout feasibility — delta annotations + political risk sub-section at 1280×800 | Frontend Architect | Comment on #987 (after G1 sprint entry is filed) |
+| CM sign-off on #986: cohort indicator scope + MDA-derived floor methodology (AC-3) | Chief Methodologist | ✅ DONE 2026-06-23 — #986 CM comment; scope restricted to poverty_headcount_ratio Q1/Q2; T3 label + Q3–Q5 suppression required |
+| CM sign-off on #987: PSP severity tier thresholds + 2pp direction sensitivity (AC-11) | Chief Methodologist | ✅ DONE 2026-06-23 — #987 CM comment; all thresholds confirmed; WARNING "within 6 steps" noted |
+| DA sign-off on #986: DemographicModule cohort field availability for GRC/JOR/EGY/ZMB | Data Architect | ✅ DONE 2026-06-23 — #986 DA comment; scope adjusted: poverty_headcount_ratio Q1/Q2 only; school enrollment and child malnutrition not available in M16 |
+| Architecture Review Facilitator confirmation: AC-1–AC-6 (#986) and AC-7–AC-11 (#987) reviewed | ARF | ✅ DONE 2026-06-23 — #986 ARF comment; #987 ARF comment; no ADR-017 dependency; no new ADR for #987 |
+| Frontend Architect: Zone 1D layout feasibility — Zone 1D at 1280×800 with political risk sub-section replacing existing PSP block | Frontend Architect | ✅ CONDITIONAL 2026-06-23 — #987 FA comment; feasible if (1) G2 replaces existing PSP block, (2) FA brief authored; see pre-condition 6 |
+| Frontend Architect brief: Zone 1B/1C/1D proportion reorganization at each breakpoint, with UX Designer sign-off | Frontend Architect + UX Designer | ⬜ REQUIRED before G2 sprint entry — FA brief specifies 1280: 35/15/50%, 1440: 40/15/45%, 1024: 50/10/40%; also resolves G1 Zone 1D overflow at 1280×800 |
 
 ---
 

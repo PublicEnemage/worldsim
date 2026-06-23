@@ -402,13 +402,17 @@ is filed. Each is named specifically.
 
 *(Completed by reviewer at time of review — before any M16 sprint entry for #986 is filed)*
 
-`[ ]` **Chief Methodologist:** Indicator scope (poverty headcount, school enrollment, child
-malnutrition) and use of MDA-derived floors as cohort-level threshold values confirmed
-methodologically defensible per AC-3. CM adjustment (if any): ________________. M16 sprint
-entry for #986 may proceed on CM grounds. [Date]
+`[x]` **Chief Methodologist:** Poverty headcount ratio by income quintile (Q1/Q2 active, Q3–Q5
+suppressed as T5) with MDA-derived floor confirmed methodologically defensible. CM conditions:
+(1) tier label in display reflects T3, not T2; (2) Q3–Q5 rows with zero/null delta suppressed
+from display. Scope restricted to poverty_headcount_ratio per DA sign-off — school enrollment
+and child malnutrition not available in M16 DemographicModule output. M16 sprint entry for
+#986 may proceed on CM grounds. 2026-06-23.
 
-`[ ]` **Architecture Review Facilitator:** AC-1 through AC-6 satisfied. M16 sprint entry for
-#986 may be filed. ADR-017 dependency: NONE (Zone 1B, independent). [Date]
+`[x]` **Architecture Review Facilitator:** AC-1 through AC-6 satisfied. M16 sprint entry for
+#986 may be filed. ADR-017 dependency: NONE (Zone 1B, independent). Implementation scope
+limited to poverty_headcount_ratio by income quintile per DA sign-off. T3 tier label
+correction and Q3–Q5 suppression are implementation requirements. 2026-06-23.
 
 ---
 
