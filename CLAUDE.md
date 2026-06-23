@@ -1,8 +1,8 @@
 # CLAUDE.md — WorldSim Project Context
 
-> Last significant revision: 2026-06-20
-> Updated against: M14 closed — Trust Architecture and Instrument Credibility complete; ADR-016 Grounding strip; ADR-015 Evidence Thread; Demo 5 (Zambia 2024 IMF ECF); M15 Human Cost Architecture now current
-> Previous version context: 2026-06-16 — M14 active; M13 closed; political economy module in production (ADR-013); alert panel Zone 1B master-detail (ADR-014); Process Redesign Phases 0–D complete
+> Last significant revision: 2026-06-23
+> Updated against: M15 closed — Human Cost Architecture complete; ADR-017 Zone 1A information architecture; Layer 3 self-interpreting outputs (Zone 1B + Zone 1D); Path 1 approved source network; cohort/political risk designs; accessibility validation; CLAUDE.md extraction; M16 Distributional Visibility now current
+> Previous version context: 2026-06-20 — M14 closed; M15 active; Trust Architecture complete; ADR-016/ADR-015 delivered; Demo 5 (Zambia 2024 IMF ECF)
 
 > **Reader Orientation:** This is the permanent project constitution — read it in full before beginning any session. It contains the mission, architectural commitments, and process rules that govern all work in this repository. Anyone making a change in this codebase, human or agent, must have read this document first. Key must-read sections if time is short: Session Continuity (what to read and in what order), Guiding Principles (the values behind every technical decision), and §Architectural Principles for Claude Code Sessions (process gates including pre-push lint, PR merge gate, and file authority rules that will cause compliance violations if not followed).
 
@@ -284,20 +284,19 @@ Full agent profiles, independence requirements, and operational agent definition
 
 ## What We Are Building First
 
-M0–M14 complete (v0.1.0–v0.14.0). ADRs 001–016 current.
+M0–M15 complete (v0.1.0–v0.15.0). ADRs 001–017 current.
 See GitHub Releases for full delivery history.
 
-**Milestone 15 — Human Cost Architecture (Current)**
+**Milestone 16 — Distributional Visibility (Current)**
 
-*Primary objective (M15):*
-- Zone 1A information architecture ADR and implementation (Phases 2–4, building on M14 G6c Phase 1 design thinking)
-- Layer 3 trajectory sentence in Zone 1B (#1065) — self-interpreting output at the table
-- Cohort disaggregation on primary surface (#986)
-- Path 1: approved source network query at scenario creation (#975)
-- Live stakeholder demo with real external participants (#843) — deferred from M14 (EL decision 2026-06-20)
-- Accessibility validation on 8GB/4-core target hardware (#990)
+*Primary objective (M16):*
+- Zone 1A implementation (Phase 4) — composite encoding in primary viewport (#845)
+- Cohort disaggregation on primary surface (#986) — design done in M15; implementation M16
+- Political risk summary surface (#987) — design done in M15; implementation M16
+- Live stakeholder demo with real external participants (#843) — deferred from M15 (EL decision 2026-06-23); M16 exit gate
+- Demo 6 (Senegalese Finance Minister scenario — distributional human cost argument)
 
-M15 closes with real external participant engagement (#843) and the architectural foundation for Demo 6.
+M16 closes with live external participant engagement (#843) and distributional visibility on the primary surface.
 
 Each milestone is a vertical slice — working software at every stage,
 not infrastructure waiting for features.
@@ -306,15 +305,15 @@ not infrastructure waiting for features.
 
 ## Milestone Roadmap
 
-M0–M14 complete (v0.1.0–v0.14.0). M15 current. See GitHub Releases for full delivery history.
+M0–M15 complete (v0.1.0–v0.15.0). M16 current. See GitHub Releases for full delivery history.
 
-The full roadmap covering M15 and beyond — milestone deliverables, demo anchors, canonical users served, and the long-term resolution spectrum direction — is maintained at `docs/roadmap/worldsim-roadmap.md`. That document is the canonical reference. The summary below reflects current and next milestone only.
+The full roadmap covering M16 and beyond — milestone deliverables, demo anchors, canonical users served, and the long-term resolution spectrum direction — is maintained at `docs/roadmap/worldsim-roadmap.md`. That document is the canonical reference. The summary below reflects current and next milestone only.
 
-**Milestone 14 — Trust Architecture and Instrument Credibility (Complete)**
-Delivered: ADR-016 (Scenario Grounding Architecture — source-cited initial state at zero interaction), ADR-015 (Evidence Thread Architecture — Zone 1B indicator names, floor, defensibility labels; Zone 1D L0 tier annotations), political economy PSP visible in Zone 1D, ecological module calibration fixes (#823/#824), confidence tier disclosure layer, methodology foundation documentation (#989), governance documentation (#988), Demo 5 (Zambia 2024 IMF ECF — trust architecture thesis; reserve challenge-response).
+**Milestone 15 — Human Cost Architecture (Complete)**
+Delivered: ADR-017 (Zone 1A Information Architecture), Layer 3 self-interpreting outputs (trajectory sentence Zone 1B, PSP sentence Zone 1D, L0 badges, grounding strip disambiguation and date accuracy), cohort disaggregation design (#986), political risk summary design (#987), Path 1 approved source network (#975), accessibility validation (VC-1/VC-2/VC-4 PASS), process documentation extraction (CLAUDE.md 1,082→800 lines). Live external demo (#843) deferred to M16 (EL decision 2026-06-23).
 
-**Milestone 15 — Human Cost Architecture (Current)**
-Core deliverable: Zone 1A information architecture (ADR + Phases 2–4), Layer 3 trajectory sentence in Zone 1B (#1065), cohort disaggregation design (#986), Path 1 approved source network (#975), live stakeholder demo with real external participants (#843). Real external participant engagement in M15.
+**Milestone 16 — Distributional Visibility (Current)**
+Core deliverable: Zone 1A implementation (Phase 4), cohort disaggregation on primary surface (#986), political risk summary implementation (#987), live stakeholder demo with real external participants (#843 — M16 exit gate), Demo 6 (Senegalese Finance Minister scenario).
 
 Full roadmap: `docs/roadmap/worldsim-roadmap.md`
 
