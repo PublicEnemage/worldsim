@@ -422,6 +422,29 @@ export function FourFrameworkZone1D({
           </span>
         </div>
       )}
+
+      {/* ADR-015 §Component 3 — PSP Layer 3 self-interpreting sentence (#1075).
+          Visible when PE enabled and PSP value is available. Fallback when null. */}
+      {peEnabled && pspValue !== undefined && (
+        <div
+          data-testid="psp-layer3-sentence"
+          style={{
+            borderLeft: "3px solid #7c3aed",
+            paddingLeft: 6,
+            paddingTop: 2,
+            paddingBottom: 2,
+            fontSize: 10,
+            color: "#555",
+            lineHeight: 1.4,
+          }}
+        >
+          {pspValue === null ? (
+            "Programme survival probability unavailable — computation error."
+          ) : (
+            `Programme survival probability: ${(parseFloat(pspValue) * 100).toFixed(0)}%. This means the programme has a ${(parseFloat(pspValue) * 100).toFixed(0)}% chance of remaining on track through conditionality compliance.`
+          )}
+        </div>
+      )}
     </div>
   );
 }

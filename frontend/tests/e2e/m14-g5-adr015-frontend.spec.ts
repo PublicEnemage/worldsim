@@ -144,7 +144,8 @@ function makeTrajectoryMock(
     ecologicalBreachType?: "ceiling" | "floor";
   } = {},
 ): object {
-  const financialTier = options.financialTier ?? 2;
+  // Use !== undefined so that explicit null is preserved (null ?? 2 would collapse to 2).
+  const financialTier = options.financialTier !== undefined ? options.financialTier : 2;
   const ecologicalTier = 3;
   const humanTier = 3;
   const governanceTier = 3;

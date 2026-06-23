@@ -71,7 +71,9 @@ async function selectEntityAndYear(
   entity: string,
   year: string,
 ): Promise<void> {
-  await page.locator('[data-testid="entity-selector"]').selectOption(entity);
+  const input = page.locator('[data-testid="entity-selector"]');
+  await input.fill(entity);
+  await page.locator(`[data-testid="entity-option-${entity}"]`).click();
   const yearInput = page.locator('[aria-label="Start year"]');
   await yearInput.fill(year);
   // Tab triggers the onChange / blur event to kick off the data-quality API call

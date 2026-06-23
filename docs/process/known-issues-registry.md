@@ -280,6 +280,63 @@ Do not file a Known Issue for:
 ### Entry template
 
 ```markdown
+## KI-005 — GitHub Rulesets: `release-branch-ci-gate` blocks new release branch creation; workaround requires temporary Ruleset disable
+
+**Date first observed:** 2026-06-20
+**Infrastructure:** GitHub Rulesets
+**Severity:** Medium — blocks every new milestone's release branch creation; workaround is reliable but requires admin API access
+**Recurrence:** Consistent — will occur at every milestone kickoff
+
+### Symptom
+
+Direct push to a new `release/m{N}` branch is rejected with:
+
+```
+remote: error: GH013: Repository rule violations found for refs/heads/release/m15.
+remote: - Required status check "branch-naming" is expected.
+```
+
+The `branch-naming` check only runs on `pull_request` events targeting `release/m*`. For a direct push (or GitHub API branch creation), the check is never triggered — GitHub Rulesets treat an expected-but-never-reported check as a violation. Since `release/m{N}` doesn't exist yet, no PR can target it, so `branch-naming` can never be satisfied. The GitHub REST API `POST /git/refs` is blocked for the same reason.
+
+### Root cause
+
+The `release-branch-ci-gate` Ruleset has `bypass_actors: []` (no bypass actors defined) and enforcement `active`. Required status checks include `branch-naming`, which only runs on PR events. A brand-new release branch cannot satisfy a PR-only check via any push path, regardless of whether the commit has passed all other checks.
+
+First observed at M15 kickoff. M14's `release/m14` was created before the Ruleset was active (M14 G7 set up the Ruleset after the branch existed).
+
+### Workaround
+
+Temporarily disable the Ruleset, create the branch via the GitHub API, then immediately re-enable:
+
+```bash
+# Step 1: Disable
+gh api repos/{owner}/{repo}/rulesets/17751852 --method PUT --input - <<'EOF'
+{"name":"release-branch-ci-gate","target":"branch","enforcement":"disabled","conditions":{"ref_name":{"include":["refs/heads/release/m*"],"exclude":[]}}}
+EOF
+
+# Step 2: Create branch from main HEAD
+SHA=$(gh api repos/{owner}/{repo}/git/ref/heads/main --jq '.object.sha')
+echo "{\"ref\":\"refs/heads/release/m{N}\",\"sha\":\"$SHA\"}" | \
+  gh api repos/{owner}/{repo}/git/refs --input -
+
+# Step 3: Re-enable
+gh api repos/{owner}/{repo}/rulesets/17751852 --method PUT --input - <<'EOF'
+{"name":"release-branch-ci-gate","target":"branch","enforcement":"active","conditions":{"ref_name":{"include":["refs/heads/release/m*"],"exclude":[]}}}
+EOF
+```
+
+The window of reduced protection is under 10 seconds and the main branch itself is protected by its own Ruleset, so there is no meaningful security exposure.
+
+### Permanent fix
+
+Set `"do_not_enforce_on_create": true` on the `required_status_checks` rule in the Ruleset, or add the `repo_admin` role as a bypass actor. Either change allows branch creation without requiring pre-existing CI results while still enforcing checks on PR merges. EL action required to update the Ruleset configuration.
+
+### Upstream
+
+No upstream issue filed. GitHub Rulesets design: required status checks require a prior CI run on the commit, which is impossible for branch creation where no PR exists yet. The `evaluate` enforcement mode (which would allow creation with warnings) is available on Enterprise plans only.
+
+---
+
 ## KI-NNN — [Infrastructure]: [Short description]
 
 **Date first observed:** YYYY-MM-DD

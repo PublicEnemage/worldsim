@@ -150,6 +150,12 @@ observable characteristic.]
 > - **After** — the intended fixed state. Label what "done" looks like: the exact string
 >   the option must display, the exact zone the element must occupy, the exact label format.
 >
+> *Minimum fields for each AC block:* viewport (e.g., `1440×900`), the specific zone
+> (`Zone 1B`, `Zone 1A`, etc.), and at least one `data-testid` selector that a Playwright
+> test can target. A visual spec without a `data-testid` anchor cannot be tested from the
+> intent document alone — the QA Lead will be forced to read implementation source code,
+> which violates the Step 2 independence requirement.
+>
 > *Why this exists:* Prose descriptions of text display states have an inherent scope ambiguity —
 > "no underscore in option text" does not distinguish label portion from unit metadata. A
 > before/after visual eliminates that ambiguity without requiring the QA Lead to read source
@@ -161,11 +167,13 @@ observable characteristic.]
 
 **AC-N (before):**
 ```
+Viewport: 1440×900 | Zone: [Zone ID] | data-testid="[testid-of-element]"
 [Paste current broken output here. Annotate the specific wrong string or missing element.]
 ```
 
 **AC-N (after):**
 ```
+Viewport: 1440×900 | Zone: [Zone ID] | data-testid="[testid-of-element]"
 [Paste intended fixed output here. Annotate the specific correct string or present element.]
 ```
 

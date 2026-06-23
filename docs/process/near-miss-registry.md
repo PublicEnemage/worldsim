@@ -2580,6 +2580,210 @@ This notation correctly represented the external prerequisite (merge) but suppre
 
 ---
 
+## NM-051 — QA Test Mock Used Wrong Field Names (alert_id/indicator_id vs mda_id/indicator_key); Undefined Key Crashed React Tree in Step 4 Verify (Reactive)
+
+**Date:** 2026-06-21
+**Milestone:** M15 — G1 Layer 3 IR Fixes
+**Detected by:** Step 4 Verify — Playwright AC-7 timed out after toggle button detached from DOM. Root cause diagnosed by tracing the crash path from `parseMdaAlerts` → `undefined indicator_key` → `getIndicatorDisplayNameAny(undefined)` → `formatFallback(undefined)` → TypeError.
+**Severity:** High — the crash unmounted the entire React tree during Step 4 Verify, preventing AC-7 from verifying that the Grounding strip disambiguation feature was correctly implemented. Without the fix, AC-7 would have appeared as a test failure that incorrectly implied the feature was absent, not that the test mock was malformed.
+
+### What happened
+
+The M15-G1 QA test file (`m15-g1-layer3-ir-fixes.spec.ts`) was authored in Step 2 before implementation. The test's local `MDAAlert` interface and `makeReserveAlert()` factory used field names `alert_id` and `indicator_id`. The production API schema (`RawMDAAlert` in ScenarioInstrumentCluster.tsx) uses `mda_id` and `indicator_key`.
+
+When AC-7 ran with the `measurement-output` route mock intercepting ScenarioInstrumentCluster's fetch, `parseMdaAlerts(raw)` was called with the malformed mock data. It read `alert.indicator_key` (which was `undefined` because the mock used `indicator_id`). The undefined value was stored in the Zone1BAlert at `indicator_key: undefined`. When any of the three Zone 1B rendering paths called `getIndicatorDisplayNameAny(undefined)`, it reached `formatFallback(undefined)` → `undefined.replace(...)` → TypeError. The uncaught error crashed the React component tree, unmounting the application. The `grounding-strip-toggle` button disappeared from the DOM. Playwright retried but could not find the element. After 30 seconds, the test timed out.
+
+### What was at risk
+
+1. **AC-7 false failure:** The timeout looked like a test failure caused by missing implementation, when in fact the Grounding strip disambiguation feature was correctly implemented. A developer reading the CI failure might have concluded the feature needed re-implementation rather than that the mock had wrong field names.
+2. **App crash in production-adjacent scenarios:** Any code path that calls `getIndicatorDisplayNameAny` with a null or undefined key (e.g., a future API change that makes `indicator_key` optional, or a new mock authoring error) would crash the React tree in production. The crash pattern was silent — no error boundary caught it, no log was produced, and the page showed only a partial DOM.
+
+### What caught it
+
+Step 4 Verify execution. The Playwright AC-7 test timed out. The implementing agent traced the failure through the call log (`element was detached from the DOM, retrying`) → investigated the DOM snapshot (`- generic [ref=e3]: "0"` suggesting React tree unmount) → compared AC-6 (passes, no measurement-output mock) with AC-7 (fails, measurement-output mock active) → identified the field name mismatch in the test mock → traced the crash path from `parseMdaAlerts` to `formatFallback(undefined)`.
+
+### Root cause
+
+Two concurrent gaps:
+1. **Test mock field names not validated against API schema.** The Step 2 QA process had no requirement to validate mock factory field names against the production `RawMDAAlert` interface. The test's `MDAAlert` interface was authored independently and used descriptive field names (`alert_id`, `indicator_id`) that seemed reasonable but didn't match the actual API schema.
+2. **`getIndicatorDisplayNameAny` had no null guard.** The function was typed as `key: string` but had no runtime defense against null/undefined. Any falsy key reached `formatFallback(key)` → `key.replace(...)` → TypeError. The typing implied the caller would always provide a valid string, but no contract prevented the crash.
+
+### Process improvement
+
+**Immediate fix (PR #1098, commit `a7c1d67`):** Added a one-line null guard at the entry point of `getIndicatorDisplayNameAny` in `frontend/src/lib/indicatorDisplayNames.ts`:
+```typescript
+if (!key) return "Indicator"; // defensive: guard against null/undefined (NM-051)
+```
+This protects all three Zone 1B rendering call sites (AlertDetailPanel, TopAlertDetail, buildTrajectoryLayerSentence) without individual call-site patching. For all real indicator keys (non-empty strings), behavior is unchanged.
+
+**Structural gap not closed by this entry:** The test mock field name mismatch (alert_id/indicator_id vs mda_id/indicator_key) was NOT fixed in the test file. The mock still uses wrong field names — but the null guard prevents the crash. This leaves the test using semantically incorrect mock data (mda_id is undefined, indicator_key is undefined on the parsed Zone1BAlert). The test passes because:
+- AC-7 guards on the label text ("Initial conditions" / "Current trajectory"), not on mda_id or indicator_key
+- `indicator_name` is a shared field name (present in both interfaces) and provides the display name fallback
+
+A proper fix would update `makeReserveAlert()` to use `mda_id`/`indicator_key`, but this is a Step 2 artifact in a pre-authored test. Fixing it without a rejection artifact would violate the Step 2 → Step 3 authorship boundary. This entry documents the gap; a future QA refactor sprint should align all mock factory field names with the production API schema.
+
+**Countermeasure for Step 2 authorship:** Mock factory field names in Playwright specs should be validated against the production TypeScript interface at Step 2 authorship time. Specifically: any mock that will be intercepted by a component that passes the response to a parsing function (like `parseMdaAlerts`) must use the field names expected by that parsing function, not field names that match the test file's local interface. This is now documented as a QA authorship check at Step 2.
+
+---
+
+## NM-052 — Pre-Push mypy Gate Non-Executable Locally: No Python 3.13 Venv with Deps; Gate Silently Degraded to CI-Only (Anticipatory)
+
+**Date:** 2026-06-22
+**Milestone:** M15 — G2 QA authorship
+**Detected by:** EL observation during G2 QA authorship session — noted that the pre-push mypy run produced 99 errors, questioned whether errors had accumulated from past work.
+**Severity:** Medium — the mypy gate has been running only in CI, not locally as intended. Real type errors introduced locally would not be caught before push. The gate's stated purpose ("CI is a confirmation, not a discovery mechanism" — CLAUDE.md §Backend pre-push lint gate) has been inverted: CI has been the discovery mechanism.
+
+### What happened
+
+The CLAUDE.md pre-push lint gate requires `cd backend && ruff check . && mypy app/` before any push touching Python files. The intent is to surface type errors locally before pushing, so CI confirms rather than discovers.
+
+The codebase uses Python 3.13 syntax (`type CompositeStrategy = ...` at `app/api/scenarios.py:1814` — PEP 695 type alias statement, introduced at M8). Running `mypy app/` requires Python 3.13. The system Python on the development machine is 3.10, which mypy cannot use to parse the 3.13 syntax — it exits with a single syntax error and checks nothing.
+
+Python 3.13 is available locally (`python3.13`) but has no project dependencies installed. Running `python3.13 -m mypy app/` without deps produces 99 errors: 44 "Class cannot subclass BaseModel (has type Any)" (pydantic absent), 13 `import-not-found` (fastapi, sqlalchemy, numpy absent), 15 "Untyped decorator makes function X untyped" (fastapi router decorators unresolved). None of these are real type errors — they are artifacts of missing dependencies.
+
+CI runs correctly: the `lint` job installs `requirements.txt` under Python 3.13 before running `mypy app/`, so all import-not-found and subclass errors resolve and real type errors would be caught.
+
+There is no documented local dev setup for a Python 3.13 virtual environment with `pip install -r requirements.txt`. The pre-push gate instruction assumes this environment exists but does not specify how to create it. Every local `mypy` run since the Python 3.13 syntax was introduced (M8) has either exited on a syntax error (Python 3.10) or produced 99 false-positive errors (Python 3.13 without deps) — neither run is meaningful.
+
+### What was at risk
+
+A real type error introduced in `app/` would not be caught locally before push. The implementing agent would push, CI would catch the error, and the push would fail at CI — exactly the pattern the pre-push gate was designed to prevent (NM-016, which established the gate). The gate has been providing false confidence: agents who ran it and saw no meaningful output believed the check passed, when in fact the check was not running.
+
+### What caught it
+
+EL observation — questioned the 99 errors during a G2 session. Investigation traced the root cause to the missing Python 3.13 venv. This was caught by a person noticing an anomaly, not by a process check. The process had no mechanism to verify that the pre-push gate was executing in a functional environment.
+
+### Process improvement
+
+**Immediate fix:** CLAUDE.md §Backend pre-push lint gate must be updated to specify the correct invocation: `python3.13 -m venv .venv && source .venv/bin/activate && pip install -r requirements.txt` once at setup, then `cd backend && source .venv/bin/activate && ruff check . && python -m mypy app/`. The gate instruction must name the venv explicitly so agents and contributors can verify they are running in the correct environment.
+
+Alternatively, a `Makefile` target or `just` recipe (`lint`) can encode the correct invocation and be the canonical form referenced in CLAUDE.md, so the gate is a single command rather than a multi-step setup check.
+
+**Structural gap:** There is no `docs/CONTRIBUTING.md` section that documents local Python 3.13 venv setup as a prerequisite for backend development. Anyone following CONTRIBUTING.md can install deps against the system Python but will be unable to run mypy correctly. This gap should be closed in the same PR as the CLAUDE.md update.
+
+**Detection improvement:** The pre-push gate should fail loudly if run in the wrong Python environment. A one-line guard at the top of any lint script — `python --version | grep -q "3.13" || { echo "ERROR: mypy requires Python 3.13"; exit 1; }` — prevents silent non-execution. Until the Makefile/just approach is adopted, this check should be added to any documented pre-push procedure.
+
+**Near-miss lineage:** NM-016 established the backend pre-push mypy gate to prevent type errors from reaching CI. NM-052 establishes that the gate has been non-functional locally since M8 (when Python 3.13 syntax was introduced). The structural fix for NM-016 created the appearance of a gate without the reality of one.
+
+---
+
+## NM-053 — CM Sign-Off Artifact Filed Post-Implementation: Component 3 Gate Bypassed
+
+**Date:** 2026-06-22
+**Milestone:** M15 — G4 (Path 1 + ADR-016 Component 3)
+**Detected by:** PI Agent at Step 4 Verify review (reading intent document obligations after implementation was merged)
+**Severity:** Medium — gate bypassed; substantive CM validation was in the intent document so no incorrect methodology was implemented, but the formal artifact requirement was not satisfied before PR #1117 merged
+
+### What happened
+
+The M15-G4 intent document §Decision Gate 2 stated: "The Chief Methodologist must comment on #975 confirming this mapping table before the Component 3 implementation PR is marked ready for review." PR #1117 (frontend G4 implementation including Component 3) was opened and merged on 2026-06-22 without the required GitHub comment on #975.
+
+The CM analogous-case mapping table WAS authored pre-implementation in the intent document (§Decision Gate 2) and the sprint entry was EL-approved before implementation began. The substantive methodological validation preceded the code. The missing artifact was the GitHub issue comment — the formal process record required by the intent document's explicit obligation.
+
+The CM sign-off comment was posted to #975 on 2026-06-22 after the PR merged (https://github.com/PublicEnemage/worldsim/issues/975#issuecomment-4771002251).
+
+### What was at risk
+
+The gate exists to ensure CM validation of the mapping table before code bakes in a static assumption. An incorrect mapping table could be implemented and not caught until the Business PO Validate step. In this instance the risk was low because the mapping table was defined by the CM in the intent document (pre-implementation) and EL-approved. The gap was a missing artifact, not a missing validation.
+
+### What caught it
+
+PI Agent review of intent document obligations during Step 4 Verify analysis (2026-06-22). The omission was identified from reading intent §Decision Gate 2. No person spotted it at implementation time — the process had no mechanism to enforce named pre-implementation artifacts before a PR could be opened.
+
+### Process improvement
+
+**Immediate:** CM sign-off posted post-implementation. No incorrect methodology shipped.
+
+**Structural gap:** Named pre-implementation obligations in intent documents (CM sign-off, Architect sign-off, etc.) have no enforcement mechanism. An implementing agent can open a PR without checking whether all named obligations are satisfied.
+
+**Recommended fix:** Add a pre-implementation obligation checklist to the intent document template (§0 or §1 header): any named pre-implementation obligation (CM sign-off, Architect confirmation, etc.) is an explicit checkbox the implementing agent must verify before opening the implementation PR. A PR description template should include a reference to the intent document's pre-implementation obligations. This is a documentation-level gate — no CI check — but naming it in the PR description makes it an explicit step, not an implicit assumption.
+
+---
+
+## NM-054 — UI Contract Change (select → combobox) Broke Six Existing E2E Tests; Not Caught Pre-Push
+
+**Date:** 2026-06-22
+**Milestone:** M15 — G4 (Path 1 entity selector)
+**Detected by:** CI `playwright-e2e` failure on PR #1117 — 6 tests failed (caught by mandatory CI gate, not by pre-push)
+**Severity:** Low — caught by CI before merge; no incorrect artifact shipped; fixed in the same session
+
+### What happened
+
+M15-G4 replaced the entity selector in `ScenarioPanel.tsx` from a `<select>` element to a searchable combobox `<input>`. Six existing Playwright tests in `m14-g1-prerequisite-bugs.spec.ts` and `m14-g4-adr016-frontend.spec.ts` used `.selectOption()` and child `<option>` queries against `[data-testid="entity-selector"]`. These Playwright APIs fail on `<input>` elements with the error "Element is not a `<select>` element." All six tests failed in CI on PR #1117 with `playwright-e2e fail 6m13s`.
+
+The implementing agent did not audit existing E2E tests for references to the changed component's interaction model before opening the PR. The tests were fixed in the same session and the corrected PR (#1117) passed CI on rerun.
+
+### What was at risk
+
+If PR #1117 had been merged with the failing tests (e.g., using admin bypass), six E2E tests would have been broken in `release/m15`, degrading the CI gate for all subsequent PRs. No incorrect application behavior would have shipped — the tests verify the UI interaction contract, not data correctness. The risk was CI gate degradation, not a mission-critical defect.
+
+### What caught it
+
+CI `playwright-e2e` check on PR #1117 — a mandatory blocking gate for all release branch PRs. The gate is not bypassable without admin action (which requires EL approval per CLAUDE.md §PR merge gate). The process worked as designed. The gap is that the detection happened at CI, not at pre-push time.
+
+### Process improvement
+
+**Why pre-push didn't catch it:** The frontend pre-push gate is `cd frontend && npm run build`. TypeScript compilation confirms type correctness but does not run Playwright tests. A UI contract change that breaks E2E tests passes the build gate and reaches CI unchanged.
+
+**Why running Playwright pre-push is not the fix:** Full Playwright suite takes 6+ minutes and requires a running backend. This is incompatible with the equitable build process constraint (8GB/4-core hardware) and would block rapid iteration. Running the full suite pre-push is not feasible.
+
+**Recommended discipline (not a gate):** When an implementing agent modifies a component's DOM interface (element type change, testid rename, interaction API change — e.g., `<select>` to `<input>`, button text change, `role` change), the implementing agent must:
+1. Grep `frontend/tests/e2e/` for all references to the changed testid or selector
+2. Audit whether any existing test uses the old interaction model (`.selectOption()`, `<option>` queries, `.check()`, etc.)
+3. Update the identified tests before opening the PR
+
+This is a named discipline step, not a CI gate. It is added to `docs/CONTRIBUTING.md §Frontend Implementation` as a requirement for UI contract changes. A future pre-push Playwright smoke test for *only* the files containing the changed testid is a potential improvement but is not required to close this near-miss — the manual audit step is sufficient.
+
+**Near-miss lineage:** SCAN-024 (M10 TS6133) established the `npm run build` pre-push gate for TypeScript type errors. NM-054 establishes that the gate does not cover Playwright E2E regressions from UI contract changes, and introduces a named manual audit step to compensate.
+
+---
+
+## NM-055 — G4 QA Test Files and Process Documents Not Committed in Implementation PRs
+
+**Date:** 2026-06-22
+**Milestone:** M15 — G4 (Path 1 + ADR-016 Component 3)
+**Detected by:** PI Agent at Step 4 Verify — checking `git ls-files` for G4 test files in `release/m15`
+**Severity:** High — the Step 2 (test authorship before implementation) process requirement was satisfied as a local file operation but not as a committed artifact. CI ran implementation PRs without the G4 tests; the `test-backend pass` and `playwright-e2e pass` in PR #1116 and #1117 CI were NOT running the G4 tests. The Step 4 Verify evidence is code-review-based, not CI-test-based.
+
+### What happened
+
+The M15-G4 implementation produced four process artifacts that were authored in-session but never committed to any branch:
+1. `docs/process/intents/M15-G4-2026-06-22-path1-fidelity-contextualisation.md` (intent document)
+2. `docs/process/sprint-plans/m15-g4-sprint-entry.md` (sprint entry document)
+3. `backend/tests/test_m15_g4_path1_fidelity_contextualisation.py` (G4 backend QA tests, Step 2)
+4. `frontend/tests/e2e/m15-g4-path1-fidelity-contextualisation.spec.ts` (G4 Playwright tests, Step 2)
+
+PR #1116 (backend implementation) contained: `grounding.py`, `models.py`, migration, `api_contracts.yml` — but NOT the test file or process documents.
+PR #1117 (frontend implementation) contained: `App.tsx`, `DataQualityPreview.tsx`, `FidelityDashboard.tsx`, `ScenarioPanel.tsx`, `types.ts`, and regression fixes — but NOT the G4 Playwright test file or process documents.
+
+The `test-backend pass` in PR #1116 CI ran the existing backend test suite without the G4 tests. The `playwright-e2e pass` in PR #1117 CI ran the existing Playwright tests without the G4 tests. Neither CI pass confirms any G4 AC assertion.
+
+### What was at risk
+
+**If undetected until sprint exit:** The G4 sprint exit would have been attempted with no CI-tested G4 test coverage. The implementation could have been validated by Business PO without any automated regression coverage for the new endpoints and UI states. A future PR could break the G4 behavior without any test catching it.
+
+**For the Step 4 Verify record:** The verification artifact claimed in the initial intent doc §8 update was incorrect — it cited CI tests as evidence when those CI tests were not running the G4 assertions. This was caught when the PI Agent checked actual PR file lists against the intent document's test file paths.
+
+### What caught it
+
+PI Agent running `gh pr view 1116 --json files` and `gh pr view 1117 --json files` at Step 4 Verify review time — seeing that the test files were absent from the PR file lists. Also confirmed by `git ls-files --with-tree=origin/release/m15 | grep "m15.g4"` returning only the Alembic migration.
+
+This was caught by a process artifact check, not by CI. CI had no way to report the absence of test files — it simply ran what was there.
+
+### Process improvement
+
+**Immediate:** All four G4 process artifacts committed to `release/m15` in the M15-G4 process-artifacts PR (this entry's PR). Step 4 Verify corrected to reflect code-review-based verification, not CI-test-based. G4 tests will run in CI from this PR's merge forward.
+
+**Root cause:** The implementing agent opened implementation PRs without running the "what files belong in this PR" check. Process documents and QA tests were mentally tracked in session context but not included in the staged commit. No CI gate, pre-push gate, or PR template enforced that the test file and process document were staged alongside the implementation code.
+
+**Recommended fix:** Add a PR description checklist item for implementation PRs: "QA tests for this sprint group are staged and included in this PR (or filed in a preceding PR on the same branch)." This is a manual checklist item — not a CI gate — because CI cannot verify the presence of test files by sprint group. The implementing agent confirms the checklist before marking the PR ready for review.
+
+Additionally: the sprint entry and intent documents should be committed to the feature branch before the implementation PR is opened. These are prerequisites — filing them as local files without committing them to the branch leaves the process requirements unverifiable by anyone reviewing the PR.
+
+**Near-miss lineage:** CLAUDE.md §Agent Execution Lifecycle states "A test authored in the same session as the implementation it covers has not satisfied this step." This near-miss is the flip side: a test authored correctly (before implementation, in a separate step) but never committed is equally non-satisfying. Both patterns defeat the purpose of the Step 2 gate.
+
+---
+
 ## Registry Maintenance
 
 ### How to add an entry

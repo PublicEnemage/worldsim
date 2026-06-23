@@ -2,10 +2,12 @@
 name: m15-sprint-plan
 type: sprint-plan
 milestone: M15 — Human Cost Architecture
-status: Proposed — awaiting EL approval
+status: EL Approved — implementation may begin (sprint entry document required per group)
 authored-by: PM Agent
 authored-date: 2026-06-20
-el-approved: pending
+el-approved: 2026-06-20
+amended: 2026-06-21
+amendment-authority: EL architectural decisions AC-001 and AC-002
 consulted-agents:
   - Business Product Owner (value prioritization and Demo 6 scope)
   - Frontend Architect (component grouping and ADR-015 Component 4 assessment)
@@ -16,7 +18,7 @@ sop-reference: docs/process/sprint-planning-sop.md
 
 # M15 Sprint Plan — Human Cost Architecture
 
-**Status:** Proposed — awaiting EL approval; HARD STOP on implementation until approved
+**Status:** EL Approved 2026-06-20 — implementation may begin; sprint entry document required per group before implementation PR opens
 **Release branch:** `release/m15` (cut from `main` 2026-06-20 at commit 500e50d)
 **Exit checklist issue:** #984 (note: title reads "Milestone 16 Exit Checklist" — follows GitHub milestone numbering; content is correct for M15)
 **Primary objective:** Zone 1A information architecture ADR + Layer 3 self-interpreting outputs (Zone 1B + Zone 1D) + live stakeholder demo with real external participants (#843) as M15 exit gate.
@@ -24,6 +26,12 @@ sop-reference: docs/process/sprint-planning-sop.md
 **M15 exit gate:** #843 — live stakeholder demo with real external participants AND Zone 1A architectural foundation for Demo 6 in place. #984 (exit checklist) closes last.
 
 **CLAUDE.md reference:** "M15 closes with real external participant engagement (#843) and the architectural foundation for Demo 6."
+
+> **Amendment — 2026-06-21 (EL decisions AC-001 and AC-002):**
+> - **AC-001 — Private data inputs are permanently prohibited.** #976 (Path 2) and #53 (RBAC design) are permanently closed — will-not-implement. This is a founding-document constraint, not a capacity deferral. G4 scope is now #975 (Path 1) + ADR-016 Component 3 only. See `docs/architecture/constraints.md §AC-001`.
+> - **AC-002 — Synthetic substitution from public sources is permitted with mandatory indicator-level disclosure.** ADR-007 and the confidence tier system address the sparse-data problem. A methodology audit against data-sparse countries (Chad, Yemen, Myanmar) is a future scope item after ADR-007 is complete. See `docs/architecture/constraints.md §AC-002`.
+> - **Issue dispositions:** #5 (data marketplace) and #4 (geocoded datasets) closed — will-not-implement-at-this-stage (no validated real-world demand). #35 (dynamic weights) and #30 (stock vs. flow) moved to Parking Lot milestone — complexity additions deferred until core capability is battle-tested through real-world use.
+> - **No further scope impact on M15.** G1 ✅ COMPLETE. G2, G3, G5, G6, G7, G8 are unaffected. G4 scope narrows: remove #53, retain #975 and ADR-016 Component 3.
 
 ---
 
@@ -58,7 +66,12 @@ Run against `CLAUDE.md §Milestone 15` and `docs/roadmap/worldsim-roadmap.md §M
 | #1048 | Docker API container Alembic migrations (NM-049) | G5 |
 | #1007 | Recompute-badge not visible after apply-control-change | G5 |
 | #1091 | CLAUDE.md extraction — child docs for Lifecycle, Exit SOP, DIC | G7 |
-| #53 | Information Access Architecture (RBAC design) | G4 prerequisite |
+| ~~#53~~ | ~~Information Access Architecture (RBAC design)~~ | ~~G4 prerequisite~~ — **CLOSED 2026-06-21 (AC-001 — permanent prohibition)** |
+| ~~#976~~ | ~~Path 2 — ministry-owned data upload~~ | **CLOSED 2026-06-21 (AC-001 — permanent prohibition)** |
+| ~~#5~~ | ~~Data marketplace~~ | **CLOSED 2026-06-21 (no validated demand)** |
+| ~~#4~~ | ~~Geocoded dataset integration~~ | **CLOSED 2026-06-21 (no validated demand)** |
+| ~~#35~~ | ~~Dynamic relationship weights~~ | **Parking Lot 2026-06-21 (battle-test core first)** |
+| ~~#30~~ | ~~Stock vs. flow distinction~~ | **Parking Lot 2026-06-21 (battle-test core first)** |
 | #3, #6 | Governance (EL-action items) | G7 |
 | #843 | Live stakeholder demo | G8 exit gate |
 
@@ -112,7 +125,7 @@ PSP historical calibration (#1084) requires Zambia ECF backtesting data. The CM 
 | G1 — Layer 3 + IR Fixes | #1065, #1066, #1068, #1069, #1075 | ADR-015 ✅ (Component 4 scope per EL confirmation) | Wave 1 | Zone 1B Layer 3 trajectory sentence; suppress zero consecutive steps; L0 badge on Zone 1A trajectory; Grounding strip initial-state label; PSP self-interpreting sentence in Zone 1D. Single PR or two parallel PRs by surface (Zone 1B and Zone 1A/1D). |
 | G2 — Zone 1A ADR | #845 (Phases 2–3) | ARCH-011 → ADR-017 (new) | Wave 2 | Architecture Review (ARCH-REVIEW) → ADR-017 authorship → EL acceptance → Phase 3 implementation design. Zone 1A Tier 1 ADR: full panel required (UX Designer independent sign-off). Phase 4 (implementation) may extend to M16 depending on scope. |
 | G3 — Cohort Disaggregation Design | #986 | None (design-only) | Parallel | Design specification for cohort disaggregation on primary surface — which cohorts, indicators, thresholds, and zero-interaction access path. Output: `docs/ux/design-thinking/cohort-disaggregation-design.md`. No implementation in M15. Design document gates M16 G-group. No sprint entry document required. |
-| G4 — Path 1 + ADR-016 Component 3 | #975, #53 (RBAC design) | ADR-016 ✅ (Component 3 in scope) | Parallel | Path 1 approved source network query at scenario creation (Journey A GA-01). ADR-016 Component 3 (Fidelity contextualisation — deferred from M14). RBAC design (#53, prerequisite for Path 2 implementation in M16). Data Architect must update `api_contracts.yml` for any new endpoints before G4 implementation begins. |
+| G4 — Path 1 + ADR-016 Component 3 | #975 | ADR-016 ✅ (Component 3 in scope) | Parallel | Path 1 approved source network query at scenario creation (Journey A GA-01). ADR-016 Component 3 (Fidelity contextualisation — deferred from M14). **#53 (RBAC design) removed from G4 scope — permanently closed under AC-001 2026-06-21.** Data Architect must update `api_contracts.yml` for any new endpoints before G4 implementation begins. |
 | G5 — Process Fixes + Walkthrough Updates | #1004, #1048, #1007, #1083, #1084, #1088, #1089, #1090 | None | Parallel | Visual Spec section for intent template; Docker Alembic migrations; recompute-badge; Grounding strip date label fix; PSP calibration anchor documentation; three walkthrough updates (DEMO-123/124/129) before #843 runs. Low-risk; may proceed early in M15 before G1 ships. |
 | G6 — Accessibility Validation | #990 | None | Parallel | Accessibility validation on 8GB/4-core target hardware. Run existing test suite on target hardware; document findings; file issues for any failures. No implementation in M15 unless blocking issues found. |
 | G7 — Process Documentation | #1091, #3, #6 | None | Parallel | CLAUDE.md extraction to child docs (#1091); governance items (#3, #6 — EL-action, no implementation agent can act). #1091 requires reviewing all CLAUDE.md cross-references before extracting sections. |
@@ -180,11 +193,11 @@ CI green and issue closure are necessary but not sufficient. #843 is the primary
 
 1. ✅ PM Agent cuts `release/m15` from `main` — DONE 2026-06-20
 2. ✅ PM Agent authors this sprint plan — DONE 2026-06-20
-3. ⬜ **EL approves sprint plan** — NEXT REQUIRED ACTION before any implementation sprint entry document can be filed
-4. ⬜ PM Agent marks ARCH-011 ASSIGNED in `docs/architecture/backlog.md`; derives panel composition
-5. ⬜ M15 Exit Checklist issue #984 confirmed as M15 gate (note: title says "Milestone 16 Exit Checklist" — EL to confirm this is acceptable or request rename)
+3. ✅ EL approves sprint plan — DONE 2026-06-20
+4. ⬜ PM Agent marks ARCH-011 ASSIGNED in `docs/architecture/backlog.md`; derives panel composition — at ADR-017 authorship time
+5. ✅ M15 Exit Checklist issue #984 renamed to "M15 Exit Checklist — blocks milestone closure" — DONE 2026-06-20
 
-**HARD STOP:** No implementation PR may open against `release/m15` until the EL has approved this sprint plan and a sprint entry document is filed for the relevant group.
+**EL approved 2026-06-20.** No implementation PR may open against `release/m15` until a sprint entry document is filed and EL-approved for the relevant group.
 
 ---
 

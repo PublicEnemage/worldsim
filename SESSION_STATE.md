@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-20 (HORIZON sweep complete — M15 sprint plan filed; release/m15 cut; ARCH-011/ADR-017 entered in backlog; four M15 issues filed (#1088–#1091); insights log entry 6 promoted. HARD STOP: EL approval of m15-sprint-plan.md required before any G-group sprint entry document can be filed.)**
+**Last updated: 2026-06-22 (M15-G6 CLOSED — sprint exit filed 2026-06-23; VC-1/VC-2/VC-4 PASS; VC-3 CONDITIONAL PASS; #990 closed; G4 CLOSED — BPO ACCEPT 2026-06-22; G5 CLOSED — BPO ACCEPT 2026-06-22; G8 UNBLOCKED)**
 **Current milestone:** M15 — Human Cost Architecture (GitHub Milestone 16)
 **Previous milestone:** M14 — Trust Architecture and Instrument Credibility (FORMALLY CLOSED 2026-06-20; release/m14 → main PR #1086; v0.14.0 at https://github.com/PublicEnemage/worldsim/releases/tag/v0.14.0; #968 closed; GitHub Milestone 15 closed)
 
@@ -20,11 +20,12 @@
 |---|---|---|
 | 1. PM Agent cuts `release/m15` from `main` | ✅ DONE 2026-06-20 | `release/m15` at 500e50d |
 | 2. PM Agent authors `m15-sprint-plan.md` | ✅ DONE 2026-06-20 | Filed in PR opening; EL approval pending |
-| 3. EL approves sprint plan | ⬜ **NEXT REQUIRED ACTION** | Hard stop — no sprint entry docs until approved |
-| 4. PM Agent marks ARCH-011 ASSIGNED in backlog | ⬜ At ADR-017 claim time | Added as PENDING_NUMBER; Architect claims when drafting begins |
-| 5. M15 exit checklist issue #984 confirmed | ⬜ EL to confirm | Note: title reads "Milestone 16 Exit Checklist" (GitHub milestone numbering); content is correct |
+| 3. EL approves sprint plan | ✅ **EL APPROVED 2026-06-20** | `docs/process/sprint-plans/m15-sprint-plan.md` |
+| 4. PM Agent marks ARCH-011 ASSIGNED in backlog | ✅ **DONE 2026-06-22** | ARCH-011 → ASSIGNED — ADR-017 (number 17); updated in this session |
+| 5. M15 exit checklist issue #984 renamed | ✅ DONE 2026-06-20 | Renamed to "M15 Exit Checklist — blocks milestone closure" |
+| 6. KI-005 permanent fix applied | ✅ DONE 2026-06-20 | `do_not_enforce_on_create: true` on Ruleset 17751852; future release branches need no Ruleset workaround |
 
-**HARD STOP:** No implementation PR may open against `release/m15` until the EL has approved the sprint plan.
+Implementation is now unblocked. A sprint entry document must be filed and EL-approved before any G-group implementation PR opens.
 
 ---
 
@@ -56,23 +57,23 @@
 
 | Issue | Title | Group | Notes |
 |---|---|---|---|
-| #1065 | ux(zone-1b): Layer 3 trajectory sentence — Zone 1B | G1 | IR-001; CRITICAL; escalation comment 2026-06-20 |
-| #1066 | ux(zone-1b): suppress "0 consecutive steps" when zero | G1 | IR-002; HIGH |
-| #1067 | demo(screenshots): Frame B and C are same screenshot | G5 | IR-003; HIGH — demo artifact fix |
-| #1068 | ux(zone-1a): L0 badge on Zone 1A trajectory curves | G1 | IR-004 Path A; HIGH |
-| #1069 | ux(grounding-strip): dual reserve values without disambiguation | G1 | IR-005; CRITICAL; escalation comment 2026-06-20 |
-| #1075 | ux(zone-1d): PSP self-interpreting sentence absent | G1 | DEMO-099; CRITICAL |
-| #1083 | ux(grounding-strip): date label "2024-Q1" → "Apr 2024" | G5 | DEMO-122; MEDIUM |
-| #1084 | methodology: PSP historical calibration anchor | G5 | DEMO-127; MEDIUM |
-| #1088 | docs(demo): walkthrough — "0 consecutive steps" plain language | G5 | DEMO-123; MEDIUM; filed 2026-06-20 |
-| #1089 | docs(demo): walkthrough — Grounding strip persistence | G5 | DEMO-124; MEDIUM; filed 2026-06-20 |
-| #1090 | docs(demo): walkthrough — methodology URL | G5 | DEMO-129; LOW; filed 2026-06-20 |
+| #1065 ✅ | ux(zone-1b): Layer 3 trajectory sentence — Zone 1B | G1 | ✅ CLOSED 2026-06-21 — M15-G1 Step 3 COMPLETE (PR #1097) |
+| #1066 ✅ | ux(zone-1b): suppress "0 consecutive steps" when zero | G1 | ✅ CLOSED 2026-06-21 — M15-G1 Step 3 COMPLETE (PR #1097) |
+| #1067 ✅ | demo(screenshots): Frame B and C are same screenshot | G5 | ✅ MERGED 2026-06-22 — PR #1121; frame-b md5 ≠ frame-c md5 (IR-003 guard) |
+| #1068 ✅ | ux(zone-1a): L0 badge on Zone 1A trajectory curves | G1 | ✅ CLOSED 2026-06-21 — M15-G1 Step 3 COMPLETE (PR #1097) |
+| #1069 ✅ | ux(grounding-strip): dual reserve values without disambiguation | G1 | ✅ CLOSED 2026-06-21 — M15-G1 Step 3 COMPLETE (PR #1097) |
+| #1075 ✅ | ux(zone-1d): PSP self-interpreting sentence absent | G1 | ✅ CLOSED 2026-06-21 — M15-G1 Step 3 COMPLETE (PR #1097) |
+| #1083 ✅ | ux(grounding-strip): date label "2024-Q1" → "Apr 2024" | G5 | ✅ MERGED 2026-06-22 — PR #1119; formatVintageDate() + grounding-strip-date testid |
+| #1084 ✅ | methodology: PSP historical calibration anchor | G5 | ✅ MERGED 2026-06-22 — PR #1122; Zambia/Ghana ECF, compliance outcomes, public IMF sources |
+| #1088 ✅ | docs(demo): walkthrough — "0 consecutive steps" plain language | G5 | ✅ MERGED 2026-06-22 — PR #1121; DEMO-123 fix: phrase absent |
+| #1089 ✅ | docs(demo): walkthrough — Grounding strip persistence | G5 | ✅ MERGED 2026-06-22 — PR #1121; "entry-state" ×9 in walkthrough |
+| #1090 ✅ | docs(demo): walkthrough — methodology URL | G5 | ✅ MERGED 2026-06-22 — PR #1121; docs/onboarding/methodology-overview.md cited ×5 |
 | #1091 | docs(claude-md): extract Lifecycle/Exit/DIC to child docs | G7 | promoted from insights log entry 6; filed 2026-06-20 |
-| #1048 | infra: Docker API container Alembic migrations (NM-049) | G5 | Pre-existing; NM-049 on record |
-| #1007 | fix: recompute-badge not visible after apply-control-change | G5 | Pre-existing; discovered M14 G4 Step 4 Verify |
-| #1004 | process: Visual Spec section for intent template | G5 | Filed 2026-06-17 |
+| #1048 ✅ | infra: Docker API container Alembic migrations (NM-049) | G5 | ✅ MERGED 2026-06-22 — PR #1123; entrypoint.sh runs alembic upgrade head at startup |
+| #1007 ✅ | fix: recompute-badge not visible after apply-control-change | G5 | ✅ MERGED 2026-06-22 — PR #1119; immediate "pending" state before async fetch |
+| #1004 ✅ | process: Visual Spec section for intent template | G5 | ✅ MERGED 2026-06-22 — PR #1122; data-testid ×4, viewport ×2 in §4b |
 | #984 | M15 Exit Checklist | — | immediate \| M15 gate issue (note: title says "Milestone 16" — GitHub milestone numbering) |
-| #990 | test: accessibility validation on 8GB/4-core target hardware | G6 | Filed 2026-06-16 |
+| #990 ✅ | test: accessibility validation on 8GB/4-core target hardware | G6 | ✅ COMPLETE 2026-06-22 — validation report at `docs/process/validation/m15-g6-accessibility-validation-report.md`; VC-1/VC-2/VC-4 PASS; VC-3 CONDITIONAL PASS (non-Docker path documented; fully offline path planned) |
 | #987 | feat(ux): political risk summary surface (Persona 3) | G3 | Design in M15; implementation M16 |
 | #986 | feat(ux): cohort disaggregation on primary surface | G3 | Design in M15; implementation M16 |
 | #975 | feat(data): Path 1 — approved source network query | G4 | Journey A GA-01; extends ADR-016 Component 1 |
@@ -82,13 +83,218 @@
 | #843 | plan: live stakeholder demo with real external participants | G8 | **M15 exit gate** — deferred from M14 (EL decision 2026-06-20) |
 | #837 | feat(demo): configuration-driven demo scripts | G5 | |
 | #569 | test(perf): MV-002 Mode 3 hardware validation | G6 | |
-| #53 | arch: RBAC design (prerequisite for Path 2 in M16) | G4 | |
+| #53 ✅ | arch: RBAC design (prerequisite for Path 2 in M16) | G4 | ✅ CLOSED 2026-06-21 — will-not-implement (AC-001); #976 permanently closed |
 | #259 | standards: CTO legibility metrics dashboard | G5 | |
 | #153 | feat(frontend): absolute threshold overlay | | |
 | #97 | arch(api): threshold-crossing markers | | |
 | #92 | arch(backtesting): Greece investment climate conditions | | |
 | #6 | governance: branch protection restoration | G7 | EL-action |
 | #3 | governance: single-principal separation of duties | G7 | EL-action |
+
+---
+
+## Open Work Streams — M15 (Human Cost Architecture)
+
+### M15-G1 — Layer 3 IR Fixes (COMPLETE)
+
+**Sprint entry:** `docs/process/sprint-plans/m15-g1-sprint-entry.md` — EL-approved 2026-06-20 (PR #1095)
+**Intent document:** `docs/process/intents/M15-G1-2026-06-20-layer3-ir-fixes.md`
+**QA tests (Step 2):** `frontend/tests/e2e/m15-g1-layer3-ir-fixes.spec.ts` — PR #1096 (merged)
+**Issues:** #1065, #1066, #1068, #1069, #1075
+
+| Item | Status | Notes |
+|---|---|---|
+| G1 sprint entry document | ✅ **EL APPROVED 2026-06-20** (PR #1095) | Five entry conditions satisfied; implementation unblocked |
+| G1 QA tests (Step 2) | ✅ FILED 2026-06-20 — PR #1096 | AC-1–AC-11 authored before implementation; NM-051 prerequisite fix |
+| G1 implementation (Step 3) | ✅ **MERGED 2026-06-21** — PR #1097 + PR #1098 → release/m15 | Five Layer 3 IR fixes: trajectory sentence (AC-1–4), zero-step suppression (AC-5), L0 badges (AC-6), grounding strip disambiguation (AC-7–8), PSP sentence (AC-9–11); null guard for `getIndicatorDisplayNameAny` (PR #1098) |
+| G1 Step 4 Verify | ✅ **PASS 2026-06-21** | 11/11 ACs pass; NM-051 filed (indicator_key crash at Step 4); verdict in intent doc §8 |
+| G1 Step 5 Validate | ✅ **BPO ACCEPT 2026-06-21** | 11/11 ACs pass live; Customer Agent Layer 3 PASS (all 4 content additions); North star PASS — Aicha can argue reserve criticality, disambiguation, and PSP meaning without specialist mediation; sprint exit filed |
+| NM-051 | ✅ FILED 2026-06-21 | QA mock used alert_id/indicator_id instead of mda_id/indicator_key; undefined key crashed React tree; null guard fix in PR #1098 |
+| #1065/#1066/#1068/#1069/#1075 | ✅ CLOSED 2026-06-21 | All five G1 issues closed on GitHub |
+
+**Sprint exit document:** `docs/process/sprint-plans/m15-g1-sprint-exit.md` — PI Agent Confirmed 2026-06-21
+**G8 gate status:** G8 (#843 live external demo) is now UNBLOCKED — G1 Step 5 Validate complete.
+
+---
+
+### M15-G2 — Zone 1A Information Architecture ADR
+
+**Sprint entry:** `docs/process/sprint-plans/m15-g2-sprint-entry.md` — **EL APPROVED 2026-06-21** (PR #1104)
+**Issue:** #845 (Phases 2–3 only)
+
+| Item | Status | Notes |
+|---|---|---|
+| G2 sprint entry document | ✅ **EL APPROVED 2026-06-21** (PR #1104) | All entry invariants satisfied |
+| Intent document (Step 1) | ✅ **FILED 2026-06-22** (PR #1107) | `docs/process/intents/M15-G2-2026-06-21-zone-1a-adr.md`; QA Lead checkbox ✅ |
+| QA test file (Step 2) | ✅ **FILED 2026-06-22** (PR #1107) | `backend/tests/test_m15_g2_zone1a_adr.py`; 34 tests AC-1–AC-11 |
+| ARCH-011 ASSIGNED in backlog | ✅ **DONE 2026-06-22** | `docs/architecture/backlog.md` — ASSIGNED — ADR-017 (number 17) |
+| Phase 2 — Architecture Review (ARCH-REVIEW-007) | ✅ **AUTHORED 2026-06-22** | `docs/architecture/reviews/ARCH-REVIEW-007-milestone15.md`; four open questions resolved; binding decisions: Mode 3 composite encoding, COMPARE_VIEW N≤2/fixture, `composite_score` reuse, endpoint label y-offset algorithm |
+| Phase 3 — ADR-017 authorship | ✅ **AUTHORED 2026-06-22** | `docs/adr/ADR-017-zone-1a-information-architecture.md`; Tier 1; full P-1–P-7, UX-1–UX-7, NM-042 sign-off |
+| Encoding mockups | ✅ **MERGED 2026-06-22** — PR #1113 | `docs/ux/mockups/ADR-017-zone-1a-encoding-mockups.html`; 6 SVG panels; referenced from ADR-017 §Visual Mockups as relative hyperlink |
+| Phase 3 — **EL acceptance** | ✅ **ACCEPTED 2026-06-22** — PR #1114 | @PublicEnemage accepted after reviewing mockups; Status → `Accepted`; `test_el_acceptance_status` now passes |
+| QA tests (34/34) | ✅ **34/34 PASS 2026-06-22** | All AC-1–AC-11 pass after PR #1114 merge |
+| Sprint exit document | ✅ **FILED 2026-06-22** | `docs/process/sprint-plans/m15-g2-sprint-exit.md`; PI Agent Confirmed |
+| **Step 5 Validate — BPO ACCEPT** | ✅ **BPO ACCEPT 2026-06-22** | Navigation PASS; kryptonite PASS; north star PASS; Layer 3 N/A (architecture doc). Phase 4 gate: Zone 1D delta annotations required companion. Full verdict: intent §9 + sprint exit §3. |
+| Phase 4 — implementation | ⬜ Out of G2 scope | Separate sprint entry required; may extend to M16. **Phase 4 entry condition:** Zone 1D delta annotations must be in same sprint as Zone 1A composite encoding (per BPO ACCEPT phase 4 gate). |
+
+**G2 is COMPLETE.** BPO ACCEPT recorded 2026-06-22. Next for #845: Phase 4 implementation sprint entry (separate sprint). Close #845 Phases 2–3 on GitHub.
+
+---
+
+### M15-G3 — Cohort Disaggregation and Political Risk Summary Design
+
+**Sprint entry:** N/A — design-only; no sprint entry required per `docs/process/sprint-plans/m15-sprint-plan.md §G3`
+**Intent document:** `docs/process/intents/M15-G3-2026-06-21-cohort-disaggregation-design.md` — filed 2026-06-21
+**Issues:** #986 (cohort disaggregation), #987 (political risk summary surface)
+
+| Item | Status | Notes |
+|---|---|---|
+| Intent document | ✅ FILED 2026-06-21 | AC-1–AC-11 with reviewer gates; both issues covered |
+| QA tests | ✅ FILED — PR #1109 | `backend/tests/test_m15_g3_cohort_political_risk_design.py` — 45 tests AC-1–AC-11 |
+| cohort-disaggregation-design.md (Step 3) | ✅ **MERGED 2026-06-22** — PR #1109 → release/m15 | Zone 1B placement; income quintile + age cohort; 3 HCL indicators; MDA-derived thresholds; ADR-017 disposition (b) — independent |
+| political-risk-summary-design.md (Step 3) | ✅ **MERGED 2026-06-22** — PR #1109 → release/m15 | Zone 1D extended; no new ADR required; mode-specific contracts; ZMB ECF step 3 literal example; 30-sec legibility check; #1084 gate |
+| G3 QA: 45/45 pass | ✅ PASS 2026-06-22 | All ACs confirmed via pytest before commit |
+| G3 Step 4 Verify | ✅ **PASS 2026-06-22** | 45/45 QA tests; all AC-1–AC-11 observable states confirmed by document read; both silent failure tests pass; verdict in intent doc §8 |
+| G3 Step 5 Validate | ✅ **BPO ACCEPT 2026-06-22** | Both designs specify Layer 3 output; North star PASS (Aicha closes FINDING-03 HIGH via cohort rows; Andreas closes PSP mediation gap via political risk sub-section); Kryptonite PASS; sprint exit filed PR #1110 |
+| Chief Methodologist sign-off (#986) | ⬜ Required before M16 sprint entry | Cohort indicator scope + MDA-derived floor methodology (AC-3); comment on #986 |
+| CM sign-off (#987) | ⬜ Required before M16 sprint entry | PSP severity tier thresholds + 2pp direction sensitivity (AC-11); comment on #987 |
+| DemographicModule output verification (#986) | ⬜ Required before M16 sprint entry | Data Architect confirms cohort field availability for GRC/JOR/EGY/ZMB |
+| Architecture Review Facilitator confirmation | ⬜ Required before M16 sprint entry | AC-1–AC-6 (#986) and AC-7–AC-11 (#987); both documents reviewed |
+| Zone 1D layout feasibility (#987) | ⬜ Required before M16 sprint entry | Frontend Architect confirms sub-section fits at 1280×800 without displacing 4-framework rows |
+
+**Sprint exit document:** `docs/process/sprint-plans/m15-g3-sprint-exit.md` — PI Agent Confirmed 2026-06-22 (PR #1110)
+
+---
+
+### M15-G4 — Path 1 + ADR-016 Component 3
+
+**Sprint entry:** `docs/process/sprint-plans/m15-g4-sprint-entry.md` — **EL APPROVED 2026-06-22**
+**Intent document:** `docs/process/intents/M15-G4-2026-06-22-path1-fidelity-contextualisation.md` — **FILED 2026-06-22**
+**Issues:** #975 (Path 1 approved source network query), ADR-016 Component 3 (Fidelity panel contextualisation)
+
+| Item | Status | Notes |
+|---|---|---|
+| G4 sprint entry document | ✅ **EL APPROVED 2026-06-22** | `docs/process/sprint-plans/m15-g4-sprint-entry.md`; all structural gates clear |
+| Architect scope confirmation (#975) | ✅ RESOLVED — intent §Decision Gate 1 | #975 within ADR-016 Component 1 scope; no ADR amendment required |
+| CM analogous-case selection logic | ✅ RESOLVED — intent §Decision Gate 2 | Rule-based mapping: ZMB→ARG, JOR→GRC, EGY→ARG, GRC→GRC, unknown→null |
+| CM sign-off on #975 | ✅ **FILED 2026-06-22 (late)** | Posted post-implementation (#975 comment); substantive CM validation was in intent doc pre-implementation; NM-053 filed for timing deviation |
+| Data Architect API decisions (DA-G4-1–4) | ✅ RESOLVED — intent §Decisions Resolved | `loadable` field on `/data-quality`; async pull job POST+GET; api_contracts.yml update; new `/fidelity-context` endpoint |
+| Intent document (Step 1) | ✅ **FILED 2026-06-22** | `docs/process/intents/M15-G4-2026-06-22-path1-fidelity-contextualisation.md`; 15 ACs |
+| QA test files (Step 2) | ✅ **FILED 2026-06-22** | `backend/tests/test_m15_g4_path1_fidelity_contextualisation.py` + `frontend/tests/e2e/m15-g4-path1-fidelity-contextualisation.spec.ts` |
+| `api_contracts.yml` update | ✅ **MERGED 2026-06-22 — PR #1116** | `/data-quality` extended; `/pull` + `/pull/{job_id}` + `/fidelity-context` added |
+| G4 backend implementation (Step 3) | ✅ **MERGED 2026-06-22 — PR #1116** | `grounding.py`: `loadable` field, async pull job endpoints, `/fidelity-context` endpoint; `DataPullJob` ORM model; Alembic migration `2b821063ef81` (data_pull_jobs table + SEN seed in source_registry) |
+| G4 frontend implementation (Step 3) | ✅ **MERGED 2026-06-22 — PR #1117** | `ScenarioPanel.tsx`: searchable combobox with 41 entities; `DataQualityPreview.tsx`: loadable state + pull trigger + polling; `FidelityDashboard.tsx`: scenario-specific contextualisation + SF-3 fallback; `App.tsx`: scenarioId prop wired |
+| E2E test regression (NM-054) | ✅ **FIXED — PR #1117** | 6 existing tests used `.selectOption()` on now-`<input>` entity-selector; fixed to combobox fill+click pattern; NM-054 filed |
+| G4 Step 4 Verify | ✅ **CONDITIONAL PASS 2026-06-22** | All 15 ACs confirmed by code review of PR #1116/#1117 implementation; G4 test files not in implementation PRs (NM-055); tests committed in process-artifacts PR; will run in CI from that merge; NM-053 (CM sign-off timing), NM-054 (combobox regression); intent doc §8 corrected |
+| G4 Step 5 Validate | ✅ **BPO ACCEPT 2026-06-22** | All 15 ACs confirmed via live application (post-migration rebuild required — NM-049 fix confirmed working); Customer Agent Layer 3 PASS (all 3 new text outputs self-interpreting); North star PASS — Aicha can argue Argentina 2001 directional validation at table + create SEN peer scenario without admin intervention; Kryptonite PASS; sprint exit filed |
+
+**G4 is CLOSED.** Sprint exit document: `docs/process/sprint-plans/m15-g4-sprint-exit.md` — PI Agent Confirmed 2026-06-22. Issue #975 to be closed on GitHub.
+
+**Setup note recorded in sprint exit §5:** Migration 2b821063ef81 required container rebuild at validate time (container was 42h old). G5 entrypoint fix (NM-049) confirmed working. G6 accessibility validation will exercise clean-build path on target hardware.
+
+---
+
+### M15-G5 — Process Fixes + Walkthrough Updates (COMPLETE)
+
+**Sprint entry:** `docs/process/sprint-plans/m15-g5-sprint-entry.md` — **EL APPROVED 2026-06-22**
+**Intent document:** `docs/process/intents/M15-G5-2026-06-22-process-fixes.md` — **FILED 2026-06-22**
+**Sprint exit document:** `docs/process/sprint-plans/m15-g5-sprint-exit.md` — **PI Agent CONFIRMED 2026-06-22**
+**Issues:** #1007, #1048, #1004, #1067, #1083, #1084, #1088, #1089, #1090
+
+| Item | Status | Notes |
+|---|---|---|
+| G5 sprint entry document | ✅ **EL APPROVED 2026-06-22** | Three-tier structure; Tier 1 gates G8; Tier 2 primary scope; Tier 3 capacity-allowing |
+| Intent document (Step 1) | ✅ **FILED 2026-06-22** | `docs/process/intents/M15-G5-2026-06-22-process-fixes.md`; 13 ACs; 5 agents co-authored |
+| QA test files (Step 2) | ✅ **FILED 2026-06-22** | `frontend/tests/e2e/m15-g5-process-fixes.spec.ts` (AC-1–6); `backend/tests/test_m15_g5_process_fixes.py` (AC-7–13) |
+| **Tier 1 — #1083** (date label) | ✅ **MERGED 2026-06-22** — PR #1119 | `formatVintageDate()` + `extractReferenceDate()` + `data-testid="grounding-strip-date"` in GroundingStrip.tsx |
+| **Tier 1 — #1007** (recompute-badge) | ✅ **MERGED 2026-06-22** — PR #1119 | Immediate `recomputeStatus: "pending"` before async branch POST; kryptonite-compliant badge text |
+| **Tier 1 — #1067** (screenshot fix) | ✅ **MERGED 2026-06-22** — PR #1121 | 5 distinct PNGs in `docs/demo/m15/screenshots/`; frame-b md5 ≠ frame-c md5 (fab826ed ≠ e30e40b1) |
+| **Tier 1 — #1088** (walkthrough DEMO-123) | ✅ **MERGED 2026-06-22** — PR #1121 | "0 consecutive steps" absent; phrase count = 0 |
+| **Tier 1 — #1089** (walkthrough DEMO-124) | ✅ **MERGED 2026-06-22** — PR #1121 | "entry-state" ×9 in `docs/demo/m15/stakeholder-walkthrough.md` |
+| **Tier 1 — #1090** (walkthrough DEMO-129) | ✅ **MERGED 2026-06-22** — PR #1121 | `docs/onboarding/methodology-overview.md` cited ×5 |
+| **Tier 2 — #1084** (PSP anchor) | ✅ **MERGED 2026-06-22** — PR #1122 | `docs/methodology/psp-calibration-anchor.md`; Zambia 2022 + Ghana 2023 ECF; public IMF sources |
+| **Tier 2 — #1004** (intent template) | ✅ **MERGED 2026-06-22** — PR #1122 | §4b data-testid ×4 (≥2 ✓); viewport ×2 (≥1 ✓) |
+| **Tier 2 — #1048** (Docker migrations) | ✅ **MERGED 2026-06-22** — PR #1123 | `backend/entrypoint.sh` (alembic upgrade head + exec "$@"); Dockerfile uses ENTRYPOINT+CMD |
+| Tier 3 — #837 (demo.sh config-driven) | ⬜ Not started — capacity-allowing | No G8 gate dependency; remains open |
+| Tier 3 — #951 (solo-use review protocol) | ⬜ Not started — capacity-allowing | Remains open |
+| Tier 3 — #259 (legibility metrics dashboard) | ⬜ Not started — capacity-allowing | Remains open |
+| **G8 gate** | ✅ **SATISFIED 2026-06-22** | All 5 Tier 1 items merged and BPO accepted — G8 sprint entry may now open |
+| Step 4 Verify | ✅ **PASS 2026-06-22** | 13/13 ACs via CI evidence (playwright-e2e + test-backend) + local file checks; intent doc §8 |
+| Customer Agent Layer 3 | ✅ **PASS 2026-06-22** | #1083: "Apr 2024" self-interpreting; #1007: badge text kryptonite-compliant; intent doc §9a |
+| Step 5 Validate (BPO) | ✅ **BPO ACCEPT 2026-06-22** | All Tier 1 + Tier 2 accepted; north star PASS; kryptonite PASS; sprint exit filed |
+
+**G5 is COMPLETE. Sprint exit document confirmed. G8 is UNBLOCKED. One non-blocking G8 action item: add hyperlink from `methodology-overview.md` to `psp-calibration-anchor.md` during G8 demo prep.**
+
+---
+
+### M15-G6 — Accessibility Validation (COMPLETE)
+
+**Sprint entry:** `docs/process/sprint-plans/m15-g6-sprint-entry.md` — **EL APPROVED 2026-06-22**
+**Validation report:** `docs/process/validation/m15-g6-accessibility-validation-report.md` — **FILED 2026-06-22** (PR #1128)
+**Sprint exit document:** `docs/process/sprint-plans/m15-g6-sprint-exit.md` — **PI Agent CONFIRMED 2026-06-22** (PR #1131)
+**Issue:** #990 ✅ CLOSED 2026-06-23
+
+| Check | Result | Key finding |
+|---|---|---|
+| VC-1 — Docker Compose startup + responsiveness | ✅ **PASS** | `/health/` HTTP 200; GRC/JOR/EGY/ZMB in `/countries`; frontend reachable; peak memory ~440 MiB / 7.663 GiB limit |
+| VC-2 — Simulation engine 8-step timing | ✅ **PASS** | 0.079s wall-clock (target ≤ 60s); all 4 framework keys in trajectory |
+| VC-3 — Non-Docker Playwright path documented | ✅ **CONDITIONAL PASS** | `CONTRIBUTING.md §4` lightweight local path documented; requires PostGIS DB via Docker; fully offline path (MSW) planned for future milestone; limitation on record |
+| VC-4 — Frontend build time | ✅ **PASS** | 3.4 seconds on 10-core host (target ≤ 5 min); build exits 0 |
+
+**Overall: 3 PASS + 1 CONDITIONAL PASS. No FAIL findings. No new issues filed.**
+
+**Infrastructure Sprint declaration confirmed at exit:** No G6 output modifies user-visible application state. VC-3 CONDITIONAL PASS limitation is documentation-only (no implementation gap). PI Agent confirms Infrastructure Sprint Exception classification is correct for G6.
+
+**#990 closed:** All VC checks complete with no FAIL findings. Accessibility validation sprint is DONE.
+
+**CI note (PR #1128):** Pre-existing AC-4 test failure (`makeTrajectoryMock` null-tier bug, PR #1130) was blocking merge. Root cause: `null ?? 2` collapsed to 2; masked by backend startup failure before PR #1123 (Docker migrations). Fixed 1-line in test helper. PR #1130 merged to release/m15 first; PR #1128 rebased and merged 2026-06-23.
+
+---
+
+## EL Architectural Decisions — 2026-06-21
+
+**Authority:** Engineering Lead permanent decisions. Recorded by PM Agent.
+**Constraint document:** `docs/architecture/constraints.md`
+
+### AC-001 — Private Data Inputs Are Prohibited (Permanent)
+
+Private, proprietary, or ministry-owned data inputs are architecturally prohibited. The shared public dataset guarantee is the epistemic foundation of WorldSim's negotiating authority — reproducibility by both parties requires both parties to be able to inspect the same public sources. Private inputs sever reproducibility.
+
+**Founding document basis:** `docs/vision/worldsim-founding-document.md §Open Source as Strategy`
+
+**Issue dispositions:**
+
+| Issue | Title | Disposition |
+|---|---|---|
+| #976 ✅ | Path 2 — ministry-owned / proprietary data upload | CLOSED 2026-06-21 — will-not-implement (AC-001); permanent prohibition, not a capacity deferral |
+| #53 ✅ | RBAC design (prerequisite for Path 2) | CLOSED 2026-06-21 — will-not-implement (AC-001); prerequisite for Path 2 which is permanently closed |
+| #5 ✅ | Data marketplace — curated / user-contributed datasets | CLOSED 2026-06-21 — will-not-implement-at-this-stage; no validated real-world demand; re-open trigger: real finance ministry analyst articulates specific dataset need Path 1 cannot satisfy |
+| #4 ✅ | Advanced geocoded dataset integration | CLOSED 2026-06-21 — will-not-implement-at-this-stage; no validated real-world demand; same re-open trigger |
+
+**G4 scope confirmed (post-AC-001):** G4 = #975 (Path 1 approved source network) + ADR-016 Component 3 only. #53 removed from G4 scope.
+
+### AC-002 — Synthetic Substitution from Public Sources Is Permitted with Mandatory Indicator-Level Disclosure
+
+Synthetic estimates from comparable economies, regional distributions, and historical patterns are permitted and required for the democratization mission. Three mandatory conditions: indicator-level disclosure, T3 confidence tier floor, meaninglessness threshold suppression. The sparse-data problem is addressed through ADR-007 and the confidence tier system — not through private uploads.
+
+**Founding document basis:** `docs/vision/worldsim-founding-document.md §Open Source as Strategy`; `CLAUDE.md §Synthetic Data and the Data Inference Layer`
+
+**Future scope:** Methodology audit of ADR-007 against data-sparse countries (Chad, Yemen, Myanmar) — filed as future scope item after ADR-007 is complete; not a new capability; validates the framework against real data-poverty conditions.
+
+### Parking Lot Dispositions (2026-06-21)
+
+| Issue | Title | Disposition |
+|---|---|---|
+| #35 | Dynamic relationship weight updating | Moved to Parking Lot milestone (GitHub milestone #20) — complexity addition; deferred until core capability is battle-tested through real-world use; no trigger condition required |
+| #30 | Stock vs. flow variable distinction | Moved to Parking Lot milestone (GitHub milestone #20) — complexity addition; same deferral basis |
+
+### Insights Log
+
+Entry 7 added to `docs/insights-log.md` (2026-06-21): AC-001 and AC-002 should be reflected in the founding document as explicit permanent governing constraints — flag for EL to author addition to `docs/vision/worldsim-founding-document.md §Open Source as Strategy`.
+
+### Hard Stop
+
+**No G-group sprint entry may be filed or EL-approved until the constraint record PR is merged to `release/m15`.** The constraint record (AC-001, AC-002, issue dispositions) must be on the release branch before any further G-group sprint entries reference G4 scope or open issues.
 
 ---
 
@@ -317,6 +523,12 @@ All near-term issues dispositioned at HORIZON sweep 2026-06-13 — see G8 sprint
 
 | PR | Title | Target | Status |
 |---|---|---|---|
+| #1126 ✅ | process(m15-g6): G6 sprint entry — accessibility validation on target hardware | release/m15 | Merged 2026-06-22 |
+| #1125 ✅ | process(m15-g4): G4 QA tests + process docs + NM-053/054/055 + G5 BPO ACCEPT + SESSION_STATE | release/m15 | Merged 2026-06-22 |
+| #1098 ✅ | fix(m15-g1): guard getIndicatorDisplayNameAny against undefined key (NM-051) | release/m15 | Merged 2026-06-21 |
+| #1097 ✅ | feat(m15-g1): Layer 3 IR fixes — trajectory sentence, zero-step suppression, L0 badges, grounding strip disambiguation, PSP sentence | release/m15 | Merged 2026-06-21 |
+| #1096 ✅ | test(m15-g1): QA Lead Steps 1+2 — AC-1–AC-11 authored before implementation | release/m15 | Merged 2026-06-21 |
+| #1095 ✅ | process(m15-g1): sprint entry document — Layer 3 IR fixes (EL-approved) | release/m15 | Merged 2026-06-20 |
 | #1081 ✅ | demo(m14-g8): Step 8 + Step 9 — stakeholder review placeholder and simulated session artifact | release/m14 | Merged 2026-06-20 |
 | #1080 ✅ | chore(m14): rename milestone — "Trust Architecture and Instrument Credibility" | release/m14 | Merged 2026-06-20 |
 | #1078 ✅ | docs(m14-g8): honest narration revision — retain M15 promises, remove false current-delivery claims | release/m14 | Merged 2026-06-20 |
