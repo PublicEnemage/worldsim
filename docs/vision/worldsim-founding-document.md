@@ -171,6 +171,18 @@ Open source also provides the methodological transparency that gives the tool cr
 
 The equitable build process principle extends this logic into the development process itself. WorldSim's build, test, and development infrastructure must be accessible to contributors who do not have access to high-end hardware or expensive CI resources. A tool designed to level the playing field for vulnerable actors must not reproduce the resource asymmetry it is designed to counter in its own development infrastructure. Computational efficiency is an equity requirement, not an engineering preference.
 
+#### Permanent Architectural Constraints on Data Inputs
+
+Two constraints follow directly from the open-source strategy and are permanent architectural constraints — not guidelines, preferences, or strategic commitments that future governance can revisit without changing the mission.
+
+**AC-001 — Private data inputs are permanently prohibited.**
+Private, proprietary, or ministry-owned data inputs are architecturally prohibited in WorldSim. The reason is reproducibility: the open-source credibility guarantee requires that both parties to any analysis can inspect the same public sources. A tool whose analytical outputs depend on data that only one party can access does not level the playing field — it recreates the asymmetry it was built to counter. Any contributor introducing a proprietary data dependency — however well-intentioned — breaks the tool's claim to credibility for the actors it exists to serve. AC-001 is a permanent architectural constraint.
+
+**AC-002 — Synthetic estimates from public comparables are permanently permitted, under conditions.**
+Where real data is unavailable or of insufficient quality, WorldSim generates synthetic estimates from comparable economies, regional distributions, and historical patterns. This is a standing architectural permission — not an exception to be justified case by case — because data poverty must not be a barrier to using the tool in precisely the contexts where institutional analytical capacity is lowest. The conditions are non-negotiable: (1) every synthetic output is flagged at indicator level, not at session or scenario level; (2) synthetic estimates carry a T3 confidence tier floor; (3) when uncertainty is so large the output is directionally meaningless, the tool suppresses the output and declares this explicitly rather than producing an uninterpretable band. AC-002 is a permanent architectural constraint.
+
+A contributor reading this document can understand the full data input architecture — what is prohibited and what is permitted and under what conditions — without consulting `docs/architecture/constraints.md`.
+
 ---
 
 ## Part Four: The Architecture
