@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-23 (M16 G1 BPO ACCEPT — Step 5 Validate complete; #845 + #1147 closed; #1162 + #1163 filed as pre-demo follow-ups)**
+**Last updated: 2026-06-23 (M16 G3 QA tests authored (CM-updated) — backend + E2E refreshed; §7 QA Lead acknowledgment complete; #274 implementation PR now unblocked)**
 **Current milestone:** M16 — Distributional Visibility (GitHub Milestone 17)
 **Previous milestone:** M15 — Human Cost Architecture (FORMALLY CLOSED 2026-06-23; release/m15 → main PR #1142; v0.15.0; #984 closed; GitHub Milestone 16 closed)
 
@@ -152,6 +152,8 @@ Implementation is now unblocked. A sprint entry document must be filed and EL-ap
 - ✅ **G2 sprint entry filed and EL-approved 2026-06-23** — `docs/process/sprint-plans/m16-g2-sprint-entry.md`; #986/#987/#1163 in scope; 6/6 pre-conditions satisfied; ADR gate CLEAR; Zone 1B 1280 regression accepted; G1 testid retirement noted as QA gate. QA tests must be authored before implementation PR opens.
 - ✅ **G2 intent document filed 2026-06-23** — `docs/process/intents/M16-G2-2026-06-23-distributional-surface.md`; AC-1 through AC-14; G1 testid retirement documented (4 testids retired: zone-1d-political-feasibility, psp-delta, psp-layer3-sentence, psp-delta-sentence); QA Lead must author G2 spec + update G1 spec before G2 implementation PR opens.
 - ✅ G3 sprint entry filed and **EL-approved 2026-06-23** — `docs/process/sprint-plans/m16-g3-sprint-entry.md`; CE Assessment embedded (§2.5): adaptive resolution override required, extend `/simulate` with `projection_steps`, CM review on #274 gates intent ACs, dry-run bounds check required at Step 4 Verify; intent document + QA tests must be filed before implementation PR opens
+- ✅ **G3 intent document filed 2026-06-23** — `docs/process/intents/M16-G3-2026-06-23-25year-human-capital-trajectory.md`; CM review satisfied 2026-06-23 (AC-CM-1/AC-CM-2/AC-CM-3 finalized — 3 cohort curves: Q1 informal, Q1 agriculture, Q2 informal; MDA-HD-POVERTY-Q1 floor ≥ 0.40; decade consequence phrase; Q2 no floor)
+- ✅ **G3 QA tests authored 2026-06-23** (CM-updated) — `backend/tests/test_m16_g3_25year_human_capital_trajectory.py` (AC-1–AC-8 + quarterly spacing); `frontend/tests/e2e/m16-g3-25year-human-capital-trajectory.spec.ts` (AC-F1–AC-F8 + AC-CM-1/AC-CM-2/AC-CM-3); §7 QA Lead acknowledgment both [x]; ruff + tsc both pass; **#274 implementation PR may now open**
 - ✅ G5 sprint entry filed and **EL-approved 2026-06-23** — `docs/process/sprint-plans/m16-g5-sprint-entry.md`; #1145 (immediate) + #837/#951/#259 (near-term, capacity-allowing); work may begin
 - ✅ **G5 COMPLETE 2026-06-23** — PR #1156 merged; all 4 G5 issues delivered (#1145, #837, #951, #259); 18/20 ACs pass (2 skipped Docker-only); M16 demo stubs created at `docs/demo/m16/`; legibility baseline at `docs/standards/legibility-baseline-m16.md`
 - ✅ **G5 sprint exit CONFIRMED 2026-06-23** — BPO ACCEPT (advisory; infrastructure sprint exception); PI confirmed; exit document PR #1158 merged; `docs/process/sprint-plans/m16-g5-sprint-exit.md`
