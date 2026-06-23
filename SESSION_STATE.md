@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-23 (release/m15 → main merged as PR #1133 by EL — mid-milestone sync; G6 CLOSED; NM-056 filed; G8 UNBLOCKED — next sprint)**
+**Last updated: 2026-06-23 (G7 sprint entry filed and EL-approved — PR #1135 merged to release/m15; QA test gate blocking before extraction PR opens)**
 **Current milestone:** M15 — Human Cost Architecture (GitHub Milestone 16)
 **Previous milestone:** M14 — Trust Architecture and Instrument Credibility (FORMALLY CLOSED 2026-06-20; release/m14 → main PR #1086; v0.14.0 at https://github.com/PublicEnemage/worldsim/releases/tag/v0.14.0; #968 closed; GitHub Milestone 15 closed)
 
@@ -78,7 +78,7 @@ Implementation is now unblocked. A sprint entry document must be filed and EL-ap
 | #1088 ✅ | docs(demo): walkthrough — "0 consecutive steps" plain language | G5 | ✅ MERGED 2026-06-22 — PR #1121; DEMO-123 fix: phrase absent |
 | #1089 ✅ | docs(demo): walkthrough — Grounding strip persistence | G5 | ✅ MERGED 2026-06-22 — PR #1121; "entry-state" ×9 in walkthrough |
 | #1090 ✅ | docs(demo): walkthrough — methodology URL | G5 | ✅ MERGED 2026-06-22 — PR #1121; docs/onboarding/methodology-overview.md cited ×5 |
-| #1091 | docs(claude-md): extract Lifecycle/Exit/DIC to child docs | G7 | promoted from insights log entry 6; filed 2026-06-20 |
+| #1091 | docs(claude-md): extract Lifecycle/Exit/DIC to child docs | G7 | sprint entry EL-approved 2026-06-23 (PR #1135); QA test gate blocks extraction PR |
 | #1048 ✅ | infra: Docker API container Alembic migrations (NM-049) | G5 | ✅ MERGED 2026-06-22 — PR #1123; entrypoint.sh runs alembic upgrade head at startup |
 | #1007 ✅ | fix: recompute-badge not visible after apply-control-change | G5 | ✅ MERGED 2026-06-22 — PR #1119; immediate "pending" state before async fetch |
 | #1004 ✅ | process: Visual Spec section for intent template | G5 | ✅ MERGED 2026-06-22 — PR #1122; data-testid ×4, viewport ×2 in §4b |
@@ -258,6 +258,24 @@ Implementation is now unblocked. A sprint entry document must be filed and EL-ap
 **G6 is CLOSED.** Issue #990 closed 2026-06-23. NM-056 filed for AC-4 soft-skip-masking-mock-bug pattern. CI fix: PR #1130 (null ?? 2 → !== undefined check); validation PR: #1128; sprint exit PR: #1131.
 
 **CI note (PR #1128):** Pre-existing AC-4 test failure (`makeTrajectoryMock` null-tier bug, PR #1130) was blocking merge. Root cause: `null ?? 2` collapsed to 2; masked by backend startup failure before PR #1123 (Docker migrations). Fixed 1-line in test helper. PR #1130 merged to release/m15 first; PR #1128 rebased and merged 2026-06-23.
+
+---
+
+### M15-G7 — Process Documentation (IN PROGRESS)
+
+**Sprint entry:** `docs/process/sprint-plans/m15-g7-sprint-entry.md` — **EL APPROVED 2026-06-23** (PR #1135)
+**Issues:** #1091 (CLAUDE.md extraction), #3 (EL-action), #6 (EL-action)
+
+| Item | Status | Notes |
+|---|---|---|
+| G7 sprint entry document | ✅ **EL APPROVED 2026-06-23** (PR #1135) | Documentation sprint — sprint plan exception noted; entry filed for process consistency; 14 ACs in Section 3.1 |
+| QA test file (Step 2) | ⬜ **MUST FILE BEFORE EXTRACTION PR OPENS** | `backend/tests/test_m15_g7_claude_md_extraction.py`; AC-1–AC-14 grep-based checks from Section 3.1 |
+| Cross-reference audit | ⬜ Pre-extraction mandatory step | `grep -rn "CLAUDE.md §Agent Execution Lifecycle\|CLAUDE.md §Milestone Exit"` — ~35 files in scope; all must be updated in same extraction PR |
+| #1091 extraction PR | ⬜ Not started | Targets `docs/process/agent-execution-lifecycle.md` (~200 lines) + `docs/process/milestone-exit-sop.md` (~65 lines); CLAUDE.md 1,082 → ≤ 800 lines |
+| #3 — single-principal separation of duties | ⬜ EL-action only | Stage 2 governance: second GitHub account with merge authority |
+| #6 — branch protection restoration | ⬜ EL-action only | Dependent on #3 Stage 2 completion |
+
+**G7 does not gate G8.** G8 sprint entry may open concurrently.
 
 ---
 
