@@ -3,17 +3,17 @@ name: m16-g5-sprint-entry
 type: sprint-entry
 milestone: M16 — Distributional Visibility
 sprint-group: G5
-status: Filed — awaiting EL approval before work begins
+status: EL Approved 2026-06-23 — work may begin per priority order (#1145 first; #837/#951/#259 parallel, capacity-allowing)
 authored-by: PM Agent
 authored-date: 2026-06-23
-el-approved: false
+el-approved: 2026-06-23
 release-branch: release/m16
 sop-reference: docs/process/sprint-planning-sop.md
 ---
 
 # Sprint Entry — M16, G5: Process + Secondary Features
 
-**Status:** Filed — awaiting EL approval before work begins
+**Status:** EL Approved 2026-06-23 — work may begin per priority order (#1145 first; #837/#951/#259 parallel, capacity-allowing)
 **Date authored:** 2026-06-23
 **Release branch:** `release/m16`
 **Sprint plan:** `docs/process/sprint-plans/m16-sprint-plan.md` (EL Approved 2026-06-23)
@@ -217,7 +217,7 @@ ship in M16. Per the BPO sprint plan consultation: cut G4 before any G5 deferral
 
 ## EL Approval Record
 
-**EL approval:** Pending
+**EL approval:** 2026-06-23
 
-> {EL approval statement — to be filled at approval time}
-> — @PublicEnemage ({date})
+> G5 sprint entry approved. Structural gates confirmed clear — release branch exists, CI trigger verified, sprint plan EL-approved. No ADR prerequisites for any G5 item; gate is clear across the board. Infrastructure sprint classification accepted: no intent document or QA test gate applies to any G5 item. Priority order accepted: #1145 (`horizon:immediate`) ships in M16 regardless of capacity; #837, #951, #259 (`horizon:near-term`) are capacity-allowing and may be deferred to M17 in order #259 → #951 → #837. Scope-cut authority noted: cut G4 before any G5 deferral. G5 is not on the G8 critical path. Work may begin.
+> — @PublicEnemage (2026-06-23)

@@ -36,6 +36,9 @@ data/raw/
 .DS_Store
 Thumbs.db
 
+# Video files
+*.mov
+
 # Test coverage
 .coverage
 htmlcov/
