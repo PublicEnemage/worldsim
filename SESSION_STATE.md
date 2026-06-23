@@ -106,7 +106,7 @@ Implementation is now unblocked. A sprint entry document must be filed and EL-ap
 
 ## Open Issues — M16 (Distributional Visibility)
 
-**GitHub Milestone:** 17 | **Created:** 2026-06-23 | **Status:** Kickoff complete — sprint plan EL-approved 2026-06-23; G1 sprint entry is next action; G2 pre-conditions to be opened in parallel
+**GitHub Milestone:** 17 | **Created:** 2026-06-23 | **Status:** Kickoff complete — G1 QA gate satisfied (PR #1152); G5 COMPLETE (PR #1156 merged 2026-06-23); G1 implementation PR is next action
 *Zone 1A Phase 4 + cohort disaggregation + political risk surface + live external demo (#843 — exit gate). Demo 6 (Senegalese Finance Minister scenario).*
 
 | Issue | Title | Group | Notes |
@@ -121,10 +121,10 @@ Implementation is now unblocked. A sprint entry document must be filed and EL-ap
 | #275 | feat(simulation): calibrated ecological-to-financial transmission | G4 | Capacity-allowing |
 | #102 | arch(api): distributional scenario comparison variance/percentile | G4 | Capacity-allowing |
 | #22 | feat: uncertainty quantification — distributional scenario bands | G4 | ADR-007 coverage confirmation required; scope to Demo 6 requirements only |
-| #1145 | docs(founding): add AC-001 and AC-002 as explicit permanent constraints | G5 | EL-authored; small documentation edit |
-| #837 | feat(demo): configuration-driven demo scripts | G5 | Capacity-allowing |
-| #951 | process: solo-use review protocol | G5 | Capacity-allowing |
-| #259 | standards: CTO legibility metrics dashboard | G5 | Capacity-allowing |
+| #1145 ✅ | docs(founding): add AC-001 and AC-002 as explicit permanent constraints | G5 | ✅ MERGED 2026-06-23 — PR #1156 |
+| #837 ✅ | feat(demo): configuration-driven demo scripts | G5 | ✅ MERGED 2026-06-23 — PR #1156 |
+| #951 ✅ | process: solo-use review protocol | G5 | ✅ MERGED 2026-06-23 — PR #1156 |
+| #259 ✅ | standards: CTO legibility metrics dashboard | G5 | ✅ MERGED 2026-06-23 — PR #1156 |
 | #569 | test(perf): MV-002 Mode 3 hardware validation | G6 | After G1/G2 |
 | #6 | Governance: branch protection restoration | G7 | EL-action; dependent on #3 |
 | #3 | Governance: single-principal separation of duties | G7 | EL-action |
@@ -146,6 +146,7 @@ Implementation is now unblocked. A sprint entry document must be filed and EL-ap
 - ✅ G1 QA tests authored and merged 2026-06-23 — PR #1152; `frontend/tests/e2e/m16-g1-zone-1a-phase4-composite.spec.ts` (AC-1 through AC-12); **G1 implementation PR may now open**
 - ⬜ G2 pre-conditions: CM/DA/ARF/FA sign-off requests to be opened on #986 and #987
 - ✅ G5 sprint entry filed and **EL-approved 2026-06-23** — `docs/process/sprint-plans/m16-g5-sprint-entry.md`; #1145 (immediate) + #837/#951/#259 (near-term, capacity-allowing); work may begin
+- ✅ **G5 COMPLETE 2026-06-23** — PR #1156 merged; all 4 G5 issues delivered (#1145, #837, #951, #259); 18/20 ACs pass (2 skipped Docker-only); M16 demo stubs created at `docs/demo/m16/`; legibility baseline at `docs/standards/legibility-baseline-m16.md`
 - ✅ G7 sprint entry filed and **EL-approved 2026-06-23** — `docs/process/sprint-plans/m16-g7-sprint-entry.md`; #3 → #6 dependency declared; actions may begin
 
 ---
