@@ -82,7 +82,7 @@ require a new ADR.
 ### 2.3 — Intent document gate
 
 *An intent document must be filed before any G5 implementation PR opens.
-(Authority: CLAUDE.md §Agent Execution Lifecycle Step 1)*
+(Authority: docs/process/agent-execution-lifecycle.md Step 1)*
 
 G5 contains two categories of deliverables with different observable-state forms:
 - **Frontend code + demo artifacts** (#1007, #1083, #1067): user-facing application changes
@@ -120,7 +120,7 @@ testable property: a file path, a grep pattern, or a command exit code.
 ### 2.4 — QA test authorship gate
 
 *QA tests must be authored from the intent document's acceptance criteria before implementation
-code is written. (Authority: CLAUDE.md §Agent Execution Lifecycle Step 2)*
+code is written. (Authority: docs/process/agent-execution-lifecycle.md Step 2)*
 
 G5 uses two test files matching its two deliverable categories:
 - `frontend/tests/e2e/m15-g5-process-fixes.spec.ts` — Playwright E2E tests for frontend code

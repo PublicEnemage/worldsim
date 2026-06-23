@@ -2122,7 +2122,7 @@ The Engineering Lead — not the process. The M12 demo preparation standard (Ste
 
 2. **Structural fix:** `bash -n scripts/demo.sh` added as a mandatory named gate at Step 3 of the Demo Preparation Standard (`docs/process/demo-preparation-standard.md §Step 3 — Syntax validation gate`). The gate runs after any edit to `demo.sh` and must exit 0 before the file is committed. This converts a person-caught gap to a process-caught gate.
 
-3. **Exit ceremony fix:** The milestone exit ceremony (CLAUDE.md §Milestone Exit Ceremony) codified as a named SOP for the first time, closing the broader gap that no formal exit ceremony checklist existed beyond the retrospective. The four exit ceremony steps (open issue audit, milestone reference audit, SESSION_STATE consistency check, fresh session continuity test) ensure the next milestone's session does not inherit stale state.
+3. **Exit ceremony fix:** The milestone exit ceremony (docs/process/milestone-exit-sop.md §Milestone Exit Ceremony) codified as a named SOP for the first time, closing the broader gap that no formal exit ceremony checklist existed beyond the retrospective. The four exit ceremony steps (open issue audit, milestone reference audit, SESSION_STATE consistency check, fresh session continuity test) ensure the next milestone's session does not inherit stale state.
 
 ---
 
@@ -2154,7 +2154,7 @@ None of these were blocking, but all three were missed by the self-generated sig
 
 ### What caught it
 
-The Engineering Lead — not the process. The Phase A execution lifecycle (CLAUDE.md §Agent Execution Lifecycle) does not include a guard against an implementing agent generating a reviewer's sign-off. The UX Designer sign-off checkbox in the ADR template has no process mechanism to verify the sign-off was performed independently.
+The Engineering Lead — not the process. The Phase A execution lifecycle (docs/process/agent-execution-lifecycle.md) does not include a guard against an implementing agent generating a reviewer's sign-off. The UX Designer sign-off checkbox in the ADR template has no process mechanism to verify the sign-off was performed independently.
 
 ### Process improvement
 
@@ -2780,7 +2780,7 @@ This was caught by a process artifact check, not by CI. CI had no way to report 
 
 Additionally: the sprint entry and intent documents should be committed to the feature branch before the implementation PR is opened. These are prerequisites — filing them as local files without committing them to the branch leaves the process requirements unverifiable by anyone reviewing the PR.
 
-**Near-miss lineage:** CLAUDE.md §Agent Execution Lifecycle states "A test authored in the same session as the implementation it covers has not satisfied this step." This near-miss is the flip side: a test authored correctly (before implementation, in a separate step) but never committed is equally non-satisfying. Both patterns defeat the purpose of the Step 2 gate.
+**Near-miss lineage:** docs/process/agent-execution-lifecycle.md states "A test authored in the same session as the implementation it covers has not satisfied this step." This near-miss is the flip side: a test authored correctly (before implementation, in a separate step) but never committed is equally non-satisfying. Both patterns defeat the purpose of the Step 2 gate.
 
 ---
 

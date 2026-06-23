@@ -11,7 +11,7 @@ deliberation-source: docs/process/design/2026-06-08-sprint-cadence-acceptance-ga
 phaseB-inputs:
   - docs/process/acceptance-protocol.md (Business PO acceptance protocol — per-type criteria and exception path)
   - docs/process/sprint-planning-sop.md §Sprint Exit Gate (Business PO acceptance attestation requirement)
-  - CLAUDE.md §Agent Execution Lifecycle (five-step lifecycle — Steps 1 and 5 are the sprint boundary reference points)
+  - docs/process/agent-execution-lifecycle.md (five-step lifecycle — Steps 1 and 5 are the sprint boundary reference points)
 gates-phases:
   - Phase D — Session Boundary Discipline
 ---
@@ -79,8 +79,8 @@ sprint is properly bounded before implementation begins. Required sections:
 1. Sprint identification (milestone, sprint group, issue list, release branch)
 2. Entry invariants checklist:
    - [ ] ADR accepted for each group requiring an ADR (per sprint-planning-sop.md §Grouping Criteria #5)
-   - [ ] Intent document filed for each user-facing deliverable (per CLAUDE.md §Agent Execution Lifecycle Step 1)
-   - [ ] QA tests authored for each user-facing deliverable (per CLAUDE.md §Agent Execution Lifecycle Step 2)
+   - [ ] Intent document filed for each user-facing deliverable (per docs/process/agent-execution-lifecycle.md Step 1)
+   - [ ] QA tests authored for each user-facing deliverable (per docs/process/agent-execution-lifecycle.md Step 2)
    - [ ] CI trigger verified on release branch (per sprint-planning-sop.md §Relationship to Release Branch)
 3. Scope declaration: the issues in this sprint; any issues explicitly out of scope with rationale
 4. ADR prerequisite table: which groups are BLOCKED_ADR and what ADR must be accepted first

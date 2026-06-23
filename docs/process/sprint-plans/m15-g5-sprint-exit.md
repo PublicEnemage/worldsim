@@ -198,4 +198,4 @@ M15-G5 is CLOSED. G8 is UNBLOCKED.
 
 *Sprint exit document authority: `docs/process/sprint-planning-sop.md §Sprint Exit Gate`.
 Three-tier structure authority: `docs/process/sprint-plans/m15-g5-sprint-entry.md §3.1`.
-All lifecycle authority: `CLAUDE.md §Agent Execution Lifecycle`.*
+All lifecycle authority: `docs/process/agent-execution-lifecycle.md`.*

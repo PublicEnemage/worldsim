@@ -185,4 +185,4 @@ No near-misses to file for G3. Design-only sprint. No implementation code. No ru
 
 ---
 
-*Sprint exit document authority: `docs/process/sprint-planning-sop.md §Sprint Exit Gate`. G3 design-only exception: `docs/process/sprint-plans/m15-sprint-plan.md §Sprint Groups`. All lifecycle authority: `CLAUDE.md §Agent Execution Lifecycle`.*
+*Sprint exit document authority: `docs/process/sprint-planning-sop.md §Sprint Exit Gate`. G3 design-only exception: `docs/process/sprint-plans/m15-sprint-plan.md §Sprint Groups`. All lifecycle authority: `docs/process/agent-execution-lifecycle.md`.*

@@ -670,4 +670,4 @@ for M14 G6 — Methodology, Calibration, and Instrument Legibility.
 Sprint entry: `docs/process/sprint-plans/m14-g6-sprint-entry.md` (EL approval pending).
 DA-G6-1, DA-G6-2, CM-G6-1 resolved — backend implementation PR may open after EL approval.
 AC-1 through AC-4 (frontend) may proceed after EL sprint entry approval. Full lifecycle
-authority: `CLAUDE.md §Agent Execution Lifecycle`.*
+authority: `docs/process/agent-execution-lifecycle.md`.*

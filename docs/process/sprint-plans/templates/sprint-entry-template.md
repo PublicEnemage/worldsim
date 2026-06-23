@@ -69,7 +69,7 @@ check "N/A" and note below.*
 
 *For each user-facing deliverable in this sprint, an intent document must be filed at
 `docs/process/intents/M{N}-{G-suffix-or-ADR-NNN}-{YYYY-MM-DD}-{short-name}.md` before implementation begins.
-(Authority: CLAUDE.md §Agent Execution Lifecycle Step 1)*
+(Authority: docs/process/agent-execution-lifecycle.md Step 1)*
 
 - [ ] Intent document filed for every user-facing deliverable in this sprint
 
@@ -86,7 +86,7 @@ check "N/A" and note below.*
 
 *For each user-facing deliverable, QA tests must be authored from the intent document's
 acceptance criteria BEFORE implementation code is written.
-(Authority: CLAUDE.md §Agent Execution Lifecycle Step 2)*
+(Authority: docs/process/agent-execution-lifecycle.md Step 2)*
 
 - [ ] QA test file authored for every user-facing deliverable in this sprint
 

@@ -74,7 +74,7 @@ Agent may not mark the G3 PR ready for review without the DA's `api_contracts.ym
 ### 2.3 — Intent document gate
 
 *An intent document must be filed before any G3 implementation PR opens.
-(Authority: CLAUDE.md §Agent Execution Lifecycle Step 1)*
+(Authority: docs/process/agent-execution-lifecycle.md Step 1)*
 
 - [x] Intent document filed for G3 deliverables — **FILED 2026-06-17**
 
@@ -93,7 +93,7 @@ sequences, and conftest setup obligations. Gate: PASS.
 ### 2.4 — QA test authorship gate
 
 *QA tests must be authored from the intent document's acceptance criteria before implementation
-code is written. (Authority: CLAUDE.md §Agent Execution Lifecycle Step 2)*
+code is written. (Authority: docs/process/agent-execution-lifecycle.md Step 2)*
 
 - [x] QA test file authored for G3 before implementation begins — **FILED 2026-06-17**
 

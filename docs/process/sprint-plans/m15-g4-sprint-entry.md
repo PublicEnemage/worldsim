@@ -118,7 +118,7 @@ on record (comment on #975 or as a filed methodology note referenced in the inte
 ### 2.3 — Intent document gate
 
 *An intent document must be filed before any G4 implementation PR opens.
-(Authority: CLAUDE.md §Agent Execution Lifecycle Step 1)*
+(Authority: docs/process/agent-execution-lifecycle.md Step 1)*
 
 - [ ] Intent document filed for G4 deliverables — **MUST FILE BEFORE IMPLEMENTATION PR OPENS**
 
@@ -149,7 +149,7 @@ return values or implementation contracts.
 implementation code is written. G4 is a full-stack sprint — backend tests cover the
 source query API and data pull mechanism; frontend Playwright tests cover the creation form
 and Fidelity panel.
-(Authority: CLAUDE.md §Agent Execution Lifecycle Step 2)*
+(Authority: docs/process/agent-execution-lifecycle.md Step 2)*
 
 - [ ] QA test files authored for G4 before implementation begins — **MUST FILE BEFORE IMPLEMENTATION BEGINS**
 

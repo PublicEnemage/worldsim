@@ -195,7 +195,7 @@ Control panel — after Apply (fixed state):
 
 ## 5. Kryptonite Constraint Check
 
-> *Authority: CLAUDE.md §Agent Execution Lifecycle — Kryptonite Design Constraint (FD-3).*
+> *Authority: docs/process/agent-execution-lifecycle.md — Kryptonite Design Constraint (FD-3).*
 > *Applied to #1007 and #1083 — both affect Persona 2 in the Reactive entry state and
 > Persona 5 in the active-control workflow. Documentation and infrastructure items
 > (AC-7–AC-13) are not user-facing and are exempt from this check.*
@@ -453,4 +453,4 @@ One non-blocking action item for G8: add hyperlink from `methodology-overview.md
 
 ---
 
-*Intent document filed 2026-06-22. Co-authored by: Frontend Architect Agent (#1007, #1083, #1067), UX Designer Agent (#1088–#1090), Chief Methodologist Agent (#1084), Data Architect Agent (#1048), Architect Agent (#1004). QA Lead files both test files before any implementation PR opens — this is a hard gate. Authority: `CLAUDE.md §Agent Execution Lifecycle`. Template: `docs/process/intent-template.md` (version 2026-06-17).*
+*Intent document filed 2026-06-22. Co-authored by: Frontend Architect Agent (#1007, #1083, #1067), UX Designer Agent (#1088–#1090), Chief Methodologist Agent (#1084), Data Architect Agent (#1048), Architect Agent (#1004). QA Lead files both test files before any implementation PR opens — this is a hard gate. Authority: `docs/process/agent-execution-lifecycle.md`. Template: `docs/process/intent-template.md` (version 2026-06-17).*
