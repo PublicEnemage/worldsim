@@ -687,12 +687,12 @@ test.describe("AC-4: Zone 1A Mode 3 divergence fill region visible and non-zero 
 
     if (!(await enableMode3(page))) return;
 
-    // Advance a step in Mode 3 to create baseline-vs-active divergence
+    // Advance a step in Mode 3 to create baseline-vs-active divergence.
+    // Guard on isEnabled — a disabled button causes a 30-second click timeout (not a no-op).
     const nextStepBtn = page.getByRole("button", { name: /Next Step/ });
-    if (await nextStepBtn.isVisible({ timeout: 5_000 }).catch(() => false)) {
-      await nextStepBtn.click();
-      await page.waitForTimeout(1_000);
-    }
+    if (!(await nextStepBtn.isEnabled({ timeout: 5_000 }).catch(() => false))) return;
+    await nextStepBtn.click();
+    await page.waitForTimeout(1_000);
 
     // Primary guard: zone-1a-divergence-fill is new in Phase 4
     const fill = page.locator('[data-testid="zone-1a-divergence-fill"]');
@@ -849,12 +849,12 @@ test.describe("AC-6: ADR-017 backtesting — Mode 3 ZMB N=1 baseline/active dive
 
     if (!(await enableMode3(page))) return;
 
-    // Advance a step — Mode 3 creates a branch trajectory diverging from baseline
+    // Advance a step — Mode 3 creates a branch trajectory diverging from baseline.
+    // Guard on isEnabled — disabled button causes a 30-second click timeout (not a no-op).
     const nextStepBtn = page.getByRole("button", { name: /Next Step/ });
-    if (await nextStepBtn.isVisible({ timeout: 5_000 }).catch(() => false)) {
-      await nextStepBtn.click();
-      await page.waitForTimeout(1_000);
-    }
+    if (!(await nextStepBtn.isEnabled({ timeout: 5_000 }).catch(() => false))) return;
+    await nextStepBtn.click();
+    await page.waitForTimeout(1_000);
 
     // Guard: zone-1a-divergence-fill (Phase 4 element — absent pre-implementation)
     const fill = page.locator('[data-testid="zone-1a-divergence-fill"]');
@@ -993,8 +993,9 @@ test.describe("AC-7/8/9/10: Zone 1D PSP delta annotations (#1147)", () => {
 
     // Advance to step 1 — update mock to return step 1 PSP (deteriorated: 0.38)
     currentPsp = "0.3800";
+    // Guard on isEnabled — a disabled button causes a 30-second click timeout (not a no-op).
     const nextStepBtn = page.getByRole("button", { name: /Next Step/ });
-    if (!(await nextStepBtn.isVisible({ timeout: 5_000 }).catch(() => false))) return;
+    if (!(await nextStepBtn.isEnabled({ timeout: 5_000 }).catch(() => false))) return;
     await nextStepBtn.click();
     await page.waitForTimeout(1_000);
 
@@ -1054,8 +1055,9 @@ test.describe("AC-7/8/9/10: Zone 1D PSP delta annotations (#1147)", () => {
     if (!(await zone1d.isVisible({ timeout: 8_000 }).catch(() => false))) return;
 
     currentPsp = "0.3800";
+    // Guard on isEnabled — a disabled button causes a 30-second click timeout (not a no-op).
     const nextStepBtn = page.getByRole("button", { name: /Next Step/ });
-    if (!(await nextStepBtn.isVisible({ timeout: 5_000 }).catch(() => false))) return;
+    if (!(await nextStepBtn.isEnabled({ timeout: 5_000 }).catch(() => false))) return;
     await nextStepBtn.click();
     await page.waitForTimeout(1_000);
 
@@ -1124,8 +1126,9 @@ test.describe("AC-7/8/9/10: Zone 1D PSP delta annotations (#1147)", () => {
 
     // Deteriorating PSP: 0.42 → 0.38 (decline)
     currentPsp = "0.3800";
+    // Guard on isEnabled — a disabled button causes a 30-second click timeout (not a no-op).
     const nextStepBtn = page.getByRole("button", { name: /Next Step/ });
-    if (!(await nextStepBtn.isVisible({ timeout: 5_000 }).catch(() => false))) return;
+    if (!(await nextStepBtn.isEnabled({ timeout: 5_000 }).catch(() => false))) return;
     await nextStepBtn.click();
     await page.waitForTimeout(1_000);
 
