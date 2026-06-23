@@ -84,7 +84,7 @@ plan §Four-Agent Consultation Summary.
 ### 2.3 — Intent document gate
 
 *An intent document must be filed before any G1 implementation PR opens.
-(Authority: CLAUDE.md §Agent Execution Lifecycle Step 1)*
+(Authority: docs/process/agent-execution-lifecycle.md Step 1)*
 
 - [ ] Intent document filed for G1 deliverables — **MUST FILE BEFORE IMPLEMENTATION PR OPENS**
 
@@ -109,7 +109,7 @@ Section 3 below — not from implementation interface.
 ### 2.4 — QA test authorship gate
 
 *QA tests must be authored from the intent document's acceptance criteria before
-implementation code is written. (Authority: CLAUDE.md §Agent Execution Lifecycle Step 2)*
+implementation code is written. (Authority: docs/process/agent-execution-lifecycle.md Step 2)*
 
 - [x] QA test file authored for G1 before implementation begins — filed 2026-06-20 (`frontend/tests/e2e/m15-g1-layer3-ir-fixes.spec.ts`)
 

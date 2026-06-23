@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-22 (M15-G6 CLOSED — sprint exit filed 2026-06-23; VC-1/VC-2/VC-4 PASS; VC-3 CONDITIONAL PASS; #990 closed; G4 CLOSED — BPO ACCEPT 2026-06-22; G5 CLOSED — BPO ACCEPT 2026-06-22; G8 UNBLOCKED)**
+**Last updated: 2026-06-23 (G7 FULLY COMPLETE — BPO ACCEPT; sprint exit filed; #1091 closable; cold-read navigability PASS; information loss PASS)**
 **Current milestone:** M15 — Human Cost Architecture (GitHub Milestone 16)
 **Previous milestone:** M14 — Trust Architecture and Instrument Credibility (FORMALLY CLOSED 2026-06-20; release/m14 → main PR #1086; v0.14.0 at https://github.com/PublicEnemage/worldsim/releases/tag/v0.14.0; #968 closed; GitHub Milestone 15 closed)
 
@@ -26,6 +26,16 @@
 | 6. KI-005 permanent fix applied | ✅ DONE 2026-06-20 | `do_not_enforce_on_create: true` on Ruleset 17751852; future release branches need no Ruleset workaround |
 
 Implementation is now unblocked. A sprint entry document must be filed and EL-approved before any G-group implementation PR opens.
+
+---
+
+## Mid-Milestone Main Sync — 2026-06-23
+
+**PR #1133** — EL merged `release/m15` → `main` 2026-06-23. This is a mid-milestone sync, not a milestone close. M15 remains active; G8 (#843, live stakeholder demo) is the M15 exit gate.
+
+**State at sync point:** G1/G2/G3/G4/G5/G6 complete (all sprint exits filed). G7 and G8 sprint entries not yet filed. `release/m15` continues as the active release branch — all future G-group feature work continues to target `release/m15`.
+
+**NM-056 filed:** E2E test soft-skip masked AC-4 mock bug for 8 sprints. Root cause: `null ?? 2` in `makeTrajectoryMock` + backend startup failure before PR #1123 made tests soft-skip silently. Fixed in PR #1130. Full record: `docs/process/near-miss-registry.md §NM-056`.
 
 ---
 
@@ -68,7 +78,7 @@ Implementation is now unblocked. A sprint entry document must be filed and EL-ap
 | #1088 ✅ | docs(demo): walkthrough — "0 consecutive steps" plain language | G5 | ✅ MERGED 2026-06-22 — PR #1121; DEMO-123 fix: phrase absent |
 | #1089 ✅ | docs(demo): walkthrough — Grounding strip persistence | G5 | ✅ MERGED 2026-06-22 — PR #1121; "entry-state" ×9 in walkthrough |
 | #1090 ✅ | docs(demo): walkthrough — methodology URL | G5 | ✅ MERGED 2026-06-22 — PR #1121; docs/onboarding/methodology-overview.md cited ×5 |
-| #1091 | docs(claude-md): extract Lifecycle/Exit/DIC to child docs | G7 | promoted from insights log entry 6; filed 2026-06-20 |
+| #1091 ✅ | docs(claude-md): extract Lifecycle/Exit/DIC to child docs | G7 | ✅ MERGED 2026-06-23 — PR #1137; CLAUDE.md 1082→800 lines; 21 QA tests AC-1–AC-14 all pass |
 | #1048 ✅ | infra: Docker API container Alembic migrations (NM-049) | G5 | ✅ MERGED 2026-06-22 — PR #1123; entrypoint.sh runs alembic upgrade head at startup |
 | #1007 ✅ | fix: recompute-badge not visible after apply-control-change | G5 | ✅ MERGED 2026-06-22 — PR #1119; immediate "pending" state before async fetch |
 | #1004 ✅ | process: Visual Spec section for intent template | G5 | ✅ MERGED 2026-06-22 — PR #1122; data-testid ×4, viewport ×2 in §4b |
@@ -245,9 +255,29 @@ Implementation is now unblocked. A sprint entry document must be filed and EL-ap
 
 **Infrastructure Sprint declaration confirmed at exit:** No G6 output modifies user-visible application state. VC-3 CONDITIONAL PASS limitation is documentation-only (no implementation gap). PI Agent confirms Infrastructure Sprint Exception classification is correct for G6.
 
-**#990 closed:** All VC checks complete with no FAIL findings. Accessibility validation sprint is DONE.
+**G6 is CLOSED.** Issue #990 closed 2026-06-23. NM-056 filed for AC-4 soft-skip-masking-mock-bug pattern. CI fix: PR #1130 (null ?? 2 → !== undefined check); validation PR: #1128; sprint exit PR: #1131.
 
 **CI note (PR #1128):** Pre-existing AC-4 test failure (`makeTrajectoryMock` null-tier bug, PR #1130) was blocking merge. Root cause: `null ?? 2` collapsed to 2; masked by backend startup failure before PR #1123 (Docker migrations). Fixed 1-line in test helper. PR #1130 merged to release/m15 first; PR #1128 rebased and merged 2026-06-23.
+
+---
+
+### M15-G7 — Process Documentation (COMPLETE 2026-06-23)
+
+**Sprint entry:** `docs/process/sprint-plans/m15-g7-sprint-entry.md` — **EL APPROVED 2026-06-23** (PR #1135)
+**Issues:** #1091 ✅ (CLAUDE.md extraction), #3 (EL-action), #6 (EL-action)
+
+| Item | Status | Notes |
+|---|---|---|
+| G7 sprint entry document | ✅ **EL APPROVED 2026-06-23** (PR #1135) | Documentation sprint — sprint plan exception noted; entry filed for process consistency; 14 ACs in Section 3.1 |
+| QA test file (Step 2) | ✅ FILED 2026-06-23 | `backend/tests/test_m15_g7_claude_md_extraction.py`; 21 tests AC-1–AC-14 |
+| Cross-reference audit | ✅ COMPLETE | 37 docs/ files updated; AC-13/AC-14 confirmed zero remaining stale refs |
+| #1091 extraction PR | ✅ **MERGED 2026-06-23** (PR #1137) | `docs/process/agent-execution-lifecycle.md` (201 lines) + `docs/process/milestone-exit-sop.md` (67 lines); CLAUDE.md 1,082 → 800 lines; 21 QA tests AC-1–AC-14 all pass |
+| Step 4 Verify | ✅ PASS 2026-06-23 | AC-1–AC-14 all confirmed; child docs complete verbatim transplants; CLAUDE.md line count: 800 |
+| Step 5 Validate | ✅ **BPO ACCEPT 2026-06-23** | Cold-read navigability PASS (lifecycle ~15s, exit SOP ~40s, both ≤60s ceiling); information loss PASS (both child docs complete verbatim transplants); sprint exit filed |
+| #3 — single-principal separation of duties | ⬜ EL-action only | Stage 2 governance: second GitHub account with merge authority |
+| #6 — branch protection restoration | ⬜ EL-action only | Dependent on #3 Stage 2 completion |
+
+**G7 is COMPLETE.** Sprint exit document: `docs/process/sprint-plans/m15-g7-sprint-exit.md` — PI Agent Confirmed 2026-06-23. Issue #1091 closable. EL-action items #3 and #6 remain open (non-blocking).
 
 ---
 

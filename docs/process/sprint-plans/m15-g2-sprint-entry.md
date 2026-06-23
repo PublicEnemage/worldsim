@@ -93,7 +93,7 @@ work; it does not block the Architecture Review (Phase 2).
 G2 is an architecture/design sprint — the observable states are document-level, not
 application-level. Intent document acceptance criteria must be specific enough that the
 QA Lead can check them without reading any authorship drafts in progress.
-(Authority: CLAUDE.md §Agent Execution Lifecycle Step 1)*
+(Authority: docs/process/agent-execution-lifecycle.md Step 1)*
 
 - [ ] Intent document filed for G2 deliverables — **MUST FILE BEFORE G2 WORK BEGINS**
 
@@ -116,7 +116,7 @@ contents. An acceptance criterion that requires expert judgment to verify is inc
 file-existence and content-presence checks analogous to M14 G7 governance documentation
 sprint (`backend/tests/test_m14_g7_governance_onboarding.py`). Tests must be authored
 from the intent document's acceptance criteria BEFORE G2 document authorship begins.
-(Authority: CLAUDE.md §Agent Execution Lifecycle Step 2)*
+(Authority: docs/process/agent-execution-lifecycle.md Step 2)*
 
 - [ ] QA test file authored for G2 before work begins — **MUST FILE BEFORE G2 WORK BEGINS**
 

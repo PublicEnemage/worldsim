@@ -8,10 +8,10 @@ authored-date: 2026-06-12
 el-endorsement-required: true
 phase-entry: docs/process/sprint-plans/process-redesign-phaseB-sprint-entry.md
 phaseA-inputs:
-  - CLAUDE.md §Agent Execution Lifecycle (Step 5 — Validate)
-  - CLAUDE.md §Agent Execution Lifecycle — When Verify or Validate fails
-  - CLAUDE.md §Agent Execution Lifecycle — Layer 3 Quality Gate
-  - CLAUDE.md §Agent Execution Lifecycle — Kryptonite Design Constraint
+  - docs/process/agent-execution-lifecycle.md (Step 5 — Validate)
+  - docs/process/agent-execution-lifecycle.md — When Verify or Validate fails
+  - docs/process/agent-execution-lifecycle.md — Layer 3 Quality Gate
+  - docs/process/agent-execution-lifecycle.md — Kryptonite Design Constraint
   - docs/process/intent-template.md
 deliberation-source: docs/process/design/2026-06-08-sprint-cadence-acceptance-gates-deliberation.md §Phase B
 ---
@@ -21,7 +21,7 @@ deliberation-source: docs/process/design/2026-06-08-sprint-cadence-acceptance-ga
 **Owner:** Business Product Owner (R)
 **Enforcer:** PI Agent (R — sprint exit confirmation; near-miss filing on rejection)
 **Accountable:** Engineering Lead
-**Authority:** `CLAUDE.md §Agent Execution Lifecycle — Step 5 (Validate)`
+**Authority:** `docs/process/agent-execution-lifecycle.md — Step 5 (Validate)`
 
 This document specifies what Business PO acceptance looks like for each work type, what
 constitutes a passing validation, and what the exception path is when acceptance is rejected.
@@ -35,7 +35,7 @@ optional, and it is not a judgment call that varies by sprint.
 
 ## Part 1 — Per-Work-Type Verification Criteria
 
-*Authored by Business PO. Authority: CLAUDE.md §Agent Execution Lifecycle — Step 5.*
+*Authored by Business PO. Authority: docs/process/agent-execution-lifecycle.md — Step 5.*
 
 ### 1.1 Frontend Feature
 
@@ -229,7 +229,7 @@ The Business PO must answer YES to all of the following:
 
 ## Part 2 — Exception Path Specification
 
-*Authored by PI Agent. Authority: CLAUDE.md §Agent Execution Lifecycle — When Verify or Validate
+*Authored by PI Agent. Authority: docs/process/agent-execution-lifecycle.md — When Verify or Validate
 fails; deliberation source §Phase B PI Agent Finding 3.*
 
 ### 2.1 When the Business PO Triggers a Rejection
@@ -256,7 +256,7 @@ judgment call.
 ### 2.2 Rejection Artifact Requirements
 
 When a rejection is triggered, the Business PO produces a rejection artifact per
-`CLAUDE.md §Agent Execution Lifecycle — When Verify or Validate fails`.
+`docs/process/agent-execution-lifecycle.md — When Verify or Validate fails`.
 
 **Location:** `docs/process/rejections/REJECT-NNN-YYYY-MM-DD-short-description.md`
 (NNN is the next sequential rejection number from the rejections directory)
@@ -298,7 +298,7 @@ gap it evidenced must become permanent institutional memory.
 
 ### 2.3 Re-Acceptance Process
 
-**Return-to-Step-1 requirement:** Per `CLAUDE.md §Agent Execution Lifecycle`, the implementing
+**Return-to-Step-1 requirement:** Per `docs/process/agent-execution-lifecycle.md`, the implementing
 agent returns to Intent authorship (Step 1), not Implementation (Step 3). A Verify or Validate
 failure is evidence that the intent-to-implementation chain had a gap. The intent must be
 re-examined before the code is corrected — the intent may be the source of the gap.
@@ -392,6 +392,6 @@ makes sprint exit a gate rather than a rubber stamp.
 ---
 
 *This document is the canonical Phase B output. It references Phase A outputs
-(`CLAUDE.md §Agent Execution Lifecycle`) and feeds Phase C (sprint cadence formalization via
+(`docs/process/agent-execution-lifecycle.md`) and feeds Phase C (sprint cadence formalization via
 the sprint exit gate reference in `docs/process/sprint-planning-sop.md §Sprint Exit Gate`).
 Changes require Business PO and PI Agent review and EL endorsement.*

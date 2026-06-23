@@ -184,7 +184,7 @@ no AC involves text display, label format, or layout.]
 
 ## 5. Kryptonite Constraint Check
 
-> *Authority: CLAUDE.md §Agent Execution Lifecycle — Kryptonite Design Constraint (FD-3).
+> *Authority: docs/process/agent-execution-lifecycle.md — Kryptonite Design Constraint (FD-3).
 > Required for any implementation that introduces or modifies a user-facing analytical output.
 > An intent document with this section unchecked is incomplete and blocks test authorship.*
 
@@ -228,4 +228,4 @@ Backend pytest: `backend/tests/test_m{N}_g{N}_{short_name}.py`]
 authority: `docs/process/agents.md §Architect Agent`. The intent document is the contract;
 the implementation is the execution. A discrepancy between them is a Verify-step failure —
 not a document-update opportunity. For the full lifecycle this template feeds into, see
-`CLAUDE.md §Agent Execution Lifecycle`.*
+`docs/process/agent-execution-lifecycle.md`.*

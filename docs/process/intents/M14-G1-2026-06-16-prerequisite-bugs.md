@@ -408,6 +408,6 @@ Issues closed by this validation: **#961, #962, #963**
 required — bug fixes only; ADR-016 entity scope (GRC/JOR/EGY/ZMB) provides context
 for #961 entity list. Implementing agent: Frontend Architect Agent. Kryptonite
 constraint: PASS — all three fixes produce directly interpretable UI affordances
-with no specialist mediation required. See CLAUDE.md §Agent Execution Lifecycle for
+with no specialist mediation required. See docs/process/agent-execution-lifecycle.md for
 the five-step lifecycle this document gates. G1 COMPLETE — all 5 steps pass; BPO
 Step 5 ACCEPT recorded 2026-06-17.*

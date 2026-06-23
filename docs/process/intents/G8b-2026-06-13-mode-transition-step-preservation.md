@@ -412,5 +412,5 @@ is reachable in a time-constrained negotiation preparation session.
 architectural decision. Implementing agent: Frontend Architect Agent. Kryptonite constraint:
 PASS — modal and mode selector interpretable without specialist mediation. Sri Lanka 2022 marquee
 case BPO Validate criterion: Mode 1 replay at step N → Mode 2 simulation in single session
-without manual context reconstruction. See CLAUDE.md §Agent Execution Lifecycle for full
+without manual context reconstruction. See docs/process/agent-execution-lifecycle.md for full
 five-step lifecycle this document gates.*

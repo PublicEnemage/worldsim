@@ -85,7 +85,7 @@ keys only — `financial`, `human_development`, `ecological`, `governance`,
 ### 2.3 — Intent document gate
 
 *An intent document must be filed before any G4 implementation PR opens.
-(Authority: CLAUDE.md §Agent Execution Lifecycle Step 1)*
+(Authority: docs/process/agent-execution-lifecycle.md Step 1)*
 
 - [ ] Intent document filed for G4 deliverables — **NOT YET FILED — required before implementation PR opens**
 
@@ -122,7 +122,7 @@ Component 3 acceptance criteria.
 ### 2.4 — QA test authorship gate
 
 *QA tests must be authored from the intent document's acceptance criteria before implementation
-code is written. (Authority: CLAUDE.md §Agent Execution Lifecycle Step 2)*
+code is written. (Authority: docs/process/agent-execution-lifecycle.md Step 2)*
 
 - [ ] QA test file authored for G4 before implementation begins — **NOT YET FILED — required before implementation PR opens**
 

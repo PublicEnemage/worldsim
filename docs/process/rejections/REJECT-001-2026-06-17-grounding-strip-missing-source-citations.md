@@ -100,4 +100,4 @@ This sprint group (G4) cannot close and no subsequent sprint group (G5+) may beg
 
 ---
 
-*Filed: 2026-06-17 by Business PO at Step 5 Validate. Near-miss: NM-045 (PI Agent to confirm). Implementing agent returns to Step 1 per CLAUDE.md §Agent Execution Lifecycle — When Verify or Validate Fails.*
+*Filed: 2026-06-17 by Business PO at Step 5 Validate. Near-miss: NM-045 (PI Agent to confirm). Implementing agent returns to Step 1 per docs/process/agent-execution-lifecycle.md — When Verify or Validate Fails.*

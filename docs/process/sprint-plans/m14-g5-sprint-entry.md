@@ -110,7 +110,7 @@ no field may be consumed by the frontend without a matching entry in that file.
 ### 2.3 — Intent document gate
 
 *An intent document must be filed before any G5 implementation PR opens.
-(Authority: CLAUDE.md §Agent Execution Lifecycle Step 1)*
+(Authority: docs/process/agent-execution-lifecycle.md Step 1)*
 
 - [ ] Intent document filed for G5 deliverables — **NOT YET FILED — required before
   implementation PR opens**
@@ -167,7 +167,7 @@ not include Component 4 acceptance criteria.
 ### 2.4 — QA test authorship gate
 
 *QA tests must be authored from the intent document's acceptance criteria before implementation
-code is written. (Authority: CLAUDE.md §Agent Execution Lifecycle Step 2)*
+code is written. (Authority: docs/process/agent-execution-lifecycle.md Step 2)*
 
 - [ ] QA test file authored for G5 before implementation begins — **NOT YET FILED — required
   before implementation PR opens**

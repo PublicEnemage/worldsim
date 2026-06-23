@@ -9,9 +9,9 @@ el-endorsement-required: true
 prerequisite: Phase A exit artifact endorsed — docs/process/sprint-plans/process-redesign-phaseA-exit.md
 deliberation-source: docs/process/design/2026-06-08-sprint-cadence-acceptance-gates-deliberation.md §Phase B
 phaseA-inputs:
-  - CLAUDE.md §Agent Execution Lifecycle (Step 5 — Validate)
-  - CLAUDE.md §Agent Execution Lifecycle — When Verify or Validate fails
-  - CLAUDE.md §Agent Execution Lifecycle — Layer 3 Quality Gate
+  - docs/process/agent-execution-lifecycle.md (Step 5 — Validate)
+  - docs/process/agent-execution-lifecycle.md — When Verify or Validate fails
+  - docs/process/agent-execution-lifecycle.md — Layer 3 Quality Gate
   - docs/process/intent-template.md
 gates-phases:
   - Phase C — Sprint Cadence Formalization
@@ -55,12 +55,12 @@ This sprint does not open until:
    lifecycle to reference.
 
 2. **All Phase A primary outputs are confirmed accessible:**
-   - `CLAUDE.md §Agent Execution Lifecycle` (Validate step, rejection artifact, Layer 3 gate)
+   - `docs/process/agent-execution-lifecycle.md` (Validate step, rejection artifact, Layer 3 gate)
    - `docs/process/intent-template.md`
 
 3. **Mandatory reading before session opens:**
    - `docs/process/sprint-plans/process-redesign-phaseA-exit.md` — Phase A summary
-   - `CLAUDE.md §Agent Execution Lifecycle` — the Phase B acceptance protocol references this
+   - `docs/process/agent-execution-lifecycle.md` — the Phase B acceptance protocol references this
    - `docs/process/design/2026-06-08-sprint-cadence-acceptance-gates-deliberation.md §Phase B`
    - `SESSION_STATE.md`, `CLAUDE.md`, `docs/process/agents.md` — standard session protocol
 
@@ -73,7 +73,7 @@ This sprint does not open until:
 A formal specification of what Business PO acceptance looks like for each work type, what
 constitutes a passing validation, and what the exception path is when acceptance is rejected.
 
-**The four work types from CLAUDE.md §Agent Execution Lifecycle — Step 5, requiring per-type
+**The four work types from docs/process/agent-execution-lifecycle.md — Step 5, requiring per-type
 verification specification:**
 
 1. **Frontend feature:** How does the Business PO confirm the named persona reaches the

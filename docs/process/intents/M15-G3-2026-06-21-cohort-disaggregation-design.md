@@ -365,7 +365,7 @@ These are G5 scope. G3 is not responsible for any G5 issues.
 
 ---
 
-*Intent document version: 2026-06-21. Issues #986 and #987 authorized as M15 G3 parallel track per `docs/process/sprint-plans/m15-sprint-plan.md §Sprint Groups`. No sprint entry document required (design-only; no implementation PR). Implementing agent: UX Designer Agent. Both design documents must exist before M15 exit. Architecture Review Facilitator confirms M16 readiness before any M16 G-group implementation sprint entry is filed for either issue. Full lifecycle authority: `CLAUDE.md §Agent Execution Lifecycle`.*
+*Intent document version: 2026-06-21. Issues #986 and #987 authorized as M15 G3 parallel track per `docs/process/sprint-plans/m15-sprint-plan.md §Sprint Groups`. No sprint entry document required (design-only; no implementation PR). Implementing agent: UX Designer Agent. Both design documents must exist before M15 exit. Architecture Review Facilitator confirms M16 readiness before any M16 G-group implementation sprint entry is filed for either issue. Full lifecycle authority: `docs/process/agent-execution-lifecycle.md`.*
 
 ---
 

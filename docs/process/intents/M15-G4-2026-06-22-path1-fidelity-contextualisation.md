@@ -508,4 +508,4 @@ Sprint exit document to be filed.
 
 ---
 
-*Intent document filed 2026-06-22. Data Architect Agent (DA-G4-1–4) + Architect Agent (scope confirmation). Chief Methodologist analogous-case mapping (Decision Gate 2) recorded here; CM sign-off required on #975 before Component 3 implementation PR is marked ready for review. QA Lead files test files before implementation code is written. Authority: `CLAUDE.md §Agent Execution Lifecycle`. Template: `docs/process/intent-template.md` (version 2026-06-17).*
+*Intent document filed 2026-06-22. Data Architect Agent (DA-G4-1–4) + Architect Agent (scope confirmation). Chief Methodologist analogous-case mapping (Decision Gate 2) recorded here; CM sign-off required on #975 before Component 3 implementation PR is marked ready for review. QA Lead files test files before implementation code is written. Authority: `docs/process/agent-execution-lifecycle.md`. Template: `docs/process/intent-template.md` (version 2026-06-17).*

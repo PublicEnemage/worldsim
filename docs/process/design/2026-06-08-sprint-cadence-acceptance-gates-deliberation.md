@@ -162,7 +162,7 @@ All four catch points precede the internal demo. The mechanisms are not redundan
 
 **Review chain:** PM Agent (milestone coordination check) → Architect Agent (compliance gate alignment) → EL endorsement.
 
-**Output artifact:** Draft text for CLAUDE.md §Agent Execution Lifecycle (not committed until EL endorses the sequencing plan and the draft clears its review chain).
+**Output artifact:** Draft text for docs/process/agent-execution-lifecycle.md (not committed until EL endorses the sequencing plan and the draft clears its review chain).
 
 ---
 

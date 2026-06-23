@@ -26,15 +26,15 @@ All primary output artifacts are filed at their canonical locations per
 | Output | Status | Canonical location | Authored by |
 |---|---|---|---|
 | Intent document template (Step 1) | ✅ Filed | `docs/process/intent-template.md` | Architect Agent |
-| Observable application state definition (Step 1) | ✅ Filed | `CLAUDE.md §Agent Execution Lifecycle — Observable Application State` | Architect Agent |
-| Rejection artifact specification (Step 2) | ✅ Filed | `CLAUDE.md §Agent Execution Lifecycle — When Verify or Validate fails` | PI Agent |
-| Enforcement language for each lifecycle gate (Step 2) | ✅ Filed | `CLAUDE.md §Agent Execution Lifecycle` (gate language per step) | PI Agent |
-| Validate step specification (Step 3) | ✅ Filed | `CLAUDE.md §Agent Execution Lifecycle — Step 5` | Business PO |
-| North star test integration into Validate step (Step 3) | ✅ Filed | `CLAUDE.md §Agent Execution Lifecycle — Step 5` (P-7 reference) | Business PO |
-| Layer 3 quality gate (FD-2) (Step 3) | ✅ Filed | `CLAUDE.md §Agent Execution Lifecycle — Layer 3 Quality Gate` | Business PO + Customer Agent |
-| Complete five-step lifecycle document (Step 4) | ✅ Filed | `CLAUDE.md §Agent Execution Lifecycle` | Architect Agent |
-| Kryptonite design constraint (FD-3) (Step 4) | ✅ Filed | `CLAUDE.md §Agent Execution Lifecycle — Kryptonite Design Constraint` | Architect Agent |
-| Self-attestation limitation documented (Step 4) | ✅ Filed | `CLAUDE.md §Agent Execution Lifecycle — Self-attestation limitation` | Architect Agent |
+| Observable application state definition (Step 1) | ✅ Filed | `docs/process/agent-execution-lifecycle.md — Observable Application State` | Architect Agent |
+| Rejection artifact specification (Step 2) | ✅ Filed | `docs/process/agent-execution-lifecycle.md — When Verify or Validate fails` | PI Agent |
+| Enforcement language for each lifecycle gate (Step 2) | ✅ Filed | `docs/process/agent-execution-lifecycle.md` (gate language per step) | PI Agent |
+| Validate step specification (Step 3) | ✅ Filed | `docs/process/agent-execution-lifecycle.md — Step 5` | Business PO |
+| North star test integration into Validate step (Step 3) | ✅ Filed | `docs/process/agent-execution-lifecycle.md — Step 5` (P-7 reference) | Business PO |
+| Layer 3 quality gate (FD-2) (Step 3) | ✅ Filed | `docs/process/agent-execution-lifecycle.md — Layer 3 Quality Gate` | Business PO + Customer Agent |
+| Complete five-step lifecycle document (Step 4) | ✅ Filed | `docs/process/agent-execution-lifecycle.md` | Architect Agent |
+| Kryptonite design constraint (FD-3) (Step 4) | ✅ Filed | `docs/process/agent-execution-lifecycle.md — Kryptonite Design Constraint` | Architect Agent |
+| Self-attestation limitation documented (Step 4) | ✅ Filed | `docs/process/agent-execution-lifecycle.md — Self-attestation limitation` | Architect Agent |
 | PI enforcement review (Step 5) | ✅ Below (Part III) | This document §Part III | PI Agent |
 | Phase A exit artifact (this document) | ✅ Filed | `docs/process/sprint-plans/process-redesign-phaseA-exit.md` | PM Agent |
 | Phase B sprint entry (Step 5) | ✅ Filed | `docs/process/sprint-plans/process-redesign-phaseB-sprint-entry.md` | PM Agent |
@@ -47,10 +47,10 @@ Phase A was tasked with closing the following gaps identified in the Phase 0 del
 
 | Gap | What was required | What was delivered | Status |
 |---|---|---|---|
-| **Execution lifecycle gap** — no gate between "ADR accepted" and "PR merged" required the implementation to produce the observable output the ADR specified | Five-step lifecycle with gates at each transition | `CLAUDE.md §Agent Execution Lifecycle` — five steps with named starting condition, output artifact, acceptance criterion, agent authority, and gate at each step | ✅ **CLOSED** |
-| **Rejection artifact gap** — Verify failure had no mandatory consequence | Rejection artifact that blocks sprint exit and requires return to Intent authorship | `CLAUDE.md §Agent Execution Lifecycle — When Verify or Validate fails` — named format, required contents, return-to-Step-1 rule, near-miss obligation, sprint exit block | ✅ **CLOSED** |
-| **FD-2** — Layer 3 self-interpreting output has no process owner | Customer Agent owns Layer 3 assessment; Business PO Validate step requires it | `CLAUDE.md §Agent Execution Lifecycle — Layer 3 Quality Gate` — Customer Agent holds R; Business PO verdict requires Customer Agent input; PI Agent blocks sprint exit if absent | ✅ **CLOSED** |
-| **FD-3** — Kryptonite frame never governs tradeoffs; financially-conventional indicators win by default | Kryptonite constraint as a concrete tradeoff rule at Intent authorship and Validate | `CLAUDE.md §Agent Execution Lifecycle — Kryptonite Design Constraint` — the three tradeoff classes named; Section 5 of intent template required at authorship; Customer Agent finding required at Validate | ✅ **CLOSED** |
+| **Execution lifecycle gap** — no gate between "ADR accepted" and "PR merged" required the implementation to produce the observable output the ADR specified | Five-step lifecycle with gates at each transition | `docs/process/agent-execution-lifecycle.md` — five steps with named starting condition, output artifact, acceptance criterion, agent authority, and gate at each step | ✅ **CLOSED** |
+| **Rejection artifact gap** — Verify failure had no mandatory consequence | Rejection artifact that blocks sprint exit and requires return to Intent authorship | `docs/process/agent-execution-lifecycle.md — When Verify or Validate fails` — named format, required contents, return-to-Step-1 rule, near-miss obligation, sprint exit block | ✅ **CLOSED** |
+| **FD-2** — Layer 3 self-interpreting output has no process owner | Customer Agent owns Layer 3 assessment; Business PO Validate step requires it | `docs/process/agent-execution-lifecycle.md — Layer 3 Quality Gate` — Customer Agent holds R; Business PO verdict requires Customer Agent input; PI Agent blocks sprint exit if absent | ✅ **CLOSED** |
+| **FD-3** — Kryptonite frame never governs tradeoffs; financially-conventional indicators win by default | Kryptonite constraint as a concrete tradeoff rule at Intent authorship and Validate | `docs/process/agent-execution-lifecycle.md — Kryptonite Design Constraint` — the three tradeoff classes named; Section 5 of intent template required at authorship; Customer Agent finding required at Validate | ✅ **CLOSED** |
 | **Intent document format gap** — no standard for what an Implementation Intent document must contain | Canonical template with observable application state, acceptance criteria, and Kryptonite check | `docs/process/intent-template.md` — seven sections; completeness test embedded; distinction from Intent Blocks documented | ✅ **CLOSED** |
 
 ---
@@ -147,7 +147,7 @@ Per `docs/process/sprint-plans/process-redesign-phaseA-sprint-entry.md §Exit Ga
 
 | # | Condition | Status |
 |---|---|---|
-| 1 | Agent execution lifecycle (five steps, enforcement gates, rejection artifact) encoded in CLAUDE.md | ✅ Confirmed — `CLAUDE.md §Agent Execution Lifecycle` |
+| 1 | Agent execution lifecycle (five steps, enforcement gates, rejection artifact) encoded in CLAUDE.md | ✅ Confirmed — `docs/process/agent-execution-lifecycle.md` |
 | 2 | PI Agent confirms enforcement language is adequate (obligation, not aspiration) | ✅ Confirmed — Part III Finding 1 |
 | 3 | EL endorses Phase A outputs | ✅ Endorsed 2026-06-12 — Part VII |
 | 4 | Phase B sprint entry document is filed | ✅ Filed — `docs/process/sprint-plans/process-redesign-phaseB-sprint-entry.md` |
@@ -199,7 +199,7 @@ lifecycle should not be weakened before its first application in M13.
 
 ## Part VI — Known Limitations
 
-These limitations are documented here and in CLAUDE.md §Agent Execution Lifecycle as part of the
+These limitations are documented here and in docs/process/agent-execution-lifecycle.md as part of the
 honest institutional record. They are not failures of Phase A — they are scope boundaries that
 later phases or tooling may address.
 

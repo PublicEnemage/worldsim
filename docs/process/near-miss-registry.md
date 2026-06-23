@@ -2122,7 +2122,7 @@ The Engineering Lead — not the process. The M12 demo preparation standard (Ste
 
 2. **Structural fix:** `bash -n scripts/demo.sh` added as a mandatory named gate at Step 3 of the Demo Preparation Standard (`docs/process/demo-preparation-standard.md §Step 3 — Syntax validation gate`). The gate runs after any edit to `demo.sh` and must exit 0 before the file is committed. This converts a person-caught gap to a process-caught gate.
 
-3. **Exit ceremony fix:** The milestone exit ceremony (CLAUDE.md §Milestone Exit Ceremony) codified as a named SOP for the first time, closing the broader gap that no formal exit ceremony checklist existed beyond the retrospective. The four exit ceremony steps (open issue audit, milestone reference audit, SESSION_STATE consistency check, fresh session continuity test) ensure the next milestone's session does not inherit stale state.
+3. **Exit ceremony fix:** The milestone exit ceremony (docs/process/milestone-exit-sop.md §Milestone Exit Ceremony) codified as a named SOP for the first time, closing the broader gap that no formal exit ceremony checklist existed beyond the retrospective. The four exit ceremony steps (open issue audit, milestone reference audit, SESSION_STATE consistency check, fresh session continuity test) ensure the next milestone's session does not inherit stale state.
 
 ---
 
@@ -2154,7 +2154,7 @@ None of these were blocking, but all three were missed by the self-generated sig
 
 ### What caught it
 
-The Engineering Lead — not the process. The Phase A execution lifecycle (CLAUDE.md §Agent Execution Lifecycle) does not include a guard against an implementing agent generating a reviewer's sign-off. The UX Designer sign-off checkbox in the ADR template has no process mechanism to verify the sign-off was performed independently.
+The Engineering Lead — not the process. The Phase A execution lifecycle (docs/process/agent-execution-lifecycle.md) does not include a guard against an implementing agent generating a reviewer's sign-off. The UX Designer sign-off checkbox in the ADR template has no process mechanism to verify the sign-off was performed independently.
 
 ### Process improvement
 
@@ -2780,7 +2780,71 @@ This was caught by a process artifact check, not by CI. CI had no way to report 
 
 Additionally: the sprint entry and intent documents should be committed to the feature branch before the implementation PR is opened. These are prerequisites — filing them as local files without committing them to the branch leaves the process requirements unverifiable by anyone reviewing the PR.
 
-**Near-miss lineage:** CLAUDE.md §Agent Execution Lifecycle states "A test authored in the same session as the implementation it covers has not satisfied this step." This near-miss is the flip side: a test authored correctly (before implementation, in a separate step) but never committed is equally non-satisfying. Both patterns defeat the purpose of the Step 2 gate.
+**Near-miss lineage:** docs/process/agent-execution-lifecycle.md states "A test authored in the same session as the implementation it covers has not satisfied this step." This near-miss is the flip side: a test authored correctly (before implementation, in a separate step) but never committed is equally non-satisfying. Both patterns defeat the purpose of the Step 2 gate.
+
+---
+
+## NM-056 — E2E Test Soft-Skipping Masked a Mock Bug; Backend Startup Failure Made Coverage Appear Green for Eight Sprints
+
+**Date:** 2026-06-23
+**Milestone:** M15 — G6 (Accessibility Validation)
+**Detected by:** CI failure on PR #1128 — `m14-g5-adr015-frontend.spec.ts:573` AC-4 failed with `expect("[T2 · pre-cal]").toContain("[—]")` after consistently passing in all prior CI runs
+**Severity:** High — the AC-4 acceptance criterion (null confidence_tier renders `[—]` fallback) was never actually exercised by CI. The feature was implemented correctly, but the test that was supposed to guard it was silently skipping. Any future refactor that broke null-tier rendering would not have been caught by CI.
+
+### What happened
+
+The AC-4 test in `frontend/tests/e2e/m14-g5-adr015-frontend.spec.ts` exercises the null-confidence-tier fallback in Zone 1D annotations: when `confidence_tier` is null, the annotation must render `[—]` instead of `[T{N}]`.
+
+The test uses a helper `makeTrajectoryMock(scenarioId, { financialTier: null })`. Inside the helper:
+
+```js
+const financialTier = options.financialTier ?? 2;
+```
+
+The `??` (nullish coalescing) operator returns the right-hand side when the left-hand side is `null` **or** `undefined`. Since `{ financialTier: null }` passes `null`, `null ?? 2` evaluates to `2` — the helper always emitted `confidence_tier: 2`, never null. The mock was functionally identical to not passing `financialTier` at all.
+
+**Why this was not previously caught:** The test `beforeAll` block calls `checkG3FixtureAccessible()` (checks if a pre-seeded JOR scenario exists) and falls back to `createCompletedScenario("JOR", 1, ...)`. In CI, `createCompletedScenario` was failing silently because the Docker backend was not starting up with migrations applied — the `alembic upgrade head` step was absent from the container startup. With `createCompletedScenario` throwing, the `catch` block set `jorScenarioId = null`. All AC-1 through AC-4 tests then hit `if (!jorScenarioId) return;` and soft-skipped. Playwright records a soft-skip as a passing test. CI showed green for eight sprint groups (M14-G5 through M15-G5) without ever running AC-4.
+
+PR #1123 (M15-G5, `entrypoint.sh: alembic upgrade head`) fixed the backend startup. On PR #1128, `createCompletedScenario` succeeded for the first time in CI, `jorScenarioId` was set, AC-4 ran, and the mock bug became visible.
+
+### What was at risk
+
+1. **Null-tier coverage gap:** The null confidence_tier rendering path (`buildFrameworkAnnotation` returning `[—]`) was tested only in unit tests (`FourFrameworkZone1D.test.ts`), not in an E2E scenario with a real page load and store integration. If a future refactor changed how `confidence_tier` was read from the trajectory store, CI would not catch a regression.
+
+2. **False CI signal for eight sprints:** CI was showing `playwright-e2e pass` on every PR since M14-G5, but AC-4 was not running. Any agent or reviewer interpreting `playwright-e2e pass` as confirmation of AC-4 coverage was reading a misleading signal.
+
+3. **Test author trust gap:** The intent document for M14-G5 cites AC-4 as a verified acceptance criterion. The CI pass that was cited as evidence was not actually running AC-4. The verification record is technically inaccurate for the E2E layer.
+
+### What caught it
+
+CI failure on PR #1128 (G6 accessibility validation docs-only PR). The failure was immediately confusing — a docs-only PR cannot cause a test regression. Investigation revealed the two-layer root cause: the mock bug and the silent-skip masking. Both layers required diagnosis before the fix was clear.
+
+This was caught by CI on an unrelated PR — not by the test suite itself (which was showing green) and not by a process gate.
+
+### Process improvement
+
+**Immediate fix:** Changed `options.financialTier ?? 2` to `options.financialTier !== undefined ? options.financialTier : 2` in `makeTrajectoryMock` (PR #1130). The fix preserves explicit `null` while defaulting `undefined` to `2`. AC-4 now runs in CI and passes.
+
+**Root cause — two layers:**
+
+1. **Mock bug layer:** `??` was used where `!== undefined` was required. The TypeScript option type declared `financialTier?: number | null`, which correctly allows `null`. But the implementation used `??` without recognizing that `??` and "default if not provided" are different for nullable types.
+
+2. **Silent-skip masking layer:** The `beforeAll` catch-and-null pattern `jorScenarioId = null` combined with `if (!jorScenarioId) return;` in each test produces soft-skips that are indistinguishable from passes in CI output. Soft-skip is not the same as pass for coverage purposes.
+
+**Recommended process improvement:**
+
+When tests use a soft-skip guard on a fixture (`if (!fixture) return;`), the test file should include at least one test that asserts the fixture IS available — so that a fixture-creation failure is a test failure, not a silent skip. A "fixture availability" test at the top of the `describe` block would have reported `jorScenarioId` as null and failed visibly, rather than letting all subsequent tests silently pass.
+
+Example pattern:
+```js
+test("fixture: JOR scenario accessible", () => {
+  expect(jorScenarioId).not.toBeNull();
+});
+```
+
+This test would have failed in CI for eight sprints and revealed that `createCompletedScenario` was not working — surfacing the missing migration step months earlier.
+
+**Near-miss lineage:** PR #1123 (NM-049 fix: Alembic auto-migration at Docker startup) was the upstream fix that exposed this latent test reliability gap. NM-049 was filed for the migration-at-startup gap; NM-056 is the downstream consequence of NM-049 being absent for eight sprints. The two near-misses together document the full failure chain: no migrations → backend starts without seeded state → `createCompletedScenario` fails → tests soft-skip → mock bug invisible.
 
 ---
 
