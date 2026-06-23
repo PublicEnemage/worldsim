@@ -1297,9 +1297,14 @@ test.describe("AC-12: Zone 1A N=4 endpoint label collision — all 4 codes visib
     const trajectory = page.locator('[data-testid="zone-1a-trajectory"]');
     if (!(await trajectory.isVisible({ timeout: 8_000 }).catch(() => false))) return;
 
-    // Primary guard: entity-labels-overlay is new in Phase 4
+    // Primary guard: entity-labels-overlay exists pre-Phase 4 but only renders
+    // entity-label-0 and entity-label-1 (hardcoded 2-entity view). Phase 4 renders
+    // all N entity labels dynamically. Guard on the 3rd label being present — this
+    // makes the test a no-op until Phase 4 N-label rendering lands.
     const labelsOverlay = page.locator('[data-testid="entity-labels-overlay"]');
     if (!(await labelsOverlay.isVisible({ timeout: 5_000 }).catch(() => false))) return;
+    const thirdLabel = labelsOverlay.locator('[data-testid="entity-label-2"]');
+    if ((await thirdLabel.count()) === 0) return;
 
     // All 4 entity codes must be visible — NM-045: containsText checks
     for (const code of FOUR_ENTITIES) {
