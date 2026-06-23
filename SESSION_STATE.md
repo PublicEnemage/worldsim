@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-23 (G7 COMPLETE — PR #1137 merged to release/m15; CLAUDE.md 1082→800 lines; agent-execution-lifecycle.md + milestone-exit-sop.md created; 21 QA tests AC-1–AC-14 all pass)**
+**Last updated: 2026-06-23 (G7 FULLY COMPLETE — BPO ACCEPT; sprint exit filed; #1091 closable; cold-read navigability PASS; information loss PASS)**
 **Current milestone:** M15 — Human Cost Architecture (GitHub Milestone 16)
 **Previous milestone:** M14 — Trust Architecture and Instrument Credibility (FORMALLY CLOSED 2026-06-20; release/m14 → main PR #1086; v0.14.0 at https://github.com/PublicEnemage/worldsim/releases/tag/v0.14.0; #968 closed; GitHub Milestone 15 closed)
 
@@ -273,11 +273,11 @@ Implementation is now unblocked. A sprint entry document must be filed and EL-ap
 | Cross-reference audit | ✅ COMPLETE | 37 docs/ files updated; AC-13/AC-14 confirmed zero remaining stale refs |
 | #1091 extraction PR | ✅ **MERGED 2026-06-23** (PR #1137) | `docs/process/agent-execution-lifecycle.md` (201 lines) + `docs/process/milestone-exit-sop.md` (67 lines); CLAUDE.md 1,082 → 800 lines; 21 QA tests AC-1–AC-14 all pass |
 | Step 4 Verify | ✅ PASS 2026-06-23 | AC-1–AC-14 all confirmed; child docs complete verbatim transplants; CLAUDE.md line count: 800 |
-| Step 5 Validate | ⬜ Pending | Business PO cold-read navigability test (≤60s); information loss check |
+| Step 5 Validate | ✅ **BPO ACCEPT 2026-06-23** | Cold-read navigability PASS (lifecycle ~15s, exit SOP ~40s, both ≤60s ceiling); information loss PASS (both child docs complete verbatim transplants); sprint exit filed |
 | #3 — single-principal separation of duties | ⬜ EL-action only | Stage 2 governance: second GitHub account with merge authority |
 | #6 — branch protection restoration | ⬜ EL-action only | Dependent on #3 Stage 2 completion |
 
-**G7 implementation complete. Step 5 Validate (Business PO) remains open.**
+**G7 is COMPLETE.** Sprint exit document: `docs/process/sprint-plans/m15-g7-sprint-exit.md` — PI Agent Confirmed 2026-06-23. Issue #1091 closable. EL-action items #3 and #6 remain open (non-blocking).
 
 ---
 
