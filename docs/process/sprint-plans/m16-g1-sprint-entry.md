@@ -3,10 +3,10 @@ name: m16-g1-sprint-entry
 type: sprint-entry
 milestone: M16 — Distributional Visibility
 sprint-group: G1
-status: Filed — awaiting EL approval before implementation begins
+status: EL Approved 2026-06-23 — intent document and QA tests must be filed before implementation PR opens
 authored-by: PM Agent
 authored-date: 2026-06-23
-el-approved: false
+el-approved: 2026-06-23
 release-branch: release/m16
 sop-reference: docs/process/sprint-planning-sop.md
 ---
@@ -214,7 +214,7 @@ condition for G8 entry.
 
 ## EL Approval Record
 
-**EL approval:** Pending
+**EL approval:** 2026-06-23
 
-> {EL approval statement — to be filled at approval time}
-> — @PublicEnemage ({date})
+> G1 sprint entry approved. Structural gates confirmed clear. ADR prerequisites clear for both issues (ADR-017 accepted 2026-06-22; ADR-015 accepted 2026-06-16). Observable application states in Section 3.1 are specific enough to gate QA test authorship. Intent document and QA test file must be filed before implementation PR opens — these remain blocking conditions. G2 gate dependency (G2 implementation PR may not open until G1 merges) and G8 gate dependency (#843 may not open until G1 + G2 + G3 are BPO-accepted) noted and accepted. Implementation may proceed once the intent and QA gates are satisfied.
+> — @PublicEnemage (2026-06-23)

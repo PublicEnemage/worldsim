@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-23 (M16 G1 sprint entry filed — awaiting EL approval; intent document and QA tests must be filed before implementation PR opens)**
+**Last updated: 2026-06-23 (M16 G1 sprint entry EL-approved — intent document and QA tests are next blocking steps before implementation PR opens)**
 **Current milestone:** M16 — Distributional Visibility (GitHub Milestone 17)
 **Previous milestone:** M15 — Human Cost Architecture (FORMALLY CLOSED 2026-06-23; release/m15 → main PR #1142; v0.15.0; #984 closed; GitHub Milestone 16 closed)
 
@@ -141,7 +141,7 @@ Implementation is now unblocked. A sprint entry document must be filed and EL-ap
 - ✅ #845 milestone corrected to M16 (was M15)
 - ✅ #1147 filed (Zone 1D delta annotations — was UNTRACKED)
 - ✅ ARCH-012: not needed for G1/G2/G3 core deliverables; may be needed for #22 (G4) — confirm at G4 sprint entry
-- ⬜ G1 sprint entry filed 2026-06-23 — `docs/process/sprint-plans/m16-g1-sprint-entry.md` — **awaiting EL approval**; intent document and QA tests remain blocking before implementation PR opens
+- ✅ G1 sprint entry filed and **EL-approved 2026-06-23** — `docs/process/sprint-plans/m16-g1-sprint-entry.md`; intent document and QA tests remain blocking before implementation PR opens
 - ⬜ G2 pre-conditions: CM/DA/ARF/FA sign-off requests to be opened on #986 and #987
 
 ---
