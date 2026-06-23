@@ -92,7 +92,7 @@ class DemographicModule(SimulationModule):
                         f"demo-{entity.id}-{cohort_id}"
                         f"-{row.attribute_key}-{timestep.isoformat()}"
                     ),
-                    source_entity_id=entity.id,
+                    source_entity_id=cohort_id,
                     event_type="demographic_cohort_delta",
                     affected_attributes={row.attribute_key: qty},
                     propagation_rules=[],

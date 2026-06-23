@@ -34,6 +34,7 @@ import { MDAAlertPanelZone1B, CohortImpactSection } from "./MDAAlertPanelZone1B"
 import { PMMWidgetZone1C } from "./PMMWidgetZone1C";
 import { FourFrameworkZone1D } from "./FourFrameworkZone1D";
 import { CohortIndicatorsPanel } from "./CohortIndicatorsPanel";
+import { HumanCapitalTrajectoryPanel } from "./HumanCapitalTrajectoryPanel";
 import { ControlPlane, type Mode3Params } from "./ControlPlane";
 import { useScenarioStepStore } from "../store/scenarioStepStore";
 import type { TrajectoryResponse, TrajectoryFrameworkPoint, Zone1BAlert, CohortThresholdCrossing } from "../store/scenarioStepStore";
@@ -868,6 +869,17 @@ export function ScenarioInstrumentCluster({
           />
         }
       />
+
+      {/* HumanCapitalTrajectoryPanel — M16-G3 #274.
+          Rendered when projection_steps > 8 (long-run quarterly projection).
+          UX Architectural Commitment 2: in primary viewport, not in a drawer. */}
+      {(activeScenarioDetail?.configuration?.projection_steps ?? 0) > 8 && (
+        <HumanCapitalTrajectoryPanel
+          scenarioId={scenarioId}
+          projectionSteps={activeScenarioDetail!.configuration.projection_steps!}
+          entities={activeScenarioDetail?.configuration?.entities ?? entityIds ?? []}
+        />
+      )}
 
       {/* ControlPlane — rendered in Mode 3 only (G6b, Issue #753). */}
       {mode === "MODE_3" && (

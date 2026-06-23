@@ -13,6 +13,7 @@ this runner.
 
 from __future__ import annotations
 
+import calendar
 import dataclasses
 import logging
 import uuid
@@ -145,6 +146,7 @@ class ScenarioRunner(InputOrchestrator):
         contingent_inputs: list[ContingentInput] | None = None,
         session_id: str | None = None,
         timestep_delta: timedelta | None = None,
+        advance_months: int = 0,
     ) -> None:
         """Initialise the scenario runner.
 
@@ -166,6 +168,9 @@ class ScenarioRunner(InputOrchestrator):
                 advances by exactly one year on the calendar regardless of
                 whether leap years fall in the path. Pass an explicit timedelta
                 for sub-annual or non-standard timestep intervals.
+            advance_months: Advance by this many calendar months per step
+                (M16-G3: quarterly = 3). Takes precedence over timestep_delta
+                when > 0. Default 0 (use timestep_delta or annual calendar).
         """
         from app.simulation.orchestration.audit import AuditLog as _AuditLog
 
@@ -180,6 +185,8 @@ class ScenarioRunner(InputOrchestrator):
         self._session_id = session_id if session_id is not None else str(uuid.uuid4())
         # None means "use calendar-year arithmetic"; see _advance_timestep().
         self._timestep_delta: timedelta | None = timestep_delta
+        # > 0 means "advance by N calendar months"; takes precedence over _timestep_delta.
+        self._advance_months: int = advance_months
         # contingent_id -> remaining cooldown periods (0 means ready to fire)
         self._cooldown_remaining: dict[str, int] = {}
 
@@ -335,7 +342,11 @@ class ScenarioRunner(InputOrchestrator):
         next_state = propagate_matrix(current_state, all_events)
         return dataclasses.replace(
             next_state,
-            timestep=_advance_timestep(current_state.timestep, self._timestep_delta),
+            timestep=_advance_timestep(
+                current_state.timestep,
+                self._timestep_delta,
+                self._advance_months,
+            ),
         )
 
     def check_contingents(self, state: SimulationState) -> list[ControlInput]:
@@ -455,11 +466,18 @@ def _expand_multi_period_inputs(
     return expanded
 
 
-def _advance_timestep(current: datetime, delta: timedelta | None) -> datetime:
+def _advance_timestep(
+    current: datetime,
+    delta: timedelta | None,
+    advance_months: int = 0,
+) -> datetime:
     """Compute the next timestep, handling leap years correctly.
 
-    When delta is None (the default for annual simulations), advances by
-    exactly one calendar year using date arithmetic. This correctly handles
+    When advance_months > 0, advances by that many calendar months (quarterly = 3).
+    Month-end dates are clamped to the last valid day of the target month.
+
+    When advance_months == 0 and delta is None (the default for annual simulations),
+    advances by exactly one calendar year using date arithmetic. This correctly handles
     leap years: 2027-01-01 + 1 year = 2028-01-01, and 2028-01-01 + 1 year
     = 2029-01-01, with no day-count drift.
 
@@ -473,10 +491,17 @@ def _advance_timestep(current: datetime, delta: timedelta | None) -> datetime:
     Args:
         current: The current timestep.
         delta: Fixed timedelta to add, or None to advance by one calendar year.
+        advance_months: Advance by this many calendar months (M16-G3 quarterly mode).
 
     Returns:
         Next timestep.
     """
+    if advance_months > 0:
+        month_0based = (current.month - 1) + advance_months
+        new_year = current.year + month_0based // 12
+        new_month = month_0based % 12 + 1
+        last_day = calendar.monthrange(new_year, new_month)[1]
+        return current.replace(year=new_year, month=new_month, day=min(current.day, last_day))
     if delta is not None:
         return current + delta
     try:

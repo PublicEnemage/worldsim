@@ -366,6 +366,11 @@ class ScenarioConfigSchema(BaseModel):
         Range 0.1–3.0; values outside this range are rejected at validation.
     `commodity_price_shocks` — global commodity shocks distributed to all entities by
         import dependency (Issue #752, ADR-012). Default empty (no shocks).
+    `projection_steps` — optional long-run projection horizon (1–100, M16-G3 #274).
+        When set, overrides n_steps as the total step count. projection_steps > 8
+        enables the 25-year human capital depletion trajectory (quarterly timestep,
+        DemographicModule auto-enabled, adaptive_resolution disabled).
+        Default None → programme-length behaviour (n_steps governs).
     """
 
     model_config = ConfigDict(from_attributes=True)
@@ -381,6 +386,7 @@ class ScenarioConfigSchema(BaseModel):
     n_runs: int = 1
     fiscal_multiplier: float = Field(default=1.0, ge=0.1, le=3.0)
     commodity_price_shocks: list[CommodityShockConfig] = []
+    projection_steps: int | None = Field(default=None, ge=1, le=100)
 
 
 class ScheduledInputSchema(BaseModel):
