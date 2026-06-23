@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-23 (M15 EXIT CEREMONY COMPLETE — v0.15.0; M16 Distributional Visibility now current; #984 closed; #843 exit gate for M16)**
+**Last updated: 2026-06-23 (M16 KICKOFF IN PROGRESS — release/m16 cut; sprint plan filed; #985 renamed; #1147 filed; EL approval pending)**
 **Current milestone:** M16 — Distributional Visibility (GitHub Milestone 17)
 **Previous milestone:** M15 — Human Cost Architecture (FORMALLY CLOSED 2026-06-23; release/m15 → main PR #1142; v0.15.0; #984 closed; GitHub Milestone 16 closed)
 
@@ -106,28 +106,41 @@ Implementation is now unblocked. A sprint entry document must be filed and EL-ap
 
 ## Open Issues — M16 (Distributional Visibility)
 
-**GitHub Milestone:** 17 | **Created:** 2026-06-23 | **Status:** Planned — kickoff prerequisites not yet filed; sprint entry required before G-group implementation begins
+**GitHub Milestone:** 17 | **Created:** 2026-06-23 | **Status:** Kickoff in progress — sprint plan filed; awaiting EL approval; sprint entry required before any G-group implementation begins
 *Zone 1A Phase 4 + cohort disaggregation + political risk surface + live external demo (#843 — exit gate). Demo 6 (Senegalese Finance Minister scenario).*
 
 | Issue | Title | Group | Notes |
 |---|---|---|---|
-| #985 | Milestone 17 Exit Checklist — blocks milestone closure | — | `immediate \| M16 gate issue` (note: title uses GitHub milestone numbering — recommend rename to "M16 Exit Checklist" at kickoff) |
-| #843 | plan: live stakeholder demo with real external participants | G8 (M16) | **M16 exit gate** — deferred from M15 (EL decision 2026-06-23) |
-| #986 | feat(ux): cohort disaggregation on primary surface | — | Design complete M15-G3; implementation M16; CM + DA sign-off required before sprint entry |
-| #987 | feat(ux): political risk summary surface (Persona 3) | — | Design complete M15-G3; implementation M16; CM + DA sign-off required before sprint entry |
-| #845 | ux: Zone 1A information architecture — Phase 4 implementation | — | ADR-017 accepted; Phase 4 entry condition: Zone 1D delta annotations in same sprint |
-| #1145 | docs(founding): add AC-001 and AC-002 as explicit permanent constraints in founding document | — | EL-authored; promoted from insights log entry 7 at HORIZON sweep 2026-06-23 |
-| #6 | Governance: branch protection restoration | — | EL-action; dependent on #3 Stage 2 |
-| #3 | Governance: single-principal separation of duties | — | EL-action; Stage 2 trigger: second GitHub account with merge authority |
+| #985 | M16 Exit Checklist — blocks milestone closure | — | `immediate \| M16 gate issue` — renamed 2026-06-23 |
+| #843 | plan: live stakeholder demo with real external participants | G8 | **M16 exit gate** — deferred from M15 (EL decision 2026-06-23) |
+| #986 | feat(ux): cohort disaggregation on primary surface | G2 | Design complete M15-G3; CM + DA sign-off required before G2 sprint entry |
+| #987 | feat(ux): political risk summary surface (Persona 3) | G2 | Design complete M15-G3; CM + DA + ARF + FA sign-offs required before G2 sprint entry |
+| #845 | ux: Zone 1A information architecture — Phase 4 implementation | G1 | ADR-017 accepted; milestone corrected to M16 2026-06-23 |
+| #1147 | feat(ux): Zone 1D delta annotations — companion to Zone 1A Phase 4 | G1 | Filed 2026-06-23 — was UNTRACKED; BPO phase 4 gate requires same sprint as #845 |
+| #274 | feat(simulation): 25-year human capital depletion trajectory | G3 | CE feasibility assessment required before sprint entry |
+| #275 | feat(simulation): calibrated ecological-to-financial transmission | G4 | Capacity-allowing |
+| #102 | arch(api): distributional scenario comparison variance/percentile | G4 | Capacity-allowing |
+| #22 | feat: uncertainty quantification — distributional scenario bands | G4 | ADR-007 coverage confirmation required; scope to Demo 6 requirements only |
+| #1145 | docs(founding): add AC-001 and AC-002 as explicit permanent constraints | G5 | EL-authored; small documentation edit |
+| #837 | feat(demo): configuration-driven demo scripts | G5 | Capacity-allowing |
+| #951 | process: solo-use review protocol | G5 | Capacity-allowing |
+| #259 | standards: CTO legibility metrics dashboard | G5 | Capacity-allowing |
+| #569 | test(perf): MV-002 Mode 3 hardware validation | G6 | After G1/G2 |
+| #6 | Governance: branch protection restoration | G7 | EL-action; dependent on #3 |
+| #3 | Governance: single-principal separation of duties | G7 | EL-action |
+| #153 | feat(frontend): absolute threshold overlay | Near-term backlog | Secondary feature; not Demo 6 critical |
+| #846 | ux: DEMO-045 — Mode 3 branch comparison values | Near-term backlog | Secondary feature; not Demo 6 critical |
+| #97 | arch(api): threshold-crossing markers in compare output | Near-term backlog | Secondary feature; not Demo 6 critical |
+| #92 | arch(backtesting): Greece 2010 investment climate conditions | Near-term backlog | Secondary feature; not Demo 6 critical |
 
-*All other M15 near-term issues (#846, #837, #951, #569, #259, #153, #97, #92) migrated to M16 at M15 exit ceremony 2026-06-23.*
-
-**M16 kickoff prerequisites (not yet started):**
-- [ ] PM Agent cuts `release/m16` from `main`
-- [ ] PM Agent authors `docs/process/sprint-plans/m16-sprint-plan.md`
-- [ ] EL approves sprint plan
-- [ ] M16 exit checklist issue #985 renamed "M16 Exit Checklist" (recommend)
-- [ ] ARCH-012 assigned in backlog (if Zone 1A Phase 4 requires new ADR review — confirm with Architect)
+**M16 kickoff status (2026-06-23):**
+- ✅ `release/m16` cut from `main` at commit 07c92b8
+- ✅ `docs/process/sprint-plans/m16-sprint-plan.md` filed
+- ⬜ EL approves sprint plan — PENDING
+- ✅ #985 renamed "M16 Exit Checklist"
+- ✅ #845 milestone corrected to M16 (was M15)
+- ✅ #1147 filed (Zone 1D delta annotations — was UNTRACKED)
+- ✅ ARCH-012: not needed for G1/G2/G3 core deliverables; may be needed for #22 (G4) — confirm at G4 sprint entry
 
 ---
 
