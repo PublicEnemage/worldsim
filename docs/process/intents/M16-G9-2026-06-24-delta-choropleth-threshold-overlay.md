@@ -275,7 +275,7 @@ Tests must be authored from this document before implementation code is written.
 **Soft-skip guard (NM-056 follow-up):** No `test.skip()` or conditional skip patterns.
 
 **QA Lead acknowledgment:**
-`[ ]` QA Lead: Tests for AC-1 through AC-6 authored and filed. [Date]
+`[x]` QA Lead: Tests for AC-1 through AC-6 authored and filed. 2026-06-24
 
 ---
 

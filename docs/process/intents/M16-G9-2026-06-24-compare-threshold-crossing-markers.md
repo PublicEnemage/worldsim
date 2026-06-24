@@ -300,7 +300,7 @@ Integration tests requiring a live database must fail explicitly (not skip) when
 absent.
 
 **QA Lead acknowledgment:**
-`[ ]` QA Lead: Tests for AC-1 through AC-6 authored and filed. [Date]
+`[x]` QA Lead: Tests for AC-1 through AC-6 authored and filed. 2026-06-24
 
 ---
 
