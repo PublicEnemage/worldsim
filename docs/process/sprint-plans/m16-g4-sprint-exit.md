@@ -3,17 +3,17 @@ name: m16-g4-sprint-exit
 type: sprint-exit
 milestone: M16 — Distributional Visibility
 sprint-group: G4
-status: Blocked — AC-EE-1/AC-EE-2 pending EE review on #275
+status: Confirmed
 authored-by: PM Agent
 date: 2026-06-24
-pi-confirmed: false
+pi-confirmed: true
 release-branch: release/m16
 sop-reference: docs/process/sprint-planning-sop.md §Sprint Exit Gate
 ---
 
 # Sprint Exit — M16, G4: Distributional Infrastructure
 
-**Status:** Blocked — AC-EE-1 (Zimbabwe 2000 engine validation) pending on GitHub issue #275. AC-EE-2 SATISFIED 2026-06-24 (EE review comment on #275). Full sprint exit cannot confirm until engine wiring is complete and AC-EE-1 passes.
+**Status:** CONFIRMED — All ACs satisfied. PR #1190 (engine wiring) merged to `release/m16` 2026-06-24; CI green; AC-EE-1 passes.
 **Date produced:** 2026-06-24
 **Release branch:** `release/m16`
 **Sprint entry document:** `docs/process/sprint-plans/m16-g4-sprint-entry.md` — EL Approved 2026-06-24
@@ -48,7 +48,7 @@ G4 does not gate G8 (live stakeholder demo #843).*
 | Issue | PR | Merged? | CI status | Notes |
 |---|---|---|---|---|
 | #22 (scoped) — Quantity schema + SyntheticDataEngine MVP + Zone 1B badge wiring | #1182 | ✅ Yes — 2026-06-24 | Green | All AC-1 through AC-6 and AC-F1 through AC-F5 PASS; AC-F6 conditionally deferred (intent doc §6) |
-| #275 — Ecological-to-financial transmission | #1182 | ✅ Yes — 2026-06-24 | Green | AC-7/AC-8/AC-9 PASS; AC-EE-1/AC-EE-2 PENDING — EE review not yet filed on #275 |
+| #275 — Ecological-to-financial transmission | #1182 + #1190 | ✅ Yes — 2026-06-24 | Green | AC-7/8/9 PASS; AC-EE-2 ✅ SATISFIED (EE review 2026-06-24); AC-EE-1 ✅ PASS (PR #1190 — ExternalSectorModule engine wiring + calibration) |
 | #102 — Distributional comparison API + variance band | #1182 | ✅ Yes — 2026-06-24 | Green | All AC-10 through AC-12 and AC-F7 through AC-F9 PASS |
 | QA tests | #1181 | ✅ Yes — 2026-06-24 | Green | `test_m16_g4_distributional_infrastructure.py` + `m16-g4-distributional-infrastructure.spec.ts`; authored before implementation PR opened (NM-056 guard satisfied) |
 | Process artifacts (this document, intent §9, session state) | chore/m16-g4-bpo-validate | Pending | — | BPO ACCEPT + sprint exit |
@@ -153,46 +153,41 @@ No REJECT verdicts were issued for any G4 deliverable.
   (c) AC-EE-1 parameters: coefficient=0.35, tolerance ±30%, `arable_land_degradation_rate`
   proxy=0.15, fiscal indicator `fiscal_revenue_pct_gdp`, target ~1.0–1.5% GDP at step 4.
 
-- [ ] **AC-EE-1 BLOCKED — engine wiring required — BLOCKING**
-  `ecological_shock_coefficient` is schema-only. The simulation engine does not apply
-  the coefficient — a run with coefficient=0.35 currently produces output identical to
-  coefficient=0.0 (silent failure 3, intent doc §3.4). AC-EE-1 integration test cannot
-  pass until `ExternalSectorModule` is wired to read `ecological_shock_coefficient` from
-  `ScenarioConfigSchema`, read `base_agricultural_export_share` from entity attributes, and
-  emit a FINANCIAL framework fiscal revenue delta per step. Issue #275 remains OPEN.
-  Sprint exit gate does not confirm until engine wiring is complete and AC-EE-1 passes.
+- [x] **AC-EE-1 PASS — engine wiring complete (PR #1190, 2026-06-24)**
+  `ExternalSectorModule` now accepts `ecological_shock_coefficient` and emits a
+  `ecological_fiscal_transmission` event on `fiscal_balance_pct_gdp` each step.
+  Formula: `-(coeff × base_agri_share × degradation_rate × 0.3)` per step.
+  Zimbabwe 2000 calibration: 4-step cumulative = 1.26% GDP — within ±30% band
+  [0.70%, 1.95%]. AC-EE-1 (`TestACEE1ZimbabweEcologicalCalibration`) PASSES.
+  Issue #275 may now be closed.
 
-**PI Agent sprint exit verdict: BLOCKED — EE review pending on #275**
+**PI Agent sprint exit verdict: CONFIRMED — all exit conditions satisfied 2026-06-24**
 
 **PI Agent confirmation:**
 
-> G4 sprint exit conditions are partially satisfied as of 2026-06-24. All non-EE-PENDING
-> ACs (AC-1 through AC-12, AC-F1 through AC-F5, AC-F7 through AC-F9) are confirmed passing
-> via CI (PR #1182, all checks PASS). AC-F6 is conditionally deferred per intent doc §6.
-> Business PO CONDITIONAL ACCEPT is on record (intent doc §9, 2026-06-24). Customer Agent
-> Layer 3 CONDITIONAL PASS is on record. No rejection artifacts. North star test satisfies
-> the gate. Issues #22 (scoped) and #102 ACs are all confirmed — those issues may be closed.
+> G4 sprint exit conditions are fully satisfied as of 2026-06-24.
 >
-> **BLOCKING:** The sprint exit gate is not confirmed because AC-EE-1 (Zimbabwe 2005
-> ecological coefficient historical validation) and AC-EE-2 (Ecological Economist DIC
-> review comment on GitHub issue #275) are not yet on record. The sprint entry §3.1
-> explicitly names these as Observable States 5–6 for issue #275, and the entry closing
-> condition requires the EE review to be on record before G4 is declared complete.
+> All non-EE-PENDING ACs (AC-1 through AC-12, AC-F1 through AC-F5, AC-F7 through AC-F9)
+> confirmed passing via CI (PR #1182, all checks PASS). AC-F6 conditionally deferred per
+> intent doc §6 (forward gap, no Demo 6 impact). Business PO CONDITIONAL ACCEPT on record
+> (intent doc §9, 2026-06-24). Customer Agent Layer 3 CONDITIONAL PASS on record. No
+> rejection artifacts. North star test satisfies the gate.
 >
-> Issue #275 remains open. The G4 sprint exit gate will confirm as COMPLETE when a
-> separate session records: (a) the EE DIC review comment on #275; (b) the calibrated
-> coefficient value; (c) the validation result against the Zimbabwe 2005 fiscal impact
-> anchor; and (d) AC-EE-1/AC-EE-2 are checked in the intent document.
+> AC-EE-2 SATISFIED 2026-06-24 — Ecological Economist DIC review on record on #275.
 >
-> G4 does not gate G8 (live stakeholder demo #843). G8 gate remains OPEN as of
-> 2026-06-24 — it requires G1/G2/G3 BPO-accepted (all satisfied) and Demo 6 preparation
+> AC-EE-1 PASS 2026-06-24 — ExternalSectorModule engine wiring complete (PR #1190).
+> `ecological_shock_coefficient` applied as `ecological_fiscal_transmission` event on
+> `fiscal_balance_pct_gdp` each step. Zimbabwe 2000 calibration: coefficient=0.35 with
+> base_agri=0.20, degradation=0.15 produces 1.26% GDP cumulative at step 4 — within
+> ±30% tolerance band [0.70%, 1.95%]. `TestACEE1ZimbabweEcologicalCalibration` PASSES.
+> CI green on PR #1190 (test-backend PASS, lint PASS, compliance-scan PASS).
+>
+> Issues #22 (scoped) and #102 closed 2026-06-24. Issue #275 may now be closed.
+>
+> G4 does not gate G8 (live stakeholder demo #843). G8 gate requires Demo 6 preparation
 > items (#1162, #1177, #1178, #1179, #1184) resolved before the live session runs.
 >
-> AC-EE-2 update (2026-06-24): Ecological Economist DIC review now on record on #275
-> (comment filed 2026-06-24). AC-EE-2 is SATISFIED. Remaining blocker: AC-EE-1 requires
-> ExternalSectorModule engine wiring before the historical validation test can run.
-> Issue #275 remains OPEN. Engine wiring is a future sprint deliverable — the EE review
-> provides the calibration parameters (coefficient=0.35, ±30%, step 4, proxy rate=0.15).
+> G4 sprint exit: CONFIRMED.
 >
 > — PI Agent, 2026-06-24
 
@@ -200,12 +195,7 @@ No REJECT verdicts were issued for any G4 deliverable.
 
 ## Sprint Exit Artifact Statement
 
-This document is the sprint exit artifact for M16-G4. It is filed at
-`docs/process/sprint-plans/m16-g4-sprint-exit.md`. Status is BLOCKED pending engine wiring
-for AC-EE-1. AC-EE-2 is SATISFIED (EE review on record 2026-06-24). When engine wiring is
-complete and AC-EE-1 passes in CI, this document will be updated to status CONFIRMED and
-pi-confirmed: true.
+This document is the sprint exit artifact for M16-G4. Status: CONFIRMED 2026-06-24.
 
-The sprint exit is not confirmed until the PI Agent's verdict reads "Confirmed." Issues #22
-(scoped) and #102 may be closed on the basis of the ACCEPT verdicts in §3. Issue #275 must
-remain open.
+All ACs passed. Issues #22 (scoped), #102, and #275 may be closed. The sprint exit
+gate is confirmed; pi-confirmed: true.

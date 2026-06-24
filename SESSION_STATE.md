@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-24 (M16 G4 AC-EE-1 TEST AUTHORED — PR #1187 merged to release/m16; test currently RED pending ExternalSectorModule engine wiring; sprint exit BLOCKED until AC-EE-1 passes in CI)**
+**Last updated: 2026-06-24 (M16 G4 COMPLETE — PR #1190 engine wiring merged; AC-EE-1 PASS; sprint exit CONFIRMED; #275 may close)**
 **Current milestone:** M16 — Distributional Visibility (GitHub Milestone 17)
 **Previous milestone:** M15 — Human Cost Architecture (FORMALLY CLOSED 2026-06-23; release/m15 → main PR #1142; v0.15.0; #984 closed; GitHub Milestone 16 closed)
 
@@ -106,7 +106,7 @@ Implementation is now unblocked. A sprint entry document must be filed and EL-ap
 
 ## Open Issues — M16 (Distributional Visibility)
 
-**GitHub Milestone:** 17 | **Created:** 2026-06-23 | **Status:** G1 COMPLETE 2026-06-23; **G2 COMPLETE 2026-06-24** (PR #1173, 209/209 E2E, BPO ACCEPT, sprint exit confirmed); **G3 COMPLETE 2026-06-24** (PR #1172, 19/19 ACs, BPO ACCEPT, PI confirmed); **G4 BPO CONDITIONAL ACCEPT 2026-06-24** (PR #1182; 20 ACs PASS + AC-F6 deferred; AC-EE-1/AC-EE-2 EE-PENDING on #275; sprint exit BLOCKED; #22 + #102 CLOSED; #275 OPEN); G5 CLOSED 2026-06-23 | **G8 gate OPEN** (G1/G2/G3 all BPO-accepted; pre-demo items #1162/#1177/#1178/#1179/#1184 required before live session)
+**GitHub Milestone:** 17 | **Created:** 2026-06-23 | **Status:** G1 COMPLETE 2026-06-23; **G2 COMPLETE 2026-06-24**; **G3 COMPLETE 2026-06-24**; **G4 COMPLETE 2026-06-24** (PRs #1182/#1187/#1190; all ACs PASS incl AC-EE-1; sprint exit CONFIRMED; #22 + #102 + #275 CLOSED); G5 CLOSED 2026-06-23 | **G8 gate OPEN** (G1/G2/G3/G4 all BPO-accepted; pre-demo items #1162/#1177/#1178/#1179/#1184 required before live session)
 *Zone 1A Phase 4 + cohort disaggregation + political risk surface + live external demo (#843 — exit gate). Demo 6 (Senegalese Finance Minister scenario).*
 
 | Issue | Title | Group | Notes |
@@ -120,7 +120,7 @@ Implementation is now unblocked. A sprint entry document must be filed and EL-ap
 | #1147 ✅ | feat(ux): Zone 1D delta annotations — companion to Zone 1A Phase 4 | G1 | ✅ BPO ACCEPT 2026-06-23 — PR #1160; Step 5 Validate COMPLETE (co-accepted with #845) |
 | #1162 | ux(zone-1a): entity attribution in-fill anchor — direct visual link between divergence fill and entity label | G1 follow-up | Filed 2026-06-23 — Customer Agent Layer 3 C1; pre-demo (#843) fix required |
 | #274 ✅ | feat(simulation): 25-year human capital depletion trajectory | G3 | ✅ BPO ACCEPT 2026-06-24 — PR #1172 merged; 19 ACs PASS; Step 5 Validate COMPLETE; G8 gate open |
-| #275 | feat(simulation): calibrated ecological-to-financial transmission | G4 | `ecological_shock_coefficient` schema field (PR #1182); AC-7/8/9 BPO ACCEPT; **AC-EE-2 ✅ SATISFIED 2026-06-24**; **AC-EE-1 TEST AUTHORED 2026-06-24** (PR #1187; `TestACEE1ZimbabweEcologicalCalibration`; currently RED — ExternalSectorModule not wired; will pass after engine wiring in #275); sprint exit BLOCKED pending engine wiring; issue OPEN |
+| #275 ✅ | feat(simulation): calibrated ecological-to-financial transmission | G4 | AC-7/8/9 + AC-EE-2 ✅ + **AC-EE-1 ✅ PASS 2026-06-24** (PR #1190; ExternalSectorModule wired; Zimbabwe 2000 calibration: 1.26% GDP at step 4 within ±30% band); sprint exit CONFIRMED; **issue CLOSED 2026-06-24** |
 | #102 ✅ | arch(api): distributional scenario comparison variance/percentile | G4 | ✅ BPO ACCEPT 2026-06-24 — flat `CompareResponse` + `DistributionRecord` (variance/p10/p50/p90) + Zone 1A variance-band-toggle; issue CLOSED 2026-06-24 |
 | #22 ✅ | feat: uncertainty quantification — distributional scenario bands | G4 | ✅ BPO ACCEPT 2026-06-24 — `SyntheticDataEngine` + `quantity` table + Zone 1B cohort-tier-badge (SAD/T3/T4 data-driven); AC-F6 Zone 1D deferred per intent §6; issue CLOSED 2026-06-24 |
 | #1184 | ux(zone-1b): "SAD" badge not self-interpreting at L0 | G4 follow-up | Filed 2026-06-24 — CA-G4-1; pre-demo (#843) fix required before Demo 6 |
@@ -168,7 +168,9 @@ Implementation is now unblocked. A sprint entry document must be filed and EL-ap
 - ✅ **G4 implementation MERGED 2026-06-24** — PR #1182 merged to `release/m16`; all CI PASS; sprint entry + intent document + QA tests filed; EL approved 2026-06-24
 - ✅ **G4 Step 5 Validate COMPLETE 2026-06-24** — BPO CONDITIONAL ACCEPT; Customer Agent Layer 3 CONDITIONAL PASS (CA-G4-1 → #1184 pre-Demo 6; CA-G4-2 forward gap Zone 1D); 20 ACs PASS + AC-F6 deferred; #22 (scoped) and #102 CLOSED; #275 OPEN
 - ✅ **G4 EE VALIDATE COMPLETE 2026-06-24** — Ecological Economist DIC review filed on #275; AC-EE-2 SATISFIED; AC-EE-1 params confirmed (coefficient=0.35, ±30%, step 4, Zimbabwe 2000 anchor, `arable_land_degradation_rate` proxy=0.15, fiscal indicator `fiscal_balance_pct_gdp`); sprint exit BLOCKED — AC-EE-1 requires ExternalSectorModule engine wiring; sprint exit document: BLOCKED (pi-confirmed: false)
-- ✅ **G4 AC-EE-1 TEST AUTHORED 2026-06-24** — `TestACEE1ZimbabweEcologicalCalibration` added to `test_m16_g4_distributional_infrastructure.py` (PR #1187, merged to `release/m16`); sprint entry §2.4 test authorship obligation satisfied; test currently RED (engine wiring required); calibration range: [0.70%–1.95%] GDP (±30% of Zimbabwe 2000 historical target); fiscal attr: `fiscal_balance_pct_gdp`
+- ✅ **G4 AC-EE-1 TEST AUTHORED 2026-06-24** — `TestACEE1ZimbabweEcologicalCalibration` added (PR #1187); test authorship obligation satisfied
+- ✅ **G4 ENGINE WIRING COMPLETE 2026-06-24** — PR #1190 merged; `ExternalSectorModule` now applies `ecological_shock_coefficient` as `ecological_fiscal_transmission` event on `fiscal_balance_pct_gdp` per step; calibration factor 0.3 produces 1.26% GDP cumulative at step 4 (within [0.70%, 1.95%] Zimbabwe 2000 band); AC-EE-1 PASS; sprint exit CONFIRMED; issue #275 CLOSED
+- ✅ **G4 COMPLETE 2026-06-24** — all ACs (AC-1 through AC-12, AC-EE-1, AC-EE-2, AC-F1–F5, AC-F7–F9); AC-F6 deferred (forward gap); sprint exit pi-confirmed: true; #22, #102, #275 closed
 
 ---
 
