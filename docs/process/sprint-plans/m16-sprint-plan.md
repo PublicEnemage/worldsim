@@ -6,6 +6,7 @@ status: EL Approved — implementation may begin (sprint entry document required
 authored-by: PM Agent
 authored-date: 2026-06-23
 el-approved: 2026-06-23
+amended: 2026-06-24 — G9 (Near-term Backlog) added; near-term deferred list promoted to formal sprint group; G10 (Pre-Demo Polish) added; five orphaned CA-condition issues formalized as G8 gate group
 consulted-agents:
   - Business Product Owner (Demo 6 value prioritization; scope cut order)
   - Frontend Architect (zone component grouping; G1/G2 sequencing; Zone 1D layout conflict)
@@ -134,13 +135,15 @@ No new ARCH entry required at kickoff. ARCH-012 may be needed for #22 — assess
 | G5 — Process + Secondary Features | #837, #951, #1145, #259 | None | Wave 1 (parallel with G1) | Config-driven demo scripts; solo-use review protocol; founding document AC-001/AC-002 addition (EL-authored); CTO legibility metrics dashboard. Process and documentation work — no frontend component conflicts. #1145 is EL-authored (small documentation edit). |
 | G6 — Accessibility + Performance Validation | #569 | None | Wave 3 (after G1/G2) | MV-002 Mode 3 hardware validation; accessibility re-validation on 8GB/4-core target hardware following G1/G2 primary surface changes. Pattern: M15-G6. |
 | G7 — Governance | #3, #6 | None | Any (EL-action) | Single-principal separation of duties (#3) and branch protection restoration (#6). EL-action only — no sprint entry document required. May proceed at any point. |
-| G8 — Live Stakeholder Demo | #843 | G1 + G2 + G3 complete | Exit gate | Live stakeholder demo with real external participants. M16 exit gate. Requires G1/G2/G3 merged and BPO-accepted before demo session is scheduled. Demo 6 story: Senegalese Finance Minister; bottom-quintile, 25-year trajectory, PSP trajectory. |
+| G8 — Live Stakeholder Demo | #843 | G1 + G2 + G3 complete + G10 complete | Exit gate | Live stakeholder demo with real external participants. M16 exit gate. Requires G1/G2/G3 merged and BPO-accepted, and all G10 pre-demo polish items resolved, before demo session is scheduled. Demo 6 story: Senegalese Finance Minister; bottom-quintile, 25-year trajectory, PSP trajectory. |
+| G10 — Pre-Demo Polish | #1162, #1177, #1178, #1179, #1184 | None | Wave 2+ (after G1/G3/G4 CA conditions filed; before G8 scheduled) | Five Customer Agent Layer 3 pre-demo conditions orphaned across G1 (#1162), G3 (#1177, #1178, #1179), and G4 (#1184) sprint exits. All required before the live Demo 6 session (#843). Small frontend/UX fixes: Zone 1A divergence fill attribution anchor (#1162); milestone sentence step-reference → year anchor (#1177); T3 badge L0 legibility (#1178); Q2 curve asymmetry label (#1179); SAD badge L0 legibility (#1184). G8 gate condition — formalized 2026-06-24. |
+| G9 — Near-term Backlog | #153, #846, #97, #92 | None | Wave 3 (capacity-allowing; parallel with G4/G6) | Absolute threshold overlay on DeltaChoropleth (#153); Mode 3 branch comparison values absent — DEMO-045 (#846); threshold-crossing markers in compare API output (#97); Greece 2010 investment climate backtesting fixture (#92). Not Demo 6 critical path. Promoted from deferred near-term backlog to formal sprint group 2026-06-24. Carry to M17 if capacity is exhausted before G8. |
 
-### Near-term backlog (on M16 milestone, not in a wave)
+### Near-term backlog (promoted to G9 — 2026-06-24)
 
-These issues are assigned to M16 but are secondary features — not Demo 6 critical path. Included in M16 if capacity remains after G1–G6 complete. Otherwise carry to M17.
+These issues were assigned to M16 as secondary features — not Demo 6 critical path. Promoted from a deferred list to formal sprint group G9 on 2026-06-24. Included in M16 if capacity remains after G1–G6 complete; otherwise carry to M17. See §Sprint Groups above and `docs/process/sprint-plans/m16-g9-sprint-entry.md`.
 
-| Issue | Title | Why deferred within M16 |
+| Issue | Title | Why capacity-allowing in G9 |
 |---|---|---|
 | #153 | feat(frontend): absolute threshold overlay on DeltaChoropleth | Enhancement; not Demo 6 critical |
 | #846 | ux: DEMO-045 — Mode 3 branch comparison values absent | Enhancement; not Demo 6 critical |
@@ -156,21 +159,25 @@ G5 (process — parallel) ──────────────────
                                                                                 │
 G7 (governance — EL-action, any time) ─────────────────────────────────────────┤
                                                                                 │
-G1 (Zone 1A Phase 4 + Zone 1D delta) ──────────────────────────────────────────┤
-         │                                                                      │
-         └── G2 pre-conditions (CM/DA/ARF/FA sign-offs — parallel with G1) ─┐  │
-                                                                             ↓  │
-                                        G2 (distributional surface) ─────────┤  │
-                                                                             │  ├──► G8 (live demo — M16 exit)
-                                        G3 (Demo 6 infrastructure) ─────────┤  │
-                                                (CE assessment first)        │  │
-                                                                             ↓  │
-                                        G4 (distributional infra — cap-allowing)│
-                                                                                │
-                                        G6 (accessibility + perf validation) ──┘
+G1 (Zone 1A Phase 4 + Zone 1D delta) ──┬───────────────────────────────────────┤
+         │                              └─► G10 (#1162) ──────────────────────┐ │
+         └── G2 pre-conditions ───────────────────────────────────────────┐   │ │
+                                        ↓                                 ↓   ↓ │
+                                        G2 (distributional surface) ──────┤   │ │
+                                                                          │   ├──► G8 (live demo — M16 exit)
+                                        G3 (Demo 6 infrastructure) ───┬──┤   │ │
+                                                (CE assessment first) │  │   │ │
+                                                                      └─►G10 (#1177/#1178/#1179)
+                                                                             ↑ │
+                                        G4 (distributional infra) ──────────┘ │
+                                             └─► G10 (#1184) ─────────────────┤
+                                                                               │
+                                        G6 (accessibility + perf) ────────────┤
+                                                                               │
+                                        G9 (near-term — cap-allowing) ────────┘
 ```
 
-**Critical path:** G1 → G2 (sequential on frontend) → G8. G3 can begin backend work in parallel with G2 frontend once CE assessment is complete. G4 is not on the critical path.
+**Critical path:** G1 → G2 (sequential on frontend) → [G10 complete] → G8. G3 runs parallel with G2 backend once CE assessment is complete. G4 and G6 are capacity-allowing and not on the critical path. G10 is on the critical path: it cannot begin until G1/G3/G4 exit conditions produce its issues, and G8 cannot be scheduled until G10 is complete. G9 is not on the critical path.
 
 ---
 
@@ -199,7 +206,9 @@ All six items must be completed before a G2 sprint entry document is filed.
 | G4 | ADR-007 (confirm for #22) | Confirm coverage at sprint entry | #22 conditional on ADR-007 scope confirmation |
 | G5 | None | N/A | Yes — after sprint entry |
 | G6 | None | N/A | Yes — after sprint entry |
-| G8 | None | N/A | Yes — after G1 + G2 + G3 BPO-accepted |
+| G8 | None | N/A | Yes — after G1 + G2 + G3 BPO-accepted and G10 complete |
+| G10 | None | N/A | Yes — after sprint entry; all fixes are within existing component boundaries; no new ADR required |
+| G9 | None | N/A | Yes — after sprint entry; all G9 issues within existing component and module boundaries; no new ADR required |
 
 ---
 
@@ -210,9 +219,10 @@ M16 closes when all of the following are satisfied:
 1. **Business PO acceptance** recorded for all user-facing G-group deliverables (G1, G2, G3, and any G4 items delivered)
 2. **Customer Agent Layer 3 assessment** on record for any capability serving Personas 2, 3, or 5 (G1 required: Zone 1A composite encoding, Zone 1D delta annotation; G2 required: cohort disaggregation, political risk summary)
 3. **North star test artifact** filed: a Senegalese Finance Minister's analyst can cite bottom-quintile threshold crossing at step N, 25-year human capital consequence, and PSP trajectory in plain language — all visible in the primary viewport without drawer navigation, in a solo unnarrated session
-4. **Live stakeholder demo delivered** (#843): real external participants attended; stakeholder review artifact filed
-5. **PI Agent exit gate confirmation** recorded in the M16 sprint exit document
-6. **No active soft-skip patterns** in E2E suite (M15 retrospective action — confirm before M16 exit, NM-056 follow-up)
+4. **All G10 pre-demo polish items resolved** (#1162, #1177, #1178, #1179, #1184): implementing agent confirms each fix merged to `release/m16` before demo session is scheduled
+5. **Live stakeholder demo delivered** (#843): real external participants attended; stakeholder review artifact filed
+6. **PI Agent exit gate confirmation** recorded in the M16 sprint exit document
+7. **No active soft-skip patterns** in E2E suite (M15 retrospective action — confirm before M16 exit, NM-056 follow-up)
 
 CI green and issue closure are necessary but not sufficient. #843 is the primary exit gate.
 
@@ -233,6 +243,10 @@ Per `docs/process/sprint-planning-sop.md §Sprint Entry Gate`, implementation ma
 
 **G3 additional gate:** CE assessment of 25-year projection feasibility (#274) must be filed (as a comment on #274 or a decision in the G3 sprint entry) before implementation begins.
 
+**G10 gate:** G10 is a G8 pre-condition — all five items must be resolved before the live demo session is scheduled. G10 may begin as soon as the relevant CA assessment issues are filed (post-G1-exit for #1162; post-G3-exit for #1177/#1178/#1179; post-G4-exit for #1184). G10 issues are small enough that no separate intent document is required — the sprint entry §3.1 observable state declarations constitute the implementation specification. QA test assertions must be authored (extending existing G1/G3/G4 spec files) before each fix PR opens.
+
+**G9 capacity gate:** G9 may begin implementation (per group: after G1 merges for #153 and #846 to avoid primary viewport conflicts; after G2 merges for #97 to avoid API contract drift; after sprint entry for #92) but is subordinate to G4 and G6 — carry all four issues to M17 if capacity is exhausted before G8 is scheduled. G9 is not a G8 gate dependency.
+
 ---
 
 ## M16 Kickoff Sequence
@@ -246,3 +260,5 @@ Per `docs/process/sprint-planning-sop.md §Sprint Entry Gate`, implementation ma
 7. ✅ EL approves sprint plan — DONE 2026-06-23 (PR #1148)
 8. ⬜ G2 pre-conditions initiated (CM/DA/ARF/FA sign-off requests opened on #986 and #987) — immediately after EL approval
 9. ⬜ G1 sprint entry filed and EL-approved — G1 is first implementation group
+10. ✅ G9 sprint entry filed and EL-approved — 2026-06-24 (`docs/process/sprint-plans/m16-g9-sprint-entry.md`)
+11. ✅ G10 sprint entry filed and EL-approved — 2026-06-24 (`docs/process/sprint-plans/m16-g10-sprint-entry.md`)
