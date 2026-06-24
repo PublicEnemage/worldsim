@@ -1128,6 +1128,20 @@ class TestAC9ApiContractsEcologicalCoeff:
 
 _ZMB_ECO_INITIAL_ATTRS: dict[str, Any] = {
     "ZMB": {
+        # fiscal_balance_pct_gdp is seeded here so both scenario runs (with and
+        # without coefficient) share the attribute from step 0. Without this seed,
+        # the baseline run has no fiscal_balance_pct_gdp in its snapshots and the
+        # compare endpoint's intersection logic drops the attribute from the delta set.
+        # ZMB calibration: IMF WEO 2023 actual deficit ~3.5% GDP (T3 synthetic composite).
+        "fiscal_balance_pct_gdp": {
+            "value": "-0.035",
+            "unit": "ratio",
+            "variable_type": "ratio",
+            "measurement_framework": "financial",
+            "confidence_tier": 3,
+            "is_synthetic": True,
+            "synthetic_basis": "IMF WEO 2023 ZMB fiscal deficit estimate; SADC composite.",
+        },
         "base_agricultural_export_share": {
             "value": "0.20",
             "unit": "ratio",

@@ -622,12 +622,14 @@ def _build_ecological_module(config: ScenarioConfigSchema) -> EcologicalModule |
 def _build_external_sector_module(
     config: ScenarioConfigSchema,
 ) -> ExternalSectorModule | None:
-    """Return an ExternalSectorModule when commodity price shocks are configured."""
-    if not config.commodity_price_shocks:
+    """Return an ExternalSectorModule when commodity shocks or ecological coefficient active."""
+    eco_coeff = Decimal(str(config.ecological_shock_coefficient))
+    if not config.commodity_price_shocks and eco_coeff == Decimal("0"):
         return None
     return ExternalSectorModule(
         commodity_price_shocks=config.commodity_price_shocks,
         start_date=config.start_date,
+        ecological_shock_coefficient=eco_coeff,
     )
 
 
