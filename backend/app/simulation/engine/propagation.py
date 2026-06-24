@@ -62,6 +62,15 @@ _ATTRIBUTE_FLOORS: dict[str, Decimal] = {
     "bottom_quintile_consumption_capacity": Decimal("0"),
 }
 
+# Unit-interval clamp: attributes that are dimensionless proportions bounded to [0.0, 1.0].
+# Applied after additive accumulation or replacement. Only extend this registry for attributes
+# that are genuine proportions (headcount ratios, prevalence rates, coverage fractions).
+# CM review 2026-06-23 (M16-G3): DemographicModule does not clamp internally;
+# the attribute store is the correct enforcement point.
+_ATTRIBUTE_UNIT_INTERVAL: frozenset[str] = frozenset({
+    "poverty_headcount_ratio",
+})
+
 _log = logging.getLogger(__name__)
 
 # ---------------------------------------------------------------------------
@@ -497,6 +506,26 @@ def _build_next_state(
                     if qty.value < floor:
                         new_attrs[key] = Quantity(
                             value=floor,
+                            unit=qty.unit,
+                            variable_type=qty.variable_type,
+                            measurement_framework=qty.measurement_framework,
+                            observation_date=qty.observation_date,
+                            source_id=qty.source_id,
+                            confidence_tier=qty.confidence_tier,
+                        )
+
+                # Clamp unit-interval attributes to [0.0, 1.0] — proportion attributes
+                # such as headcount ratios cannot exceed the unit interval. Only applied
+                # to attributes in _ATTRIBUTE_UNIT_INTERVAL; DemographicModule does not
+                # clamp internally (CM review 2026-06-23, M16-G3 AC-6).
+                if key in _ATTRIBUTE_UNIT_INTERVAL:
+                    qty = new_attrs[key]
+                    _zero = Decimal("0")
+                    _one = Decimal("1")
+                    clamped = max(_zero, min(_one, qty.value))
+                    if clamped != qty.value:
+                        new_attrs[key] = Quantity(
+                            value=clamped,
                             unit=qty.unit,
                             variable_type=qty.variable_type,
                             measurement_framework=qty.measurement_framework,

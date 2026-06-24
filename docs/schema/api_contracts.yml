@@ -204,7 +204,7 @@ endpoints:
   # ---------------------------------------------------------------------------
   - method: POST
     path: /scenarios
-    summary: Create a new scenario in pending status
+    summary: "POST /scenarios — Create a new scenario in pending status"
     auth: none
     request_body:
       name: {type: string, required: true, description: "Non-empty. Validated server-side."}
@@ -212,6 +212,7 @@ endpoints:
       configuration:
         entities: {type: "string[]", required: true, description: "entity_id values; validated to exist"}
         n_steps: {type: integer, required: true, range: [1, 100]}
+        projection_steps: {type: "integer|null", required: false, range: [1, 100], default: null, description: "Long-run projection horizon (M16-G3 #274). When set, overrides n_steps as total step count. projection_steps > 8 enables 25-year quarterly trajectory with DemographicModule auto-enabled and adaptive_resolution disabled."}
         timestep_label: {type: string, required: true, example: "annual"}
         start_date: {type: "string|null", required: false, format: "ISO 8601 date", example: "2010-01-01", description: "Step-0 base date. Defaults to 2000-01-01 when absent."}
         initial_attributes: {type: object, required: false, default: {}}

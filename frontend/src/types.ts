@@ -73,6 +73,8 @@ export interface ScenarioConfigSchema {
   timestep_label: string;
   fiscal_multiplier?: number;
   start_date?: string;
+  /** M16-G3 #274 — long-run projection horizon (1–100). When set, overrides n_steps as total step count. */
+  projection_steps?: number | null;
   // DA-G5-3: confirmed JSONB paths for political economy module configuration
   modules_config?: {
     political_economy?: {

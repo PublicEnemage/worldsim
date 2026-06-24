@@ -1052,6 +1052,62 @@ class ContingentInput:
 # External sector inputs (ADR-012, Issue #751)
 # ---------------------------------------------------------------------------
 
+# ---------------------------------------------------------------------------
+# GDP growth change input (M16-G3 #274 — 25-year human capital trajectory)
+# ---------------------------------------------------------------------------
+
+
+@dataclass(kw_only=True)
+class GdpGrowthChangeInput(ControlInput):
+    """A direct GDP growth rate shock injected as an exogenous ControlInput (M16-G3 #274).
+
+    Emits a 'gdp_growth_change' event that the DemographicModule subscribes to,
+    triggering elasticity-matrix application to cohort poverty_headcount_ratio.
+
+    Used in long-run human capital depletion projections (projection_steps > 8)
+    where the GDP growth trajectory is the primary driver of demographic outcomes.
+
+    Attributes:
+        magnitude: GDP growth rate change as a signed Decimal fraction.
+            Negative values represent contraction shocks (e.g. Decimal("-0.04")
+            for a 4-percentage-point growth reduction). Confidence tier 3 —
+            this is an exogenously specified shock, not a model estimate.
+    """
+
+    magnitude: Decimal = Decimal("0")
+
+    def to_events(self, timestep: datetime) -> list[Event]:
+        from app.simulation.engine.models import Event, MeasurementFramework  # noqa: PLC0415
+
+        delta = Quantity(
+            value=self.magnitude,
+            unit="dimensionless",
+            variable_type=VariableType.RATIO,
+            measurement_framework=MeasurementFramework.FINANCIAL,
+            confidence_tier=3,
+        )
+        return [
+            Event(
+                event_id=f"{self.input_id}-gdp-growth-0",
+                source_entity_id=self.target_entity,
+                event_type="gdp_growth_change",
+                affected_attributes={"gdp_growth_change": delta},
+                propagation_rules=self.propagation_rules,
+                timestep_originated=timestep,
+                framework=MeasurementFramework.FINANCIAL,
+                metadata={
+                    "control_input_id": self.input_id,
+                    "actor_id": self.actor_id,
+                },
+            )
+        ]
+
+
+# ---------------------------------------------------------------------------
+# External sector inputs (ADR-012, Issue #751)
+# ---------------------------------------------------------------------------
+
+
 # Fraction of import price shock that reaches bottom-quintile consumption
 # within one simulation step. Approximation calibrated against World Bank
 # food/fuel price transmission studies (2007–2008 crisis). Full calibration
