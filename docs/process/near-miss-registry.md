@@ -3076,6 +3076,103 @@ When a near-miss is identified — during a session, in a HORIZON sweep, or in p
 review — the PM Agent files a new entry following the template below:
 
 ```markdown
+## NM-061 — AC-F8 Silent No-Op: Scenario Created via API But Never Selected in UI; 60-Second Ceiling Gate Measuring Nothing Since G3 (Reactive)
+
+**Date:** 2026-06-24
+**Milestone:** M16 — Distributional Visibility (gap origin: G3, PR #1172)
+**Detected by:** PI Agent at G6 exit gate review, triggered by explicit EL activation. Sprint entry §3.1 pre-check was specified in writing but not executed during G6 validation.
+**Severity:** High
+
+### What happened
+
+`frontend/tests/e2e/m16-g3-25year-human-capital-trajectory.spec.ts` AC-F8 measures the
+time from scenario creation to `human-capital-trajectory-panel` visibility. The test
+creates a SEN 100-step scenario via direct `fetch` API calls (`createSen100StepScenario()`),
+runs it via API, then navigates to `/` and waits for the panel to become visible.
+
+The panel is rendered in `ScenarioInstrumentCluster.tsx` only when:
+```
+(activeScenarioDetail?.configuration?.projection_steps ?? 0) > 8
+```
+
+`activeScenarioDetail` reflects the **UI-selected** primary scenario. The test creates
+the scenario via API but never selects it in the UI — there is no Scenarios panel
+interaction, no `Select as primary scenario` click, no `__worldsim_selectEntity` call.
+When the test navigates to `/`, no scenario is selected, `activeScenarioDetail` is null
+or undefined, and the panel never renders.
+
+The guard at line 459 (`if (!(await panel.isVisible(...).catch(() => false))) return;`)
+fires silently, and the test returns without asserting anything. AC-F8 has been a
+passing CI gate that measures nothing since G3 shipped (PR #1172, 2026-06-24).
+
+The G6 sprint entry (§3.1) required an explicit pre-check: *"Before running VC-2, verify
+the AC-F8 test assertion path is live (not silently skipped via `catch(() => false)`)."*
+This pre-check was not executed during G6 validation, and the validation report did not
+address it. The PI Agent discovered the gap at exit gate review.
+
+### What was at risk
+
+AC-F8 is the CI gate for G3's contracted simulation ceiling: 100-step scenarios must
+complete within 60 seconds (CE Assessment Decision 4, `docs/process/sprint-plans/m16-g3-sprint-entry.md §2.5`).
+G3's sprint exit record cites AC-F8 as PASS. That citation is inaccurate — the test has
+been measuring nothing. A simulation engine regression that caused 100-step scenarios to
+exceed 60 seconds would be invisible to CI.
+
+The VC-2 ProBook timing (0.5s for 100 steps) confirms the simulation currently runs well
+under the ceiling. But the CI guard provides no regression protection.
+
+### What caught it
+
+PI Agent review at G6 exit gate, triggered by explicit EL activation (`BPO and PI Agents:
+validate and confirm G6 exit`). The sprint entry §3.1 pre-check requirement was written
+in advance specifically to prevent this failure mode — it was caught because it was named
+in the entry document and the PI Agent checked whether it had been satisfied.
+
+This is partial process success (the requirement was anticipated and written down) and
+partial process failure (the requirement was not executed). The pre-check existed on paper
+but had no enforcement mechanism to ensure it ran.
+
+### Root cause — same failure mode as NM-058, different mechanism
+
+NM-058: testid mismatch — guard locator finds nothing in DOM
+NM-061: setup mismatch — testid is correct, but component never renders because test
+setup (API-only scenario creation) does not satisfy the render condition
+
+The NM-058 QA Lead audit step (`grep -rn "isVisible().catch" frontend/tests/e2e/`)
+would have found this guard and checked the testid — `human-capital-trajectory-panel`
+exists in source. The audit step would have passed, missing the setup gap entirely.
+The two failure modes require two distinct audit questions.
+
+### Process improvement
+
+**Immediate (G6 fix — this session):** AC-F8 must be updated to select the created
+scenario in the UI before checking panel visibility. After `createSen100StepScenario()`
+returns a `scenario_id`, use the Scenarios panel UI to select the scenario as primary
+(same pattern as `mode3-active-control.spec.ts` and the AC-009 fix in PR #1211).
+
+**QA Lead working agreement addition (NM-061 addition):** The NM-058 audit step covers
+testid correctness but not setup correctness. A second audit question must be added to
+the working agreement: *For any E2E test that creates scenario or entity data via direct
+`fetch` API calls and then checks for conditional UI component visibility, verify the
+test also selects or activates that data through the UI before checking visibility.
+API-created data that is never surfaced through a UI selection action will not satisfy
+conditional renders that depend on `activeScenarioDetail`, `selectedScenarioId`, or
+equivalent state.* This audit requires reading the render condition in the source
+component, not just checking the testid.
+
+The two-part audit (NM-058: testid correctness; NM-061: setup completeness) together
+cover both failure modes of the soft-skip pattern.
+
+**Sprint entry pre-check enforcement:** The G6 sprint entry named the AC-F8 pre-check
+as a blocking condition. The failure was that "named in the entry" did not translate to
+"executed in the validation." Sprint validation checklists must include a named sign-off
+for each named pre-check — not just a description of what to check, but a filled-in
+result field. The validation report template for future sprints must include a
+`pre-checks performed` section with one row per entry-document-named pre-check, each
+requiring an observed result (not a checkbox).
+
+---
+
 ## NM-NNN — [Short descriptive title]
 
 **Date:** YYYY-MM-DD (or approximate milestone era)
