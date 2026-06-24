@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-24 (G7 DEFERRED to Parking Lot — EL decision; #3 and #6 moved to GitHub Milestone #20; does not gate M16 exit)**
+**Last updated: 2026-06-24 (G6 COMPLETE — VC-1–VC-4 PASS; MV-002 50.5ms PASS; NM-058/059/060 + EX-001 filed; #569 closed; #1217 filed)**
 **Current milestone:** M16 — Distributional Visibility (GitHub Milestone 17)
 **Previous milestone:** M15 — Human Cost Architecture (FORMALLY CLOSED 2026-06-23; release/m15 → main PR #1142; v0.15.0; #984 closed; GitHub Milestone 16 closed)
 
@@ -106,7 +106,7 @@ Implementation is now unblocked. A sprint entry document must be filed and EL-ap
 
 ## Open Issues — M16 (Distributional Visibility)
 
-**GitHub Milestone:** 17 | **Created:** 2026-06-23 | **Status:** G1 COMPLETE 2026-06-23; **G2 COMPLETE 2026-06-24**; **G3 COMPLETE 2026-06-24**; **G4 COMPLETE 2026-06-24** (PRs #1182/#1187/#1190; all ACs PASS incl AC-EE-1; sprint exit pi-confirmed: true; #22 + #102 + #275 CLOSED); G5 CLOSED 2026-06-23; **G9 COMPLETE 2026-06-24** (PRs #1201/#1202/#1204/#1205; all four issues closed; sprint exit pi-confirmed: true); **G10 COMPLETE 2026-06-24** (PR #1199; all 11 ACs PASS; #1162/#1177/#1178/#1179/#1184 CLOSED; sprint exit pi-confirmed: true; **fresh-session BPO ACCEPT + PI Agent confirmation 2026-06-24**; NM-057 filed) | **G8 gate: FULLY OPEN** — G1 ✅ G2 ✅ G3 ✅ G4 ✅ G10 ✅; #843 may now be scheduled
+**GitHub Milestone:** 17 | **Created:** 2026-06-23 | **Status:** G1 COMPLETE 2026-06-23; **G2 COMPLETE 2026-06-24**; **G3 COMPLETE 2026-06-24**; **G4 COMPLETE 2026-06-24** (PRs #1182/#1187/#1190; all ACs PASS incl AC-EE-1; sprint exit pi-confirmed: true; #22 + #102 + #275 CLOSED); G5 CLOSED 2026-06-23; **G6 COMPLETE 2026-06-24** (PRs #1211–#1213/#1215–#1216; VC-1–VC-4 PASS; MV-002 50.5ms PASS; NM-058/059/060 + EX-001 filed; #569 CLOSED; #1217 filed); **G9 COMPLETE 2026-06-24** (PRs #1201/#1202/#1204/#1205; all four issues closed; sprint exit pi-confirmed: true); **G10 COMPLETE 2026-06-24** (PR #1199; all 11 ACs PASS; #1162/#1177/#1178/#1179/#1184 CLOSED; sprint exit pi-confirmed: true; **fresh-session BPO ACCEPT + PI Agent confirmation 2026-06-24**; NM-057 filed) | **G8 gate: FULLY OPEN** — G1 ✅ G2 ✅ G3 ✅ G4 ✅ G10 ✅; #843 may now be scheduled
 *Zone 1A Phase 4 + cohort disaggregation + political risk surface + live external demo (#843 — exit gate). Demo 6 (Senegalese Finance Minister scenario).*
 
 | Issue | Title | Group | Notes |
@@ -128,7 +128,7 @@ Implementation is now unblocked. A sprint entry document must be filed and EL-ap
 | #837 ✅ | feat(demo): configuration-driven demo scripts | G5 | ✅ MERGED 2026-06-23 — PR #1156 |
 | #951 ✅ | process: solo-use review protocol | G5 | ✅ MERGED 2026-06-23 — PR #1156 |
 | #259 ✅ | standards: CTO legibility metrics dashboard | G5 | ✅ MERGED 2026-06-23 — PR #1156 |
-| #569 | test(perf): MV-002 Mode 3 hardware validation | G6 | After G1/G2 |
+| #569 ✅ | test(perf): MV-002 Mode 3 hardware validation | G6 | **✅ G6 COMPLETE 2026-06-24** — PRs #1211–#1213/#1215–#1216; VC-1–VC-4 PASS; MV-002 50.5ms PASS; NM-058/059/060 + EX-001 filed; #1217 filed; sprint exit pi-confirmed: true; CLOSED 2026-06-24 |
 | #6 | Governance: branch protection restoration | G7 | **DEFERRED — Parking Lot (EL decision 2026-06-24)** — moved to GitHub Milestone #20; no external contributors yet |
 | #3 | Governance: single-principal separation of duties | G7 | **DEFERRED — Parking Lot (EL decision 2026-06-24)** — moved to GitHub Milestone #20; no external contributors yet |
 | #1177 ✅ | ux(zone-1d): milestone sentence step-reference → year anchor | G10 | ✅ BPO ACCEPT 2026-06-24 — PR #1199; milestone-sentence wrapper; year leads text; issue CLOSED 2026-06-24 |
@@ -183,6 +183,9 @@ Implementation is now unblocked. A sprint entry document must be filed and EL-ap
 - ✅ **G10 Step 5 Validate COMPLETE 2026-06-24** — fresh-session BPO ACCEPT (independent of implementation session); Customer Agent Layer 3 PASS (Persona 5 + Persona 2; all five CA source conditions resolved; no new conditions); North Star Test PASS (Demo 6 Senegalese FM scenario; 90-second Reactive ceiling satisfied); `docs/process/sprint-plans/m16-g10-sprint-exit.md` filed; intent §9 complete
 - ✅ **G10 sprint exit CONFIRMED 2026-06-24** — PI Agent fresh-session confirmation; all five SOP exit conditions satisfied; NM-057 filed (CA-condition follow-up issues not assigned to sprint group at exit time — LOW severity, SOP amendment recommended); `docs/process/near-miss-registry.md §NM-057`
 - ✅ **G8 gate (#843): FULLY OPEN 2026-06-24** — all gate dependencies cleared: G1 ✅ G2 ✅ G3 ✅ G4 ✅ G10 ✅; PM Agent may now schedule #843 live stakeholder demo
+- ✅ **G6 sprint entry filed and EL-approved 2026-06-24** — `docs/process/sprint-plans/m16-g6-sprint-entry.md`; infrastructure sprint; VC-1–VC-4 + MV-002 scope
+- ✅ **G6 COMPLETE 2026-06-24** — PRs #1211/#1212/#1213/#1215/#1216; AC-009 testid fix + NM-058 + NM-059 + NM-060 + EX-001; VC-1 PASS (164MiB); VC-2 PASS (0.8s/0.5s); VC-3 CONDITIONAL PASS; VC-4 PASS (11.8s); MV-002 PASS (50.5ms); #1217 filed (Mode 3 optimization, EX-001 expiry M17)
+- ✅ **G6 sprint exit CONFIRMED 2026-06-24** — `docs/process/sprint-plans/m16-g6-sprint-exit.md`; PI Agent confirmed; #569 CLOSED
 
 ---
 
