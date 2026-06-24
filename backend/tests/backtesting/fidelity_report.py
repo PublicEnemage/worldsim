@@ -243,3 +243,18 @@ def _extract_health_expenditure_value(
         return Decimal(str(val))
     except (KeyError, TypeError, ValueError):
         return None
+
+
+def _extract_investment_climate_value(
+    snapshot: dict[str, Any], attribute: str, entity_id: str = "GRC"
+) -> Decimal | None:
+    """Extract an investment climate attribute Decimal value from a snapshot dict.
+
+    Supports: sovereign_risk_premium, fdi_stock_pct_gdp, portfolio_flow_velocity,
+    credit_rating_score. Returns None if the attribute is absent or unparseable.
+    """
+    try:
+        val = snapshot["state_data"][entity_id][attribute]["value"]
+        return Decimal(str(val))
+    except (KeyError, TypeError, ValueError):
+        return None

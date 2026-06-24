@@ -21,6 +21,23 @@ Sources:
       health_expenditure_pct_gdp_2010  — 9.5% (initial state seed)
       health_expenditure_pct_gdp_2011  — 9.4% (slight decline; austerity begins)
       health_expenditure_pct_gdp_2012  — 8.7% (accelerated cuts in second program)
+  - Investment climate conditions — Issue #92 (M16-G9):
+      ECB Statistical Data Warehouse (ECB_SDW) — 10Y GRC-DEU sovereign spread:
+        sovereign_risk_premium_2010  — year-end ~850 bps = 0.085
+        sovereign_risk_premium_2011  — year-end ~1500 bps = 0.150 (escalation peak)
+        sovereign_risk_premium_2012  — mid-year ~2000 bps = 0.200 (near-default)
+      UNCTAD World Investment Report 2012/2013 (UNCTAD_WIR_2012) — FDI inward stock/GDP:
+        fdi_stock_pct_gdp_2010  — 10.5% = 0.105 (initial state baseline)
+        fdi_stock_pct_gdp_2011  — ~8.5% = 0.085 (capital flight; austerity)
+        fdi_stock_pct_gdp_2012  — ~7.0% = 0.070 (continued FDI decline)
+      S&P sovereign credit ratings (SP_SOVEREIGN_RATINGS_GRC_2010–2012):
+        credit_rating_score_2010  — BBB+ (Jan 2010) = 55; BB+ (Apr 2010) = 47
+        credit_rating_score_2011  — CCC+ = ~25 (multiple notch downgrades)
+        credit_rating_score_2012  — SD (selective default) = 5
+      IMF Balance of Payments Statistics 2012 (IMF_BOP_GRC_2012):
+        portfolio_flow_velocity_2010  — net portfolio investment ~-8% GDP = -0.080
+        portfolio_flow_velocity_2011  — accelerating outflows ~-12% GDP = -0.120
+        portfolio_flow_velocity_2012  — continued capital flight ~-15% GDP = -0.150
 
 These actuals define the benchmark against which backtesting fidelity is
 measured. ADR-004 Decision 3: M3 ships DIRECTION_ONLY thresholds only.
@@ -122,6 +139,33 @@ class GreeceActuals:
     health_expenditure_pct_gdp_2011: Decimal = Decimal("0.094")
     health_expenditure_pct_gdp_2012: Decimal = Decimal("0.087")
 
+    # Investment climate conditions — Issue #92 (M16-G9)
+    # ECB SDW 10Y GRC-DEU spread (expressed as ratio: 850bps = 0.085)
+    # Direction: UP (sovereign spread widened dramatically under programme pressure)
+    sovereign_risk_premium_2010_eoy: Decimal = Decimal("0.085")
+    sovereign_risk_premium_2011_eoy: Decimal = Decimal("0.150")
+    sovereign_risk_premium_2012_peak: Decimal = Decimal("0.200")
+
+    # UNCTAD World Investment Report — FDI inward stock/GDP
+    # Direction: DOWN (capital flight; deteriorating investment climate)
+    fdi_stock_pct_gdp_2010: Decimal = Decimal("0.105")
+    fdi_stock_pct_gdp_2011: Decimal = Decimal("0.085")
+    fdi_stock_pct_gdp_2012: Decimal = Decimal("0.070")
+
+    # S&P sovereign credit rating mapped to 0–100 index (AAA=100, D=0)
+    # BBB+=55 (Jan 2010), BB+=47 (Apr 2010), CCC+≈25 (2011), SD=5 (2012 PSI)
+    # Direction: DOWN (multiple-notch downgrade cascade through programme period)
+    credit_rating_score_2010_jan: Decimal = Decimal("55.0")
+    credit_rating_score_2010_apr: Decimal = Decimal("47.0")
+    credit_rating_score_2011: Decimal = Decimal("25.0")
+    credit_rating_score_2012: Decimal = Decimal("5.0")
+
+    # IMF BOP Statistics — net portfolio investment/GDP (negative = outflows)
+    # Direction: DOWN (net outflows intensified; more negative through programme)
+    portfolio_flow_velocity_2010: Decimal = Decimal("-0.080")
+    portfolio_flow_velocity_2011: Decimal = Decimal("-0.120")
+    portfolio_flow_velocity_2012: Decimal = Decimal("-0.150")
+
 
 ACTUALS = GreeceActuals()
 
@@ -180,6 +224,15 @@ class FidelityThresholds:
     unemployment_rising_step1_to_step2: bool = False
     health_expenditure_declining_step1_to_step2: bool = False
     unemployment_declining_step4_to_step6: bool = False
+    # Investment climate thresholds — deferred (Issue #92, M16-G9)
+    # No endogenous module currently updates sovereign_risk_premium, fdi_stock_pct_gdp,
+    # portfolio_flow_velocity, or credit_rating_score. These variables are seeded in the
+    # initial state but remain static across steps. Thresholds re-enable when an
+    # InvestmentClimateModule or equivalent produces endogenous updates.
+    sovereign_risk_rising_step0_to_step2: bool = False
+    fdi_stock_declining_step0_to_step2: bool = False
+    credit_rating_declining_step0_to_step2: bool = False
+    portfolio_outflows_deepening_step0_to_step2: bool = False
 
 
 THRESHOLDS = FidelityThresholds()
