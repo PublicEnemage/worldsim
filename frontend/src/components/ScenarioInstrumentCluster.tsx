@@ -892,6 +892,7 @@ export function ScenarioInstrumentCluster({
           scenarioId={scenarioId}
           projectionSteps={activeScenarioDetail!.configuration.projection_steps!}
           entities={activeScenarioDetail?.configuration?.entities ?? entityIds ?? []}
+          currentStep={currentStep}
         />
       )}
 

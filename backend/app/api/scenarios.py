@@ -1223,7 +1223,11 @@ async def get_trajectory(
             if fw_tag in entity_indicators_by_fw:
                 entity_indicators_by_fw[fw_tag][attr_key] = qty
 
-        is_single_entity = len(all_entity_attrs) == 1
+        # Exclude cohort entities (":CHT:" in entity_id) from the sovereign count.
+        # PR #1228 injected cohort entities into state_data; without this exclusion
+        # len(all_entity_attrs) > 1 for SEN-only scenarios, causing percentile_rank
+        # fallthrough that pegs financial/HD composites at 1.0 (rank 1st of 1).
+        is_single_entity = sum(1 for eid in all_entity_attrs if ":CHT:" not in eid) == 1
 
         framework_points: list[TrajectoryFrameworkPoint] = []
         for fw in _TRAJECTORY_FRAMEWORKS:
@@ -2328,7 +2332,8 @@ async def get_measurement_output(
 
     all_entity_attrs = _parse_entity_attrs(state_dict)
     target_attrs = all_entity_attrs.get(entity_id, {})
-    is_single_entity = len(all_entity_attrs) == 1
+    # Exclude cohort entities from sovereign count — same fix as trajectory endpoint.
+    is_single_entity = sum(1 for eid in all_entity_attrs if ":CHT:" not in eid) == 1
 
     outputs: dict[str, FrameworkOutput] = {}
     for fw in _ALL_FRAMEWORKS:

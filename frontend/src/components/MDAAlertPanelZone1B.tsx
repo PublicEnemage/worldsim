@@ -732,12 +732,11 @@ export function CohortImpactSection({ isCompleted = false }: { isCompleted?: boo
               <span style={{ color, fontWeight: 700, flexShrink: 0, fontSize: 9 }}>
                 {crossing.severity}
               </span>
-              <span style={{ color: "#333", lineHeight: 1.3, flex: 1 }}>
-                <span style={{ fontWeight: 600 }}>
+              <span style={{ color: "#333", lineHeight: 1.3, flex: 1, minWidth: 0 }}>
+                <span style={{ fontWeight: 600, display: "block", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                   {crossing.cohort_label} — {crossing.indicator_label}
                 </span>
-                <br />
-                <span style={{ color: "#666" }}>
+                <span style={{ color: "#666", display: "block", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                   {`Threshold crossed at step ${crossing.step_crossed} · `}
                   <span data-testid={`cohort-value-${crossing.indicator_key}`}>
                     {valueDisplay}

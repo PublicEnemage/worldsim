@@ -3241,6 +3241,67 @@ for any PR that adds visible static text to a component rendered in the primary 
 
 ---
 
+## NM-063 — CohortImpactSection Text Overflow Not Covered by Legibility Spec; Same Gap Class as NM-056 (Reactive)
+
+**Date:** 2026-06-24
+**Milestone:** M16 — Distributional Visibility
+**Detected by:** EL live demo observation (G8 Demo 6 walkthrough)
+**Severity:** High
+
+### What happened
+
+`CohortImpactSection` renders cohort crossing rows with `display: flex` and a `flex: 1`
+content span containing the cohort label. Without `minWidth: 0` on the flex container
+and `display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap` on
+the label span, long cohort labels (e.g., "bottom quintile, informal workers — poverty
+headcount ratio") overflow the row container and overlap adjacent rows vertically.
+This was observed during the EL live demo (2026-06-24, G8 Demo 6). The EL noted text
+was "cut/overlapping with other text vertically — unacceptable UX/UI at this stage."
+
+`demo-legibility.spec.ts` did not cover `CohortImpactSection` text overflow. The existing
+Zone 1B MDA overflow check (test: "Zone 1B MDA panel text is not overflow-clipped") guards
+`zone-1b-top-detail` only — not the cohort section which is a sibling component.
+
+### What was at risk
+
+The primary Zone 1B argument in Demo 6 — the cohort threshold crossing that identifies
+which cohort bears the cost of the programme — would be illegible to stakeholders. The
+component delivering the mission-critical Persona 2 output was degraded at the moment
+the EL demonstrated it to external participants.
+
+### What caught it
+
+EL live demo observation. The legibility spec existed and had been extended in M14–M16
+but did not include a test for `CohortImpactSection`, which was added in M16-G2 (#986).
+New components added to the primary viewport were not added to the legibility spec in the
+same sprint. This is the same gap class as NM-056 (test coverage gap for a component added
+mid-milestone).
+
+### Process improvement
+
+**Immediate fix:** `CohortImpactSection` label span now has `display: block; overflow: hidden;
+text-overflow: ellipsis; white-space: nowrap` with `minWidth: 0` on the flex:1 container.
+Applied in M16-G8 PR (2026-06-24).
+
+**Legibility spec extension:** New test `"NM-063: CohortImpactSection label text is not
+overflow-clipped at 1440×900"` added to `frontend/tests/e2e/demo-legibility.spec.ts`.
+Advances one step, checks the `zone-1b-cohort-impact` container for non-overflow; if
+crossing rows are present, checks each label span.
+
+**QA Lead working agreement addition (NM-063):** When a new component delivering a
+primary surface output (Zone 1A, 1B, 1C, 1D) is added to the instrument cluster, the
+authoring sprint must extend `demo-legibility.spec.ts` with at minimum: (1) non-zero
+bounding box for the component container; (2) non-overflow on any text-rendering spans
+visible at 1440×900. Adding the component without the legibility extension is a
+compliance gap — QA Lead must flag this in the sprint exit review if not completed
+in the implementation PR.
+
+**Near-miss lineage:** Same gap class as NM-056 (M14: test suite gap for mid-milestone
+component addition). M16-G2 added `CohortImpactSection` to the primary surface; legibility
+coverage was not added in the same sprint.
+
+---
+
 ## NM-NNN — [Short descriptive title]
 
 **Date:** YYYY-MM-DD (or approximate milestone era)
