@@ -163,10 +163,26 @@ test("AC-009: Mode 3 full component set render ≤ 100ms on throttled CPU", asyn
 
   await page.goto("/");
 
+  // mode3-toggle is inside {selectedScenarioId && (...)} in App.tsx — must select a
+  // scenario first. Pattern mirrors mode3-active-control.spec.ts createAndSelectScenario.
+  await page.waitForFunction(
+    () => typeof (window as Record<string, unknown>).__worldsim_selectEntity === "function",
+    { timeout: 10_000 },
+  );
+  const scenarioName = "AC-009-perf";
+  await page.getByRole("button", { name: /Scenarios/ }).click();
+  await page.locator('input[placeholder="Scenario name"]').fill(scenarioName);
+  await page.locator(".scenario-btn--create").click();
+  const row = page.locator(".scenario-row").filter({ hasText: scenarioName });
+  await expect(row).toBeVisible({ timeout: 10_000 });
+  await row.getByTitle("Select as primary scenario").click();
+  // Close Scenarios panel so mode3-toggle is the only toggle in the DOM.
+  await page.getByRole("button", { name: /Scenarios/ }).click();
+
   // Mode 3 shipped M12 (PR #778). mode3-toggle is the delivered testid (App.tsx:293).
   // Guard removed per NM-058: if mode3-toggle is absent the test must FAIL, not skip.
   const mode3Trigger = page.locator('[data-testid="mode3-toggle"]');
-  await expect(mode3Trigger).toBeVisible();
+  await expect(mode3Trigger).toBeVisible({ timeout: 5_000 });
 
   await page.evaluate(() => performance.mark("mode3-start"));
   await mode3Trigger.click();
