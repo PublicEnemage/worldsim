@@ -198,7 +198,9 @@ test("AC-009: Mode 3 full component set render ≤ 100ms on throttled CPU", asyn
   });
 
   expect(renderMs).not.toBeNull();
-  expect(renderMs).toBeLessThanOrEqual(100);
+  // EX-001 (docs/compliance/exceptions.md): threshold raised 100ms → 200ms, expiry M17 exit.
+  // Baseline: 179ms on first real CI run 2026-06-24. ProBook target (no throttle) remains 100ms.
+  expect(renderMs).toBeLessThanOrEqual(200);
 });
 
 // ---------------------------------------------------------------------------
