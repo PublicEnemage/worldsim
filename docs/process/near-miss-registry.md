@@ -3173,6 +3173,74 @@ requiring an observed result (not a checkbox).
 
 ---
 
+## NM-062 — Demo Spec `getByText("Step N")` Collides with Projection Panel Step Axis Spans; Every Demo Run Would Fail with Strict Mode Violation (Reactive)
+
+**Date:** 2026-06-24
+**Milestone:** M16 — Distributional Visibility (gap origin: G3/G8 interaction)
+**Detected by:** Demo spec execution failure at Step 6 during M16-G8 demo preparation
+**Severity:** High
+
+### What happened
+
+`demo-narrated.spec.ts` used `page.getByText("Step N")` to assert that the step counter
+had advanced after each `nextStepBtn.click()`. `getByText` in Playwright performs a
+default substring match — an element is matched if its text content *contains* the target
+string.
+
+`HumanCapitalTrajectoryPanel` (G3/#274) renders a step axis with static spans:
+```tsx
+<span>Step 1</span>
+<span>Step 25</span>
+<span>Step 50</span>
+<span>Step 75</span>
+<span>Step {projectionSteps}</span>   // "Step 100" for 100-step demo scenario
+```
+
+`getByText("Step 1")` matched both:
+1. `<span>Step 1</span>` — the projection panel step axis start label (exact match)
+2. `<span>Step 100</span>` — the projection panel step axis end label ("Step 100" contains
+   "Step 1" as a prefix substring)
+
+Playwright strict mode requires locators to match exactly one element. The assertion
+failed with: *"strict mode violation: getByText('Step 1') resolved to 2 elements."*
+
+The demo spec was originally authored before `HumanCapitalTrajectoryPanel` existed.
+When G3 added the panel (PR #1172), the static step axis labels created an undetected
+collision with the existing step navigation assertions. The collision was only discovered
+when the demo spec was executed at Step 6 of G8 demo preparation.
+
+### What was at risk
+
+Every demo run — including the M16 live stakeholder demo (#843, M16 exit gate) — would
+fail before capturing any screenshots. The walkthrough would abort at Step 1 advance with
+a strict mode violation. The five frame screenshots required for Step 6b and the internal
+panel review would not be captured.
+
+### What caught it
+
+Step 6 execution of the demo script during M16-G8 demo preparation. The failure appeared
+as the first advance assertion in the test. This was caught during demo preparation, not
+during a live stakeholder session — the G8 demo preparation protocol (Steps 5b, 6, 6b
+before any live audience) is functioning as designed.
+
+### Process improvement
+
+**Immediate fix:** All `page.getByText("Step N")` assertions replaced with
+`page.locator('[data-testid="current-step-display"]').toContainText("Step N")`.
+The `current-step-display` testid is on `<span>` in `ScenarioControls.tsx` — the
+actual step counter showing "Step N / totalSteps". This locator is unique and unambiguous.
+
+**QA Lead working agreement addition (NM-062):** When a new component introduces static
+text content — particularly labels, axis annotations, or header strings — the authoring
+agent must check whether existing test specs use `getByText()` with any of those strings.
+The check is: `grep -r 'getByText.*Step\|getByText.*{string}' frontend/tests/e2e/`.
+If any existing spec uses a `getByText` that would collide with new static text, the
+locator in the existing spec must be updated to a scoped testid-based locator before the
+new component is merged. This check is a required line item in the frontend pre-push gate
+for any PR that adds visible static text to a component rendered in the primary viewport.
+
+---
+
 ## NM-NNN — [Short descriptive title]
 
 **Date:** YYYY-MM-DD (or approximate milestone era)
