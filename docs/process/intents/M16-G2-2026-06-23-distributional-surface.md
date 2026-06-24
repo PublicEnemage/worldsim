@@ -572,9 +572,129 @@ updated for 4 retired testids. Both files filed before any G2 implementation PR 
 ---
 
 *Intent document authority: `docs/process/intent-template.md` (version 2026-06-17).
-Sprint entry: `docs/process/sprint-plans/m16-g2-sprint-entry.md` (EL Approval pending).
+Sprint entry: `docs/process/sprint-plans/m16-g2-sprint-entry.md` (EL Approved 2026-06-23).
 Design authorities: `docs/ux/design-thinking/cohort-disaggregation-design.md`;
 `docs/ux/design-thinking/political-risk-summary-design.md`.
 FA layout brief: `docs/frontend/fa-brief-m16-g2-zone-1d-layout.md` (DD-016).
 Implementing agent: Frontend Architect Agent. Layer 3 assessment: Customer Agent required
 (Persona 2 and Persona 3 served — both require Layer 3 gate before BPO verdict).*
+
+---
+
+## 9. Customer Agent Layer 3 Assessment and Business PO Verdict
+
+*This section is the primary verdict artifact for G2. Filed 2026-06-24 post-implementation.
+Implementation PR: #1173 (merged to `release/m16`, 2026-06-24). CI: 209/209 E2E tests passing,
+including all 14 G2 ACs.*
+
+### Customer Agent Layer 3 Assessment — 2026-06-24
+
+**Agent:** Customer Agent
+**Persona scope:** Persona 2 (finance ministry negotiator — Aicha Mbaye archetype); Persona 3 (political advisor — Andreas Stefanidis archetype)
+**Assessment date:** 2026-06-24
+**Implementation reviewed:** PR #1173 — `feat/m16-g2-distributional-surface` → `release/m16`
+
+#### Persona 2 assessment — #986 Cohort Disaggregation (Zone 1B)
+
+Persona 2 goal: read which income cohort has crossed a threshold and form a defensible argument
+at the negotiating table without specialist mediation. Acceptance criterion: bottom income
+quintile cohort row visible in Zone 1B at step 2, with severity, indicator, and step cited.
+
+**Layer 3 verdict: PASS**
+
+The Zone 1B Cohort Impact sub-section delivers the P-6 negotiating leverage: Persona 2 can
+state "The bottom income quintile has crossed the poverty headcount threshold at step 2 — this
+is a CRITICAL finding" from the primary viewport without any Zone 2B navigation. The cohort
+label, indicator label, severity badge, step citation, tier label, and data source are all present
+in the row. The COHORT IMPACT header label, the CRITICAL colour encoding (red left-border), and
+the empty-state fallback text are all confirmed present in the 209-test CI run.
+
+The Mode 1 vs. Mode 2 label tense distinction (COHORT IMPACT vs. COHORT IMPACT (HISTORICAL))
+correctly signals to Persona 2 whether they are reading projected or historical data. The
+`isCompleted` prop pattern (from `activeScenarioDetail.status === "completed"`) is the correct
+signal — it reflects scenario completion status, not the Zustand store mode field.
+
+No suppressed cohort rows (Q3–Q5) appear — the Tier 5 suppression rule is confirmed active.
+
+Named conditions:
+- **None blocking Persona 2's G2 use case.** The 1280 viewport 1+1 visible-row regression
+  (named in FA brief and accepted by UX Designer) is a spatial constraint, not a readability
+  failure — the top cohort row is visible without scroll and that is the critical row.
+
+#### Persona 3 assessment — #987 Political Risk Summary (Zone 1D) + #1163 PSP legibility
+
+Persona 3 goal: read the full political risk situation (PSP level, severity, historical
+analogue, legitimacy, elite capture) from Zone 1D within 30 seconds without knowing what
+PSP stands for or what makes a value "bad." Acceptance criterion: severity-labelled PSP display
+with historical analogue sentence, legitimacy index with floor proximity, elite capture
+direction.
+
+**Layer 3 verdict: PASS**
+
+Zone 1D's political risk sub-section delivers the Persona 3 read: "Programme survival is CRITICAL
+at 38% and declining — historical ECF programmes at this level show abandonment within 3 steps.
+Legitimacy index: 0.42, declining, 0.07 above fragility threshold. Elite capture divergence:
+widening." This is readable without domain expertise — the severity label ("CRITICAL") and
+historical analogue sentence provide the interpretive frame Persona 3 needs.
+
+PSP threshold legibility (#1163): the CRITICAL severity badge on "Programme survival: CRITICAL
+(38%)" answers the #1163 requirement. Persona 3 can now interpret 38% as "critical range" without
+knowing the 0.40 threshold value. #1163 closes as a consequence of #987 implementation as
+specified in the entry document.
+
+The four STABLE/WATCH/WARNING/CRITICAL severity thresholds (>0.70 / 0.55–0.70 / 0.40–0.55 /
+<0.40) are confirmed in AC-8 across 209 CI tests. The historical analogue sentences (CRITICAL:
+"within 3 steps"; WARNING: "within 6 steps") match CM sign-off values.
+
+The political economy not-enabled fallback ("Political risk: not modelled in this fixture.") is
+confirmed present in AC-14.
+
+Named conditions:
+- **None blocking Persona 3's G2 use case.** The G1 testids (`zone-1d-political-feasibility`,
+  `psp-delta`, `psp-layer3-sentence`, `psp-delta-sentence`) are confirmed absent from the DOM
+  (AC-14 guards); Zone 1D flex proportion at 1280 is confirmed 50% of chartHeight (DD-016).
+
+**Overall Layer 3 verdict: PASS — no blocking conditions. No REJECT verdicts on record.**
+
+---
+
+### Business PO Step 5 Validate — 2026-06-24
+
+**Agent:** Business PO
+**Verdict date:** 2026-06-24
+
+**BPO ACCEPT** — issued after Customer Agent Layer 3 PASS (above) and CI confirmation (209/209).
+
+Acceptance rationale:
+
+1. **Persona 2 cohort argument confirmed (§3.2 completion criterion):** Zone 1B Zone 1B Cohort
+   Impact sub-section delivers the bottom quintile crossing at CRITICAL severity. Persona 2 can
+   form the statement "Bottom income quintile crosses poverty headcount threshold at step 2"
+   from the primary viewport without Zone 2B navigation or specialist mediation. G2 entry
+   criterion (a) satisfied.
+
+2. **Persona 3 political risk read confirmed (§3.2 completion criterion):** Zone 1D political
+   risk sub-section delivers severity label, percentage, direction, historical analogue, legitimacy
+   floor proximity, and elite capture direction at L0. Persona 3 can read the full situation within
+   30 seconds without knowing what PSP stands for. G2 entry criterion (b) satisfied.
+
+3. **#1163 PSP threshold legibility confirmed (§3.2 completion criterion):** The CRITICAL badge
+   on "Programme survival: CRITICAL (38%)" makes the absolute PSP level self-interpreting. G2
+   entry criterion (c) satisfied. Issue #1163 closed 2026-06-24.
+
+4. **North star test — G2:**
+
+   *"The Senegalese finance ministry analyst with ZMB ECF loaded in Mode 2 at step 3 can now
+   tell the delegating Minister: 'The bottom income quintile has crossed the poverty headcount
+   threshold at step 2 — that is a CRITICAL cohort impact finding. Programme survival is also
+   CRITICAL at 38% and falling — comparable ECF programmes at this level have shown abandonment
+   within 3 steps.' Both facts are readable from the primary viewport in under 15 seconds, without
+   opening any drawer or consulting any specialist. The Zone 1D political risk section and the
+   Zone 1B cohort impact section together constitute the distributional visibility argument that
+   Demo 6 will anchor."*
+
+   PI Agent confirms: this is specific — names scenario (ZMB ECF Mode 2), step, two distinct
+   arguments (cohort crossing + PSP level), time ceiling, and the Demo 6 forward connection.
+   North star test artifact: **SATISFIES** the gate condition.
+
+**Business PO ACCEPT — recorded 2026-06-24. Issues #986, #987, #1163 closed.**
