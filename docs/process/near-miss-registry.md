@@ -2848,6 +2848,62 @@ This test would have failed in CI for eight sprints and revealed that `createCom
 
 ---
 
+## NM-057 — CA-Condition Follow-Up Issues Not Assigned to a Sprint Group at Sprint Exit Time (Anticipatory)
+
+**Date:** 2026-06-24
+**Milestone:** M16 — Distributional Visibility
+**Detected by:** PM Agent (near-miss sweep at G10 sprint entry, 2026-06-24)
+**Severity:** Low
+
+### What happened
+
+At G1, G3, and G4 sprint exits (2026-06-23 and 2026-06-24), the PI Agent named five
+CA-condition issues (#1162, #1177, #1178, #1179, #1184) as required before the live
+demo session (#843). These conditions were recorded in the prose of each PI confirmation
+and in the sprint exit documents (Section 5). No formal sprint group assignment was made
+for these issues at exit time — they held no slot in the sprint plan's Sprint Groups table
+and no sprint entry was initiated. Between G1 exit (2026-06-23) and G10 sprint entry
+(2026-06-24), five G8 gate dependencies existed as informal obligations documented only
+in PI confirmation prose, not in the plan's structured group tracking.
+
+### What was at risk
+
+If the session had closed after G3 or G4 exit without G10 being formally entered, the
+five CA conditions would exist only in prose — present in PI confirmation narrative, absent
+from the sprint plan's group table, and without a sequenced timing relationship to the G8
+gate (#843). A future session could have attempted to schedule #843 without having
+completed the CA conditions, because the sprint plan's Group table would not have shown
+them as gate dependencies. The G8 gate declaration in the sprint plan read "after G1/G2/G3"
+— the CA-condition group (G10) was nowhere in the plan until this was caught.
+
+### What caught it
+
+The PM Agent identified the gap during the G10 sprint entry near-miss sweep (same session
+as G9 entry filing, before any G10 implementation began). The EL confirmed the G8 gate
+dependency in the G10 sprint entry approval. The gap was caught anticipatorily — no
+implementation was blocked, and no incorrect scheduling occurred. Gap duration: one calendar
+day (G1 exit 2026-06-23 to G10 entry 2026-06-24).
+
+### Process improvement
+
+The sprint exit SOP (`docs/process/sprint-planning-sop.md §Sprint Exit Gate`) must be
+amended to require: when the PI Agent's exit confirmation names CA-condition follow-up
+issues, those issues must be assigned to a sprint group before the exit session closes.
+The assignment must appear in the sprint plan Sprint Groups table — either added to an
+existing open group or by initiating a new sprint entry stub with a group number. A PI
+Agent confirmation that names CA-condition issues without assigning them to a group is not
+complete. The PI Agent blocks final exit confirmation until the assignment is recorded.
+
+Prose-only documentation of gate-blocking follow-up items is not sufficient. If the item
+gates a downstream group (e.g., G8), the gating relationship must appear in the sprint
+plan, not only in the PI confirmation prose.
+
+SOP amendment target: `docs/process/sprint-planning-sop.md §Sprint Exit Gate` —
+add step: "PI Agent confirms any named CA-condition follow-up issues are assigned to a
+sprint group before exit confirmation is filed." PI Agent holds R for this check.
+
+---
+
 ## Registry Maintenance
 
 ### How to add an entry
