@@ -464,9 +464,12 @@ test.describe("AC-F8: Panel renders within 60 seconds", () => {
     // a UI-selected scenario. Without UI selection, the panel never renders and the
     // soft-skip guard at the old line 459 always fired silently.
     // Fix: open Scenarios panel and select the created scenario before checking visibility.
+    // Multiple G3 tests call createSen100StepScenario() within the same CI run, producing
+    // several rows with the same name. Use .first() to avoid strict mode violation while
+    // still selecting a valid completed projection scenario.
     const scenarioName = "M16-G3 E2E — SEN 25-year projection";
     await page.getByRole("button", { name: /Scenarios/ }).click();
-    const row = page.locator(".scenario-row").filter({ hasText: scenarioName });
+    const row = page.locator(".scenario-row").filter({ hasText: scenarioName }).first();
     await expect(row).toBeVisible({ timeout: 10_000 });
     await row.getByTitle("Select as primary scenario").click();
     await page.getByRole("button", { name: /Scenarios/ }).click();
