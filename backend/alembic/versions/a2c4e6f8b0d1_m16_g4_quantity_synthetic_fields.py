@@ -1,7 +1,7 @@
 """m16_g4_quantity_synthetic_fields — ADR-007 §Consequences step 1, Issue #22 (scoped)
 
 Revision ID: a2c4e6f8b0d1
-Revises: f8a3c7e2d1b5
+Revises: 2b821063ef81
 Create Date: 2026-06-24
 
 Creates the `quantity` table with four synthetic-data disclosure fields required by
@@ -30,7 +30,7 @@ from alembic import op
 
 # revision identifiers, used by Alembic.
 revision = "a2c4e6f8b0d1"
-down_revision = "f8a3c7e2d1b5"
+down_revision = "2b821063ef81"
 branch_labels = None
 depends_on = None
 
