@@ -48,7 +48,8 @@ entry §2.3 and §2.4).*
 | `playwright.hardware.config.ts` | #1213 | Yes | Green | Hardware config for @hardware-only test runs on ProBook |
 | NM-060 + CONTRIBUTING.md seed fix | #1215 | Yes | Green | Observability near-miss filed; seed command corrected; symptom description fixed |
 | VC-2 validation script | #1216 | Yes | Green | `tmp/vc2_test.py` — stdlib Python; avoids Git Bash line-wrap issues |
-| Validation report (this exit) | this PR | Yes | Green | `docs/process/validation/m16-g6-accessibility-validation-report.md` |
+| Validation report | #1218 | Yes | Green | `docs/process/validation/m16-g6-accessibility-validation-report.md` |
+| NM-061 + AC-F8 setup fix | #1221 | Yes | Green | AC-F8 UI selection added; NM-061 filed; QA Lead audit step (agents.md); #1220 filed |
 
 **Implementation status:** All merged, CI green.
 
@@ -85,44 +86,55 @@ No open rejections. Proceed to Section 5.
 
 **Exit conditions checklist (PI Agent):**
 
-- [x] All implementation groups merged; CI green on release branch (Section 2) — confirmed: PRs #1211–#1213, #1215–#1216 merged; CI green
-- [x] Business PO ACCEPT verdict filed for each user-facing deliverable, or EL exception on record — Infrastructure sprint exception applies; confirmed in sprint entry §2.3; no user-visible output produced by G6
+- [x] All implementation groups merged; CI green on release branch (Section 2) — confirmed: PRs #1211–#1213, #1215–#1216, #1218, #1221 merged; CI green
+- [x] Business PO ACCEPT verdict filed for each user-facing deliverable, or EL exception on record — Infrastructure sprint exception applies; confirmed in sprint entry §2.3; no user-visible output produced by G6; BPO advisory review confirms classification correct (2026-06-24)
 - [x] Customer Agent Layer 3 assessment on record for all Persona 2/3/5 deliverables — N/A; no G6 deliverable serves Personas 2, 3, or 5
 - [x] No open rejection artifacts (Section 4) — confirmed
-- [x] Near-miss entry filed for each rejection in this sprint — no rejections; NM-058, NM-059, NM-060 filed for process gaps discovered during G6 validation
+- [x] Near-miss entry filed for each rejection in this sprint — no rejections; NM-058, NM-059, NM-060, NM-061 filed for process gaps discovered during G6 validation and exit review
 
 **Additional PI Agent confirmation items (G6-specific):**
 
 - [x] Validation report filed at canonical path (`docs/process/validation/m16-g6-accessibility-validation-report.md`)
 - [x] All five VC checks documented: VC-1 PASS, VC-2 PASS, VC-3 CONDITIONAL PASS (unchanged from M15-G6), VC-4 PASS
 - [x] MV-002 hardware validation documented: 50.5ms PASS on ProBook (≤ 100ms target)
-- [x] EX-001 filed at `docs/compliance/exceptions.md` with M17 expiry — Mode 3 render optimization enhancement logged as pending issue filing before M17 sprint planning
-- [x] Infrastructure Sprint Exception re-confirmed: no G6 output is user-visible
+- [x] EX-001 filed at `docs/compliance/exceptions.md` with M17 expiry; #1217 filed (Mode 3 optimization)
+- [x] Infrastructure Sprint Exception re-confirmed: no G6 output is user-visible; AC-F8 fix and NM-061 are test infrastructure only
+- [x] Sprint entry §3.1 pre-check satisfied: AC-F8 guard evaluated — found to be soft-skipping (NM-061 filed); guard removed and UI selection added in PR #1221; #1220 filed for AC-F1–F7 broader gap
 
 **PI Agent sprint exit verdict:** Confirmed — all exit conditions satisfied.
 
 **PI Agent confirmation:**
 
-> G6 exit conditions are satisfied. All implementation PRs are merged and CI is green.
+> G6 exit conditions are satisfied. All implementation PRs are merged and CI is green
+> (PRs #1211–#1213, #1215–#1216, #1218, #1221).
+>
 > Infrastructure Sprint Exception confirmed — no user-facing deliverable was produced;
 > Business PO acceptance and Customer Agent Layer 3 assessment are not required.
+> Business PO advisory review (2026-06-24) confirms the classification is accurate.
 >
 > Validation findings: VC-1 PASS (ProBook, 164 MiB / 3.744 GiB Docker limit), VC-2 PASS
 > (8-step: 0.8s; 100-step: 0.5s — well under 60s contracted ceiling), VC-3 CONDITIONAL
 > PASS (lightweight path functional; MSW offline path unchanged from M15-G6), VC-4 PASS
 > (11.8s on ProBook 4-core), MV-002 PASS (50.5ms — 50% headroom vs 100ms hardware target).
 >
-> Three near-misses filed during G6 validation: NM-058 (AC-009 silent no-op since M12),
-> NM-059 (multi-CDP measurement methodology), NM-060 (startup observability gap). All
-> three produced process improvements — QA Lead audit steps added (NM-058, NM-059);
-> CONTRIBUTING.md corrected (NM-060). Blameless continuous improvement obligations satisfied.
+> Four near-misses filed during G6 validation and exit review: NM-058 (AC-009 silent
+> no-op since M12), NM-059 (multi-CDP measurement methodology), NM-060 (startup
+> observability gap), NM-061 (AC-F8 setup gap — scenario created via API, never
+> selected in UI; 60-second CI ceiling gate measuring nothing since G3). All four
+> produced process improvements with QA Lead audit steps added. Blameless continuous
+> improvement obligations satisfied.
 >
 > One exception on record: EX-001 (CI throttled threshold 100ms → 200ms, M17 expiry).
-> Mode 3 render optimization filed as #1217 (Recharts memoization, lazy ControlPlane).
-> EX-001 renewal or resolution is a required PI Agent check at M17 entry.
+> Mode 3 render optimization filed as #1217. EX-001 renewal or resolution is a required
+> PI Agent check at M17 entry.
 >
-> G6 closes. Issue #569 may be closed.
-> — PI Agent, 2026-06-24
+> Sprint entry §3.1 pre-check (AC-F8 guard) was the named blocking condition at PI
+> Agent exit review. NM-061 filed; guard removed; PR #1221 merged. The sprint entry's
+> anticipatory design of a named pre-check is confirmed to have been necessary — it
+> caught a silent no-op that had been accumulating since G3 shipped.
+>
+> G6 is closed. Issue #569 closed 2026-06-24.
+> — PI Agent, 2026-06-24 (EL-activated exit review)
 
 ---
 
