@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-24 (G6 PI Agent exit review complete — NM-061 filed; AC-F8 fixed PR #1221; sprint exit v2 PR #1222; G6 formally closed)**
+**Last updated: 2026-06-24 (G8 Steps 5b/6/6b complete — NM-062 filed; PRs #1228/#1230/#1231 merged; DEMO6-001/002/003 CRITICAL findings block Steps 7/6c/8/9; EL decisions required)**
 **Current milestone:** M16 — Distributional Visibility (GitHub Milestone 17)
 **Previous milestone:** M15 — Human Cost Architecture (FORMALLY CLOSED 2026-06-23; release/m15 → main PR #1142; v0.15.0; #984 closed; GitHub Milestone 16 closed)
 
@@ -188,7 +188,11 @@ Implementation is now unblocked. A sprint entry document must be filed and EL-ap
 - ✅ **G6 sprint exit CONFIRMED 2026-06-24** — `docs/process/sprint-plans/m16-g6-sprint-exit.md` (v2 — NM-061 + PI Agent final confirmation); #569 CLOSED
 - ✅ **PI Agent exit gate review 2026-06-24** — NM-061 filed (AC-F8 silent no-op since G3 — scenario created via API, never selected in UI; 60s ceiling gate measuring nothing); AC-F8 fixed PR #1221 (UI selection + .first() for multi-row); QA setup completeness audit step added to agents.md; #1220 filed for AC-F1–F7 broader gap
 - ✅ **G8 sprint entry filed and EL-approved 2026-06-24** — `docs/process/sprint-plans/m16-g8-sprint-entry.md`; EL decisions recorded: challenge moment T3 Inferred; Persona 3 (Andreas) included in Step 6c; Step 5b additional gate criteria (step-2 Q1 threshold crossing + calendar year anchor); #1225 filed (demo prep issue — Step 1 complete)
-- ⬜ **G8 Steps 1–4 PR #1226 open** — `feat/m16-g8-demo6-prep` → `release/m16`; CI pending; screenshot brief + full walkthrough + narrated spec (SEN Demo 6, 100-step quarterly, NM-061 audit) + M14 archive; Steps 5a/5c satisfied inline; Step 5b (legibility spec) deferred to pre-screenshot gate (requires live stack); Steps 6/6b deferred (require screenshots); Steps 7/6c Phase 2 (require release→main merge)
+- ✅ **G8 Steps 1–4 PR #1226 merged** — screenshot brief + full walkthrough (honest "approaching" framing per EL) + narrated spec (SEN Demo 6, 100-step quarterly, NM-061 audit) + M14 archive; Steps 5a/5c satisfied inline
+- ✅ **G8 Step 5b backend fix PR #1228 merged** — `_ensure_demographic_enabled` in `advance_scenario` path; second `_apply_initial_overrides` call after `_inject_cohort_entities`; milestone sentence `[step N]` annotation removed; NM-057; calibration gap filed as Issue #1229 (M17/CM scope); insights log entries (calibration finding → #1229; Demo 7 arc open); Step 5b GATE 1 PASS (80 cohort entities at 0.385 in step-0 state_data); Step 5b GATE 2 PASS (milestone sentence format confirmed no `[step N]`)
+- ✅ **G8 Step 6 screenshots PR #1230 merged** — five frames captured to `docs/demo/m16/screenshots/`; NM-062 filed (getByText strict mode collision with projection panel step axis); step locator fix (`current-step-display` testid); FRAME-D WARNING recorded (milestone sentence not visible — calibration gap, M17 scope); Step 6 COMPLETE
+- ✅ **G8 Step 6b internal review PR #1231 merged** — `docs/demo/m16/reviews/2026-06-24-v0.16.0-internal-review.md`; DEMO6-001 through DEMO6-008; PI Agent verdict: **INCOMPLETE** — 3 CRITICAL findings block demo readiness
+- 🚨 **G8 BLOCKED pending EL decisions on DEMO6-001/002/003** — DEMO6-001: spec TTS narration Frame A claims Zone 1B crossing that does not exist (zone shows "No cohort threshold crossings"); DEMO6-002: Frame A=Frame D and Frame B=Frame C (byte-identical, needs EL fix decision: deck annotation vs spec highlight overlay); DEMO6-003: spec TTS narration Frame D references absent milestone sentence; **Steps 7/6c/8/9 all gated on these fixes**
 
 ---
 
