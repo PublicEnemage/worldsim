@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-24 (G10 implementation COMPLETE — PR #1199 merged; all five pre-demo polish issues closed; G8 gate cleared for G10; sprint exit filed)**
+**Last updated: 2026-06-24 (G9 implementation COMPLETE — PRs #1201/#1202/#1204/#1205 merged; all four G9 issues closed; sprint exit pi-confirmed)**
 **Current milestone:** M16 — Distributional Visibility (GitHub Milestone 17)
 **Previous milestone:** M15 — Human Cost Architecture (FORMALLY CLOSED 2026-06-23; release/m15 → main PR #1142; v0.15.0; #984 closed; GitHub Milestone 16 closed)
 
@@ -106,7 +106,7 @@ Implementation is now unblocked. A sprint entry document must be filed and EL-ap
 
 ## Open Issues — M16 (Distributional Visibility)
 
-**GitHub Milestone:** 17 | **Created:** 2026-06-23 | **Status:** G1 COMPLETE 2026-06-23; **G2 COMPLETE 2026-06-24**; **G3 COMPLETE 2026-06-24**; **G4 COMPLETE 2026-06-24** (PRs #1182/#1187/#1190; all ACs PASS incl AC-EE-1; sprint exit pi-confirmed: true; #22 + #102 + #275 CLOSED); G5 CLOSED 2026-06-23; **G10 COMPLETE 2026-06-24** (PR #1199; all 11 ACs PASS; #1162/#1177/#1178/#1179/#1184 CLOSED; sprint exit pi-confirmed: true) | **G8 gate: G10 CLEARED** — all five pre-demo items merged; #843 scheduling gate open for G10 contribution
+**GitHub Milestone:** 17 | **Created:** 2026-06-23 | **Status:** G1 COMPLETE 2026-06-23; **G2 COMPLETE 2026-06-24**; **G3 COMPLETE 2026-06-24**; **G4 COMPLETE 2026-06-24** (PRs #1182/#1187/#1190; all ACs PASS incl AC-EE-1; sprint exit pi-confirmed: true; #22 + #102 + #275 CLOSED); G5 CLOSED 2026-06-23; **G9 COMPLETE 2026-06-24** (PRs #1201/#1202/#1204/#1205; all four issues closed; sprint exit pi-confirmed: true); **G10 COMPLETE 2026-06-24** (PR #1199; all 11 ACs PASS; #1162/#1177/#1178/#1179/#1184 CLOSED; sprint exit pi-confirmed: true) | **G8 gate: G10 CLEARED** — all five pre-demo items merged; #843 scheduling gate open for G10 contribution
 *Zone 1A Phase 4 + cohort disaggregation + political risk surface + live external demo (#843 — exit gate). Demo 6 (Senegalese Finance Minister scenario).*
 
 | Issue | Title | Group | Notes |
@@ -134,10 +134,10 @@ Implementation is now unblocked. A sprint entry document must be filed and EL-ap
 | #1177 ✅ | ux(zone-1d): milestone sentence step-reference → year anchor | G10 | ✅ BPO ACCEPT 2026-06-24 — PR #1199; milestone-sentence wrapper; year leads text; issue CLOSED 2026-06-24 |
 | #1178 ✅ | ux(zone-1b): T3 badge L0 legibility | G10 | ✅ BPO ACCEPT 2026-06-24 — PR #1199; confidence-tier-badge-sublabel "Inferred"; option (b) sub-label; issue CLOSED 2026-06-24 |
 | #1179 ✅ | ux(zone-1a): Q2 curve asymmetry label | G10 | ✅ BPO ACCEPT 2026-06-24 — PR #1199; q2-suppression-legend "Q2 — floor threshold not registered"; issue CLOSED 2026-06-24 |
-| #153 | feat(frontend): absolute threshold overlay | G9 | Promoted from near-term backlog to G9 (capacity-allowing) 2026-06-24 |
-| #846 | ux: DEMO-045 — Mode 3 branch comparison values | G9 | Promoted from near-term backlog to G9 (capacity-allowing) 2026-06-24 |
-| #97 | arch(api): threshold-crossing markers in compare output | G9 | Promoted from near-term backlog to G9 (capacity-allowing) 2026-06-24 |
-| #92 | arch(backtesting): Greece 2010 investment climate conditions | G9 | Promoted from near-term backlog to G9 (capacity-allowing) 2026-06-24 |
+| #153 ✅ | feat(frontend): absolute threshold overlay | G9 | ✅ BPO ACCEPT 2026-06-24 — PR #1204; DeltaChoropleth threshold overlay line; issue CLOSED 2026-06-24 |
+| #846 ✅ | ux: DEMO-045 — Mode 3 branch comparison values | G9 | ✅ BPO ACCEPT 2026-06-24 — PR #1202; branch-comparison-panel numeric values; DEMO-045 closed; issue CLOSED 2026-06-24 |
+| #97 ✅ | arch(api): threshold-crossing markers in compare output | G9 | ✅ BPO ACCEPT 2026-06-24 — PR #1201; threshold_crossings field in compare endpoint; schema updated; issue CLOSED 2026-06-24 |
+| #92 ✅ | arch(backtesting): Greece 2010 investment climate conditions | G9 | ✅ Infrastructure — PR #1205; 4 deferred investment climate thresholds; backtesting PASS; issue CLOSED 2026-06-24 |
 
 **M16 kickoff status (2026-06-23):**
 - ✅ `release/m16` cut from `main` at commit 07c92b8
