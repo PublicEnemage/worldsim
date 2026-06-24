@@ -449,14 +449,31 @@ test.describe("AC-F8: Panel renders within 60 seconds", () => {
   test("scenario creation to panel visibility ≤ 60 seconds", async ({ page }) => {
     const t0 = Date.now();
     const scenarioId = await createSen100StepScenario();
-    if (!scenarioId) return; // pre-implementation guard: backend doesn't yet accept projection_steps
+    // Guard removed per NM-061: if backend rejects projection_steps, the test must FAIL.
+    // The pre-implementation guard was appropriate before G3 shipped; G3 is now delivered
+    // (PR #1172) and projection_steps is a supported parameter.
+    if (!scenarioId) throw new Error("AC-F8: createSen100StepScenario returned null — backend rejected projection_steps");
     const createMs = Date.now() - t0;
 
     await page.goto("/");
     await waitForAppReady(page);
 
+    // NM-061 fix: createSen100StepScenario() creates the scenario via API but does not
+    // select it in the UI. HumanCapitalTrajectoryPanel renders only when
+    // (activeScenarioDetail?.configuration?.projection_steps ?? 0) > 8, which requires
+    // a UI-selected scenario. Without UI selection, the panel never renders and the
+    // soft-skip guard at the old line 459 always fired silently.
+    // Fix: open Scenarios panel and select the created scenario before checking visibility.
+    const scenarioName = "M16-G3 E2E — SEN 25-year projection";
+    await page.getByRole("button", { name: /Scenarios/ }).click();
+    const row = page.locator(".scenario-row").filter({ hasText: scenarioName });
+    await expect(row).toBeVisible({ timeout: 10_000 });
+    await row.getByTitle("Select as primary scenario").click();
+    await page.getByRole("button", { name: /Scenarios/ }).click();
+
     const panel = page.locator('[data-testid="human-capital-trajectory-panel"]');
-    if (!(await panel.isVisible({ timeout: 60_000 }).catch(() => false))) return;
+    // Guard removed per NM-061: if panel is absent after UI selection the test must FAIL.
+    await expect(panel).toBeVisible({ timeout: 10_000 });
 
     const totalMs = Date.now() - t0;
     expect(totalMs).toBeLessThanOrEqual(60_000, [
