@@ -13,7 +13,7 @@ sop-reference: docs/process/sprint-planning-sop.md §Sprint Exit Gate
 
 # Sprint Exit — M16, G4: Distributional Infrastructure
 
-**Status:** Blocked — AC-EE-1 (Zimbabwe 2005 calibration) and AC-EE-2 (EE DIC review) pending on GitHub issue #275. Full sprint exit gate cannot confirm until Ecological Economist DIC review is on record.
+**Status:** Blocked — AC-EE-1 (Zimbabwe 2000 engine validation) pending on GitHub issue #275. AC-EE-2 SATISFIED 2026-06-24 (EE review comment on #275). Full sprint exit cannot confirm until engine wiring is complete and AC-EE-1 passes.
 **Date produced:** 2026-06-24
 **Release branch:** `release/m16`
 **Sprint entry document:** `docs/process/sprint-plans/m16-g4-sprint-entry.md` — EL Approved 2026-06-24
@@ -146,12 +146,21 @@ No REJECT verdicts were issued for any G4 deliverable.
   versus pre-G4 (T3→SAD correction prevents false precision; P10/P90 enables distributional
   argument). PI Agent confirms: specific, not aspirational. Gate satisfied.
 
-- [ ] **EE-PENDING ACs resolved — BLOCKING**
-  AC-EE-1 (Zimbabwe 2005 historical calibration of `ecological_shock_coefficient`) and
-  AC-EE-2 (Ecological Economist DIC review comment on GitHub issue #275) have not been
-  verified. Issue #275 remains open. The sprint entry §3.1 Observable State 6 is
-  EE-PENDING. Until the EE DIC agent files a review comment on #275 and AC-EE-1/AC-EE-2
-  are verified, the sprint exit gate does not confirm for issue #275.
+- [x] **AC-EE-2 SATISFIED 2026-06-24** — Ecological Economist DIC review comment filed
+  on GitHub issue #275 (comment https://github.com/PublicEnemage/worldsim/issues/275#issuecomment-4785674661).
+  Confirmed: (a) soil-degradation → agricultural-export → fiscal-revenue pathway correct;
+  (b) calibration anchor corrected to Zimbabwe 2000 (not 2005); step 4 (2004) horizon;
+  (c) AC-EE-1 parameters: coefficient=0.35, tolerance ±30%, `arable_land_degradation_rate`
+  proxy=0.15, fiscal indicator `fiscal_revenue_pct_gdp`, target ~1.0–1.5% GDP at step 4.
+
+- [ ] **AC-EE-1 BLOCKED — engine wiring required — BLOCKING**
+  `ecological_shock_coefficient` is schema-only. The simulation engine does not apply
+  the coefficient — a run with coefficient=0.35 currently produces output identical to
+  coefficient=0.0 (silent failure 3, intent doc §3.4). AC-EE-1 integration test cannot
+  pass until `ExternalSectorModule` is wired to read `ecological_shock_coefficient` from
+  `ScenarioConfigSchema`, read `base_agricultural_export_share` from entity attributes, and
+  emit a FINANCIAL framework fiscal revenue delta per step. Issue #275 remains OPEN.
+  Sprint exit gate does not confirm until engine wiring is complete and AC-EE-1 passes.
 
 **PI Agent sprint exit verdict: BLOCKED — EE review pending on #275**
 
@@ -177,7 +186,13 @@ No REJECT verdicts were issued for any G4 deliverable.
 >
 > G4 does not gate G8 (live stakeholder demo #843). G8 gate remains OPEN as of
 > 2026-06-24 — it requires G1/G2/G3 BPO-accepted (all satisfied) and Demo 6 preparation
-> items (#1162, #1177, #1178, #1179, #1183) resolved before the live session runs.
+> items (#1162, #1177, #1178, #1179, #1184) resolved before the live session runs.
+>
+> AC-EE-2 update (2026-06-24): Ecological Economist DIC review now on record on #275
+> (comment filed 2026-06-24). AC-EE-2 is SATISFIED. Remaining blocker: AC-EE-1 requires
+> ExternalSectorModule engine wiring before the historical validation test can run.
+> Issue #275 remains OPEN. Engine wiring is a future sprint deliverable — the EE review
+> provides the calibration parameters (coefficient=0.35, ±30%, step 4, proxy rate=0.15).
 >
 > — PI Agent, 2026-06-24
 
@@ -186,9 +201,10 @@ No REJECT verdicts were issued for any G4 deliverable.
 ## Sprint Exit Artifact Statement
 
 This document is the sprint exit artifact for M16-G4. It is filed at
-`docs/process/sprint-plans/m16-g4-sprint-exit.md`. Status is BLOCKED pending EE review on
-#275. When AC-EE-1/AC-EE-2 are verified in a future session, this document will be updated
-to status CONFIRMED and pi-confirmed: true.
+`docs/process/sprint-plans/m16-g4-sprint-exit.md`. Status is BLOCKED pending engine wiring
+for AC-EE-1. AC-EE-2 is SATISFIED (EE review on record 2026-06-24). When engine wiring is
+complete and AC-EE-1 passes in CI, this document will be updated to status CONFIRMED and
+pi-confirmed: true.
 
 The sprint exit is not confirmed until the PI Agent's verdict reads "Confirmed." Issues #22
 (scoped) and #102 may be closed on the basis of the ACCEPT verdicts in §3. Issue #275 must

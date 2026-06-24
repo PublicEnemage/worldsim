@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-24 (M16 G4 Step 5 Validate COMPLETE — BPO CONDITIONAL ACCEPT; 20 ACs PASS; #22+#102 CLOSED; #275 EE-PENDING; sprint exit BLOCKED pending EE review on #275; #1184 filed — SAD badge tooltip pre-Demo 6)**
+**Last updated: 2026-06-24 (M16 G4 EE VALIDATE COMPLETE — AC-EE-2 SATISFIED (EE review on #275); AC-EE-1 BLOCKED pending engine wiring in ExternalSectorModule; calibration params confirmed: coefficient=0.35, ±30%, step 4, Zimbabwe 2000 anchor)**
 **Current milestone:** M16 — Distributional Visibility (GitHub Milestone 17)
 **Previous milestone:** M15 — Human Cost Architecture (FORMALLY CLOSED 2026-06-23; release/m15 → main PR #1142; v0.15.0; #984 closed; GitHub Milestone 16 closed)
 
@@ -120,7 +120,7 @@ Implementation is now unblocked. A sprint entry document must be filed and EL-ap
 | #1147 ✅ | feat(ux): Zone 1D delta annotations — companion to Zone 1A Phase 4 | G1 | ✅ BPO ACCEPT 2026-06-23 — PR #1160; Step 5 Validate COMPLETE (co-accepted with #845) |
 | #1162 | ux(zone-1a): entity attribution in-fill anchor — direct visual link between divergence fill and entity label | G1 follow-up | Filed 2026-06-23 — Customer Agent Layer 3 C1; pre-demo (#843) fix required |
 | #274 ✅ | feat(simulation): 25-year human capital depletion trajectory | G3 | ✅ BPO ACCEPT 2026-06-24 — PR #1172 merged; 19 ACs PASS; Step 5 Validate COMPLETE; G8 gate open |
-| #275 | feat(simulation): calibrated ecological-to-financial transmission | G4 | `ecological_shock_coefficient` implemented (PR #1182); AC-7/8/9 BPO ACCEPT 2026-06-24; **EE-PENDING: AC-EE-1 (Zimbabwe 2005 calibration) + AC-EE-2 (EE DIC review)** — sprint exit BLOCKED; issue OPEN until EE files review on #275 |
+| #275 | feat(simulation): calibrated ecological-to-financial transmission | G4 | `ecological_shock_coefficient` schema field (PR #1182); AC-7/8/9 BPO ACCEPT; **AC-EE-2 ✅ SATISFIED 2026-06-24** (EE review on #275 — pathway confirmed, Zimbabwe 2000 anchor corrected from "2005", params: coeff=0.35 ±30% step-4); **AC-EE-1 BLOCKED** — engine wiring not yet implemented (coefficient schema-only; ExternalSectorModule not wired); sprint exit BLOCKED; issue OPEN |
 | #102 ✅ | arch(api): distributional scenario comparison variance/percentile | G4 | ✅ BPO ACCEPT 2026-06-24 — flat `CompareResponse` + `DistributionRecord` (variance/p10/p50/p90) + Zone 1A variance-band-toggle; issue CLOSED 2026-06-24 |
 | #22 ✅ | feat: uncertainty quantification — distributional scenario bands | G4 | ✅ BPO ACCEPT 2026-06-24 — `SyntheticDataEngine` + `quantity` table + Zone 1B cohort-tier-badge (SAD/T3/T4 data-driven); AC-F6 Zone 1D deferred per intent §6; issue CLOSED 2026-06-24 |
 | #1184 | ux(zone-1b): "SAD" badge not self-interpreting at L0 | G4 follow-up | Filed 2026-06-24 — CA-G4-1; pre-demo (#843) fix required before Demo 6 |
@@ -166,7 +166,8 @@ Implementation is now unblocked. A sprint entry document must be filed and EL-ap
 - ✅ **G5 sprint exit CONFIRMED 2026-06-23** — BPO ACCEPT (advisory; infrastructure sprint exception); PI confirmed; exit document PR #1158 merged; `docs/process/sprint-plans/m16-g5-sprint-exit.md`
 - ✅ G7 sprint entry filed and **EL-approved 2026-06-23** — `docs/process/sprint-plans/m16-g7-sprint-entry.md`; #3 → #6 dependency declared; actions may begin
 - ✅ **G4 implementation MERGED 2026-06-24** — PR #1182 merged to `release/m16`; all CI PASS; sprint entry + intent document + QA tests filed; EL approved 2026-06-24
-- ✅ **G4 Step 5 Validate COMPLETE 2026-06-24** — BPO CONDITIONAL ACCEPT; Customer Agent Layer 3 CONDITIONAL PASS (CA-G4-1 → #1184 pre-Demo 6; CA-G4-2 forward gap Zone 1D); 20 ACs PASS + AC-F6 deferred per intent §6; #22 (scoped) and #102 CLOSED; #275 remains OPEN; **sprint exit BLOCKED** — AC-EE-1/AC-EE-2 (EE DIC review on #275) pending; north star test PASS (SEN Article IV credibility protection + P10/P90 distributional argument); sprint exit document filed `docs/process/sprint-plans/m16-g4-sprint-exit.md`; PI Agent confirmation pending EE review on #275
+- ✅ **G4 Step 5 Validate COMPLETE 2026-06-24** — BPO CONDITIONAL ACCEPT; Customer Agent Layer 3 CONDITIONAL PASS (CA-G4-1 → #1184 pre-Demo 6; CA-G4-2 forward gap Zone 1D); 20 ACs PASS + AC-F6 deferred; #22 (scoped) and #102 CLOSED; #275 OPEN
+- ✅ **G4 EE VALIDATE COMPLETE 2026-06-24** — Ecological Economist DIC review filed on #275; AC-EE-2 SATISFIED; AC-EE-1 params confirmed (coefficient=0.35, ±30%, step 4, Zimbabwe 2000 anchor, `arable_land_degradation_rate` proxy=0.15, fiscal indicator `fiscal_revenue_pct_gdp`); **sprint exit BLOCKED — AC-EE-1 requires ExternalSectorModule engine wiring** (coefficient currently schema-only); sprint exit document `docs/process/sprint-plans/m16-g4-sprint-exit.md` status: BLOCKED (pi-confirmed: false)
 
 ---
 
