@@ -248,11 +248,13 @@ class TestAC1ThresholdCrossingsFieldPresent:
         assert not missing, (
             f"AC-1 FAIL: {len(missing)} delta record(s) are missing 'threshold_crossings' key: "
             f"{missing[:5]}. "
-            "Intent doc AC-1: 'for each entity-step entry, threshold_crossings is a key in the entry.' "
+            "Intent doc AC-1: 'for each entity-step entry, threshold_crossings is a key "
+            "in the entry.' "
             "The field must be present even when empty (empty list [], not absent)."
         )
         assert not wrong_type, (
-            f"AC-1 FAIL: {len(wrong_type)} delta record(s) have threshold_crossings with wrong type: "
+            f"AC-1 FAIL: {len(wrong_type)} delta record(s) have threshold_crossings "
+            f"with wrong type: "
             f"{wrong_type[:3]}. "
             "Intent doc AC-1: threshold_crossings must be a list. "
             "Null or non-list values are not acceptable."
@@ -383,7 +385,8 @@ class TestAC2ZmbCrossingStep:
                     assert entry.get("threshold_name"), (
                         f"AC-2 FAIL: crossing entry has crossed=True but threshold_name is "
                         f"empty or absent: {entry}. "
-                        "Intent doc AC-2: 'that entry has a non-empty string value for threshold_name.'"
+                        "Intent doc AC-2: 'that entry has a non-empty string value "
+                        "for threshold_name.'"
                     )
 
     async def test_zmb_threshold_crossings_entries_have_required_keys(
@@ -420,15 +423,17 @@ class TestAC2ZmbCrossingStep:
             for entry in delta.get("threshold_crossings") or []:
                 assert "threshold_name" in entry, (
                     f"AC-2b FAIL: threshold_crossings entry missing 'threshold_name': {entry}. "
-                    "Intent doc visual spec: each entry has {{ threshold_name: str, crossed: bool }}."
+                    "Intent doc visual spec: each entry has "
+                    "{{ threshold_name: str, crossed: bool }}."
                 )
                 assert "crossed" in entry, (
                     f"AC-2b FAIL: threshold_crossings entry missing 'crossed': {entry}. "
-                    "Intent doc visual spec: each entry has {{ threshold_name: str, crossed: bool }}."
+                    "Intent doc visual spec: each entry has "
+                    "{{ threshold_name: str, crossed: bool }}."
                 )
                 assert isinstance(entry["crossed"], bool), (
-                    f"AC-2b FAIL: 'crossed' must be a boolean, got {type(entry['crossed']).__name__}: "
-                    f"{entry}."
+                    f"AC-2b FAIL: 'crossed' must be a boolean, got "
+                    f"{type(entry['crossed']).__name__}: {entry}."
                 )
 
 
@@ -779,8 +784,8 @@ class TestAC6ExistingFieldsUnchanged:
 
         distribution = first["distribution"]
         assert distribution is not None or isinstance(distribution, dict), (
-            "AC-6 FAIL: 'distribution' field changed to a non-dict/non-null type after G9 extension. "
-            "G4 adds distribution; G9 must not modify or remove it."
+            "AC-6 FAIL: 'distribution' field changed to a non-dict/non-null type "
+            "after G9 extension. G4 adds distribution; G9 must not modify or remove it."
         )
 
         # Both threshold_crossings and distribution must coexist if G9 is implemented.
