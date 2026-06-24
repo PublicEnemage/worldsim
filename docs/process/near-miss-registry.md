@@ -2904,6 +2904,69 @@ sprint group before exit confirmation is filed." PI Agent holds R for this check
 
 ---
 
+## NM-058 — AC-009 Testid Mismatch: Mode 3 Performance Gate Silent No-Op Since M12 (Reactive)
+
+**Date:** 2026-06-24
+**Milestone:** M16 — Distributional Visibility (gap origin: M12, PR #778)
+**Detected by:** PM Agent during M16-G6 sprint entry authorship — cross-referencing `trajectory-view.spec.ts` locator against `App.tsx` source
+**Severity:** High
+
+### What happened
+
+`frontend/tests/e2e/trajectory-view.spec.ts` AC-009 test located the Mode 3 activation
+control using `[data-testid="mode-3-activate"]`. The control implemented in M12 (PR #778,
+`App.tsx:293`) uses `data-testid="mode3-toggle"`. The testid mismatch caused `hasMode3`
+to always evaluate `false`, the `if (hasMode3)` guard to never execute, and the AC-009
+assertion (`renderMs ≤ 100ms`) to never run. AC-009 has been passing vacuously — measuring
+nothing — across every CI run from M12 through M15.
+
+### What was at risk
+
+AC-009 was cited as a passing CI gate for Mode 3 render performance in sprint exit records
+for M12 through M15. Those citations are inaccurate. Any implementation agent relying on
+"AC-009 passes" as evidence that Mode 3 render performance had been validated was reading
+a false signal. A Mode 3 render regression introduced in any M12–M15 sprint would have
+been invisible to CI.
+
+### Root cause — three-layer failure
+
+1. **Specification drift at implementation:** The FA brief (`docs/frontend/fa-brief-m9-instrument-cluster.md`)
+   specified `mode-3-activate` as the required testid. M12 implementation used `mode3-toggle`
+   (semantically correct — the control is a bidirectional toggle). The FA brief was not updated.
+
+2. **NM-027 FA pre-PR checklist not executed:** NM-027 established a FA pre-PR checklist item:
+   before any PR implementing a component with named performance ACs, verify the component uses
+   the testid named in the spec. This was not run at PR #778.
+
+3. **NM-027 QA post-ship activation check not executed:** NM-027 also required the QA Lead to
+   verify all guarded assertions are producing real measurements when a previously guarded component
+   ships. PR #778 was exactly this event. The check was not run.
+
+This is the fourth recurrence of the NM-027 pattern class (NM-027: AC-007/AC-008 no-op guards;
+NM-028: IR-004 SVG guard; NM-056: soft-skip via fixture null; NM-058: testid mismatch).
+
+### Prior sprint exit audit trail note
+
+M12–M15 sprint exit records that cite "Playwright CI green" as covering AC-009 contain an
+inaccurate verification claim. These sprints are not reopened — Mode 3 has been functionally
+sound throughout. NM-058 is the permanent record that AC-009 render performance coverage was
+absent during M12–M15.
+
+### Process improvement
+
+1. **Immediate (G6 fix PR):** Testid corrected to `mode3-toggle`; `if (hasMode3)` and
+   `if (renderMs !== null)` guards removed; replaced with unconditional `expect` assertions.
+   FA brief AC-009 row updated to reflect delivered testid. (PR merged to `release/m16`.)
+
+2. **QA Lead working agreement (`docs/process/agents.md §QA Lead Agent`):** Named no-op guard
+   locator audit step added (NM-058 addition): at every sprint entry, run
+   `grep -rn "isVisible().catch" frontend/tests/e2e/` and verify each guard's testid against
+   `grep -rn "data-testid" frontend/src/`. Any guard whose testid does not appear in source is
+   a filing-blocking finding. This converts the "remember to check" working agreement into a
+   reproducible two-minute audit that would have caught this gap at every sprint entry since M12.
+
+---
+
 ## Registry Maintenance
 
 ### How to add an entry

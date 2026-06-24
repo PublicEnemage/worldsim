@@ -163,28 +163,26 @@ test("AC-009: Mode 3 full component set render ≤ 100ms on throttled CPU", asyn
 
   await page.goto("/");
 
-  // Navigate to Mode 3 if available
-  const mode3Trigger = page.locator('[data-testid="mode-3-activate"]');
-  const hasMode3 = await mode3Trigger.isVisible().catch(() => false);
+  // Mode 3 shipped M12 (PR #778). mode3-toggle is the delivered testid (App.tsx:293).
+  // Guard removed per NM-058: if mode3-toggle is absent the test must FAIL, not skip.
+  const mode3Trigger = page.locator('[data-testid="mode3-toggle"]');
+  await expect(mode3Trigger).toBeVisible();
 
-  if (hasMode3) {
-    await page.evaluate(() => performance.mark("mode3-start"));
-    await mode3Trigger.click();
-    await page.waitForTimeout(20);
-    await page.evaluate(() => {
-      performance.mark("mode3-end");
-      performance.measure("mode3-render", "mode3-start", "mode3-end");
-    });
+  await page.evaluate(() => performance.mark("mode3-start"));
+  await mode3Trigger.click();
+  await page.waitForTimeout(20);
+  await page.evaluate(() => {
+    performance.mark("mode3-end");
+    performance.measure("mode3-render", "mode3-start", "mode3-end");
+  });
 
-    const renderMs = await page.evaluate(() => {
-      const m = performance.getEntriesByName("mode3-render")[0];
-      return m?.duration ?? null;
-    });
+  const renderMs = await page.evaluate(() => {
+    const m = performance.getEntriesByName("mode3-render")[0];
+    return m?.duration ?? null;
+  });
 
-    if (renderMs !== null) {
-      expect(renderMs).toBeLessThanOrEqual(100);
-    }
-  }
+  expect(renderMs).not.toBeNull();
+  expect(renderMs).toBeLessThanOrEqual(100);
 });
 
 // ---------------------------------------------------------------------------
