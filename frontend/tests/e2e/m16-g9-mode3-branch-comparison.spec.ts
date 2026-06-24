@@ -60,7 +60,15 @@ async function waitForAppReady(page: import("@playwright/test").Page): Promise<v
 }
 
 /**
- * Create and advance a ZMB scenario via API.
+ * Create (and optionally pre-advance) a GRC scenario via API.
+ *
+ * GRC is used with an explicit trend_growth initial_attribute so the
+ * MacroeconomicModule emits gdp_growth at each step regardless of whether WDI
+ * data is seeded in the test environment (CI only seeds natural_earth_loader).
+ * Without trend_growth and without prior fiscal policy events, MacroeconomicModule
+ * returns early and gdp_growth is absent — composite_score is null everywhere and
+ * the branch-comparison-panel shows "—".
+ *
  * Returns the scenario_id or null if setup fails (pre-G1 guard).
  */
 async function createZmbScenario(name: string, nSteps: number): Promise<string | null> {
@@ -71,9 +79,20 @@ async function createZmbScenario(name: string, nSteps: number): Promise<string |
       body: JSON.stringify({
         name,
         configuration: {
-          entities: ["ZMB"],
+          entities: ["GRC"],
           n_steps: 4,
-          start_date: "2024-01-01",
+          start_date: "2010-01-01",
+          // Inject trend_growth so MacroeconomicModule runs without WDI data.
+          initial_attributes: {
+            GRC: {
+              trend_growth: {
+                value: "0.02",
+                unit: "fraction",
+                variable_type: "flow",
+                confidence_tier: 3,
+              },
+            },
+          },
           modules_config: {
             ecological: { enabled: false },
             political_economy: { enabled: false },
@@ -154,8 +173,8 @@ test.describe("AC-1: Mode 3 branch-comparison-panel shows numeric values for 2 b
   let scenarioId: string | null = null;
 
   test.beforeAll(async () => {
-    // Advance 1 step — Mode 3 branching requires at least 1 prior step.
-    scenarioId = await createZmbScenario(`G9-AC1-branch-values-${Date.now()}`, 1);
+    // No API pre-advance — the test advances step 0→1 in the UI so store.current_step is 1.
+    scenarioId = await createZmbScenario(`G9-AC1-branch-values-${Date.now()}`, 0);
   });
 
   test("AC-1: branch-value-0 and branch-value-1 each contain at least one digit in Mode 3 at step 1", async ({
@@ -166,6 +185,14 @@ test.describe("AC-1: Mode 3 branch-comparison-panel shows numeric values for 2 b
     await page.setViewportSize({ width: 1280, height: 800 });
     await page.goto(`/?scenario=${encodeURIComponent(scenarioId)}`);
     await waitForAppReady(page);
+
+    // Advance to step 1 in the UI before Mode 3.
+    // store.current_step must be ≥1 so composite_score is non-null (MacroeconomicModule
+    // only emits gdp_growth after running at least once — step 0 has null composite_score).
+    const nextStepBtnAC1 = page.getByRole("button", { name: /Next Step/ });
+    if (!(await nextStepBtnAC1.isEnabled({ timeout: 8_000 }).catch(() => false))) return;
+    await nextStepBtnAC1.click();
+    await page.waitForTimeout(2_000);
 
     // Enable Mode 3.
     if (!(await enableMode3(page))) return;
@@ -226,8 +253,8 @@ test.describe("AC-2: Branch values update when advancing from step 1 to step 2 (
   let scenarioId: string | null = null;
 
   test.beforeAll(async () => {
-    // Advance 1 step so Mode 3 is valid; need ≥2 steps available in scenario (n_steps=4).
-    scenarioId = await createZmbScenario(`G9-AC2-update-${Date.now()}`, 1);
+    // No API pre-advance — test advances in UI so store.current_step is correct.
+    scenarioId = await createZmbScenario(`G9-AC2-update-${Date.now()}`, 0);
   });
 
   test("AC-2: at least one branch-value cell changes text between step 1 and step 2", async ({
@@ -238,6 +265,12 @@ test.describe("AC-2: Branch values update when advancing from step 1 to step 2 (
     await page.setViewportSize({ width: 1280, height: 800 });
     await page.goto(`/?scenario=${encodeURIComponent(scenarioId)}`);
     await waitForAppReady(page);
+
+    // Advance to step 1 in the UI before Mode 3 — store.current_step must be ≥1.
+    const nextStepBtnInit = page.getByRole("button", { name: /Next Step/ });
+    if (!(await nextStepBtnInit.isEnabled({ timeout: 8_000 }).catch(() => false))) return;
+    await nextStepBtnInit.click();
+    await page.waitForTimeout(2_000);
 
     if (!(await enableMode3(page))) return;
     if (!(await applyControlChange(page))) return;
@@ -371,7 +404,8 @@ test.describe("AC-5: Mode 3 with 2 branches — no phantom branch-value-2 or hig
   let scenarioId: string | null = null;
 
   test.beforeAll(async () => {
-    scenarioId = await createZmbScenario(`G9-AC5-exact-branches-${Date.now()}`, 1);
+    // No API pre-advance — test advances in UI so store.current_step is correct.
+    scenarioId = await createZmbScenario(`G9-AC5-exact-branches-${Date.now()}`, 0);
   });
 
   test("AC-5: branch-value-0 and branch-value-1 present; branch-value-2 absent (no phantom branches)", async ({
@@ -382,6 +416,12 @@ test.describe("AC-5: Mode 3 with 2 branches — no phantom branch-value-2 or hig
     await page.setViewportSize({ width: 1280, height: 800 });
     await page.goto(`/?scenario=${encodeURIComponent(scenarioId)}`);
     await waitForAppReady(page);
+
+    // Advance to step 1 in the UI before Mode 3 — store.current_step must be ≥1.
+    const nextStepBtnAC5 = page.getByRole("button", { name: /Next Step/ });
+    if (!(await nextStepBtnAC5.isEnabled({ timeout: 8_000 }).catch(() => false))) return;
+    await nextStepBtnAC5.click();
+    await page.waitForTimeout(2_000);
 
     if (!(await enableMode3(page))) return;
     if (!(await applyControlChange(page))) return;
