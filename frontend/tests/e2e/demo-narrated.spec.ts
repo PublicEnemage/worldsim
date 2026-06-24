@@ -402,12 +402,12 @@ test(
       "Fiscal conditionality has begun: social spending cut by three percent of GDP. " +
       "Look at Zone one B — the alert and cohort panel. " +
       "The cohort impact section shows: bottom quintile informal workers poverty headcount. " +
-      "Current value: at or above zero point four zero. Recovery floor: zero point four zero. " +
-      "This cohort is at the threshold. Six months in. " +
-      "The badge next to that number reads: T3 — Inferred. " +
+      "Current value: approaching the recovery floor of zero point four zero. " +
+      "The badge reads: T3 — Inferred. " +
       "The demographic weighting comes from ECOWAS comparable economy distributions. " +
-      "The precision of who bears the cost is visible. " +
-      "Not aggregate poverty. Not a trend. This cohort, at this step.",
+      "Tier three means the calibration is from regional comparables, not primary survey data. " +
+      "That is exactly what T3 Inferred signals. The precision of who bears the cost is visible. " +
+      "Not aggregate poverty. Not a trend. This cohort, on this trajectory.",
     );
 
     // Frame A (THESIS): Zone 1B cohort impact section showing Q1 informal threshold crossing.
@@ -426,10 +426,15 @@ test(
     await speak(
       "Below the Zone one instruments: the 25-year projection panel. " +
       "Three cohort curves — bottom quintile informal, bottom quintile agricultural, " +
-      "second quintile informal — over one hundred quarterly steps. " +
-      "Read the milestone sentence at the bottom of the panel. " +
-      "By a specific year, bottom quintile informal workers poverty headcount crosses " +
-      "the recovery floor. Capability restoration takes a decade or more. " +
+      "second quintile informal — over one hundred steps. " +
+      "The red dashed line is the recovery floor at zero point four zero. " +
+      "The curves are currently below that line. The trajectory is what matters here, " +
+      "not a single step value. " +
+      "Under current Tier three estimates, this trajectory approaches the recovery floor " +
+      "within the programme arc. The fiscal-to-cohort transmission calibration is a " +
+      "Chief Methodologist finding — we know where the model's precision ends. " +
+      "The structural argument stands: if this trajectory crosses the floor, " +
+      "capability restoration takes a decade or more. " +
       "The programme lasts two years. The consequence lasts ten. " +
       "That is the intergenerational argument the ministry team could not make before Demo six. " +
       "Visible from the primary viewport. No drawer navigation. No specialist mediation.",

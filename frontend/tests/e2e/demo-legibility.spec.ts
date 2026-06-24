@@ -318,6 +318,57 @@ test("G1/AC-2 legibility: Zone 1A trajectory container height ≥ 340px at 1440�
   expect(box!.height).toBeGreaterThanOrEqual(340);
 });
 
+// ---------------------------------------------------------------------------
+// NM-063: CohortImpactSection label text overflow — same class as NM-056.
+//
+// The CohortImpactSection row renders cohort_label + indicator_label in a
+// flex row. Without minWidth:0 on the flex:1 container and display:block on
+// the label span, long cohort labels overflow the container and vertically
+// overlap adjacent rows (observed in EL live demo, 2026-06-24).
+//
+// This test guards against regression. Because the default scenario at step 0
+// has no cohort threshold crossings, the test advances one step. If no crossings
+// are produced (calibration-dependent), the test skips the row-level check and
+// validates only the section container layout (guards container-level overflow).
+// Row-level overflow is structurally prevented by the CSS fix applied in M16-G8.
+// ---------------------------------------------------------------------------
+
+test("NM-063: CohortImpactSection label text is not overflow-clipped at 1440×900", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/");
+  await createAndSelectScenario(page, `LEG-cohort-${Date.now()}`);
+
+  // Advance one step — cohort crossings may fire depending on initial attributes.
+  const nextBtn = page.getByRole("button", { name: /Next Step/ });
+  await expect(nextBtn).toBeVisible({ timeout: 10_000 });
+  await nextBtn.click();
+  await page.waitForTimeout(1_500);
+
+  const cohortSection = page.locator('[data-testid="zone-1b-cohort-impact"]');
+  await expect(cohortSection).toBeVisible({ timeout: 10_000 });
+
+  // Container must not be overflow-clipped.
+  const isSectionClipped = await cohortSection.evaluate(
+    (el) => (el as HTMLElement).scrollWidth > (el as HTMLElement).offsetWidth,
+  );
+  expect(isSectionClipped).toBe(false);
+
+  // If any crossing rows are present, the label span must not be clipped.
+  const rows = page.locator('[data-testid^="cohort-row-"]');
+  const rowCount = await rows.count();
+  for (let i = 0; i < rowCount; i++) {
+    const labelSpan = rows.nth(i).locator("span[style*='font-weight: 600'], span[style*='fontWeight']").first();
+    const exists = await labelSpan.count();
+    if (exists === 0) continue;
+    const isTruncated = await labelSpan.evaluate(
+      (el) => (el as HTMLElement).scrollWidth > (el as HTMLElement).offsetWidth,
+    );
+    expect(isTruncated).toBe(false);
+  }
+});
+
 test("G1/AC-3 legibility: Zone 1B alert line-2 text not clipped at 1440×900", async ({
   page,
 }) => {

@@ -88,12 +88,14 @@ export interface HumanCapitalTrajectoryPanelProps {
   scenarioId: string;
   projectionSteps: number;
   entities: string[];
+  currentStep: number;
 }
 
 export function HumanCapitalTrajectoryPanel({
   scenarioId,
   projectionSteps,
   entities,
+  currentStep,
 }: HumanCapitalTrajectoryPanelProps) {
   const countryId = entities[0] ?? "SEN";
   const cohortDefs = COHORT_DEFS_TEMPLATE.map((def) => ({
@@ -160,8 +162,7 @@ export function HumanCapitalTrajectoryPanel({
     return () => {
       cancelled = true;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [scenarioId]);
+  }, [scenarioId, currentStep]); // re-fetch on each step advance so sparklines update
 
   return (
     <div
