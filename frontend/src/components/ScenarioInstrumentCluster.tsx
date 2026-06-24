@@ -148,9 +148,12 @@ interface RawCohortThresholdCrossing {
   indicator_label: string;
   severity: "CRITICAL" | "WARNING" | "WATCH";
   step_crossed: number;
-  above_floor_pct: string;
+  above_floor_pct: string | null;
   tier: number;
   source: string;
+  is_synthetic?: boolean;
+  synthetic_method?: "STRUCTURAL_ABSENCE" | "SYNTHETIC_COMPARABLE" | "SYNTHETIC_MODEL" | null;
+  value?: string | null;
 }
 
 interface RawFrameworkOutputForAlerts {
@@ -527,6 +530,9 @@ export function ScenarioInstrumentCluster({
           above_floor_pct: c.above_floor_pct,
           tier: c.tier,
           source: c.source,
+          is_synthetic: c.is_synthetic,
+          synthetic_method: c.synthetic_method,
+          value: c.value,
         }));
         store.setCohortThresholdCrossings(parsedCrossings);
 
@@ -839,6 +845,7 @@ export function ScenarioInstrumentCluster({
         chartHeight={chartHeight}
         entityTrajectories={entityTrajectories}
         entityBaselineTrajectories={entityBaselineTrajectories}
+        comparisonMode={!!comparisonScenarioId}
         mdaPanel={
           <MDAAlertPanelZone1B
             columnWidth={coPrimaryWidth}

@@ -387,6 +387,7 @@ class ScenarioConfigSchema(BaseModel):
     fiscal_multiplier: float = Field(default=1.0, ge=0.1, le=3.0)
     commodity_price_shocks: list[CommodityShockConfig] = []
     projection_steps: int | None = Field(default=None, ge=1, le=100)
+    ecological_shock_coefficient: float = Field(default=0.0, ge=0.0, le=1.0)
 
 
 class ScheduledInputSchema(BaseModel):
@@ -520,6 +521,25 @@ class AdvanceResponse(BaseModel):
 # ---------------------------------------------------------------------------
 
 
+class DistributionRecord(BaseModel):
+    """Distributional statistics of a delta series across shared simulation steps.
+
+    Computed from all shared steps between two scenarios (M16-G4 #102).
+    All fields are null when fewer than 3 shared steps exist — the minimum
+    sample required for meaningful distributional statistics.
+
+    `variance` — population variance of delta values (as Decimal string).
+    `p10`, `p50`, `p90` — 10th, 50th, and 90th percentile of delta values.
+    """
+
+    model_config = ConfigDict(from_attributes=True)
+
+    variance: str | None = None
+    p10: str | None = None
+    p50: str | None = None
+    p90: str | None = None
+
+
 class DeltaRecord(BaseModel):
     """Delta between the same attribute across two scenario snapshots.
 
@@ -541,11 +561,35 @@ class DeltaRecord(BaseModel):
     threshold_crossed: bool | None = None
 
 
-class CompareResponse(BaseModel):
-    """Comparative output across two scenario final snapshots — ADR-004 Decision 5.
+class FlatDeltaRecord(BaseModel):
+    """Flat-list entry for GET /scenarios/compare — M16-G4 #102.
 
-    `deltas` maps entity_id → attribute_key → DeltaRecord.
-    Only entities and attributes present in both snapshots are included.
+    Extends DeltaRecord with `entity_id`, `attribute_key`, and `distribution`.
+    The flat list format replaces the nested dict[entity_id][attr_key] structure
+    so distribution metadata can be attached per-record without a third nesting level.
+    """
+
+    model_config = ConfigDict(from_attributes=True)
+
+    entity_id: str
+    attribute_key: str
+    value_a: str
+    value_b: str
+    delta: str
+    direction: str
+    confidence_tier: int
+    threshold_crossed: bool | None = None
+    distribution: DistributionRecord = DistributionRecord()
+
+
+class CompareResponse(BaseModel):
+    """Comparative output across two scenario snapshots — ADR-004 Decision 5.
+
+    `deltas` is a flat list of FlatDeltaRecord (M16-G4 #102).
+    Each record carries entity_id, attribute_key, the point delta, and
+    distributional statistics across all shared steps.
+
+    Only entities and attributes present in both scenarios are included.
     When `attr` is omitted, ALL shared attributes across all shared entities are
     returned in a single call (Issue #90). Pass `attr` to filter to one key.
     """
@@ -556,7 +600,7 @@ class CompareResponse(BaseModel):
     scenario_b_id: str
     step_a: int
     step_b: int
-    deltas: dict[str, dict[str, DeltaRecord]]
+    deltas: list[FlatDeltaRecord]
 
 
 # ---------------------------------------------------------------------------

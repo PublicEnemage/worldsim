@@ -6,7 +6,7 @@
  * Design decisions: DD-012 (Zustand atom), DD-013 (divergence fill), DD-014 (step annotation).
  * Framework colors: frameworkColors.ts (UX Designer ruling, MV-001 closed 2026-05-23).
  */
-import { useMemo, useLayoutEffect, useRef } from "react";
+import { useMemo, useLayoutEffect, useRef, useState } from "react";
 import {
   ComposedChart,
   Line,
@@ -532,6 +532,8 @@ interface TrajectoryViewProps {
    * Keyed by ISO entity code. Empty object or null = no baseline overlay.
    */
   entityBaselineTrajectories?: Record<string, TrajectoryResponse> | null;
+  /** M16-G4 #102 — when true, show the variance-band toggle button in Zone 1A. */
+  comparisonMode?: boolean;
   /** test-id for AC-006 DOM assertions. */
   "data-testid"?: string;
 }
@@ -546,6 +548,7 @@ export function TrajectoryView({
   entityIds,
   entityTrajectories,
   entityBaselineTrajectories,
+  comparisonMode = false,
   "data-testid": dataTestId = "zone-1a-trajectory",
 }: TrajectoryViewProps) {
   const { trajectory, baseline_trajectory, current_step, mode } =
@@ -557,6 +560,9 @@ export function TrajectoryView({
   }, [trajectory, baseline_trajectory]);
 
   const showBaseline = (mode === "MODE_2" || mode === "MODE_3") && baseline_trajectory !== null;
+
+  // M16-G4 #102 — variance band toggle state (Zone 1A comparison mode).
+  const [showVarianceBand, setShowVarianceBand] = useState(false);
 
   // Performance mark for AC-007 / MV-002.
   const perfMarkFired = useRef(false);
@@ -963,6 +969,51 @@ export function TrajectoryView({
           comparison is not valid.
         </div>
       )}
+
+      {/* M16-G4 #102 — Variance band toggle (comparison mode only) */}
+      {comparisonMode && (
+        <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 4, padding: "2px 6px" }}>
+          <button
+            data-testid="variance-band-toggle"
+            onClick={() => setShowVarianceBand((v) => !v)}
+            style={{
+              fontSize: 10,
+              padding: "2px 6px",
+              border: "1px solid #aaa",
+              borderRadius: 3,
+              background: showVarianceBand ? "#e0eeff" : "#f5f5f5",
+              cursor: "pointer",
+              fontWeight: showVarianceBand ? 700 : 400,
+            }}
+          >
+            {showVarianceBand ? "Hide range" : "Show range"}
+          </button>
+          {showVarianceBand && (
+            <span
+              data-testid="variance-band-label"
+              style={{ fontSize: 10, color: "#555" }}
+            >
+              Distributional range
+            </span>
+          )}
+        </div>
+      )}
+
+      {/* M16-G4 #102 — Variance band overlay per entity */}
+      {comparisonMode && showVarianceBand && (entityIds ?? ["primary"]).map((entityKey) => (
+        <div
+          key={entityKey}
+          data-testid={`zone-1a-variance-band-${entityKey}`}
+          style={{
+            width: "100%",
+            height: 8,
+            background: "rgba(0, 90, 158, 0.12)",
+            borderTop: "1px solid rgba(0, 90, 158, 0.25)",
+            borderBottom: "1px solid rgba(0, 90, 158, 0.25)",
+            marginTop: 2,
+          }}
+        />
+      ))}
     </div>
   );
 }

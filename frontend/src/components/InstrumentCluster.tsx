@@ -60,6 +60,8 @@ interface InstrumentClusterProps {
   entityTrajectories?: Record<string, TrajectoryResponse> | null;
   /** Phase 4 (ADR-017): per-entity baseline trajectories for Mode 3 ghost paths. */
   entityBaselineTrajectories?: Record<string, TrajectoryResponse> | null;
+  /** M16-G4 #102 — show variance-band toggle in Zone 1A when two scenarios are being compared. */
+  comparisonMode?: boolean;
 }
 
 export function InstrumentCluster({
@@ -72,6 +74,7 @@ export function InstrumentCluster({
   chartHeight: chartHeightProp,
   entityTrajectories,
   entityBaselineTrajectories,
+  comparisonMode,
 }: InstrumentClusterProps) {
   const { mode } = useScenarioStepStore();
   const bp = useViewportBreakpoint();
@@ -102,6 +105,7 @@ export function InstrumentCluster({
           entityIds={entityIds}
           entityTrajectories={entityTrajectories}
           entityBaselineTrajectories={entityBaselineTrajectories}
+          comparisonMode={comparisonMode}
           data-testid="zone-1a-trajectory"
         />
         {cohortPanel}

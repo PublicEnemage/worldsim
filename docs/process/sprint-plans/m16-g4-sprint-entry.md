@@ -3,17 +3,17 @@ name: m16-g4-sprint-entry
 type: sprint-entry
 milestone: M16 — Distributional Visibility
 sprint-group: G4
-status: Filed — QA tests AUTHORED 2026-06-24; EL approval pending; implementation unblocked on EL approval (Wave 3 gate CLEAR 2026-06-24; intent document FILED 2026-06-24)
+status: EL Approved 2026-06-24 — implementation in progress
 authored-by: PM Agent
 authored-date: 2026-06-23
-el-approved: false
+el-approved: 2026-06-24
 release-branch: release/m16
 sop-reference: docs/process/sprint-planning-sop.md
 ---
 
 # Sprint Entry — M16, G4: Distributional Infrastructure
 
-**Status:** Filed — QA tests AUTHORED 2026-06-24; awaiting EL approval; implementation PR may open on EL approval (Wave 3 gate CLEAR 2026-06-24; intent document FILED 2026-06-24)
+**Status:** EL Approved 2026-06-24 — implementation in progress
 **Date authored:** 2026-06-23
 **Release branch:** `release/m16`
 **Sprint plan:** `docs/process/sprint-plans/m16-sprint-plan.md` (EL Approved 2026-06-23)
@@ -337,11 +337,10 @@ gate (§2.4) explicitly requires no `test.skip()` patterns. G4 implementation PR
 
 ## EL Approval Record
 
-**EL approval:** Pending
+**EL approval:** 2026-06-24
 
-> {EL approval statement — to be filled at approval time.
-> Note for EL: §2.3 and §2.4 remain unchecked — intent document and QA tests are not yet
-> filed. EL approval of this entry authorizes the structural and ADR gates as clear, and
-> confirms that ARCH-012 is not required. The implementation PR remains blocked until G2
-> is BPO-accepted (§2.5), intent document is filed (§2.3), and QA tests are authored (§2.4).}
-> — @PublicEnemage ({date})
+> G4 sprint entry approved. All gates confirmed clear: Wave 3 (G2 BPO-accepted 2026-06-24),
+> intent document filed 2026-06-24, QA tests authored 2026-06-24, ADR-007 coverage confirmed
+> sufficient (ARCH-012 not required). Implementation PR may open immediately. EE-PENDING ACs
+> (AC-EE-1, AC-EE-2) remain deferred until Ecological Economist DIC review on #275 is on record.
+> — @PublicEnemage (2026-06-24)
