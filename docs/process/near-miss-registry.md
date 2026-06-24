@@ -2967,6 +2967,46 @@ absent during M12–M15.
 
 ---
 
+## NM-059 — AC-009 CI Measurement Methodology: Multi-CDP Round-Trip Contaminates Performance Window (Reactive)
+
+**Date identified:** 2026-06-24
+**Severity:** Medium
+**Sprint:** M16-G6
+**Detection:** Reactive — caught when EX-001 threshold raise (100ms → 200ms) revealed 179ms → 802ms variance between two consecutive CI runs on PR #1212. Without the threshold raise, the gate would have been flipping pass/fail on runner load with no visible signal of unreliability.
+
+### What happened
+
+After the NM-058 fix (AC-009 testid corrected, scenario setup added), the first real CI run measured 179ms — used as the calibration baseline for EX-001. The second CI run on the next PR measured 802ms against the same 200ms threshold. Both runs used the same test code and the same throttle rate (4×).
+
+### Root cause
+
+The measurement used three separate CDP evaluate calls with a Playwright `waitForTimeout(20)` between the start mark and the end mark:
+
+```
+CDP call 1: page.evaluate → performance.mark("mode3-start")   [T1 set in browser]
+CDP call 2: mode3Trigger.click()                               [click dispatched]
+            page.waitForTimeout(20)                            [Playwright waits 20ms wall-clock]
+CDP call 3: page.evaluate → performance.mark("mode3-end")     [T2 set in browser]
+```
+
+T1 and T2 are browser-side timestamps (accurate). But the time between CDP call 2 completing and CDP call 3 executing in the browser is not bounded by the 20ms Playwright wait — it includes Playwright scheduler latency and CI runner event-loop queue time. On a lightly loaded runner: ~20–50ms overhead. On a loaded runner: hundreds of ms. The entire runner queue delay lands inside the T1–T2 measurement window.
+
+### What was at risk
+
+The AC-009 CI gate was measuring CI runner load, not Mode 3 render performance. Any sprint exit citing AC-009 as a passing performance gate was citing an unreliable measurement. Under sustained CI load, even the EX-001 raised threshold (200ms) would produce false failures — the gate would block PRs due to runner congestion, not actual render regressions.
+
+### Fix
+
+Both AC-009 (`trajectory-view.spec.ts`) and the MV-002 hardware test (`mv-002-hardware-validation.spec.ts`) updated to contain the entire measurement inside a single `page.evaluate` call. The programmatic click, start mark, RAF wait, and end mark all execute inside the browser's own event loop with no CDP round-trips in the measurement window. Two `requestAnimationFrame` cycles give React time to commit the synchronous state update.
+
+### Process improvement
+
+1. **QA Lead working agreement (`docs/process/agents.md §QA Lead Agent`):** Performance measurement methodology audit step added (NM-059 addition): at every sprint entry, run `grep -rn "performance.mark\|waitForTimeout" frontend/tests/e2e/` and verify that no test places a Playwright wait or separate `page.evaluate` call between its start and end performance marks. Any test that does is a filing-blocking methodology finding — multi-CDP measurement methodology produces CI-runner-load-dependent results, not render performance measurements.
+
+2. **Pattern rule:** A valid Playwright performance measurement must either (a) contain both marks and the action being measured inside a single `page.evaluate` call, or (b) use `page.waitForFunction` with a browser-side condition (not a Playwright wall-clock wait) to trigger the end mark. `waitForTimeout` between performance marks is always a methodology violation.
+
+---
+
 ## Registry Maintenance
 
 ### How to add an entry

@@ -7,8 +7,10 @@ export default defineConfig({
   // List reporter provides per-test stdout lines in GitHub Actions log output.
   reporter: [["html", { open: "never" }], ["list"]],
   // Exclude @demo tests from CI — they require a live stack and TTS narration.
-  // The demo config (playwright.demo.config.ts) runs them explicitly.
-  grep: /^(?!.*@demo)/,
+  // Exclude @hardware-only tests from CI — they must run on target hardware without
+  // CPU throttle (MV-002 pattern). Run explicitly: npx playwright test --grep @hardware-only
+  // The demo config (playwright.demo.config.ts) runs @demo tests explicitly.
+  grep: /^(?!.*(@demo|@hardware-only))/,
   use: {
     baseURL: "http://localhost:5173",
     headless: true,
