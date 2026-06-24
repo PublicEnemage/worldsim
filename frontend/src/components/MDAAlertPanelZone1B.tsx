@@ -669,13 +669,12 @@ const COHORT_SEVERITY_COLOR: Record<CohortThresholdCrossing["severity"], string>
   WATCH: "#0070a0",
 };
 
-export function CohortImpactSection() {
-  const { cohort_threshold_crossings: crossings, mode } = useScenarioStepStore();
-  const headerLabel = mode === "MODE_1" ? "COHORT IMPACT (HISTORICAL)" : "COHORT IMPACT";
-  const emptyText =
-    mode === "MODE_1"
-      ? "No cohort threshold crossings at or before this step."
-      : "No cohort threshold crossings projected on current path.";
+export function CohortImpactSection({ isCompleted = false }: { isCompleted?: boolean }) {
+  const { cohort_threshold_crossings: crossings } = useScenarioStepStore();
+  const headerLabel = isCompleted ? "COHORT IMPACT (HISTORICAL)" : "COHORT IMPACT";
+  const emptyText = isCompleted
+    ? "No cohort threshold crossings at or before this step."
+    : "No cohort threshold crossings projected on current path.";
 
   return (
     <div

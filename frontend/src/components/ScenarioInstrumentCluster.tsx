@@ -843,7 +843,7 @@ export function ScenarioInstrumentCluster({
             columnWidth={coPrimaryWidth}
           />
         }
-        zone1bCohortSection={<CohortImpactSection />}
+        zone1bCohortSection={<CohortImpactSection isCompleted={activeScenarioDetail?.status === "completed"} />}
         pmmWidget={<PMMWidgetZone1C />}
         fourFramework={
           <FourFrameworkZone1D
