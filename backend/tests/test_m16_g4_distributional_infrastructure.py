@@ -13,10 +13,10 @@ NM-056 rule (soft-skip prevention): NO test uses pytest.skip() conditionally
 except on DATABASE_URL absence for integration tests. No test.skip() patterns.
 A test that cannot yet run returns without asserting — it does not skip.
 
-EE-PENDING ACs (AC-EE-1, AC-EE-2 from #275): NOT YET AUTHORED. The Ecological
-Economist DIC review on GitHub issue #275 is required before these tests can be
-written. They will be authored in a follow-up commit once the EE review comment
-is filed, per the intent document §7 Test Authorship Obligation.
+EE-PENDING ACs (AC-EE-1, AC-EE-2 from #275): AC-EE-1 authored 2026-06-24 after
+Ecological Economist DIC review was filed on GitHub issue #275 (EE review 2026-06-24).
+AC-EE-2 is satisfied by the EE review comment itself (not a coded test). AC-EE-1 is
+CURRENTLY RED — engine wiring in ExternalSectorModule is required before it passes.
 
 SyntheticDataEngine interface (designed by these tests — implementing agent must match):
   Module: app.simulation.synthetic_data_engine
@@ -66,7 +66,8 @@ AC coverage:
     AC-7   ScenarioConfigSchema accepts ecological_shock_coefficient in [0.0, 1.0]
     AC-8   ecological_shock_coefficient=0.0 → trajectory identical to no coefficient (DB)
     AC-9   api_contracts.yml documents "ecological_shock_coefficient"
-    [AC-EE-1, AC-EE-2 — deferred pending Ecological Economist DIC review on #275]
+    AC-EE-1  coeff=0.35 produces fiscal delta within Zimbabwe 2000 calibration range (DB)
+    [AC-EE-2  satisfied by EE review comment on #275 — not a coded test]
 
   #102 backend:
     AC-10  GET /compare response includes distribution.variance/p10/p50/p90 (DB)
@@ -1107,10 +1108,168 @@ class TestAC9ApiContractsEcologicalCoeff:
         )
 
 
-# NOTE: AC-EE-1 and AC-EE-2 are NOT YET AUTHORED.
-# They will be added after the Ecological Economist DIC review comment is filed on GitHub
-# issue #275 and the calibration values (Zimbabwe 2005 coefficient, tolerance %, step horizon,
-# fiscal indicator key) are confirmed. See intent document §7 Test Authorship Obligation.
+# ===========================================================================
+# SECTION: #275 EE-PENDING — AC-EE-1 (Zimbabwe 2000 ecological calibration)
+# ===========================================================================
+#
+# AC-EE-2 is satisfied by the Ecological Economist DIC review comment on GitHub
+# issue #275 (filed 2026-06-24). AC-EE-1 is the integration test authored here.
+#
+# Calibration anchor: Zimbabwe 2000 land reform shock, step 4 (2004).
+# EE DIC review parameters (2026-06-24): coefficient=0.35, tolerance ±30%,
+# arable_land_degradation_rate proxy=0.15, base_agricultural_export_share=0.20,
+# fiscal indicator=fiscal_balance_pct_gdp, target ~1.0–1.5% GDP at step 4.
+#
+# CURRENTLY RED: ecological_shock_coefficient is schema-only. Engine wiring
+# required in ExternalSectorModule (#275) before this test can pass.
+# NM-056 guard: no pytest.skip(). Fail loudly.
+# ===========================================================================
+
+
+_ZMB_ECO_INITIAL_ATTRS: dict[str, Any] = {
+    "ZMB": {
+        "base_agricultural_export_share": {
+            "value": "0.20",
+            "unit": "ratio",
+            "variable_type": "stock",
+            "measurement_framework": "financial",
+            "confidence_tier": 2,
+            "is_synthetic": False,
+        },
+        "arable_land_degradation_rate": {
+            "value": "0.15",
+            "unit": "ratio",
+            "variable_type": "flow",
+            "measurement_framework": "ecological",
+            "confidence_tier": 3,
+            "is_synthetic": True,
+            "synthetic_basis": (
+                "Zimbabwe 2000 land reform shock proxy — agricultural channel "
+                "attributable degradation rate; EE DIC calibration anchor 2026-06-24."
+            ),
+        },
+    }
+}
+
+
+class TestACEE1ZimbabweEcologicalCalibration:
+    """AC-EE-1: ecological_shock_coefficient=0.35 must produce measurable fiscal impact
+    at step 4, within the Zimbabwe 2000 land reform shock historical calibration range.
+
+    Ecological Economist DIC review parameters (filed 2026-06-24, issue #275):
+      Calibration anchor : Zimbabwe 2000 land reform shock, step 4 (2004)
+      Coefficient        : 0.35
+      Proxy rate         : arable_land_degradation_rate = 0.15
+      Agricultural share : base_agricultural_export_share = 0.20
+      Target             : ~1.0–1.5% GDP cumulative fiscal reduction at step 4
+      Tolerance          : ±30% → range [0.70%, 1.95%] → [0.0070, 0.0195]
+      Fiscal indicator   : fiscal_balance_pct_gdp (MacroeconomicModule attr, confirmed line 290)
+
+    NOTE on discrepancy: the formula 0.35 × 0.20 × 0.15 = 0.0105 per step ≈ 4.2% over 4
+    steps. The EE calibration target (1.0–1.5%) is the agricultural-channel-attributable
+    portion of the historical fiscal impact, not the total. The ExternalSectorModule
+    implementing agent must scale the per-step contribution to produce output within the
+    calibrated range — see EE review comment on #275.
+
+    CURRENTLY FAILS (red): ecological_shock_coefficient is schema-only (silent failure 3,
+    intent doc §3.4). coefficient=0.35 currently produces output identical to 0.0.
+    This test MUST remain red until ExternalSectorModule engine wiring is complete.
+    NM-056 guard: no soft-skip.
+    """
+
+    async def test_coefficient_0_35_produces_nonzero_fiscal_delta_at_step4(
+        self, client: httpx.AsyncClient
+    ) -> None:
+        """ZMB 4-step run with coefficient=0.35 must differ from coefficient=0.0
+        baseline on fiscal_balance_pct_gdp, within the Zimbabwe 2000 calibration range."""
+        payload_with_coeff = _zmb_8_step_payload({
+            "n_steps": 4,
+            "ecological_shock_coefficient": 0.35,
+            "initial_attributes": _ZMB_ECO_INITIAL_ATTRS,
+        })
+        payload_with_coeff["name"] = "M16-G4 AC-EE-1 ZMB coeff=0.35 (ZW2000 anchor)"
+
+        payload_baseline = _zmb_8_step_payload({
+            "n_steps": 4,
+            "initial_attributes": _ZMB_ECO_INITIAL_ATTRS,
+        })
+        payload_baseline["name"] = "M16-G4 AC-EE-1 ZMB baseline coeff=0.0"
+
+        ids: list[str] = []
+        for payload, label in (
+            (payload_with_coeff, "coeff=0.35"),
+            (payload_baseline, "baseline"),
+        ):
+            create_res = await client.post("/api/v1/scenarios", json=payload)
+            assert create_res.status_code == 201, (
+                f"AC-EE-1 {label}: POST /scenarios returned {create_res.status_code}: "
+                f"{create_res.text[:200]}"
+            )
+            sid = create_res.json()["scenario_id"]
+            run_res = await client.post(f"/api/v1/scenarios/{sid}/run")
+            assert run_res.status_code == 200, (
+                f"AC-EE-1 {label}: /run returned {run_res.status_code}."
+            )
+            assert run_res.json().get("steps_executed") == 4, (
+                f"AC-EE-1 {label}: steps_executed={run_res.json().get('steps_executed')!r}, "
+                f"expected 4."
+            )
+            ids.append(sid)
+
+        id_with_coeff, id_baseline = ids
+
+        compare_res = await client.get(
+            "/api/v1/scenarios/compare",
+            params={"scenario_a": id_with_coeff, "scenario_b": id_baseline},
+        )
+        assert compare_res.status_code == 200, (
+            f"AC-EE-1: GET /compare returned {compare_res.status_code}: "
+            f"{compare_res.text[:200]}"
+        )
+
+        deltas = compare_res.json().get("deltas", [])
+        fiscal_delta: Decimal | None = None
+        for record in deltas:
+            if (
+                record.get("entity_id") == "ZMB"
+                and record.get("attribute_key") == "fiscal_balance_pct_gdp"
+            ):
+                raw = record.get("delta")
+                if raw is not None:
+                    fiscal_delta = abs(Decimal(str(raw)))
+                break
+
+        # Primary assertion: engine must apply the coefficient.
+        # CURRENTLY FAILS: fiscal_delta is 0.0 or absent (schema-only, silent failure 3).
+        # Fail here is correct — red until ExternalSectorModule wiring is complete (#275).
+        assert fiscal_delta is not None and fiscal_delta > Decimal("0"), (
+            "AC-EE-1 FAIL (engine wiring): fiscal_balance_pct_gdp delta between "
+            "coeff=0.35 and coeff=0.0 at step 4 is zero or absent. "
+            "ecological_shock_coefficient is schema-only — ExternalSectorModule does not "
+            "yet apply it (silent failure 3, intent §3.4). "
+            "Required engine wiring (#275): read ecological_shock_coefficient from "
+            "ScenarioConfigSchema; read base_agricultural_export_share and "
+            "arable_land_degradation_rate from entity initial_attributes; emit a "
+            "FINANCIAL framework delta on fiscal_balance_pct_gdp per step. "
+            "Zimbabwe 2000 calibration anchor: ~1.0–1.5% GDP cumulative at step 4 "
+            "(EE DIC review 2026-06-24, issue #275)."
+        )
+
+        # Calibration assertion: delta within Zimbabwe 2000 historical range.
+        # EE target: 1.0–1.5% GDP cumulative at step 4 (agricultural-channel-attributable).
+        # ±30% tolerance: [0.70%, 1.95%] → [0.0070, 0.0195].
+        _CAL_MIN = Decimal("0.0070")
+        _CAL_MAX = Decimal("0.0195")
+        assert _CAL_MIN <= fiscal_delta <= _CAL_MAX, (
+            f"AC-EE-1 CALIBRATION FAIL: fiscal_balance_pct_gdp delta at step 4 is "
+            f"{float(fiscal_delta) * 100:.3f}% GDP — outside Zimbabwe 2000 calibration "
+            f"range [{float(_CAL_MIN) * 100:.2f}%, {float(_CAL_MAX) * 100:.2f}%] GDP "
+            f"(EE DIC review 2026-06-24, ±30% around 1.0–1.5% historical target). "
+            f"Parameters: coeff=0.35, base_agri_export=0.20, degradation_rate=0.15. "
+            f"The calibration range reflects the agricultural-channel-attributable portion "
+            f"of Zimbabwe fiscal impact only — not total fiscal decline (which includes "
+            f"monetary dysfunction). Adjust ExternalSectorModule scaling accordingly."
+        )
 
 
 # ===========================================================================
