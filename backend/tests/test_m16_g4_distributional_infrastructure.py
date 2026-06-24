@@ -37,7 +37,8 @@ SyntheticDataEngine interface (designed by these tests — implementing agent mu
 
   SyntheticQuantityResult attributes:
     is_synthetic: bool
-    synthetic_method: str | None     — "STRUCTURAL_ABSENCE" | "SYNTHETIC_COMPARABLE" | "SYNTHETIC_MODEL"
+    synthetic_method: str | None  — "STRUCTURAL_ABSENCE" | "SYNTHETIC_COMPARABLE"
+                                    | "SYNTHETIC_MODEL"
     value: float | None              — None for STRUCTURAL_ABSENCE
 
 Method dispatch rules (ADR-007 §Section 1, enforced by AC-3/AC-4/AC-5):
@@ -219,7 +220,8 @@ class TestAC1QuantitySchemaMigration:
     def test_quantity_table_exists(self) -> None:
         _require_db()
         try:
-            from sqlalchemy import create_engine, inspect as sa_inspect
+            from sqlalchemy import create_engine
+            from sqlalchemy import inspect as sa_inspect
         except ImportError:
             pytest.fail("sqlalchemy not importable — cannot run AC-1 schema inspection test.")
 
@@ -235,7 +237,8 @@ class TestAC1QuantitySchemaMigration:
 
     def test_quantity_table_has_is_synthetic_column(self) -> None:
         _require_db()
-        from sqlalchemy import create_engine, inspect as sa_inspect
+        from sqlalchemy import create_engine
+        from sqlalchemy import inspect as sa_inspect
 
         engine = create_engine(_DATABASE_URL)
         inspector = sa_inspect(engine)
@@ -253,7 +256,8 @@ class TestAC1QuantitySchemaMigration:
 
     def test_quantity_table_has_synthetic_method_column(self) -> None:
         _require_db()
-        from sqlalchemy import create_engine, inspect as sa_inspect
+        from sqlalchemy import create_engine
+        from sqlalchemy import inspect as sa_inspect
 
         engine = create_engine(_DATABASE_URL)
         inspector = sa_inspect(engine)
@@ -272,7 +276,8 @@ class TestAC1QuantitySchemaMigration:
 
     def test_quantity_table_has_comparison_group_id_column(self) -> None:
         _require_db()
-        from sqlalchemy import create_engine, inspect as sa_inspect
+        from sqlalchemy import create_engine
+        from sqlalchemy import inspect as sa_inspect
 
         engine = create_engine(_DATABASE_URL)
         inspector = sa_inspect(engine)
@@ -285,7 +290,8 @@ class TestAC1QuantitySchemaMigration:
 
     def test_quantity_table_has_holdout_validated_column(self) -> None:
         _require_db()
-        from sqlalchemy import create_engine, inspect as sa_inspect
+        from sqlalchemy import create_engine
+        from sqlalchemy import inspect as sa_inspect
 
         engine = create_engine(_DATABASE_URL)
         inspector = sa_inspect(engine)
@@ -398,7 +404,9 @@ class TestAC3MethodEStructuralAbsence:
 
     def test_method_e_fires_for_zero_comparables(self) -> None:
         try:
-            from app.simulation.synthetic_data_engine import SyntheticDataEngine  # type: ignore[import]
+            from app.simulation.synthetic_data_engine import (
+                SyntheticDataEngine,  # type: ignore[import]
+            )
         except ImportError:
             pytest.fail(
                 "app.simulation.synthetic_data_engine.SyntheticDataEngine could not be imported. "
@@ -437,7 +445,9 @@ class TestAC3MethodEStructuralAbsence:
 
     def test_method_e_fires_for_two_comparables(self) -> None:
         try:
-            from app.simulation.synthetic_data_engine import SyntheticDataEngine  # type: ignore[import]
+            from app.simulation.synthetic_data_engine import (
+                SyntheticDataEngine,  # type: ignore[import]
+            )
         except ImportError:
             pytest.fail(
                 "SyntheticDataEngine could not be imported — AC-3 boundary test cannot run."
@@ -468,7 +478,9 @@ class TestAC3MethodEStructuralAbsence:
     def test_method_e_fires_for_high_ci_ratio(self) -> None:
         """Method E also fires when CI width > 4× the point estimate."""
         try:
-            from app.simulation.synthetic_data_engine import SyntheticDataEngine  # type: ignore[import]
+            from app.simulation.synthetic_data_engine import (
+                SyntheticDataEngine,  # type: ignore[import]
+            )
         except ImportError:
             pytest.fail("SyntheticDataEngine could not be imported — AC-3 CI test cannot run.")
 
@@ -515,7 +527,9 @@ class TestAC4MethodBMice:
 
     def test_method_b_fires_for_mice_conditions(self) -> None:
         try:
-            from app.simulation.synthetic_data_engine import SyntheticDataEngine  # type: ignore[import]
+            from app.simulation.synthetic_data_engine import (
+                SyntheticDataEngine,  # type: ignore[import]
+            )
         except ImportError:
             pytest.fail(
                 "app.simulation.synthetic_data_engine.SyntheticDataEngine could not be imported. "
@@ -564,9 +578,13 @@ class TestAC4MethodBMice:
     def test_method_b_minimum_observed_fraction_boundary(self) -> None:
         """Method B fires at exactly 80% observed fraction (boundary condition)."""
         try:
-            from app.simulation.synthetic_data_engine import SyntheticDataEngine  # type: ignore[import]
+            from app.simulation.synthetic_data_engine import (
+                SyntheticDataEngine,  # type: ignore[import]
+            )
         except ImportError:
-            pytest.fail("SyntheticDataEngine could not be imported — AC-4 boundary test cannot run.")
+            pytest.fail(
+                "SyntheticDataEngine could not be imported — AC-4 boundary test cannot run."
+            )
 
         profile = _IndicatorDataProfile(
             comparable_country_count=5,
@@ -592,9 +610,13 @@ class TestAC4MethodBMice:
     def test_method_b_gap_length_boundary(self) -> None:
         """Method B fires at exactly gap_length=3 (boundary condition)."""
         try:
-            from app.simulation.synthetic_data_engine import SyntheticDataEngine  # type: ignore[import]
+            from app.simulation.synthetic_data_engine import (
+                SyntheticDataEngine,  # type: ignore[import]
+            )
         except ImportError:
-            pytest.fail("SyntheticDataEngine could not be imported — AC-4 boundary test cannot run.")
+            pytest.fail(
+                "SyntheticDataEngine could not be imported — AC-4 boundary test cannot run."
+            )
 
         profile = _IndicatorDataProfile(
             comparable_country_count=5,
@@ -620,7 +642,9 @@ class TestAC4MethodBMice:
     def test_method_b_does_not_fire_for_unmet_conditions(self) -> None:
         """Method B must NOT fire when observed_fraction < 0.80 (and no Method E conditions)."""
         try:
-            from app.simulation.synthetic_data_engine import SyntheticDataEngine  # type: ignore[import]
+            from app.simulation.synthetic_data_engine import (
+                SyntheticDataEngine,  # type: ignore[import]
+            )
         except ImportError:
             pytest.fail("SyntheticDataEngine could not be imported — AC-4 failure case cannot run.")
 
@@ -667,7 +691,9 @@ class TestAC5MethodSelectionOrder:
 
     def test_mnar_flag_triggers_method_e_over_method_b(self) -> None:
         try:
-            from app.simulation.synthetic_data_engine import SyntheticDataEngine  # type: ignore[import]
+            from app.simulation.synthetic_data_engine import (
+                SyntheticDataEngine,  # type: ignore[import]
+            )
         except ImportError:
             pytest.fail(
                 "SyntheticDataEngine could not be imported — AC-5 precedence test cannot run."
@@ -709,9 +735,13 @@ class TestAC5MethodSelectionOrder:
         where Method E fires unconditionally (ignoring method selection logic).
         """
         try:
-            from app.simulation.synthetic_data_engine import SyntheticDataEngine  # type: ignore[import]
+            from app.simulation.synthetic_data_engine import (
+                SyntheticDataEngine,  # type: ignore[import]
+            )
         except ImportError:
-            pytest.fail("SyntheticDataEngine could not be imported — AC-5 positive case cannot run.")
+            pytest.fail(
+                "SyntheticDataEngine could not be imported — AC-5 positive case cannot run."
+            )
 
         profile = _IndicatorDataProfile(
             comparable_country_count=10,
@@ -775,7 +805,8 @@ class TestAC6ApiContractsYaml:
         assert "synthetic_method" in text, (
             "AC-6 FAIL: 'synthetic_method' not found in docs/schema/api_contracts.yml. "
             "The G4 Quantity schema extension adds synthetic_method to the trajectory response. "
-            "Schema drift: synthetic_method must be documented in the same commit as implementation."
+            "Schema drift: synthetic_method must be documented in the same commit as"
+            " implementation."
         )
 
     def test_structural_absence_value_documented(self) -> None:
@@ -847,7 +878,9 @@ class TestAC7EcologicalShockCoefficientSchema:
         from pydantic import ValidationError
 
         try:
-            config = ScenarioConfigSchema(entities=["ZMB"], n_steps=8, ecological_shock_coefficient=0.0)
+            config = ScenarioConfigSchema(
+                entities=["ZMB"], n_steps=8, ecological_shock_coefficient=0.0
+            )
         except (ValidationError, TypeError) as exc:
             pytest.fail(f"ecological_shock_coefficient=0.0 (default/no-op) rejected: {exc}")
         assert getattr(config, "ecological_shock_coefficient", None) == 0.0
@@ -860,7 +893,9 @@ class TestAC7EcologicalShockCoefficientSchema:
         from pydantic import ValidationError
 
         try:
-            config = ScenarioConfigSchema(entities=["ZMB"], n_steps=8, ecological_shock_coefficient=1.0)
+            config = ScenarioConfigSchema(
+                entities=["ZMB"], n_steps=8, ecological_shock_coefficient=1.0
+            )
         except (ValidationError, TypeError) as exc:
             pytest.fail(f"ecological_shock_coefficient=1.0 (upper boundary) rejected: {exc}")
         assert getattr(config, "ecological_shock_coefficient", None) == 1.0
@@ -1005,7 +1040,7 @@ class TestAC8CoefficientZeroNonRegression:
                 continue
             try:
                 delta_val = abs(Decimal(str(raw_delta)))
-            except Exception:  # noqa: BLE001
+            except Exception:  # noqa: BLE001, S112
                 continue
             if delta_val > Decimal("0"):
                 non_zero_deltas.append({
@@ -1050,7 +1085,7 @@ class TestAC9ApiContractsEcologicalCoeff:
         )
 
     def test_ecological_shock_coefficient_near_post_scenarios(self) -> None:
-        """ecological_shock_coefficient must appear in the POST /scenarios request schema context."""
+        """ecological_shock_coefficient must appear in the POST /scenarios request schema."""
         text = _API_CONTRACTS.read_text(encoding="utf-8")
         if "ecological_shock_coefficient" not in text:
             pytest.fail("ecological_shock_coefficient not found in api_contracts.yml.")
@@ -1226,7 +1261,10 @@ class TestAC11NullDistributionInsufficientData:
                 "n_steps": 1,
                 "timestep_label": "annual",
                 "start_date": "2023-01-01",
-                "modules_config": {"ecological": {"enabled": False}, "political_economy": {"enabled": False}},
+                "modules_config": {
+                    "ecological": {"enabled": False},
+                    "political_economy": {"enabled": False},
+                },
             },
             "scheduled_inputs": [],
         }
@@ -1237,7 +1275,10 @@ class TestAC11NullDistributionInsufficientData:
                 "n_steps": 1,
                 "timestep_label": "annual",
                 "start_date": "2023-01-01",
-                "modules_config": {"ecological": {"enabled": False}, "political_economy": {"enabled": False}},
+                "modules_config": {
+                    "ecological": {"enabled": False},
+                    "political_economy": {"enabled": False},
+                },
             },
             "scheduled_inputs": [],
         }
@@ -1270,7 +1311,8 @@ class TestAC11NullDistributionInsufficientData:
                     assert val is None, (
                         f"AC-11 FAIL: distribution.{field} was {val!r} for a 1-step window "
                         f"(entity: {delta.get('entity_id')}, key: {delta.get('attribute_key')}). "
-                        "Intent doc AC-11: 'when the comparison window has fewer than 3 data points, "
+                        "Intent doc AC-11: 'when the comparison window has fewer than"
+                        " 3 data points, "
                         "distribution contains null values.' HTTP 200 with nulls is correct. "
                         "A non-null value for a 1-step window indicates the distribution "
                         "is being computed from insufficient data."
