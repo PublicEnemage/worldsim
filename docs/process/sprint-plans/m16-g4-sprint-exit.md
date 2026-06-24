@@ -38,8 +38,8 @@ G4 does not gate G8 (live stakeholder demo #843).*
 | Sprint entry document | `docs/process/sprint-plans/m16-g4-sprint-entry.md` |
 | Intent document | `docs/process/intents/M16-G4-2026-06-23-distributional-infrastructure.md` |
 | Exit checklist issue | #985 |
-| Date implementation completed | 2026-06-24 (PR #1182 merged to `release/m16`) |
-| CI status on release branch | **Green** — all required checks PASS (test-backend PASS, playwright-e2e PASS, lint PASS, compliance-scan PASS, branch-naming PASS, backtesting SKIP); Alembic multiple-head conflict resolved (down_revision corrected in migration a2c4e6f8b0d1) |
+| Date implementation completed | 2026-06-24 (PRs #1182 + #1190 merged to `release/m16`) |
+| CI status on release branch | **Green** — all required checks PASS on all implementation PRs; Alembic multiple-head conflict resolved in #1182; AC-EE-1 engine wiring in #1190 (test-backend PASS, lint PASS, compliance-scan PASS) |
 
 ---
 
@@ -51,7 +51,7 @@ G4 does not gate G8 (live stakeholder demo #843).*
 | #275 — Ecological-to-financial transmission | #1182 + #1190 | ✅ Yes — 2026-06-24 | Green | AC-7/8/9 PASS; AC-EE-2 ✅ SATISFIED (EE review 2026-06-24); AC-EE-1 ✅ PASS (PR #1190 — ExternalSectorModule engine wiring + calibration) |
 | #102 — Distributional comparison API + variance band | #1182 | ✅ Yes — 2026-06-24 | Green | All AC-10 through AC-12 and AC-F7 through AC-F9 PASS |
 | QA tests | #1181 | ✅ Yes — 2026-06-24 | Green | `test_m16_g4_distributional_infrastructure.py` + `m16-g4-distributional-infrastructure.spec.ts`; authored before implementation PR opened (NM-056 guard satisfied) |
-| Process artifacts (this document, intent §9, session state) | chore/m16-g4-bpo-validate | Pending | — | BPO ACCEPT + sprint exit |
+| Process artifacts (sprint exit, intent §9, session state) | #1191 (sprint exit), #1192 (BPO §9 update), #1189 (SESSION_STATE) | ✅ Yes — 2026-06-24 | Green | BPO ACCEPT (original + AC-EE-1 supplementary); sprint exit CONFIRMED; SESSION_STATE updated |
 
 **Implementation status:** PR #1182 merged 2026-06-24. CI green on `release/m16` post-merge
 confirmed: all non-EE-PENDING ACs passing (test-backend + playwright-e2e PASS). Pre-push
@@ -66,10 +66,9 @@ before push. No soft-skip patterns in G4 test files (NM-056 guard satisfied — 
 |---|---|---|---|---|
 | #22 (scoped) — SyntheticDataEngine + Zone 1B badge wiring | Backend + Frontend | Filed 2026-06-24 — CONDITIONAL PASS (CA-G4-1: SAD badge tooltip; CA-G4-2: Zone 1D deferral) | **ACCEPT** 2026-06-24 | `docs/process/intents/M16-G4-2026-06-23-distributional-infrastructure.md §9` |
 | #102 — Distributional comparison API + Zone 1A variance band | Backend + Frontend | Filed 2026-06-24 — CONDITIONAL PASS (no new conditions for #102 scope) | **ACCEPT** 2026-06-24 | (same intent document §9) |
-| #275 structural ACs (AC-7/8/9) — ecological shock coefficient | Backend | N/A — no user-visible frontend; backend parameter accepts/rejects correctly | **PARTIAL ACCEPT** 2026-06-24 — structural ACs pass; EE-PENDING ACs (AC-EE-1/AC-EE-2) require EE review before issue can close | (same intent document §9) |
+| #275 — ecological transmission (all ACs: AC-7/8/9 + AC-EE-1 + AC-EE-2) | Backend | N/A — no user-visible frontend; backend parameter only | **ACCEPT** 2026-06-24 — AC-7/8/9 structural PASS (PR #1182); AC-EE-2 ✅ (EE review on #275); AC-EE-1 ✅ PASS (PR #1190 engine wiring; supplementary BPO validate in intent doc §9, PR #1192); issue #275 CLOSED | (same intent document §9 + supplementary validate) |
 
-**Business PO acceptance status:** CONDITIONAL ACCEPT — #22 (scoped) and #102 fully accepted;
-#275 structurally accepted with EE-PENDING ACs blocking issue closure.
+**Business PO acceptance status:** ACCEPT — all three issues fully accepted; all 21 ACs confirmed; AC-F6 deferred per §6; issue #275 CLOSED 2026-06-24.
 
 ### Customer Agent Layer 3 assessments
 
