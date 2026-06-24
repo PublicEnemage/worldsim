@@ -951,21 +951,30 @@ docker compose restart frontend
 
 ---
 
-### Natural Earth loader not run — choropleth is empty or GRC entity missing
+### Natural Earth loader not run — scenario creation fails or choropleth is empty
 
-**Symptom:** The choropleth map is blank, or a backtesting run fails with
-`EntityNotFound: GRC`. The `simulation_entities` table is empty.
+**Symptom (most common):** Scenario creation returns an error in the UI —
+the scenario row never appears after clicking Create. The backend log shows:
+`POST /api/v1/scenarios HTTP/1.1" 422 Unprocessable Content`
+and the response body contains: `Entity IDs not found in simulation_entities: {'GRC'}.`
 
-**Cause:** The Natural Earth boundary loader seed script has not been run
-against this database.
+**Symptom (alternative):** The choropleth map is blank, or a backtesting run
+fails with `EntityNotFound: GRC`. The `simulation_entities` table is empty.
+
+**Cause:** The Natural Earth boundary loader has not been run against this
+database. `docker compose up` runs Alembic migrations (which create the schema)
+but does not seed `simulation_entities`. The API starts and appears healthy —
+`/api/v1/health` returns 200 and the choropleth loads — but any operation that
+validates entity IDs against `simulation_entities` will return 422. (NM-060)
 
 **Fix:**
 
 ```bash
-docker compose exec api python scripts/natural_earth_loader.py
+docker compose exec api python -m app.db.seed.natural_earth_loader
 ```
 
-The loader is idempotent — safe to run multiple times.
+The loader is idempotent — safe to run multiple times. Takes 30–60 seconds
+on first run (downloads Natural Earth 110m GeoJSON; cached after first run).
 
 ---
 

@@ -3007,6 +3007,67 @@ Both AC-009 (`trajectory-view.spec.ts`) and the MV-002 hardware test (`mv-002-ha
 
 ---
 
+## NM-060 — Startup Observability Gap: Empty simulation_entities Table Produces Silent 422 with No Diagnostic Signal (Reactive)
+
+**Date identified:** 2026-06-24
+**Severity:** Medium
+**Sprint:** M16-G6
+**Detection:** Reactive — caught when MV-002 ProBook hardware validation was blocked by
+422 errors on scenario creation. Root cause took multiple investigation steps to identify
+because no observability signal pointed to the seed gap.
+
+### What happened
+
+After `docker compose up --build` (and repeated with `down -v` for a fresh database),
+scenario creation returned `422 Unprocessable Content` on the ProBook. The backend log
+showed the 422 but not why. The frontend showed a generic error. The choropleth loaded
+correctly (GDP growth 200 OK), so the stack *appeared* healthy. The real cause —
+`simulation_entities` was empty because the Natural Earth loader had not been run —
+required inspecting the API source to discover.
+
+### Three-layer failure
+
+1. **No startup observability:** The backend logs `Application startup complete.` with no
+   check on whether `simulation_entities` is populated. A stack with zero entities is
+   indistinguishable from a healthy stack in the startup log. The API health endpoint
+   returns 200 regardless.
+
+2. **Wrong fix command in CONTRIBUTING.md:** The troubleshooting entry said
+   `docker compose exec api python scripts/natural_earth_loader.py` — a path that does
+   not exist. The correct command is `docker compose exec api python -m app.db.seed.natural_earth_loader`.
+
+3. **Wrong/incomplete symptom description:** CONTRIBUTING.md listed "choropleth is blank"
+   as the only symptom. In practice the choropleth loaded correctly and the failure was
+   a 422 on scenario creation — a completely different, unmatched symptom.
+
+### What was at risk
+
+Any developer or EL doing a first-time or fresh setup would hit this with no diagnostic
+path. CI avoids the problem by explicitly running the seed loader (`.github/workflows/ci.yml`
+line 232) — local and ProBook setups have no equivalent, and CONTRIBUTING.md's
+troubleshooting entry was not discoverable from the observed symptom.
+
+### Fix
+
+CONTRIBUTING.md updated in this commit:
+- Correct fix command: `python -m app.db.seed.natural_earth_loader`
+- Primary symptom updated to scenario creation 422 (first encounter for most users)
+- Explanation added that the stack appears healthy despite the empty table
+
+### Process improvement
+
+1. **GitHub issue filed for startup observability** (enhancement, M17): The backend
+   should log a structured `WARNING` at startup lifespan if `simulation_entities` is
+   empty, with the fix command in the log message. A zero-entity stack is never a valid
+   operating state — it should say so. Issue filed against M17.
+
+2. **Troubleshooting entry standard:** CONTRIBUTING.md symptoms must describe what a
+   developer *observes* (HTTP status codes, UI behaviour, log lines) — not internal
+   state requiring source inspection. "Choropleth is blank" was accurate but not the
+   first observable signal; scenario creation 422 is.
+
+---
+
 ## Registry Maintenance
 
 ### How to add an entry
