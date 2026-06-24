@@ -65,6 +65,7 @@ from app.schemas import (
     ScenarioRestoreResponse,
     ScheduledInputSchema,
     SnapshotRecord,
+    ThresholdCrossingItem,
     TrajectoryCompareResponse,
     TrajectoryCompareStep,
     TrajectoryFrameworkPoint,
@@ -595,6 +596,13 @@ async def compare_scenarios(
     state_a = snapmap_a[step_a]
     state_b = snapmap_b[step_b]
 
+    # Fetch MDA thresholds once for threshold_crossings population — M16-G9 #97.
+    mda_rows = await conn.fetch(
+        "SELECT mda_id, indicator_key, floor_value, comparison_operator FROM mda_thresholds"
+        " ORDER BY mda_id"
+    )
+    mda_threshold_list: list[dict[str, Any]] = [dict(r) for r in mda_rows]
+
     shared_entities = sorted(set(state_a) & set(state_b))
     flat_deltas: list[FlatDeltaRecord] = []
 
@@ -645,6 +653,30 @@ async def compare_scenarios(
                 except Exception:  # noqa: BLE001 S112
                     continue
 
+            # Compute threshold_crossings: check val_b against each matching MDA threshold.
+            # Only entries where the threshold IS crossed (crossed=True) are included.
+            # Empty list when no MDA threshold applies or none are violated — M16-G9 #97.
+            threshold_crossings: list[ThresholdCrossingItem] = []
+            try:
+                vb_dec = Decimal(vb)
+                for thr in mda_threshold_list:
+                    if str(thr["indicator_key"]) != key:
+                        continue
+                    floor = Decimal(str(thr["floor_value"]))
+                    op = str(thr.get("comparison_operator", "lte"))
+                    is_crossed = (
+                        vb_dec <= floor if op == "lte" else vb_dec >= floor
+                    )
+                    if is_crossed:
+                        threshold_crossings.append(
+                            ThresholdCrossingItem(
+                                threshold_name=str(thr["mda_id"]),
+                                crossed=True,
+                            )
+                        )
+            except Exception:  # noqa: BLE001 S110 S112
+                pass  # Non-fatal: leave threshold_crossings empty on Decimal parse failure
+
             flat_deltas.append(
                 FlatDeltaRecord(
                     entity_id=eid,
@@ -656,6 +688,7 @@ async def compare_scenarios(
                     confidence_tier=tier,
                     threshold_crossed=crossed,
                     distribution=_compute_distribution(delta_series),
+                    threshold_crossings=threshold_crossings,
                 )
             )
 

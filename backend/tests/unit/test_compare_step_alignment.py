@@ -49,17 +49,19 @@ def _make_conn(
     fetchrow_effects: list,  # type: ignore[type-arg]
     fetch_a: list,  # type: ignore[type-arg]
     fetch_b: list,  # type: ignore[type-arg]
+    mda_rows: list | None = None,  # type: ignore[type-arg]
 ) -> AsyncMock:
     """Build a mock DB connection.
 
     `fetchrow_effects` — side-effects for existence-check calls (2 entries).
     `fetch_a` — rows returned for scenario_a all-snapshots fetch.
     `fetch_b` — rows returned for scenario_b all-snapshots fetch.
+    `mda_rows` — rows returned for mda_thresholds fetch (M16-G9 #97); defaults to [].
     """
     conn = AsyncMock()
     conn.fetchrow = AsyncMock(side_effect=list(fetchrow_effects))
-    # The endpoint calls conn.fetch twice in order: scenario_a then scenario_b
-    conn.fetch = AsyncMock(side_effect=[fetch_a, fetch_b])
+    # conn.fetch call order: scenario_a snapshots, scenario_b snapshots, mda_thresholds.
+    conn.fetch = AsyncMock(side_effect=[fetch_a, fetch_b, mda_rows or []])
     return conn
 
 
