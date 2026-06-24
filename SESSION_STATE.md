@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-24 (G9 COMPLETE — PRs #1201/#1202/#1204/#1205 merged; sprint exit pi-confirmed; G10 FULLY CONFIRMED — fresh-session BPO ACCEPT + PI Agent exit confirmation; NM-057 filed; G8 gate fully open; #843 scheduling gate cleared)**
+**Last updated: 2026-06-24 (G7 DEFERRED to Parking Lot — EL decision; #3 and #6 moved to GitHub Milestone #20; does not gate M16 exit)**
 **Current milestone:** M16 — Distributional Visibility (GitHub Milestone 17)
 **Previous milestone:** M15 — Human Cost Architecture (FORMALLY CLOSED 2026-06-23; release/m15 → main PR #1142; v0.15.0; #984 closed; GitHub Milestone 16 closed)
 
@@ -129,8 +129,8 @@ Implementation is now unblocked. A sprint entry document must be filed and EL-ap
 | #951 ✅ | process: solo-use review protocol | G5 | ✅ MERGED 2026-06-23 — PR #1156 |
 | #259 ✅ | standards: CTO legibility metrics dashboard | G5 | ✅ MERGED 2026-06-23 — PR #1156 |
 | #569 | test(perf): MV-002 Mode 3 hardware validation | G6 | After G1/G2 |
-| #6 | Governance: branch protection restoration | G7 | EL-action; dependent on #3 |
-| #3 | Governance: single-principal separation of duties | G7 | EL-action |
+| #6 | Governance: branch protection restoration | G7 | **DEFERRED — Parking Lot (EL decision 2026-06-24)** — moved to GitHub Milestone #20; no external contributors yet |
+| #3 | Governance: single-principal separation of duties | G7 | **DEFERRED — Parking Lot (EL decision 2026-06-24)** — moved to GitHub Milestone #20; no external contributors yet |
 | #1177 ✅ | ux(zone-1d): milestone sentence step-reference → year anchor | G10 | ✅ BPO ACCEPT 2026-06-24 — PR #1199; milestone-sentence wrapper; year leads text; issue CLOSED 2026-06-24 |
 | #1178 ✅ | ux(zone-1b): T3 badge L0 legibility | G10 | ✅ BPO ACCEPT 2026-06-24 — PR #1199; confidence-tier-badge-sublabel "Inferred"; option (b) sub-label; issue CLOSED 2026-06-24 |
 | #1179 ✅ | ux(zone-1a): Q2 curve asymmetry label | G10 | ✅ BPO ACCEPT 2026-06-24 — PR #1199; q2-suppression-legend "Q2 — floor threshold not registered"; issue CLOSED 2026-06-24 |
@@ -167,7 +167,7 @@ Implementation is now unblocked. A sprint entry document must be filed and EL-ap
 - ✅ G5 sprint entry filed and **EL-approved 2026-06-23** — `docs/process/sprint-plans/m16-g5-sprint-entry.md`; #1145 (immediate) + #837/#951/#259 (near-term, capacity-allowing); work may begin
 - ✅ **G5 COMPLETE 2026-06-23** — PR #1156 merged; all 4 G5 issues delivered (#1145, #837, #951, #259); 18/20 ACs pass (2 skipped Docker-only); M16 demo stubs created at `docs/demo/m16/`; legibility baseline at `docs/standards/legibility-baseline-m16.md`
 - ✅ **G5 sprint exit CONFIRMED 2026-06-23** — BPO ACCEPT (advisory; infrastructure sprint exception); PI confirmed; exit document PR #1158 merged; `docs/process/sprint-plans/m16-g5-sprint-exit.md`
-- ✅ G7 sprint entry filed and **EL-approved 2026-06-23** — `docs/process/sprint-plans/m16-g7-sprint-entry.md`; #3 → #6 dependency declared; actions may begin
+- ~~G7 sprint entry filed and EL-approved 2026-06-23~~ — **G7 DEFERRED TO PARKING LOT (EL decision 2026-06-24)** — no external contributors yet; #3 and #6 moved to GitHub Milestone #20 (Parking Lot); sprint entry preserved at `docs/process/sprint-plans/m16-g7-sprint-entry.md`; does not gate M16 exit (#985)
 - ✅ **G4 implementation MERGED 2026-06-24** — PR #1182 merged to `release/m16`; all CI PASS; sprint entry + intent document + QA tests filed; EL approved 2026-06-24
 - ✅ **G4 Step 5 Validate COMPLETE 2026-06-24** — BPO CONDITIONAL ACCEPT; Customer Agent Layer 3 CONDITIONAL PASS (CA-G4-1 → #1184 pre-Demo 6; CA-G4-2 forward gap Zone 1D); 20 ACs PASS + AC-F6 deferred; #22 (scoped) and #102 CLOSED; #275 OPEN
 - ✅ **G4 EE VALIDATE COMPLETE 2026-06-24** — Ecological Economist DIC review filed on #275; AC-EE-2 SATISFIED; AC-EE-1 params confirmed (coefficient=0.35, ±30%, step 4, Zimbabwe 2000 anchor, `arable_land_degradation_rate` proxy=0.15, fiscal indicator `fiscal_balance_pct_gdp`); sprint exit BLOCKED — AC-EE-1 requires ExternalSectorModule engine wiring; sprint exit document: BLOCKED (pi-confirmed: false)
