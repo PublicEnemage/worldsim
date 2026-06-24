@@ -1,11 +1,11 @@
-"""Unit tests for DeltaRecord and CompareResponse schemas — ADR-004 Decision 5."""
+"""Unit tests for DeltaRecord, FlatDeltaRecord, and CompareResponse schemas — ADR-004 Decision 5."""
 from __future__ import annotations
 
 from decimal import Decimal
 
 import pytest
 
-from app.schemas import CompareResponse, DeltaRecord
+from app.schemas import CompareResponse, DeltaRecord, DistributionRecord, FlatDeltaRecord
 
 
 class TestDeltaRecord:
@@ -81,24 +81,75 @@ class TestDeltaRecord:
         assert r.delta == "-200"
 
 
-class TestCompareResponse:
-    def test_round_trip(self) -> None:
-        delta = DeltaRecord(
+class TestFlatDeltaRecord:
+    def test_flat_record_has_entity_and_attribute_fields(self) -> None:
+        r = FlatDeltaRecord(
+            entity_id="USA",
+            attribute_key="gdp",
             value_a="100",
             value_b="200",
             delta="100",
             direction="increase",
             confidence_tier=2,
         )
+        assert r.entity_id == "USA"
+        assert r.attribute_key == "gdp"
+
+    def test_distribution_defaults_to_null_fields(self) -> None:
+        r = FlatDeltaRecord(
+            entity_id="USA",
+            attribute_key="gdp",
+            value_a="100",
+            value_b="200",
+            delta="100",
+            direction="increase",
+            confidence_tier=2,
+        )
+        assert r.distribution.variance is None
+        assert r.distribution.p10 is None
+        assert r.distribution.p50 is None
+        assert r.distribution.p90 is None
+
+    def test_distribution_fields_populated(self) -> None:
+        dist = DistributionRecord(variance="4.5", p10="2.0", p50="5.0", p90="8.0")
+        r = FlatDeltaRecord(
+            entity_id="DEU",
+            attribute_key="inflation_rate",
+            value_a="3.0",
+            value_b="5.0",
+            delta="2.0",
+            direction="increase",
+            confidence_tier=3,
+            distribution=dist,
+        )
+        assert r.distribution.variance == "4.5"
+        assert r.distribution.p50 == "5.0"
+
+
+class TestCompareResponse:
+    def _make_flat_delta(self, entity: str = "USA", key: str = "gdp") -> FlatDeltaRecord:
+        return FlatDeltaRecord(
+            entity_id=entity,
+            attribute_key=key,
+            value_a="100",
+            value_b="200",
+            delta="100",
+            direction="increase",
+            confidence_tier=2,
+        )
+
+    def test_round_trip(self) -> None:
+        delta = self._make_flat_delta()
         resp = CompareResponse(
             scenario_a_id="aaa",
             scenario_b_id="bbb",
             step_a=5,
             step_b=5,
-            deltas={"USA": {"gdp": delta}},
+            deltas=[delta],
         )
         assert resp.scenario_a_id == "aaa"
-        assert resp.deltas["USA"]["gdp"].direction == "increase"
+        assert resp.deltas[0].entity_id == "USA"
+        assert resp.deltas[0].direction == "increase"
 
     def test_empty_deltas(self) -> None:
         resp = CompareResponse(
@@ -106,12 +157,14 @@ class TestCompareResponse:
             scenario_b_id="y",
             step_a=0,
             step_b=0,
-            deltas={},
+            deltas=[],
         )
-        assert resp.deltas == {}
+        assert resp.deltas == []
 
     def test_serialization_no_float(self) -> None:
-        delta = DeltaRecord(
+        delta = FlatDeltaRecord(
+            entity_id="DEU",
+            attribute_key="inflation_rate",
             value_a="999.999",
             value_b="1000.001",
             delta="1.002",
@@ -123,10 +176,10 @@ class TestCompareResponse:
             scenario_b_id="b",
             step_a=3,
             step_b=4,
-            deltas={"DEU": {"inflation_rate": delta}},
+            deltas=[delta],
         )
         dumped = resp.model_dump(mode="json")
-        rec = dumped["deltas"]["DEU"]["inflation_rate"]
+        rec = dumped["deltas"][0]
         assert isinstance(rec["delta"], str)
         assert isinstance(rec["value_a"], str)
         assert isinstance(rec["value_b"], str)

@@ -704,6 +704,15 @@ export function CohortImpactSection({ isCompleted = false }: { isCompleted?: boo
       ) : (
         crossings.map((crossing, idx) => {
           const color = COHORT_SEVERITY_COLOR[crossing.severity];
+          const isSad = crossing.is_synthetic && crossing.synthetic_method === "STRUCTURAL_ABSENCE";
+          const badgeText = isSad
+            ? "SAD"
+            : crossing.is_synthetic && crossing.synthetic_method === "SYNTHETIC_MODEL"
+              ? "T4"
+              : crossing.is_synthetic && crossing.synthetic_method === "SYNTHETIC_COMPARABLE"
+                ? "T3"
+                : `T${crossing.tier}`;
+          const valueDisplay = isSad ? "—" : (crossing.above_floor_pct != null ? `${crossing.above_floor_pct}% above floor` : "—");
           return (
             <div
               key={`${crossing.quintile_key}-${crossing.indicator_key}`}
@@ -723,14 +732,33 @@ export function CohortImpactSection({ isCompleted = false }: { isCompleted?: boo
               <span style={{ color, fontWeight: 700, flexShrink: 0, fontSize: 9 }}>
                 {crossing.severity}
               </span>
-              <span style={{ color: "#333", lineHeight: 1.3 }}>
+              <span style={{ color: "#333", lineHeight: 1.3, flex: 1 }}>
                 <span style={{ fontWeight: 600 }}>
                   {crossing.cohort_label} — {crossing.indicator_label}
                 </span>
                 <br />
                 <span style={{ color: "#666" }}>
-                  {`Threshold crossed at step ${crossing.step_crossed} · was ${crossing.above_floor_pct}% above floor · T${crossing.tier} · ${crossing.source}`}
+                  {`Threshold crossed at step ${crossing.step_crossed} · `}
+                  <span data-testid={`cohort-value-${crossing.indicator_key}`}>
+                    {valueDisplay}
+                  </span>
+                  {` · ${crossing.source}`}
                 </span>
+              </span>
+              <span
+                data-testid={`cohort-tier-badge-${crossing.indicator_key}`}
+                style={{
+                  fontSize: 8,
+                  fontWeight: 700,
+                  color: isSad ? "#7a0000" : "#005a9e",
+                  background: isSad ? "#ffe0e0" : "#e0eeff",
+                  borderRadius: 2,
+                  padding: "1px 3px",
+                  flexShrink: 0,
+                  display: "inline-block",
+                }}
+              >
+                {badgeText}
               </span>
             </div>
           );

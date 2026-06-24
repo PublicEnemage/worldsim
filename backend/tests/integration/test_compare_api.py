@@ -196,8 +196,12 @@ async def test_compare_returns_delta_for_shared_entity(
         body = res.json()
         assert body["scenario_a_id"] == sid_a
         assert body["scenario_b_id"] == sid_b
-        assert "USA" in body["deltas"]
-        delta_rec = body["deltas"]["USA"]["pop"]
+        assert isinstance(body["deltas"], list)
+        delta_rec = next(
+            (d for d in body["deltas"] if d["entity_id"] == "USA" and d["attribute_key"] == "pop"),
+            None,
+        )
+        assert delta_rec is not None
         assert delta_rec["direction"] == "increase"
         assert delta_rec["delta"] == "20"
         assert delta_rec["confidence_tier"] == 3  # max(2, 3)
@@ -234,8 +238,10 @@ async def test_compare_attr_filter_excludes_other_keys(
         )
         assert res.status_code == 200
         body = res.json()
-        assert "pop" in body["deltas"]["USA"]
-        assert "gdp" not in body["deltas"]["USA"]
+        deltas = body["deltas"]
+        attr_keys = {d["attribute_key"] for d in deltas if d["entity_id"] == "USA"}
+        assert "pop" in attr_keys
+        assert "gdp" not in attr_keys
     finally:
         await _cleanup(db_conn, sid_a, sid_b)
 
@@ -259,7 +265,7 @@ async def test_compare_no_shared_entities_returns_empty_deltas(
             params={"scenario_a": sid_a, "scenario_b": sid_b},
         )
         assert res.status_code == 200
-        assert res.json()["deltas"] == {}
+        assert res.json()["deltas"] == []
     finally:
         await _cleanup(db_conn, sid_a, sid_b)
 

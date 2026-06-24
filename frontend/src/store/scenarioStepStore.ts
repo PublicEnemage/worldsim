@@ -88,9 +88,13 @@ export interface CohortThresholdCrossing {
   indicator_label: string;
   severity: "CRITICAL" | "WARNING" | "WATCH";
   step_crossed: number;
-  above_floor_pct: string;
+  above_floor_pct: string | null;
   tier: number;
   source: string;
+  /** M16-G4 #22 — ADR-007 synthetic disclosure fields. Null = real primary-source data. */
+  is_synthetic?: boolean;
+  synthetic_method?: "STRUCTURAL_ABSENCE" | "SYNTHETIC_COMPARABLE" | "SYNTHETIC_MODEL" | null;
+  value?: string | null;
 }
 
 interface ScenarioStepState {
