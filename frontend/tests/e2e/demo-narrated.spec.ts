@@ -372,10 +372,15 @@ test(
     const nextStepBtn = page.getByRole("button", { name: /Next Step/ });
     await expect(nextStepBtn).toBeVisible({ timeout: 10_000 });
 
+    // Use data-testid="current-step-display" for step assertions to avoid
+    // strict mode violations with the projection panel step axis spans
+    // (Step 1, Step 25, Step 50, Step 75, Step 100) that are always in the DOM.
+    const stepDisplay = page.locator('[data-testid="current-step-display"]');
+
     // ── Step 1 — IMF programme acceptance ─────────────────────────────────────
 
     await nextStepBtn.click();
-    await expect(page.getByText("Step 1")).toBeVisible({ timeout: 20_000 });
+    await expect(stepDisplay).toContainText("Step 1", { timeout: 20_000 });
     await page.waitForTimeout(1_200);
 
     await speak(
@@ -389,7 +394,7 @@ test(
     // ── FRAME A: Step 2 — THESIS: Cohort threshold crossing ───────────────────
 
     await nextStepBtn.click();
-    await expect(page.getByText("Step 2")).toBeVisible({ timeout: 20_000 });
+    await expect(stepDisplay).toContainText("Step 2", { timeout: 20_000 });
     await page.waitForTimeout(1_500);
 
     await speak(
@@ -446,13 +451,13 @@ test(
     // ── Advance to step 3 (no screenshot) ─────────────────────────────────────
 
     await nextStepBtn.click();
-    await expect(page.getByText("Step 3")).toBeVisible({ timeout: 20_000 });
+    await expect(stepDisplay).toContainText("Step 3", { timeout: 20_000 });
     await page.waitForTimeout(600);
 
     // ── FRAME B: Step 4 — Zone 1A composite encoding ──────────────────────────
 
     await nextStepBtn.click();
-    await expect(page.getByText("Step 4")).toBeVisible({ timeout: 20_000 });
+    await expect(stepDisplay).toContainText("Step 4", { timeout: 20_000 });
     await page.waitForTimeout(1_500);
 
     await speak(
@@ -495,21 +500,21 @@ test(
     // ── Advance to steps 5, 6, 7 (no screenshots) ─────────────────────────────
 
     await nextStepBtn.click();
-    await expect(page.getByText("Step 5")).toBeVisible({ timeout: 20_000 });
+    await expect(stepDisplay).toContainText("Step 5", { timeout: 20_000 });
     await page.waitForTimeout(500);
 
     await nextStepBtn.click();
-    await expect(page.getByText("Step 6")).toBeVisible({ timeout: 20_000 });
+    await expect(stepDisplay).toContainText("Step 6", { timeout: 20_000 });
     await page.waitForTimeout(500);
 
     await nextStepBtn.click();
-    await expect(page.getByText("Step 7")).toBeVisible({ timeout: 20_000 });
+    await expect(stepDisplay).toContainText("Step 7", { timeout: 20_000 });
     await page.waitForTimeout(500);
 
     // ── FRAME E: Step 8 — "All Arguments on One Screen" ──────────────────────
 
     await nextStepBtn.click();
-    await expect(page.getByText("Step 8")).toBeVisible({ timeout: 20_000 });
+    await expect(stepDisplay).toContainText("Step 8", { timeout: 20_000 });
     await page.waitForTimeout(1_500);
 
     await speak(
