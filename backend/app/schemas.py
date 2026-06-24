@@ -561,6 +561,20 @@ class DeltaRecord(BaseModel):
     threshold_crossed: bool | None = None
 
 
+class ThresholdCrossingItem(BaseModel):
+    """One MDA threshold crossing entry within a FlatDeltaRecord — M16-G9 #97.
+
+    `threshold_name` identifies the MDA threshold (its mda_id).
+    `crossed` is True when scenario_b's value at the compared step violates
+    the threshold (value_b <= floor for "lte" operator; value_b >= floor for "gte").
+    Only entries with crossed=True are included; the list is empty when no threshold
+    is violated.
+    """
+
+    threshold_name: str
+    crossed: bool
+
+
 class FlatDeltaRecord(BaseModel):
     """Flat-list entry for GET /scenarios/compare — M16-G4 #102.
 
@@ -580,6 +594,7 @@ class FlatDeltaRecord(BaseModel):
     confidence_tier: int
     threshold_crossed: bool | None = None
     distribution: DistributionRecord = DistributionRecord()
+    threshold_crossings: list[ThresholdCrossingItem] = []
 
 
 class CompareResponse(BaseModel):
