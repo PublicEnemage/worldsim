@@ -3,7 +3,7 @@ name: m16-g7-sprint-entry
 type: sprint-entry
 milestone: M16 — Distributional Visibility
 sprint-group: G7
-status: EL Approved 2026-06-23 — actions may begin per dependency order (#3 before #6)
+status: DEFERRED TO PARKING LOT — EL decision 2026-06-24; no external contributors yet; #3 and #6 removed from M16 milestone
 authored-by: PM Agent
 authored-date: 2026-06-23
 el-approved: 2026-06-23
@@ -13,7 +13,7 @@ sop-reference: docs/process/sprint-planning-sop.md
 
 # Sprint Entry — M16, G7: Governance
 
-**Status:** EL Approved 2026-06-23 — actions may begin per dependency order (#3 before #6)
+**Status:** DEFERRED TO PARKING LOT — EL decision 2026-06-24
 **Date authored:** 2026-06-23
 **Release branch:** `release/m16`
 **Sprint plan:** `docs/process/sprint-plans/m16-sprint-plan.md` (EL Approved 2026-06-23)
@@ -150,3 +150,8 @@ governance account is active.
 
 > G7 sprint entry approved. Structural gates confirmed clear. No ADR prerequisites; no intent or QA test gates apply — EL-action governance items only. Dependency order noted and accepted: #3 (second governance account) must close before #6 (branch protection restoration) is actioned. Actions may proceed immediately per that sequence.
 > — @PublicEnemage (2026-06-23)
+
+**EL deferral decision:** 2026-06-24
+
+> G7 deferred to Parking Lot. No active external contributors yet; the trigger condition for Stage 2 governance ("second governance account") is not pressing without external collaborators. Issues #3 and #6 removed from M16 milestone. This sprint entry is preserved as a complete record of scope and dependency order for when the deferral is reversed. G7 does not gate M16 exit (#985).
+> — @PublicEnemage (2026-06-24)
