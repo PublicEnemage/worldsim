@@ -790,21 +790,28 @@ export function ScenarioInstrumentCluster({
         </div>
       )}
 
-      {/* Mode 3 comparison readout — shows labeled baseline vs. branch values (DEMO-064).
-          Visible when branch is applied and recompute has completed. */}
+      {/* Mode 3 comparison panel — baseline (branch-value-0) vs branch (branch-value-1).
+          Visible when branch is applied and recompute has completed. Fixes DEMO-045. */}
       {mode === "MODE_3" && branchFromStep !== null && !isRecomputing && recomputeStatus !== "failed" && (() => {
         const currentStepIdx = store.current_step;
         const activeStep = store.trajectory?.steps.find(s => s.step_index === currentStepIdx)
           ?? store.trajectory?.steps.at(-1);
         const baseStep = store.baseline_trajectory?.steps.find(s => s.step_index === currentStepIdx)
           ?? store.baseline_trajectory?.steps.at(-1);
-        const activeScore = activeStep?.frameworks["financial"]?.composite_score ?? null;
-        const baseScore = baseStep?.frameworks["financial"]?.composite_score ?? null;
+        // Try financial framework first; fall back to first non-null score across all frameworks.
+        const pickScore = (step: typeof activeStep): number | null => {
+          if (!step) return null;
+          const fin = step.frameworks["financial"]?.composite_score ?? null;
+          if (fin !== null) return fin;
+          return Object.values(step.frameworks).find(fw => fw.composite_score !== null)?.composite_score ?? null;
+        };
+        const activeScore = pickScore(activeStep);
+        const baseScore = pickScore(baseStep);
         const delta = activeScore !== null && baseScore !== null ? activeScore - baseScore : null;
         const displayStep = activeStep?.step_index ?? baseStep?.step_index ?? currentStepIdx;
         return (
           <div
-            data-testid="mode3-comparison-readout"
+            data-testid="branch-comparison-panel"
             style={{
               padding: "4px 10px",
               background: "#f8f4ff",
@@ -821,13 +828,13 @@ export function ScenarioInstrumentCluster({
             </span>
             <span>
               Baseline:{" "}
-              <span data-testid="mode3-baseline-value" style={{ fontWeight: 700 }}>
+              <span data-testid="branch-value-0" style={{ fontWeight: 700 }}>
                 {baseScore !== null ? baseScore.toFixed(2) : "—"}
               </span>
             </span>
             <span>
               Branch:{" "}
-              <span data-testid="mode3-branch-value" style={{ fontWeight: 700 }}>
+              <span data-testid="branch-value-1" style={{ fontWeight: 700 }}>
                 {activeScore !== null ? activeScore.toFixed(2) : "—"}
               </span>
             </span>
