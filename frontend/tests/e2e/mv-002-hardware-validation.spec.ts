@@ -49,23 +49,30 @@ test("@hardware-only MV-002 AC-009: Mode 3 full component set render ≤ 100ms o
   const mode3Trigger = page.locator('[data-testid="mode3-toggle"]');
   await expect(mode3Trigger).toBeVisible({ timeout: 5_000 });
 
-  await page.evaluate(() => performance.mark("mode3-start"));
-  await mode3Trigger.click();
-  await page.waitForTimeout(20);
-  await page.evaluate(() => {
-    performance.mark("mode3-end");
-    performance.measure("mode3-render", "mode3-start", "mode3-end");
-  });
-
+  // Single page.evaluate measurement — eliminates CDP round-trip latency from the
+  // measurement window (NM-059). Two RAF cycles for React to commit the render.
   const renderMs = await page.evaluate(() => {
-    const m = performance.getEntriesByName("mode3-render")[0];
-    return m?.duration ?? null;
+    return new Promise<number>((resolve) => {
+      const btn = document.querySelector(
+        '[data-testid="mode3-toggle"]',
+      ) as HTMLElement;
+      performance.mark("mode3-start");
+      btn.click();
+      requestAnimationFrame(() =>
+        requestAnimationFrame(() => {
+          performance.mark("mode3-end");
+          performance.measure("mode3-render", "mode3-start", "mode3-end");
+          const m = performance.getEntriesByName("mode3-render")[0];
+          resolve(m?.duration ?? 0);
+        }),
+      );
+    });
   });
 
   console.log(`MV-002 measured renderMs: ${renderMs}ms`);
   console.log(`MV-002 pass criterion: ≤ 100ms`);
-  console.log(`MV-002 result: ${renderMs !== null && renderMs <= 100 ? "PASS" : "FAIL"}`);
+  console.log(`MV-002 result: ${renderMs > 0 && renderMs <= 100 ? "PASS" : "FAIL"}`);
 
-  expect(renderMs).not.toBeNull();
+  expect(renderMs).toBeGreaterThan(0);
   expect(renderMs).toBeLessThanOrEqual(100);
 });
