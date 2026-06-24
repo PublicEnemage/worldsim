@@ -19,7 +19,7 @@
  * AlertDetailPanel is exported for future EntityDetailDrawer use (ADR-014).
  */
 import { useEffect, useRef, useState } from "react";
-import { useScenarioStepStore, type Zone1BAlert } from "../store/scenarioStepStore";
+import { useScenarioStepStore, type Zone1BAlert, type CohortThresholdCrossing } from "../store/scenarioStepStore";
 import { getIndicatorDisplayNameAny, getIndicatorAbbreviation } from "../lib/indicatorDisplayNames";
 
 // ---------------------------------------------------------------------------
@@ -651,6 +651,91 @@ function CompactAlertList({ alerts, onClearNewBadge }: CompactAlertListProps) {
           </div>
         );
       })}
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// CohortImpactSection — Zone 1B Cohort Impact sub-section (M16-G2 #986)
+//
+// Standalone store-connected component. Rendered as a sibling of MDAAlertPanelZone1B
+// inside the zone-1b flex wrapper (not nested inside MDAAlertPanelZone1B) so that
+// it occupies a guaranteed visible slot in zone-1b regardless of MDA panel content height.
+// ---------------------------------------------------------------------------
+
+const COHORT_SEVERITY_COLOR: Record<CohortThresholdCrossing["severity"], string> = {
+  CRITICAL: "#cc0000",
+  WARNING: "#a06000",
+  WATCH: "#0070a0",
+};
+
+export function CohortImpactSection({ isCompleted = false }: { isCompleted?: boolean }) {
+  const { cohort_threshold_crossings: crossings } = useScenarioStepStore();
+  const headerLabel = isCompleted ? "COHORT IMPACT (HISTORICAL)" : "COHORT IMPACT";
+  const emptyText = isCompleted
+    ? "No cohort threshold crossings at or before this step."
+    : "No cohort threshold crossings projected on current path.";
+
+  return (
+    <div
+      data-testid="zone-1b-cohort-impact"
+      style={{ borderTop: "1px solid #e0e0e0", paddingTop: 2, flexShrink: 0, background: "#fff" }}
+    >
+      <div
+        data-testid="cohort-section-header"
+        style={{
+          fontSize: 9,
+          fontWeight: 600,
+          color: "#555",
+          letterSpacing: 0.3,
+          paddingBottom: 2,
+          paddingLeft: 4,
+        }}
+      >
+        {headerLabel}
+      </div>
+      {crossings.length === 0 ? (
+        <div
+          data-testid="cohort-empty-state"
+          style={{ fontSize: 10, color: "#aaa", fontStyle: "italic", paddingLeft: 4 }}
+        >
+          {emptyText}
+        </div>
+      ) : (
+        crossings.map((crossing, idx) => {
+          const color = COHORT_SEVERITY_COLOR[crossing.severity];
+          return (
+            <div
+              key={`${crossing.quintile_key}-${crossing.indicator_key}`}
+              data-testid={`cohort-row-${idx}`}
+              style={{
+                display: "flex",
+                alignItems: "flex-start",
+                gap: 4,
+                borderLeft: `2px solid ${color}`,
+                paddingLeft: 6,
+                paddingTop: 2,
+                paddingBottom: 2,
+                marginBottom: 2,
+                fontSize: 10,
+              }}
+            >
+              <span style={{ color, fontWeight: 700, flexShrink: 0, fontSize: 9 }}>
+                {crossing.severity}
+              </span>
+              <span style={{ color: "#333", lineHeight: 1.3 }}>
+                <span style={{ fontWeight: 600 }}>
+                  {crossing.cohort_label} — {crossing.indicator_label}
+                </span>
+                <br />
+                <span style={{ color: "#666" }}>
+                  {`Threshold crossed at step ${crossing.step_crossed} · was ${crossing.above_floor_pct}% above floor · T${crossing.tier} · ${crossing.source}`}
+                </span>
+              </span>
+            </div>
+          );
+        })
+      )}
     </div>
   );
 }
