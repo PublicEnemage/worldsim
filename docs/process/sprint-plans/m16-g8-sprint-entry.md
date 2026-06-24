@@ -3,10 +3,10 @@ name: m16-g8-sprint-entry
 type: sprint-entry
 milestone: M16 — Distributional Visibility
 sprint-group: G8
-status: Filed — awaiting EL approval
+status: Filed and EL Approved — 2026-06-24
 authored-by: PM Agent
 authored-date: 2026-06-24
-el-approved: false
+el-approved: 2026-06-24
 release-branch: release/m16
 sop-reference: docs/process/sprint-planning-sop.md
 ---
@@ -30,17 +30,18 @@ PM Agent (orchestrates all agent-scope steps).*
 
 ---
 
-## EL Decisions for Demo 6 (to be recorded at EL approval)
+## EL Decisions for Demo 6 (confirmed 2026-06-24)
 
 | Decision | Value |
 |---|---|
 | Entity | SEN (Senegal) — distributional human cost argument |
 | Mode 3 | Not in Demo 6 scope (Step 5d does NOT apply) |
 | Demo 6 primary argument | "This cohort, at this step, for this long" — bottom-quintile threshold crossing at step 2; 25-year human capital trajectory; PSP trajectory with plain-language interpretation — all visible in the primary viewport without drawer navigation |
-| Challenge moment | {EL to confirm at approval — candidate: cohort distribution methodology challenged by creditor side → analyst responds with confidence tier, synthetic flag, demographic weight source} |
-| Persona 3 inclusion (Step 6c) | Conditional — include Andreas Stefanidis if PSP trajectory and political risk surface (#987) are featured in the walkthrough; preliminary assessment: YES (political risk is new in M16) |
+| Challenge moment | Cohort distribution methodology challenged by creditor side → analyst responds with confidence tier T3 Inferred, synthetic flag visible, demographic weight source (ECOWAS comparable economy weighting) |
+| Persona 3 inclusion (Step 6c) | YES (confirmed) — Andreas Stefanidis included; Zone 1D political risk section (#987) is his primary frame; PSP severity label + plain-language interpretation are the Demo 6 capability Andreas evaluates |
+| Step 5b additional gate | Before Step 6 screenshots: verify SEN 100-step scenario produces bottom-quintile threshold crossing at step 2 AND milestone sentence reads with calendar year anchor (not step reference as primary) — see §2.5 pre-checks |
 
-*These decisions are binding on all G8 deliverables. EL must confirm or amend at approval time.*
+*These decisions are binding on all G8 deliverables. Confirmed by EL 2026-06-24.*
 
 ---
 
@@ -165,9 +166,21 @@ The following named pre-conditions must be verified at sprint entry before any G
 | Pre-check | Expected result | Result |
 |---|---|---|
 | Demo 6 stubs exist at canonical paths | `docs/demo/m16/stakeholder-walkthrough.md` and `docs/demo/m16/screenshot-brief.md` both exist as stubs | Confirmed — stubs created at G5 (PR #1156 2026-06-23) |
-| `demo.sh --milestone 16` runs without error | Script exits without file-not-found warning | To verify at Step 3 |
+| `demo.sh --milestone 16` runs without error | Script exits without file-not-found warning | Verify at Step 3 after walkthrough is complete |
 | NM-061 audit step added to agents.md | QA Lead working agreement includes setup completeness audit | Confirmed — PR #1221 merged 2026-06-24 |
 | DEMO-NNN namespace current number | Last assigned DEMO-NNN number is known before Step 6b | To check at Step 6b; last known: DEMO-096 (M14 audience simulation) |
+| Step 2 threshold crossing (EL 2026-06-24) | SEN 100-step quarterly scenario produces Q1 cohort poverty headcount ≥ 0.40 at step 2 — bottom-quintile threshold crossing is the Demo 6 thesis frame | Verify before Step 6 by running `demo-narrated.spec.ts` and checking the scenario state; calibrate initial attributes if step 2 crossing is not achieved |
+| Milestone sentence calendar year anchor (EL 2026-06-24) | Milestone sentence in `HumanCapitalTrajectoryPanel` reads with 4-digit calendar year as the primary element — not "[step N]" as primary (G10/#1177 fix confirmed this; verify with SEN demo scenario specifically) | Verify during Step 5b legibility gate against the live scenario |
+
+**Step 5b additional gate criteria (EL 2026-06-24 addition):**
+
+Before capturing screenshots in Step 6:
+1. Run the SEN demo scenario with `projection_steps=100` and advance to step 2
+2. Confirm Zone 1B cohort impact section shows Q1 informal workers poverty headcount at or above the recovery floor (0.40) — the bottom-quintile threshold crossing that is the Demo 6 thesis frame
+3. Confirm `projection-milestone-sentence` text leads with `"by [YYYY]"` format — calendar year anchor is prominent; "[step N]" is secondary
+4. If step 2 crossing is not achieved, adjust SEN initial `poverty_headcount_ratio` upward (toward 0.39) and re-run before proceeding to screenshots
+
+These are scenario-calibration verification steps, not new automated test assertions. They are manual checks in the `demo-narrated.spec.ts` run (Step 4 outputs the scenario and the PM Agent reads the state).
 
 ---
 
@@ -283,8 +296,11 @@ dispositioned the single open entry to #1145.)
 
 ## EL Approval Record
 
-**EL approval:** Pending
+**EL approval:** 2026-06-24
 
-> {EL approval statement — to be filled at approval time. EL must confirm or amend
-> Demo 6 design decisions in the frontmatter table before G8 agent work begins.}
-> — @PublicEnemage ({date})
+> G8 sprint entry approved. Design decisions confirmed: entity SEN; no Mode 3; challenge moment
+> is cohort distribution methodology → T3 Inferred response; Persona 3 (Andreas) included in
+> Step 6c for Zone 1D political risk frame. Additional Step 5b gate: verify SEN step-2 Q1
+> threshold crossing and milestone sentence calendar year anchor before screenshots.
+> Demo prep issue #1225 to be filed.
+> — @PublicEnemage (2026-06-24)
