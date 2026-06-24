@@ -305,21 +305,30 @@ Delta between fiscal revenue values at each step: exactly 0.0.
 **AC-9 — api_contracts.yml documents ecological_shock_coefficient:**
 `docs/schema/api_contracts.yml` contains `"ecological_shock_coefficient"` in the simulation request schema, documented as optional (default 0.0, range [0.0, 1.0]), in the same commit as the backend implementation.
 
-**AC-EE-1 — Historical validation (EE-PENDING):**
-*EE review required on #275 before this AC finalizes. Placeholder:*
-Integration: ZMB scenario with `ecological_shock_coefficient={EE-confirmed value}` applied.
+**AC-EE-1 — Historical validation (EE parameters confirmed 2026-06-24; engine wiring required):**
+Integration: ZWE scenario with `ecological_shock_coefficient=0.35` applied.
 At step 4, the fiscal revenue trajectory delta from the baseline (no-coefficient) run is
-within ±{EE-confirmed tolerance}% of the documented historical Zimbabwe 2005 land-reform
-fiscal impact. EE must confirm: (a) coefficient value, (b) tolerance percentage, (c) step
-horizon for comparison, (d) fiscal indicator key to compare. Implementing agent records the
-validation result in the Step 4 Verify verdict.
+within ±30% of the documented historical Zimbabwe 2000 land-reform fiscal impact
+(~1.0–1.5% of GDP cumulative agricultural-channel-attributable reduction by step 4).
 
-**AC-EE-2 — Ecological Economist DIC review on record (gate):**
-*EE review required before this AC can be checked.*
-A comment from the Ecological Economist DIC agent on GitHub issue #275 is on record,
-confirming: (a) transmission pathway correctness; (b) Zimbabwe 2005 calibration anchor
-appropriateness; (c) tolerance parameters from AC-EE-1. The comment must be filed before
-the implementation PR merges — not before it opens.
+EE-confirmed parameters (EE review comment on #275, 2026-06-24):
+- `ecological_shock_coefficient`: **0.35** (35% transmission efficiency)
+- Tolerance band: **±30%** (proxy data limitations on `arable_land_degradation_rate`)
+- Step horizon: **step 4** (2000→2004; IMF Article IV 2004 documentation window)
+- `arable_land_degradation_rate` proxy: **0.15 per year** (tobacco yield decline rate 2001–2004; Tier 3 confidence)
+- `base_agricultural_export_share`: entity attribute ZWE 2000 ≈ 0.20 (WDI)
+- Fiscal indicator: `fiscal_revenue_pct_gdp` or equivalent — confirm exact attribute name in `docs/schema/simulation_state.yml` before authoring the integration test
+- Historical target: ~1.0–1.5% of GDP cumulative reduction at step 4
+- Calibration anchor: **Zimbabwe 2000 land reform shock, calibrated at step 4 (2004)** — *not* "Zimbabwe 2005" (EE correction: shock onset is 2000; post-2004 dominated by hyperinflationary dynamics that are outside ExternalSectorModule scope)
+
+Computed check: 0.35 × 0.20 × 0.15 = 0.0105 ≈ 1% of GDP per step; cumulated ≈ 4% of GDP (full-channel); agricultural-channel-attributable portion in historical record ≈ 1.0–1.5% of GDP by step 4.
+
+**Blocked pending engine wiring.** `ecological_shock_coefficient` is currently schema-only — the engine does not apply it. AC-EE-1 will produce a zero delta until the ExternalSectorModule wiring is complete. The implementing agent must wire the coefficient before authoring the AC-EE-1 integration test.
+
+**AC-EE-2 — Ecological Economist DIC review on record: ✅ SATISFIED 2026-06-24**
+EE review comment filed on GitHub issue #275 (comment https://github.com/PublicEnemage/worldsim/issues/275#issuecomment-4785674661).
+Confirmed: (a) transmission pathway correctness; (b) Zimbabwe 2000 calibration anchor (with correction from intent doc "2005" → "2000, calibrated at step 4"); (c) AC-EE-1 parameters specified above.
+AC-EE-2 is satisfied. AC-EE-1 remains blocked on engine wiring.
 
 ---
 
@@ -697,8 +706,8 @@ before Demo 6 (#843) runs.
 | AC-7 | `ecological_shock_coefficient` accepted, range [0.0, 1.0] | ✅ PASS |
 | AC-8 | Non-regression: coefficient=0.0 identical to no-coefficient | ✅ PASS |
 | AC-9 | api_contracts.yml documents `ecological_shock_coefficient` | ✅ PASS |
-| AC-EE-1 | Zimbabwe 2005 historical calibration validation | ⏳ EE-PENDING |
-| AC-EE-2 | Ecological Economist DIC review on record on #275 | ⏳ EE-PENDING |
+| AC-EE-1 | Zimbabwe 2000 calibration validation (engine wiring required) | ⏳ BLOCKED — engine not yet wired; parameters confirmed by EE 2026-06-24 |
+| AC-EE-2 | Ecological Economist DIC review on record on #275 | ✅ SATISFIED 2026-06-24 — comment filed on #275 |
 | AC-10 | `distribution` fields (variance/p10/p50/p90) in compare response | ✅ PASS |
 | AC-11 | Insufficient data → null distribution fields (HTTP 200) | ✅ PASS |
 | AC-12 | api_contracts.yml documents `distribution` fields | ✅ PASS |
@@ -714,7 +723,7 @@ before Demo 6 (#843) runs.
 
 **Confirmed pass: 20 ACs (AC-1–12, AC-F1–F5, AC-F7–F9)**
 **Conditionally deferred: 1 AC (AC-F6 — per intent doc §6 deferral clause)**
-**EE-PENDING: 2 ACs (AC-EE-1, AC-EE-2 — block full sprint exit; issue #275 remains open)**
+**EE-PENDING (updated 2026-06-24): AC-EE-2 ✅ SATISFIED. AC-EE-1 BLOCKED — engine wiring required before historical validation can run; parameters confirmed by EE; issue #275 remains open.**
 
 **North Star Test:**
 
