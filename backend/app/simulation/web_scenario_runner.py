@@ -260,6 +260,11 @@ class WebScenarioRunner:
                 for step, inps in inputs_by_step.items()
             }
 
+        # Mirror run_scenario: auto-enable DemographicModule for long-run projection
+        # runs so _inject_cohort_entities finds the module enabled in both paths.
+        if config.projection_steps is not None and config.projection_steps > 8:
+            _ensure_demographic_enabled(config)
+
         if current_step < 0:
             # No snapshots — initialise step 0 then advance to step 1
             base_timestep = _base_timestep(config)
@@ -269,6 +274,10 @@ class WebScenarioRunner:
             )
             _apply_initial_overrides(current_state, config)
             _inject_cohort_entities(current_state, config)
+            # Second pass: apply initial_attribute overrides for cohort entity IDs
+            # (e.g. SEN:CHT:1-25-54-INFORMAL). The first pass skips them because
+            # cohort entities don't exist until _inject_cohort_entities runs.
+            _apply_initial_overrides(current_state, config)
             _apply_political_context(current_state, config)
             await snap_repo.write_snapshot(conn, scenario_id, 0, base_timestep, current_state)
             current_step = 0

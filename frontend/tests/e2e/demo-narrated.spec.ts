@@ -121,18 +121,21 @@ test(
     // Create the M16 Senegal Article IV demo scenario via API.
     //
     // SEN initial attributes (T3 synthetic — ECOWAS comparable economy estimates):
-    // poverty_headcount_ratio: 0.385 — calibrated to produce bottom-quintile
-    //   (SEN:CHT:1-25-54-INFORMAL) threshold crossing to ≥ 0.40 at step 2 under
-    //   the fiscal conditionality scheduled at step 2 (spending_change social -0.030).
-    //   MDA-HD-POVERTY-Q1 floor is 0.40; crossing at step 2 is the Demo 6 thesis moment.
+    // poverty_headcount_ratio: 0.385 — national aggregate T3 estimate.
+    // Cohort disaggregation (ECOWAS demographic weighting, T3):
+    //   SEN:CHT:1-25-54-INFORMAL: 0.443 — Q1 informal workers ALREADY above MDA floor (0.40)
+    //   SEN:CHT:1-25-54-AGRICULTURE: 0.489 — Q1 agricultural workers, above floor
+    //   SEN:CHT:2-25-54-INFORMAL: 0.308 — Q2 informal workers, below floor
+    // The demo argument: Q1 workers arrived at the conditionality table already past the
+    // recovery threshold. Fiscal consolidation worsens the trajectory from step 3 onward.
     // legitimacy_index: 0.43 — PSP in WARNING zone (threshold: CRITICAL < 0.40 /
     //   WARNING 0.40–0.55 / WATCH 0.55–0.70 / STABLE > 0.70).
     //
     // Scheduled inputs:
     //   Step 1: IMF programme acceptance (emergency policy — triggers political economy module)
     //   Step 2: Fiscal conditionality begins — social spending cut (−3.0% GDP)
-    //           This drives poverty_headcount_ratio upward in the bottom quintile cohorts,
-    //           producing the step-2 Q1 threshold crossing (Frame A thesis moment).
+    //           GDP effect (via MacroeconomicModule multiplier) reaches DemographicModule
+    //           at step 3 (one-step lag); Q1 poverty increases further from step 3.
     //
     // projection_steps: 100 — enables the HumanCapitalTrajectoryPanel (G3/#274).
     //   The panel renders only when activeScenarioDetail?.configuration?.projection_steps > 8.
@@ -294,6 +297,72 @@ test(
                 synthetic_basis: "V-Dem LDI regional estimate for West Africa 2023.",
               },
             },
+
+            // ── Cohort initial attributes (T3 synthetic — ECOWAS demographic weighting) ──
+            //
+            // ECOWAS comparable-economy distributions (ECOWAS_REGIONAL_2023):
+            // Bottom quintile (Q1) informal workers in coastal West Africa have poverty
+            // headcount ratios ~1.15× the national aggregate due to income concentration
+            // and informal sector vulnerability. Agricultural Q1 workers are ~1.27× due to
+            // subsistence exposure and seasonal income volatility. Q2 informal workers are
+            // ~0.80× — below aggregate but above median.
+            //
+            // Key implication: Q1 cohorts START above the MDA-HD-POVERTY-Q1 floor (0.40)
+            // at conditionality entry. The demo argument is not that conditionality pushes
+            // them over the threshold — it is that they ARRIVED at the table already past
+            // the recovery threshold. The 25-year projection shows the consequence.
+            //
+            // The fiscal spending cut at step 2 (FiscalPolicyInput −3% GDP) produces a
+            // gdp_growth_change at step 2 via MacroeconomicModule, which the DemographicModule
+            // picks up at step 3 (one-step lag). The Q1 poverty INCREASES further from step 3
+            // onward — worsening a situation that was already critical at programme entry.
+            "SEN:CHT:1-25-54-INFORMAL": {
+              poverty_headcount_ratio: {
+                value: "0.443",
+                unit: "ratio",
+                variable_type: "ratio",
+                confidence_tier: 3,
+                is_synthetic: true,
+                observation_date: "2024-01-01",
+                source_registry_id: "ECOWAS_REGIONAL_2023",
+                measurement_framework: "human_development",
+                synthetic_basis:
+                  "ECOWAS comparable-economy composite 2022–2023: Q1 informal workers " +
+                  "coastal West Africa ≈ 1.15× national aggregate poverty headcount. " +
+                  "Tier 3 per DATA_STANDARDS.md §Confidence Tier System.",
+              },
+            },
+            "SEN:CHT:1-25-54-AGRICULTURE": {
+              poverty_headcount_ratio: {
+                value: "0.489",
+                unit: "ratio",
+                variable_type: "ratio",
+                confidence_tier: 3,
+                is_synthetic: true,
+                observation_date: "2024-01-01",
+                source_registry_id: "ECOWAS_REGIONAL_2023",
+                measurement_framework: "human_development",
+                synthetic_basis:
+                  "ECOWAS comparable-economy composite 2022–2023: Q1 agricultural workers " +
+                  "coastal West Africa ≈ 1.27× national aggregate poverty headcount. " +
+                  "Rural subsistence and seasonal income volatility amplifier. Tier 3.",
+              },
+            },
+            "SEN:CHT:2-25-54-INFORMAL": {
+              poverty_headcount_ratio: {
+                value: "0.308",
+                unit: "ratio",
+                variable_type: "ratio",
+                confidence_tier: 3,
+                is_synthetic: true,
+                observation_date: "2024-01-01",
+                source_registry_id: "ECOWAS_REGIONAL_2023",
+                measurement_framework: "human_development",
+                synthetic_basis:
+                  "ECOWAS comparable-economy composite 2022–2023: Q2 informal workers " +
+                  "coastal West Africa ≈ 0.80× national aggregate poverty headcount. Tier 3.",
+              },
+            },
           },
         },
         // scheduled_inputs is top-level in ScenarioCreateRequest, NOT inside configuration.
@@ -309,8 +378,9 @@ test(
           },
           {
             // Fiscal conditionality: social spending cut begins at step 2.
-            // This produces the poverty_headcount_ratio increase in bottom-quintile
-            // cohorts that drives the step-2 Q1 threshold crossing (Frame A thesis).
+            // GDP effect reaches DemographicModule at step 3 via one-step lag.
+            // Q1 cohorts are already above the 0.40 floor from initial state;
+            // this worsens the trajectory further from step 3 onward.
             step: 2,
             input_type: "FiscalPolicyInput",
             input_data: {
