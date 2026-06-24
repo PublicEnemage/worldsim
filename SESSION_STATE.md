@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-24 (M16 G2 COMPLETE — PR #1173 merged 209/209 E2E; BPO ACCEPT; #986/#987/#1163 closed; sprint exit filed; G3 merged PR #1172; G4 sprint entry filed — ADR-007 coverage confirmed)**
+**Last updated: 2026-06-24 (M16 G2 COMPLETE + G3 BPO ACCEPT — G2: PR #1173 merged 209/209 E2E, BPO ACCEPT, sprint exit filed; G3: Step 4 Verify PASS 19/19 ACs, Customer Agent Layer 3 CONDITIONAL PASS CA-1/CA-2/CA-3, North Star Test PASS, G8 gate open, intent doc §8/§9 filed)**
 **Current milestone:** M16 — Distributional Visibility (GitHub Milestone 17)
 **Previous milestone:** M15 — Human Cost Architecture (FORMALLY CLOSED 2026-06-23; release/m15 → main PR #1142; v0.15.0; #984 closed; GitHub Milestone 16 closed)
 
@@ -106,7 +106,7 @@ Implementation is now unblocked. A sprint entry document must be filed and EL-ap
 
 ## Open Issues — M16 (Distributional Visibility)
 
-**GitHub Milestone:** 17 | **Created:** 2026-06-23 | **Status:** G1 COMPLETE 2026-06-23; **G2 COMPLETE 2026-06-24** (PR #1173, 209/209 E2E, BPO ACCEPT, sprint exit confirmed); G3 MERGED 2026-06-24 (PR #1172, Step 4/5 pending); G4 sprint entry filed (EL approval pending); G5 CLOSED 2026-06-23
+**GitHub Milestone:** 17 | **Created:** 2026-06-23 | **Status:** G1 COMPLETE 2026-06-23; **G2 COMPLETE 2026-06-24** (PR #1173, 209/209 E2E, BPO ACCEPT, sprint exit confirmed); **G3 BPO ACCEPT 2026-06-24** (PR #1172, 19/19 ACs, sprint exit pending PI confirm); G4 sprint entry filed (EL approval pending); G5 CLOSED 2026-06-23
 *Zone 1A Phase 4 + cohort disaggregation + political risk surface + live external demo (#843 — exit gate). Demo 6 (Senegalese Finance Minister scenario).*
 
 | Issue | Title | Group | Notes |
@@ -119,7 +119,7 @@ Implementation is now unblocked. A sprint entry document must be filed and EL-ap
 | #845 ✅ | ux: Zone 1A information architecture — Phase 4 implementation | G1 | ✅ BPO ACCEPT 2026-06-23 — PR #1160; all 12 ACs PASS; Step 5 Validate COMPLETE |
 | #1147 ✅ | feat(ux): Zone 1D delta annotations — companion to Zone 1A Phase 4 | G1 | ✅ BPO ACCEPT 2026-06-23 — PR #1160; Step 5 Validate COMPLETE (co-accepted with #845) |
 | #1162 | ux(zone-1a): entity attribution in-fill anchor — direct visual link between divergence fill and entity label | G1 follow-up | Filed 2026-06-23 — Customer Agent Layer 3 C1; pre-demo (#843) fix required |
-| #274 | feat(simulation): 25-year human capital depletion trajectory | G3 | ✅ Implementation PR #1172 open — CI pending merge 2026-06-23 |
+| #274 ✅ | feat(simulation): 25-year human capital depletion trajectory | G3 | ✅ BPO ACCEPT 2026-06-24 — PR #1172 merged; 19 ACs PASS; Step 5 Validate COMPLETE; G8 gate open |
 | #275 | feat(simulation): calibrated ecological-to-financial transmission | G4 | Capacity-allowing |
 | #102 | arch(api): distributional scenario comparison variance/percentile | G4 | Capacity-allowing |
 | #22 | feat: uncertainty quantification — distributional scenario bands | G4 | ADR-007 coverage confirmation required; scope to Demo 6 requirements only |
@@ -158,7 +158,7 @@ Implementation is now unblocked. A sprint entry document must be filed and EL-ap
 - ✅ G3 sprint entry filed and **EL-approved 2026-06-23** — `docs/process/sprint-plans/m16-g3-sprint-entry.md`; CE Assessment embedded (§2.5): adaptive resolution override required, extend `/simulate` with `projection_steps`, CM review on #274 gates intent ACs, dry-run bounds check required at Step 4 Verify; intent document + QA tests must be filed before implementation PR opens
 - ✅ **G3 intent document filed 2026-06-23** — `docs/process/intents/M16-G3-2026-06-23-25year-human-capital-trajectory.md`; CM review satisfied 2026-06-23 (AC-CM-1/AC-CM-2/AC-CM-3 finalized — 3 cohort curves: Q1 informal, Q1 agriculture, Q2 informal; MDA-HD-POVERTY-Q1 floor ≥ 0.40; decade consequence phrase; Q2 no floor)
 - ✅ **G3 QA tests authored 2026-06-23** (CM-updated) — `backend/tests/test_m16_g3_25year_human_capital_trajectory.py` (AC-1–AC-8 + quarterly spacing); `frontend/tests/e2e/m16-g3-25year-human-capital-trajectory.spec.ts` (AC-F1–AC-F8 + AC-CM-1/AC-CM-2/AC-CM-3); §7 QA Lead acknowledgment both [x]; ruff + tsc both pass
-- ✅ **G3 implementation complete 2026-06-23** — PR #1172 open targeting `release/m16`; branch `feat/m16-g3-25year-human-capital` at commit `c889817`; 13/13 backend QA tests pass (5 skipped DB-only); frontend build gate pass (0 TS errors); Step 4 Verify dry-run pending merge
+- ✅ **G3 implementation MERGED 2026-06-24** — PR #1172 merged to `release/m16`; all CI checks PASS; Step 4 Verify PASS (19/19 ACs via CI); Step 5 Validate COMPLETE 2026-06-24 — BPO ACCEPT; Customer Agent Layer 3 CONDITIONAL PASS (CA-1/CA-2/CA-3 pre-demo polish items, not blocking); North Star Test PASS; G8 gate (#843) open; intent document §8/§9 filed
 - ✅ G5 sprint entry filed and **EL-approved 2026-06-23** — `docs/process/sprint-plans/m16-g5-sprint-entry.md`; #1145 (immediate) + #837/#951/#259 (near-term, capacity-allowing); work may begin
 - ✅ **G5 COMPLETE 2026-06-23** — PR #1156 merged; all 4 G5 issues delivered (#1145, #837, #951, #259); 18/20 ACs pass (2 skipped Docker-only); M16 demo stubs created at `docs/demo/m16/`; legibility baseline at `docs/standards/legibility-baseline-m16.md`
 - ✅ **G5 sprint exit CONFIRMED 2026-06-23** — BPO ACCEPT (advisory; infrastructure sprint exception); PI confirmed; exit document PR #1158 merged; `docs/process/sprint-plans/m16-g5-sprint-exit.md`
