@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-24 (M16 G2 COMPLETE + G3 BPO ACCEPT — G2: PR #1173 merged 209/209 E2E, BPO ACCEPT, sprint exit filed; G3: Step 4 Verify PASS 19/19 ACs, Customer Agent Layer 3 CONDITIONAL PASS CA-1/CA-2/CA-3, North Star Test PASS, G8 gate open, intent doc §8/§9 filed)**
+**Last updated: 2026-06-24 (M16 G3 sprint exit CONFIRMED — PI Agent confirmed; CA items #1177/#1178/#1179 filed; G8 gate open; G3 sprint-exit doc filed)**
 **Current milestone:** M16 — Distributional Visibility (GitHub Milestone 17)
 **Previous milestone:** M15 — Human Cost Architecture (FORMALLY CLOSED 2026-06-23; release/m15 → main PR #1142; v0.15.0; #984 closed; GitHub Milestone 16 closed)
 
@@ -106,7 +106,7 @@ Implementation is now unblocked. A sprint entry document must be filed and EL-ap
 
 ## Open Issues — M16 (Distributional Visibility)
 
-**GitHub Milestone:** 17 | **Created:** 2026-06-23 | **Status:** G1 COMPLETE 2026-06-23; **G2 COMPLETE 2026-06-24** (PR #1173, 209/209 E2E, BPO ACCEPT, sprint exit confirmed); **G3 BPO ACCEPT 2026-06-24** (PR #1172, 19/19 ACs, sprint exit pending PI confirm); G4 sprint entry filed (EL approval pending); G5 CLOSED 2026-06-23
+**GitHub Milestone:** 17 | **Created:** 2026-06-23 | **Status:** G1 COMPLETE 2026-06-23; **G2 COMPLETE 2026-06-24** (PR #1173, 209/209 E2E, BPO ACCEPT, sprint exit confirmed); **G3 COMPLETE 2026-06-24** (PR #1172, 19/19 ACs, BPO ACCEPT, PI confirmed); G4 sprint entry filed (EL approval pending); G5 CLOSED 2026-06-23 | **G8 gate OPEN** (G1/G2/G3 all BPO-accepted; pre-demo items #1162/#1177/#1178/#1179 required before live session)
 *Zone 1A Phase 4 + cohort disaggregation + political risk surface + live external demo (#843 — exit gate). Demo 6 (Senegalese Finance Minister scenario).*
 
 | Issue | Title | Group | Notes |
@@ -158,7 +158,8 @@ Implementation is now unblocked. A sprint entry document must be filed and EL-ap
 - ✅ G3 sprint entry filed and **EL-approved 2026-06-23** — `docs/process/sprint-plans/m16-g3-sprint-entry.md`; CE Assessment embedded (§2.5): adaptive resolution override required, extend `/simulate` with `projection_steps`, CM review on #274 gates intent ACs, dry-run bounds check required at Step 4 Verify; intent document + QA tests must be filed before implementation PR opens
 - ✅ **G3 intent document filed 2026-06-23** — `docs/process/intents/M16-G3-2026-06-23-25year-human-capital-trajectory.md`; CM review satisfied 2026-06-23 (AC-CM-1/AC-CM-2/AC-CM-3 finalized — 3 cohort curves: Q1 informal, Q1 agriculture, Q2 informal; MDA-HD-POVERTY-Q1 floor ≥ 0.40; decade consequence phrase; Q2 no floor)
 - ✅ **G3 QA tests authored 2026-06-23** (CM-updated) — `backend/tests/test_m16_g3_25year_human_capital_trajectory.py` (AC-1–AC-8 + quarterly spacing); `frontend/tests/e2e/m16-g3-25year-human-capital-trajectory.spec.ts` (AC-F1–AC-F8 + AC-CM-1/AC-CM-2/AC-CM-3); §7 QA Lead acknowledgment both [x]; ruff + tsc both pass
-- ✅ **G3 implementation MERGED 2026-06-24** — PR #1172 merged to `release/m16`; all CI checks PASS; Step 4 Verify PASS (19/19 ACs via CI); Step 5 Validate COMPLETE 2026-06-24 — BPO ACCEPT; Customer Agent Layer 3 CONDITIONAL PASS (CA-1/CA-2/CA-3 pre-demo polish items, not blocking); North Star Test PASS; G8 gate (#843) open; intent document §8/§9 filed
+- ✅ **G3 implementation MERGED 2026-06-24** — PR #1172 merged to `release/m16`; all CI checks PASS; Step 4 Verify PASS (19/19 ACs via CI); Step 5 Validate COMPLETE 2026-06-24 — BPO ACCEPT; Customer Agent Layer 3 CONDITIONAL PASS (CA-1 → #1177; CA-2 → #1178; CA-3 → #1179; pre-demo polish, not blocking); North Star Test PASS; intent document §8/§9 filed
+- ✅ **G3 sprint exit CONFIRMED 2026-06-24** — `docs/process/sprint-plans/m16-g3-sprint-exit.md`; PI Agent confirmed all exit conditions satisfied; CA pre-demo items #1177/#1178/#1179 tracked; G8 gate (#843) open (G1/G2/G3 all BPO-accepted)
 - ✅ G5 sprint entry filed and **EL-approved 2026-06-23** — `docs/process/sprint-plans/m16-g5-sprint-entry.md`; #1145 (immediate) + #837/#951/#259 (near-term, capacity-allowing); work may begin
 - ✅ **G5 COMPLETE 2026-06-23** — PR #1156 merged; all 4 G5 issues delivered (#1145, #837, #951, #259); 18/20 ACs pass (2 skipped Docker-only); M16 demo stubs created at `docs/demo/m16/`; legibility baseline at `docs/standards/legibility-baseline-m16.md`
 - ✅ **G5 sprint exit CONFIRMED 2026-06-23** — BPO ACCEPT (advisory; infrastructure sprint exception); PI confirmed; exit document PR #1158 merged; `docs/process/sprint-plans/m16-g5-sprint-exit.md`
