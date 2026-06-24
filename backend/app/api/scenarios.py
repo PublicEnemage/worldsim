@@ -46,6 +46,7 @@ from app.schemas import (
     BranchRequest,
     BranchResponse,
     CompareResponse,
+    DeltaRecord,
     DistributionRecord,
     FlatDeltaRecord,
     FrameworkOutput,
@@ -421,6 +422,27 @@ def _compute_delta_values(
         thr = Decimal(threshold_value)
         threshold_crossed = (dec_a < thr) != (dec_b < thr)
     return value_a, value_b, str(delta), max(tier_a, tier_b), threshold_crossed
+
+
+def _compute_delta(
+    value_a: str,
+    value_b: str,
+    tier_a: int,
+    tier_b: int,
+    threshold_value: str | None = None,
+) -> DeltaRecord:
+    """Backward-compatible wrapper used by test_g6a_multi_country.py (Issue #153)."""
+    va, vb, delta_str, tier, crossed = _compute_delta_values(
+        value_a, value_b, tier_a, tier_b, threshold_value
+    )
+    return DeltaRecord(
+        value_a=va,
+        value_b=vb,
+        delta=delta_str,
+        direction=_delta_str_to_direction(delta_str),
+        confidence_tier=tier,
+        threshold_crossed=crossed,
+    )
 
 
 def _delta_str_to_direction(delta_str: str) -> str:
