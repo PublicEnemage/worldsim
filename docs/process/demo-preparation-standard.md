@@ -130,24 +130,32 @@ sequence, and thesis frame identification.
 
 Save output to `docs/demo/m{N}/screenshot-brief.md`. This is a permanent artifact — do not discard.
 
-### Step 3 — Update `scripts/demo.sh` presenter guide
+### Step 3 — Complete the milestone walkthrough; verify presenter guide renders
 
-Update the presenter guide section of `demo.sh` to reflect current milestone state: which axes
-are live, which are null, what the honest disclosures are, what the roadmap section says.
+`scripts/demo.sh` derives the full presenter guide from `docs/demo/m{N}/stakeholder-walkthrough.md`
+automatically — **no edits to `demo.sh` are required for a new milestone** (M16 forward; #837).
 
-Do NOT update the North Star closing. It does not change.
-Do NOT update the backtesting credibility section unless new cases were added.
+Step 3 is:
 
-**Syntax validation gate (mandatory — NM-041):**
-After any edit to `scripts/demo.sh`, run:
-```bash
-bash -n scripts/demo.sh
-```
-The command must exit 0 before the file is committed. A syntax error in `demo.sh` makes the entire stack startup sequence inaccessible — the presenter guide, all timed narration cues, and the stack-ready confirmation all live inside this script. Root cause: M12 — a missing `)` closing a `$(bold ...)` command substitution on line 208 was undetected throughout M12 development and only surfaced when attempting to record the post-closure screen recording (PR #890, NM-041).
+1. Ensure `docs/demo/m{N}/stakeholder-walkthrough.md` is complete: Presenter Briefing,
+   Section 2 step-by-step narration, Honest Disclosures, Section 4 roadmap.
+2. Verify the guide renders correctly:
+   ```bash
+   ./scripts/demo.sh --milestone N
+   ```
+   The startup sequence and presenter guide should print without errors. If the walkthrough
+   file is not found, the script emits a warning — resolve before proceeding to Step 4.
+
+Do NOT edit the North Star closing in `demo.sh`. It is hardcoded invariant and must not be
+sourced from a config file.
+
+**Syntax validation gate (NM-041):** `demo.sh` must not be edited as part of standard demo
+prep. If a defect in the script itself is found and a fix is required, run `bash -n scripts/demo.sh`
+after any edit before committing. A syntax error makes the entire startup sequence inaccessible.
 
 **ExternalSector + Mode 3 reserve invariant — mandatory disclosure (M12 forward):**
 If the demo scenario uses `ExternalSectorModule` (ADR-012) and Mode 3 Active Control
-simultaneously, the honest disclosures section of `demo.sh` MUST include the following caveat:
+simultaneously, the walkthrough's **Honest Disclosures** section MUST include the following caveat:
 
 > *Reserve depletion is identical in the baseline and the Mode 3 branch. Better conditionality
 > terms improve GDP and unemployment trajectories. They do not change the entity's structural
@@ -242,10 +250,13 @@ fixture, Mode 3 is applied at step 3 but the divergence peaks at step 5 (austeri
 lag). Always advance to the peak divergence step before capturing the Mode 3 comparison frame.
 The screenshot brief specifies this step — follow it explicitly.
 
-### Step 5 — Update `docs/demo/stakeholder-walkthrough.md`
+### Step 5 — Author `docs/demo/m{N}/stakeholder-walkthrough.md`
 
-Copy current version to `docs/demo/m{N-2}/stakeholder-walkthrough.md` (archive).
-Update the current version for this milestone:
+The milestone-scoped walkthrough at `docs/demo/m{N}/stakeholder-walkthrough.md` is the sole
+source of truth for the presenter guide (M16 forward; #837). Edit it directly — there is no
+root-level file to archive or copy. A stub is created at milestone kickoff by the PM Agent.
+
+Complete the stub for this milestone:
 
 - Section 2 (Live Application): reflect current axis state
 - Section 4 (Roadmap): past-tense completed milestones, next milestone description
@@ -253,10 +264,13 @@ Update the current version for this milestone:
 
 Do NOT change Section 3 (Backtesting Credibility) or Section 5 (North Star).
 
+Note: `docs/demo/stakeholder-walkthrough.md` (root-level) is a historical artifact from the
+pre-#837 workflow. It is not read by `demo.sh` and need not be updated.
+
 ### Step 5a — Narration instrument check (M10 forward — UX-RULING-4)
 
-Before screenshots are captured, review the presenter script and any narration in
-`scripts/demo.sh` for the following violation:
+Before screenshots are captured, review the presenter narration in
+`docs/demo/m{N}/stakeholder-walkthrough.md` for the following violation:
 
 > Any sentence that routes the audience to the choropleth for quantitative step-to-step
 > change (e.g. "watch [entity] shift in the choropleth") is incorrect per UX-RULING-4.
