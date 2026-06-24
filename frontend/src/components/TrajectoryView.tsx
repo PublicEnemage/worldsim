@@ -418,6 +418,23 @@ function CompositeChartSVG({
           );
         })}
 
+      {/* Divergence fill attribution — G10 #1162 */}
+      {hasDivergence && (
+        <text
+          data-testid="divergence-fill-attribution"
+          x={MARGIN.left + chartW / 2}
+          y={MARGIN.top + 10}
+          fontSize={9}
+          fill="#555"
+          textAnchor="middle"
+        >
+          {entityCodes
+            .filter((code) => activeTrajectories[code] && baselineTrajectories[code])
+            .join(" / ")}{" "}
+          — active vs. baseline
+        </text>
+      )}
+
       {/* MDA floor lines — one per entity (lowest non-trivial floor) */}
       {entityCodes.map((code, i) => {
         const active = activeTrajectories[code];

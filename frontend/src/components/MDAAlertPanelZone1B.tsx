@@ -746,19 +746,29 @@ export function CohortImpactSection({ isCompleted = false }: { isCompleted?: boo
                 </span>
               </span>
               <span
-                data-testid={`cohort-tier-badge-${crossing.indicator_key}`}
-                style={{
-                  fontSize: 8,
-                  fontWeight: 700,
-                  color: isSad ? "#7a0000" : "#005a9e",
-                  background: isSad ? "#ffe0e0" : "#e0eeff",
-                  borderRadius: 2,
-                  padding: "1px 3px",
-                  flexShrink: 0,
-                  display: "inline-block",
-                }}
+                data-testid="confidence-tier-badge"
+                style={{ display: 'inline-flex', flexDirection: 'column', alignItems: 'center', gap: 1, flexShrink: 0 }}
               >
-                {badgeText}
+                <span
+                  data-testid={`cohort-tier-badge-${crossing.indicator_key}`}
+                  style={{
+                    fontSize: 8,
+                    fontWeight: 700,
+                    color: isSad ? "#7a0000" : "#005a9e",
+                    background: isSad ? "#ffe0e0" : "#e0eeff",
+                    borderRadius: 2,
+                    padding: "1px 3px",
+                    display: "inline-block",
+                  }}
+                >
+                  {badgeText}
+                </span>
+                <span
+                  data-testid="confidence-tier-badge-sublabel"
+                  style={{ fontSize: 7, color: '#6b7280', fontWeight: 400, lineHeight: 1, whiteSpace: 'nowrap' }}
+                >
+                  {isSad ? "No primary data" : badgeText === "T4" ? "Model est." : "Inferred"}
+                </span>
               </span>
             </div>
           );

@@ -190,21 +190,23 @@ export function HumanCapitalTrajectoryPanel({
 
       {/* Milestone sentence — AC-F3, AC-CM-2 (only when Q1 floor crossed) */}
       {milestone && (
-        <div
-          data-testid="projection-milestone-sentence"
-          style={{
-            marginBottom: 8,
-            padding: "4px 8px",
-            background: "#fee2e2",
-            border: "1px solid #fca5a5",
-            borderRadius: 4,
-            color: "#7f1d1d",
-            fontSize: 11,
-            lineHeight: 1.5,
-          }}
-        >
-          by {milestone.year} [step {milestone.step}], {milestone.cohortLabel} poverty headcount crosses
-          the recovery floor — at this level, capability restoration takes {Q1_RECOVERY_CONSEQUENCE}
+        <div data-testid="milestone-sentence">
+          <div
+            data-testid="projection-milestone-sentence"
+            style={{
+              marginBottom: 8,
+              padding: "4px 8px",
+              background: "#fee2e2",
+              border: "1px solid #fca5a5",
+              borderRadius: 4,
+              color: "#7f1d1d",
+              fontSize: 11,
+              lineHeight: 1.5,
+            }}
+          >
+            by {milestone.year} [step {milestone.step}], {milestone.cohortLabel} poverty headcount crosses
+            the recovery floor — at this level, capability restoration takes {Q1_RECOVERY_CONSEQUENCE}
+          </div>
         </div>
       )}
 
@@ -247,6 +249,25 @@ export function HumanCapitalTrajectoryPanel({
           </div>
         );
       })}
+
+      {/* Q2 suppression annotation — G10 #1179 */}
+      {!loading && (() => {
+        const q2Def = cohortDefs.find(d => !d.isQ1) ?? null;
+        return q2Def !== null && (trajectories[q2Def.entityId]?.length ?? 0) === 0 ? (
+          <div
+            data-testid="q2-suppression-legend"
+            style={{
+              fontSize: 10,
+              color: '#6b7280',
+              fontStyle: 'italic',
+              paddingLeft: 6,
+              marginBottom: 4,
+            }}
+          >
+            Q2 — floor threshold not registered (suppressed)
+          </div>
+        ) : null;
+      })()}
 
       {/* Step axis — AC-F5 */}
       <div
