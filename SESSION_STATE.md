@@ -163,7 +163,7 @@ Implementation is now unblocked. A sprint entry document must be filed and EL-ap
 - ✅ **G5 COMPLETE 2026-06-23** — PR #1156 merged; all 4 G5 issues delivered (#1145, #837, #951, #259); 18/20 ACs pass (2 skipped Docker-only); M16 demo stubs created at `docs/demo/m16/`; legibility baseline at `docs/standards/legibility-baseline-m16.md`
 - ✅ **G5 sprint exit CONFIRMED 2026-06-23** — BPO ACCEPT (advisory; infrastructure sprint exception); PI confirmed; exit document PR #1158 merged; `docs/process/sprint-plans/m16-g5-sprint-exit.md`
 - ✅ G7 sprint entry filed and **EL-approved 2026-06-23** — `docs/process/sprint-plans/m16-g7-sprint-entry.md`; #3 → #6 dependency declared; actions may begin
-- ⬜ **G4 sprint entry filed 2026-06-23** — `docs/process/sprint-plans/m16-g4-sprint-entry.md`; #22 (scoped: Quantity schema + SyntheticDataEngine MVP + badges) + #102 (comparison variance/percentile API) + #275 (ecological-to-financial transmission); ADR-007 coverage assessment embedded (§2.2) — ARCH-012 not required; Wave 3 gate (G2 BPO-acceptance), intent document, and QA tests all blocking before implementation PR; **EL approval pending**
+- ⬜ **G4 sprint entry filed 2026-06-23** — `docs/process/sprint-plans/m16-g4-sprint-entry.md`; #22 (scoped: Quantity schema + SyntheticDataEngine MVP + badges) + #102 (comparison variance/percentile API) + #275 (ecological-to-financial transmission); ADR-007 coverage assessment embedded (§2.2) — ARCH-012 not required; Wave 3 gate (G2 BPO-acceptance): ✅ **CLEARED 2026-06-24** (G2 BPO ACCEPT); intent document and QA tests still required before implementation PR; **EL approval pending**
 
 ---
 
