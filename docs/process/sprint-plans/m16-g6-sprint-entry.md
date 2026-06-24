@@ -137,6 +137,18 @@ change — no production code modified.
 run against a loaded scenario with Mode 3 visible. The CI throttled gate (4× CPU)
 must pass at ≤ 100ms.
 
+**EL Decision — 2026-06-24 (threshold amendment):** First real CI run post-fix
+measured 179ms vs the 100ms threshold. Chief Engineer assessment: measurement
+methodology is sound; ~40ms estimated at 1× speed; 100ms threshold was never
+validated against a real Mode 3 run (NM-058 gap). CE recommendation: raise CI
+throttled threshold to 200ms (179ms + 21ms headroom) to preserve regression
+sensitivity while recognising the calibration gap. Optimization (Recharts
+memoization, lazy ControlPlane mounting) filed as `enhancement` for M17.
+
+CI throttled threshold amended to **200ms** for M16-G6. Approved exception
+recorded at `docs/compliance/exceptions.md §EX-001` (expiry: M17 exit).
+ProBook hardware target (MV-002, no throttle) remains ≤ 100ms — unchanged.
+
 ---
 
 **VC-1 — Docker Compose stack starts and is responsive on target hardware (M16 state)**
