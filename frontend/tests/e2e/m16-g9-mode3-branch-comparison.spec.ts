@@ -61,10 +61,14 @@ async function waitForAppReady(page: import("@playwright/test").Page): Promise<v
 
 /**
  * Create (and optionally pre-advance) a GRC scenario via API.
- * GRC is used instead of ZMB because GRC has trend_growth seeded from WDI, which
- * causes the MacroeconomicModule to emit gdp_growth at each step. Without trend_growth
- * and without fiscal policy events, the MacroeconomicModule returns early and gdp_growth
- * is absent — composite_score is null and the branch-comparison-panel shows "—".
+ *
+ * GRC is used with an explicit trend_growth initial_attribute so the
+ * MacroeconomicModule emits gdp_growth at each step regardless of whether WDI
+ * data is seeded in the test environment (CI only seeds natural_earth_loader).
+ * Without trend_growth and without prior fiscal policy events, MacroeconomicModule
+ * returns early and gdp_growth is absent — composite_score is null everywhere and
+ * the branch-comparison-panel shows "—".
+ *
  * Returns the scenario_id or null if setup fails (pre-G1 guard).
  */
 async function createZmbScenario(name: string, nSteps: number): Promise<string | null> {
@@ -78,6 +82,17 @@ async function createZmbScenario(name: string, nSteps: number): Promise<string |
           entities: ["GRC"],
           n_steps: 4,
           start_date: "2010-01-01",
+          // Inject trend_growth so MacroeconomicModule runs without WDI data.
+          initial_attributes: {
+            GRC: {
+              trend_growth: {
+                value: "0.02",
+                unit: "fraction",
+                variable_type: "flow",
+                confidence_tier: 3,
+              },
+            },
+          },
           modules_config: {
             ecological: { enabled: false },
             political_economy: { enabled: false },
