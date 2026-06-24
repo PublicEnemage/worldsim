@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-24 (M16 G3 sprint exit CONFIRMED — PI Agent confirmed; CA items #1177/#1178/#1179 filed; G8 gate open; G3 sprint-exit doc filed)**
+**Last updated: 2026-06-24 (M16 G4 implementation MERGED — PR #1182; all CI PASS including playwright-e2e; Alembic multiple-head bug fixed; EE-PENDING ACs deferred until EE files review on #275; Step 5 Validate pending BPO)**
 **Current milestone:** M16 — Distributional Visibility (GitHub Milestone 17)
 **Previous milestone:** M15 — Human Cost Architecture (FORMALLY CLOSED 2026-06-23; release/m15 → main PR #1142; v0.15.0; #984 closed; GitHub Milestone 16 closed)
 
@@ -106,7 +106,7 @@ Implementation is now unblocked. A sprint entry document must be filed and EL-ap
 
 ## Open Issues — M16 (Distributional Visibility)
 
-**GitHub Milestone:** 17 | **Created:** 2026-06-23 | **Status:** G1 COMPLETE 2026-06-23; **G2 COMPLETE 2026-06-24** (PR #1173, 209/209 E2E, BPO ACCEPT, sprint exit confirmed); **G3 COMPLETE 2026-06-24** (PR #1172, 19/19 ACs, BPO ACCEPT, PI confirmed); G4 sprint entry filed (EL approval pending); G5 CLOSED 2026-06-23 | **G8 gate OPEN** (G1/G2/G3 all BPO-accepted; pre-demo items #1162/#1177/#1178/#1179 required before live session)
+**GitHub Milestone:** 17 | **Created:** 2026-06-23 | **Status:** G1 COMPLETE 2026-06-23; **G2 COMPLETE 2026-06-24** (PR #1173, 209/209 E2E, BPO ACCEPT, sprint exit confirmed); **G3 COMPLETE 2026-06-24** (PR #1172, 19/19 ACs, BPO ACCEPT, PI confirmed); **G4 implementation MERGED 2026-06-24** (PR #1182; Step 4 Verify PASS; Step 5 Validate pending BPO; EE-PENDING ACs deferred); G5 CLOSED 2026-06-23 | **G8 gate OPEN** (G1/G2/G3 all BPO-accepted; pre-demo items #1162/#1177/#1178/#1179 required before live session)
 *Zone 1A Phase 4 + cohort disaggregation + political risk surface + live external demo (#843 — exit gate). Demo 6 (Senegalese Finance Minister scenario).*
 
 | Issue | Title | Group | Notes |
@@ -120,9 +120,9 @@ Implementation is now unblocked. A sprint entry document must be filed and EL-ap
 | #1147 ✅ | feat(ux): Zone 1D delta annotations — companion to Zone 1A Phase 4 | G1 | ✅ BPO ACCEPT 2026-06-23 — PR #1160; Step 5 Validate COMPLETE (co-accepted with #845) |
 | #1162 | ux(zone-1a): entity attribution in-fill anchor — direct visual link between divergence fill and entity label | G1 follow-up | Filed 2026-06-23 — Customer Agent Layer 3 C1; pre-demo (#843) fix required |
 | #274 ✅ | feat(simulation): 25-year human capital depletion trajectory | G3 | ✅ BPO ACCEPT 2026-06-24 — PR #1172 merged; 19 ACs PASS; Step 5 Validate COMPLETE; G8 gate open |
-| #275 | feat(simulation): calibrated ecological-to-financial transmission | G4 | Capacity-allowing |
-| #102 | arch(api): distributional scenario comparison variance/percentile | G4 | Capacity-allowing |
-| #22 | feat: uncertainty quantification — distributional scenario bands | G4 | ADR-007 coverage confirmation required; scope to Demo 6 requirements only |
+| #275 | feat(simulation): calibrated ecological-to-financial transmission | G4 | `ecological_shock_coefficient` implemented (PR #1182); EE-PENDING: AC-EE-1 (Zimbabwe 2005 calibration) + AC-EE-2 (EE DIC review) deferred until EE files review; issue remains OPEN |
+| #102 | arch(api): distributional scenario comparison variance/percentile | G4 | Flat `CompareResponse` + `DistributionRecord` (variance/p10/p50/p90) implemented (PR #1182); Step 5 Validate pending |
+| #22 | feat: uncertainty quantification — distributional scenario bands | G4 | `SyntheticDataEngine` + `quantity` table + cohort-tier-badge + variance-band-toggle implemented (PR #1182); ADR-007 Method E/B dispatch; Step 5 Validate pending |
 | #1145 ✅ | docs(founding): add AC-001 and AC-002 as explicit permanent constraints | G5 | ✅ MERGED 2026-06-23 — PR #1156 |
 | #837 ✅ | feat(demo): configuration-driven demo scripts | G5 | ✅ MERGED 2026-06-23 — PR #1156 |
 | #951 ✅ | process: solo-use review protocol | G5 | ✅ MERGED 2026-06-23 — PR #1156 |
@@ -164,7 +164,7 @@ Implementation is now unblocked. A sprint entry document must be filed and EL-ap
 - ✅ **G5 COMPLETE 2026-06-23** — PR #1156 merged; all 4 G5 issues delivered (#1145, #837, #951, #259); 18/20 ACs pass (2 skipped Docker-only); M16 demo stubs created at `docs/demo/m16/`; legibility baseline at `docs/standards/legibility-baseline-m16.md`
 - ✅ **G5 sprint exit CONFIRMED 2026-06-23** — BPO ACCEPT (advisory; infrastructure sprint exception); PI confirmed; exit document PR #1158 merged; `docs/process/sprint-plans/m16-g5-sprint-exit.md`
 - ✅ G7 sprint entry filed and **EL-approved 2026-06-23** — `docs/process/sprint-plans/m16-g7-sprint-entry.md`; #3 → #6 dependency declared; actions may begin
-- ⬜ **G4 sprint entry filed 2026-06-23** — `docs/process/sprint-plans/m16-g4-sprint-entry.md`; #22 (scoped: Quantity schema + SyntheticDataEngine MVP + badges) + #102 (comparison variance/percentile API) + #275 (ecological-to-financial transmission); ADR-007 coverage assessment embedded (§2.2) — ARCH-012 not required; Wave 3 gate (G2 BPO-acceptance): ✅ **CLEARED 2026-06-24** (G2 BPO ACCEPT); intent document and QA tests still required before implementation PR; **EL approval pending**
+- ✅ **G4 implementation MERGED 2026-06-24** — PR #1182 merged to `release/m16`; all CI PASS (playwright-e2e PASS on second run — Alembic multiple-head bug fixed: migration a2c4e6f8b0d1 `down_revision` corrected from `f8a3c7e2d1b5` to `2b821063ef81`); sprint entry filed 2026-06-23 `docs/process/sprint-plans/m16-g4-sprint-entry.md`; intent document filed `docs/process/intents/M16-G4-2026-06-23-distributional-infrastructure.md`; QA tests PR #1181 merged; EL approved 2026-06-24; deliverables: `SyntheticDataEngine` (ADR-007 Method E/B dispatch), `quantity` table migration, `ecological_shock_coefficient` field, flat `CompareResponse` with per-record `DistributionRecord` (variance/p10/p50/p90), cohort-tier-badge in Zone 1B, variance-band-toggle in Zone 1A, `?compare=idA,idB` URL param; **EE-PENDING ACs** (AC-EE-1 Zimbabwe 2005 calibration, AC-EE-2 EE DIC review on #275) deferred — no blocking on PR merge; pending until Ecological Economist files review on #275; **Step 5 Validate pending** — BPO review required before sprint exit
 
 ---
 
