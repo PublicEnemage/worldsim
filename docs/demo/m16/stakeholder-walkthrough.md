@@ -64,8 +64,8 @@ citation).
 | Mode 3 | Not in Demo 6 scope |
 | Challenge moment | Cohort distribution methodology challenged → analyst responds with T3 Inferred badge, synthetic flag, ECOWAS demographic weight source |
 | Persona 3 (Andreas Stefanidis, Political Advisor) | Included in Step 6c audience simulation — Zone 1D political risk section is his primary evaluation frame |
-| Step 5b additional gate | Before screenshots: verify Q1 poverty headcount ≥ 0.40 at step 2; verify milestone sentence leads with calendar year anchor ("by [YYYY]") |
-| Initial poverty headcount (Q1 informal) | ~0.385–0.39 (calibrated to produce step-2 crossing to ≥ 0.40 under fiscal conditionality) |
+| Step 5b additional gate | Milestone sentence leads with calendar year anchor ("by [YYYY]") — confirmed. Q1 step-2 dynamic crossing not achievable at current elasticity calibration (fiscal-to-cohort transmission ~+0.0015pp per step — calibration gap filed as M17 Chief Methodologist finding). Demo proceeds with what the data shows. |
+| Initial poverty headcount (Q1 informal) | 0.385 (national aggregate T3, seeded to cohort entities — not adjusted to manufacture a crossing) |
 | Legitimacy index | ~0.43 (PSP in WARNING zone at programme entry) |
 
 ### Who Is in the Room
@@ -83,11 +83,11 @@ Demo 6 answers that question in the first two minutes.
 Three things, in priority order:
 
 1. **The distributional thesis is specific, not rhetorical.** "The poor suffer more"
-   is not a citeable claim at the table. "Bottom quintile informal sector workers cross
-   the poverty recovery floor at step 2, six months into the proposed programme — at
-   that threshold, capability restoration takes a decade or more, labeled T3 Inferred
-   from ECOWAS comparable economy distributions" — that is a citeable claim. Demo 6
-   shows the difference.
+   is not a citeable claim at the table. "Bottom quintile informal sector workers enter
+   the conditionality period at 0.385 poverty headcount — approaching the 0.40 recovery
+   floor. The 25-year trajectory shows the structural consequence of that trajectory.
+   The demographic weighting is labeled T3 Inferred from ECOWAS comparable economy
+   distributions" — that is a citeable claim. Demo 6 shows the difference.
 
 2. **The model is honest about what it knows and what it inferred.** The T3 Inferred
    badge on the cohort distribution data is not a weakness to be defended. It is the
@@ -175,10 +175,17 @@ lives. Do NOT narrate the choropleth as the analytical instrument (UX-RULING-4).
 ### Step 1 — Frame A: "This Cohort, at This Step" (THESIS FRAME) (Step 2, Q2 2024)
 
 **What the audience sees:** SEN at step 2. Zone 1B's `CohortImpactSection` shows the
-bottom quintile informal worker poverty headcount at or crossing the 0.40 recovery floor.
-The T3 badge with "Inferred" sublabel is visible adjacent to the cohort row. Zone 1A shows
-the composite encoding with four framework curves diverging as conditionality begins.
-Zone 1D shows the PSP severity label (WARNING) with delta annotation.
+bottom quintile informal worker poverty headcount approaching the 0.40 recovery floor
+(T3 Inferred, current value shown with floor labeled). Zone 1A shows the composite
+encoding with four framework curves diverging as conditionality begins. Zone 1D shows
+the PSP severity label (WARNING) with delta annotation.
+
+**Calibration note for presenter:** At current engine calibration, the fiscal
+conditionality produces ~+0.0015pp per step for Q1 poverty headcount via the
+GDP-channel elasticity. The Zone 1B row shows where the cohort is and how far from
+the floor. If the milestone sentence in the 25-year panel has fired, note the year.
+If it has not, the trajectory shows the approach. Either reading is honest. Do not
+claim the crossing happened if the data does not show it.
 
 **What the presenter says:**
 
@@ -189,21 +196,20 @@ Zone 1D shows the PSP severity label (WARNING) with delta annotation.
 > Two rows are visible. The upper section is the MDA alert you have seen in prior
 > milestones. The lower section is new: it is the cohort impact section.
 >
-> It reads: bottom quintile informal workers poverty headcount. Current value: 0.40.
-> Recovery floor: 0.40.
+> It reads: bottom quintile informal workers poverty headcount. Current value: [read
+> from screen]. Recovery floor: 0.40.
 >
-> This cohort is at the threshold. Six months in.
+> This cohort is approaching the threshold. Six months in.
 >
 > Next to that number is a badge: T3 — Inferred. The methodology for the demographic
-> weighting — how we assigned 0.40 to this specific cohort rather than to aggregate
-> poverty — is declared on screen. ECOWAS comparable economy distributions. Tier 3
-> synthetic estimate.
+> weighting — how we disaggregated this specific cohort from aggregate poverty — is
+> declared on screen. ECOWAS comparable economy distributions. Tier 3 synthetic estimate.
 >
 > That badge is not an apology. It is the analytical chain made visible.
 >
 > The argument the ministry team can now make: under the proposed programme terms, the
 > bottom quintile informal sector workers — not "the poor" in the aggregate, this cohort
-> specifically — cross the poverty recovery floor by Q2 2024. Six months in. With the
+> specifically — are this far from the poverty recovery floor at six months. With the
 > demographic weight source named, the tier labeled, and the threshold on screen.
 >
 > That is not a political claim. That is a citeable technical finding.
@@ -318,11 +324,10 @@ to watch, not what will happen."
 ### Step 4 — Frame D: "For This Long — The 25-Year Trajectory"
 
 **What the audience sees:** The `HumanCapitalTrajectoryPanel` visible in the primary
-viewport below the Zone 1 instruments. Three cohort curves over 100 quarterly steps.
-The Layer 3 milestone sentence visible at L0: "by [year], bottom quintile informal
-workers poverty headcount crosses the recovery floor — at this level, capability
-restoration takes a decade or more." T3 Inferred badges adjacent to curve endpoints.
-Zone 1A/1B/1C/1D all visible above the projection panel.
+viewport below the Zone 1 instruments. Three cohort curves over available quarterly
+snapshots. T3 Inferred badges adjacent to curve endpoints. Zone 1A/1B/1C/1D all
+visible above the projection panel. The milestone sentence renders if the Q1 cohort
+trajectory has reached the 0.40 floor; if not, the panel shows the approach trajectory.
 
 **What the presenter says:**
 
@@ -331,20 +336,20 @@ Zone 1A/1B/1C/1D all visible above the projection panel.
 > The 25-year projection panel below Zone 1 asks a different question: what does the
 > conditionality commit this cohort to beyond the programme window?
 >
-> Read the milestone sentence at the bottom of that panel.
+> Look at the three curve trajectories. Bottom quintile informal workers. Bottom quintile
+> agricultural workers. Second quintile informal workers.
 >
-> "By [year], bottom quintile informal workers poverty headcount crosses the recovery
-> floor — at this level, capability restoration takes a decade or more."
+> The Q1 curves are approaching the 0.40 recovery floor. That floor is not a prediction —
+> it is the threshold at which, empirically, poverty becomes self-reinforcing and capability
+> restoration takes a decade or more.
 >
-> The programme lasts two years. The consequence — if the crossing happens — lasts
-> a decade or more. That is the intergenerational argument the minister's team needs
-> to make. Not "the programme is bad." The specific, temporally precise claim: under
-> these conditionality terms, this cohort crosses this threshold by this year, and
-> the recovery timeline for human capability is a decade.
+> The question the ministry team can now ask with this panel visible: does the proposed
+> programme avoid driving these cohorts to that threshold — or does it commit them to it?
 >
-> That sentence is visible from the primary viewport without opening a drawer. It is
-> the Layer 3 treatment for the human capital trajectory — the instrument telling you
-> not just what the gauge shows, but what to do with the reading.
+> That is a different question from "does GDP recover by the end of the programme window."
+> It is the question about the structural consequence of the programme terms beyond the
+> two-year window. The instrument makes that question specific: which cohort, approaching
+> which threshold, over what trajectory.
 >
 > Notice the T3 Inferred badges on the curve endpoints. The demographic weighting behind
 > these three cohort curves — bottom quintile informal, bottom quintile agricultural,
@@ -354,13 +359,19 @@ Zone 1A/1B/1C/1D all visible above the projection panel.
 > is published. The assumption is named."
 >
 > That is the challenge-response for the distributional methodology question.
+>
+> **[If milestone sentence is visible]:** Read the milestone sentence: "By [year],
+> bottom quintile informal workers poverty headcount crosses the recovery floor — at
+> this level, capability restoration takes a decade or more." The programme lasts two
+> years. The consequence, if this trajectory holds, lasts a decade. That is the
+> intergenerational argument. Cite the year. Cite the tier.
 
-**PAUSE — let them read the three curve trajectories and the milestone sentence.**
+**PAUSE — let them read the three curve trajectories.**
 
-**Cognitive purpose:** Establish the "for this long" argument as distinct from the
-"this cohort, at this step" argument. Frame D is the intergenerational dimension —
-the consequence persists beyond the programme window, and the instrument names the
-persistence explicitly.
+**Cognitive purpose:** Establish the structural consequence argument — the question of
+what the conditionality commits these cohorts to beyond the programme window. The
+argument holds whether or not the milestone sentence has fired: the trajectory toward
+the floor is the finding, and the tool names it specifically rather than in aggregate.
 
 ---
 

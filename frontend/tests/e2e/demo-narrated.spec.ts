@@ -120,19 +120,25 @@ test(
 
     // Create the M16 Senegal Article IV demo scenario via API.
     //
+    // Create the M16 Senegal Article IV demo scenario via API.
+    //
     // SEN initial attributes (T3 synthetic — ECOWAS comparable economy estimates):
-    // poverty_headcount_ratio: 0.385 — calibrated to produce bottom-quintile
-    //   (SEN:CHT:1-25-54-INFORMAL) threshold crossing to ≥ 0.40 at step 2 under
-    //   the fiscal conditionality scheduled at step 2 (spending_change social -0.030).
-    //   MDA-HD-POVERTY-Q1 floor is 0.40; crossing at step 2 is the Demo 6 thesis moment.
+    // poverty_headcount_ratio: 0.385 — T3 national aggregate, what the data shows.
+    // Cohort entities are seeded from this value by _inject_cohort_entities. The
+    // fiscal-to-cohort-poverty transmission elasticity (gdp_growth_change → Q1
+    // poverty_headcount_ratio) produces ~+0.0015pp per step under current calibration —
+    // insufficient to cross the 0.40 MDA floor within the 8-step programme window.
+    // The milestone sentence fires when the trajectory first reaches the floor; if it
+    // does not fire within available snapshots, the demo shows the approach trajectory
+    // and presents the 25-year structural consequence argument without claiming step-level
+    // crossing precision. Calibration gap filed as a Chief Methodologist finding (M17 scope).
     // legitimacy_index: 0.43 — PSP in WARNING zone (threshold: CRITICAL < 0.40 /
     //   WARNING 0.40–0.55 / WATCH 0.55–0.70 / STABLE > 0.70).
     //
     // Scheduled inputs:
     //   Step 1: IMF programme acceptance (emergency policy — triggers political economy module)
     //   Step 2: Fiscal conditionality begins — social spending cut (−3.0% GDP)
-    //           This drives poverty_headcount_ratio upward in the bottom quintile cohorts,
-    //           producing the step-2 Q1 threshold crossing (Frame A thesis moment).
+    //           GDP effect reaches DemographicModule at step 3 (one-step lag).
     //
     // projection_steps: 100 — enables the HumanCapitalTrajectoryPanel (G3/#274).
     //   The panel renders only when activeScenarioDetail?.configuration?.projection_steps > 8.
@@ -161,9 +167,9 @@ test(
           initial_attributes: {
             SEN: {
               // poverty_headcount_ratio: 0.385 — T3 synthetic estimate.
-              // Calibrated to cross MDA-HD-POVERTY-Q1 floor (0.40) at step 2 when
-              // social spending conditionality (−3% GDP) is applied at step 2.
-              // ECOWAS comparable economy distributions used for demographic weighting.
+              // National aggregate per ECOWAS_REGIONAL_2023. Cohort entities are seeded
+              // from this value by _inject_cohort_entities; not adjusted to produce a
+              // desired model outcome (calibration gap filed as M17 finding).
               poverty_headcount_ratio: {
                 value: "0.385",
                 unit: "ratio",
@@ -294,6 +300,7 @@ test(
                 synthetic_basis: "V-Dem LDI regional estimate for West Africa 2023.",
               },
             },
+
           },
         },
         // scheduled_inputs is top-level in ScenarioCreateRequest, NOT inside configuration.
@@ -309,8 +316,9 @@ test(
           },
           {
             // Fiscal conditionality: social spending cut begins at step 2.
-            // This produces the poverty_headcount_ratio increase in bottom-quintile
-            // cohorts that drives the step-2 Q1 threshold crossing (Frame A thesis).
+            // GDP effect (standard multiplier 0.5 × −0.030 spend = ~−0.015pp GDP
+            // growth change) reaches DemographicModule at step 3 via one-step lag,
+            // producing ~+0.0015pp Q1 poverty delta per active conditionality step.
             step: 2,
             input_type: "FiscalPolicyInput",
             input_data: {
