@@ -634,10 +634,132 @@ patterns before it closes.
 
 ## 9. Step 5 Validate Record
 
-*To be completed by the Business PO Agent at Step 5 Validate.*
+**Validate date:** 2026-06-24
+**Validator (Business PO):** Business PO Agent
 
-**Validate date:** [pending]
-**Validator (Business PO):** [pending]
+---
+
+### Customer Agent Layer 3 Assessment
+
+**Assessment date:** 2026-06-24
+**Personas served:** Persona 2 — Finance Ministry Negotiator (Preparatory state)
+
+G4 is a Preparatory-state infrastructure sprint. The user-facing deliverables are:
+(a) cohort tier badge wiring in Zone 1B (#22 frontend) — makes "T3" data-driven and adds
+"SAD" / "T4" for synthetic cases; (b) variance band toggle in Zone 1A (#102 frontend).
+
+**Kryptonite review (Preparatory state, 3-hour window):**
+
+Badge wiring: no new interaction required — the badge was already visible at L0 (G2).
+G4 corrects its accuracy. Persona 2 in a Preparatory session reviewing cohort data will see
+"SAD" where before they saw "T3" for SEN indicators with Structural Absence Declarations.
+The correction is accurate; the kryptonite check is whether "SAD" is interpretable without
+specialist help. It is not immediately self-interpreting. The intent document (§5) flags
+this as an accepted forward gap: "A tooltip or expanded label is a pre-Demo 6 polish item,
+not a G4 blocker." Kryptonite constraint satisfied for Demo 6 scope as specified, but the
+forward gap requires a pre-Demo 6 fix.
+
+Variance band: opt-in; labeled "Distributional range"; visible only in comparison mode.
+Persona 2 (finance analyst background) understands P10/P90 notation. No kryptonite risk
+in Preparatory state.
+
+**Layer 3 named conditions:**
+
+| # | Condition | Persona affected | Disposition |
+|---|---|---|---|
+| CA-G4-1 | "SAD" badge abbreviation not self-interpreting at L0 — needs tooltip or expanded label ("SAD — no primary data" or "SAD — Structural Absence") before a non-specialist can act on it without reading documentation | Persona 5 (Finance Minister); Persona 2 on first encounter | Pre-Demo 6 polish — required before Demo 6 (#843) runs with external participants. Filed as GitHub issue #1184 |
+| CA-G4-2 | AC-F6 (Zone 1D badge wiring) conditionally deferred per intent doc — Zone 1D indicators (PSP, legitimacy index) will show "T3" instead of "SAD" when SEN Zone 1D structural absence data is populated. This is a documented deferral, not a failure; the intent doc authorizes it | Persona 3 (Future G4 scope) | Forward gap — no Demo 6 impact (ZMB/SEN Zone 1D indicators do not exhibit structural absence in Demo 6 fixtures); track as follow-up when SEN Zone 1D data is populated |
+
+The primary deliverable (Zone 1B badge accuracy) is Layer 3 compliant for Persona 2 in
+Preparatory state. The "SAD" tooltip gap (CA-G4-1) is a Persona 5 first-encounter legibility
+issue — it does not prevent the ministry analyst team from completing the Demo 6 argument.
+CA-G4-2 (Zone 1D deferral) does not affect Demo 6 fixtures.
+
+**Customer Agent Layer 3 verdict: CONDITIONAL PASS**
+Two named conditions: CA-G4-1 (pre-Demo 6, filed as #1183) and CA-G4-2 (forward gap,
+no Demo 6 impact). Neither is blocking for G4 sprint exit. CA-G4-1 must be resolved
+before Demo 6 (#843) runs.
+
+---
+
+### Business PO Verdict
+
+**Acceptance criteria assessment — all delivered ACs:**
+
+| AC | Description | Verdict |
+|---|---|---|
+| AC-1 | Alembic migration: `quantity` table with 4 synthetic-data columns | ✅ PASS |
+| AC-2 | Non-regression: ZMB 8-step run unaffected by migration | ✅ PASS |
+| AC-3 | Method E fires for <3 comparables → STRUCTURAL_ABSENCE | ✅ PASS |
+| AC-4 | Method B fires for MICE conditions → SYNTHETIC_COMPARABLE | ✅ PASS |
+| AC-5 | Method selection order follows ADR-007 §Section 1 (MNAR overrides) | ✅ PASS |
+| AC-6 | api_contracts.yml documents `is_synthetic` in trajectory response | ✅ PASS |
+| AC-7 | `ecological_shock_coefficient` accepted, range [0.0, 1.0] | ✅ PASS |
+| AC-8 | Non-regression: coefficient=0.0 identical to no-coefficient | ✅ PASS |
+| AC-9 | api_contracts.yml documents `ecological_shock_coefficient` | ✅ PASS |
+| AC-EE-1 | Zimbabwe 2005 historical calibration validation | ⏳ EE-PENDING |
+| AC-EE-2 | Ecological Economist DIC review on record on #275 | ⏳ EE-PENDING |
+| AC-10 | `distribution` fields (variance/p10/p50/p90) in compare response | ✅ PASS |
+| AC-11 | Insufficient data → null distribution fields (HTTP 200) | ✅ PASS |
+| AC-12 | api_contracts.yml documents `distribution` fields | ✅ PASS |
+| AC-F1 | "SAD" badge on Zone 1B cohort row for STRUCTURAL_ABSENCE | ✅ PASS |
+| AC-F2 | "T3" badge for SYNTHETIC_COMPARABLE (data-driven, not hardcoded) | ✅ PASS |
+| AC-F3 | "T4" badge for SYNTHETIC_MODEL | ✅ PASS |
+| AC-F4 | Real-data "T3" badge unchanged (ZMB non-regression) | ✅ PASS |
+| AC-F5 | Badge visible without hover/click/drawer (ADR-007 §Section 2) | ✅ PASS |
+| AC-F6 | Zone 1D badge wiring | ⏸ DEFERRED — intent doc deferral condition met (no Zone 1D wiring in FourFrameworkZone1D.tsx); test guard fires no-op; forward gap per intent §6 |
+| AC-F7 | Variance band not visible by default in Zone 1A | ✅ PASS |
+| AC-F8 | Variance band visible when toggled; labeled "Distributional range" | ✅ PASS |
+| AC-F9 | Variance band toggle in comparison mode only | ✅ PASS |
+
+**Confirmed pass: 20 ACs (AC-1–12, AC-F1–F5, AC-F7–F9)**
+**Conditionally deferred: 1 AC (AC-F6 — per intent doc §6 deferral clause)**
+**EE-PENDING: 2 ACs (AC-EE-1, AC-EE-2 — block full sprint exit; issue #275 remains open)**
+
+**North Star Test:**
+
+*Scenario: Aminata Diallo, Senegalese Finance Ministry economist, 90 minutes before the
+Article IV consultation review session. The IMF team's conditionality document includes
+health expenditure reductions that will affect the bottom quintile. Aminata loads the SEN
+scenario in Mode 1, navigating to Zone 1B to cite the cohort poverty headcount figures.*
+
+*Before G4: Zone 1B cohort rows for SEN indicators showed "T3" regardless of whether the
+underlying Quantity carried World Bank primary data or an inference. If the IMF counterpart
+challenged the data quality, Aminata could not distinguish "T3 from primary statistics" from
+"T3 from synthetic inference" — both showed the same badge. The IMF team, with access to
+more complete data coverage, could undermine the citation.*
+
+*After G4: A SEN indicator with no primary country data in the source registry now shows
+"SAD" (Structural Absence Declaration) rather than "T3." Aminata can correctly tell the
+consultation team: "For this indicator, WorldSim has declared a Structural Absence — we do
+not have primary data for Senegal and are not presenting a synthetic estimate as if we did."
+This is a credibility protection: Aminata's team does not overstate their data quality, and
+they cannot be surprised by a counterpart who knows the primary data gaps better than they do.*
+
+*The P10/P90 variance band (#102) allows the ministry team to argue: "Even at the P90 of
+the scenario distribution, the bottom quintile poverty headcount threshold crossing occurs
+within the programme window" — a distributional argument that was not available from the
+existing /compare endpoint.*
+
+*North star assessment: PASS. G4 makes the tool more accurate for the Senegalese team
+in the consultation moment — not by adding new arguments but by preventing false precision
+in the citations they already make.*
+
+**Business PO verdict: CONDITIONAL ACCEPT**
+
+ACCEPT on all 20 confirmed ACs plus AC-F6 conditionally deferred per intent doc.
+
+Full sprint exit is blocked by AC-EE-1 and AC-EE-2 (EE review pending on #275). Issue #275
+remains open until Ecological Economist DIC review is filed. Issues #22 (scoped) and #102
+may be closed — their acceptance criteria are fully confirmed.
+
+Customer Agent Layer 3 CONDITIONAL PASS on record (2026-06-24). CA-G4-1 filed as #1183
+(pre-Demo 6, not blocking exit). CA-G4-2 documented as forward gap.
+
+PI Agent: sprint exit gate is blocked — do not confirm until EE review is on record on
+GitHub issue #275 and AC-EE-1/AC-EE-2 are verified.
+
+— Business PO Agent, 2026-06-24
 
 ---
 
