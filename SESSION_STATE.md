@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-25 (G3 Phase 2 ADR-018 accepted — PR #1291 merged; [ADR-VALUE]=80px; Architect determination on #1252; G5 sprint entry filed PR ready EL approval; G2-P3 intent+QA PR #1289 pending playwright CI; G3 early QA PR #1290 playwright failing intentionally — AC-A2 pre-impl red)**
+**Last updated: 2026-06-25 (G2 sprint entry READY FOR EL REVIEW — all §2.1–§2.5 satisfied; PRs #1289+#1295+#1296 merged; G3 early QA PR #1290 open — playwright failing intentionally on AC-A2, EL admin merge required)**
 **Current milestone:** M17 — Calibration and Comparative Infrastructure (GitHub Milestone 18)
 **Previous milestone:** M16 — Distributional Visibility (FORMALLY CLOSED 2026-06-25; release/m16 → main; v0.16.0; #985 closed; GitHub Milestone 17 closed)
 
@@ -41,7 +41,7 @@
 | #982 | M17 Exit Checklist — blocks milestone closure | — | — | `immediate \| M17 gate issue` |
 | #1229 | feat(simulation): fiscal-to-cohort elasticity calibration — ELASTICITY_REGISTRY | G1 | Wave 1 | ✅ BPO ACCEPT 2026-06-25 — PR #1270 merged; FRAME-D tests pass; CM-certified constants on release/m17; sprint exit confirmed |
 | #1248 | feat(simulation): governance sensitivity calibration — GovernanceModule fiscal conditionality | G1 | Wave 1 | ✅ BPO ACCEPT 2026-06-25 (Wave 1 spec) — governance sensitivity spec filed (PR #1270); three CM positions on record; sprint exit confirmed; Wave 2 code changes gated on data preconditions |
-| #394 | feat: multi-scenario comparison (>2 scenarios) | G2 | Wave 2 | **Phase 1 + Phase 2 COMPLETE 2026-06-25** — PR #1280 merged; Artifact 1 (`ux-journeys-n3.md`), Artifact 2 (`persona-mvs-n3.md`), Artifact 3 (`ARCH-REVIEW-007-m17-n3-assessment.md`); ADR determination option (b) — review note on #394 sufficient, no new ADR; Phase 3 gate: BPO Phase 1 acceptance + #1249 merge required before sprint entry EL approval + Phase 3 PR |
+| #394 | feat: multi-scenario comparison (>2 scenarios) | G2 | Wave 2 | **G2 sprint entry READY FOR EL REVIEW 2026-06-25** — all §2.1–§2.5 satisfied: Phase 1+2 COMPLETE; intent doc filed (`M17-G2-2026-06-25-multi-scenario-comparison.md`, PR #1289); QA test filed (`m17-g2-multi-scenario-comparison.spec.ts`, PR #1289); AC-009 fixme (PR #1295); sprint entry updated (PR #1296). **Phase 3 implementation gate:** EL approval of sprint entry + #1249 merge to `release/m17` (hard gate before implementation PR opens). |
 | #1252 | arch(zone-1b): Zone 1B proportional allocation — MDA alert vs cohort sections | G3 | Wave 2 | **Phase 1 BPO ACCEPTED + Phase 2 ADR-018 ACCEPTED 2026-06-25** — PR #1291 merged; ARCH-012 → ADR-018; [ADR-VALUE]=80px (all breakpoints); G2 compatible; minHeight:80px superseded; G3 sprint entry gate: QA✅ (early-filed PR #1290 — playwright failing intentionally on AC-A2); EL sprint entry approval PENDING; #1250 merge gate PENDING |
 | #1249 | ux(zone-1a): DEMO6-014 curve identifiability | G4 | Wave 2 | **DEMO6 CRITICAL**; required before live demo session |
 | #1250 | ux(zone-1b): DEMO6-026/043 tablet legibility at 768px | G4 | Wave 2 | **DEMO6 CRITICAL**; required before live demo session |
