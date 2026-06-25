@@ -42,7 +42,7 @@ PR, not on this entry document's filing.*
 | Sprint plan document | `docs/process/sprint-plans/m17-sprint-plan.md` |
 | Exit checklist issue | #982 |
 | Sprint groups in scope | G3 Phase 3 only |
-| ADR gate | **PENDING** — Architect determines at Phase 2 completion: ADR-017 amendment (ARCH-011 extension) or new ADR (ARCH-012). See §2.2. |
+| ADR gate | **CLEAR 2026-06-25** — ADR-018 (ARCH-012) filed and accepted; path B: new ADR; PR #1291 merged 2026-06-25 |
 | Implementing agent | Frontend Engineer + QA Lead; Architect holds R on ADR determination |
 | Wave | Wave 2 (gated on Wave 1 exit ✅ confirmed 2026-06-25) |
 | Phase 3 implementation gate | **#1250 merged to `release/m17`** before implementation PR opens (FA constraint — Zone 1B layout conflict) |
@@ -54,9 +54,9 @@ PR, not on this entry document's filing.*
 | G3 Phase 1 complete: UX brief filed answering four allocation questions (proportional model, overflow handling, empty-state behavior, viewport contract) — at minimum a written specification with viewport-anchored decisions; mockup if proportional model is ambiguous at 1280×800 or 768px | UX Designer (R) + Design Thinking + Customer Agent | ⬜ NOT STARTED |
 | G3 Phase 1 brief panel review: brief reviewed by Phase 1 panel before BPO acceptance — UX Designer confirms governing premises satisfied; Design Thinking confirms MDA primary instrument preserved; Customer Agent confirms Aicha/Lucas reading order is satisfied | UX Designer (R) + Design Thinking + Customer Agent + Business PO | ⬜ PENDING Phase 1 artifact |
 | G3 Phase 1 BPO acceptance: BPO accepts Phase 1 brief output | Business PO | ⬜ PENDING panel review |
-| G3 Phase 2 complete: Architect determines ADR path — ADR-017 amendment or new ARCH-012; ADR authored and accepted | Architect | ⬜ PENDING Phase 1 BPO + Wave 1 exit (✅ Wave 1 exited 2026-06-25) |
+| G3 Phase 2 complete: Architect determines ADR path — ADR-017 amendment or new ARCH-012; ADR authored and accepted | Architect | ✅ COMPLETE 2026-06-25 — ADR-018 (ARCH-012) filed and accepted; path B: new ADR; PR #1291 merged 2026-06-25 |
 | Intent document filed for #1252 implementation (must reference accepted ADR and UX brief) | PM Agent | ⬜ PENDING Phase 1/2 |
-| QA test file authored before implementation begins | QA Lead | ⚠️ EARLY FILED 2026-06-25 — `frontend/tests/e2e/m17-g3-zone-1b-allocation.spec.ts`; authored from sprint entry §2.4 ACs; pixel constants (MDA_PANEL_MIN_HEIGHT_PX, COHORT_MAX_DISPLAY) are placeholders pending ADR spec; update required when formal intent document is filed |
+| QA test file authored before implementation begins | QA Lead | ⬜ PENDING intent document — QA test file authored locally 2026-06-25 from sprint entry §2.4 ACs; will be committed in G3 implementation PR (per NM-055: tests committed in same PR as implementation) |
 | #1250 merged to `release/m17` | G4 sprint group | ⬜ PENDING G4 |
 
 ---
@@ -110,18 +110,18 @@ G3 Phase 3 must replace this temporary constraint with an ADR-grounded allocatio
 The implementation PR may not merge with `minHeight: 80px` as the sole Zone 1B allocation
 mechanism — the ADR-grounded model must be in place.
 
-- [ ] **ADR prerequisite gate: PENDING** — Phase 1 UX brief and Phase 2 Architect determination
-  required; cannot be resolved until Phase 1 brief is filed, panel-reviewed, and BPO-accepted
+- [x] **ADR prerequisite gate: CLEAR 2026-06-25** — ADR-018 (ARCH-012) filed and accepted;
+  path B: new ADR; PR #1291 merged to `release/m17` 2026-06-25; Phase 2 complete independent
+  of Phase 1 UX brief (Architect filed ADR-018 with structural determination sufficient for
+  the ADR; Phase 1 UX brief still required for intent document and implementation to begin)
 
-**ADR prerequisite status (at filing; to be updated at Phase 2 completion):**
+**ADR prerequisite status (updated at Phase 2 completion 2026-06-25):**
 
 | Group | Required ADR | ADR status | Gate |
 |---|---|---|---|
-| G3 Phase 3 — #1252 (Zone 1B proportional allocation model) | Path A: ADR-017 amendment (ARCH-011) / Path B: ARCH-012 (new ADR) | Pending Phase 2 Architect determination | **PENDING — BLOCKING** |
-| G3 Phase 3 — #1252 (Zone 1B overflow handling contract) | Included in same ADR as allocation model (same decision unit) | Pending Phase 2 determination | **PENDING** |
-| G3 Phase 3 — #1252 (Zone 1B empty-state behavior) | Likely covered by same ADR; simple enough to not require standalone entry | Pending Phase 2 determination | **PENDING** |
-
-*These entries must be updated to CLEAR or BLOCKED_ADR before EL approval of this entry.*
+| G3 Phase 3 — #1252 (Zone 1B proportional allocation model) | Path B: ARCH-012 (new ADR) — ADR-018 | **CLEAR 2026-06-25** — ADR-018 filed and accepted; PR #1291 | **CLEAR** |
+| G3 Phase 3 — #1252 (Zone 1B overflow handling contract) | Included in ADR-018 (same decision unit) | **CLEAR 2026-06-25** — ADR-018 covers overflow contract | **CLEAR** |
+| G3 Phase 3 — #1252 (Zone 1B empty-state behavior) | Included in ADR-018 | **CLEAR 2026-06-25** — ADR-018 covers empty-state | **CLEAR** |
 
 ### 2.3 — Intent document gate
 
@@ -130,8 +130,9 @@ mechanism — the ADR-grounded model must be in place.
 implementation PR opens. The QA Lead must be able to write tests from it without reading
 implementation code.*
 
-- [ ] **Intent document gate: PENDING** — intent document cannot be authored until Phase 1
-  UX brief is complete, panel-reviewed, and BPO-accepted, AND Phase 2 ADR is accepted. The
+- [ ] **Intent document gate: PENDING** — Phase 2 ADR gate now CLEAR (ADR-018 PR #1291);
+  intent document still blocked on Phase 1 UX brief (filed, panel-reviewed, BPO-accepted).
+  The
   intent document's acceptance criteria are derived from the UX brief's four allocation
   decisions and the ADR's implementation contract. **The intent document must reference the
   accepted ADR as the authoritative architectural specification and the UX brief as the
