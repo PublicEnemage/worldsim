@@ -61,6 +61,34 @@ Implementation is now unblocked. A sprint entry document must be filed and EL-ap
 
 ---
 
+## HORIZON Sweep — 2026-06-25
+
+**Open issues reviewed:** 5 (insights log entries 8–12 — all filed since 2026-06-24)
+**Disposition:**
+- Entry 8 (2026-06-24, fiscal-to-cohort elasticity calibration gap): **promoted → #1229** — filed during G8 Step 5b; CM-owned M17 Wave 1 scope; DemographicModule ELASTICITY_REGISTRY revision; already tracked in CLAUDE.md §M17
+- Entry 9 (2026-06-24, Zone 1B proportional allocation): **promoted → #1252** — filed during M16 exit ceremony PR #1257; M17 Wave 2 scope; ADR-017 amendment or new ADR required; already tracked in CLAUDE.md §M17
+- Entry 10 (2026-06-24, Demo 7 opening arc): **hold** — not yet actionable as a discrete issue; Demo 7 narrative is scenario planning context for sprint plan authorship; actionable dependencies (#1229 calibration, Mode 3 north star) are both tracked; leave open until M17 Wave 2 sprint planning
+- Entry 11 (2026-06-24, governance calibration gap): **promoted → #1248** — filed during M16 exit ceremony PR #1257; CM-owned M17 Wave 1 scope; GovernanceModule fiscal conditionality transmission; already tracked in CLAUDE.md §M17
+- Entry 12 (2026-06-25, #843 deferral EL decision): **resolved** — EL decision fully recorded in SESSION_STATE.md exit ceremony, CLAUDE.md §M16+M17, and #843 GitHub issue moved to M17; all required artifact updates complete
+
+**New issues filed this sweep:**
+- None — all promoted entries were filed during M16 exit ceremony (PR #1257) or G8 Step 5b sprint work; DEMO6 high/medium/low findings remain reference material until M17 Wave 2 scope planning
+
+**Process gaps identified:**
+- **M17 kickoff prerequisite steps 1–4 are pending.** No implementation is unblocked. Required chain: (1) EL merges `release/m16` → `main` (admin bypass); (2) PM Agent cuts `release/m17` from updated `main`; (3) PM Agent authors `m17-sprint-plan.md` with Wave 1/Wave 2 structure; (4) EL approves sprint plan. Wave 1 sprint entry (G1) may not open until step 4 completes.
+- No near-misses to file. No new ADR backlog assignments required at this sweep.
+
+**M17 kickoff status at sweep time:**
+- `release/m17`: ⬜ not yet cut (step 1 pending EL action)
+- `m17-sprint-plan.md`: ⬜ not yet filed
+- EL sprint plan approval: ⬜ pending
+- #982 (M17 Exit Checklist): ✅ renamed 2026-06-25
+- Wave 1 issues in scope: #1229 (fiscal elasticity, CM-owned), #1248 (governance sensitivity, CM-owned)
+- Wave 1 exit gate: FRAME-D milestone sentence fires within 8-step Demo 6 window after CM-certified ELASTICITY_REGISTRY change
+- Wave 2 gate: blocked until Wave 1 exits; Wave 2 scope: #394 (multi-scenario comparison), #1249/#1250/#1253 (DEMO6 CRITICAL polish), #1251 (adaptive y-axis extension), #1252 (Zone 1B proportional allocation)
+
+---
+
 ## HORIZON Sweep — 2026-06-23
 
 **Open issues reviewed:** 1 (insights log entry 7 — AC-001/AC-002 founding document addition)
