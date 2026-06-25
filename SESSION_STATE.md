@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-25 (HORIZON sweep complete; M17 kickoff — release/m17 cut; m17-sprint-plan.md filed; EL APPROVED 2026-06-25; G1 sprint entry next)**
+**Last updated: 2026-06-25 (HORIZON sweep complete; M17 kickoff — release/m17 cut; m17-sprint-plan.md EL APPROVED; G1 sprint entry filed; CM activated on #1229 + #1248; EL approval of G1 entry pending)**
 **Current milestone:** M17 — Calibration and Comparative Infrastructure (GitHub Milestone 18)
 **Previous milestone:** M16 — Distributional Visibility (FORMALLY CLOSED 2026-06-25; release/m16 → main; v0.16.0; #985 closed; GitHub Milestone 17 closed)
 
@@ -23,11 +23,11 @@
 | 3. PM Agent authors `m17-sprint-plan.md` with Wave 1/Wave 2 structure | ✅ DONE 2026-06-25 | Wave 1 = CM calibration sprint; Wave 2 = DEMO6 CRITICAL + comparative infrastructure; hard gate between waves |
 | 4. EL approves sprint plan | ✅ EL APPROVED 2026-06-25 | Design phases may begin immediately; G1 sprint entry required before Wave 1 begins |
 | 5. #982 exit checklist confirmed as M17 gate issue | ✅ DONE 2026-06-25 | Renamed to "M17 Exit Checklist — blocks milestone closure"; assigned to GitHub Milestone 18 |
-| 6. Wave 1 sprint entry (G1) may open after sprint plan EL-approved | ⬜ PENDING | CM must be activated on #1229 and #1248 before G1 sprint entry is filed |
+| 6. Wave 1 sprint entry (G1) may open after sprint plan EL-approved | ✅ FILED 2026-06-25 | CM activated on #1229 and #1248 (comments filed); G1 sprint entry filed at `docs/process/sprint-plans/m17-g1-sprint-entry.md`; awaiting EL approval |
 
 **Critical prerequisite: M17 Wave 2 may not begin until Wave 1 exits.** Wave 1 exit gate: FRAME-D milestone sentence fires within an 8-step programme window on the Demo 6 Senegal scenario after the elasticity calibration change. DemographicModule ELASTICITY_REGISTRY updated with CM-certified values. Governance calibration specification on record.
 
-**Sprint plan EL-approved.** Design phases (G2 Phase 1, G3 Phase 1, G4 visual specs) may begin immediately. G1 sprint entry required before Wave 1 implementation begins. Next action: activate CM on #1229 and #1248, file G1 sprint entry.
+**Sprint plan EL-approved. G1 sprint entry filed.** Design phases (G2 Phase 1, G3 Phase 1, G4 visual specs) may begin immediately. Next action: EL approves G1 sprint entry → Wave 1 implementation begins (CM research → calibration decision document → ELASTICITY_REGISTRY code change + FRAME-D test).
 
 ---
 
