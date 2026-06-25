@@ -212,6 +212,23 @@ export function buildSparklinePoints(
 // No longer rendered by MDAAlertPanelZone1B itself.
 // ---------------------------------------------------------------------------
 
+/**
+ * Format the floor-distance label for a cohort threshold crossing entry.
+ * Direction is determined by breaches_below (set by the backend based on
+ * comparison_operator): gte thresholds breach when value falls BELOW the floor;
+ * lte thresholds (future) breach when value rises ABOVE the floor.
+ */
+export function formatCohortDistance(
+  pct: string | null,
+  breachesBelow: boolean,
+  isSad: boolean,
+): string {
+  if (isSad || pct == null) return "—";
+  return breachesBelow ? `${pct}% below floor` : `${pct}% above floor`;
+}
+
+// ---------------------------------------------------------------------------
+
 interface AlertDetailPanelProps {
   alert: Zone1BAlert;
   onClose: () => void;
@@ -704,7 +721,7 @@ export function CohortImpactSection({ isCompleted = false }: { isCompleted?: boo
       ) : (
         crossings.map((crossing, idx) => {
           const color = COHORT_SEVERITY_COLOR[crossing.severity];
-          const isSad = crossing.is_synthetic && crossing.synthetic_method === "STRUCTURAL_ABSENCE";
+          const isSad = !!crossing.is_synthetic && crossing.synthetic_method === "STRUCTURAL_ABSENCE";
           const badgeText = isSad
             ? "SAD"
             : crossing.is_synthetic && crossing.synthetic_method === "SYNTHETIC_MODEL"
@@ -712,7 +729,7 @@ export function CohortImpactSection({ isCompleted = false }: { isCompleted?: boo
               : crossing.is_synthetic && crossing.synthetic_method === "SYNTHETIC_COMPARABLE"
                 ? "T3"
                 : `T${crossing.tier}`;
-          const valueDisplay = isSad ? "—" : (crossing.above_floor_pct != null ? `${crossing.above_floor_pct}% above floor` : "—");
+          const valueDisplay = formatCohortDistance(crossing.above_floor_pct, crossing.breaches_below !== false, isSad);
           return (
             <div
               key={`${crossing.quintile_key}-${crossing.indicator_key}`}

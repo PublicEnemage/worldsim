@@ -2497,6 +2497,7 @@ async def get_measurement_output(
                                     else None
                                 ),
                                 value=qty.value,
+                                breaches_below=True,  # gte: breach = value below floor
                             )
                         )
 

@@ -756,6 +756,7 @@ class CohortThresholdCrossing(BaseModel):
     is_synthetic: bool
     synthetic_method: str | None
     value: str
+    breaches_below: bool
 
 
 class FrameworkOutput(BaseModel):

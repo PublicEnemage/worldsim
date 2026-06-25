@@ -95,6 +95,9 @@ export interface CohortThresholdCrossing {
   is_synthetic?: boolean;
   synthetic_method?: "STRUCTURAL_ABSENCE" | "SYNTHETIC_COMPARABLE" | "SYNTHETIC_MODEL" | null;
   value?: string | null;
+  /** Issue #1239 (DEMO6-010): True when the breach direction is value below floor (gte threshold).
+   *  False when breach is value above floor (lte threshold — future). Drives label in Zone 1B. */
+  breaches_below?: boolean;
 }
 
 interface ScenarioStepState {
