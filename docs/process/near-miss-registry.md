@@ -3302,6 +3302,64 @@ coverage was not added in the same sprint.
 
 ---
 
+## NM-064 — AC-009 Performance Test Consistently Exceeds 200ms Threshold on GHA Shared Runners; test.fixme() Required to Unblock CI (Anticipatory)
+
+**Date:** 2026-06-25
+**Milestone:** M17 — Calibration and Comparative Infrastructure
+**Detected by:** EL direction during G2 sprint entry PR (#1289) CI review
+**Severity:** Medium — blocks CI-green merges on unrelated PRs; no incorrect outputs produced
+
+### What happened
+
+`AC-009` (`trajectory-view.spec.ts:156`) is a Mode 3 render performance test that applies
+a 4× CPU throttle via CDP and asserts `renderMs ≤ 200ms` (threshold raised from 100ms per
+EX-001, approved 2026-06-24). On the M17 G2 sprint entry PR (#1289), AC-009 failed in two
+consecutive CI runs with measured times of 712ms and 771ms — both 3–4× the 200ms threshold.
+The test had been passing in recent release branch CI runs (e.g., run after PR #1286).
+
+This test was previously identified as high-variance: NM-059 (prior multi-CDP approach
+produced 179ms–802ms variance) and EX-001 (raised threshold from 100ms to 200ms at M14
+exit). The PR #1289 failures are consistent and well above the raised threshold, suggesting
+the current GHA runner load makes the 4× throttle performance gate unreliable as a CI check.
+
+### What was at risk
+
+Any PR that triggers the Playwright E2E suite on a loaded GHA runner will fail AC-009
+regardless of whether the PR introduced any performance regression. This makes AC-009 a
+false CI gate — blocking unrelated merges while providing no signal about actual performance
+change.
+
+### What caught it
+
+EL directed disabling the test and filing an exception after two consecutive CI failures
+on a PR containing only process documents (no frontend code changes).
+
+### Root cause
+
+The CI GitHub Actions shared runner (2-core, throttled to effectively 0.5-core for this
+test) cannot reliably render a React/Recharts component cluster in under 200ms. The 4× CDP
+throttle is too aggressive for the GHA shared runner tier. The test provides no meaningful
+performance regression signal when the baseline varies by 3–4× between runs.
+
+### Process improvement
+
+**Immediate:** Add `test.fixme()` to AC-009 in `trajectory-view.spec.ts` referencing
+NM-064 and KI-006. This authorizes the skip per NM-056 (skip requires NM entry on record).
+
+**KI filed:** KI-006 — external infrastructure limitation (GHA shared runner can't
+reliably satisfy 200ms throttled render threshold).
+
+**EX-001 update:** EX-001 (docs/compliance/exceptions.md) to be updated at M17 exit
+review to either: (a) resolve by removing AC-009 from CI scope, or (b) convert to a
+local-only performance gate with a higher CI threshold.
+
+**Performance gate ownership:** AC-009 should be converted to a local developer gate
+(not a CI gate) or replaced with a Playwright `--trace` perf annotation that records
+render time without asserting a threshold. A performance regression is better caught via
+comparison to prior runs than via absolute threshold on variable shared infrastructure.
+
+---
+
 ## NM-NNN — [Short descriptive title]
 
 **Date:** YYYY-MM-DD (or approximate milestone era)

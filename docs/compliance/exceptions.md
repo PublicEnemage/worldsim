@@ -88,6 +88,22 @@ At M17 sprint entry (or earlier if optimization is delivered mid-M17):
   and CE assessment support it), file a permanent specification change via the FA brief
   amendment process and close this exception.
 
+### M17 Status Update — 2026-06-25
+
+**Action taken (EL direction):** AC-009 converted from `test()` to `test.fixme()` in
+`frontend/tests/e2e/trajectory-view.spec.ts`. CI consistently returned 712ms–771ms vs the
+200ms threshold on GHA 2-core shared runners — 3–4× above even the raised threshold.
+The performance gate provides no CI signal at this runner tier.
+
+**Authority:** EL direction 2026-06-25 during G2 sprint entry PR (#1289) CI review.
+KI-006 filed (`docs/process/known-issues-registry.md`): external infrastructure limitation.
+NM-064 filed (`docs/process/near-miss-registry.md`): test.fixme() authorized per NM-056.
+
+**Expiry:** EX-001 expiry condition (M17 exit) unchanged. At M17 exit, EL to decide:
+(a) remove AC-009 from the test suite and replace with a local developer gate, or
+(b) convert to a Playwright `--trace` perf annotation (record without assert), or
+(c) close as Won't Fix if Mode 3 render performance is confirmed acceptable by FE profiling.
+
 ---
 
 ## Registry Maintenance
