@@ -5,16 +5,16 @@ milestone: M17 — Calibration and Comparative Infrastructure
 status: Pending EL Approval
 authored-by: PM Agent
 authored-date: 2026-06-25
-amended: 2026-06-25 — issue audit complete; G2 restructured to put UX/Design Thinking/Customer Agent upstream of architecture per EL direction; six issues disposition-resolved; sprint plan v2
+amended: 2026-06-25v2 — issue audit complete; G2 restructured UX-first per EL direction; 2026-06-25v3 — G3 Zone 1B deconflict UX brief added; G4 UX visual spec requirement added per issue; design-before-architecture principle applied consistently across all Wave 2 groups
 el-approved:
 consulted-agents:
   - Chief Methodologist (Wave 1 calibration scope and uncertainty; exit gate specification)
   - Business Product Owner (Demo 7 value prioritization; scope cut order; #394 Demo 7 narrative)
-  - Design Thinking Agent (multi-scenario cognitive task analysis; #394 use-case grounding)
-  - UX Designer (multi-scenario experience journeys; zone layout for N>2; Mode 1/2/3 comparison model)
-  - Customer Agent (multi-scenario persona assessment — Personas 1, 5; Demo 7 Act 2 minimum viable story)
-  - Architect (ADR prerequisites; ARCH-REVIEW-007 N≤2 constraint — assessed only after UX design settled)
-  - Frontend Architect (Wave 2 frontend sequencing; TrajectoryView N>2 conflict risk — downstream of UX)
+  - Design Thinking Agent (multi-scenario cognitive task analysis; Zone 1B cognitive task when both sections populated)
+  - UX Designer (multi-scenario experience journeys; Zone 1B allocation brief; G4 visual spec per issue)
+  - Customer Agent (multi-scenario persona assessment; Zone 1B persona reading order)
+  - Architect (ADR prerequisites; ARCH-REVIEW-007 constraint; Zone 1B ADR — all downstream of UX)
+  - Frontend Architect (Wave 2 sequencing; conflict risk — downstream of UX)
 sop-reference: docs/process/sprint-planning-sop.md
 ---
 
@@ -159,6 +159,49 @@ None of these can be answered by architecture alone. The UX journeys produce the
 
 **Minimum viable story for M17 design sprint:** The personas' needs reveal that the minimum viable multi-scenario is: (a) Side-by-side Zone 1A trajectories with labeled scenario differentiation; (b) Per-scenario Zone 1B threshold crossing summary (not a merged union); (c) Per-scenario PSP value in Zone 1D. Everything else — scenario interaction in Mode 3, full N≥4 support, cross-scenario Zone 1D delta — is enhancement beyond the Demo 7 minimum.
 
+### UX Designer + Design Thinking — Zone 1B deconflict brief (G3)
+
+Zone 1B has two occupants with competing space claims. The design question precedes the architecture question: what does the user need to see, in what order, when both the MDA alert panel and the cohort impact section are populated?
+
+**Design Thinking — cognitive task analysis:**
+
+Zone 1B serves one primary cognitive task: threshold breach evidence. The MDA alert panel is the instrument — it tells the analyst whether a hard floor has been crossed, by how much, for how long. The CohortImpactSection is evidence of consequence — it tells the analyst who bears the cost of that breach, at which cohort, at which crossing point. These are not equal-weight occupants. The primary instrument (breach evidence) must remain readable even when the supplementary section (cohort crossings) is fully populated.
+
+The failure mode documented in the M16 retrospective — MDA panel collapsed to zero under cohort overflow — is not merely an implementation bug. It is a symptom of an unresolved design question: when there are 8 cohort crossing entries, what should the user see? All 8? The top 3? A summary ("8 crossings across Q1/Q2")? The architecture cannot answer this — UX must answer it first.
+
+**UX Designer — Zone 1B allocation brief required before ADR:**
+
+The brief must answer four questions before the Architect can determine the ADR scope:
+
+1. **Proportional model:** Static split (e.g., MDA panel 60% / Cohort 40%) vs. dynamic (MDA panel gets at least N pixels, Cohort takes remainder with internal scroll) vs. separate scrollable sub-zones?
+
+2. **Overflow handling:** When cohort crossings exceed the Cohort section's allotted height — do they scroll internally? Are they truncated to a max-N with a count label ("and 5 more")? Does the section expand at the cost of the MDA panel? The answer determines whether the ADR needs to address a max-cohort-display constraint or a scroll container.
+
+3. **Empty-state behavior:** When there are MDA breaches but no cohort crossings (e.g., early steps before thresholds are approached), does Zone 1B show only the MDA panel at full height? When there are cohort crossings but no MDA breach, does the layout invert?
+
+4. **Viewport contract:** At 1024×768, 1280×800, and 1440×900 — what is the minimum readable height for each section? The brief should specify minimum pixel heights and whether the proportional split changes at each breakpoint.
+
+**Customer Agent — Zone 1B reading order:**
+
+Aicha (Persona 5, Finance Minister) reads Zone 1B for the breach headline: severity label + indicator + how far below the floor. She does not read the cohort rows in detail — she reads the count ("Q1 informal workers: crossed at step 1") as confirmation that the bottom quintile is affected. The MDA panel headline is her anchor. The cohort section is her supporting evidence when challenged.
+
+Lucas (Persona 1, Programme Analyst) reads both sections in depth. He needs the trajectory sentence in the MDA detail slot and the specific cohort crossing values. For Lucas, the cohort section is co-primary.
+
+This reading-order difference is architecturally material: Aicha's use requires MDA panel top, always visible, at minimum 80px (current guarantee). Lucas's use requires cohort section to be fully readable, not truncated. A single proportional model must serve both.
+
+### UX Designer — G4 DEMO6 CRITICAL visual spec requirement
+
+Each DEMO6 CRITICAL issue (#1249, #1250, #1253) requires a UX visual spec — a before/after annotated mockup or screenshot brief — produced by the UX Designer before the implementation PR for that issue opens. This is lighter than a design sprint; it is a constrained visual decision that takes one session to produce. The spec prevents the same failure mode that produced NM-042 (intent document without visual spec caused QA scope ambiguity).
+
+**#1249 — Zone 1A curve identifiability:**
+The solution space is "terminal endpoint labels or dashed/solid line style differentiation." The UX Designer must choose one (or specify which combination) and produce a before/after mockup at presentation scale (1280×800 at 80% zoom, the audience simulation condition from the IR review). The choice must also be validated at N=3 — the G2 multi-scenario work will need Zone 1A to differentiate three curves, not two. A solution that solves N=2 but fails at N=3 creates rework.
+
+**#1250 — Zone 1B tablet legibility:**
+The UX Designer specifies: minimum font size for current value, floor, and T3 badge at 768px; whether the layout reflows (e.g., badge moves below value) or scales; and what "readable without zoom" means in measurable terms (minimum 14px body, minimum 12px label?). The spec is a testid-anchored layout description that the QA Lead can assert.
+
+**#1253 — PSP historical precedent anchor:**
+The UX Designer specifies how the comparable programme reference is surfaced in Zone 1D. Inline text below the PSP severity label? A collapsible section? A tooltip on the severity chip? The choice affects Zone 1D layout (already dense at 1280×800) and determines whether Zone 1D requires a structural change or a content addition. Design Thinking input: Andreas (Persona 3) uses the precedent to build a political brief — he needs to cite a comparable case with a known compliance outcome. The design must make the citation-worthy reference immediately readable, not hidden behind an interaction.
+
 ### Architect — ADR prerequisites (downstream of UX)
 
 The ARCH-REVIEW-007 binding constraint (`COMPARE_VIEW N≤2/fixture`) was written before the UX journeys for multi-scenario existed. The constraint exists because the Zone 1A rendering architecture was not designed for N>2 differentiation. The UX Designer's Zone 1A journey (Journey 2 above) will surface whether a simple extension of the existing curve encoding suffices or whether a structural change to the compare rendering architecture is required.
@@ -189,8 +232,8 @@ TrajectoryView is the most complex component in the frontend. N>2 scenario rende
 |---|---|---|---|---|
 | G1 — CM Calibration Sprint | #1229, #1248 | Single phase | Wave 1 (**entry gate**) | Fiscal-to-cohort ELASTICITY_REGISTRY revision (#1229, CM-owned); governance sensitivity specification (#1248, CM-owned). Hard gate — no other G-group sprint entry may open until G1 exits. |
 | G2 — Multi-Scenario Design Sprint | #394 | Phase 1: Design (no sprint entry required); Phase 2: Architecture; Phase 3: Implementation sprint entry | Wave 2 | Design Thinking + UX Designer + Customer Agent → user journeys and use stories first; then Architect assessment of ARCH-REVIEW-007; then sprint entry for implementation. Design may complete in M17; implementation may carry to M18 depending on design complexity. |
-| G3 — Zone 1B Architecture | #1252 | Implementation (ADR-gated) | Wave 2 | Formal proportional allocation between MDAAlertPanelZone1B and CohortImpactSection. ADR required before implementation (ADR-017 amendment or new ADR). `minHeight: 80px` temporary guarantee active. Can run parallel with G4 once ADR is accepted. |
-| G4 — DEMO6 CRITICAL Polish | #1249, #1250, #1253, #1239 | Sequential PRs within single sprint entry | Wave 2 | Four issues: DEMO6-014 curve identifiability (#1249 — CRITICAL), DEMO6-026/043 tablet legibility (#1250 — CRITICAL), DEMO6-040 PSP precedent anchor (#1253 — CRITICAL), DEMO6-010 inverted floor label (#1239 — UI bug). FA-recommended sequence: #1249 → #1253 → #1250 → #1239. All four required before live Demo 7 session is scheduled. |
+| G3 — Zone 1B Deconflict | #1252 | Phase 1: UX brief (no sprint entry; may begin concurrently with G1); Phase 2: ADR authorship; Phase 3: Implementation sprint entry | Wave 2 | UX Designer + Design Thinking produce Zone 1B allocation brief (reading order, proportional model, overflow handling, viewport contract) → BPO accepts → Architect determines ADR scope → ADR accepted → implementation. `minHeight: 80px` temporary guarantee active until implementation. Phase 1 may begin as soon as sprint plan is EL-approved — not blocked by Wave 1 calibration exit. |
+| G4 — DEMO6 CRITICAL Polish | #1249, #1250, #1253, #1239 | UX visual spec per CRITICAL issue before its implementation PR; single sprint entry covers all four | Wave 2 | UX Designer produces a before/after visual spec for each of #1249, #1250, #1253 before its implementation PR opens. #1239 (inverted label — clear bug fix) proceeds directly to implementation. FA-recommended sequence: #1249 (with spec) → #1253 (with spec) → #1250 (with spec) → #1239. All four required before live Demo 7 session is scheduled. |
 | G5 — Infrastructure Fixes | #1220, #1214, #1251 | Implementation | Wave 2 (capacity-allowing after G4) | Test infrastructure bug (#1220 — NM-061 upstream, G3 spec soft-skip); observability fix (#1214 — NM-060 upstream, startup WARNING); adaptive y-axis audit (#1251 — `computeYDomain()` extension). None are demo critical-path. |
 
 ### Issue-to-group full mapping
@@ -231,26 +274,54 @@ G2 Phase 3 (sprint entry required — implementation):
   Implementation — must start after #1249 (Zone 1A identifiability) is merged
 ```
 
+### G3 Phase sequencing detail
+
+```
+G3 Phase 1 (no sprint entry required — UX brief; may begin concurrently with G1):
+  Design Thinking: cognitive task analysis for Zone 1B dual-occupant state
+  UX Designer: Zone 1B allocation brief — proportional model, overflow
+               handling, empty-state behavior, viewport contract
+  Customer Agent: Zone 1B reading order — Aicha (MDA headline first)
+                  vs Lucas (cohort section co-primary)
+        │
+        ↓ BPO accepts Phase 1 brief
+        │
+G3 Phase 2 (no sprint entry required — architecture; after Wave 1 exit):
+  Architect: ADR-017 amendment or new ADR — with UX brief in hand
+             (scope: proportional model, overflow, max-cohort constraint)
+        │
+        ↓ ADR accepted; #1250 merged (no Zone 1B conflicts)
+        │
+G3 Phase 3 (sprint entry required — implementation):
+  QA tests authored — including overflow regression (M16 retrospective)
+  Implementation
+```
+
 ### Wave 2 sequencing diagram
 
 ```
-Wave 1: G1 (CM calibration — FRAME-D exit gate) ──────────────────────────────────────────┐
-                                                                                           │
-                                            ↓ Wave 1 exit confirmed                       │
-                                                                                           │
-G2 Phase 1 (design — parallel with G4/G5 design phases) ──────────────────────────────────┤
-  ↓                                                                                        │
-G2 Phase 2 (architecture — after Phase 1 accepted) ───────────────────────────────────────┤
-  ↓                                                                                        │
-G4 (#1249 → #1253 → #1250 → #1239 — sequential PRs) ─────────────────────────────────────┤
-                                                                                           ├─► G8 (M18 Demo 7)
-G3 (#1252 — after ADR accepted; after #1250 merged) ──────────────────────────────────────┤
-                                                                                           │
-G5 (#1220, #1214, #1251 — capacity-allowing) ─────────────────────────────────────────────┤
-                                                                                           │
-G2 Phase 3 (#394 implementation — after #1249 merged; after Phase 2 architecture) ────────┘
+G1 (CM calibration — Wave 1; FRAME-D exit gate) ─────────────────────────────────────────┐
+                                                                                          │
+[Concurrently with G1 — design phases, no implementation]:                               │
+  G2 Phase 1 (multi-scenario UX journeys + use stories)                                  │
+  G3 Phase 1 (Zone 1B UX brief)                                                          │
+                                                                                          │
+                          ↓ Wave 1 exit confirmed                                        │
+                                                                                          │
+G2 Phase 2 (architecture — ARCH-REVIEW-007 with UX in hand) ─────────────────────────────┤
+G3 Phase 2 (Zone 1B ADR authorship — with UX brief in hand) ─────────────────────────────┤
+                                                                                          │
+G4 UX specs: #1249 spec → impl → #1253 spec → impl → #1250 spec → impl → #1239 impl ────┤
+                                                                                          ├─► G8 (M18 Demo 7)
+G3 Phase 3 (#1252 implementation — after ADR; after #1250 merged) ───────────────────────┤
+                                                                                          │
+G5 (#1220, #1214, #1251 — capacity-allowing) ────────────────────────────────────────────┤
+                                                                                          │
+G2 Phase 3 (#394 implementation — after #1249 merged; after Phase 2 arch) ───────────────┘
   (may carry to M18 if design/architecture phase reveals scope complexity)
 ```
+
+**Key structural change from v2:** G2 Phase 1 and G3 Phase 1 (design work) may begin concurrently with Wave 1 calibration work — design is not blocked by the FRAME-D exit gate. Only implementation (G2 Phase 3, G3 Phase 3, G4 PRs, G5) waits for Wave 1 exit confirmation.
 
 ---
 
@@ -293,11 +364,15 @@ Per `docs/process/sprint-planning-sop.md §Sprint Entry Gate`, implementation ma
 
 **G1 additional requirement:** CM explicitly activated on #1229 and #1248 before G1 sprint entry is filed. The sprint entry must record the CM activation.
 
-**G2 Phase 1 exception:** No sprint entry required for Phase 1 (design work only). Phase 1 produces design artifacts — use stories, UX journeys, wireframes — which are committed to `docs/ux/` or `docs/process/intents/` and BPO-reviewed. Phase 2 (architecture) also requires no sprint entry — it produces an architecture review and ADR decision. Only Phase 3 (implementation) requires a sprint entry document.
+**G2 Phase 1 exception:** No sprint entry required for Phase 1 (design work only — UX journeys, use stories, wireframes). Phase 2 (architecture) also requires no sprint entry. Only Phase 3 (implementation) requires a sprint entry document. Phase 1 may begin concurrently with Wave 1 G1 calibration work — design is not blocked by the FRAME-D exit gate.
 
-**G2 Phase 3 gate:** #1249 must be merged before G2 Phase 3 implementation PR opens. Zone 1A N>2 rendering must not begin on a Zone 1A codebase that has not passed the DEMO6-014 identifiability fix.
+**G2 Phase 3 gate:** #1249 must be merged before G2 Phase 3 implementation PR opens.
 
-**G3 gate:** ADR accepted before implementation PR opens.
+**G3 Phase 1 exception:** No sprint entry required for Phase 1 (UX brief). The brief is committed to `docs/ux/` or as a document on #1252 before Phase 2 begins. Phase 1 may begin concurrently with Wave 1 G1 calibration work.
+
+**G3 Phase 3 gate:** ADR accepted and #1250 merged before G3 implementation PR opens. The Zone 1B proportional allocation implementation must not begin while the tablet legibility fix (#1250) is still in progress — both touch Zone 1B layout.
+
+**G4 UX visual spec gate:** For each DEMO6 CRITICAL issue (#1249, #1250, #1253), the UX Designer's visual spec must exist before that issue's implementation PR opens. The sprint entry for G4 covers all four issues; the visual spec is a per-issue pre-condition on the implementation PR, not on the sprint entry filing. #1239 (inverted label) is a clear bug fix that requires no visual spec — it proceeds directly to implementation once the sprint entry is filed.
 
 ---
 
@@ -313,5 +388,9 @@ Per `docs/process/sprint-planning-sop.md §Sprint Entry Gate`, implementation ma
 8. ⬜ CM activated on #1229 and #1248 — immediately after EL approval
 9. ⬜ G1 sprint entry filed and EL-approved — Wave 1 begins
 10. ⬜ Wave 1 exit gate confirmed by PI Agent
-11. ⬜ G2 Phase 1 (design sprint) begins — Design Thinking + UX Designer + Customer Agent; may run concurrently with Wave 1 G1 work if EL chooses (design work is not blocked by calibration)
-12. ⬜ G4 DEMO6 CRITICAL sprint entry — first Wave 2 implementation group after Wave 1 exits
+11. ⬜ G4 DEMO6 CRITICAL sprint entry — first Wave 2 implementation group after Wave 1 exits
+
+**Design phases (no sprint entry required; may run concurrently with G1 after step 8):**
+- G2 Phase 1: Design Thinking + UX Designer + Customer Agent — multi-scenario journeys, use stories, N>2 zone layout
+- G3 Phase 1: UX Designer + Design Thinking — Zone 1B allocation brief (proportional model, overflow handling, viewport contract, reading order)
+- G4 UX visual specs: UX Designer — before/after spec for #1249, #1250, #1253 individually; may be produced alongside G1 calibration work
