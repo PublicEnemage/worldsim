@@ -213,6 +213,19 @@ export function buildSparklinePoints(
 // ---------------------------------------------------------------------------
 
 /**
+ * Convert a raw source registry ID (e.g. "ECOWAS_REGIONAL_2023") to a
+ * human-readable label ("Ecowas Regional 2023") for display in Zone 1B.
+ * Numeric parts (year) are preserved unchanged; word parts are title-cased.
+ */
+export function formatSourceId(id: string | null | undefined): string {
+  if (!id) return "—";
+  return id
+    .split("_")
+    .map(part => /^\d+$/.test(part) ? part : part.charAt(0).toUpperCase() + part.slice(1).toLowerCase())
+    .join(" ");
+}
+
+/**
  * Format the floor-distance label for a cohort threshold crossing entry.
  * Direction is determined by breaches_below (set by the backend based on
  * comparison_operator): gte thresholds breach when value falls BELOW the floor;
@@ -758,7 +771,7 @@ export function CohortImpactSection({ isCompleted = false }: { isCompleted?: boo
                   <span data-testid={`cohort-value-${crossing.indicator_key}`}>
                     {valueDisplay}
                   </span>
-                  {` · ${crossing.source}`}
+                  {` · ${formatSourceId(crossing.source)}`}
                 </span>
               </span>
               <span

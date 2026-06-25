@@ -570,6 +570,35 @@ mediation — that is the capability change Demo 6 demonstrates.
 and the presenter should not need to look anything up. The T3 badge is on screen
 before the challenge arrives.)*
 
+### "What is the confidence interval on that 0.385 estimate?"
+
+> Tier 3 means we are working from ECOWAS regional comparable economy distributions
+> for West Africa 2022–2023. We have not run country-specific household survey
+> decomposition for this cohort at this level of granularity. That data is not
+> available for this scenario.
+>
+> The practical uncertainty band at T3 is approximately ±0.05 from 0.385 — meaning
+> the actual Q1 informal worker poverty headcount could plausibly range from 0.335
+> to 0.435. The 0.40 recovery floor is inside that range. The T3 label is not a
+> hedge around a known number. It is a precise statement about what we estimated
+> and how. The ECOWAS distributions are the best publicly available source for this
+> cohort at this geography. We chose to declare the inference rather than present a
+> falsely precise number and let you discover the source later.
+>
+> The question this analysis answers is not "is the poverty headcount exactly 0.385?"
+> It is: "under T3 ECOWAS comparable economy weights, which cohorts are in the
+> vicinity of the recovery floor, and what does the 25-year trajectory look like
+> if the programme proceeds as proposed?" That question is answerable at T3. The
+> ministry team can use this analysis to ask the IMF: "What does your distributional
+> model show for this cohort?" — and that question changes the character of
+> the conversation regardless of whether the T3 estimate is within ±0.01 of
+> the IMF's own figure.
+
+*(Presenter note: do not concede that T3 is "not good enough to cite." T3 Inferred
+is a citable, disclosed estimate. The citation is: ECOWAS Regional 2023, declared
+at T3. The IMF's own projections for this cohort are also estimates — the ministry
+team should ask what tier they are and what the source is.)*
+
 ### "How do you define 'bottom quintile informal workers'?"
 
 > The cohort is defined as `SEN:CHT:1-25-54-INFORMAL` in the WorldSim cohort
