@@ -47,9 +47,9 @@
 | #1250 | ux(zone-1b): DEMO6-026/043 tablet legibility at 768px | G4 | Wave 2 | **DEMO6 CRITICAL**; required before live demo session |
 | #1253 | ux(zone-1d): DEMO6-040 PSP historical precedent anchor | G4 | Wave 2 | **DEMO6 CRITICAL**; required before live demo session |
 | #1239 | ux(zone-1b): DEMO6-010 inverted floor label — "above floor" when below | G4 | Wave 2 | UI bug; milestone assigned 2026-06-25 |
-| #1220 | fix(e2e): G3 spec AC-F1–AC-F7 soft-skip — NM-061 upstream | G5 | Wave 2 | Test infrastructure bug; milestone assigned 2026-06-25; **Sprint entry FILED 2026-06-25 — awaiting EL approval** |
-| #1214 | feat(observability): startup WARNING if simulation_entities empty | G5 | Wave 2 | NM-060 upstream; milestone assigned 2026-06-25; **Sprint entry FILED 2026-06-25 — awaiting EL approval** |
-| #1251 | ux(zone-1a): adaptive y-axis extension audit | G5 | Wave 2 | Capacity-allowing; `computeYDomain()` extension; **Sprint entry FILED 2026-06-25 — awaiting EL approval** |
+| #1220 | fix(e2e): G3 spec AC-F1–AC-F7 soft-skip — NM-061 upstream | G5 | Wave 2 | Test infrastructure bug; milestone assigned 2026-06-25; **Sprint entry EL APPROVED 2026-06-25** — `docs/process/sprint-plans/m17-g5-sprint-entry.md`; implementation may begin |
+| #1214 | feat(observability): startup WARNING if simulation_entities empty | G5 | Wave 2 | NM-060 upstream; milestone assigned 2026-06-25; **Sprint entry EL APPROVED 2026-06-25** |
+| #1251 | ux(zone-1a): adaptive y-axis extension audit | G5 | Wave 2 | Capacity-allowing; `computeYDomain()` extension; **Sprint entry EL APPROVED 2026-06-25** |
 | #1275 | feat(simulation): seed SEN institutional_capacity_index + GovernanceElasticity fiscal conditionality entry | Wave 2 (unassigned G-group) | Wave 2 | From CM governance spec Q2; co-gated: data seed + elasticity entry in same PR |
 | #1276 | docs(zone-1d): governance horizon disclosure — divergence is ≥12-step signal | Wave 2 (unassigned G-group) | Wave 2 | From CM governance spec Q3; doc/UI text only; no code change |
 | #1277 | docs(process): sprint-planning-sop.md amendment — UX/UI design artifact gate | Wave 2 (unassigned G-group) | Wave 2 | Promoted from insights log entry 13; G2 §2.5 pattern → SOP |

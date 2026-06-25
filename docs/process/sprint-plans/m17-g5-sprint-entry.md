@@ -3,17 +3,17 @@ name: m17-g5-sprint-entry
 type: sprint-entry
 milestone: M17 — Calibration and Comparative Infrastructure
 sprint-group: G5 — Infrastructure Fixes
-status: Filed — awaiting EL approval before implementation begins
+status: EL Approved 2026-06-25 — implementation may begin on #1220, #1214, and #1251 (audit stage)
 authored-by: PM Agent
 authored-date: 2026-06-25
-el-approved: false
+el-approved: 2026-06-25
 release-branch: release/m17
 sop-reference: docs/process/sprint-planning-sop.md
 ---
 
 # Sprint Entry — M17, G5: Infrastructure Fixes
 
-**Status:** Filed — awaiting EL approval before implementation begins
+**Status:** EL Approved 2026-06-25 — implementation may begin on #1220, #1214, and #1251 (audit stage)
 **Date authored:** 2026-06-25
 **Release branch:** `release/m17`
 **Sprint plan:** `docs/process/sprint-plans/m17-sprint-plan.md` (EL Approved 2026-06-25)
@@ -339,7 +339,10 @@ scope outside ADR-017, the §2.2 escalation path applies.
 
 ## EL Approval Record
 
-**EL approval:** Pending
+**EL approval:** 2026-06-25
 
-> {EL approval statement — to be filled at approval time}
-> — @PublicEnemage ({date})
+> G5 sprint entry approved. Structural gates confirmed clear. ADR N/A confirmed. Wave 2
+> gate clear (Wave 1 exit confirmed 2026-06-25). Implementation may begin on #1220 and
+> #1214 immediately. #1251 audit stage may begin immediately; implementation PR (if any)
+> requires audit finding + conditional intent document + QA test before opening.
+> — @PublicEnemage (2026-06-25)
