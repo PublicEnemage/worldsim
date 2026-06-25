@@ -5,9 +5,29 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-25 (EL decision: #843 live demo deferred to M17/Demo 7 — DEMO6 findings addressed holistically in M17/M18; M16 closes on distributional visibility delivery; G8 closes as preparatory work complete; M16 exit ceremony next)**
-**Current milestone:** M16 — Distributional Visibility (GitHub Milestone 17)
-**Previous milestone:** M15 — Human Cost Architecture (FORMALLY CLOSED 2026-06-23; release/m15 → main PR #1142; v0.15.0; #984 closed; GitHub Milestone 16 closed)
+**Last updated: 2026-06-25 (M16 exit ceremony complete — M16 FORMALLY CLOSED; v0.16.0; #985 closed; GitHub Milestone 17 closed; M17 Calibration and Comparative Infrastructure now current)**
+**Current milestone:** M17 — Calibration and Comparative Infrastructure (GitHub Milestone 18)
+**Previous milestone:** M16 — Distributional Visibility (FORMALLY CLOSED 2026-06-25; release/m16 → main; v0.16.0; #985 closed; GitHub Milestone 17 closed)
+
+---
+
+## M17 Kickoff Prerequisites
+
+**Release branch:** `release/m17` — ⬜ NOT YET CUT (EL must merge release/m16 → main first, then PM Agent cuts release/m17 from main)
+**Sprint plan:** ⬜ NOT YET FILED — `docs/process/sprint-plans/m17-sprint-plan.md` (PM Agent authors at kickoff)
+
+| Step | Status | Notes |
+|---|---|---|
+| 1. EL merges `release/m16` → `main` (admin bypass) | ⬜ PENDING EL ACTION | EL merges the release branch; Claude Code does not do this merge |
+| 2. PM Agent cuts `release/m17` from updated `main` | ⬜ PENDING | After step 1 completes |
+| 3. PM Agent authors `m17-sprint-plan.md` with Wave 1/Wave 2 structure | ⬜ PENDING | Wave 1 = CM calibration sprint; hard gate before Wave 2 |
+| 4. EL approves sprint plan | ⬜ PENDING | EL must approve before any sprint entry may open |
+| 5. #982 exit checklist confirmed as M17 gate issue | ✅ DONE 2026-06-25 | Renamed to "M17 Exit Checklist — blocks milestone closure"; assigned to GitHub Milestone 18 |
+| 6. Wave 1 sprint entry (G1) may open after sprint plan EL-approved | ⬜ PENDING | CM must be activated; #1229 and #1248 are G1 scope |
+
+**Critical prerequisite: M17 Wave 2 may not begin until Wave 1 exits.** Wave 1 exit gate: FRAME-D milestone sentence fires within an 8-step programme window on the Demo 6 Senegal scenario after the elasticity calibration change. DemographicModule ELASTICITY_REGISTRY updated with CM-certified values.
+
+Implementation is NOT yet unblocked. Steps 1–4 above must complete first.
 
 ---
 
@@ -199,6 +219,38 @@ Implementation is now unblocked. A sprint entry document must be filed and EL-ap
 - ✅ **G8 Step 6 screenshots re-captured 2026-06-25** — five frames in `docs/demo/m16/screenshots/`; FIN/GOV curves now visually distinct after adaptive y-axis fix; FRAME-D WARNING remains (pre-existing calibration gap, M17 scope)
 - ✅ **G8 Step 6c audience simulation PR #1244 merged 2026-06-25** — `docs/demo/m16/reviews/2026-06-25-v0.16.0-audience-simulation.md`; four persona agents (P1/P2/P3/P5); 36 findings DEMO6-014 through DEMO6-049 (4 CRITICAL / 11 HIGH / 13 MEDIUM / 5 LOW); **north star gate: CONDITIONAL PASS**; primary finding sentence on record; three mandatory presenter preparation items before Step 9
 - ✅ **G8 CLOSES — preparatory work complete (EL decision 2026-06-25)** — Steps 1–6c delivered: demo scripts, walkthrough, narrated spec, screenshots, internal review, IR review, adaptive y-axis fix, audience simulation (DEMO6-001–049). Step 9 (live demo) deferred to M17/Demo 7 per EL decision. DEMO6 findings are the specification foundation for Demo 7 in M17. #843 moved to M17. M16 exit gate is now distributional visibility delivery (G1–G4/G6/G9/G10), not #843.
+
+---
+
+## M16 Exit Ceremony — 2026-06-25
+
+**Exit ceremony steps:**
+| Step | Status | Notes |
+|---|---|---|
+| Step 1 — Open issue audit | ✅ COMPLETE | 7 issues closed as delivered (#1147, #274, #97, #846, #153, #92, #1209); only #985 remains |
+| Step 2 — Milestone reference audit | ✅ COMPLETE | README badge/status/table updated; CLAUDE.md §What We Are Building First + §Milestone Roadmap updated; roadmap all UNTRACKED entries replaced with issue numbers (PR #1257) |
+| Step 3 — SESSION_STATE consistency | ✅ COMPLETE | Header and current milestone updated; M17 kickoff prerequisites section added; M17 open issues table with Wave 1/Wave 2 structure and #982 gate issue confirmed |
+| Step 4 — Fresh session continuity | ✅ COMPLETE | M17 kickoff prerequisites section added; #982 renamed; Wave 1/Wave 2 gate explicitly documented; no critical/high gaps remain |
+
+**Retrospective (mandatory):**
+
+1. *Defects that evaded the test suite:*
+   - **FRAME-D milestone sentence not visible in Demo 6 window** — surfaced at Step 5b (backend gate), not by the test suite. The DemographicModule elasticity calibration gap (`imf_program_acceptance` producing ~+0.0015pp/step) was not covered by any integration test that would have flagged the insufficient delta.
+   - **Zone 1A FIN/GOV curve overlap (IR-001)** — the adaptive y-axis gap was caught by the IR review (Step 6b), not by any automated test. No Playwright assertion verified that FIN and GOV curves were visually distinguishable when their range was < 0.05.
+   - **Zone 1B MDA alert panel collapse on cohort overflow** — caught during G8 live demo run, not by the G2 or G9 test suites. `minHeight: 0` on the flex container allowed CohortImpactSection to squeeze MDAAlertPanelZone1B to zero when cohort rows filled the natural height.
+   - **G8 strict mode `getByText` collision** (NM-062) — Playwright step-axis `getByText` matched the projection panel's duplicate step text, producing a strict mode error. Caught during Step 6 screenshot capture.
+
+2. *Process gaps that caused them:*
+   - **Calibration gap** — no test verifies that a known-realistic conditionality shock (5% GDP fiscal cut on SEN T3 scenario) produces a cohort poverty headcount change of a defensible magnitude within an 8-step window. The test suite verifies that cohort entities exist and that the endpoint responds — not that the engine's output is analytically meaningful.
+   - **Adaptive y-axis** — the pre-IR test suite had no assertion that verified visual distinguishability (minimum pixel separation between curves of similar value). The `computeYDomain()` unit tests were authored POST-detection (correct fix but test-after, not test-before).
+   - **Zone 1B overflow** — no test verified that the MDA alert panel maintained minimum visible height when CohortImpactSection was populated with multiple rows.
+   - **Demo script locator discipline** — Step 6 screenshot scripts relied on `getByText()` without scoping to a specific parent container, creating fragility when duplicate text appeared in projection panel step axes.
+
+3. *Testing improvements required before M17 close:*
+   - [ ] **Calibration integration test** — after Wave 1 exits, add a backend integration test that asserts: given a representative conditionality shock on a T3 scenario, the cohort poverty headcount delta per step is within the CM-certified ELASTICITY_REGISTRY range. This is the test that would have caught the FRAME-D gap in M16.
+   - [ ] **Visual distinguishability assertion** — after `computeYDomain()` pattern is extended to other instruments (#1251), add Playwright assertions verifying that trajectory curves with value range < 0.10 still produce visually distinct rendered paths (bounding-box separation ≥ N pixels).
+   - [ ] **Zone 1B overflow regression** — add Playwright assertion that `MDAAlertPanelZone1B` maintains minimum visible height (≥ 80px) when `CohortImpactSection` is populated with 4+ cohort rows.
+   - [ ] **Demo script testid discipline** — all demo screenshot scripts must scope locators to named parent containers; `getByText()` without scoping is prohibited in demo scripts (NM-062 countermeasure).
 
 ---
 
@@ -1186,8 +1238,14 @@ CI hotfix: NM-035 filed; `ci.yml` PR trigger updated to include `release/m*` (PR
 
 ## Open Issues — M17 (Calibration and Comparative Infrastructure)
 
-**GitHub Milestone:** 18 | **Created:** 2026-06-16 | **Status:** Planned — no demo
+**GitHub Milestone:** 18 | **Created:** 2026-06-16 | **Status:** Current — no demo; release branch cut at M17 kickoff
 *Wave 1 gated before Wave 2. #407/#5/#4 deferred to M19+. See roadmap §M17.*
+
+**Gate issue:**
+
+| Issue | Title | Notes |
+|---|---|---|
+| #982 | M17 Exit Checklist — blocks milestone closure | `immediate \| M17 gate issue` |
 
 **Wave 1 — Chief Methodologist Calibration Sprint (M17 entry gate; Wave 2 blocked until Wave 1 exit):**
 
