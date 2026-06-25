@@ -1184,17 +1184,42 @@ CI hotfix: NM-035 filed; `ci.yml` PR trigger updated to include `release/m*` (PR
 
 ---
 
-## Open Issues — M17 (Multi-Scenario Infrastructure)
+## Open Issues — M17 (Calibration and Comparative Infrastructure)
 
 **GitHub Milestone:** 18 | **Created:** 2026-06-16 | **Status:** Planned — no demo
-*Multi-scenario comparison infrastructure, entity template library. Sets up Demo 7.*
+*Wave 1 gated before Wave 2. #407/#5/#4 deferred to M19+. See roadmap §M17.*
+
+**Wave 1 — Chief Methodologist Calibration Sprint (M17 entry gate; Wave 2 blocked until Wave 1 exit):**
 
 | Issue | Title | Notes |
 |---|---|---|
-| #394 | platform: multi-scenario comparison (>2 scenarios) | Core Demo 7 prerequisite |
-| #407 | arch(vision): simulation resolution spectrum — entity template library | |
-| #5 | Architecture: data marketplace design | |
-| #4 | Data: advanced geocoded dataset integration | |
+| #1229 | feat(simulation): fiscal-to-cohort elasticity calibration — DemographicModule ELASTICITY_REGISTRY | CM-owned; Wave 1 exit gate (FRAME-D must fire within 8-step window) |
+| #1248 | feat(simulation): governance sensitivity calibration — fiscal conditionality transmission | CM-owned; Wave 1 |
+
+**Wave 2 — Comparative Infrastructure and DEMO6 Polish (begins after Wave 1 exit gate):**
+
+| Issue | Title | Notes |
+|---|---|---|
+| #394 | platform: multi-scenario comparison (>2 scenarios) | Core Demo 7 Act 2 prerequisite |
+| #1249 | ux(zone-1a): Zone 1A trajectory curve identifiability — terminal labels or line style differentiation | DEMO6-014 CRITICAL |
+| #1250 | ux(zone-1b): cohort impact values not legible at tablet scale without zoom | DEMO6-026/043 CRITICAL |
+| #1253 | ux(zone-1d): PSP WARNING historical precedent anchor — comparable programme reference in Zone 1D | DEMO6-040 CRITICAL |
+| #1251 | ux(zone-1a): adaptive y-axis extension — audit all instruments for fixed-domain overlap failure mode | IR-001 pattern extension |
+| #1252 | arch(zone-1b): proportional allocation between MDA alert panel and CohortImpactSection | M16 minHeight:80px temporary fix → durable design |
+
+---
+
+## Open Issues — M18 (Full Argument and Demo 7)
+
+**GitHub Milestone:** 19 | **Status:** Planned — Demo 7 is M18 exit gate
+*Mode 3 interrogation + three-scenario comparison + CI bands + live demo.*
+
+| Issue | Title | Notes |
+|---|---|---|
+| #843 | plan: live stakeholder demo with real external participants | M18 exit gate; Demo 7 (Senegal Mode 3 + Zambia three-scenario) |
+| #1254 | ux(zone-1a): CI bands on Zone 1A trajectory curves — ADR-007 implementation | DEMO6-015; ADR required before implementation |
+| #1255 | ux(zone-1d): PSP driver decomposition — dominant signal category visible alongside severity label | DEMO6-036 |
+| #1256 | feat(data): Path 2 — ministry-supplied proprietary data integration | Capacity-allowing; does not gate Demo 7 |
 
 ---
 
