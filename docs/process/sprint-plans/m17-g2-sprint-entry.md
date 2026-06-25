@@ -55,8 +55,8 @@ on this entry document's filing.*
 | G2 Phase 1 design artifact panel review: UX mockups (and UI mockups if produced) reviewed and approved by the Phase 1 design panel before BPO acceptance | UX Designer (R) + Design Thinking + Customer Agent + Frontend Architect + Business PO | ✅ COMPLETE 2026-06-25 — 4/4 PASS; panel summary comment #394#issuecomment-4803973123; UX mockups sufficient (no UI mockup conditions triggered) |
 | G2 Phase 1 BPO acceptance: BPO accepts Phase 1 design output (use stories + journeys + approved mockups) | Business PO | ✅ BPO ACCEPT 2026-06-25 — #394#issuecomment-4803977557; AC-1–AC-10 all satisfied; Phase 3 fixture-based approach accepted |
 | G2 Phase 2 complete: Architect assesses ARCH-REVIEW-007 with UX in hand; ADR determination | Architect + Frontend Architect | ✅ COMPLETE 2026-06-25 — PR #1280 merged; `ARCH-REVIEW-007-m17-n3-assessment.md`; ADR determination option (b): review note on #394 sufficient; no new ADR |
-| Intent document filed for #394 implementation (must reference approved mockups) | PM Agent + UX Designer | ⬜ PENDING Phase 1/2 |
-| QA test file authored before implementation begins | QA Lead | ⬜ PENDING intent document |
+| Intent document filed for #394 implementation (must reference approved mockups) | PM Agent + UX Designer | ✅ FILED 2026-06-25 — `docs/process/intents/M17-G2-2026-06-25-multi-scenario-comparison.md` (PR #1289) |
+| QA test file authored before implementation begins | QA Lead | ✅ FILED 2026-06-25 — `frontend/tests/e2e/m17-g2-multi-scenario-comparison.spec.ts`; AC-S1/A1/B1/D1/P1/P3/P5 asserted (PR #1289) |
 | #1249 merged to `release/m17` | G4 sprint group | ⬜ PENDING G4 |
 
 ---
@@ -126,14 +126,10 @@ formal ADR. This is also resolved in Phase 2.
 implementation PR opens. The QA Lead must be able to write tests from it without reading
 implementation code.*
 
-- [ ] **Intent document gate: PENDING** — intent document cannot be authored until Phase 1
-  (UX journeys, use stories, N>2 mockups) is complete, panel-reviewed, and BPO-accepted.
-  The intent document's acceptance criteria are derived from the Phase 1 use stories and
-  Phase 2 component scope. **The intent document must include or reference the approved UX
-  mockups (and UI mockups if produced) as the authoritative visual specification — QA Lead
-  writes assertions against the mockup-defined observable states, not against implementation
-  inference.** If UI mockups were produced and panel-approved, they are the binding visual
-  specification; if only UX mockups exist, they are the binding specification.
+- [x] **Intent document gate: COMPLETE 2026-06-25** — filed at
+  `docs/process/intents/M17-G2-2026-06-25-multi-scenario-comparison.md` (PR #1289 merged);
+  references approved UX mockups (`ux-journeys-n3.md`, `persona-mvs-n3.md`); all eight content
+  requirements satisfied; QA Lead can write tests from it without reading implementation code.
 
 **Intent document content requirements (to be satisfied at filing):**
 
@@ -215,7 +211,7 @@ document's acceptance criteria:
 
 | Deliverable | Intent document | Test file path | Authored before implementation? |
 |---|---|---|---|
-| #394 — Multi-scenario comparison (N>2) | `docs/process/intents/M17-G2-{YYYY-MM-DD}-multi-scenario-comparison.md` | `frontend/tests/e2e/m17-g2-multi-scenario-comparison.spec.ts` | **No — BLOCKING** |
+| #394 — Multi-scenario comparison (N>2) | `docs/process/intents/M17-G2-2026-06-25-multi-scenario-comparison.md` | `frontend/tests/e2e/m17-g2-multi-scenario-comparison.spec.ts` | **✅ AUTHORED 2026-06-25** (PR #1289) |
 
 ### 2.5 — Phase 1 design artifact standards and panel review gate
 
