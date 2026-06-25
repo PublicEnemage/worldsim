@@ -3,17 +3,17 @@ name: m17-g3-sprint-entry
 type: sprint-entry
 milestone: M17 — Calibration and Comparative Infrastructure
 sprint-group: G3 (Phase 3 — Implementation)
-status: Draft — pending Phase 1/2 completion; EL approval required before implementation PR opens
+status: EL Approved 2026-06-25 — Phase 1 UX brief may begin; implementation PR requires all §2.2–§2.5 conditions satisfied
 authored-by: PM Agent
 authored-date: 2026-06-25
-el-approved: false
+el-approved: 2026-06-25
 release-branch: release/m17
 sop-reference: docs/process/sprint-planning-sop.md
 ---
 
 # Sprint Entry — M17, G3: Zone 1B Deconflict (Phase 3 Implementation)
 
-**Status:** Draft — conditions pending Phase 1 and Phase 2 completion; EL approval required before any implementation PR opens
+**Status:** EL Approved 2026-06-25 — Phase 1 UX brief may begin; implementation PR requires all §2.2–§2.5 conditions satisfied
 **Date authored:** 2026-06-25
 **Release branch:** `release/m17`
 **Sprint plan:** `docs/process/sprint-plans/m17-sprint-plan.md` (EL Approved 2026-06-25)
@@ -418,14 +418,14 @@ At the next HORIZON sweep, PM Agent must:
 
 ## EL Approval Record
 
-**EL approval:** Pending — entry filed as draft; all PENDING conditions above must be resolved before EL approval is requested
+**EL approval:** Approved 2026-06-25
 
-*EL approval may not be granted until all §2.2, §2.3, §2.4, and §2.5 PENDING items are checked.
-Specifically: (1) G3 Phase 1 UX brief is complete, panel-reviewed (all panel verdicts PASS),
-and BPO-accepted; (2) G3 Phase 2 Architect ADR determination is filed on #1252 and the required
-ADR (Path A amendment or Path B new ADR) is accepted; (3) intent document is filed at
-`docs/process/intents/M17-G3-{date}-zone-1b-proportional-allocation.md`; (4) QA test file
-`frontend/tests/e2e/m17-g3-zone-1b-allocation.spec.ts` is authored and on record.*
+*The structural gates (§2.1) are CLEAR. The remaining PENDING conditions (§2.2 ADR gate,
+§2.3 intent document, §2.4 QA tests, §2.5 panel review) must be satisfied before any
+Phase 3 implementation PR opens — EL approval of this entry document does not substitute
+for those per-phase gates. Phase 1 (UX brief) may begin immediately.*
 
-> {EL approval statement — to be filled at approval time, once all PENDING conditions confirmed}
-> — @PublicEnemage ({date})
+> G3 sprint entry approved. Phase 1 UX brief (Zone 1B allocation brief — four questions:
+> proportional model, overflow handling, empty-state behavior, viewport contract) may begin.
+> Implementation PR may not open until §2.2–§2.5 are satisfied.
+> — @PublicEnemage (2026-06-25)
