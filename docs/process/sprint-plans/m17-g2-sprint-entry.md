@@ -275,7 +275,9 @@ journeys at both viewports are present.
 
 Each panel member records their verdict as a comment on GitHub issue #394. The UX Designer
 collects the verdicts and produces a panel summary comment on #394 before PM Agent routes to
-BPO for formal acceptance. The panel summary must record:
+BPO for formal acceptance. **The panel summary comment must explicitly tag the PM Agent
+(@PublicEnemage) — a summary comment without this tag does not constitute a routing signal
+and PM Agent is not obligated to act on it.** The panel summary must record:
 
 - Count of panel members who reviewed
 - Any REJECT verdict and the specific concern raised
