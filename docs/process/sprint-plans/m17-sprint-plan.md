@@ -2,11 +2,11 @@
 name: m17-sprint-plan
 type: sprint-plan
 milestone: M17 — Calibration and Comparative Infrastructure
-status: Pending EL Approval
+status: EL Approved — implementation may begin; G1 sprint entry required before Wave 1 begins; design phases (G2/G3 Phase 1, G4 visual specs) may begin immediately
 authored-by: PM Agent
 authored-date: 2026-06-25
 amended: 2026-06-25v2 — issue audit complete; G2 restructured UX-first per EL direction; 2026-06-25v3 — G3 Zone 1B deconflict UX brief added; G4 UX visual spec requirement added per issue; design-before-architecture principle applied consistently across all Wave 2 groups
-el-approved:
+el-approved: 2026-06-25
 consulted-agents:
   - Chief Methodologist (Wave 1 calibration scope and uncertainty; exit gate specification)
   - Business Product Owner (Demo 7 value prioritization; scope cut order; #394 Demo 7 narrative)
@@ -20,7 +20,7 @@ sop-reference: docs/process/sprint-planning-sop.md
 
 # M17 Sprint Plan — Calibration and Comparative Infrastructure
 
-**Status:** Pending EL Approval — implementation may NOT begin until this plan is EL-approved and a sprint entry document is filed per group
+**Status:** EL Approved 2026-06-25 — G1 sprint entry required before Wave 1 begins; design phases (G2/G3 Phase 1, G4 visual specs) may begin immediately
 **Release branch:** `release/m17` (cut from `main` at commit d806957, 2026-06-25)
 **Exit checklist issue:** #982 (renamed 2026-06-25 — "M17 Exit Checklist — blocks milestone closure")
 **Primary objective:** Make Demo 7 analytically defensible. Two-wave structure: Wave 1 (CM calibration sprint) is the hard prerequisite for Wave 2. Wave 2 is anchored by UX-grounded multi-scenario design (#394) and DEMO6 CRITICAL polish. No live demo at M17 close — Demo 7 is at M18.
@@ -37,8 +37,8 @@ sop-reference: docs/process/sprint-planning-sop.md
 |---|---|---|
 | 1. EL merges `release/m16` → `main` (admin bypass) | ✅ DONE 2026-06-25 | PR #1259 merged |
 | 2. PM Agent cuts `release/m17` from `main` | ✅ DONE 2026-06-25 | `release/m17` cut at commit d806957 |
-| 3. PM Agent authors `m17-sprint-plan.md` | ✅ THIS DOCUMENT | Filed 2026-06-25; EL approval pending |
-| 4. EL approves sprint plan | ⬜ PENDING | Required before any sprint entry is filed |
+| 3. PM Agent authors `m17-sprint-plan.md` | ✅ THIS DOCUMENT | Filed 2026-06-25 (v3); EL-approved 2026-06-25 |
+| 4. EL approves sprint plan | ✅ EL APPROVED 2026-06-25 | Design phases may begin immediately; G1 sprint entry required before Wave 1 begins |
 | 5. #982 renamed "M17 Exit Checklist" | ✅ DONE 2026-06-25 | GitHub milestone 18 |
 | 6. CI trigger verified | ✅ CLEAR | `.github/workflows/ci.yml` covers `release/m*` |
 
@@ -384,7 +384,7 @@ Per `docs/process/sprint-planning-sop.md §Sprint Entry Gate`, implementation ma
 4. ✅ #982 renamed "M17 Exit Checklist" — DONE 2026-06-25
 5. ✅ Issue audit complete — all open issues accounted for; #1229 assigned to M17; #843 moved to M18; #1225 closed; six issues milestoned — DONE 2026-06-25
 6. ✅ This sprint plan filed — DONE 2026-06-25 (v2)
-7. ⬜ EL approves sprint plan
+7. ✅ EL APPROVED 2026-06-25
 8. ⬜ CM activated on #1229 and #1248 — immediately after EL approval
 9. ⬜ G1 sprint entry filed and EL-approved — Wave 1 begins
 10. ⬜ Wave 1 exit gate confirmed by PI Agent

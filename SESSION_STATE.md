@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-25 (HORIZON sweep complete; M17 kickoff — release/m17 cut; m17-sprint-plan.md filed; EL approval pending)**
+**Last updated: 2026-06-25 (HORIZON sweep complete; M17 kickoff — release/m17 cut; m17-sprint-plan.md filed; EL APPROVED 2026-06-25; G1 sprint entry next)**
 **Current milestone:** M17 — Calibration and Comparative Infrastructure (GitHub Milestone 18)
 **Previous milestone:** M16 — Distributional Visibility (FORMALLY CLOSED 2026-06-25; release/m16 → main; v0.16.0; #985 closed; GitHub Milestone 17 closed)
 
@@ -14,20 +14,20 @@
 ## M17 Kickoff Prerequisites
 
 **Release branch:** `release/m17` — ✅ CUT 2026-06-25 from `main` at commit d806957
-**Sprint plan:** ✅ FILED 2026-06-25 — `docs/process/sprint-plans/m17-sprint-plan.md` (PR pending EL approval)
+**Sprint plan:** ✅ FILED + EL APPROVED 2026-06-25 — `docs/process/sprint-plans/m17-sprint-plan.md`
 
 | Step | Status | Notes |
 |---|---|---|
 | 1. EL merges `release/m16` → `main` (admin bypass) | ✅ DONE 2026-06-25 | PR #1259 merged |
 | 2. PM Agent cuts `release/m17` from updated `main` | ✅ DONE 2026-06-25 | `release/m17` cut at commit d806957 |
 | 3. PM Agent authors `m17-sprint-plan.md` with Wave 1/Wave 2 structure | ✅ DONE 2026-06-25 | Wave 1 = CM calibration sprint; Wave 2 = DEMO6 CRITICAL + comparative infrastructure; hard gate between waves |
-| 4. EL approves sprint plan | ⬜ PENDING | EL must approve before any sprint entry may open |
+| 4. EL approves sprint plan | ✅ EL APPROVED 2026-06-25 | Design phases may begin immediately; G1 sprint entry required before Wave 1 begins |
 | 5. #982 exit checklist confirmed as M17 gate issue | ✅ DONE 2026-06-25 | Renamed to "M17 Exit Checklist — blocks milestone closure"; assigned to GitHub Milestone 18 |
 | 6. Wave 1 sprint entry (G1) may open after sprint plan EL-approved | ⬜ PENDING | CM must be activated on #1229 and #1248 before G1 sprint entry is filed |
 
 **Critical prerequisite: M17 Wave 2 may not begin until Wave 1 exits.** Wave 1 exit gate: FRAME-D milestone sentence fires within an 8-step programme window on the Demo 6 Senegal scenario after the elasticity calibration change. DemographicModule ELASTICITY_REGISTRY updated with CM-certified values. Governance calibration specification on record.
 
-Implementation is NOT yet unblocked. Step 4 (EL sprint plan approval) must complete first.
+**Sprint plan EL-approved.** Design phases (G2 Phase 1, G3 Phase 1, G4 visual specs) may begin immediately. G1 sprint entry required before Wave 1 implementation begins. Next action: activate CM on #1229 and #1248, file G1 sprint entry.
 
 ---
 
@@ -54,7 +54,7 @@ Implementation is NOT yet unblocked. Step 4 (EL sprint plan approval) must compl
 **Deferred to M18:** #843 (Demo 7 live session), #1217 (Mode 3 render optimization), #1238 (DEMO6-009 narration), #1059 (HCL demo narration), #1254 (CI bands), #1255 (PSP driver decomp), #1256 (Path 2)
 **Closed at audit:** #1225 (Demo 6 prep — Steps 1–6c complete)
 
-**M17 sprint plan:** `docs/process/sprint-plans/m17-sprint-plan.md` — filed 2026-06-25 (v2, EL-directed revisions); **EL approval pending (step 4)**
+**M17 sprint plan:** `docs/process/sprint-plans/m17-sprint-plan.md` — filed 2026-06-25 (v3, EL-directed revisions); **EL APPROVED 2026-06-25**
 
 ---
 
@@ -102,13 +102,13 @@ Implementation is now unblocked. A sprint entry document must be filed and EL-ap
 - None — all promoted entries were filed during M16 exit ceremony (PR #1257) or G8 Step 5b sprint work; DEMO6 high/medium/low findings remain reference material until M17 Wave 2 scope planning
 
 **Process gaps identified:**
-- **M17 kickoff prerequisite steps 1–4 are pending.** No implementation is unblocked. Required chain: (1) EL merges `release/m16` → `main` (admin bypass); (2) PM Agent cuts `release/m17` from updated `main`; (3) PM Agent authors `m17-sprint-plan.md` with Wave 1/Wave 2 structure; (4) EL approves sprint plan. Wave 1 sprint entry (G1) may not open until step 4 completes.
+- **M17 kickoff prerequisites all complete as of 2026-06-25.** Steps 1–4 done: (1) EL merged `release/m16` → `main` (PR #1259); (2) PM Agent cut `release/m17`; (3) PM Agent authored `m17-sprint-plan.md` (v3); (4) EL approved sprint plan 2026-06-25. Design phases (G2 Phase 1, G3 Phase 1, G4 visual specs) may begin immediately. G1 sprint entry required before Wave 1 begins.
 - No near-misses to file. No new ADR backlog assignments required at this sweep.
 
-**M17 kickoff status at sweep time:**
-- `release/m17`: ⬜ not yet cut (step 1 pending EL action)
-- `m17-sprint-plan.md`: ⬜ not yet filed
-- EL sprint plan approval: ⬜ pending
+**M17 kickoff status at sweep time (updated at EL approval):**
+- `release/m17`: ✅ cut 2026-06-25 from `main` at d806957
+- `m17-sprint-plan.md`: ✅ filed 2026-06-25 (v3, EL-directed revisions)
+- EL sprint plan approval: ✅ APPROVED 2026-06-25
 - #982 (M17 Exit Checklist): ✅ renamed 2026-06-25
 - Wave 1 issues in scope: #1229 (fiscal elasticity, CM-owned), #1248 (governance sensitivity, CM-owned)
 - Wave 1 exit gate: FRAME-D milestone sentence fires within 8-step Demo 6 window after CM-certified ELASTICITY_REGISTRY change
