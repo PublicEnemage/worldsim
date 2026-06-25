@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-25 (G5 sprint entry FILED 2026-06-25 — `docs/process/sprint-plans/m17-g5-sprint-entry.md`; awaiting EL approval; G2 Phase 3 intent doc + QA test filed — PR #1287 open pending CI; sprint entry READY FOR EL REVIEW; remaining Phase 3 hard gate: #1249 merge only; BPO ACCEPT 2026-06-25 on record; Architect Phase 2 filed #394#issuecomment-4804024195)**
+**Last updated: 2026-06-25 (G3 Phase 2 ADR-018 accepted — PR #1291 merged; [ADR-VALUE]=80px; Architect determination on #1252; G5 sprint entry filed PR ready EL approval; G2-P3 intent+QA PR #1289 pending playwright CI; G3 early QA PR #1290 playwright failing intentionally — AC-A2 pre-impl red)**
 **Current milestone:** M17 — Calibration and Comparative Infrastructure (GitHub Milestone 18)
 **Previous milestone:** M16 — Distributional Visibility (FORMALLY CLOSED 2026-06-25; release/m16 → main; v0.16.0; #985 closed; GitHub Milestone 17 closed)
 
@@ -42,7 +42,7 @@
 | #1229 | feat(simulation): fiscal-to-cohort elasticity calibration — ELASTICITY_REGISTRY | G1 | Wave 1 | ✅ BPO ACCEPT 2026-06-25 — PR #1270 merged; FRAME-D tests pass; CM-certified constants on release/m17; sprint exit confirmed |
 | #1248 | feat(simulation): governance sensitivity calibration — GovernanceModule fiscal conditionality | G1 | Wave 1 | ✅ BPO ACCEPT 2026-06-25 (Wave 1 spec) — governance sensitivity spec filed (PR #1270); three CM positions on record; sprint exit confirmed; Wave 2 code changes gated on data preconditions |
 | #394 | feat: multi-scenario comparison (>2 scenarios) | G2 | Wave 2 | **Phase 1 + Phase 2 COMPLETE 2026-06-25** — PR #1280 merged; Artifact 1 (`ux-journeys-n3.md`), Artifact 2 (`persona-mvs-n3.md`), Artifact 3 (`ARCH-REVIEW-007-m17-n3-assessment.md`); ADR determination option (b) — review note on #394 sufficient, no new ADR; Phase 3 gate: BPO Phase 1 acceptance + #1249 merge required before sprint entry EL approval + Phase 3 PR |
-| #1252 | arch(zone-1b): Zone 1B proportional allocation — MDA alert vs cohort sections | G3 | Wave 2 | **Sprint entry EL APPROVED 2026-06-25** — `docs/process/sprint-plans/m17-g3-sprint-entry.md`; Phase 1 UX brief may begin; ADR gate PENDING Phase 2; `minHeight: 80px` temporary guarantee active |
+| #1252 | arch(zone-1b): Zone 1B proportional allocation — MDA alert vs cohort sections | G3 | Wave 2 | **Phase 1 BPO ACCEPTED + Phase 2 ADR-018 ACCEPTED 2026-06-25** — PR #1291 merged; ARCH-012 → ADR-018; [ADR-VALUE]=80px (all breakpoints); G2 compatible; minHeight:80px superseded; G3 sprint entry gate: QA✅ (early-filed PR #1290 — playwright failing intentionally on AC-A2); EL sprint entry approval PENDING; #1250 merge gate PENDING |
 | #1249 | ux(zone-1a): DEMO6-014 curve identifiability | G4 | Wave 2 | **DEMO6 CRITICAL**; required before live demo session |
 | #1250 | ux(zone-1b): DEMO6-026/043 tablet legibility at 768px | G4 | Wave 2 | **DEMO6 CRITICAL**; required before live demo session |
 | #1253 | ux(zone-1d): DEMO6-040 PSP historical precedent anchor | G4 | Wave 2 | **DEMO6 CRITICAL**; required before live demo session |
