@@ -1,8 +1,8 @@
 # CLAUDE.md — WorldSim Project Context
 
-> Last significant revision: 2026-06-23
-> Updated against: M15 closed — Human Cost Architecture complete; ADR-017 Zone 1A information architecture; Layer 3 self-interpreting outputs (Zone 1B + Zone 1D); Path 1 approved source network; cohort/political risk designs; accessibility validation; CLAUDE.md extraction; M16 Distributional Visibility now current
-> Previous version context: 2026-06-20 — M14 closed; M15 active; Trust Architecture complete; ADR-016/ADR-015 delivered; Demo 5 (Zambia 2024 IMF ECF)
+> Last significant revision: 2026-06-25
+> Updated against: M16 exit gate revised — #843 live demo deferred to M17/Demo 7 (EL decision 2026-06-25); M16 closes on distributional visibility delivery; DEMO6 findings (001–049) retained as Demo 7 specification foundation
+> Previous version context: 2026-06-23 — M15 closed; M16 active; ADR-017 Zone 1A information architecture; Layer 3 self-interpreting outputs; cohort/political risk designs; accessibility validation; CLAUDE.md extraction
 
 > **Reader Orientation:** This is the permanent project constitution — read it in full before beginning any session. It contains the mission, architectural commitments, and process rules that govern all work in this repository. Anyone making a change in this codebase, human or agent, must have read this document first. Key must-read sections if time is short: Session Continuity (what to read and in what order), Guiding Principles (the values behind every technical decision), and §Architectural Principles for Claude Code Sessions (process gates including pre-push lint, PR merge gate, and file authority rules that will cause compliance violations if not followed).
 
@@ -290,13 +290,13 @@ See GitHub Releases for full delivery history.
 **Milestone 16 — Distributional Visibility (Current)**
 
 *Primary objective (M16):*
-- Zone 1A implementation (Phase 4) — composite encoding in primary viewport (#845)
-- Cohort disaggregation on primary surface (#986) — design done in M15; implementation M16
-- Political risk summary surface (#987) — design done in M15; implementation M16
-- Live stakeholder demo with real external participants (#843) — deferred from M15 (EL decision 2026-06-23); M16 exit gate
-- Demo 6 (Senegalese Finance Minister scenario — distributional human cost argument)
+- Zone 1A implementation (Phase 4) — composite encoding in primary viewport (#845) ✅ COMPLETE
+- Cohort disaggregation on primary surface (#986) ✅ COMPLETE
+- Political risk summary surface (#987) ✅ COMPLETE
+- Demo 6 preparation — Steps 1–6c complete; DEMO6-001–049 findings record on file; north star finding sentence recorded
+- Live stakeholder demo with real external participants (#843) — **deferred to M17/Demo 7 (EL decision 2026-06-25)**; DEMO6 findings address holistically in M17/M18 alongside Mode 3 and calibrated fiscal-to-cohort elasticity
 
-M16 closes with live external participant engagement (#843) and distributional visibility on the primary surface.
+M16 closes on distributional visibility delivery. The live external demo is Demo 7, scoped to M17 when Mode 3 Active Control is available and the DEMO6 legibility/calibration gaps are resolved holistically.
 
 Each milestone is a vertical slice — working software at every stage,
 not infrastructure waiting for features.
@@ -313,7 +313,7 @@ The full roadmap covering M16 and beyond — milestone deliverables, demo anchor
 Delivered: ADR-017 (Zone 1A Information Architecture), Layer 3 self-interpreting outputs (trajectory sentence Zone 1B, PSP sentence Zone 1D, L0 badges, grounding strip disambiguation and date accuracy), cohort disaggregation design (#986), political risk summary design (#987), Path 1 approved source network (#975), accessibility validation (VC-1/VC-2/VC-4 PASS), process documentation extraction (CLAUDE.md 1,082→800 lines). Live external demo (#843) deferred to M16 (EL decision 2026-06-23).
 
 **Milestone 16 — Distributional Visibility (Current)**
-Core deliverable: Zone 1A implementation (Phase 4), cohort disaggregation on primary surface (#986), political risk summary implementation (#987), live stakeholder demo with real external participants (#843 — M16 exit gate), Demo 6 (Senegalese Finance Minister scenario).
+Core deliverable: Zone 1A implementation (Phase 4), cohort disaggregation on primary surface (#986), political risk summary implementation (#987), Demo 6 preparation (Steps 1–6c; DEMO6 findings; north star finding sentence). Live external demo (#843) deferred to M17/Demo 7 (EL decision 2026-06-25) — DEMO6 legibility and calibration gaps addressed holistically alongside Mode 3.
 
 Full roadmap: `docs/roadmap/worldsim-roadmap.md`
 
