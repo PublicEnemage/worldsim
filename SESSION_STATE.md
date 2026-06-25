@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-25 (G1 implementation COMPLETE — PR #1270 merged; ELASTICITY_REGISTRY SSA recalibration on release/m17; governance sensitivity spec filed; FRAME-D tests pass in CI; Wave 1 exit gate ready for PI Agent confirmation)**
+**Last updated: 2026-06-25 (G1 WAVE 1 EXIT GATE CONFIRMED — Sprint exit doc filed; BPO ACCEPT on #1229 + #1248; PI Agent confirmation complete; Wave 2 implementation sprint entries now unblocked)**
 **Current milestone:** M17 — Calibration and Comparative Infrastructure (GitHub Milestone 18)
 **Previous milestone:** M16 — Distributional Visibility (FORMALLY CLOSED 2026-06-25; release/m16 → main; v0.16.0; #985 closed; GitHub Milestone 17 closed)
 
@@ -27,7 +27,7 @@
 
 **Critical prerequisite: M17 Wave 2 may not begin until Wave 1 exits.** Wave 1 exit gate: FRAME-D milestone sentence fires within an 8-step programme window on the Demo 6 Senegal scenario after the elasticity calibration change. DemographicModule ELASTICITY_REGISTRY updated with CM-certified values. Governance calibration specification on record.
 
-**M17 kickoff COMPLETE. G1 implementation COMPLETE.** PR #1270 merged 2026-06-25. ELASTICITY_REGISTRY revised: Q1 informal −0.20, Q2 informal −0.133, Q1 agricultural −0.16 (all T3, Fosu 2011 SSA calibration). Fosu 2011 source seeded in source_registry (migration a3b5d7f9e2c1). Governance sensitivity spec filed (docs/calibration/m17-g1-governance-sensitivity-specification.md — three CM positions: Q1 working-as-designed, Q2 institutional capacity deferred to Wave 2 with data precondition, Q3 working-as-designed with transparency disclosure recommended). FRAME-D tests pass in CI (test-backend green on PR #1270). **Wave 1 exit gate ready for PI Agent confirmation.** Wave 2 implementation sprint entries may open after PI Agent confirms exit gate.
+**M17 kickoff COMPLETE. G1 WAVE 1 EXIT GATE CONFIRMED 2026-06-25.** PR #1270 merged 2026-06-25. ELASTICITY_REGISTRY revised: Q1 informal −0.20, Q2 informal −0.133, Q1 agricultural −0.16 (all T3, Fosu 2011 SSA calibration). Fosu 2011 source seeded in source_registry (migration a3b5d7f9e2c1). Governance sensitivity spec filed (docs/calibration/m17-g1-governance-sensitivity-specification.md — three CM positions: Q1 working-as-designed, Q2 institutional capacity deferred to Wave 2 with data precondition, Q3 working-as-designed with transparency disclosure recommended). FRAME-D tests pass in CI (test-backend green on PR #1270). Sprint exit doc filed: `docs/process/sprint-plans/m17-g1-sprint-exit.md`. BPO supplemental assessment: #1229 ACCEPT + #1248 ACCEPT (2026-06-25). PI Agent confirmation: CONFIRMED — all Wave 1 exit conditions satisfied. **Wave 2 implementation sprint entries now unblocked.** PM Agent action at next HORIZON sweep: file two Wave 2 issues from governance specification §Summary (SEN institutional_capacity_index seed + GovernanceElasticity; Zone 1D governance horizon tooltip).
 
 ---
 
@@ -39,8 +39,8 @@
 | Issue | Title | Group | Wave | Notes |
 |---|---|---|---|---|
 | #982 | M17 Exit Checklist — blocks milestone closure | — | — | `immediate \| M17 gate issue` |
-| #1229 | feat(simulation): fiscal-to-cohort elasticity calibration — ELASTICITY_REGISTRY | G1 | Wave 1 | ✅ COMPLETE — PR #1270 merged 2026-06-25; FRAME-D tests pass; CM-certified constants on release/m17 |
-| #1248 | feat(simulation): governance sensitivity calibration — GovernanceModule fiscal conditionality | G1 | Wave 1 | ✅ COMPLETE (Wave 1 spec) — governance sensitivity spec filed 2026-06-25 (PR #1270); three CM positions on record; Wave 2 code changes gated on data preconditions |
+| #1229 | feat(simulation): fiscal-to-cohort elasticity calibration — ELASTICITY_REGISTRY | G1 | Wave 1 | ✅ BPO ACCEPT 2026-06-25 — PR #1270 merged; FRAME-D tests pass; CM-certified constants on release/m17; sprint exit confirmed |
+| #1248 | feat(simulation): governance sensitivity calibration — GovernanceModule fiscal conditionality | G1 | Wave 1 | ✅ BPO ACCEPT 2026-06-25 (Wave 1 spec) — governance sensitivity spec filed (PR #1270); three CM positions on record; sprint exit confirmed; Wave 2 code changes gated on data preconditions |
 | #394 | feat: multi-scenario comparison (>2 scenarios) | G2 | Wave 2 | **UX design sprint first** — Design Thinking + UX Designer + Customer Agent → use stories → architecture; implementation may carry to M18 |
 | #1252 | arch(zone-1b): Zone 1B proportional allocation — MDA alert vs cohort sections | G3 | Wave 2 | ADR required before implementation; `minHeight: 80px` temporary guarantee active |
 | #1249 | ux(zone-1a): DEMO6-014 curve identifiability | G4 | Wave 2 | **DEMO6 CRITICAL**; required before live demo session |
