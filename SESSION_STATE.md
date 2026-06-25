@@ -33,22 +33,28 @@ Implementation is NOT yet unblocked. Step 4 (EL sprint plan approval) must compl
 
 ## Open Issues — M17 (Calibration and Comparative Infrastructure)
 
-**GitHub Milestone:** 18 | **Created:** 2026-06-25 | **Status:** Kickoff in progress — sprint plan filed, EL approval pending; implementation NOT yet unblocked
+**GitHub Milestone:** 18 | **Created:** 2026-06-25 | **Status:** Kickoff in progress — sprint plan v2 filed, EL approval pending; implementation NOT yet unblocked
+**Issue audit:** Complete 2026-06-25. All open issues accounted for. #1229 assigned to M17; #843 moved to M18 + title corrected; #1225 closed; #1239/#1220/#1214 assigned to M17; #1217/#1238/#1059 assigned to M18.
 
 | Issue | Title | Group | Wave | Notes |
 |---|---|---|---|---|
-| #982 | M17 Exit Checklist — blocks milestone closure | — | — | `immediate \| M17 gate issue` — renamed 2026-06-25 |
-| #843 | plan: live stakeholder demo with real external participants | G8/M18 | — | **DEFERRED TO M18/Demo 7** — depends on Mode 3 (M18 north star); DEMO6 findings are specification foundation |
-| #1229 | feat(simulation): fiscal-to-cohort elasticity calibration — DemographicModule ELASTICITY_REGISTRY | G1 | Wave 1 | CM-owned; Wave 1 entry gate for entire milestone; FRAME-D exit condition |
-| #1248 | feat(simulation): governance sensitivity calibration — GovernanceModule fiscal conditionality | G1 | Wave 1 | CM-owned; specification may precede implementation; does not block Wave 1 exit if spec on record |
-| #394 | feat: multi-scenario comparison (>2 scenarios) | G2 | Wave 2 | Architect ARCH-REVIEW-007 N≤2 constraint assessment required at sprint entry; Demo 7 Act 2 (Zambia three-scenario) |
-| #1252 | ux(zone-1b): Zone 1B proportional allocation — MDA alert vs cohort sections | G3 | Wave 2 | ADR required before implementation (ADR-017 amendment or new ADR); `minHeight: 80px` temporary guarantee active |
-| #1249 | ux(zone-1a): DEMO6-014 curve identifiability — terminal labels or line style | G4 | Wave 2 | DEMO6 CRITICAL; required before live demo session scheduled |
-| #1250 | ux(zone-1b): DEMO6-026/043 tablet legibility at 768px | G4 | Wave 2 | DEMO6 CRITICAL; required before live demo session scheduled |
-| #1253 | ux(zone-1d): DEMO6-040 PSP historical precedent anchor | G4 | Wave 2 | DEMO6 CRITICAL; required before live demo session scheduled |
-| #1251 | ux(zone-1a): adaptive y-axis extension audit — other instruments | G5 | Wave 2 | Capacity-allowing after G4; `computeYDomain()` pattern extension |
+| #982 | M17 Exit Checklist — blocks milestone closure | — | — | `immediate \| M17 gate issue` |
+| #1229 | feat(simulation): fiscal-to-cohort elasticity calibration — ELASTICITY_REGISTRY | G1 | Wave 1 | CM-owned; **entry gate** for entire milestone; FRAME-D exit condition; milestone assigned 2026-06-25 |
+| #1248 | feat(simulation): governance sensitivity calibration — GovernanceModule fiscal conditionality | G1 | Wave 1 | CM-owned; specification may precede implementation |
+| #394 | feat: multi-scenario comparison (>2 scenarios) | G2 | Wave 2 | **UX design sprint first** — Design Thinking + UX Designer + Customer Agent → use stories → architecture; implementation may carry to M18 |
+| #1252 | arch(zone-1b): Zone 1B proportional allocation — MDA alert vs cohort sections | G3 | Wave 2 | ADR required before implementation; `minHeight: 80px` temporary guarantee active |
+| #1249 | ux(zone-1a): DEMO6-014 curve identifiability | G4 | Wave 2 | **DEMO6 CRITICAL**; required before live demo session |
+| #1250 | ux(zone-1b): DEMO6-026/043 tablet legibility at 768px | G4 | Wave 2 | **DEMO6 CRITICAL**; required before live demo session |
+| #1253 | ux(zone-1d): DEMO6-040 PSP historical precedent anchor | G4 | Wave 2 | **DEMO6 CRITICAL**; required before live demo session |
+| #1239 | ux(zone-1b): DEMO6-010 inverted floor label — "above floor" when below | G4 | Wave 2 | UI bug; milestone assigned 2026-06-25 |
+| #1220 | fix(e2e): G3 spec AC-F1–AC-F7 soft-skip — NM-061 upstream | G5 | Wave 2 | Test infrastructure bug; milestone assigned 2026-06-25 |
+| #1214 | feat(observability): startup WARNING if simulation_entities empty | G5 | Wave 2 | NM-060 upstream; milestone assigned 2026-06-25 |
+| #1251 | ux(zone-1a): adaptive y-axis extension audit | G5 | Wave 2 | Capacity-allowing; `computeYDomain()` extension |
 
-**M17 sprint plan:** `docs/process/sprint-plans/m17-sprint-plan.md` — filed 2026-06-25; **EL approval pending (step 4)**
+**Deferred to M18:** #843 (Demo 7 live session), #1217 (Mode 3 render optimization), #1238 (DEMO6-009 narration), #1059 (HCL demo narration), #1254 (CI bands), #1255 (PSP driver decomp), #1256 (Path 2)
+**Closed at audit:** #1225 (Demo 6 prep — Steps 1–6c complete)
+
+**M17 sprint plan:** `docs/process/sprint-plans/m17-sprint-plan.md` — filed 2026-06-25 (v2, EL-directed revisions); **EL approval pending (step 4)**
 
 ---
 
