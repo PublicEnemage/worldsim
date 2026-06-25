@@ -23,6 +23,7 @@ expired exceptions at sprint exit.
 | ID | Type | Summary | Expiry | Status |
 |---|---|---|---|---|
 | EX-001 | threshold | AC-009 CI throttled render threshold raised 100ms → 200ms | M17 exit | Active |
+| EX-002 | process | AC-A2 annotated with `test.fail()` during G3 pre-implementation window; CI passes while test is intentionally red | G3 Phase 3 implementation PR merged | Active |
 
 ---
 
@@ -103,6 +104,69 @@ NM-064 filed (`docs/process/near-miss-registry.md`): test.fixme() authorized per
 (a) remove AC-009 from the test suite and replace with a local developer gate, or
 (b) convert to a Playwright `--trace` perf annotation (record without assert), or
 (c) close as Won't Fix if Mode 3 render performance is confirmed acceptable by FE profiling.
+
+---
+
+## EX-002 — AC-A2 `test.fail()` pre-implementation annotation
+
+**Type:** process
+**Status:** Active
+**EL Approved:** 2026-06-25
+**Expiry:** G3 Phase 3 implementation PR merged (removing `test.fail()` is a required step in that PR)
+
+### Specification
+
+`docs/process/intents/M17-G3-2026-06-25-zone-1b-proportional-allocation.md §5 AC-A2`:
+AC-A2 is a regression guard — it must be hard-fail (red) before G3 implementation and
+hard-pass (green) after. The intent document §5 states: **"No soft-skip patterns (NM-056
+guard): AC-A2 must be hard-fail. No `test.skip()`, `test.fixme()`, or conditional skips."**
+
+### Approved Deviation
+
+`test.fail()` applied to AC-A2 in `frontend/tests/e2e/m17-g3-zone-1b-allocation.spec.ts`
+during the pre-G3-implementation window. CI treats the expected failure as a passing state;
+CI will fail (correctly) when G3 Phase 3 adds `data-testid="zone-1b-mda-panel-wrapper"` and
+AC-A2 unexpectedly passes, signalling the implementing engineer to remove `test.fail()`.
+
+`test.fail()` is not a soft-skip. The test still runs and still must fail — the annotation
+only prevents the pre-implementation red from blocking CI on the early-filed QA PR (#1290).
+This is distinct from `test.skip()` and `test.fixme()` (which suppress execution entirely).
+The NM-056 guard against soft-skip patterns is not violated.
+
+### Rationale
+
+PR #1290 (`chore/m17-g3-early-qa-filing`) filed the G3 regression guard test before G3 Phase 3
+implementation, causing CI to block on the intentionally-red AC-A2. Previous pre-implementation
+QA tests used early-return guards to stay green; AC-A2 opted out (by design — the whole point
+is to confirm it's red before implementation). No SOP guidance existed for this case (NM-065).
+
+EL direction 2026-06-25: annotate with `test.fail()`, file EX-002, file NM-065, document
+reversal steps in the intent document.
+
+### Testid reconciliation (same PR)
+
+AC-A2 locator updated from `zone-1b-mda-panel` to `zone-1b-mda-panel-wrapper` (per ADR-018
+and intent doc §5). The original testid in the early-filed test was a shorthand; the correct
+ADR-018 testid is `zone-1b-mda-panel-wrapper`.
+
+### Linked artifacts
+
+- NM-065 (`docs/process/near-miss-registry.md`) — process gap: no SOP for intentionally-red pre-implementation tests
+- PR #1290 (`chore/m17-g3-early-qa-filing`) — early QA test PR; AC-A2 is the failing test
+- ADR-018 (`docs/adr/ADR-018-zone-1b-proportional-allocation.md`) — implementation contract specifying `zone-1b-mda-panel-wrapper` testid
+- Intent doc §5 — AC-A2 specification and reversal steps
+
+### Expiry and Resolution
+
+**Expiry condition:** G3 Phase 3 implementation PR is merged.
+
+**Resolution steps (required in the Phase 3 implementation PR):**
+1. G3 Phase 3 adds `data-testid="zone-1b-mda-panel-wrapper"` to `InstrumentCluster.tsx`
+2. Run playwright locally — AC-A2 passes (testid exists, height ≥ 80px)
+3. Playwright reports "unexpected pass" because `test.fail()` is still present → CI would fail
+4. Remove `test.fail()` and its comment from AC-A2 in `m17-g3-zone-1b-allocation.spec.ts`
+5. Re-run playwright — AC-A2 passes cleanly
+6. Push; update Status to Resolved in this registry
 
 ---
 

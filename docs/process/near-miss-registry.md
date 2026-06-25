@@ -3360,6 +3360,82 @@ comparison to prior runs than via absolute threshold on variable shared infrastr
 
 ---
 
+## NM-065 — No SOP for Intentionally-Red Pre-Implementation QA Tests; Ad-Hoc Resolution Required (Anticipatory)
+
+**Date:** 2026-06-25
+**Milestone:** M17 — Calibration and Comparative Infrastructure
+**Detected by:** EL review of PR #1290 CI failure (G3 early QA filing)
+**Severity:** Low — no incorrect outputs; CI blocked on unrelated PRs; ad-hoc resolution added process debt
+
+### What happened
+
+PR #1290 (`chore/m17-g3-early-qa-filing`) filed the G3 regression guard test before G3 Phase 3
+implementation. AC-A2 (`m17-g3-zone-1b-allocation.spec.ts:454`) was explicitly authored WITHOUT
+an early-return guard — by design, to confirm it was red before implementation. The test
+intentionally fails pre-implementation: `zone-1b-mda-panel-wrapper` does not exist until G3
+Phase 3 adds the testid.
+
+When the PR reached CI, playwright-e2e failed on AC-A2. This blocked the merge of an
+unrelated PR (SESSION_STATE.md) on the same CI run. There was no documented mechanism in the
+sprint planning SOP or QA filing process for handling an intentionally-red pre-implementation
+test.
+
+All previous pre-implementation QA tests in M14–M16 used early-return guards (`if (!someTestid)
+return;`) to stay CI-green while still filing the test structure. AC-A2 was the first test to
+explicitly opt out of that pattern (the intent document cited NM-056 and specified "no
+soft-skip patterns; AC-A2 must be hard-fail"). The two patterns are incompatible: the spec
+required a hard-fail, but the process assumed CI-green QA filing PRs.
+
+### What was at risk
+
+Any QA team member filing a regression guard test in the same "red-before-green" pattern
+would face the same undocumented conflict. Without a process answer, the resolution defaults
+to ad-hoc EL direction each time.
+
+### What caught it
+
+EL recognized the conflict when reviewing CI failures on PR #1290 and directed the resolution
+(EX-002 + `test.fail()` + intent doc reversal steps + NM-065).
+
+### Root cause
+
+The sprint planning SOP (`docs/process/sprint-planning-sop.md`) and QA filing process do not
+specify what to do when a test must be intentionally red pre-implementation. The only prior
+guidance was NM-056 (no soft-skips without a near-miss on record) and the early-return guard
+pattern. These two mechanisms serve different purposes:
+
+- **Early-return guard:** test appears to pass (skips assertions) before implementation; provides
+  no regression detection if the test structure is wrong; CI stays green.
+- **`test.fail()`:** test runs, must fail pre-implementation (CI passes), and CI fails when it
+  unexpectedly passes post-implementation (regression detection still works); CI stays green.
+
+The QA filing process assumes early-return guards are the only mechanism. The intent document
+correctly specified a hard-fail pattern but the SOP had no process home for it.
+
+### Process improvement
+
+**Immediate:** EX-002 filed; `test.fail()` applied to AC-A2; intent document updated with
+reversal steps. Testid reconciled from `zone-1b-mda-panel` to `zone-1b-mda-panel-wrapper`
+in the same PR.
+
+**SOP update required:** `docs/process/sprint-planning-sop.md §QA Filing` (or equivalent QA
+section) must document two approved patterns for pre-implementation QA tests:
+
+1. **Early-return guard** (preferred for most tests): `if (!locator.isVisible()) return;` — test
+   stays green pre-implementation; appropriate when the test structure is complete and only the
+   testid is missing.
+
+2. **`test.fail()` + EX-NNN** (required for regression guards): when the spec requires the test
+   to be hard-fail before implementation (i.e., CI must confirm the test is red), apply
+   `test.fail()`, file an exception (EX-NNN), and document reversal steps in the intent
+   document. The test must fail before implementation and CI must fail when it unexpectedly
+   passes after implementation.
+
+The choice between patterns is a QA Lead decision documented in the intent document §5 AC
+preamble. A regression guard AC that opts out of the early-return pattern must document why.
+
+---
+
 ## NM-NNN — [Short descriptive title]
 
 **Date:** YYYY-MM-DD (or approximate milestone era)
