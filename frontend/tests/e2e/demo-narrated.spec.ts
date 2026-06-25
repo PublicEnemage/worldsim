@@ -388,7 +388,7 @@ test(
       "The political economy module is active: programme survival probability is computing " +
       "from step one. Watch Zone one D as we advance — the PSP severity label shows whether " +
       "the conditionality terms are deliverable given the political economy conditions. " +
-      "Legitimacy index: zero point four three — the programme starts in the WARNING zone.",
+      "Zone one D already reads WARNING. The programme starts in political risk territory.",
     );
 
     // ── FRAME A: Step 2 — THESIS: Cohort threshold crossing ───────────────────
@@ -402,7 +402,7 @@ test(
       "Fiscal conditionality has begun: social spending cut by three percent of GDP. " +
       "Look at Zone one B — the alert and cohort panel. " +
       "The cohort impact section shows: bottom quintile informal workers poverty headcount. " +
-      "Current value: approaching the recovery floor of zero point four zero. " +
+      "Current value: approaching the recovery floor. " +
       "The badge reads: T3 — Inferred. " +
       "The demographic weighting comes from ECOWAS comparable economy distributions. " +
       "Tier three means the calibration is from regional comparables, not primary survey data. " +
@@ -427,7 +427,7 @@ test(
       "Below the Zone one instruments: the 25-year projection panel. " +
       "Three cohort curves — bottom quintile informal, bottom quintile agricultural, " +
       "second quintile informal — over one hundred steps. " +
-      "The red dashed line is the recovery floor at zero point four zero. " +
+      "The red dashed line is the recovery floor — the minimum sustainable threshold. " +
       "The curves are currently below that line. The trajectory is what matters here, " +
       "not a single step value. " +
       "Under current Tier three estimates, this trajectory approaches the recovery floor " +

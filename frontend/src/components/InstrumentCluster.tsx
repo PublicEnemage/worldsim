@@ -97,8 +97,9 @@ export function InstrumentCluster({
       {/* Zone 1A — Trajectory View + Human Cost Ledger strip (Issue #747) */}
       <div
         data-testid="zone-1a-trajectory-container"
-        style={{ gridColumn: 1, gridRow: 1, minWidth: layout.trajectory, minHeight: chartHeight, display: "flex", flexDirection: "column" }}
+        style={{ gridColumn: 1, gridRow: 1, minWidth: layout.trajectory, minHeight: chartHeight, display: "flex", flexDirection: "column", position: "relative", outline: "2px solid #d0d4db", borderRadius: 4 }}
       >
+        <div style={{ position: "absolute", top: 4, right: 6, fontSize: 9, fontWeight: 700, letterSpacing: 0.5, color: "#666", backgroundColor: "rgba(255,255,255,0.88)", borderRadius: 2, padding: "1px 5px", userSelect: "none", zIndex: 10, lineHeight: 1.5 }}>Zone 1A</div>
         <TrajectoryView
           width={layout.trajectory}
           height={chartHeight}
@@ -131,8 +132,12 @@ export function InstrumentCluster({
             overflow: "auto",
             display: "flex",
             flexDirection: "column",
+            position: "relative",
+            outline: "2px solid #d0d4db",
+            borderRadius: 4,
           }}
         >
+          <div style={{ position: "absolute", top: 4, right: 6, fontSize: 9, fontWeight: 700, letterSpacing: 0.5, color: "#666", backgroundColor: "rgba(255,255,255,0.88)", borderRadius: 2, padding: "1px 5px", userSelect: "none", zIndex: 10, lineHeight: 1.5 }}>Zone 1B</div>
           <div style={{ flex: "1 1 0", minHeight: 0, overflow: "hidden" }}>
             {mdaPanel ?? (
               <div style={{ color: "#bbb", fontSize: 12, padding: 8 }}>
@@ -145,7 +150,8 @@ export function InstrumentCluster({
 
         {/* Zone 1C — PMM Widget (DD-016: 15% at 1280/1440, 10% at 1024) */}
         {/* data-testid lives on PMMWidgetZone1C root — not duplicated here */}
-        <div style={{ flex: `0 0 ${zoneProportions.zone1c}`, overflow: "hidden" }}>
+        <div style={{ flex: `0 0 ${zoneProportions.zone1c}`, overflow: "hidden", position: "relative", outline: "2px solid #d0d4db", borderRadius: 4 }}>
+          <div style={{ position: "absolute", top: 4, right: 6, fontSize: 9, fontWeight: 700, letterSpacing: 0.5, color: "#666", backgroundColor: "rgba(255,255,255,0.88)", borderRadius: 2, padding: "1px 5px", userSelect: "none", zIndex: 10, lineHeight: 1.5 }}>Zone 1C</div>
           {pmmWidget ?? (
             <div style={{ color: "#bbb", fontSize: 12, padding: 8 }}>
               PMM Widget (Zone 1C)
@@ -156,7 +162,8 @@ export function InstrumentCluster({
         {/* Zone 1D — Four-Framework + Political Risk sub-section (DD-016: 50% at 1280) */}
         {/* data-testid lives on FourFrameworkZone1D root — not duplicated here */}
         {/* overflow-y:auto per DD-016 — prevents clipping at 1024; no-op at 1280/1440 */}
-        <div style={{ flex: `0 0 ${zoneProportions.zone1d}`, overflowY: "auto" }}>
+        <div style={{ flex: `0 0 ${zoneProportions.zone1d}`, overflowY: "auto", position: "relative", outline: "2px solid #d0d4db", borderRadius: 4 }}>
+          <div style={{ position: "absolute", top: 4, right: 6, fontSize: 9, fontWeight: 700, letterSpacing: 0.5, color: "#666", backgroundColor: "rgba(255,255,255,0.88)", borderRadius: 2, padding: "1px 5px", userSelect: "none", zIndex: 10, lineHeight: 1.5 }}>Zone 1D</div>
           {fourFramework ?? (
             <div style={{ color: "#bbb", fontSize: 12, padding: 8 }}>
               Four-Framework Current Position (Zone 1D)

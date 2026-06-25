@@ -45,6 +45,7 @@ from app.schemas import (
     AdvanceResponse,
     BranchRequest,
     BranchResponse,
+    CohortThresholdCrossing,
     CompareResponse,
     DeltaRecord,
     DistributionRecord,
@@ -2248,6 +2249,51 @@ def _alert_matches_framework(
     return indicator_fw == framework
 
 
+# ---------------------------------------------------------------------------
+# Cohort threshold crossing helpers (M16-G8 — Option A cumulative crossings)
+# ---------------------------------------------------------------------------
+
+_QUINTILE_LABELS: dict[str, str] = {
+    "1": "Bottom Quintile",
+    "2": "Lower-Middle Quintile",
+    "3": "Middle Quintile",
+    "4": "Upper-Middle Quintile",
+    "5": "Top Quintile",
+}
+_SECTOR_LABELS: dict[str, str] = {
+    "INFORMAL": "Informal Workers",
+    "AGRICULTURE": "Agricultural Workers",
+    "FORMAL": "Formal Sector",
+    "UNEMPLOYED": "Unemployed",
+}
+_INDICATOR_LABELS: dict[str, str] = {
+    "poverty_headcount_ratio": "Poverty Headcount Ratio",
+    "net_enrollment_secondary": "Secondary Net Enrollment",
+}
+_QUINTILE_SEVERITY: dict[str, str] = {
+    "1": "CRITICAL",
+    "2": "WARNING",
+    "3": "MEDIUM",
+    "4": "MEDIUM",
+    "5": "MEDIUM",
+}
+
+
+def _parse_cohort_id(entity_id: str) -> tuple[str, str, str] | None:
+    """Parse a ':CHT:' entity ID into (quintile_num, age_range, sector).
+
+    Returns None for non-cohort or malformed IDs.
+    Example: 'SEN:CHT:1-25-54-INFORMAL' -> ('1', '25-54', 'INFORMAL')
+    """
+    if ":CHT:" not in entity_id:
+        return None
+    suffix = entity_id.split(":CHT:", 1)[-1]
+    parts = suffix.split("-")
+    if len(parts) < 3:  # noqa: PLR2004
+        return None
+    return parts[0], "-".join(parts[1:-1]), parts[-1]
+
+
 @router.get(
     "/scenarios/{scenario_id}/measurement-output",
     response_model=MultiFrameworkOutput,
@@ -2367,6 +2413,93 @@ async def get_measurement_output(
             note = _SINGLE_ENTITY_NOTE
         else:
             note = None
+        # M16-G8 Option A: cumulative cohort threshold crossings for HD framework.
+        # Detect cohort groups (Q1/Q2) whose poverty_headcount_ratio remains below
+        # the MDA floor at this step. De-duplicated by (quintile, sector) using the
+        # 25-54 working-age group as the representative cohort where available.
+        cohort_crossings: list[CohortThresholdCrossing] = []
+        if fw == "human_development":
+            hd_threshold_rows = await conn.fetch(
+                """
+                SELECT indicator_key, floor_value, comparison_operator
+                FROM mda_thresholds
+                WHERE measurement_framework = 'human_development'
+                """
+            )
+            hd_floors: dict[str, Decimal] = {
+                row["indicator_key"]: Decimal(str(row["floor_value"]))
+                for row in hd_threshold_rows
+                if row["comparison_operator"] == "gte"
+            }
+            if hd_floors:
+                seen_qsec: dict[tuple[str, str], tuple[str, dict[str, QuantitySchema]]] = {}
+                for cht_id, cht_attrs in all_entity_attrs.items():
+                    parsed = _parse_cohort_id(cht_id)
+                    if parsed is None:
+                        continue
+                    q_num, age_range, sector = parsed
+                    if int(q_num) > 2:  # noqa: PLR2004
+                        continue
+                    q_sec_key = (q_num, sector)
+                    if q_sec_key not in seen_qsec or age_range == "25-54":
+                        seen_qsec[q_sec_key] = (cht_id, cht_attrs)
+                for (q_num, sector), (cht_id, cht_attrs) in sorted(seen_qsec.items()):
+                    for ind_key, floor_val in hd_floors.items():
+                        qty = cht_attrs.get(ind_key)
+                        if qty is None:
+                            continue
+                        try:
+                            ind_val = Decimal(qty.value)
+                        except Exception:  # noqa: BLE001,S112
+                            continue
+                        if ind_val >= floor_val:
+                            continue
+                        pct_below = (
+                            (floor_val - ind_val) / floor_val * 100
+                        ).quantize(Decimal("0.01"))
+                        first_step: int = (
+                            await conn.fetchval(
+                                """
+                                SELECT MIN(step)
+                                FROM scenario_state_snapshots
+                                WHERE scenario_id = $1
+                                  AND step >= 1
+                                  AND (state_data->$2->$3->>'value')::numeric < $4
+                                """,
+                                scenario_id,
+                                cht_id,
+                                ind_key,
+                                float(floor_val),
+                            )
+                            or step
+                        )
+                        eff_tier = effective_tier(qty.confidence_tier, step)
+                        cohort_crossings.append(
+                            CohortThresholdCrossing(
+                                quintile_key=f"Q{q_num}",
+                                cohort_label=(
+                                    f"{_QUINTILE_LABELS.get(q_num, f'Q{q_num}')} "
+                                    f"{_SECTOR_LABELS.get(sector, sector.capitalize())}"
+                                ),
+                                indicator_key=ind_key,
+                                indicator_label=_INDICATOR_LABELS.get(
+                                    ind_key, ind_key.replace("_", " ").title()
+                                ),
+                                severity=_QUINTILE_SEVERITY.get(q_num, "MEDIUM"),
+                                step_crossed=first_step,
+                                above_floor_pct=str(pct_below),
+                                tier=eff_tier,
+                                source=qty.source_registry_id,
+                                is_synthetic=eff_tier >= 3,
+                                synthetic_method=(
+                                    "regional_statistical_inference"
+                                    if eff_tier >= 3
+                                    else None
+                                ),
+                                value=qty.value,
+                            )
+                        )
+
         outputs[fw] = FrameworkOutput(
             framework=fw,
             entity_id=entity_id,
@@ -2376,6 +2509,7 @@ async def get_measurement_output(
             mda_alerts=fw_alerts,
             has_below_floor_indicator=has_below_floor,
             note=note,
+            cohort_threshold_crossings=cohort_crossings,
         )
 
     return MultiFrameworkOutput(
