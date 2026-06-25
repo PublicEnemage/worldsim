@@ -56,7 +56,7 @@ PR, not on this entry document's filing.*
 | G3 Phase 1 BPO acceptance: BPO accepts Phase 1 brief output | Business PO | ⬜ PENDING panel review |
 | G3 Phase 2 complete: Architect determines ADR path — ADR-017 amendment or new ARCH-012; ADR authored and accepted | Architect | ⬜ PENDING Phase 1 BPO + Wave 1 exit (✅ Wave 1 exited 2026-06-25) |
 | Intent document filed for #1252 implementation (must reference accepted ADR and UX brief) | PM Agent | ⬜ PENDING Phase 1/2 |
-| QA test file authored before implementation begins | QA Lead | ⬜ PENDING intent document |
+| QA test file authored before implementation begins | QA Lead | ⚠️ EARLY FILED 2026-06-25 — `frontend/tests/e2e/m17-g3-zone-1b-allocation.spec.ts`; authored from sprint entry §2.4 ACs; pixel constants (MDA_PANEL_MIN_HEIGHT_PX, COHORT_MAX_DISPLAY) are placeholders pending ADR spec; update required when formal intent document is filed |
 | #1250 merged to `release/m17` | G4 sprint group | ⬜ PENDING G4 |
 
 ---
@@ -193,7 +193,7 @@ The intent document for #1252 Phase 3 must specify, at minimum:
 *QA tests must be authored from the intent document's acceptance criteria BEFORE implementation
 code is written. The test file must be on record before the implementing agent begins.*
 
-- [ ] **QA test gate: PENDING** — cannot be authored until the intent document is filed
+- [x] **QA test gate: EARLY FILED 2026-06-25** — `frontend/tests/e2e/m17-g3-zone-1b-allocation.spec.ts` authored from sprint entry §2.4 ACs (AC-A1, AC-A2, AC-A3, AC-A4, AC-P5, AC-P1); pixel constants (MDA_PANEL_MIN_HEIGHT_PX, COHORT_MAX_DISPLAY) are placeholders requiring update at Phase 3 handoff when formal intent document and ADR specifications are accepted; pre-implementation guard pattern applied to new G3 testids per NM-056
 
 **QA test file requirements (to be satisfied at filing):**
 
@@ -229,7 +229,7 @@ document's acceptance criteria:
 
 | Deliverable | Intent document | Test file path | Authored before implementation? |
 |---|---|---|---|
-| #1252 — Zone 1B proportional allocation | `docs/process/intents/M17-G3-{YYYY-MM-DD}-zone-1b-proportional-allocation.md` | `frontend/tests/e2e/m17-g3-zone-1b-allocation.spec.ts` | **No — BLOCKING** |
+| #1252 — Zone 1B proportional allocation | `docs/process/intents/M17-G3-{YYYY-MM-DD}-zone-1b-proportional-allocation.md` | `frontend/tests/e2e/m17-g3-zone-1b-allocation.spec.ts` | **Early — filed 2026-06-25 from sprint entry ACs; update required at Phase 3 handoff with formal intent doc pixel specs** |
 
 ### 2.5 — Phase 1 UX brief standards and panel review gate
 
