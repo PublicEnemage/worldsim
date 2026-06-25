@@ -2429,7 +2429,7 @@ async def get_measurement_output(
             hd_floors: dict[str, Decimal] = {
                 row["indicator_key"]: Decimal(str(row["floor_value"]))
                 for row in hd_threshold_rows
-                if row["comparison_operator"] == "gte"
+                if row.get("comparison_operator") == "gte"
             }
             if hd_floors:
                 seen_qsec: dict[tuple[str, str], tuple[str, dict[str, QuantitySchema]]] = {}
