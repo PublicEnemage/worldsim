@@ -734,6 +734,30 @@ class MDAAlert(BaseModel):
     recovery_horizon_years: int | None = None
 
 
+class CohortThresholdCrossing(BaseModel):
+    """One cohort group's poverty threshold crossing, cumulative as of the current step.
+
+    Represents a cohort (quintile × sector) whose poverty_headcount_ratio has
+    fallen below the MDA floor and remains there at the queried step. Computed
+    by get_measurement_output for the human_development framework.
+    """
+
+    model_config = ConfigDict(from_attributes=True)
+
+    quintile_key: str
+    cohort_label: str
+    indicator_key: str
+    indicator_label: str
+    severity: str
+    step_crossed: int
+    above_floor_pct: str
+    tier: int
+    source: str | None
+    is_synthetic: bool
+    synthetic_method: str | None
+    value: str
+
+
 class FrameworkOutput(BaseModel):
     """One measurement framework's indicators and composite score for an entity.
 
@@ -757,6 +781,7 @@ class FrameworkOutput(BaseModel):
     mda_alerts: list[MDAAlert]
     has_below_floor_indicator: bool
     note: str | None
+    cohort_threshold_crossings: list[CohortThresholdCrossing] = []
 
 
 class MultiFrameworkOutput(BaseModel):

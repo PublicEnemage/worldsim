@@ -90,6 +90,13 @@ Each entry has four fields:
 ---
 
 **Date:** 2026-06-24
+**Source:** M16-G8 Demo 6 live session — EL observation + five-agent panel (UX Designer, Design Thinking, Frontend Architect, Architect, Business PO)
+**Finding:** Zone 1B lacks a formal proportional allocation between the MDA alert panel (primary instrument) and the CohortImpactSection (supplementary). When cohort crossings fill Zone 1B's natural height, the MDA alert panel collapses to zero due to `flex: "1 1 0"` with `minHeight: 0`. Demo 6 immediate fix: `minHeight: 80px` guarantee on the MDA panel wrapper. M17 architecture decision required: explicit proportional allocation (e.g., 50/50 split, or separate scrollable sub-zones) between the two Zone 1B occupants, captured in ADR-017 amendment or new ADR.
+**Status:** open
+
+---
+
+**Date:** 2026-06-24
 **Source:** EL observation during M16-G8 Demo 6 session
 **Finding:** Demo 7 opening act: Mode 3 active control on the Senegal Article IV scenario as a continuation of Demo 6. Same scenario, step 2, Mode 3 activates. Analyst interrogates whether any available fiscal instrument prevents Q1 informal workers crossing the 0.40 recovery floor. If yes: counter-proposal found. If no: conditionality structure itself is the binding constraint — the most powerful finding the tool can produce. Prerequisite: Chief Methodologist review of fiscal-to-cohort-poverty transmission elasticity (filed from Step 5b calibration finding, Issue #1229). This is M17 scope. Demo 7 second act: Zambia restructuring, three-scenario comparison.
 **Detail:** Demo 7 is structurally dependent on two M17 deliverables: (1) Mode 3 Active Control, which is the north star instrument design; (2) calibrated fiscal-to-cohort-poverty elasticity so that the Mode 3 instrument search is analytically meaningful rather than searching a mis-calibrated response surface. The Demo 6 → Demo 7 continuity (same entity, same step, Mode 3 activates) is the demonstration arc that takes the tool from analytical standing to active decision support. "Counter-proposal found" and "conditionality structure is the binding constraint" are both defensible outcomes — the tool's value is in answering the question precisely, not in producing a preferred result.
