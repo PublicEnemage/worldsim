@@ -4,6 +4,13 @@ import "maplibre-gl/dist/maplibre-gl.css";
 import type { FeatureCollection } from "geojson";
 import type { GeoJSONFeatureCollection, DeltaChoroplethFeatureProperties } from "../types";
 
+interface MDAFloorEntry {
+  framework: string;
+  floor_value: string | number;
+  label: string;
+  severity: string;
+}
+
 const API_BASE = "http://localhost:8000/api/v1";
 const SOURCE_ID = "worldsim-delta";
 const FILL_LAYER_ID = "delta-fill";
@@ -54,6 +61,8 @@ export default function DeltaChoropleth({
   const mapRef = useRef<maplibregl.Map | null>(null);
   const popupRef = useRef<maplibregl.Popup | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [mdaFloors, setMdaFloors] = useState<MDAFloorEntry[]>([]);
+  const [showOverlay, setShowOverlay] = useState(false);
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -194,6 +203,17 @@ export default function DeltaChoropleth({
     });
   }, [scenarioAId, scenarioBId, attributeName, title]);
 
+  // Fetch MDA floors for threshold overlay toggle — M16-G9 #153.
+  useEffect(() => {
+    const fetchFloors = async () => {
+      const res = await fetch(`${API_BASE}/scenarios/${encodeURIComponent(scenarioAId)}/trajectory`);
+      if (!res.ok) return;
+      const data = await res.json() as { mda_floors?: MDAFloorEntry[] };
+      setMdaFloors(Array.isArray(data.mda_floors) ? data.mda_floors : []);
+    };
+    fetchFloors().catch(() => {}); // non-fatal: leave mdaFloors empty on error
+  }, [scenarioAId]);
+
   return (
     <div style={{ position: "relative", width: "100%", height: "100%" }}>
       <div ref={containerRef} style={{ width: "100%", height: "100%" }} />
@@ -229,6 +249,58 @@ export default function DeltaChoropleth({
         >
           {error}
         </div>
+      )}
+      {mdaFloors.length > 0 && (
+        <button
+          data-testid="delta-choropleth-threshold-toggle"
+          onClick={() => setShowOverlay((v) => !v)}
+          style={{
+            position: "absolute",
+            top: 8,
+            right: 48,
+            background: showOverlay ? "#e74c3c" : "rgba(255,255,255,0.9)",
+            color: showOverlay ? "#fff" : "#333",
+            border: "1px solid #ccc",
+            borderRadius: 4,
+            padding: "3px 8px",
+            fontSize: 11,
+            cursor: "pointer",
+            zIndex: 10,
+          }}
+        >
+          {showOverlay ? "Hide" : "Show"} thresholds
+        </button>
+      )}
+      {showOverlay && mdaFloors.length > 0 && (
+        <svg
+          data-testid="delta-choropleth-threshold-overlay"
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+            pointerEvents: "none",
+            zIndex: 5,
+          }}
+        >
+          {mdaFloors.slice(0, 3).map((_floor, i) => {
+            const yPct = 25 + i * 25;
+            return (
+              <line
+                key={i}
+                x1="0"
+                y1={`${yPct}%`}
+                x2="100%"
+                y2={`${yPct}%`}
+                stroke="#e74c3c"
+                strokeWidth="2"
+                strokeDasharray="8,4"
+                opacity="0.75"
+              />
+            );
+          })}
+        </svg>
       )}
     </div>
   );

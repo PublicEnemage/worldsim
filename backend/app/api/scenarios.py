@@ -35,7 +35,7 @@ from collections.abc import Callable
 from datetime import datetime  # noqa: TCH003
 from decimal import Decimal
 from math import floor
-from typing import Annotated, Any
+from typing import Annotated, Any, cast
 
 import asyncpg  # noqa: TCH002 — used in Annotated[] resolved at runtime by FastAPI
 from fastapi import APIRouter, Depends, HTTPException, Response
@@ -45,8 +45,11 @@ from app.schemas import (
     AdvanceResponse,
     BranchRequest,
     BranchResponse,
+    CohortThresholdCrossing,
     CompareResponse,
     DeltaRecord,
+    DistributionRecord,
+    FlatDeltaRecord,
     FrameworkOutput,
     MDAAlert,
     MDAFloorRecord,
@@ -63,6 +66,7 @@ from app.schemas import (
     ScenarioRestoreResponse,
     ScheduledInputSchema,
     SnapshotRecord,
+    ThresholdCrossingItem,
     TrajectoryCompareResponse,
     TrajectoryCompareStep,
     TrajectoryFrameworkPoint,
@@ -404,6 +408,24 @@ async def list_scenarios(
 # ---------------------------------------------------------------------------
 
 
+def _compute_delta_values(
+    value_a: str,
+    value_b: str,
+    tier_a: int,
+    tier_b: int,
+    threshold_value: str | None = None,
+) -> tuple[str, str, str, int, bool | None]:
+    """Return (value_a, value_b, delta_str, confidence_tier, threshold_crossed)."""
+    dec_a = Decimal(value_a)
+    dec_b = Decimal(value_b)
+    delta = dec_b - dec_a
+    threshold_crossed: bool | None = None
+    if threshold_value is not None:
+        thr = Decimal(threshold_value)
+        threshold_crossed = (dec_a < thr) != (dec_b < thr)
+    return value_a, value_b, str(delta), max(tier_a, tier_b), threshold_crossed
+
+
 def _compute_delta(
     value_a: str,
     value_b: str,
@@ -411,31 +433,67 @@ def _compute_delta(
     tier_b: int,
     threshold_value: str | None = None,
 ) -> DeltaRecord:
-    from decimal import Decimal  # noqa: PLC0415
-
-    dec_a = Decimal(value_a)
-    dec_b = Decimal(value_b)
-    delta = dec_b - dec_a
-    if delta > 0:
-        direction = "increase"
-    elif delta < 0:
-        direction = "decrease"
-    else:
-        direction = "unchanged"
-
-    threshold_crossed: bool | None = None
-    if threshold_value is not None:
-        thr = Decimal(threshold_value)
-        threshold_crossed = (dec_a < thr) != (dec_b < thr)
-
-    return DeltaRecord(
-        value_a=value_a,
-        value_b=value_b,
-        delta=str(delta),
-        direction=direction,
-        confidence_tier=max(tier_a, tier_b),
-        threshold_crossed=threshold_crossed,
+    """Backward-compatible wrapper used by test_g6a_multi_country.py (Issue #153)."""
+    va, vb, delta_str, tier, crossed = _compute_delta_values(
+        value_a, value_b, tier_a, tier_b, threshold_value
     )
+    return DeltaRecord(
+        value_a=va,
+        value_b=vb,
+        delta=delta_str,
+        direction=_delta_str_to_direction(delta_str),
+        confidence_tier=tier,
+        threshold_crossed=crossed,
+    )
+
+
+def _delta_str_to_direction(delta_str: str) -> str:
+    d = Decimal(delta_str)
+    if d > 0:
+        return "increase"
+    if d < 0:
+        return "decrease"
+    return "unchanged"
+
+
+def _compute_distribution(delta_values: list[Decimal]) -> DistributionRecord:
+    """Compute distributional statistics from a list of delta values.
+
+    Returns a DistributionRecord with null fields when fewer than 3 values
+    are available — the minimum sample for meaningful statistics (M16-G4 #102).
+    """
+    n = len(delta_values)
+    if n < 3:
+        return DistributionRecord(variance=None, p10=None, p50=None, p90=None)
+
+    floats = [float(v) for v in delta_values]
+    mean = sum(floats) / n
+    variance = sum((v - mean) ** 2 for v in floats) / n
+    sorted_vals = sorted(floats)
+
+    def _pct(p: float) -> str:
+        idx = (n - 1) * p
+        lo = int(idx)
+        hi = lo + 1
+        if hi >= n:
+            val = sorted_vals[lo]
+        else:
+            frac = idx - lo
+            val = sorted_vals[lo] * (1 - frac) + sorted_vals[hi] * frac
+        return str(Decimal(str(round(val, 10))))
+
+    return DistributionRecord(
+        variance=str(Decimal(str(round(variance, 10)))),
+        p10=_pct(0.10),
+        p50=_pct(0.50),
+        p90=_pct(0.90),
+    )
+
+
+def _parse_state(raw: Any) -> dict[str, Any]:  # noqa: ANN401
+    if isinstance(raw, str):
+        return cast(dict[str, Any], json.loads(raw))
+    return cast(dict[str, Any], raw)
 
 
 @router.get("/scenarios/compare", response_model=CompareResponse)
@@ -447,24 +505,25 @@ async def compare_scenarios(
     step: int | None = None,
     threshold_value: str | None = None,
 ) -> CompareResponse:
-    """Return attribute deltas between two scenarios.
+    """Return attribute deltas between two scenarios with distributional statistics.
 
     Computes delta = value_b - value_a for each shared entity and attribute.
-    Only entities and attributes present in both snapshots are included.
+    Only entities and attributes present in both scenarios are included.
 
     All-attributes mode (Issue #90, ARCH-REVIEW-002 BI2-I-05): when `attr` is
     omitted, ALL shared attributes across ALL shared entities are returned in a
-    single call. This satisfies the multi-framework comparison requirement — a
-    scenario that improves GDP while worsening unemployment is fully visible
-    without N serial calls. Pass `attr` to filter the response to one key.
+    single call. Pass `attr` to filter the response to one key.
 
     `step` — when provided, both scenarios must have a snapshot at exactly
     that step. Returns 404 identifying which scenario is missing the step.
-    When omitted, compares the final (highest-step) snapshot of each scenario.
+    When omitted, compares the final (highest-step) shared snapshot.
 
-    `threshold_value` — when provided (as a numeric string), each DeltaRecord
-    includes `threshold_crossed: bool` indicating whether the delta crossed this
-    absolute value boundary (value_a and value_b on opposite sides). Issue #153.
+    `threshold_value` — when provided (as a numeric string), each FlatDeltaRecord
+    includes `threshold_crossed: bool`. Issue #153.
+
+    `distribution` — distributional statistics (variance, p10, p50, p90) of each
+    attribute's delta across all shared steps. Fields are null when fewer than 3
+    shared steps exist (M16-G4 #102).
 
     Returns 404 if either scenario is not found.
     Returns 404 if `step` is provided and either scenario has no snapshot at
@@ -480,14 +539,21 @@ async def compare_scenarios(
                 status_code=404, detail=f"Scenario '{sid}' not found."
             )
 
+    rows_a = await conn.fetch(
+        "SELECT step, state_data FROM scenario_state_snapshots "
+        "WHERE scenario_id = $1 ORDER BY step ASC",
+        scenario_a,
+    )
+    rows_b = await conn.fetch(
+        "SELECT step, state_data FROM scenario_state_snapshots "
+        "WHERE scenario_id = $1 ORDER BY step ASC",
+        scenario_b,
+    )
+
     if step is not None:
-        snap_a = await conn.fetchrow(
-            "SELECT step, state_data FROM scenario_state_snapshots "
-            "WHERE scenario_id = $1 AND step = $2",
-            scenario_a,
-            step,
-        )
-        if snap_a is None:
+        steps_a = {row["step"] for row in rows_a}
+        steps_b = {row["step"] for row in rows_b}
+        if step not in steps_a:
             raise HTTPException(
                 status_code=404,
                 detail=(
@@ -495,13 +561,7 @@ async def compare_scenarios(
                     "Advance the scenario to this step before comparing."
                 ),
             )
-        snap_b = await conn.fetchrow(
-            "SELECT step, state_data FROM scenario_state_snapshots "
-            "WHERE scenario_id = $1 AND step = $2",
-            scenario_b,
-            step,
-        )
-        if snap_b is None:
+        if step not in steps_b:
             raise HTTPException(
                 status_code=404,
                 detail=(
@@ -509,39 +569,45 @@ async def compare_scenarios(
                     "Advance the scenario to this step before comparing."
                 ),
             )
+        step_a = step
+        step_b = step
     else:
-        snap_a = await conn.fetchrow(
-            "SELECT step, state_data FROM scenario_state_snapshots "
-            "WHERE scenario_id = $1 ORDER BY step DESC LIMIT 1",
-            scenario_a,
-        )
-        snap_b = await conn.fetchrow(
-            "SELECT step, state_data FROM scenario_state_snapshots "
-            "WHERE scenario_id = $1 ORDER BY step DESC LIMIT 1",
-            scenario_b,
-        )
-        if snap_a is None:
+        if not rows_a:
             raise HTTPException(
                 status_code=409,
                 detail=f"Scenario '{scenario_a}' has no snapshots. Run it first.",
             )
-        if snap_b is None:
+        if not rows_b:
             raise HTTPException(
                 status_code=409,
                 detail=f"Scenario '{scenario_b}' has no snapshots. Run it first.",
             )
+        step_a = max(row["step"] for row in rows_a)
+        step_b = max(row["step"] for row in rows_b)
 
-    state_a: dict[str, Any] = snap_a["state_data"]
-    state_b: dict[str, Any] = snap_b["state_data"]
-    if isinstance(state_a, str):
-        state_a = json.loads(state_a)
-    if isinstance(state_b, str):
-        state_b = json.loads(state_b)
+    # Build step-indexed maps for fast lookup (used for point delta and distribution)
+    snapmap_a = {
+        row["step"]: _parse_state(row["state_data"]) for row in rows_a
+    }
+    snapmap_b = {
+        row["step"]: _parse_state(row["state_data"]) for row in rows_b
+    }
+    shared_steps = sorted(set(snapmap_a) & set(snapmap_b))
 
-    shared_entities = set(state_a) & set(state_b)
-    deltas: dict[str, dict[str, DeltaRecord]] = {}
+    state_a = snapmap_a[step_a]
+    state_b = snapmap_b[step_b]
 
-    for eid in sorted(shared_entities):
+    # Fetch MDA thresholds once for threshold_crossings population — M16-G9 #97.
+    mda_rows = await conn.fetch(
+        "SELECT mda_id, indicator_key, floor_value, comparison_operator FROM mda_thresholds"
+        " ORDER BY mda_id"
+    )
+    mda_threshold_list: list[dict[str, Any]] = [dict(r) for r in mda_rows]
+
+    shared_entities = sorted(set(state_a) & set(state_b))
+    flat_deltas: list[FlatDeltaRecord] = []
+
+    for eid in shared_entities:
         attrs_a: dict[str, Any] = state_a[eid]
         attrs_b: dict[str, Any] = state_b[eid]
         if not isinstance(attrs_a, dict) or not isinstance(attrs_b, dict):
@@ -551,7 +617,6 @@ async def compare_scenarios(
         if attr is not None:
             shared_attrs = shared_attrs & {attr}
 
-        entity_deltas: dict[str, DeltaRecord] = {}
         for key in sorted(shared_attrs):
             a_env = attrs_a[key]
             b_env = attrs_b[key]
@@ -560,7 +625,7 @@ async def compare_scenarios(
             val_a = str(a_env.get("value", ""))
             val_b = str(b_env.get("value", ""))
             try:
-                entity_deltas[key] = _compute_delta(
+                va, vb, delta_str, tier, crossed = _compute_delta_values(
                     val_a,
                     val_b,
                     int(a_env.get("confidence_tier", 5)),
@@ -570,15 +635,70 @@ async def compare_scenarios(
             except Exception:  # noqa: BLE001 S112
                 continue
 
-        if entity_deltas:
-            deltas[eid] = entity_deltas
+            # Collect deltas at all shared steps for distributional statistics
+            delta_series: list[Decimal] = []
+            for s in shared_steps:
+                try:
+                    ea = snapmap_a[s].get(eid, {}) if isinstance(snapmap_a[s], dict) else {}
+                    eb = snapmap_b[s].get(eid, {}) if isinstance(snapmap_b[s], dict) else {}
+                    if not isinstance(ea, dict) or not isinstance(eb, dict):
+                        continue
+                    ae = ea.get(key)
+                    be = eb.get(key)
+                    if not isinstance(ae, dict) or not isinstance(be, dict):
+                        continue
+                    delta_series.append(
+                        Decimal(str(be.get("value", "")))
+                        - Decimal(str(ae.get("value", "")))
+                    )
+                except Exception:  # noqa: BLE001 S112
+                    continue
+
+            # Compute threshold_crossings: check val_b against each matching MDA threshold.
+            # Only entries where the threshold IS crossed (crossed=True) are included.
+            # Empty list when no MDA threshold applies or none are violated — M16-G9 #97.
+            threshold_crossings: list[ThresholdCrossingItem] = []
+            try:
+                vb_dec = Decimal(vb)
+                for thr in mda_threshold_list:
+                    if str(thr["indicator_key"]) != key:
+                        continue
+                    floor = Decimal(str(thr["floor_value"]))
+                    op = str(thr.get("comparison_operator", "lte"))
+                    is_crossed = (
+                        vb_dec <= floor if op == "lte" else vb_dec >= floor
+                    )
+                    if is_crossed:
+                        threshold_crossings.append(
+                            ThresholdCrossingItem(
+                                threshold_name=str(thr["mda_id"]),
+                                crossed=True,
+                            )
+                        )
+            except Exception:  # noqa: BLE001 S110 S112
+                pass  # Non-fatal: leave threshold_crossings empty on Decimal parse failure
+
+            flat_deltas.append(
+                FlatDeltaRecord(
+                    entity_id=eid,
+                    attribute_key=key,
+                    value_a=va,
+                    value_b=vb,
+                    delta=delta_str,
+                    direction=_delta_str_to_direction(delta_str),
+                    confidence_tier=tier,
+                    threshold_crossed=crossed,
+                    distribution=_compute_distribution(delta_series),
+                    threshold_crossings=threshold_crossings,
+                )
+            )
 
     return CompareResponse(
         scenario_a_id=scenario_a,
         scenario_b_id=scenario_b,
-        step_a=snap_a["step"],
-        step_b=snap_b["step"],
-        deltas=deltas,
+        step_a=step_a,
+        step_b=step_b,
+        deltas=flat_deltas,
     )
 
 
@@ -1104,7 +1224,11 @@ async def get_trajectory(
             if fw_tag in entity_indicators_by_fw:
                 entity_indicators_by_fw[fw_tag][attr_key] = qty
 
-        is_single_entity = len(all_entity_attrs) == 1
+        # Exclude cohort entities (":CHT:" in entity_id) from the sovereign count.
+        # PR #1228 injected cohort entities into state_data; without this exclusion
+        # len(all_entity_attrs) > 1 for SEN-only scenarios, causing percentile_rank
+        # fallthrough that pegs financial/HD composites at 1.0 (rank 1st of 1).
+        is_single_entity = sum(1 for eid in all_entity_attrs if ":CHT:" not in eid) == 1
 
         framework_points: list[TrajectoryFrameworkPoint] = []
         for fw in _TRAJECTORY_FRAMEWORKS:
@@ -2125,6 +2249,51 @@ def _alert_matches_framework(
     return indicator_fw == framework
 
 
+# ---------------------------------------------------------------------------
+# Cohort threshold crossing helpers (M16-G8 — Option A cumulative crossings)
+# ---------------------------------------------------------------------------
+
+_QUINTILE_LABELS: dict[str, str] = {
+    "1": "Bottom Quintile",
+    "2": "Lower-Middle Quintile",
+    "3": "Middle Quintile",
+    "4": "Upper-Middle Quintile",
+    "5": "Top Quintile",
+}
+_SECTOR_LABELS: dict[str, str] = {
+    "INFORMAL": "Informal Workers",
+    "AGRICULTURE": "Agricultural Workers",
+    "FORMAL": "Formal Sector",
+    "UNEMPLOYED": "Unemployed",
+}
+_INDICATOR_LABELS: dict[str, str] = {
+    "poverty_headcount_ratio": "Poverty Headcount Ratio",
+    "net_enrollment_secondary": "Secondary Net Enrollment",
+}
+_QUINTILE_SEVERITY: dict[str, str] = {
+    "1": "CRITICAL",
+    "2": "WARNING",
+    "3": "MEDIUM",
+    "4": "MEDIUM",
+    "5": "MEDIUM",
+}
+
+
+def _parse_cohort_id(entity_id: str) -> tuple[str, str, str] | None:
+    """Parse a ':CHT:' entity ID into (quintile_num, age_range, sector).
+
+    Returns None for non-cohort or malformed IDs.
+    Example: 'SEN:CHT:1-25-54-INFORMAL' -> ('1', '25-54', 'INFORMAL')
+    """
+    if ":CHT:" not in entity_id:
+        return None
+    suffix = entity_id.split(":CHT:", 1)[-1]
+    parts = suffix.split("-")
+    if len(parts) < 3:  # noqa: PLR2004
+        return None
+    return parts[0], "-".join(parts[1:-1]), parts[-1]
+
+
 @router.get(
     "/scenarios/{scenario_id}/measurement-output",
     response_model=MultiFrameworkOutput,
@@ -2209,7 +2378,8 @@ async def get_measurement_output(
 
     all_entity_attrs = _parse_entity_attrs(state_dict)
     target_attrs = all_entity_attrs.get(entity_id, {})
-    is_single_entity = len(all_entity_attrs) == 1
+    # Exclude cohort entities from sovereign count — same fix as trajectory endpoint.
+    is_single_entity = sum(1 for eid in all_entity_attrs if ":CHT:" not in eid) == 1
 
     outputs: dict[str, FrameworkOutput] = {}
     for fw in _ALL_FRAMEWORKS:
@@ -2243,6 +2413,94 @@ async def get_measurement_output(
             note = _SINGLE_ENTITY_NOTE
         else:
             note = None
+        # M16-G8 Option A: cumulative cohort threshold crossings for HD framework.
+        # Detect cohort groups (Q1/Q2) whose poverty_headcount_ratio remains below
+        # the MDA floor at this step. De-duplicated by (quintile, sector) using the
+        # 25-54 working-age group as the representative cohort where available.
+        cohort_crossings: list[CohortThresholdCrossing] = []
+        if fw == "human_development":
+            hd_threshold_rows = await conn.fetch(
+                """
+                SELECT indicator_key, floor_value, comparison_operator
+                FROM mda_thresholds
+                WHERE measurement_framework = 'human_development'
+                """
+            )
+            hd_floors: dict[str, Decimal] = {
+                row["indicator_key"]: Decimal(str(row["floor_value"]))
+                for row in hd_threshold_rows
+                if row.get("comparison_operator") == "gte"
+            }
+            if hd_floors:
+                seen_qsec: dict[tuple[str, str], tuple[str, dict[str, QuantitySchema]]] = {}
+                for cht_id, cht_attrs in all_entity_attrs.items():
+                    parsed = _parse_cohort_id(cht_id)
+                    if parsed is None:
+                        continue
+                    q_num, age_range, sector = parsed
+                    if int(q_num) > 2:  # noqa: PLR2004
+                        continue
+                    q_sec_key = (q_num, sector)
+                    if q_sec_key not in seen_qsec or age_range == "25-54":
+                        seen_qsec[q_sec_key] = (cht_id, cht_attrs)
+                for (q_num, sector), (cht_id, cht_attrs) in sorted(seen_qsec.items()):
+                    for ind_key, floor_val in hd_floors.items():
+                        qty = cht_attrs.get(ind_key)
+                        if qty is None:
+                            continue
+                        try:
+                            ind_val = Decimal(qty.value)
+                        except Exception:  # noqa: BLE001,S112
+                            continue
+                        if ind_val >= floor_val:
+                            continue
+                        pct_below = (
+                            (floor_val - ind_val) / floor_val * 100
+                        ).quantize(Decimal("0.01"))
+                        first_step: int = (
+                            await conn.fetchval(
+                                """
+                                SELECT MIN(step)
+                                FROM scenario_state_snapshots
+                                WHERE scenario_id = $1
+                                  AND step >= 1
+                                  AND (state_data->$2->$3->>'value')::numeric < $4
+                                """,
+                                scenario_id,
+                                cht_id,
+                                ind_key,
+                                float(floor_val),
+                            )
+                            or step
+                        )
+                        eff_tier = effective_tier(qty.confidence_tier, step)
+                        cohort_crossings.append(
+                            CohortThresholdCrossing(
+                                quintile_key=f"Q{q_num}",
+                                cohort_label=(
+                                    f"{_QUINTILE_LABELS.get(q_num, f'Q{q_num}')} "
+                                    f"{_SECTOR_LABELS.get(sector, sector.capitalize())}"
+                                ),
+                                indicator_key=ind_key,
+                                indicator_label=_INDICATOR_LABELS.get(
+                                    ind_key, ind_key.replace("_", " ").title()
+                                ),
+                                severity=_QUINTILE_SEVERITY.get(q_num, "MEDIUM"),
+                                step_crossed=first_step,
+                                above_floor_pct=str(pct_below),
+                                tier=eff_tier,
+                                source=qty.source_registry_id,
+                                is_synthetic=eff_tier >= 3,
+                                synthetic_method=(
+                                    "regional_statistical_inference"
+                                    if eff_tier >= 3
+                                    else None
+                                ),
+                                value=qty.value,
+                                breaches_below=True,  # gte: breach = value below floor
+                            )
+                        )
+
         outputs[fw] = FrameworkOutput(
             framework=fw,
             entity_id=entity_id,
@@ -2252,6 +2510,7 @@ async def get_measurement_output(
             mda_alerts=fw_alerts,
             has_below_floor_indicator=has_below_floor,
             note=note,
+            cohort_threshold_crossings=cohort_crossings,
         )
 
     return MultiFrameworkOutput(

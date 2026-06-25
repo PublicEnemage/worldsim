@@ -60,6 +60,19 @@ function getUrlScenarioId(): string | null {
   }
 }
 
+// Returns [idA, idB] from ?compare=idA,idB, or null if absent or malformed.
+function getUrlCompareIds(): [string, string] | null {
+  try {
+    const val = new URLSearchParams(window.location.search).get("compare");
+    if (!val) return null;
+    const parts = val.split(",");
+    if (parts.length !== 2 || !parts[0] || !parts[1]) return null;
+    return [parts[0].trim(), parts[1].trim()];
+  } catch {
+    return null;
+  }
+}
+
 export default function App() {
   // ---------------------------------------------------------------------------
   // Pillar 1 — M11.5 usability session recording
@@ -115,9 +128,32 @@ export default function App() {
   };
 
   // Restore last active scenario on mount (IR-003).
-  // URL ?scenario= takes precedence; falls back to localStorage.
+  // ?compare=idA,idB takes precedence over ?scenario= for E2E comparison mode (M16-G4 AC-F9).
+  // ?scenario= takes precedence over localStorage.
   // Non-fatal: if the stored ID no longer exists, clear stale localStorage silently.
   useEffect(() => {
+    const compareIds = getUrlCompareIds();
+    if (compareIds) {
+      // Comparison mode from URL — load scenario A as primary, B as comparison.
+      const [idA, idB] = compareIds;
+      setCompareMode(true);
+      setSecondScenarioId(idB);
+      let cancelled = false;
+      fetch(`${API_BASE}/scenarios/${encodeURIComponent(idA)}`)
+        .then((res) => (res.ok ? (res.json() as Promise<ScenarioDetailResponse>) : null))
+        .then((detail) => {
+          if (cancelled || !detail) return;
+          setSelectedScenarioId(detail.scenario_id);
+          setSelectedScenarioName(detail.name);
+          setSelectedScenarioSteps(detail.configuration.n_steps);
+          if (detail.status === "completed") {
+            setCurrentStep(detail.configuration.n_steps);
+          }
+        })
+        .catch(() => {});
+      return () => { cancelled = true; };
+    }
+
     const urlId = getUrlScenarioId();
     const stored = readStoredScenario();
     const scenarioId = urlId ?? stored?.id ?? null;

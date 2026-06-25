@@ -366,6 +366,11 @@ class ScenarioConfigSchema(BaseModel):
         Range 0.1–3.0; values outside this range are rejected at validation.
     `commodity_price_shocks` — global commodity shocks distributed to all entities by
         import dependency (Issue #752, ADR-012). Default empty (no shocks).
+    `projection_steps` — optional long-run projection horizon (1–100, M16-G3 #274).
+        When set, overrides n_steps as the total step count. projection_steps > 8
+        enables the 25-year human capital depletion trajectory (quarterly timestep,
+        DemographicModule auto-enabled, adaptive_resolution disabled).
+        Default None → programme-length behaviour (n_steps governs).
     """
 
     model_config = ConfigDict(from_attributes=True)
@@ -381,6 +386,8 @@ class ScenarioConfigSchema(BaseModel):
     n_runs: int = 1
     fiscal_multiplier: float = Field(default=1.0, ge=0.1, le=3.0)
     commodity_price_shocks: list[CommodityShockConfig] = []
+    projection_steps: int | None = Field(default=None, ge=1, le=100)
+    ecological_shock_coefficient: float = Field(default=0.0, ge=0.0, le=1.0)
 
 
 class ScheduledInputSchema(BaseModel):
@@ -514,6 +521,25 @@ class AdvanceResponse(BaseModel):
 # ---------------------------------------------------------------------------
 
 
+class DistributionRecord(BaseModel):
+    """Distributional statistics of a delta series across shared simulation steps.
+
+    Computed from all shared steps between two scenarios (M16-G4 #102).
+    All fields are null when fewer than 3 shared steps exist — the minimum
+    sample required for meaningful distributional statistics.
+
+    `variance` — population variance of delta values (as Decimal string).
+    `p10`, `p50`, `p90` — 10th, 50th, and 90th percentile of delta values.
+    """
+
+    model_config = ConfigDict(from_attributes=True)
+
+    variance: str | None = None
+    p10: str | None = None
+    p50: str | None = None
+    p90: str | None = None
+
+
 class DeltaRecord(BaseModel):
     """Delta between the same attribute across two scenario snapshots.
 
@@ -535,11 +561,50 @@ class DeltaRecord(BaseModel):
     threshold_crossed: bool | None = None
 
 
-class CompareResponse(BaseModel):
-    """Comparative output across two scenario final snapshots — ADR-004 Decision 5.
+class ThresholdCrossingItem(BaseModel):
+    """One MDA threshold crossing entry within a FlatDeltaRecord — M16-G9 #97.
 
-    `deltas` maps entity_id → attribute_key → DeltaRecord.
-    Only entities and attributes present in both snapshots are included.
+    `threshold_name` identifies the MDA threshold (its mda_id).
+    `crossed` is True when scenario_b's value at the compared step violates
+    the threshold (value_b <= floor for "lte" operator; value_b >= floor for "gte").
+    Only entries with crossed=True are included; the list is empty when no threshold
+    is violated.
+    """
+
+    threshold_name: str
+    crossed: bool
+
+
+class FlatDeltaRecord(BaseModel):
+    """Flat-list entry for GET /scenarios/compare — M16-G4 #102.
+
+    Extends DeltaRecord with `entity_id`, `attribute_key`, and `distribution`.
+    The flat list format replaces the nested dict[entity_id][attr_key] structure
+    so distribution metadata can be attached per-record without a third nesting level.
+    """
+
+    model_config = ConfigDict(from_attributes=True)
+
+    entity_id: str
+    attribute_key: str
+    value_a: str
+    value_b: str
+    delta: str
+    direction: str
+    confidence_tier: int
+    threshold_crossed: bool | None = None
+    distribution: DistributionRecord = DistributionRecord()
+    threshold_crossings: list[ThresholdCrossingItem] = []
+
+
+class CompareResponse(BaseModel):
+    """Comparative output across two scenario snapshots — ADR-004 Decision 5.
+
+    `deltas` is a flat list of FlatDeltaRecord (M16-G4 #102).
+    Each record carries entity_id, attribute_key, the point delta, and
+    distributional statistics across all shared steps.
+
+    Only entities and attributes present in both scenarios are included.
     When `attr` is omitted, ALL shared attributes across all shared entities are
     returned in a single call (Issue #90). Pass `attr` to filter to one key.
     """
@@ -550,7 +615,7 @@ class CompareResponse(BaseModel):
     scenario_b_id: str
     step_a: int
     step_b: int
-    deltas: dict[str, dict[str, DeltaRecord]]
+    deltas: list[FlatDeltaRecord]
 
 
 # ---------------------------------------------------------------------------
@@ -669,6 +734,31 @@ class MDAAlert(BaseModel):
     recovery_horizon_years: int | None = None
 
 
+class CohortThresholdCrossing(BaseModel):
+    """One cohort group's poverty threshold crossing, cumulative as of the current step.
+
+    Represents a cohort (quintile × sector) whose poverty_headcount_ratio has
+    fallen below the MDA floor and remains there at the queried step. Computed
+    by get_measurement_output for the human_development framework.
+    """
+
+    model_config = ConfigDict(from_attributes=True)
+
+    quintile_key: str
+    cohort_label: str
+    indicator_key: str
+    indicator_label: str
+    severity: str
+    step_crossed: int
+    above_floor_pct: str
+    tier: int
+    source: str | None
+    is_synthetic: bool
+    synthetic_method: str | None
+    value: str
+    breaches_below: bool
+
+
 class FrameworkOutput(BaseModel):
     """One measurement framework's indicators and composite score for an entity.
 
@@ -692,6 +782,7 @@ class FrameworkOutput(BaseModel):
     mda_alerts: list[MDAAlert]
     has_below_floor_indicator: bool
     note: str | None
+    cohort_threshold_crossings: list[CohortThresholdCrossing] = []
 
 
 class MultiFrameworkOutput(BaseModel):

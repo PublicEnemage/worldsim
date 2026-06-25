@@ -129,6 +129,53 @@ export function formatReversibilityLabel(
 // FourFrameworkZone1D
 // ---------------------------------------------------------------------------
 
+// ---------------------------------------------------------------------------
+// PSP severity classification (M16-G2 #987, #1163)
+// ---------------------------------------------------------------------------
+
+export type PspSeverity = "CRITICAL" | "WARNING" | "WATCH" | "STABLE";
+
+/** Classify PSP value into severity tier per CM-calibrated thresholds (2026-06-23). */
+export function getPspSeverity(pspValue: string): PspSeverity {
+  const v = parseFloat(pspValue);
+  if (v < 0.40) return "CRITICAL";
+  if (v < 0.55) return "WARNING";
+  if (v < 0.70) return "WATCH";
+  return "STABLE";
+}
+
+const PSP_SEVERITY_COLOR: Record<PspSeverity, string> = {
+  CRITICAL: "#cc0000",
+  WARNING: "#a06000",
+  WATCH: "#0070a0",
+  STABLE: "#059669",
+};
+
+/** Historical analogue sentence per PSP severity (CM sign-off 2026-06-23). */
+function getPspHistoricalAnalogue(severity: PspSeverity): string | null {
+  if (severity === "CRITICAL") return "At this level, historical ECF programmes show abandonment within 3 steps.";
+  if (severity === "WARNING") return "At this level, historical ECF programmes show abandonment within 6 steps.";
+  if (severity === "WATCH") return "At this level, historical ECF programmes show elevated discontinuation risk.";
+  return null;
+}
+
+// ---------------------------------------------------------------------------
+// Legitimacy floor proximity label
+// ---------------------------------------------------------------------------
+
+function getFloorProximityLabel(value: string, floor: string): string {
+  const v = parseFloat(value);
+  const f = parseFloat(floor);
+  const diff = Math.abs(v - f);
+  if (Math.abs(v - f) < 0.001) return "AT fragility threshold";
+  if (v > f) return `${diff.toFixed(2)} above fragility threshold`;
+  return `${diff.toFixed(2)} below fragility threshold`;
+}
+
+// ---------------------------------------------------------------------------
+// Props
+// ---------------------------------------------------------------------------
+
 interface FourFrameworkZone1DProps {
   "data-testid"?: string;
   /** True while the trajectory fetch is in flight (IR-006). */
@@ -141,17 +188,27 @@ interface FourFrameworkZone1DProps {
   entityIds?: string[];
   /** ADR-015 §Component 1: data-quality per framework (DA-G5-1). */
   dataQuality?: Record<string, FrameworkDataQuality> | null;
-  /** ADR-015 §Component 3: whether political economy module is enabled (DA-G5-3). */
+  /** Whether political economy module is enabled (DA-G5-3). */
   peEnabled?: boolean;
   /**
-   * ADR-015 §Component 3: programme_survival_probability value as Decimal string.
-   * undefined = not fetched / PE disabled (row absent).
-   * null = PE enabled but computation returned null (show error row).
-   * string = valid value (show percentage).
+   * M16-G2 (#987): programme_survival_probability value as Decimal string.
+   * undefined = not fetched / PE disabled (section absent).
+   * null = PE enabled but computation returned null.
+   * string = valid value.
    */
   pspValue?: string | null;
-  /** ADR-015 §Component 3: confidence tier of the PSP indicator. */
+  /** Confidence tier of the PSP indicator. */
   pspTier?: number | null;
+  /** M16-G2 (#987): legitimacy_index value as Decimal string (null = unavailable). */
+  legitimacyValue?: string | null;
+  /** M16-G2 (#987): legitimacy_index floor value as Decimal string. */
+  legitimacyFloor?: string | null;
+  /** M16-G2 (#987): legitimacy_index direction ("declining" | "stable" | "improving"). */
+  legitimacyDirection?: string | null;
+  /** M16-G2 (#987): elite_capture_divergence direction ("widening" | "stable" | "narrowing"). */
+  eliteCaptureDirection?: string | null;
+  /** M16-G2 (#987): elite_capture_divergence qualifier text (e.g. "fiscal benefits concentrating"). */
+  eliteCaptureQualifier?: string | null;
 }
 
 const CONTAINER_STYLE: React.CSSProperties = {
@@ -172,7 +229,12 @@ export function FourFrameworkZone1D({
   dataQuality,
   peEnabled,
   pspValue,
-  pspTier,
+  pspTier: _pspTier,
+  legitimacyValue,
+  legitimacyFloor,
+  legitimacyDirection,
+  eliteCaptureDirection,
+  eliteCaptureQualifier,
 }: FourFrameworkZone1DProps) {
   const { trajectory, current_step, mda_alerts, mode } = useScenarioStepStore();
 
@@ -386,63 +448,123 @@ export function FourFrameworkZone1D({
         );
       })}
 
-      {/* ADR-015 §Component 3 — Political Feasibility row (programme_survival_probability).
-          Visible only when PE module is enabled. Absent entirely when PE is disabled. */}
-      {peEnabled && (
-        <div
-          data-testid="zone-1d-political-feasibility"
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            borderLeft: "3px solid #7c3aed",
-            paddingLeft: 6,
-            paddingTop: 2,
-            paddingBottom: 2,
-          }}
-        >
-          <span style={{ fontSize: 11, color: "#555", fontWeight: 500 }}>
-            Political Feasibility
-          </span>
-          <span
-            style={{
-              fontSize: 12,
-              fontWeight: 700,
-              color: "#7c3aed",
-              fontVariantNumeric: "tabular-nums",
-            }}
-          >
-            {pspValue === undefined ? (
-              "—"
-            ) : pspValue === null ? (
-              <span style={{ color: "#cc0000", fontSize: 10 }}>— [computation error]</span>
-            ) : (
-              `${(parseFloat(pspValue) * 100).toFixed(0)}% [T${pspTier ?? 3} · political economy module]`
-            )}
-          </span>
-        </div>
-      )}
+      {/* M16-G2 #987 — Political Risk sub-section (replaces G1 political economy elements).
+          Visible when PE enabled; shows structured severity-labeled summary for Persona 3.
+          Empty state shown when PE is disabled. G1 testids fully retired (DD-016). */}
+      {peEnabled ? (
+        pspValue !== undefined ? (
+          <div data-testid="zone-1d-political-risk">
+            {/* Section divider + header */}
+            <div
+              style={{
+                borderTop: "1px solid #e0e0e0",
+                paddingTop: 4,
+                marginTop: 2,
+              }}
+            >
+              <span
+                data-testid="zone-1d-political-risk-header"
+                style={{ fontSize: 9, fontWeight: 600, color: "#555", letterSpacing: 0.3 }}
+              >
+                POLITICAL RISK
+              </span>
+            </div>
 
-      {/* ADR-015 §Component 3 — PSP Layer 3 self-interpreting sentence (#1075).
-          Visible when PE enabled and PSP value is available. Fallback when null. */}
-      {peEnabled && pspValue !== undefined && (
+            {/* PSP severity row */}
+            {pspValue !== null ? (() => {
+              const severity = getPspSeverity(pspValue);
+              const pspPct = Math.round(parseFloat(pspValue) * 100);
+              const severityColor = PSP_SEVERITY_COLOR[severity];
+              const analogue = getPspHistoricalAnalogue(severity);
+              return (
+                <>
+                  <div
+                    data-testid="psp-severity-row"
+                    style={{ paddingTop: 2, fontSize: 11, color: "#333" }}
+                  >
+                    {"Programme survival: "}
+                    <span
+                      data-testid="psp-severity-badge"
+                      style={{ fontWeight: 700, color: severityColor }}
+                    >
+                      {severity}
+                    </span>
+                    {` (${pspPct}%) — `}
+                    <span style={{ color: "#555" }}>
+                      {legitimacyDirection === "declining" || eliteCaptureDirection === "widening"
+                        ? "DECLINING"
+                        : "STABLE"}
+                    </span>
+                  </div>
+                  {analogue && (
+                    <div
+                      data-testid="psp-historical-analogue"
+                      style={{ paddingTop: 1, paddingBottom: 1, fontSize: 10, color: "#555", lineHeight: 1.3 }}
+                    >
+                      {analogue}
+                    </div>
+                  )}
+                </>
+              );
+            })() : (
+              <div
+                data-testid="psp-severity-row"
+                style={{ paddingTop: 2, fontSize: 10, color: "#aaa", fontStyle: "italic" }}
+              >
+                Programme survival: unavailable
+              </div>
+            )}
+
+            {/* Legitimacy index row */}
+            {legitimacyValue != null && (
+              <>
+                <div
+                  data-testid="legitimacy-index-row"
+                  style={{ paddingTop: 1, fontSize: 10, color: "#333" }}
+                >
+                  {`Legitimacy index: ${parseFloat(legitimacyValue).toFixed(2)} — `}
+                  <span style={{ color: "#555" }}>{legitimacyDirection ?? "unknown"}</span>
+                  {legitimacyFloor != null && (
+                    <span style={{ color: "#888" }}>{` (floor: ${parseFloat(legitimacyFloor).toFixed(2)})`}</span>
+                  )}
+                </div>
+                {legitimacyFloor != null && (
+                  <div
+                    data-testid="legitimacy-floor-proximity"
+                    style={{ fontSize: 9, color: "#777", paddingBottom: 1 }}
+                  >
+                    {getFloorProximityLabel(legitimacyValue, legitimacyFloor)}
+                  </div>
+                )}
+              </>
+            )}
+
+            {/* Elite capture row */}
+            {eliteCaptureDirection != null && (
+              <div
+                data-testid="elite-capture-row"
+                style={{
+                  paddingTop: 1,
+                  paddingBottom: 1,
+                  fontSize: 10,
+                  color: "#333",
+                  whiteSpace: "nowrap",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                }}
+              >
+                {`Elite capture divergence: ${eliteCaptureDirection}`}
+                {eliteCaptureQualifier != null && ` — ${eliteCaptureQualifier}`}
+              </div>
+            )}
+          </div>
+        ) : null
+      ) : (
         <div
-          data-testid="psp-layer3-sentence"
-          style={{
-            borderLeft: "3px solid #7c3aed",
-            paddingLeft: 6,
-            paddingTop: 2,
-            paddingBottom: 2,
-            fontSize: 10,
-            color: "#555",
-            lineHeight: 1.4,
-          }}
+          data-testid="political-risk-empty"
+          style={{ paddingTop: 4, fontSize: 10, color: "#aaa", fontStyle: "italic" }}
         >
-          {pspValue === null ? (
-            "Programme survival probability unavailable — computation error."
-          ) : (
-            `Programme survival probability: ${(parseFloat(pspValue) * 100).toFixed(0)}%. This means the programme has a ${(parseFloat(pspValue) * 100).toFixed(0)}% chance of remaining on track through conditionality compliance.`
-          )}
+          Political risk: not modelled in this fixture.
         </div>
       )}
     </div>

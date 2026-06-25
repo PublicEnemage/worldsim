@@ -2848,6 +2848,226 @@ This test would have failed in CI for eight sprints and revealed that `createCom
 
 ---
 
+## NM-057 — CA-Condition Follow-Up Issues Not Assigned to a Sprint Group at Sprint Exit Time (Anticipatory)
+
+**Date:** 2026-06-24
+**Milestone:** M16 — Distributional Visibility
+**Detected by:** PM Agent (near-miss sweep at G10 sprint entry, 2026-06-24)
+**Severity:** Low
+
+### What happened
+
+At G1, G3, and G4 sprint exits (2026-06-23 and 2026-06-24), the PI Agent named five
+CA-condition issues (#1162, #1177, #1178, #1179, #1184) as required before the live
+demo session (#843). These conditions were recorded in the prose of each PI confirmation
+and in the sprint exit documents (Section 5). No formal sprint group assignment was made
+for these issues at exit time — they held no slot in the sprint plan's Sprint Groups table
+and no sprint entry was initiated. Between G1 exit (2026-06-23) and G10 sprint entry
+(2026-06-24), five G8 gate dependencies existed as informal obligations documented only
+in PI confirmation prose, not in the plan's structured group tracking.
+
+### What was at risk
+
+If the session had closed after G3 or G4 exit without G10 being formally entered, the
+five CA conditions would exist only in prose — present in PI confirmation narrative, absent
+from the sprint plan's group table, and without a sequenced timing relationship to the G8
+gate (#843). A future session could have attempted to schedule #843 without having
+completed the CA conditions, because the sprint plan's Group table would not have shown
+them as gate dependencies. The G8 gate declaration in the sprint plan read "after G1/G2/G3"
+— the CA-condition group (G10) was nowhere in the plan until this was caught.
+
+### What caught it
+
+The PM Agent identified the gap during the G10 sprint entry near-miss sweep (same session
+as G9 entry filing, before any G10 implementation began). The EL confirmed the G8 gate
+dependency in the G10 sprint entry approval. The gap was caught anticipatorily — no
+implementation was blocked, and no incorrect scheduling occurred. Gap duration: one calendar
+day (G1 exit 2026-06-23 to G10 entry 2026-06-24).
+
+### Process improvement
+
+The sprint exit SOP (`docs/process/sprint-planning-sop.md §Sprint Exit Gate`) must be
+amended to require: when the PI Agent's exit confirmation names CA-condition follow-up
+issues, those issues must be assigned to a sprint group before the exit session closes.
+The assignment must appear in the sprint plan Sprint Groups table — either added to an
+existing open group or by initiating a new sprint entry stub with a group number. A PI
+Agent confirmation that names CA-condition issues without assigning them to a group is not
+complete. The PI Agent blocks final exit confirmation until the assignment is recorded.
+
+Prose-only documentation of gate-blocking follow-up items is not sufficient. If the item
+gates a downstream group (e.g., G8), the gating relationship must appear in the sprint
+plan, not only in the PI confirmation prose.
+
+SOP amendment target: `docs/process/sprint-planning-sop.md §Sprint Exit Gate` —
+add step: "PI Agent confirms any named CA-condition follow-up issues are assigned to a
+sprint group before exit confirmation is filed." PI Agent holds R for this check.
+
+---
+
+## NM-058 — AC-009 Testid Mismatch: Mode 3 Performance Gate Silent No-Op Since M12 (Reactive)
+
+**Date:** 2026-06-24
+**Milestone:** M16 — Distributional Visibility (gap origin: M12, PR #778)
+**Detected by:** PM Agent during M16-G6 sprint entry authorship — cross-referencing `trajectory-view.spec.ts` locator against `App.tsx` source
+**Severity:** High
+
+### What happened
+
+`frontend/tests/e2e/trajectory-view.spec.ts` AC-009 test located the Mode 3 activation
+control using `[data-testid="mode-3-activate"]`. The control implemented in M12 (PR #778,
+`App.tsx:293`) uses `data-testid="mode3-toggle"`. The testid mismatch caused `hasMode3`
+to always evaluate `false`, the `if (hasMode3)` guard to never execute, and the AC-009
+assertion (`renderMs ≤ 100ms`) to never run. AC-009 has been passing vacuously — measuring
+nothing — across every CI run from M12 through M15.
+
+### What was at risk
+
+AC-009 was cited as a passing CI gate for Mode 3 render performance in sprint exit records
+for M12 through M15. Those citations are inaccurate. Any implementation agent relying on
+"AC-009 passes" as evidence that Mode 3 render performance had been validated was reading
+a false signal. A Mode 3 render regression introduced in any M12–M15 sprint would have
+been invisible to CI.
+
+### Root cause — three-layer failure
+
+1. **Specification drift at implementation:** The FA brief (`docs/frontend/fa-brief-m9-instrument-cluster.md`)
+   specified `mode-3-activate` as the required testid. M12 implementation used `mode3-toggle`
+   (semantically correct — the control is a bidirectional toggle). The FA brief was not updated.
+
+2. **NM-027 FA pre-PR checklist not executed:** NM-027 established a FA pre-PR checklist item:
+   before any PR implementing a component with named performance ACs, verify the component uses
+   the testid named in the spec. This was not run at PR #778.
+
+3. **NM-027 QA post-ship activation check not executed:** NM-027 also required the QA Lead to
+   verify all guarded assertions are producing real measurements when a previously guarded component
+   ships. PR #778 was exactly this event. The check was not run.
+
+This is the fourth recurrence of the NM-027 pattern class (NM-027: AC-007/AC-008 no-op guards;
+NM-028: IR-004 SVG guard; NM-056: soft-skip via fixture null; NM-058: testid mismatch).
+
+### Prior sprint exit audit trail note
+
+M12–M15 sprint exit records that cite "Playwright CI green" as covering AC-009 contain an
+inaccurate verification claim. These sprints are not reopened — Mode 3 has been functionally
+sound throughout. NM-058 is the permanent record that AC-009 render performance coverage was
+absent during M12–M15.
+
+### Process improvement
+
+1. **Immediate (G6 fix PR):** Testid corrected to `mode3-toggle`; `if (hasMode3)` and
+   `if (renderMs !== null)` guards removed; replaced with unconditional `expect` assertions.
+   FA brief AC-009 row updated to reflect delivered testid. (PR merged to `release/m16`.)
+
+2. **QA Lead working agreement (`docs/process/agents.md §QA Lead Agent`):** Named no-op guard
+   locator audit step added (NM-058 addition): at every sprint entry, run
+   `grep -rn "isVisible().catch" frontend/tests/e2e/` and verify each guard's testid against
+   `grep -rn "data-testid" frontend/src/`. Any guard whose testid does not appear in source is
+   a filing-blocking finding. This converts the "remember to check" working agreement into a
+   reproducible two-minute audit that would have caught this gap at every sprint entry since M12.
+
+---
+
+## NM-059 — AC-009 CI Measurement Methodology: Multi-CDP Round-Trip Contaminates Performance Window (Reactive)
+
+**Date identified:** 2026-06-24
+**Severity:** Medium
+**Sprint:** M16-G6
+**Detection:** Reactive — caught when EX-001 threshold raise (100ms → 200ms) revealed 179ms → 802ms variance between two consecutive CI runs on PR #1212. Without the threshold raise, the gate would have been flipping pass/fail on runner load with no visible signal of unreliability.
+
+### What happened
+
+After the NM-058 fix (AC-009 testid corrected, scenario setup added), the first real CI run measured 179ms — used as the calibration baseline for EX-001. The second CI run on the next PR measured 802ms against the same 200ms threshold. Both runs used the same test code and the same throttle rate (4×).
+
+### Root cause
+
+The measurement used three separate CDP evaluate calls with a Playwright `waitForTimeout(20)` between the start mark and the end mark:
+
+```
+CDP call 1: page.evaluate → performance.mark("mode3-start")   [T1 set in browser]
+CDP call 2: mode3Trigger.click()                               [click dispatched]
+            page.waitForTimeout(20)                            [Playwright waits 20ms wall-clock]
+CDP call 3: page.evaluate → performance.mark("mode3-end")     [T2 set in browser]
+```
+
+T1 and T2 are browser-side timestamps (accurate). But the time between CDP call 2 completing and CDP call 3 executing in the browser is not bounded by the 20ms Playwright wait — it includes Playwright scheduler latency and CI runner event-loop queue time. On a lightly loaded runner: ~20–50ms overhead. On a loaded runner: hundreds of ms. The entire runner queue delay lands inside the T1–T2 measurement window.
+
+### What was at risk
+
+The AC-009 CI gate was measuring CI runner load, not Mode 3 render performance. Any sprint exit citing AC-009 as a passing performance gate was citing an unreliable measurement. Under sustained CI load, even the EX-001 raised threshold (200ms) would produce false failures — the gate would block PRs due to runner congestion, not actual render regressions.
+
+### Fix
+
+Both AC-009 (`trajectory-view.spec.ts`) and the MV-002 hardware test (`mv-002-hardware-validation.spec.ts`) updated to contain the entire measurement inside a single `page.evaluate` call. The programmatic click, start mark, RAF wait, and end mark all execute inside the browser's own event loop with no CDP round-trips in the measurement window. Two `requestAnimationFrame` cycles give React time to commit the synchronous state update.
+
+### Process improvement
+
+1. **QA Lead working agreement (`docs/process/agents.md §QA Lead Agent`):** Performance measurement methodology audit step added (NM-059 addition): at every sprint entry, run `grep -rn "performance.mark\|waitForTimeout" frontend/tests/e2e/` and verify that no test places a Playwright wait or separate `page.evaluate` call between its start and end performance marks. Any test that does is a filing-blocking methodology finding — multi-CDP measurement methodology produces CI-runner-load-dependent results, not render performance measurements.
+
+2. **Pattern rule:** A valid Playwright performance measurement must either (a) contain both marks and the action being measured inside a single `page.evaluate` call, or (b) use `page.waitForFunction` with a browser-side condition (not a Playwright wall-clock wait) to trigger the end mark. `waitForTimeout` between performance marks is always a methodology violation.
+
+---
+
+## NM-060 — Startup Observability Gap: Empty simulation_entities Table Produces Silent 422 with No Diagnostic Signal (Reactive)
+
+**Date identified:** 2026-06-24
+**Severity:** Medium
+**Sprint:** M16-G6
+**Detection:** Reactive — caught when MV-002 ProBook hardware validation was blocked by
+422 errors on scenario creation. Root cause took multiple investigation steps to identify
+because no observability signal pointed to the seed gap.
+
+### What happened
+
+After `docker compose up --build` (and repeated with `down -v` for a fresh database),
+scenario creation returned `422 Unprocessable Content` on the ProBook. The backend log
+showed the 422 but not why. The frontend showed a generic error. The choropleth loaded
+correctly (GDP growth 200 OK), so the stack *appeared* healthy. The real cause —
+`simulation_entities` was empty because the Natural Earth loader had not been run —
+required inspecting the API source to discover.
+
+### Three-layer failure
+
+1. **No startup observability:** The backend logs `Application startup complete.` with no
+   check on whether `simulation_entities` is populated. A stack with zero entities is
+   indistinguishable from a healthy stack in the startup log. The API health endpoint
+   returns 200 regardless.
+
+2. **Wrong fix command in CONTRIBUTING.md:** The troubleshooting entry said
+   `docker compose exec api python scripts/natural_earth_loader.py` — a path that does
+   not exist. The correct command is `docker compose exec api python -m app.db.seed.natural_earth_loader`.
+
+3. **Wrong/incomplete symptom description:** CONTRIBUTING.md listed "choropleth is blank"
+   as the only symptom. In practice the choropleth loaded correctly and the failure was
+   a 422 on scenario creation — a completely different, unmatched symptom.
+
+### What was at risk
+
+Any developer or EL doing a first-time or fresh setup would hit this with no diagnostic
+path. CI avoids the problem by explicitly running the seed loader (`.github/workflows/ci.yml`
+line 232) — local and ProBook setups have no equivalent, and CONTRIBUTING.md's
+troubleshooting entry was not discoverable from the observed symptom.
+
+### Fix
+
+CONTRIBUTING.md updated in this commit:
+- Correct fix command: `python -m app.db.seed.natural_earth_loader`
+- Primary symptom updated to scenario creation 422 (first encounter for most users)
+- Explanation added that the stack appears healthy despite the empty table
+
+### Process improvement
+
+1. **GitHub issue filed for startup observability** (enhancement, M17): The backend
+   should log a structured `WARNING` at startup lifespan if `simulation_entities` is
+   empty, with the fix command in the log message. A zero-entity stack is never a valid
+   operating state — it should say so. Issue filed against M17.
+
+2. **Troubleshooting entry standard:** CONTRIBUTING.md symptoms must describe what a
+   developer *observes* (HTTP status codes, UI behaviour, log lines) — not internal
+   state requiring source inspection. "Choropleth is blank" was accurate but not the
+   first observable signal; scenario creation 422 is.
+
+---
+
 ## Registry Maintenance
 
 ### How to add an entry
@@ -2856,6 +3076,232 @@ When a near-miss is identified — during a session, in a HORIZON sweep, or in p
 review — the PM Agent files a new entry following the template below:
 
 ```markdown
+## NM-061 — AC-F8 Silent No-Op: Scenario Created via API But Never Selected in UI; 60-Second Ceiling Gate Measuring Nothing Since G3 (Reactive)
+
+**Date:** 2026-06-24
+**Milestone:** M16 — Distributional Visibility (gap origin: G3, PR #1172)
+**Detected by:** PI Agent at G6 exit gate review, triggered by explicit EL activation. Sprint entry §3.1 pre-check was specified in writing but not executed during G6 validation.
+**Severity:** High
+
+### What happened
+
+`frontend/tests/e2e/m16-g3-25year-human-capital-trajectory.spec.ts` AC-F8 measures the
+time from scenario creation to `human-capital-trajectory-panel` visibility. The test
+creates a SEN 100-step scenario via direct `fetch` API calls (`createSen100StepScenario()`),
+runs it via API, then navigates to `/` and waits for the panel to become visible.
+
+The panel is rendered in `ScenarioInstrumentCluster.tsx` only when:
+```
+(activeScenarioDetail?.configuration?.projection_steps ?? 0) > 8
+```
+
+`activeScenarioDetail` reflects the **UI-selected** primary scenario. The test creates
+the scenario via API but never selects it in the UI — there is no Scenarios panel
+interaction, no `Select as primary scenario` click, no `__worldsim_selectEntity` call.
+When the test navigates to `/`, no scenario is selected, `activeScenarioDetail` is null
+or undefined, and the panel never renders.
+
+The guard at line 459 (`if (!(await panel.isVisible(...).catch(() => false))) return;`)
+fires silently, and the test returns without asserting anything. AC-F8 has been a
+passing CI gate that measures nothing since G3 shipped (PR #1172, 2026-06-24).
+
+The G6 sprint entry (§3.1) required an explicit pre-check: *"Before running VC-2, verify
+the AC-F8 test assertion path is live (not silently skipped via `catch(() => false)`)."*
+This pre-check was not executed during G6 validation, and the validation report did not
+address it. The PI Agent discovered the gap at exit gate review.
+
+### What was at risk
+
+AC-F8 is the CI gate for G3's contracted simulation ceiling: 100-step scenarios must
+complete within 60 seconds (CE Assessment Decision 4, `docs/process/sprint-plans/m16-g3-sprint-entry.md §2.5`).
+G3's sprint exit record cites AC-F8 as PASS. That citation is inaccurate — the test has
+been measuring nothing. A simulation engine regression that caused 100-step scenarios to
+exceed 60 seconds would be invisible to CI.
+
+The VC-2 ProBook timing (0.5s for 100 steps) confirms the simulation currently runs well
+under the ceiling. But the CI guard provides no regression protection.
+
+### What caught it
+
+PI Agent review at G6 exit gate, triggered by explicit EL activation (`BPO and PI Agents:
+validate and confirm G6 exit`). The sprint entry §3.1 pre-check requirement was written
+in advance specifically to prevent this failure mode — it was caught because it was named
+in the entry document and the PI Agent checked whether it had been satisfied.
+
+This is partial process success (the requirement was anticipated and written down) and
+partial process failure (the requirement was not executed). The pre-check existed on paper
+but had no enforcement mechanism to ensure it ran.
+
+### Root cause — same failure mode as NM-058, different mechanism
+
+NM-058: testid mismatch — guard locator finds nothing in DOM
+NM-061: setup mismatch — testid is correct, but component never renders because test
+setup (API-only scenario creation) does not satisfy the render condition
+
+The NM-058 QA Lead audit step (`grep -rn "isVisible().catch" frontend/tests/e2e/`)
+would have found this guard and checked the testid — `human-capital-trajectory-panel`
+exists in source. The audit step would have passed, missing the setup gap entirely.
+The two failure modes require two distinct audit questions.
+
+### Process improvement
+
+**Immediate (G6 fix — this session):** AC-F8 must be updated to select the created
+scenario in the UI before checking panel visibility. After `createSen100StepScenario()`
+returns a `scenario_id`, use the Scenarios panel UI to select the scenario as primary
+(same pattern as `mode3-active-control.spec.ts` and the AC-009 fix in PR #1211).
+
+**QA Lead working agreement addition (NM-061 addition):** The NM-058 audit step covers
+testid correctness but not setup correctness. A second audit question must be added to
+the working agreement: *For any E2E test that creates scenario or entity data via direct
+`fetch` API calls and then checks for conditional UI component visibility, verify the
+test also selects or activates that data through the UI before checking visibility.
+API-created data that is never surfaced through a UI selection action will not satisfy
+conditional renders that depend on `activeScenarioDetail`, `selectedScenarioId`, or
+equivalent state.* This audit requires reading the render condition in the source
+component, not just checking the testid.
+
+The two-part audit (NM-058: testid correctness; NM-061: setup completeness) together
+cover both failure modes of the soft-skip pattern.
+
+**Sprint entry pre-check enforcement:** The G6 sprint entry named the AC-F8 pre-check
+as a blocking condition. The failure was that "named in the entry" did not translate to
+"executed in the validation." Sprint validation checklists must include a named sign-off
+for each named pre-check — not just a description of what to check, but a filled-in
+result field. The validation report template for future sprints must include a
+`pre-checks performed` section with one row per entry-document-named pre-check, each
+requiring an observed result (not a checkbox).
+
+---
+
+## NM-062 — Demo Spec `getByText("Step N")` Collides with Projection Panel Step Axis Spans; Every Demo Run Would Fail with Strict Mode Violation (Reactive)
+
+**Date:** 2026-06-24
+**Milestone:** M16 — Distributional Visibility (gap origin: G3/G8 interaction)
+**Detected by:** Demo spec execution failure at Step 6 during M16-G8 demo preparation
+**Severity:** High
+
+### What happened
+
+`demo-narrated.spec.ts` used `page.getByText("Step N")` to assert that the step counter
+had advanced after each `nextStepBtn.click()`. `getByText` in Playwright performs a
+default substring match — an element is matched if its text content *contains* the target
+string.
+
+`HumanCapitalTrajectoryPanel` (G3/#274) renders a step axis with static spans:
+```tsx
+<span>Step 1</span>
+<span>Step 25</span>
+<span>Step 50</span>
+<span>Step 75</span>
+<span>Step {projectionSteps}</span>   // "Step 100" for 100-step demo scenario
+```
+
+`getByText("Step 1")` matched both:
+1. `<span>Step 1</span>` — the projection panel step axis start label (exact match)
+2. `<span>Step 100</span>` — the projection panel step axis end label ("Step 100" contains
+   "Step 1" as a prefix substring)
+
+Playwright strict mode requires locators to match exactly one element. The assertion
+failed with: *"strict mode violation: getByText('Step 1') resolved to 2 elements."*
+
+The demo spec was originally authored before `HumanCapitalTrajectoryPanel` existed.
+When G3 added the panel (PR #1172), the static step axis labels created an undetected
+collision with the existing step navigation assertions. The collision was only discovered
+when the demo spec was executed at Step 6 of G8 demo preparation.
+
+### What was at risk
+
+Every demo run — including the M16 live stakeholder demo (#843, M16 exit gate) — would
+fail before capturing any screenshots. The walkthrough would abort at Step 1 advance with
+a strict mode violation. The five frame screenshots required for Step 6b and the internal
+panel review would not be captured.
+
+### What caught it
+
+Step 6 execution of the demo script during M16-G8 demo preparation. The failure appeared
+as the first advance assertion in the test. This was caught during demo preparation, not
+during a live stakeholder session — the G8 demo preparation protocol (Steps 5b, 6, 6b
+before any live audience) is functioning as designed.
+
+### Process improvement
+
+**Immediate fix:** All `page.getByText("Step N")` assertions replaced with
+`page.locator('[data-testid="current-step-display"]').toContainText("Step N")`.
+The `current-step-display` testid is on `<span>` in `ScenarioControls.tsx` — the
+actual step counter showing "Step N / totalSteps". This locator is unique and unambiguous.
+
+**QA Lead working agreement addition (NM-062):** When a new component introduces static
+text content — particularly labels, axis annotations, or header strings — the authoring
+agent must check whether existing test specs use `getByText()` with any of those strings.
+The check is: `grep -r 'getByText.*Step\|getByText.*{string}' frontend/tests/e2e/`.
+If any existing spec uses a `getByText` that would collide with new static text, the
+locator in the existing spec must be updated to a scoped testid-based locator before the
+new component is merged. This check is a required line item in the frontend pre-push gate
+for any PR that adds visible static text to a component rendered in the primary viewport.
+
+---
+
+## NM-063 — CohortImpactSection Text Overflow Not Covered by Legibility Spec; Same Gap Class as NM-056 (Reactive)
+
+**Date:** 2026-06-24
+**Milestone:** M16 — Distributional Visibility
+**Detected by:** EL live demo observation (G8 Demo 6 walkthrough)
+**Severity:** High
+
+### What happened
+
+`CohortImpactSection` renders cohort crossing rows with `display: flex` and a `flex: 1`
+content span containing the cohort label. Without `minWidth: 0` on the flex container
+and `display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap` on
+the label span, long cohort labels (e.g., "bottom quintile, informal workers — poverty
+headcount ratio") overflow the row container and overlap adjacent rows vertically.
+This was observed during the EL live demo (2026-06-24, G8 Demo 6). The EL noted text
+was "cut/overlapping with other text vertically — unacceptable UX/UI at this stage."
+
+`demo-legibility.spec.ts` did not cover `CohortImpactSection` text overflow. The existing
+Zone 1B MDA overflow check (test: "Zone 1B MDA panel text is not overflow-clipped") guards
+`zone-1b-top-detail` only — not the cohort section which is a sibling component.
+
+### What was at risk
+
+The primary Zone 1B argument in Demo 6 — the cohort threshold crossing that identifies
+which cohort bears the cost of the programme — would be illegible to stakeholders. The
+component delivering the mission-critical Persona 2 output was degraded at the moment
+the EL demonstrated it to external participants.
+
+### What caught it
+
+EL live demo observation. The legibility spec existed and had been extended in M14–M16
+but did not include a test for `CohortImpactSection`, which was added in M16-G2 (#986).
+New components added to the primary viewport were not added to the legibility spec in the
+same sprint. This is the same gap class as NM-056 (test coverage gap for a component added
+mid-milestone).
+
+### Process improvement
+
+**Immediate fix:** `CohortImpactSection` label span now has `display: block; overflow: hidden;
+text-overflow: ellipsis; white-space: nowrap` with `minWidth: 0` on the flex:1 container.
+Applied in M16-G8 PR (2026-06-24).
+
+**Legibility spec extension:** New test `"NM-063: CohortImpactSection label text is not
+overflow-clipped at 1440×900"` added to `frontend/tests/e2e/demo-legibility.spec.ts`.
+Advances one step, checks the `zone-1b-cohort-impact` container for non-overflow; if
+crossing rows are present, checks each label span.
+
+**QA Lead working agreement addition (NM-063):** When a new component delivering a
+primary surface output (Zone 1A, 1B, 1C, 1D) is added to the instrument cluster, the
+authoring sprint must extend `demo-legibility.spec.ts` with at minimum: (1) non-zero
+bounding box for the component container; (2) non-overflow on any text-rendering spans
+visible at 1440×900. Adding the component without the legibility extension is a
+compliance gap — QA Lead must flag this in the sprint exit review if not completed
+in the implementation PR.
+
+**Near-miss lineage:** Same gap class as NM-056 (M14: test suite gap for mid-milestone
+component addition). M16-G2 added `CohortImpactSection` to the primary surface; legibility
+coverage was not added in the same sprint.
+
+---
+
 ## NM-NNN — [Short descriptive title]
 
 **Date:** YYYY-MM-DD (or approximate milestone era)

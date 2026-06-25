@@ -328,6 +328,43 @@ requirement (ADR-008 Decision 13). The 280px column must be present at all times
 
 ---
 
+## DD-016: Zone 1D/1C/1B Proportion Rebalance — M16-G2 Political Risk Layout
+
+**Decision (M16-G2):** Zone 1B/1C/1D flex proportions are rebalanced from the M9 baseline
+(45%/25%/30%) to accommodate G2's political risk sub-section in Zone 1D. Binding values:
+
+| Viewport | Zone 1B | Zone 1C | Zone 1D | Zone 1D px |
+|---|---|---|---|---|
+| 1024×768 | 50% | 10% | 40% | 120px |
+| 1280×800 | 35% | 15% | 50% | 160px |
+| 1440×900 | 40% | 15% | 45% | 171px |
+
+**Rationale:** Post-G1, Zone 1D content height ≈ 148px overflows the 30% allocation (96px at
+1280) by 52px — silently clipped by `overflow:hidden`. G2 adds a structured political risk
+sub-section (~76px) below the four framework rows (~84px), making overflow impossible without a
+proportion change. Zone 1C (PMM Widget) compresses most aggressively (25% → 15%) as the least
+time-critical Zone 1 element in the Reactive entry state — the PMM percentile value remains
+visible at compressed height; full context is Zone 2B. Zone 1D `overflow-y: auto` at all
+viewports provides scroll insurance.
+
+**Zone 1B viewport limit change at 1280:** The design spec called for 2 MDA alert rows + 2
+cohort rows visible without scroll at 1280×800. At 35% (112px), Zone 1B shows 1+1 without
+scroll. At 1440 (40%, 152px) the 2+2 target is met. UX Designer accepted this 1280 regression
+(sign-off in `docs/frontend/fa-brief-m16-g2-zone-1d-layout.md §UX Designer Sign-Off`).
+
+**Alternatives considered:**
+- Add political risk sub-section without proportion change: +80px content in already-overflowing
+  container. Not feasible.
+- New Zone 1E: requires layout ADR; disproportionate for content that fits Zone 1D's existing
+  cognitive task (current-step readout).
+- Collapsible Zone 1D political risk section: interaction required to see political risk — violates
+  zero-interaction requirement for Persona 3 in Reactive entry state.
+
+**Source:** `docs/frontend/fa-brief-m16-g2-zone-1d-layout.md` (Frontend Architect Agent,
+2026-06-23). UX Designer sign-off on record in brief. Issues: #986, #987.
+
+---
+
 ## DD-010: Recharts for Radar Chart Over D3 or SVG-from-Scratch
 
 **Decision:** The radar chart uses Recharts `RechartsRadarChart` with custom

@@ -19,7 +19,7 @@
  * AlertDetailPanel is exported for future EntityDetailDrawer use (ADR-014).
  */
 import { useEffect, useRef, useState } from "react";
-import { useScenarioStepStore, type Zone1BAlert } from "../store/scenarioStepStore";
+import { useScenarioStepStore, type Zone1BAlert, type CohortThresholdCrossing } from "../store/scenarioStepStore";
 import { getIndicatorDisplayNameAny, getIndicatorAbbreviation } from "../lib/indicatorDisplayNames";
 
 // ---------------------------------------------------------------------------
@@ -210,6 +210,36 @@ export function buildSparklinePoints(
 // ---------------------------------------------------------------------------
 // AlertDetailPanel — exported for EntityDetailDrawer use (ADR-014)
 // No longer rendered by MDAAlertPanelZone1B itself.
+// ---------------------------------------------------------------------------
+
+/**
+ * Convert a raw source registry ID (e.g. "ECOWAS_REGIONAL_2023") to a
+ * human-readable label ("Ecowas Regional 2023") for display in Zone 1B.
+ * Numeric parts (year) are preserved unchanged; word parts are title-cased.
+ */
+export function formatSourceId(id: string | null | undefined): string {
+  if (!id) return "—";
+  return id
+    .split("_")
+    .map(part => /^\d+$/.test(part) ? part : part.charAt(0).toUpperCase() + part.slice(1).toLowerCase())
+    .join(" ");
+}
+
+/**
+ * Format the floor-distance label for a cohort threshold crossing entry.
+ * Direction is determined by breaches_below (set by the backend based on
+ * comparison_operator): gte thresholds breach when value falls BELOW the floor;
+ * lte thresholds (future) breach when value rises ABOVE the floor.
+ */
+export function formatCohortDistance(
+  pct: string | null,
+  breachesBelow: boolean,
+  isSad: boolean,
+): string {
+  if (isSad || pct == null) return "—";
+  return breachesBelow ? `${pct}% below floor` : `${pct}% above floor`;
+}
+
 // ---------------------------------------------------------------------------
 
 interface AlertDetailPanelProps {
@@ -651,6 +681,128 @@ function CompactAlertList({ alerts, onClearNewBadge }: CompactAlertListProps) {
           </div>
         );
       })}
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// CohortImpactSection — Zone 1B Cohort Impact sub-section (M16-G2 #986)
+//
+// Standalone store-connected component. Rendered as a sibling of MDAAlertPanelZone1B
+// inside the zone-1b flex wrapper (not nested inside MDAAlertPanelZone1B) so that
+// it occupies a guaranteed visible slot in zone-1b regardless of MDA panel content height.
+// ---------------------------------------------------------------------------
+
+const COHORT_SEVERITY_COLOR: Record<CohortThresholdCrossing["severity"], string> = {
+  CRITICAL: "#cc0000",
+  WARNING: "#a06000",
+  WATCH: "#0070a0",
+};
+
+export function CohortImpactSection({ isCompleted = false }: { isCompleted?: boolean }) {
+  const { cohort_threshold_crossings: crossings } = useScenarioStepStore();
+  const headerLabel = isCompleted ? "COHORT IMPACT (HISTORICAL)" : "COHORT IMPACT";
+  const emptyText = isCompleted
+    ? "No cohort threshold crossings at or before this step."
+    : "No cohort threshold crossings projected on current path.";
+
+  return (
+    <div
+      data-testid="zone-1b-cohort-impact"
+      style={{ borderTop: "1px solid #e0e0e0", paddingTop: 2, flexShrink: 0, background: "#fff" }}
+    >
+      <div
+        data-testid="cohort-section-header"
+        style={{
+          fontSize: 9,
+          fontWeight: 600,
+          color: "#555",
+          letterSpacing: 0.3,
+          paddingBottom: 2,
+          paddingLeft: 4,
+        }}
+      >
+        {headerLabel}
+      </div>
+      {crossings.length === 0 ? (
+        <div
+          data-testid="cohort-empty-state"
+          style={{ fontSize: 10, color: "#aaa", fontStyle: "italic", paddingLeft: 4 }}
+        >
+          {emptyText}
+        </div>
+      ) : (
+        crossings.map((crossing, idx) => {
+          const color = COHORT_SEVERITY_COLOR[crossing.severity];
+          const isSad = !!crossing.is_synthetic && crossing.synthetic_method === "STRUCTURAL_ABSENCE";
+          const badgeText = isSad
+            ? "SAD"
+            : crossing.is_synthetic && crossing.synthetic_method === "SYNTHETIC_MODEL"
+              ? "T4"
+              : crossing.is_synthetic && crossing.synthetic_method === "SYNTHETIC_COMPARABLE"
+                ? "T3"
+                : `T${crossing.tier}`;
+          const valueDisplay = formatCohortDistance(crossing.above_floor_pct, crossing.breaches_below !== false, isSad);
+          return (
+            <div
+              key={`${crossing.quintile_key}-${crossing.indicator_key}`}
+              data-testid={`cohort-row-${idx}`}
+              style={{
+                display: "flex",
+                alignItems: "flex-start",
+                gap: 4,
+                borderLeft: `2px solid ${color}`,
+                paddingLeft: 6,
+                paddingTop: 2,
+                paddingBottom: 2,
+                marginBottom: 2,
+                fontSize: 10,
+              }}
+            >
+              <span style={{ color, fontWeight: 700, flexShrink: 0, fontSize: 9 }}>
+                {crossing.severity}
+              </span>
+              <span style={{ color: "#333", lineHeight: 1.3, flex: 1, minWidth: 0 }}>
+                <span style={{ fontWeight: 600, display: "block", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                  {crossing.cohort_label} — {crossing.indicator_label}
+                </span>
+                <span style={{ color: "#666", display: "block", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                  {`Threshold crossed at step ${crossing.step_crossed} · `}
+                  <span data-testid={`cohort-value-${crossing.indicator_key}`}>
+                    {valueDisplay}
+                  </span>
+                  {` · ${formatSourceId(crossing.source)}`}
+                </span>
+              </span>
+              <span
+                data-testid="confidence-tier-badge"
+                style={{ display: 'inline-flex', flexDirection: 'column', alignItems: 'center', gap: 1, flexShrink: 0 }}
+              >
+                <span
+                  data-testid={`cohort-tier-badge-${crossing.indicator_key}`}
+                  style={{
+                    fontSize: 8,
+                    fontWeight: 700,
+                    color: isSad ? "#7a0000" : "#005a9e",
+                    background: isSad ? "#ffe0e0" : "#e0eeff",
+                    borderRadius: 2,
+                    padding: "1px 3px",
+                    display: "inline-block",
+                  }}
+                >
+                  {badgeText}
+                </span>
+                <span
+                  data-testid="confidence-tier-badge-sublabel"
+                  style={{ fontSize: 7, color: '#6b7280', fontWeight: 400, lineHeight: 1, whiteSpace: 'nowrap' }}
+                >
+                  {isSad ? "No primary data" : badgeText === "T4" ? "Model est." : "Inferred"}
+                </span>
+              </span>
+            </div>
+          );
+        })
+      )}
     </div>
   );
 }

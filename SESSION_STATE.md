@@ -5,9 +5,29 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-23 (M15 EXIT CEREMONY COMPLETE — v0.15.0; M16 Distributional Visibility now current; #984 closed; #843 exit gate for M16)**
-**Current milestone:** M16 — Distributional Visibility (GitHub Milestone 17)
-**Previous milestone:** M15 — Human Cost Architecture (FORMALLY CLOSED 2026-06-23; release/m15 → main PR #1142; v0.15.0; #984 closed; GitHub Milestone 16 closed)
+**Last updated: 2026-06-25 (M16 exit ceremony complete — M16 FORMALLY CLOSED; v0.16.0; #985 closed; GitHub Milestone 17 closed; M17 Calibration and Comparative Infrastructure now current)**
+**Current milestone:** M17 — Calibration and Comparative Infrastructure (GitHub Milestone 18)
+**Previous milestone:** M16 — Distributional Visibility (FORMALLY CLOSED 2026-06-25; release/m16 → main; v0.16.0; #985 closed; GitHub Milestone 17 closed)
+
+---
+
+## M17 Kickoff Prerequisites
+
+**Release branch:** `release/m17` — ⬜ NOT YET CUT (EL must merge release/m16 → main first, then PM Agent cuts release/m17 from main)
+**Sprint plan:** ⬜ NOT YET FILED — `docs/process/sprint-plans/m17-sprint-plan.md` (PM Agent authors at kickoff)
+
+| Step | Status | Notes |
+|---|---|---|
+| 1. EL merges `release/m16` → `main` (admin bypass) | ⬜ PENDING EL ACTION | EL merges the release branch; Claude Code does not do this merge |
+| 2. PM Agent cuts `release/m17` from updated `main` | ⬜ PENDING | After step 1 completes |
+| 3. PM Agent authors `m17-sprint-plan.md` with Wave 1/Wave 2 structure | ⬜ PENDING | Wave 1 = CM calibration sprint; hard gate before Wave 2 |
+| 4. EL approves sprint plan | ⬜ PENDING | EL must approve before any sprint entry may open |
+| 5. #982 exit checklist confirmed as M17 gate issue | ✅ DONE 2026-06-25 | Renamed to "M17 Exit Checklist — blocks milestone closure"; assigned to GitHub Milestone 18 |
+| 6. Wave 1 sprint entry (G1) may open after sprint plan EL-approved | ⬜ PENDING | CM must be activated; #1229 and #1248 are G1 scope |
+
+**Critical prerequisite: M17 Wave 2 may not begin until Wave 1 exits.** Wave 1 exit gate: FRAME-D milestone sentence fires within an 8-step programme window on the Demo 6 Senegal scenario after the elasticity calibration change. DemographicModule ELASTICITY_REGISTRY updated with CM-certified values.
+
+Implementation is NOT yet unblocked. Steps 1–4 above must complete first.
 
 ---
 
@@ -106,28 +126,131 @@ Implementation is now unblocked. A sprint entry document must be filed and EL-ap
 
 ## Open Issues — M16 (Distributional Visibility)
 
-**GitHub Milestone:** 17 | **Created:** 2026-06-23 | **Status:** Planned — kickoff prerequisites not yet filed; sprint entry required before G-group implementation begins
+**GitHub Milestone:** 17 | **Created:** 2026-06-23 | **Status:** G1 COMPLETE 2026-06-23; **G2 COMPLETE 2026-06-24**; **G3 COMPLETE 2026-06-24**; **G4 COMPLETE 2026-06-24** (PRs #1182/#1187/#1190; all ACs PASS incl AC-EE-1; sprint exit pi-confirmed: true; #22 + #102 + #275 CLOSED); G5 CLOSED 2026-06-23; **G6 COMPLETE 2026-06-24** (PRs #1211–#1213/#1215–#1216; VC-1–VC-4 PASS; MV-002 50.5ms PASS; NM-058/059/060 + EX-001 filed; #569 CLOSED; #1217 filed); **G9 COMPLETE 2026-06-24** (PRs #1201/#1202/#1204/#1205; all four issues closed; sprint exit pi-confirmed: true); **G10 COMPLETE 2026-06-24** (PR #1199; all 11 ACs PASS; #1162/#1177/#1178/#1179/#1184 CLOSED; sprint exit pi-confirmed: true; **fresh-session BPO ACCEPT + PI Agent confirmation 2026-06-24**; NM-057 filed) | **G8 COMPLETE 2026-06-25** — Steps 1–6c delivered; #843 deferred to M17/Demo 7 (EL decision 2026-06-25); DEMO6-001–049 findings on record as Demo 7 specification; M16 exit ceremony ready
 *Zone 1A Phase 4 + cohort disaggregation + political risk surface + live external demo (#843 — exit gate). Demo 6 (Senegalese Finance Minister scenario).*
 
 | Issue | Title | Group | Notes |
 |---|---|---|---|
-| #985 | Milestone 17 Exit Checklist — blocks milestone closure | — | `immediate \| M16 gate issue` (note: title uses GitHub milestone numbering — recommend rename to "M16 Exit Checklist" at kickoff) |
-| #843 | plan: live stakeholder demo with real external participants | G8 (M16) | **M16 exit gate** — deferred from M15 (EL decision 2026-06-23) |
-| #986 | feat(ux): cohort disaggregation on primary surface | — | Design complete M15-G3; implementation M16; CM + DA sign-off required before sprint entry |
-| #987 | feat(ux): political risk summary surface (Persona 3) | — | Design complete M15-G3; implementation M16; CM + DA sign-off required before sprint entry |
-| #845 | ux: Zone 1A information architecture — Phase 4 implementation | — | ADR-017 accepted; Phase 4 entry condition: Zone 1D delta annotations in same sprint |
-| #1145 | docs(founding): add AC-001 and AC-002 as explicit permanent constraints in founding document | — | EL-authored; promoted from insights log entry 7 at HORIZON sweep 2026-06-23 |
-| #6 | Governance: branch protection restoration | — | EL-action; dependent on #3 Stage 2 |
-| #3 | Governance: single-principal separation of duties | — | EL-action; Stage 2 trigger: second GitHub account with merge authority |
+| #985 | M16 Exit Checklist — blocks milestone closure | — | `immediate \| M16 gate issue` — renamed 2026-06-23 |
+| #843 | plan: live stakeholder demo with real external participants | G8 | **DEFERRED TO M17/Demo 7 (EL decision 2026-06-25)** — DEMO6 findings addressed holistically in M17/M18 alongside Mode 3; no longer M16 exit gate |
+| #986 ✅ | feat(ux): cohort disaggregation on primary surface | G2 | ✅ BPO ACCEPT 2026-06-24 — PR #1173; Customer Agent Layer 3 PASS (Persona 2); 209/209 E2E; issue closed 2026-06-24 |
+| #987 ✅ | feat(ux): political risk summary surface (Persona 3) | G2 | ✅ BPO ACCEPT 2026-06-24 — PR #1173; Customer Agent Layer 3 PASS (Persona 3); issue closed 2026-06-24 |
+| #1163 ✅ | ux(zone-1d): PSP threshold anchor — absolute PSP level legibility for Persona 3 | G2 | ✅ CLOSED 2026-06-24 — resolved by #987 PSP severity-labeled display (CRITICAL/WARNING/WATCH/STABLE); closed as consequence of PR #1173 merge |
+| #845 ✅ | ux: Zone 1A information architecture — Phase 4 implementation | G1 | ✅ BPO ACCEPT 2026-06-23 — PR #1160; all 12 ACs PASS; Step 5 Validate COMPLETE |
+| #1147 ✅ | feat(ux): Zone 1D delta annotations — companion to Zone 1A Phase 4 | G1 | ✅ BPO ACCEPT 2026-06-23 — PR #1160; Step 5 Validate COMPLETE (co-accepted with #845) |
+| #1162 ✅ | ux(zone-1a): entity attribution in-fill anchor — direct visual link between divergence fill and entity label | G10 | ✅ BPO ACCEPT 2026-06-24 — PR #1199; divergence-fill-attribution SVG text; issue CLOSED 2026-06-24 |
+| #274 ✅ | feat(simulation): 25-year human capital depletion trajectory | G3 | ✅ BPO ACCEPT 2026-06-24 — PR #1172 merged; 19 ACs PASS; Step 5 Validate COMPLETE; G8 gate open |
+| #275 ✅ | feat(simulation): calibrated ecological-to-financial transmission | G4 | AC-7/8/9 + AC-EE-2 ✅ + **AC-EE-1 ✅ PASS 2026-06-24** (PR #1190; ExternalSectorModule wired; Zimbabwe 2000 calibration: 1.26% GDP at step 4 within ±30% band); sprint exit CONFIRMED; **issue CLOSED 2026-06-24** |
+| #102 ✅ | arch(api): distributional scenario comparison variance/percentile | G4 | ✅ BPO ACCEPT 2026-06-24 — flat `CompareResponse` + `DistributionRecord` (variance/p10/p50/p90) + Zone 1A variance-band-toggle; issue CLOSED 2026-06-24 |
+| #22 ✅ | feat: uncertainty quantification — distributional scenario bands | G4 | ✅ BPO ACCEPT 2026-06-24 — `SyntheticDataEngine` + `quantity` table + Zone 1B cohort-tier-badge (SAD/T3/T4 data-driven); AC-F6 Zone 1D deferred per intent §6; issue CLOSED 2026-06-24 |
+| #1184 ✅ | ux(zone-1b): "SAD" badge not self-interpreting at L0 | G10 | ✅ BPO ACCEPT 2026-06-24 — PR #1199; confidence-tier-badge-sublabel "No primary data"; issue CLOSED 2026-06-24 |
+| #1145 ✅ | docs(founding): add AC-001 and AC-002 as explicit permanent constraints | G5 | ✅ MERGED 2026-06-23 — PR #1156 |
+| #837 ✅ | feat(demo): configuration-driven demo scripts | G5 | ✅ MERGED 2026-06-23 — PR #1156 |
+| #951 ✅ | process: solo-use review protocol | G5 | ✅ MERGED 2026-06-23 — PR #1156 |
+| #259 ✅ | standards: CTO legibility metrics dashboard | G5 | ✅ MERGED 2026-06-23 — PR #1156 |
+| #569 ✅ | test(perf): MV-002 Mode 3 hardware validation | G6 | **✅ G6 COMPLETE 2026-06-24** — PRs #1211–#1213/#1215–#1216/#1221/#1222; VC-1–VC-4 PASS; MV-002 50.5ms PASS; NM-058/059/060/061 + EX-001 filed; #1217/#1220 filed; PI Agent exit review complete; CLOSED 2026-06-24 |
+| #6 | Governance: branch protection restoration | G7 | **DEFERRED — Parking Lot (EL decision 2026-06-24)** — moved to GitHub Milestone #20; no external contributors yet |
+| #3 | Governance: single-principal separation of duties | G7 | **DEFERRED — Parking Lot (EL decision 2026-06-24)** — moved to GitHub Milestone #20; no external contributors yet |
+| #1177 ✅ | ux(zone-1d): milestone sentence step-reference → year anchor | G10 | ✅ BPO ACCEPT 2026-06-24 — PR #1199; milestone-sentence wrapper; year leads text; issue CLOSED 2026-06-24 |
+| #1178 ✅ | ux(zone-1b): T3 badge L0 legibility | G10 | ✅ BPO ACCEPT 2026-06-24 — PR #1199; confidence-tier-badge-sublabel "Inferred"; option (b) sub-label; issue CLOSED 2026-06-24 |
+| #1179 ✅ | ux(zone-1a): Q2 curve asymmetry label | G10 | ✅ BPO ACCEPT 2026-06-24 — PR #1199; q2-suppression-legend "Q2 — floor threshold not registered"; issue CLOSED 2026-06-24 |
+| #153 ✅ | feat(frontend): absolute threshold overlay | G9 | ✅ BPO ACCEPT 2026-06-24 — PR #1204; DeltaChoropleth threshold overlay line; issue CLOSED 2026-06-24 |
+| #846 ✅ | ux: DEMO-045 — Mode 3 branch comparison values | G9 | ✅ BPO ACCEPT 2026-06-24 — PR #1202; branch-comparison-panel numeric values; DEMO-045 closed; issue CLOSED 2026-06-24 |
+| #97 ✅ | arch(api): threshold-crossing markers in compare output | G9 | ✅ BPO ACCEPT 2026-06-24 — PR #1201; threshold_crossings field in compare endpoint; schema updated; issue CLOSED 2026-06-24 |
+| #92 ✅ | arch(backtesting): Greece 2010 investment climate conditions | G9 | ✅ Infrastructure — PR #1205; 4 deferred investment climate thresholds; backtesting PASS; issue CLOSED 2026-06-24 |
 
-*All other M15 near-term issues (#846, #837, #951, #569, #259, #153, #97, #92) migrated to M16 at M15 exit ceremony 2026-06-23.*
+**M16 kickoff status (2026-06-23):**
+- ✅ `release/m16` cut from `main` at commit 07c92b8
+- ✅ `docs/process/sprint-plans/m16-sprint-plan.md` filed
+- ✅ EL approves sprint plan — **EL APPROVED 2026-06-23** (PR #1148)
+- ✅ #985 renamed "M16 Exit Checklist"
+- ✅ #845 milestone corrected to M16 (was M15)
+- ✅ #1147 filed (Zone 1D delta annotations — was UNTRACKED)
+- ✅ ARCH-012: not needed for G1/G2/G3 core deliverables; may be needed for #22 (G4) — confirm at G4 sprint entry
+- ✅ G1 sprint entry filed and **EL-approved 2026-06-23** — `docs/process/sprint-plans/m16-g1-sprint-entry.md`
+- ✅ G1 intent document filed 2026-06-23 — `docs/process/intents/M16-G1-2026-06-23-zone-1a-phase4-composite.md`; 12 ACs across #845 and #1147; ADR-017 backtesting validation cases named
+- ✅ G1 QA tests authored and merged 2026-06-23 — PR #1152; `frontend/tests/e2e/m16-g1-zone-1a-phase4-composite.spec.ts` (AC-1 through AC-12)
+- ✅ **G1 implementation COMPLETE 2026-06-23** — PR #1160 merged to `release/m16`; playwright-e2e PASS; all 12 ACs verified; Step 4 Verify PASS; intent document Step 4 record filed
+- ✅ **G1 Step 5 Validate COMPLETE 2026-06-23** — BPO ACCEPT; Customer Agent Layer 3 CONDITIONAL PASS (3 named conditions, none blocking); intent document §9 filed; #1162 + #1163 filed as pre-demo follow-ups; C3 scope alignment noted (per-framework delta vs. baseline is G2 scope)
+- ✅ **G2 pre-conditions: 6/6 complete 2026-06-23** — CM ✅ #986 + #987; DA ✅ #986 (scope: poverty_headcount_ratio Q1/Q2 only); ARF ✅ #986 + #987; FA brief ✅ 2026-06-23 (`docs/frontend/fa-brief-m16-g2-zone-1d-layout.md`; 1280: 35/15/50%, 1440: 40/15/45%, 1024: 50/10/40%; UX Designer sign-off in brief; DD-016 filed). #1163 confirmed G2 scope (resolved by #987 political risk sub-section).
+- ✅ **G2 sprint entry filed and EL-approved 2026-06-23** — `docs/process/sprint-plans/m16-g2-sprint-entry.md`; #986/#987/#1163 in scope; 6/6 pre-conditions satisfied; ADR gate CLEAR; Zone 1B 1280 regression accepted; G1 testid retirement noted as QA gate. QA tests must be authored before implementation PR opens.
+- ✅ **G2 intent document filed 2026-06-23** — `docs/process/intents/M16-G2-2026-06-23-distributional-surface.md`; AC-1 through AC-14; G1 testid retirement documented (4 testids retired: zone-1d-political-feasibility, psp-delta, psp-layer3-sentence, psp-delta-sentence); QA Lead must author G2 spec + update G1 spec before G2 implementation PR opens.
+- ✅ **G2 QA tests authored and merged 2026-06-23** — PR #1170; `frontend/tests/e2e/m16-g2-distributional-surface.spec.ts` (AC-1 through AC-14 + NM-056 pre-implementation guards throughout); `frontend/tests/e2e/m16-g1-zone-1a-phase4-composite.spec.ts` updated (AC-7/8/9/10 G1 testid retirement; retired testids removed from selectors); sprint entry §2.5 QA gate ✅ FILED
+- ✅ **G2 implementation COMPLETE 2026-06-24** — PR #1173 merged to `release/m16`; 209/209 E2E tests passing (all 14 G2 ACs); pre-push build gate ✅; `isCompleted` prop pattern adopted in `CohortImpactSection` (replaces `mode === "MODE_1"` store read — completion status, not fiscal-multiplier mode, drives label tense); Zone 1B CohortImpactSection as flex sibling of MDAAlertPanelZone1B; Zone 1D political risk sub-section with PSP severity thresholds (CRITICAL <0.40 / WARNING 0.40–0.55 / WATCH 0.55–0.70 / STABLE >0.70); DD-016 proportion constants live (1280: 35/15/50%, 1440: 40/15/45%, 1024: 50/10/40%); 4 G1 testids confirmed absent from DOM
+- ✅ **G2 Step 5 Validate COMPLETE 2026-06-24** — Customer Agent Layer 3 PASS (Persona 2: cohort argument from Zone 1B ✅; Persona 3: political risk read within 30s ✅); BPO ACCEPT; north star test filed (ZMB ECF Mode 2 step 3, 15-second ceiling, Demo 6 connection); #986 + #987 + #1163 closed on GitHub 2026-06-24
+- ✅ **G2 sprint exit CONFIRMED 2026-06-24** — `docs/process/sprint-plans/m16-g2-sprint-exit.md`; intent §9 filed; PI Agent confirmed all exit conditions satisfied; G2 portion of G8 gate (#843 live demo) cleared
+- ✅ G3 sprint entry filed and **EL-approved 2026-06-23** — `docs/process/sprint-plans/m16-g3-sprint-entry.md`; CE Assessment embedded (§2.5): adaptive resolution override required, extend `/simulate` with `projection_steps`, CM review on #274 gates intent ACs, dry-run bounds check required at Step 4 Verify; intent document + QA tests must be filed before implementation PR opens
+- ✅ **G3 intent document filed 2026-06-23** — `docs/process/intents/M16-G3-2026-06-23-25year-human-capital-trajectory.md`; CM review satisfied 2026-06-23 (AC-CM-1/AC-CM-2/AC-CM-3 finalized — 3 cohort curves: Q1 informal, Q1 agriculture, Q2 informal; MDA-HD-POVERTY-Q1 floor ≥ 0.40; decade consequence phrase; Q2 no floor)
+- ✅ **G3 QA tests authored 2026-06-23** (CM-updated) — `backend/tests/test_m16_g3_25year_human_capital_trajectory.py` (AC-1–AC-8 + quarterly spacing); `frontend/tests/e2e/m16-g3-25year-human-capital-trajectory.spec.ts` (AC-F1–AC-F8 + AC-CM-1/AC-CM-2/AC-CM-3); §7 QA Lead acknowledgment both [x]; ruff + tsc both pass
+- ✅ **G3 implementation MERGED 2026-06-24** — PR #1172 merged to `release/m16`; all CI checks PASS; Step 4 Verify PASS (19/19 ACs via CI); Step 5 Validate COMPLETE 2026-06-24 — BPO ACCEPT; Customer Agent Layer 3 CONDITIONAL PASS (CA-1 → #1177; CA-2 → #1178; CA-3 → #1179; pre-demo polish, not blocking); North Star Test PASS; intent document §8/§9 filed
+- ✅ **G3 sprint exit CONFIRMED 2026-06-24** — `docs/process/sprint-plans/m16-g3-sprint-exit.md`; PI Agent confirmed all exit conditions satisfied; CA pre-demo items #1177/#1178/#1179 tracked; G8 gate (#843) open (G1/G2/G3 all BPO-accepted)
+- ✅ G5 sprint entry filed and **EL-approved 2026-06-23** — `docs/process/sprint-plans/m16-g5-sprint-entry.md`; #1145 (immediate) + #837/#951/#259 (near-term, capacity-allowing); work may begin
+- ✅ **G5 COMPLETE 2026-06-23** — PR #1156 merged; all 4 G5 issues delivered (#1145, #837, #951, #259); 18/20 ACs pass (2 skipped Docker-only); M16 demo stubs created at `docs/demo/m16/`; legibility baseline at `docs/standards/legibility-baseline-m16.md`
+- ✅ **G5 sprint exit CONFIRMED 2026-06-23** — BPO ACCEPT (advisory; infrastructure sprint exception); PI confirmed; exit document PR #1158 merged; `docs/process/sprint-plans/m16-g5-sprint-exit.md`
+- ~~G7 sprint entry filed and EL-approved 2026-06-23~~ — **G7 DEFERRED TO PARKING LOT (EL decision 2026-06-24)** — no external contributors yet; #3 and #6 moved to GitHub Milestone #20 (Parking Lot); sprint entry preserved at `docs/process/sprint-plans/m16-g7-sprint-entry.md`; does not gate M16 exit (#985)
+- ✅ **G4 implementation MERGED 2026-06-24** — PR #1182 merged to `release/m16`; all CI PASS; sprint entry + intent document + QA tests filed; EL approved 2026-06-24
+- ✅ **G4 Step 5 Validate COMPLETE 2026-06-24** — BPO CONDITIONAL ACCEPT; Customer Agent Layer 3 CONDITIONAL PASS (CA-G4-1 → #1184 pre-Demo 6; CA-G4-2 forward gap Zone 1D); 20 ACs PASS + AC-F6 deferred; #22 (scoped) and #102 CLOSED; #275 OPEN
+- ✅ **G4 EE VALIDATE COMPLETE 2026-06-24** — Ecological Economist DIC review filed on #275; AC-EE-2 SATISFIED; AC-EE-1 params confirmed (coefficient=0.35, ±30%, step 4, Zimbabwe 2000 anchor, `arable_land_degradation_rate` proxy=0.15, fiscal indicator `fiscal_balance_pct_gdp`); sprint exit BLOCKED — AC-EE-1 requires ExternalSectorModule engine wiring; sprint exit document: BLOCKED (pi-confirmed: false)
+- ✅ **G4 AC-EE-1 TEST AUTHORED 2026-06-24** — `TestACEE1ZimbabweEcologicalCalibration` added (PR #1187); test authorship obligation satisfied
+- ✅ **G4 ENGINE WIRING COMPLETE 2026-06-24** — PR #1190 merged; `ExternalSectorModule` now applies `ecological_shock_coefficient` as `ecological_fiscal_transmission` event on `fiscal_balance_pct_gdp` per step; calibration factor 0.3 produces 1.26% GDP cumulative at step 4 (within [0.70%, 1.95%] Zimbabwe 2000 band); AC-EE-1 PASS; sprint exit CONFIRMED; issue #275 CLOSED
+- ✅ **G4 COMPLETE 2026-06-24** — all ACs (AC-1 through AC-12, AC-EE-1, AC-EE-2, AC-F1–F5, AC-F7–F9); AC-F6 deferred (forward gap); sprint exit pi-confirmed: true; #22, #102, #275 closed
+- ✅ **G4 sprint exit stale entries corrected 2026-06-24** — PR #1193 merged to `release/m16`; Section 1 implementation date, Section 2 process artifacts, and Section 3 BPO table all corrected; PI confirmation narrative was already correct in PR #1191
+- ✅ G9 sprint entry filed and **EL-approved 2026-06-24** — `docs/process/sprint-plans/m16-g9-sprint-entry.md`; #153/#846/#97/#92 in scope; capacity-allowing; not G8 gate dependency
+- ✅ G10 sprint entry filed and **EL-approved 2026-06-24** — `docs/process/sprint-plans/m16-g10-sprint-entry.md`; #1162/#1177/#1178/#1179/#1184; G8 gate condition
+- ✅ **G10 intent document filed 2026-06-24** — `docs/process/intents/M16-G10-2026-06-24-predemo-polish.md`; 11 ACs across all five issues; EL override of sprint entry §2.3 no-intent declaration; supersedes §3.1 observable states as binding spec; QA test authorship is now unblocked
+- ✅ **Sprint plan amendments (G9/G10 formalization) committed PR #1194 2026-06-24** — `m16-sprint-plan.md`, `m16-g7-sprint-entry.md`, `m16-g9-sprint-entry.md`, `m16-g10-sprint-entry.md` now committed for the first time; EL review was required and G10 EL approval was confirmed 2026-06-24
+- ✅ **G10 implementation COMPLETE 2026-06-24** — PR #1199 merged to `release/m16`; all 11 ACs PASS; CI green; all five issues CLOSED; G3/G4 testid regressions confirmed absent
+- ✅ **G10 Step 5 Validate COMPLETE 2026-06-24** — fresh-session BPO ACCEPT (independent of implementation session); Customer Agent Layer 3 PASS (Persona 5 + Persona 2; all five CA source conditions resolved; no new conditions); North Star Test PASS (Demo 6 Senegalese FM scenario; 90-second Reactive ceiling satisfied); `docs/process/sprint-plans/m16-g10-sprint-exit.md` filed; intent §9 complete
+- ✅ **G10 sprint exit CONFIRMED 2026-06-24** — PI Agent fresh-session confirmation; all five SOP exit conditions satisfied; NM-057 filed (CA-condition follow-up issues not assigned to sprint group at exit time — LOW severity, SOP amendment recommended); `docs/process/near-miss-registry.md §NM-057`
+- ✅ **G8 gate (#843): FULLY OPEN 2026-06-24** — all gate dependencies cleared: G1 ✅ G2 ✅ G3 ✅ G4 ✅ G10 ✅; PM Agent may now schedule #843 live stakeholder demo
+- ✅ **G6 sprint entry filed and EL-approved 2026-06-24** — `docs/process/sprint-plans/m16-g6-sprint-entry.md`; infrastructure sprint; VC-1–VC-4 + MV-002 scope
+- ✅ **G6 COMPLETE 2026-06-24** — PRs #1211/#1212/#1213/#1215/#1216/#1221/#1222; AC-009 testid fix + NM-058/059/060/061 + EX-001; VC-1–VC-4 PASS; MV-002 PASS (50.5ms); #1217/#1220 filed
+- ✅ **G6 sprint exit CONFIRMED 2026-06-24** — `docs/process/sprint-plans/m16-g6-sprint-exit.md` (v2 — NM-061 + PI Agent final confirmation); #569 CLOSED
+- ✅ **PI Agent exit gate review 2026-06-24** — NM-061 filed (AC-F8 silent no-op since G3 — scenario created via API, never selected in UI; 60s ceiling gate measuring nothing); AC-F8 fixed PR #1221 (UI selection + .first() for multi-row); QA setup completeness audit step added to agents.md; #1220 filed for AC-F1–F7 broader gap
+- ✅ **G8 sprint entry filed and EL-approved 2026-06-24** — `docs/process/sprint-plans/m16-g8-sprint-entry.md`; EL decisions recorded: challenge moment T3 Inferred; Persona 3 (Andreas) included in Step 6c; Step 5b additional gate criteria (step-2 Q1 threshold crossing + calendar year anchor); #1225 filed (demo prep issue — Step 1 complete)
+- ✅ **G8 Steps 1–4 PR #1226 merged** — screenshot brief + full walkthrough (honest "approaching" framing per EL) + narrated spec (SEN Demo 6, 100-step quarterly, NM-061 audit) + M14 archive; Steps 5a/5c satisfied inline
+- ✅ **G8 Step 5b backend fix PR #1228 merged** — `_ensure_demographic_enabled` in `advance_scenario` path; second `_apply_initial_overrides` call after `_inject_cohort_entities`; milestone sentence `[step N]` annotation removed; NM-057; calibration gap filed as Issue #1229 (M17/CM scope); insights log entries (calibration finding → #1229; Demo 7 arc open); Step 5b GATE 1 PASS (80 cohort entities at 0.385 in step-0 state_data); Step 5b GATE 2 PASS (milestone sentence format confirmed no `[step N]`)
+- ✅ **G8 Step 6 screenshots PR #1230 merged** — five frames captured to `docs/demo/m16/screenshots/`; NM-062 filed (getByText strict mode collision with projection panel step axis); step locator fix (`current-step-display` testid); FRAME-D WARNING recorded (milestone sentence not visible — calibration gap, M17 scope); Step 6 COMPLETE
+- ✅ **G8 Step 6b internal review PR #1231 merged** — `docs/demo/m16/reviews/2026-06-24-v0.16.0-internal-review.md`; DEMO6-001 through DEMO6-008; PI Agent verdict: **INCOMPLETE** — 3 CRITICAL findings block demo readiness
+- ✅ **G8 EL live-demo fixes PR #1233 merged 2026-06-24** — four EL-directed fixes: (1) Zone 1A scoring: is_single_entity bug fixed — cohort entities (`:CHT:` IDs) excluded from sovereign count at both trajectory and measurement-output endpoints; normalized_absolute strategy now active for SEN single-entity scenario so diverging curves visible; (2) 25-year panel: `currentStep` prop added to `HumanCapitalTrajectoryPanel`; useEffect re-fetches on each step advance so sparklines populate; (3) CohortImpactSection overflow: `minWidth: 0` on flex container + `display: block; overflow: hidden; textOverflow: ellipsis; whiteSpace: nowrap` on label spans; NM-063 filed; legibility spec `demo-legibility.spec.ts` extended with overflow check; (4) DEMO6-001/DEMO6-003 narration: Frame A updated to "approaching" framing; Frame D updated to structural intergenerational argument without referencing absent milestone sentence; DEMO6-002 (byte-identical frames) partially addressed — useEffect fix means Frame D will show sparklines after step advance; re-capture will determine if frames remain byte-identical
+- ✅ **G8 Steps 6/6b re-run COMPLETE 2026-06-24** — PR #1235 merged to `release/m16`; cohort threshold crossings backend (Option A: `CohortThresholdCrossing` schema + `get_measurement_output` Q1/Q2 cumulative computation via MDA floor query); zone labels/borders (boxShadow:inset for AC-009 perf gate); 3 narration fixes (invisible 0.4x values removed); MDA alert panel restored in Zone 1B (minHeight:80 guarantee; M17 proportional allocation queued in insights log 2026-06-24); DEMO6-002 (Frame B=C byte-identical) → EL decision: deck annotation, no code change; all five frames re-captured: both MDA alert panel AND cohort crossings visible in Zone 1B at Steps 2 and 8
+- ✅ **G8 Step 6b IR review COMPLETE 2026-06-25** — PR #1242 merged to `release/m16`; `docs/demo/m16/reviews/2026-06-24-v0.16.0-ir-review.md`; IR-001 (Zone 1A FIN/GOV overlap — adaptive y-axis fix required); IR-002 (25-year panel "no data" — expected behavior for pending scenario, no fix)
+- ✅ **G8 IR-001 adaptive y-axis fix PR #1243 merged 2026-06-25** — `computeYDomain()` pure function added + exported; both recharts and CompositeChartSVG render paths updated; 7 new unit tests (all 31 pass); frontend build gate ✅; M17 governance calibration finding filed to insights-log (GOV barely responds to fiscal conditionality across 8 steps)
+- ✅ **G8 Step 6 screenshots re-captured 2026-06-25** — five frames in `docs/demo/m16/screenshots/`; FIN/GOV curves now visually distinct after adaptive y-axis fix; FRAME-D WARNING remains (pre-existing calibration gap, M17 scope)
+- ✅ **G8 Step 6c audience simulation PR #1244 merged 2026-06-25** — `docs/demo/m16/reviews/2026-06-25-v0.16.0-audience-simulation.md`; four persona agents (P1/P2/P3/P5); 36 findings DEMO6-014 through DEMO6-049 (4 CRITICAL / 11 HIGH / 13 MEDIUM / 5 LOW); **north star gate: CONDITIONAL PASS**; primary finding sentence on record; three mandatory presenter preparation items before Step 9
+- ✅ **G8 CLOSES — preparatory work complete (EL decision 2026-06-25)** — Steps 1–6c delivered: demo scripts, walkthrough, narrated spec, screenshots, internal review, IR review, adaptive y-axis fix, audience simulation (DEMO6-001–049). Step 9 (live demo) deferred to M17/Demo 7 per EL decision. DEMO6 findings are the specification foundation for Demo 7 in M17. #843 moved to M17. M16 exit gate is now distributional visibility delivery (G1–G4/G6/G9/G10), not #843.
 
-**M16 kickoff prerequisites (not yet started):**
-- [ ] PM Agent cuts `release/m16` from `main`
-- [ ] PM Agent authors `docs/process/sprint-plans/m16-sprint-plan.md`
-- [ ] EL approves sprint plan
-- [ ] M16 exit checklist issue #985 renamed "M16 Exit Checklist" (recommend)
-- [ ] ARCH-012 assigned in backlog (if Zone 1A Phase 4 requires new ADR review — confirm with Architect)
+---
+
+## M16 Exit Ceremony — 2026-06-25
+
+**Exit ceremony steps:**
+| Step | Status | Notes |
+|---|---|---|
+| Step 1 — Open issue audit | ✅ COMPLETE | 7 issues closed as delivered (#1147, #274, #97, #846, #153, #92, #1209); only #985 remains |
+| Step 2 — Milestone reference audit | ✅ COMPLETE | README badge/status/table updated; CLAUDE.md §What We Are Building First + §Milestone Roadmap updated; roadmap all UNTRACKED entries replaced with issue numbers (PR #1257) |
+| Step 3 — SESSION_STATE consistency | ✅ COMPLETE | Header and current milestone updated; M17 kickoff prerequisites section added; M17 open issues table with Wave 1/Wave 2 structure and #982 gate issue confirmed |
+| Step 4 — Fresh session continuity | ✅ COMPLETE | M17 kickoff prerequisites section added; #982 renamed; Wave 1/Wave 2 gate explicitly documented; no critical/high gaps remain |
+
+**Retrospective (mandatory):**
+
+1. *Defects that evaded the test suite:*
+   - **FRAME-D milestone sentence not visible in Demo 6 window** — surfaced at Step 5b (backend gate), not by the test suite. The DemographicModule elasticity calibration gap (`imf_program_acceptance` producing ~+0.0015pp/step) was not covered by any integration test that would have flagged the insufficient delta.
+   - **Zone 1A FIN/GOV curve overlap (IR-001)** — the adaptive y-axis gap was caught by the IR review (Step 6b), not by any automated test. No Playwright assertion verified that FIN and GOV curves were visually distinguishable when their range was < 0.05.
+   - **Zone 1B MDA alert panel collapse on cohort overflow** — caught during G8 live demo run, not by the G2 or G9 test suites. `minHeight: 0` on the flex container allowed CohortImpactSection to squeeze MDAAlertPanelZone1B to zero when cohort rows filled the natural height.
+   - **G8 strict mode `getByText` collision** (NM-062) — Playwright step-axis `getByText` matched the projection panel's duplicate step text, producing a strict mode error. Caught during Step 6 screenshot capture.
+
+2. *Process gaps that caused them:*
+   - **Calibration gap** — no test verifies that a known-realistic conditionality shock (5% GDP fiscal cut on SEN T3 scenario) produces a cohort poverty headcount change of a defensible magnitude within an 8-step window. The test suite verifies that cohort entities exist and that the endpoint responds — not that the engine's output is analytically meaningful.
+   - **Adaptive y-axis** — the pre-IR test suite had no assertion that verified visual distinguishability (minimum pixel separation between curves of similar value). The `computeYDomain()` unit tests were authored POST-detection (correct fix but test-after, not test-before).
+   - **Zone 1B overflow** — no test verified that the MDA alert panel maintained minimum visible height when CohortImpactSection was populated with multiple rows.
+   - **Demo script locator discipline** — Step 6 screenshot scripts relied on `getByText()` without scoping to a specific parent container, creating fragility when duplicate text appeared in projection panel step axes.
+
+3. *Testing improvements required before M17 close:*
+   - [ ] **Calibration integration test** — after Wave 1 exits, add a backend integration test that asserts: given a representative conditionality shock on a T3 scenario, the cohort poverty headcount delta per step is within the CM-certified ELASTICITY_REGISTRY range. This is the test that would have caught the FRAME-D gap in M16.
+   - [ ] **Visual distinguishability assertion** — after `computeYDomain()` pattern is extended to other instruments (#1251), add Playwright assertions verifying that trajectory curves with value range < 0.10 still produce visually distinct rendered paths (bounding-box separation ≥ N pixels).
+   - [ ] **Zone 1B overflow regression** — add Playwright assertion that `MDAAlertPanelZone1B` maintains minimum visible height (≥ 80px) when `CohortImpactSection` is populated with 4+ cohort rows.
+   - [ ] **Demo script testid discipline** — all demo screenshot scripts must scope locators to named parent containers; `getByText()` without scoping is prohibited in demo scripts (NM-062 countermeasure).
 
 ---
 
@@ -1113,17 +1236,48 @@ CI hotfix: NM-035 filed; `ci.yml` PR trigger updated to include `release/m*` (PR
 
 ---
 
-## Open Issues — M17 (Multi-Scenario Infrastructure)
+## Open Issues — M17 (Calibration and Comparative Infrastructure)
 
-**GitHub Milestone:** 18 | **Created:** 2026-06-16 | **Status:** Planned — no demo
-*Multi-scenario comparison infrastructure, entity template library. Sets up Demo 7.*
+**GitHub Milestone:** 18 | **Created:** 2026-06-16 | **Status:** Current — no demo; release branch cut at M17 kickoff
+*Wave 1 gated before Wave 2. #407/#5/#4 deferred to M19+. See roadmap §M17.*
+
+**Gate issue:**
 
 | Issue | Title | Notes |
 |---|---|---|
-| #394 | platform: multi-scenario comparison (>2 scenarios) | Core Demo 7 prerequisite |
-| #407 | arch(vision): simulation resolution spectrum — entity template library | |
-| #5 | Architecture: data marketplace design | |
-| #4 | Data: advanced geocoded dataset integration | |
+| #982 | M17 Exit Checklist — blocks milestone closure | `immediate \| M17 gate issue` |
+
+**Wave 1 — Chief Methodologist Calibration Sprint (M17 entry gate; Wave 2 blocked until Wave 1 exit):**
+
+| Issue | Title | Notes |
+|---|---|---|
+| #1229 | feat(simulation): fiscal-to-cohort elasticity calibration — DemographicModule ELASTICITY_REGISTRY | CM-owned; Wave 1 exit gate (FRAME-D must fire within 8-step window) |
+| #1248 | feat(simulation): governance sensitivity calibration — fiscal conditionality transmission | CM-owned; Wave 1 |
+
+**Wave 2 — Comparative Infrastructure and DEMO6 Polish (begins after Wave 1 exit gate):**
+
+| Issue | Title | Notes |
+|---|---|---|
+| #394 | platform: multi-scenario comparison (>2 scenarios) | Core Demo 7 Act 2 prerequisite |
+| #1249 | ux(zone-1a): Zone 1A trajectory curve identifiability — terminal labels or line style differentiation | DEMO6-014 CRITICAL |
+| #1250 | ux(zone-1b): cohort impact values not legible at tablet scale without zoom | DEMO6-026/043 CRITICAL |
+| #1253 | ux(zone-1d): PSP WARNING historical precedent anchor — comparable programme reference in Zone 1D | DEMO6-040 CRITICAL |
+| #1251 | ux(zone-1a): adaptive y-axis extension — audit all instruments for fixed-domain overlap failure mode | IR-001 pattern extension |
+| #1252 | arch(zone-1b): proportional allocation between MDA alert panel and CohortImpactSection | M16 minHeight:80px temporary fix → durable design |
+
+---
+
+## Open Issues — M18 (Full Argument and Demo 7)
+
+**GitHub Milestone:** 19 | **Status:** Planned — Demo 7 is M18 exit gate
+*Mode 3 interrogation + three-scenario comparison + CI bands + live demo.*
+
+| Issue | Title | Notes |
+|---|---|---|
+| #843 | plan: live stakeholder demo with real external participants | M18 exit gate; Demo 7 (Senegal Mode 3 + Zambia three-scenario) |
+| #1254 | ux(zone-1a): CI bands on Zone 1A trajectory curves — ADR-007 implementation | DEMO6-015; ADR required before implementation |
+| #1255 | ux(zone-1d): PSP driver decomposition — dominant signal category visible alongside severity label | DEMO6-036 |
+| #1256 | feat(data): Path 2 — ministry-supplied proprietary data integration | Capacity-allowing; does not gate Demo 7 |
 
 ---
 

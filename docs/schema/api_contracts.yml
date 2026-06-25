@@ -204,7 +204,7 @@ endpoints:
   # ---------------------------------------------------------------------------
   - method: POST
     path: /scenarios
-    summary: Create a new scenario in pending status
+    summary: "POST /scenarios — Create a new scenario in pending status"
     auth: none
     request_body:
       name: {type: string, required: true, description: "Non-empty. Validated server-side."}
@@ -212,6 +212,8 @@ endpoints:
       configuration:
         entities: {type: "string[]", required: true, description: "entity_id values; validated to exist"}
         n_steps: {type: integer, required: true, range: [1, 100]}
+        projection_steps: {type: "integer|null", required: false, range: [1, 100], default: null, description: "Long-run projection horizon (M16-G3 #274). When set, overrides n_steps as total step count. projection_steps > 8 enables 25-year quarterly trajectory with DemographicModule auto-enabled and adaptive_resolution disabled."}
+        ecological_shock_coefficient: {type: number, required: false, range: [0.0, 1.0], default: 0.0, description: "ADR-012 ecological-to-financial transmission coefficient (M16-G4 #275). 0.0 = no ecological transmission (default). 1.0 = full transmission. Values outside [0.0, 1.0] rejected with 422."}
         timestep_label: {type: string, required: true, example: "annual"}
         start_date: {type: "string|null", required: false, format: "ISO 8601 date", example: "2010-01-01", description: "Step-0 base date. Defaults to 2000-01-01 when absent."}
         initial_attributes: {type: object, required: false, default: {}}
@@ -296,15 +298,34 @@ endpoints:
         step_a: {type: integer}
         step_b: {type: integer}
         deltas:
-          type: object
-          description: "dict[entity_id, dict[attribute_key, DeltaRecord]]"
-          delta_record:
+          type: array
+          description: "Flat list of FlatDeltaRecord — M16-G4 #102"
+          items:
+            entity_id: {type: string}
+            attribute_key: {type: string}
             value_a: {type: string, description: "Decimal as string"}
             value_b: {type: string, description: "Decimal as string"}
             delta: {type: string, description: "Decimal as string; negative for decrease"}
             direction: {type: string, values: ["increase", "decrease", "unchanged"]}
             confidence_tier: {type: integer, description: "max() of both tiers"}
             threshold_crossed: {type: "bool|null", description: "null when threshold_value not supplied"}
+            threshold_crossings:
+              type: array
+              description: >
+                MDA threshold crossing entries for this indicator at the compared step — M16-G9 #97.
+                Only entries where the threshold is violated (crossed=True) are included.
+                Empty list [] when no MDA threshold applies to this indicator or none are crossed.
+                Never null — always a list (empty or non-empty).
+              items:
+                threshold_name: {type: string, description: "mda_id of the crossed MDA threshold"}
+                crossed: {type: boolean, description: "Always true — only violated thresholds are listed"}
+            distribution:
+              type: object
+              description: "Distributional statistics across all shared steps. All fields null when <3 shared steps (M16-G4 #102)."
+              variance: {type: "string|null", description: "Population variance of delta series (Decimal as string)"}
+              p10: {type: "string|null", description: "10th percentile of delta series (Decimal as string)"}
+              p50: {type: "string|null", description: "50th percentile of delta series (Decimal as string)"}
+              p90: {type: "string|null", description: "90th percentile of delta series (Decimal as string)"}
       status_404: "scenario_a or scenario_b not found; or step not found for a scenario"
       status_409: "step omitted and one or both scenarios have no snapshots yet"
     db_reads: [scenarios, scenario_state_snapshots]
@@ -976,7 +997,11 @@ endpoints:
                     example: 2
                   is_synthetic:
                     type: boolean
-                    description: "True if confidence_tier >= 3 (inferred or modeled data)"
+                    description: "True when the indicator value was inferred by SyntheticDataEngine (M16-G4 #22). False = primary source data."
+                  synthetic_method:
+                    type: "string|null"
+                    description: "ADR-007 method used when is_synthetic=true. STRUCTURAL_ABSENCE = Method E (SAD badge); SYNTHETIC_COMPARABLE = Method B (T3/T4 badge); SYNTHETIC_MODEL = Method A (T4 badge). Null when is_synthetic=false."
+                    enum: ["STRUCTURAL_ABSENCE", "SYNTHETIC_COMPARABLE", "SYNTHETIC_MODEL", null]
       status_404: "Scenario not found (scenario_id does not exist in scenarios table)"
     db_reads: [scenarios, scenario_state_snapshots, source_registry]
     notes:

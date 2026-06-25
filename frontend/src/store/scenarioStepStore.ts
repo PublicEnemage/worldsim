@@ -76,6 +76,30 @@ export interface Zone1BAlert {
   recovery_horizon_years: number | null;
 }
 
+/**
+ * Cohort threshold crossing — from outputs.human_development.cohort_threshold_crossings.
+ * M16-G2 (#986): income quintile cohort disaggregation on primary surface (Zone 1B).
+ * Scope: poverty_headcount_ratio Q1/Q2 only (DA sign-off 2026-06-23).
+ */
+export interface CohortThresholdCrossing {
+  quintile_key: string;
+  cohort_label: string;
+  indicator_key: string;
+  indicator_label: string;
+  severity: "CRITICAL" | "WARNING" | "WATCH";
+  step_crossed: number;
+  above_floor_pct: string | null;
+  tier: number;
+  source: string;
+  /** M16-G4 #22 — ADR-007 synthetic disclosure fields. Null = real primary-source data. */
+  is_synthetic?: boolean;
+  synthetic_method?: "STRUCTURAL_ABSENCE" | "SYNTHETIC_COMPARABLE" | "SYNTHETIC_MODEL" | null;
+  value?: string | null;
+  /** Issue #1239 (DEMO6-010): True when the breach direction is value below floor (gte threshold).
+   *  False when breach is value above floor (lte threshold — future). Drives label in Zone 1B. */
+  breaches_below?: boolean;
+}
+
 interface ScenarioStepState {
   scenario_id: string;
   current_step: number;
@@ -85,6 +109,8 @@ interface ScenarioStepState {
   computation_state: "idle" | "computing" | "complete";
   mode: "MODE_1" | "MODE_2" | "MODE_3";
   mda_alerts: Zone1BAlert[];
+  /** M16-G2 (#986) — cohort threshold crossings at the current step (Zone 1B Cohort Impact sub-section). */
+  cohort_threshold_crossings: CohortThresholdCrossing[];
   /** Zone 1C — Policy Maneuver Margin value at current step. */
   pmm_value: number | null;
   /** Zone 1C — Direction indicator: margin growing, shrinking, or flat since last step. */
@@ -114,6 +140,7 @@ interface ScenarioStepState {
   /** Jump to a specific step — used by scenario re-selection to land on the final step. */
   setCurrentStep: (step: number) => void;
   setMdaAlerts: (alerts: Zone1BAlert[]) => void;
+  setCohortThresholdCrossings: (crossings: CohortThresholdCrossing[]) => void;
   /** Set PMM state in a single set() call (DD-012 atomicity). */
   setPmmState: (value: number | null, direction: "up" | "down" | "flat" | null) => void;
   advanceStep: () => void;
@@ -142,6 +169,7 @@ export const useScenarioStepStore = create<ScenarioStepState>((set, get) => ({
   computation_state: "idle",
   mode: "MODE_1",
   mda_alerts: [],
+  cohort_threshold_crossings: [],
   pmm_value: null,
   pmm_direction: null,
   baselineScenarioId: null,
@@ -160,6 +188,7 @@ export const useScenarioStepStore = create<ScenarioStepState>((set, get) => ({
       baseline_trajectory: null,
       computation_state: "idle",
       mda_alerts: [],
+      cohort_threshold_crossings: [],
       pmm_value: null,
       pmm_direction: null,
     }),
@@ -173,6 +202,8 @@ export const useScenarioStepStore = create<ScenarioStepState>((set, get) => ({
   setCurrentStep: (step) => set({ current_step: step }),
 
   setMdaAlerts: (alerts) => set({ mda_alerts: alerts }),
+
+  setCohortThresholdCrossings: (crossings) => set({ cohort_threshold_crossings: crossings }),
 
   setPmmState: (value, direction) => set({ pmm_value: value, pmm_direction: direction }),
 
@@ -234,6 +265,7 @@ export const useScenarioStepStore = create<ScenarioStepState>((set, get) => ({
       computation_state: "idle",
       mode: "MODE_1",
       mda_alerts: [],
+      cohort_threshold_crossings: [],
       pmm_value: null,
       pmm_direction: null,
       baselineScenarioId: null,

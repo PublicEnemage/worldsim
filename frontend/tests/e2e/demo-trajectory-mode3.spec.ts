@@ -133,12 +133,12 @@ test("G2/AC-1: Mode 3 comparison readout visible after branch recompute", async 
   });
 
   // Mode 3 comparison readout must now be visible.
-  const readout = page.locator('[data-testid="mode3-comparison-readout"]');
+  const readout = page.locator('[data-testid="branch-comparison-panel"]');
   await expect(readout).toBeVisible({ timeout: 5_000 });
 
-  // Both baseline and branch value elements must be present.
-  await expect(page.locator('[data-testid="mode3-baseline-value"]')).toBeVisible();
-  await expect(page.locator('[data-testid="mode3-branch-value"]')).toBeVisible();
+  // Both baseline (branch-value-0) and branch (branch-value-1) value elements must be present.
+  await expect(page.locator('[data-testid="branch-value-0"]')).toBeVisible();
+  await expect(page.locator('[data-testid="branch-value-1"]')).toBeVisible();
 });
 
 // ---------------------------------------------------------------------------

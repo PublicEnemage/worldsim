@@ -1,8 +1,8 @@
 # CLAUDE.md — WorldSim Project Context
 
-> Last significant revision: 2026-06-23
-> Updated against: M15 closed — Human Cost Architecture complete; ADR-017 Zone 1A information architecture; Layer 3 self-interpreting outputs (Zone 1B + Zone 1D); Path 1 approved source network; cohort/political risk designs; accessibility validation; CLAUDE.md extraction; M16 Distributional Visibility now current
-> Previous version context: 2026-06-20 — M14 closed; M15 active; Trust Architecture complete; ADR-016/ADR-015 delivered; Demo 5 (Zambia 2024 IMF ECF)
+> Last significant revision: 2026-06-25
+> Updated against: M16 exit gate revised — #843 live demo deferred to M17/Demo 7 (EL decision 2026-06-25); M16 closes on distributional visibility delivery; DEMO6 findings (001–049) retained as Demo 7 specification foundation
+> Previous version context: 2026-06-23 — M15 closed; M16 active; ADR-017 Zone 1A information architecture; Layer 3 self-interpreting outputs; cohort/political risk designs; accessibility validation; CLAUDE.md extraction
 
 > **Reader Orientation:** This is the permanent project constitution — read it in full before beginning any session. It contains the mission, architectural commitments, and process rules that govern all work in this repository. Anyone making a change in this codebase, human or agent, must have read this document first. Key must-read sections if time is short: Session Continuity (what to read and in what order), Guiding Principles (the values behind every technical decision), and §Architectural Principles for Claude Code Sessions (process gates including pre-push lint, PR merge gate, and file authority rules that will cause compliance violations if not followed).
 
@@ -284,19 +284,26 @@ Full agent profiles, independence requirements, and operational agent definition
 
 ## What We Are Building First
 
-M0–M15 complete (v0.1.0–v0.15.0). ADRs 001–017 current.
+M0–M16 complete (v0.1.0–v0.16.0). ADRs 001–017 current.
 See GitHub Releases for full delivery history.
 
-**Milestone 16 — Distributional Visibility (Current)**
+**Milestone 16 — Distributional Visibility (Complete)**
 
-*Primary objective (M16):*
-- Zone 1A implementation (Phase 4) — composite encoding in primary viewport (#845)
-- Cohort disaggregation on primary surface (#986) — design done in M15; implementation M16
-- Political risk summary surface (#987) — design done in M15; implementation M16
-- Live stakeholder demo with real external participants (#843) — deferred from M15 (EL decision 2026-06-23); M16 exit gate
-- Demo 6 (Senegalese Finance Minister scenario — distributional human cost argument)
+Delivered: Zone 1A Phase 4 composite encoding (#845), cohort disaggregation on primary surface (#986), political risk summary surface (#987), 25-year human capital depletion trajectory (#274), calibrated ecological-to-financial transmission (#275), uncertainty quantification (#22 partial), adaptive y-axis scaling (IR-001 fix), G9 polish (threshold overlay, Mode 3 branch comparison values, threshold-crossing markers, Greece backtesting fixture extension), G10 pre-demo polish (11 ACs). Demo 6 preparatory work complete: Steps 1–6c, DEMO6-001–049 findings on record, north star finding sentence filed. Live external demo (#843) deferred to M17/Demo 7 (EL decision 2026-06-25).
 
-M16 closes with live external participant engagement (#843) and distributional visibility on the primary surface.
+**Milestone 17 — Calibration and Comparative Infrastructure (Current)**
+
+*Wave 1 (entry gate; Wave 2 blocked until Wave 1 exit):*
+- Fiscal-to-cohort elasticity calibration — DemographicModule ELASTICITY_REGISTRY revision → Issue #1229 (CM-owned)
+- Governance sensitivity calibration — GovernanceModule fiscal conditionality transmission → Issue #1248 (CM-owned)
+- Wave 1 exit gate: FRAME-D milestone sentence fires within 8-step Demo 6 window after calibration change
+
+*Wave 2 (after Wave 1 exit gate):*
+- Multi-scenario comparison (>2 scenarios) → Issue #394
+- DEMO6 CRITICAL polish: #1249 (curve identifiability), #1250 (tablet legibility), #1253 (PSP historical precedent)
+- Adaptive y-axis extension audit → Issue #1251; Zone 1B proportional allocation → Issue #1252
+
+No demo at M17 close. Demo 7 at M18.
 
 Each milestone is a vertical slice — working software at every stage,
 not infrastructure waiting for features.
@@ -305,15 +312,15 @@ not infrastructure waiting for features.
 
 ## Milestone Roadmap
 
-M0–M15 complete (v0.1.0–v0.15.0). M16 current. See GitHub Releases for full delivery history.
+M0–M16 complete (v0.1.0–v0.16.0). M17 current. See GitHub Releases for full delivery history.
 
-The full roadmap covering M16 and beyond — milestone deliverables, demo anchors, canonical users served, and the long-term resolution spectrum direction — is maintained at `docs/roadmap/worldsim-roadmap.md`. That document is the canonical reference. The summary below reflects current and next milestone only.
+The full roadmap covering M17 and beyond — milestone deliverables, demo anchors, canonical users served, and the long-term resolution spectrum direction — is maintained at `docs/roadmap/worldsim-roadmap.md`. That document is the canonical reference. The summary below reflects current and next milestone only.
 
-**Milestone 15 — Human Cost Architecture (Complete)**
-Delivered: ADR-017 (Zone 1A Information Architecture), Layer 3 self-interpreting outputs (trajectory sentence Zone 1B, PSP sentence Zone 1D, L0 badges, grounding strip disambiguation and date accuracy), cohort disaggregation design (#986), political risk summary design (#987), Path 1 approved source network (#975), accessibility validation (VC-1/VC-2/VC-4 PASS), process documentation extraction (CLAUDE.md 1,082→800 lines). Live external demo (#843) deferred to M16 (EL decision 2026-06-23).
+**Milestone 16 — Distributional Visibility (Complete)**
+Delivered: Zone 1A Phase 4 composite encoding (#845), cohort disaggregation (#986), political risk summary (#987), 25-year human capital trajectory (#274), ecological-fiscal transmission (#275), uncertainty quantification (#22), adaptive y-axis fix (IR-001), G9/G10 polish. Demo 6 preparatory work (Steps 1–6c; DEMO6-001–049 findings on record; north star finding sentence). Live external demo (#843) deferred to M17/Demo 7 (EL decision 2026-06-25).
 
-**Milestone 16 — Distributional Visibility (Current)**
-Core deliverable: Zone 1A implementation (Phase 4), cohort disaggregation on primary surface (#986), political risk summary implementation (#987), live stakeholder demo with real external participants (#843 — M16 exit gate), Demo 6 (Senegalese Finance Minister scenario).
+**Milestone 17 — Calibration and Comparative Infrastructure (Current)**
+Core deliverable: Wave 1 = Chief Methodologist calibration sprint (fiscal-to-cohort elasticity #1229, governance sensitivity #1248); Wave 2 = multi-scenario (#394) + DEMO6 CRITICAL polish (#1249/#1250/#1253) + adaptive y-axis extension (#1251) + Zone 1B proportional allocation (#1252). Wave 2 gated on Wave 1 exit. No demo at M17 close.
 
 Full roadmap: `docs/roadmap/worldsim-roadmap.md`
 
@@ -728,6 +735,7 @@ the artifact type and cannot be caught by CI.
 | Module Capability Registry | `docs/scenarios/module-capability-registry.md` | Single file | Updated in place with each milestone |
 | Near-Miss Registry | `docs/process/near-miss-registry.md` | Single file — append NM entries only | Append only; never insert mid-registry |
 | Known Issues Registry | `docs/process/known-issues-registry.md` | Single file — append KI entries only | Append only; never insert mid-registry |
+| Exceptions Registry | `docs/compliance/exceptions.md` | Single file — append EX entries only | Append only; never insert mid-registry. Types: threshold, architecture, security, process, data. Every entry requires an expiry condition. Expired unrenewed exceptions are compliance findings. |
 | Internal Demo Reviews | `docs/demo/{milestone}/reviews/` | `YYYY-MM-DD-vX.X.X-internal-review.md` | New file per demo cycle (even-numbered milestones) |
 | Independent Review (IR) | `docs/demo/{milestone}/reviews/` | `YYYY-MM-DD-vX.X.X-ir-review.md` | Pre-demo quality gate; authored by Independent Review Agent (Step 7); distinct from internal-review.md. EL decision 2026-06-10. |
 | Stakeholder Reviews | `docs/demo/{milestone}/reviews/` | `YYYY-MM-DD-vX.X.X-stakeholder-review.md` | Post-demo artifact; authored after the live stakeholder demo runs; captures attendees, questions raised, and outcome. A placeholder with templated sections is created at milestone close and filled in after the demo. EL decision 2026-06-10. |

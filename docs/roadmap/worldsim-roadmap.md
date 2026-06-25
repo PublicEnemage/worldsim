@@ -1,8 +1,9 @@
 # WorldSim Roadmap
 
-> Last significant revision: 2026-06-23
-> Next mandatory review: Milestone 16 close
-> Updated against: M15 close 2026-06-23 — Human Cost Architecture complete; ADR-017 Zone 1A accepted; Layer 3 self-interpreting outputs delivered; Path 1 approved source network; cohort/political risk designs; accessibility validated; #843 deferred to M16 (EL decision 2026-06-23); M16 Distributional Visibility now current
+> Last significant revision: 2026-06-25
+> Next mandatory review: Milestone 17 close
+> Updated against: M16 close — Distributional Visibility complete; Zone 1A Phase 4, cohort disaggregation, political risk surface, 25-year trajectory, ecological-fiscal transmission, uncertainty quantification all delivered; Demo 6 preparatory work (Steps 1–6c, DEMO6-001–049, north star finding sentence) on record; #843 live demo deferred to M17/Demo 7 (EL decision 2026-06-25) — DEMO6 findings addressed holistically alongside Mode 3 calibration; M17/M18 scope revised to reflect Demo 7 arc, Wave 1 calibration gate, and #407/#5/#4 deferral to M19+
+> Previous version context: 2026-06-23 — M15 close; M16 active; #843 M16 exit gate
 > Canonical location: `docs/roadmap/worldsim-roadmap.md`
 
 *Note: This document was not updated at M10, M11, M11.5, or M12 close — a gap against the "Roadmap Currency" policy. Updates at those closes are now reflected in the registry and narrative sections.*
@@ -34,19 +35,21 @@
 | M13 | Political Economy and Instrument Credibility | ADR-013, political economy integration, ADR-014 alert panel UX, instrument legibility, mode transition UX, Process Redesign Phases 0–D | Complete |
 | M14 | Trust Architecture and Instrument Credibility | ADR-016 Grounding strip (source provenance), ADR-015 Evidence thread (Zone 1B credibility), PSP in Zone 1D, methodology foundation docs, Demo 5 | Complete |
 | M15 | Human Cost Architecture | ADR-017 Zone 1A, Layer 3 self-interpreting outputs, Path 1 approved source, cohort/political risk designs, accessibility validation | Complete |
-| M16 | Distributional Visibility | Demo 6 + live external demo (#843 — exit gate); Zone 1A implementation; cohort disaggregation; political risk summary; distributional output | Current |
-| M17 | Multi-Scenario Infrastructure | Multi-scenario comparison infrastructure (>2 scenarios), dynamic relationship weights, stock vs. flow at scale, entity template library design | Planned |
-| M18 | Comparative Analysis and Full Argument | Demo 7: multi-scenario comparison with distributional overlay, uncertainty bands, full counter-scenario argument at the negotiating table | Planned |
+| M16 | Distributional Visibility | Zone 1A Phase 4; cohort disaggregation; political risk summary; 25-year trajectory; ecological-fiscal transmission; uncertainty quantification; Demo 6 prep (Steps 1–6c; DEMO6 findings on record) | Complete |
+| M17 | Calibration and Comparative Infrastructure | Wave 1: CM calibration (fiscal-to-cohort elasticity #1229, governance sensitivity); Wave 2: multi-scenario (#394) + DEMO6 CRITICAL polish + adaptive y-axis extension | Planned |
+| M18 | Full Argument and Demo 7 | Demo 7 (Senegal Mode 3 + Zambia three-scenario); counter-scenario comparison; CI bands (ADR-007); PSP driver decomposition | Planned |
 
 ---
 
 ## Where We Are
 
-WorldSim v0.15.0 is released. Sixteen milestones of foundational and delivery work are complete. The simulation engine runs multi-country scenarios with matrix computation. The external sector module enables bilateral trade shocks and commodity price cascades. Mode 3 Active Control lets a finance ministry analyst branch from any simulation step, apply policy instruments, and compare the resulting trajectory against the baseline in real time. All four measurement framework axes are live. The political economy module makes programme survival probability and conditionality dynamics analytically visible. The alert panel (Zone 1B) delivers threshold breach evidence in persistent-detail with a self-interpreting trajectory sentence — "at the current draw rate, the CRITICAL floor is reached within one step" — without interaction. The Grounding strip surfaces source-cited initial state provenance with date-accurate labels. Path 1 enables a user-directed query from the approved source network at scenario creation. Zone 1A information architecture (ADR-017) is accepted and governs the M16 distributional implementation. Five historical backtesting cases are validated (Greece, Argentina, Lebanon, Thailand, Ecuador). Demo 5 — a Zambia 2024 IMF ECF programme review — has been delivered.
+WorldSim v0.16.0 is released. Seventeen milestones of foundational and delivery work are complete. The simulation engine runs multi-country scenarios with matrix computation. The external sector module enables bilateral trade shocks and commodity price cascades. Mode 3 Active Control lets a finance ministry analyst branch from any simulation step, apply policy instruments, and compare the resulting trajectory against the baseline in real time. All four measurement framework axes are live. The political economy module makes programme survival probability and conditionality dynamics analytically visible. The alert panel (Zone 1B) delivers threshold breach evidence with a self-interpreting trajectory sentence and cohort disaggregation — bottom quintile threshold crossings are visible at primary viewport without navigation. Zone 1D surfaces a plain-language PSP severity label (CRITICAL/WARNING/WATCH/STABLE) readable in thirty seconds by a political advisor without economist mediation. The Grounding strip surfaces source-cited initial state provenance with date-accurate labels. Path 1 enables a user-directed query from the approved source network at scenario creation. The 25-year human capital depletion trajectory is live. Uncertainty quantification delivers scenario bands (p10/p50/p90). Six historical backtesting cases are validated.
 
-M15 is complete. The human cost argument is now self-interpreting: a finance ministry economist can read what a threshold crossing means without specialist mediation. Zone 1A's architecture is locked. The cohort disaggregation and political risk surface designs are ready for M16 implementation. M15 asks and answers: can we make the human cost argument specific enough to change what a minister's team can argue at the table? Yes — Aicha can cite reserve criticality, PSP trajectory, and Argentina 2001 directional validation without leaving the instrument cluster.
+M16 is complete. The distributional argument — which cohort, at which step, against what floor, for how long — is on the primary surface without navigation. Demo 6 preparation work (Steps 1–6c) has been completed: screenshot brief, full walkthrough, narrated specification, five frames captured, internal review, IR review, audience simulation (DEMO6-001–049 findings), and the north star finding sentence are all on record as the specification foundation for Demo 7. The live external session (#843) has been deferred to M17/Demo 7 (EL decision 2026-06-25) — the four DEMO6 CRITICAL findings and the fiscal-to-cohort calibration gap are addressed holistically alongside Mode 3 rather than as pre-demo patches.
 
-M16–M18 are defined and issued-scoped. The roadmap through M18 is directionally committed. The demo arc (Demo 5 delivered; Demo 6 at M16; Demo 7 at M18) defines the progressive capability story the tool tells to the world.
+M16 asks and answers: can the tool surface who bears the cost — specifically enough to cite at the table? Yes — a Senegalese Finance Minister's team can now show that the bottom quintile of informal workers is approaching a poverty threshold they would not recover from for a decade, and that the government may not have the political capacity to deliver the conditionality. That argument has a number, a step, a confidence tier, and a 25-year consequence frame.
+
+M17–M18 are defined and issued-scoped. The roadmap through M18 is directionally committed. The demo arc (Demo 5 at M14; Demo 6 preparation complete at M16; Demo 7 at M18) defines the progressive capability story the tool tells to the world.
 
 ---
 
@@ -80,9 +83,13 @@ The story is distributional evidence. The argument the ministry team can make is
 
 **Demo 7 — Milestone 18: WorldSim shows it didn't have to be this way.**
 
-The counter-scenario comparison is live. A Zambian restructuring team loads three scenarios simultaneously: IMF proposed terms, Zambian counter-proposal, Ghana 2023 restructuring as a regional comparator. The instrument cluster shows overlaid trajectories with uncertainty bands. Under proposed terms: 340,000 additional people below the poverty threshold. Under the counter-proposal: 80,000. The ministry's counter-proposal is now an argument with a specific number differential, a confidence band, and a historical precedent.
+Demo 7 runs in two acts, continuous.
 
-The story is the complete analytical stack at the negotiating table: inputs cited, methodology transparent, human cost visible, alternatives compared. The minister's team has parity.
+*Act 1 — Senegal, Mode 3:* The Demo 6 scenario is already loaded. Step 2. The analyst activates Mode 3 and asks one question: is there a fiscal instrument configuration that avoids the bottom quintile crossing the 0.40 recovery floor? The tool runs the interrogation. One of two things happens — and both are the answer. Either a configuration exists that prevents the crossing: the counter-proposal is found. Or no configuration within the programme's fiscal envelope prevents the crossing: the conditionality structure itself is the binding constraint. That is the most powerful finding the tool can produce. The ministry's argument is no longer "this is too harsh" — it is "there is no version of this programme, on these terms, that does not cross this threshold."
+
+*Act 2 — Zambia, comparison:* A Zambian restructuring team loads three scenarios simultaneously: IMF proposed terms, Zambian counter-proposal, Ghana 2023 restructuring as a regional comparator. The instrument cluster shows overlaid trajectories with uncertainty bands. Under proposed terms: 340,000 additional people below the poverty threshold. Under the counter-proposal: 80,000. The ministry's counter-proposal is now an argument with a specific number differential, a confidence band, and a historical precedent.
+
+The story is the complete analytical stack at the negotiating table: inputs cited, methodology transparent, human cost visible, alternatives compared, counter-scenario quantified. The minister's team has parity.
 
 ---
 
@@ -303,63 +310,117 @@ surface: any milestone entry with UNTRACKED items is an open kickoff gate.
 
 ---
 
-### Milestone 16 — Distributional Visibility *(current)*
+### Milestone 16 — Distributional Visibility *(complete)*
 
-**Core deliverable:** The human cost ledger is operationally visible. A finance minister can cite which cohort bears the cost, at which step, with what confidence, against a 25-year horizon. Demo 6 shows this — with real external participants.
+**Core deliverable:** The human cost ledger is operationally visible. A finance minister can cite which cohort bears the cost, at which step, with what confidence, against a 25-year horizon.
 
 **Demo 6 story:** *"Here is who bears the cost — specifically, this cohort, at this step, for this long."*
 
-**What ships:**
-- Live stakeholder demo with real external participants (#843) — M16 exit gate; deferred from M15 (EL decision 2026-06-23)
-- Zone 1A implementation (Phase 4) — composite encoding in primary viewport (#845); Zone 1D delta annotations in same sprint (BPO phase 4 gate)
-- Cohort disaggregation on primary surface — bottom-quintile threshold crossings visible in primary viewport within 90-second retrieval ceiling → Issue #986 (design complete in M15; horizon:immediate)
-- Political risk summary surface for Persona 3 — programme survival probability and legitimacy trajectory in plain language → Issue #987 (design complete in M15; horizon:immediate)
-- Distributional scenario comparison — variance and percentile ranges by cohort → Issue #102 (horizon:immediate)
-- 25-year human capital depletion trajectory → Issue #274 (horizon:immediate)
-- Calibrated ecological-to-financial transmission — resource curse → fiscal capacity chain → Issue #275 (horizon:immediate)
-- Uncertainty quantification — full distributional output as scenario bands (builds on ADR-015 evidence thread) → Issue #22 full implementation (horizon:immediate)
-- Dynamic relationship weight updating → Issue #35 (Parking Lot — deferred until core capability is battle-tested; EL decision 2026-06-21)
-- Stock vs. flow variable distinction in entity attribute model → Issue #30 (Parking Lot — same deferral basis; EL decision 2026-06-21)
+**What shipped:**
+- ✅ Zone 1A implementation (Phase 4) — composite encoding in primary viewport (#845); Zone 1D delta annotations (#1147)
+- ✅ Cohort disaggregation on primary surface — CohortImpactSection in Zone 1B; bottom-quintile threshold crossings visible in primary viewport within 90-second retrieval ceiling → Issue #986
+- ✅ Political risk summary surface for Persona 3 — PSP severity label (CRITICAL/WARNING/WATCH/STABLE) in Zone 1D; plain-language sentence readable without economist mediation → Issue #987
+- ✅ Distributional scenario comparison — variance and percentile ranges by cohort → Issue #102
+- ✅ 25-year human capital depletion trajectory → Issue #274
+- ✅ Calibrated ecological-to-financial transmission — Zimbabwe 2000 calibration anchor → Issue #275
+- ✅ Uncertainty quantification — SyntheticDataEngine + quantity table + Zone 1B tier badges → Issue #22 (partial; AC-F6 Zone 1D deferred)
+- ✅ Adaptive y-axis scaling — computeYDomain() for TrajectoryView; resolves IR-001 Zone 1A curve overlap at FIN/GOV separation < 0.05 → PR #1243
+- ✅ G9 polish (threshold overlay, Mode 3 branch comparison values, threshold-crossing markers, Greece backtesting)
+- ✅ G10 pre-demo polish (entity attribution, SAD badge, T3 badge sublabel, Q2 asymmetry label, milestone sentence year anchor)
+- ✅ Demo 6 preparatory work complete — Steps 1–6c delivered: screenshot brief, full walkthrough, narrated specification, five frames captured, internal review, IR review, adaptive y-axis fix, audience simulation (DEMO6-001–049 findings on record), north star finding sentence filed
+- ⏭ Live stakeholder demo with real external participants (#843) — deferred to M17/Demo 7 (EL decision 2026-06-25); DEMO6 legibility and calibration gaps addressed holistically alongside Mode 3
+- ⏭ Dynamic relationship weight updating (#35) — Parking Lot (EL decision 2026-06-21)
+- ⏭ Stock vs. flow variable distinction (#30) — Parking Lot (EL decision 2026-06-21)
 
-**Demo:** Demo 6 at M16 close. Senegalese Finance Minister scenario. The human cost argument becomes specific.
+**Demo:** Demo 6 preparation complete (Steps 1–6c). Live external session deferred to M17/Demo 7 (EL decision 2026-06-25). Primary finding sentence on record: *"Under this programme, the poorest informal workers in Senegal are six months away from a poverty threshold they would not recover from for a decade — and the government may not have the political capacity to deliver the conditionality either."*
 
-**Canonical user primarily served:** Persona 5 (Institutional Decision-Maker, Aicha Mbaye) and Persona 2 — the distributional evidence is what Aicha presents to her cabinet and what Eleni cites at the table.
+**Canonical user primarily served:** Persona 5 (Aicha Mbaye, Finance Minister) and Persona 2 (Finance Ministry Negotiator) — the distributional evidence is what Aicha's team presents at the Article IV consultation.
 
-**What M16 does not do:** M16 does not enable comparison of more than two scenarios simultaneously (M17). M16 does not deliver the entity template library.
+**What M16 did not do:** M16 did not run the live external demo (#843 — deferred). M16 did not enable comparison of more than two scenarios simultaneously (M17). M16 did not deliver CI bands on Zone 1A trajectories (ADR-007 scope, M18). M16 did not surface PSP driver decomposition (M18).
 
 ---
 
-### Milestone 17 — Multi-Scenario Infrastructure *(planned)*
+### Milestone 17 — Calibration and Comparative Infrastructure *(planned)*
 
-**Core deliverable:** The comparison infrastructure that makes Demo 7 possible. No demo at M17 close.
+**Core deliverable:** A calibrated engine and comparative infrastructure that makes Demo 7 analytically defensible. No demo at M17 close. M17 is the prerequisite milestone — the work here is the condition of possibility for everything Demo 7 claims.
 
-**What ships:**
-- Multi-scenario comparison (>2 scenarios) — Kenya budget planning use case → Issue #394 (horizon:immediate)
-- Entity template library — initial templates (transport fuel, food systems) → Issue #407 (horizon:near-term)
-- Data marketplace design — curated dataset registry → Issue #5 (horizon:near-term)
-- Advanced geocoded dataset integration → Issue #4 (horizon:near-term)
+M17 is structured in two waves. **Wave 2 may not begin until Wave 1 produces a calibrated elasticity baseline.** This is a hard gate, not a scheduling preference. Running the multi-scenario infrastructure or the DEMO6 polish work before the calibration is settled would build on a miscalibrated response surface — the Demo 7 Mode 3 interrogation is only analytically meaningful if the fiscal-to-cohort transmission channel reflects the empirically defensible elasticity.
+
+---
+
+**Wave 1 — Chief Methodologist Calibration Sprint** *(M17 entry gate; Wave 2 blocked until Wave 1 exit)*
+
+*Scope uncertainty notice:* The fiscal-to-cohort elasticity calibration (#1229) involves genuine research work. The Chief Methodologist must determine: (1) whether `fiscal_policy_spending_change` should have direct elasticity entries bypassing the GDP multiplier chain; (2) whether the GDP multiplier should be larger for social spending cuts specifically; (3) whether the current T3 calibration accurately represents the uncertainty at that tier or whether the response surface is simply miscalibrated. Candidate sources are already in ELASTICITY_REGISTRY (IMF 2014, Lustig 2017, Ball et al. 2013). The CM review may conclude that one of these possibilities is correct, or it may identify a new calibration approach. **M17 Wave 2 cannot begin until Wave 1 delivers a written calibration decision with the revised elasticity constants and a confirmed test that the FRAME-D milestone sentence fires within an 8-step programme window on the Demo 6 scenario.** If Wave 1 takes longer than estimated, M17 slips rather than Wave 2 beginning on a miscalibrated base.
+
+*Wave 1 exit gate:* The FRAME-D milestone sentence fires within the Demo 6 window after the calibration change. DemographicModule ELASTICITY_REGISTRY updated with CM-certified values. Governance sensitivity specification (see below) is produced even if implementation is Wave 2.
+
+- Fiscal-to-cohort elasticity calibration — DemographicModule ELASTICITY_REGISTRY revision; CM certification required → Issue #1229 (horizon:immediate; CM-owned)
+- Governance sensitivity calibration — GovernanceModule response to fiscal conditionality events; institutional capacity degradation under austerity; `imf_program_acceptance` direct governance transmission pathway; whether the 8-step window is sufficient to manifest governance divergence or whether governance stress is a longer-horizon signal → Issue #1248 (horizon:immediate; CM-owned)
+
+---
+
+**Wave 2 — Comparative Infrastructure and DEMO6 Polish** *(begins after Wave 1 exit gate)*
+
+*Scope:* Multi-scenario infrastructure enabling Demo 7 Act 2, plus the DEMO6 CRITICAL and HIGH findings that would visibly undermine Demo 7 if unaddressed, plus the adaptive y-axis pattern extension established in M16.
+
+- Multi-scenario comparison (>2 scenarios) — Kenya budget planning use case; enables Demo 7 Act 2 Zambia three-scenario comparison → Issue #394 (horizon:immediate)
+- DEMO6-014: Zone 1A curves visually indistinguishable at presentation scale — terminal endpoint labels or dashed/solid line style differentiation; Human Development curve must be identifiable at a glance without presenter narration → Issue #1249 (horizon:near-term)
+- DEMO6-026/043: Zone 1B cohort values not legible at tablet scale — CohortImpactSection current value, floor, and T3 badge must be readable at 768px width without zoom → Issue #1250 (horizon:near-term)
+- DEMO6-040: No historical precedent anchor for PSP WARNING in Zone 1D — comparable programme reference accessible from Zone 1D surface; comparable cases at WARNING level with known compliance outcomes; enables Andreas's political brief argument and Lucas's reproducibility threshold → Issue #1253 (horizon:near-term)
+- Adaptive y-axis extension — `computeYDomain()` pattern (PR #1243) applied to any additional instrument that exhibits the overlap failure mode identified in IR-001; confirm no other instrument has a fixed-domain chart that would obscure small-range values → Issue #1251 (horizon:near-term)
+- Zone 1B proportional allocation — formal split between MDAAlertPanelZone1B and CohortImpactSection; replace `minHeight: 80px` temporary guarantee with a durable proportional design; ADR decision required (ADR-017 amendment or new ADR) → Issue #1252 (horizon:near-term)
+
+*Wave 2 deferred (not M17 scope):*
+- Entity template library (#407) — deferred to M19+; not on Demo 7 critical path
+- Data marketplace design (#5) — deferred to M19+; not on Demo 7 critical path
+- Advanced geocoded dataset integration (#4) — deferred to M19+; not on Demo 7 critical path
+
+---
 
 **Demo:** None (M17). Demo 7 at M18.
 
-**Canonical user primarily served:** Persona 7 (Parliamentary Economist, James Ochieng) — the multi-scenario comparison enables the independent fiscal analysis his PBO mandate requires.
+**Canonical user primarily served:** Lucas Ferreira (Programme Analyst, Persona 1) and Aicha Mbaye (Finance Minister, Persona 5) — Wave 1 satisfies Lucas's calibration credibility requirement; Wave 2 enables the Mode 3 interrogation and multi-scenario comparison that Aicha's team needs at the table.
+
+**What M17 does not do:** M17 does not run the live external demo (M18). M17 does not deliver CI bands on Zone 1A trajectories — that is ADR-007 scope requiring a separate architecture decision (M18). M17 does not deliver PSP driver decomposition (M18). M17 does not deliver entity templates, data marketplace, or geocoded dataset expansion (M19+).
 
 ---
 
-### Milestone 18 — Comparative Analysis and Full Argument *(planned)*
+### Milestone 18 — Full Argument and Demo 7 *(planned)*
 
-**Core deliverable:** The complete analytical stack at the negotiating table. A finance ministry team can load three scenarios, show who bears the cost under each, compare the distributional outcomes, and cite the counter-proposal with a specific number differential.
+**Core deliverable:** The complete analytical stack at the negotiating table. A finance ministry team can interrogate whether any available instrument prevents a human cost threshold crossing (Mode 3, Act 1), and can load three scenarios and show distributional differences under each pathway with confidence bands (Act 2). Demo 7 is the live external session that delivers both arguments to real participants.
 
-**Demo 7 story:** *"Here is what we proposed instead — side by side, with error bars, with human cost consequences."*
+**Demo 7 story:** *"Here is what we proposed instead — and here is what the conditionality structure does to this cohort under every version of the programme."*
 
 **What ships:**
-- Multi-scenario comparison with distributional overlay — three+ scenarios, overlaid trajectories with uncertainty bands → builds on Issue #394
-- Counter-scenario comparison showing distributional differences under each pathway
-- Path 2 full implementation — ministry-owned proprietary data integrated into multi-scenario comparison
-- Entity template library operational — additional countries navigable in comparison
 
-**Demo:** Demo 7 at M18 close. Zambian restructuring team scenario. The ministry team has negotiating parity.
+*Mode 3 interrogation capability for Demo 7 Act 1:*
+- Mode 3 instrument search on Demo 6 scenario — M17 calibration is the prerequisite; M18 delivers the demo-ready configuration and the presenter narration for both possible outcomes ("counter-proposal found" and "conditionality structure is the binding constraint")
+- The Demo 7 Act 1 argument does not require new engine features — Mode 3 was delivered in M12; M18 delivers the calibrated scenario and narrated demo sequence
 
-**Canonical user primarily served:** Persona 2 (Finance Ministry Negotiator) and Persona 5 (Institutional Decision-Maker) — the moment the tool's full promise is operationally real.
+*Multi-scenario comparative analysis for Demo 7 Act 2:*
+- Multi-scenario comparison with distributional overlay — three+ scenarios, overlaid trajectories with uncertainty bands → builds on M17 Issue #394 infrastructure
+- Counter-scenario comparison showing distributional differences under each pathway — the specific number differential (e.g., 340,000 vs. 80,000 people below the poverty threshold) with confidence bands
+- Zone 1A CI bands — scenario-band rendering on trajectory curves; ADR-007 scope; architecture decision required before implementation → Issue #1254 (horizon:near-term; DEMO6-015)
+
+*PSP analytical depth for Demo 7:*
+- PSP driver decomposition in Zone 1D — dominant signal category visible alongside severity label; enables Andreas's direct political brief without economist mediation → Issue #1255 (horizon:near-term; DEMO6-036)
+
+*Live external session:*
+- Demo 7 — live stakeholder session with real external participants; both acts (Senegal Mode 3 + Zambia comparison); M18 exit gate → Issue #843
+
+*Path 2 (capacity-allowing):*
+- Path 2 full implementation — ministry-owned proprietary data integrated into multi-scenario comparison; carries from M16 design groundwork → Issue #1256 (horizon:near-term; capacity-allowing)
+
+*Deferred to M19+:*
+- Entity template library operational (#407) — not required for Demo 7; deferred
+- Data marketplace design (#5) — deferred
+- Advanced geocoded dataset integration (#4) — deferred
+
+**Demo:** Demo 7 at M18 close. Two-act live session: Senegal Article IV (Mode 3 interrogation) + Zambia restructuring (three-scenario comparison). The ministry team has negotiating parity.
+
+**Canonical user primarily served:** Persona 5 (Aicha Mbaye, Finance Minister) in Act 1 — the counter-proposal interrogation is her instrument; Persona 2 (Eleni Papadimitriou, Finance Ministry Negotiator) in Act 2 — the distributional comparison with number differentials is what she cites at the table.
+
+**What M18 does not do:** M18 does not deliver entity templates, data marketplace, or geocoded dataset expansion (M19+). M18 does not guarantee Path 2 delivery — that is capacity-allowing, not exit-gating.
 
 ---
 

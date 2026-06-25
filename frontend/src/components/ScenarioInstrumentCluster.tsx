@@ -30,13 +30,14 @@
  */
 import { useEffect, useRef, useState } from "react";
 import { InstrumentCluster, LAYOUT, useViewportBreakpoint } from "./InstrumentCluster";
-import { MDAAlertPanelZone1B } from "./MDAAlertPanelZone1B";
+import { MDAAlertPanelZone1B, CohortImpactSection } from "./MDAAlertPanelZone1B";
 import { PMMWidgetZone1C } from "./PMMWidgetZone1C";
 import { FourFrameworkZone1D } from "./FourFrameworkZone1D";
 import { CohortIndicatorsPanel } from "./CohortIndicatorsPanel";
+import { HumanCapitalTrajectoryPanel } from "./HumanCapitalTrajectoryPanel";
 import { ControlPlane, type Mode3Params } from "./ControlPlane";
 import { useScenarioStepStore } from "../store/scenarioStepStore";
-import type { TrajectoryResponse, TrajectoryFrameworkPoint, Zone1BAlert } from "../store/scenarioStepStore";
+import type { TrajectoryResponse, TrajectoryFrameworkPoint, Zone1BAlert, CohortThresholdCrossing } from "../store/scenarioStepStore";
 import type { QuantitySchema, ScenarioDetailResponse } from "../types";
 import type { FrameworkDataQuality } from "./FourFrameworkZone1D";
 
@@ -140,9 +141,25 @@ interface RawMDAAlert {
   recovery_horizon_years?: number | null;
 }
 
+interface RawCohortThresholdCrossing {
+  quintile_key: string;
+  cohort_label: string;
+  indicator_key: string;
+  indicator_label: string;
+  severity: "CRITICAL" | "WARNING" | "WATCH";
+  step_crossed: number;
+  above_floor_pct: string | null;
+  tier: number;
+  source: string;
+  is_synthetic?: boolean;
+  synthetic_method?: "STRUCTURAL_ABSENCE" | "SYNTHETIC_COMPARABLE" | "SYNTHETIC_MODEL" | null;
+  value?: string | null;
+}
+
 interface RawFrameworkOutputForAlerts {
   mda_alerts: RawMDAAlert[];
   indicators: Record<string, unknown>;
+  cohort_threshold_crossings?: RawCohortThresholdCrossing[];
 }
 
 interface RawMultiFrameworkOutput {
@@ -243,11 +260,28 @@ export function ScenarioInstrumentCluster({
   const [pspValue, setPspValue] = useState<string | null | undefined>(undefined);
   const [pspTier, setPspTier] = useState<number | null>(null);
 
+  // M16-G2 (#987) — political economy indicators for Zone 1D political risk sub-section.
+  const [legitimacyValue, setLegitimacyValue] = useState<string | null | undefined>(undefined);
+  const [legitimacyFloor, setLegitimacyFloor] = useState<string | null>(null);
+  const [legitimacyDirection, setLegitimacyDirection] = useState<string | null>(null);
+  const [eliteCaptureDirection, setEliteCaptureDirection] = useState<string | null>(null);
+  const [eliteCaptureQualifier, setEliteCaptureQualifier] = useState<string | null>(null);
+
+  // ADR-017 Phase 4 — per-entity trajectory maps for composite encoding.
+  const [entityTrajectories, setEntityTrajectories] = useState<Record<string, TrajectoryResponse>>({});
+  const [entityBaselineTrajectories, setEntityBaselineTrajectories] = useState<Record<string, TrajectoryResponse>>({});
+
   // Mode 3 branch advance loop — abortController cancels in-flight advances on cleanup.
   const branchAbortRef = useRef<AbortController | null>(null);
 
   // Track previous scenarioId to distinguish scenario change (full reset) from mode-only change.
   const prevScenarioIdRef = useRef<string>("");
+
+  // Track Mode 3 activation to auto-save entity baselines when entering Mode 3.
+  const prevMode3ActiveRef = useRef(false);
+  // Deferred baseline save: when Mode 3 activates before entity trajectories are loaded,
+  // save them on the next entityTrajectories update.
+  const saveBaselineOnNextUpdateRef = useRef(false);
 
   // Initialise store when scenario changes (full reset) or update mode without resetting.
   // setScenario resets trajectory and current_step — calling it on mode changes would drop
@@ -306,6 +340,74 @@ export function ScenarioInstrumentCluster({
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps -- store is a Zustand singleton, stable reference
   }, [scenarioId, currentStep]);
+
+  // ADR-017 Phase 4 — per-entity trajectory fetch for composite encoding (N > 1).
+  // Fetches trajectory for each entity using ?entity_id= query param.
+  // Skipped at step 0 (no snapshots yet) and when only one entity is loaded.
+  useEffect(() => {
+    const ids = entityIds ?? [];
+    if (!scenarioId || currentStep === 0 || ids.length <= 1) return;
+    let cancelled = false;
+
+    Promise.all(
+      ids.map((entityId) =>
+        fetch(
+          `${API_BASE}/scenarios/${encodeURIComponent(scenarioId)}/trajectory?entity_id=${encodeURIComponent(entityId)}`
+        )
+          .then((res) => (res.ok ? (res.json() as Promise<RawTrajectoryResponse>) : null))
+          .then((raw) => (raw ? parseTrajectoryResponse(raw) : null))
+          .catch(() => null)
+      )
+    ).then((trajectories) => {
+      if (cancelled) return;
+      const map: Record<string, TrajectoryResponse> = {};
+      ids.forEach((entityId, i) => {
+        const traj = trajectories[i];
+        if (traj) map[entityId] = traj;
+      });
+      setEntityTrajectories(map);
+    });
+
+    return () => { cancelled = true; };
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- store is a Zustand singleton, stable reference
+  }, [scenarioId, currentStep, entityIds]);
+
+  // ADR-017 Phase 4 — deferred baseline save when entity trajectories arrive after Mode 3 activation.
+  useEffect(() => {
+    if (!saveBaselineOnNextUpdateRef.current) return;
+    if (Object.keys(entityTrajectories).length === 0) return;
+    setEntityBaselineTrajectories({ ...entityTrajectories });
+    saveBaselineOnNextUpdateRef.current = false;
+  }, [entityTrajectories]);
+
+  // ADR-017 Phase 4 — Mode 3 auto-baseline for multi-entity composite encoding.
+  // When entering Mode 3 with N > 1, lock current entity trajectories as baseline
+  // so CompositeChartSVG can render ghost (baseline) + active paths.
+  // N=1 Mode 3: Zustand store's baseline_trajectory handles ghost (set by applyControlInput).
+  useEffect(() => {
+    const ids = entityIds ?? [];
+    if (mode3Active && !prevMode3ActiveRef.current && ids.length > 1) {
+      if (Object.keys(entityTrajectories).length > 0) {
+        setEntityBaselineTrajectories({ ...entityTrajectories });
+      } else {
+        // Entity trajectories not yet loaded — save on next update
+        saveBaselineOnNextUpdateRef.current = true;
+      }
+    }
+    if (!mode3Active) {
+      setEntityBaselineTrajectories({});
+      saveBaselineOnNextUpdateRef.current = false;
+    }
+    prevMode3ActiveRef.current = mode3Active;
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- entityTrajectories dep handled by the deferred-save effect
+  }, [mode3Active, entityIds]);
+
+  // Reset per-entity trajectory state on scenario change.
+  useEffect(() => {
+    setEntityTrajectories({});
+    setEntityBaselineTrajectories({});
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [scenarioId]);
 
   // Sync PMM from trajectory step data when current step changes (Issue #496).
   // PMM is pre-computed per step by the backend; no additional fetch needed.
@@ -416,7 +518,26 @@ export function ScenarioInstrumentCluster({
           setHdState((s) => ({ prev: s.current, current: flat }));
         }
 
+        // M16-G2 (#986) — extract cohort threshold crossings from human_development output.
+        const hdCrossings = (hdOutput?.cohort_threshold_crossings ?? []) as RawCohortThresholdCrossing[];
+        const parsedCrossings: CohortThresholdCrossing[] = hdCrossings.map((c) => ({
+          quintile_key: c.quintile_key,
+          cohort_label: c.cohort_label,
+          indicator_key: c.indicator_key,
+          indicator_label: c.indicator_label,
+          severity: c.severity,
+          step_crossed: c.step_crossed,
+          above_floor_pct: c.above_floor_pct,
+          tier: c.tier,
+          source: c.source,
+          is_synthetic: c.is_synthetic,
+          synthetic_method: c.synthetic_method,
+          value: c.value,
+        }));
+        store.setCohortThresholdCrossings(parsedCrossings);
+
         // ADR-015 §Component 3 — extract programme_survival_probability (DA-G5-4 Option A).
+        // M16-G2 (#987) — also extract legitimacy_index and elite_capture_divergence.
         const peOutput = raw.outputs["political_economy"];
         const peEnabled = activeScenarioDetail?.configuration?.modules_config?.political_economy?.enabled;
         if (peOutput && peEnabled) {
@@ -433,14 +554,42 @@ export function ScenarioInstrumentCluster({
               typeof entry.confidence_tier === "number" ? entry.confidence_tier : null,
             );
           } else {
-            // PE enabled but PSP indicator absent from output — treat as computation error
             setPspValue(null);
             setPspTier(null);
           }
+
+          // M16-G2 (#987) — legitimacy_index
+          const legEntry = peOutput.indicators["legitimacy_index"];
+          if (legEntry !== null && legEntry !== undefined && typeof legEntry === "object") {
+            const leg = legEntry as { value?: string | null; floor?: string | null; direction?: string | null };
+            setLegitimacyValue(leg.value ?? null);
+            setLegitimacyFloor(leg.floor ?? null);
+            setLegitimacyDirection(leg.direction ?? null);
+          } else {
+            setLegitimacyValue(null);
+            setLegitimacyFloor(null);
+            setLegitimacyDirection(null);
+          }
+
+          // M16-G2 (#987) — elite_capture_divergence
+          const ecEntry = peOutput.indicators["elite_capture_divergence"];
+          if (ecEntry !== null && ecEntry !== undefined && typeof ecEntry === "object") {
+            const ec = ecEntry as { direction?: string | null; qualifier?: string | null };
+            setEliteCaptureDirection(ec.direction ?? null);
+            setEliteCaptureQualifier(ec.qualifier ?? null);
+          } else {
+            setEliteCaptureDirection(null);
+            setEliteCaptureQualifier(null);
+          }
         } else if (!peEnabled) {
-          // PE not enabled — reset PSP state so row is absent
+          // PE not enabled — reset all PE state
           setPspValue(undefined);
           setPspTier(null);
+          setLegitimacyValue(undefined);
+          setLegitimacyFloor(null);
+          setLegitimacyDirection(null);
+          setEliteCaptureDirection(null);
+          setEliteCaptureQualifier(null);
         }
       })
       .catch(() => {
@@ -641,21 +790,28 @@ export function ScenarioInstrumentCluster({
         </div>
       )}
 
-      {/* Mode 3 comparison readout — shows labeled baseline vs. branch values (DEMO-064).
-          Visible when branch is applied and recompute has completed. */}
+      {/* Mode 3 comparison panel — baseline (branch-value-0) vs branch (branch-value-1).
+          Visible when branch is applied and recompute has completed. Fixes DEMO-045. */}
       {mode === "MODE_3" && branchFromStep !== null && !isRecomputing && recomputeStatus !== "failed" && (() => {
         const currentStepIdx = store.current_step;
         const activeStep = store.trajectory?.steps.find(s => s.step_index === currentStepIdx)
           ?? store.trajectory?.steps.at(-1);
         const baseStep = store.baseline_trajectory?.steps.find(s => s.step_index === currentStepIdx)
           ?? store.baseline_trajectory?.steps.at(-1);
-        const activeScore = activeStep?.frameworks["financial"]?.composite_score ?? null;
-        const baseScore = baseStep?.frameworks["financial"]?.composite_score ?? null;
+        // Try financial framework first; fall back to first non-null score across all frameworks.
+        const pickScore = (step: typeof activeStep): number | null => {
+          if (!step) return null;
+          const fin = step.frameworks["financial"]?.composite_score ?? null;
+          if (fin !== null) return fin;
+          return Object.values(step.frameworks).find(fw => fw.composite_score !== null)?.composite_score ?? null;
+        };
+        const activeScore = pickScore(activeStep);
+        const baseScore = pickScore(baseStep);
         const delta = activeScore !== null && baseScore !== null ? activeScore - baseScore : null;
         const displayStep = activeStep?.step_index ?? baseStep?.step_index ?? currentStepIdx;
         return (
           <div
-            data-testid="mode3-comparison-readout"
+            data-testid="branch-comparison-panel"
             style={{
               padding: "4px 10px",
               background: "#f8f4ff",
@@ -672,13 +828,13 @@ export function ScenarioInstrumentCluster({
             </span>
             <span>
               Baseline:{" "}
-              <span data-testid="mode3-baseline-value" style={{ fontWeight: 700 }}>
+              <span data-testid="branch-value-0" style={{ fontWeight: 700 }}>
                 {baseScore !== null ? baseScore.toFixed(2) : "—"}
               </span>
             </span>
             <span>
               Branch:{" "}
-              <span data-testid="mode3-branch-value" style={{ fontWeight: 700 }}>
+              <span data-testid="branch-value-1" style={{ fontWeight: 700 }}>
                 {activeScore !== null ? activeScore.toFixed(2) : "—"}
               </span>
             </span>
@@ -694,11 +850,15 @@ export function ScenarioInstrumentCluster({
       <InstrumentCluster
         entityIds={entityIds}
         chartHeight={chartHeight}
+        entityTrajectories={entityTrajectories}
+        entityBaselineTrajectories={entityBaselineTrajectories}
+        comparisonMode={!!comparisonScenarioId}
         mdaPanel={
           <MDAAlertPanelZone1B
             columnWidth={coPrimaryWidth}
           />
         }
+        zone1bCohortSection={<CohortImpactSection isCompleted={activeScenarioDetail?.status === "completed"} />}
         pmmWidget={<PMMWidgetZone1C />}
         fourFramework={
           <FourFrameworkZone1D
@@ -709,6 +869,11 @@ export function ScenarioInstrumentCluster({
             peEnabled={activeScenarioDetail?.configuration?.modules_config?.political_economy?.enabled ?? false}
             pspValue={pspValue}
             pspTier={pspTier}
+            legitimacyValue={legitimacyValue}
+            legitimacyFloor={legitimacyFloor}
+            legitimacyDirection={legitimacyDirection}
+            eliteCaptureDirection={eliteCaptureDirection}
+            eliteCaptureQualifier={eliteCaptureQualifier}
           />
         }
         cohortPanel={
@@ -718,6 +883,18 @@ export function ScenarioInstrumentCluster({
           />
         }
       />
+
+      {/* HumanCapitalTrajectoryPanel — M16-G3 #274.
+          Rendered when projection_steps > 8 (long-run quarterly projection).
+          UX Architectural Commitment 2: in primary viewport, not in a drawer. */}
+      {(activeScenarioDetail?.configuration?.projection_steps ?? 0) > 8 && (
+        <HumanCapitalTrajectoryPanel
+          scenarioId={scenarioId}
+          projectionSteps={activeScenarioDetail!.configuration.projection_steps!}
+          entities={activeScenarioDetail?.configuration?.entities ?? entityIds ?? []}
+          currentStep={currentStep}
+        />
+      )}
 
       {/* ControlPlane — rendered in Mode 3 only (G6b, Issue #753). */}
       {mode === "MODE_3" && (

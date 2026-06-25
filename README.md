@@ -3,7 +3,7 @@
 [![CI](https://github.com/PublicEnemage/worldsim/actions/workflows/ci.yml/badge.svg)](https://github.com/PublicEnemage/worldsim/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Python 3.12](https://img.shields.io/badge/python-3.12-blue.svg)](https://www.python.org/downloads/release/python-3120/)
-[![Release](https://img.shields.io/badge/release-v0.15.0%20M15%20complete-green)](https://github.com/PublicEnemage/worldsim/releases/tag/v0.15.0)
+[![Release](https://img.shields.io/badge/release-v0.16.0%20M16%20complete-green)](https://github.com/PublicEnemage/worldsim/releases/tag/v0.16.0)
 
 **An open-source geopolitical-economic simulation platform for governments and
 vulnerable actors navigating high-stakes decisions under uncertainty.**
@@ -133,7 +133,7 @@ The working system at Milestone 15 (core components — not exhaustive):
 
 ## Development Status
 
-**Active pre-release development. Demo 5 delivered 2026-06-20. M15 complete (v0.15.0). M16 in active development.**
+**Active pre-release development. Demo 6 preparation complete 2026-06-25. M16 complete (v0.16.0). M17 in active development.**
 
 | Milestone | Status | Version | Description |
 |---|---|---|---|
@@ -154,7 +154,8 @@ The working system at Milestone 15 (core components — not exhaustive):
 | M13 — Political Economy and Instrument Credibility | ✅ Complete | v0.13.0 | ADR-013/ADR-014; political economy module; alert panel Zone 1B persistent-detail; instrument legibility; mode transition UX; Process Redesign Phases 0–D |
 | M14 — Trust Architecture and Instrument Credibility | ✅ Complete | [v0.14.0](https://github.com/PublicEnemage/worldsim/releases/tag/v0.14.0) | ADR-016 (Scenario Grounding Architecture); ADR-015 (Evidence Thread Architecture); PSP in Zone 1D; methodology foundation docs; governance; Demo 5 |
 | M15 — Human Cost Architecture | ✅ Complete | [v0.15.0](https://github.com/PublicEnemage/worldsim/releases/tag/v0.15.0) | ADR-017 Zone 1A information architecture; Layer 3 self-interpreting outputs (Zone 1B + Zone 1D); Path 1 approved source network; cohort disaggregation and political risk designs; accessibility validation |
-| M16 — Distributional Visibility | 🔧 In progress | — | Zone 1A implementation (Phase 4); cohort disaggregation on primary surface; political risk summary; live external demo (#843 — exit gate); Demo 6 |
+| M16 — Distributional Visibility | ✅ Complete | [v0.16.0](https://github.com/PublicEnemage/worldsim/releases/tag/v0.16.0) | Zone 1A Phase 4; cohort disaggregation on primary surface; political risk summary; 25-year human capital trajectory; uncertainty quantification; Demo 6 prep (Steps 1–6c; DEMO6-001–049 on record) |
+| M17 — Calibration and Comparative Infrastructure | 🔧 In progress | — | Wave 1: CM calibration (fiscal-to-cohort elasticity, governance sensitivity); Wave 2: multi-scenario (#394) + DEMO6 CRITICAL polish + adaptive y-axis extension |
 
 Full milestone history: [`CHANGELOG.md`](CHANGELOG.md). Live issue tracker:
 [GitHub Milestones](https://github.com/PublicEnemage/worldsim/milestones).

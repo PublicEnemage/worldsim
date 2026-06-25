@@ -163,28 +163,54 @@ test("AC-009: Mode 3 full component set render ≤ 100ms on throttled CPU", asyn
 
   await page.goto("/");
 
-  // Navigate to Mode 3 if available
-  const mode3Trigger = page.locator('[data-testid="mode-3-activate"]');
-  const hasMode3 = await mode3Trigger.isVisible().catch(() => false);
+  // mode3-toggle is inside {selectedScenarioId && (...)} in App.tsx — must select a
+  // scenario first. Pattern mirrors mode3-active-control.spec.ts createAndSelectScenario.
+  await page.waitForFunction(
+    () => typeof (window as Record<string, unknown>).__worldsim_selectEntity === "function",
+    { timeout: 10_000 },
+  );
+  const scenarioName = "AC-009-perf";
+  await page.getByRole("button", { name: /Scenarios/ }).click();
+  await page.locator('input[placeholder="Scenario name"]').fill(scenarioName);
+  await page.locator(".scenario-btn--create").click();
+  const row = page.locator(".scenario-row").filter({ hasText: scenarioName });
+  await expect(row).toBeVisible({ timeout: 10_000 });
+  await row.getByTitle("Select as primary scenario").click();
+  // Close Scenarios panel so mode3-toggle is the only toggle in the DOM.
+  await page.getByRole("button", { name: /Scenarios/ }).click();
 
-  if (hasMode3) {
-    await page.evaluate(() => performance.mark("mode3-start"));
-    await mode3Trigger.click();
-    await page.waitForTimeout(20);
-    await page.evaluate(() => {
-      performance.mark("mode3-end");
-      performance.measure("mode3-render", "mode3-start", "mode3-end");
+  // Mode 3 shipped M12 (PR #778). mode3-toggle is the delivered testid (App.tsx:293).
+  // Guard removed per NM-058: if mode3-toggle is absent the test must FAIL, not skip.
+  const mode3Trigger = page.locator('[data-testid="mode3-toggle"]');
+  await expect(mode3Trigger).toBeVisible({ timeout: 5_000 });
+
+  // Measurement runs entirely inside a single page.evaluate to eliminate CDP round-trip
+  // latency from the measurement window. NM-059: the prior multi-CDP approach (three
+  // separate evaluate calls with waitForTimeout between them) produced 179ms–802ms variance
+  // on CI because external queue time landed inside the measurement window. Two RAF cycles
+  // give React time to commit the synchronous state update from the programmatic click.
+  // EX-001 (docs/compliance/exceptions.md): CI throttled threshold 200ms, expiry M17 exit.
+  const renderMs = await page.evaluate(() => {
+    return new Promise<number>((resolve) => {
+      const btn = document.querySelector(
+        '[data-testid="mode3-toggle"]',
+      ) as HTMLElement;
+      performance.mark("mode3-start");
+      btn.click();
+      requestAnimationFrame(() =>
+        requestAnimationFrame(() => {
+          performance.mark("mode3-end");
+          performance.measure("mode3-render", "mode3-start", "mode3-end");
+          const m = performance.getEntriesByName("mode3-render")[0];
+          resolve(m?.duration ?? 0);
+        }),
+      );
     });
+  });
 
-    const renderMs = await page.evaluate(() => {
-      const m = performance.getEntriesByName("mode3-render")[0];
-      return m?.duration ?? null;
-    });
-
-    if (renderMs !== null) {
-      expect(renderMs).toBeLessThanOrEqual(100);
-    }
-  }
+  expect(renderMs).toBeGreaterThan(0);
+  // EX-001 (docs/compliance/exceptions.md): threshold raised 100ms → 200ms, expiry M17 exit.
+  expect(renderMs).toBeLessThanOrEqual(200);
 });
 
 // ---------------------------------------------------------------------------

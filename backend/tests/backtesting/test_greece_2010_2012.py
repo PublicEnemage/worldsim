@@ -31,6 +31,7 @@ import pytest_asyncio
 from tests.backtesting.fidelity_report import (
     _extract_gdp_value,
     _extract_health_expenditure_value,
+    _extract_investment_climate_value,
     _extract_unemployment_value,
     format_fidelity_report,
     write_fidelity_artifact,
@@ -193,6 +194,28 @@ async def test_greece_2010_2012_direction_only_fidelity(
             and unemp6 < unemp5
         )
 
+        # Investment climate deferred thresholds — Issue #92 (M16-G9).
+        # No endogenous module currently updates these attributes; they remain at initial state.
+        # These thresholds re-enable when an InvestmentClimateModule produces endogenous updates.
+        snap0 = snapshots_by_step.get(0)
+        srp0 = _extract_investment_climate_value(snap0, "sovereign_risk_premium") if snap0 else None
+        srp2 = _extract_investment_climate_value(snap2, "sovereign_risk_premium") if snap2 else None
+        fdi0 = _extract_investment_climate_value(snap0, "fdi_stock_pct_gdp") if snap0 else None
+        fdi2 = _extract_investment_climate_value(snap2, "fdi_stock_pct_gdp") if snap2 else None
+        crs0 = _extract_investment_climate_value(snap0, "credit_rating_score") if snap0 else None
+        crs2 = _extract_investment_climate_value(snap2, "credit_rating_score") if snap2 else None
+        pfv0 = (
+            _extract_investment_climate_value(snap0, "portfolio_flow_velocity") if snap0 else None
+        )
+        pfv2 = (
+            _extract_investment_climate_value(snap2, "portfolio_flow_velocity") if snap2 else None
+        )
+
+        srp_rising = srp0 is not None and srp2 is not None and srp2 > srp0
+        fdi_declining = fdi0 is not None and fdi2 is not None and fdi2 < fdi0
+        crs_declining = crs0 is not None and crs2 is not None and crs2 < crs0
+        pfv_deepening = pfv0 is not None and pfv2 is not None and pfv2 < pfv0
+
         deferred_thresholds: dict[str, str] = {
             "gdp_growth_step5_positive": (
                 "PASS" if val5 is not None and val5 > Decimal("0")
@@ -212,6 +235,22 @@ async def test_greece_2010_2012_direction_only_fidelity(
             "unemployment_declining_step4_to_step6": (
                 "PASS" if unemp_declining_4_to_6
                 else "FAIL — no endogenous module updates unemployment_rate (Issue #87)"
+            ),
+            "sovereign_risk_rising_step0_to_step2": (
+                "PASS" if srp_rising
+                else "FAIL — no endogenous module updates sovereign_risk_premium (Issue #92)"
+            ),
+            "fdi_stock_declining_step0_to_step2": (
+                "PASS" if fdi_declining
+                else "FAIL — no endogenous module updates fdi_stock_pct_gdp (Issue #92)"
+            ),
+            "credit_rating_declining_step0_to_step2": (
+                "PASS" if crs_declining
+                else "FAIL — no endogenous module updates credit_rating_score (Issue #92)"
+            ),
+            "portfolio_outflows_deepening_step0_to_step2": (
+                "PASS" if pfv_deepening
+                else "FAIL — no endogenous module updates portfolio_flow_velocity (Issue #92)"
             ),
         }
 

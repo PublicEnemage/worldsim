@@ -17,6 +17,8 @@ import {
   formatAlertText,
   truncateIndicatorName,
   buildSparklinePoints,
+  formatCohortDistance,
+  formatSourceId,
   SEVERITY_ORDER,
   FRAMEWORK_ABBREV,
 } from "../MDAAlertPanelZone1B";
@@ -325,5 +327,67 @@ describe("buildSparklinePoints: SVG polyline generation", () => {
     const firstPair = result!.split(" ")[0];
     const x = parseFloat(firstPair.split(",")[0]);
     expect(x).toBeCloseTo(padding, 0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// formatCohortDistance — dynamic floor distance label (Issue #1239 / DEMO6-010)
+// ---------------------------------------------------------------------------
+
+describe("formatCohortDistance — dynamic floor distance label", () => {
+  it("gte threshold (breachesBelow=true): returns 'X% below floor'", () => {
+    expect(formatCohortDistance("3.75", true, false)).toBe("3.75% below floor");
+  });
+
+  it("lte threshold (breachesBelow=false): returns 'X% above floor'", () => {
+    expect(formatCohortDistance("2.00", false, false)).toBe("2.00% above floor");
+  });
+
+  it("SAD case (isSad=true): returns '—' regardless of breachesBelow", () => {
+    expect(formatCohortDistance("3.75", true, true)).toBe("—");
+    expect(formatCohortDistance("2.00", false, true)).toBe("—");
+  });
+
+  it("null pct: returns '—' regardless of direction", () => {
+    expect(formatCohortDistance(null, true, false)).toBe("—");
+    expect(formatCohortDistance(null, false, false)).toBe("—");
+  });
+
+  it("zero pct: returns '0% below floor' (boundary — cohort exactly at floor)", () => {
+    expect(formatCohortDistance("0", true, false)).toBe("0% below floor");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// formatSourceId — human-readable source registry ID (Issue #DEMO6-012)
+// ---------------------------------------------------------------------------
+
+describe("formatSourceId — source registry ID to human-readable label", () => {
+  it("ECOWAS_REGIONAL_2023 → 'Ecowas Regional 2023'", () => {
+    expect(formatSourceId("ECOWAS_REGIONAL_2023")).toBe("Ecowas Regional 2023");
+  });
+
+  it("IMF_WEO_2023 → 'Imf Weo 2023'", () => {
+    expect(formatSourceId("IMF_WEO_2023")).toBe("Imf Weo 2023");
+  });
+
+  it("WORLD_BANK_WDI_2022 → 'World Bank Wdi 2022'", () => {
+    expect(formatSourceId("WORLD_BANK_WDI_2022")).toBe("World Bank Wdi 2022");
+  });
+
+  it("null → '—'", () => {
+    expect(formatSourceId(null)).toBe("—");
+  });
+
+  it("undefined → '—'", () => {
+    expect(formatSourceId(undefined)).toBe("—");
+  });
+
+  it("empty string → '—'", () => {
+    expect(formatSourceId("")).toBe("—");
+  });
+
+  it("numeric year part is preserved unchanged", () => {
+    expect(formatSourceId("V_DEM_2024")).toBe("V Dem 2024");
   });
 });

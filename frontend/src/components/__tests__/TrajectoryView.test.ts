@@ -39,6 +39,7 @@ import { describe, it, expect } from "vitest";
 import {
   computeDivergenceFill,
   getConfidenceBadgeVisible,
+  computeYDomain,
   FRAMEWORKS,
   CONNECT_NULLS,
 } from "../TrajectoryView";
@@ -413,5 +414,59 @@ describe("AC-006 — atomicity: Zustand store single-set() invariant", () => {
     useScenarioStepStore.getState().setCurrentStep(5);
 
     expect(useScenarioStepStore.getState().current_step).toBe(5);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// computeYDomain — adaptive y-axis domain (IR-001 fix)
+// ---------------------------------------------------------------------------
+
+describe("computeYDomain — adaptive y-axis domain from score values", () => {
+  it("empty array → [0, 1] fallback", () => {
+    expect(computeYDomain([])).toEqual([0, 1]);
+  });
+
+  it("all values equal — padding of 0.05 applied on each side", () => {
+    const [lo, hi] = computeYDomain([0.5, 0.5, 0.5]);
+    expect(lo).toBeCloseTo(0.45, 2);
+    expect(hi).toBeCloseTo(0.55, 2);
+  });
+
+  it("wide spread — padding is 10% of range, not flat 0.05", () => {
+    // range = 0.6, 10% = 0.06 > 0.05 → padding = 0.06
+    const [lo, hi] = computeYDomain([0.2, 0.8]);
+    expect(lo).toBeCloseTo(0.14, 1);
+    expect(hi).toBeCloseTo(0.86, 1);
+  });
+
+  it("narrow spread comparable to Demo 6 data (FIN 0.51–0.56, GOV 0.51, HD 0.24–0.25)", () => {
+    const scores = [0.5635, 0.5100, 0.2500, 0.5198, 0.5125, 0.2375];
+    const [lo, hi] = computeYDomain(scores);
+    expect(lo).toBeGreaterThanOrEqual(0);
+    expect(lo).toBeLessThan(0.24);  // padded below HD's minimum
+    expect(hi).toBeGreaterThan(0.56); // padded above FIN's maximum
+    expect(hi).toBeLessThanOrEqual(1);
+  });
+
+  it("min - padding < 0 → floor clamped to 0", () => {
+    const [lo] = computeYDomain([0.02, 0.03]);
+    expect(lo).toBeGreaterThanOrEqual(0);
+  });
+
+  it("max + padding > 1 → ceiling clamped to 1", () => {
+    const [, hi] = computeYDomain([0.97, 0.98]);
+    expect(hi).toBeLessThanOrEqual(1);
+  });
+
+  it("returns a tuple of exactly two numbers", () => {
+    const result = computeYDomain([0.3, 0.7]);
+    expect(result).toHaveLength(2);
+    expect(typeof result[0]).toBe("number");
+    expect(typeof result[1]).toBe("number");
+  });
+
+  it("lo is always ≤ hi", () => {
+    expect(computeYDomain([0.5])[0]).toBeLessThanOrEqual(computeYDomain([0.5])[1]);
+    expect(computeYDomain([0.1, 0.9])[0]).toBeLessThanOrEqual(computeYDomain([0.1, 0.9])[1]);
   });
 });
