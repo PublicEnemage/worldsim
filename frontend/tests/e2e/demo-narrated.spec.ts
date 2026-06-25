@@ -401,13 +401,14 @@ test(
       "Step two. Q2 2024. Six months into the programme. " +
       "Fiscal conditionality has begun: social spending cut by three percent of GDP. " +
       "Look at Zone one B — the alert and cohort panel. " +
-      "The cohort impact section shows: bottom quintile informal workers poverty headcount. " +
-      "Current value: approaching the recovery floor. " +
+      "The cohort impact section shows confirmed threshold entries: " +
+      "bottom quintile informal workers, bottom quintile agricultural workers — " +
+      "all four sectors in Q1 flagged CRITICAL. " +
       "The badge reads: T3 — Inferred. " +
       "The demographic weighting comes from ECOWAS comparable economy distributions. " +
-      "Tier three means the calibration is from regional comparables, not primary survey data. " +
-      "That is exactly what T3 Inferred signals. The precision of who bears the cost is visible. " +
-      "Not aggregate poverty. Not a trend. This cohort, on this trajectory.",
+      "T3 Inferred means the calibration is from regional comparables — not primary survey data. " +
+      "The poverty headcount at programme entry is below the recovery floor. " +
+      "Not aggregate poverty. Not a trend. This cohort, at this step, named with precision.",
     );
 
     // Frame A (THESIS): Zone 1B cohort impact section showing Q1 informal threshold crossing.

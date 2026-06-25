@@ -583,3 +583,146 @@ def test_multiframework_output_default_single_entity_warning_is_false() -> None:
         ia1_disclosure=IA1_CANONICAL_PHRASE,
     )
     assert obj.single_entity_warning is False
+
+
+# ---------------------------------------------------------------------------
+# CohortThresholdCrossing.breaches_below — Issue #1239 (DEMO6-010)
+# ---------------------------------------------------------------------------
+
+
+def test_cohort_threshold_crossing_schema_accepts_breaches_below_true() -> None:
+    """CohortThresholdCrossing: gte threshold — breaches_below=True (value below floor = breach)."""
+    from app.schemas import CohortThresholdCrossing
+
+    crossing = CohortThresholdCrossing(
+        quintile_key="Q1",
+        cohort_label="Bottom Quintile Informal Workers",
+        indicator_key="poverty_headcount_ratio",
+        indicator_label="Poverty Headcount Ratio",
+        severity="CRITICAL",
+        step_crossed=1,
+        above_floor_pct="3.75",
+        tier=3,
+        source="ECOWAS_REGIONAL_2023",
+        is_synthetic=True,
+        synthetic_method="regional_statistical_inference",
+        value="0.385",
+        breaches_below=True,
+    )
+    assert crossing.breaches_below is True
+
+
+def test_cohort_threshold_crossing_schema_accepts_breaches_below_false() -> None:
+    """CohortThresholdCrossing: lte threshold (future) — breaches_below=False."""
+    from app.schemas import CohortThresholdCrossing
+
+    crossing = CohortThresholdCrossing(
+        quintile_key="Q1",
+        cohort_label="Bottom Quintile",
+        indicator_key="debt_to_gdp",
+        indicator_label="Debt to GDP",
+        severity="WARNING",
+        step_crossed=3,
+        above_floor_pct="5.20",
+        tier=2,
+        source="IMF_WEO_2023",
+        is_synthetic=False,
+        synthetic_method=None,
+        value="0.852",
+        breaches_below=False,
+    )
+    assert crossing.breaches_below is False
+
+
+_SEN_GRP_ATTR = {
+    "_envelope_version": "1",
+    "value": "0.039",
+    "unit": "dimensionless",
+    "variable_type": "ratio",
+    "confidence_tier": 2,
+    "observation_date": None,
+    "source_registry_id": "IMF_WEO_2023",
+    "measurement_framework": "financial",
+}
+
+_SEN_CHT_BREACH_ATTR = {
+    "_envelope_version": "1",
+    "value": "0.385",  # below floor 0.40 → breach for gte threshold
+    "unit": "dimensionless",
+    "variable_type": "ratio",
+    "confidence_tier": 3,
+    "observation_date": None,
+    "source_registry_id": "ECOWAS_REGIONAL_2023",
+    "measurement_framework": "human_development",
+}
+
+_SEN_CHT_SAFE_ATTR = {
+    "_envelope_version": "1",
+    "value": "0.42",   # above floor 0.40 → no breach for gte threshold
+    "unit": "dimensionless",
+    "variable_type": "ratio",
+    "confidence_tier": 3,
+    "observation_date": None,
+    "source_registry_id": "ECOWAS_REGIONAL_2023",
+    "measurement_framework": "human_development",
+}
+
+_SEN_BREACH_STATE = {
+    "_envelope_version": "2",
+    "_modules_active": [],
+    "SEN": {"gdp_growth": _SEN_GRP_ATTR},
+    "SEN:CHT:1-25-54-INFORMAL": {"poverty_headcount_ratio": _SEN_CHT_BREACH_ATTR},
+}
+
+_SEN_SAFE_STATE = {
+    "_envelope_version": "2",
+    "_modules_active": [],
+    "SEN": {"gdp_growth": _SEN_GRP_ATTR},
+    "SEN:CHT:1-25-54-INFORMAL": {"poverty_headcount_ratio": _SEN_CHT_SAFE_ATTR},
+}
+
+
+def _make_sen_conn(state: dict, fetchval_return: int | None) -> AsyncMock:
+    conn = _make_conn(
+        {"scenario_id": "scen-sen"},
+        _snap_row(state=state),
+        _entity_row("Senegal"),
+    )
+
+    async def _fetch_side_effect(query: str, *_args: object) -> list[dict]:
+        if "mda_thresholds" in query:
+            return [
+                {
+                    "indicator_key": "poverty_headcount_ratio",
+                    "floor_value": "0.40",
+                    "comparison_operator": "gte",
+                }
+            ]
+        return []  # ecological boundary constants and any other fetch
+
+    conn.fetch = AsyncMock(side_effect=_fetch_side_effect)
+    conn.fetchval = AsyncMock(return_value=fetchval_return)
+    return conn
+
+
+@pytest.mark.asyncio
+async def test_gte_threshold_crossing_sets_breaches_below_true() -> None:
+    """get_measurement_output: gte threshold crossing emits breaches_below=True."""
+    conn = _make_sen_conn(_SEN_BREACH_STATE, fetchval_return=1)
+    result = await get_measurement_output(
+        scenario_id="scen-sen", entity_id="SEN", step=2, conn=conn
+    )
+    hd = result.outputs["human_development"]
+    assert len(hd.cohort_threshold_crossings) == 1
+    assert hd.cohort_threshold_crossings[0].breaches_below is True
+
+
+@pytest.mark.asyncio
+async def test_value_above_floor_emits_no_crossing() -> None:
+    """get_measurement_output: cohort value at or above gte floor emits no crossing."""
+    conn = _make_sen_conn(_SEN_SAFE_STATE, fetchval_return=None)
+    result = await get_measurement_output(
+        scenario_id="scen-sen", entity_id="SEN", step=2, conn=conn
+    )
+    hd = result.outputs["human_development"]
+    assert len(hd.cohort_threshold_crossings) == 0
