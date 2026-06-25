@@ -175,14 +175,14 @@ The intent document for #394 Phase 3 must specify, at minimum:
 
 | Deliverable | ADR reference | Intent document path | Filed? |
 |---|---|---|---|
-| #394 — Multi-scenario comparison (N>2), Phase 3 implementation | TBD (Phase 2 output) | `docs/process/intents/M17-G2-{YYYY-MM-DD}-multi-scenario-comparison.md` | **No — BLOCKING** |
+| #394 — Multi-scenario comparison (N>2), Phase 3 implementation | option (b) — review note on #394 | `docs/process/intents/M17-G2-2026-06-25-multi-scenario-comparison.md` | **✅ FILED 2026-06-25** |
 
 ### 2.4 — QA test authorship gate
 
 *QA tests must be authored from the intent document's acceptance criteria BEFORE implementation
 code is written. The test file must be on record before the implementing agent begins.*
 
-- [ ] **QA test gate: PENDING** — cannot be authored until the intent document is filed
+- [x] **QA test gate: COMPLETE 2026-06-25** — `frontend/tests/e2e/m17-g2-multi-scenario-comparison.spec.ts` filed; AC-S1, AC-A1, AC-B1, AC-D1, AC-P1/P3/P5 all asserted; guard pattern applied (hard-fail once implementation lands)
 
 **QA test file requirements (to be satisfied at filing):**
 
@@ -407,16 +407,20 @@ traceability to the G1 exit PI Agent confirmation (m17-g1-sprint-exit.md §Secti
 
 ## EL Approval Record
 
-**EL approval:** Pending — Phase 1 + Phase 2 COMPLETE (BPO ACCEPT 2026-06-25); ADR gate CLEAR;
-remaining blocking items: §2.3 intent document + §2.4 QA test file
+**EL approval:** READY FOR EL REVIEW — all four preconditions satisfied 2026-06-25
 
-*Updated 2026-06-25: Conditions (1) and (2) are now satisfied:*
+*All sprint entry preconditions confirmed:*
 *(1) G2 Phase 1 complete + BPO ACCEPT 2026-06-25 (#394#issuecomment-4803977557)*
-*(2) G2 Phase 2 Architect assessment filed 2026-06-25 (PR #1280; ADR option (b) — review note on #394)*
-*Remaining before EL approval:*
-*(3) Intent document filed at `docs/process/intents/M17-G2-{date}-multi-scenario-comparison.md`*
-*(4) QA test file `frontend/tests/e2e/m17-g2-multi-scenario-comparison.spec.ts` authored and on record*
-*Note: §2.1 #1249 merge required before Phase 3 PR opens but does not block EL approval of this entry.*
+*(2) G2 Phase 2 Architect assessment filed 2026-06-25 (ADR option (b) — review note on #394;*
+*    #394#issuecomment-4804024195)*
+*(3) Intent document filed 2026-06-25:*
+*    `docs/process/intents/M17-G2-2026-06-25-multi-scenario-comparison.md`*
+*(4) QA test file filed 2026-06-25:*
+*    `frontend/tests/e2e/m17-g2-multi-scenario-comparison.spec.ts`*
+*    (AC-S1, AC-A1, AC-B1, AC-D1, AC-P1/P3/P5 asserted; guard pattern applied)*
 
-> {EL approval statement — to be filled at approval time, once §2.3 + §2.4 confirmed}
+*Note: §2.1 #1249 merge required before Phase 3 implementation PR opens — does not*
+*block EL approval of this sprint entry.*
+
+> {EL approval statement — to be filled at approval time}
 > — @PublicEnemage ({date})
