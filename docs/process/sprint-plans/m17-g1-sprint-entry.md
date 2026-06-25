@@ -90,12 +90,12 @@ governance sensitivity specification is both the deliverable and the intent equi
 be filed before any Wave 2 implementation work on governance calibration opens. No code change
 is required in Wave 1 for #1248.
 
-- [ ] CM calibration decision document filed before #1229 implementation PR opens (gate: PENDING — document authored during G1 work; this entry records the precondition)
+- [x] CM calibration decision document filed before #1229 implementation PR opens (gate: SATISFIED 2026-06-25 — `docs/calibration/m17-g1-elasticity-calibration-decision.md` committed on feat/m17-g1-calibration-decision; PR #1268 merged)
 - [x] #1248 governance sensitivity specification: document-only deliverable for Wave 1; intent gate not applicable to specification documents
 
 | Deliverable | ADR reference | Intent document equivalent | Gate |
 |---|---|---|---|
-| #1229 — ELASTICITY_REGISTRY calibration | N/A | CM calibration decision document (to be filed by CM before implementation PR) | PENDING — filed during G1 work |
+| #1229 — ELASTICITY_REGISTRY calibration | N/A | CM calibration decision document (filed 2026-06-25, PR #1268) | SATISFIED — implementation PR open |
 | #1248 — Governance sensitivity specification | N/A | The specification document IS the deliverable — no separate intent document | CLEAR — document-only deliverable |
 
 ### 2.4 — QA test authorship gate
