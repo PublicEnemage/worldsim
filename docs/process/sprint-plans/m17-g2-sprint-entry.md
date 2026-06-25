@@ -51,10 +51,10 @@ on this entry document's filing.*
 
 | Prerequisite | Owner | Status |
 |---|---|---|
-| G2 Phase 1 complete: UX journeys (Journey 1–3), use stories, N>2 zone layout — **UX mockups required at minimum; UI mockups required if feasible** | Design Thinking + UX Designer + Customer Agent | ⬜ NOT STARTED |
-| G2 Phase 1 design artifact panel review: UX mockups (and UI mockups if produced) reviewed and approved by the Phase 1 design panel before BPO acceptance | UX Designer (R) + Design Thinking + Customer Agent + Frontend Architect + Business PO | ⬜ PENDING Phase 1 artifacts |
-| G2 Phase 1 BPO acceptance: BPO accepts Phase 1 design output (use stories + journeys + approved mockups) | Business PO | ⬜ PENDING panel review |
-| G2 Phase 2 complete: Architect assesses ARCH-REVIEW-007 with UX in hand; ADR determination | Architect + Frontend Architect | ⬜ PENDING Phase 1 BPO |
+| G2 Phase 1 complete: UX journeys (Journey 1–3), use stories, N>2 zone layout — **UX mockups required at minimum; UI mockups required if feasible** | Design Thinking + UX Designer + Customer Agent | ✅ COMPLETE 2026-06-25 — PR #1280 merged; `ux-journeys-n3.md` + `persona-mvs-n3.md` on release/m17 |
+| G2 Phase 1 design artifact panel review: UX mockups (and UI mockups if produced) reviewed and approved by the Phase 1 design panel before BPO acceptance | UX Designer (R) + Design Thinking + Customer Agent + Frontend Architect + Business PO | ✅ COMPLETE 2026-06-25 — 4/4 PASS; panel summary comment #394#issuecomment-4803973123; UX mockups sufficient (no UI mockup conditions triggered) |
+| G2 Phase 1 BPO acceptance: BPO accepts Phase 1 design output (use stories + journeys + approved mockups) | Business PO | ✅ BPO ACCEPT 2026-06-25 — #394#issuecomment-4803977557; AC-1–AC-10 all satisfied; Phase 3 fixture-based approach accepted |
+| G2 Phase 2 complete: Architect assesses ARCH-REVIEW-007 with UX in hand; ADR determination | Architect + Frontend Architect | ✅ COMPLETE 2026-06-25 — PR #1280 merged; `ARCH-REVIEW-007-m17-n3-assessment.md`; ADR determination option (b): review note on #394 sufficient; no new ADR |
 | Intent document filed for #394 implementation (must reference approved mockups) | PM Agent + UX Designer | ⬜ PENDING Phase 1/2 |
 | QA test file authored before implementation begins | QA Lead | ⬜ PENDING intent document |
 | #1249 merged to `release/m17` | G4 sprint group | ⬜ PENDING G4 |
@@ -105,16 +105,17 @@ architectural decision. The existing `threshold_crossings` field was delivered i
 the question is whether the per-scenario extension is a data contract change that requires a
 formal ADR. This is also resolved in Phase 2.
 
-- [ ] **ADR prerequisite gate: PENDING** — Architect Phase 2 assessment required; cannot be
-  resolved until Phase 1 UX journeys are produced and BPO-accepted
+- [x] **ADR prerequisite gate: CLEAR** — Architect Phase 2 assessment filed 2026-06-25
+  (`docs/architecture/reviews/ARCH-REVIEW-007-m17-n3-assessment.md`, PR #1280);
+  ADR determination: option (b) — review note on #394 sufficient; no new ADR required
 
 **ADR prerequisite status (at filing; to be updated at Phase 2 completion):**
 
 | Group | Required ADR | ADR status | Gate |
 |---|---|---|---|
-| G2 Phase 3 — #394 (Zone 1A N>2 rendering) | Path A: ARCH-012 / Path B: review note on #394 | Pending Phase 2 determination | **PENDING — BLOCKING** |
-| G2 Phase 3 — #394 (Zone 1B per-scenario threshold crossings) | Pending Phase 2 assessment | Pending Phase 2 determination | **PENDING** |
-| G2 Phase 3 — #394 (Zone 1D per-scenario PSP) | Client-side store extension, likely no ADR | Pending Phase 2 assessment | **PENDING** |
+| G2 Phase 3 — #394 (Zone 1A N>2 rendering) | Path B: review note on #394 | **CLEAR 2026-06-25** — compare-mode overlay only; no composite_score path change | **CLEAR** |
+| G2 Phase 3 — #394 (Zone 1B per-scenario threshold crossings) | No ADR — client-side composition from N parallel trajectory fetches | **CLEAR 2026-06-25** — no new endpoint; no API contract change | **CLEAR** |
+| G2 Phase 3 — #394 (Zone 1D per-scenario PSP) | No ADR — client-side store extension | **CLEAR 2026-06-25** — PSP field already in trajectory response | **CLEAR** |
 
 *These entries must be updated to CLEAR or BLOCKED_ADR before EL approval of this entry.*
 
@@ -293,8 +294,10 @@ all panel verdicts are PASS (or the rejecting agent explicitly marks their conce
 after revision). A BPO acceptance issued without all panel verdicts on record is non-compliant
 and the PI Agent blocks Phase 2 from opening.
 
-- [ ] **Phase 1 design artifact panel review: PENDING** — artifacts not yet produced; panel
-  cannot convene until UX mockups for all three journeys at both viewports are filed on #394
+- [x] **Phase 1 design artifact panel review: COMPLETE 2026-06-25** — 4/4 PASS verdicts
+  (UX Designer, Design Thinking Agent, Customer Agent, Frontend Architect); panel summary
+  comment: #394#issuecomment-4803973123; UI mockups not required (no triggering conditions
+  met); BPO ACCEPT: #394#issuecomment-4803977557; AC-1–AC-10 all satisfied
 
 ---
 
@@ -346,9 +349,9 @@ this entry can be EL-approved.*
 
 | Group | ADR required | ADR status | Implementation may begin? |
 |---|---|---|---|
-| G2 Phase 3 — #394 (Zone 1A N>2 rendering path) | Path A (ARCH-012 or ARCH-013) or Path B (review note) | **PENDING Phase 2 determination** | **No — awaiting Architect Phase 2 output** |
-| G2 Phase 3 — #394 (Zone 1B per-scenario crossings) | Pending Phase 2 assessment | **PENDING Phase 2 determination** | **No — awaiting Architect Phase 2 output** |
-| G2 Phase 3 — #394 (Zone 1D per-scenario PSP) | Client-side store extension likely requires no ADR | **PENDING Phase 2 assessment** | **No — awaiting Architect Phase 2 output** |
+| G2 Phase 3 — #394 (Zone 1A N>2 rendering path) | Path B — review note on #394 | **CLEAR 2026-06-25** — overlay extension only; no ADR | **Yes — pending intent doc + QA test** |
+| G2 Phase 3 — #394 (Zone 1B per-scenario crossings) | No ADR — client-side composition | **CLEAR 2026-06-25** — N parallel trajectory fetches; no endpoint change | **Yes — pending intent doc + QA test** |
+| G2 Phase 3 — #394 (Zone 1D per-scenario PSP) | No ADR — client-side store extension | **CLEAR 2026-06-25** — PSP in existing response | **Yes — pending intent doc + QA test** |
 
 **Phase 2 Architect output required before EL approval:**
 
@@ -404,13 +407,16 @@ traceability to the G1 exit PI Agent confirmation (m17-g1-sprint-exit.md §Secti
 
 ## EL Approval Record
 
-**EL approval:** Pending — entry filed as draft; all PENDING conditions above must be resolved before EL approval is requested
+**EL approval:** Pending — Phase 1 + Phase 2 COMPLETE (BPO ACCEPT 2026-06-25); ADR gate CLEAR;
+remaining blocking items: §2.3 intent document + §2.4 QA test file
 
-*EL approval may not be granted until all §2.2, §2.3, and §2.4 PENDING items are checked.
-Specifically: (1) G2 Phase 1 output (UX journeys, use stories, wireframes) is complete and
-BPO-accepted; (2) G2 Phase 2 Architect determination is filed on #394 (ADR scope resolved);
-(3) Intent document is filed at `docs/process/intents/M17-G2-{date}-multi-scenario-comparison.md`;
-(4) QA test file `frontend/tests/e2e/m17-g2-multi-scenario-comparison.spec.ts` is authored and on record.*
+*Updated 2026-06-25: Conditions (1) and (2) are now satisfied:*
+*(1) G2 Phase 1 complete + BPO ACCEPT 2026-06-25 (#394#issuecomment-4803977557)*
+*(2) G2 Phase 2 Architect assessment filed 2026-06-25 (PR #1280; ADR option (b) — review note on #394)*
+*Remaining before EL approval:*
+*(3) Intent document filed at `docs/process/intents/M17-G2-{date}-multi-scenario-comparison.md`*
+*(4) QA test file `frontend/tests/e2e/m17-g2-multi-scenario-comparison.spec.ts` authored and on record*
+*Note: §2.1 #1249 merge required before Phase 3 PR opens but does not block EL approval of this entry.*
 
-> {EL approval statement — to be filled at approval time, once all PENDING conditions confirmed}
+> {EL approval statement — to be filled at approval time, once §2.3 + §2.4 confirmed}
 > — @PublicEnemage ({date})
