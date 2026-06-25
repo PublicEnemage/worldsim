@@ -310,8 +310,10 @@ entry existence can be asserted in a separate unit test in the same file), AC-5 
 confirmed before push, not by the test itself).
 
 **QA Lead acknowledgment:**
-`[ ]` CM (QA Lead): FRAME-D test for AC-1 authored and filed before implementation PR opens.
-      Date: [pending CM calibration decision document — to be filled when test is filed]
+`[x]` CM (QA Lead): FRAME-D test for AC-1 authored and filed before implementation PR opens.
+      Date: 2026-06-25 — `backend/tests/test_m17_g1_frame_d_calibration.py`; 12 tests;
+      ruff + mypy clean; red-before-implementation confirmed (7 fail on pre-revision constants,
+      5 pass on calibration-independent invariants).
 
 ---
 
