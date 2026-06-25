@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-25 (M16 exit ceremony complete — M16 FORMALLY CLOSED; v0.16.0; #985 closed; GitHub Milestone 17 closed; M17 Calibration and Comparative Infrastructure now current)**
+**Last updated: 2026-06-25 (HORIZON sweep complete; M17 kickoff — release/m17 cut; m17-sprint-plan.md filed; EL approval pending)**
 **Current milestone:** M17 — Calibration and Comparative Infrastructure (GitHub Milestone 18)
 **Previous milestone:** M16 — Distributional Visibility (FORMALLY CLOSED 2026-06-25; release/m16 → main; v0.16.0; #985 closed; GitHub Milestone 17 closed)
 
@@ -13,21 +13,42 @@
 
 ## M17 Kickoff Prerequisites
 
-**Release branch:** `release/m17` — ⬜ NOT YET CUT (EL must merge release/m16 → main first, then PM Agent cuts release/m17 from main)
-**Sprint plan:** ⬜ NOT YET FILED — `docs/process/sprint-plans/m17-sprint-plan.md` (PM Agent authors at kickoff)
+**Release branch:** `release/m17` — ✅ CUT 2026-06-25 from `main` at commit d806957
+**Sprint plan:** ✅ FILED 2026-06-25 — `docs/process/sprint-plans/m17-sprint-plan.md` (PR pending EL approval)
 
 | Step | Status | Notes |
 |---|---|---|
-| 1. EL merges `release/m16` → `main` (admin bypass) | ⬜ PENDING EL ACTION | EL merges the release branch; Claude Code does not do this merge |
-| 2. PM Agent cuts `release/m17` from updated `main` | ⬜ PENDING | After step 1 completes |
-| 3. PM Agent authors `m17-sprint-plan.md` with Wave 1/Wave 2 structure | ⬜ PENDING | Wave 1 = CM calibration sprint; hard gate before Wave 2 |
+| 1. EL merges `release/m16` → `main` (admin bypass) | ✅ DONE 2026-06-25 | PR #1259 merged |
+| 2. PM Agent cuts `release/m17` from updated `main` | ✅ DONE 2026-06-25 | `release/m17` cut at commit d806957 |
+| 3. PM Agent authors `m17-sprint-plan.md` with Wave 1/Wave 2 structure | ✅ DONE 2026-06-25 | Wave 1 = CM calibration sprint; Wave 2 = DEMO6 CRITICAL + comparative infrastructure; hard gate between waves |
 | 4. EL approves sprint plan | ⬜ PENDING | EL must approve before any sprint entry may open |
 | 5. #982 exit checklist confirmed as M17 gate issue | ✅ DONE 2026-06-25 | Renamed to "M17 Exit Checklist — blocks milestone closure"; assigned to GitHub Milestone 18 |
-| 6. Wave 1 sprint entry (G1) may open after sprint plan EL-approved | ⬜ PENDING | CM must be activated; #1229 and #1248 are G1 scope |
+| 6. Wave 1 sprint entry (G1) may open after sprint plan EL-approved | ⬜ PENDING | CM must be activated on #1229 and #1248 before G1 sprint entry is filed |
 
-**Critical prerequisite: M17 Wave 2 may not begin until Wave 1 exits.** Wave 1 exit gate: FRAME-D milestone sentence fires within an 8-step programme window on the Demo 6 Senegal scenario after the elasticity calibration change. DemographicModule ELASTICITY_REGISTRY updated with CM-certified values.
+**Critical prerequisite: M17 Wave 2 may not begin until Wave 1 exits.** Wave 1 exit gate: FRAME-D milestone sentence fires within an 8-step programme window on the Demo 6 Senegal scenario after the elasticity calibration change. DemographicModule ELASTICITY_REGISTRY updated with CM-certified values. Governance calibration specification on record.
 
-Implementation is NOT yet unblocked. Steps 1–4 above must complete first.
+Implementation is NOT yet unblocked. Step 4 (EL sprint plan approval) must complete first.
+
+---
+
+## Open Issues — M17 (Calibration and Comparative Infrastructure)
+
+**GitHub Milestone:** 18 | **Created:** 2026-06-25 | **Status:** Kickoff in progress — sprint plan filed, EL approval pending; implementation NOT yet unblocked
+
+| Issue | Title | Group | Wave | Notes |
+|---|---|---|---|---|
+| #982 | M17 Exit Checklist — blocks milestone closure | — | — | `immediate \| M17 gate issue` — renamed 2026-06-25 |
+| #843 | plan: live stakeholder demo with real external participants | G8/M18 | — | **DEFERRED TO M18/Demo 7** — depends on Mode 3 (M18 north star); DEMO6 findings are specification foundation |
+| #1229 | feat(simulation): fiscal-to-cohort elasticity calibration — DemographicModule ELASTICITY_REGISTRY | G1 | Wave 1 | CM-owned; Wave 1 entry gate for entire milestone; FRAME-D exit condition |
+| #1248 | feat(simulation): governance sensitivity calibration — GovernanceModule fiscal conditionality | G1 | Wave 1 | CM-owned; specification may precede implementation; does not block Wave 1 exit if spec on record |
+| #394 | feat: multi-scenario comparison (>2 scenarios) | G2 | Wave 2 | Architect ARCH-REVIEW-007 N≤2 constraint assessment required at sprint entry; Demo 7 Act 2 (Zambia three-scenario) |
+| #1252 | ux(zone-1b): Zone 1B proportional allocation — MDA alert vs cohort sections | G3 | Wave 2 | ADR required before implementation (ADR-017 amendment or new ADR); `minHeight: 80px` temporary guarantee active |
+| #1249 | ux(zone-1a): DEMO6-014 curve identifiability — terminal labels or line style | G4 | Wave 2 | DEMO6 CRITICAL; required before live demo session scheduled |
+| #1250 | ux(zone-1b): DEMO6-026/043 tablet legibility at 768px | G4 | Wave 2 | DEMO6 CRITICAL; required before live demo session scheduled |
+| #1253 | ux(zone-1d): DEMO6-040 PSP historical precedent anchor | G4 | Wave 2 | DEMO6 CRITICAL; required before live demo session scheduled |
+| #1251 | ux(zone-1a): adaptive y-axis extension audit — other instruments | G5 | Wave 2 | Capacity-allowing after G4; `computeYDomain()` pattern extension |
+
+**M17 sprint plan:** `docs/process/sprint-plans/m17-sprint-plan.md` — filed 2026-06-25; **EL approval pending (step 4)**
 
 ---
 
