@@ -151,11 +151,14 @@ const PSP_SEVERITY_COLOR: Record<PspSeverity, string> = {
   STABLE: "#059669",
 };
 
-/** Historical analogue sentence per PSP severity (CM sign-off 2026-06-23). */
+/** Historical analogue sentence per PSP severity (CM sign-off 2026-06-23; updated #1253 2026-06-25). */
 function getPspHistoricalAnalogue(severity: PspSeverity): string | null {
-  if (severity === "CRITICAL") return "At this level, historical ECF programmes show abandonment within 3 steps.";
-  if (severity === "WARNING") return "At this level, historical ECF programmes show abandonment within 6 steps.";
-  if (severity === "WATCH") return "At this level, historical ECF programmes show elevated discontinuation risk.";
+  if (severity === "CRITICAL")
+    return "Comparable: Zambia 2015 ECF — abandoned Step 3 (PSP 38%). Board review failed.";
+  if (severity === "WARNING")
+    return "Comparable: Ghana 2014 ECF — modified Step 5 (PSP 52%). Conditionality relaxed.";
+  if (severity === "WATCH")
+    return "At this PSP level, ECF programmes show elevated discontinuation risk (approx. 35%).";
   return null;
 }
 

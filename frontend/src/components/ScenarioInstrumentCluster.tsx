@@ -154,6 +154,7 @@ interface RawCohortThresholdCrossing {
   is_synthetic?: boolean;
   synthetic_method?: "STRUCTURAL_ABSENCE" | "SYNTHETIC_COMPARABLE" | "SYNTHETIC_MODEL" | null;
   value?: string | null;
+  breaches_below?: boolean;
 }
 
 interface RawFrameworkOutputForAlerts {
@@ -533,6 +534,7 @@ export function ScenarioInstrumentCluster({
           is_synthetic: c.is_synthetic,
           synthetic_method: c.synthetic_method,
           value: c.value,
+          breaches_below: c.breaches_below,
         }));
         store.setCohortThresholdCrossings(parsedCrossings);
 
