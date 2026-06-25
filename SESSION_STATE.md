@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-25 (G8 Steps 6/6b/6c complete — IR-001 adaptive y-axis fix PR #1243; Step 6c audience simulation PR #1244; north star gate CONDITIONAL PASS; DEMO6-014–049 filed; Step 8 triage next; Step 9 CONDITIONAL on 4 CRITICAL findings + Frame D EL decision)**
+**Last updated: 2026-06-25 (EL decision: #843 live demo deferred to M17/Demo 7 — DEMO6 findings addressed holistically in M17/M18; M16 closes on distributional visibility delivery; G8 closes as preparatory work complete; M16 exit ceremony next)**
 **Current milestone:** M16 — Distributional Visibility (GitHub Milestone 17)
 **Previous milestone:** M15 — Human Cost Architecture (FORMALLY CLOSED 2026-06-23; release/m15 → main PR #1142; v0.15.0; #984 closed; GitHub Milestone 16 closed)
 
@@ -106,13 +106,13 @@ Implementation is now unblocked. A sprint entry document must be filed and EL-ap
 
 ## Open Issues — M16 (Distributional Visibility)
 
-**GitHub Milestone:** 17 | **Created:** 2026-06-23 | **Status:** G1 COMPLETE 2026-06-23; **G2 COMPLETE 2026-06-24**; **G3 COMPLETE 2026-06-24**; **G4 COMPLETE 2026-06-24** (PRs #1182/#1187/#1190; all ACs PASS incl AC-EE-1; sprint exit pi-confirmed: true; #22 + #102 + #275 CLOSED); G5 CLOSED 2026-06-23; **G6 COMPLETE 2026-06-24** (PRs #1211–#1213/#1215–#1216; VC-1–VC-4 PASS; MV-002 50.5ms PASS; NM-058/059/060 + EX-001 filed; #569 CLOSED; #1217 filed); **G9 COMPLETE 2026-06-24** (PRs #1201/#1202/#1204/#1205; all four issues closed; sprint exit pi-confirmed: true); **G10 COMPLETE 2026-06-24** (PR #1199; all 11 ACs PASS; #1162/#1177/#1178/#1179/#1184 CLOSED; sprint exit pi-confirmed: true; **fresh-session BPO ACCEPT + PI Agent confirmation 2026-06-24**; NM-057 filed) | **G8 IN PROGRESS** — sprint entry EL-approved 2026-06-24; **Steps 1–6c complete 2026-06-25**; IR-001 adaptive y-axis fix PR #1243; Step 6c audience simulation PR #1244; north star gate CONDITIONAL PASS; DEMO6-014–049; Step 8 triage next; Step 9 pending 4 CRITICAL findings + Frame D EL decision
+**GitHub Milestone:** 17 | **Created:** 2026-06-23 | **Status:** G1 COMPLETE 2026-06-23; **G2 COMPLETE 2026-06-24**; **G3 COMPLETE 2026-06-24**; **G4 COMPLETE 2026-06-24** (PRs #1182/#1187/#1190; all ACs PASS incl AC-EE-1; sprint exit pi-confirmed: true; #22 + #102 + #275 CLOSED); G5 CLOSED 2026-06-23; **G6 COMPLETE 2026-06-24** (PRs #1211–#1213/#1215–#1216; VC-1–VC-4 PASS; MV-002 50.5ms PASS; NM-058/059/060 + EX-001 filed; #569 CLOSED; #1217 filed); **G9 COMPLETE 2026-06-24** (PRs #1201/#1202/#1204/#1205; all four issues closed; sprint exit pi-confirmed: true); **G10 COMPLETE 2026-06-24** (PR #1199; all 11 ACs PASS; #1162/#1177/#1178/#1179/#1184 CLOSED; sprint exit pi-confirmed: true; **fresh-session BPO ACCEPT + PI Agent confirmation 2026-06-24**; NM-057 filed) | **G8 COMPLETE 2026-06-25** — Steps 1–6c delivered; #843 deferred to M17/Demo 7 (EL decision 2026-06-25); DEMO6-001–049 findings on record as Demo 7 specification; M16 exit ceremony ready
 *Zone 1A Phase 4 + cohort disaggregation + political risk surface + live external demo (#843 — exit gate). Demo 6 (Senegalese Finance Minister scenario).*
 
 | Issue | Title | Group | Notes |
 |---|---|---|---|
 | #985 | M16 Exit Checklist — blocks milestone closure | — | `immediate \| M16 gate issue` — renamed 2026-06-23 |
-| #843 | plan: live stakeholder demo with real external participants | G8 | **M16 exit gate** — deferred from M15 (EL decision 2026-06-23); Step 9 CONDITIONAL PASS pending 4 CRITICAL findings + Frame D EL decision |
+| #843 | plan: live stakeholder demo with real external participants | G8 | **DEFERRED TO M17/Demo 7 (EL decision 2026-06-25)** — DEMO6 findings addressed holistically in M17/M18 alongside Mode 3; no longer M16 exit gate |
 | #986 ✅ | feat(ux): cohort disaggregation on primary surface | G2 | ✅ BPO ACCEPT 2026-06-24 — PR #1173; Customer Agent Layer 3 PASS (Persona 2); 209/209 E2E; issue closed 2026-06-24 |
 | #987 ✅ | feat(ux): political risk summary surface (Persona 3) | G2 | ✅ BPO ACCEPT 2026-06-24 — PR #1173; Customer Agent Layer 3 PASS (Persona 3); issue closed 2026-06-24 |
 | #1163 ✅ | ux(zone-1d): PSP threshold anchor — absolute PSP level legibility for Persona 3 | G2 | ✅ CLOSED 2026-06-24 — resolved by #987 PSP severity-labeled display (CRITICAL/WARNING/WATCH/STABLE); closed as consequence of PR #1173 merge |
@@ -198,8 +198,7 @@ Implementation is now unblocked. A sprint entry document must be filed and EL-ap
 - ✅ **G8 IR-001 adaptive y-axis fix PR #1243 merged 2026-06-25** — `computeYDomain()` pure function added + exported; both recharts and CompositeChartSVG render paths updated; 7 new unit tests (all 31 pass); frontend build gate ✅; M17 governance calibration finding filed to insights-log (GOV barely responds to fiscal conditionality across 8 steps)
 - ✅ **G8 Step 6 screenshots re-captured 2026-06-25** — five frames in `docs/demo/m16/screenshots/`; FIN/GOV curves now visually distinct after adaptive y-axis fix; FRAME-D WARNING remains (pre-existing calibration gap, M17 scope)
 - ✅ **G8 Step 6c audience simulation PR #1244 merged 2026-06-25** — `docs/demo/m16/reviews/2026-06-25-v0.16.0-audience-simulation.md`; four persona agents (P1/P2/P3/P5); 36 findings DEMO6-014 through DEMO6-049 (4 CRITICAL / 11 HIGH / 13 MEDIUM / 5 LOW); **north star gate: CONDITIONAL PASS**; primary finding sentence on record; three mandatory presenter preparation items before Step 9
-- ⬜ **G8 Step 8 — DEMO6 issue triage** — PM Agent triage of DEMO6-014–049 findings; CRITICAL findings must be resolved before Step 9; EL decisions required on Frame D scope (milestone sentence fires or walkthrough revised)
-- ⬜ **G8 Step 9 — live stakeholder demo** — BLOCKED on: (1) four CRITICAL findings addressed; (2) Frame D EL scope decision; (3) Persona 5 north star CONDITIONAL PASS mandatory items confirmed; (4) EL merges `release/m16` → `main`
+- ✅ **G8 CLOSES — preparatory work complete (EL decision 2026-06-25)** — Steps 1–6c delivered: demo scripts, walkthrough, narrated spec, screenshots, internal review, IR review, adaptive y-axis fix, audience simulation (DEMO6-001–049). Step 9 (live demo) deferred to M17/Demo 7 per EL decision. DEMO6 findings are the specification foundation for Demo 7 in M17. #843 moved to M17. M16 exit gate is now distributional visibility delivery (G1–G4/G6/G9/G10), not #843.
 
 ---
 
