@@ -21,9 +21,12 @@
  *   - MDA-HD-POVERTY-Q1 floor (≥ 0.40); recovery_horizon_years=10 → "a decade or more"
  *   - No MDA-HD-POVERTY-Q2 floor — Q2 cannot trigger milestone sentence
  *
- * NM-056 rule: NO test.skip() or conditional skip patterns. Pre-implementation
- * guard pattern: guard on primary testid → isVisible() returns false → return
- * without asserting (no-op, not a pass). Guards use .catch(() => false).
+ * NM-061 fix (M17-G5 #1220): createSen100StepScenario() creates the scenario via API
+ * but does not select it in the UI. HumanCapitalTrajectoryPanel renders only when
+ * (activeScenarioDetail?.configuration?.projection_steps ?? 0) > 8, which requires
+ * a UI-selected scenario. All tests now use createAndSelectSenProjection() or
+ * createAndSelectZmbScenario() to select the scenario before checking panel visibility.
+ * No soft-skip patterns remain (NM-056 + NM-061 guards applied).
  *
  * AC coverage:
  *   AC-F1   Projection panel visible in primary viewport without drawer
@@ -50,6 +53,9 @@ import { test, expect } from "@playwright/test";
 
 const API_BASE = "http://localhost:8000/api/v1";
 
+const _SEN_SCENARIO_NAME = "M16-G3 E2E — SEN 25-year projection";
+const _ZMB_SCENARIO_NAME = "M16-G3 E2E — ZMB 8-step non-regression";
+
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
@@ -71,7 +77,7 @@ async function waitForAppReady(page: import("@playwright/test").Page): Promise<v
 
 /**
  * Create a SEN scenario with projection_steps=100, run it to completion.
- * Returns scenario_id or throws on failure.
+ * Returns scenario_id or null if backend rejects projection_steps.
  *
  * Synthetic SEN initial attributes (Tier 3 — CE Assessment Decision 3).
  * Fires gdp_growth_change at step 1 to trigger DemographicModule elasticity path.
@@ -81,7 +87,7 @@ async function createSen100StepScenario(): Promise<string | null> {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      name: "M16-G3 E2E — SEN 25-year projection",
+      name: _SEN_SCENARIO_NAME,
       configuration: {
         entities: ["SEN"],
         n_steps: 8,
@@ -124,8 +130,6 @@ async function createSen100StepScenario(): Promise<string | null> {
       ],
     }),
   });
-  // Pre-implementation guard: if the backend does not yet accept projection_steps,
-  // the create or run will fail (422 / 500). Return null so callers can no-op.
   if (!createRes.ok) return null;
   const { scenario_id } = (await createRes.json()) as ScenarioCreateResponse;
 
@@ -145,7 +149,7 @@ async function createZmb8StepScenario(): Promise<string> {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      name: "M16-G3 E2E — ZMB 8-step non-regression",
+      name: _ZMB_SCENARIO_NAME,
       configuration: { entities: ["ZMB"], n_steps: 8, timestep_label: "annual", start_date: "2023-01-01" },
       scheduled_inputs: [],
     }),
@@ -163,6 +167,51 @@ async function createZmb8StepScenario(): Promise<string> {
   return scenario_id;
 }
 
+/**
+ * NM-061 fix: create SEN 100-step scenario via API then select it in the UI.
+ * Throws if backend rejects projection_steps — test must FAIL, not skip.
+ * Uses .first() to tolerate multiple rows with the same name from parallel CI runs.
+ */
+async function createAndSelectSenProjection(
+  page: import("@playwright/test").Page,
+): Promise<void> {
+  const scenarioId = await createSen100StepScenario();
+  if (!scenarioId) {
+    throw new Error(
+      "createAndSelectSenProjection: backend rejected projection_steps — " +
+      "G3 (#274) is delivered; this must FAIL, not skip. " +
+      "Check that the backend accepts projection_steps in the scenario configuration.",
+    );
+  }
+  await page.goto("/");
+  await waitForAppReady(page);
+
+  await page.getByRole("button", { name: /Scenarios/ }).click();
+  const row = page.locator(".scenario-row").filter({ hasText: _SEN_SCENARIO_NAME }).first();
+  await expect(row).toBeVisible({ timeout: 10_000 });
+  await row.getByTitle("Select as primary scenario").click();
+  await page.getByRole("button", { name: /Scenarios/ }).click();
+}
+
+/**
+ * NM-061 fix: create ZMB 8-step scenario via API then select it in the UI.
+ * ZMB scenario must be selected for zone-1a-trajectory to reflect it.
+ * Uses .first() to tolerate multiple rows from parallel CI runs.
+ */
+async function createAndSelectZmbScenario(
+  page: import("@playwright/test").Page,
+): Promise<void> {
+  await createZmb8StepScenario(); // throws on any failure
+  await page.goto("/");
+  await waitForAppReady(page);
+
+  await page.getByRole("button", { name: /Scenarios/ }).click();
+  const row = page.locator(".scenario-row").filter({ hasText: _ZMB_SCENARIO_NAME }).first();
+  await expect(row).toBeVisible({ timeout: 10_000 });
+  await row.getByTitle("Select as primary scenario").click();
+  await page.getByRole("button", { name: /Scenarios/ }).click();
+}
+
 // ---------------------------------------------------------------------------
 // AC-F1 — Projection panel visible in primary viewport (no drawer)
 // ---------------------------------------------------------------------------
@@ -171,14 +220,10 @@ test.describe("AC-F1: Projection panel visible without drawer", () => {
   test.use({ viewport: { width: 1280, height: 800 } });
 
   test("human-capital-trajectory-panel present at 1280×800 without drawer", async ({ page }) => {
-    if (!(await createSen100StepScenario())) return;
-    await page.goto("/");
-    await waitForAppReady(page);
+    await createAndSelectSenProjection(page);
 
     const panel = page.locator('[data-testid="human-capital-trajectory-panel"]');
-    if (!(await panel.isVisible({ timeout: 60_000 }).catch(() => false))) return;
-
-    await expect(panel).toBeVisible();
+    await expect(panel).toBeVisible({ timeout: 10_000 });
 
     // Panel must have non-zero dimensions — not hidden in a closed drawer (SF-3).
     const box = await panel.boundingBox();
@@ -203,12 +248,10 @@ test.describe("AC-F2: ≥3 indicator curves displayed", () => {
   test.use({ viewport: { width: 1280, height: 800 } });
 
   test("projection-curve-* count ≥ 3 within trajectory panel", async ({ page }) => {
-    if (!(await createSen100StepScenario())) return;
-    await page.goto("/");
-    await waitForAppReady(page);
+    await createAndSelectSenProjection(page);
 
     const panel = page.locator('[data-testid="human-capital-trajectory-panel"]');
-    if (!(await panel.isVisible({ timeout: 60_000 }).catch(() => false))) return;
+    await expect(panel).toBeVisible({ timeout: 10_000 });
 
     const curves = panel.locator('[data-testid^="projection-curve-"]');
     const count = await curves.count();
@@ -228,17 +271,13 @@ test.describe("AC-F3: Milestone sentence at L0 without hover", () => {
   test.use({ viewport: { width: 1280, height: 800 } });
 
   test("projection-milestone-sentence visible at L0 with year + [step N] content", async ({ page }) => {
-    if (!(await createSen100StepScenario())) return;
-    await page.goto("/");
-    await waitForAppReady(page);
+    await createAndSelectSenProjection(page);
 
     const panel = page.locator('[data-testid="human-capital-trajectory-panel"]');
-    if (!(await panel.isVisible({ timeout: 60_000 }).catch(() => false))) return;
+    await expect(panel).toBeVisible({ timeout: 10_000 });
 
     const sentence = page.locator('[data-testid="projection-milestone-sentence"]');
-    if (!(await sentence.isVisible({ timeout: 5_000 }).catch(() => false))) return;
-
-    await expect(sentence).toBeVisible();
+    await expect(sentence).toBeVisible({ timeout: 10_000 });
 
     // Must be in the normal flow — not hidden via CSS (SF-3 variant).
     const isInNormalFlow = await sentence.evaluate((el) => {
@@ -276,17 +315,13 @@ test.describe("AC-F4: Panel header exact string", () => {
   test(
     'projection-panel-header contains "25-year projection · quarterly resolution" (U+00B7 middle-dot)',
     async ({ page }) => {
-      if (!(await createSen100StepScenario())) return;
-      await page.goto("/");
-      await waitForAppReady(page);
+      await createAndSelectSenProjection(page);
 
       const panel = page.locator('[data-testid="human-capital-trajectory-panel"]');
-      if (!(await panel.isVisible({ timeout: 60_000 }).catch(() => false))) return;
+      await expect(panel).toBeVisible({ timeout: 10_000 });
 
       const header = panel.locator('[data-testid="projection-panel-header"]');
-      if (!(await header.isVisible({ timeout: 5_000 }).catch(() => false))) return;
-
-      await expect(header).toBeVisible();
+      await expect(header).toBeVisible({ timeout: 10_000 });
 
       const text = ((await header.textContent()) ?? "").trim();
 
@@ -313,17 +348,13 @@ test.describe("AC-F5: 100-step axis present within projection panel", () => {
   test.use({ viewport: { width: 1280, height: 800 } });
 
   test("projection-panel-step-axis visible within panel", async ({ page }) => {
-    if (!(await createSen100StepScenario())) return;
-    await page.goto("/");
-    await waitForAppReady(page);
+    await createAndSelectSenProjection(page);
 
     const panel = page.locator('[data-testid="human-capital-trajectory-panel"]');
-    if (!(await panel.isVisible({ timeout: 60_000 }).catch(() => false))) return;
+    await expect(panel).toBeVisible({ timeout: 10_000 });
 
     const stepAxis = panel.locator('[data-testid="projection-panel-step-axis"]');
-    if (!(await stepAxis.isVisible({ timeout: 5_000 }).catch(() => false))) return;
-
-    await expect(stepAxis).toBeVisible();
+    await expect(stepAxis).toBeVisible({ timeout: 10_000 });
 
     // The axis may scroll/zoom internally; it must not cause Zone 1A/1C/1D to move
     // out of the viewport (that's tested in AC-F6).
@@ -341,17 +372,14 @@ test.describe("AC-F6: Zone 1A, 1C, 1D not displaced at 1280×800", () => {
   test.use({ viewport: { width: 1280, height: 800 } });
 
   test("zone-1a-trajectory visible within 800px viewport with projection panel present", async ({ page }) => {
-    if (!(await createSen100StepScenario())) return;
-    await page.goto("/");
-    await waitForAppReady(page);
+    await createAndSelectSenProjection(page);
 
     const panel = page.locator('[data-testid="human-capital-trajectory-panel"]');
-    if (!(await panel.isVisible({ timeout: 60_000 }).catch(() => false))) return;
+    await expect(panel).toBeVisible({ timeout: 10_000 });
 
     const zone1a = page.locator('[data-testid="zone-1a-trajectory"]');
-    if (!(await zone1a.isVisible({ timeout: 5_000 }).catch(() => false))) return;
+    await expect(zone1a).toBeVisible({ timeout: 10_000 });
 
-    await expect(zone1a).toBeVisible();
     const box = await zone1a.boundingBox();
     expect(box).not.toBeNull();
     expect(box!.y + box!.height).toBeLessThanOrEqual(800 + 10, [
@@ -361,17 +389,14 @@ test.describe("AC-F6: Zone 1A, 1C, 1D not displaced at 1280×800", () => {
   });
 
   test("zone-1c-pmm visible within 800px viewport with projection panel present", async ({ page }) => {
-    if (!(await createSen100StepScenario())) return;
-    await page.goto("/");
-    await waitForAppReady(page);
+    await createAndSelectSenProjection(page);
 
     const panel = page.locator('[data-testid="human-capital-trajectory-panel"]');
-    if (!(await panel.isVisible({ timeout: 60_000 }).catch(() => false))) return;
+    await expect(panel).toBeVisible({ timeout: 10_000 });
 
     const zone1c = page.locator('[data-testid="zone-1c-pmm"]');
-    if (!(await zone1c.isVisible({ timeout: 5_000 }).catch(() => false))) return;
+    await expect(zone1c).toBeVisible({ timeout: 10_000 });
 
-    await expect(zone1c).toBeVisible();
     const box = await zone1c.boundingBox();
     expect(box).not.toBeNull();
     expect(box!.y + box!.height).toBeLessThanOrEqual(800 + 10, [
@@ -380,17 +405,14 @@ test.describe("AC-F6: Zone 1A, 1C, 1D not displaced at 1280×800", () => {
   });
 
   test("zone-1d-four-framework visible within 800px viewport with projection panel present", async ({ page }) => {
-    if (!(await createSen100StepScenario())) return;
-    await page.goto("/");
-    await waitForAppReady(page);
+    await createAndSelectSenProjection(page);
 
     const panel = page.locator('[data-testid="human-capital-trajectory-panel"]');
-    if (!(await panel.isVisible({ timeout: 60_000 }).catch(() => false))) return;
+    await expect(panel).toBeVisible({ timeout: 10_000 });
 
     const zone1d = page.locator('[data-testid="zone-1d-four-framework"]');
-    if (!(await zone1d.isVisible({ timeout: 5_000 }).catch(() => false))) return;
+    await expect(zone1d).toBeVisible({ timeout: 10_000 });
 
-    await expect(zone1d).toBeVisible();
     const box = await zone1d.boundingBox();
     expect(box).not.toBeNull();
     expect(box!.y + box!.height).toBeLessThanOrEqual(800 + 10, [
@@ -407,19 +429,14 @@ test.describe("AC-F7: ZMB 8-step render path unchanged (ADR-017 non-regression)"
   test.use({ viewport: { width: 1280, height: 800 } });
 
   test("ZMB 8-step: zone-1a visible, projection panel absent, zone-1a has 4 SVG paths", async ({ page }) => {
-    await createZmb8StepScenario();
-    await page.goto("/");
-    await waitForAppReady(page);
+    await createAndSelectZmbScenario(page);
 
     const zone1a = page.locator('[data-testid="zone-1a-trajectory"]');
-    if (!(await zone1a.isVisible({ timeout: 10_000 }).catch(() => false))) return;
-
-    // Zone 1A must render for ZMB 8-step (existing behavior).
-    await expect(zone1a).toBeVisible();
+    await expect(zone1a).toBeVisible({ timeout: 10_000 });
 
     // Projection panel must be absent for default-step scenarios (SF-4 guard).
     const panel = page.locator('[data-testid="human-capital-trajectory-panel"]');
-    const panelVisible = await panel.isVisible({ timeout: 3_000 }).catch(() => false);
+    const panelVisible = await panel.isVisible({ timeout: 3_000 });
     expect(panelVisible).toBe(false, [
       "AC-F7 violation: human-capital-trajectory-panel visible for a ZMB 8-step scenario.",
       "Observable state A: 'data-testid=human-capital-trajectory-panel is absent from",
@@ -430,7 +447,6 @@ test.describe("AC-F7: ZMB 8-step render path unchanged (ADR-017 non-regression)"
     // Zone 1A must have exactly 4 SVG path elements (N=1 Mode 1 four-framework encoding).
     const paths = zone1a.locator("path");
     const pathCount = await paths.count();
-    if (pathCount === 0) return; // pre-implementation guard — paths not yet rendered
     expect(pathCount).toBe(4, [
       `AC-F7 violation: zone-1a-trajectory has ${pathCount} SVG paths, expected 4.`,
       "Observable state A: 'zone-1a-trajectory contains exactly 4 SVG path elements",
@@ -467,9 +483,8 @@ test.describe("AC-F8: Panel renders within 60 seconds", () => {
     // Multiple G3 tests call createSen100StepScenario() within the same CI run, producing
     // several rows with the same name. Use .first() to avoid strict mode violation while
     // still selecting a valid completed projection scenario.
-    const scenarioName = "M16-G3 E2E — SEN 25-year projection";
     await page.getByRole("button", { name: /Scenarios/ }).click();
-    const row = page.locator(".scenario-row").filter({ hasText: scenarioName }).first();
+    const row = page.locator(".scenario-row").filter({ hasText: _SEN_SCENARIO_NAME }).first();
     await expect(row).toBeVisible({ timeout: 10_000 });
     await row.getByTitle("Select as primary scenario").click();
     await page.getByRole("button", { name: /Scenarios/ }).click();
@@ -496,16 +511,13 @@ test.describe("AC-CM-1: Exactly 3 named cohort curves (CM-confirmed 2026-06-23)"
   test.use({ viewport: { width: 1280, height: 800 } });
 
   test("projection panel contains exactly 3 projection-curve-* elements", async ({ page }) => {
-    if (!(await createSen100StepScenario())) return;
-    await page.goto("/");
-    await waitForAppReady(page);
+    await createAndSelectSenProjection(page);
 
     const panel = page.locator('[data-testid="human-capital-trajectory-panel"]');
-    if (!(await panel.isVisible({ timeout: 60_000 }).catch(() => false))) return;
+    await expect(panel).toBeVisible({ timeout: 10_000 });
 
     const curves = panel.locator('[data-testid^="projection-curve-"]');
     const count = await curves.count();
-    if (count === 0) return; // pre-implementation guard
 
     expect(count).toBe(3, [
       `AC-CM-1 violation: found ${count} projection-curve-* elements, expected exactly 3.`,
@@ -518,12 +530,10 @@ test.describe("AC-CM-1: Exactly 3 named cohort curves (CM-confirmed 2026-06-23)"
   });
 
   test("panel contains 'bottom quintile, informal workers' plain label", async ({ page }) => {
-    if (!(await createSen100StepScenario())) return;
-    await page.goto("/");
-    await waitForAppReady(page);
+    await createAndSelectSenProjection(page);
 
     const panel = page.locator('[data-testid="human-capital-trajectory-panel"]');
-    if (!(await panel.isVisible({ timeout: 60_000 }).catch(() => false))) return;
+    await expect(panel).toBeVisible({ timeout: 10_000 });
 
     // Each curve must be labelled in plain language (kryptonite constraint).
     // The exact testid encoding of colons is implementation-defined (may be %3A or dashes).
@@ -531,32 +541,26 @@ test.describe("AC-CM-1: Exactly 3 named cohort curves (CM-confirmed 2026-06-23)"
     const informalLabel = panel.locator(
       ':text-matches("bottom quintile.*informal|informal.*bottom quintile", "i")',
     );
-    if (!(await informalLabel.isVisible({ timeout: 3_000 }).catch(() => false))) return;
-    await expect(informalLabel.first()).toBeVisible();
+    await expect(informalLabel.first()).toBeVisible({ timeout: 10_000 });
   });
 
   test("panel contains 'bottom quintile, agricultural workers' plain label", async ({ page }) => {
-    if (!(await createSen100StepScenario())) return;
-    await page.goto("/");
-    await waitForAppReady(page);
+    await createAndSelectSenProjection(page);
 
     const panel = page.locator('[data-testid="human-capital-trajectory-panel"]');
-    if (!(await panel.isVisible({ timeout: 60_000 }).catch(() => false))) return;
+    await expect(panel).toBeVisible({ timeout: 10_000 });
 
     const agriLabel = panel.locator(
       ':text-matches("bottom quintile.*agricultur|agricultur.*bottom quintile", "i")',
     );
-    if (!(await agriLabel.isVisible({ timeout: 3_000 }).catch(() => false))) return;
-    await expect(agriLabel.first()).toBeVisible();
+    await expect(agriLabel.first()).toBeVisible({ timeout: 10_000 });
   });
 
   test("no health_index or food_insecurity_rate curves present", async ({ page }) => {
-    if (!(await createSen100StepScenario())) return;
-    await page.goto("/");
-    await waitForAppReady(page);
+    await createAndSelectSenProjection(page);
 
     const panel = page.locator('[data-testid="human-capital-trajectory-panel"]');
-    if (!(await panel.isVisible({ timeout: 60_000 }).catch(() => false))) return;
+    await expect(panel).toBeVisible({ timeout: 10_000 });
 
     // CM finding: health_index and food_insecurity_rate have no elasticity entries —
     // they must not appear as curves.
@@ -585,18 +589,16 @@ test.describe("AC-CM-2: Milestone sentence matches CM-confirmed template", () =>
   test.use({ viewport: { width: 1280, height: 800 } });
 
   test("sentence contains year, [step N], cohort plain name, and consequence phrase", async ({ page }) => {
-    if (!(await createSen100StepScenario())) return;
-    await page.goto("/");
-    await waitForAppReady(page);
+    await createAndSelectSenProjection(page);
 
     const panel = page.locator('[data-testid="human-capital-trajectory-panel"]');
-    if (!(await panel.isVisible({ timeout: 60_000 }).catch(() => false))) return;
+    await expect(panel).toBeVisible({ timeout: 10_000 });
 
     const sentence = page.locator('[data-testid="projection-milestone-sentence"]');
-    if (!(await sentence.isVisible({ timeout: 5_000 }).catch(() => false))) return;
+    await expect(sentence).toBeVisible({ timeout: 10_000 });
 
     const text = ((await sentence.textContent()) ?? "").trim();
-    if (!text) return; // pre-implementation guard — element present but not yet populated
+    expect(text.length).toBeGreaterThan(0, "AC-CM-2: projection-milestone-sentence is visible but empty.");
 
     // Year anchor: 4-digit year in 2025–2050.
     expect(text).toMatch(/\b(202[5-9]|20[3-4]\d|2050)\b/, [
@@ -640,15 +642,13 @@ test.describe("AC-CM-2: Milestone sentence matches CM-confirmed template", () =>
     // CM finding: 'No MDA-HD-POVERTY-Q2 floor registered; Q2 curve does not trigger a sentence.'
     // This test confirms there is no fabricated Q2 floor. Pass if no sentence, or if sentence
     // (when present) was triggered by a Q1 cohort.
-    if (!(await createSen100StepScenario())) return;
-    await page.goto("/");
-    await waitForAppReady(page);
+    await createAndSelectSenProjection(page);
 
     const panel = page.locator('[data-testid="human-capital-trajectory-panel"]');
-    if (!(await panel.isVisible({ timeout: 60_000 }).catch(() => false))) return;
+    await expect(panel).toBeVisible({ timeout: 10_000 });
 
     const sentence = page.locator('[data-testid="projection-milestone-sentence"]');
-    const sentenceVisible = await sentence.isVisible({ timeout: 3_000 }).catch(() => false);
+    const sentenceVisible = await sentence.isVisible({ timeout: 3_000 });
     if (!sentenceVisible) return; // no sentence — correct for scenarios where Q1 doesn't cross
 
     const text = ((await sentence.textContent()) ?? "").toLowerCase();
@@ -676,16 +676,13 @@ test.describe("AC-CM-3: Tier 3 confidence badges for all three cohort curves", (
   test.use({ viewport: { width: 1280, height: 800 } });
 
   test("3 projection-tier-badge-* elements present with text 'T3'", async ({ page }) => {
-    if (!(await createSen100StepScenario())) return;
-    await page.goto("/");
-    await waitForAppReady(page);
+    await createAndSelectSenProjection(page);
 
     const panel = page.locator('[data-testid="human-capital-trajectory-panel"]');
-    if (!(await panel.isVisible({ timeout: 60_000 }).catch(() => false))) return;
+    await expect(panel).toBeVisible({ timeout: 10_000 });
 
     const badges = panel.locator('[data-testid^="projection-tier-badge-"]');
     const count = await badges.count();
-    if (count === 0) return; // pre-implementation guard
 
     expect(count).toBe(3, [
       `AC-CM-3 violation: found ${count} projection-tier-badge-* elements, expected exactly 3.`,
