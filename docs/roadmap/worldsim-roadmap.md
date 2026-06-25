@@ -355,7 +355,7 @@ M17 is structured in two waves. **Wave 2 may not begin until Wave 1 produces a c
 *Wave 1 exit gate:* The FRAME-D milestone sentence fires within the Demo 6 window after the calibration change. DemographicModule ELASTICITY_REGISTRY updated with CM-certified values. Governance sensitivity specification (see below) is produced even if implementation is Wave 2.
 
 - Fiscal-to-cohort elasticity calibration — DemographicModule ELASTICITY_REGISTRY revision; CM certification required → Issue #1229 (horizon:immediate; CM-owned)
-- Governance sensitivity calibration — GovernanceModule response to fiscal conditionality events; institutional capacity degradation under austerity; `imf_program_acceptance` direct governance transmission pathway; whether the 8-step window is sufficient to manifest governance divergence or whether governance stress is a longer-horizon signal → UNTRACKED (file issue before Wave 1 begins)
+- Governance sensitivity calibration — GovernanceModule response to fiscal conditionality events; institutional capacity degradation under austerity; `imf_program_acceptance` direct governance transmission pathway; whether the 8-step window is sufficient to manifest governance divergence or whether governance stress is a longer-horizon signal → Issue #1248 (horizon:immediate; CM-owned)
 
 ---
 
@@ -364,11 +364,11 @@ M17 is structured in two waves. **Wave 2 may not begin until Wave 1 produces a c
 *Scope:* Multi-scenario infrastructure enabling Demo 7 Act 2, plus the DEMO6 CRITICAL and HIGH findings that would visibly undermine Demo 7 if unaddressed, plus the adaptive y-axis pattern extension established in M16.
 
 - Multi-scenario comparison (>2 scenarios) — Kenya budget planning use case; enables Demo 7 Act 2 Zambia three-scenario comparison → Issue #394 (horizon:immediate)
-- DEMO6-014: Zone 1A curves visually indistinguishable at presentation scale — terminal endpoint labels or dashed/solid line style differentiation; Human Development curve must be identifiable at a glance without presenter narration → UNTRACKED (file issue before Wave 2 begins)
-- DEMO6-026/043: Zone 1B cohort values not legible at tablet scale — CohortImpactSection current value, floor, and T3 badge must be readable at 768px width without zoom → UNTRACKED (file issue before Wave 2 begins)
-- DEMO6-040: No historical precedent anchor for PSP WARNING in Zone 1D — comparable programme reference accessible from Zone 1D surface; comparable cases at WARNING level with known compliance outcomes; enables Andreas's political brief argument and Lucas's reproducibility threshold → UNTRACKED (file issue before Wave 2 begins)
-- Adaptive y-axis extension — `computeYDomain()` pattern (PR #1243) applied to any additional instrument that exhibits the overlap failure mode identified in IR-001; confirm no other instrument has a fixed-domain chart that would obscure small-range values → UNTRACKED (file issue before Wave 2 begins)
-- Zone 1B proportional allocation — formal split between MDAAlertPanelZone1B and CohortImpactSection; replace `minHeight: 80px` temporary guarantee with a durable proportional design; ADR decision required (ADR-017 amendment or new ADR) → UNTRACKED (file issue before Wave 2 begins)
+- DEMO6-014: Zone 1A curves visually indistinguishable at presentation scale — terminal endpoint labels or dashed/solid line style differentiation; Human Development curve must be identifiable at a glance without presenter narration → Issue #1249 (horizon:near-term)
+- DEMO6-026/043: Zone 1B cohort values not legible at tablet scale — CohortImpactSection current value, floor, and T3 badge must be readable at 768px width without zoom → Issue #1250 (horizon:near-term)
+- DEMO6-040: No historical precedent anchor for PSP WARNING in Zone 1D — comparable programme reference accessible from Zone 1D surface; comparable cases at WARNING level with known compliance outcomes; enables Andreas's political brief argument and Lucas's reproducibility threshold → Issue #1253 (horizon:near-term)
+- Adaptive y-axis extension — `computeYDomain()` pattern (PR #1243) applied to any additional instrument that exhibits the overlap failure mode identified in IR-001; confirm no other instrument has a fixed-domain chart that would obscure small-range values → Issue #1251 (horizon:near-term)
+- Zone 1B proportional allocation — formal split between MDAAlertPanelZone1B and CohortImpactSection; replace `minHeight: 80px` temporary guarantee with a durable proportional design; ADR decision required (ADR-017 amendment or new ADR) → Issue #1252 (horizon:near-term)
 
 *Wave 2 deferred (not M17 scope):*
 - Entity template library (#407) — deferred to M19+; not on Demo 7 critical path
@@ -400,16 +400,16 @@ M17 is structured in two waves. **Wave 2 may not begin until Wave 1 produces a c
 *Multi-scenario comparative analysis for Demo 7 Act 2:*
 - Multi-scenario comparison with distributional overlay — three+ scenarios, overlaid trajectories with uncertainty bands → builds on M17 Issue #394 infrastructure
 - Counter-scenario comparison showing distributional differences under each pathway — the specific number differential (e.g., 340,000 vs. 80,000 people below the poverty threshold) with confidence bands
-- Zone 1A CI bands — scenario-band rendering on trajectory curves; ADR-007 scope; architecture decision required before implementation → Issue UNTRACKED (file issue at M18 kickoff; DEMO6-015)
+- Zone 1A CI bands — scenario-band rendering on trajectory curves; ADR-007 scope; architecture decision required before implementation → Issue #1254 (horizon:near-term; DEMO6-015)
 
 *PSP analytical depth for Demo 7:*
-- PSP driver decomposition in Zone 1D — dominant signal category visible alongside severity label; enables Andreas's direct political brief without economist mediation → UNTRACKED (file issue at M18 kickoff; DEMO6-036)
+- PSP driver decomposition in Zone 1D — dominant signal category visible alongside severity label; enables Andreas's direct political brief without economist mediation → Issue #1255 (horizon:near-term; DEMO6-036)
 
 *Live external session:*
 - Demo 7 — live stakeholder session with real external participants; both acts (Senegal Mode 3 + Zambia comparison); M18 exit gate → Issue #843
 
 *Path 2 (capacity-allowing):*
-- Path 2 full implementation — ministry-owned proprietary data integrated into multi-scenario comparison; carries from M16 design groundwork → UNTRACKED
+- Path 2 full implementation — ministry-owned proprietary data integrated into multi-scenario comparison; carries from M16 design groundwork → Issue #1256 (horizon:near-term; capacity-allowing)
 
 *Deferred to M19+:*
 - Entity template library operational (#407) — not required for Demo 7; deferred
