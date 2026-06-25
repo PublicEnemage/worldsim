@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-25 (G1 WAVE 1 EXIT GATE CONFIRMED — Sprint exit doc filed; BPO ACCEPT on #1229 + #1248; PI Agent confirmation complete; Wave 2 implementation sprint entries now unblocked)**
+**Last updated: 2026-06-25 (G4 sprint entry EL APPROVED — `docs/process/sprint-plans/m17-g4-sprint-entry.md`; UX Designer authorized to begin visual specs #1249 → #1253 → #1250; #1239 intent doc + QA test may be filed immediately)**
 **Current milestone:** M17 — Calibration and Comparative Infrastructure (GitHub Milestone 18)
 **Previous milestone:** M16 — Distributional Visibility (FORMALLY CLOSED 2026-06-25; release/m16 → main; v0.16.0; #985 closed; GitHub Milestone 17 closed)
 
@@ -27,7 +27,7 @@
 
 **Critical prerequisite: M17 Wave 2 may not begin until Wave 1 exits.** Wave 1 exit gate: FRAME-D milestone sentence fires within an 8-step programme window on the Demo 6 Senegal scenario after the elasticity calibration change. DemographicModule ELASTICITY_REGISTRY updated with CM-certified values. Governance calibration specification on record.
 
-**M17 kickoff COMPLETE. G1 WAVE 1 EXIT GATE CONFIRMED 2026-06-25.** PR #1270 merged 2026-06-25. ELASTICITY_REGISTRY revised: Q1 informal −0.20, Q2 informal −0.133, Q1 agricultural −0.16 (all T3, Fosu 2011 SSA calibration). Fosu 2011 source seeded in source_registry (migration a3b5d7f9e2c1). Governance sensitivity spec filed (docs/calibration/m17-g1-governance-sensitivity-specification.md — three CM positions: Q1 working-as-designed, Q2 institutional capacity deferred to Wave 2 with data precondition, Q3 working-as-designed with transparency disclosure recommended). FRAME-D tests pass in CI (test-backend green on PR #1270). Sprint exit doc filed: `docs/process/sprint-plans/m17-g1-sprint-exit.md`. BPO supplemental assessment: #1229 ACCEPT + #1248 ACCEPT (2026-06-25). PI Agent confirmation: CONFIRMED — all Wave 1 exit conditions satisfied. **Wave 2 implementation sprint entries now unblocked.** PM Agent action at next HORIZON sweep: file two Wave 2 issues from governance specification §Summary (SEN institutional_capacity_index seed + GovernanceElasticity; Zone 1D governance horizon tooltip).
+**M17 kickoff COMPLETE. G1 WAVE 1 EXIT GATE CONFIRMED 2026-06-25.** PR #1270 merged 2026-06-25. ELASTICITY_REGISTRY revised: Q1 informal −0.20, Q2 informal −0.133, Q1 agricultural −0.16 (all T3, Fosu 2011 SSA calibration). Fosu 2011 source seeded in source_registry (migration a3b5d7f9e2c1). Governance sensitivity spec filed (docs/calibration/m17-g1-governance-sensitivity-specification.md — three CM positions: Q1 working-as-designed, Q2 institutional capacity deferred to Wave 2 with data precondition, Q3 working-as-designed with transparency disclosure recommended). FRAME-D tests pass in CI (test-backend green on PR #1270). Sprint exit doc filed: `docs/process/sprint-plans/m17-g1-sprint-exit.md`. BPO supplemental assessment: #1229 ACCEPT + #1248 ACCEPT (2026-06-25). PI Agent confirmation: CONFIRMED — all Wave 1 exit conditions satisfied. **Wave 2 implementation sprint entries now unblocked.** PM Agent HORIZON sweep actions complete 2026-06-25: #1275 (SEN institutional_capacity_index seed + GovernanceElasticity, Wave 2), #1276 (Zone 1D governance horizon disclosure, Wave 2), #1277 (sprint-planning-sop.md UX/UI design artifact gate amendment, M17). Insights log entry 13 promoted → #1277.
 
 ---
 
@@ -50,6 +50,9 @@
 | #1220 | fix(e2e): G3 spec AC-F1–AC-F7 soft-skip — NM-061 upstream | G5 | Wave 2 | Test infrastructure bug; milestone assigned 2026-06-25 |
 | #1214 | feat(observability): startup WARNING if simulation_entities empty | G5 | Wave 2 | NM-060 upstream; milestone assigned 2026-06-25 |
 | #1251 | ux(zone-1a): adaptive y-axis extension audit | G5 | Wave 2 | Capacity-allowing; `computeYDomain()` extension |
+| #1275 | feat(simulation): seed SEN institutional_capacity_index + GovernanceElasticity fiscal conditionality entry | Wave 2 (unassigned G-group) | Wave 2 | From CM governance spec Q2; co-gated: data seed + elasticity entry in same PR |
+| #1276 | docs(zone-1d): governance horizon disclosure — divergence is ≥12-step signal | Wave 2 (unassigned G-group) | Wave 2 | From CM governance spec Q3; doc/UI text only; no code change |
+| #1277 | docs(process): sprint-planning-sop.md amendment — UX/UI design artifact gate | Wave 2 (unassigned G-group) | Wave 2 | Promoted from insights log entry 13; G2 §2.5 pattern → SOP |
 
 **Deferred to M18:** #843 (Demo 7 live session), #1217 (Mode 3 render optimization), #1238 (DEMO6-009 narration), #1059 (HCL demo narration), #1254 (CI bands), #1255 (PSP driver decomp), #1256 (Path 2)
 **Closed at audit:** #1225 (Demo 6 prep — Steps 1–6c complete)
