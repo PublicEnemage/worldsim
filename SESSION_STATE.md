@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-25 (G2 Phase 1 + Phase 2 complete — PR #1280 merged; three design artifacts on release/m17; BPO panel review + Phase 1 acceptance required before Phase 3 entry EL approval; G3 sprint entry EL APPROVED 2026-06-25 — Phase 1 UX brief may begin)**
+**Last updated: 2026-06-25 (G5 sprint entry FILED 2026-06-25 — `docs/process/sprint-plans/m17-g5-sprint-entry.md`; awaiting EL approval; G2 Phase 3 intent doc + QA test filed — PR #1287 open pending CI; sprint entry READY FOR EL REVIEW; remaining Phase 3 hard gate: #1249 merge only; BPO ACCEPT 2026-06-25 on record; Architect Phase 2 filed #394#issuecomment-4804024195)**
 **Current milestone:** M17 — Calibration and Comparative Infrastructure (GitHub Milestone 18)
 **Previous milestone:** M16 — Distributional Visibility (FORMALLY CLOSED 2026-06-25; release/m16 → main; v0.16.0; #985 closed; GitHub Milestone 17 closed)
 
@@ -47,9 +47,9 @@
 | #1250 | ux(zone-1b): DEMO6-026/043 tablet legibility at 768px | G4 | Wave 2 | **DEMO6 CRITICAL**; required before live demo session |
 | #1253 | ux(zone-1d): DEMO6-040 PSP historical precedent anchor | G4 | Wave 2 | **DEMO6 CRITICAL**; required before live demo session |
 | #1239 | ux(zone-1b): DEMO6-010 inverted floor label — "above floor" when below | G4 | Wave 2 | UI bug; milestone assigned 2026-06-25 |
-| #1220 | fix(e2e): G3 spec AC-F1–AC-F7 soft-skip — NM-061 upstream | G5 | Wave 2 | Test infrastructure bug; milestone assigned 2026-06-25 |
-| #1214 | feat(observability): startup WARNING if simulation_entities empty | G5 | Wave 2 | NM-060 upstream; milestone assigned 2026-06-25 |
-| #1251 | ux(zone-1a): adaptive y-axis extension audit | G5 | Wave 2 | Capacity-allowing; `computeYDomain()` extension |
+| #1220 | fix(e2e): G3 spec AC-F1–AC-F7 soft-skip — NM-061 upstream | G5 | Wave 2 | Test infrastructure bug; milestone assigned 2026-06-25; **Sprint entry FILED 2026-06-25 — awaiting EL approval** |
+| #1214 | feat(observability): startup WARNING if simulation_entities empty | G5 | Wave 2 | NM-060 upstream; milestone assigned 2026-06-25; **Sprint entry FILED 2026-06-25 — awaiting EL approval** |
+| #1251 | ux(zone-1a): adaptive y-axis extension audit | G5 | Wave 2 | Capacity-allowing; `computeYDomain()` extension; **Sprint entry FILED 2026-06-25 — awaiting EL approval** |
 | #1275 | feat(simulation): seed SEN institutional_capacity_index + GovernanceElasticity fiscal conditionality entry | Wave 2 (unassigned G-group) | Wave 2 | From CM governance spec Q2; co-gated: data seed + elasticity entry in same PR |
 | #1276 | docs(zone-1d): governance horizon disclosure — divergence is ≥12-step signal | Wave 2 (unassigned G-group) | Wave 2 | From CM governance spec Q3; doc/UI text only; no code change |
 | #1277 | docs(process): sprint-planning-sop.md amendment — UX/UI design artifact gate | Wave 2 (unassigned G-group) | Wave 2 | Promoted from insights log entry 13; G2 §2.5 pattern → SOP |
