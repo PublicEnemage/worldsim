@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-25 (G4 sprint entry EL APPROVED — `docs/process/sprint-plans/m17-g4-sprint-entry.md`; UX Designer authorized to begin visual specs #1249 → #1253 → #1250; #1239 intent doc + QA test may be filed immediately)**
+**Last updated: 2026-06-25 (G3 sprint entry filed — `docs/process/sprint-plans/m17-g3-sprint-entry.md`; structural gates CLEAR; ADR gate PENDING Phase 1/2; Phase 1 UX brief not started; panel review + BPO acceptance required before Phase 2; #1250 merge required before implementation PR; awaiting EL approval)**
 **Current milestone:** M17 — Calibration and Comparative Infrastructure (GitHub Milestone 18)
 **Previous milestone:** M16 — Distributional Visibility (FORMALLY CLOSED 2026-06-25; release/m16 → main; v0.16.0; #985 closed; GitHub Milestone 17 closed)
 
@@ -42,7 +42,7 @@
 | #1229 | feat(simulation): fiscal-to-cohort elasticity calibration — ELASTICITY_REGISTRY | G1 | Wave 1 | ✅ BPO ACCEPT 2026-06-25 — PR #1270 merged; FRAME-D tests pass; CM-certified constants on release/m17; sprint exit confirmed |
 | #1248 | feat(simulation): governance sensitivity calibration — GovernanceModule fiscal conditionality | G1 | Wave 1 | ✅ BPO ACCEPT 2026-06-25 (Wave 1 spec) — governance sensitivity spec filed (PR #1270); three CM positions on record; sprint exit confirmed; Wave 2 code changes gated on data preconditions |
 | #394 | feat: multi-scenario comparison (>2 scenarios) | G2 | Wave 2 | **UX design sprint first** — Design Thinking + UX Designer + Customer Agent → use stories → architecture; implementation may carry to M18 |
-| #1252 | arch(zone-1b): Zone 1B proportional allocation — MDA alert vs cohort sections | G3 | Wave 2 | ADR required before implementation; `minHeight: 80px` temporary guarantee active |
+| #1252 | arch(zone-1b): Zone 1B proportional allocation — MDA alert vs cohort sections | G3 | Wave 2 | **Sprint entry filed 2026-06-25 (draft)** — `docs/process/sprint-plans/m17-g3-sprint-entry.md`; ADR gate PENDING Phase 1/2; `minHeight: 80px` temporary guarantee active; awaiting EL approval |
 | #1249 | ux(zone-1a): DEMO6-014 curve identifiability | G4 | Wave 2 | **DEMO6 CRITICAL**; required before live demo session |
 | #1250 | ux(zone-1b): DEMO6-026/043 tablet legibility at 768px | G4 | Wave 2 | **DEMO6 CRITICAL**; required before live demo session |
 | #1253 | ux(zone-1d): DEMO6-040 PSP historical precedent anchor | G4 | Wave 2 | **DEMO6 CRITICAL**; required before live demo session |
