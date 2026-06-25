@@ -66,6 +66,24 @@ export function getConfidenceBadgeVisible(confidenceTier: number): boolean {
   return confidenceTier >= 4;
 }
 
+/**
+ * Compute adaptive y-axis domain from a set of composite score values.
+ * Padding = max(0.05, 10% of range); result clamped to [0, 1].
+ * Used by both the recharts path and CompositeChartSVG to ensure curve separation
+ * is visible when scores cluster in a narrow band (e.g. FIN ~0.51–0.56, GOV ~0.51).
+ */
+export function computeYDomain(values: number[]): [number, number] {
+  if (values.length === 0) return [0, 1];
+  const min = Math.min(...values);
+  const max = Math.max(...values);
+  const range = max - min;
+  const padding = Math.max(0.05, range * 0.1);
+  return [
+    Math.max(0, parseFloat((min - padding).toFixed(2))),
+    Math.min(1, parseFloat((max + padding).toFixed(2))),
+  ];
+}
+
 // ---------------------------------------------------------------------------
 // Phase 4 — composite encoding constants and helpers (ADR-017 §Decision table)
 // ---------------------------------------------------------------------------
@@ -313,8 +331,29 @@ function CompositeChartSVG({
     return MARGIN.left + (i / (stepIndices.length - 1)) * chartW;
   };
 
-  const yScale = (score: number): number =>
-    MARGIN.top + (1 - Math.min(1, Math.max(0, score))) * chartH;
+  const [yMin, yMax] = useMemo(() => {
+    const values: number[] = [];
+    for (const traj of [...Object.values(activeTrajectories), ...Object.values(baselineTrajectories)]) {
+      for (const step of traj.steps) {
+        const s = computeEntityCompositeScore(step);
+        if (s !== null) values.push(s);
+      }
+    }
+    return computeYDomain(values);
+  }, [activeTrajectories, baselineTrajectories]);
+
+  const yScale = (score: number): number => {
+    const clamped = Math.min(yMax, Math.max(yMin, score));
+    return MARGIN.top + (1 - (clamped - yMin) / (yMax - yMin)) * chartH;
+  };
+
+  const yGridValues = [
+    yMin,
+    yMin + (yMax - yMin) * 0.25,
+    yMin + (yMax - yMin) * 0.5,
+    yMin + (yMax - yMin) * 0.75,
+    yMax,
+  ];
 
   const buildPathD = (steps: TrajectoryStep[]): string => {
     const pts: string[] = [];
@@ -346,8 +385,6 @@ function CompositeChartSVG({
         return aScore !== null && bScore !== null && Math.abs(aScore - bScore) > 0.001;
       });
     });
-
-  const yGridValues = [0, 0.25, 0.5, 0.75, 1.0];
 
   return (
     <svg width={width} height={height} style={{ display: "block", overflow: "visible" }}>
@@ -597,6 +634,23 @@ export function TrajectoryView({
     (d) => d.financial_scoring_basis === "normalized_absolute",
   );
 
+  const yDomain = useMemo<[number, number]>(() => {
+    const values: number[] = [];
+    const fields = [
+      "financial_active", "financial_baseline",
+      "human_development_active", "human_development_baseline",
+      "ecological_active", "ecological_baseline",
+      "governance_active", "governance_baseline",
+    ] as const;
+    for (const d of mergedData) {
+      for (const field of fields) {
+        const v = d[field];
+        if (typeof v === "number") values.push(v);
+      }
+    }
+    return computeYDomain(values);
+  }, [mergedData]);
+
   // ---------------------------------------------------------------------------
   // Phase 4 — composite encoding data (ADR-017 §Decision table)
   // ---------------------------------------------------------------------------
@@ -770,7 +824,7 @@ export function TrajectoryView({
           />
 
           <YAxis
-            domain={[0, "auto"]}
+            domain={yDomain}
             tick={{ fontSize: 11 }}
             width={44}
             tickFormatter={(v: number) => v.toFixed(2)}
