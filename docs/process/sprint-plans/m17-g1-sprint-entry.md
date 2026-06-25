@@ -110,7 +110,7 @@ the implementation PR merges.
 
 File: `backend/tests/test_m17_g1_frame_d_calibration.py` (or equivalent path determined by CM)
 
-- [ ] FRAME-D integration test authored before implementation PR merges (gate: PENDING — test authored by CM alongside calibration code change)
+- [x] FRAME-D integration test authored before implementation PR merges (gate: SATISFIED 2026-06-25 — `backend/tests/test_m17_g1_frame_d_calibration.py` filed; 12 tests; ruff + mypy clean; red-before-implementation confirmed)
 
 **#1248 — Governance sensitivity specification:**
 
@@ -122,7 +122,7 @@ sprint entry.
 
 | Deliverable | Test file path | Gate |
 |---|---|---|
-| #1229 — ELASTICITY_REGISTRY calibration | `backend/tests/test_m17_g1_frame_d_calibration.py` | PENDING — authored by CM before implementation PR merges |
+| #1229 — ELASTICITY_REGISTRY calibration | `backend/tests/test_m17_g1_frame_d_calibration.py` | ✅ SATISFIED 2026-06-25 — 12 tests filed; ruff + mypy clean; red-before-implementation confirmed |
 | #1248 — Governance sensitivity specification | N/A — specification only at Wave 1 | CLEAR |
 
 ---
