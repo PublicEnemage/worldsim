@@ -123,8 +123,10 @@ export function InstrumentCluster({
         }}
       >
         {/* Zone 1B — MDA Alert Panel + Cohort Impact sub-section (DD-016, M16-G2 #986) */}
-        {/* Flex column: mdaPanel gets flex:1 1 0 (fills remaining space after cohort section);
-            zone1bCohortSection gets flex:0 0 auto (natural height, always visible). */}
+        {/* Flex column: mdaPanel gets flex:1 1 80px (guaranteed 80px minimum so alert panel
+            is never displaced by cohort section); zone1bCohortSection gets flex:0 0 auto
+            (natural height). Zone 1B overflows to scroll when combined content exceeds height.
+            M17 architecture decision required for formal proportional allocation. */}
         <div
           data-testid="zone-1b"
           style={{
@@ -138,7 +140,7 @@ export function InstrumentCluster({
           }}
         >
           <div style={{ position: "absolute", top: 4, right: 6, fontSize: 9, fontWeight: 700, letterSpacing: 0.5, color: "#666", backgroundColor: "rgba(255,255,255,0.88)", borderRadius: 2, padding: "1px 5px", userSelect: "none", zIndex: 10, lineHeight: 1.5 }}>Zone 1B</div>
-          <div style={{ flex: "1 1 0", minHeight: 0, overflow: "hidden" }}>
+          <div style={{ flex: "1 1 80px", minHeight: 80, overflow: "hidden" }}>
             {mdaPanel ?? (
               <div style={{ color: "#bbb", fontSize: 12, padding: 8 }}>
                 MDA Alert Panel (Zone 1B)
