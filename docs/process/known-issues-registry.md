@@ -337,6 +337,57 @@ No upstream issue filed. GitHub Rulesets design: required status checks require 
 
 ---
 
+## KI-006 — GitHub Actions: AC-009 4× CPU Throttle Performance Test Unreliable on GHA Shared Runners
+
+**Date first observed:** 2026-06-25
+**Infrastructure:** GitHub Actions (2-core Ubuntu shared runner)
+**Severity:** Medium — blocks CI-green PR merges with no frontend change; workaround is test.fixme() per NM-064
+**Recurrence:** Consistent — reproducible whenever GHA runner load is above baseline
+
+### Symptom
+
+`AC-009` (`tests/e2e/trajectory-view.spec.ts:156`) fails with:
+
+```
+Error: expect(received).toBeLessThanOrEqual(expected)
+Expected: <= 200
+Received:    712  (or 771 in a separate run)
+```
+
+The test applies a 4× CPU throttle via CDP (`Emulation.setCPUThrottlingRate`, rate 4)
+and asserts Mode 3 component render time is ≤ 200ms (threshold raised from 100ms per
+EX-001, 2026-06-24). On GHA 2-core shared runners under normal load, the throttled
+render consistently exceeds 700ms — 3–4× the raised threshold.
+
+### Trigger condition
+
+Any CI run on a GitHub Actions shared runner where the runner is under load. The test
+is not sensitive to the PR contents — it fails on PRs with no frontend changes.
+Historically observed at 712ms and 771ms on M17 G2 sprint entry PR (#1289).
+
+### Workaround
+
+`test.fixme()` applied to AC-009 in `trajectory-view.spec.ts` per NM-064 process
+improvement. The test remains in the suite as a local developer gate; it is skipped
+in CI. Run locally without CDP throttle or with a relaxed threshold to verify
+Mode 3 performance has not regressed.
+
+```bash
+# Run AC-009 locally (no throttle — local assertion only):
+cd frontend && npx playwright test trajectory-view.spec.ts -g "AC-009" --headed
+```
+
+### Upstream
+
+Not filed upstream. The GHA 2-core shared runner specs are documented and will not
+change for this tier. The root cause is the test design (4× CDP throttle on shared
+infrastructure), not a GHA defect.
+
+Near-miss authority: NM-064
+EX-001 (docs/compliance/exceptions.md): threshold exception active through M17 exit.
+
+---
+
 ## KI-NNN — [Infrastructure]: [Short description]
 
 **Date first observed:** YYYY-MM-DD
