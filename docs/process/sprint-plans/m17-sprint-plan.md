@@ -386,7 +386,7 @@ Per `docs/process/sprint-planning-sop.md §Sprint Entry Gate`, implementation ma
 6. ✅ This sprint plan filed — DONE 2026-06-25 (v2)
 7. ✅ EL APPROVED 2026-06-25
 8. ⬜ CM activated on #1229 and #1248 — immediately after EL approval
-9. ⬜ G1 sprint entry filed and EL-approved — Wave 1 begins
+9. ✅ G1 sprint entry FILED + EL APPROVED 2026-06-25 — Wave 1 begins
 10. ⬜ Wave 1 exit gate confirmed by PI Agent
 11. ⬜ G4 DEMO6 CRITICAL sprint entry — first Wave 2 implementation group after Wave 1 exits
 

@@ -3,17 +3,17 @@ name: m17-g1-sprint-entry
 type: sprint-entry
 milestone: M17 — Calibration and Comparative Infrastructure
 sprint-group: G1
-status: Filed — awaiting EL approval before implementation PR opens
+status: EL Approved 2026-06-25 — CM may begin research; implementation PR requires calibration decision document + FRAME-D test first
 authored-by: PM Agent
 authored-date: 2026-06-25
-el-approved: false
+el-approved: 2026-06-25
 release-branch: release/m17
 sop-reference: docs/process/sprint-planning-sop.md
 ---
 
 # Sprint Entry — M17, G1: Chief Methodologist Calibration Sprint
 
-**Status:** Filed — awaiting EL approval before implementation PR opens
+**Status:** EL Approved 2026-06-25 — Wave 1 begins
 **Date authored:** 2026-06-25
 **Release branch:** `release/m17`
 **Sprint plan:** `docs/process/sprint-plans/m17-sprint-plan.md` (EL Approved 2026-06-25)
@@ -190,7 +190,7 @@ G1 is complete when: FRAME-D integration test passes in CI with CM-certified con
 
 ## EL Approval Record
 
-**EL approval:** Pending
+**EL approval:** 2026-06-25
 
-> {EL approval statement — to be filled at approval time}
-> — @PublicEnemage ({date})
+> G1 sprint entry approved. Structural gates confirmed clear: release/m17 cut, CI trigger verified, sprint plan EL-approved. ADR gates clear for both issues (calibration constant revisions within existing module architecture — no new ADR required). CM activation confirmed on #1229 and #1248 before filing. Calibration decision document and FRAME-D integration test must be filed and passing before the ELASTICITY_REGISTRY implementation PR opens — these remain blocking conditions for the code change. Governance sensitivity specification (#1248) is the Wave 1 document deliverable; implementation carries to Wave 2. Wave 2 implementation sprint entries may not open until PI Agent confirms the Wave 1 exit gate (FRAME-D pass + calibration decision document on record + governance specification on record).
+> — @PublicEnemage (2026-06-25)
