@@ -3,17 +3,17 @@ name: m17-g2-sprint-entry
 type: sprint-entry
 milestone: M17 — Calibration and Comparative Infrastructure
 sprint-group: G2 (Phase 3 — Implementation)
-status: Draft — pending Phase 1/2 completion; EL approval required before implementation PR opens
+status: EL Approved — 2026-06-25; implementation may begin once #1249 merges to release/m17
 authored-by: PM Agent
 authored-date: 2026-06-25
-el-approved: false
+el-approved: 2026-06-25
 release-branch: release/m17
 sop-reference: docs/process/sprint-planning-sop.md
 ---
 
 # Sprint Entry — M17, G2: Multi-Scenario Design Sprint (Phase 3 Implementation)
 
-**Status:** Draft — conditions pending Phase 1 and Phase 2 completion; EL approval required before any implementation PR opens
+**Status:** EL Approved — 2026-06-25. Implementation may begin once #1249 is merged to `release/m17` (hard gate on implementation PR).
 **Date authored:** 2026-06-25
 **Release branch:** `release/m17`
 **Sprint plan:** `docs/process/sprint-plans/m17-sprint-plan.md` (EL Approved 2026-06-25)
@@ -403,7 +403,7 @@ traceability to the G1 exit PI Agent confirmation (m17-g1-sprint-exit.md §Secti
 
 ## EL Approval Record
 
-**EL approval:** READY FOR EL REVIEW — all four preconditions satisfied 2026-06-25
+**EL approval:** ✅ APPROVED — 2026-06-25
 
 *All sprint entry preconditions confirmed:*
 *(1) G2 Phase 1 complete + BPO ACCEPT 2026-06-25 (#394#issuecomment-4803977557)*
@@ -416,7 +416,9 @@ traceability to the G1 exit PI Agent confirmation (m17-g1-sprint-exit.md §Secti
 *    (AC-S1, AC-A1, AC-B1, AC-D1, AC-P1/P3/P5 asserted; guard pattern applied)*
 
 *Note: §2.1 #1249 merge required before Phase 3 implementation PR opens — does not*
-*block EL approval of this sprint entry.*
+*block this EL approval. Implementation PR may not open until #1249 is on `release/m17`.*
 
-> {EL approval statement — to be filled at approval time}
-> — @PublicEnemage ({date})
+> G2 Phase 3 sprint entry approved. All four preconditions satisfied. Phase 3 implementation
+> may begin once #1249 (Zone 1A curve identifiability) merges to `release/m17`. The hard gate
+> on the implementation PR opening is the merge of #1249 — not this approval record.
+> — @PublicEnemage (2026-06-25)
