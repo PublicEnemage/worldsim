@@ -4,18 +4,18 @@
  * Authored BEFORE implementation from sprint entry §2.3–§2.4 acceptance criteria at:
  * docs/process/sprint-plans/m17-g3-sprint-entry.md
  *
- * NOTE: The formal intent document at
- * docs/process/intents/M17-G3-{YYYY-MM-DD}-zone-1b-proportional-allocation.md
- * was not yet filed at the time of test authorship (Phase 1 UX brief and Phase 2 ADR
- * pending). The ACs below are derived directly from sprint entry §2.3–§2.4 specifications.
+ * ACs updated 2026-06-25 to align with the accepted intent document:
+ * docs/process/intents/M17-G3-2026-06-25-zone-1b-proportional-allocation.md
+ * ADR-018 (ARCH-012, Path B) accepted 2026-06-25. Sub-zone A floor = 80px at all
+ * breakpoints. Testid reconciled to zone-1b-mda-panel-wrapper (ADR-018 §Decision).
  *
  * At Phase 3 handoff, the implementing Frontend Engineer must:
- *   1. Read the accepted intent document and ADR for final pixel specifications
- *   2. Update MDA_PANEL_MIN_HEIGHT_PX to the ADR-specified minimum height
- *   3. Update COHORT_MAX_DISPLAY to the ADR-specified max-display count
- *   4. Confirm the G3 testids below match those added by the ADR-grounded implementation
+ *   1. Read the accepted intent document and ADR-018 for implementation contract
+ *   2. Confirm MDA_PANEL_MIN_HEIGHT_PX = 80 matches ADR-018 (no change needed)
+ *   3. Add data-testid="zone-1b-mda-panel-wrapper" to InstrumentCluster.tsx ~line 143
+ *   4. Change Zone 1B outer container overflow: "auto" → "hidden"
+ *   5. Remove test.fail() from AC-A2 after confirming AC-A2 passes post-implementation
  *
- * ADR gate: TBD — Path A (ADR-017 amendment, ARCH-011) or Path B (new ARCH-012).
  * Sprint entry: docs/process/sprint-plans/m17-g3-sprint-entry.md (EL Approved 2026-06-25)
  *
  * Issues covered:
@@ -23,12 +23,12 @@
  *
  * NM-056 rule: NO test.skip(), test.fixme(), or .only() patterns.
  * Pre-implementation guard pattern (AC-A1, AC-A3, AC-A4, AC-P5, AC-P1):
- *   Guard on zone-1b-mda-panel testid → isVisible() returns false → return without
+ *   Guard on zone-1b-mda-panel-wrapper testid → isVisible() returns false → return without
  *   asserting (no-op, not a pass). This testid is new in G3; pre-G3 it is absent.
  *
  * AC-A2 EXCEPTION (overflow regression guard): Does NOT use the early-return guard.
- * This test must be RED before implementation — it asserts on zone-1b-mda-panel, which
- * does not exist pre-G3. toBeVisible() times out → test fails explicitly. This is
+ * This test must be RED before implementation — it asserts on zone-1b-mda-panel-wrapper,
+ * which does not exist pre-G3. toBeVisible() times out → test fails explicitly. This is
  * intentional: it confirms the permanent ADR-grounded allocation model is not in place
  * until G3 implementation lands (the temporary minHeight: 80px guarantee from PR #1235 is
  * not sufficient — the ADR-specified testid-anchored model must exist).
@@ -36,16 +36,14 @@
  * to "minHeight: 80px temporary guarantee active as of PR #1235."
  *
  * G3 testids (added by implementation — absent pre-G3):
- *   zone-1b-mda-panel       — MDA alert panel allocation wrapper; replaces the anonymous
- *                              flex:1 1 80px div in InstrumentCluster.tsx:143; G3 adds
- *                              this testid and replaces inline minHeight with the
- *                              ADR-grounded proportional allocation model
- *   zone-1b-cohort-count-label — "and N more" label when cohort entries exceed
- *                                COHORT_MAX_DISPLAY (new truncation logic in G3)
+ *   zone-1b-mda-panel-wrapper — MDA alert panel allocation wrapper; replaces the anonymous
+ *                               flex:1 1 80px div in InstrumentCluster.tsx:143; G3 adds
+ *                               this testid and replaces inline minHeight with the
+ *                               ADR-grounded proportional allocation model (ADR-018)
  *
  * Existing testids used:
  *   zone-1b, zone-1b-cohort-impact, zone-1b-mda-alerts, zone-1b-top-detail,
- *   cohort-empty-state, cohort-row-{idx}
+ *   cohort-empty-state, cohort-row-{idx}, detail-indicator-name, detail-status
  *
  * Viewport: primary assertions at 1280×800 (minimum per sprint entry §3.1 observable
  * application state); AC-A3 also asserts at 768px (tablet legibility gate).
@@ -58,12 +56,9 @@ const API_BASE = "http://localhost:8000/api/v1";
 // Placeholder constants — update to ADR-specified values at Phase 3 handoff
 // ---------------------------------------------------------------------------
 
-// M16 temporary guarantee (PR #1235). Replace with ADR-specified minimum at handoff.
+// ADR-018: Sub-zone A permanent floor = 80px at all breakpoints.
+// Codifies the PR #1235 temporary guarantee as the permanent architectural minimum.
 const MDA_PANEL_MIN_HEIGHT_PX = 80;
-
-// Placeholder — ADR will specify the max cohort rows before "and N more" truncation.
-// Update to ADR-specified value at Phase 3 handoff.
-const COHORT_MAX_DISPLAY = 5;
 
 // ---------------------------------------------------------------------------
 // Types
@@ -352,10 +347,11 @@ const OVERFLOW_CROSSINGS: CohortThresholdCrossing[] = [
 // ---------------------------------------------------------------------------
 // AC-A1: Proportional model — both Zone 1B sections visible at 1280×800 (#1252)
 //
-// Sprint entry §2.4 AC-A1:
-// At 1280×800, the MDA alert panel occupies its ADR-specified minimum height and the
-// CohortImpactSection is visible below it; neither section is zero-height.
-// Assert via testid-anchored bounding box checks for both sections.
+// Intent §5 AC-A1:
+// At 1280×800 with dual-occupant state (MDA alerts + cohort crossings):
+// - zone-1b-mda-panel-wrapper bounding box height ≥ MDA_PANEL_MIN_HEIGHT_PX (ADR-018)
+// - zone-1b-cohort-impact bounding box height > 0
+// - zone-1b scrollTop = 0 (Zone 1B outer container not scrolled)
 // ---------------------------------------------------------------------------
 
 test.describe("AC-A1: Zone 1B proportional model — both sections non-zero at 1280×800 (#1252)", () => {
@@ -365,7 +361,7 @@ test.describe("AC-A1: Zone 1B proportional model — both sections non-zero at 1
     scenarioId = await createScenario(["SEN"], 1, `G3-SEN-AC-A1-${Date.now()}`);
   });
 
-  test("AC-A1: zone-1b-mda-panel and zone-1b-cohort-impact both visible with non-zero height at 1280×800", async ({
+  test("AC-A1: zone-1b-mda-panel-wrapper and zone-1b-cohort-impact both visible with non-zero height at 1280×800", async ({
     page,
   }) => {
     if (!scenarioId) return;
@@ -398,8 +394,8 @@ test.describe("AC-A1: Zone 1B proportional model — both sections non-zero at 1
     const zone1b = page.locator('[data-testid="zone-1b"]');
     if (!(await zone1b.isVisible({ timeout: 8_000 }).catch(() => false))) return;
 
-    // Guard: zone-1b-mda-panel is new in G3 — absent pre-G3, no-op until implementation lands
-    const mdaPanel = page.locator('[data-testid="zone-1b-mda-panel"]');
+    // Guard: zone-1b-mda-panel-wrapper is new in G3 — absent pre-G3, no-op until implementation lands
+    const mdaPanel = page.locator('[data-testid="zone-1b-mda-panel-wrapper"]');
     if (!(await mdaPanel.isVisible({ timeout: 5_000 }).catch(() => false))) return;
 
     // Both sections must be visible and have non-zero height
@@ -415,32 +411,37 @@ test.describe("AC-A1: Zone 1B proportional model — both sections non-zero at 1
     expect(cohortBox).not.toBeNull();
 
     if (mdaBox && cohortBox) {
-      expect(mdaBox.height).toBeGreaterThan(0);
+      // MDA panel must meet ADR-018 minimum — not merely non-zero
+      expect(mdaBox.height).toBeGreaterThanOrEqual(MDA_PANEL_MIN_HEIGHT_PX);
       expect(cohortBox.height).toBeGreaterThan(0);
 
       // Cohort section must appear below the MDA panel within Zone 1B
       expect(cohortBox.y).toBeGreaterThanOrEqual(mdaBox.y + mdaBox.height - 4);
     }
+
+    // Zone 1B outer container must not scroll — confirms sub-zone allocation, not outer scroll
+    const scrollTop = await zone1b.evaluate((el: Element) => (el as HTMLElement).scrollTop);
+    expect(scrollTop).toBe(0);
   });
 });
 
 // ---------------------------------------------------------------------------
 // AC-A2: Overflow regression guard — MDA panel not collapsed at 8+ crossings (#1252)
 //
-// Sprint entry §2.4 AC-A2:
+// Intent §5 AC-A2 (M16 retrospective):
 // A scenario with 8+ cohort crossing entries does not collapse the MDA panel below the
-// ADR-specified minimum height.
+// ADR-specified minimum height (80px, ADR-018).
 //
 // NM-056 EXCEPTION — this test does NOT use the early-return guard pattern.
 // It must be RED before G3 implementation:
-//   zone-1b-mda-panel does not exist pre-G3 → toBeVisible() times out → test fails (RED)
+//   zone-1b-mda-panel-wrapper does not exist pre-G3 → toBeVisible() times out → test fails (RED)
 // It must be GREEN after G3 implementation:
-//   zone-1b-mda-panel exists with ADR-grounded allocation → height >= MDA_PANEL_MIN_HEIGHT_PX
+//   zone-1b-mda-panel-wrapper exists with ADR-grounded allocation → height >= MDA_PANEL_MIN_HEIGHT_PX
 //
 // M16 retrospective context: the anonymous flex wrapper at InstrumentCluster.tsx:143 used
 // only a temporary `minHeight: 80px` inline style (PR #1235) — not a testid-anchored
 // proportional allocation model. G3 replaces it with the ADR-grounded model. The presence
-// of zone-1b-mda-panel confirms the permanent fix is in place, not just the temporary one.
+// of zone-1b-mda-panel-wrapper confirms the permanent fix is in place, not just the temporary one.
 // Source: sprint entry §2.3 regression guard specification; m17-sprint-plan.md §#1252 note.
 // ---------------------------------------------------------------------------
 
@@ -451,7 +452,7 @@ test.describe("AC-A2: Overflow regression guard — 8+ crossings do not collapse
     scenarioId = await createScenario(["SEN"], 1, `G3-SEN-AC-A2-${Date.now()}`);
   });
 
-  test("AC-A2: zone-1b-mda-panel height >= MDA_PANEL_MIN_HEIGHT_PX with 8 cohort crossings", async ({
+  test("AC-A2: zone-1b-mda-panel-wrapper height >= MDA_PANEL_MIN_HEIGHT_PX with 8 cohort crossings", async ({
     page,
   }) => {
     if (!scenarioId) return;
@@ -507,10 +508,12 @@ test.describe("AC-A2: Overflow regression guard — 8+ crossings do not collapse
 // ---------------------------------------------------------------------------
 // AC-A3: Viewport contract — 768px tablet (#1252)
 //
-// Sprint entry §2.4 AC-A3:
-// At 768px (tablet), both sections meet minimum readable height per UX brief specification;
-// CohortImpactSection does not collapse MDA panel below minimum.
-// Assert via testid-anchored bounding box checks at 768px viewport.
+// Intent §5 AC-A3:
+// At 768px (tablet), with Senegal T3 active MDA alerts and cohort crossings:
+// - zone-1b-top-detail is visible (positive bounding box height, within viewport)
+// - zone-1b scrollTop is 0
+// - zone-1b-cohort-impact has positive bounding box height
+// - zone-1b-mda-panel-wrapper bounding box height ≥ MDA_PANEL_MIN_HEIGHT_PX (ADR-018)
 // ---------------------------------------------------------------------------
 
 test.describe("AC-A3: Viewport contract — both Zone 1B sections readable at 768px tablet (#1252)", () => {
@@ -520,7 +523,7 @@ test.describe("AC-A3: Viewport contract — both Zone 1B sections readable at 76
     scenarioId = await createScenario(["SEN"], 1, `G3-SEN-AC-A3-${Date.now()}`);
   });
 
-  test("AC-A3: zone-1b-mda-panel and zone-1b-cohort-impact both have non-zero height at 768px width", async ({
+  test("AC-A3: zone-1b-mda-panel-wrapper and zone-1b-cohort-impact both have non-zero height at 768px width", async ({
     page,
   }) => {
     if (!scenarioId) return;
@@ -554,8 +557,8 @@ test.describe("AC-A3: Viewport contract — both Zone 1B sections readable at 76
     const zone1b = page.locator('[data-testid="zone-1b"]');
     if (!(await zone1b.isVisible({ timeout: 8_000 }).catch(() => false))) return;
 
-    // Guard: zone-1b-mda-panel is new in G3
-    const mdaPanel = page.locator('[data-testid="zone-1b-mda-panel"]');
+    // Guard: zone-1b-mda-panel-wrapper is new in G3
+    const mdaPanel = page.locator('[data-testid="zone-1b-mda-panel-wrapper"]');
     if (!(await mdaPanel.isVisible({ timeout: 5_000 }).catch(() => false))) return;
 
     await expect(mdaPanel).toBeVisible();
@@ -570,16 +573,16 @@ test.describe("AC-A3: Viewport contract — both Zone 1B sections readable at 76
     expect(cohortBox).not.toBeNull();
 
     if (mdaBox && cohortBox) {
-      // Both sections must be readable (non-zero height) at 768px
-      expect(mdaBox.height).toBeGreaterThan(0);
-      expect(cohortBox.height).toBeGreaterThan(0);
-
-      // MDA panel must not be collapsed below minimum by the cohort section at 768px
       expect(mdaBox.height).toBeGreaterThanOrEqual(MDA_PANEL_MIN_HEIGHT_PX);
+      expect(cohortBox.height).toBeGreaterThan(0);
     }
+
+    // Zone 1B outer container must not scroll at 768px either
+    const scrollTop = await zone1b.evaluate((el: Element) => (el as HTMLElement).scrollTop);
+    expect(scrollTop).toBe(0);
   });
 
-  test("AC-A3b: zone-1b-mda-panel not collapsed below minimum by cohort section at 768px with 8 crossings", async ({
+  test("AC-A3b: zone-1b-mda-panel-wrapper not collapsed below minimum by cohort section at 768px with 8 crossings", async ({
     page,
   }) => {
     if (!scenarioId) return;
@@ -610,7 +613,7 @@ test.describe("AC-A3: Viewport contract — both Zone 1B sections readable at 76
     const zone1b = page.locator('[data-testid="zone-1b"]');
     if (!(await zone1b.isVisible({ timeout: 8_000 }).catch(() => false))) return;
 
-    const mdaPanel = page.locator('[data-testid="zone-1b-mda-panel"]');
+    const mdaPanel = page.locator('[data-testid="zone-1b-mda-panel-wrapper"]');
     if (!(await mdaPanel.isVisible({ timeout: 5_000 }).catch(() => false))) return;
 
     const mdaBox = await mdaPanel.boundingBox();
@@ -618,16 +621,22 @@ test.describe("AC-A3: Viewport contract — both Zone 1B sections readable at 76
     if (mdaBox) {
       expect(mdaBox.height).toBeGreaterThanOrEqual(MDA_PANEL_MIN_HEIGHT_PX);
     }
+
+    // Zone 1B must not scroll as a unit even under overflow load at 768px
+    const scrollTop = await zone1b.evaluate((el: Element) => (el as HTMLElement).scrollTop);
+    expect(scrollTop).toBe(0);
   });
 });
 
 // ---------------------------------------------------------------------------
 // AC-A4: Empty-state behavior — MDA breaches with no cohort crossings (#1252)
 //
-// Sprint entry §2.4 AC-A4:
-// When Zone 1B has MDA breaches but no cohort crossings, MDA panel is visible at full
-// allocated height; CohortImpactSection shows its empty state.
-// Assert both conditions via testid presence and bounding box.
+// Intent §5 AC-A4:
+// At a step where Zone 1B has MDA alerts but no cohort crossings:
+// - zone-1b-top-detail is visible (positive bounding box height)
+// - cohort-row-0 is absent from the DOM OR cohort-empty-state is present
+// - zone-1b-cohort-impact has bounding box height ≤ 60px — confirming it is hidden or
+//   shows only the empty-state element (confirming single-occupant expansion of Sub-zone A)
 // ---------------------------------------------------------------------------
 
 test.describe("AC-A4: Zone 1B empty-state — MDA breaches with no cohort crossings (#1252)", () => {
@@ -637,7 +646,7 @@ test.describe("AC-A4: Zone 1B empty-state — MDA breaches with no cohort crossi
     scenarioId = await createScenario(["SEN"], 1, `G3-SEN-AC-A4-${Date.now()}`);
   });
 
-  test("AC-A4: zone-1b-mda-panel visible at allocated height; cohort-empty-state visible when no crossings", async ({
+  test("AC-A4: zone-1b-mda-panel-wrapper visible at allocated height; cohort-impact near-zero when no crossings", async ({
     page,
   }) => {
     if (!scenarioId) return;
@@ -669,8 +678,8 @@ test.describe("AC-A4: Zone 1B empty-state — MDA breaches with no cohort crossi
     const zone1b = page.locator('[data-testid="zone-1b"]');
     if (!(await zone1b.isVisible({ timeout: 8_000 }).catch(() => false))) return;
 
-    // Guard: zone-1b-mda-panel is new in G3
-    const mdaPanel = page.locator('[data-testid="zone-1b-mda-panel"]');
+    // Guard: zone-1b-mda-panel-wrapper is new in G3
+    const mdaPanel = page.locator('[data-testid="zone-1b-mda-panel-wrapper"]');
     if (!(await mdaPanel.isVisible({ timeout: 5_000 }).catch(() => false))) return;
 
     // MDA panel must be visible with non-zero height (MDA breach present, no cohort load)
@@ -681,30 +690,35 @@ test.describe("AC-A4: Zone 1B empty-state — MDA breaches with no cohort crossi
       expect(mdaBox.height).toBeGreaterThan(0);
     }
 
-    // Cohort section must show its empty state (not be hidden entirely)
-    const cohortSection = page.locator('[data-testid="zone-1b-cohort-impact"]');
-    await expect(cohortSection).toBeVisible();
-
+    // Cohort section must show its empty state
     const emptyState = page.locator('[data-testid="cohort-empty-state"]');
     await expect(emptyState).toBeVisible();
 
     // No cohort rows present
     const firstRow = page.locator('[data-testid="cohort-row-0"]');
     expect(await firstRow.count()).toBe(0);
+
+    // Cohort-impact section must be near-zero height (≤ 60px), confirming Sub-zone A
+    // expands to fill Zone 1B in the single-occupant state (intent §5 AC-A4)
+    const cohortSection = page.locator('[data-testid="zone-1b-cohort-impact"]');
+    const cohortBox = await cohortSection.boundingBox();
+    if (cohortBox) {
+      expect(cohortBox.height).toBeLessThanOrEqual(60);
+    }
   });
 });
 
 // ---------------------------------------------------------------------------
 // AC-P5: Persona 5 (Aicha Mbaye) — MDA severity label visible at high cohort load (#1252)
 //
-// Sprint entry §2.4 AC-P5:
-// MDA panel severity label and indicator are visible without scrolling at 1280×800,
-// regardless of cohort load. Assert via testid-anchored element visibility check after
-// populating Zone 1B with a high-cohort-load scenario.
+// Intent §5 AC-P5:
+// In the Senegal T3 conditionality scenario at 1280×800 with MDA alerts + 4+ cohort rows:
+// - zone-1b-top-detail is visible at initial viewport state (no scroll, no interaction)
+// - detail-indicator-name (inside zone-1b-top-detail) is visible — indicator name legible
+// - detail-status (inside zone-1b-top-detail) is visible — floor-distance status legible
 //
-// Aicha's use case: the MDA panel headline (severity label + indicator + distance below
-// floor) must be the primary visual anchor in Zone 1B — visible on landing without any
-// user interaction, even when the cohort section is fully populated.
+// Aicha's use case: reads MDA headline within 90-second Reactive ceiling without any
+// Zone 1B scroll or analyst mediation.
 // ---------------------------------------------------------------------------
 
 test.describe("AC-P5: Persona 5 (Aicha) — MDA severity label visible at high cohort load (#1252)", () => {
@@ -746,8 +760,8 @@ test.describe("AC-P5: Persona 5 (Aicha) — MDA severity label visible at high c
     const zone1b = page.locator('[data-testid="zone-1b"]');
     if (!(await zone1b.isVisible({ timeout: 8_000 }).catch(() => false))) return;
 
-    // Guard: zone-1b-mda-panel is new in G3
-    const mdaPanel = page.locator('[data-testid="zone-1b-mda-panel"]');
+    // Guard: zone-1b-mda-panel-wrapper is new in G3
+    const mdaPanel = page.locator('[data-testid="zone-1b-mda-panel-wrapper"]');
     if (!(await mdaPanel.isVisible({ timeout: 5_000 }).catch(() => false))) return;
 
     // zone-1b-top-detail contains the MDA severity headline (indicator + severity + value)
@@ -768,31 +782,42 @@ test.describe("AC-P5: Persona 5 (Aicha) — MDA severity label visible at high c
         expect(topDetailBox.y).toBeGreaterThanOrEqual(zone1bBox.y - 4);
       }
     }
+
+    // Aicha must be able to read the indicator name and floor-distance status without
+    // analyst mediation — both must be visible within zone-1b-top-detail
+    const indicatorName = page.locator('[data-testid="detail-indicator-name"]');
+    await expect(indicatorName).toBeVisible();
+
+    const statusLabel = page.locator('[data-testid="detail-status"]');
+    await expect(statusLabel).toBeVisible();
   });
 });
 
 // ---------------------------------------------------------------------------
-// AC-P1: Persona 1 (Lucas Ferreira) — cohort display count and overflow label (#1252)
+// AC-P1: Persona 1 (Lucas Ferreira) — cohort section readable with internal scroll (#1252)
 //
-// Sprint entry §2.4 AC-P1:
-// CohortImpactSection shows the ADR-specified max-display count at 1280×800; if more
-// entries exist, count label ("and N more") is visible. Assert via testid on cohort entry
-// items and count label.
+// Intent §5 AC-P1:
+// In the Senegal T3 conditionality scenario at step 2, at 1280×800:
+// - zone-1b-cohort-impact is visible (positive height) in Zone 1B without Zone 1B outer scroll
+// - cohort-row-0 is visible within zone-1b-cohort-impact
+// - zone-1b scrollTop = 0 (Zone 1B outer container not scrolled)
+// - Sub-zone B shows internal scroll when content exceeds height (scrollHeight > clientHeight)
 //
-// Lucas's use case: the CohortImpactSection must be fully readable at the ADR-specified
-// max-display count — not truncated below his minimum usable state. When more crossings
-// exist than the max-display count, the "and N more" label is visible and accessible.
+// NOTE: G3 uses internal scroll, not truncation. "and N more" count labels are explicitly
+// out of scope per intent §3.2 and §7. Lucas scrolls Sub-zone B to access all entries.
+//
+// Lucas's use case: CohortImpactSection fully readable in allocated space, internal scroll
+// available for overflow entries, without Zone 1B container scrolling as a unit.
 // ---------------------------------------------------------------------------
 
-test.describe("AC-P1: Persona 1 (Lucas) — cohort display count and overflow label (#1252)", () => {
+test.describe("AC-P1: Persona 1 (Lucas) — cohort section visible with internal scroll (#1252)", () => {
   let scenarioId: string | null = null;
 
   test.beforeAll(async () => {
-    // COHORT_MAX_DISPLAY + 3 crossings to trigger the overflow label
     scenarioId = await createScenario(["SEN"], 1, `G3-SEN-AC-P1-${Date.now()}`);
   });
 
-  test("AC-P1a: cohort-row count does not exceed COHORT_MAX_DISPLAY at 1280×800 with 8 crossings", async ({
+  test("AC-P1: zone-1b-cohort-impact visible without Zone 1B outer scroll; cohort-row-0 accessible; Sub-zone B scrollable with 8 crossings", async ({
     page,
   }) => {
     if (!scenarioId) return;
@@ -808,6 +833,7 @@ test.describe("AC-P1: Persona 1 (Lucas) — cohort display count and overflow la
       });
     });
 
+    // 8 cohort crossings — enough to exceed Sub-zone B visible height and activate internal scroll
     await page.route("**/api/v1/scenarios/*/measurement-output**", (route) =>
       route.fulfill({
         status: 200,
@@ -823,64 +849,34 @@ test.describe("AC-P1: Persona 1 (Lucas) — cohort display count and overflow la
     const zone1b = page.locator('[data-testid="zone-1b"]');
     if (!(await zone1b.isVisible({ timeout: 8_000 }).catch(() => false))) return;
 
-    // Guard: zone-1b-mda-panel is new in G3
-    const mdaPanel = page.locator('[data-testid="zone-1b-mda-panel"]');
+    // Guard: zone-1b-mda-panel-wrapper is new in G3
+    const mdaPanel = page.locator('[data-testid="zone-1b-mda-panel-wrapper"]');
     if (!(await mdaPanel.isVisible({ timeout: 5_000 }).catch(() => false))) return;
 
+    // CohortImpactSection must be visible within Zone 1B (positive height)
     const cohortSection = page.locator('[data-testid="zone-1b-cohort-impact"]');
-    if (!(await cohortSection.isVisible({ timeout: 5_000 }).catch(() => false))) return;
+    await expect(cohortSection).toBeVisible();
 
-    // Cohort rows must not exceed COHORT_MAX_DISPLAY
-    const rows = cohortSection.locator('[data-testid^="cohort-row-"]');
-    const rowCount = await rows.count();
-    expect(rowCount).toBeLessThanOrEqual(COHORT_MAX_DISPLAY);
-  });
+    const cohortBox = await cohortSection.boundingBox();
+    expect(cohortBox).not.toBeNull();
+    if (cohortBox) {
+      expect(cohortBox.height).toBeGreaterThan(0);
+    }
 
-  test("AC-P1b: zone-1b-cohort-count-label visible with 'and N more' when crossings exceed COHORT_MAX_DISPLAY", async ({
-    page,
-  }) => {
-    if (!scenarioId) return;
+    // Zone 1B must not scroll as a unit — Lucas reads CohortImpactSection via Sub-zone B
+    // internal scroll, not by scrolling Zone 1B outer container
+    const scrollTop = await zone1b.evaluate((el: Element) => (el as HTMLElement).scrollTop);
+    expect(scrollTop).toBe(0);
 
-    const sid = scenarioId;
+    // At least the first cohort row must be visible within CohortImpactSection
+    const firstRow = page.locator('[data-testid="cohort-row-0"]');
+    await expect(firstRow).toBeVisible();
 
-    await page.route(`**/api/v1/scenarios/${sid}`, (route) => {
-      if (route.request().method() !== "GET") { route.continue(); return; }
-      route.fulfill({
-        status: 200,
-        contentType: "application/json",
-        body: JSON.stringify(makeScenarioDetailMock(sid, ["SEN"])),
-      });
-    });
-
-    await page.route("**/api/v1/scenarios/*/measurement-output**", (route) =>
-      route.fulfill({
-        status: 200,
-        contentType: "application/json",
-        body: JSON.stringify(makeMeasurementOutputMock(sid, OVERFLOW_CROSSINGS)),
-      }),
+    // Sub-zone B must be internally scrollable when 8 crossings exceed its visible height
+    // Confirmed by scrollHeight > clientHeight on the cohort-impact container
+    const cohortInternallyScrollable = await cohortSection.evaluate(
+      (el: Element) => (el as HTMLElement).scrollHeight > (el as HTMLElement).clientHeight,
     );
-
-    await page.setViewportSize({ width: 1280, height: 800 });
-    await page.goto(`/?scenario=${encodeURIComponent(sid)}`);
-    await waitForAppReady(page);
-
-    const zone1b = page.locator('[data-testid="zone-1b"]');
-    if (!(await zone1b.isVisible({ timeout: 8_000 }).catch(() => false))) return;
-
-    // Guard: zone-1b-mda-panel is new in G3
-    const mdaPanel = page.locator('[data-testid="zone-1b-mda-panel"]');
-    if (!(await mdaPanel.isVisible({ timeout: 5_000 }).catch(() => false))) return;
-
-    // Guard: zone-1b-cohort-count-label is new in G3 (truncation not yet implemented)
-    const countLabel = page.locator('[data-testid="zone-1b-cohort-count-label"]');
-    if (!(await countLabel.isVisible({ timeout: 5_000 }).catch(() => false))) return;
-
-    // Count label must contain "and N more" phrasing
-    const labelText = await countLabel.textContent() ?? "";
-    expect(labelText).toMatch(/and \d+ more/i);
-
-    // Verify the number shown is the correct overflow count (8 total - COHORT_MAX_DISPLAY)
-    const expectedOverflow = OVERFLOW_CROSSINGS.length - COHORT_MAX_DISPLAY;
-    expect(labelText).toContain(String(expectedOverflow));
+    expect(cohortInternallyScrollable).toBe(true);
   });
 });
