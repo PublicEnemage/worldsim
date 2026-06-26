@@ -177,6 +177,51 @@ Sprint plan documents are not silently overwritten. Changes are visible through 
 
 ---
 
+## Wave Kickoff Coordination Check
+
+*Authority: NM-071 process improvement (2026-06-26). Changes to this section require PM Agent authorship and EL endorsement.*
+
+The wave kickoff coordination check is a PM Agent obligation executed before any sprint group in a new wave opens an implementation PR. It is distinct from the sprint entry gate (which is per-group) — this check is per-wave and asks whether the groups running concurrently are at a coordination tier where the PM Agent can reliably manage shared-file conflicts, cross-group dependencies, and PI Agent gate obligations alongside normal HORIZON sweep duties.
+
+The check produces a coordination tier assignment recorded in every sprint entry document for the wave.
+
+### Wave kickoff coordination fields
+
+PM Agent records these fields in each sprint group's entry document (Section 1 — Sprint Identification):
+
+1. **Groups in this wave** — list all sprint groups opening in the same wave, their primary implementation domains, and their shared-file write scope (`SESSION_STATE.md`, registry files, `CLAUDE.md`, DS-owned files). Use the file-conflict risk assessment (sprint entry §6.2) for each group to construct this list.
+
+2. **Cross-group dependency graph** — for each group, list any upstream group whose merged output is required before this group can begin implementation. Any group with an upstream dependency must have the dependency merge sequence documented before implementation begins — the downstream group may not open its integration PR until the upstream group's integration PR has merged to the release branch.
+
+3. **Coordination tier** — PM Agent determines the tier based on the count of groups actively running concurrently (not groups in the wave plan, but groups with open implementation PRs):
+
+| Concurrent groups | Tier | Required coordination protocol |
+|---|---|---|
+| 1–2 | **Standard** | Groups write to shared files in their own PRs; conflicts are recoverable at merge time. No additional coordination required beyond normal sprint entry. |
+| 3–4 | **Recommended coordination** | PM Agent coordination lane is recommended for shared-state files (`SESSION_STATE.md`, registry files). Groups flag shared-file changes in their exit PR description. PM Agent reviews exit PRs before PI Agent gate comment. |
+| 5 | **Required coordination** | PM Agent coordination lane is mandatory for all shared-state files. Sprint group sub-branches mandatory (per `docs/process/sprint-group-isolation.md`). No group may open an integration PR without PM Agent clearance. |
+
+**Hard ceiling: 5 concurrent groups per wave maximum.**
+
+If 5 groups are already actively running (implementation PRs open), no new group may open an implementation PR until at least one exits (integration PR merges to release branch). Exceeding this ceiling without explicit EL direction is a process deviation. The PM Agent is responsible for enforcing this ceiling — EL is accountable and may revise the ceiling after M18 experience.
+
+### Wave kickoff sequence
+
+1. PM Agent reviews all groups planned for the wave before any group opens an implementation PR.
+2. PM Agent determines the coordination tier for the wave.
+3. PM Agent records the tier and the dependency merge sequence in each group's sprint entry document (Section 1).
+4. EL approves the sprint entry documents (which now include the coordination tier).
+5. Implementation PRs may open once sprint entry documents are EL-approved.
+
+### When a new group joins mid-wave
+
+If a group not originally in the wave plan is added mid-wave:
+1. PM Agent re-runs the wave coordination check counting all currently open implementation PRs.
+2. If the new group's addition would push the concurrent count above 5, the group holds at sprint entry until a running group exits.
+3. The new group's entry document records the coordination tier at the time of its entry — not the tier from original wave planning.
+
+---
+
 ## Sprint Entry Gate
 
 *Authority: Phase C output (2026-06-12).

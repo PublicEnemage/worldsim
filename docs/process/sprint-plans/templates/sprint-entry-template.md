@@ -34,6 +34,9 @@ Changes to this template require PM Agent authorship and EL endorsement.*
 | Sprint plan document | `docs/process/sprint-plans/{milestone-slug}-sprint-plan.md` |
 | Exit checklist issue | #{exit-checklist-issue-number} |
 | Sprint groups in scope | {G1, G2, G3, …} |
+| Wave coordination tier | {Standard / Recommended coordination / Required coordination — PM Agent determination per §Wave Kickoff Coordination Check} |
+| Concurrent groups at entry | {N of 5 max — count of implementation PRs open across all active sprint groups when this entry is filed} |
+| Cross-group dependencies | {None / See §6.4 for dependency merge sequence} |
 
 ---
 
