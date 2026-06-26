@@ -391,8 +391,8 @@ Per `docs/process/sprint-planning-sop.md §Sprint Entry Gate`, implementation ma
 3. ✅ EL approves sprint plan — PR #1364 merged 2026-06-26
 4. ✅ PM Agent cuts `release/m18` from `main` — cut 2026-06-26 at commit 8cffc86 (sync PR #1366 merged)
 5. ✅ DS Agent: `backend/test-results/` already in `.gitignore` (PR #1346 — no action needed)
-6. ⬜ G1 sprint entry filed and EL-approved → Wave 1 begins
-7. ⬜ G2 sprint entry filed and EL-approved → Wave 1 parallel group open
+6. ✅ G1 sprint entry filed and EL-approved 2026-06-26 (PR #1369; approval recorded in entry doc)
+7. ✅ G2 sprint entry filed and EL-approved 2026-06-26 (PR #1369; approval recorded in entry doc)
 8. ⬜ GD Phase 1 begins (Artifacts 1 + 3) — immediately after EL sprint plan approval
 9. ⬜ GR begins (#1352) — immediately after EL sprint plan approval
 10. ⬜ Wave 1 exit gates confirmed by PI Agent (G1, G2)
