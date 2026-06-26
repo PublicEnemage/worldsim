@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-26 (M17 Exit Checklist — all agent-verifiable items confirmed; SCAN-027 appended + ADR-018 .mmd diagram created + pre-existing Vitest test fix — PR #1330 merged; #982 verification comment filed; EL sign-off + exit ceremony (SOP Steps 1–4) pending EL merge of release/m17 → main)**
+**Last updated: 2026-06-26 (M17 systemic process gap sprint — NM-066–071 filed; GitHub Issues #1328/#1329/#1332–#1335 opened; insights-log entries for all six flagged as M18 entry blockers; PR #1336 merged to release/m17; EL sign-off + M17 exit ceremony pending)**
 **Current milestone:** M17 — Calibration and Comparative Infrastructure (GitHub Milestone 18)
 **Previous milestone:** M16 — Distributional Visibility (FORMALLY CLOSED 2026-06-25; release/m16 → main; v0.16.0; #985 closed; GitHub Milestone 17 closed)
 
@@ -55,6 +55,19 @@
 | #1277 | docs(process): sprint-planning-sop.md amendment — UX/UI design artifact gate | G6 | Wave 2 | ✅ **BPO N/A (process document)** — PR #1324 merged 2026-06-26; all seven SOP components on record; CI green; G6 sprint exit CONFIRMED; **CLOSED** |
 
 **Deferred to M18:** #843 (Demo 7 live session), #1217 (Mode 3 render optimization), #1238 (DEMO6-009 narration), #1059 (HCL demo narration), #1254 (CI bands), #1255 (PSP driver decomp), #1256 (Path 2)
+
+**Pre-M18 infrastructure issues (M18 entry blockers — filed 2026-06-26):**
+
+| Issue | NM | Title | Blocker level |
+|---|---|---|---|
+| #1328 | NM-066 | SESSION_STATE.md size: exceeds Claude Code read ceiling; session continuity guarantee silently degraded | M18 entry blocker — file reduced + archival protocol in CLAUDE.md before sprint entry gate opens |
+| #1329 | NM-067 | Branching strategy: no sprint group isolation protocol for parallel workstreams | M18 entry blocker — CLAUDE.md §Release Branch Workflow + sprint entry file-conflict field updated before sprint entry gate opens |
+| #1332 | NM-068 | Sprint entry gate: add prior NM process improvement verification step | M18 entry blocker — sprint entry template Prior NM applicability check field required before first M18 group |
+| #1333 | NM-069 | .gitignore: missing Playwright/test artifact directories | First M18 infrastructure PR — one-PR fix; not a hard entry gate blocker |
+| #1334 | NM-070 | Pre-push gates: implement git hook enforcement; mypy gate non-functional M8–M16 | M18 entry blocker — hook in place before first M18 push |
+| #1335 | NM-071 | Sprint planning SOP: wave-level concurrency ceiling and coordination budget check | M18 entry blocker — wave kickoff coordination check required before M18 Wave 1 implementation begins |
+
+All six have open insights-log entries flagged for PM Agent promotion at the next HORIZON sweep. NM-066–071 appended to `docs/process/near-miss-registry.md`; PR #1336 merged to release/m17 2026-06-26.
 **Closed at audit:** #1225 (Demo 6 prep — Steps 1–6c complete)
 
 **M17 sprint plan:** `docs/process/sprint-plans/m17-sprint-plan.md` — filed 2026-06-25 (v3, EL-directed revisions); **EL APPROVED 2026-06-25**
