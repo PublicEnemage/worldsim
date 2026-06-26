@@ -3,23 +3,23 @@ name: m18-g1-sprint-entry
 type: sprint-entry
 milestone: M18 — Full Argument and Demo 7
 sprint-group: G1
-status: Filed — awaiting EL approval
+status: EL-approved 2026-06-26 — intent document, UX/UI mockups, panel review, and QA tests required before implementation PR opens
 authored-by: PM Agent
 authored-date: 2026-06-26
-el-approved: false
+el-approved: 2026-06-26
 release-branch: release/m18
 sop-reference: docs/process/sprint-planning-sop.md
 ---
 
 # Sprint Entry — M18, G1: CI Bands on Zone 1A
 
-**Status:** Filed — awaiting EL approval before implementation PR opens
+**Status:** EL-approved 2026-06-26 — intent document, UX/UI mockups, panel review, and QA tests required before implementation PR opens
 **Date authored:** 2026-06-26
 **Release branch:** `release/m18`
 **Sprint plan:** `docs/process/sprint-plans/m18-sprint-plan.md` (EL-approved 2026-06-26, PR #1364)
 **Sprint journal issue:** #1367
 
-*No implementation PR may open until this entry document is EL-approved.*
+*EL-approved. Implementation PR may not open until intent document, UX/UI mockups, panel review, and QA tests are complete (§2.3 and §2.4).*
 
 ---
 
@@ -211,7 +211,7 @@ G1 does not write to `InstrumentCluster.tsx` structurally — CI bands are passe
 
 ## EL Approval Record
 
-**EL approval:** Pending
+**EL approval:** 2026-06-26
 
-> {EL approval statement — implementation PR may not open until this record is complete}
-> — @PublicEnemage ({date})
+> G1 sprint entry approved. ADR prerequisites confirmed (ADR-007 and ADR-017 both ACCEPTED). Sprint sub-branch `sprint/m18-g1` is live. Implementation PR may not open until: intent document filed at `docs/process/intents/M18-G1-2026-06-26-ci-bands-zone-1a.md`, UX mockup and UI mockup complete, 5-agent panel review ACCEPT recorded, and QA tests authored (red before implementation).
+> — @PublicEnemage (2026-06-26)

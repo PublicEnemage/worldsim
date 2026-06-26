@@ -3,23 +3,23 @@ name: m18-g2-sprint-entry
 type: sprint-entry
 milestone: M18 — Full Argument and Demo 7
 sprint-group: G2
-status: Filed — awaiting EL approval
+status: EL-approved 2026-06-26 — intent document, UX mockup, panel review, and QA tests required before implementation PR opens
 authored-by: PM Agent
 authored-date: 2026-06-26
-el-approved: false
+el-approved: 2026-06-26
 release-branch: release/m18
 sop-reference: docs/process/sprint-planning-sop.md
 ---
 
 # Sprint Entry — M18, G2: PSP Driver Decomposition
 
-**Status:** Filed — awaiting EL approval before implementation PR opens
+**Status:** EL-approved 2026-06-26 — intent document, UX mockup, panel review, and QA tests required before implementation PR opens
 **Date authored:** 2026-06-26
 **Release branch:** `release/m18`
 **Sprint plan:** `docs/process/sprint-plans/m18-sprint-plan.md` (EL-approved 2026-06-26, PR #1364)
 **Sprint journal issue:** #1368
 
-*No implementation PR may open until this entry document is EL-approved.*
+*EL-approved. Implementation PR may not open until intent document, UX mockup, panel review, and QA tests are complete (§2.3 and §2.4).*
 
 ---
 
@@ -210,7 +210,7 @@ G2 does not touch `InstrumentCluster.tsx` if decomposition is inline within the 
 
 ## EL Approval Record
 
-**EL approval:** Pending
+**EL approval:** 2026-06-26
 
-> {EL approval statement — implementation PR may not open until this record is complete}
-> — @PublicEnemage ({date})
+> G2 sprint entry approved. ADR prerequisite confirmed (ADR-015 ACCEPTED). Sprint sub-branch `sprint/m18-g2` is live. Implementation PR may not open until: intent document filed at `docs/process/intents/M18-G2-2026-06-26-psp-driver-decomposition.md`, UX mockup complete (UI mockup conditional — UX Designer determines at mockup authorship time whether Zone 1D structural change is required), 5-agent panel review ACCEPT recorded, and QA tests authored (red before implementation).
+> — @PublicEnemage (2026-06-26)
