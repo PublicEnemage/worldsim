@@ -6,7 +6,7 @@
 > Historical state lives in `docs/process/session-archives/`.
 > Authority: `docs/process/sprint-group-isolation.md §SESSION_STATE.md Cockpit Card Protocol`.
 
-**Last updated:** 2026-06-26 (ALL SIX M18 ENTRY BLOCKERS RESOLVED — PRs #1344/#1345/#1346/#1347; release/m18 ready to cut; sprint plan pending)
+**Last updated:** 2026-06-26 (M18 HORIZON sweep complete — #1328/#1329/#983 closed; #1349 counter-scenario filed; #1350 PI determination recorded; sprint plan pending)
 **Current milestone:** M18 — Full Argument and Demo 7 (GitHub Milestone 19)
 
 ---
@@ -55,11 +55,11 @@ None open. #1328 and #1329 resolved 2026-06-26 (DS consultation; Option E hybrid
 | #843 | Demo 7 — live external session (Senegal Mode 3 + Zambia 3-scenario) | Primary deliverable |
 | #1254 | CI bands on Zone 1A trajectories (ADR-007 full implementation) | Wave 1 |
 | #1255 | PSP driver decomposition | Wave 1 |
-| #1256 | Path 2 / counter-scenario comparison | Wave 1 |
-| #394 | Multi-scenario comparison Phase 2 | Wave 1 |
+| #1349 | Counter-scenario comparison — distributional number differential with CI bands | Wave 1 |
+| #1256 | Path 2 / proprietary data integration | Capacity-allowing |
 | #1217 | Mode 3 render optimization | Deferred |
-| #1238 | DEMO6-009 narration layer | Deferred |
-| #1059 | HCL demo narration | Deferred |
+| #1238 | DEMO6-009 TTS narration fix | Deferred |
+| #1059 | HCL narration integration | Deferred |
 
 ---
 
