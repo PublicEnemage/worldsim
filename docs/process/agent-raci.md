@@ -35,6 +35,7 @@
 | DA | Data Architect Agent | Active |
 | QA | QA Lead Agent | Active |
 | Sr | Security & Review Agent | Active |
+| DS | DevSecOps Agent | Active (M18) |
 | IR | Independent Review Agent | Active |
 | So | Socratic Agent | Active |
 | CE | Computation Engine Agent | Active (Issue #524, M10) |
@@ -54,17 +55,18 @@
 
 ## RACI Matrix
 
-| Decision type | EL | PM | Ar | Im | DA | QA | Sr | IR | So | CE | FA | UD | UT | DI | CO | AF | IB | DQ | PO | PI | CU |
-|---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
-| 1. Architectural decisions | A | I | R | I | C | I | I | I | I | C | C | I | C | C | I | C | I | I | I | I | C |
-| 2. UX frame decisions | A | I | I | I | I | I | I | C | I | I | C | C | R | I | I | I | I | I | C | I | C |
-| 3. UX component decisions | A | I | I | I | I | I | I | C | I | I | C | R | I | I | I | I | I | I | C | I | C |
+| Decision type | EL | PM | Ar | Im | DA | QA | Sr | DS | IR | So | CE | FA | UD | UT | DI | CO | AF | IB | DQ | PO | PI | CU |
+|---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
+| 1. Architectural decisions | A | I | R | I | C | I | I | C | I | I | C | C | I | C | C | I | C | I | I | I | I | C |
+| 2. UX frame decisions | A | I | I | I | I | I | I | I | C | I | I | C | C | R | I | I | I | I | I | C | I | C |
+| 3. UX component decisions | A | I | I | I | I | I | I | I | C | I | I | C | R | I | I | I | I | I | I | C | I | C |
 | 4. Data / schema decisions | A | I | C | C | R | C | I | I | I | I | I | I | I | I | I | I | I | C | I | I | I |
 | 5. Domain / measurement decisions | A | I | C | I | I | C | C | I | I | I | I | I | I | R | C | C | I | C | I | I | I |
-| 6. Process / milestone decisions | A | R | C | I | I | C | I | I | I | I | I | I | C | I | C | I | I | I | C | R | I |
-| 7. Compliance decisions | A | I | I | C | C | C | R | I | I | I | I | I | I | C | I | I | R | C | I | R | I |
-| 8. Demo / stakeholder decisions | A | R | I | I | I | I | I | R | I | I | C | C | I | C | I | I | I | I | R | I | C |
-| 9. Agent activation decisions | A/R | C | I | I | I | I | I | I | I | I | I | I | I | I | I | I | I | I | I | I | I |
+| 6. Process / milestone decisions | A | R | C | I | I | C | I | C | I | I | I | I | I | C | I | C | I | I | I | C | R | I |
+| 7. Compliance decisions | A | I | I | C | C | C | R | C | I | I | I | I | I | I | C | I | I | R | C | I | R | I |
+| 8. Demo / stakeholder decisions | A | R | I | I | I | I | I | I | R | I | I | C | C | I | C | I | I | I | I | R | I | C |
+| 9. Agent activation decisions | A/R | C | I | I | I | I | I | I | I | I | I | I | I | I | I | I | I | I | I | I | I | I |
+| 10. Build / infrastructure decisions | A | I | C | I | I | C | I | R | I | I | C | I | I | I | I | I | I | I | I | I | C | I |
 
 ---
 
@@ -96,6 +98,11 @@ code drift is a compliance violation." (`agents.md §Data Architect Agent`)
 implications before they are accepted. A proposal that defines a new module interface or
 relationship type without Computation Engine Agent review may create performance constraints that cannot be
 resolved without interface rework." (`agents.md §Computation Engine Agent`)
+
+**DS — C:** Consulted on any architectural decision that adds CI/CD pipeline gates, introduces
+new dependency types, or changes container configuration. Specifically: any ADR that adds a
+mandatory CI check must pass DS review confirming the check is enforceable on the Equitable
+Build Process hardware targets. (`agents.md §DevSecOps Agent`)
 
 **FA — C:** "RACI position: R on frontend component architecture briefs; C on ADR decisions
 with frontend type implications." (`agents.md §Frontend Architect Agent`)
@@ -318,6 +325,10 @@ recommendations that might be acted on later." Filed issues affect milestone sco
 management, not a unilateral PO decision." The PO assesses the user-value impact of scope cuts
 before they are decided. (`agents.md §Business Product Owner Agent`)
 
+**DS — C:** Consulted when sprint entries introduce new dependencies, test frameworks, or output
+paths. DS confirms `.gitignore` coverage, CVE status, and CI gate implications before EL
+approves the entry. (`agents.md §DevSecOps Agent`)
+
 **PI — R:** "I own the record of what the project learned about itself. PM decides what to work
 on next; I ensure the project does not repeat what it already learned was a hazard." Owns the
 near-miss registry, known-issues registry, and process audit (four-lens, milestone cadence) —
@@ -353,6 +364,12 @@ modeling for dual-use concerns." "Dual-use check: Is this feature more useful fo
 financial attacks than for defending against them? If yes, it is out of scope for WorldSim."
 "Reports directly to Engineering Lead for dual-use concerns." (`agents.md §Security and Review
 Agent`)
+
+**DS — C:** Consulted on infrastructure-level compliance findings: dependency CVE status, CI
+pipeline gate health, pre-push hook enforcement. DS files dependency audit reports to
+`docs/compliance/infra-reviews/`. DS HORIZON gate health check findings route to PI Agent for
+NM filing — DS identifies the technical failure; PI files the institutional record.
+(`agents.md §DevSecOps Agent`)
 
 **DI — C:** Geopolitical Analyst (DIC member) has a standing compliance-facing commitment:
 "I flag the dual-use boundary when a SCENARIO finding could as easily serve a financial attack
@@ -440,6 +457,41 @@ requires DIC activation) and escalates activation decisions — but does not mak
 
 ---
 
+### 10. Build / infrastructure decisions
+
+*Scope: CI/CD pipeline configuration (`.github/workflows/`), pre-push hook specification and
+enforcement (`.githooks/`), `.gitignore` coverage, dependency management (package CVE and
+license assessment), container and Docker configuration, build infrastructure configuration
+targeting the Equitable Build Process hardware targets.*
+
+**EL — A:** "Engineering Lead sets the Equitable Build Process equity targets (2-core, 8GB
+RAM, GitHub Actions free-tier)." The build infrastructure must remain accessible to
+resource-constrained contributors; EL holds accountability for that constraint.
+(`agents.md §Engineering Lead`)
+
+**Ar — C:** Consulted when CI/CD pipeline changes have architectural implications — e.g., a
+new CI gate that enforces an ADR constraint, or a workflow change that affects how ADRs are
+validated at merge time. (`agents.md §Architect Agent`)
+
+**QA — C:** Consulted when CI configuration changes affect test execution scheduling, reporting,
+or gate thresholds. QA owns the tests; DS owns the pipeline that runs them.
+(`agents.md §QA Lead Agent`)
+
+**DS — R:** "Owns `.github/` CI/CD configuration; `.githooks/pre-push`; `.gitignore`;
+dependency audit at each milestone close. At each HORIZON sweep, verifies all mandatory
+pre-push gates are functional — not merely documented." (`agents.md §DevSecOps Agent`)
+
+**CE — C:** Consulted when build pipeline changes affect benchmark execution or when
+Equitable Build Process hardware targets require CI configuration adjustments.
+(`agents.md §Computation Engine Agent`)
+
+**PI — C:** Consulted when build/infrastructure decisions close or prevent a near-miss class
+(e.g., the pre-push hook implementation that closes NM-070). PI confirms the process improvement
+is structurally enforced, not merely documented, before the NM entry is marked resolved.
+(`agents.md §Process Integrity Agent — Working Agreement`)
+
+---
+
 ## Cross-Agent Interaction Patterns
 
 The working agreements establish several standing interaction obligations that the RACI above
@@ -481,6 +533,8 @@ These are explicit commitments in working agreements, not inferred relationships
 | Customer Agent | PO Agent | "When a story involves Personas 2, 3, or 5, request a Customer Agent review of the acceptance criteria before QA authorship begins." | Customer Agent working agreement (offer of help) |
 | Customer Agent | Architect Agent | "When an ADR introduces a new output format, flag it to me before the panel review. I will produce a Layer 3 usability finding for the panel record." | Customer Agent working agreement (offer of help) |
 | Architect Agent | Customer Agent | For any ADR whose scope includes a user-visible instrument, widget, or workflow change: invoke `Customer Agent: AUDIT — [scope]` on the draft before the panel review is distributed. The Customer Agent response must be included in the ADR's Context section. | Issue #539 (PI-AUDIT-002 F-PIPELINE-2) |
+| DevSecOps Agent | Process Integrity Agent | "When a pre-push gate has degraded, I activate PI Agent for NM filing before the HORIZON sweep closes. DS identifies the technical failure; PI files the institutional record." | `agents.md §DevSecOps Agent` |
+| DevSecOps Agent | QA Lead | "When CI configuration changes affect test execution scheduling or reporting, I consult QA before the change merges." | `agents.md §DevSecOps Agent` |
 
 ---
 
@@ -545,7 +599,9 @@ finalized — not afterward.
 |---|---|---|---|
 | `CLAUDE.md` | EL | Ar, PM | Constitutional document; structural changes require Architect review |
 | `SESSION_STATE.md` | PM | EL | PM maintains; EL reviews major restructuring |
-| `.github/` | EL | Ar | CI/CD pipeline changes require Architect review |
+| `.github/` | DS | EL (A), Ar (C) | DS owns CI/CD workflow configuration; EL is accountable; Architect consulted on architectural implications |
+| `.githooks/` | DS | EL (A) | Pre-push hook owned by DS; installation documented in `docs/CONTRIBUTING.md` |
+| `.gitignore` | DS | CE (C) | DS owns build and test artifact exclusions; CE consulted when benchmark output paths are added |
 | `docs/process/agents.md` | PM | EL | Agent persona definitions; EL approves new agent additions |
 | `docs/process/agent-raci.md` | PM | EL, Ar | RACI matrix; Architect consulted when decision-type grounding changes. Any addition to or change of decision-type grounding text (rows in the RACI matrix) triggers Required C (Ar) — "addition" qualifies, not only "change." (NM-021) |
 | `docs/process/near-miss-registry.md` | PI | EL | PI files entries; EL informed of High severity entries; PM informed of all entries (I). **No delegation:** PM Agent does not have authority to file NM entries without PI Agent activation — PI Agent must be activated before any entry is written, regardless of severity. EL decision 2026-06-05. |
@@ -580,6 +636,7 @@ finalized — not afterward.
 | `docs/ux/design-thinking/` | UT | UD | UX Design Thinking Agent produces first-principles derivation and critique artifacts in this directory; UX Designer consulted on outputs that affect design decisions (Issue #528) |
 | `docs/demo/{milestone}/reviews/*-stakeholder-review.md` | IR | PM | Independent Review Agent is the author of record for Step 7 stakeholder review artifacts; PM owns the demo cycle and receives IR output for triage (Issue #528) |
 | `docs/compliance/security-reviews/` | Sr | EL, PI | Security & Review Agent produces vulnerability audit and dual-use review reports here; EL informed of all reports; PI consulted when a report produces a SCAN-entry finding (Issue #528) |
+| `docs/compliance/infra-reviews/` | DS | EL, PI | DevSecOps Agent produces dependency audit reports and CI health reports here; naming convention `YYYY-MM-DD-mN-[type].md`; EL informed of all reports; PI consulted when a report produces a near-miss finding |
 
 **Socratic Agent (So) — explicitly excluded from file ownership (Issue #528):**
 The Socratic Agent produces understanding, not documents. Its outputs are delivered

@@ -10,7 +10,7 @@ first-applied: M12
 
 **Owner:** PM Agent (R)  
 **Accountable:** Engineering Lead (A)  
-**Required Consultants:** Business Product Owner, Frontend Architect, Computation Engine Agent, Architect  
+**Required Consultants:** Business Product Owner, Frontend Architect, Computation Engine Agent, Architect, DevSecOps Agent  
 **Activation:** `PM Agent: SPRINT — [milestone]`
 
 ---
@@ -79,7 +79,15 @@ PM Agent runs four consultations before producing a draft plan. Consultations ar
 
 **Output informs:** Wave 2 and Wave 3 sequencing; any group split or merge recommendations on the backend side.
 
-### 4. Architect — ADR prerequisites
+### 4. DevSecOps Agent — Infrastructure and dependency review
+
+`DevSecOps Agent: REVIEW — sprint dependency and output-path assessment for [milestone name]`
+
+**Ask:** For each proposed sprint group: (1) Does the group introduce a new Python or npm dependency? If yes, confirm CVE status and license. (2) Does the group introduce a new test framework or output directory? If yes, confirm `.gitignore` coverage is planned for the same PR. (3) Does the group change CI/CD configuration? If yes, confirm the change is compatible with the Equitable Build Process hardware targets.
+
+**Output informs:** Sprint entry template "Prior NM applicability check" field for infrastructure-class groups; any group flagged `NEEDS_GITIGNORE_UPDATE` or `DEPENDENCY_CVE_REVIEW` is noted before EL approves.
+
+### 5. Architect — ADR prerequisites
 
 `Architect: REVIEW — ADR prerequisites for [milestone name]`
 
