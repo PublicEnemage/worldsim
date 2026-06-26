@@ -1,9 +1,9 @@
 # WorldSim Roadmap
 
-> Last significant revision: 2026-06-25
-> Next mandatory review: Milestone 17 close
-> Updated against: M16 close — Distributional Visibility complete; Zone 1A Phase 4, cohort disaggregation, political risk surface, 25-year trajectory, ecological-fiscal transmission, uncertainty quantification all delivered; Demo 6 preparatory work (Steps 1–6c, DEMO6-001–049, north star finding sentence) on record; #843 live demo deferred to M17/Demo 7 (EL decision 2026-06-25) — DEMO6 findings addressed holistically alongside Mode 3 calibration; M17/M18 scope revised to reflect Demo 7 arc, Wave 1 calibration gate, and #407/#5/#4 deferral to M19+
-> Previous version context: 2026-06-23 — M15 close; M16 active; #843 M16 exit gate
+> Last significant revision: 2026-06-26
+> Next mandatory review: Milestone 18 close
+> Updated against: M17 close — Calibration and Comparative Infrastructure complete; Wave 1 CM calibration (fiscal-to-cohort elasticity, governance sensitivity) delivered; Wave 2 N=3 multi-scenario, DEMO6 CRITICAL polish, adaptive y-axis, Zone 1B proportional allocation (ADR-018), GovernanceModule institutional_capacity_index all delivered; M18 now current; Demo 7 at M18 close
+> Previous version context: 2026-06-25 — M16 closed; M17 active; #843 live demo deferred to M17/Demo 7
 > Canonical location: `docs/roadmap/worldsim-roadmap.md`
 
 *Note: This document was not updated at M10, M11, M11.5, or M12 close — a gap against the "Roadmap Currency" policy. Updates at those closes are now reflected in the registry and narrative sections.*
@@ -36,20 +36,20 @@
 | M14 | Trust Architecture and Instrument Credibility | ADR-016 Grounding strip (source provenance), ADR-015 Evidence thread (Zone 1B credibility), PSP in Zone 1D, methodology foundation docs, Demo 5 | Complete |
 | M15 | Human Cost Architecture | ADR-017 Zone 1A, Layer 3 self-interpreting outputs, Path 1 approved source, cohort/political risk designs, accessibility validation | Complete |
 | M16 | Distributional Visibility | Zone 1A Phase 4; cohort disaggregation; political risk summary; 25-year trajectory; ecological-fiscal transmission; uncertainty quantification; Demo 6 prep (Steps 1–6c; DEMO6 findings on record) | Complete |
-| M17 | Calibration and Comparative Infrastructure | Wave 1: CM calibration (fiscal-to-cohort elasticity #1229, governance sensitivity); Wave 2: multi-scenario (#394) + DEMO6 CRITICAL polish + adaptive y-axis extension | Planned |
-| M18 | Full Argument and Demo 7 | Demo 7 (Senegal Mode 3 + Zambia three-scenario); counter-scenario comparison; CI bands (ADR-007); PSP driver decomposition | Planned |
+| M17 | Calibration and Comparative Infrastructure | Wave 1: CM calibration (fiscal-to-cohort elasticity #1229, governance sensitivity #1248, FRAME-D gate); Wave 2: N=3 multi-scenario (#394), DEMO6 CRITICAL polish (#1249/#1250/#1253/#1239), adaptive y-axis (#1251), Zone 1B proportional allocation ADR-018 (#1252), GovernanceModule institutional_capacity_index (#1275) | Complete |
+| M18 | Full Argument and Demo 7 | Demo 7 (Senegal Mode 3 + Zambia three-scenario, live external session #843); counter-scenario comparison; CI bands (ADR-007 full implementation); PSP driver decomposition | Current |
 
 ---
 
 ## Where We Are
 
-WorldSim v0.16.0 is released. Seventeen milestones of foundational and delivery work are complete. The simulation engine runs multi-country scenarios with matrix computation. The external sector module enables bilateral trade shocks and commodity price cascades. Mode 3 Active Control lets a finance ministry analyst branch from any simulation step, apply policy instruments, and compare the resulting trajectory against the baseline in real time. All four measurement framework axes are live. The political economy module makes programme survival probability and conditionality dynamics analytically visible. The alert panel (Zone 1B) delivers threshold breach evidence with a self-interpreting trajectory sentence and cohort disaggregation — bottom quintile threshold crossings are visible at primary viewport without navigation. Zone 1D surfaces a plain-language PSP severity label (CRITICAL/WARNING/WATCH/STABLE) readable in thirty seconds by a political advisor without economist mediation. The Grounding strip surfaces source-cited initial state provenance with date-accurate labels. Path 1 enables a user-directed query from the approved source network at scenario creation. The 25-year human capital depletion trajectory is live. Uncertainty quantification delivers scenario bands (p10/p50/p90). Six historical backtesting cases are validated.
+WorldSim v0.17.0 is released. Eighteen milestones of foundational and delivery work are complete. The simulation engine is calibrated against empirical SSA LIC evidence. Three simultaneous scenarios can be compared across all four Zone 1 instruments. The fiscal-to-cohort transmission channel reflects Fosu 2011 elasticity constants. The governance composite responds to fiscal austerity through both GDP-mediated and direct institutional capacity channels (Gupta 2002). Zone 1B proportional allocation (ADR-018) ensures MDA alerts remain visible regardless of cohort section height. DEMO6 CRITICAL legibility findings are resolved.
 
-M16 is complete. The distributional argument — which cohort, at which step, against what floor, for how long — is on the primary surface without navigation. Demo 6 preparation work (Steps 1–6c) has been completed: screenshot brief, full walkthrough, narrated specification, five frames captured, internal review, IR review, audience simulation (DEMO6-001–049 findings), and the north star finding sentence are all on record as the specification foundation for Demo 7. The live external session (#843) has been deferred to M17/Demo 7 (EL decision 2026-06-25) — the four DEMO6 CRITICAL findings and the fiscal-to-cohort calibration gap are addressed holistically alongside Mode 3 rather than as pre-demo patches.
+M17 is complete. The calibration argument — that the tool's response surface is grounded in published SSA LIC evidence, not arbitrary defaults — is now on record. The Chief Methodologist calibration sprint produced a written specification, a FRAME-D milestone sentence gate that fires in the Demo 7 window, and three CM positions documented for governance sensitivity. The comparative infrastructure (N=3 multi-scenario, Zone 1B proportional allocation) makes the Demo 7 three-scenario comparison technically possible.
 
-M16 asks and answers: can the tool surface who bears the cost — specifically enough to cite at the table? Yes — a Senegalese Finance Minister's team can now show that the bottom quintile of informal workers is approaching a poverty threshold they would not recover from for a decade, and that the government may not have the political capacity to deliver the conditionality. That argument has a number, a step, a confidence tier, and a 25-year consequence frame.
+M17 asks and answers: is the engine calibrated well enough to defend the numbers at the table? Yes — the fiscal-to-cohort transmission channel now reflects Fosu 2011 SSA LIC evidence (T3), the FRAME-D milestone sentence fires within the Demo 6 window, and the institutional capacity channel (Gupta 2002) is live in Zone 1D. The comparative infrastructure enables a Zambian finance ministry team to compare three fiscal adjustment paths simultaneously.
 
-M17–M18 are defined and issued-scoped. The roadmap through M18 is directionally committed. The demo arc (Demo 5 at M14; Demo 6 preparation complete at M16; Demo 7 at M18) defines the progressive capability story the tool tells to the world.
+M18 is current. The roadmap through M18 is directionally committed. Demo 7 at M18 close — the first live external session (#843) with the complete analytical stack.
 
 ---
 
@@ -340,7 +340,7 @@ surface: any milestone entry with UNTRACKED items is an open kickoff gate.
 
 ---
 
-### Milestone 17 — Calibration and Comparative Infrastructure *(planned)*
+### Milestone 17 — Calibration and Comparative Infrastructure *(complete)*
 
 **Core deliverable:** A calibrated engine and comparative infrastructure that makes Demo 7 analytically defensible. No demo at M17 close. M17 is the prerequisite milestone — the work here is the condition of possibility for everything Demo 7 claims.
 

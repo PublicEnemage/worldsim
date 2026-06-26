@@ -1,8 +1,8 @@
 # CLAUDE.md — WorldSim Project Context
 
-> Last significant revision: 2026-06-25
-> Updated against: M16 exit gate revised — #843 live demo deferred to M17/Demo 7 (EL decision 2026-06-25); M16 closes on distributional visibility delivery; DEMO6 findings (001–049) retained as Demo 7 specification foundation
-> Previous version context: 2026-06-23 — M15 closed; M16 active; ADR-017 Zone 1A information architecture; Layer 3 self-interpreting outputs; cohort/political risk designs; accessibility validation; CLAUDE.md extraction
+> Last significant revision: 2026-06-26
+> Updated against: M17 close — Calibration and Comparative Infrastructure complete; Wave 1 CM calibration (fiscal-to-cohort elasticity, governance sensitivity) delivered; Wave 2 N=3 multi-scenario, DEMO6 CRITICAL polish, adaptive y-axis, Zone 1B proportional allocation (ADR-018), GovernanceModule institutional_capacity_index all delivered; M18 now current
+> Previous version context: 2026-06-25 — M16 closed; M17 active; DEMO6 findings (001–049) retained as Demo 7 specification foundation
 
 > **Reader Orientation:** This is the permanent project constitution — read it in full before beginning any session. It contains the mission, architectural commitments, and process rules that govern all work in this repository. Anyone making a change in this codebase, human or agent, must have read this document first. Key must-read sections if time is short: Session Continuity (what to read and in what order), Guiding Principles (the values behind every technical decision), and §Architectural Principles for Claude Code Sessions (process gates including pre-push lint, PR merge gate, and file authority rules that will cause compliance violations if not followed).
 
@@ -284,26 +284,18 @@ Full agent profiles, independence requirements, and operational agent definition
 
 ## What We Are Building First
 
-M0–M16 complete (v0.1.0–v0.16.0). ADRs 001–017 current.
+M0–M17 complete (v0.1.0–v0.17.0). ADRs 001–018 current.
 See GitHub Releases for full delivery history.
 
-**Milestone 16 — Distributional Visibility (Complete)**
+**Milestone 17 — Calibration and Comparative Infrastructure (Complete)**
 
-Delivered: Zone 1A Phase 4 composite encoding (#845), cohort disaggregation on primary surface (#986), political risk summary surface (#987), 25-year human capital depletion trajectory (#274), calibrated ecological-to-financial transmission (#275), uncertainty quantification (#22 partial), adaptive y-axis scaling (IR-001 fix), G9 polish (threshold overlay, Mode 3 branch comparison values, threshold-crossing markers, Greece backtesting fixture extension), G10 pre-demo polish (11 ACs). Demo 6 preparatory work complete: Steps 1–6c, DEMO6-001–049 findings on record, north star finding sentence filed. Live external demo (#843) deferred to M17/Demo 7 (EL decision 2026-06-25).
+Delivered: Wave 1 CM calibration — ELASTICITY_REGISTRY revised (Fosu 2011 SSA LIC, #1229), governance sensitivity spec on record (#1248), FRAME-D milestone sentence fires within 8-step Demo 6 window. Wave 2 — N=3 multi-scenario comparison (#394), Zone 1B proportional allocation (ADR-018, #1252), DEMO6 CRITICAL polish (#1249/#1250/#1253/#1239), adaptive y-axis extension (#1251), GovernanceModule institutional_capacity_index (Gupta 2002, −0.015 T3, #1275), governance horizon disclosure (#1276), SOP UX/UI design artifact gate (#1277). SCAN-027 clean.
 
-**Milestone 17 — Calibration and Comparative Infrastructure (Current)**
+**Milestone 18 — Full Argument and Demo 7 (Current)**
 
-*Wave 1 (entry gate; Wave 2 blocked until Wave 1 exit):*
-- Fiscal-to-cohort elasticity calibration — DemographicModule ELASTICITY_REGISTRY revision → Issue #1229 (CM-owned)
-- Governance sensitivity calibration — GovernanceModule fiscal conditionality transmission → Issue #1248 (CM-owned)
-- Wave 1 exit gate: FRAME-D milestone sentence fires within 8-step Demo 6 window after calibration change
+Core deliverable: Demo 7 (Senegal Mode 3 active control + Zambia three-scenario comparison, live external session #843). Counter-scenario comparison infrastructure; CI bands on Zone 1A trajectories (ADR-007 full implementation); PSP driver decomposition.
 
-*Wave 2 (after Wave 1 exit gate):*
-- Multi-scenario comparison (>2 scenarios) → Issue #394
-- DEMO6 CRITICAL polish: #1249 (curve identifiability), #1250 (tablet legibility), #1253 (PSP historical precedent)
-- Adaptive y-axis extension audit → Issue #1251; Zone 1B proportional allocation → Issue #1252
-
-No demo at M17 close. Demo 7 at M18.
+Demo 7 at M18 close.
 
 Each milestone is a vertical slice — working software at every stage,
 not infrastructure waiting for features.
@@ -312,15 +304,15 @@ not infrastructure waiting for features.
 
 ## Milestone Roadmap
 
-M0–M16 complete (v0.1.0–v0.16.0). M17 current. See GitHub Releases for full delivery history.
+M0–M17 complete (v0.1.0–v0.17.0). M18 current. See GitHub Releases for full delivery history.
 
-The full roadmap covering M17 and beyond — milestone deliverables, demo anchors, canonical users served, and the long-term resolution spectrum direction — is maintained at `docs/roadmap/worldsim-roadmap.md`. That document is the canonical reference. The summary below reflects current and next milestone only.
+The full roadmap covering M18 and beyond — milestone deliverables, demo anchors, canonical users served, and the long-term resolution spectrum direction — is maintained at `docs/roadmap/worldsim-roadmap.md`. That document is the canonical reference. The summary below reflects current and next milestone only.
 
-**Milestone 16 — Distributional Visibility (Complete)**
-Delivered: Zone 1A Phase 4 composite encoding (#845), cohort disaggregation (#986), political risk summary (#987), 25-year human capital trajectory (#274), ecological-fiscal transmission (#275), uncertainty quantification (#22), adaptive y-axis fix (IR-001), G9/G10 polish. Demo 6 preparatory work (Steps 1–6c; DEMO6-001–049 findings on record; north star finding sentence). Live external demo (#843) deferred to M17/Demo 7 (EL decision 2026-06-25).
+**Milestone 17 — Calibration and Comparative Infrastructure (Complete)**
+Delivered: Wave 1 CM calibration (fiscal-to-cohort elasticity #1229, governance sensitivity #1248, FRAME-D gate); Wave 2 — N=3 multi-scenario (#394), Zone 1B proportional allocation ADR-018 (#1252), DEMO6 CRITICAL polish (#1249/#1250/#1253/#1239), adaptive y-axis (#1251), GovernanceModule institutional_capacity_index (#1275), governance horizon disclosure (#1276), SOP UX/UI gate (#1277). SCAN-027 clean.
 
-**Milestone 17 — Calibration and Comparative Infrastructure (Current)**
-Core deliverable: Wave 1 = Chief Methodologist calibration sprint (fiscal-to-cohort elasticity #1229, governance sensitivity #1248); Wave 2 = multi-scenario (#394) + DEMO6 CRITICAL polish (#1249/#1250/#1253) + adaptive y-axis extension (#1251) + Zone 1B proportional allocation (#1252). Wave 2 gated on Wave 1 exit. No demo at M17 close.
+**Milestone 18 — Full Argument and Demo 7 (Current)**
+Core deliverable: Demo 7 (Senegal Mode 3 + Zambia three-scenario, live external session #843). CI bands on Zone 1A trajectories (ADR-007 full); PSP driver decomposition; counter-scenario comparison.
 
 Full roadmap: `docs/roadmap/worldsim-roadmap.md`
 
