@@ -10,7 +10,7 @@
  * See DD-015 for why collapsing is prohibited.
  */
 import React, { useEffect, useState } from "react";
-import { TrajectoryView } from "./TrajectoryView";
+import { TrajectoryView, type ScenarioComparisonConfig } from "./TrajectoryView";
 import { useScenarioStepStore, type TrajectoryResponse } from "../store/scenarioStepStore";
 
 export const LAYOUT = {
@@ -60,8 +60,8 @@ interface InstrumentClusterProps {
   entityTrajectories?: Record<string, TrajectoryResponse> | null;
   /** Phase 4 (ADR-017): per-entity baseline trajectories for Mode 3 ghost paths. */
   entityBaselineTrajectories?: Record<string, TrajectoryResponse> | null;
-  /** M16-G4 #102 — show variance-band toggle in Zone 1A when two scenarios are being compared. */
-  comparisonMode?: boolean;
+  /** M17-G2 — multi-scenario comparison configs for Zone 1A curve rendering. */
+  comparisonScenarios?: ScenarioComparisonConfig[];
 }
 
 export function InstrumentCluster({
@@ -74,7 +74,7 @@ export function InstrumentCluster({
   chartHeight: chartHeightProp,
   entityTrajectories,
   entityBaselineTrajectories,
-  comparisonMode,
+  comparisonScenarios,
 }: InstrumentClusterProps) {
   const { mode } = useScenarioStepStore();
   const bp = useViewportBreakpoint();
@@ -106,7 +106,7 @@ export function InstrumentCluster({
           entityIds={entityIds}
           entityTrajectories={entityTrajectories}
           entityBaselineTrajectories={entityBaselineTrajectories}
-          comparisonMode={comparisonMode}
+          comparisonScenarios={comparisonScenarios}
           data-testid="zone-1a-trajectory"
         />
         {cohortPanel}
@@ -122,16 +122,16 @@ export function InstrumentCluster({
           minWidth: layout.coPrimary,
         }}
       >
-        {/* Zone 1B — MDA Alert Panel + Cohort Impact sub-section (DD-016, M16-G2 #986) */}
-        {/* Flex column: mdaPanel gets flex:1 1 80px (guaranteed 80px minimum so alert panel
-            is never displaced by cohort section); zone1bCohortSection gets flex:0 0 auto
-            (natural height). Zone 1B overflows to scroll when combined content exceeds height.
-            M17 architecture decision required for formal proportional allocation. */}
+        {/* Zone 1B — MDA Alert Panel + Cohort Impact sub-section (ADR-018, M17-G3 #1252) */}
+        {/* Sub-zone A (MDA panel): flex:1 1 80px — growable with permanent 80px floor (ADR-018).
+            Sub-zone B (CohortImpactSection): flex:1 1 0 — takes remaining height, internal scroll.
+            Zone 1B outer: overflow:hidden — prevents unit scroll; each sub-zone manages its own.
+            Supersedes the temporary minHeight:80px guarantee from PR #1235. */}
         <div
           data-testid="zone-1b"
           style={{
             flex: `0 0 ${zoneProportions.zone1b}`,
-            overflow: "auto",
+            overflow: "hidden",
             display: "flex",
             flexDirection: "column",
             position: "relative",
@@ -140,14 +140,19 @@ export function InstrumentCluster({
           }}
         >
           <div style={{ position: "absolute", top: 4, right: 6, fontSize: 9, fontWeight: 700, letterSpacing: 0.5, color: "#666", backgroundColor: "rgba(255,255,255,0.88)", borderRadius: 2, padding: "1px 5px", userSelect: "none", zIndex: 10, lineHeight: 1.5 }}>Zone 1B</div>
-          <div style={{ flex: "1 1 80px", minHeight: 80, overflow: "hidden" }}>
+          {/* Sub-zone A — MDA alert panel; permanent 80px floor (ADR-018) */}
+          <div data-testid="zone-1b-mda-panel-wrapper" style={{ flex: "1 1 80px", minHeight: 80, overflow: "hidden" }}>
             {mdaPanel ?? (
               <div style={{ color: "#bbb", fontSize: 12, padding: 8 }}>
                 MDA Alert Panel (Zone 1B)
               </div>
             )}
           </div>
-          {zone1bCohortSection}
+          {/* Sub-zone B — CohortImpactSection; internal scroll on the section itself (flex:1 1 0 + overflowY:auto
+              on zone-1b-cohort-impact); overflow:hidden here prevents Sub-zone B from overflowing Zone 1B */}
+          <div style={{ flex: "1 1 0", display: "flex", flexDirection: "column", overflow: "hidden", maxHeight: "calc(100% - 80px)" }}>
+            {zone1bCohortSection}
+          </div>
         </div>
 
         {/* Zone 1C — PMM Widget (DD-016: 15% at 1280/1440, 10% at 1024) */}

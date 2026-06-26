@@ -205,7 +205,7 @@ export function HumanCapitalTrajectoryPanel({
               lineHeight: 1.5,
             }}
           >
-            by {milestone.year}, {milestone.cohortLabel} poverty headcount crosses
+            by {milestone.year} [step {milestone.step}], {milestone.cohortLabel} poverty headcount crosses
             the recovery floor — at this level, capability restoration takes {Q1_RECOVERY_CONSEQUENCE}
           </div>
         </div>

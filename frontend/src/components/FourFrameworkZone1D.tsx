@@ -21,6 +21,7 @@ import React from "react";
 import { useScenarioStepStore } from "../store/scenarioStepStore";
 import { FRAMEWORK_COLORS } from "../constants/frameworkColors";
 import { sortAlerts } from "./MDAAlertPanelZone1B";
+import { type ScenarioComparisonConfig } from "./TrajectoryView";
 
 // ---------------------------------------------------------------------------
 // ADR-015 §Component 1 — L0 annotation constants and helpers
@@ -151,11 +152,14 @@ const PSP_SEVERITY_COLOR: Record<PspSeverity, string> = {
   STABLE: "#059669",
 };
 
-/** Historical analogue sentence per PSP severity (CM sign-off 2026-06-23). */
+/** Historical analogue sentence per PSP severity (CM sign-off 2026-06-23; updated #1253 2026-06-25). */
 function getPspHistoricalAnalogue(severity: PspSeverity): string | null {
-  if (severity === "CRITICAL") return "At this level, historical ECF programmes show abandonment within 3 steps.";
-  if (severity === "WARNING") return "At this level, historical ECF programmes show abandonment within 6 steps.";
-  if (severity === "WATCH") return "At this level, historical ECF programmes show elevated discontinuation risk.";
+  if (severity === "CRITICAL")
+    return "Comparable: Zambia 2015 ECF — abandoned Step 3 (PSP 38%). Board review failed.";
+  if (severity === "WARNING")
+    return "Comparable: Ghana 2014 ECF — modified Step 5 (PSP 52%). Conditionality relaxed.";
+  if (severity === "WATCH")
+    return "At this PSP level, ECF programmes show elevated discontinuation risk (approx. 35%).";
   return null;
 }
 
@@ -209,6 +213,8 @@ interface FourFrameworkZone1DProps {
   eliteCaptureDirection?: string | null;
   /** M16-G2 (#987): elite_capture_divergence qualifier text (e.g. "fiscal benefits concentrating"). */
   eliteCaptureQualifier?: string | null;
+  /** M17-G2 — loaded comparison scenario configs with PSP values for Zone 1D rows. */
+  comparisonScenarios?: ScenarioComparisonConfig[];
 }
 
 const CONTAINER_STYLE: React.CSSProperties = {
@@ -235,6 +241,7 @@ export function FourFrameworkZone1D({
   legitimacyDirection,
   eliteCaptureDirection,
   eliteCaptureQualifier,
+  comparisonScenarios = [],
 }: FourFrameworkZone1DProps) {
   const { trajectory, current_step, mda_alerts, mode } = useScenarioStepStore();
 
@@ -448,6 +455,23 @@ export function FourFrameworkZone1D({
         );
       })}
 
+      {/* #1276 — Governance horizon disclosure (No False Precision; Placement A — always visible). */}
+      <div
+        data-testid="governance-horizon-disclosure"
+        style={{
+          fontSize: 8,
+          color: "#888",
+          lineHeight: 1.4,
+          paddingTop: 3,
+          paddingLeft: 9,
+          fontStyle: "italic",
+        }}
+      >
+        Governance indicators (rule of law, democratic quality) respond to fiscal adjustment over
+        3–6 year horizons in this model&apos;s calibration. An 8-step quarterly window captures the
+        beginning of the governance stress trajectory; full divergence requires a 12–24 step analysis.
+      </div>
+
       {/* M16-G2 #987 — Political Risk sub-section (replaces G1 political economy elements).
           Visible when PE enabled; shows structured severity-labeled summary for Persona 3.
           Empty state shown when PE is disabled. G1 testids fully retired (DD-016). */}
@@ -469,6 +493,29 @@ export function FourFrameworkZone1D({
                 POLITICAL RISK
               </span>
             </div>
+
+            {/* Scenario comparison PSP rows (M17-G2) */}
+            {comparisonScenarios.length > 0 && (
+              <div style={{ marginTop: 2 }}>
+                {comparisonScenarios.map((sc) => {
+                  const slug = sc.scenarioId.replace(/^[a-z]{3}-/, "");
+                  const pspNum = sc.pspValue != null ? parseFloat(sc.pspValue) : null;
+                  const pspPct = pspNum !== null ? Math.round(pspNum * 100) : null;
+                  return (
+                    <div
+                      key={sc.scenarioId}
+                      data-testid={`zone1d-psp-row-scenario-${slug}`}
+                      style={{ fontSize: 10, color: "#333", paddingTop: 1 }}
+                    >
+                      {`Option ${sc.label}: `}
+                      <span data-testid={`zone1d-psp-value-${slug}`}>
+                        {pspPct !== null ? `${pspPct}%` : "—"}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
 
             {/* PSP severity row */}
             {pspValue !== null ? (() => {
