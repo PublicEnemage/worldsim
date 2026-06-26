@@ -2,10 +2,10 @@
 name: m18-sprint-plan
 type: sprint-plan
 milestone: M18 — Full Argument and Demo 7
-status: Filed — awaiting EL approval before Wave 1 sprint entries open
+status: EL-approved 2026-06-26 — Wave 1 sprint entries may be filed and approved; pre-wave GD and GR phases may begin
 authored-by: PM Agent
 authored-date: 2026-06-26
-el-approved: false
+el-approved: 2026-06-26
 consulted-agents:
   - Business Product Owner (Demo 7 value prioritization; scope cut order; Mode 3 as Act 1 anchor)
   - Frontend Architect (file area grouping; Wave 1 parallel safety; Wave 2 sequencing; InstrumentCluster.tsx conflict map)
@@ -17,8 +17,8 @@ sop-reference: docs/process/sprint-planning-sop.md
 
 # M18 Sprint Plan — Full Argument and Demo 7
 
-**Status:** Filed 2026-06-26 — awaiting EL approval before Wave 1 sprint entries open; pre-wave design phases (GD and GR) may begin immediately after EL approval
-**Release branch:** `release/m18` — to be cut from `main` at EL approval
+**Status:** EL-approved 2026-06-26 (PR #1364) — Wave 1 sprint entries may be filed and approved; pre-wave GD and GR phases may begin immediately
+**Release branch:** `release/m18` — cut from `main` 2026-06-26 at commit 8cffc86 (after sync PR #1366)
 **Exit checklist issue:** #1340 (M18 Exit Checklist — blocks milestone closure)
 **GitHub Milestone:** #19
 
@@ -388,9 +388,9 @@ Per `docs/process/sprint-planning-sop.md §Sprint Entry Gate`, implementation ma
 
 1. ✅ EL merges `release/m17` → `main` — DONE 2026-06-26
 2. ✅ PM Agent authors `m18-sprint-plan.md` — THIS DOCUMENT (2026-06-26)
-3. ⬜ EL approves sprint plan (review and approve below or on #1340)
-4. ⬜ PM Agent cuts `release/m18` from `main`: `git checkout -b release/m18 main && git push -u origin release/m18`
-5. ⬜ DS Agent: `infra/m18-gitignore-backend-test-results` PR — add `backend/test-results/` to `.gitignore`
+3. ✅ EL approves sprint plan — PR #1364 merged 2026-06-26
+4. ✅ PM Agent cuts `release/m18` from `main` — cut 2026-06-26 at commit 8cffc86 (sync PR #1366 merged)
+5. ✅ DS Agent: `backend/test-results/` already in `.gitignore` (PR #1346 — no action needed)
 6. ⬜ G1 sprint entry filed and EL-approved → Wave 1 begins
 7. ⬜ G2 sprint entry filed and EL-approved → Wave 1 parallel group open
 8. ⬜ GD Phase 1 begins (Artifacts 1 + 3) — immediately after EL sprint plan approval
@@ -408,7 +408,7 @@ Per `docs/process/sprint-planning-sop.md §Sprint Entry Gate`, implementation ma
 
 ## EL Approval Record
 
-**EL approval:** Pending
+**EL approval:** 2026-06-26 (PR #1364 merged)
 
-> {EL approval statement}
-> — @PublicEnemage ({date})
+> Sprint plan approved. Wave structure (Pre-wave GD + GR → Wave 1 G1+G2 → Wave 2 G4→G3 → Demo 7) confirmed. ADR prerequisites clear. Release branch cut. Pre-wave phases (GD #1354 and GR #1352) may begin immediately. Wave 1 sprint entries (G1 and G2) may be filed — each requires separate EL approval before implementation PR opens.
+> — @PublicEnemage (2026-06-26)
