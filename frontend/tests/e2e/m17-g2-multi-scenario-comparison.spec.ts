@@ -147,6 +147,32 @@ async function waitForAppReady(page: import("@playwright/test").Page): Promise<v
 }
 
 /**
+ * Inject N=3 comparison scenario configs via the M17-G2 test seam.
+ * Returns true if the window function was available (Phase 3 landed), false otherwise.
+ */
+async function injectComparisonScenarios(
+  page: import("@playwright/test").Page,
+  primaryScenarioId: string,
+): Promise<boolean> {
+  const configs = N3_SCENARIOS.map((s) => ({
+    scenarioId: s.scenarioId,
+    label: s.label,
+    paletteIndex: s.paletteIndex,
+  }));
+  return page.evaluate(
+    ({ configs: c, _primaryId }) => {
+      const fn = (window as Record<string, unknown>).__worldsim_setComparisonScenarios as
+        | ((cfgs: unknown) => void)
+        | undefined;
+      if (!fn) return false;
+      fn(c);
+      return true;
+    },
+    { configs, _primaryId: primaryScenarioId },
+  );
+}
+
+/**
  * Create a ZMB scenario via API and advance N steps.
  * Returns the scenario_id from the backend.
  */
@@ -301,8 +327,7 @@ test.describe("M17-G2 — Multi-scenario comparison N=3", () => {
   // --------------------------------------------------------------------------
 
   test("AC-S1: N=3 comparison renders all three scenario curves in Zone 1A", async ({ page }) => {
-    // Mock the N=3 comparison store injection endpoint or trajectory responses.
-    // The route mock intercepts the comparison scenario trajectories.
+    // Mock the N=3 comparison trajectory responses — intercepted when cluster fetches each.
     for (const scenario of N3_SCENARIOS) {
       await page.route(
         `**/api/v1/scenarios/${scenario.scenarioId}/trajectory*`,
@@ -323,10 +348,11 @@ test.describe("M17-G2 — Multi-scenario comparison N=3", () => {
       );
     }
 
-    await page.goto("/");
+    await page.goto(`/?scenario=${encodeURIComponent(primaryScenarioId)}`);
     await waitForAppReady(page);
+    await injectComparisonScenarios(page, primaryScenarioId);
 
-    // Guard: Phase 3 not yet implemented — return without failing if testid absent.
+    // Guard: Phase 3 not yet wired — return without failing if testid absent.
     const curveA = page.locator('[data-testid="zone1a-curve-scenario-option-a"]');
     if (!(await curveA.isVisible({ timeout: 5_000 }).catch(() => false))) {
       return; // Guard fires — implementation not yet landed
@@ -372,8 +398,18 @@ test.describe("M17-G2 — Multi-scenario comparison N=3", () => {
   test("AC-A1: Zone 1A terminal endpoint labels A/B/C are visible; MDA floor line preserved", async ({
     page,
   }) => {
-    await page.goto("/");
+    for (const scenario of N3_SCENARIOS) {
+      await page.route(`**/api/v1/scenarios/${scenario.scenarioId}/trajectory*`, (route) => {
+        route.fulfill({
+          status: 200,
+          contentType: "application/json",
+          body: JSON.stringify(makeTrajectoryMock(scenario.scenarioId, scenario.q1CompositeAtStep4, scenario.pspValue, [...scenario.thresholdCrossings])),
+        });
+      });
+    }
+    await page.goto(`/?scenario=${encodeURIComponent(primaryScenarioId)}`);
     await waitForAppReady(page);
+    await injectComparisonScenarios(page, primaryScenarioId);
 
     const labelA = page.locator('[data-testid="zone1a-terminal-label-scenario-option-a"]');
     if (!(await labelA.isVisible({ timeout: 5_000 }).catch(() => false))) {
@@ -411,8 +447,18 @@ test.describe("M17-G2 — Multi-scenario comparison N=3", () => {
   test("AC-B1: Zone 1B shows per-scenario crossing rows; Option C shows no-crossings; MDA panel ≥80px", async ({
     page,
   }) => {
-    await page.goto("/");
+    for (const scenario of N3_SCENARIOS) {
+      await page.route(`**/api/v1/scenarios/${scenario.scenarioId}/trajectory*`, (route) => {
+        route.fulfill({
+          status: 200,
+          contentType: "application/json",
+          body: JSON.stringify(makeTrajectoryMock(scenario.scenarioId, scenario.q1CompositeAtStep4, scenario.pspValue, [...scenario.thresholdCrossings])),
+        });
+      });
+    }
+    await page.goto(`/?scenario=${encodeURIComponent(primaryScenarioId)}`);
     await waitForAppReady(page);
+    await injectComparisonScenarios(page, primaryScenarioId);
 
     const headerA = page.locator('[data-testid="zone1b-scenario-header-option-a"]');
     if (!(await headerA.isVisible({ timeout: 5_000 }).catch(() => false))) {
@@ -450,8 +496,18 @@ test.describe("M17-G2 — Multi-scenario comparison N=3", () => {
   test("AC-D1: Zone 1D shows PSP values for all three scenarios simultaneously without interaction", async ({
     page,
   }) => {
-    await page.goto("/");
+    for (const scenario of N3_SCENARIOS) {
+      await page.route(`**/api/v1/scenarios/${scenario.scenarioId}/trajectory*`, (route) => {
+        route.fulfill({
+          status: 200,
+          contentType: "application/json",
+          body: JSON.stringify(makeTrajectoryMock(scenario.scenarioId, scenario.q1CompositeAtStep4, scenario.pspValue, [...scenario.thresholdCrossings])),
+        });
+      });
+    }
+    await page.goto(`/?scenario=${encodeURIComponent(primaryScenarioId)}`);
     await waitForAppReady(page);
+    await injectComparisonScenarios(page, primaryScenarioId);
 
     const pspA = page.locator('[data-testid="zone1d-psp-row-scenario-option-a"]');
     if (!(await pspA.isVisible({ timeout: 5_000 }).catch(() => false))) {
@@ -485,8 +541,18 @@ test.describe("M17-G2 — Multi-scenario comparison N=3", () => {
     page,
   }) => {
     // Viewport is set at describe level (1280×800).
-    await page.goto("/");
+    for (const scenario of N3_SCENARIOS) {
+      await page.route(`**/api/v1/scenarios/${scenario.scenarioId}/trajectory*`, (route) => {
+        route.fulfill({
+          status: 200,
+          contentType: "application/json",
+          body: JSON.stringify(makeTrajectoryMock(scenario.scenarioId, scenario.q1CompositeAtStep4, scenario.pspValue, [...scenario.thresholdCrossings])),
+        });
+      });
+    }
+    await page.goto(`/?scenario=${encodeURIComponent(primaryScenarioId)}`);
     await waitForAppReady(page);
+    await injectComparisonScenarios(page, primaryScenarioId);
 
     // Guard.
     const labelC = page.locator('[data-testid="zone1a-terminal-label-scenario-option-c"]');
@@ -537,8 +603,18 @@ test.describe("M17-G2 — Multi-scenario comparison N=3", () => {
   test("AC-P1: Lucas can identify Option A as worst Q1 trajectory from Zone 1A without specialist narration", async ({
     page,
   }) => {
-    await page.goto("/");
+    for (const scenario of N3_SCENARIOS) {
+      await page.route(`**/api/v1/scenarios/${scenario.scenarioId}/trajectory*`, (route) => {
+        route.fulfill({
+          status: 200,
+          contentType: "application/json",
+          body: JSON.stringify(makeTrajectoryMock(scenario.scenarioId, scenario.q1CompositeAtStep4, scenario.pspValue, [...scenario.thresholdCrossings])),
+        });
+      });
+    }
+    await page.goto(`/?scenario=${encodeURIComponent(primaryScenarioId)}`);
     await waitForAppReady(page);
+    await injectComparisonScenarios(page, primaryScenarioId);
 
     const curveA = page.locator('[data-testid="zone1a-curve-scenario-option-a"]');
     if (!(await curveA.isVisible({ timeout: 5_000 }).catch(() => false))) {
@@ -572,8 +648,18 @@ test.describe("M17-G2 — Multi-scenario comparison N=3", () => {
   test("AC-P3: Andreas can compare PSP across all three scenarios from Zone 1D without switching views", async ({
     page,
   }) => {
-    await page.goto("/");
+    for (const scenario of N3_SCENARIOS) {
+      await page.route(`**/api/v1/scenarios/${scenario.scenarioId}/trajectory*`, (route) => {
+        route.fulfill({
+          status: 200,
+          contentType: "application/json",
+          body: JSON.stringify(makeTrajectoryMock(scenario.scenarioId, scenario.q1CompositeAtStep4, scenario.pspValue, [...scenario.thresholdCrossings])),
+        });
+      });
+    }
+    await page.goto(`/?scenario=${encodeURIComponent(primaryScenarioId)}`);
     await waitForAppReady(page);
+    await injectComparisonScenarios(page, primaryScenarioId);
 
     const pspRowA = page.locator('[data-testid="zone1d-psp-row-scenario-option-a"]');
     if (!(await pspRowA.isVisible({ timeout: 5_000 }).catch(() => false))) {
@@ -610,9 +696,19 @@ test.describe("M17-G2 — Multi-scenario comparison N=3", () => {
   test("AC-B1 (768px): Zone 1B per-scenario rows do not collapse MDA alert panel below 80px at tablet viewport", async ({
     page,
   }) => {
+    for (const scenario of N3_SCENARIOS) {
+      await page.route(`**/api/v1/scenarios/${scenario.scenarioId}/trajectory*`, (route) => {
+        route.fulfill({
+          status: 200,
+          contentType: "application/json",
+          body: JSON.stringify(makeTrajectoryMock(scenario.scenarioId, scenario.q1CompositeAtStep4, scenario.pspValue, [...scenario.thresholdCrossings])),
+        });
+      });
+    }
     await page.setViewportSize({ width: 768, height: 1024 });
-    await page.goto("/");
+    await page.goto(`/?scenario=${encodeURIComponent(primaryScenarioId)}`);
     await waitForAppReady(page);
+    await injectComparisonScenarios(page, primaryScenarioId);
 
     const headerC = page.locator('[data-testid="zone1b-scenario-header-option-c"]');
     if (!(await headerC.isVisible({ timeout: 5_000 }).catch(() => false))) {
