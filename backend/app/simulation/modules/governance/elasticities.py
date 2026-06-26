@@ -100,4 +100,30 @@ GOVERNANCE_ELASTICITY_REGISTRY: list[GovernanceElasticity] = [
         ),
         source_registry_id="ACADEMIC_LITERATURE_BERMEO_2016_EMERGENCY_DEMOCRACY",
     ),
+    # Fiscal spending cut → institutional capacity degradation.
+    # Gupta et al. (2002, IMF WP/02/77) Table 3 documents that fiscal adjustment
+    # programmes in SSA LICs reduce public service delivery capacity — education
+    # ministry staffing, health infrastructure maintenance, statistical office
+    # capacity — as social spending is cut. Elasticity -0.015 per 1pp spending
+    # change on the CPIA institutional capacity index [0,1]. Point estimate from
+    # SSA LIC cross-country panel; T3 because it is a regional inference, not
+    # a SEN-specific observation. T2 upgrade requires Senegal-specific CPIA
+    # time-series validation (deferred to M18).
+    # CM sign-off: M17-G1 Governance Sensitivity Specification §Question 2 (2026-06-25).
+    GovernanceElasticity(
+        event_type="fiscal_policy_spending_change",
+        indicator_key="institutional_capacity_index",
+        elasticity=Decimal("-0.015"),
+        confidence_tier=3,
+        source=(
+            "Gupta, S., Clements, B., Baldacci, E. and Mulas-Granados, C. (2002):"
+            " Expenditure Composition, Fiscal Adjustment, and Growth in Low-Income Countries."
+            " IMF Working Paper WP/02/77. Table 3: institutional capacity response to fiscal"
+            " adjustment in SSA LICs. Elasticity -0.015 per 1pp fiscal spending change on"
+            " World Bank CPIA institutional capacity index (normalized 0–1). T3 confidence:"
+            " cross-country SSA panel; Senegal-specific upgrade deferred to M18."
+            " CM position: M17-G1 Governance Sensitivity Specification §Question 2 (2026-06-25)."
+        ),
+        source_registry_id="ACADEMIC_LITERATURE_GUPTA_2002_IMF_WP_INSTITUTIONAL_CAPACITY",
+    ),
 ]
