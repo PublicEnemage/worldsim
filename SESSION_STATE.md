@@ -6,7 +6,7 @@
 > Historical state lives in `docs/process/session-archives/`.
 > Authority: `docs/process/sprint-group-isolation.md §SESSION_STATE.md Cockpit Card Protocol`.
 
-**Last updated:** 2026-06-26 (control plane design package filed #1354 + 7 children #1355–#1361; ADR-019 assigned in backlog; #1352 requirements phase for #1349 filed; sprint plan pending)
+**Last updated:** 2026-06-26 (M18 kicked off — sprint plan EL-approved PR #1364; release/m18 cut at 151904d; G1+G2 sprint entries next)
 **Current milestone:** M18 — Full Argument and Demo 7 (GitHub Milestone 19)
 
 ---
@@ -18,17 +18,17 @@
 | Milestone | M18 — Full Argument and Demo 7 |
 | GitHub Milestone | #19 |
 | Exit checklist issue | #1340 |
-| Release branch | ⏳ NOT YET CUT — all blockers resolved; ready to cut |
-| Sprint plan | ⏳ NOT YET FILED |
-| Active wave | None — pre-Wave 1 |
-| Active sprint groups | None |
+| Release branch | ✅ `release/m18` — cut 2026-06-26 at commit 151904d |
+| Sprint plan | ✅ EL-approved 2026-06-26 — `docs/process/sprint-plans/m18-sprint-plan.md` (PR #1364) |
+| Active wave | Pre-wave (GD + GR may begin; Wave 1 entries pending) |
+| Active sprint groups | None — G1+G2 sprint entries not yet filed |
 | Active sprint journal issues | None |
 
 ---
 
-## M18 Entry Blockers
+## M18 Entry Blockers — All Resolved
 
-All must be resolved before `release/m18` is cut and the sprint entry gate opens.
+All blockers resolved before `release/m18` was cut.
 
 | Issue | NM | Title | Status |
 |---|---|---|---|
@@ -55,13 +55,13 @@ None open. #1328 and #1329 resolved 2026-06-26 (DS consultation; Option E hybrid
 | #843 | Demo 7 — live external session (Senegal Mode 3 + Zambia 3-scenario) | Primary deliverable |
 | #1254 | CI bands on Zone 1A trajectories (ADR-007 full implementation) | Wave 1 |
 | #1255 | PSP driver decomposition | Wave 1 |
-| #1349 | Counter-scenario comparison — distributional number differential with CI bands | Wave 1 (blocked: #1352) |
-| #1352 | Requirements phase for #1349 — UX journeys, Customer Agent, BPO requirements | Wave 1 / Active |
-| #1354 | Control Plane Column Design Package — Mode 2 + Mode 3 full vision (7 artifacts, #1355–#1361) | Pre-wave / Active — gates all Mode 3 + Mode 2 implementation |
+| #1349 | Counter-scenario comparison — distributional number differential with CI bands | G3 Wave 2 (blocked: GR #1352) |
+| #1352 | Requirements phase for #1349 — UX journeys, Customer Agent, BPO requirements | GR Pre-wave / ready to begin |
+| #1354 | Control Plane Column Design Package — Mode 2 + Mode 3 (7 artifacts #1355–#1361) | GD Pre-wave / ready to begin |
 | #1256 | Path 2 / proprietary data integration | Capacity-allowing |
-| #1217 | Mode 3 render optimization (EX-001 expired M17) | Deferred — sequenced via #1354 |
-| #1238 | DEMO6-009 TTS narration fix | Deferred |
-| #1059 | HCL narration integration | Deferred |
+| #1217 | Mode 3 render optimization (EX-001 expired) | G4 Wave 2 — sequenced via GD/ADR-019 |
+| #1238 | DEMO6-009 TTS narration fix | Capacity-allowing |
+| #1059 | HCL narration integration | Capacity-allowing |
 
 ---
 
