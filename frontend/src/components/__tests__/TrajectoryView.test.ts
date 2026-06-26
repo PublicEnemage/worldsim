@@ -469,4 +469,19 @@ describe("computeYDomain — adaptive y-axis domain from score values", () => {
     expect(computeYDomain([0.5])[0]).toBeLessThanOrEqual(computeYDomain([0.5])[1]);
     expect(computeYDomain([0.1, 0.9])[0]).toBeLessThanOrEqual(computeYDomain([0.1, 0.9])[1]);
   });
+
+  it("AC-1251-1: floor below data range — yMin extends to accommodate floor", () => {
+    // Worked example from intent doc §0: data 0.65–0.80, floor 0.40 included in values array
+    // after call-site fix; computeYDomain must return yMin ≤ 0.40
+    const [lo] = computeYDomain([0.65, 0.70, 0.80, 0.40]);
+    expect(lo).toBeLessThanOrEqual(0.40);
+  });
+
+  it("AC-1251-2: floor within data range — domain not shrunk", () => {
+    // floor 0.40 already between data min (0.30) and max (0.70); including it is a no-op
+    const [loWith, hiWith] = computeYDomain([0.30, 0.40, 0.70]);
+    const [loWithout, hiWithout] = computeYDomain([0.30, 0.70]);
+    expect(loWith).toBeCloseTo(loWithout, 5);
+    expect(hiWith).toBeCloseTo(hiWithout, 5);
+  });
 });
