@@ -3,17 +3,17 @@ name: m17-g2-sprint-entry
 type: sprint-entry
 milestone: M17 — Calibration and Comparative Infrastructure
 sprint-group: G2 (Phase 3 — Implementation)
-status: Draft — pending Phase 1/2 completion; EL approval required before implementation PR opens
+status: EL Approved — 2026-06-25; implementation UNBLOCKED 2026-06-25 (#1249 merged PR #1300)
 authored-by: PM Agent
 authored-date: 2026-06-25
-el-approved: false
+el-approved: 2026-06-25
 release-branch: release/m17
 sop-reference: docs/process/sprint-planning-sop.md
 ---
 
 # Sprint Entry — M17, G2: Multi-Scenario Design Sprint (Phase 3 Implementation)
 
-**Status:** Draft — conditions pending Phase 1 and Phase 2 completion; EL approval required before any implementation PR opens
+**Status:** EL Approved — 2026-06-25. Implementation UNBLOCKED 2026-06-25 — #1249 merged to `release/m17` (PR #1300).
 **Date authored:** 2026-06-25
 **Release branch:** `release/m17`
 **Sprint plan:** `docs/process/sprint-plans/m17-sprint-plan.md` (EL Approved 2026-06-25)
@@ -55,8 +55,8 @@ on this entry document's filing.*
 | G2 Phase 1 design artifact panel review: UX mockups (and UI mockups if produced) reviewed and approved by the Phase 1 design panel before BPO acceptance | UX Designer (R) + Design Thinking + Customer Agent + Frontend Architect + Business PO | ✅ COMPLETE 2026-06-25 — 4/4 PASS; panel summary comment #394#issuecomment-4803973123; UX mockups sufficient (no UI mockup conditions triggered) |
 | G2 Phase 1 BPO acceptance: BPO accepts Phase 1 design output (use stories + journeys + approved mockups) | Business PO | ✅ BPO ACCEPT 2026-06-25 — #394#issuecomment-4803977557; AC-1–AC-10 all satisfied; Phase 3 fixture-based approach accepted |
 | G2 Phase 2 complete: Architect assesses ARCH-REVIEW-007 with UX in hand; ADR determination | Architect + Frontend Architect | ✅ COMPLETE 2026-06-25 — PR #1280 merged; `ARCH-REVIEW-007-m17-n3-assessment.md`; ADR determination option (b): review note on #394 sufficient; no new ADR |
-| Intent document filed for #394 implementation (must reference approved mockups) | PM Agent + UX Designer | ⬜ PENDING Phase 1/2 |
-| QA test file authored before implementation begins | QA Lead | ⬜ PENDING intent document |
+| Intent document filed for #394 implementation (must reference approved mockups) | PM Agent + UX Designer | ✅ FILED 2026-06-25 — `docs/process/intents/M17-G2-2026-06-25-multi-scenario-comparison.md` (PR #1289) |
+| QA test file authored before implementation begins | QA Lead | ✅ FILED 2026-06-25 — `frontend/tests/e2e/m17-g2-multi-scenario-comparison.spec.ts`; AC-S1/A1/B1/D1/P1/P3/P5 asserted (PR #1289) |
 | #1249 merged to `release/m17` | G4 sprint group | ⬜ PENDING G4 |
 
 ---
@@ -126,14 +126,10 @@ formal ADR. This is also resolved in Phase 2.
 implementation PR opens. The QA Lead must be able to write tests from it without reading
 implementation code.*
 
-- [ ] **Intent document gate: PENDING** — intent document cannot be authored until Phase 1
-  (UX journeys, use stories, N>2 mockups) is complete, panel-reviewed, and BPO-accepted.
-  The intent document's acceptance criteria are derived from the Phase 1 use stories and
-  Phase 2 component scope. **The intent document must include or reference the approved UX
-  mockups (and UI mockups if produced) as the authoritative visual specification — QA Lead
-  writes assertions against the mockup-defined observable states, not against implementation
-  inference.** If UI mockups were produced and panel-approved, they are the binding visual
-  specification; if only UX mockups exist, they are the binding specification.
+- [x] **Intent document gate: COMPLETE 2026-06-25** — filed at
+  `docs/process/intents/M17-G2-2026-06-25-multi-scenario-comparison.md` (PR #1289 merged);
+  references approved UX mockups (`ux-journeys-n3.md`, `persona-mvs-n3.md`); all eight content
+  requirements satisfied; QA Lead can write tests from it without reading implementation code.
 
 **Intent document content requirements (to be satisfied at filing):**
 
@@ -175,14 +171,14 @@ The intent document for #394 Phase 3 must specify, at minimum:
 
 | Deliverable | ADR reference | Intent document path | Filed? |
 |---|---|---|---|
-| #394 — Multi-scenario comparison (N>2), Phase 3 implementation | TBD (Phase 2 output) | `docs/process/intents/M17-G2-{YYYY-MM-DD}-multi-scenario-comparison.md` | **No — BLOCKING** |
+| #394 — Multi-scenario comparison (N>2), Phase 3 implementation | option (b) — review note on #394 | `docs/process/intents/M17-G2-2026-06-25-multi-scenario-comparison.md` | **✅ FILED 2026-06-25** |
 
 ### 2.4 — QA test authorship gate
 
 *QA tests must be authored from the intent document's acceptance criteria BEFORE implementation
 code is written. The test file must be on record before the implementing agent begins.*
 
-- [ ] **QA test gate: PENDING** — cannot be authored until the intent document is filed
+- [x] **QA test gate: COMPLETE 2026-06-25** — `frontend/tests/e2e/m17-g2-multi-scenario-comparison.spec.ts` filed; AC-S1, AC-A1, AC-B1, AC-D1, AC-P1/P3/P5 all asserted; guard pattern applied (hard-fail once implementation lands)
 
 **QA test file requirements (to be satisfied at filing):**
 
@@ -215,7 +211,7 @@ document's acceptance criteria:
 
 | Deliverable | Intent document | Test file path | Authored before implementation? |
 |---|---|---|---|
-| #394 — Multi-scenario comparison (N>2) | `docs/process/intents/M17-G2-{YYYY-MM-DD}-multi-scenario-comparison.md` | `frontend/tests/e2e/m17-g2-multi-scenario-comparison.spec.ts` | **No — BLOCKING** |
+| #394 — Multi-scenario comparison (N>2) | `docs/process/intents/M17-G2-2026-06-25-multi-scenario-comparison.md` | `frontend/tests/e2e/m17-g2-multi-scenario-comparison.spec.ts` | **✅ AUTHORED 2026-06-25** (PR #1289) |
 
 ### 2.5 — Phase 1 design artifact standards and panel review gate
 
@@ -407,16 +403,22 @@ traceability to the G1 exit PI Agent confirmation (m17-g1-sprint-exit.md §Secti
 
 ## EL Approval Record
 
-**EL approval:** Pending — Phase 1 + Phase 2 COMPLETE (BPO ACCEPT 2026-06-25); ADR gate CLEAR;
-remaining blocking items: §2.3 intent document + §2.4 QA test file
+**EL approval:** ✅ APPROVED — 2026-06-25
 
-*Updated 2026-06-25: Conditions (1) and (2) are now satisfied:*
+*All sprint entry preconditions confirmed:*
 *(1) G2 Phase 1 complete + BPO ACCEPT 2026-06-25 (#394#issuecomment-4803977557)*
-*(2) G2 Phase 2 Architect assessment filed 2026-06-25 (PR #1280; ADR option (b) — review note on #394)*
-*Remaining before EL approval:*
-*(3) Intent document filed at `docs/process/intents/M17-G2-{date}-multi-scenario-comparison.md`*
-*(4) QA test file `frontend/tests/e2e/m17-g2-multi-scenario-comparison.spec.ts` authored and on record*
-*Note: §2.1 #1249 merge required before Phase 3 PR opens but does not block EL approval of this entry.*
+*(2) G2 Phase 2 Architect assessment filed 2026-06-25 (ADR option (b) — review note on #394;*
+*    #394#issuecomment-4804024195)*
+*(3) Intent document filed 2026-06-25:*
+*    `docs/process/intents/M17-G2-2026-06-25-multi-scenario-comparison.md`*
+*(4) QA test file filed 2026-06-25:*
+*    `frontend/tests/e2e/m17-g2-multi-scenario-comparison.spec.ts`*
+*    (AC-S1, AC-A1, AC-B1, AC-D1, AC-P1/P3/P5 asserted; guard pattern applied)*
 
-> {EL approval statement — to be filled at approval time, once §2.3 + §2.4 confirmed}
-> — @PublicEnemage ({date})
+*Note: §2.1 #1249 merge required before Phase 3 implementation PR opens — does not*
+*block this EL approval. Implementation PR may not open until #1249 is on `release/m17`.*
+
+> G2 Phase 3 sprint entry approved. All four preconditions satisfied. Phase 3 implementation
+> may begin once #1249 (Zone 1A curve identifiability) merges to `release/m17`. The hard gate
+> on the implementation PR opening is the merge of #1249 — not this approval record.
+> — @PublicEnemage (2026-06-25)

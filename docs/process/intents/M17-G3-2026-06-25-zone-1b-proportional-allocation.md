@@ -3,15 +3,17 @@ name: M17-G3-zone-1b-proportional-allocation
 type: design-and-implementation-intent
 issue: "#1252"
 status: >
-  Draft — Phase 1 UX design decisions authored; Phase 2 ADR path pending Architect
-  determination; Phase 1 panel review and BPO acceptance required before Phase 3
-  implementation begins. Satisfies sprint entry §2.3 content requirements at principle
-  level; pixel values and implementation contract completed when Phase 2 ADR is accepted.
+  Phase 2 ADR accepted — ADR-018 (ARCH-012, Path B) accepted 2026-06-25. [ADR-VALUE]
+  resolved at 80px (Sub-zone A floor, all breakpoints). Phase 1 BPO accepted 2026-06-25.
+  Phase 3 implementation gated on: (1) QA test file authored; (2) EL sprint entry approval;
+  (3) #1250 merged to release/m17. Intent document satisfies sprint entry §2.3 content
+  requirements in full — pixel values and implementation contract complete per ADR-018.
 authored-by: UX Designer Agent (Phase 1 design decisions) + PM Agent (document framing)
 authored-date: 2026-06-25
 adr-reference: >
-  TBD — Path A (ADR-017 amendment, ARCH-011 extension) or Path B (new ADR, ARCH-012);
-  Architect determines at Phase 2 after Phase 1 BPO acceptance. See §Phase 2 ADR Gate below.
+  ADR-018 — Zone 1B Proportional Allocation (ARCH-012, Path B). New ADR required — overflow
+  contract and multi-occupant allocation are new decisions not derivable from ADR-017 (Zone 1A)
+  or ADR-014 (single-occupant; Valid Until clause fires). Accepted 2026-06-25.
 release-branch: release/m17
 sprint-entry: docs/process/sprint-plans/m17-g3-sprint-entry.md (draft — awaiting EL approval)
 ---
@@ -141,10 +143,13 @@ taking remaining height with internal scroll.**
 Zone 1B's inner layout changes from flex-height-negotiation to an **explicit two-sub-zone
 allocation**:
 
-- **Sub-zone A (MDA panel):** `flex: 0 0 [ADR-VALUE]px` — fixed height per breakpoint,
-  not flex-shrinkable. `overflow: hidden`. Height is the ADR-specified minimum per breakpoint
-  (placeholder values resolved at Phase 2). The `minHeight: 80px` temporary guarantee
-  (`PR #1235`) is superseded by this fixed allocation.
+- **Sub-zone A (MDA panel):** `flex: 1 1 80px, minHeight: 80px, overflow: hidden` — ADR-018
+  specifies 80px as the permanent floor (unchanged from current). Sub-zone A uses growable
+  flex (not fixed `flex: 0 0 80px`) so it expands to full Zone 1B height in the empty-state
+  (Case A) without a JS toggle. The `minHeight: 80px` temporary guarantee (PR #1235) is
+  superseded by this ADR-grounded permanent contract. See ADR-018 §Decision for the refinement
+  from the Phase 1 brief's `flex: 0 0 [ADR-VALUE]px` description to the ADR-specified
+  `flex: 1 1 80px` — observable states are identical; implementation mechanism is simpler.
 
 - **Sub-zone B (CohortImpactSection):** `flex: 1 1 0` — takes all remaining Zone 1B height
   after Sub-zone A. `overflow-y: auto` — internal scroll only. Cohort crossing entries that
@@ -171,7 +176,7 @@ is an ADR output. The Architect measures the MDA panel's natural content height 
 breakpoint with the Senegal T3 scenario, selects a minimum that covers the top-detail area
 (`data-testid="zone-1b-top-detail"`) plus the trajectory sentence
 (`data-testid="zone-1b-trajectory-sentence"`), and declares these values in the ADR. Until
-the ADR is accepted, [ADR-VALUE] in this document is a placeholder.
+the ADR is accepted, [ADR-VALUE] in this document is a placeholder. **ADR-018 resolved this at 80px for all breakpoints.** The 80px floor covers zone-1b-top-detail; the trajectory sentence may be partially visible at low Zone 1B heights (1280: ~60px Sub-zone B leaves limited MDA visible height).
 
 **Governing premise satisfied:** UX Architectural Commitment Premise 2 — "Instruments are
 always visible; no primary instrument lives behind a click or scroll." The MDA alert panel is
@@ -229,9 +234,10 @@ G3 does not modify this case.
 already handles the empty case (renders `data-testid="cohort-empty-state"` when no cohort
 crossings). G3 must ensure that in Case A, Sub-zone A takes the full Zone 1B height rather
 than a fixed ADR-value height — otherwise Zone 1B shows large empty space below the MDA panel.
-The implementation must toggle Sub-zone A between `flex: 0 0 [ADR-VALUE]px` (dual-occupant)
-and `flex: 1 1 0` (single-occupant / cohort empty). The toggle is observable by comparing the
-MDA panel bounding box height in Case A vs Case B.
+ADR-018 resolves this without a JS toggle: Sub-zone A uses `flex: 1 1 80px, minHeight: 80px`
+(grows when Sub-zone B is absent) and Sub-zone B wrapper uses `maxHeight: calc(100% - 80px)`.
+When Sub-zone B has minimal content (empty-state), Sub-zone A grows to fill Zone 1B. The
+observable expansion is confirmed by comparing the MDA panel bounding box height in Case A vs Case B.
 
 ---
 
@@ -242,12 +248,18 @@ breakpoints, including 768px tablet. Minimum heights are ADR-specified per break
 
 Required viewport observable states (pixel values resolved at Phase 2):
 
-| Breakpoint | Zone 1B total height | Sub-zone A minimum | Sub-zone B minimum | Observable condition |
+| Breakpoint | Zone 1B total height | Sub-zone A minimum | Sub-zone B available | Observable condition |
 |---|---|---|---|---|
-| 1024×768 | [ADR-VALUE] | [ADR-VALUE] | [ADR-VALUE] | `zone-1b-top-detail` visible without Zone 1B scroll |
-| 1280×800 | [ADR-VALUE] | [ADR-VALUE] | [ADR-VALUE] | `zone-1b-top-detail` visible; `zone-1b-cohort-impact` has non-zero height |
-| 1440×900 | [ADR-VALUE] | [ADR-VALUE] | [ADR-VALUE] | Both sub-zones visible at their minimum heights |
-| 768px (tablet) | [ADR-VALUE] | [ADR-VALUE] | [ADR-VALUE] | `zone-1b-top-detail` visible; no Zone 1B outer scroll required |
+| 1024×768 | ~185px (est.) | 80px (ADR-018) | ~105px (~4 rows) | `zone-1b-top-detail` visible without Zone 1B scroll |
+| 1280×800 | ~138px (est.) | 80px (ADR-018) | ~58px (~2 rows) | `zone-1b-top-detail` visible; `zone-1b-cohort-impact` has non-zero height |
+| 1440×900 | ~182px (est.) | 80px (ADR-018) | ~102px (~3–4 rows) | Both sub-zones visible at their minimum heights |
+| 768px (tablet) | ~185px (est.) | 80px (ADR-018) | ~105px (~4 rows) | `zone-1b-top-detail` visible; no Zone 1B outer scroll required |
+
+> **Note on estimated heights:** Zone 1B heights are computed from LAYOUT × ZONE_PROPORTIONS +
+> estimated cohortPanel height (~75px). The implementing engineer must confirm at runtime using
+> browser dev tools before QA numeric thresholds are finalized. Row height reference: ~26px
+> per cohort crossing row (ADR-014 measurement). QA test assertions use ≥ 80px for Sub-zone A
+> (not the estimated Zone 1B total).
 
 **768px (tablet) constraint:** DEMO6-026/043 (#1250) revealed tablet legibility failures at
 768px. G3 must confirm that the proportional allocation model does not worsen the tablet
@@ -316,7 +328,7 @@ With a scenario producing 8 or more cohort crossing entries (confirmed by
 `data-testid^="cohort-row-"` count ≥ 8), `data-testid="zone-1b-top-detail"` has positive
 bounding box height within `data-testid="zone-1b"`. The MDA panel sub-zone (`data-testid=
 "zone-1b-mda-panel-wrapper"` — new testid added by G3; see §6 note) has bounding box height
-≥ [ADR-VALUE for 1280×800]. This confirms the M16 regression failure mode does not recur.
+≥ 80px (ADR-018). This confirms the M16 regression failure mode does not recur.
 
 **State B — Empty-state (MDA only):**
 At a step where Zone 1B has MDA alerts but no cohort crossings (e.g., step 1 of the Senegal
@@ -363,25 +375,24 @@ which elements are in the viewport).
 > The QA Lead authors `frontend/tests/e2e/m17-g3-zone-1b-allocation.spec.ts` from these criteria
 > before the implementation PR opens.*
 >
-> *[ADR-VALUE] placeholders must be substituted with Phase 2 ADR-specified pixel values before
-> the QA Lead can finalize the bounding box assertions. The QA Lead may author the test structure
-> and scenario-loading logic before the ADR is accepted, but must update the numeric thresholds
-> once [ADR-VALUE] is resolved.*
+> *ADR-018 accepted 2026-06-25. Sub-zone A floor = 80px at all breakpoints. Zone 1B heights are
+> estimated (see §3.4 table); implementing engineer must confirm at runtime before QA thresholds
+> are finalized. QA Lead may author test structure now; update numeric thresholds after runtime
+> measurement confirms Zone 1B heights at each breakpoint.*
 
 **AC-A1 (proportional model — dual-occupant state):**
 In the Senegal T3 conditionality scenario at step 2 (or the Greece backtesting fixture at a
 step where both MDA alerts and cohort crossings are active), when Zone 1B is rendered at
 1280×800:
 - `data-testid="zone-1b-mda-panel-wrapper"` (the MDA sub-zone wrapper) has bounding box height
-  ≥ [ADR-VALUE for Sub-zone A minimum at 1280×800]
+  ≥ 80px (ADR-018)
 - `data-testid="zone-1b-cohort-impact"` has bounding box height > 0
 - `data-testid="zone-1b"` scrollTop is 0 (Zone 1B outer container is not scrolled)
 
 **AC-A2 (overflow regression guard — red-before-green, M16 retrospective):**
 With a scenario fixture that populates Zone 1B with 8 or more cohort crossing entries (count:
 `data-testid` matching `cohort-row-{n}` for n = 0 through 7 or more), at 1280×800:
-- `data-testid="zone-1b-mda-panel-wrapper"` bounding box height ≥ [ADR-VALUE for Sub-zone A
-  minimum at 1280×800] — confirming the MDA panel is not displaced
+- `data-testid="zone-1b-mda-panel-wrapper"` bounding box height ≥ 80px (ADR-018) — confirming the MDA panel is not displaced
 
 **This assertion must be red before G3 implementation is applied** — the QA Lead must confirm
 that the pre-implementation fixture at 8+ cohort rows causes the assertion to fail (either
@@ -393,8 +404,27 @@ before AND after implementation does not confirm the fix.
 evidence source** — reference `docs/process/sprint-plans/m17-g3-sprint-entry.md §2.2
 (Standing constraint)` and the PR #1235 note.
 
-**No soft-skip patterns** (NM-056 guard): AC-A2 must be hard-fail. No `test.skip()`,
-`test.fixme()`, or conditional skips.
+**`test.fail()` annotation — EX-002 (2026-06-25):**
+AC-A2 is annotated with `test.fail()` in `m17-g3-zone-1b-allocation.spec.ts` during the
+pre-G3-implementation window. CI treats the expected failure as a passing state. When G3 Phase 3
+adds `data-testid="zone-1b-mda-panel-wrapper"`, AC-A2 will pass — triggering a CI "unexpected
+pass" that signals the implementing engineer to remove `test.fail()`. See EX-002
+(`docs/compliance/exceptions.md`) and NM-065 (`docs/process/near-miss-registry.md`).
+
+`test.fail()` is not a soft-skip. The test still runs and still must fail before implementation.
+This does not violate the NM-056 guard against soft-skip patterns (`test.skip()`, `test.fixme()`,
+conditional early-returns suppress execution; `test.fail()` does not).
+
+**Phase 3 reversal steps (required in the G3 implementation PR):**
+1. Add `data-testid="zone-1b-mda-panel-wrapper"` to `InstrumentCluster.tsx` (line ~143)
+2. Run playwright locally — AC-A2 should pass (testid present, height ≥ 80px)
+3. Playwright will report "unexpected pass" because `test.fail()` is still present
+4. Remove `test.fail()` and its four-line comment block from AC-A2 in the test file
+5. Re-run playwright — AC-A2 passes cleanly; update EX-002 Status to Resolved
+
+**No soft-skip patterns** (NM-056 guard): `test.skip()`, `test.fixme()`, and conditional
+early-returns remain prohibited for AC-A2. Only `test.fail()` + EX-NNN is an approved
+alternative (NM-065).
 
 **AC-A3 (viewport contract at 768px):**
 With the Senegal T3 scenario at a step where both MDA alerts and cohort crossings are active,
@@ -402,15 +432,13 @@ at `page.setViewportSize({width: 768, height: 1024})`:
 - `data-testid="zone-1b-top-detail"` is visible (positive bounding box height, within viewport)
 - `data-testid="zone-1b"` scrollTop is 0
 - `data-testid="zone-1b-cohort-impact"` has positive bounding box height
-- `data-testid="zone-1b-mda-panel-wrapper"` bounding box height ≥ [ADR-VALUE for Sub-zone A
-  minimum at 768px]
+- `data-testid="zone-1b-mda-panel-wrapper"` bounding box height ≥ 80px (ADR-018)
 
 **AC-A4 (empty-state — MDA only):**
 At a step where Zone 1B has MDA alerts but no cohort crossings (assert: `data-testid=
 "cohort-row-0"` is absent from the DOM OR `data-testid="cohort-empty-state"` is present):
 - `data-testid="zone-1b-top-detail"` is visible (positive bounding box height)
-- `data-testid="zone-1b-cohort-impact"` has bounding box height ≤ [ADR-VALUE for empty-state
-  cohort section height] — confirming it is hidden or shows only the empty-state element
+- `data-testid="zone-1b-cohort-impact"` has bounding box height ≤ 60px — confirming it is hidden or shows only the empty-state element (cohort-empty-state message + optional header; no crossing rows)
 
 **AC-P5 (Persona 5 — Aicha, 90-second ceiling):**
 In the Senegal T3 conditionality scenario at step 2, with Zone 1B fully populated (MDA alerts
@@ -477,7 +505,7 @@ Senegal T3 conditionality · Step 2 · 8 cohort crossing rows loaded
 Zone 1B (overflow: hidden — NO OUTER SCROLL):
 ┌─────────────────────────────────────────────────┐
 │ Zone 1B                                         │
-│ [zone-1b-mda-panel-wrapper] — Sub-zone A        │  ← fixed ADR-VALUE height
+│ [zone-1b-mda-panel-wrapper] — Sub-zone A        │  ← 80px min (ADR-018)
 │   [zone-1b-top-detail]                          │
 │   CRITICAL — poverty_headcount_ratio             │
 │   3.5% below floor · Q1 Informal · T3           │
@@ -491,7 +519,7 @@ Zone 1B (overflow: hidden — NO OUTER SCROLL):
 │  [↓ scroll within Sub-zone B for rows 4-8]      │
 └─────────────────────────────────────────────────┘
 
-FIXED: zone-1b-mda-panel-wrapper always at ADR-VALUE height.
+FIXED: zone-1b-mda-panel-wrapper always ≥ 80px (ADR-018).
 zone-1b-cohort-impact scrolls internally. Zone 1B scrollTop = 0.
 AC-A2 assertion PASSES after fix.
 ```
@@ -619,17 +647,18 @@ Does the ADR explicitly declare the `minHeight: 80px` temporary constraint (PR #
 superseded? The ADR must include a statement that the permanent allocation contract governs
 Zone 1B layout post-G3, removing any ambiguity about which constraint applies.
 
-**[ADR-VALUE] resolution:**
-The Architect measures actual Zone 1B height at 1024×768, 1280×800, 1440×900, and 768px
-(tablet) by running the application at each breakpoint. Sub-zone A minimum heights are selected
-to ensure `data-testid="zone-1b-top-detail"` and `data-testid="zone-1b-trajectory-sentence"`
-are both visible within Sub-zone A without overflow. The measured values replace all
-[ADR-VALUE] placeholders in this document and in the QA test file before the implementation
-PR opens.
+**[ADR-VALUE] resolution — COMPLETE:**
+ADR-018 specifies Sub-zone A floor = **80px at all breakpoints** (codifying the PR #1235
+temporary guarantee as the permanent architectural minimum). Estimated Zone 1B heights per
+breakpoint are in §3.4. The implementing engineer must confirm measured Zone 1B heights at
+runtime before QA thresholds are finalized. All [ADR-VALUE] placeholders in this document
+have been replaced with resolved values (80px for Sub-zone A assertions; ≤ 60px for AC-A4
+empty-state check; §3.4 table has estimated Zone 1B totals).
 
 **Architect determination acknowledgment (to be filled at Phase 2):**
-`[ ]` Architect: ADR path determined (Path A / Path B). [ADR-VALUE] placeholders resolved.
-      G2 compatibility confirmed. `minHeight: 80px` supersession declared in ADR. [Date]
+`[x]` Architect: ADR path determined (Path B — new ADR-018, ARCH-012). [ADR-VALUE] = 80px
+      at all breakpoints. G2 compatibility confirmed (per FA review, ADR-018-panel-review.md).
+      `minHeight: 80px` supersession declared in ADR-018 §Decision. 2026-06-25
 
 ---
 
@@ -677,12 +706,18 @@ be finalized; QA Lead may author test structure before ADR is accepted.
 - AC-P5: `zone-1b-top-detail`, `detail-indicator-name`, `detail-status` visible without interaction
 - AC-P1: `cohort-row-0` visible within `zone-1b-cohort-impact`; Sub-zone B shows internal scroll when content exceeds height
 
-**No soft-skip patterns** (NM-056 guard): All assertions must be hard-fail.
+**No soft-skip patterns** (NM-056 guard): All assertions must be hard-fail. Exception: AC-A2
+uses `test.fail()` per EX-002 (approved 2026-06-25; see AC-A2 note above).
+
+**Testid reconciliation (2026-06-25):** AC-A2 locator updated from `zone-1b-mda-panel` to
+`zone-1b-mda-panel-wrapper` (aligning with ADR-018 and intent doc §5). Change applied in
+same PR as `test.fail()` annotation.
 
 **QA Lead acknowledgment:**
 `[ ]` QA Lead: Tests for AC-A1 through AC-P1 authored and filed in
       `frontend/tests/e2e/m17-g3-zone-1b-allocation.spec.ts`. AC-A2 red confirmed before
-      implementation. Date: [to be completed]
+      implementation. AC-A2 annotated with `test.fail()` (EX-002); reversal steps documented above.
+      Date: [to be completed]
 
 ---
 

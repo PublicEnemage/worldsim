@@ -16,6 +16,7 @@ import { SessionRecordingBanner } from "./components/SessionRecordingBanner";
 import { SessionReplayViewer } from "./components/SessionReplayViewer";
 import { useSessionRecording } from "./hooks/useSessionRecording";
 import type { ScenarioDetailResponse } from "./types";
+import { type ScenarioComparisonConfig } from "./components/TrajectoryView";
 import "./App.css";
 
 const API_BASE = "http://localhost:8000/api/v1";
@@ -101,6 +102,8 @@ export default function App() {
   const [activeFiscalMultiplier, setActiveFiscalMultiplier] = useState<number | null>(null);
   // Mode 3 Active Control toggle (G6b, Issue #753)
   const [mode3Active, setMode3Active] = useState(false);
+  // M17-G2 — N>2 scenario comparison configs (IDs + palette; trajectories fetched by cluster)
+  const [comparisonScenarios, setComparisonScenarios] = useState<ScenarioComparisonConfig[]>([]);
 
   const handleStepChange = (step: number) => {
     // Always set — never reset to null on completion so EntityDetailDrawer
@@ -193,6 +196,10 @@ export default function App() {
       setSelectedEntityId(id);
     (window as unknown as Record<string, unknown>).__worldsim_setAttributeName = (key: string) =>
       setAttributeName(key);
+    // M17-G2 — inject N>2 comparison scenario configs for E2E test seam (AC-S1).
+    (window as unknown as Record<string, unknown>).__worldsim_setComparisonScenarios = (
+      configs: ScenarioComparisonConfig[],
+    ) => setComparisonScenarios(configs);
   }, [setSelectedEntityId, setAttributeName]);
 
   // When a scenario is selected: fast-forward currentStep if already completed,
@@ -363,6 +370,7 @@ export default function App() {
               mode3Active={mode3Active}
               entityIds={activeEntityIds}
               activeScenarioDetail={activeScenarioDetail}
+              comparisonScenarios={comparisonScenarios.length > 0 ? comparisonScenarios : undefined}
             />
           </div>
         )}

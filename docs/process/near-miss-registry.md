@@ -3302,6 +3302,437 @@ coverage was not added in the same sprint.
 
 ---
 
+## NM-064 — AC-009 Performance Test Consistently Exceeds 200ms Threshold on GHA Shared Runners; test.fixme() Required to Unblock CI (Anticipatory)
+
+**Date:** 2026-06-25
+**Milestone:** M17 — Calibration and Comparative Infrastructure
+**Detected by:** EL direction during G2 sprint entry PR (#1289) CI review
+**Severity:** Medium — blocks CI-green merges on unrelated PRs; no incorrect outputs produced
+
+### What happened
+
+`AC-009` (`trajectory-view.spec.ts:156`) is a Mode 3 render performance test that applies
+a 4× CPU throttle via CDP and asserts `renderMs ≤ 200ms` (threshold raised from 100ms per
+EX-001, approved 2026-06-24). On the M17 G2 sprint entry PR (#1289), AC-009 failed in two
+consecutive CI runs with measured times of 712ms and 771ms — both 3–4× the 200ms threshold.
+The test had been passing in recent release branch CI runs (e.g., run after PR #1286).
+
+This test was previously identified as high-variance: NM-059 (prior multi-CDP approach
+produced 179ms–802ms variance) and EX-001 (raised threshold from 100ms to 200ms at M14
+exit). The PR #1289 failures are consistent and well above the raised threshold, suggesting
+the current GHA runner load makes the 4× throttle performance gate unreliable as a CI check.
+
+### What was at risk
+
+Any PR that triggers the Playwright E2E suite on a loaded GHA runner will fail AC-009
+regardless of whether the PR introduced any performance regression. This makes AC-009 a
+false CI gate — blocking unrelated merges while providing no signal about actual performance
+change.
+
+### What caught it
+
+EL directed disabling the test and filing an exception after two consecutive CI failures
+on a PR containing only process documents (no frontend code changes).
+
+### Root cause
+
+The CI GitHub Actions shared runner (2-core, throttled to effectively 0.5-core for this
+test) cannot reliably render a React/Recharts component cluster in under 200ms. The 4× CDP
+throttle is too aggressive for the GHA shared runner tier. The test provides no meaningful
+performance regression signal when the baseline varies by 3–4× between runs.
+
+### Process improvement
+
+**Immediate:** Add `test.fixme()` to AC-009 in `trajectory-view.spec.ts` referencing
+NM-064 and KI-006. This authorizes the skip per NM-056 (skip requires NM entry on record).
+
+**KI filed:** KI-006 — external infrastructure limitation (GHA shared runner can't
+reliably satisfy 200ms throttled render threshold).
+
+**EX-001 update:** EX-001 (docs/compliance/exceptions.md) to be updated at M17 exit
+review to either: (a) resolve by removing AC-009 from CI scope, or (b) convert to a
+local-only performance gate with a higher CI threshold.
+
+**Performance gate ownership:** AC-009 should be converted to a local developer gate
+(not a CI gate) or replaced with a Playwright `--trace` perf annotation that records
+render time without asserting a threshold. A performance regression is better caught via
+comparison to prior runs than via absolute threshold on variable shared infrastructure.
+
+---
+
+## NM-065 — No SOP for Intentionally-Red Pre-Implementation QA Tests; Ad-Hoc Resolution Required (Anticipatory)
+
+**Date:** 2026-06-25
+**Milestone:** M17 — Calibration and Comparative Infrastructure
+**Detected by:** EL review of PR #1290 CI failure (G3 early QA filing)
+**Severity:** Low — no incorrect outputs; CI blocked on unrelated PRs; ad-hoc resolution added process debt
+
+### What happened
+
+PR #1290 (`chore/m17-g3-early-qa-filing`) filed the G3 regression guard test before G3 Phase 3
+implementation. AC-A2 (`m17-g3-zone-1b-allocation.spec.ts:454`) was explicitly authored WITHOUT
+an early-return guard — by design, to confirm it was red before implementation. The test
+intentionally fails pre-implementation: `zone-1b-mda-panel-wrapper` does not exist until G3
+Phase 3 adds the testid.
+
+When the PR reached CI, playwright-e2e failed on AC-A2. This blocked the merge of an
+unrelated PR (SESSION_STATE.md) on the same CI run. There was no documented mechanism in the
+sprint planning SOP or QA filing process for handling an intentionally-red pre-implementation
+test.
+
+All previous pre-implementation QA tests in M14–M16 used early-return guards (`if (!someTestid)
+return;`) to stay CI-green while still filing the test structure. AC-A2 was the first test to
+explicitly opt out of that pattern (the intent document cited NM-056 and specified "no
+soft-skip patterns; AC-A2 must be hard-fail"). The two patterns are incompatible: the spec
+required a hard-fail, but the process assumed CI-green QA filing PRs.
+
+### What was at risk
+
+Any QA team member filing a regression guard test in the same "red-before-green" pattern
+would face the same undocumented conflict. Without a process answer, the resolution defaults
+to ad-hoc EL direction each time.
+
+### What caught it
+
+EL recognized the conflict when reviewing CI failures on PR #1290 and directed the resolution
+(EX-002 + `test.fail()` + intent doc reversal steps + NM-065).
+
+### Root cause
+
+The sprint planning SOP (`docs/process/sprint-planning-sop.md`) and QA filing process do not
+specify what to do when a test must be intentionally red pre-implementation. The only prior
+guidance was NM-056 (no soft-skips without a near-miss on record) and the early-return guard
+pattern. These two mechanisms serve different purposes:
+
+- **Early-return guard:** test appears to pass (skips assertions) before implementation; provides
+  no regression detection if the test structure is wrong; CI stays green.
+- **`test.fail()`:** test runs, must fail pre-implementation (CI passes), and CI fails when it
+  unexpectedly passes post-implementation (regression detection still works); CI stays green.
+
+The QA filing process assumes early-return guards are the only mechanism. The intent document
+correctly specified a hard-fail pattern but the SOP had no process home for it.
+
+### Process improvement
+
+**Immediate:** EX-002 filed; `test.fail()` applied to AC-A2; intent document updated with
+reversal steps. Testid reconciled from `zone-1b-mda-panel` to `zone-1b-mda-panel-wrapper`
+in the same PR.
+
+**SOP update required:** `docs/process/sprint-planning-sop.md §QA Filing` (or equivalent QA
+section) must document two approved patterns for pre-implementation QA tests:
+
+1. **Early-return guard** (preferred for most tests): `if (!locator.isVisible()) return;` — test
+   stays green pre-implementation; appropriate when the test structure is complete and only the
+   testid is missing.
+
+2. **`test.fail()` + EX-NNN** (required for regression guards): when the spec requires the test
+   to be hard-fail before implementation (i.e., CI must confirm the test is red), apply
+   `test.fail()`, file an exception (EX-NNN), and document reversal steps in the intent
+   document. The test must fail before implementation and CI must fail when it unexpectedly
+   passes after implementation.
+
+The choice between patterns is a QA Lead decision documented in the intent document §5 AC
+preamble. A regression guard AC that opts out of the early-return pattern must document why.
+
+---
+
+## NM-066 — SESSION_STATE.md Exceeds Claude Code Read Ceiling; Session Continuity Guarantee Silently Degraded (Reactive)
+
+**Date:** 2026-06-26
+**Milestone:** M17 — Calibration and Comparative Infrastructure
+**Detected by:** EL observation during session startup (person, not process)
+**Severity:** High — the foundational session continuity protocol requires reading `SESSION_STATE.md` in full at session start; the file now exceeds the 256 KB Claude Code read ceiling, meaning agents have been silently operating on truncated session state for an unknown number of sessions
+
+### What happened
+
+`SESSION_STATE.md` grew to 2,038 lines / 301 KB across milestones M9–M17 with no archival process, no size limit, and no CI check. Claude Code's maximum file read size is 256 KB. Any agent that attempted to read `SESSION_STATE.md` as specified by `CLAUDE.md §Session Continuity` would receive a truncation error or silently incomplete content. The file has exceeded the read ceiling by approximately 45 KB.
+
+The EL identified the size issue during a session startup review and filed GitHub Issue #1328 to investigate remediation options.
+
+### What was at risk
+
+The session continuity guarantee — that every agent begins a session with complete awareness of current milestone status, open PRs, pending decisions, and in-progress work — has been silently unachievable. An agent that cannot read the full file may:
+
+- Miss recent EL architectural decisions recorded in the lower half of the file
+- Miss open work streams or pending decisions from earlier in the current milestone
+- Operate on an incomplete picture of which sprint groups are active or which PRs are open
+- Make implementation or process decisions that contradict state it cannot see
+
+Because the truncation happens silently (no error is surfaced to the agent), the gap is invisible: the agent believes it has fulfilled the continuity read requirement, but has not.
+
+### What caught it
+
+EL noticed the file size during a session. No process gate flagged it. This is evidence that the process had a gap — the continuity protocol specifies what to read but places no constraint on the maximum size of what must be read, and CI has no check on file size.
+
+### Root cause
+
+The session continuity protocol (`CLAUDE.md §Session Continuity`) specifies `SESSION_STATE.md` as a required read but defines no maximum file size, no archival cadence, and no enforcement mechanism. The file has accumulated content from every milestone since M9 without any rotation or archival step. There is no CI check that would flag when the file approaches the tool's read ceiling.
+
+### Process improvement
+
+**Immediate:** GitHub Issue #1328 filed to investigate and select a remediation option (archive-and-rotate, sprint journal issue, cockpit-card model, or hybrid). Decision to be recorded as an EL architectural decision entry; new format to activate at M18 kickoff.
+
+**Required at M18 kickoff (blocking):**
+1. `SESSION_STATE.md` reduced to or below a defined line limit (proposed: ≤ 150 lines) before M18 implementation begins.
+2. An archival or rotation protocol defined and documented in `CLAUDE.md §Session Continuity`.
+3. A CI lint step (or pre-push check) added that fails if `SESSION_STATE.md` exceeds the defined limit, so the ceiling violation is caught at push time rather than by EL observation.
+
+**Near-miss lineage:** The root cause is structural accumulation with no expiry mechanism — the same pattern class as scan-registry ordering violations (NM noted in CLAUDE.md) and known-issues registry growth. Any append-only or accumulating document that lacks a size limit or rotation protocol is a candidate for the same failure.
+
+---
+
+## NM-067 — No Sprint Group Isolation Protocol for Parallel Workstreams; Unregulated Release Branch Merges Causing Lost Updates and Rework Across M15–M17 (Reactive)
+
+**Date:** 2026-06-26
+**Milestone:** M17 — Calibration and Comparative Infrastructure (pattern identified; instances across M15–M17)
+**Detected by:** EL pattern recognition across M15–M17 PR history (person, not process)
+**Severity:** High — actual work was lost, rework was required, and wrong-target merges occurred across three consecutive milestones; no process gate prevented any instance
+
+### What happened
+
+The current branching model allows multiple sprint groups to cut `feat/m{N}-g{N}-*` branches from `release/m{N}` simultaneously and merge back to `release/m{N}` as implementation PRs complete, with no coordination protocol and no isolation between groups. When two or more Claude Code sessions run parallel sprint groups against the same release branch, several failure modes recur:
+
+**Documented instances in M15–M17 PR history:**
+
+| Failure mode | Evidence |
+|---|---|
+| Duplicate PRs — same-named PR opened twice because a conflict-forced re-open overwrote the first | #1293 and #1294 both named `chore/m17-state-g3-phase2-complete`; #1307 and #1308 both named `chore/m17-g3-g2-entry-approvals` |
+| Wrong-target merge — feature branch merged to `main` instead of `release/m{N}` | #1303 `chore/m17-g4-session-state-v2` → `main` |
+| Post-exit rework — one group's merge reveals a spec gap in an already-exited group | `feat/m17-g5-g3-spec-fix` (#1319) required after G3 sprint exit (#1320) |
+| CLOSED PRs with lost work — state rebuilt elsewhere after a conflict superseded the PR | #1290, #1292, #1299, #1302, #1304, #1306 all closed without merging |
+| Shared file overwrites — last merge wins, silently discarding earlier additions | Multiple groups writing `SESSION_STATE.md`, `near-miss-registry.md`, and `scan-registry.md` concurrently |
+
+The primary conflict vector is shared non-code files: every sprint group writes `SESSION_STATE.md` and may write registry files, meaning any two concurrent groups are in a guaranteed write conflict regardless of whether their code changes overlap.
+
+### What was at risk
+
+- **Silent data loss:** When two groups both append to `SESSION_STATE.md` and one merge overwrites the other, the overwritten content is lost without any error. Registry entries (near-miss, scan, known issues) are permanent institutional memory — a silently overwritten entry is an integrity violation.
+- **CI running on incomplete state:** A PR that merges after a conflicting group has already merged may push a state where partially-integrated code reaches CI before it is ready, producing false passes or false failures that consume sprint capacity to diagnose.
+- **Cascading rework:** When one group's implementation invalidates a spec that another group has already shipped (the M17 G1→G2→G5 cascade), there is no mechanism to detect or route the dependency at sprint entry. The rework is discovered at merge time, not at planning time.
+
+### What caught it
+
+EL review of the M17 PR history identified the pattern. No process gate prevented any individual instance. The only detection mechanism was EL post-hoc observation, which means each instance consumed rework capacity before being caught.
+
+### Root cause
+
+The release branch workflow (`CLAUDE.md §Release Branch Workflow`) defines how a single feature branch should be managed but does not address parallel sprint group coordination. There is no:
+
+1. **Sprint group isolation protocol** — no sub-branch layer between feature work and the release branch when groups run in parallel
+2. **Shared file coordination lane** — no designated single writer for `SESSION_STATE.md`, registry files, and other files that every group modifies
+3. **File-conflict risk assessment at sprint entry** — no step in the sprint entry gate that identifies which files a group will write and which other active groups write the same files
+4. **Cross-group dependency declaration** — no mechanism at sprint planning to declare upstream/downstream dependencies between groups (e.g., G1 calibration → G2 wiring → G5 display), so cascading impacts are discovered at merge time rather than at entry time
+
+### Process improvement
+
+**Immediate:** GitHub Issue #1329 filed to investigate and select a branching model. Proposed direction (Option E — hybrid): sprint group sub-branches (`sprint/m{N}-g{N}`) for code isolation, combined with a PM Agent coordination lane for shared-file writes.
+
+**Required at M18 kickoff (blocking):**
+1. EL selects a branching model and records the decision as an architectural decision entry.
+2. `CLAUDE.md §Release Branch Workflow` updated to reflect the new model.
+3. Sprint entry template (`docs/process/sprint-plans/templates/sprint-entry-template.md`) amended to include a **file-conflict risk assessment field**: list of files the group will write, and which other active groups write the same files. If overlap exists, the entry gate requires a coordination protocol before implementation may begin.
+4. Cross-group dependency declaration added to sprint entry: if this group's implementation depends on another group's output, the upstream group's integration PR must be merged to the release branch before this group opens its own integration PR.
+5. PM Agent coordination lane protocol defined (if hybrid model is selected): what triggers a shared-state sync PR, which files it covers, and how sprint groups signal the PM Agent that a shared-file update is ready to queue.
+
+**Near-miss lineage:** The root cause — a process that works correctly for sequential workstreams silently breaks under parallel execution — is a structural gap that will recur in any milestone with ≥ 2 simultaneous sprint groups. M18 is expected to have parallel workstreams. This gap must be closed before M18 implementation begins.
+
+---
+
+## NM-068 — Prior NM Process Improvements Not Verified at Sprint Entry; NM-027 Pattern Class Has Recurred Four Times (Reactive)
+
+**Date:** 2026-06-26
+**Milestone:** M17 — Calibration and Comparative Infrastructure (pattern identified; recurrences across M12–M17)
+**Detected by:** EL pattern recognition across NM registry — NM-058 explicitly labels NM-027's fourth recurrence
+**Severity:** High — process improvements recorded in the near-miss registry are not preventing recurrence; the NM registry fulfils its forensics function but its prevention function is structurally incomplete
+
+### What happened
+
+The NM-027 pattern class — a QA test that measures nothing because a no-op guard was not removed after the component it guarded against was wired up — has recurred four times:
+
+| Entry | Sprint | What recurred |
+|---|---|---|
+| NM-027 | M12 | AC-007 and AC-008 no-op guards masked non-measurement for one milestone |
+| NM-028 | M13 | IR-004 trajectory tick year test was a silent no-op for one milestone |
+| NM-047 | M14 | G5 Playwright AC-3 timing-dependent; guard timeout produced no-op |
+| NM-058 | M16 | AC-009 testid mismatch; Mode 3 performance gate silent no-op since M12 |
+
+Each recurrence produced a process improvement: the QA Lead working agreement was amended after NM-027, and additional audit steps were added after NM-028, NM-047, and NM-058. The amendments exist in the working agreement text. They do not prevent recurrence because nothing at sprint entry verifies that the relevant prior process improvements are being applied to the current sprint group's scope.
+
+This is not isolated to the NM-027 class. NM-052 established that the backend pre-push mypy gate had been non-functional locally since M8 — a structural fix from NM-016 created the appearance of a gate without the reality of one. The NM-016 process improvement (add pre-push lint gate) was implemented; the NM-052 recurrence revealed that "implemented" had not been verified to mean "functional."
+
+### What was at risk
+
+The near-miss registry's stated purpose is both forensic (record what happened) and preventive (drive process improvements that stop recurrence). The forensic function is working: 67 entries document failures with root causes. The preventive function has a structural gap: there is no mechanism to verify that prior improvements are in effect when a sprint group begins work. A process improvement that exists in the working agreement but is not checked at entry time will not prevent recurrence by a different agent in a different session.
+
+### What caught it
+
+EL recognition of the recurrence pattern while reviewing the NM registry — specifically the NM-058 entry's explicit "fourth recurrence" label. No process gate surfaced the recurrence. The working agreement additions from prior entries were not consulted at the point when they would have been actionable (sprint entry or PR authorship).
+
+### Root cause
+
+The sprint entry gate (`docs/process/sprint-planning-sop.md §Sprint Entry Gate`) does not include a step requiring the implementing agent to identify which prior NM process improvements are relevant to the sprint group's scope and confirm they are in place. The NM registry entries themselves contain the improvement specifications, but they are written as permanent institutional records — not as a checklist consulted at sprint entry. The two functions (record and prevent) are in the same document but have no mechanism connecting them at the point of action.
+
+### Process improvement
+
+**Immediate:** GitHub Issue #1330 filed to investigate a sprint entry NM verification step.
+
+**Required at M18 kickoff (blocking):**
+1. Sprint entry template (`docs/process/sprint-plans/templates/sprint-entry-template.md`) amended to include a **"Prior NM applicability check"** field: at sprint entry, the implementing agent must search the NM registry for entries whose process improvements apply to the sprint group's implementation domain (backend, frontend, E2E tests, shared files, demo specs, etc.) and explicitly confirm each relevant improvement is in effect. For domain-specific sprints, a short curated lookup list (e.g., "frontend E2E sprint groups must confirm NM-027/028/047/058/061 guard activation check is in working agreement and will be executed") is more actionable than a full registry scan.
+2. PM Agent sprint entry review responsibility extended: PM Agent checks that the Prior NM applicability check field is complete before recommending EL approval.
+
+**Near-miss lineage:** NM-027 → NM-028 → NM-047 → NM-058 → NM-061 form the primary recurrence chain. NM-016 → NM-052 form a second chain in the same gap class (improvement implemented but not verified as functional). NM-068 addresses the structural root common to both chains.
+
+---
+
+## NM-069 — Gitignore Missing Playwright and Test Artifact Directories; Accidental Staging Would Commit Binary Artifacts to History (Anticipatory)
+
+**Date:** 2026-06-26
+**Milestone:** M17 — Calibration and Comparative Infrastructure
+**Detected by:** EL observation — persistent untracked files in git status across multiple sessions
+**Severity:** Medium — no accidental commit has occurred; risk is latent but the untracked artifacts are present in every session, and the process has at least one known pathway (`git add -A`) that would capture them
+
+### What happened
+
+The following paths are consistently untracked in git status and are not covered by `.gitignore`:
+
+- `backend/test-results/`
+- `frontend/playwright-report/`
+- `frontend/session-screenshots/`
+- `frontend/test-results/`
+- `docs/process/near-miss-registry.md.test-marker`
+
+These are generated test and CI artifacts — Playwright HTML reports, session screenshots, JSON test result files — that have no place in version control. The current `.gitignore` covers `.coverage`, `htmlcov/`, `.pytest_cache/`, and `backend/sessions/*.json` but does not cover Playwright output directories or session screenshot directories.
+
+CLAUDE.md §Commit process warns against `git add -A` or `git add .` due to the risk of capturing sensitive files. This warning is the only defence against the gap. It relies on agent compliance and is not structural.
+
+### What was at risk
+
+A `git add -A` or `git add .` at any point — including by an agent following a pattern from training data rather than CLAUDE.md — would stage all untracked files, including Playwright HTML reports (which can contain screenshots and full page captures), session screenshots, and test result JSON files. Once committed and pushed, large binary artifacts require `git filter-repo` or a force-push to remove, both of which are destructive operations that rewrite history. The `docs/process/near-miss-registry.md.test-marker` is an unknown artifact whose provenance is unclear — it could be a CI test fixture or a leftover from a failed test run; its presence in the working tree without a gitignore entry is itself a gap.
+
+### What caught it
+
+EL noticed the persistent untracked files in git status during session review. No CI check or pre-push gate flags untracked files that should be ignored. Detection was person-dependent.
+
+### Root cause
+
+The `.gitignore` was authored before Playwright E2E testing was introduced and has not been updated to cover Playwright output directories. `session-screenshots/` was added by a sprint group to capture browser automation outputs but was not accompanied by a gitignore entry. There is no process step that requires a gitignore audit when a new test framework, output directory, or CI artifact path is introduced.
+
+### Process improvement
+
+**Immediate:** GitHub Issue #1331 filed. `.gitignore` update is a one-PR fix — add `backend/test-results/`, `frontend/playwright-report/`, `frontend/session-screenshots/`, `frontend/test-results/`, and `*.test-marker` entries. The `near-miss-registry.md.test-marker` artifact should be investigated (deleted if a leftover, gitignored if generated by a test harness).
+
+**Process addition:** Sprint entry template amended to include a **"New output paths"** field: any sprint group whose implementation generates new output directories (test results, screenshots, reports, build artifacts) must either (a) confirm the path is already covered by `.gitignore`, or (b) include a `.gitignore` update in the same implementation PR. PM Agent checks this field at sprint entry review.
+
+---
+
+## NM-070 — Pre-Push Gates Enforced by Documentation Only; No Git Hook Enforcement; Gates Non-Functional or Bypassed Across Multiple Milestones (Reactive)
+
+**Date:** 2026-06-26
+**Milestone:** M17 — Calibration and Comparative Infrastructure (structural gap; individual instances in NM-016, NM-052, NM-054)
+**Detected by:** EL pattern recognition across NM-016, NM-052, NM-054 — the same structural absence underlies all three
+**Severity:** High — the pre-push gates are stated as mandatory in CLAUDE.md but are enforced only by agent compliance; two documented instances (mypy gate non-functional M8–M16; E2E breakage not caught pre-push) show the compliance-only model fails across milestone boundaries without detection
+
+### What happened
+
+CLAUDE.md §Backend pre-push lint gate and §Frontend pre-push build gate define mandatory pre-push checks: `ruff check . && mypy app/` for backend Python changes, `npm run build` for frontend changes. Both are described as blocking: "Both must exit 0." "Must exit 0."
+
+Despite this language, neither gate has a structural enforcement mechanism. There is no git pre-push hook that runs the checks. There is no CI fast-fail that distinguishes "gate not run" from "gate run and passed." An agent that pushes without running the gates faces no immediate consequence — CI catches the error instead, which is exactly the outcome the gates were designed to prevent.
+
+**Documented failures under this structural gap:**
+
+| Near-miss | What the gate missed | Duration |
+|---|---|---|
+| NM-016 | Lint gate absent from agent prompts; two PRs failed CI on trivially-preventable errors | M10 (gate established) |
+| NM-052 | mypy gate non-functional locally since M8 — Python 3.13 venv not documented; gate ran but produced meaningless output; every local mypy run since M8 was either a syntax error (Python 3.10) or 99 false-positive errors (Python 3.13 without deps) | M8–M16 (8 milestones) |
+| NM-054 | Frontend build gate does not catch E2E breakage; `npm run build` passes while 6 Playwright tests fail; UI contract change (`select` → `combobox`) reached CI uncaught | M16 |
+
+NM-052 is the most consequential: for eight milestones, the mypy gate appeared to be running but was providing false confidence. Agents who ran it and saw output believed the check passed. The gate was protecting nothing.
+
+### What was at risk
+
+The pre-push gates exist to make CI a confirmation, not a discovery mechanism. When gates are non-functional or not run, CI becomes the first line of defence, which means:
+- Type errors, lint violations, and build failures are discovered at CI round-trip time rather than at push time — adding minutes to every iteration
+- Agents who believe the gate passed may not investigate CI failures promptly ("I ran the gate, so this must be a CI environment issue")
+- Errors can accumulate across PRs if CI is slow to surface them
+
+The mypy gap specifically means type errors introduced across eight milestones of Python backend work were caught only by CI — or not caught at all if CI was not blocking in that period.
+
+### What caught it
+
+Individual instances were caught by CI failure (NM-016, NM-054) or by EL noticing anomalous mypy output (NM-052). No process gate detected that the pre-push gates themselves were non-functional. This is the deepest version of the gap: a process check that fails silently produces the same output as one that succeeds.
+
+### Root cause
+
+The pre-push gates are documentation obligations, not structural constraints. A git pre-push hook runs automatically before every push regardless of which agent or human is pushing — it cannot be omitted by accident or by a new agent unfamiliar with the CLAUDE.md mandate. The gates have never been implemented as hooks.
+
+A secondary root cause for the mypy gap specifically: the gate instruction did not specify the Python environment required (`python3.13 -m venv .venv`), so agents running `mypy app/` in the wrong environment received output that appeared meaningful but was not. The gate instruction has been updated (NM-052 fix), but the structural gap — no hook enforcement — remains open.
+
+### Process improvement
+
+**Immediate:** GitHub Issue #1332 filed. This is an M18 entry blocker.
+
+**Required at M18 kickoff (blocking):**
+1. Implement a git pre-push hook at `.git/hooks/pre-push` (or via a hook manager like `pre-commit`) that:
+   - Detects whether the push touches `backend/` Python files; if so, runs `cd backend && source .venv/bin/activate && ruff check . && python -m mypy app/`
+   - Detects whether the push touches `frontend/src/`; if so, runs `cd frontend && npm run build`
+   - Exits non-zero on any failure, blocking the push
+   - Prints a clear error message distinguishing lint failure from environment failure (missing venv → `ERROR: backend/.venv not found — run setup first`, not a silent mypy 99-error run)
+2. Hook installation documented in `docs/CONTRIBUTING.md §Development Setup` as a required setup step, not an optional one.
+3. CLAUDE.md §Backend pre-push lint gate and §Frontend pre-push build gate updated to reference the hook as the enforcement mechanism: "The pre-push hook enforces this gate automatically. If the hook is not installed, install it before pushing."
+4. CI fast-fail step added that checks for a sentinel file written by the hook — so CI can distinguish "hook ran and passed" from "hook was not present."
+
+**Near-miss lineage:** NM-016 established the lint gate. NM-052 revealed the mypy gate had been non-functional for eight milestones. NM-054 revealed the frontend build gate does not cover E2E breakage. NM-070 identifies the structural root cause common to all three: documentation-only enforcement. Closing NM-070 closes the root cause that enabled NM-016, NM-052, and NM-054 to occur.
+
+---
+
+## NM-071 — No Sprint Group Concurrency Ceiling at Sprint Planning; Unbounded Parallelism Upstream Cause of NM-067 Coordination Failures (Anticipatory)
+
+**Date:** 2026-06-26
+**Milestone:** M17 — Calibration and Comparative Infrastructure
+**Detected by:** EL pattern recognition — identified as the upstream planning gap enabling NM-067
+**Severity:** Medium — no specific ceiling violation has been defined or breached; M17's seven parallel sprint groups is the proximate upstream condition for the coordination failures documented in NM-067
+
+### What happened
+
+M17 ran seven sprint groups (G1 through G7) across two waves, with multiple groups running simultaneously in parallel Claude Code sessions. The current sprint planning SOP has no step that asks: "how many groups will run concurrently in this wave, and does the shared-file coordination overhead remain manageable at that count?"
+
+The consequences of unmanaged concurrency were documented in NM-067: duplicate PRs, wrong-target merges, shared-file overwrites, and post-exit rework. NM-067 proposes a branching model fix (sprint group sub-branches + PM Agent coordination lane). But the branching fix addresses the symptom; it does not address the upstream planning question that determines whether the coordination load is feasible in the first place.
+
+A sprint planning process that can authorise seven parallel groups with no explicit coordination budget is a structural gap independent of what branching model is chosen. Even with sprint group sub-branches, seven simultaneous groups sharing a PM Agent coordination lane will overwhelm the lane's capacity.
+
+### What was at risk
+
+As parallel group count increases, coordination overhead scales nonlinearly:
+- Each additional group adds shared-file write conflicts proportional to the number of other active groups
+- PM Agent coordination obligations (state sync, HORIZON sweeps, entry approvals, exit confirmations) compound across groups
+- Cross-group dependency chains (M17: G1 calibration → G2 wiring → G5 display) become harder to sequence correctly as the dependency graph grows
+
+At seven groups, the coordination overhead exceeded what the existing process could manage, producing the NM-067 failure set. At some lower count — likely three to four parallel groups — the overhead is manageable without a coordination lane at all. The sprint planning SOP does not define that threshold.
+
+### What caught it
+
+EL pattern recognition during NM-067 investigation. No planning gate surfaced the coordination risk before M17 implementation began.
+
+### Root cause
+
+The sprint planning SOP defines entry criteria for individual sprint groups (entry document, EL approval, etc.) but has no wave-level coordination check. There is no question at wave planning time that asks: "how many groups are in this wave, which files do they share, and what is the coordination protocol if that count exceeds a manageable threshold?" The threshold itself is undefined.
+
+### Process improvement
+
+**Immediate:** GitHub Issue #1333 filed.
+
+**Required at M18 kickoff:**
+1. Sprint planning SOP (`docs/process/sprint-planning-sop.md`) amended to include a **wave-level coordination check** at wave kickoff: list all groups planned for the wave, identify shared files (especially `SESSION_STATE.md`, registry files, `CLAUDE.md`), and determine the coordination protocol based on group count:
+   - **1–2 groups:** standard model — each group writes shared files in its own PRs; conflicts are recoverable at merge time
+   - **3–4 groups:** PM Agent coordination lane recommended — shared-file updates queued through PM Agent; groups flag shared-file changes in their exit PRs rather than writing directly
+   - **5+ groups:** PM Agent coordination lane required — sprint group sub-branches mandatory (per NM-067 fix); no direct shared-file writes from feature branches
+2. The wave kickoff coordination check is a PM Agent responsibility, recorded in the wave kickoff artifact before any group opens an implementation PR.
+3. A hard ceiling of five parallel groups per wave is recommended as a starting point, subject to EL revision after M18 experience.
+
+**Near-miss lineage:** NM-071 is the upstream planning gap that enabled NM-067. Closing NM-067 (branching model) without closing NM-071 (concurrency ceiling) would allow a future wave to recreate the same conditions that made NM-067 inevitable.
+
+---
+
 ## NM-NNN — [Short descriptive title]
 
 **Date:** YYYY-MM-DD (or approximate milestone era)

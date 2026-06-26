@@ -21,6 +21,8 @@
 import { useEffect, useRef, useState } from "react";
 import { useScenarioStepStore, type Zone1BAlert, type CohortThresholdCrossing } from "../store/scenarioStepStore";
 import { getIndicatorDisplayNameAny, getIndicatorAbbreviation } from "../lib/indicatorDisplayNames";
+import { useViewportBreakpoint } from "./InstrumentCluster";
+import { type ScenarioComparisonConfig, SCENARIO_COMPARISON_PALETTE } from "./TrajectoryView";
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -701,6 +703,8 @@ const COHORT_SEVERITY_COLOR: Record<CohortThresholdCrossing["severity"], string>
 
 export function CohortImpactSection({ isCompleted = false }: { isCompleted?: boolean }) {
   const { cohort_threshold_crossings: crossings } = useScenarioStepStore();
+  const bp = useViewportBreakpoint();
+  const isNarrow = bp === 1024; // covers all viewports < 1280px, including 768px (#1250)
   const headerLabel = isCompleted ? "COHORT IMPACT (HISTORICAL)" : "COHORT IMPACT";
   const emptyText = isCompleted
     ? "No cohort threshold crossings at or before this step."
@@ -709,7 +713,7 @@ export function CohortImpactSection({ isCompleted = false }: { isCompleted?: boo
   return (
     <div
       data-testid="zone-1b-cohort-impact"
-      style={{ borderTop: "1px solid #e0e0e0", paddingTop: 2, flexShrink: 0, background: "#fff" }}
+      style={{ borderTop: "1px solid #e0e0e0", paddingTop: 2, flex: "1 1 0", overflowY: "auto", background: "#fff" }}
     >
       <div
         data-testid="cohort-section-header"
@@ -756,10 +760,10 @@ export function CohortImpactSection({ isCompleted = false }: { isCompleted?: boo
                 paddingTop: 2,
                 paddingBottom: 2,
                 marginBottom: 2,
-                fontSize: 10,
+                fontSize: isNarrow ? 11 : 10,
               }}
             >
-              <span style={{ color, fontWeight: 700, flexShrink: 0, fontSize: 9 }}>
+              <span style={{ color, fontWeight: 700, flexShrink: 0, fontSize: isNarrow ? 10 : 9 }}>
                 {crossing.severity}
               </span>
               <span style={{ color: "#333", lineHeight: 1.3, flex: 1, minWidth: 0 }}>
@@ -781,7 +785,7 @@ export function CohortImpactSection({ isCompleted = false }: { isCompleted?: boo
                 <span
                   data-testid={`cohort-tier-badge-${crossing.indicator_key}`}
                   style={{
-                    fontSize: 8,
+                    fontSize: isNarrow ? 10 : 8,
                     fontWeight: 700,
                     color: isSad ? "#7a0000" : "#005a9e",
                     background: isSad ? "#ffe0e0" : "#e0eeff",
@@ -794,7 +798,7 @@ export function CohortImpactSection({ isCompleted = false }: { isCompleted?: boo
                 </span>
                 <span
                   data-testid="confidence-tier-badge-sublabel"
-                  style={{ fontSize: 7, color: '#6b7280', fontWeight: 400, lineHeight: 1, whiteSpace: 'nowrap' }}
+                  style={{ fontSize: isNarrow ? 9 : 7, color: '#6b7280', fontWeight: 400, lineHeight: 1, whiteSpace: 'nowrap' }}
                 >
                   {isSad ? "No primary data" : badgeText === "T4" ? "Model est." : "Inferred"}
                 </span>
@@ -815,10 +819,13 @@ interface MDAAlertPanelZone1BProps {
   /** Column width in px — retained for compatibility; no longer drives compact vs. full rendering. */
   columnWidth?: number;
   "data-testid"?: string;
+  /** M17-G2 — loaded comparison scenario configs with threshold crossings. */
+  comparisonScenarios?: ScenarioComparisonConfig[];
 }
 
 export function MDAAlertPanelZone1B({
   "data-testid": dataTestId = "zone-1b-mda-alerts",
+  comparisonScenarios = [],
 }: MDAAlertPanelZone1BProps) {
   const { mda_alerts, mode } = useScenarioStepStore();
 
@@ -852,6 +859,43 @@ export function MDAAlertPanelZone1B({
         boxSizing: "border-box",
       }}
     >
+      {comparisonScenarios.length > 0 && (
+        <div style={{ padding: "4px 6px" }}>
+          {comparisonScenarios.map((sc) => {
+            const slug = sc.scenarioId.replace(/^[a-z]{3}-/, "");
+            const palette = SCENARIO_COMPARISON_PALETTE[sc.paletteIndex];
+            const crossings = sc.thresholdCrossings ?? [];
+            return (
+              <div key={sc.scenarioId} style={{ marginBottom: 4 }}>
+                <div
+                  data-testid={`zone1b-scenario-header-${slug}`}
+                  style={{ fontSize: 10, fontWeight: 700, color: palette.color, marginBottom: 2 }}
+                >
+                  {`Option ${sc.label}`}
+                </div>
+                {crossings.length > 0 ? (
+                  crossings.map((tc, j) => (
+                    <div
+                      key={j}
+                      data-testid={`zone1b-threshold-row-scenario-${slug}`}
+                      style={{ fontSize: 9, color: tc.severity === "CRITICAL" ? "#b91c1c" : "#d97706", paddingLeft: 6 }}
+                    >
+                      {`${tc.severity} ${tc.indicator_name ?? tc.indicator_id} — crossed step ${tc.first_crossing_step}`}
+                    </div>
+                  ))
+                ) : (
+                  <div
+                    data-testid={`zone1b-no-crossings-${slug}`}
+                    style={{ fontSize: 9, color: "#6b7280", paddingLeft: 6, fontStyle: "italic" }}
+                  >
+                    {`[no crossings through step ${sc.trajectory?.step_count ?? 8}]`}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      )}
       {topAlert === null ? (
         <div
           data-testid="zone-1b-top-detail"

@@ -204,12 +204,12 @@ describe("ADR-008 Decision 5 — getNegotiationLabel: confidence tier to label",
     expect(getNegotiationLabel(3)).toBe("Moderate confidence — cite with caveat");
   });
 
-  it("Tier 4 → 'Exploratory — do not cite'", () => {
-    expect(getNegotiationLabel(4)).toBe("Exploratory — do not cite");
+  it("Tier 4 → 'Model estimate — verify before citing'", () => {
+    expect(getNegotiationLabel(4)).toBe("Model estimate — verify before citing");
   });
 
-  it("Tier 5 → 'Exploratory — do not cite'", () => {
-    expect(getNegotiationLabel(5)).toBe("Exploratory — do not cite");
+  it("Tier 5 → 'Synthetic extrapolation — do not cite'", () => {
+    expect(getNegotiationLabel(5)).toBe("Synthetic extrapolation — do not cite");
   });
 
   it("boundary: Tier 2 and Tier 3 produce different labels", () => {

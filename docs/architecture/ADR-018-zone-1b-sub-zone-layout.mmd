@@ -1,0 +1,18 @@
+graph TD
+    ZoneOuterContainer["data-testid='zone-1b'<br/>overflow: hidden<br/>flex: 0 0 zone1b%<br/>display: flex<br/>flexDirection: column"]
+
+    SubzoneA["Sub-zone A wrapper<br/>data-testid='zone-1b-mda-panel-wrapper'<br/>flex: 1 1 80px<br/>minHeight: 80px<br/>overflow: hidden"]
+
+    SubzoneB["Sub-zone B wrapper (NEW)<br/>flex: 0 0 auto<br/>maxHeight: calc(100% - 80px)<br/>overflowY: auto"]
+
+    MDAPanel["MDAAlertPanelZone1B<br/>data-testid='zone-1b-top-detail'<br/>data-testid='zone-1b-compact'<br/>data-testid='zone-1b-mda-alerts'"]
+
+    CohortSection["CohortImpactSection<br/>data-testid='zone-1b-cohort-impact'<br/>data-testid='cohort-row-{n}'"]
+
+    ZoneOuterContainer --> SubzoneA
+    ZoneOuterContainer --> SubzoneB
+    SubzoneA --> MDAPanel
+    SubzoneB --> CohortSection
+
+    style SubzoneB fill:#e8f5e9,stroke:#2e7d32
+    style ZoneOuterContainer fill:#fff3e0,stroke:#e65100

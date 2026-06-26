@@ -425,6 +425,82 @@ def test_registry_event_types_are_subscribed() -> None:
 # ---------------------------------------------------------------------------
 
 
+def test_registry_has_four_entries() -> None:
+    """AC-1275-2: M17-G7 adds fiscal_policy_spending_change → institutional_capacity_index.
+
+    M17-G7 (#1275): Gupta 2002 IMF WP/02/77, T3 SSA LIC panel.
+    """
+    assert len(GOVERNANCE_ELASTICITY_REGISTRY) >= 4, (
+        f"Expected ≥4 registry entries after M17-G7. Got {len(GOVERNANCE_ELASTICITY_REGISTRY)}. "
+        "Missing: fiscal_policy_spending_change → institutional_capacity_index (Gupta 2002, T3)."
+    )
+
+
+def test_registry_contains_fiscal_spending_to_institutional_capacity() -> None:
+    """AC-1275-2: Registry must contain CM-certified entry per M17-G7 intent doc."""
+    from decimal import Decimal
+    matches = [
+        row for row in GOVERNANCE_ELASTICITY_REGISTRY
+        if row.event_type == "fiscal_policy_spending_change"
+        and row.indicator_key == "institutional_capacity_index"
+    ]
+    assert len(matches) == 1, (
+        f"Expected exactly 1 entry for fiscal_policy_spending_change"
+        f" → institutional_capacity_index. Got {len(matches)}."
+    )
+    row = matches[0]
+    assert row.elasticity == Decimal("-0.015"), (
+        f"CM-certified elasticity is Decimal('-0.015'). Got {row.elasticity!r}."
+    )
+    assert row.confidence_tier == 3, (
+        f"Gupta 2002 SSA cross-country inference is T3. Got tier {row.confidence_tier}."
+    )
+    expected_source_id = "ACADEMIC_LITERATURE_GUPTA_2002_IMF_WP_INSTITUTIONAL_CAPACITY"
+    assert row.source_registry_id == expected_source_id, (
+        f"Source registry ID mismatch. Got {row.source_registry_id!r}."
+    )
+
+
+def test_indicator_units_contains_institutional_capacity_index() -> None:
+    """AC-1275-5: _INDICATOR_UNITS must register institutional_capacity_index as ratio_0_1."""
+    from app.simulation.modules.governance.module import _INDICATOR_UNITS
+    assert "institutional_capacity_index" in _INDICATOR_UNITS, (
+        "_INDICATOR_UNITS missing 'institutional_capacity_index'. "
+        "CPIA normalized [0,1] — unit must be 'ratio_0_1'."
+    )
+    assert _INDICATOR_UNITS["institutional_capacity_index"] == "ratio_0_1", (
+        f"Expected unit 'ratio_0_1' for institutional_capacity_index. "
+        f"Got {_INDICATOR_UNITS['institutional_capacity_index']!r}."
+    )
+
+
+def test_existing_registry_entries_unchanged_after_m17_g7() -> None:
+    """AC-1275-R: Existing three entries unchanged — gdp/rl, imf/dq, emergency/dq."""
+    from decimal import Decimal
+    existing = {
+        (row.event_type, row.indicator_key): row
+        for row in GOVERNANCE_ELASTICITY_REGISTRY
+    }
+    gdp_rl = existing.get(("gdp_growth_change", "rule_of_law_percentile"))
+    assert gdp_rl is not None, "gdp_growth_change → rule_of_law_percentile entry missing"
+    assert gdp_rl.elasticity == Decimal("-0.08"), (
+        f"gdp→rl elasticity changed. Expected -0.08, got {gdp_rl.elasticity!r}"
+    )
+    assert gdp_rl.confidence_tier == 2
+
+    imf_dq = existing.get(("emergency_policy_imf_program_acceptance", "democratic_quality_score"))
+    assert imf_dq is not None, "imf_program_acceptance → democratic_quality_score entry missing"
+    assert imf_dq.elasticity == Decimal("0.005"), (
+        f"imf→dq elasticity changed. Expected 0.005, got {imf_dq.elasticity!r}"
+    )
+
+    emg_dq = existing.get(("emergency_policy_emergency_declaration", "democratic_quality_score"))
+    assert emg_dq is not None, "emergency_declaration → democratic_quality_score entry missing"
+    assert emg_dq.elasticity == Decimal("-0.05"), (
+        f"emergency→dq elasticity changed. Expected -0.05, got {emg_dq.elasticity!r}"
+    )
+
+
 def test_governance_module_logs_debug_on_no_prior_events(caplog: pytest.LogCaptureFixture) -> None:
     """GovernanceModule must emit a DEBUG log when prior_events is empty (Issue #245)."""
     ts = datetime(2010, 1, 1, tzinfo=timezone.utc)  # noqa: UP017

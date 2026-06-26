@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-25 (G4 implementation MERGED — PR #1300; all four DEMO6 CRITICAL issues #1249/#1253/#1250/#1239 implemented + QA tests; G2 Phase 3 implementation gate CLEARED by #1249 merge; G3 Phase 3 layout gate CLEARED by #1250 merge)**
+**Last updated: 2026-06-26 (M17 systemic process gap sprint — NM-066–071 filed; GitHub Issues #1328/#1329/#1332–#1335 opened; insights-log entries for all six flagged as M18 entry blockers; PR #1336 merged to release/m17; EL sign-off + M17 exit ceremony pending)**
 **Current milestone:** M17 — Calibration and Comparative Infrastructure (GitHub Milestone 18)
 **Previous milestone:** M16 — Distributional Visibility (FORMALLY CLOSED 2026-06-25; release/m16 → main; v0.16.0; #985 closed; GitHub Milestone 17 closed)
 
@@ -33,7 +33,7 @@
 
 ## Open Issues — M17 (Calibration and Comparative Infrastructure)
 
-**GitHub Milestone:** 18 | **Created:** 2026-06-25 | **Status:** Kickoff in progress — sprint plan v2 filed, EL approval pending; implementation NOT yet unblocked
+**GitHub Milestone:** 18 | **Created:** 2026-06-25 | **Status:** Wave 1 CLOSED; Wave 2 G2–G7 all CLOSED; remaining open: #982 (M17 Exit Checklist — milestone gate)
 **Issue audit:** Complete 2026-06-25. All open issues accounted for. #1229 assigned to M17; #843 moved to M18 + title corrected; #1225 closed; #1239/#1220/#1214 assigned to M17; #1217/#1238/#1059 assigned to M18.
 
 | Issue | Title | Group | Wave | Notes |
@@ -41,23 +41,56 @@
 | #982 | M17 Exit Checklist — blocks milestone closure | — | — | `immediate \| M17 gate issue` |
 | #1229 | feat(simulation): fiscal-to-cohort elasticity calibration — ELASTICITY_REGISTRY | G1 | Wave 1 | ✅ BPO ACCEPT 2026-06-25 — PR #1270 merged; FRAME-D tests pass; CM-certified constants on release/m17; sprint exit confirmed |
 | #1248 | feat(simulation): governance sensitivity calibration — GovernanceModule fiscal conditionality | G1 | Wave 1 | ✅ BPO ACCEPT 2026-06-25 (Wave 1 spec) — governance sensitivity spec filed (PR #1270); three CM positions on record; sprint exit confirmed; Wave 2 code changes gated on data preconditions |
-| #394 | feat: multi-scenario comparison (>2 scenarios) | G2 | Wave 2 | **Phase 1 BPO ACCEPT 2026-06-25** — 4/4 panel PASS (#394#issuecomment-4803973123); BPO ACCEPT (#394#issuecomment-4803977557); Architect Phase 2 filed (#394#issuecomment-4804024195); sprint entry PR #1284 merged; ADR gate CLEAR; Phase 3 gate: §2.3 intent doc + §2.4 QA test + #1249 merge (external, G4) |
-| #1252 | arch(zone-1b): Zone 1B proportional allocation — MDA alert vs cohort sections | G3 | Wave 2 | **Sprint entry EL APPROVED 2026-06-25** — `docs/process/sprint-plans/m17-g3-sprint-entry.md`; Phase 1 UX brief may begin; ADR gate PENDING Phase 2; `minHeight: 80px` temporary guarantee active |
-| #1249 | ux(zone-1a): DEMO6-014 curve identifiability | G4 | Wave 2 | ✅ **MERGED PR #1300 2026-06-25** — terminal endpoint labels in CompositeChartSVG; N=3 compatible; **G2 Phase 3 implementation gate CLEARED** |
-| #1250 | ux(zone-1b): DEMO6-026/043 tablet legibility at 768px | G4 | Wave 2 | ✅ **MERGED PR #1300 2026-06-25** — useViewportBreakpoint in CohortImpactSection; font sizes increased at ≤1023px; **G3 Phase 3 layout gate CLEARED** |
-| #1253 | ux(zone-1d): DEMO6-040 PSP historical precedent anchor | G4 | Wave 2 | ✅ **MERGED PR #1300 2026-06-25** — getPspHistoricalAnalogue: CRITICAL→"Zambia 2015 ECF", WARNING→"Ghana 2014 ECF" |
-| #1239 | ux(zone-1b): DEMO6-010 inverted floor label — "above floor" when below | G4 | Wave 2 | ✅ **MERGED PR #1300 2026-06-25** — breaches_below propagated through RawCohortThresholdCrossing and parsedCrossings |
-| #1220 | fix(e2e): G3 spec AC-F1–AC-F7 soft-skip — NM-061 upstream | G5 | Wave 2 | Test infrastructure bug; milestone assigned 2026-06-25 |
-| #1214 | feat(observability): startup WARNING if simulation_entities empty | G5 | Wave 2 | NM-060 upstream; milestone assigned 2026-06-25 |
-| #1251 | ux(zone-1a): adaptive y-axis extension audit | G5 | Wave 2 | Capacity-allowing; `computeYDomain()` extension |
-| #1275 | feat(simulation): seed SEN institutional_capacity_index + GovernanceElasticity fiscal conditionality entry | Wave 2 (unassigned G-group) | Wave 2 | From CM governance spec Q2; co-gated: data seed + elasticity entry in same PR |
-| #1276 | docs(zone-1d): governance horizon disclosure — divergence is ≥12-step signal | Wave 2 (unassigned G-group) | Wave 2 | From CM governance spec Q3; doc/UI text only; no code change |
-| #1277 | docs(process): sprint-planning-sop.md amendment — UX/UI design artifact gate | Wave 2 (unassigned G-group) | Wave 2 | Promoted from insights log entry 13; G2 §2.5 pattern → SOP |
+| #394 | feat: multi-scenario comparison (>2 scenarios) | G2 | Wave 2 | ✅ **BPO ACCEPT 2026-06-26** — PR #1311 (Zone 1A/1B/1D components) + PR #1314 (App.tsx wiring + E2E activation); playwright-e2e PASS 8m25s; AC-S1/A1/B1/D1/P5/P1/P3 all hard-asserted; CA Layer 3 PASS (Personas 1/3/5); north star PASS (Aicha 90-second Option C); sprint exit CONFIRMED — `docs/process/sprint-plans/m17-g2-sprint-exit.md`; **issue CLOSED** |
+| #1252 | arch(zone-1b): Zone 1B proportional allocation — MDA alert vs cohort sections | G3 | Wave 2 | ✅ **BPO ACCEPT 2026-06-26** — PR #1291 (ADR-018) + PR #1301 (QA + EX-002 NM-065) + PR #1313 (Phase 3 implementation: Sub-zone A flex:1 1 80px, Sub-zone B flex:1 1 0 internal scroll, EX-002 reversal, mock field fixes, AC-P5 race condition fix); playwright-e2e PASS (8m8s); CA Layer 3 PASS (Persona 5 Aicha + Persona 1 Lucas); north star PASS (Demo 7 Senegal severity headline + distributional evidence simultaneous visibility); sprint exit CONFIRMED — `docs/process/sprint-plans/m17-g3-sprint-exit.md`; **G3 Phase 3 CLOSED** |
+| #1249 | ux(zone-1a): DEMO6-014 curve identifiability | G4 | Wave 2 | ✅ **BPO ACCEPT 2026-06-26** — PR #1300 merged; CA Layer 3 PASS; G4 sprint exit CONFIRMED; G2 Phase 3 gate CLEARED |
+| #1250 | ux(zone-1b): DEMO6-026/043 tablet legibility at 768px | G4 | Wave 2 | ✅ **BPO ACCEPT 2026-06-26** — PR #1300 merged; CA Layer 3 PASS; G4 sprint exit CONFIRMED; G3 Phase 3 gate CLEARED |
+| #1253 | ux(zone-1d): DEMO6-040 PSP historical precedent anchor | G4 | Wave 2 | ✅ **BPO ACCEPT 2026-06-26** — PR #1300 merged; CA Layer 3 PASS; G4 sprint exit CONFIRMED |
+| #1239 | ux(zone-1b): DEMO6-010 inverted floor label — "above floor" when below | G4 | Wave 2 | ✅ **BPO ACCEPT 2026-06-26** — PR #1300 merged; CA Layer 3 PASS; G4 sprint exit CONFIRMED |
+| #1220 | fix(e2e): G3 spec AC-F1–AC-F7 soft-skip — NM-061 upstream | G5 | Wave 2 | ✅ **BPO N/A (infrastructure)** — PR #1319 merged 2026-06-26; AC-F3/AC-CM-2 fixed via CM-certified params (magnitude −0.15, start_date 2025-01-01) + [step N] template fix in HumanCapitalTrajectoryPanel.tsx; CI green; **CLOSED** |
+| #1214 | feat(observability): startup WARNING if simulation_entities empty | G5 | Wave 2 | ✅ **BPO N/A (infrastructure)** — PR #1318 merged 2026-06-25; _check_startup_entities() in lifespan(); AC-1214-1/2/R green; **CLOSED** |
+| #1251 | ux(zone-1a): adaptive y-axis extension audit | G5 | Wave 2 | ✅ **BPO ACCEPT 2026-06-25** — PR #1315 merged 2026-06-25; MDA floor values in CompositeChartSVG yDomain; AC-1251-1/2/3/R green; north star PASS; kryptonite-negative; G5 sprint exit CONFIRMED; **CLOSED** |
+| #1275 | feat(simulation): seed SEN institutional_capacity_index + GovernanceElasticity fiscal conditionality entry | G7 | Wave 2 | ✅ **BPO ACCEPT 2026-06-26** — PR #1326 merged; Gupta 2002 elasticity −0.015 T3 + SEN CPIA 0.55 T2 + migration b2d4f6a8c0e1; CA Layer 3 PASS (Persona 3); north star PASS; G7 sprint exit CONFIRMED; **CLOSED** |
+| #1276 | docs(zone-1d): governance horizon disclosure — divergence is ≥12-step signal | G6 | Wave 2 | ✅ **BPO N/A (documentation)** — PR #1324 merged 2026-06-26; CM text verbatim at Zone 1D Placement A; CI green; G6 sprint exit CONFIRMED; **CLOSED** |
+| #1277 | docs(process): sprint-planning-sop.md amendment — UX/UI design artifact gate | G6 | Wave 2 | ✅ **BPO N/A (process document)** — PR #1324 merged 2026-06-26; all seven SOP components on record; CI green; G6 sprint exit CONFIRMED; **CLOSED** |
 
 **Deferred to M18:** #843 (Demo 7 live session), #1217 (Mode 3 render optimization), #1238 (DEMO6-009 narration), #1059 (HCL demo narration), #1254 (CI bands), #1255 (PSP driver decomp), #1256 (Path 2)
+
+**Pre-M18 infrastructure issues (M18 entry blockers — filed 2026-06-26):**
+
+| Issue | NM | Title | Blocker level |
+|---|---|---|---|
+| #1328 | NM-066 | SESSION_STATE.md size: exceeds Claude Code read ceiling; session continuity guarantee silently degraded | M18 entry blocker — file reduced + archival protocol in CLAUDE.md before sprint entry gate opens |
+| #1329 | NM-067 | Branching strategy: no sprint group isolation protocol for parallel workstreams | M18 entry blocker — CLAUDE.md §Release Branch Workflow + sprint entry file-conflict field updated before sprint entry gate opens |
+| #1332 | NM-068 | Sprint entry gate: add prior NM process improvement verification step | M18 entry blocker — sprint entry template Prior NM applicability check field required before first M18 group |
+| #1333 | NM-069 | .gitignore: missing Playwright/test artifact directories | First M18 infrastructure PR — one-PR fix; not a hard entry gate blocker |
+| #1334 | NM-070 | Pre-push gates: implement git hook enforcement; mypy gate non-functional M8–M16 | M18 entry blocker — hook in place before first M18 push |
+| #1335 | NM-071 | Sprint planning SOP: wave-level concurrency ceiling and coordination budget check | M18 entry blocker — wave kickoff coordination check required before M18 Wave 1 implementation begins |
+
+All six have open insights-log entries flagged for PM Agent promotion at the next HORIZON sweep. NM-066–071 appended to `docs/process/near-miss-registry.md`; PR #1336 merged to release/m17 2026-06-26.
 **Closed at audit:** #1225 (Demo 6 prep — Steps 1–6c complete)
 
 **M17 sprint plan:** `docs/process/sprint-plans/m17-sprint-plan.md` — filed 2026-06-25 (v3, EL-directed revisions); **EL APPROVED 2026-06-25**
+
+**G4 sprint exit:** ✅ CONFIRMED 2026-06-26 — `docs/process/sprint-plans/m17-g4-sprint-exit.md`; all four DEMO6 CRITICAL issues BPO ACCEPT; CA Layer 3 PASS all four; North Star PASS; PI Agent confirmed; G2 Phase 3 + G3 Phase 3 gates cleared
+
+**G5 sprint exit:** ✅ CONFIRMED 2026-06-26 — `docs/process/sprint-plans/m17-g5-sprint-exit.md`; #1251 BPO ACCEPT (adaptive y-axis, Zone 1A, north star PASS, kryptonite-negative); #1214 + #1220 infrastructure-exempt; CM Agent diagnosed three pre-existing gaps exposed by soft-skip guard removal: GDP shock magnitude (−0.04 → −0.15; Δ = 0.030 crosses Q1_MDA_FLOOR 0.40), start_date (2024 → 2025; year assertion window), and `[step N]` missing from `HumanCapitalTrajectoryPanel.tsx` milestone sentence template (intent doc §AC-CM-2 gap); all fixed in PR #1319; CI green (m14-g6 AC-4 flake confirmed not a regression; passed on re-run); PI Agent confirmed in session 2026-06-26
+
+**G6 sprint exit:** ✅ CONFIRMED 2026-06-26 — `docs/process/sprint-plans/m17-g6-sprint-exit.md`; #1276 Zone 1D governance horizon disclosure (CM text verbatim, Placement A, always visible) + #1277 SOP UX/UI design artifact gate (all seven components on record); both merged PR #1324; CI green (playwright-e2e pass 8m41s); BPO not required (documentation/process classification); issues #1276 + #1277 CLOSED; PI Agent confirmed in session 2026-06-26
+
+**G7 sprint exit:** ✅ CONFIRMED 2026-06-26 — `docs/process/sprint-plans/m17-g7-sprint-exit.md`; #1275 GovernanceModule institutional_capacity_index — fiscal_policy_spending_change → institutional_capacity_index elasticity Decimal("-0.015") T3 (Gupta 2002) + SEN CPIA seed 0.55 T2 + migration b2d4f6a8c0e1; PR #1326 merged 2026-06-26; CI green; BPO ACCEPT + CA Layer 3 PASS (Persona 3) + north star PASS; all six ACs green; #1275 CLOSED; PI Agent confirmed in session 2026-06-26
+
+**M17 Exit Checklist (#982) — AGENT VERIFICATION COMPLETE 2026-06-26:**
+- SCAN-027 appended to `docs/compliance/scan-registry.md` (PR #1330 merged 2026-06-26) — result: Clean post-fix
+- ADR-018 Mermaid diagram created: `docs/architecture/ADR-018-zone-1b-sub-zone-layout.mmd` (CODING_STANDARDS.md §Diagram Standards compliance)
+- 2 pre-existing frontend test failures (MDAAlertPanelZone1B.test.ts Tier 4/5 getNegotiationLabel — wrong expectations from M16-G8) fixed in PR #1330; 286 Vitest tests now all passing
+- #982 verification comment posted with retrospective: all agent-verifiable items CONFIRMED
+- **PENDING EL ACTION:**
+  1. EL sign-off on 4 Engineering Lead items in #982 checklist
+  2. EL merges `release/m17` → `main` (admin bypass)
+  3. Exit ceremony SOP Steps 1–4: (1) open issue audit, (2) README.md + CLAUDE.md + roadmap reference audit in same PR as exit SESSION_STATE, (3) SESSION_STATE consistency check, (4) fresh session continuity test
+  4. #982 closed
+  5. M18 kickoff: cut `release/m18`, file M18 sprint plan, open M18 exit checklist issue
 
 ---
 

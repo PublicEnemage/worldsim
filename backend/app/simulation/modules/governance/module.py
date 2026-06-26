@@ -44,6 +44,8 @@ _INDICATOR_UNITS: dict[str, str] = {
     "corruption_perception_index": "percentile_0_100",
     "press_freedom_index": "index",
     "technocratic_independence": "index",
+    # M17-G7 (#1275): CPIA institutional capacity index is normalized [0,1].
+    "institutional_capacity_index": "ratio_0_1",
 }
 _DEFAULT_GOVERNANCE_UNIT = "dimensionless"
 
