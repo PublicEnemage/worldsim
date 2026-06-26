@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-26 (G5 sprint exit CONFIRMED — #1220/#1214/#1251 all merged + closed; CI green; BPO ACCEPT #1251; [step N] milestone sentence template fix; CM-certified scenario params; sprint exit doc filed)**
+**Last updated: 2026-06-26 (G5 sprint exit CONFIRMED + PI Agent in-session confirmation — all Wave 2 sprint groups (G2/G3/G4/G5) closed; #1220/#1214/#1251 merged + closed; CM-certified milestone sentence fix ([step N] + magnitude −0.15 + start_date 2025-01-01); sprint exit doc + SESSION_STATE merged PR #1321; remaining open: #1275/#1276/#1277 unassigned Wave 2; #982 M17 gate)**
 **Current milestone:** M17 — Calibration and Comparative Infrastructure (GitHub Milestone 18)
 **Previous milestone:** M16 — Distributional Visibility (FORMALLY CLOSED 2026-06-25; release/m16 → main; v0.16.0; #985 closed; GitHub Milestone 17 closed)
 
@@ -33,7 +33,7 @@
 
 ## Open Issues — M17 (Calibration and Comparative Infrastructure)
 
-**GitHub Milestone:** 18 | **Created:** 2026-06-25 | **Status:** Kickoff in progress — sprint plan v2 filed, EL approval pending; implementation NOT yet unblocked
+**GitHub Milestone:** 18 | **Created:** 2026-06-25 | **Status:** Wave 1 CLOSED; Wave 2 G2/G3/G4/G5 all CLOSED; remaining open: #1275/#1276/#1277 (unassigned Wave 2), #982 (M17 gate)
 **Issue audit:** Complete 2026-06-25. All open issues accounted for. #1229 assigned to M17; #843 moved to M18 + title corrected; #1225 closed; #1239/#1220/#1214 assigned to M17; #1217/#1238/#1059 assigned to M18.
 
 | Issue | Title | Group | Wave | Notes |
@@ -61,7 +61,13 @@
 
 **G4 sprint exit:** ✅ CONFIRMED 2026-06-26 — `docs/process/sprint-plans/m17-g4-sprint-exit.md`; all four DEMO6 CRITICAL issues BPO ACCEPT; CA Layer 3 PASS all four; North Star PASS; PI Agent confirmed; G2 Phase 3 + G3 Phase 3 gates cleared
 
-**G5 sprint exit:** ✅ CONFIRMED 2026-06-26 — `docs/process/sprint-plans/m17-g5-sprint-exit.md`; #1251 BPO ACCEPT (adaptive y-axis, zone 1A, north star PASS, kryptonite-negative); #1214 + #1220 infrastructure-exempt; CM-certified scenario parameters (magnitude −0.15, start_date 2025-01-01) + [step N] milestone sentence template gap fixed as part of soft-skip remediation; all three issues CLOSED; PI Agent confirmed
+**G5 sprint exit:** ✅ CONFIRMED 2026-06-26 — `docs/process/sprint-plans/m17-g5-sprint-exit.md`; #1251 BPO ACCEPT (adaptive y-axis, Zone 1A, north star PASS, kryptonite-negative); #1214 + #1220 infrastructure-exempt; CM Agent diagnosed three pre-existing gaps exposed by soft-skip guard removal: GDP shock magnitude (−0.04 → −0.15; Δ = 0.030 crosses Q1_MDA_FLOOR 0.40), start_date (2024 → 2025; year assertion window), and `[step N]` missing from `HumanCapitalTrajectoryPanel.tsx` milestone sentence template (intent doc §AC-CM-2 gap); all fixed in PR #1319; CI green (m14-g6 AC-4 flake confirmed not a regression; passed on re-run); PI Agent confirmed in session 2026-06-26
+
+**M17 Wave 2 remaining open work:**
+- #1275 — SEN institutional_capacity_index seed + GovernanceElasticity (Wave 2, unassigned G-group; co-gated with data preconditions)
+- #1276 — Zone 1D governance horizon disclosure (Wave 2, unassigned G-group; doc/UI text only)
+- #1277 — sprint-planning-sop.md UX/UI design artifact gate amendment (Wave 2, unassigned G-group)
+- #982 — M17 Exit Checklist (milestone gate issue; blocks M17 close)
 
 ---
 
