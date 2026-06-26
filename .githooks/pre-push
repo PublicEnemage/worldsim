@@ -1,0 +1,85 @@
+#!/usr/bin/env bash
+# WorldSim pre-push gate
+# Enforces backend lint (ruff + mypy) and frontend build gates before every push.
+#
+# Authority: CLAUDE.md §Backend pre-push lint gate and §Frontend pre-push build gate
+# DS owns this file; EL is accountable. See docs/process/agent-raci.md §.githooks/.
+#
+# Installation — one-time per clone (required setup step):
+#   git config core.hooksPath .githooks
+#
+# Emergency bypass (requires EL authorization + NM entry immediately after):
+#   git push --no-verify
+#   Then file a near-miss entry in docs/process/near-miss-registry.md.
+
+set -euo pipefail
+
+# ---------------------------------------------------------------------------
+# Detect changed files in this push.
+# Compare against upstream if tracked; fall back to HEAD~1.
+# ---------------------------------------------------------------------------
+UPSTREAM=$(git rev-parse --abbrev-ref --symbolic-full-name @{u} 2>/dev/null || echo "")
+if [ -n "$UPSTREAM" ]; then
+  CHANGED=$(git diff --name-only "${UPSTREAM}...HEAD" 2>/dev/null || true)
+else
+  CHANGED=$(git diff --name-only HEAD~1 HEAD 2>/dev/null || true)
+fi
+
+BACKEND_CHANGED=$(echo "$CHANGED" | grep -c "^backend/" 2>/dev/null || true)
+FRONTEND_CHANGED=$(echo "$CHANGED" | grep -c "^frontend/src/" 2>/dev/null || true)
+
+# ---------------------------------------------------------------------------
+# Backend gate — ruff + mypy
+# ---------------------------------------------------------------------------
+if [ "$BACKEND_CHANGED" -gt 0 ]; then
+  echo "[pre-push] Backend files changed — running ruff + mypy gate..."
+
+  if [ ! -f backend/.venv/bin/activate ]; then
+    echo ""
+    echo "ERROR: backend/.venv not found — cannot run pre-push gate."
+    echo ""
+    echo "Set up the virtual environment first:"
+    echo "  cd backend"
+    echo "  python3.13 -m venv .venv"
+    echo "  source .venv/bin/activate"
+    echo "  pip install -r requirements.txt"
+    echo ""
+    echo "See docs/CONTRIBUTING.md §Step 2: Python Environment for full instructions."
+    exit 1
+  fi
+
+  (
+    # Activate the venv in a subshell to avoid polluting the calling shell.
+    # shellcheck source=/dev/null
+    source backend/.venv/bin/activate
+    cd backend
+    echo "[pre-push]   ruff check ..."
+    ruff check .
+    echo "[pre-push]   mypy app/ ..."
+    mypy app/
+  )
+  echo "[pre-push] Backend gate: PASS"
+fi
+
+# ---------------------------------------------------------------------------
+# Frontend gate — npm run build
+# ---------------------------------------------------------------------------
+if [ "$FRONTEND_CHANGED" -gt 0 ]; then
+  echo "[pre-push] Frontend src/ files changed — running build gate..."
+
+  if ! command -v npm >/dev/null 2>&1; then
+    echo ""
+    echo "ERROR: npm not found — cannot run frontend build gate."
+    echo "Install Node.js ≥ 20 LTS before pushing frontend changes."
+    echo "See docs/CONTRIBUTING.md §Step 6: Frontend Setup."
+    exit 1
+  fi
+
+  (
+    cd frontend
+    npm run build
+  )
+  echo "[pre-push] Frontend gate: PASS"
+fi
+
+echo "[pre-push] All gates passed."

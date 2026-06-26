@@ -472,20 +472,22 @@ shared state lane above (PM Agent, `chore/m{N}-state-sync-NNN` → `release/m{N}
 auto-merge). The `auto-merge-session-state` workflow only fires on PRs targeting
 `main` and does not apply here.
 
-**Backend pre-push lint gate — mandatory before any `git push` touching Python files.**
-Before pushing any branch that modifies files under `backend/`, run:
-`cd backend && ruff check . && mypy app/`
+**Backend pre-push lint gate — enforced by `.githooks/pre-push`; mandatory before any `git push` touching Python files.**
+The pre-push hook runs automatically before every push and executes:
+`cd backend && source .venv/bin/activate && ruff check . && mypy app/`
 Both must exit 0. `ruff check . --fix` resolves most I001/E501 violations automatically;
 fix any remaining errors before pushing. CI is a confirmation, not a discovery mechanism.
 Local ruff is pinned to the same version as CI (`ruff==0.7.2` in `requirements.txt`) —
 there is no environment difference that would cause CI to catch what local missed.
-Near-miss record: NM-016 (`docs/process/near-miss-registry.md`).
+Hook installation (one-time per clone): `git config core.hooksPath .githooks` — see `docs/CONTRIBUTING.md §Step 7`.
+Near-miss records: NM-016, NM-052, NM-070 (`docs/process/near-miss-registry.md`).
 
-**Frontend pre-push build gate — mandatory before any `git push` touching files under `frontend/src/`.**
-Before pushing any branch that modifies files under `frontend/src/`, run:
+**Frontend pre-push build gate — enforced by `.githooks/pre-push`; mandatory before any `git push` touching files under `frontend/src/`.**
+The pre-push hook runs automatically before every push and executes:
 `cd frontend && npm run build`
 Must exit 0. TypeScript errors are a compliance finding — 7 TS6133 errors accumulated across M10 PRs without detection because this gate did not exist. CI is a confirmation, not a discovery mechanism.
-Near-miss record: SCAN-024 (M10 exit — TS6133 findings found at compliance scan, not at push time).
+Hook installation (one-time per clone): `git config core.hooksPath .githooks` — see `docs/CONTRIBUTING.md §Step 7`.
+Near-miss records: SCAN-024 (M10 exit — TS6133 findings found at compliance scan), NM-070 (`docs/process/near-miss-registry.md`).
 
 **Tests are not optional.**
 The backtesting infrastructure is the most important test suite.

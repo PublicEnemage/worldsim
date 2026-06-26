@@ -200,6 +200,24 @@ implementation can begin:**
 
 > {description or "N/A"}
 
+#### 6.3a — New output paths declaration (NM-069 process improvement)
+
+*Does this sprint group's implementation generate any new output directories not currently
+covered by `.gitignore`? (Examples: new test artifact paths, benchmark output directories,
+report directories.)*
+
+- [ ] No new output directories — all generated paths are already covered by `.gitignore`
+- [ ] Yes — `.gitignore` update required (see below)
+
+**If yes, list each new output directory and confirm it will be added to `.gitignore` in the
+same implementation PR (or as a DS infra lane PR that merges before the generating code):**
+
+| New output path | Already in `.gitignore`? | Action |
+|---|---|---|
+| {e.g. `backend/reports/`} | {Yes / No} | {None / Add to .gitignore in same PR / DS infra lane PR} |
+
+*If no new output paths: "No new output directories introduced by this sprint group."*
+
 ### 6.4 — Cross-group dependency declaration
 
 *Does this sprint group depend on the output of another active sprint group?*

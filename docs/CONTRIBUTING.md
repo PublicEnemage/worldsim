@@ -172,7 +172,42 @@ npm run dev                        # starts development server
 > detect files that appeared or changed during a `git merge` or `git pull`.
 > Without a restart, the browser will continue serving the pre-merge bundle.
 
-### Step 7: Launching Claude Code
+### Step 7: Install the Pre-Push Gate Hook
+
+**This is a required setup step.** The pre-push hook enforces the backend lint gate
+(`ruff + mypy`) and the frontend build gate (`npm run build`) automatically before
+every push. Without it, gate failures reach CI instead of being caught locally —
+which is exactly what these gates exist to prevent.
+
+```bash
+git config core.hooksPath .githooks
+```
+
+Verify the hook is registered:
+
+```bash
+git config core.hooksPath
+# Expected output: .githooks
+```
+
+**What the hook does:**
+- When `backend/` files are included in the push: activates `.venv`, runs `ruff check . && mypy app/`
+- When `frontend/src/` files are included in the push: runs `npm run build`
+- If the backend `.venv` is absent, the hook fails loudly with setup instructions — it does not run silently in the wrong environment (NM-052 fix)
+
+**Emergency bypass** (requires EL authorization and an immediate near-miss entry):
+```bash
+git push --no-verify
+# Then: file a near-miss entry in docs/process/near-miss-registry.md immediately after.
+# Bypassing the hook without EL authorization is a process deviation.
+```
+
+Authority: `docs/process/agent-raci.md §.githooks/` (DS owns; EL accountable).
+Near-miss authority: NM-016, NM-052, NM-070 (`docs/process/near-miss-registry.md`).
+
+---
+
+### Step 8: Launching Claude Code
 
 WorldSim uses Claude Code agents for AI-assisted development. When you open
 a Claude Code session in this repository:
