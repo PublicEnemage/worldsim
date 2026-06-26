@@ -3,23 +3,23 @@ name: m18-g3-sprint-entry
 type: sprint-entry
 milestone: M18 — Full Argument and Demo 7
 sprint-group: G3
-status: Filed — awaiting EL approval
+status: EL-approved 2026-06-26
 authored-by: PM Agent
 authored-date: 2026-06-26
-el-approved: false
+el-approved: 2026-06-26
 release-branch: release/m18
 sop-reference: docs/process/sprint-planning-sop.md
 ---
 
 # Sprint Entry — M18, G3: Counter-Scenario Comparison
 
-**Status:** Filed — awaiting EL approval before implementation PR opens
+**Status:** EL-approved 2026-06-26
 **Date authored:** 2026-06-26
 **Release branch:** `release/m18`
 **Sprint plan:** `docs/process/sprint-plans/m18-sprint-plan.md` (EL-approved 2026-06-26, PR #1364)
 **Sprint journal issue:** #1377
 
-*No implementation PR may open until this entry document is EL-approved.*
+*EL-approved 2026-06-26. `sprint/m18-g3` sub-branch cut from `release/m18` same session.*
 
 ---
 
@@ -380,7 +380,10 @@ No upstream dependency on G4 (ScenarioInstrumentCluster.tsx confirmed out of G3 
 
 ## EL Approval Record
 
-**EL approval:** Pending
+**EL approval:** 2026-06-26
 
-> {EL approval statement — implementation sub-branch cut and implementation PR may not open until this record is complete}
-> — @PublicEnemage ({date})
+> G3 sprint entry approved. GR close confirmed, Architect ADR determination (Option A CLEAR)
+> on record, ScenarioInstrumentCluster.tsx determination confirmed by PM Agent. `sprint/m18-g3`
+> sub-branch may be cut. Pre-implementation prerequisites (intent document, UX/UI mockups + panel
+> review, QA tests, schema update) must be satisfied before any feature PR opens on this group.
+> — @PublicEnemage (2026-06-26)

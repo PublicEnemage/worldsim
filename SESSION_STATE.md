@@ -6,7 +6,7 @@
 > Historical state lives in `docs/process/session-archives/`.
 > Authority: `docs/process/sprint-group-isolation.md §SESSION_STATE.md Cockpit Card Protocol`.
 
-**Last updated:** 2026-06-26 (sprint plan EL approval recorded in sprint plan doc; G1+G2 sprint entries filed — awaiting separate EL approval; pre-wave GD+GR ready to begin)
+**Last updated:** 2026-06-26 (G3 sprint entry EL-approved; sprint/m18-g3 sub-branch cut; G1+G2 also EL-approved; GR closed #1352; Wave 1 + Wave 2 G3 active)
 **Current milestone:** M18 — Full Argument and Demo 7 (GitHub Milestone 19)
 
 ---
@@ -20,9 +20,9 @@
 | Exit checklist issue | #1340 |
 | Release branch | ✅ `release/m18` — cut 2026-06-26 at commit 151904d |
 | Sprint plan | ✅ EL-approved 2026-06-26 — `docs/process/sprint-plans/m18-sprint-plan.md` (PR #1364) |
-| Active wave | Pre-wave — GD (#1354) and GR (#1352) may begin now; Wave 1 G1+G2 entries filed, awaiting EL approval |
-| Active sprint groups | G1 (#1367) and G2 (#1368) — entries filed, EL approval pending; GD and GR pre-wave (no entries required) |
-| Active sprint journal issues | #1367 (G1 — CI Bands Zone 1A), #1368 (G2 — PSP Decomposition) |
+| Active wave | Wave 1 (G1+G2) + Wave 2 G3 open; GD pre-wave continues; GR closed 2026-06-26 (#1352) |
+| Active sprint groups | G1 (#1367) EL-approved; G2 (#1368) EL-approved; G3 (#1377) EL-approved 2026-06-26; GD pre-wave (no entry) |
+| Active sprint journal issues | #1367 (G1 — CI Bands Zone 1A), #1368 (G2 — PSP Decomposition), #1377 (G3 — Counter-Scenario Comparison) |
 
 ---
 
@@ -55,8 +55,8 @@ None open. #1328 and #1329 resolved 2026-06-26 (DS consultation; Option E hybrid
 | #843 | Demo 7 — live external session (Senegal Mode 3 + Zambia 3-scenario) | Primary deliverable |
 | #1254 | CI bands on Zone 1A trajectories (ADR-007 full implementation) | Wave 1 |
 | #1255 | PSP driver decomposition | Wave 1 |
-| #1349 | Counter-scenario comparison — distributional number differential with CI bands | G3 Wave 2 (blocked: GR #1352) |
-| #1352 | Requirements phase for #1349 — UX journeys, Customer Agent, BPO requirements | GR Pre-wave / ready to begin |
+| #1349 | Counter-scenario comparison — distributional number differential with CI bands | G3 Wave 2 — active (EL-approved 2026-06-26; pending intent doc + QA tests + UX/UI mockups) |
+| #1352 | Requirements phase for #1349 — UX journeys, Customer Agent, BPO requirements | ✅ GR CLOSED 2026-06-26 (PR #1375) |
 | #1354 | Control Plane Column Design Package — Mode 2 + Mode 3 (7 artifacts #1355–#1361) | GD Pre-wave / ready to begin |
 | #1256 | Path 2 / proprietary data integration | Capacity-allowing |
 | #1217 | Mode 3 render optimization (EX-001 expired) | G4 Wave 2 — sequenced via GD/ADR-019 |
