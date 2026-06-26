@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-25 (G4 implementation MERGED — PR #1300; all four DEMO6 CRITICAL issues #1249/#1253/#1250/#1239 implemented + QA tests; G2 Phase 3 implementation gate CLEARED by #1249 merge; G3 Phase 3 layout gate CLEARED by #1250 merge)**
+**Last updated: 2026-06-26 (G4 impl MERGED PR #1300; G3 QA PR #1301 merged — test.fail() EX-002 NM-065 AC-A2, testid reconciled, PR #1290 closed; G3 CI green; G3 Phase 3 gated EL sprint entry approval)**
 **Current milestone:** M17 — Calibration and Comparative Infrastructure (GitHub Milestone 18)
 **Previous milestone:** M16 — Distributional Visibility (FORMALLY CLOSED 2026-06-25; release/m16 → main; v0.16.0; #985 closed; GitHub Milestone 17 closed)
 
@@ -42,7 +42,7 @@
 | #1229 | feat(simulation): fiscal-to-cohort elasticity calibration — ELASTICITY_REGISTRY | G1 | Wave 1 | ✅ BPO ACCEPT 2026-06-25 — PR #1270 merged; FRAME-D tests pass; CM-certified constants on release/m17; sprint exit confirmed |
 | #1248 | feat(simulation): governance sensitivity calibration — GovernanceModule fiscal conditionality | G1 | Wave 1 | ✅ BPO ACCEPT 2026-06-25 (Wave 1 spec) — governance sensitivity spec filed (PR #1270); three CM positions on record; sprint exit confirmed; Wave 2 code changes gated on data preconditions |
 | #394 | feat: multi-scenario comparison (>2 scenarios) | G2 | Wave 2 | **Phase 1 BPO ACCEPT 2026-06-25** — 4/4 panel PASS (#394#issuecomment-4803973123); BPO ACCEPT (#394#issuecomment-4803977557); Architect Phase 2 filed (#394#issuecomment-4804024195); sprint entry PR #1284 merged; ADR gate CLEAR; Phase 3 gate: §2.3 intent doc + §2.4 QA test + #1249 merge (external, G4) |
-| #1252 | arch(zone-1b): Zone 1B proportional allocation — MDA alert vs cohort sections | G3 | Wave 2 | **Sprint entry EL APPROVED 2026-06-25** — `docs/process/sprint-plans/m17-g3-sprint-entry.md`; Phase 1 UX brief may begin; ADR gate PENDING Phase 2; `minHeight: 80px` temporary guarantee active |
+| #1252 | arch(zone-1b): Zone 1B proportional allocation — MDA alert vs cohort sections | G3 | Wave 2 | **Phase 1 BPO ACCEPT + Phase 2 ADR-018 ACCEPT + QA ✅ 2026-06-25/26** — PR #1291 (ADR-018) + PR #1301 (QA test.fail() EX-002 NM-065) merged; testid zone-1b-mda-panel-wrapper; CI green; EL sprint entry approval PENDING |
 | #1249 | ux(zone-1a): DEMO6-014 curve identifiability | G4 | Wave 2 | ✅ **MERGED PR #1300 2026-06-25** — terminal endpoint labels in CompositeChartSVG; N=3 compatible; **G2 Phase 3 implementation gate CLEARED** |
 | #1250 | ux(zone-1b): DEMO6-026/043 tablet legibility at 768px | G4 | Wave 2 | ✅ **MERGED PR #1300 2026-06-25** — useViewportBreakpoint in CohortImpactSection; font sizes increased at ≤1023px; **G3 Phase 3 layout gate CLEARED** |
 | #1253 | ux(zone-1d): DEMO6-040 PSP historical precedent anchor | G4 | Wave 2 | ✅ **MERGED PR #1300 2026-06-25** — getPspHistoricalAnalogue: CRITICAL→"Zambia 2015 ECF", WARNING→"Ghana 2014 ECF" |
