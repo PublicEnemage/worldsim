@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-26 (G7 sprint exit CONFIRMED — #1275 GovernanceModule institutional_capacity_index merged PR #1326; Gupta 2002 elasticity Decimal("-0.015") T3 + SEN CPIA 0.55 T2 seed + migration b2d4f6a8c0e1; BPO ACCEPT + CA Layer 3 PASS (Persona 3); remaining open: #982 M17 Exit Checklist only)**
+**Last updated: 2026-06-26 (M17 Exit Checklist — all agent-verifiable items confirmed; SCAN-027 appended + ADR-018 .mmd diagram created + pre-existing Vitest test fix — PR #1330 merged; #982 verification comment filed; EL sign-off + exit ceremony (SOP Steps 1–4) pending EL merge of release/m17 → main)**
 **Current milestone:** M17 — Calibration and Comparative Infrastructure (GitHub Milestone 18)
 **Previous milestone:** M16 — Distributional Visibility (FORMALLY CLOSED 2026-06-25; release/m16 → main; v0.16.0; #985 closed; GitHub Milestone 17 closed)
 
@@ -67,8 +67,17 @@
 
 **G7 sprint exit:** ✅ CONFIRMED 2026-06-26 — `docs/process/sprint-plans/m17-g7-sprint-exit.md`; #1275 GovernanceModule institutional_capacity_index — fiscal_policy_spending_change → institutional_capacity_index elasticity Decimal("-0.015") T3 (Gupta 2002) + SEN CPIA seed 0.55 T2 + migration b2d4f6a8c0e1; PR #1326 merged 2026-06-26; CI green; BPO ACCEPT + CA Layer 3 PASS (Persona 3) + north star PASS; all six ACs green; #1275 CLOSED; PI Agent confirmed in session 2026-06-26
 
-**M17 Wave 2 remaining open work:**
-- #982 — M17 Exit Checklist (milestone gate issue; blocks M17 close; all Wave 2 sprint groups G2–G7 now CLOSED)
+**M17 Exit Checklist (#982) — AGENT VERIFICATION COMPLETE 2026-06-26:**
+- SCAN-027 appended to `docs/compliance/scan-registry.md` (PR #1330 merged 2026-06-26) — result: Clean post-fix
+- ADR-018 Mermaid diagram created: `docs/architecture/ADR-018-zone-1b-sub-zone-layout.mmd` (CODING_STANDARDS.md §Diagram Standards compliance)
+- 2 pre-existing frontend test failures (MDAAlertPanelZone1B.test.ts Tier 4/5 getNegotiationLabel — wrong expectations from M16-G8) fixed in PR #1330; 286 Vitest tests now all passing
+- #982 verification comment posted with retrospective: all agent-verifiable items CONFIRMED
+- **PENDING EL ACTION:**
+  1. EL sign-off on 4 Engineering Lead items in #982 checklist
+  2. EL merges `release/m17` → `main` (admin bypass)
+  3. Exit ceremony SOP Steps 1–4: (1) open issue audit, (2) README.md + CLAUDE.md + roadmap reference audit in same PR as exit SESSION_STATE, (3) SESSION_STATE consistency check, (4) fresh session continuity test
+  4. #982 closed
+  5. M18 kickoff: cut `release/m18`, file M18 sprint plan, open M18 exit checklist issue
 
 ---
 
