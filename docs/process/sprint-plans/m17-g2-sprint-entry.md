@@ -3,7 +3,7 @@ name: m17-g2-sprint-entry
 type: sprint-entry
 milestone: M17 — Calibration and Comparative Infrastructure
 sprint-group: G2 (Phase 3 — Implementation)
-status: EL Approved — 2026-06-25; implementation may begin once #1249 merges to release/m17
+status: EL Approved — 2026-06-25; implementation UNBLOCKED 2026-06-25 (#1249 merged PR #1300)
 authored-by: PM Agent
 authored-date: 2026-06-25
 el-approved: 2026-06-25
@@ -13,7 +13,7 @@ sop-reference: docs/process/sprint-planning-sop.md
 
 # Sprint Entry — M17, G2: Multi-Scenario Design Sprint (Phase 3 Implementation)
 
-**Status:** EL Approved — 2026-06-25. Implementation may begin once #1249 is merged to `release/m17` (hard gate on implementation PR).
+**Status:** EL Approved — 2026-06-25. Implementation UNBLOCKED 2026-06-25 — #1249 merged to `release/m17` (PR #1300).
 **Date authored:** 2026-06-25
 **Release branch:** `release/m17`
 **Sprint plan:** `docs/process/sprint-plans/m17-sprint-plan.md` (EL Approved 2026-06-25)
