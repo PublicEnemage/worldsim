@@ -4,7 +4,7 @@ on:
   push:
     branches: [ main, develop, release/m* ]
   pull_request:
-    branches: [ main, release/m* ]
+    branches: [ main, 'release/m*', 'sprint/m*' ]
   workflow_dispatch:
     inputs:
       force_backtesting:
@@ -350,3 +350,28 @@ jobs:
           python scripts/compliance_scan.py --scope simulation-engine 2>&1 | \
             grep "COMPLIANCE-WARN" || echo "No monetary float warnings found."
           exit 0
+
+  # ---------------------------------------------------------------------------
+  # SESSION_STATE.md size gate — M18 onward (sprint group isolation protocol)
+  #
+  # SESSION_STATE.md is a cockpit card capped at 200 lines. Exceeding the cap
+  # means historical content was added instead of archived.
+  # Authority: docs/process/sprint-group-isolation.md §SESSION_STATE.md Cockpit Card Protocol
+  # DS owns this check; EL is accountable.
+  # ---------------------------------------------------------------------------
+  session-state-size-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check SESSION_STATE.md line count
+        run: |
+          LINES=$(wc -l < SESSION_STATE.md)
+          echo "SESSION_STATE.md: ${LINES} lines (ceiling: 200)"
+          if [ "${LINES}" -gt 200 ]; then
+            echo ""
+            echo "ERROR: SESSION_STATE.md exceeds the 200-line cockpit card ceiling."
+            echo "Archive historical content to docs/process/session-archives/ before committing."
+            echo "See docs/process/sprint-group-isolation.md §SESSION_STATE.md Cockpit Card Protocol"
+            exit 1
+          fi
+          echo "OK: ${LINES} ≤ 200 lines."

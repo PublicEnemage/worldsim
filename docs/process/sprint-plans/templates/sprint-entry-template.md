@@ -151,6 +151,84 @@ to the PI Agent — PM Agent does not write registry entries directly.*
 
 ---
 
+## Section 6 — Sprint Group Isolation (M18 onward)
+
+*Required for every sprint group under the sprint group isolation protocol.
+Authority: `docs/process/sprint-group-isolation.md`.*
+
+### 6.1 — Sprint sub-branch
+
+| Field | Value |
+|---|---|
+| Sprint sub-branch | `sprint/m{N}-g{N}` |
+| Cut from | `release/m{N}` |
+| Sprint journal issue | #{TBD — PM Agent creates at entry} |
+
+**PM Agent sprint sub-branch cut command:**
+```bash
+git checkout -b sprint/m{N}-g{N} release/m{N} && git push -u origin sprint/m{N}-g{N}
+```
+
+### 6.2 — File-conflict risk assessment
+
+*List every shared state file or DS-owned file this group will need to write.
+Shared state files route through the PM Agent coordination lane.
+DS-owned files route through the DS infra lane.
+Never write to these files directly from a feature branch.*
+
+| File | Lane required | Trigger |
+|---|---|---|
+| `SESSION_STATE.md` | PM Agent coordination lane | Sprint exit cockpit update |
+| `docs/process/near-miss-registry.md` | PM Agent coordination lane (PI Agent authors) | If NM identified |
+| `docs/compliance/scan-registry.md` | PM Agent coordination lane | If compliance scan produced |
+| {any DS-owned file} | DS infra lane | {describe the needed change} |
+| {code/test files} | Sprint sub-branch (no coordination needed) | — |
+
+*If this sprint group writes no shared state files and requires no DS-owned file changes,
+write: "No shared-file conflicts anticipated. All writes are to code and test files."*
+
+### 6.3 — Infrastructure dependency declaration
+
+*Does this sprint group's implementation require a change to a DS-owned file
+(`.github/workflows/`, `.githooks/`, `.gitignore`)?*
+
+- [ ] No DS-owned file changes required
+- [ ] Yes — DS infra lane required (activate: `DevSecOps Agent: CONFIGURE — [description]`)
+
+**If yes, describe the required change and which DS deliverable must merge before
+implementation can begin:**
+
+> {description or "N/A"}
+
+### 6.4 — Cross-group dependency declaration
+
+*Does this sprint group depend on the output of another active sprint group?*
+
+- [ ] No cross-group dependencies
+- [ ] Yes — dependency declared below
+
+**If yes, state the upstream group, what output is required, and the merge ordering constraint:**
+
+> {e.g. "G2 depends on G1: requires ELASTICITY_REGISTRY changes from G1's sprint branch
+> to be on release/m{N} before G2's sprint/m{N}-g2 sub-branch is cut."}
+
+### 6.5 — Prior NM verification (NM-068 process improvement)
+
+*For each near-miss entry filed since the previous sprint closed, confirm whether the
+process improvement it mandated has been applied to this sprint's execution.*
+
+**NM verification sweep date:** {YYYY-MM-DD}
+**Sweep period:** Since {previous sprint close date}
+
+| NM entry | Process improvement required | Applied in this sprint? |
+|---|---|---|
+| {NM-NNN} | {brief description of required process change} | {Yes / N/A — does not apply to this group} |
+
+*If no NM entries are open with applicable process improvements: "No applicable NM process
+improvements identified since previous sprint close."*
+
+---
+
 ## EL Approval Record
 
 *EL reviews this entry document before any implementation PR opens. Approval is recorded here

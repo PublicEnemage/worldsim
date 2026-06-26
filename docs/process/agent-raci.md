@@ -637,6 +637,8 @@ finalized — not afterward.
 | `docs/demo/{milestone}/reviews/*-stakeholder-review.md` | IR | PM | Independent Review Agent is the author of record for Step 7 stakeholder review artifacts; PM owns the demo cycle and receives IR output for triage (Issue #528) |
 | `docs/compliance/security-reviews/` | Sr | EL, PI | Security & Review Agent produces vulnerability audit and dual-use review reports here; EL informed of all reports; PI consulted when a report produces a SCAN-entry finding (Issue #528) |
 | `docs/compliance/infra-reviews/` | DS | EL, PI | DevSecOps Agent produces dependency audit reports and CI health reports here; naming convention `YYYY-MM-DD-mN-[type].md`; EL informed of all reports; PI consulted when a report produces a near-miss finding |
+| `docs/process/sprint-group-isolation.md` | DS | EL (A) | Sprint group isolation protocol — branch topology, journal issue protocol, file authority matrix, PI Agent gate, cross-group dependency rules. DS authors amendments; EL approves. |
+| `docs/process/session-archives/` | PM | EL | Session state archive files; PM creates at each milestone close; archives are permanent (never edited or deleted) |
 
 **Socratic Agent (So) — explicitly excluded from file ownership (Issue #528):**
 The Socratic Agent produces understanding, not documents. Its outputs are delivered
