@@ -148,8 +148,9 @@ export function InstrumentCluster({
               </div>
             )}
           </div>
-          {/* Sub-zone B — CohortImpactSection; internal scroll; capped to leave Sub-zone A its minimum */}
-          <div style={{ flex: "1 1 0", overflowY: "auto", maxHeight: "calc(100% - 80px)" }}>
+          {/* Sub-zone B — CohortImpactSection; internal scroll on the section itself (flex:1 1 0 + overflowY:auto
+              on zone-1b-cohort-impact); overflow:hidden here prevents Sub-zone B from overflowing Zone 1B */}
+          <div style={{ flex: "1 1 0", display: "flex", flexDirection: "column", overflow: "hidden", maxHeight: "calc(100% - 80px)" }}>
             {zone1bCohortSection}
           </div>
         </div>

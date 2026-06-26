@@ -713,7 +713,7 @@ export function CohortImpactSection({ isCompleted = false }: { isCompleted?: boo
   return (
     <div
       data-testid="zone-1b-cohort-impact"
-      style={{ borderTop: "1px solid #e0e0e0", paddingTop: 2, flexShrink: 0, background: "#fff" }}
+      style={{ borderTop: "1px solid #e0e0e0", paddingTop: 2, flex: "1 1 0", overflowY: "auto", background: "#fff" }}
     >
       <div
         data-testid="cohort-section-header"
