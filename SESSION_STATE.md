@@ -6,7 +6,7 @@
 > Historical state lives in `docs/process/session-archives/`.
 > Authority: `docs/process/sprint-group-isolation.md §SESSION_STATE.md Cockpit Card Protocol`.
 
-**Last updated:** 2026-06-26 (M17 CLOSED — v0.17.0 released; M18 entry blockers in progress; #1328/#1329 resolved this session)
+**Last updated:** 2026-06-26 (ALL SIX M18 ENTRY BLOCKERS RESOLVED — PRs #1344/#1345/#1346/#1347; release/m18 ready to cut; sprint plan pending)
 **Current milestone:** M18 — Full Argument and Demo 7 (GitHub Milestone 19)
 
 ---
@@ -18,7 +18,7 @@
 | Milestone | M18 — Full Argument and Demo 7 |
 | GitHub Milestone | #19 |
 | Exit checklist issue | #1340 |
-| Release branch | ⏳ NOT YET CUT (entry blockers in progress) |
+| Release branch | ⏳ NOT YET CUT — all blockers resolved; ready to cut |
 | Sprint plan | ⏳ NOT YET FILED |
 | Active wave | None — pre-Wave 1 |
 | Active sprint groups | None |
@@ -34,10 +34,10 @@ All must be resolved before `release/m18` is cut and the sprint entry gate opens
 |---|---|---|---|
 | #1328 | NM-066 | SESSION_STATE.md size exceeds Claude Code read ceiling | ✅ RESOLVED 2026-06-26 — cockpit card + archive implemented (this session) |
 | #1329 | NM-067 | No sprint group isolation protocol for parallel workstreams | ✅ RESOLVED 2026-06-26 — Option E hybrid + DS amendment implemented (this session) |
-| #1332 | NM-068 | Sprint entry gate: prior NM verification field missing | ⏳ PENDING |
-| #1333 | NM-069 | .gitignore missing Playwright/test artifact directories | ⏳ PENDING |
-| #1334 | NM-070 | Pre-push gates: git hook enforcement non-functional | ⏳ PENDING |
-| #1335 | NM-071 | Sprint planning SOP: wave-level concurrency ceiling | ⏳ PENDING |
+| #1332 | NM-068 | Sprint entry gate: prior NM verification field missing | ✅ RESOLVED 2026-06-26 — sprint entry template §6.5 (PR #1345) |
+| #1333 | NM-069 | .gitignore missing Playwright/test artifact directories | ✅ RESOLVED 2026-06-26 — .gitignore + sprint entry template §6.3a (PR #1346) |
+| #1334 | NM-070 | Pre-push gates: git hook enforcement non-functional | ✅ RESOLVED 2026-06-26 — .githooks/pre-push + CONTRIBUTING.md Step 7 (PR #1346) |
+| #1335 | NM-071 | Sprint planning SOP: wave-level concurrency ceiling | ✅ RESOLVED 2026-06-26 — sprint-planning-sop.md §Wave Kickoff Coordination Check (PR #1347) |
 
 ---
 
@@ -68,4 +68,6 @@ None open. #1328 and #1329 resolved 2026-06-26 (DS consultation; Option E hybrid
 - **Process redesign (M18):** Sprint group isolation (Option E hybrid) + SESSION_STATE.md cockpit card model now active from M18 onward. Full documentation: `docs/process/sprint-group-isolation.md`.
 - **Auto-merge protocol (PR #1344):** CLAUDE.md updated — `gh pr merge --auto` replaces polling loop; `gh run watch` for observation. KI-007 filed (GraphQL rate limit). Active from M18.
 - **Agent roster (PR #1342/#1343):** Chief Engineer renamed → Computation Engine Agent. DevSecOps Agent (DS) added — owns `.github/`, `.githooks/`, `.gitignore`, sprint isolation process doc.
+- **Pre-push hook (PR #1346):** `.githooks/pre-push` active — enforces ruff + mypy (backend) and npm run build (frontend). Install: `git config core.hooksPath .githooks`. EL has installed this locally.
+- **Wave concurrency ceiling (PR #1347):** Hard ceiling of 5 concurrent sprint groups per wave. Coordination tier table in `docs/process/sprint-planning-sop.md §Wave Kickoff Coordination Check`. PM Agent runs check before wave kickoff.
 - **M17 archive:** Full M1–M17 session state at `docs/process/session-archives/session-state-pre-m18.md`.
