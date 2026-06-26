@@ -223,15 +223,26 @@ dissent.
 `docs/process/sprint-planning-sop.md §Sprint Exit Gate` (Phase C output).
 Updated 2026-06-12 per Phase C. Changes to this section require PI Agent review and EL endorsement.*
 
+**At wave kickoff — before any group in the wave opens an implementation PR:**
+
+The PM Agent runs the wave kickoff coordination check defined in
+`docs/process/sprint-planning-sop.md §Wave Kickoff Coordination Check`. This check determines
+the coordination tier for the wave (Standard / Recommended / Required) based on the count of
+concurrently active implementation PRs across all sprint groups. The tier and any cross-group
+dependency merge sequence are recorded in every group's sprint entry document (Section 1)
+before the entry is routed to EL for approval. The hard ceiling is 5 concurrent groups — if
+5 are already active, no new group opens an implementation PR until one exits.
+
 **At sprint entry — before any implementation PR opens:**
 
 The PM Agent fills out the sprint entry template
 (`docs/process/sprint-plans/templates/sprint-entry-template.md`) and files it at
 `docs/process/sprint-plans/{milestone-slug}-sprint-{N}-entry.md`. The entry document must
 satisfy all five invariants in the template (release branch, CI trigger, ADR gates, intent
-documents, QA test authorship) before any implementation PR opens. A sprint that opens
-without a filed sprint entry template is a process deviation — the PM Agent may not authorize
-implementation to begin without the entry document filed and EL-approved.
+documents, QA test authorship) before any implementation PR opens, and must include the wave
+coordination tier from the wave kickoff check. A sprint that opens without a filed sprint entry
+template is a process deviation — the PM Agent may not authorize implementation to begin
+without the entry document filed and EL-approved.
 
 **What "EL-approved" means at entry:** The EL approves the sprint entry document either by
 adding the `el-approved` date in the frontmatter, or by confirming approval in a comment on
