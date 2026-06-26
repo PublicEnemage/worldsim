@@ -37,10 +37,15 @@ Before beginning any task, read these files in order:
 2. `docs/process/agents.md` — agent roster, personas, activation protocols
 3. `CLAUDE.md` — permanent constitution, architecture, standards
 4. `docs/insights-log.md` — pre-GitHub inbox; findings, open questions, and insights not yet promoted to issues or near-miss entries
+5. **Active sprint journal issue** (if a sprint group is active) — `gh issue view <N> --comments`
+   where `<N>` is listed in `SESSION_STATE.md §Cockpit` under "Active sprint journal issues".
+   Skip if none listed. The journal issue is the intra-sprint status record — it contains
+   what SESSION_STATE.md used to contain for an active sprint group.
 
-`CLAUDE.md` is the permanent constitution. `SESSION_STATE.md` is the
-current situation report. `docs/process/agents.md` is the canonical home
-for all agent personas. All four are required reading at session start.
+`CLAUDE.md` is the permanent constitution. `SESSION_STATE.md` is the current situation
+report (cockpit card, ≤ 200 lines — history at `docs/process/session-archives/`).
+`docs/process/agents.md` is the canonical home for all agent personas.
+All reads are required at session start.
 
 At the end of every session, updating `SESSION_STATE.md` is the last
 action before closing — not optional.
@@ -411,36 +416,61 @@ will not fire and EL must merge manually.
 
 **Release Branch Workflow.**
 Each milestone has a release branch (`release/m{N}`) cut from `main` at
-milestone kickoff by the PM Agent as part of sprint planning. All feature work
-during the milestone uses this pattern:
+milestone kickoff by the PM Agent as part of sprint planning. From M18 onward,
+the sprint group isolation model is active — see full protocol at
+`docs/process/sprint-group-isolation.md`. Summary:
 
-1. Cut feature branch from `release/m{N}` using a **milestone-scoped name**:
-   `git checkout -b feat/m{N}-g{N}-short-description release/m{N}`
-   The branch name must contain the milestone prefix (e.g. `m14`). Sprint group
-   numbers (G1, G2, …) are reused across milestones — `feat/g1-bugs` is ambiguous
-   and will be rejected by the `branch-naming` CI check. Use `feat/m14-g1-bugs`.
-2. Implement, run pre-push gates (lint, build), push feature branch
-3. Open PR targeting `release/m{N}` (not `main`)
-4. Set auto-merge immediately after opening the PR:
+**Branch naming (M18 onward):**
+
+| Branch type | Pattern | Targets |
+|---|---|---|
+| Sprint sub-branch | `sprint/m{N}-g{N}` | `release/m{N}` (via integration PR) |
+| Feature branch | `feat/m{N}-g{N}-short-name` | `sprint/m{N}-g{N}` |
+| Shared state | `chore/m{N}-state-sync-NNN` | `release/m{N}` (PM Agent only) |
+| Infrastructure | `infra/m{N}-short-name` | `release/m{N}` (DS Agent only) |
+
+**Feature branch lifecycle (within a sprint group):**
+
+1. PM Agent cuts `sprint/m{N}-g{N}` from `release/m{N}` at group entry:
+   `git checkout -b sprint/m{N}-g{N} release/m{N} && git push -u origin sprint/m{N}-g{N}`
+2. Implementing agent cuts feature branches from the sprint sub-branch:
+   `git checkout -b feat/m{N}-g{N}-short-name sprint/m{N}-g{N}`
+   Branch names must contain the milestone prefix — `feat/g1-name` is ambiguous
+   and will be rejected by the `branch-naming` CI check.
+3. Implement, run pre-push gates (lint, build), push feature branch
+4. Open PR targeting `sprint/m{N}-g{N}` (not `release/m{N}`); set auto-merge:
    `gh pr merge <number> --merge --auto`
-   GitHub merges when all required checks pass. The agent does not poll or wait —
-   move on to the next task or close the session. To observe CI in real time:
-   `gh run watch $(gh run list --branch <branch> --limit 1 --json databaseId --jq '.[0].databaseId') --exit-status`
-5. Pull from release branch before starting the next feature branch:
-   `git pull origin release/m{N}`
-6. Continue with next feature branch
+5. Pull sprint branch before next feature: `git pull origin sprint/m{N}-g{N}`
+
+**Integration PR (sprint branch → release branch, at sprint group exit):**
+
+1. File sprint exit document; PI Agent confirms exit conditions
+2. Open integration PR: `sprint/m{N}-g{N}` → `release/m{N}`
+3. PI Agent posts gate comment on the integration PR (required — see
+   `docs/process/sprint-group-isolation.md §PI Agent Integration PR Gate`)
+4. Set auto-merge: `gh pr merge <number> --merge --auto`
+5. Pull release branch: `git pull origin release/m{N}`
+
+**Observing CI (streaming, not polling):**
+```
+gh run watch $(gh run list --branch <branch> --limit 1 --json databaseId --jq '.[0].databaseId') --exit-status
+```
+
+**Shared state file updates** (`SESSION_STATE.md`, registries, `CLAUDE.md`):
+PM Agent opens `chore/m{N}-state-sync-NNN` PR targeting `release/m{N}`;
+sets auto-merge. Sprint groups never write to shared state files directly.
+
+**DS-owned file changes** (`.github/`, `.githooks/`, `.gitignore`):
+DS opens `infra/m{N}-short-name` PR targeting `release/m{N}`;
+sets auto-merge. Activate DS with `DevSecOps Agent: CONFIGURE — [description]`.
 
 At milestone close, EL performs one admin bypass: `release/m{N}` → `main`.
-The release branch is never merged to `main` by Claude Code — that merge is
-always the Engineering Lead's action.
+The release branch is never merged to `main` by Claude Code.
 
-`SESSION_STATE.md` updates during an active milestone target the release branch,
-not `main`, and follow the same autonomous merge rule as all release branch PRs:
-set auto-merge immediately after opening the PR (`gh pr merge <number> --merge --auto`).
-No `--admin` needed — the `release-branch-ci-gate` Ruleset treats skipped checks
-as passing, and GitHub's auto-merge fires the moment all checks are terminal.
-The `auto-merge-session-state` workflow only fires on PRs targeting `main` and
-does not apply here.
+`SESSION_STATE.md` program-level updates during an active milestone follow the
+shared state lane above (PM Agent, `chore/m{N}-state-sync-NNN` → `release/m{N}`,
+auto-merge). The `auto-merge-session-state` workflow only fires on PRs targeting
+`main` and does not apply here.
 
 **Backend pre-push lint gate — mandatory before any `git push` touching Python files.**
 Before pushing any branch that modifies files under `backend/`, run:
@@ -743,6 +773,9 @@ the artifact type and cannot be caught by CI.
 | Independent Review (IR) | `docs/demo/{milestone}/reviews/` | `YYYY-MM-DD-vX.X.X-ir-review.md` | Pre-demo quality gate; authored by Independent Review Agent (Step 7); distinct from internal-review.md. EL decision 2026-06-10. |
 | Stakeholder Reviews | `docs/demo/{milestone}/reviews/` | `YYYY-MM-DD-vX.X.X-stakeholder-review.md` | Post-demo artifact; authored after the live stakeholder demo runs; captures attendees, questions raised, and outcome. A placeholder with templated sections is created at milestone close and filled in after the demo. EL decision 2026-06-10. |
 | Security Review Reports | `docs/compliance/security-reviews/` | `YYYY-MM-DD-security-review-[topic].md` | New file per review; authored by Security & Review Agent; topic is a short kebab-case label (e.g., `dual-use-financial-attack-surface`) (Issue #528) |
+| Session State Archives | `docs/process/session-archives/` | `session-state-pre-m{N}.md` | New file at each milestone close; PM Agent copies full SESSION_STATE.md before redrafting the cockpit card. Archives are permanent — never edited or deleted. |
+| Sprint Journal Issues | GitHub Issues | Title: `sprint journal: M{N} G{N} — [description]`; label: `documentation` | One issue per sprint group; opened by PM Agent at sprint entry; closed by PI Agent at exit confirmation. Read at session start via `gh issue view <N> --comments`. |
+| DevSecOps Infra Reviews | `docs/compliance/infra-reviews/` | `YYYY-MM-DD-[type]-review.md` | New file per audit; authored by DevSecOps Agent (DS). Types: `dependency`, `ci-health`, `gate-status`. |
 
 ### Pre-creation checklist for documents
 
