@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-26 (G2 Phase 3 implementation MERGED — PR #1311; #394 N=3 scenario comparison Zone 1A/1B/1D; build clean; CI green; autonomous merge)**
+**Last updated: 2026-06-26 (G5 implementation MERGED — PR #1315; #1251 adaptive y-axis extension; MDA floor values included in computeYDomain call site; AC-1251-1/2 unit tests + AC-1251-3/R E2E spec; build clean; CI green; autonomous merge)**
 **Current milestone:** M17 — Calibration and Comparative Infrastructure (GitHub Milestone 18)
 **Previous milestone:** M16 — Distributional Visibility (FORMALLY CLOSED 2026-06-25; release/m16 → main; v0.16.0; #985 closed; GitHub Milestone 17 closed)
 
@@ -49,7 +49,7 @@
 | #1239 | ux(zone-1b): DEMO6-010 inverted floor label — "above floor" when below | G4 | Wave 2 | ✅ **BPO ACCEPT 2026-06-26** — PR #1300 merged; CA Layer 3 PASS; G4 sprint exit CONFIRMED |
 | #1220 | fix(e2e): G3 spec AC-F1–AC-F7 soft-skip — NM-061 upstream | G5 | Wave 2 | Test infrastructure bug; milestone assigned 2026-06-25; **Sprint entry EL APPROVED 2026-06-25** — `docs/process/sprint-plans/m17-g5-sprint-entry.md`; implementation may begin |
 | #1214 | feat(observability): startup WARNING if simulation_entities empty | G5 | Wave 2 | NM-060 upstream; milestone assigned 2026-06-25; **Sprint entry EL APPROVED 2026-06-25** |
-| #1251 | ux(zone-1a): adaptive y-axis extension audit | G5 | Wave 2 | Capacity-allowing; `computeYDomain()` extension; **Sprint entry EL APPROVED 2026-06-25** |
+| #1251 | ux(zone-1a): adaptive y-axis extension audit | G5 | Wave 2 | **✅ MERGED PR #1315 2026-06-26** — MDA floor values included in CompositeChartSVG yDomain useMemo; AC-1251-1/2 unit tests + AC-1251-3/R E2E spec; build clean (619 modules, 0 TS errors); CI green; BPO acceptance pending |
 | #1275 | feat(simulation): seed SEN institutional_capacity_index + GovernanceElasticity fiscal conditionality entry | Wave 2 (unassigned G-group) | Wave 2 | From CM governance spec Q2; co-gated: data seed + elasticity entry in same PR |
 | #1276 | docs(zone-1d): governance horizon disclosure — divergence is ≥12-step signal | Wave 2 (unassigned G-group) | Wave 2 | From CM governance spec Q3; doc/UI text only; no code change |
 | #1277 | docs(process): sprint-planning-sop.md amendment — UX/UI design artifact gate | Wave 2 (unassigned G-group) | Wave 2 | Promoted from insights log entry 13; G2 §2.5 pattern → SOP |
