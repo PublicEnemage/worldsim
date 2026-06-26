@@ -747,9 +747,24 @@ test.describe("AC-P5: Persona 5 (Aicha) — MDA severity label visible at high c
       }),
     );
 
+    // ScenarioInstrumentCluster skips measurement-output at step 0 (no simulation output
+    // before the first advance). Mocking the advance endpoint lets the UI step to 1
+    // without consuming a real backend step, triggering the trajectory + measurement-output
+    // fetch chain that populates Zone 1B with MDA alerts and cohort crossing rows.
+    await page.route(`**/api/v1/scenarios/${sid}/advance`, (route) => {
+      if (route.request().method() !== "POST") { route.continue(); return; }
+      route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({ step_executed: 1, is_complete: false }),
+      });
+    });
+
     await page.setViewportSize({ width: 1280, height: 800 });
     await page.goto(`/?scenario=${encodeURIComponent(sid)}`);
     await waitForAppReady(page);
+    // Step to 1 so trajectory + measurement-output fetches fire (both skip at step 0).
+    await page.locator('[data-testid="advance-step-btn"]').click();
 
     const zone1b = page.locator('[data-testid="zone-1b"]');
     if (!(await zone1b.isVisible({ timeout: 8_000 }).catch(() => false))) return;
@@ -836,9 +851,24 @@ test.describe("AC-P1: Persona 1 (Lucas) — cohort section visible with internal
       }),
     );
 
+    // ScenarioInstrumentCluster skips measurement-output at step 0 (no simulation output
+    // before the first advance). Mocking the advance endpoint lets the UI step to 1
+    // without consuming a real backend step, triggering the trajectory + measurement-output
+    // fetch chain that populates Zone 1B with cohort crossing rows.
+    await page.route(`**/api/v1/scenarios/${sid}/advance`, (route) => {
+      if (route.request().method() !== "POST") { route.continue(); return; }
+      route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({ step_executed: 1, is_complete: false }),
+      });
+    });
+
     await page.setViewportSize({ width: 1280, height: 800 });
     await page.goto(`/?scenario=${encodeURIComponent(sid)}`);
     await waitForAppReady(page);
+    // Step to 1 so trajectory + measurement-output fetches fire (both skip at step 0).
+    await page.locator('[data-testid="advance-step-btn"]').click();
 
     const zone1b = page.locator('[data-testid="zone-1b"]');
     if (!(await zone1b.isVisible({ timeout: 8_000 }).catch(() => false))) return;
