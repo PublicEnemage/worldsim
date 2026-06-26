@@ -404,8 +404,27 @@ before AND after implementation does not confirm the fix.
 evidence source** — reference `docs/process/sprint-plans/m17-g3-sprint-entry.md §2.2
 (Standing constraint)` and the PR #1235 note.
 
-**No soft-skip patterns** (NM-056 guard): AC-A2 must be hard-fail. No `test.skip()`,
-`test.fixme()`, or conditional skips.
+**`test.fail()` annotation — EX-002 (2026-06-25):**
+AC-A2 is annotated with `test.fail()` in `m17-g3-zone-1b-allocation.spec.ts` during the
+pre-G3-implementation window. CI treats the expected failure as a passing state. When G3 Phase 3
+adds `data-testid="zone-1b-mda-panel-wrapper"`, AC-A2 will pass — triggering a CI "unexpected
+pass" that signals the implementing engineer to remove `test.fail()`. See EX-002
+(`docs/compliance/exceptions.md`) and NM-065 (`docs/process/near-miss-registry.md`).
+
+`test.fail()` is not a soft-skip. The test still runs and still must fail before implementation.
+This does not violate the NM-056 guard against soft-skip patterns (`test.skip()`, `test.fixme()`,
+conditional early-returns suppress execution; `test.fail()` does not).
+
+**Phase 3 reversal steps (required in the G3 implementation PR):**
+1. Add `data-testid="zone-1b-mda-panel-wrapper"` to `InstrumentCluster.tsx` (line ~143)
+2. Run playwright locally — AC-A2 should pass (testid present, height ≥ 80px)
+3. Playwright will report "unexpected pass" because `test.fail()` is still present
+4. Remove `test.fail()` and its four-line comment block from AC-A2 in the test file
+5. Re-run playwright — AC-A2 passes cleanly; update EX-002 Status to Resolved
+
+**No soft-skip patterns** (NM-056 guard): `test.skip()`, `test.fixme()`, and conditional
+early-returns remain prohibited for AC-A2. Only `test.fail()` + EX-NNN is an approved
+alternative (NM-065).
 
 **AC-A3 (viewport contract at 768px):**
 With the Senegal T3 scenario at a step where both MDA alerts and cohort crossings are active,
@@ -687,12 +706,18 @@ be finalized; QA Lead may author test structure before ADR is accepted.
 - AC-P5: `zone-1b-top-detail`, `detail-indicator-name`, `detail-status` visible without interaction
 - AC-P1: `cohort-row-0` visible within `zone-1b-cohort-impact`; Sub-zone B shows internal scroll when content exceeds height
 
-**No soft-skip patterns** (NM-056 guard): All assertions must be hard-fail.
+**No soft-skip patterns** (NM-056 guard): All assertions must be hard-fail. Exception: AC-A2
+uses `test.fail()` per EX-002 (approved 2026-06-25; see AC-A2 note above).
+
+**Testid reconciliation (2026-06-25):** AC-A2 locator updated from `zone-1b-mda-panel` to
+`zone-1b-mda-panel-wrapper` (aligning with ADR-018 and intent doc §5). Change applied in
+same PR as `test.fail()` annotation.
 
 **QA Lead acknowledgment:**
 `[ ]` QA Lead: Tests for AC-A1 through AC-P1 authored and filed in
       `frontend/tests/e2e/m17-g3-zone-1b-allocation.spec.ts`. AC-A2 red confirmed before
-      implementation. Date: [to be completed]
+      implementation. AC-A2 annotated with `test.fail()` (EX-002); reversal steps documented above.
+      Date: [to be completed]
 
 ---
 
