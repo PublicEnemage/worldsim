@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-26 (G2 BPO ACCEPT + sprint exit CONFIRMED — PR #1314 App.tsx wiring merged; #394 closed; AC-S1/A1/B1/D1/P5/P1/P3 all hard-asserted in CI; north star PASS; sprint exit doc filed; G2 Phase 3 CLOSED)**
+**Last updated: 2026-06-26 (G3 BPO ACCEPT + sprint exit CONFIRMED — PR #1313 Zone 1B proportional allocation merged; #1252 ACCEPT; AC-A1/A2/A3/A4/P5/P1 all hard-asserted in CI; north star PASS; EX-002 reversal confirmed; sprint exit doc filed; G3 Phase 3 CLOSED)**
 **Current milestone:** M17 — Calibration and Comparative Infrastructure (GitHub Milestone 18)
 **Previous milestone:** M16 — Distributional Visibility (FORMALLY CLOSED 2026-06-25; release/m16 → main; v0.16.0; #985 closed; GitHub Milestone 17 closed)
 
@@ -42,7 +42,7 @@
 | #1229 | feat(simulation): fiscal-to-cohort elasticity calibration — ELASTICITY_REGISTRY | G1 | Wave 1 | ✅ BPO ACCEPT 2026-06-25 — PR #1270 merged; FRAME-D tests pass; CM-certified constants on release/m17; sprint exit confirmed |
 | #1248 | feat(simulation): governance sensitivity calibration — GovernanceModule fiscal conditionality | G1 | Wave 1 | ✅ BPO ACCEPT 2026-06-25 (Wave 1 spec) — governance sensitivity spec filed (PR #1270); three CM positions on record; sprint exit confirmed; Wave 2 code changes gated on data preconditions |
 | #394 | feat: multi-scenario comparison (>2 scenarios) | G2 | Wave 2 | ✅ **BPO ACCEPT 2026-06-26** — PR #1311 (Zone 1A/1B/1D components) + PR #1314 (App.tsx wiring + E2E activation); playwright-e2e PASS 8m25s; AC-S1/A1/B1/D1/P5/P1/P3 all hard-asserted; CA Layer 3 PASS (Personas 1/3/5); north star PASS (Aicha 90-second Option C); sprint exit CONFIRMED — `docs/process/sprint-plans/m17-g2-sprint-exit.md`; **issue CLOSED** |
-| #1252 | arch(zone-1b): Zone 1B proportional allocation — MDA alert vs cohort sections | G3 | Wave 2 | **Phase 1 BPO ACCEPTED + Phase 2 ADR-018 ACCEPTED + QA ✅ 2026-06-25/26** — PR #1291 (ADR-018) + PR #1301 (QA test.fail() EX-002 NM-065 testid zone-1b-mda-panel-wrapper) merged; CI green; #1290 closed; EL sprint entry approval PENDING |
+| #1252 | arch(zone-1b): Zone 1B proportional allocation — MDA alert vs cohort sections | G3 | Wave 2 | ✅ **BPO ACCEPT 2026-06-26** — PR #1291 (ADR-018) + PR #1301 (QA + EX-002 NM-065) + PR #1313 (Phase 3 implementation: Sub-zone A flex:1 1 80px, Sub-zone B flex:1 1 0 internal scroll, EX-002 reversal, mock field fixes, AC-P5 race condition fix); playwright-e2e PASS (8m8s); CA Layer 3 PASS (Persona 5 Aicha + Persona 1 Lucas); north star PASS (Demo 7 Senegal severity headline + distributional evidence simultaneous visibility); sprint exit CONFIRMED — `docs/process/sprint-plans/m17-g3-sprint-exit.md`; **G3 Phase 3 CLOSED** |
 | #1249 | ux(zone-1a): DEMO6-014 curve identifiability | G4 | Wave 2 | ✅ **BPO ACCEPT 2026-06-26** — PR #1300 merged; CA Layer 3 PASS; G4 sprint exit CONFIRMED; G2 Phase 3 gate CLEARED |
 | #1250 | ux(zone-1b): DEMO6-026/043 tablet legibility at 768px | G4 | Wave 2 | ✅ **BPO ACCEPT 2026-06-26** — PR #1300 merged; CA Layer 3 PASS; G4 sprint exit CONFIRMED; G3 Phase 3 gate CLEARED |
 | #1253 | ux(zone-1d): DEMO6-040 PSP historical precedent anchor | G4 | Wave 2 | ✅ **BPO ACCEPT 2026-06-26** — PR #1300 merged; CA Layer 3 PASS; G4 sprint exit CONFIRMED |
