@@ -243,6 +243,75 @@ deliverable produces user-visible output, it is not infrastructure and the gates
 retroactively. PI Agent files a near-miss for any infrastructure declaration that was
 incorrect.
 
+### UX/UI Design Artifact Gate
+
+*Authority: M17-G6 sprint entry (2026-06-26). This gate applies to all sprint groups containing
+deliverables classified as UX/UI-impacting. Changes to this section require PI Agent review and
+EL endorsement.*
+
+#### Classification trigger
+
+A deliverable is **UX/UI-impacting** if it introduces or modifies: any visible component, any
+layout region, any instrument boundary, any interaction pattern, or any data presentation in
+the primary viewport. Documentation-only changes, backend-only changes, and test-only changes
+are not UX/UI-impacting. The PM Agent records the classification in the sprint entry document.
+The UX Designer may override a non-impacting classification before the sprint entry is
+EL-approved.
+
+#### Minimum artifact — UX mockups
+
+Every UX/UI-impacting deliverable requires a **UX mockup** before the implementation PR opens.
+The UX mockup is a minimum viable artifact: a rough sketch, ASCII layout diagram, annotated
+screenshot, or wireframe sufficient for the panel to evaluate placement and information
+hierarchy. The mockup is filed with or referenced from the intent document.
+
+#### Conditional artifact — UI mockups
+
+When a deliverable introduces a **new component, new layout zone, or new interaction pattern**
+(not a modification of an existing element), a **UI mockup** is required in addition to the UX
+mockup. A UI mockup specifies exact visual treatment: dimensions, color palette reference,
+typography scale, and interaction states. The UI mockup is authored by the UX Designer and the
+Frontend Architect jointly, and filed before the panel review.
+
+#### Panel composition
+
+UX/UI panel reviews require exactly five agents:
+
+| Agent | Role in review |
+|---|---|
+| UX Designer | Lead reviewer — placement, information hierarchy, UX Architectural Commitment compliance |
+| Design Thinking Agent | Evaluates against `docs/ux/design-thinking/worldsim-ux-architecture-first-principles.md` |
+| Customer Agent | Confirms the deliverable does not introduce kryptonite for Personas 2, 3, or 5 |
+| Frontend Architect | Confirms technical feasibility and component boundary compliance |
+| Business PO | Confirms the north star test can be answered for the deliverable |
+
+#### Panel review format
+
+Each panel agent posts a review as a GitHub comment on the feature issue (not the PR), tagging
+`@PM Agent`. The comment must include: (1) agent name and role, (2) governing document sections
+reviewed, (3) any concerns or REJECT condition, and (4) a final verdict: ACCEPT or REJECT. The
+PM Agent records the panel verdict in the sprint exit document.
+
+#### Binding specification rule
+
+The intent document for a UX/UI-impacting deliverable must reference the panel-approved mockup
+by filename or GitHub comment link before the implementation PR opens. An implementation PR that
+opens against an intent document with no panel-approved mockup reference is a process deviation.
+The implementing agent verifies this reference exists before opening the PR.
+
+#### Panel review fail condition
+
+If any panel agent issues a REJECT verdict:
+
+- The REJECT blocks Business PO acceptance — the Business PO may not issue an ACCEPT while any
+  unresolved REJECT from a panel agent is outstanding.
+- The PI Agent blocks the architecture phase of any downstream deliverable that depends on
+  this deliverable.
+- The implementing agent must address the REJECT condition and request re-review from the
+  rejecting agent before the implementation PR opens.
+- A near-miss entry is filed in `docs/process/near-miss-registry.md` if implementation began
+  before the panel review was complete.
+
 ### Sprint Entry Artifact
 
 The sprint entry artifact is the proof that all entry conditions were confirmed before
