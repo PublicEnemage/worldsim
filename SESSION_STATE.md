@@ -5,9 +5,9 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-26 (M17 systemic process gap sprint — NM-066–071 filed; GitHub Issues #1328/#1329/#1332–#1335 opened; insights-log entries for all six flagged as M18 entry blockers; PR #1336 merged to release/m17; EL sign-off + M17 exit ceremony pending)**
-**Current milestone:** M17 — Calibration and Comparative Infrastructure (GitHub Milestone 18)
-**Previous milestone:** M16 — Distributional Visibility (FORMALLY CLOSED 2026-06-25; release/m16 → main; v0.16.0; #985 closed; GitHub Milestone 17 closed)
+**Last updated: 2026-06-26 (M17 FORMALLY CLOSED — release/m17 → main PR #1339 merged; v0.17.0 released; exit ceremony SOP Steps 1–4 complete; #982 closed; M18 kickoff section added)**
+**Current milestone:** M18 — Full Argument and Demo 7 (GitHub Milestone 19)
+**Previous milestone:** M17 — Calibration and Comparative Infrastructure (FORMALLY CLOSED 2026-06-26; release/m17 → main PR #1339; v0.17.0; #982 closed; GitHub Milestone 18 closed)
 
 ---
 
@@ -80,17 +80,56 @@ All six have open insights-log entries flagged for PM Agent promotion at the nex
 
 **G7 sprint exit:** ✅ CONFIRMED 2026-06-26 — `docs/process/sprint-plans/m17-g7-sprint-exit.md`; #1275 GovernanceModule institutional_capacity_index — fiscal_policy_spending_change → institutional_capacity_index elasticity Decimal("-0.015") T3 (Gupta 2002) + SEN CPIA seed 0.55 T2 + migration b2d4f6a8c0e1; PR #1326 merged 2026-06-26; CI green; BPO ACCEPT + CA Layer 3 PASS (Persona 3) + north star PASS; all six ACs green; #1275 CLOSED; PI Agent confirmed in session 2026-06-26
 
-**M17 Exit Checklist (#982) — AGENT VERIFICATION COMPLETE 2026-06-26:**
+**M17 Exit Checklist (#982) — COMPLETE 2026-06-26:**
 - SCAN-027 appended to `docs/compliance/scan-registry.md` (PR #1330 merged 2026-06-26) — result: Clean post-fix
 - ADR-018 Mermaid diagram created: `docs/architecture/ADR-018-zone-1b-sub-zone-layout.mmd` (CODING_STANDARDS.md §Diagram Standards compliance)
 - 2 pre-existing frontend test failures (MDAAlertPanelZone1B.test.ts Tier 4/5 getNegotiationLabel — wrong expectations from M16-G8) fixed in PR #1330; 286 Vitest tests now all passing
 - #982 verification comment posted with retrospective: all agent-verifiable items CONFIRMED
-- **PENDING EL ACTION:**
-  1. EL sign-off on 4 Engineering Lead items in #982 checklist
-  2. EL merges `release/m17` → `main` (admin bypass)
-  3. Exit ceremony SOP Steps 1–4: (1) open issue audit, (2) README.md + CLAUDE.md + roadmap reference audit in same PR as exit SESSION_STATE, (3) SESSION_STATE consistency check, (4) fresh session continuity test
-  4. #982 closed
-  5. M18 kickoff: cut `release/m18`, file M18 sprint plan, open M18 exit checklist issue
+- EL sign-off on 4 Engineering Lead items in #982 checklist: DONE 2026-06-26
+- EL merges `release/m17` → `main` (admin bypass): DONE 2026-06-26 — PR #1339 merged
+- Exit ceremony SOP Steps 1–4: COMPLETE 2026-06-26
+  - Step 1 (open issue audit): all M17 issues confirmed closed except #982 (closed in this ceremony)
+  - Step 2 (milestone reference audit): README.md + CLAUDE.md + roadmap updated to M17 Complete / M18 Current in same PR as this SESSION_STATE update
+  - Step 3 (SESSION_STATE consistency check): this update — M18 kickoff section added; #1340 gate issue listed
+  - Step 4 (fresh session continuity test): deferred — EL to run after ceremony PR merges
+- **#982 CLOSED 2026-06-26**
+- **M18 exit checklist:** Issue #1340 created — `immediate | M18 gate issue`
+
+---
+
+## M18 Kickoff Prerequisites
+
+**Release branch:** `release/m18` — ⏳ NOT YET CUT (M18 entry blockers must be resolved first — see #1328/#1329/#1332–#1335)
+**Sprint plan:** ⏳ NOT YET FILED
+
+| Step | Status | Notes |
+|---|---|---|
+| 1. EL merges `release/m17` → `main` (admin bypass) | ✅ DONE 2026-06-26 | PR #1339 merged |
+| 2. Resolve M18 entry blockers | ⏳ PENDING | #1328 (SESSION_STATE size), #1329 (branch isolation protocol), #1332 (sprint entry NM verification), #1334 (pre-push hooks), #1335 (concurrency ceiling) — all must be addressed before sprint entry gate opens |
+| 3. PM Agent cuts `release/m18` from updated `main` | ⏳ PENDING | After M18 entry blockers resolved |
+| 4. PM Agent authors `m18-sprint-plan.md` | ⏳ PENDING | |
+| 5. EL approves sprint plan | ⏳ PENDING | |
+| 6. M18 exit checklist confirmed as M18 gate issue | ✅ DONE 2026-06-26 | Issue #1340 created; assigned to GitHub Milestone 19 |
+
+**M18 open issues at kickoff:**
+
+| Issue | Title | Notes |
+|---|---|---|
+| #1340 | M18 Exit Checklist — blocks milestone closure | `immediate \| M18 gate issue` |
+| #843 | Demo 7 live external session | Deferred from M16/M17; M18 primary demo deliverable |
+| #394 | Multi-scenario comparison (>2 scenarios) — Phase 2 | Deferred comparative infrastructure work |
+| #1217 | Mode 3 render optimization | Deferred from M17 |
+| #1238 | DEMO6-009 narration layer | Deferred from M17 |
+| #1059 | HCL demo narration | Deferred from M17 |
+| #1254 | CI bands (ADR-007 full implementation) | M18 Wave — full uncertainty quantification |
+| #1255 | PSP driver decomposition | M18 Wave |
+| #1256 | Path 2 (counter-scenario comparison) | M18 Wave |
+| #1328 | SESSION_STATE.md size: exceeds Claude Code read ceiling | M18 entry blocker — file reduced + archival protocol in CLAUDE.md before sprint entry gate |
+| #1329 | Branching strategy: no sprint group isolation protocol | M18 entry blocker — CLAUDE.md + sprint entry template updated before sprint entry gate |
+| #1332 | Sprint entry gate: add prior NM verification step | M18 entry blocker — sprint entry template updated before first M18 group |
+| #1333 | .gitignore: missing Playwright/test artifact directories | First M18 infrastructure PR |
+| #1334 | Pre-push gates: git hook enforcement | M18 entry blocker — hook in place before first M18 push |
+| #1335 | Sprint planning SOP: wave-level concurrency ceiling | M18 entry blocker — wave kickoff coordination check required before M18 Wave 1 |
 
 ---
 
