@@ -323,7 +323,7 @@ graph TD
     style ZoneOuterContainer fill:#fff3e0,stroke:#e65100
 ```
 
-The mermaid diagram is embedded here; no separate `.mmd` file is required for a Tier 2 ADR without cross-subsystem dependencies.
+The diagram source is also maintained as a standalone file at `docs/architecture/ADR-018-zone-1b-sub-zone-layout.mmd` per CODING_STANDARDS.md §Diagram Standards.
 
 ---
 
