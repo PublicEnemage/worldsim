@@ -93,7 +93,7 @@ async function createSen100StepScenario(): Promise<string | null> {
         n_steps: 8,
         projection_steps: 100,
         timestep_label: "quarterly",
-        start_date: "2024-01-01",
+        start_date: "2025-01-01",
         initial_attributes: {
           SEN: {
             poverty_headcount_ratio: {
@@ -126,7 +126,7 @@ async function createSen100StepScenario(): Promise<string | null> {
         },
       },
       scheduled_inputs: [
-        { step: 1, input_type: "gdp_growth_change", input_data: { magnitude: "-0.04" } },
+        { step: 1, input_type: "gdp_growth_change", input_data: { magnitude: "-0.15" } },
       ],
     }),
   });
