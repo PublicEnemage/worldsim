@@ -10,7 +10,7 @@ first-applied: M12
 
 **Owner:** PM Agent (R)  
 **Accountable:** Engineering Lead (A)  
-**Required Consultants:** Business Product Owner, Frontend Architect, Chief Engineer, Architect  
+**Required Consultants:** Business Product Owner, Frontend Architect, Computation Engine Agent, Architect  
 **Activation:** `PM Agent: SPRINT — [milestone]`
 
 ---
@@ -71,9 +71,9 @@ PM Agent runs four consultations before producing a draft plan. Consultations ar
 
 **Output informs:** G1/G2/G3 groupings and which frontend features share TrajectoryView, App.tsx, or zone components.
 
-### 3. Chief Engineer — Backend dependency sequencing
+### 3. Computation Engine Agent — Backend dependency sequencing
 
-`Chief Engineer: REVIEW — sprint dependency chain for [milestone name]`
+`Computation Engine Agent: REVIEW — sprint dependency chain for [milestone name]`
 
 **Ask:** Review the proposed backend issue groupings for dependency correctness. Are there hidden performance or schema dependencies between groups that affect sequencing? Is the critical path correctly identified?
 

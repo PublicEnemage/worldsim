@@ -420,7 +420,7 @@ The recency bias counter is the most important process element. Without it, a ne
 | ADR-009 | Simulation engine computation model — iterative vs. matrix | Pending M11 baseline benchmarks | M11 |
 | ADR-010 | Trajectory view as primary instrument | Pending (Issue #366) | M9 |
 
-ADR-009 has a hard constraint: it must not be authored until the Phase 1 baseline benchmarks from the Chief Engineer's performance investigation are complete. Writing ADR-009 before the empirical evidence exists produces a guess with a document number, not an architectural decision.
+ADR-009 has a hard constraint: it must not be authored until the Phase 1 baseline benchmarks from the Computation Engine Agent's performance investigation are complete. Writing ADR-009 before the empirical evidence exists produces a guess with a document number, not an architectural decision.
 
 ---
 

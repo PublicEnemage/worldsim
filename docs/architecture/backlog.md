@@ -28,7 +28,7 @@ Minimum panel by ADR type:
 | ADR type | Required panel members |
 |---|---|
 | Frontend architecture | Architect Agent (author), Frontend Architect Agent, UX Designer Agent, Engineering Lead |
-| Simulation engine | Architect Agent (author), Chief Engineer, Chief Methodologist, Engineering Lead |
+| Simulation engine | Architect Agent (author), Computation Engine Agent, Chief Methodologist, Engineering Lead |
 | Data standards | Architect Agent (author), Chief Methodologist, Development Economist, Engineering Lead |
 | UX design | Architect Agent (author), UX Designer Agent, Frontend Architect Agent, Engineering Lead |
 | Cross-cutting | Architect Agent (author), relevant domain DIC members per RACI, Engineering Lead |

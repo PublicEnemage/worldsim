@@ -37,7 +37,7 @@
 | Sr | Security & Review Agent | Active |
 | IR | Independent Review Agent | Active |
 | So | Socratic Agent | Active |
-| CE | Chief Engineer Agent | Active (Issue #524, M10) |
+| CE | Computation Engine Agent | Active (Issue #524, M10) |
 | FA | Frontend Architect Agent | Active |
 | UD | UX Designer Agent | Active |
 | UT | UX Design Thinking Agent | Active |
@@ -94,8 +94,8 @@ code drift is a compliance violation." (`agents.md §Data Architect Agent`)
 
 **CE — C:** "Reviews all Architect Agent proposals that have computational performance
 implications before they are accepted. A proposal that defines a new module interface or
-relationship type without Chief Engineer review may create performance constraints that cannot be
-resolved without interface rework." (`agents.md §Chief Engineer Agent`)
+relationship type without Computation Engine Agent review may create performance constraints that cannot be
+resolved without interface rework." (`agents.md §Computation Engine Agent`)
 
 **FA — C:** "RACI position: R on frontend component architecture briefs; C on ADR decisions
 with frontend type implications." (`agents.md §Frontend Architect Agent`)
@@ -493,7 +493,7 @@ notified in every case.
 | Agent | Basis for implicit-I-only status |
 |---|---|
 | So (Socratic Agent) | "Does not produce code or architecture — produces understanding." Works directly with Engineering Lead only. (`agents.md §Socratic Agent`) |
-| CE (Chief Engineer Agent) | Active as of Issue #524 (M10). C on architectural decisions with computational implications; I on all other decision types outside simulation engine scope. (`agents.md §Chief Engineer Agent`) |
+| CE (Computation Engine Agent) | Active as of Issue #524 (M10). C on architectural decisions with computational implications; I on all other decision types outside simulation engine scope. (`agents.md §Computation Engine Agent`) |
 
 ---
 
@@ -519,7 +519,7 @@ Minimum panels by ADR type (derived from the RACI matrix above):
 | ADR type | RACI row | Required panel members |
 |---|---|---|
 | Frontend architecture | Row 1 (Architectural decisions) | Architect Agent (author), Frontend Architect Agent (C), Engineering Lead (A) |
-| Simulation engine | Row 1 (Architectural decisions) | Architect Agent (author), Chief Engineer Agent (C), Chief Methodologist (via DI — C), Engineering Lead (A) |
+| Simulation engine | Row 1 (Architectural decisions) | Architect Agent (author), Computation Engine Agent (C), Chief Methodologist (via DI — C), Engineering Lead (A) |
 | Data standards | Row 4 (Data / schema decisions) | Architect Agent (C), Chief Methodologist (via DI — C), Development Economist (domain validation), Engineering Lead (A) |
 | UX design | Row 2/3 (UX frame / component decisions) | Architect Agent (C), UX Designer Agent (R), Frontend Architect Agent (C), Customer Agent (C — Layer 3 usability finding), Engineering Lead (A) |
 | Cross-cutting | All relevant rows | Relevant R/C agents per RACI, Engineering Lead (A) |

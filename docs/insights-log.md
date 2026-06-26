@@ -100,7 +100,7 @@ Each entry has four fields:
 **Source:** EL observation during M16-G8 Demo 6 session
 **Finding:** Demo 7 opening act: Mode 3 active control on the Senegal Article IV scenario as a continuation of Demo 6. Same scenario, step 2, Mode 3 activates. Analyst interrogates whether any available fiscal instrument prevents Q1 informal workers crossing the 0.40 recovery floor. If yes: counter-proposal found. If no: conditionality structure itself is the binding constraint — the most powerful finding the tool can produce. Prerequisite: Chief Methodologist review of fiscal-to-cohort-poverty transmission elasticity (filed from Step 5b calibration finding, Issue #1229). This is M17 scope. Demo 7 second act: Zambia restructuring, three-scenario comparison.
 **Detail:** Demo 7 is structurally dependent on two M17 deliverables: (1) Mode 3 Active Control, which is the north star instrument design; (2) calibrated fiscal-to-cohort-poverty elasticity so that the Mode 3 instrument search is analytically meaningful rather than searching a mis-calibrated response surface. The Demo 6 → Demo 7 continuity (same entity, same step, Mode 3 activates) is the demonstration arc that takes the tool from analytical standing to active decision support. "Counter-proposal found" and "conditionality structure is the binding constraint" are both defensible outcomes — the tool's value is in answering the question precisely, not in producing a preferred result.
-**Status:** open
+**Status:** promoted → #843 (Demo 7 live external session); two-act structure and M17 calibration prerequisites fully captured in roadmap §M18, SESSION_STATE §M18 kickoff, and Demo 7 arc narrative
 
 ---
 
@@ -133,7 +133,7 @@ Each entry has four fields:
 **Source:** EL observation during session startup — SESSION_STATE.md file size review
 **Finding:** `SESSION_STATE.md` has grown to 2,038 lines / 301 KB, exceeding the Claude Code 256 KB read ceiling. The session continuity guarantee cannot currently be satisfied in full — agents reading the file at session start receive truncated content. This is a live failure, not a future risk. Filed as NM-066 and GitHub Issue #1328.
 **Action required:** EL direction decision on remediation model (archive-and-rotate, sprint journal issue, cockpit-card, or hybrid) must be made and recorded before M18 kickoff. This is an M18 entry blocker: no M18 sprint group may begin implementation until `SESSION_STATE.md` is at or below a defined size limit and an archival/rotation protocol is documented in `CLAUDE.md §Session Continuity`. PM Agent: promote to M18 sprint planning agenda at next HORIZON sweep; flag as pre-M18 infrastructure item requiring EL decision before sprint entry gate opens.
-**Status:** open
+**Status:** promoted → NM-066, #1328
 
 ---
 
@@ -141,7 +141,7 @@ Each entry has four fields:
 **Source:** EL pattern recognition across M15–M17 PR history
 **Finding:** The current release branch workflow has no sprint group isolation protocol for parallel workstreams. When ≥ 2 Claude Code sessions run concurrent sprint groups, shared-file overwrites, duplicate PRs, wrong-target merges, and post-exit rework recur without any process gate to prevent them. Documented instances across M15–M17: 6 CLOSED PRs with lost state, duplicate same-named PRs (#1293/#1294, #1307/#1308), wrong-target merge (#1303 to `main`), and a post-exit spec fix (#1319 after G3 exit). M18 is expected to have parallel sprint groups. This gap will recur unless addressed before M18 kickoff. Filed as NM-067 and GitHub Issue #1329.
 **Action required:** EL direction decision on branching model (sprint group sub-branches, wave integration branch, PM Agent coordination lane, or hybrid) must be made and recorded before M18 kickoff. Required protocol changes: (1) `CLAUDE.md §Release Branch Workflow` updated; (2) sprint entry template amended to include file-conflict risk assessment field; (3) cross-group dependency declaration added to sprint entry gate. PM Agent: promote to M18 sprint planning agenda at next HORIZON sweep; flag as pre-M18 infrastructure item requiring EL decision before sprint entry gate opens.
-**Status:** open
+**Status:** promoted → NM-067, #1329
 
 ---
 
@@ -149,7 +149,7 @@ Each entry has four fields:
 **Source:** EL pattern recognition across NM registry — NM-027 class has recurred four times across M12–M17
 **Finding:** The sprint entry gate has no step requiring the implementing agent to verify that prior NM process improvements relevant to the sprint group's domain are in effect. The NM-027 no-op guard pattern has recurred as NM-027, NM-028, NM-047, NM-058, and NM-061 despite working agreement amendments after each instance. A second chain: NM-016 established the mypy gate; NM-052 revealed it had been non-functional for 8 milestones. Filed as NM-068 and GitHub Issue #1332.
 **Action required:** Sprint entry template amended before M18 kickoff to include a "Prior NM applicability check" field — implementing agent confirms which prior NM process improvements apply to the sprint group's domain and that each is in effect. PM Agent checks the field before recommending EL approval. For the NM-027 class specifically, a curated lookup list for frontend E2E sprints is more actionable than a full registry scan. This is an M18 entry blocker: first M18 sprint group must demonstrate the check. PM Agent: promote to M18 sprint planning agenda at next HORIZON sweep.
-**Status:** open
+**Status:** promoted → NM-068, #1332
 
 ---
 
@@ -157,7 +157,7 @@ Each entry has four fields:
 **Source:** EL observation — persistent untracked test artifact directories in git status across multiple M17 sessions
 **Finding:** `backend/test-results/`, `frontend/playwright-report/`, `frontend/session-screenshots/`, `frontend/test-results/`, and `*.test-marker` files are not covered by `.gitignore`. They appear as untracked in every session. A `git add -A` would stage them; large binary artifacts committed to history require destructive git operations to remove. The `near-miss-registry.md.test-marker` file's provenance is unknown. Filed as NM-069 and GitHub Issue #1333.
 **Action required:** One-PR fix — add the four directory patterns and `*.test-marker` to `.gitignore`; investigate and delete or gitignore the `near-miss-registry.md.test-marker` artifact. Sprint entry template amended with a "New output paths" field so future test frameworks land in `.gitignore` in the same PR that introduces them. This is not an M18 kickoff blocker but should be resolved in the first M18 infrastructure PR. PM Agent: include in first M18 HORIZON sweep as an open housekeeping item.
-**Status:** open
+**Status:** promoted → NM-069, #1333
 
 ---
 
@@ -165,7 +165,7 @@ Each entry has four fields:
 **Source:** EL pattern recognition across NM-016, NM-052, NM-054 — same structural absence underlies all three
 **Finding:** The pre-push gates (`ruff check . && mypy app/` for backend; `npm run build` for frontend) are mandatory in `CLAUDE.md` but enforced only by agent compliance — no git hook runs them automatically. NM-052 documented that the mypy gate was non-functional locally for 8 milestones (M8–M16) because the Python 3.13 venv requirement was undocumented; agents who ran it received meaningless output and believed the gate had passed. NM-054 documented that the frontend build gate does not catch E2E breakage. The root cause common to both is the absence of a hook that enforces the gate structurally regardless of agent compliance. Filed as NM-070 and GitHub Issue #1334.
 **Action required:** Implement a git pre-push hook (`.githooks/pre-push`) before M18 kickoff that (1) detects changed files, (2) runs the backend gate only when `backend/` files are touched — failing loudly if `.venv` is absent rather than running silently in the wrong environment, (3) runs the frontend build gate only when `frontend/src/` files are touched, (4) exits non-zero on any failure. Document hook installation as a required setup step in `docs/CONTRIBUTING.md`. This is an M18 entry blocker: all M18 sprint groups must run with hook enforcement from the first push. PM Agent: promote to M18 sprint planning agenda at next HORIZON sweep; flag alongside #1328 and #1329 as pre-M18 infrastructure.
-**Status:** open
+**Status:** promoted → NM-070, #1334
 
 ---
 
@@ -173,4 +173,4 @@ Each entry has four fields:
 **Source:** EL pattern recognition — upstream planning gap enabling NM-067 coordination failures
 **Finding:** The sprint planning SOP has no wave-level coordination check. There is no defined threshold above which a coordination protocol is required before parallel sprint groups begin implementation. M17 ran seven concurrent groups with no coordination budget, making NM-067's merge conflicts and lost updates structurally inevitable. Even with the branching model fix from Issue #1329, seven simultaneous groups sharing a PM Agent coordination lane would exceed the lane's capacity. Filed as NM-071 and GitHub Issue #1335.
 **Action required:** `docs/process/sprint-planning-sop.md` amended before M18 kickoff with a wave kickoff coordination check: PM Agent lists all groups in the wave, their shared-file write scope, and cross-group dependencies, then assigns a coordination tier (standard / recommended / required) based on group count. Recommended starting ceiling: 5 parallel groups per wave. Dependency merge sequence documented before any downstream group opens an implementation PR. This is an M18 entry blocker: wave kickoff coordination check must be completed before M18 Wave 1 implementation begins. PM Agent: promote to M18 sprint planning agenda at next HORIZON sweep alongside #1329.
-**Status:** open
+**Status:** promoted → NM-071, #1335
