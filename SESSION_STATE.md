@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-25 (G2 Phase 1 BPO ACCEPT 2026-06-25 — 4/4 panel PASS; ADR gate CLEAR; sprint entry updated PR #1284 merged; Architect Phase 2 assessment filed on #394 (#issuecomment-4804024195); Phase 3 gate: §2.3 intent doc + §2.4 QA test + #1249 merge remaining)**
+**Last updated: 2026-06-25 (G4 implementation MERGED — PR #1300; all four DEMO6 CRITICAL issues #1249/#1253/#1250/#1239 implemented + QA tests; G2 Phase 3 implementation gate CLEARED by #1249 merge; G3 Phase 3 layout gate CLEARED by #1250 merge)**
 **Current milestone:** M17 — Calibration and Comparative Infrastructure (GitHub Milestone 18)
 **Previous milestone:** M16 — Distributional Visibility (FORMALLY CLOSED 2026-06-25; release/m16 → main; v0.16.0; #985 closed; GitHub Milestone 17 closed)
 
@@ -43,10 +43,10 @@
 | #1248 | feat(simulation): governance sensitivity calibration — GovernanceModule fiscal conditionality | G1 | Wave 1 | ✅ BPO ACCEPT 2026-06-25 (Wave 1 spec) — governance sensitivity spec filed (PR #1270); three CM positions on record; sprint exit confirmed; Wave 2 code changes gated on data preconditions |
 | #394 | feat: multi-scenario comparison (>2 scenarios) | G2 | Wave 2 | **Phase 1 BPO ACCEPT 2026-06-25** — 4/4 panel PASS (#394#issuecomment-4803973123); BPO ACCEPT (#394#issuecomment-4803977557); Architect Phase 2 filed (#394#issuecomment-4804024195); sprint entry PR #1284 merged; ADR gate CLEAR; Phase 3 gate: §2.3 intent doc + §2.4 QA test + #1249 merge (external, G4) |
 | #1252 | arch(zone-1b): Zone 1B proportional allocation — MDA alert vs cohort sections | G3 | Wave 2 | **Sprint entry EL APPROVED 2026-06-25** — `docs/process/sprint-plans/m17-g3-sprint-entry.md`; Phase 1 UX brief may begin; ADR gate PENDING Phase 2; `minHeight: 80px` temporary guarantee active |
-| #1249 | ux(zone-1a): DEMO6-014 curve identifiability | G4 | Wave 2 | **DEMO6 CRITICAL**; required before live demo session |
-| #1250 | ux(zone-1b): DEMO6-026/043 tablet legibility at 768px | G4 | Wave 2 | **DEMO6 CRITICAL**; required before live demo session |
-| #1253 | ux(zone-1d): DEMO6-040 PSP historical precedent anchor | G4 | Wave 2 | **DEMO6 CRITICAL**; required before live demo session |
-| #1239 | ux(zone-1b): DEMO6-010 inverted floor label — "above floor" when below | G4 | Wave 2 | UI bug; milestone assigned 2026-06-25 |
+| #1249 | ux(zone-1a): DEMO6-014 curve identifiability | G4 | Wave 2 | ✅ **MERGED PR #1300 2026-06-25** — terminal endpoint labels in CompositeChartSVG; N=3 compatible; **G2 Phase 3 implementation gate CLEARED** |
+| #1250 | ux(zone-1b): DEMO6-026/043 tablet legibility at 768px | G4 | Wave 2 | ✅ **MERGED PR #1300 2026-06-25** — useViewportBreakpoint in CohortImpactSection; font sizes increased at ≤1023px; **G3 Phase 3 layout gate CLEARED** |
+| #1253 | ux(zone-1d): DEMO6-040 PSP historical precedent anchor | G4 | Wave 2 | ✅ **MERGED PR #1300 2026-06-25** — getPspHistoricalAnalogue: CRITICAL→"Zambia 2015 ECF", WARNING→"Ghana 2014 ECF" |
+| #1239 | ux(zone-1b): DEMO6-010 inverted floor label — "above floor" when below | G4 | Wave 2 | ✅ **MERGED PR #1300 2026-06-25** — breaches_below propagated through RawCohortThresholdCrossing and parsedCrossings |
 | #1220 | fix(e2e): G3 spec AC-F1–AC-F7 soft-skip — NM-061 upstream | G5 | Wave 2 | Test infrastructure bug; milestone assigned 2026-06-25 |
 | #1214 | feat(observability): startup WARNING if simulation_entities empty | G5 | Wave 2 | NM-060 upstream; milestone assigned 2026-06-25 |
 | #1251 | ux(zone-1a): adaptive y-axis extension audit | G5 | Wave 2 | Capacity-allowing; `computeYDomain()` extension |
