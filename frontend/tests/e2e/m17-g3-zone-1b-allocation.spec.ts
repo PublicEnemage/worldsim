@@ -170,14 +170,15 @@ function makeMeasurementOutputMock(
         indicators: {},
         mda_alerts: [
           {
+            mda_id: "mda-reserve-coverage-001",
+            entity_id: "SEN",
             indicator_key: "reserve_coverage_months",
-            indicator_label: "Reserve coverage",
+            indicator_name: "Reserve coverage",
             severity: "CRITICAL",
-            value: "2.1",
-            unit: "months",
-            consecutive_steps: 4,
-            confidence_tier: 2,
-            source: "BCG 2023-Q4",
+            floor_value: "3.0",
+            current_value: "2.1",
+            approach_pct_remaining: "-0.30",
+            consecutive_breach_steps: 4,
           },
         ],
         has_below_floor_indicator: true,
@@ -456,12 +457,6 @@ test.describe("AC-A2: Overflow regression guard — 8+ crossings do not collapse
     page,
   }) => {
     if (!scenarioId) return;
-
-    // EX-002 (docs/compliance/exceptions.md): pre-implementation expected failure.
-    // This test is the regression guard — it MUST fail before G3 Phase 3 adds zone-1b-mda-panel-wrapper.
-    // REVERSAL: remove test.fail() in the Phase 3 implementation PR after confirming AC-A2 passes.
-    // See also NM-065 (docs/process/near-miss-registry.md).
-    test.fail();
 
     const sid = scenarioId;
 
@@ -753,9 +748,24 @@ test.describe("AC-P5: Persona 5 (Aicha) — MDA severity label visible at high c
       }),
     );
 
+    // ScenarioInstrumentCluster skips measurement-output at step 0 (no simulation output
+    // before the first advance). Mocking the advance endpoint lets the UI step to 1
+    // without consuming a real backend step, triggering the trajectory + measurement-output
+    // fetch chain that populates Zone 1B with MDA alerts and cohort crossing rows.
+    await page.route(`**/api/v1/scenarios/${sid}/advance`, (route) => {
+      if (route.request().method() !== "POST") { route.continue(); return; }
+      route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({ step_executed: 1, is_complete: false }),
+      });
+    });
+
     await page.setViewportSize({ width: 1280, height: 800 });
     await page.goto(`/?scenario=${encodeURIComponent(sid)}`);
     await waitForAppReady(page);
+    // Step to 1 so trajectory + measurement-output fetches fire (both skip at step 0).
+    await page.locator('[data-testid="advance-step-btn"]').click();
 
     const zone1b = page.locator('[data-testid="zone-1b"]');
     if (!(await zone1b.isVisible({ timeout: 8_000 }).catch(() => false))) return;
@@ -763,6 +773,15 @@ test.describe("AC-P5: Persona 5 (Aicha) — MDA severity label visible at high c
     // Guard: zone-1b-mda-panel-wrapper is new in G3
     const mdaPanel = page.locator('[data-testid="zone-1b-mda-panel-wrapper"]');
     if (!(await mdaPanel.isVisible({ timeout: 5_000 }).catch(() => false))) return;
+
+    // zone-1b-top-detail renders in two states:
+    //   null state  (no alerts): "No active threshold breaches." — always present at step 0
+    //   data state  (alerts loaded): TopAlertDetail — only after measurement-output fetch
+    // Wait for detail-indicator-name (only inside TopAlertDetail) to confirm data state
+    // before checking bounding box.  Without this, toBeVisible() resolves on the null-state
+    // div and boundingBox() fires during the React transition (element briefly disconnected).
+    const indicatorName = page.locator('[data-testid="detail-indicator-name"]');
+    await expect(indicatorName).toBeVisible({ timeout: 10_000 });
 
     // zone-1b-top-detail contains the MDA severity headline (indicator + severity + value)
     // Aicha's read requires this to be the primary visible element in Zone 1B
@@ -785,7 +804,6 @@ test.describe("AC-P5: Persona 5 (Aicha) — MDA severity label visible at high c
 
     // Aicha must be able to read the indicator name and floor-distance status without
     // analyst mediation — both must be visible within zone-1b-top-detail
-    const indicatorName = page.locator('[data-testid="detail-indicator-name"]');
     await expect(indicatorName).toBeVisible();
 
     const statusLabel = page.locator('[data-testid="detail-status"]');
@@ -842,9 +860,24 @@ test.describe("AC-P1: Persona 1 (Lucas) — cohort section visible with internal
       }),
     );
 
+    // ScenarioInstrumentCluster skips measurement-output at step 0 (no simulation output
+    // before the first advance). Mocking the advance endpoint lets the UI step to 1
+    // without consuming a real backend step, triggering the trajectory + measurement-output
+    // fetch chain that populates Zone 1B with cohort crossing rows.
+    await page.route(`**/api/v1/scenarios/${sid}/advance`, (route) => {
+      if (route.request().method() !== "POST") { route.continue(); return; }
+      route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({ step_executed: 1, is_complete: false }),
+      });
+    });
+
     await page.setViewportSize({ width: 1280, height: 800 });
     await page.goto(`/?scenario=${encodeURIComponent(sid)}`);
     await waitForAppReady(page);
+    // Step to 1 so trajectory + measurement-output fetches fire (both skip at step 0).
+    await page.locator('[data-testid="advance-step-btn"]').click();
 
     const zone1b = page.locator('[data-testid="zone-1b"]');
     if (!(await zone1b.isVisible({ timeout: 8_000 }).catch(() => false))) return;
