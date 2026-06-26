@@ -5,7 +5,7 @@ artifact: "Artifact 5 — GD Design Package (#1359)"
 issues:
   - "#1359 — Artifact 5: Scope Decision Document (EL gate)"
   - "#1354 — Control Plane Design Package (parent)"
-status: "EL-approved 2026-06-26"
+status: "EL-approved 2026-06-26 (Decisions 1–3); Decision 4 pending EL review (GrowthShock gap — post-panel escalation)"
 authored-by: PM Agent
 authored-date: 2026-06-26
 el-approved: "2026-06-26"
@@ -161,19 +161,123 @@ Won't Fix otherwise. AC-009 removed from CI permanently regardless of label.
 
 ---
 
+## Decision 4 — GrowthShock Taxonomy Gap (Post-Approval Escalation)
+
+**Post-approval escalation.** This decision was not raised during the panel deliberation
+for Decision 2. The six-type taxonomy was the input presented to the panel — the panel
+deliberated whether to include all six or a deferred subset, not whether the six were
+the right six. `GrowthShock` was absent, not considered and rejected.
+
+This gap was identified during GD design work following panel deliberation. It is
+escalated here as a Decision 4 amendment before ADR-019 authorship begins, so the
+ADR-019 author receives a complete scope specification rather than discovering the gap
+during drafting.
+
+**Question:** Should `GrowthShock` be added as a seventh shock type in the M18 Form 2
+shock taxonomy, or explicitly deferred with recorded rationale?
+
+---
+
+### Why GrowthShock was not in the original six
+
+The ADR-008 taxonomy was designed around systemic risk events: political instability
+(`ElectionShock`), financial attacks (`CurrencyAttack`, `CreditorDefection`), and
+exogenous destabilizers (`GeopoliticalShock`, `NaturalDisaster`, `ContagionShock`).
+All six model adverse shocks — events that put the system under stress.
+
+`GrowthShock` models a different category: a counter-hypothesis shock — what if the
+GDP growth rate departs from the projected baseline? This is not necessarily adverse;
+it models optimistic, pessimistic, or orthogonal growth scenarios. ADR-008 did not
+include it because ADR-008 addressed crisis-response modeling. Demo 7 exposes the gap:
+a primary demo narrative requires testing a growth counter-claim at the negotiating table.
+
+---
+
+### Demo 7 requirement — Artifact 3 Customer Agent finding
+
+The Artifact 3 Layer 3 assessment
+(`docs/ux/usability-sessions/synthesis/2026-06-26-control-plane-layer3-assessment.md`)
+identified `GrowthShock` as ESSENTIAL for Demo 7 Step 4 — the Troika rebuttal
+scenario: the opposing analyst claims "GDP rebound will protect bottom quintile."
+The ministry team's counter is to inject a GDP growth shock at the rebound step and
+observe whether the modeled rebound reaches the bottom quintile or is captured
+disproportionately by upper cohorts.
+
+Without `GrowthShock`, the analyst must use `fiscal_multiplier` as a proxy — a
+methodological compromise that a sophisticated opposing analyst (Persona 3) can
+challenge on the spot. The Demo 7 Step 4 argument is only cogent if the growth
+departure is modeled as what it is: a growth shock, not a fiscal lever.
+
+---
+
+### Architectural impact — additive, not re-architecting
+
+The deliberation record (CE Agent, Decision 2) specifies the shock injection endpoint
+as a discriminated union:
+
+```
+shock_type: enum[ElectionShock, CurrencyAttack, ...]
+parameters: {type-specific dict — validated against shock_type}
+inject_at_step: int
+```
+
+Adding `GrowthShock` is purely additive — new enum value, new parameter schema:
+
+| Parameter | Type | Notes |
+|---|---|---|
+| `growth_rate_delta` | `float` | Departure from baseline GDP growth rate. Positive = optimistic; negative = pessimistic. |
+| `duration_steps` | `int` | Steps the growth rate departure persists. |
+| `distribution_asymmetry` | `float` (optional, default `0.0`) | Cohort skew on growth landing. `0` = proportional; positive = upper-cohort skew; negative = lower-cohort skew. This parameter carries the Demo 7 Step 4 argument. |
+
+No data dependency beyond the scenario's existing cohort structure (already loaded with
+the scenario — same tier as `ElectionShock` per the CE Agent's Decision 2 parameter
+complexity table). No new database tables, no new reference data.
+
+The endpoint structure is unchanged. The discriminated union is already designed to
+accommodate additional types.
+
+---
+
+### Recommendation
+
+Add `GrowthShock` as the seventh type in the M18 Form 2 taxonomy. Rationale:
+
+1. **Demo 7 Step 4 cogency** — the Troika rebuttal argument is methodologically unsound
+   without a growth shock. A fiscal multiplier proxy is a kryptonite vector under
+   the scrutiny of a sophisticated opposing analyst (Persona 3).
+2. **Architecture is already extensible** — one new enum value and one parameter schema.
+   No re-architecture cost. This was the design intent of the discriminated union pattern.
+3. **No data dependency** — self-contained; no new reference tables or database schema
+   changes beyond what Decision 2 already mandates for `CreditorDefection` and
+   `ContagionShock`.
+4. **Taxonomy coherence** — extending from adverse-crisis shocks to counter-hypothesis
+   shocks is a natural capability extension, not a category change. The `distribution_asymmetry`
+   parameter makes `GrowthShock` analytically distinct from a fiscal lever: it directly
+   models the distributional question that is at the center of Demo 7 Step 4.
+
+**If EL defers:** Deferral must be recorded with explicit rationale (not "not in original
+scope" — that is the gap, not a rationale). If deferred, Demo 7 Step 4 requires a
+documented methodological workaround noting that `fiscal_multiplier` is used as a proxy
+and naming the analytical limitation this introduces.
+
+**EL decision:** ☐ Pending
+
+---
+
 ## Downstream Unblock Record
 
 On EL approval of this document, the following downstream actions unblock:
 
 | Action | Owner | Can begin |
 |---|---|---|
-| ADR-019 authorship | Architect Agent | Immediately after EL approval of this document, **provided Artifacts 2 (#1356) and 4 (#1358) are also on record** |
+| ADR-019 authorship | Architect Agent | After EL approval of Decisions 1–3 **and** Decision 4 — provided Artifacts 2 (#1356) and 4 (#1358) are also on record |
 | G4 sprint entry filing | PM Agent | After ADR-019 accepted (separate-session UX Designer sign-off, Tier 1, NM-042 compliance) |
 | EX-001 renewal suppressed | Compliance | No renewal required — EX-001 resolves at G4 exit per Decision 3 |
 
 **ADR-019 inputs from this document:**
 - §Decision 1 provides the Mode 2 column content specification (ADR-019 §Mode 2 state)
-- §Decision 2 provides the shock taxonomy scope (ADR-019 §Form 2 shock taxonomy)
+- §Decision 2 provides the shock taxonomy scope — six base types (ADR-019 §Form 2 shock taxonomy)
+- §Decision 4 provides the GrowthShock addition or explicit deferral (ADR-019 §Form 2 shock taxonomy must reflect whichever EL selects)
 - §Decision 3 provides the render optimization obligation and EX-001 exit condition
   (ADR-019 §G4 implementation obligations)
 
@@ -215,3 +319,23 @@ On EL approval of this document, the following downstream actions unblock:
 > (#1356) and 4 (#1358) being on record per §Downstream Unblock Record.
 >
 > — @PublicEnemage (2026-06-26)
+
+---
+
+## Decision 4 EL Approval Record
+
+**Filed:** 2026-06-26 (post-panel escalation)
+**EL decision pending.**
+
+> ☐ **Add GrowthShock as seventh type** — ADR-019 includes `GrowthShock` in the Form 2
+> shock taxonomy with parameter schema: `growth_rate_delta: float`,
+> `duration_steps: int`, `distribution_asymmetry: float (optional, default 0.0)`.
+> CE Agent parameter schema table updated accordingly. No additional sprint scope
+> change required — data dependency is self-contained (same tier as `ElectionShock`).
+>
+> ☐ **Defer GrowthShock** — ADR-019 notes explicit deferral with recorded rationale.
+> Demo 7 Step 4 methodology note required: analyst uses `fiscal_multiplier` as growth
+> proxy; limitation documented in the demo script and surfaced to the presenter as
+> a methodological caveat.
+>
+> — @PublicEnemage (date)
