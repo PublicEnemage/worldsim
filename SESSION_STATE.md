@@ -6,7 +6,7 @@
 > Historical state lives in `docs/process/session-archives/`.
 > Authority: `docs/process/sprint-group-isolation.md §SESSION_STATE.md Cockpit Card Protocol`.
 
-**Last updated:** 2026-06-26 (M18 kicked off — sprint plan EL-approved PR #1364; release/m18 cut at 151904d; G1+G2 sprint entries next)
+**Last updated:** 2026-06-26 (sprint plan EL approval recorded in sprint plan doc; G1+G2 sprint entries filed — awaiting separate EL approval; pre-wave GD+GR ready to begin)
 **Current milestone:** M18 — Full Argument and Demo 7 (GitHub Milestone 19)
 
 ---
@@ -20,9 +20,9 @@
 | Exit checklist issue | #1340 |
 | Release branch | ✅ `release/m18` — cut 2026-06-26 at commit 151904d |
 | Sprint plan | ✅ EL-approved 2026-06-26 — `docs/process/sprint-plans/m18-sprint-plan.md` (PR #1364) |
-| Active wave | Pre-wave (GD + GR may begin; Wave 1 entries pending) |
-| Active sprint groups | None — G1+G2 sprint entries not yet filed |
-| Active sprint journal issues | None |
+| Active wave | Pre-wave — GD (#1354) and GR (#1352) may begin now; Wave 1 G1+G2 entries filed, awaiting EL approval |
+| Active sprint groups | G1 (#1367) and G2 (#1368) — entries filed, EL approval pending; GD and GR pre-wave (no entries required) |
+| Active sprint journal issues | #1367 (G1 — CI Bands Zone 1A), #1368 (G2 — PSP Decomposition) |
 
 ---
 
