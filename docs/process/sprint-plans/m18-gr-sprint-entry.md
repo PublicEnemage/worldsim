@@ -3,17 +3,17 @@ name: m18-gr-sprint-entry
 type: sprint-entry
 milestone: M18 — Full Argument and Demo 7
 sprint-group: GR — Requirements Phase for Counter-Scenario Comparison
-status: Filed — awaiting EL approval
+status: EL-approved 2026-06-26
 authored-by: PM Agent
 authored-date: 2026-06-26
-el-approved: false
+el-approved: 2026-06-26
 release-branch: release/m18
 sop-reference: docs/process/sprint-planning-sop.md
 ---
 
 # Sprint Entry — M18, GR: Requirements Phase for Counter-Scenario Comparison
 
-**Status:** Filed — awaiting EL approval before GR phase output is treated as entry-gate-complete for G3
+**Status:** EL-approved 2026-06-26
 **Date authored:** 2026-06-26
 **Release branch:** `release/m18`
 **Sprint plan:** `docs/process/sprint-plans/m18-sprint-plan.md` (EL-approved 2026-06-26, PR #1364)
@@ -196,7 +196,7 @@ GR's output is a downstream dependency for G3 (G3 sprint entry requires all thre
 
 ## EL Approval Record
 
-**EL approval:** Pending
+**EL approval:** 2026-06-26
 
-> {EL approval statement — GR phase may proceed; artifact PRs may target release/m18 directly}
-> — @PublicEnemage ({date})
+> Approved: GR requirements phase as filed. The three activation calls in §4 may be issued. All three artifacts (UX journey, Customer Agent Layer 3, BPO business requirements) must be on record and PM Agent must record close confirmation on #1352 before G3 sprint entry is filed. GR close does not trigger G3 implementation — Architect ADR determination is still required at G3 sprint entry.
+> — @PublicEnemage (2026-06-26)
