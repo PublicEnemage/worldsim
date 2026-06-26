@@ -3,17 +3,17 @@ name: m17-g6-sprint-entry
 type: sprint-entry
 milestone: M17 — Calibration and Comparative Infrastructure
 sprint-group: G6 — Process and Transparency Documents
-status: Awaiting EL approval — implementation blocked
+status: EL Approved 2026-06-26 — implementation may begin on #1276 and #1277
 authored-by: PM Agent
 authored-date: 2026-06-26
-el-approved: pending
+el-approved: 2026-06-26
 release-branch: release/m17
 sop-reference: docs/process/sprint-planning-sop.md
 ---
 
 # Sprint Entry — M17, G6: Process and Transparency Documents
 
-**Status:** Awaiting EL approval — implementation blocked
+**Status:** EL Approved 2026-06-26 — implementation may begin on #1276 and #1277
 **Date authored:** 2026-06-26
 **Release branch:** `release/m17`
 **Sprint plan:** `docs/process/sprint-plans/m17-sprint-plan.md` (EL Approved 2026-06-25)
