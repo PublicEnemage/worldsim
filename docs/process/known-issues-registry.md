@@ -388,6 +388,92 @@ EX-001 (docs/compliance/exceptions.md): threshold exception active through M17 e
 
 ---
 
+## KI-007 — GitHub GraphQL API: Personal token rate limit (5,000 req/hr) exhausted by concurrent sprint sessions
+
+**Date first observed:** 2026-06-18
+**Infrastructure:** GitHub GraphQL API (personal access token quota, shared across all `gh` CLI calls in a session)
+**Severity:** Medium — `gh pr create` and CI polling calls fail with "API rate limit already exceeded"; sprint sessions must wait up to 60 minutes for quota reset or switch to REST workarounds mid-session
+**Recurrence:** Consistent — reproducible when ≥ 3 concurrent sprint group sessions make GraphQL-heavy `gh` CLI calls in the same clock hour
+
+### Symptom
+
+`gh pr create` or `gh pr checks` fails with:
+
+```
+GraphQL: API rate limit already exceeded for user ID 140208420.
+gh: API rate limit already exceeded for user ID 140208420.
+```
+
+The GitHub GraphQL API enforces a limit of 5,000 requests per hour per authenticated
+personal access token. The `gh` CLI uses GraphQL internally for `gh pr create`,
+`gh pr checks`, `gh pr merge`, and `gh issue create`. During periods of parallel sprint
+group activity (≥ 3 concurrent groups each polling CI and opening PRs), the cumulative
+call volume exhausts this quota within a single clock hour.
+
+First confirmed in session logs from 2026-06-18 (M14 G6a/G6b/G6c parallel sprint exits):
+35+ rate limit errors across a single day, with sessions blocked for up to 14 minutes
+awaiting reset.
+
+### Trigger condition
+
+Multiple concurrent Claude Code sprint sessions each running:
+- `gh pr create` (1 GraphQL call per invocation — `gh` uses GraphQL for PR creation)
+- CI polling via `gh pr checks <number>` (1+ GraphQL calls per poll, repeated every
+  30 seconds for the duration of CI runs of 3–7 minutes each)
+- `gh issue create`, `gh issue comment`, `gh pr view` (additional GraphQL calls)
+
+With 3–4 parallel sprint groups each running 2–3 PRs per session, the polling loops
+alone can consume several hundred calls per hour. High-frequency CI polling is the
+primary driver.
+
+### Workaround (pre-M18 protocol)
+
+Replace GraphQL-heavy operations with REST equivalents, which do not count against
+the 5,000/hr GraphQL quota:
+
+**PR creation (REST instead of GraphQL):**
+```bash
+gh api repos/PublicEnemage/worldsim/pulls \
+  --method POST \
+  --field title="<title>" \
+  --field body="<body>" \
+  --field head="<branch>" \
+  --field base="release/m{N}" \
+  --jq '.html_url'
+```
+
+**CI status check (REST instead of GraphQL polling):**
+```bash
+gh api repos/PublicEnemage/worldsim/commits/<sha>/check-runs \
+  --jq '[.check_runs[] | {name, status, conclusion}]'
+```
+
+### Permanent mitigation (M18 CLAUDE.md update)
+
+The M18 `CLAUDE.md §Release Branch Workflow` update replaces the CI polling
+loop with two patterns that eliminate high-frequency GraphQL consumption:
+
+1. **`gh pr merge <number> --merge --auto`** — set immediately after PR creation.
+   GitHub monitors CI server-side and merges when all checks pass. Zero ongoing
+   API calls from the agent. REST, not GraphQL.
+
+2. **`gh run watch <run-id> --exit-status`** — when real-time CI observation is
+   needed. Opens a single streaming connection; exits on completion. One connection,
+   not a polling loop.
+
+With these patterns in place, GraphQL calls are limited to low-frequency operations
+(PR creation fallback, issue management) and the 5,000/hr limit is not approached
+under normal sprint workloads.
+
+### Upstream
+
+No upstream issue filed. The 5,000 GraphQL requests/hour limit is GitHub's documented
+rate limit for authenticated personal access tokens. It is not configurable at the
+free tier. The mitigation is to use REST endpoints and streaming alternatives that
+do not consume GraphQL quota.
+
+---
+
 ## KI-NNN — [Infrastructure]: [Short description]
 
 **Date first observed:** YYYY-MM-DD
