@@ -81,6 +81,10 @@ async function waitForAppReady(page: import("@playwright/test").Page): Promise<v
  *
  * Synthetic SEN initial attributes (Tier 3 — CE Assessment Decision 3).
  * Fires gdp_growth_change at step 1 to trigger DemographicModule elasticity path.
+ * CM-certified parameters (2026-06-26): magnitude="-0.15" (15% GDP contraction), start_date="2025-01-01".
+ * Δ = 0.15 × Q1-informal-elasticity(0.20) = 0.030; poverty 0.38 + 0.030 = 0.410 ≥ Q1_MDA_FLOOR(0.40).
+ * Crossing at step 2 (year 2025) — satisfies AC-F3/AC-CM-2 year anchor 2025–2050 constraint.
+ * Prior magnitude "-0.04" was too small (Δ=0.008 → 0.388 < 0.40); soft-skip guards masked this.
  */
 async function createSen100StepScenario(): Promise<string | null> {
   const createRes = await fetch(`${API_BASE}/scenarios`, {
@@ -93,7 +97,7 @@ async function createSen100StepScenario(): Promise<string | null> {
         n_steps: 8,
         projection_steps: 100,
         timestep_label: "quarterly",
-        start_date: "2024-01-01",
+        start_date: "2025-01-01",
         initial_attributes: {
           SEN: {
             poverty_headcount_ratio: {
@@ -126,7 +130,7 @@ async function createSen100StepScenario(): Promise<string | null> {
         },
       },
       scheduled_inputs: [
-        { step: 1, input_type: "gdp_growth_change", input_data: { magnitude: "-0.04" } },
+        { step: 1, input_type: "gdp_growth_change", input_data: { magnitude: "-0.15" } },
       ],
     }),
   });
