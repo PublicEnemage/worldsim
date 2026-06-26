@@ -3,17 +3,17 @@ name: m18-gd-sprint-entry
 type: sprint-entry
 milestone: M18 — Full Argument and Demo 7
 sprint-group: GD
-status: Filed — coordination artifact; GD Phase 1 authorized to begin immediately per sprint plan EL approval
+status: EL-approved 2026-06-26
 authored-by: PM Agent
 authored-date: 2026-06-26
-el-approved: false
+el-approved: 2026-06-26
 release-branch: release/m18
 sop-reference: docs/process/sprint-planning-sop.md
 ---
 
 # Sprint Entry — M18, GD: Control Plane Design Package
 
-**Status:** Filed — coordination artifact (see SOP exception note below)
+**Status:** EL-approved 2026-06-26
 **Date authored:** 2026-06-26
 **Release branch:** `release/m18`
 **Sprint plan:** `docs/process/sprint-plans/m18-sprint-plan.md` (EL-approved 2026-06-26, PR #1364)
@@ -220,9 +220,9 @@ GD writes to documentation files only. No conflict risk with G1 (TrajectoryView.
 
 ## EL Approval Record
 
-**EL approval:** Pending — acknowledgment of coordination artifact
+**EL approval:** 2026-06-26
 
 *Per sprint plan §Sprint Entry Gate Requirements, EL approval of this document is not a gate for GD Phase 1 — the sprint plan EL approval (PR #1364, 2026-06-26) already authorizes all GD phases to begin. The binding EL gate for GD is Artifact 5 (#1359) approval. This record acknowledges the scope as filed.*
 
-> {EL acknowledgment — or "Acknowledged: GD scope and phase sequencing as filed. GD Phase 1 (#1355 + #1357) may proceed."}
-> — @PublicEnemage ({date})
+> Acknowledged: GD scope and phase sequencing as filed. GD Phase 1 (#1355 + #1357) may proceed. Phase 2 opens after Artifact 1 complete. Binding EL gate is Artifact 5 (#1359) — no G4 sprint entry may open until Artifact 5 is approved.
+> — @PublicEnemage (2026-06-26)
