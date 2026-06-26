@@ -455,6 +455,23 @@ export function FourFrameworkZone1D({
         );
       })}
 
+      {/* #1276 — Governance horizon disclosure (No False Precision; Placement A — always visible). */}
+      <div
+        data-testid="governance-horizon-disclosure"
+        style={{
+          fontSize: 8,
+          color: "#888",
+          lineHeight: 1.4,
+          paddingTop: 3,
+          paddingLeft: 9,
+          fontStyle: "italic",
+        }}
+      >
+        Governance indicators (rule of law, democratic quality) respond to fiscal adjustment over
+        3–6 year horizons in this model&apos;s calibration. An 8-step quarterly window captures the
+        beginning of the governance stress trajectory; full divergence requires a 12–24 step analysis.
+      </div>
+
       {/* M16-G2 #987 — Political Risk sub-section (replaces G1 political economy elements).
           Visible when PE enabled; shows structured severity-labeled summary for Persona 3.
           Empty state shown when PE is disabled. G1 testids fully retired (DD-016). */}
