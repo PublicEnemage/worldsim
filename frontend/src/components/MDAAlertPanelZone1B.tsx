@@ -21,6 +21,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useScenarioStepStore, type Zone1BAlert, type CohortThresholdCrossing } from "../store/scenarioStepStore";
 import { getIndicatorDisplayNameAny, getIndicatorAbbreviation } from "../lib/indicatorDisplayNames";
+import { useViewportBreakpoint } from "./InstrumentCluster";
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -701,6 +702,8 @@ const COHORT_SEVERITY_COLOR: Record<CohortThresholdCrossing["severity"], string>
 
 export function CohortImpactSection({ isCompleted = false }: { isCompleted?: boolean }) {
   const { cohort_threshold_crossings: crossings } = useScenarioStepStore();
+  const bp = useViewportBreakpoint();
+  const isNarrow = bp === 1024; // covers all viewports < 1280px, including 768px (#1250)
   const headerLabel = isCompleted ? "COHORT IMPACT (HISTORICAL)" : "COHORT IMPACT";
   const emptyText = isCompleted
     ? "No cohort threshold crossings at or before this step."
@@ -756,10 +759,10 @@ export function CohortImpactSection({ isCompleted = false }: { isCompleted?: boo
                 paddingTop: 2,
                 paddingBottom: 2,
                 marginBottom: 2,
-                fontSize: 10,
+                fontSize: isNarrow ? 11 : 10,
               }}
             >
-              <span style={{ color, fontWeight: 700, flexShrink: 0, fontSize: 9 }}>
+              <span style={{ color, fontWeight: 700, flexShrink: 0, fontSize: isNarrow ? 10 : 9 }}>
                 {crossing.severity}
               </span>
               <span style={{ color: "#333", lineHeight: 1.3, flex: 1, minWidth: 0 }}>
@@ -781,7 +784,7 @@ export function CohortImpactSection({ isCompleted = false }: { isCompleted?: boo
                 <span
                   data-testid={`cohort-tier-badge-${crossing.indicator_key}`}
                   style={{
-                    fontSize: 8,
+                    fontSize: isNarrow ? 10 : 8,
                     fontWeight: 700,
                     color: isSad ? "#7a0000" : "#005a9e",
                     background: isSad ? "#ffe0e0" : "#e0eeff",
@@ -794,7 +797,7 @@ export function CohortImpactSection({ isCompleted = false }: { isCompleted?: boo
                 </span>
                 <span
                   data-testid="confidence-tier-badge-sublabel"
-                  style={{ fontSize: 7, color: '#6b7280', fontWeight: 400, lineHeight: 1, whiteSpace: 'nowrap' }}
+                  style={{ fontSize: isNarrow ? 9 : 7, color: '#6b7280', fontWeight: 400, lineHeight: 1, whiteSpace: 'nowrap' }}
                 >
                   {isSad ? "No primary data" : badgeText === "T4" ? "Model est." : "Inferred"}
                 </span>

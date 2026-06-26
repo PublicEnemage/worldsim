@@ -561,6 +561,32 @@ function CompositeChartSVG({
           </text>
         );
       })}
+
+      {/* Terminal entity labels — #1249 Zone 1A curve identifiability (DEMO6-014) */}
+      {entityCodes.map((code, i) => {
+        const active = activeTrajectories[code];
+        if (!active || active.steps.length === 0) return null;
+        const lastStep = active.steps[active.steps.length - 1];
+        const lastScore = computeEntityCompositeScore(lastStep);
+        if (lastScore === null) return null;
+        const color = ENTITY_PALETTE[i % ENTITY_PALETTE.length];
+        const x = xScale(lastStep.step_index);
+        const y = yScale(lastScore);
+        return (
+          <text
+            key={`terminal-label-${code}`}
+            data-testid={`zone-1a-terminal-label-${code}`}
+            x={x + 3}
+            y={y - 7}
+            fontSize={8}
+            fontWeight="bold"
+            fill={color}
+            dominantBaseline="auto"
+          >
+            {code}
+          </text>
+        );
+      })}
     </svg>
   );
 }

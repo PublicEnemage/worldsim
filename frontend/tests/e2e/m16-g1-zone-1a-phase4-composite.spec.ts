@@ -1079,12 +1079,16 @@ test.describe("AC-7/8/9/10: Zone 1D PSP severity row and political risk annotati
     const text = await analogue.textContent() ?? "";
     expect(text.trim().length).toBeGreaterThan(10); // meaningful sentence, not empty or trivial
 
-    // Must contain language about programme risk — "steps", "abandonment", "discontinuation", or "risk"
+    // Must contain language about programme risk — "steps", "abandonment", "discontinuation", "risk",
+    // "abandoned", or "ecf" (#1253: CRITICAL/WARNING texts updated to named programme references)
     const hasRiskLanguage =
       text.toLowerCase().includes("steps") ||
       text.toLowerCase().includes("abandonment") ||
+      text.toLowerCase().includes("discontinued") ||
       text.toLowerCase().includes("discontinuation") ||
-      text.toLowerCase().includes("risk");
+      text.toLowerCase().includes("risk") ||
+      text.toLowerCase().includes("abandoned") ||
+      text.toLowerCase().includes("ecf");
     expect(hasRiskLanguage).toBe(true);
   });
 
