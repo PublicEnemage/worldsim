@@ -9,6 +9,7 @@ deferred until authentication is introduced in Milestone 3.
 """
 from __future__ import annotations
 
+import logging
 import sys
 
 if sys.version_info < (3, 13):  # noqa: UP036 — operational guard for stale Docker images
@@ -23,6 +24,8 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import AsyncGenerator
 
+    import asyncpg
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -31,7 +34,24 @@ from app.api.grounding import router as grounding_router
 from app.api.health import router as health_router
 from app.api.scenarios import router as scenarios_router
 from app.api.sessions import router as sessions_router
-from app.db.connection import close_asyncpg_pool, create_asyncpg_pool
+from app.db.connection import close_asyncpg_pool, create_asyncpg_pool, get_asyncpg_pool
+
+logger = logging.getLogger(__name__)
+
+
+async def _check_startup_entities(pool: asyncpg.Pool) -> None:
+    """Emit a WARNING if simulation_entities is empty at startup.
+
+    NM-060: an empty entity table produces silent 422s on scenario creation.
+    This diagnostic surfaces the gap immediately in startup logs so developers
+    can self-diagnose without source inspection.
+    """
+    count: int = await pool.fetchval("SELECT COUNT(*) FROM simulation_entities")
+    if count == 0:
+        logger.warning(
+            "simulation_entities is empty — run: "
+            "python -m app.db.seed.natural_earth_loader"
+        )
 
 
 @asynccontextmanager
@@ -42,6 +62,7 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     The pool is shared across all request handlers per ADR-003 Decision 2.
     """
     await create_asyncpg_pool()
+    await _check_startup_entities(get_asyncpg_pool())
     yield
     await close_asyncpg_pool()
 
