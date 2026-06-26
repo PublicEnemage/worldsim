@@ -3,7 +3,7 @@ name: m17-g2-sprint-entry
 type: sprint-entry
 milestone: M17 — Calibration and Comparative Infrastructure
 sprint-group: G2 (Phase 3 — Implementation)
-status: EL Approved — 2026-06-25; implementation may begin once #1249 merges to release/m17
+status: EL Approved — 2026-06-25; implementation UNBLOCKED 2026-06-25 (#1249 merged PR #1300)
 authored-by: PM Agent
 authored-date: 2026-06-25
 el-approved: 2026-06-25
@@ -13,7 +13,7 @@ sop-reference: docs/process/sprint-planning-sop.md
 
 # Sprint Entry — M17, G2: Multi-Scenario Design Sprint (Phase 3 Implementation)
 
-**Status:** EL Approved — 2026-06-25. Implementation may begin once #1249 is merged to `release/m17` (hard gate on implementation PR).
+**Status:** EL Approved + Implementation UNBLOCKED — 2026-06-25. #1249 merged to `release/m17` (PR #1300 2026-06-25). Cut `feat/m17-g2-multi-scenario` from `release/m17` to begin Phase 3 implementation.
 **Date authored:** 2026-06-25
 **Release branch:** `release/m17`
 **Sprint plan:** `docs/process/sprint-plans/m17-sprint-plan.md` (EL Approved 2026-06-25)
@@ -45,7 +45,7 @@ on this entry document's filing.*
 | ADR gate | **PENDING** — Architect determines at Phase 2 completion (see §2.2) |
 | Implementing agent | Frontend Engineer + QA Lead; Architect consults on N>2 rendering path |
 | Wave | Wave 2 (gated on Wave 1 exit ✅ confirmed 2026-06-25) |
-| Phase 3 implementation gate | **#1249 merged to `release/m17`** before implementation PR opens (FA constraint) |
+| Phase 3 implementation gate | **✅ CLEARED 2026-06-25** — #1249 merged to `release/m17` (PR #1300); implementation PR may now open |
 
 **Phase 1 and Phase 2 prerequisite summary (must be complete before this entry can be EL-approved):**
 
@@ -57,7 +57,7 @@ on this entry document's filing.*
 | G2 Phase 2 complete: Architect assesses ARCH-REVIEW-007 with UX in hand; ADR determination | Architect + Frontend Architect | ✅ COMPLETE 2026-06-25 — PR #1280 merged; `ARCH-REVIEW-007-m17-n3-assessment.md`; ADR determination option (b): review note on #394 sufficient; no new ADR |
 | Intent document filed for #394 implementation (must reference approved mockups) | PM Agent + UX Designer | ✅ FILED 2026-06-25 — `docs/process/intents/M17-G2-2026-06-25-multi-scenario-comparison.md` (PR #1289) |
 | QA test file authored before implementation begins | QA Lead | ✅ FILED 2026-06-25 — `frontend/tests/e2e/m17-g2-multi-scenario-comparison.spec.ts`; AC-S1/A1/B1/D1/P1/P3/P5 asserted (PR #1289) |
-| #1249 merged to `release/m17` | G4 sprint group | ⬜ PENDING G4 |
+| #1249 merged to `release/m17` | G4 sprint group | ✅ MERGED PR #1300 2026-06-25 — terminal endpoint labels in CompositeChartSVG; N=3 compatible |
 
 ---
 

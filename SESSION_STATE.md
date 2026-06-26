@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-25 (G2 sprint entry EL APPROVED — implementation may begin once #1249 merges to release/m17; G3 early QA PR #1290 open — EL admin merge required)**
+**Last updated: 2026-06-26 (G4 COMPLETE PR #1300; G2 Phase 3 FULLY UNBLOCKED — EL approved + #1249 gate cleared; G3 Phase 3 gated on EL sprint entry approval; G3 early QA PR #1301 merged; PR #1290 closed)**
 **Current milestone:** M17 — Calibration and Comparative Infrastructure (GitHub Milestone 18)
 **Previous milestone:** M16 — Distributional Visibility (FORMALLY CLOSED 2026-06-25; release/m16 → main; v0.16.0; #985 closed; GitHub Milestone 17 closed)
 
@@ -41,12 +41,12 @@
 | #982 | M17 Exit Checklist — blocks milestone closure | — | — | `immediate \| M17 gate issue` |
 | #1229 | feat(simulation): fiscal-to-cohort elasticity calibration — ELASTICITY_REGISTRY | G1 | Wave 1 | ✅ BPO ACCEPT 2026-06-25 — PR #1270 merged; FRAME-D tests pass; CM-certified constants on release/m17; sprint exit confirmed |
 | #1248 | feat(simulation): governance sensitivity calibration — GovernanceModule fiscal conditionality | G1 | Wave 1 | ✅ BPO ACCEPT 2026-06-25 (Wave 1 spec) — governance sensitivity spec filed (PR #1270); three CM positions on record; sprint exit confirmed; Wave 2 code changes gated on data preconditions |
-| #394 | feat: multi-scenario comparison (>2 scenarios) | G2 | Wave 2 | **G2 sprint entry EL APPROVED 2026-06-25** (`el-approved: 2026-06-25`; PR #1298). All §2.1–§2.5 satisfied. **Phase 3 implementation gate: #1249 must merge to `release/m17` before implementation PR opens** (FA hard gate — not blocked by this approval). |
-| #1252 | arch(zone-1b): Zone 1B proportional allocation — MDA alert vs cohort sections | G3 | Wave 2 | **Phase 1 BPO ACCEPTED + Phase 2 ADR-018 ACCEPTED 2026-06-25** — PR #1291 merged; ARCH-012 → ADR-018; [ADR-VALUE]=80px (all breakpoints); G2 compatible; minHeight:80px superseded; G3 sprint entry gate: QA✅ (early-filed PR #1290 — playwright failing intentionally on AC-A2); EL sprint entry approval PENDING; #1250 merge gate PENDING |
-| #1249 | ux(zone-1a): DEMO6-014 curve identifiability | G4 | Wave 2 | **DEMO6 CRITICAL**; required before live demo session |
-| #1250 | ux(zone-1b): DEMO6-026/043 tablet legibility at 768px | G4 | Wave 2 | **DEMO6 CRITICAL**; required before live demo session |
-| #1253 | ux(zone-1d): DEMO6-040 PSP historical precedent anchor | G4 | Wave 2 | **DEMO6 CRITICAL**; required before live demo session |
-| #1239 | ux(zone-1b): DEMO6-010 inverted floor label — "above floor" when below | G4 | Wave 2 | UI bug; milestone assigned 2026-06-25 |
+| #394 | feat: multi-scenario comparison (>2 scenarios) | G2 | Wave 2 | **G2 Phase 3 IMPLEMENTATION UNBLOCKED 2026-06-25** — EL approved (PR #1298) + #1249 merged (PR #1300). Cut `feat/m17-g2-multi-scenario` from `release/m17` to begin. Sprint entry: `docs/process/sprint-plans/m17-g2-sprint-entry.md` (`el-approved: 2026-06-25`; gate cleared). |
+| #1252 | arch(zone-1b): Zone 1B proportional allocation — MDA alert vs cohort sections | G3 | Wave 2 | **Phase 1 BPO ACCEPTED + Phase 2 ADR-018 ACCEPTED 2026-06-25** — PR #1291 merged; ARCH-012 → ADR-018; [ADR-VALUE]=80px (all breakpoints); G3 sprint entry gate: QA✅ (PR #1301 merged — AC-A2 test.fail() EX-002 NM-065; testid reconciled); **#1250 merge gate CLEARED** (PR #1300); **EL sprint entry approval PENDING** |
+| #1249 | ux(zone-1a): DEMO6-014 curve identifiability | G4 | Wave 2 | ✅ **MERGED PR #1300 2026-06-25** — terminal endpoint labels in CompositeChartSVG; N=3 compatible; **G2 Phase 3 implementation gate CLEARED** |
+| #1250 | ux(zone-1b): DEMO6-026/043 tablet legibility at 768px | G4 | Wave 2 | ✅ **MERGED PR #1300 2026-06-25** — useViewportBreakpoint in CohortImpactSection; font sizes increased at ≤1023px; **G3 Phase 3 layout gate CLEARED** |
+| #1253 | ux(zone-1d): DEMO6-040 PSP historical precedent anchor | G4 | Wave 2 | ✅ **MERGED PR #1300 2026-06-25** — getPspHistoricalAnalogue: CRITICAL→"Zambia 2015 ECF", WARNING→"Ghana 2014 ECF" |
+| #1239 | ux(zone-1b): DEMO6-010 inverted floor label — "above floor" when below | G4 | Wave 2 | ✅ **MERGED PR #1300 2026-06-25** — breaches_below propagated through RawCohortThresholdCrossing and parsedCrossings |
 | #1220 | fix(e2e): G3 spec AC-F1–AC-F7 soft-skip — NM-061 upstream | G5 | Wave 2 | Test infrastructure bug; milestone assigned 2026-06-25; **Sprint entry EL APPROVED 2026-06-25** — `docs/process/sprint-plans/m17-g5-sprint-entry.md`; implementation may begin |
 | #1214 | feat(observability): startup WARNING if simulation_entities empty | G5 | Wave 2 | NM-060 upstream; milestone assigned 2026-06-25; **Sprint entry EL APPROVED 2026-06-25** |
 | #1251 | ux(zone-1a): adaptive y-axis extension audit | G5 | Wave 2 | Capacity-allowing; `computeYDomain()` extension; **Sprint entry EL APPROVED 2026-06-25** |
