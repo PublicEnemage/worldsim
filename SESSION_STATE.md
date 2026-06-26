@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-26 (G3 BPO ACCEPT + sprint exit CONFIRMED — PR #1313 Zone 1B proportional allocation merged; #1252 ACCEPT; AC-A1/A2/A3/A4/P5/P1 all hard-asserted in CI; north star PASS; EX-002 reversal confirmed; sprint exit doc filed; G3 Phase 3 CLOSED)**
+**Last updated: 2026-06-26 (G5 sprint exit CONFIRMED — #1220/#1214/#1251 all merged + closed; CI green; BPO ACCEPT #1251; [step N] milestone sentence template fix; CM-certified scenario params; sprint exit doc filed)**
 **Current milestone:** M17 — Calibration and Comparative Infrastructure (GitHub Milestone 18)
 **Previous milestone:** M16 — Distributional Visibility (FORMALLY CLOSED 2026-06-25; release/m16 → main; v0.16.0; #985 closed; GitHub Milestone 17 closed)
 
@@ -47,9 +47,9 @@
 | #1250 | ux(zone-1b): DEMO6-026/043 tablet legibility at 768px | G4 | Wave 2 | ✅ **BPO ACCEPT 2026-06-26** — PR #1300 merged; CA Layer 3 PASS; G4 sprint exit CONFIRMED; G3 Phase 3 gate CLEARED |
 | #1253 | ux(zone-1d): DEMO6-040 PSP historical precedent anchor | G4 | Wave 2 | ✅ **BPO ACCEPT 2026-06-26** — PR #1300 merged; CA Layer 3 PASS; G4 sprint exit CONFIRMED |
 | #1239 | ux(zone-1b): DEMO6-010 inverted floor label — "above floor" when below | G4 | Wave 2 | ✅ **BPO ACCEPT 2026-06-26** — PR #1300 merged; CA Layer 3 PASS; G4 sprint exit CONFIRMED |
-| #1220 | fix(e2e): G3 spec AC-F1–AC-F7 soft-skip — NM-061 upstream | G5 | Wave 2 | Test infrastructure bug; milestone assigned 2026-06-25; **Sprint entry EL APPROVED 2026-06-25** — `docs/process/sprint-plans/m17-g5-sprint-entry.md`; implementation may begin |
-| #1214 | feat(observability): startup WARNING if simulation_entities empty | G5 | Wave 2 | NM-060 upstream; milestone assigned 2026-06-25; **Sprint entry EL APPROVED 2026-06-25** |
-| #1251 | ux(zone-1a): adaptive y-axis extension audit | G5 | Wave 2 | **✅ MERGED PR #1315 2026-06-26** — MDA floor values included in CompositeChartSVG yDomain useMemo; AC-1251-1/2 unit tests + AC-1251-3/R E2E spec; build clean (619 modules, 0 TS errors); CI green; BPO acceptance pending |
+| #1220 | fix(e2e): G3 spec AC-F1–AC-F7 soft-skip — NM-061 upstream | G5 | Wave 2 | ✅ **BPO N/A (infrastructure)** — PR #1319 merged 2026-06-26; AC-F3/AC-CM-2 fixed via CM-certified params (magnitude −0.15, start_date 2025-01-01) + [step N] template fix in HumanCapitalTrajectoryPanel.tsx; CI green; **CLOSED** |
+| #1214 | feat(observability): startup WARNING if simulation_entities empty | G5 | Wave 2 | ✅ **BPO N/A (infrastructure)** — PR #1318 merged 2026-06-25; _check_startup_entities() in lifespan(); AC-1214-1/2/R green; **CLOSED** |
+| #1251 | ux(zone-1a): adaptive y-axis extension audit | G5 | Wave 2 | ✅ **BPO ACCEPT 2026-06-25** — PR #1315 merged 2026-06-25; MDA floor values in CompositeChartSVG yDomain; AC-1251-1/2/3/R green; north star PASS; kryptonite-negative; G5 sprint exit CONFIRMED; **CLOSED** |
 | #1275 | feat(simulation): seed SEN institutional_capacity_index + GovernanceElasticity fiscal conditionality entry | Wave 2 (unassigned G-group) | Wave 2 | From CM governance spec Q2; co-gated: data seed + elasticity entry in same PR |
 | #1276 | docs(zone-1d): governance horizon disclosure — divergence is ≥12-step signal | Wave 2 (unassigned G-group) | Wave 2 | From CM governance spec Q3; doc/UI text only; no code change |
 | #1277 | docs(process): sprint-planning-sop.md amendment — UX/UI design artifact gate | Wave 2 (unassigned G-group) | Wave 2 | Promoted from insights log entry 13; G2 §2.5 pattern → SOP |
@@ -60,6 +60,8 @@
 **M17 sprint plan:** `docs/process/sprint-plans/m17-sprint-plan.md` — filed 2026-06-25 (v3, EL-directed revisions); **EL APPROVED 2026-06-25**
 
 **G4 sprint exit:** ✅ CONFIRMED 2026-06-26 — `docs/process/sprint-plans/m17-g4-sprint-exit.md`; all four DEMO6 CRITICAL issues BPO ACCEPT; CA Layer 3 PASS all four; North Star PASS; PI Agent confirmed; G2 Phase 3 + G3 Phase 3 gates cleared
+
+**G5 sprint exit:** ✅ CONFIRMED 2026-06-26 — `docs/process/sprint-plans/m17-g5-sprint-exit.md`; #1251 BPO ACCEPT (adaptive y-axis, zone 1A, north star PASS, kryptonite-negative); #1214 + #1220 infrastructure-exempt; CM-certified scenario parameters (magnitude −0.15, start_date 2025-01-01) + [step N] milestone sentence template gap fixed as part of soft-skip remediation; all three issues CLOSED; PI Agent confirmed
 
 ---
 
