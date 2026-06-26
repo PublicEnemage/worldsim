@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-26 (G5 implementation MERGED — PR #1315; #1251 adaptive y-axis extension; MDA floor values included in computeYDomain call site; AC-1251-1/2 unit tests + AC-1251-3/R E2E spec; build clean; CI green; autonomous merge)**
+**Last updated: 2026-06-26 (G2 BPO ACCEPT + sprint exit CONFIRMED — PR #1314 App.tsx wiring merged; #394 closed; AC-S1/A1/B1/D1/P5/P1/P3 all hard-asserted in CI; north star PASS; sprint exit doc filed; G2 Phase 3 CLOSED)**
 **Current milestone:** M17 — Calibration and Comparative Infrastructure (GitHub Milestone 18)
 **Previous milestone:** M16 — Distributional Visibility (FORMALLY CLOSED 2026-06-25; release/m16 → main; v0.16.0; #985 closed; GitHub Milestone 17 closed)
 
@@ -41,7 +41,7 @@
 | #982 | M17 Exit Checklist — blocks milestone closure | — | — | `immediate \| M17 gate issue` |
 | #1229 | feat(simulation): fiscal-to-cohort elasticity calibration — ELASTICITY_REGISTRY | G1 | Wave 1 | ✅ BPO ACCEPT 2026-06-25 — PR #1270 merged; FRAME-D tests pass; CM-certified constants on release/m17; sprint exit confirmed |
 | #1248 | feat(simulation): governance sensitivity calibration — GovernanceModule fiscal conditionality | G1 | Wave 1 | ✅ BPO ACCEPT 2026-06-25 (Wave 1 spec) — governance sensitivity spec filed (PR #1270); three CM positions on record; sprint exit confirmed; Wave 2 code changes gated on data preconditions |
-| #394 | feat: multi-scenario comparison (>2 scenarios) | G2 | Wave 2 | **G2 Phase 3 implementation ✅ MERGED PR #1311 2026-06-26** — SCENARIO_COMPARISON_PALETTE + ScenarioComparisonConfig; Zone 1A N=3 curves; Zone 1B per-scenario threshold rows; Zone 1D per-scenario PSP; build clean (619 modules, 0 TS errors); CI green; AC-S1/A1/B1/D1/P1/P3/P5 guarded; BPO acceptance pending. |
+| #394 | feat: multi-scenario comparison (>2 scenarios) | G2 | Wave 2 | ✅ **BPO ACCEPT 2026-06-26** — PR #1311 (Zone 1A/1B/1D components) + PR #1314 (App.tsx wiring + E2E activation); playwright-e2e PASS 8m25s; AC-S1/A1/B1/D1/P5/P1/P3 all hard-asserted; CA Layer 3 PASS (Personas 1/3/5); north star PASS (Aicha 90-second Option C); sprint exit CONFIRMED — `docs/process/sprint-plans/m17-g2-sprint-exit.md`; **issue CLOSED** |
 | #1252 | arch(zone-1b): Zone 1B proportional allocation — MDA alert vs cohort sections | G3 | Wave 2 | **Phase 1 BPO ACCEPTED + Phase 2 ADR-018 ACCEPTED + QA ✅ 2026-06-25/26** — PR #1291 (ADR-018) + PR #1301 (QA test.fail() EX-002 NM-065 testid zone-1b-mda-panel-wrapper) merged; CI green; #1290 closed; EL sprint entry approval PENDING |
 | #1249 | ux(zone-1a): DEMO6-014 curve identifiability | G4 | Wave 2 | ✅ **BPO ACCEPT 2026-06-26** — PR #1300 merged; CA Layer 3 PASS; G4 sprint exit CONFIRMED; G2 Phase 3 gate CLEARED |
 | #1250 | ux(zone-1b): DEMO6-026/043 tablet legibility at 768px | G4 | Wave 2 | ✅ **BPO ACCEPT 2026-06-26** — PR #1300 merged; CA Layer 3 PASS; G4 sprint exit CONFIRMED; G3 Phase 3 gate CLEARED |
