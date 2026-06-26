@@ -1,8 +1,8 @@
 # Information Hierarchy — WorldSim Dashboard
 
-> Last significant revision: 2026-06-06
-> Updated against: NB-7 (Mode 1 COMPARE_VIEW spec — entry point, API design decision, Persona 3 user story; closes Issue #451)
-> Previous version context: 2026-05-22 — ADR-008 and ADR-010 accepted; instruments in Zone 1; choropleth navigable context
+> Last significant revision: 2026-06-26
+> Updated against: GD Artifact 2 (#1354) — Control Plane Reserved Zone expanded: Mode 1 confirmed; Mode 2 column content designed for first time (closes GA-02); Mode 3 specification consolidated and shock taxonomy extended with GrowthShock; mode transition behavior specified; CVD color values documented
+> Previous version context: 2026-06-06 — NB-7 (Mode 1 COMPARE_VIEW spec; closes Issue #451)
 
 > Owned by the UX Designer Agent. This document defines the visual weight
 > and disclosure depth of every element on the WorldSim dashboard. It is
@@ -445,33 +445,272 @@ When `uncertainty_range_pct = None`:
 
 ## Control Plane Reserved Zone
 
-A dedicated screen zone is reserved in the primary viewport layout for the Mode 3
-control plane from M9 onward. This zone is reserved before Mode 3 is built —
-not retrofitted when Mode 3 arrives (CLAUDE.md Governing Premise 5).
+> Revised: 2026-06-26 — Mode 2 content designed at form level (GA-02 resolution);
+> Mode 3 specification consolidated; shock taxonomy extended with GrowthShock;
+> mode transition and CVD colors added. Authority: GD Artifact 2, Issue #1356.
 
-**Location:** A persistent zone adjacent to the trajectory view. In Mode 1 and
-Mode 2, this zone is empty — it holds no content and is not collapsed or hidden;
-it is reserved. In Mode 3, it is populated with the control plane.
+A dedicated screen zone is reserved in the primary viewport layout for the control
+plane from M9 onward. This zone is reserved before Mode 3 is built — not retrofitted
+when Mode 3 arrives (CLAUDE.md Governing Premise 5). The zone is 280px wide
+(`gridColumn: 3` in `InstrumentCluster`), rendered at all three supported breakpoints
+(1024, 1280, 1440), and never collapsed or hidden in any mode.
 
-**Minimum Mode 3 zone content (established M9, sized from this requirement):**
+---
 
-The reserved zone must be large enough to accommodate simultaneously:
-- Policy instruments form: control input type selector, parameter field(s),
-  step selector, "Apply policy input" button, applied inputs history list
-  (blue visual treatment throughout)
-- Scenario shocks form: step selector, shock type selector from taxonomy,
-  "Inject scenario shock" button, injected shocks history list (orange visual
-  treatment throughout)
+### Mode 1 (Replay) — Reserved, Empty
 
-Both forms must be visible simultaneously in Mode 3 — the visual separation
-between policy inputs (blue) and exogenous shocks (orange) is an epistemic
-requirement, not a layout preference. The zone sizing must accommodate both
-without requiring scroll to see either form.
+The 280px column contains no interactive content in Mode 1. A subdued watermark
+label — "Control plane (Mode 3)" — is rendered in the lower-left of the column
+using `color: rgba(0,0,0,0.25)`, `fontSize: 11`, `fontFamily: monospace`, no
+pointer events. This is the final Mode 1 state; no additional content is specified.
 
-**Sizing constraint:** The control plane zone must not reduce the trajectory view
-below a minimum legible width at the desktop minimum viewport (1280×800). The
-trajectory view is the primary instrument — the control plane is secondary. If
-the zone sizes conflict, the trajectory view wins.
+**Testable constraint:** No element inside the control plane zone has `tabIndex`,
+`onClick`, `onChange`, or any interactive attribute in Mode 1. The watermark font
+size (11px) must not exceed the smallest text in Zone 1 instruments.
+
+---
+
+### Mode 2 (Simulation) — Scenario Configuration Surface
+
+> **This section is original design work (GD Artifact 2). No prior form-level
+> specification existed for the Mode 2 column. GA-02 gap is resolved here.**
+
+The Mode 2 column exposes the parameters that affect the scenario trajectory in
+real time — visible alongside the trajectory view without navigating away. This is
+the resolution of Journey A Gap GA-02: Eleni cannot currently adjust the fiscal
+multiplier while watching the Human Development curve respond.
+
+**Visual treatment:** Neutral — not blue (blue is reserved for policy inputs in
+Mode 3) and not orange (orange is reserved for exogenous shocks). Use the
+application's standard text and control colors. The column header uses
+`fontWeight: 700`, `fontSize: 11`, `letterSpacing: 0.5`, `color: #555` — the
+same treatment as Zone 1B label rows.
+
+**Column header:** "SCENARIO CONFIGURATION" — in the same label style as the Mode 3
+"ACTIVE CONTROL" header. Positioned at the top of the 280px column.
+
+**Controls present in Mode 2 column:**
+
+1. **Fiscal Multiplier** (required, from Issue #746)
+   - Slider: range 0.1–3.0, step 0.05
+   - Display value: `{value.toFixed(2)}×` — same format as current `ControlPlane.tsx`
+   - Label: "Fiscal Multiplier (spending & tax scaling)"
+   - This is the primary Mode 2 parameter control — the first control Eleni reaches
+     for when adjusting her counter-proposal in preparation mode
+
+2. **Legitimacy Constraint** (required — Mode 2 complement to Mode 3)
+   - Slider: range 0.0–1.0, step 0.05
+   - Display value: `{Math.round(value * 100)}%`
+   - Label: "Legitimacy Constraint (political feasibility floor)"
+   - Rationale: the fiscal multiplier determines the intensity of fiscal action;
+     the legitimacy constraint determines how much political capital that action
+     consumes. Both parameters interact with the trajectory. A Eleni adjusting the
+     fiscal multiplier must also be able to see how close the legitimacy floor is.
+
+**Interaction model: explicit Apply, not live recompute**
+
+A parameter change in Mode 2 does NOT trigger immediate recomputation. Each slider
+change updates only the pending display value. A single "Apply Configuration" button
+at the bottom of the Mode 2 form triggers the recompute. Rationale: Mode 2 prepares
+a scenario; live recompute on slider drag would produce multiple intermediate states
+and degrade responsiveness. The pilot configures, then applies.
+
+Button label: **"Apply Configuration"**
+Button treatment: neutral (not blue/orange) — `background: #64748b` (slate-500),
+`color: #fff`. Same rounded rectangle and font-weight treatment as the Mode 3 Apply
+button but without the blue/orange treatment.
+
+Disabled state: during recomputation (`recomputeStatus === "computing"` or
+`"pending"`), both sliders and the Apply button are disabled. Button label changes
+to "Recomputing…".
+
+**Empty state (before any Apply action):** The sliders show the scenario's
+current loaded configuration values — not zero, not 1.0. The parameter values
+are pre-populated from the active scenario's `configuration` object on component
+mount. This reflects the actual starting conditions, not blank defaults.
+
+---
+
+### Mode 3 (Active Control) — Two-Form Control Plane
+
+The 280px column is populated with two independent forms: the policy instruments form
+(blue) and the scenario shocks form (orange). Both form headers must be visible
+simultaneously without scroll within the column. Content within each form may scroll
+independently if the history list grows.
+
+**Column header:** "ACTIVE CONTROL" — `fontWeight: 700`, `fontSize: 11`,
+`letterSpacing: 0.5`, `color: #0284c7` (the primary Mode 3 blue). Positioned at
+the top of the column, above both forms.
+
+---
+
+#### Policy Instruments Form (blue visual treatment)
+
+**Form section header:** "POLICY INSTRUMENTS" — `fontWeight: 700`, `fontSize: 10`,
+`letterSpacing: 0.5`, `color: #0284c7`. Section has `borderLeft: 3px solid #0284c7`.
+
+**Controls:**
+
+1. **Control input type selector** (dropdown/select)
+   - Label: "Input type"
+   - Available types for M18: `FiscalMultiplier`, `LegitimacyConstraint`
+   - Display names: "Fiscal Multiplier", "Legitimacy Constraint"
+   - Selecting a type updates the parameter field(s) shown below
+   - `data-testid="policy-input-type-selector"`
+
+2. **Parameter field** (slider, updates based on selected type)
+   - FiscalMultiplier: range 0.1–3.0, step 0.05, display `{value.toFixed(2)}×`
+   - LegitimacyConstraint: range 0.0–1.0, step 0.05, display `{Math.round(value * 100)}%`
+   - `data-testid="policy-param-slider"`
+
+3. **Step selector** (dropdown or number input)
+   - Label: "Apply at step"
+   - Range: 1 through current max computed step
+   - Default: current step
+   - Distinct from Mode 2's "branch from step" slider — this selects the step
+     at which the policy input takes effect, not the recompute anchor
+   - `data-testid="policy-step-selector"`
+
+4. **"Apply policy input" button**
+   - Background: `#0284c7`, color: `#fff`
+   - Disabled state: `background: #bae6fd` (sky-200), label "Computing…"
+   - `data-testid="apply-policy-input"`
+
+5. **Applied inputs history list** (scrollable within policy section)
+   - Appears below the Apply button after the first application
+   - Each entry: `step N — [InputType]: [value]` — e.g., "Step 1 — Fiscal Multiplier: 0.75×"
+   - Max visible without scroll: 2 entries; scrollable after
+   - `data-testid="policy-inputs-history"`
+   - Empty state: no list element rendered (not an empty list placeholder)
+
+---
+
+#### Scenario Shocks Form (orange visual treatment)
+
+**Form section header:** "SCENARIO SHOCKS" — `fontWeight: 700`, `fontSize: 10`,
+`letterSpacing: 0.5`, `color: #ea580c` (the primary Mode 3 orange). Section has
+`borderLeft: 3px solid #ea580c`.
+
+**Controls:**
+
+1. **Step selector**
+   - Label: "Inject at step"
+   - Range: 1 through current max computed step
+   - Default: next step after current
+   - `data-testid="shock-step-selector"`
+
+2. **Shock type selector** (dropdown/select)
+   - Label: "Shock type"
+   - `data-testid="shock-type-selector"`
+   - Available types (display name — internal enum):
+
+   | Display name | Enum value | Notes |
+   |---|---|---|
+   | GDP Growth Shock | `GrowthShock` | **Added for Demo 7** — positive or negative GDP growth rate injection; covers the Troika rebuttal scenario (positive GDP rebound assumption) |
+   | Election / Political Transition | `ElectionShock` | Sudden change in political leadership or legitimacy |
+   | Currency Crisis | `CurrencyAttack` | Exchange rate pressure event |
+   | Creditor Defection | `CreditorDefection` | Flight of bilateral or multilateral creditors |
+   | Geopolitical Shock | `GeopoliticalShock` | External political pressure event |
+   | Natural Disaster | `NaturalDisaster` | Physical infrastructure or agricultural shock |
+   | Financial Contagion | `ContagionShock` | Cross-border financial stress propagation |
+
+   Seven types total. `GrowthShock` is the Demo 7 primary type — it must be
+   the first option in the selector (it is the Troika rebuttal injection type).
+
+3. **Shock magnitude** (shown for `GrowthShock` only in M18; other types use default magnitude)
+   - Label: "Magnitude" (for GrowthShock: "GDP growth adjustment (%)")
+   - Range: −20 to +20, step 1, display `{value > 0 ? '+' : ''}{value}%`
+   - `data-testid="shock-magnitude-slider"`
+   - For non-magnitude shock types: this field is hidden (not shown)
+
+4. **"Inject scenario shock" button**
+   - Background: `#ea580c`, color: `#fff`
+   - Disabled state: `background: #fed7aa` (orange-200), label "Computing…"
+   - `data-testid="inject-scenario-shock"`
+
+5. **Injected shocks history list** (scrollable within shock section)
+   - Each entry: `step N — [ShockType] [magnitude if applicable]` — e.g.,
+     "Step 2 — GDP Growth Shock: +8%"
+   - Max visible without scroll: 2 entries; scrollable after
+   - `data-testid="shock-history"`
+   - Empty state: no list element rendered
+
+---
+
+### Simultaneous Visibility Requirement
+
+Both the "POLICY INSTRUMENTS" section header and the "SCENARIO SHOCKS" section
+header must be visible simultaneously without scroll within the 280px column. This
+is the US-028 acceptance criterion and an epistemic requirement: Eleni must be able
+to see at a glance that both action categories are available without scrolling.
+
+**Sizing at 1280×800:** The instrument cluster height at 1280 is constrained by the
+chart height (320px) plus header elements. The two form section headers require
+approximately 28px each (10px font, padding, border). Both headers are visible
+at 56px combined — easily within any realistic column height. The 280px column
+width is confirmed sufficient for the two-form layout at all three breakpoints.
+
+**The trajectory view width takes priority.** At 1280×800 the trajectory is 580px.
+If future additions to the column require width beyond 280px, the trajectory view
+minimum (580px) must not be violated. The 280px + 400px co-primary + 580px
+trajectory = 1260px total, within the 1280px minimum viewport width.
+
+---
+
+### CVD (Colour Vision Deficiency) Color Specification
+
+The blue/orange distinction is an epistemic requirement. It must hold for users with
+deuteranopia (red-green CVD, the most common form) and protanopia.
+
+| Role | Hex | Name | Use |
+|---|---|---|---|
+| Policy (blue) | `#0284c7` | Sky-700 | Policy form header, border, Apply button, trajectory inflection markers |
+| Shock (orange) | `#ea580c` | Orange-600 | Shock form header, border, Inject button, trajectory shock markers |
+
+These two values are safe under deuteranopia and protanopia simulations: they differ
+in hue (blue vs. orange/yellow region) and in luminance (sky-700 is darker than
+orange-600 at 100% opacity), providing both hue and luminance discrimination channels.
+
+**MV-001 validation is a hard gate.** Manual CVD validation using a simulation tool
+(e.g., Sim Daltonism, Coblis) must be completed and documented before any Mode 3
+control plane component ships. The validation must confirm that both section headers
+and their respective form elements are distinguishable from each other under
+deuteranopia and protanopia simulation at all supported viewports. The MV-001 gate
+applies to both trajectory markers and alert panel treatment as well.
+
+**Purple is deprecated for control plane elements.** The current `#8b5cf6` purple
+in `ControlPlane.tsx` does not satisfy the blue/orange requirement and must be
+replaced in all Mode 3 control plane styling.
+
+---
+
+### Mode 2 → Mode 3 Transition (Column Behavior)
+
+When the user switches from Mode 2 to Mode 3 (Journey C Step 1):
+
+1. The Mode 2 "SCENARIO CONFIGURATION" form is hidden (not removed from DOM — the
+   column always renders at 280px; the content switches).
+2. The Mode 3 "ACTIVE CONTROL" header and both forms render.
+3. The transition must complete in under 3 seconds (Journey C Step 1 critical constraint).
+
+No animation is specified for the column transition. A simple conditional render
+based on `mode` state is sufficient. The trajectory view must not reflowed during
+the transition — the column width (280px) is identical in both modes.
+
+**State preservation:** When the Mode 2 → Mode 3 transition occurs, the scenario's
+computed trajectory becomes the Mode 3 baseline. The Mode 2 fiscal multiplier and
+legitimacy constraint values that were applied are locked in as the baseline scenario
+parameters — they are not editable via the Mode 2 form once Mode 3 is active.
+
+---
+
+### Sizing Constraint (All Modes)
+
+The control plane zone must not reduce the trajectory view below its minimum legible
+width at the desktop minimum viewport (1280×800). Rule: trajectory view wins if zone
+sizes conflict. The current 280px column leaves 580px for the trajectory view at
+1280px viewport — above the minimum legible width. This constraint must be verified
+at ADR-019 acceptance if any column width change is proposed.
 
 ## M8 Hierarchy Decisions
 
