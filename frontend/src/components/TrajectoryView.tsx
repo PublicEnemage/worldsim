@@ -365,6 +365,8 @@ function CompositeChartSVG({
         const s = computeEntityCompositeScore(step);
         if (s !== null) values.push(s);
       }
+      const floor = getEntityMdaFloor(traj.mda_floors);
+      if (floor !== null) values.push(floor);
     }
     for (const sc of comparisonScenarios) {
       if (!sc.trajectory) continue;
@@ -372,6 +374,8 @@ function CompositeChartSVG({
         const s = computeEntityCompositeScore(step);
         if (s !== null) values.push(s);
       }
+      const floor = getEntityMdaFloor(sc.trajectory.mda_floors);
+      if (floor !== null) values.push(floor);
     }
     return computeYDomain(values);
   }, [activeTrajectories, baselineTrajectories, comparisonScenarios]);
