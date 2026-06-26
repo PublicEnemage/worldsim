@@ -5,10 +5,10 @@ artifact: "Artifact 5 — GD Design Package (#1359)"
 issues:
   - "#1359 — Artifact 5: Scope Decision Document (EL gate)"
   - "#1354 — Control Plane Design Package (parent)"
-status: "Filed — awaiting EL approval"
+status: "EL-approved 2026-06-26"
 authored-by: PM Agent
 authored-date: 2026-06-26
-el-approved: ""
+el-approved: "2026-06-26"
 release-branch: release/m18
 gd-phase: "Phase 3 — filed after Artifacts 2 (#1356) and 4 (#1358)"
 downstream-unblock:
@@ -67,7 +67,7 @@ scenario configuration surface is a future milestone scope item.
 carries minimal read-only content from M18 onward. The "empty reserved zone" description
 applies to Mode 1 only after this change.
 
-**EL decision:** ☐ Approved as drafted / ☐ Amended — see EL Approval Record below
+**EL decision:** ☑ Approved as drafted — with panel conditions required in ADR-019 (see EL Approval Record)
 
 ---
 
@@ -108,9 +108,7 @@ demo-relevance). Defer `CurrencyAttack`, `CreditorDefection`, `NaturalDisaster`,
 `ContagionShock` to a post-M18 sprint. This requires a process exception for a
 partially-populated taxonomy that ADR-019 must explicitly record.
 
-**EL decision:** ☐ All six in M18 / ☐ Partial — specify subset below:
-
-*If partial: _________________________*
+**EL decision:** ☑ All six in M18 — ADR-019 must specify parameter schemas and data dependency status for all six types before G4 sprint entry (see EL Approval Record)
 
 ---
 
@@ -157,8 +155,9 @@ Specifically:
 decision. This is the third milestone at which EX-001 reaches its expiry. An expired
 exception that silently carries forward is a compliance finding.
 
-**EL decision:** ☐ Approved — optimize in G4, close based on exit measurement per
-recommendation above / ☐ Amended — see EL Approval Record below
+**EL decision:** ☑ Approved — optimize in G4, close based on exit measurement per
+recommendation above. Resolution label: Resolved if MV-002 ≤ 100ms at G4 exit;
+Won't Fix otherwise. AC-009 removed from CI permanently regardless of label.
 
 ---
 
@@ -183,9 +182,36 @@ On EL approval of this document, the following downstream actions unblock:
 ## EL Approval Record
 
 **Filed:** 2026-06-26
-**Awaiting EL review and approval**
+**EL-approved:** 2026-06-26
 
-*EL to record approval or amendment below. ADR-019 authorship begins on EL approval.*
-
-> ___
-> — @PublicEnemage (date: ______)
+> All three decisions approved per panel recommendations. Panel deliberation record:
+> `docs/process/intents/M18-GD-2026-06-26-control-plane-scope-decision-deliberation.md`
+>
+> **Decision 1 — Mode 2 column 3:** Approved. Populate with read-only scenario summary
+> and Mode 3 activation control. ADR-019 must satisfy all three panel conditions before
+> G4 sprint entry: (1) button label is "Enter Active Control" — not "Enter Mode 3"
+> (Customer Agent kryptonite finding, Personas 2 and 5); (2) subdued visual treatment
+> in Mode 2 to signal pre-active state (UX Designer); (3) two-component architecture —
+> `Mode2ColumnSurface` and `ControlPlane` are separate components, not conditional
+> rendering within one component (Frontend Architect).
+>
+> **Decision 2 — Shock taxonomy:** Approved — all six types in M18. ADR-019 must
+> specify parameter schemas and data dependency status for all six types before the G4
+> sprint entry is filed. Specifically: `creditor_class` enum taxonomy for
+> `CreditorDefection` and the `ContagionShock` linkage approach (pre-populated table vs.
+> simplified model) must be resolved in ADR-019 (CE Agent finding).
+>
+> **Decision 3 — EX-001:** Approved. G4 implements structural optimization (lazy
+> mounting via two-component architecture, Recharts memoization). At G4 exit, re-run
+> MV-002 on ProBook hardware. Resolution label: **Resolved** if MV-002 ≤ 100ms;
+> **Won't Fix** otherwise. AC-009 `test.fixme()` removed from CI permanently regardless
+> of label — test structure preserved with comment referencing EX-001 closure record.
+> PI Agent process conditions apply: (1) resolution path recorded in
+> `docs/compliance/exceptions.md §EX-001` before G4 begins; (2) EX-001 named as
+> explicit deliverable in G4 sprint entry scope; (3) final closure entry with MV-002
+> measurement at G4 exit.
+>
+> ADR-019 authorship is unblocked from this approval — still gated on Artifacts 2
+> (#1356) and 4 (#1358) being on record per §Downstream Unblock Record.
+>
+> — @PublicEnemage (2026-06-26)
