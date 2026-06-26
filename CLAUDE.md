@@ -385,10 +385,15 @@ begins, no files are edited, and no git commands run until the user confirms the
 merge and Claude Code has executed `git pull origin main`.
 
 **Exception — PRs targeting a release branch (`release/m{N}`).** Release branch
-PRs are pre-authorized for autonomous merge. Claude Code polls `gh pr checks`
-until all checks have reached a terminal state (pass or skipped — no pending),
-then executes `gh pr merge <number> --merge` only if no check has failed.
-If any check has failed, stop and report to the user — do not attempt the merge.
+PRs are pre-authorized for autonomous merge. Immediately after opening the PR,
+set auto-merge: `gh pr merge <number> --merge --auto`. GitHub monitors CI and
+merges the PR the moment all required checks pass — no polling loop, no GraphQL
+quota consumption. If CI fails, `ci-failure-notify.yml` posts a comment and the
+auto-merge is abandoned; stop and report to the user.
+To observe CI output in real time (e.g. to diagnose a failure), use
+`gh run watch <run-id> --exit-status` — a single streaming connection, not a
+polling loop. Obtain the run ID with:
+`gh run list --branch <branch> --limit 1 --json databaseId --jq '.[0].databaseId'`
 `release/m{N}` branches are protected by the `release-branch-ci-gate` Ruleset —
 a failed required check will block the merge at the server regardless.
 See §Release Branch Workflow below.
@@ -416,8 +421,13 @@ during the milestone uses this pattern:
    and will be rejected by the `branch-naming` CI check. Use `feat/m14-g1-bugs`.
 2. Implement, run pre-push gates (lint, build), push feature branch
 3. Open PR targeting `release/m{N}` (not `main`)
-4. Poll CI; merge autonomously once all checks are terminal (pass or skipped, none failed): `gh pr merge <number> --merge`
-5. Pull from release branch: `git pull origin release/m{N}`
+4. Set auto-merge immediately after opening the PR:
+   `gh pr merge <number> --merge --auto`
+   GitHub merges when all required checks pass. The agent does not poll or wait —
+   move on to the next task or close the session. To observe CI in real time:
+   `gh run watch $(gh run list --branch <branch> --limit 1 --json databaseId --jq '.[0].databaseId') --exit-status`
+5. Pull from release branch before starting the next feature branch:
+   `git pull origin release/m{N}`
 6. Continue with next feature branch
 
 At milestone close, EL performs one admin bypass: `release/m{N}` → `main`.
@@ -426,10 +436,11 @@ always the Engineering Lead's action.
 
 `SESSION_STATE.md` updates during an active milestone target the release branch,
 not `main`, and follow the same autonomous merge rule as all release branch PRs:
-poll until all checks are terminal (pass or skipped, none failed), then
-`gh pr merge <number> --merge`. No `--admin` needed — the `release-branch-ci-gate`
-Ruleset treats skipped checks as passing. The `auto-merge-session-state` workflow
-only fires on PRs targeting `main` and does not apply here.
+set auto-merge immediately after opening the PR (`gh pr merge <number> --merge --auto`).
+No `--admin` needed — the `release-branch-ci-gate` Ruleset treats skipped checks
+as passing, and GitHub's auto-merge fires the moment all checks are terminal.
+The `auto-merge-session-state` workflow only fires on PRs targeting `main` and
+does not apply here.
 
 **Backend pre-push lint gate — mandatory before any `git push` touching Python files.**
 Before pushing any branch that modifies files under `backend/`, run:
