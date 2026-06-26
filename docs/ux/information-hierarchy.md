@@ -445,9 +445,11 @@ When `uncertainty_range_pct = None`:
 
 ## Control Plane Reserved Zone
 
-> Revised: 2026-06-26 — Mode 2 content designed at form level (GA-02 resolution);
-> Mode 3 specification consolidated; shock taxonomy extended with GrowthShock;
-> mode transition and CVD colors added. Authority: GD Artifact 2, Issue #1356.
+> Revised: 2026-06-26 — Mode 2 column specified as read-only scenario summary +
+> "Enter Active Control" affordance (EL Decision 1, Artifact 5 #1359); Mode 3
+> specification consolidated; shock taxonomy confirmed as six types (EL Decision 2,
+> Artifact 5 #1359); mode transition and CVD colors added. Authority: GD Artifact 2
+> Issue #1356, corrected against Artifact 5 EL-approved decisions.
 
 A dedicated screen zone is reserved in the primary viewport layout for the control
 plane from M9 onward. This zone is reserved before Mode 3 is built — not retrofitted
@@ -470,64 +472,76 @@ size (11px) must not exceed the smallest text in Zone 1 instruments.
 
 ---
 
-### Mode 2 (Simulation) — Scenario Configuration Surface
+### Mode 2 (Simulation) — Read-Only Summary + Mode 3 Activation
 
-> **This section is original design work (GD Artifact 2). No prior form-level
-> specification existed for the Mode 2 column. GA-02 gap is resolved here.**
+> **Authority: EL Decision 1, Artifact 5 (#1359), approved 2026-06-26.**
+> Mode 2 column 3 is NOT a scenario parameter editor in M18. It is a read-only
+> scenario summary surface with a single mode-transition affordance. A richer
+> configuration surface is deferred to a future milestone.
 
-The Mode 2 column exposes the parameters that affect the scenario trajectory in
-real time — visible alongside the trajectory view without navigating away. This is
-the resolution of Journey A Gap GA-02: Eleni cannot currently adjust the fiscal
-multiplier while watching the Human Development curve respond.
+The Mode 2 column carries two elements only: a read-only summary of the loaded
+scenario, and a single control to enter Mode 3. No editable fields. No sliders.
+No Apply button.
 
-**Visual treatment:** Neutral — not blue (blue is reserved for policy inputs in
-Mode 3) and not orange (orange is reserved for exogenous shocks). Use the
-application's standard text and control colors. The column header uses
-`fontWeight: 700`, `fontSize: 11`, `letterSpacing: 0.5`, `color: #555` — the
-same treatment as Zone 1B label rows.
+**Component:** `Mode2ColumnSurface` — a separate component from `ControlPlane`.
+The two-component architecture is an EL-mandated condition (Decision 1 panel
+condition 3): `Mode2ColumnSurface` and `ControlPlane` must not be implemented
+as conditional rendering inside a single component. This constraint exists to
+enable lazy mounting of `ControlPlane` independently of Mode 2 content (Issue
+#1217 render optimization — EX-001 decision 3).
 
-**Column header:** "SCENARIO CONFIGURATION" — in the same label style as the Mode 3
-"ACTIVE CONTROL" header. Positioned at the top of the 280px column.
+**Visual treatment:** Subdued — the column in Mode 2 should visually signal
+"this zone becomes active in Mode 3," not present itself as a live instrument.
+Use `color: rgba(0,0,0,0.45)` for summary text labels (slightly lighter than
+body text but not as subdued as the Mode 1 watermark). The "Enter Active Control"
+button is the single element with full-weight styling.
 
-**Controls present in Mode 2 column:**
+---
 
-1. **Fiscal Multiplier** (required, from Issue #746)
-   - Slider: range 0.1–3.0, step 0.05
-   - Display value: `{value.toFixed(2)}×` — same format as current `ControlPlane.tsx`
-   - Label: "Fiscal Multiplier (spending & tax scaling)"
-   - This is the primary Mode 2 parameter control — the first control Eleni reaches
-     for when adjusting her counter-proposal in preparation mode
+**Element 1 — Active scenario summary (read-only)**
 
-2. **Legitimacy Constraint** (required — Mode 2 complement to Mode 3)
-   - Slider: range 0.0–1.0, step 0.05
-   - Display value: `{Math.round(value * 100)}%`
-   - Label: "Legitimacy Constraint (political feasibility floor)"
-   - Rationale: the fiscal multiplier determines the intensity of fiscal action;
-     the legitimacy constraint determines how much political capital that action
-     consumes. Both parameters interact with the trajectory. A Eleni adjusting the
-     fiscal multiplier must also be able to see how close the legitimacy floor is.
+Four lines, plain text, no interaction:
 
-**Interaction model: explicit Apply, not live recompute**
+- **Scenario name** — the name of the currently loaded and completed scenario
+- **Entity** — ISO 3166-1 alpha-3 code + entity display name
+- **Calibration vintage** — the data vintage used (e.g., "2023 WB WDI")
+- **Run horizon** — "Steps 1–N (YYYY–YYYY)" using the scenario's `start_year`
+  and computed step count
 
-A parameter change in Mode 2 does NOT trigger immediate recomputation. Each slider
-change updates only the pending display value. A single "Apply Configuration" button
-at the bottom of the Mode 2 form triggers the recompute. Rationale: Mode 2 prepares
-a scenario; live recompute on slider drag would produce multiple intermediate states
-and degrade responsiveness. The pilot configures, then applies.
+All four fields sourced from `activeScenarioDetail` — no additional fetch
+required. If any field is unavailable, render "—" (em dash) for that line.
 
-Button label: **"Apply Configuration"**
-Button treatment: neutral (not blue/orange) — `background: #64748b` (slate-500),
-`color: #fff`. Same rounded rectangle and font-weight treatment as the Mode 3 Apply
-button but without the blue/orange treatment.
+`data-testid="mode2-scenario-summary"`
 
-Disabled state: during recomputation (`recomputeStatus === "computing"` or
-`"pending"`), both sliders and the Apply button are disabled. Button label changes
-to "Recomputing…".
+---
 
-**Empty state (before any Apply action):** The sliders show the scenario's
-current loaded configuration values — not zero, not 1.0. The parameter values
-are pre-populated from the active scenario's `configuration` object on component
-mount. This reflects the actual starting conditions, not blank defaults.
+**Element 2 — "Enter Active Control" affordance**
+
+A single button positioned below the scenario summary.
+
+Button label: **"Enter Active Control"** (not "Enter Mode 3" — EL condition 1).
+Rationale: "Mode 3" is an internal label; "Active Control" is the instrument
+cluster mode indicator label that Eleni already reads (US-026). Using the same
+language removes a translation step.
+
+Button treatment: subdued by default to signal the weight of the action —
+`background: #0284c7` (sky-700), `color: #fff`, `opacity: 0.75`. Not disabled,
+not grayed out — but visually restrained relative to the full-brightness Mode 3
+Apply button.
+
+**Caution text** below the button (12px, `color: rgba(0,0,0,0.45)`):
+"Mode 3 branching cannot be undone from this view — return to Mode 2 resets
+the active branch."
+
+`data-testid="enter-active-control"`
+
+---
+
+**Testable constraints for Mode 2 column:**
+- No `<input>`, `<select>`, or `<textarea>` element within `Mode2ColumnSurface`
+- Exactly one button element present (`enter-active-control`)
+- All four summary fields present in DOM (may display "—" if data unavailable)
+- Column width remains 280px (same as Mode 1 and Mode 3)
 
 ---
 
@@ -604,26 +618,21 @@ the top of the column, above both forms.
    - `data-testid="shock-type-selector"`
    - Available types (display name — internal enum):
 
-   | Display name | Enum value | Notes |
-   |---|---|---|
-   | GDP Growth Shock | `GrowthShock` | **Added for Demo 7** — positive or negative GDP growth rate injection; covers the Troika rebuttal scenario (positive GDP rebound assumption) |
-   | Election / Political Transition | `ElectionShock` | Sudden change in political leadership or legitimacy |
-   | Currency Crisis | `CurrencyAttack` | Exchange rate pressure event |
-   | Creditor Defection | `CreditorDefection` | Flight of bilateral or multilateral creditors |
-   | Geopolitical Shock | `GeopoliticalShock` | External political pressure event |
-   | Natural Disaster | `NaturalDisaster` | Physical infrastructure or agricultural shock |
-   | Financial Contagion | `ContagionShock` | Cross-border financial stress propagation |
+   | Display name | Enum value |
+   |---|---|
+   | Election / Political Transition | `ElectionShock` |
+   | Currency Crisis | `CurrencyAttack` |
+   | Creditor Defection | `CreditorDefection` |
+   | Geopolitical Shock | `GeopoliticalShock` |
+   | Natural Disaster | `NaturalDisaster` |
+   | Financial Contagion | `ContagionShock` |
 
-   Seven types total. `GrowthShock` is the Demo 7 primary type — it must be
-   the first option in the selector (it is the Troika rebuttal injection type).
+   Six types total (EL Decision 2, Artifact 5 #1359). Parameter schemas and
+   data dependency status for each type are specified in ADR-019 before G4
+   sprint entry. The shock magnitude field and any type-specific parameter
+   fields are ADR-019 scope — not specified here.
 
-3. **Shock magnitude** (shown for `GrowthShock` only in M18; other types use default magnitude)
-   - Label: "Magnitude" (for GrowthShock: "GDP growth adjustment (%)")
-   - Range: −20 to +20, step 1, display `{value > 0 ? '+' : ''}{value}%`
-   - `data-testid="shock-magnitude-slider"`
-   - For non-magnitude shock types: this field is hidden (not shown)
-
-4. **"Inject scenario shock" button**
+3. **"Inject scenario shock" button**
    - Background: `#ea580c`, color: `#fff`
    - Disabled state: `background: #fed7aa` (orange-200), label "Computing…"
    - `data-testid="inject-scenario-shock"`
@@ -686,21 +695,29 @@ replaced in all Mode 3 control plane styling.
 
 ### Mode 2 → Mode 3 Transition (Column Behavior)
 
-When the user switches from Mode 2 to Mode 3 (Journey C Step 1):
+The transition is triggered by the "Enter Active Control" button in `Mode2ColumnSurface`.
 
-1. The Mode 2 "SCENARIO CONFIGURATION" form is hidden (not removed from DOM — the
-   column always renders at 280px; the content switches).
-2. The Mode 3 "ACTIVE CONTROL" header and both forms render.
-3. The transition must complete in under 3 seconds (Journey C Step 1 critical constraint).
+When the user clicks "Enter Active Control":
 
-No animation is specified for the column transition. A simple conditional render
-based on `mode` state is sufficient. The trajectory view must not reflowed during
-the transition — the column width (280px) is identical in both modes.
+1. The `mode` state transitions to `"MODE_3"`.
+2. `Mode2ColumnSurface` unmounts (or hides — two-component architecture per EL
+   Decision 1 condition 3 means these are separate mounted components, not a
+   conditional render within one component).
+3. `ControlPlane` mounts into the column slot — lazy mounting is intentional
+   (Issue #1217, EX-001 Decision 3): `ControlPlane` is not in the DOM until
+   Mode 3 is entered, avoiding its render cost during Mode 1 and Mode 2.
+4. The Mode 3 "ACTIVE CONTROL" header and both forms render.
+5. The transition must complete in under 3 seconds (Journey C Step 1 critical
+   constraint). No animation is specified — simple mount/unmount.
 
-**State preservation:** When the Mode 2 → Mode 3 transition occurs, the scenario's
-computed trajectory becomes the Mode 3 baseline. The Mode 2 fiscal multiplier and
-legitimacy constraint values that were applied are locked in as the baseline scenario
-parameters — they are not editable via the Mode 2 form once Mode 3 is active.
+The trajectory view must not reflow during the transition — the column width
+(280px) is identical in both modes and does not change on mount/unmount.
+
+**State preservation:** The scenario's completed trajectory becomes the Mode 3
+baseline at the moment Mode 3 is entered. The baseline is locked — no Mode 2
+parameter adjustments are possible once Mode 3 is active. (In M18, Mode 2 column
+3 has no editable fields; this constraint is architectural rather than enforced
+by hiding controls.)
 
 ---
 
