@@ -457,12 +457,6 @@ test.describe("AC-A2: Overflow regression guard — 8+ crossings do not collapse
   }) => {
     if (!scenarioId) return;
 
-    // EX-002 (docs/compliance/exceptions.md): pre-implementation expected failure.
-    // This test is the regression guard — it MUST fail before G3 Phase 3 adds zone-1b-mda-panel-wrapper.
-    // REVERSAL: remove test.fail() in the Phase 3 implementation PR after confirming AC-A2 passes.
-    // See also NM-065 (docs/process/near-miss-registry.md).
-    test.fail();
-
     const sid = scenarioId;
 
     await page.route(`**/api/v1/scenarios/${sid}`, (route) => {
