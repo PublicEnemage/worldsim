@@ -3,17 +3,17 @@ name: m17-g3-sprint-entry
 type: sprint-entry
 milestone: M17 — Calibration and Comparative Infrastructure
 sprint-group: G3 (Phase 3 — Implementation)
-status: EL Approved 2026-06-25 — Phase 1 UX brief may begin; implementation PR requires all §2.2–§2.5 conditions satisfied
+status: EL Approved 2026-06-26 — Phase 3 implementation UNBLOCKED; all §2.2–§2.5 conditions satisfied; #1250 merged
 authored-by: PM Agent
 authored-date: 2026-06-25
-el-approved: 2026-06-25
+el-approved: 2026-06-26 (Phase 3 implementation gate; initial Phase 1 approval 2026-06-25)
 release-branch: release/m17
 sop-reference: docs/process/sprint-planning-sop.md
 ---
 
 # Sprint Entry — M17, G3: Zone 1B Deconflict (Phase 3 Implementation)
 
-**Status:** EL Approved 2026-06-25 — Phase 1 UX brief may begin; implementation PR requires all §2.2–§2.5 conditions satisfied
+**Status:** EL Approved 2026-06-26 — Phase 3 implementation UNBLOCKED; all §2.2–§2.5 conditions satisfied; #1250 merged
 **Date authored:** 2026-06-25
 **Release branch:** `release/m17`
 **Sprint plan:** `docs/process/sprint-plans/m17-sprint-plan.md` (EL Approved 2026-06-25)
@@ -51,13 +51,13 @@ PR, not on this entry document's filing.*
 
 | Prerequisite | Owner | Status |
 |---|---|---|
-| G3 Phase 1 complete: UX brief filed answering four allocation questions (proportional model, overflow handling, empty-state behavior, viewport contract) — at minimum a written specification with viewport-anchored decisions; mockup if proportional model is ambiguous at 1280×800 or 768px | UX Designer (R) + Design Thinking + Customer Agent | ⬜ NOT STARTED |
-| G3 Phase 1 brief panel review: brief reviewed by Phase 1 panel before BPO acceptance — UX Designer confirms governing premises satisfied; Design Thinking confirms MDA primary instrument preserved; Customer Agent confirms Aicha/Lucas reading order is satisfied | UX Designer (R) + Design Thinking + Customer Agent + Business PO | ⬜ PENDING Phase 1 artifact |
-| G3 Phase 1 BPO acceptance: BPO accepts Phase 1 brief output | Business PO | ⬜ PENDING panel review |
-| G3 Phase 2 complete: Architect determines ADR path — ADR-017 amendment or new ARCH-012; ADR authored and accepted | Architect | ⬜ PENDING Phase 1 BPO + Wave 1 exit (✅ Wave 1 exited 2026-06-25) |
-| Intent document filed for #1252 implementation (must reference accepted ADR and UX brief) | PM Agent | ⬜ PENDING Phase 1/2 |
-| QA test file authored before implementation begins | QA Lead | ⬜ PENDING intent document |
-| #1250 merged to `release/m17` | G4 sprint group | ⬜ PENDING G4 |
+| G3 Phase 1 complete: UX brief filed answering four allocation questions (proportional model, overflow handling, empty-state behavior, viewport contract) — at minimum a written specification with viewport-anchored decisions; mockup if proportional model is ambiguous at 1280×800 or 768px | UX Designer (R) + Design Thinking + Customer Agent | ✅ COMPLETE 2026-06-25 — filed `docs/process/intents/M17-G3-2026-06-25-zone-1b-proportional-allocation.md` §3 |
+| G3 Phase 1 brief panel review: brief reviewed by Phase 1 panel before BPO acceptance — UX Designer confirms governing premises satisfied; Design Thinking confirms MDA primary instrument preserved; Customer Agent confirms Aicha/Lucas reading order is satisfied | UX Designer (R) + Design Thinking + Customer Agent + Business PO | ✅ COMPLETE 2026-06-25 — all-PASS verdicts on #1252 |
+| G3 Phase 1 BPO acceptance: BPO accepts Phase 1 brief output | Business PO | ✅ BPO ACCEPTED 2026-06-25 — recorded on #1252 |
+| G3 Phase 2 complete: Architect determines ADR path — ADR-017 amendment or new ARCH-012; ADR authored and accepted | Architect | ✅ COMPLETE 2026-06-25 — Path B; ADR-018 (ARCH-012) accepted; PR #1291 merged |
+| Intent document filed for #1252 implementation (must reference accepted ADR and UX brief) | PM Agent | ✅ COMPLETE 2026-06-25 — `docs/process/intents/M17-G3-2026-06-25-zone-1b-proportional-allocation.md`; [ADR-VALUE] resolved at 80px; reversal steps filed |
+| QA test file authored before implementation begins | QA Lead | ✅ COMPLETE 2026-06-26 — `frontend/tests/e2e/m17-g3-zone-1b-allocation.spec.ts`; PR #1301 merged; test.fail() EX-002 NM-065 on AC-A2 |
+| #1250 merged to `release/m17` | G4 sprint group | ✅ MERGED 2026-06-25 — PR #1300 |
 
 ---
 
@@ -110,18 +110,15 @@ G3 Phase 3 must replace this temporary constraint with an ADR-grounded allocatio
 The implementation PR may not merge with `minHeight: 80px` as the sole Zone 1B allocation
 mechanism — the ADR-grounded model must be in place.
 
-- [ ] **ADR prerequisite gate: PENDING** — Phase 1 UX brief and Phase 2 Architect determination
-  required; cannot be resolved until Phase 1 brief is filed, panel-reviewed, and BPO-accepted
+- [x] **ADR prerequisite gate: CLEAR** — ADR-018 (ARCH-012, Path B) accepted 2026-06-25; PR #1291 merged to release/m17
 
-**ADR prerequisite status (at filing; to be updated at Phase 2 completion):**
+**ADR prerequisite status (updated at Phase 2 completion 2026-06-25):**
 
 | Group | Required ADR | ADR status | Gate |
 |---|---|---|---|
-| G3 Phase 3 — #1252 (Zone 1B proportional allocation model) | Path A: ADR-017 amendment (ARCH-011) / Path B: ARCH-012 (new ADR) | Pending Phase 2 Architect determination | **PENDING — BLOCKING** |
-| G3 Phase 3 — #1252 (Zone 1B overflow handling contract) | Included in same ADR as allocation model (same decision unit) | Pending Phase 2 determination | **PENDING** |
-| G3 Phase 3 — #1252 (Zone 1B empty-state behavior) | Likely covered by same ADR; simple enough to not require standalone entry | Pending Phase 2 determination | **PENDING** |
-
-*These entries must be updated to CLEAR or BLOCKED_ADR before EL approval of this entry.*
+| G3 Phase 3 — #1252 (Zone 1B proportional allocation model) | Path B — ADR-018 (ARCH-012, new ADR) | ✅ ACCEPTED 2026-06-25 — PR #1291 | **CLEAR** |
+| G3 Phase 3 — #1252 (Zone 1B overflow handling contract) | Covered by ADR-018 (overflow: hidden + Sub-zone B scroll) | ✅ ACCEPTED 2026-06-25 | **CLEAR** |
+| G3 Phase 3 — #1252 (Zone 1B empty-state behavior) | Covered by ADR-018 (flex: 1 1 80px growable handles empty state) | ✅ ACCEPTED 2026-06-25 | **CLEAR** |
 
 ### 2.3 — Intent document gate
 
@@ -130,13 +127,7 @@ mechanism — the ADR-grounded model must be in place.
 implementation PR opens. The QA Lead must be able to write tests from it without reading
 implementation code.*
 
-- [ ] **Intent document gate: PENDING** — intent document cannot be authored until Phase 1
-  UX brief is complete, panel-reviewed, and BPO-accepted, AND Phase 2 ADR is accepted. The
-  intent document's acceptance criteria are derived from the UX brief's four allocation
-  decisions and the ADR's implementation contract. **The intent document must reference the
-  accepted ADR as the authoritative architectural specification and the UX brief as the
-  authoritative visual/interaction specification — QA Lead writes assertions against the
-  brief-defined and ADR-grounded observable states, not against implementation inference.**
+- [x] **Intent document gate: CLEAR** — filed 2026-06-25 at `docs/process/intents/M17-G3-2026-06-25-zone-1b-proportional-allocation.md`; references ADR-018; [ADR-VALUE] resolved at 80px (all breakpoints); reversal steps for test.fail() documented.
 
 **Intent document content requirements (to be satisfied at filing):**
 
@@ -193,7 +184,7 @@ The intent document for #1252 Phase 3 must specify, at minimum:
 *QA tests must be authored from the intent document's acceptance criteria BEFORE implementation
 code is written. The test file must be on record before the implementing agent begins.*
 
-- [ ] **QA test gate: PENDING** — cannot be authored until the intent document is filed
+- [x] **QA test gate: CLEAR** — filed 2026-06-26 at `frontend/tests/e2e/m17-g3-zone-1b-allocation.spec.ts`; PR #1301 merged; AC-A2 annotated with test.fail() (EX-002, NM-065); testid zone-1b-mda-panel-wrapper; CI green.
 
 **QA test file requirements (to be satisfied at filing):**
 
@@ -306,8 +297,7 @@ PASS (or the rejecting agent explicitly marks their concern resolved after revis
 acceptance issued without all panel verdicts on record is non-compliant and the PI Agent
 blocks Phase 2 from opening.
 
-- [ ] **Phase 1 UX brief panel review: PENDING** — brief not yet produced; panel cannot convene
-  until all four allocation questions are answered and filed on #1252
+- [x] **Phase 1 UX brief panel review: CLEAR** — all-PASS verdicts on #1252 2026-06-25; BPO ACCEPTED 2026-06-25.
 
 ---
 
@@ -352,7 +342,7 @@ this entry can be EL-approved.*
 
 | Group | ADR required | ADR status | Implementation may begin? |
 |---|---|---|---|
-| G3 Phase 3 — #1252 (Zone 1B proportional allocation + overflow contract + empty-state) | Path A: ADR-017 amendment (ARCH-011) / Path B: new ADR (ARCH-012) | **PENDING Phase 2 Architect determination** | **No — awaiting Phase 1 BPO acceptance + Architect Phase 2 output** |
+| G3 Phase 3 — #1252 (Zone 1B proportional allocation + overflow contract + empty-state) | Path B — ADR-018 (ARCH-012, new ADR) | ✅ ACCEPTED 2026-06-25 — PR #1291 merged | **Yes — EL approved 2026-06-26; all gates clear** |
 
 **Phase 2 Architect output required before EL approval:**
 
@@ -418,14 +408,27 @@ At the next HORIZON sweep, PM Agent must:
 
 ## EL Approval Record
 
-**EL approval:** Approved 2026-06-25
+**EL approval (Phase 1 gate):** Approved 2026-06-25
 
-*The structural gates (§2.1) are CLEAR. The remaining PENDING conditions (§2.2 ADR gate,
-§2.3 intent document, §2.4 QA tests, §2.5 panel review) must be satisfied before any
-Phase 3 implementation PR opens — EL approval of this entry document does not substitute
-for those per-phase gates. Phase 1 (UX brief) may begin immediately.*
+*The structural gates (§2.1) were CLEAR at initial approval. Phase 1 (UX brief) was unblocked.
+Implementation PR gate (§2.2–§2.5) remained PENDING.*
 
-> G3 sprint entry approved. Phase 1 UX brief (Zone 1B allocation brief — four questions:
-> proportional model, overflow handling, empty-state behavior, viewport contract) may begin.
-> Implementation PR may not open until §2.2–§2.5 are satisfied.
+> G3 sprint entry approved. Phase 1 UX brief may begin. Implementation PR may not open until §2.2–§2.5 are satisfied.
 > — @PublicEnemage (2026-06-25)
+
+---
+
+**EL approval (Phase 3 implementation gate):** Approved 2026-06-26
+
+*All five entry conditions now satisfied:*
+- *§2.1 Structural gates: CLEAR*
+- *§2.2 ADR gate: CLEAR — ADR-018 (ARCH-012, Path B) accepted 2026-06-25*
+- *§2.3 Intent document: CLEAR — filed 2026-06-25; [ADR-VALUE]=80px; reversal steps documented*
+- *§2.4 QA test: CLEAR — PR #1301 merged 2026-06-26; test.fail() EX-002 NM-065 on AC-A2; CI green*
+- *§2.5 Phase 1 panel review + BPO acceptance: CLEAR — all-PASS 2026-06-25*
+- *#1250 merge gate: CLEAR — PR #1300 merged 2026-06-25*
+
+> G3 Phase 3 implementation gate approved. Cut `feat/m17-g3-zone-1b-allocation` from
+> `release/m17` and proceed per Section 4 sequencing. Implementing engineer must remove
+> `test.fail()` from AC-A2 in the Phase 3 implementation PR (EX-002 reversal step).
+> — @PublicEnemage (2026-06-26)
