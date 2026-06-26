@@ -30,6 +30,7 @@
  */
 import { useEffect, useRef, useState } from "react";
 import { InstrumentCluster, LAYOUT, useViewportBreakpoint } from "./InstrumentCluster";
+import { type ScenarioComparisonConfig, type ScenarioComparisonThresholdCrossing } from "./TrajectoryView";
 import { MDAAlertPanelZone1B, CohortImpactSection } from "./MDAAlertPanelZone1B";
 import { PMMWidgetZone1C } from "./PMMWidgetZone1C";
 import { FourFrameworkZone1D } from "./FourFrameworkZone1D";
@@ -218,6 +219,8 @@ interface ScenarioInstrumentClusterProps {
   /** Mode 2 — ID of the comparison (baseline) scenario. When set, its trajectory is
    *  fetched and stored as baseline_trajectory so TrajectoryView renders the overlay. */
   comparisonScenarioId?: string | null;
+  /** M17-G2 — N-scenario comparison configs (Zone 1A curves, Zone 1B rows, Zone 1D PSP). */
+  comparisonScenarios?: ScenarioComparisonConfig[] | null;
   /** Mode 2 fiscal multiplier for the active scenario — displayed in identity header. */
   fiscalMultiplier?: number | null;
   /** Mode 3 Active Control — when true, ControlPlane is rendered and branching is enabled. */
@@ -232,6 +235,7 @@ export function ScenarioInstrumentCluster({
   currentStep,
   entityIds,
   comparisonScenarioId,
+  comparisonScenarios,
   fiscalMultiplier,
   mode3Active = false,
   activeScenarioDetail,
@@ -447,6 +451,82 @@ export function ScenarioInstrumentCluster({
       });
     return () => { cancelled = true; };
   }, [comparisonScenarioId]);
+
+  // M17-G2 — fetch trajectory, threshold crossings, and PSP for each comparison scenario.
+  const [loadedComparisonScenarios, setLoadedComparisonScenarios] = useState<ScenarioComparisonConfig[]>([]);
+  const comparisonScenariosKey = (comparisonScenarios ?? []).map(s => s.scenarioId).join(',');
+
+  useEffect(() => {
+    const configs = comparisonScenarios ?? [];
+    if (configs.length === 0) {
+      setLoadedComparisonScenarios([]);
+      return;
+    }
+    let cancelled = false;
+    Promise.all(
+      configs.map(async (config) => {
+        try {
+          const res = await fetch(`${API_BASE}/scenarios/${encodeURIComponent(config.scenarioId)}/trajectory`);
+          if (!res.ok || cancelled) return config;
+          const rawJson = await res.json() as Record<string, unknown>;
+          const rawSteps = (rawJson.steps as Array<Record<string, unknown>>) ?? [];
+          const lastStep = rawSteps[rawSteps.length - 1] as Record<string, unknown> | undefined;
+          const frameworks = (lastStep?.frameworks as Array<Record<string, unknown>>) ?? [];
+          const peFramework = frameworks.find(f => f.framework === "political_economy") as Record<string, unknown> | undefined;
+          const indicators = (peFramework?.indicators as Record<string, Record<string, unknown>>) ?? {};
+          const pspValue = (indicators.programme_survival_probability?.value as string) ?? null;
+          const rawCrossings = (rawJson.threshold_crossings as Array<Record<string, unknown>>) ?? [];
+          const thresholdCrossings: ScenarioComparisonThresholdCrossing[] = rawCrossings.map(tc => ({
+            indicator_id: tc.indicator_id as string,
+            indicator_name: tc.indicator_name as string | undefined,
+            severity: tc.severity as "CRITICAL" | "WARNING",
+            first_crossing_step: tc.first_crossing_step as number,
+          }));
+          // Build a minimal TrajectoryResponse for Zone 1A curve rendering
+          const trajectory: TrajectoryResponse = {
+            scenario_id: rawJson.scenario_id as string,
+            entity_id: rawJson.entity_id as string,
+            step_count: rawJson.step_count as number,
+            mda_floors: ((rawJson.mda_floors as Array<Record<string, unknown>>) ?? []).map(f => ({
+              framework: (f.framework as string) ?? "human_development",
+              floor_value: parseFloat(String(f.floor_value)),
+              label: (f.label as string) ?? "",
+              severity: (f.severity as "WARNING" | "CRITICAL") ?? "WARNING",
+            })),
+            steps: rawSteps.map((step) => {
+              const fws = (step.frameworks as Array<Record<string, unknown>>) ?? [];
+              const frameworkMap: Record<string, TrajectoryFrameworkPoint> = {};
+              for (const fw of fws) {
+                const fwName = fw.framework as string;
+                frameworkMap[fwName] = {
+                  composite_score: fw.composite_score != null ? parseFloat(String(fw.composite_score)) : null,
+                  ci_lower: null,
+                  ci_upper: null,
+                  confidence_tier: (fw.confidence_tier as number) ?? 3,
+                  scoring_basis: "percentile_rank",
+                };
+              }
+              return {
+                step_index: step.step_index as number,
+                effective_from: step.effective_from as string,
+                step_event_label: (step.step_event_label as string | null) ?? null,
+                step_significance: (step.step_significance as "SIGNIFICANT" | "ROUTINE") ?? "ROUTINE",
+                frameworks: frameworkMap,
+                pmm: null,
+              };
+            }),
+          };
+          return { ...config, trajectory, thresholdCrossings, pspValue };
+        } catch {
+          return config;
+        }
+      })
+    ).then(loaded => {
+      if (!cancelled) setLoadedComparisonScenarios(loaded);
+    });
+    return () => { cancelled = true; };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [comparisonScenariosKey]);
 
   // ADR-015 §Component 1 — fetch data-quality for Zone 1D L0 source annotations (DA-G5-1).
   // Triggered when entity_id becomes available from the trajectory response.
@@ -854,10 +934,11 @@ export function ScenarioInstrumentCluster({
         chartHeight={chartHeight}
         entityTrajectories={entityTrajectories}
         entityBaselineTrajectories={entityBaselineTrajectories}
-        comparisonMode={!!comparisonScenarioId}
+        comparisonScenarios={loadedComparisonScenarios.length > 0 ? loadedComparisonScenarios : undefined}
         mdaPanel={
           <MDAAlertPanelZone1B
             columnWidth={coPrimaryWidth}
+            comparisonScenarios={loadedComparisonScenarios}
           />
         }
         zone1bCohortSection={<CohortImpactSection isCompleted={activeScenarioDetail?.status === "completed"} />}
@@ -876,6 +957,7 @@ export function ScenarioInstrumentCluster({
             legitimacyDirection={legitimacyDirection}
             eliteCaptureDirection={eliteCaptureDirection}
             eliteCaptureQualifier={eliteCaptureQualifier}
+            comparisonScenarios={loadedComparisonScenarios}
           />
         }
         cohortPanel={

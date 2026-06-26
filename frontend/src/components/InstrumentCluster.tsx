@@ -10,7 +10,7 @@
  * See DD-015 for why collapsing is prohibited.
  */
 import React, { useEffect, useState } from "react";
-import { TrajectoryView } from "./TrajectoryView";
+import { TrajectoryView, type ScenarioComparisonConfig } from "./TrajectoryView";
 import { useScenarioStepStore, type TrajectoryResponse } from "../store/scenarioStepStore";
 
 export const LAYOUT = {
@@ -60,8 +60,8 @@ interface InstrumentClusterProps {
   entityTrajectories?: Record<string, TrajectoryResponse> | null;
   /** Phase 4 (ADR-017): per-entity baseline trajectories for Mode 3 ghost paths. */
   entityBaselineTrajectories?: Record<string, TrajectoryResponse> | null;
-  /** M16-G4 #102 — show variance-band toggle in Zone 1A when two scenarios are being compared. */
-  comparisonMode?: boolean;
+  /** M17-G2 — multi-scenario comparison configs for Zone 1A curve rendering. */
+  comparisonScenarios?: ScenarioComparisonConfig[];
 }
 
 export function InstrumentCluster({
@@ -74,7 +74,7 @@ export function InstrumentCluster({
   chartHeight: chartHeightProp,
   entityTrajectories,
   entityBaselineTrajectories,
-  comparisonMode,
+  comparisonScenarios,
 }: InstrumentClusterProps) {
   const { mode } = useScenarioStepStore();
   const bp = useViewportBreakpoint();
@@ -106,7 +106,7 @@ export function InstrumentCluster({
           entityIds={entityIds}
           entityTrajectories={entityTrajectories}
           entityBaselineTrajectories={entityBaselineTrajectories}
-          comparisonMode={comparisonMode}
+          comparisonScenarios={comparisonScenarios}
           data-testid="zone-1a-trajectory"
         />
         {cohortPanel}
