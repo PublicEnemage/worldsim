@@ -5,7 +5,7 @@ artifact: "Artifact 5 — GD Design Package (#1359)"
 issues:
   - "#1359 — Artifact 5: Scope Decision Document (EL gate)"
   - "#1354 — Control Plane Design Package (parent)"
-status: "EL-approved 2026-06-26 (Decisions 1–3); Decision 4 pending EL review (GrowthShock gap — post-panel escalation)"
+status: "EL-approved 2026-06-26 (Decisions 1–4)"
 authored-by: PM Agent
 authored-date: 2026-06-26
 el-approved: "2026-06-26"
@@ -260,7 +260,7 @@ scope" — that is the gap, not a rationale). If deferred, Demo 7 Step 4 require
 documented methodological workaround noting that `fiscal_multiplier` is used as a proxy
 and naming the analytical limitation this introduces.
 
-**EL decision:** ☐ Pending
+**EL decision:** ☑ Add GrowthShock as seventh type — approved 2026-06-26
 
 ---
 
@@ -325,17 +325,12 @@ On EL approval of this document, the following downstream actions unblock:
 ## Decision 4 EL Approval Record
 
 **Filed:** 2026-06-26 (post-panel escalation)
-**EL decision pending.**
+**EL-approved:** 2026-06-26
 
-> ☐ **Add GrowthShock as seventh type** — ADR-019 includes `GrowthShock` in the Form 2
+> ☑ **Add GrowthShock as seventh type.** ADR-019 includes `GrowthShock` in the Form 2
 > shock taxonomy with parameter schema: `growth_rate_delta: float`,
 > `duration_steps: int`, `distribution_asymmetry: float (optional, default 0.0)`.
 > CE Agent parameter schema table updated accordingly. No additional sprint scope
 > change required — data dependency is self-contained (same tier as `ElectionShock`).
 >
-> ☐ **Defer GrowthShock** — ADR-019 notes explicit deferral with recorded rationale.
-> Demo 7 Step 4 methodology note required: analyst uses `fiscal_multiplier` as growth
-> proxy; limitation documented in the demo script and surfaced to the presenter as
-> a methodological caveat.
->
-> — @PublicEnemage (date)
+> — @PublicEnemage (2026-06-26)
