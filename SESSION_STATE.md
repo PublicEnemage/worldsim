@@ -5,7 +5,7 @@
 > Engineering Lead decisions and context are recorded here for session
 > continuity. For permanent rules and architecture, see CLAUDE.md.
 
-**Last updated: 2026-06-26 (G6 sprint exit CONFIRMED — #1276 Zone 1D governance horizon disclosure + #1277 SOP UX/UI design artifact gate both merged PR #1324; CI green; issues closed; sprint exit filed; remaining open: #1275 unassigned Wave 2; #982 M17 gate)**
+**Last updated: 2026-06-26 (G7 sprint exit CONFIRMED — #1275 GovernanceModule institutional_capacity_index merged PR #1326; Gupta 2002 elasticity Decimal("-0.015") T3 + SEN CPIA 0.55 T2 seed + migration b2d4f6a8c0e1; BPO ACCEPT + CA Layer 3 PASS (Persona 3); remaining open: #982 M17 Exit Checklist only)**
 **Current milestone:** M17 — Calibration and Comparative Infrastructure (GitHub Milestone 18)
 **Previous milestone:** M16 — Distributional Visibility (FORMALLY CLOSED 2026-06-25; release/m16 → main; v0.16.0; #985 closed; GitHub Milestone 17 closed)
 
@@ -33,7 +33,7 @@
 
 ## Open Issues — M17 (Calibration and Comparative Infrastructure)
 
-**GitHub Milestone:** 18 | **Created:** 2026-06-25 | **Status:** Wave 1 CLOSED; Wave 2 G2/G3/G4/G5/G6 all CLOSED; remaining open: #1275 (unassigned Wave 2), #982 (M17 gate)
+**GitHub Milestone:** 18 | **Created:** 2026-06-25 | **Status:** Wave 1 CLOSED; Wave 2 G2–G7 all CLOSED; remaining open: #982 (M17 Exit Checklist — milestone gate)
 **Issue audit:** Complete 2026-06-25. All open issues accounted for. #1229 assigned to M17; #843 moved to M18 + title corrected; #1225 closed; #1239/#1220/#1214 assigned to M17; #1217/#1238/#1059 assigned to M18.
 
 | Issue | Title | Group | Wave | Notes |
@@ -50,7 +50,7 @@
 | #1220 | fix(e2e): G3 spec AC-F1–AC-F7 soft-skip — NM-061 upstream | G5 | Wave 2 | ✅ **BPO N/A (infrastructure)** — PR #1319 merged 2026-06-26; AC-F3/AC-CM-2 fixed via CM-certified params (magnitude −0.15, start_date 2025-01-01) + [step N] template fix in HumanCapitalTrajectoryPanel.tsx; CI green; **CLOSED** |
 | #1214 | feat(observability): startup WARNING if simulation_entities empty | G5 | Wave 2 | ✅ **BPO N/A (infrastructure)** — PR #1318 merged 2026-06-25; _check_startup_entities() in lifespan(); AC-1214-1/2/R green; **CLOSED** |
 | #1251 | ux(zone-1a): adaptive y-axis extension audit | G5 | Wave 2 | ✅ **BPO ACCEPT 2026-06-25** — PR #1315 merged 2026-06-25; MDA floor values in CompositeChartSVG yDomain; AC-1251-1/2/3/R green; north star PASS; kryptonite-negative; G5 sprint exit CONFIRMED; **CLOSED** |
-| #1275 | feat(simulation): seed SEN institutional_capacity_index + GovernanceElasticity fiscal conditionality entry | Wave 2 (unassigned G-group) | Wave 2 | From CM governance spec Q2; co-gated: data seed + elasticity entry in same PR |
+| #1275 | feat(simulation): seed SEN institutional_capacity_index + GovernanceElasticity fiscal conditionality entry | G7 | Wave 2 | ✅ **BPO ACCEPT 2026-06-26** — PR #1326 merged; Gupta 2002 elasticity −0.015 T3 + SEN CPIA 0.55 T2 + migration b2d4f6a8c0e1; CA Layer 3 PASS (Persona 3); north star PASS; G7 sprint exit CONFIRMED; **CLOSED** |
 | #1276 | docs(zone-1d): governance horizon disclosure — divergence is ≥12-step signal | G6 | Wave 2 | ✅ **BPO N/A (documentation)** — PR #1324 merged 2026-06-26; CM text verbatim at Zone 1D Placement A; CI green; G6 sprint exit CONFIRMED; **CLOSED** |
 | #1277 | docs(process): sprint-planning-sop.md amendment — UX/UI design artifact gate | G6 | Wave 2 | ✅ **BPO N/A (process document)** — PR #1324 merged 2026-06-26; all seven SOP components on record; CI green; G6 sprint exit CONFIRMED; **CLOSED** |
 
@@ -65,9 +65,10 @@
 
 **G6 sprint exit:** ✅ CONFIRMED 2026-06-26 — `docs/process/sprint-plans/m17-g6-sprint-exit.md`; #1276 Zone 1D governance horizon disclosure (CM text verbatim, Placement A, always visible) + #1277 SOP UX/UI design artifact gate (all seven components on record); both merged PR #1324; CI green (playwright-e2e pass 8m41s); BPO not required (documentation/process classification); issues #1276 + #1277 CLOSED; PI Agent confirmed in session 2026-06-26
 
+**G7 sprint exit:** ✅ CONFIRMED 2026-06-26 — `docs/process/sprint-plans/m17-g7-sprint-exit.md`; #1275 GovernanceModule institutional_capacity_index — fiscal_policy_spending_change → institutional_capacity_index elasticity Decimal("-0.015") T3 (Gupta 2002) + SEN CPIA seed 0.55 T2 + migration b2d4f6a8c0e1; PR #1326 merged 2026-06-26; CI green; BPO ACCEPT + CA Layer 3 PASS (Persona 3) + north star PASS; all six ACs green; #1275 CLOSED; PI Agent confirmed in session 2026-06-26
+
 **M17 Wave 2 remaining open work:**
-- #1275 — SEN institutional_capacity_index seed + GovernanceElasticity (Wave 2, unassigned G-group; co-gated with data preconditions; CM spec on record; needs sprint entry before implementation)
-- #982 — M17 Exit Checklist (milestone gate issue; blocks M17 close; gates on #1275 closure)
+- #982 — M17 Exit Checklist (milestone gate issue; blocks M17 close; all Wave 2 sprint groups G2–G7 now CLOSED)
 
 ---
 
