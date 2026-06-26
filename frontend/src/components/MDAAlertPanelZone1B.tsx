@@ -22,6 +22,7 @@ import { useEffect, useRef, useState } from "react";
 import { useScenarioStepStore, type Zone1BAlert, type CohortThresholdCrossing } from "../store/scenarioStepStore";
 import { getIndicatorDisplayNameAny, getIndicatorAbbreviation } from "../lib/indicatorDisplayNames";
 import { useViewportBreakpoint } from "./InstrumentCluster";
+import { type ScenarioComparisonConfig, SCENARIO_COMPARISON_PALETTE } from "./TrajectoryView";
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -818,10 +819,13 @@ interface MDAAlertPanelZone1BProps {
   /** Column width in px — retained for compatibility; no longer drives compact vs. full rendering. */
   columnWidth?: number;
   "data-testid"?: string;
+  /** M17-G2 — loaded comparison scenario configs with threshold crossings. */
+  comparisonScenarios?: ScenarioComparisonConfig[];
 }
 
 export function MDAAlertPanelZone1B({
   "data-testid": dataTestId = "zone-1b-mda-alerts",
+  comparisonScenarios = [],
 }: MDAAlertPanelZone1BProps) {
   const { mda_alerts, mode } = useScenarioStepStore();
 
@@ -855,6 +859,43 @@ export function MDAAlertPanelZone1B({
         boxSizing: "border-box",
       }}
     >
+      {comparisonScenarios.length > 0 && (
+        <div style={{ padding: "4px 6px" }}>
+          {comparisonScenarios.map((sc) => {
+            const slug = sc.scenarioId.replace(/^[a-z]{3}-/, "");
+            const palette = SCENARIO_COMPARISON_PALETTE[sc.paletteIndex];
+            const crossings = sc.thresholdCrossings ?? [];
+            return (
+              <div key={sc.scenarioId} style={{ marginBottom: 4 }}>
+                <div
+                  data-testid={`zone1b-scenario-header-${slug}`}
+                  style={{ fontSize: 10, fontWeight: 700, color: palette.color, marginBottom: 2 }}
+                >
+                  {`Option ${sc.label}`}
+                </div>
+                {crossings.length > 0 ? (
+                  crossings.map((tc, j) => (
+                    <div
+                      key={j}
+                      data-testid={`zone1b-threshold-row-scenario-${slug}`}
+                      style={{ fontSize: 9, color: tc.severity === "CRITICAL" ? "#b91c1c" : "#d97706", paddingLeft: 6 }}
+                    >
+                      {`${tc.severity} ${tc.indicator_name ?? tc.indicator_id} — crossed step ${tc.first_crossing_step}`}
+                    </div>
+                  ))
+                ) : (
+                  <div
+                    data-testid={`zone1b-no-crossings-${slug}`}
+                    style={{ fontSize: 9, color: "#6b7280", paddingLeft: 6, fontStyle: "italic" }}
+                  >
+                    {`[no crossings through step ${sc.trajectory?.step_count ?? 8}]`}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      )}
       {topAlert === null ? (
         <div
           data-testid="zone-1b-top-detail"

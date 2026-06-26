@@ -21,6 +21,7 @@ import React from "react";
 import { useScenarioStepStore } from "../store/scenarioStepStore";
 import { FRAMEWORK_COLORS } from "../constants/frameworkColors";
 import { sortAlerts } from "./MDAAlertPanelZone1B";
+import { type ScenarioComparisonConfig } from "./TrajectoryView";
 
 // ---------------------------------------------------------------------------
 // ADR-015 §Component 1 — L0 annotation constants and helpers
@@ -212,6 +213,8 @@ interface FourFrameworkZone1DProps {
   eliteCaptureDirection?: string | null;
   /** M16-G2 (#987): elite_capture_divergence qualifier text (e.g. "fiscal benefits concentrating"). */
   eliteCaptureQualifier?: string | null;
+  /** M17-G2 — loaded comparison scenario configs with PSP values for Zone 1D rows. */
+  comparisonScenarios?: ScenarioComparisonConfig[];
 }
 
 const CONTAINER_STYLE: React.CSSProperties = {
@@ -238,6 +241,7 @@ export function FourFrameworkZone1D({
   legitimacyDirection,
   eliteCaptureDirection,
   eliteCaptureQualifier,
+  comparisonScenarios = [],
 }: FourFrameworkZone1DProps) {
   const { trajectory, current_step, mda_alerts, mode } = useScenarioStepStore();
 
@@ -472,6 +476,29 @@ export function FourFrameworkZone1D({
                 POLITICAL RISK
               </span>
             </div>
+
+            {/* Scenario comparison PSP rows (M17-G2) */}
+            {comparisonScenarios.length > 0 && (
+              <div style={{ marginTop: 2 }}>
+                {comparisonScenarios.map((sc) => {
+                  const slug = sc.scenarioId.replace(/^[a-z]{3}-/, "");
+                  const pspNum = sc.pspValue != null ? parseFloat(sc.pspValue) : null;
+                  const pspPct = pspNum !== null ? Math.round(pspNum * 100) : null;
+                  return (
+                    <div
+                      key={sc.scenarioId}
+                      data-testid={`zone1d-psp-row-scenario-${slug}`}
+                      style={{ fontSize: 10, color: "#333", paddingTop: 1 }}
+                    >
+                      {`Option ${sc.label}: `}
+                      <span data-testid={`zone1d-psp-value-${slug}`}>
+                        {pspPct !== null ? `${pspPct}%` : "—"}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
 
             {/* PSP severity row */}
             {pspValue !== null ? (() => {

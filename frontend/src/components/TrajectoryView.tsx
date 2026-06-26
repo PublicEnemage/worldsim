@@ -6,7 +6,7 @@
  * Design decisions: DD-012 (Zustand atom), DD-013 (divergence fill), DD-014 (step annotation).
  * Framework colors: frameworkColors.ts (UX Designer ruling, MV-001 closed 2026-05-23).
  */
-import { useMemo, useLayoutEffect, useRef, useState } from "react";
+import { useMemo, useLayoutEffect, useRef } from "react";
 import {
   ComposedChart,
   Line,
@@ -95,6 +95,31 @@ const ENTITY_PALETTE: readonly string[] = [
   FRAMEWORK_COLORS.human_development,  // #D4841A — entity 2
   FRAMEWORK_COLORS.governance,         // #7B50A8 — entity 3
 ] as const;
+
+/** Palette for N-scenario comparison mode (M17-G2 multi-scenario comparison). */
+export const SCENARIO_COMPARISON_PALETTE = [
+  { color: '#2563EB', strokeDasharray: 'none', label: 'A' },
+  { color: '#D97706', strokeDasharray: '8 2',  label: 'B' },
+  { color: '#16A34A', strokeDasharray: '2 4',  label: 'C' },
+  { color: '#7C3AED', strokeDasharray: '12 4', label: 'D' },
+  { color: '#E11D48', strokeDasharray: '2 2 8 2', label: 'E' },
+] as const;
+
+export interface ScenarioComparisonThresholdCrossing {
+  indicator_id: string;
+  indicator_name?: string;
+  severity: "CRITICAL" | "WARNING";
+  first_crossing_step: number;
+}
+
+export interface ScenarioComparisonConfig {
+  scenarioId: string;
+  label: string;
+  paletteIndex: number;
+  trajectory?: TrajectoryResponse | null;
+  thresholdCrossings?: ScenarioComparisonThresholdCrossing[];
+  pspValue?: string | null;
+}
 
 /** Mean of non-null framework composite_scores at a step. */
 function computeEntityCompositeScore(step: TrajectoryStep): number | null {
@@ -306,6 +331,7 @@ interface CompositeChartSVGProps {
   mode: "MODE_1" | "MODE_2" | "MODE_3";
   width: number;
   height: number;
+  comparisonScenarios?: ScenarioComparisonConfig[];
 }
 
 function CompositeChartSVG({
@@ -315,6 +341,7 @@ function CompositeChartSVG({
   mode,
   width,
   height,
+  comparisonScenarios = [],
 }: CompositeChartSVGProps) {
   const MARGIN = { top: 16, right: 60, bottom: 48, left: 44 };
   const chartW = width - MARGIN.left - MARGIN.right;
@@ -339,8 +366,15 @@ function CompositeChartSVG({
         if (s !== null) values.push(s);
       }
     }
+    for (const sc of comparisonScenarios) {
+      if (!sc.trajectory) continue;
+      for (const step of sc.trajectory.steps) {
+        const s = computeEntityCompositeScore(step);
+        if (s !== null) values.push(s);
+      }
+    }
     return computeYDomain(values);
-  }, [activeTrajectories, baselineTrajectories]);
+  }, [activeTrajectories, baselineTrajectories, comparisonScenarios]);
 
   const yScale = (score: number): number => {
     const clamped = Math.min(yMax, Math.max(yMin, score));
@@ -495,6 +529,27 @@ function CompositeChartSVG({
         );
       })}
 
+      {/* Scenario comparison MDA floor lines — one per scenario, first gets zone1a-mda-floor-line testid */}
+      {comparisonScenarios.length > 0 && comparisonScenarios.map((sc, i) => {
+        if (!sc.trajectory) return null;
+        const floor = getEntityMdaFloor(sc.trajectory.mda_floors);
+        if (floor === null) return null;
+        return (
+          <line
+            key={`scenario-mda-${sc.scenarioId}`}
+            data-testid={i === 0 ? "zone1a-mda-floor-line" : undefined}
+            x1={MARGIN.left}
+            y1={yScale(floor)}
+            x2={MARGIN.left + chartW}
+            y2={yScale(floor)}
+            stroke="#888"
+            strokeWidth={1}
+            strokeDasharray="6 3"
+            strokeOpacity={0.6}
+          />
+        );
+      })}
+
       {/* Baseline ghost paths — Mode 2/3, opacity=0.5 + dasharray (ADR-017) */}
       {showBaseline &&
         entityCodes.map((code, i) => {
@@ -517,7 +572,7 @@ function CompositeChartSVG({
         })}
 
       {/* Active composite paths — solid, full opacity */}
-      {entityCodes.map((code, i) => {
+      {comparisonScenarios.length === 0 && entityCodes.map((code, i) => {
         const active = activeTrajectories[code];
         if (!active) return null;
         const pathD = buildPathD(active.steps);
@@ -530,6 +585,26 @@ function CompositeChartSVG({
             stroke={color}
             strokeWidth={2}
             opacity={1}
+            fill="none"
+          />
+        );
+      })}
+
+      {/* Scenario comparison curves — N palette-colored paths */}
+      {comparisonScenarios.length > 0 && comparisonScenarios.map((sc) => {
+        if (!sc.trajectory) return null;
+        const pathD = buildPathD(sc.trajectory.steps);
+        if (!pathD) return null;
+        const palette = SCENARIO_COMPARISON_PALETTE[sc.paletteIndex];
+        const slug = sc.scenarioId.replace(/^[a-z]{3}-/, "");
+        return (
+          <path
+            key={`scenario-curve-${sc.scenarioId}`}
+            data-testid={`zone1a-curve-scenario-${slug}`}
+            d={pathD}
+            stroke={palette.color}
+            strokeWidth={2}
+            strokeDasharray={palette.strokeDasharray === 'none' ? undefined : palette.strokeDasharray}
             fill="none"
           />
         );
@@ -563,7 +638,7 @@ function CompositeChartSVG({
       })}
 
       {/* Terminal entity labels — #1249 Zone 1A curve identifiability (DEMO6-014) */}
-      {entityCodes.map((code, i) => {
+      {comparisonScenarios.length === 0 && entityCodes.map((code, i) => {
         const active = activeTrajectories[code];
         if (!active || active.steps.length === 0) return null;
         const lastStep = active.steps[active.steps.length - 1];
@@ -584,6 +659,32 @@ function CompositeChartSVG({
             dominantBaseline="auto"
           >
             {code}
+          </text>
+        );
+      })}
+
+      {/* Scenario comparison terminal labels */}
+      {comparisonScenarios.length > 0 && comparisonScenarios.map((sc) => {
+        if (!sc.trajectory || sc.trajectory.steps.length === 0) return null;
+        const lastStep = sc.trajectory.steps[sc.trajectory.steps.length - 1];
+        const lastScore = computeEntityCompositeScore(lastStep);
+        if (lastScore === null) return null;
+        const palette = SCENARIO_COMPARISON_PALETTE[sc.paletteIndex];
+        const x = xScale(lastStep.step_index);
+        const y = yScale(lastScore);
+        const slug = sc.scenarioId.replace(/^[a-z]{3}-/, "");
+        return (
+          <text
+            key={`scenario-terminal-${sc.scenarioId}`}
+            data-testid={`zone1a-terminal-label-scenario-${slug}`}
+            x={x + 3}
+            y={y - 7}
+            fontSize={8}
+            fontWeight="bold"
+            fill={palette.color}
+            dominantBaseline="auto"
+          >
+            {sc.label}
           </text>
         );
       })}
@@ -612,8 +713,8 @@ interface TrajectoryViewProps {
    * Keyed by ISO entity code. Empty object or null = no baseline overlay.
    */
   entityBaselineTrajectories?: Record<string, TrajectoryResponse> | null;
-  /** M16-G4 #102 — when true, show the variance-band toggle button in Zone 1A. */
-  comparisonMode?: boolean;
+  /** M17-G2 — multi-scenario comparison configs for Zone 1A curve rendering. */
+  comparisonScenarios?: ScenarioComparisonConfig[];
   /** test-id for AC-006 DOM assertions. */
   "data-testid"?: string;
 }
@@ -628,7 +729,7 @@ export function TrajectoryView({
   entityIds,
   entityTrajectories,
   entityBaselineTrajectories,
-  comparisonMode = false,
+  comparisonScenarios,
   "data-testid": dataTestId = "zone-1a-trajectory",
 }: TrajectoryViewProps) {
   const { trajectory, baseline_trajectory, current_step, mode } =
@@ -640,9 +741,6 @@ export function TrajectoryView({
   }, [trajectory, baseline_trajectory]);
 
   const showBaseline = (mode === "MODE_2" || mode === "MODE_3") && baseline_trajectory !== null;
-
-  // M16-G4 #102 — variance band toggle state (Zone 1A comparison mode).
-  const [showVarianceBand, setShowVarianceBand] = useState(false);
 
   // Performance mark for AC-007 / MV-002.
   const perfMarkFired = useRef(false);
@@ -697,7 +795,7 @@ export function TrajectoryView({
   const entityCount = entityIds?.length ?? 1;
   const isLegibilityLimit = entityCount > 4;
   // Composite path: N>1 entities, or N=1 in Mode 3 (ghost+active from store).
-  const useComposite = !isLegibilityLimit && !(entityCount <= 1 && mode !== "MODE_3");
+  const useComposite = !isLegibilityLimit && (!(entityCount <= 1 && mode !== "MODE_3") || (comparisonScenarios?.length ?? 0) > 0);
   const hasCompositeData = Object.keys(effectiveActiveTrajectories).length > 0;
 
   // Shared entity-labels-overlay — rendered in every path (DEMO-063).
@@ -816,6 +914,7 @@ export function TrajectoryView({
           mode={mode}
           width={width ?? 480}
           height={height}
+          comparisonScenarios={comparisonScenarios ?? []}
         />
         {entityLabelsOverlay}
       </div>
@@ -1067,50 +1166,6 @@ export function TrajectoryView({
         </div>
       )}
 
-      {/* M16-G4 #102 — Variance band toggle (comparison mode only) */}
-      {comparisonMode && (
-        <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 4, padding: "2px 6px" }}>
-          <button
-            data-testid="variance-band-toggle"
-            onClick={() => setShowVarianceBand((v) => !v)}
-            style={{
-              fontSize: 10,
-              padding: "2px 6px",
-              border: "1px solid #aaa",
-              borderRadius: 3,
-              background: showVarianceBand ? "#e0eeff" : "#f5f5f5",
-              cursor: "pointer",
-              fontWeight: showVarianceBand ? 700 : 400,
-            }}
-          >
-            {showVarianceBand ? "Hide range" : "Show range"}
-          </button>
-          {showVarianceBand && (
-            <span
-              data-testid="variance-band-label"
-              style={{ fontSize: 10, color: "#555" }}
-            >
-              Distributional range
-            </span>
-          )}
-        </div>
-      )}
-
-      {/* M16-G4 #102 — Variance band overlay per entity */}
-      {comparisonMode && showVarianceBand && (entityIds ?? ["primary"]).map((entityKey) => (
-        <div
-          key={entityKey}
-          data-testid={`zone-1a-variance-band-${entityKey}`}
-          style={{
-            width: "100%",
-            height: 8,
-            background: "rgba(0, 90, 158, 0.12)",
-            borderTop: "1px solid rgba(0, 90, 158, 0.25)",
-            borderBottom: "1px solid rgba(0, 90, 158, 0.25)",
-            marginTop: 2,
-          }}
-        />
-      ))}
     </div>
   );
 }
