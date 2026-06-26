@@ -107,7 +107,7 @@ def test_sen_institutional_capacity_initial_value_is_cm_certified() -> None:
     seed value has drifted from the CM-certified value or the fixture was not updated.
     """
     # The canonical seed value is defined by CM spec — verified here as a constant.
-    assert _INITIAL_VALUE == Decimal("0.55"), (
+    assert Decimal("0.55") == _INITIAL_VALUE, (
         "CM-certified institutional_capacity_index for SEN is 0.55 "
         "(World Bank CPIA 2023 score 3.3/6 normalized). "
         f"Got {_INITIAL_VALUE!r}."

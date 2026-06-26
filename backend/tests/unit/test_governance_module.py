@@ -426,7 +426,10 @@ def test_registry_event_types_are_subscribed() -> None:
 
 
 def test_registry_has_four_entries() -> None:
-    """AC-1275-2: M17-G7 adds fourth entry — fiscal_policy_spending_change → institutional_capacity_index."""
+    """AC-1275-2: M17-G7 adds fiscal_policy_spending_change → institutional_capacity_index.
+
+    M17-G7 (#1275): Gupta 2002 IMF WP/02/77, T3 SSA LIC panel.
+    """
     assert len(GOVERNANCE_ELASTICITY_REGISTRY) >= 4, (
         f"Expected ≥4 registry entries after M17-G7. Got {len(GOVERNANCE_ELASTICITY_REGISTRY)}. "
         "Missing: fiscal_policy_spending_change → institutional_capacity_index (Gupta 2002, T3)."
@@ -442,8 +445,8 @@ def test_registry_contains_fiscal_spending_to_institutional_capacity() -> None:
         and row.indicator_key == "institutional_capacity_index"
     ]
     assert len(matches) == 1, (
-        f"Expected exactly 1 entry for fiscal_policy_spending_change → institutional_capacity_index. "
-        f"Got {len(matches)}."
+        f"Expected exactly 1 entry for fiscal_policy_spending_change"
+        f" → institutional_capacity_index. Got {len(matches)}."
     )
     row = matches[0]
     assert row.elasticity == Decimal("-0.015"), (
@@ -452,7 +455,8 @@ def test_registry_contains_fiscal_spending_to_institutional_capacity() -> None:
     assert row.confidence_tier == 3, (
         f"Gupta 2002 SSA cross-country inference is T3. Got tier {row.confidence_tier}."
     )
-    assert row.source_registry_id == "ACADEMIC_LITERATURE_GUPTA_2002_IMF_WP_INSTITUTIONAL_CAPACITY", (
+    expected_source_id = "ACADEMIC_LITERATURE_GUPTA_2002_IMF_WP_INSTITUTIONAL_CAPACITY"
+    assert row.source_registry_id == expected_source_id, (
         f"Source registry ID mismatch. Got {row.source_registry_id!r}."
     )
 
