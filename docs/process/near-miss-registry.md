@@ -3733,6 +3733,74 @@ The sprint planning SOP defines entry criteria for individual sprint groups (ent
 
 ---
 
+## NM-072 — Artifact 5 (EL Scope Decision Gate) Authored and Approved Before Artifacts 2, 3, and 4; Sequence Inversion in GD Design Package
+
+**Date:** 2026-06-27
+**Milestone:** M18 — Full Argument and Demo 7
+**Detected by:** EL retrospective questioning during the M18 GD design session — EL asked why Artifact 5 had been authored so early, surfacing the inversion
+**Severity:** High — produced incorrect and contradictory artifacts in the repository; required post-hoc Decisions 4 and 5 to partially recover; Artifact 4 Dimensions 3 and 4 remain stale and misleading pending course correction
+
+### What happened
+
+The GD design package (#1354) is a 7-artifact sequential gate structure. The intended information flow is:
+
+```
+Artifact 1 (current state audit)
+    ↓ informs
+Artifact 2 (target state specification) + Artifact 3 (Customer Agent assessment)
+    ↓ both inform
+Artifact 4 (delta analysis — gap between current and target)
+    ↓ informs
+Artifact 5 (EL scope decision — what M18 delivers against the target)
+    ↓ informs
+Artifact 6 (ADR-019)
+```
+
+Artifact 5 was authored and EL-approved in a prior session before Artifacts 2, 3, or 4 existed. When the current session began Artifacts 2, 3, and 4 authorship, those artifacts had to be retrofitted to match the pre-existing Artifact 5 decisions rather than informing them.
+
+The consequences cascaded:
+
+1. **GrowthShock missing from Artifact 5 Decision 2** — Artifact 3 (Customer Agent assessment) had not been written when Artifact 5 approved the 6-type taxonomy. Artifact 3 found GrowthShock ESSENTIAL for Demo 7 Step 4. GrowthShock had to be added post-hoc as Decision 4.
+
+2. **Artifact 2 authored maximally, then corrected to match Artifact 5** — Artifact 2 was written as the intended maximalist target state, including GrowthShock and the full shock taxonomy. When the conflict with Artifact 5 was discovered, Artifact 2 was corrected to match Artifact 5's narrower scope. This left `docs/ux/information-hierarchy.md` documenting M18 delivery scope rather than the platform target state — the opposite of its purpose.
+
+3. **Artifact 4 became stale at Dimensions 3 and 4** — Artifact 4 (delta analysis) was authored against the original maximalist Artifact 2 before the correction. When Artifact 2 was corrected, Artifact 4's Dimension 4 (Mode 2 column surface — editable sliders) and Dimension 3 (ShockInjectRequest schema) became incorrect but were never updated. Both dimensions now describe the pre-correction state.
+
+4. **EL scope decisions made with incomplete design analysis** — Decision 1 (Mode 2 = read-only) and Decision 2 (6 shock types) were made without the benefit of a complete target-state analysis (Artifact 2), customer assessment (Artifact 3), or delta analysis (Artifact 4). The EL did not have the full design picture at the time of approval.
+
+### What was at risk
+
+An implementing agent authoring ADR-019 against the current artifact set would receive contradictory inputs:
+- Artifact 4 Dimension 4 describes a `ScenarioConfigColumn.tsx` with editable sliders in Mode 2 — which conflicts with Decision 1 (read-only Mode2ColumnSurface)
+- Artifact 4 Dimension 3 describes a single-magnitude ShockInjectRequest — which conflicts with Decision 4's multi-parameter GrowthShock schema
+- `information-hierarchy.md` (Artifact 2 output) describes M18 scope as the platform target — which would cause future agents to treat M18 delivery constraints as permanent platform architecture
+
+Without course correction, ADR-019 would either (a) build the wrong Mode 2 component, (b) build the wrong shock schema, or (c) require a rework cycle after the Architect discovered the contradictions mid-authorship.
+
+### What caught it
+
+EL retrospective questioning. The EL asked "I am a bit puzzled how Artifact 4 and Artifact 5 diverged so much at inception" — which surfaced the sequence inversion. No process gate prevented Artifact 5 from being approved before its inputs existed.
+
+### Root cause
+
+The GD sprint entry defined the downstream gate (Artifact 5 must be EL-approved before ADR-019 begins) but did not define the upstream gate (Artifacts 2, 3, and 4 must be on record before Artifact 5 is authored). The gate was unidirectional — it protected ADR-019's inputs but not Artifact 5's inputs.
+
+### Process improvement
+
+**Immediate:** Course correction in the current session — restore Artifact 2 to maximalist target state, correct Artifact 4 Dimensions 3 and 4, clarify Artifact 5 framing. See course correction record below.
+
+**Structural fix for future pre-wave design packages:**
+
+Any future design package following the GD model must include an explicit upstream gate on its EL scope decision artifact:
+
+> "This document may not be authored until [list of prerequisite artifacts] are all filed and on record. The EL scope decision must be informed by the complete design analysis, not preceded by it."
+
+This gate condition belongs in the sprint entry or design package kickoff document — not just in the downstream unblock record. The bidirectional constraint must be explicit: the scope decision gates downstream work AND is gated by upstream analysis.
+
+**Course correction record:** `docs/process/intents/M18-GD-2026-06-26-control-plane-scope-decision.md` amended; `docs/ux/information-hierarchy.md §Control Plane Reserved Zone` restored; `docs/architecture/control-plane-column-delta-analysis-m18.md` Dimensions 3 and 4 corrected. See GD session record 2026-06-27.
+
+---
+
 ## NM-NNN — [Short descriptive title]
 
 **Date:** YYYY-MM-DD (or approximate milestone era)

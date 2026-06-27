@@ -445,11 +445,12 @@ When `uncertainty_range_pct = None`:
 
 ## Control Plane Reserved Zone
 
-> Revised: 2026-06-26 — Mode 2 column specified as read-only scenario summary +
-> "Enter Active Control" affordance (EL Decision 1, Artifact 5 #1359); Mode 3
-> specification consolidated; shock taxonomy confirmed as six types (EL Decision 2,
-> Artifact 5 #1359); mode transition and CVD colors added. Authority: GD Artifact 2
-> Issue #1356, corrected against Artifact 5 EL-approved decisions.
+> Revised: 2026-06-27 — Course corrected per NM-072: restored to maximalist
+> platform target state. Mode 2 read-only specification is confirmed correct target
+> architecture (not an M18 scope compromise). Mode 3 shock taxonomy restored to
+> all 7 types including GrowthShock. M18 delivery scope constraints removed —
+> this document records platform target state only. M18 delivery scope and G4
+> implementation scope are in Artifact 5 (#1359) and ADR-019.
 
 A dedicated screen zone is reserved in the primary viewport layout for the control
 plane from M9 onward. This zone is reserved before Mode 3 is built — not retrofitted
@@ -474,10 +475,13 @@ size (11px) must not exceed the smallest text in Zone 1 instruments.
 
 ### Mode 2 (Simulation) — Read-Only Summary + Mode 3 Activation
 
-> **Authority: EL Decision 1, Artifact 5 (#1359), approved 2026-06-26.**
-> Mode 2 column 3 is NOT a scenario parameter editor in M18. It is a read-only
-> scenario summary surface with a single mode-transition affordance. A richer
-> configuration surface is deferred to a future milestone.
+> **Platform architecture ruling — UX Designer, GD Artifact 5 panel 2026-06-26.**
+> Mode 2 column 3 is a read-only scenario summary surface with a single
+> mode-transition affordance. This is the correct target architecture for Mode 2,
+> not a scope compromise: Mode 2's cognitive task is threshold-safe path
+> construction, which requires undistracted trajectory reading. Editable parameters
+> in column 3 would undermine that task. No editable configuration surface is
+> specified for Mode 2 column 3 at any milestone.
 
 The Mode 2 column carries two elements only: a read-only summary of the loaded
 scenario, and a single control to enter Mode 3. No editable fields. No sliders.
@@ -567,7 +571,7 @@ the top of the column, above both forms.
 
 1. **Control input type selector** (dropdown/select)
    - Label: "Input type"
-   - Available types for M18: `FiscalMultiplier`, `LegitimacyConstraint`
+   - Available types: `FiscalMultiplier`, `LegitimacyConstraint`
    - Display names: "Fiscal Multiplier", "Legitimacy Constraint"
    - Selecting a type updates the parameter field(s) shown below
    - `data-testid="policy-input-type-selector"`
@@ -626,11 +630,11 @@ the top of the column, above both forms.
    | Geopolitical Shock | `GeopoliticalShock` |
    | Natural Disaster | `NaturalDisaster` |
    | Financial Contagion | `ContagionShock` |
+   | GDP / Growth Scenario | `GrowthShock` |
 
-   Six types total (EL Decision 2, Artifact 5 #1359). Parameter schemas and
-   data dependency status for each type are specified in ADR-019 before G4
-   sprint entry. The shock magnitude field and any type-specific parameter
-   fields are ADR-019 scope — not specified here.
+   Seven types — the complete platform shock taxonomy. Parameter schemas for
+   each type are specified in ADR-019. Type-specific parameter fields (magnitude,
+   duration, distribution parameters) are ADR-019 scope — not specified here.
 
 3. **"Inject scenario shock" button**
    - Background: `#ea580c`, color: `#fff`

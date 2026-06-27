@@ -5,7 +5,7 @@ artifact: "Artifact 5 — GD Design Package (#1359)"
 issues:
   - "#1359 — Artifact 5: Scope Decision Document (EL gate)"
   - "#1354 — Control Plane Design Package (parent)"
-status: "EL-approved 2026-06-26 (Decisions 1–4); Decision 5 EL-approved 2026-06-27 (Form 2 MVP scope — 4 types for Demo 7)"
+status: "EL-approved 2026-06-26 (Decisions 1–4); Decision 5 superseded by Decision 6 (2026-06-27); Decision 6 EL-approved 2026-06-27 (all 7 shock handlers in G4)"
 authored-by: PM Agent
 authored-date: 2026-06-26
 el-approved: "2026-06-26"
@@ -19,7 +19,16 @@ sprint-entry-reference: "docs/process/sprint-plans/m18-gd-sprint-entry.md (EL-ap
 
 # Artifact 5 — Control Plane Scope Decision Document
 
-**GD Phase 3 gate.** This document records three EL decisions required before ADR-019
+> **Framing note (added 2026-06-27, per NM-072 course correction):**
+> This document records M18 delivery scope decisions against the platform target
+> state defined in Artifact 2 (`docs/ux/information-hierarchy.md §Control Plane
+> Reserved Zone`). It does not define or modify the platform target state — that
+> is Artifact 2's role. Where this document says "in M18" or "for Demo 7," those
+> are delivery scope qualifiers. The target state itself is milestone-independent.
+> Agents reading this document must consult Artifact 2 for the full platform target
+> before interpreting any decision here as an architectural constraint.
+
+**GD Phase 3 gate.** This document records EL decisions required before ADR-019
 may be authored. It is filed in the intents directory by convention (per
 `docs/process/sprint-plans/m18-gd-sprint-entry.md §2.3`) — it is not an
 implementation intent. The agent-execution-lifecycle Step 1 obligation does not apply.
@@ -270,7 +279,7 @@ On EL approval of this document, the following downstream actions unblock:
 
 | Action | Owner | Can begin |
 |---|---|---|
-| ADR-019 authorship | Architect Agent | After EL approval of Decisions 1–5 — provided Artifacts 2 (#1356) and 4 (#1358) are also on record |
+| ADR-019 authorship | Architect Agent | After EL approval of Decisions 1–4 and Decision 6 (Decision 5 superseded) — provided Artifacts 2 (#1356) and 4 (#1358) corrected per NM-072 and on record |
 | G4 sprint entry filing | PM Agent | After ADR-019 accepted (separate-session UX Designer sign-off, Tier 1, NM-042 compliance) |
 | EX-001 renewal suppressed | Compliance | No renewal required — EX-001 resolves at G4 exit per Decision 3 |
 
@@ -278,7 +287,7 @@ On EL approval of this document, the following downstream actions unblock:
 - §Decision 1 provides the Mode 2 column content specification (ADR-019 §Mode 2 state)
 - §Decision 2 provides the shock taxonomy scope — six base types (ADR-019 §Form 2 shock taxonomy)
 - §Decision 4 provides the GrowthShock addition (approved — add as seventh type)
-- §Decision 5 scopes Form 2 to four types for Demo 7: `GrowthShock`, `ElectionShock`, `GeopoliticalShock`, `CurrencyAttack`; ADR-019 §Form 2 defines parameter schemas for these four only; deferred types noted as M19 scope
+- §Decision 6 supersedes Decision 5: all 7 shock handlers implemented in G4; Form 2 exposes all 7 types; ADR-019 §Form 2 defines parameter schemas for all 7 types; no deferred types
 - §Decision 3 provides the render optimization obligation and EX-001 exit condition
   (ADR-019 §G4 implementation obligations)
 
@@ -323,7 +332,45 @@ On EL approval of this document, the following downstream actions unblock:
 
 ---
 
-## Decision 5 — Form 2 MVP Shock Type Scope for Demo 7
+## Decision 6 — Shock Engine Implementation Scope for G4
+
+**Supersedes Decision 5.** Decision 5 limited Form 2 UI to 4 types for Demo 7.
+Decision 6 resolves the broader question of engine implementation scope. As engine
+scope is a superset of UI scope, Decision 6 takes precedence. Decision 5 is
+preserved below as a historical record of the reasoning that led to this decision.
+
+**Question:** Does G4 build 4 shock engine handlers (matching the Decision 5 UI scope)
+or all 7 (complete engine implementation regardless of UI exposure)?
+
+**EL decision and rationale (2026-06-27):**
+
+Build all 7 shock handlers in G4. Rationale: the risk of misinterpretation across
+implementing agents is too high to scale shock handlers incrementally against a
+fully-specified target architecture. Cherry-picking 4 of 7 types for engine
+implementation creates ambiguity about which handlers are complete and which are
+absent — this ambiguity compounds as different agents read different artifacts at
+different points in time. The NM-072 sequence inversion has already demonstrated
+that artifact-to-artifact confusion is a real failure mode in this design package.
+The forcing-function argument applies: requiring all 7 engine handlers to be built
+simultaneously forces the architecture (dispatch pattern, ShockEffect protocol,
+registry) to be correct for the general case, not the 4-type case.
+
+**Consequence for UI exposure:** Form 2 type selector shows all 7 types. Decision 5's
+4-type UI restriction is superseded. "Don't slice and dice" applies to both engine
+and UI — the complete taxonomy is present and functional from G4 exit.
+
+**ADR-019 obligations from this decision:**
+- `ShockEffect` protocol / registry pattern must be specified for all 7 types
+- Parameter schemas for all 7 types must be fully resolved (including
+  `creditor_class` enum for `CreditorDefection` and linkage table approach
+  for `ContagionShock`) before G4 sprint entry is filed
+- The implementing engineer must not defer any handler to M19
+
+**EL approval:** ☑ Approved 2026-06-27
+
+---
+
+## Decision 5 — Form 2 MVP Shock Type Scope for Demo 7 (SUPERSEDED by Decision 6)
 
 **Post-approval scope refinement.** Decision 2 (all seven types in M18) established the
 full taxonomy. Decision 5 defines which subset is implemented and exposed in Form 2 for

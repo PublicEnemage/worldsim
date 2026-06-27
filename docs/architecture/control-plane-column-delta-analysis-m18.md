@@ -195,12 +195,46 @@ injection mechanism needed for Mode 3.
    ```
 
 2. **Define shock injection request schema** (`backend/app/schemas.py`):
+
+   The schema uses a discriminated union — `shock_type` is the discriminator; each
+   type carries its own named parameter fields. This is the maximalist architecture:
+   every type's parameters are explicit and validated at the API boundary. Adding a
+   new shock type in a future milestone is additive — one new branch in the union, one
+   new handler module, no changes to the dispatch pattern.
+
    ```python
    class ShockInjectRequest(BaseModel):
        shock_type: ShockType
        inject_at_step: int
-       magnitude: float | None = None  # required for GrowthShock, None for others
+       # Type-specific parameters — validated against shock_type by the endpoint.
+       # All are optional at the schema level; the endpoint validates that required
+       # fields for the selected shock_type are present.
+       # GrowthShock parameters:
+       growth_rate_delta: float | None = None      # departure from baseline growth rate
+       duration_steps: int | None = None           # steps the perturbation persists
+       distribution_asymmetry: float | None = None # cohort skew (0 = proportional)
+       # ElectionShock parameters:
+       severity: float | None = None               # political uncertainty magnitude
+       political_uncertainty: float | None = None  # governance disruption factor
+       # CurrencyAttack parameters:
+       attack_magnitude: float | None = None       # FX rate shock magnitude
+       # CreditorDefection parameters:
+       creditor_class: str | None = None           # enum defined in ADR-019
+       share_affected: float | None = None         # fraction of class defecting
+       # GeopoliticalShock parameters:
+       regime_change_probability: float | None = None
+       regional_contagion: bool | None = None
+       # NaturalDisaster parameters:
+       affected_sectors: list[str] | None = None   # sector taxonomy from scenario
+       gdp_impact: float | None = None
+       # ContagionShock parameters:
+       source_country: str | None = None           # ISO3 code
+       transmission_rate: float | None = None
    ```
+
+   ADR-019 specifies the complete parameter schemas, validation rules per type,
+   and data dependency requirements (creditor_class taxonomy; ContagionShock
+   linkage table approach) before G4 sprint entry.
 
 3. **New API endpoint** (`backend/app/api/scenarios.py`):
    `POST /scenarios/{scenario_id}/inject-shock` — applies a shock to an existing
@@ -210,13 +244,30 @@ injection mechanism needed for Mode 3.
    - The endpoint must re-run the scenario from `inject_at_step` with the shock applied
 
 4. **Engine shock implementation** (simulation modules):
-   Each shock type requires a defined effect on the simulation state:
-   - `GrowthShock`: scales GDP growth rate at the target step by `(1 + magnitude/100)`.
-     This is the Demo 7 primary type — it must be implemented first.
-   - Other shock types: each requires a defined mapping to the simulation parameters
-     they affect (e.g., `ElectionShock` → legitimacy_index step drop; `CurrencyAttack`
-     → FX rate shock to fiscal parameters). These mappings require separate ADR-019
-     specification before implementation.
+
+   **All 7 shock types are implemented in G4** (EL Decision 6, 2026-06-27).
+   No incremental rollout — the full engine is built complete. Each type requires
+   a defined effect on the simulation state; all mappings must be specified in
+   ADR-019 before G4 begins:
+   - `GrowthShock`: perturbs GDP growth rate from `inject_at_step`; applies
+     `distribution_asymmetry` across cohorts. Primary Demo 7 type.
+   - `ElectionShock`: step-drop to `legitimacy_index`; propagates through
+     GovernanceModule confidence cascade
+   - `CurrencyAttack`: FX rate shock; propagates through fiscal parameters
+     (import costs, debt servicing if FX-denominated)
+   - `CreditorDefection`: removes `share_affected` of `creditor_class` from
+     future debt service capacity; triggers MDA creditor flight alert
+   - `GeopoliticalShock`: regional stability perturbation; affects FDI inflows
+     and external balance
+   - `NaturalDisaster`: sector-level output reduction across `affected_sectors`;
+     GDP impact distributed by sector weight
+   - `ContagionShock`: cross-country transmission from `source_country` via
+     contagion linkage table; affects trade and capital flow parameters
+
+   The implementing engineer MUST NOT implement a subset and defer the rest.
+   The engine dispatch pattern (registry / `ShockEffect` protocol) is designed
+   for all 7 simultaneously — partial implementation risks the shortcuts that
+   incremental rollout is specifically designed to prevent.
 
 5. **Populate `TrajectoryStep.shock_events`** (trajectory endpoint):
    The `GET /scenarios/{id}/trajectory` response must populate `shock_events` at
@@ -239,50 +290,48 @@ Shock implementation is therefore a Wave 2 or later item.
 
 ---
 
-## Dimension 4 — Mode 2 Scenario Configuration Surface
+## Dimension 4 — Mode 2 Column Surface
+
+> **Corrected 2026-06-27 per NM-072.** The original version of this dimension
+> described a `ScenarioConfigColumn.tsx` with editable sliders and an "Apply
+> Configuration" button — based on the pre-correction Artifact 2. That description
+> is superseded. Mode 2 column 3 is not a scenario parameter editor. The correct
+> target is specified below.
 
 ### Gap
 
-No Mode 2 content exists in the 280px column. Journey A Gap GA-02: Eleni must
-navigate away from the instrument cluster to change the fiscal multiplier.
+No Mode 2 content exists in the 280px column. The column shows only the subdued
+watermark. The gap is an absent pre-flight scenario summary and absent Mode 3
+activation affordance.
 
 ### Frontend engineering delta
 
-New component: `ScenarioConfigColumn.tsx`
-- "SCENARIO CONFIGURATION" header (neutral slate-500 color)
-- FiscalMultiplier slider (range 0.1–3.0, same as Mode 3)
-- LegitimacyConstraint slider (range 0.0–1.0)
-- "Apply Configuration" button (slate-500, not blue/orange)
-- Pre-populated from `activeScenarioDetail.configuration` on mount
-- Disabled during recompute
+New component: `Mode2ColumnSurface.tsx` — lightweight, no form state, no sliders.
 
-### Backend dependency: None for the preferred implementation model
+- **Scenario summary** (read-only, 4 lines): scenario name, entity (ISO3 +
+  display name), calibration vintage, run horizon. All sourced from existing
+  store state — no new API fetch required.
+  `data-testid="mode2-scenario-summary"`
 
-**Recommended implementation:** Mode 2 "Apply Configuration" creates a new scenario
-via `POST /scenarios` with the updated parameters, then auto-advances it. This reuses
-the existing endpoint without any new API work. The UI switches its `scenarioId` to
-the new scenario on creation.
+- **"Enter Active Control" button** (only interactive element):
+  `background: #0284c7`, `opacity: 0.75` (subdued — pre-active signaling).
+  On click: dispatches MODE_3 transition via Zustand store.
+  `data-testid="enter-active-control"`
 
-This is the same pattern used when the user creates a new scenario from the start —
-the "Apply Configuration" action in Mode 2 is semantically equivalent to "create a
-modified variant and run it." No new endpoint is required.
+- **Caution text** (12px, `color: rgba(0,0,0,0.45)`): plain-language description
+  of what Active Control does and how to exit it.
 
-**Alternative considered and rejected:** A dedicated "reconfigure and re-run" endpoint.
-Rejected because: (a) it duplicates `POST /scenarios` semantics; (b) it adds API
-surface for a use case already covered; (c) the existing create + advance flow is
-already tested and reliable.
+### Backend dependency: None
 
-**Frontend state change:** `ScenarioInstrumentCluster` must handle the scenario ID
-switch on Mode 2 Apply — updating the active scenario ID in the store and re-fetching
-the trajectory for the new scenario.
+All display data is already in the scenario store. No new API calls.
 
 ### Dependency on Mode 3 column layout
 
-Mode 2 and Mode 3 column content are independent components that render in the same
-column slot. They do not share layout contracts beyond the 280px column width.
-**Mode 2 column content can be built independently of Mode 3 column content** —
-once Dimension 1 (the column slot) is built, Mode 2 and Mode 3 content can be
-developed concurrently on separate branches.
+`Mode2ColumnSurface` and `ControlPlane` are separate components passed into the
+`InstrumentCluster` `controlPlane` prop slot (Dimension 1). They share no state.
+The two-component separation is an EL-mandated architectural constraint — it enables
+lazy mounting of `ControlPlane` for render optimization (Issue #1217 / EX-001).
+**Mode 2 column content can be built independently of Mode 3 column content.**
 
 ---
 
