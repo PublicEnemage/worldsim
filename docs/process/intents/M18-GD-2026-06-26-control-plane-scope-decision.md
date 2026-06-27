@@ -5,21 +5,31 @@ artifact: "Artifact 5 — GD Design Package (#1359)"
 issues:
   - "#1359 — Artifact 5: Scope Decision Document (EL gate)"
   - "#1354 — Control Plane Design Package (parent)"
-status: "EL-approved 2026-06-26 (Decisions 1–3); Decision 4 pending EL review (GrowthShock gap — post-panel escalation)"
+status: "EL-approved: Decisions 1–4 (2026-06-26/27); Decision 5 superseded by Decision 6 (2026-06-27); Decision 6 (all 7 shock handlers) EL-approved 2026-06-27"
 authored-by: PM Agent
 authored-date: 2026-06-26
 el-approved: "2026-06-26"
 release-branch: release/m18
 gd-phase: "Phase 3 — filed after Artifacts 2 (#1356) and 4 (#1358)"
 downstream-unblock:
-  - "ADR-019 authorship (Architect Agent, #1360) — may not begin until this document is EL-approved"
-  - "G4 sprint entry (Wave 2 implementation) — may not be filed until ADR-019 is accepted"
+  - "ADR-019 authorship (Architect Agent, #1360) — unblocked; all Decisions 1–4 + Decision 6 on record; Artifacts 2 (#1356) and 4 (#1358) corrected (NM-072 course correction 2026-06-27)"
+  - "G4 sprint entry (Wave 2 implementation) — may not be filed until ADR-019 is accepted (separate-session UX Designer sign-off, Tier 1, NM-042 compliance)"
 sprint-entry-reference: "docs/process/sprint-plans/m18-gd-sprint-entry.md (EL-approved 2026-06-26)"
 ---
 
 # Artifact 5 — Control Plane Scope Decision Document
 
-**GD Phase 3 gate.** This document records three EL decisions required before ADR-019
+> **Framing (NM-072 course correction, 2026-06-27):** This document records M18 delivery
+> scope decisions and the EL's deliberation record. It does not define or modify the
+> platform target state. The platform target state — including the full seven-type shock
+> taxonomy, the Mode 2 column architecture, and the Mode 3 control plane — is defined in
+> `docs/ux/information-hierarchy.md §Control Plane Reserved Zone` (Artifact 2, GD design
+> package). Decisions in this document govern what is *delivered in M18*; they are delivery
+> scope decisions against the platform target, not architectural constraints on what the
+> platform can eventually do. When this document names a subset of types or a simplified
+> surface, it means "not in M18" — not "not in the platform."
+
+**GD Phase 3 gate.** This document records EL decisions required before ADR-019
 may be authored. It is filed in the intents directory by convention (per
 `docs/process/sprint-plans/m18-gd-sprint-entry.md §2.3`) — it is not an
 implementation intent. The agent-execution-lifecycle Step 1 obligation does not apply.
@@ -260,26 +270,28 @@ scope" — that is the gap, not a rationale). If deferred, Demo 7 Step 4 require
 documented methodological workaround noting that `fiscal_multiplier` is used as a proxy
 and naming the analytical limitation this introduces.
 
-**EL decision:** ☐ Pending
+**EL decision:** ☑ Add — GrowthShock added as seventh type. ADR-019 includes GrowthShock in the Form 2 shock taxonomy with parameter schema: `growth_rate_delta: float`, `duration_steps: int`, `distribution_asymmetry: float (optional, default 0.0)`. Demo 7 Step 4 (Troika rebuttal — GDP rebound reaches bottom quintile) requires a growth shock, not a fiscal lever proxy. EL-approved 2026-06-26.
 
 ---
 
 ## Downstream Unblock Record
 
-On EL approval of this document, the following downstream actions unblock:
+*Updated 2026-06-27 (NM-072 course correction — all decisions on record; Artifacts 2 and 4 corrected).*
 
-| Action | Owner | Can begin |
+All six EL decisions are on record. ADR-019 authorship is fully unblocked.
+
+| Action | Owner | Status |
 |---|---|---|
-| ADR-019 authorship | Architect Agent | After EL approval of Decisions 1–3 **and** Decision 4 — provided Artifacts 2 (#1356) and 4 (#1358) are also on record |
-| G4 sprint entry filing | PM Agent | After ADR-019 accepted (separate-session UX Designer sign-off, Tier 1, NM-042 compliance) |
+| ADR-019 authorship | Architect Agent | **UNBLOCKED** — Decisions 1–4 + Decision 6 on record; Artifacts 2 (#1356) and 4 (#1358) corrected (NM-072 course correction 2026-06-27) |
+| G4 sprint entry filing | PM Agent | Gated on ADR-019 acceptance (separate-session UX Designer sign-off, Tier 1, NM-042 compliance) |
 | EX-001 renewal suppressed | Compliance | No renewal required — EX-001 resolves at G4 exit per Decision 3 |
 
 **ADR-019 inputs from this document:**
-- §Decision 1 provides the Mode 2 column content specification (ADR-019 §Mode 2 state)
-- §Decision 2 provides the shock taxonomy scope — six base types (ADR-019 §Form 2 shock taxonomy)
-- §Decision 4 provides the GrowthShock addition or explicit deferral (ADR-019 §Form 2 shock taxonomy must reflect whichever EL selects)
-- §Decision 3 provides the render optimization obligation and EX-001 exit condition
-  (ADR-019 §G4 implementation obligations)
+- §Decision 1: Mode 2 column content — read-only `Mode2ColumnSurface` + "Enter Active Control" button; two-component architecture required
+- §Decision 2: Shock taxonomy scope — all six base types in M18 (EL condition: parameter schemas + data dependency status for all six before G4 sprint entry)
+- §Decision 4: GrowthShock added as seventh type — ADR-019 §Form 2 must include `GrowthShock` with parameter schema
+- §Decision 3: EX-001 resolution — optimize in G4, close based on MV-002 exit measurement; AC-009 removed from CI permanently
+- §Decision 6: All 7 shock handlers in G4 — ShockEffect protocol and registry for all 7; complete parameter schemas (including `creditor_class` enum for `CreditorDefection` and `ContagionShock` linkage table approach) must be resolved in ADR-019 before G4 sprint entry
 
 ---
 
@@ -325,17 +337,71 @@ On EL approval of this document, the following downstream actions unblock:
 ## Decision 4 EL Approval Record
 
 **Filed:** 2026-06-26 (post-panel escalation)
-**EL decision pending.**
+**EL-approved:** 2026-06-26
 
-> ☐ **Add GrowthShock as seventh type** — ADR-019 includes `GrowthShock` in the Form 2
+> ☑ **Add GrowthShock as seventh type** — ADR-019 includes `GrowthShock` in the Form 2
 > shock taxonomy with parameter schema: `growth_rate_delta: float`,
 > `duration_steps: int`, `distribution_asymmetry: float (optional, default 0.0)`.
-> CE Agent parameter schema table updated accordingly. No additional sprint scope
-> change required — data dependency is self-contained (same tier as `ElectionShock`).
+> The `distribution_asymmetry` parameter carries the Demo 7 Step 4 argument: the
+> Zambian ministry analyst can show whether a GDP rebound reaches the bottom quintile
+> or is captured by upper cohorts — a growth shock, not a fiscal lever proxy. No
+> additional sprint scope change required — data dependency is self-contained.
 >
-> ☐ **Defer GrowthShock** — ADR-019 notes explicit deferral with recorded rationale.
-> Demo 7 Step 4 methodology note required: analyst uses `fiscal_multiplier` as growth
-> proxy; limitation documented in the demo script and surfaced to the presenter as
-> a methodological caveat.
->
-> — @PublicEnemage (date)
+> — @PublicEnemage (2026-06-26)
+
+---
+
+## Decision 5 — Demo 7 Shock Type Subset (SUPERSEDED by Decision 6)
+
+> **Note:** Decision 5 was made and immediately superseded by Decision 6 in the same
+> session (2026-06-27). It is recorded here for change management traceability only.
+> The binding decision is Decision 6.
+
+**Question asked:** Of the seven shock types (Decisions 2 + 4), which subset should the
+Form 2 type selector expose for Demo 7?
+
+**EL decision (superseded):** ☑ Four types for Demo 7 UI: `GrowthShock`,
+`ElectionShock`, `GeopoliticalShock`, `CurrencyAttack`. The four are self-contained
+(no data dependency beyond scenario structure already loaded). The remaining three
+(`CreditorDefection`, `NaturalDisaster`, `ContagionShock`) were flagged as higher
+data dependency risk for the Demo 7 timeline.
+
+**Superseded by Decision 6 (below):** The EL reconsidered immediately — thin-slicing
+the engine to match a Demo 7 UI subset introduces the same re-architecture risk that
+led to NM-072. Decision 6 mandates all 7 handlers in G4 regardless of which types
+are highlighted in the Demo 7 script.
+
+— @PublicEnemage (2026-06-27)
+
+---
+
+## Decision 6 — All 7 Shock Handlers in G4 (Supersedes Decision 5)
+
+**Question:** Should G4 implement all 7 shock engine handlers, or only the subset
+needed for the Demo 7 MVP script?
+
+**Background:** After Decision 5 was made, the EL raised a deeper concern: building
+4 handlers now and 3 later creates the same incremental-to-full-re-architecture
+risk that produced NM-072. The ShockEffect protocol and registry architecture must
+be correct for the general case. Building all 7 handlers simultaneously is the
+forcing function that ensures the architecture is not taking shortcuts valid only
+for a subset.
+
+**EL decision:** ☑ Build all 7 shock handlers in G4. No incremental rollout.
+The Form 2 type selector shows all 7 types. This is not a Demo 7 scope increase —
+it is an architectural completeness requirement. The risk of misinterpretation by
+different agents implementing a partial architecture is higher than the cost of
+building the full taxonomy now.
+
+**ADR-019 obligations from this decision:**
+- ShockEffect protocol and registry architecture must be designed for all 7 types
+  before G4 sprint entry
+- Full parameter schemas for all 7 types (including `creditor_class` enum taxonomy
+  for `CreditorDefection` and `ContagionShock` linkage table approach) must be
+  resolved in ADR-019 — no open questions deferred to G4
+- The implementing engineer MUST NOT implement a subset and defer the rest — this
+  constraint is recorded in ADR-019 and in Artifact 4 §Dimension 3
+
+**EL-approved:** 2026-06-27
+
+— @PublicEnemage (2026-06-27)
