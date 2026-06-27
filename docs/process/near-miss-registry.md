@@ -3733,6 +3733,54 @@ The sprint planning SOP defines entry criteria for individual sprint groups (ent
 
 ---
 
+## NM-072 — Artifact 5 (Scope Decision Gate) Authored and EL-Approved Before Prerequisite Design Artifacts Existed; Cascaded into Stale Delta Analysis and Incomplete Taxonomy (Reactive)
+
+**Date:** 2026-06-27
+**Milestone:** M18 — Full Argument and Demo 7
+**Detected by:** EL observation during GD design package review — EL noted divergence between Artifact 4 (maximalist discriminated union schema, all types) and Artifact 5 (six-type taxonomy, single-parameter ShockInjectRequest), and asked how they diverged so much at inception
+**Severity:** High — produced incorrect artifacts in the repository: Artifact 4 Dimensions 3 and 4 were drafted against an information hierarchy that had not yet been corrected, and Artifact 5's EL scope decisions were made without access to the full CE Agent analysis in Artifact 4; the GrowthShock type was absent from panel deliberation as a result
+
+### What happened
+
+The GD design package specifies a seven-artifact sequence: Artifacts 1→2→3→4 inform Artifact 5 (EL scope gate) → Artifact 6 (ADR-019) → Artifact 7 (UX update). Artifact 5 is the EL scope gate — the decisions it records gate ADR-019 authorship and G4 sprint entry.
+
+Artifact 5 was authored and EL-approved in a prior session **before Artifacts 2, 3, and 4 existed**. The sprint entry document specified the correct sequence, but no gate enforced it. The Artifact 5 author used a six-type shock taxonomy derived from ADR-008 (the only available input) without the benefit of: (a) Artifact 2's maximalist platform target for the control plane zone, (b) Artifact 3's Customer Agent Layer 3 finding that GrowthShock is ESSENTIAL for Demo 7 Step 4, or (c) Artifact 4's CE Agent discriminated union architecture analysis.
+
+Consequences:
+1. **GrowthShock omission from panel deliberation.** The panel deliberated the six types from ADR-008. GrowthShock was not considered and rejected — it was absent from the input. Decision 2 ("all six in M18") was made without the seventh type on the table.
+2. **Artifact 4 Dimension 4 drafted against stale Artifact 5.** The Artifact 4 author read Artifact 5 before authoring Dimension 4 and produced `ScenarioConfigColumn.tsx` — an editable configuration surface — because the stale Artifact 5 framing implied Mode 2 column 3 would have editable sliders. The correct Artifact 2 target (read-only summary + "Enter Active Control" button, named `Mode2ColumnSurface`) had not yet been written.
+3. **Artifact 4 Dimension 3 had a shallow ShockInjectRequest.** The CE Agent's discriminated union analysis in Dimension 3 used a single `magnitude: float | None` parameter because the panel had not yet deliberated on per-type parameter schemas. The correct schema names per-type parameters for all seven types.
+4. **Information hierarchy temporarily documented M18 scope instead of platform target.** Before the course correction, `information-hierarchy.md §Control Plane Reserved Zone` described the six-type shock taxonomy as the complete set, effectively encoding M18 scope into the platform governing document.
+5. **Thin-slicing concern.** The EL independently identified that Artifact 5's design appeared to be architectural minimalism rather than incremental delivery of a maximalist target — this would have led to re-architecture cost when deferred types were eventually added.
+
+### What was at risk
+
+ADR-019 was the next step. If the course correction had not been made before ADR-019 authorship began, the ADR-019 author would have received: contradictory inputs from Artifacts 4 and 5, a missing GrowthShock type, an incorrect Mode2ColumnSurface specification (editable sliders vs. read-only summary), and a shallow ShockInjectRequest schema. The resulting ADR-019 would have encoded the errors into the accepted architectural record, from which G4 sprint entry and implementation would follow. Discovering the errors during G4 implementation (the next failure point) would have required ADR-019 amendment, G4 sprint entry amendment, and partial implementation rework.
+
+### What caught it
+
+EL pattern recognition. The EL observed the Artifact 4 / Artifact 5 divergence and asked how they had diverged so much at inception. Investigation revealed the sequence inversion. No process gate surfaced the ordering problem before Artifact 5 was approved.
+
+### Root cause
+
+The GD gate was **unidirectional**: Artifact 5 gates ADR-019 (downstream). The gate was not **upstream**: no check prevented Artifact 5 from being filed and approved before its prerequisite artifacts existed. The sprint entry SOP correctly specified the artifact sequence, but specification without enforcement is not a gate.
+
+### Process improvement
+
+**Immediate:** Four-document course correction executed before ADR-019 authorship:
+1. `docs/process/near-miss-registry.md`: NM-072 filed (this entry)
+2. `docs/ux/information-hierarchy.md §Control Plane Reserved Zone`: Restored to maximalist platform target; Mode 2 column architecture ruling reframed as platform ruling (not M18 scope compromise); GrowthShock added as seventh type; shock taxonomy no longer encodes milestone scope
+3. `docs/architecture/control-plane-column-delta-analysis-m18.md §Dimension 3 and §Dimension 4`: Dimension 3 corrected to full discriminated union schema with per-type parameters for all seven types; Dimension 4 corrected to `Mode2ColumnSurface.tsx` (read-only summary + "Enter Active Control", no editable sliders); EL Decision 6 (all 7 handlers in G4) recorded
+4. `docs/process/intents/M18-GD-2026-06-26-control-plane-scope-decision.md §Artifact 5`: Framing note added; Decision 4 (GrowthShock) approved; Decision 5 (4 MVP types, superseded) filed; Decision 6 (all 7 handlers, forcing function for architectural completeness) filed
+
+**Structural fix required (sprint planning SOP):** Future pre-wave design packages that include an EL scope gate artifact must specify both:
+- **Downstream gate:** EL scope gate artifact → ADR authorship (already exists)
+- **Upstream gate:** Prerequisite design artifacts must be filed and on record before EL scope gate artifact may be submitted for EL review
+
+The upstream gate must be an explicit check in the sprint planning SOP, not guidance. An EL scope decision made without the full design analysis input is not independent review — it is approval of an incomplete specification. PI Agent holds R for verifying the upstream gate condition is satisfied before routing an Artifact 5 equivalent for EL review in any future pre-wave design package.
+
+---
+
 ## NM-NNN — [Short descriptive title]
 
 **Date:** YYYY-MM-DD (or approximate milestone era)

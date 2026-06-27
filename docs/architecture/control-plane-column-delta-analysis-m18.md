@@ -195,11 +195,37 @@ injection mechanism needed for Mode 3.
    ```
 
 2. **Define shock injection request schema** (`backend/app/schemas.py`):
+
+   > **Correction (NM-072, 2026-06-27):** The original schema used a single
+   > `magnitude: float | None` parameter — a shallow stub inconsistent with the CE Agent
+   > discriminated union architecture. The correct schema names per-type parameters for
+   > all seven types. Field-level validation at the API layer: required parameters
+   > per type are enforced by a Pydantic `@model_validator`.
+
    ```python
    class ShockInjectRequest(BaseModel):
        shock_type: ShockType
        inject_at_step: int
-       magnitude: float | None = None  # required for GrowthShock, None for others
+       # GrowthShock parameters
+       growth_rate_delta: float | None = None      # departure from baseline GDP growth rate
+       duration_steps: int | None = None           # steps the departure persists
+       distribution_asymmetry: float | None = None # cohort skew: 0=proportional, +=upper, -=lower
+       # ElectionShock / GeopoliticalShock parameters
+       severity: float | None = None               # 0.0–1.0
+       political_uncertainty: float | None = None  # 0.0–1.0
+       # CurrencyAttack parameters
+       attack_magnitude: float | None = None       # FX rate shock magnitude
+       # CreditorDefection parameters
+       creditor_class: str | None = None           # "bilateral" | "multilateral" | "commercial"
+       share_affected: float | None = None         # 0.0–1.0
+       regime_change_probability: float | None = None
+       # ContagionShock parameters
+       regional_contagion: bool | None = None
+       affected_sectors: list[str] | None = None
+       # NaturalDisaster parameters
+       gdp_impact: float | None = None
+       source_country: str | None = None
+       transmission_rate: float | None = None
    ```
 
 3. **New API endpoint** (`backend/app/api/scenarios.py`):
@@ -210,79 +236,128 @@ injection mechanism needed for Mode 3.
    - The endpoint must re-run the scenario from `inject_at_step` with the shock applied
 
 4. **Engine shock implementation** (simulation modules):
-   Each shock type requires a defined effect on the simulation state:
-   - `GrowthShock`: scales GDP growth rate at the target step by `(1 + magnitude/100)`.
-     This is the Demo 7 primary type — it must be implemented first.
-   - Other shock types: each requires a defined mapping to the simulation parameters
-     they affect (e.g., `ElectionShock` → legitimacy_index step drop; `CurrencyAttack`
-     → FX rate shock to fiscal parameters). These mappings require separate ADR-019
-     specification before implementation.
+
+   > **EL Decision 6 (2026-06-27):** All 7 shock handlers are implemented in G4.
+   > No incremental rollout. The implementing engineer MUST NOT implement a subset
+   > and defer the rest — the ADR-019 ShockEffect protocol and registry architecture
+   > must be correct for the general case, and building all handlers simultaneously
+   > is the forcing function that ensures the architecture handles the full taxonomy
+   > rather than taking shortcuts valid for a subset.
+
+   Each shock type requires a handler implementing a defined effect on the simulation state:
+
+   | Shock type | Engine effect |
+   |---|---|
+   | `GrowthShock` | Scale GDP growth rate at `inject_at_step` by `(1 + growth_rate_delta)`; persist for `duration_steps`; distribute cohort impact by `distribution_asymmetry` |
+   | `ElectionShock` | Apply `severity` drop to `legitimacy_index` at `inject_at_step`; propagate `political_uncertainty` to governance composite |
+   | `GeopoliticalShock` | Same parameters as `ElectionShock`; different causal attribution in MDA alerts |
+   | `CurrencyAttack` | Apply `attack_magnitude` to FX rate parameters affecting fiscal module; `creditor_class` optional for attribution |
+   | `CreditorDefection` | Mark `creditor_class` as defecting; apply `share_affected` to debt service calculations; `regime_change_probability` to legitimacy |
+   | `ContagionShock` | Apply `transmission_rate` from `source_country`; propagate to `affected_sectors`; `regional_contagion` flag triggers regional module |
+   | `NaturalDisaster` | Apply `gdp_impact` to GDP at `inject_at_step`; `affected_sectors` for sector-level distribution |
+
+   All effect mappings must be specified in ADR-019 before G4 sprint entry. ADR-019 holds
+   the ShockEffect protocol specification — the implementing agent's contract.
 
 5. **Populate `TrajectoryStep.shock_events`** (trajectory endpoint):
    The `GET /scenarios/{id}/trajectory` response must populate `shock_events` at
    steps where a shock was injected, so the frontend can render orange vertical
    markers. Current stub returns `[]` always.
 
-**Backend change scope:** NEW — schemas.py (ShockType enum, ShockInjectRequest),
-api/scenarios.py (inject-shock endpoint), simulation modules (shock effects per type),
-trajectory endpoint (shock_events population), api_contracts.yml.
+**Backend change scope:** NEW — schemas.py (ShockType enum, ShockInjectRequest with full
+discriminated union schema), api/scenarios.py (inject-shock endpoint), simulation modules
+(ShockEffect protocol + all 7 handler modules), trajectory endpoint (shock_events
+population), api_contracts.yml.
 
 **This is the largest single engineering dependency in the design package.** It
 gates Demo 7 Act 1 Step 4 (Troika rebuttal injection) entirely.
 
 ### ADR-019 dependency
 
-The shock type effect mappings (what each shock type does to the engine state) are
-architectural decisions that must be in ADR-019 before implementation begins.
+The ShockEffect protocol — the interface that each handler module must implement —
+is an architectural decision that must be in ADR-019 before implementation begins.
+ADR-019 must also resolve: (1) `creditor_class` enum taxonomy for `CreditorDefection`;
+(2) `ContagionShock` linkage table approach (pre-populated source-country linkage table
+vs. simplified model). These two open questions must be closed in ADR-019 before the
+G4 sprint entry is filed.
+
 ADR-019 is Artifact 6 of this design package — it gates on Artifacts 2, 4, and 5.
-Shock implementation is therefore a Wave 2 or later item.
+Shock implementation is G4 Wave 2 work.
 
 ---
 
-## Dimension 4 — Mode 2 Scenario Configuration Surface
+## Dimension 4 — Mode 2 Column Surface
+
+> **Correction (NM-072, 2026-06-27):** The original Dimension 4 specified a
+> `ScenarioConfigColumn.tsx` with editable sliders and an "Apply Configuration"
+> button — an editable configuration surface. This was drafted against the stale
+> Artifact 5 framing before Artifact 2 existed. The correct target, per EL Decision 1
+> (Artifact 5 §Decision 1, approved 2026-06-26) and `information-hierarchy.md
+> §Control Plane Reserved Zone`, is a **read-only** scenario summary surface with
+> a single "Enter Active Control" mode transition affordance. No editable fields.
+> See NM-072 for root cause and lineage.
 
 ### Gap
 
-No Mode 2 content exists in the 280px column. Journey A Gap GA-02: Eleni must
-navigate away from the instrument cluster to change the fiscal multiplier.
+No Mode 2 content exists in the 280px column. The column is empty in Mode 1 and
+Mode 2 — it renders as an empty reserved zone. This leaves the mode transition to
+Mode 3 without a visible affordance, which is the Demo 7 Act 1 critical path gap:
+the presenter must explain the transition out-of-band rather than pointing to a
+control in the instrument cluster.
+
+### Target
+
+`Mode2ColumnSurface.tsx` — a **read-only** column component showing:
+1. **Scenario identity block** — scenario name, entity (country), loaded calibration
+   vintage, run horizon (start step → end step). Pre-populated from
+   `activeScenarioDetail` on mount. No edit affordance.
+2. **"Enter Active Control" button** — the sole interactive element. Label is
+   "Enter Active Control" (not "Enter Mode 3" — Customer Agent kryptonite finding,
+   Personas 2 and 5; jargon-free label required per Artifact 5 §Decision 1 panel
+   condition). Button color: subdued slate-400 (not blue/orange — Mode 2 pre-active
+   state is visually differentiated from the active Mode 3 surface).
+3. **Visual treatment** — the Mode 2 surface is rendered at reduced visual weight
+   relative to the Mode 3 surface (e.g., slate-100 background, dashed column border)
+   to signal that this zone becomes active in Mode 3.
+
+**The Mode 2 surface is intentionally minimal.** No parameter editing. No
+FiscalMultiplier or LegitimacyConstraint sliders. The analyst's preparation work
+(scenario selection, calibration) is complete before they reach Mode 2 —
+the column's job in Mode 2 is to orient the analyst to what is loaded and give
+them a clear, intentional path to Mode 3.
 
 ### Frontend engineering delta
 
-New component: `ScenarioConfigColumn.tsx`
-- "SCENARIO CONFIGURATION" header (neutral slate-500 color)
-- FiscalMultiplier slider (range 0.1–3.0, same as Mode 3)
-- LegitimacyConstraint slider (range 0.0–1.0)
-- "Apply Configuration" button (slate-500, not blue/orange)
-- Pre-populated from `activeScenarioDetail.configuration` on mount
-- Disabled during recompute
+New component: `Mode2ColumnSurface.tsx`
+- Props: `activeScenarioDetail: ScenarioDetail`, `onEnterActiveControl: () => void`
+- Renders the scenario identity block (read-only, no form elements)
+- Renders the "Enter Active Control" button (`data-testid="enter-active-control-btn"`)
+- No `useState` beyond standard React rendering — no form state
+- Visual treatment: `background: '#f8fafc'` (slate-50), subdued border
 
-### Backend dependency: None for the preferred implementation model
+**`ScenarioInstrumentCluster.tsx`:**
+- Mode 2: `<InstrumentCluster controlPlane={<Mode2ColumnSurface .../>}>`
+- Mode 3: `<InstrumentCluster controlPlane={<ControlPlaneColumn .../>}>`
+- Mode 1: `<InstrumentCluster>` (no controlPlane prop, placeholder renders)
 
-**Recommended implementation:** Mode 2 "Apply Configuration" creates a new scenario
-via `POST /scenarios` with the updated parameters, then auto-advances it. This reuses
-the existing endpoint without any new API work. The UI switches its `scenarioId` to
-the new scenario on creation.
+**Two-component architecture (mandatory — EL Decision 1 panel condition):**
+`Mode2ColumnSurface` and `ControlPlaneColumn` are **separate components**. They are
+not conditional rendering branches within a single component. This is required for
+the lazy-mount optimization in Issue #1217: `ControlPlaneColumn` is lazy-mounted
+when Mode 3 is entered; `Mode2ColumnSurface` is unmounted at the same transition.
+A single conditional-render component would defeat the lazy-mount optimization.
 
-This is the same pattern used when the user creates a new scenario from the start —
-the "Apply Configuration" action in Mode 2 is semantically equivalent to "create a
-modified variant and run it." No new endpoint is required.
+### Backend dependency
 
-**Alternative considered and rejected:** A dedicated "reconfigure and re-run" endpoint.
-Rejected because: (a) it duplicates `POST /scenarios` semantics; (b) it adds API
-surface for a use case already covered; (c) the existing create + advance flow is
-already tested and reliable.
-
-**Frontend state change:** `ScenarioInstrumentCluster` must handle the scenario ID
-switch on Mode 2 Apply — updating the active scenario ID in the store and re-fetching
-the trajectory for the new scenario.
+None. `Mode2ColumnSurface` reads from `activeScenarioDetail` already present in
+the component's data flow. No new endpoint required. The "Enter Active Control"
+button triggers the mode transition in the client state machine only.
 
 ### Dependency on Mode 3 column layout
 
-Mode 2 and Mode 3 column content are independent components that render in the same
-column slot. They do not share layout contracts beyond the 280px column width.
-**Mode 2 column content can be built independently of Mode 3 column content** —
-once Dimension 1 (the column slot) is built, Mode 2 and Mode 3 content can be
-developed concurrently on separate branches.
+`Mode2ColumnSurface` and `ControlPlaneColumn` are independent components that
+render in the same column slot. Once Dimension 1 (the column slot) is built,
+Mode 2 and Mode 3 content can be developed concurrently on separate branches.
 
 ---
 
@@ -415,7 +490,7 @@ Can begin immediately after Artifact 6 (ADR-019) is accepted.
 |---|---|---|
 | L0-A: Move ControlPlane into column slot | `InstrumentCluster.tsx`, `ScenarioInstrumentCluster.tsx` | All subsequent column work |
 | L0-B: Color correction (purple → blue) | `ControlPlane.tsx` → `ControlPlaneColumn.tsx` | L0-D, L2-A |
-| L0-C: Mode 2 config form (FiscalMultiplier + LegitimacyConstraint) | New `ScenarioConfigColumn.tsx` | Nothing |
+| L0-C: Mode 2 read-only surface + "Enter Active Control" button | New `Mode2ColumnSurface.tsx` | Nothing |
 | L0-D: Policy instruments form (type selector, history list, step selector) | `ControlPlaneColumn.tsx` | L1-B (blue markers in trajectory) |
 | L0-E: Resolve #1217 (Recharts memoization / lazy mount) | `InstrumentCluster.tsx`, `ControlPlaneColumn.tsx` | L0-A (should precede or accompany) |
 
@@ -435,8 +510,8 @@ L1-A, L1-B, L1-C can proceed concurrently.
 
 | Item | Backend files | Frontend consumer | Blocks |
 |---|---|---|---|
-| L2-A: Implement GrowthShock in engine + inject-shock endpoint | `schemas.py`, `api/scenarios.py`, simulation modules | `ControlPlaneColumn.tsx` scenario shocks form | Demo 7 Step 4 |
-| L2-B: Implement remaining shock types (ElectionShock, CurrencyAttack, etc.) | simulation modules (per-type effects) | — | Complete shock taxonomy |
+| L2-A: Implement inject-shock endpoint + all 7 shock handlers (EL Decision 6) | `schemas.py`, `api/scenarios.py`, simulation modules | `ControlPlaneColumn.tsx` scenario shocks form | Demo 7 Step 4 |
+| L2-B: *(Subsumed by L2-A — all 7 handlers in a single G4 deliverable)* | — | — | — |
 | L2-C: Populate shock_events in trajectory response | `api/scenarios.py` trajectory handler | `TrajectoryView.tsx` orange markers | Orange shock markers |
 
 L2-A must precede L2-B and L2-C. L2-B and L2-C can proceed concurrently after L2-A.
@@ -475,8 +550,8 @@ live A/B → causal attribution with color treatment. This is the core argument.
 | R-2 | GrowthShock engine mapping is not specified | L2-A cannot begin without a defined effect on simulation state | ADR-019 must specify GrowthShock → engine parameter mapping before L2-A |
 | R-3 | #1217 deferred past L0-A creates a regression | Column mount with both forms may worsen 179ms baseline | Sequence #1217 before or with L0-A (Level 0 constraint) |
 | R-4 | EX-001 in expired-but-active limbo at M18 start | Compliance finding if not resolved | EL decision required in Artifact 5 |
-| R-5 | Shock type effects for non-GrowthShock types unspecified | L2-B cannot begin without per-type engine mappings | These are Wave 2+ items; document as out-of-scope for Demo 7 minimum viable set |
-| R-6 | Mode 2 "Apply Configuration" creates a new scenario ID | Frontend must handle scenario ID switch; existing store/fetch hooks must support live ID change | Scope this carefully in L0-C; test store ID switch before merging |
+| R-5 | Shock type effect mappings for all 7 types must be in ADR-019 | L2-A cannot begin without per-type engine mappings in ADR-019 | ADR-019 §Engine Effect Mappings table is a required section; G4 sprint entry gated on ADR-019 acceptance |
+| R-6 | *(Removed — ScenarioConfigColumn and scenario ID switch pattern no longer in scope for Mode 2 column)* | — | — |
 
 ---
 
@@ -485,6 +560,7 @@ live A/B → causal attribution with color treatment. This is the core argument.
 - [x] All six dimensions covered (Dimensions 1–6 above)
 - [x] Backend dependencies called out for shocks form (Dimension 3) and orange markers (Dimension 5 Layer C)
 - [x] Shock taxonomy backend status confirmed: **NOT modeled** in current engine; stub only; Level 2 new work required
-- [x] Dependency map identifies Demo 7 minimum viable set: L0-A, L0-D, L1-A, L1-B, L1-C, L2-A (GrowthShock only)
+- [x] Dependency map identifies Demo 7 minimum viable set: L0-A, L0-D, L1-A, L1-B, L1-C, L2-A (all 7 handlers per EL Decision 6)
 - [x] #1217 positioned in build sequence: before or during L0-A
 - [x] Mode 2 column content dependency on Mode 3 column layout addressed: independent after L0-A; concurrent build possible
+- [x] **NM-072 course correction applied:** Dimension 3 updated to full discriminated union ShockInjectRequest schema; Dimension 4 corrected from ScenarioConfigColumn (editable sliders) to Mode2ColumnSurface (read-only summary + "Enter Active Control"); EL Decision 6 (all 7 handlers) recorded in Dimension 3
