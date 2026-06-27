@@ -5,7 +5,7 @@ artifact: "Artifact 5 — GD Design Package (#1359)"
 issues:
   - "#1359 — Artifact 5: Scope Decision Document (EL gate)"
   - "#1354 — Control Plane Design Package (parent)"
-status: "EL-approved 2026-06-26 (Decisions 1–4)"
+status: "EL-approved 2026-06-26 (Decisions 1–4); Decision 5 EL-approved 2026-06-27 (Form 2 MVP scope — 4 types for Demo 7)"
 authored-by: PM Agent
 authored-date: 2026-06-26
 el-approved: "2026-06-26"
@@ -270,14 +270,15 @@ On EL approval of this document, the following downstream actions unblock:
 
 | Action | Owner | Can begin |
 |---|---|---|
-| ADR-019 authorship | Architect Agent | After EL approval of Decisions 1–3 **and** Decision 4 — provided Artifacts 2 (#1356) and 4 (#1358) are also on record |
+| ADR-019 authorship | Architect Agent | After EL approval of Decisions 1–5 — provided Artifacts 2 (#1356) and 4 (#1358) are also on record |
 | G4 sprint entry filing | PM Agent | After ADR-019 accepted (separate-session UX Designer sign-off, Tier 1, NM-042 compliance) |
 | EX-001 renewal suppressed | Compliance | No renewal required — EX-001 resolves at G4 exit per Decision 3 |
 
 **ADR-019 inputs from this document:**
 - §Decision 1 provides the Mode 2 column content specification (ADR-019 §Mode 2 state)
 - §Decision 2 provides the shock taxonomy scope — six base types (ADR-019 §Form 2 shock taxonomy)
-- §Decision 4 provides the GrowthShock addition or explicit deferral (ADR-019 §Form 2 shock taxonomy must reflect whichever EL selects)
+- §Decision 4 provides the GrowthShock addition (approved — add as seventh type)
+- §Decision 5 scopes Form 2 to four types for Demo 7: `GrowthShock`, `ElectionShock`, `GeopoliticalShock`, `CurrencyAttack`; ADR-019 §Form 2 defines parameter schemas for these four only; deferred types noted as M19 scope
 - §Decision 3 provides the render optimization obligation and EX-001 exit condition
   (ADR-019 §G4 implementation obligations)
 
@@ -319,6 +320,86 @@ On EL approval of this document, the following downstream actions unblock:
 > (#1356) and 4 (#1358) being on record per §Downstream Unblock Record.
 >
 > — @PublicEnemage (2026-06-26)
+
+---
+
+## Decision 5 — Form 2 MVP Shock Type Scope for Demo 7
+
+**Post-approval scope refinement.** Decision 2 (all seven types in M18) established the
+full taxonomy. Decision 5 defines which subset is implemented and exposed in Form 2 for
+Demo 7. The remaining types are deferred to M19 — they do not appear in the Form 2 type
+selector and are not engine-implemented in G4.
+
+**Question:** Of the seven approved shock types, which are implemented and exposed in
+Form 2 for Demo 7?
+
+---
+
+### Analysis basis
+
+The Demo 7 readiness checklist (sprint plan §Demo 7 Minimum Viable Readiness Checklist)
+does not list Form 2 as a required condition. Artifact 3 Customer Agent assessment
+challenges this: "Steps 1–3 alone prove Mode 2 capability, not Mode 3" — the Troika
+rebuttal injection is what makes Active Control demonstrably distinct from Simulation
+mode. Form 2 therefore needs at minimum one exercised, functional type for the Mode 3
+claim to survive scrutiny from a sophisticated participant (Persona 3).
+
+**Data dependency filter:** CE Agent (Decision 2 deliberation) identified two types with
+data-dependent parameters — `CreditorDefection` (`creditor_class` enum) and
+`ContagionShock` (linkage table). Including either in G4 scope creates an ADR-019
+obligation to resolve the dependency before sprint entry. Deferring both removes that
+obligation entirely and reduces ADR-019 parameter schema scope.
+
+---
+
+### Demo 7 type evaluation
+
+| Type | Demo hook | Data dependency | Decision 5 verdict |
+|---|---|---|---|
+| `GrowthShock` | ESSENTIAL — Troika rebuttal (Demo 7 Step 4): inject positive GDP growth at rebound step; observe whether distribution reaches bottom quintile | None | **Include** |
+| `ElectionShock` | HIGH — Senegal political context; governance timeline is the source of conditionality pressure the minister is navigating | None | **Include** |
+| `GeopoliticalShock` | HIGH — ECOWAS/regional dynamics; demonstrates shock injection spans structural domain, not only macro | None | **Include** |
+| `CurrencyAttack` | MEDIUM — Zambia Kwacha vulnerability; answers "what happens to the restructuring path if the currency comes under pressure?" in Act 2 Q&A | None | **Include** |
+| `NaturalDisaster` | LOW — no specific hook in either demo narrative | None | **Defer → M19** |
+| `CreditorDefection` | MEDIUM — Zambia debt context; but Act 2 is comparison-driven, not shock-injection-driven | `creditor_class` enum required | **Defer → M19** |
+| `ContagionShock` | LOW — least contextually specific; highest data dependency | Linkage table required | **Defer → M19** |
+
+---
+
+### Decision 5 ruling
+
+**Four types for Demo 7 — `GrowthShock`, `ElectionShock`, `GeopoliticalShock`,
+`CurrencyAttack`.**
+
+Three types deferred to M19 — `NaturalDisaster`, `CreditorDefection`, `ContagionShock`.
+
+**UI implication:** Form 2 type selector shows exactly four types. The deferred three
+do not appear. Demo presenter answer if asked: *"Four shock categories are available in
+Active Control — currency attacks, election shocks, geopolitical shocks, and growth
+scenario testing. We're expanding the library in the next milestone."* This is an honest
+and complete answer; it does not trigger the "next release" kryptonite because it is
+describing what is present, not deferring what was expected.
+
+**Scope reduction from Decision 2 baseline:**
+
+- Removes `NaturalDisaster`, `CreditorDefection`, `ContagionShock` from G4 engine
+  implementation scope
+- Removes `creditor_class` taxonomy definition obligation from ADR-019
+- Removes `ContagionShock` linkage table approach from ADR-019
+- ADR-019 §Form 2 shock taxonomy specifies parameter schemas for four types only;
+  the deferred three are noted as M19 scope in the ADR
+
+**The four included types span four distinct analytical domains:**
+- Macro (growth rate): `GrowthShock`
+- Political (governance uncertainty): `ElectionShock`
+- Structural (regional dynamics): `GeopoliticalShock`
+- Financial attack (exchange rate): `CurrencyAttack`
+
+This breadth of domain coverage is the platform claim — four domains, one instrument
+interface, one shared trajectory display. It is a stronger demo argument than seven
+types across overlapping domains.
+
+**EL decision:** ☑ Approved 2026-06-27 — four types for Demo 7 as specified above.
 
 ---
 
