@@ -910,3 +910,418 @@ class TestACSchemaApiContractsUpdated:
             "AC-schema FAIL: 'ci_upper' not found in api_contracts.yml. "
             "Intent doc §7: response step array must include upper CI bound by this name."
         )
+
+
+# ---------------------------------------------------------------------------
+# AC-1422-G — methodology_detail object in distributional-differential response
+# ---------------------------------------------------------------------------
+# Authored BEFORE implementation from intent document at:
+#   docs/process/intents/M18-G5-2026-06-28-zone3-auditability-panel.md
+#
+# Sprint entry: docs/process/sprint-plans/m18-g5-sprint-entry.md
+# Issue: #1422 (G3 CA condition — Lucas, Persona 1)
+# Sprint journal: #1435
+#
+# These tests are appended to the G3 test file because:
+#   (1) The AC targets the same endpoint as AC-1349-G
+#   (2) The fixture creation helpers are already defined here
+#   (3) The schema tests share the same _API_CONTRACTS path
+#
+# NM-056 rule: no pytest.skip() or pytest.mark.skip() without a filed near-miss.
+#   DATABASE_URL absence guard is the only permitted skip condition.
+#
+# Guard pattern: AC-1422-G asserts a NEW field in the response object.
+#   Pre-G5: endpoint returns no `methodology_detail` key → assertions fail.
+#   Post-G5: endpoint includes `methodology_detail` → assertions pass.
+#   Tests run RED immediately; do NOT guard on field absence.
+
+# Expected values for ZMB — from backend/app/api/scenarios.py constants
+# _ENTITY_Q1_POPULATION["ZMB"] = 3_894_625 (UN WPP 2024, 20% Q1 fraction)
+_ZMB_EXPECTED_Q1_POPULATION = 3_894_625
+
+# Expected fragments in string fields — from intent doc §3.2 and backend constants
+# ci_methodology: should contain "±13–16%" or both "0.87" and "1.16" (the factor values)
+_CI_METHODOLOGY_FACTOR_LOWER = "0.87"
+_CI_METHODOLOGY_FACTOR_UPPER = "1.16"
+# extraction_path: should contain "Q1 CHT" (cohort extraction reference)
+_EXTRACTION_PATH_FRAG = "Q1 CHT"
+# tier_rationale: should contain "T3" classification and rationale
+_TIER_RATIONALE_FRAG = "T3"
+
+
+class TestAC1422GMethodologyDetail:
+    """AC-1422-G: distributional-differential endpoint returns methodology_detail object.
+
+    The Zone 3 auditability panel (intent doc §3.2) requires the backend to enrich the
+    DistributionalDifferentialResponse with a structured `methodology_detail` object.
+    This is a new field added to the existing endpoint — not a new endpoint.
+
+    Four sub-fields are required:
+      q1_population:   int — entity Q1 population used in headcount calculation
+      ci_methodology:  str — description of CI band computation method
+      extraction_path: str — description of how Q1 poverty_headcount_ratio is extracted
+      tier_rationale:  str — plain-language explanation of the T-tier classification
+
+    These tests are integration tests (require DATABASE_URL and real ZMB scenario creation).
+    """
+
+    @pytest.mark.asyncio
+    async def test_methodology_detail_key_present_in_response(
+        self,
+        client: httpx.AsyncClient,
+    ) -> None:
+        """AC-1422-G(a): 'methodology_detail' key present in response body.
+
+        Pre-G5: key absent → test fails (RED).
+        Post-G5: key present → test passes (GREEN).
+        """
+        _require_db()
+        scenario_id = await _create_and_run_zmb_scenario(client, "ac1422g-presence")
+
+        response = await client.post(
+            _ENDPOINT_PATH,
+            json={
+                "primary_scenario_id": scenario_id,
+                "comparison_scenario_ids": [scenario_id],
+                "entity_id": "ZMB",
+            },
+        )
+        assert response.status_code == 200, (
+            f"AC-1422-G(a) FAIL: endpoint returned {response.status_code}. "
+            f"Body: {response.text[:500]}"
+        )
+        data = response.json()
+        assert "methodology_detail" in data, (
+            "AC-1422-G(a) FAIL: 'methodology_detail' key absent from "
+            "distributional-differential response. Intent doc §3.2: the backend must enrich "
+            "DistributionalDifferentialResponse with a structured methodology_detail object "
+            "for Zone 3 auditability panel (AC-1422-C). "
+            "This is not the same as methodology_summary — it is a typed object, not a string."
+        )
+
+    @pytest.mark.asyncio
+    async def test_methodology_detail_q1_population_is_zmb_value(
+        self,
+        client: httpx.AsyncClient,
+    ) -> None:
+        """AC-1422-G(b): methodology_detail.q1_population == 3,894,625 for ZMB entity.
+
+        The frontend formats this as toLocaleString("en-US") → "3,894,625".
+        The backend must provide the integer value; the frontend handles formatting.
+        """
+        _require_db()
+        scenario_id = await _create_and_run_zmb_scenario(client, "ac1422g-q1pop")
+
+        response = await client.post(
+            _ENDPOINT_PATH,
+            json={
+                "primary_scenario_id": scenario_id,
+                "comparison_scenario_ids": [scenario_id],
+                "entity_id": "ZMB",
+            },
+        )
+        assert response.status_code == 200
+        data = response.json()
+
+        if "methodology_detail" not in data:
+            pytest.fail(
+                "AC-1422-G(b) FAIL: 'methodology_detail' absent — cannot verify q1_population. "
+                "AC-1422-G(a) must pass before AC-1422-G(b) can be meaningful."
+            )
+
+        detail = data["methodology_detail"]
+        assert "q1_population" in detail, (
+            "AC-1422-G(b) FAIL: 'q1_population' key absent from methodology_detail. "
+            "Intent doc §3.2 MethodologyDetail schema: q1_population: int — "
+            "entity Q1 population used in headcount calculation. "
+            "Backend source: _ENTITY_Q1_POPULATION.get(entity_id, 0) in scenarios.py."
+        )
+
+        q1_pop = detail["q1_population"]
+        assert isinstance(q1_pop, int), (
+            f"AC-1422-G(b) FAIL: q1_population is {type(q1_pop).__name__}, expected int. "
+            "The frontend calls toLocaleString('en-US') on this value — it must be an integer, "
+            "not a string or float."
+        )
+        assert q1_pop == _ZMB_EXPECTED_Q1_POPULATION, (
+            f"AC-1422-G(b) FAIL: q1_population == {q1_pop}, "
+            f"expected {_ZMB_EXPECTED_Q1_POPULATION}. "
+            "Backend constant: _ENTITY_Q1_POPULATION['ZMB'] = 3_894_625 "
+            "(UN WPP 2024, 20% Q1 fraction). "
+            "Lucas (Persona 1) will use this value to verify the headcount "
+            "differential arithmetic. An incorrect value silently undermines "
+            "the analytical credibility of the Zone 3 panel."
+        )
+
+    @pytest.mark.asyncio
+    async def test_methodology_detail_ci_methodology_nonempty_with_factor_references(
+        self,
+        client: httpx.AsyncClient,
+    ) -> None:
+        """AC-1422-G(c): methodology_detail.ci_methodology is a non-empty str referencing CI bounds.
+
+        Must contain the lower and upper CI factor values (0.87, 1.16) or percentage equivalents
+        (13%, 16%) so Lucas can reproduce the CI band arithmetic from the disclosure text.
+        """
+        _require_db()
+        scenario_id = await _create_and_run_zmb_scenario(client, "ac1422g-cimeth")
+
+        response = await client.post(
+            _ENDPOINT_PATH,
+            json={
+                "primary_scenario_id": scenario_id,
+                "comparison_scenario_ids": [scenario_id],
+                "entity_id": "ZMB",
+            },
+        )
+        assert response.status_code == 200
+        data = response.json()
+
+        if "methodology_detail" not in data:
+            pytest.fail("AC-1422-G(c) FAIL: 'methodology_detail' absent.")
+
+        detail = data["methodology_detail"]
+        assert "ci_methodology" in detail, (
+            "AC-1422-G(c) FAIL: 'ci_methodology' key absent from methodology_detail. "
+            "Intent doc §3.2: ci_methodology: str — CI band computation method description."
+        )
+
+        ci_meth = detail["ci_methodology"]
+        assert isinstance(ci_meth, str) and len(ci_meth) > 0, (
+            f"AC-1422-G(c) FAIL: ci_methodology is empty or not a string (got {ci_meth!r}). "
+            "The Zone 3 panel renders this text verbatim in the methodology-ci-band element."
+        )
+
+        # Must contain either the decimal factor values or the percentage representations
+        # so the analyst can reproduce the CI band calculation
+        has_decimal_refs = (
+            _CI_METHODOLOGY_FACTOR_LOWER in ci_meth
+            or _CI_METHODOLOGY_FACTOR_UPPER in ci_meth
+        )
+        has_percent_refs = "13" in ci_meth or "16" in ci_meth
+        assert has_decimal_refs or has_percent_refs, (
+            f"AC-1422-G(c) FAIL: ci_methodology string does not reference CI bound factors. "
+            f"Got: {ci_meth!r}. "
+            f"Must contain '0.87'/'1.16' (decimal factors) or '13'/'16' (percentage equivalents) "
+            f"so Lucas can reproduce the CI arithmetic: lower = point_estimate × 0.87, "
+            f"upper = point_estimate × 1.16. "
+            f"Backend source: _CI_FACTOR_LOWER=Decimal('0.87'), _CI_FACTOR_UPPER=Decimal('1.16')."
+        )
+
+    @pytest.mark.asyncio
+    async def test_methodology_detail_extraction_path_references_q1_cht(
+        self,
+        client: httpx.AsyncClient,
+    ) -> None:
+        """AC-1422-G(d): methodology_detail.extraction_path references Q1 CHT cohort logic.
+
+        The extraction path must describe how poverty_headcount_ratio is extracted from
+        the simulation state — specifically the Q1 CHT (cohort: lowest income quintile)
+        path and fallback logic. This is required for AC-1422-C frontend display.
+        """
+        _require_db()
+        scenario_id = await _create_and_run_zmb_scenario(client, "ac1422g-xpath")
+
+        response = await client.post(
+            _ENDPOINT_PATH,
+            json={
+                "primary_scenario_id": scenario_id,
+                "comparison_scenario_ids": [scenario_id],
+                "entity_id": "ZMB",
+            },
+        )
+        assert response.status_code == 200
+        data = response.json()
+
+        if "methodology_detail" not in data:
+            pytest.fail("AC-1422-G(d) FAIL: 'methodology_detail' absent.")
+
+        detail = data["methodology_detail"]
+        assert "extraction_path" in detail, (
+            "AC-1422-G(d) FAIL: 'extraction_path' key absent from methodology_detail. "
+            "Intent doc §3.2: extraction_path: str — description of Q1 poverty_headcount_ratio "
+            "extraction from simulation state."
+        )
+
+        epath = detail["extraction_path"]
+        assert isinstance(epath, str) and len(epath) > 0, (
+            f"AC-1422-G(d) FAIL: extraction_path is empty or not a string (got {epath!r})."
+        )
+
+        assert _EXTRACTION_PATH_FRAG in epath, (
+            f"AC-1422-G(d) FAIL: extraction_path does not contain '{_EXTRACTION_PATH_FRAG}'. "
+            f"Got: {epath!r}. "
+            "Intent doc §3.2: 'Q1 CHT cohort mean (entities matching <entity_id>:CHT:1-*); "
+            "falls back to main entity poverty_headcount_ratio if no cohort data present.' "
+            "The 'Q1 CHT' reference is required for Lucas to understand the data provenance chain."
+        )
+
+    @pytest.mark.asyncio
+    async def test_methodology_detail_tier_rationale_references_t3(
+        self,
+        client: httpx.AsyncClient,
+    ) -> None:
+        """AC-1422-G(e): methodology_detail.tier_rationale is non-empty and references T3.
+
+        The tier_rationale is the plain-language explanation displayed in the
+        methodology-tier-rationale element. It must name the tier classification
+        so Lucas can cross-reference with the T-tier badge in Zone 3.
+        """
+        _require_db()
+        scenario_id = await _create_and_run_zmb_scenario(client, "ac1422g-tier")
+
+        response = await client.post(
+            _ENDPOINT_PATH,
+            json={
+                "primary_scenario_id": scenario_id,
+                "comparison_scenario_ids": [scenario_id],
+                "entity_id": "ZMB",
+            },
+        )
+        assert response.status_code == 200
+        data = response.json()
+
+        if "methodology_detail" not in data:
+            pytest.fail("AC-1422-G(e) FAIL: 'methodology_detail' absent.")
+
+        detail = data["methodology_detail"]
+        assert "tier_rationale" in detail, (
+            "AC-1422-G(e) FAIL: 'tier_rationale' key absent from methodology_detail. "
+            "Intent doc §3.2: tier_rationale: str — plain-language T-tier explanation."
+        )
+
+        rationale = detail["tier_rationale"]
+        assert isinstance(rationale, str) and len(rationale) > 0, (
+            f"AC-1422-G(e) FAIL: tier_rationale is empty or not a string (got {rationale!r})."
+        )
+
+        assert _TIER_RATIONALE_FRAG in rationale, (
+            f"AC-1422-G(e) FAIL: tier_rationale does not contain '{_TIER_RATIONALE_FRAG}'. "
+            f"Got: {rationale!r}. "
+            "The tier rationale must name the T3 classification so Lucas can cross-reference "
+            "it with the T-tier badge rendered by the comparison-tier-badge testid. "
+            "Backend constant: _DISTRIBUTIONAL_TIER = 'T3'."
+        )
+
+    @pytest.mark.asyncio
+    async def test_methodology_detail_structure_is_typed_object_not_string(
+        self,
+        client: httpx.AsyncClient,
+    ) -> None:
+        """AC-1422-G(f): methodology_detail is a dict (JSON object), NOT a string.
+
+        Silent failure guard SF-methodology-as-string:
+          If backend returns methodology_detail as a string (e.g., the methodology_summary
+          value duplicated under a new key), the frontend TypeScript type annotation
+          `MethodologyDetail` will pass compilation but the .q1_population accessor will
+          return undefined at runtime, causing the Zone 3 panel to silently render nothing.
+
+        This test explicitly catches that failure mode.
+        """
+        _require_db()
+        scenario_id = await _create_and_run_zmb_scenario(client, "ac1422g-type")
+
+        response = await client.post(
+            _ENDPOINT_PATH,
+            json={
+                "primary_scenario_id": scenario_id,
+                "comparison_scenario_ids": [scenario_id],
+                "entity_id": "ZMB",
+            },
+        )
+        assert response.status_code == 200
+        data = response.json()
+
+        if "methodology_detail" not in data:
+            pytest.fail("AC-1422-G(f) FAIL: 'methodology_detail' absent.")
+
+        detail = data["methodology_detail"]
+        assert isinstance(detail, dict), (
+            f"AC-1422-G(f) FAIL: methodology_detail is {type(detail).__name__}, expected dict. "
+            "Silent failure guard SF-methodology-as-string: returning a string here causes the "
+            "frontend to silently render an empty Zone 3 panel — the .q1_population accessor "
+            "returns undefined on a string object. "
+            "The backend Pydantic model must be MethodologyDetail (BaseModel), not str."
+        )
+
+        # Confirm all 4 required keys are present in the dict
+        required_keys = {"q1_population", "ci_methodology", "extraction_path", "tier_rationale"}
+        missing = required_keys - set(detail.keys())
+        assert not missing, (
+            f"AC-1422-G(f) FAIL: methodology_detail missing required keys: {sorted(missing)}. "
+            "Intent doc §3.2 MethodologyDetail schema requires all 4 fields. "
+            "The frontend MethodologyDetail TypeScript interface mirrors these field names exactly."
+        )
+
+
+class TestAC1422GSchemaDocumented:
+    """AC-1422-G(schema): api_contracts.yml documents methodology_detail in the response shape.
+
+    File-read tests — must NEVER skip (NM-056 rule). DATABASE_URL guard does not apply.
+    These tests verify the schema contract between frontend and backend is documented
+    before implementation begins — matching the AC-schema tests already in this file.
+    """
+
+    def test_api_contracts_documents_methodology_detail_key(self) -> None:
+        """api_contracts.yml must document 'methodology_detail' in the distributional-differential
+        response shape.
+
+        The frontend MethodologyDetail TypeScript interface is authored from this schema.
+        If the schema is not updated, the implementing agent may invent different field names
+        causing a name mismatch between backend serialisation and frontend deserialisation.
+
+        This test must remain in the file permanently — it enforces the schema-first discipline
+        for G5 in the same way AC-schema enforced it for G3.
+        """
+        if not _API_CONTRACTS.exists():
+            pytest.fail(
+                "AC-1422-G(schema): api_contracts.yml not found at expected path. "
+                f"Expected: {_API_CONTRACTS}. "
+                "The intent doc §8 prerequisite requires api_contracts.yml to be updated "
+                "in the same PR as the backend schema change."
+            )
+        content = _API_CONTRACTS.read_text(encoding="utf-8")
+        if "distributional-differential" not in content:
+            pytest.fail(
+                "AC-1422-G(schema): distributional-differential endpoint not yet documented "
+                "in api_contracts.yml. AC-schema tests (G3) must pass before AC-1422-G(schema). "
+                "The G5 implementation PR must build on the G3 schema documentation."
+            )
+
+        assert "methodology_detail" in content, (
+            "AC-1422-G(schema) FAIL: 'methodology_detail' not documented in api_contracts.yml. "
+            "Intent doc §8 (Schema prerequisite): api_contracts.yml must be updated with "
+            "the methodology_detail field in the same PR as the backend schema change. "
+            "The frontend implementing agent reads this schema before authoring the "
+            "MethodologyDetail TypeScript interface — if the schema is absent, the agent "
+            "cannot determine the correct field names and types."
+        )
+
+    def test_api_contracts_documents_q1_population_field(self) -> None:
+        """api_contracts.yml must document 'q1_population' within methodology_detail."""
+        if not _API_CONTRACTS.exists():
+            pytest.fail("AC-1422-G(schema): api_contracts.yml not found.")
+        content = _API_CONTRACTS.read_text(encoding="utf-8")
+        if "methodology_detail" not in content:
+            pytest.fail("AC-1422-G(schema): 'methodology_detail' not yet in schema.")
+
+        assert "q1_population" in content, (
+            "AC-1422-G(schema) FAIL: 'q1_population' not found in api_contracts.yml. "
+            "The frontend formats this integer as toLocaleString('en-US') — the name "
+            "'q1_population' must be documented precisely (not 'population', 'q1_pop', etc.) "
+            "so the TypeScript type is authored with the correct accessor."
+        )
+
+    def test_api_contracts_documents_tier_rationale_field(self) -> None:
+        """api_contracts.yml must document 'tier_rationale' within methodology_detail."""
+        if not _API_CONTRACTS.exists():
+            pytest.fail("AC-1422-G(schema): api_contracts.yml not found.")
+        content = _API_CONTRACTS.read_text(encoding="utf-8")
+        if "methodology_detail" not in content:
+            pytest.fail("AC-1422-G(schema): 'methodology_detail' not yet in schema.")
+
+        assert "tier_rationale" in content, (
+            "AC-1422-G(schema) FAIL: 'tier_rationale' not found in api_contracts.yml. "
+            "The methodology-tier-rationale testid (AC-1422-C) renders this field. "
+            "Schema documentation ensures the implementing agent uses this exact name."
+        )
