@@ -51,6 +51,7 @@ from app.schemas import (
     DistributionRecord,
     FlatDeltaRecord,
     FrameworkOutput,
+    InjectShockResponse,
     MDAAlert,
     MDAFloorRecord,
     MultiFrameworkOutput,
@@ -65,6 +66,7 @@ from app.schemas import (
     ScenarioRestoreRequest,
     ScenarioRestoreResponse,
     ScheduledInputSchema,
+    ShockInjectRequest,
     SnapshotRecord,
     ThresholdCrossingItem,
     TrajectoryCompareResponse,
@@ -1064,38 +1066,13 @@ async def _compute_trajectory_framework_point(
     )
 
 
-@router.get(
-    "/scenarios/{scenario_id}/trajectory",
-    response_model=TrajectoryResponse,
-)
-async def get_trajectory(
+async def _build_trajectory_response(
     scenario_id: str,
-    conn: Annotated[asyncpg.Connection, Depends(get_db)],
+    conn: asyncpg.Connection,
 ) -> TrajectoryResponse:
-    """Multi-step trajectory for all four measurement frameworks.
+    """Build a TrajectoryResponse for scenario_id (shared by get_trajectory + inject_shock).
 
-    Returns computed steps as a dense array. Each step carries per-framework
-    composite scores, optional policy inputs, and PMM (Policy Maneuver Margin).
-    mda_floors is at the response root (not per-step). In M9, mda_floors
-    contains at most one entry: ecological WARNING at floor_value=1.0 when
-    EcologicalModule is active.
-
-    PMM computation (Issue #496): each step's pmm field is derived from all
-    'all'-scoped MDA thresholds in the database. PMM = min(indicator margins)
-    across thresholds with matching indicator data; null when no matching data.
-
-    Composite score dispatch (Issue #458, CM consultation 2026-05-23; ADR-005 Amendment 4):
-    - Single-entity: financial/HD use normalized_absolute; ecological uses
-      boundary_proximity; governance uses normalized_absolute (WGI/V-Dem are country absolutes).
-    - Multi-entity: financial/HD use percentile_rank; ecological uses
-      boundary_proximity; governance uses normalized_absolute (entity count irrelevant).
-
-    step_significance is sourced from scenarios.configuration->>'step_metadata'
-    JSONB (ADR-010 Decision 7). Keys are 1-based step index strings. Absent key
-    → ROUTINE. "STANDARD" is never emitted — only "SIGNIFICANT" or "ROUTINE".
-
-    Returns 404 if scenario not found.
-    Returns 409 if scenario has no snapshots yet (run it first).
+    Raises 409 if no snapshots exist. Does not raise 404 — callers must verify existence.
     """
     scenario_row = await conn.fetchrow(
         "SELECT scenario_id, configuration FROM scenarios WHERE scenario_id = $1",
@@ -1295,6 +1272,50 @@ async def get_trajectory(
         mda_floors=mda_floors,
         steps=steps,
     )
+
+
+@router.get(
+    "/scenarios/{scenario_id}/trajectory",
+    response_model=TrajectoryResponse,
+)
+async def get_trajectory(
+    scenario_id: str,
+    conn: Annotated[asyncpg.Connection, Depends(get_db)],
+) -> TrajectoryResponse:
+    """Multi-step trajectory for all four measurement frameworks.
+
+    Returns computed steps as a dense array. Each step carries per-framework
+    composite scores, optional policy inputs, and PMM (Policy Maneuver Margin).
+    mda_floors is at the response root (not per-step). In M9, mda_floors
+    contains at most one entry: ecological WARNING at floor_value=1.0 when
+    EcologicalModule is active.
+
+    PMM computation (Issue #496): each step's pmm field is derived from all
+    'all'-scoped MDA thresholds in the database. PMM = min(indicator margins)
+    across thresholds with matching indicator data; null when no matching data.
+
+    Composite score dispatch (Issue #458, CM consultation 2026-05-23; ADR-005 Amendment 4):
+    - Single-entity: financial/HD use normalized_absolute; ecological uses
+      boundary_proximity; governance uses normalized_absolute (WGI/V-Dem are country absolutes).
+    - Multi-entity: financial/HD use percentile_rank; ecological uses
+      boundary_proximity; governance uses normalized_absolute (entity count irrelevant).
+
+    step_significance is sourced from scenarios.configuration->>'step_metadata'
+    JSONB (ADR-010 Decision 7). Keys are 1-based step index strings. Absent key
+    → ROUTINE. "STANDARD" is never emitted — only "SIGNIFICANT" or "ROUTINE".
+
+    Returns 404 if scenario not found.
+    Returns 409 if scenario has no snapshots yet (run it first).
+    """
+    scenario_row = await conn.fetchrow(
+        "SELECT scenario_id FROM scenarios WHERE scenario_id = $1",
+        scenario_id,
+    )
+    if scenario_row is None:
+        raise HTTPException(
+            status_code=404, detail=f"Scenario '{scenario_id}' not found."
+        )
+    return await _build_trajectory_response(scenario_id, conn)
 
 
 # ---------------------------------------------------------------------------
@@ -1583,6 +1604,13 @@ async def branch_scenario(
         )
 
     cfg_raw["fiscal_multiplier"] = req.fiscal_multiplier
+    # ADR-019 D-4: apply legitimacy_index override when provided.
+    if req.legitimacy_index is not None:
+        pc = cfg_raw.get("political_context")
+        if not isinstance(pc, dict):
+            pc = {}
+        pc["legitimacy_index"] = str(req.legitimacy_index)
+        cfg_raw["political_context"] = pc
     branch_config = ScenarioConfigSchema(**cfg_raw)
     n_steps: int = branch_config.n_steps
 
@@ -1714,6 +1742,13 @@ async def rebranch_scenario(
     if isinstance(cfg_raw, str):
         cfg_raw = json.loads(cfg_raw)
     cfg_raw["fiscal_multiplier"] = req.fiscal_multiplier
+    # ADR-019 D-4: apply legitimacy_index override when provided.
+    if req.legitimacy_index is not None:
+        pc = cfg_raw.get("political_context")
+        if not isinstance(pc, dict):
+            pc = {}
+        pc["legitimacy_index"] = str(req.legitimacy_index)
+        cfg_raw["political_context"] = pc
     branch_config = ScenarioConfigSchema(**cfg_raw)
     n_steps: int = branch_config.n_steps
 
@@ -1734,6 +1769,180 @@ async def rebranch_scenario(
         branch_scenario_id=scenario_id,
         branch_from_step=req.from_step,
         n_steps=n_steps,
+    )
+
+
+# ---------------------------------------------------------------------------
+# POST /scenarios/{scenario_id}/inject-shock — ADR-019 D-5 + D-7
+# ---------------------------------------------------------------------------
+
+
+@router.post(
+    "/scenarios/{scenario_id}/inject-shock",
+    response_model=InjectShockResponse,
+    status_code=200,
+)
+async def inject_shock(
+    scenario_id: str,
+    req: ShockInjectRequest,
+    conn: Annotated[asyncpg.Connection, Depends(get_db)],
+) -> InjectShockResponse:
+    """Inject an exogenous shock at inject_at_step and recompute forward.
+
+    Creates a branch scenario with the shock applied to the configuration
+    (via the SHOCK_REGISTRY handler), advances the branch to completion, and
+    returns the updated trajectory with shock_events populated.
+
+    This endpoint is distinct from the branch endpoint:
+    - branch: policy instruments (fiscal/legitimacy overrides) applied to config
+    - inject-shock: exogenous shocks applied via SHOCK_REGISTRY handler, recomputing
+      from inject_at_step onward
+
+    Returns 404 if scenario not found or no snapshot at inject_at_step.
+    Returns 422 if required shock-type parameters are missing (model_validator).
+    ADR-019 D-5.
+    """
+    # 1. Verify scenario exists
+    row = await conn.fetchrow(
+        "SELECT scenario_id, name, configuration FROM scenarios WHERE scenario_id = $1",
+        scenario_id,
+    )
+    if row is None:
+        raise HTTPException(status_code=404, detail=f"Scenario '{scenario_id}' not found.")
+
+    cfg_raw = row["configuration"]
+    if isinstance(cfg_raw, str):
+        cfg_raw = json.loads(cfg_raw)
+
+    # 2. Verify snapshot exists at inject_at_step (branch point)
+    snap_check = await conn.fetchrow(
+        "SELECT step FROM scenario_state_snapshots WHERE scenario_id = $1 AND step = $2",
+        scenario_id,
+        req.inject_at_step,
+    )
+    if snap_check is None:
+        raise HTTPException(
+            status_code=404,
+            detail=(
+                f"No snapshot at step {req.inject_at_step} for scenario '{scenario_id}'. "
+                "Advance the scenario to this step before injecting a shock."
+            ),
+        )
+
+    # 3. Apply shock handler to config dict (ADR-019 D-7 SHOCK_REGISTRY)
+    from app.simulation.shocks.registry import SHOCK_REGISTRY  # noqa: PLC0415
+
+    handler_cls = SHOCK_REGISTRY.get(req.shock_type)
+    if handler_cls is None:
+        raise HTTPException(status_code=400, detail=f"Unknown shock type: {req.shock_type}")
+
+    handler = handler_cls()
+    modified_cfg_raw: dict[str, Any] = handler.apply(dict(cfg_raw), req)
+
+    # 4. Create branch scenario with modified config and snapshots 0..inject_at_step
+    branch_config = ScenarioConfigSchema(**modified_cfg_raw)
+    branch_id = str(uuid.uuid4())
+    branch_name = f"{row['name']} [shock-{req.shock_type.value}]"
+
+    async with conn.transaction():
+        await conn.execute(
+            """
+            INSERT INTO scenarios
+                (scenario_id, name, description, status,
+                 configuration, version, engine_version_hash)
+            VALUES ($1, $2, NULL, 'pending', $3, 1, $4)
+            """,
+            branch_id,
+            branch_name,
+            json.dumps(branch_config.model_dump(mode="json")),
+            _GIT_COMMIT_HASH,
+        )
+
+        # Copy scheduled inputs up to inject_at_step
+        input_rows = await conn.fetch(
+            """
+            SELECT step, input_type, input_data FROM scenario_scheduled_inputs
+            WHERE scenario_id = $1 AND step <= $2
+            ORDER BY step, created_at
+            """,
+            scenario_id,
+            req.inject_at_step,
+        )
+        for inp in input_rows:
+            idata = inp["input_data"]
+            if isinstance(idata, str):
+                idata = json.loads(idata)
+            await conn.execute(
+                """
+                INSERT INTO scenario_scheduled_inputs
+                    (id, scenario_id, step, input_type, input_data)
+                VALUES ($1, $2, $3, $4, $5)
+                """,
+                str(uuid.uuid4()),
+                branch_id,
+                inp["step"],
+                inp["input_type"],
+                json.dumps(idata),
+            )
+
+        # Copy snapshots 0..inject_at_step into the branch
+        snapshot_rows = await conn.fetch(
+            """
+            SELECT step, timestep, state_data, events_snapshot, ia1_disclosure
+            FROM scenario_state_snapshots
+            WHERE scenario_id = $1 AND step <= $2
+            ORDER BY step ASC
+            """,
+            scenario_id,
+            req.inject_at_step,
+        )
+        for snap in snapshot_rows:
+            state_raw = snap["state_data"]
+            if isinstance(state_raw, str):
+                state_raw = json.loads(state_raw)
+            events_raw = snap["events_snapshot"]
+            if isinstance(events_raw, str):
+                events_raw = json.loads(events_raw)
+            await conn.execute(
+                """
+                INSERT INTO scenario_state_snapshots
+                    (scenario_id, step, timestep, state_data, events_snapshot, ia1_disclosure)
+                VALUES ($1, $2, $3, $4, $5, $6)
+                """,
+                branch_id,
+                snap["step"],
+                snap["timestep"],
+                json.dumps(state_raw),
+                json.dumps(events_raw) if events_raw is not None else None,
+                snap["ia1_disclosure"],
+            )
+
+    # 5. Run branch scenario to completion (advances from inject_at_step to n_steps)
+    from app.simulation.web_scenario_runner import WebScenarioRunner  # noqa: PLC0415
+
+    await WebScenarioRunner().run(conn, branch_id)
+
+    # 6. Fetch branch trajectory
+    branch_trajectory = await _build_trajectory_response(branch_id, conn)
+
+    # 7. Build shock_events record for the response (ADR-019 D-9)
+    shock_params = {
+        k: v for k, v in req.model_dump().items()
+        if v is not None and k not in ("shock_type", "inject_at_step")
+    }
+    shock_event: dict[str, Any] = {
+        "step": req.inject_at_step,
+        "shock_type": req.shock_type.value,
+        "parameters": shock_params,
+    }
+
+    return InjectShockResponse(
+        scenario_id=branch_trajectory.scenario_id,
+        entity_id=branch_trajectory.entity_id,
+        step_count=branch_trajectory.step_count,
+        mda_floors=branch_trajectory.mda_floors,
+        steps=branch_trajectory.steps,
+        shock_events=[shock_event],
     )
 
 
