@@ -3905,6 +3905,39 @@ DS Agent investigation triggered by EL — the process had no guard. The sprint-
 
 ---
 
+## NM-076 — Testid Renames in G4 Implementation Not Cross-Checked Against Full E2E Corpus; Three Tests Merged to Sprint Branch Silently Broken (Reactive)
+
+**Date:** 2026-06-28
+**Milestone:** M18 — Full Argument and Demo 7
+**Detected by:** playwright-e2e CI run on sprint/m18-g4 (run 28332341391) after PR #1424 had auto-merged — post-merge detection, not pre-merge prevention
+**Severity:** Medium — broken tests merged to sprint/m18-g4 with no blocking artifact; corrected by PR #1426 before integration PR opened
+
+### What happened
+
+G4 implementation (PR #1424, `feat/m18-g4-control-plane-column` → `sprint/m18-g4`) delivered `ControlPlaneColumn.tsx` with testid renames specified in ADR-019 D-3: `apply-control-change` → `apply-policy-input`, `fiscal-multiplier-slider` → `policy-param-slider`. Five pre-G4 E2E test files (`mode3-active-control.spec.ts`, `demo-trajectory-mode3.spec.ts`, `demo-narrated-m12.spec.ts`, `m16-g9-mode3-branch-comparison.spec.ts`, `mode-transition.spec.ts`) referenced the old testids and were not identified or updated before PR #1424 was opened.
+
+The `sprint-branch-ci-gate` Ruleset (NM-073 resolution) does not require `playwright-e2e` for feature→sprint PRs — only `changes`, `lint`, `test-backend`, `compliance-scan`. PR #1424 therefore auto-merged when those four checks passed, without waiting for Playwright results. Three test failures were detected only by the post-merge CI run on `sprint/m18-g4` (run 28332341391).
+
+Recovery: PR #1426 updated all five affected test files. CA L3 assessment was bundled into PR #1426 to avoid an additional round-trip. PR #1426 opened before the integration PR (sprint/m18-g4 → release/m18) was created.
+
+### What was at risk
+
+The sprint/m18-g4 branch held three broken E2E tests for the period between PR #1424 auto-merge and PR #1426 merge. If an integration PR had been opened in that window, `playwright-e2e` (required by `release-branch-ci-gate`) would have blocked it — but the detection would have been at integration time, not sprint-internal time. The broken tests were not caught before merging to the sprint branch.
+
+### What caught it
+
+CI run 28332341391 (playwright-e2e on sprint/m18-g4 post-merge) surfaced the failures. Manual inspection of `gh run view 28332341391 --log-failed` identified the root cause as testid rename coverage. No process guard prevented the mis-matched tests from entering the sprint branch.
+
+### Process improvement
+
+**Immediate:** CODING_STANDARDS.md should include a testid rename rule: when renaming a `data-testid` in any component, run `grep -r 'old-testid-value' frontend/tests/e2e/` before opening the PR and update every matching locator in the same PR. A testid rename that reaches the sprint branch without its E2E corpus update is an incomplete implementation.
+
+**Structural:** ADR-019 §D-3 (testid authority section) should note the cross-file coupling risk and reference this near-miss. Testid renames are not single-file changes — they create implicit contracts across all E2E test files that reference the renamed element.
+
+**Near-miss lineage:** Testid mismatches have caused silent no-ops before (NM-058: AC-009 testid mismatch since M12). NM-076 is a write-side variant of the same pattern: NM-058 was a read-side miss (test locator never found the element and passed vacuously); NM-076 is a rename-side miss (implementation renamed the element and left existing tests broken). Both are caused by the absence of a testid change management rule.
+
+---
+
 ## NM-NNN — [Short descriptive title]
 
 **Date:** YYYY-MM-DD (or approximate milestone era)
