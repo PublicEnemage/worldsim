@@ -118,6 +118,13 @@ export interface DistributionalPairSummary {
   steps: DistributionalStepSummary[];
 }
 
+export interface MethodologyDetail {
+  q1_population: number;
+  ci_methodology: string;
+  extraction_path: string;
+  tier_rationale: string;
+}
+
 export interface DistributionalSummaryData {
   entity_id: string;
   reference_scenario_id: string;
@@ -125,6 +132,7 @@ export interface DistributionalSummaryData {
   terminal_step: number;
   tier: string;
   methodology_summary: string;
+  methodology_detail?: MethodologyDetail;
   pairs: DistributionalPairSummary[];
 }
 

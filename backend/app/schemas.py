@@ -1074,6 +1074,15 @@ class DistributionalPairResult(BaseModel):
     steps: list[DistributionalStepResult]
 
 
+class MethodologyDetail(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    q1_population: int
+    ci_methodology: str
+    extraction_path: str
+    tier_rationale: str
+
+
 class DistributionalDifferentialResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
@@ -1082,4 +1091,5 @@ class DistributionalDifferentialResponse(BaseModel):
     terminal_step: int
     tier: str
     methodology_summary: str
+    methodology_detail: MethodologyDetail
     pairs: list[DistributionalPairResult]

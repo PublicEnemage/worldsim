@@ -260,6 +260,7 @@ export default function App() {
         if (!data || controller.signal.aborted) return;
         const refLabel = comparisonScenarios.find((c) => c.scenarioId === referenceScenarioId)?.label ?? "ref";
         const rawPairs = (data.pairs ?? []) as Array<Record<string, unknown>>;
+        const rawDetail = data.methodology_detail as Record<string, unknown> | undefined;
         const enriched: DistributionalSummaryData = {
           entity_id: String(data.entity_id ?? entityId),
           reference_scenario_id: String(data.reference_scenario_id ?? referenceScenarioId),
@@ -267,6 +268,16 @@ export default function App() {
           terminal_step: Number(data.terminal_step ?? 0),
           tier: String(data.tier ?? "T3"),
           methodology_summary: String(data.methodology_summary ?? ""),
+          ...(rawDetail
+            ? {
+                methodology_detail: {
+                  q1_population: Number(rawDetail.q1_population ?? 0),
+                  ci_methodology: String(rawDetail.ci_methodology ?? ""),
+                  extraction_path: String(rawDetail.extraction_path ?? ""),
+                  tier_rationale: String(rawDetail.tier_rationale ?? ""),
+                },
+              }
+            : {}),
           pairs: rawPairs.map((pair) => ({
             scenario_id: String(pair.scenario_id ?? ""),
             scenario_label: String(

@@ -708,6 +708,8 @@ function _formatK(n: number): string {
 }
 
 function DistributionalComparisonSummary({ summary }: { summary: DistributionalSummaryData }) {
+  const [panelOpen, setPanelOpen] = useState(false);
+
   const terminalPairs = summary.pairs.map((pair) => {
     const terminal = pair.steps.find((s) => s.step === summary.terminal_step) ?? pair.steps[pair.steps.length - 1];
     return { ...pair, terminal };
@@ -716,6 +718,9 @@ function DistributionalComparisonSummary({ summary }: { summary: DistributionalS
   const totalSteps = Math.max(...summary.pairs.flatMap((p) => p.steps.map((s) => s.step)));
   const allDirectionStable = terminalPairs.every((p) => p.terminal?.direction_stable ?? false);
   const refLabel = summary.reference_scenario_label;
+
+  const rowStyle: React.CSSProperties = { fontSize: 11, color: "#4b5563", marginBottom: 2, lineHeight: 1.4 };
+  const labelStyle: React.CSSProperties = { fontWeight: 500 };
 
   return (
     <div
@@ -747,6 +752,21 @@ function DistributionalComparisonSummary({ summary }: { summary: DistributionalS
         >
           {summary.tier}
         </span>
+        <button
+          data-testid="methodology-panel-toggle"
+          onClick={() => setPanelOpen((v) => !v)}
+          aria-expanded={panelOpen}
+          style={{
+            fontSize: 10,
+            color: "#6b7280",
+            cursor: "pointer",
+            background: "none",
+            border: "none",
+            padding: "0 2px",
+          }}
+        >
+          {panelOpen ? "▼ Methodology" : "▶ Methodology"}
+        </button>
       </div>
       <div style={{ fontSize: 11, color: "#4b5563", fontStyle: "italic", marginBottom: 4 }}>
         Poverty headcount differential
@@ -783,6 +803,26 @@ function DistributionalComparisonSummary({ summary }: { summary: DistributionalS
           ? "→ Direction stable across uncertainty range"
           : "→ Direction uncertain: CI spans zero"}
       </div>
+      {panelOpen && summary.methodology_detail && (
+        <div style={{ borderTop: "1px dashed #e5e7eb", marginTop: 4, paddingTop: 4 }}>
+          <div data-testid="methodology-q1-population" style={rowStyle}>
+            <span style={labelStyle}>Q1 population:</span>{" "}
+            {summary.entity_id}: {summary.methodology_detail.q1_population.toLocaleString("en-US")} (UN WPP 2024, 20% Q1 fraction)
+          </div>
+          <div data-testid="methodology-ci-band" style={rowStyle}>
+            <span style={labelStyle}>CI band:</span>{" "}
+            {summary.methodology_detail.ci_methodology}
+          </div>
+          <div data-testid="methodology-extraction-path" style={rowStyle}>
+            <span style={labelStyle}>Extraction path:</span>{" "}
+            {summary.methodology_detail.extraction_path}
+          </div>
+          <div data-testid="methodology-tier-rationale" style={rowStyle}>
+            <span style={labelStyle}>Tier rationale:</span>{" "}
+            {summary.methodology_detail.tier_rationale}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

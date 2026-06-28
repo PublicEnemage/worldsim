@@ -947,6 +947,31 @@ def test_austerity_shock_human_cost_scales_with_shock_magnitude():
 
 The human cost ledger is never a footnote. Its test coverage reflects this.
 
+### Testid Rename Crosscheck (NM-076)
+
+When renaming a `data-testid` value in any component or application file, the
+implementing agent **must** run the following check before pushing:
+
+```
+grep -r 'old-testid-value' frontend/tests/e2e/
+```
+
+For every match found: update the E2E test reference in the same PR as the
+rename. A rename without an E2E corpus crosscheck is a compliance violation —
+tests that silently reference stale testids will pass CI (because they run against
+a non-existent element and the guard returns early) while asserting nothing.
+
+The check must also be run when **introducing** a new testid: confirm no
+existing test inadvertently references the same string, which would cause
+unexpected test interactions post-implementation.
+
+**Authority:** NM-076 (`docs/process/near-miss-registry.md`). Filed 2026-06-28
+after G4 testid renames (`apply-control-change → apply-policy-input`,
+`fiscal-multiplier-slider → policy-param-slider`) were not crosschecked against
+the E2E corpus; 3 tests merged broken and were caught only by a subsequent fix PR.
+
+---
+
 ### E2E Pre-implementation Test Categorization
 
 When implementation is decomposed into multiple Task Issues (one component per
