@@ -6,7 +6,7 @@
 > Historical state lives in `docs/process/session-archives/`.
 > Authority: `docs/process/sprint-group-isolation.md §SESSION_STATE.md Cockpit Card Protocol`.
 
-**Last updated:** 2026-06-28 (G3 independent BPO ACCEPT filed (#1349#issuecomment-4826830111, separate session from sprint exit); #1422 filed (Zone 3 auditability CA condition); PI Agent confirmation on #1377)
+**Last updated:** 2026-06-28 (G4 implementation PR #1424 MERGED; EX-002 resolved PR #1425 MERGED; testid regression fix + CA L3 PR #1426 OPEN auto-merge; BPO ACCEPT conditional on record #1402; NM-076 filed; EX-001 pending user MV-002)
 **Current milestone:** M18 — Full Argument and Demo 7 (GitHub Milestone 19)
 
 ---
@@ -20,8 +20,8 @@
 | Exit checklist issue | #1340 |
 | Release branch | ✅ `release/m18` — cut 2026-06-26 at commit 151904d |
 | Sprint plan | ✅ EL-approved 2026-06-26 — `docs/process/sprint-plans/m18-sprint-plan.md` (PR #1364) |
-| Active wave | G1 CLOSED (PR #1411 merged); G2 CLOSED (PR #1408 merged); G3 CLOSED (integration PR #1417 MERGED; independent BPO ACCEPT 2026-06-28); G4 active |
-| Active sprint groups | G4 (#1402) control plane + render; G1/G2/G3 CLOSED 2026-06-28 |
+| Active wave | G1 CLOSED (PR #1411 merged); G2 CLOSED (PR #1408 merged); G3 CLOSED (PR #1417 MERGED); G4 in-progress — exit pending EX-001 closure (user MV-002) |
+| Active sprint groups | G4 (#1402) — implementation MERGED (PR #1424); testid fix PR #1426 auto-merge; exit blocked EX-001 |
 | Active sprint journal issues | #1402 (G4 — Control Plane + Render) |
 
 ---
@@ -79,4 +79,6 @@ None open. ADR-019 Accepted (PR #1393, 2026-06-27). GA-02 / Path 2 retired on op
 - **G3 CLOSED (2026-06-28):** Counter-scenario comparison (#1349) — distributional headcount differential with T3 CI bands in Zone 1B sticky-bottom panel. Sprint exit CONFIRMED (`m18-g3-sprint-exit.md`, PR #1414). Integration PR #1417 MERGED 2026-06-28. Independent BPO ACCEPT filed 2026-06-28 (separate session — confirms sprint exit same-session ACCEPT validity). #1422 filed — Zone 3 auditability panel (US-1349-D; capacity-allowing; screen recording to be captured at M18 close Demo 7 live session #843).
 - **G1 CLOSED (2026-06-28):** CI bands (#1254) — PR #1404 merged to sprint/m18-g1. Integration PR #1411 MERGED 2026-06-28 (playwright-e2e PASS after divergence fill `fill="none"` fix). Sprint exit document: `docs/process/sprint-plans/m18-g1-sprint-exit.md` (filed 2026-06-28, PR #1419).
 - **sprint-branch-ci-gate Ruleset:** Node ID `RRS_lACqUmVwb3NpdG9yec5IKi2kzgEV92A`. Requires `changes`, `lint`, `test-backend`, `compliance-scan`. Workaround for direct push: temporarily clear rules via GraphQL `updateRepositoryRuleset`, push, restore.
+- **NM-076 (2026-06-28):** G4 testid renames (ADR-019 D-3: apply-control-change → apply-policy-input, fiscal-multiplier-slider → policy-param-slider) not crosschecked against E2E corpus before PR #1424; 3 tests merged broken to sprint/m18-g4. sprint-branch-ci-gate does not require playwright-e2e, so auto-merge fired. Fixed by PR #1426. Process improvement: testid rename rule to be added to CODING_STANDARDS.md.
+- **G4 IN-PROGRESS (2026-06-28):** ControlPlaneColumn.tsx implementation MERGED (PR #1424 → sprint/m18-g4). Testid regression fix + CA L3 in PR #1426 (auto-merge enabled, CI running). BPO ACCEPT conditional on record (#1402#issuecomment-4827099333) pending EX-001 closure. EX-001 (AC-009 render ≤100ms): user must run MV-002 local ProBook profiling — report result to proceed. Sprint exit doc and integration PR blocked on EX-001. EX-002 RESOLVED (PR #1425 MERGED).
 - **M17 archive:** Full M1–M17 session state at `docs/process/session-archives/session-state-pre-m18.md`.
