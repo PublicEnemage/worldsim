@@ -22,7 +22,7 @@ expired exceptions at sprint exit.
 
 | ID | Type | Summary | Expiry | Status |
 |---|---|---|---|---|
-| EX-001 | threshold | AC-009 CI throttled render threshold raised 100ms → 200ms | M17 exit | Active |
+| EX-001 | threshold | AC-009 CI throttled render threshold raised 100ms → 200ms | G4 exit (ADR-019 §D-10) | Active |
 | EX-002 | process | AC-A2 annotated with `test.fail()` during G3 pre-implementation window; CI passes while test is intentionally red | G3 Phase 3 implementation PR merged | Active |
 
 ---
@@ -104,6 +104,35 @@ NM-064 filed (`docs/process/near-miss-registry.md`): test.fixme() authorized per
 (a) remove AC-009 from the test suite and replace with a local developer gate, or
 (b) convert to a Playwright `--trace` perf annotation (record without assert), or
 (c) close as Won't Fix if Mode 3 render performance is confirmed acceptable by FE profiling.
+
+### M18 Status Update — 2026-06-28
+
+**EX-001 passed M17 exit without renewal or resolution — compliance finding would normally
+apply (expiry discipline above). EL direction via ADR-019 §D-10 and G4 sprint entry
+§EX-001 Pre-Implementation Condition provides the resolution path.**
+
+ADR-019 §D-10 (accepted 2026-06-27, PR #1393) specifies the EX-001 resolution procedure
+for G4 exit:
+
+1. Implement Issue #1217 (Recharts memoization + lazy `ControlPlaneColumn` mounting) in
+   the same PR as the column layout move (Dimension 1 of G4), before adding form content.
+2. Run MV-002 profiling gate at G4 Dimension 1 implementation PR submission (local,
+   unthrottled ProBook hardware); record measurement in PR description.
+3. After G4 Dimension 3 CI merge: AC-009 `test.fixme()` behavior observed on CI runner.
+   - If ≤ 200ms on CI: restore AC-009 from `test.fixme()` to `test()` at 100ms threshold.
+     Close EX-001 as **Resolved**.
+   - If > 200ms on CI (KI-006 infrastructure limitation persists): remove AC-009 from
+     Playwright CI suite permanently; replace with local developer gate (`npm run test:perf`).
+     Close EX-001 as **Won't Fix**.
+4. AC-009 `test.fixme()` removed from CI permanently regardless of resolution label.
+   Test structure preserved with comment referencing EX-001 closure record.
+
+**Expiry condition updated:** G4 exit (ADR-019 §D-10). This supersedes the expired M17
+exit condition. The resolution path is the active commitment. At G4 exit, PI Agent confirms
+EX-001 closure record is present in this registry before exit gate passes.
+
+**Authority:** EL-approved ADR-019 §D-10 (2026-06-27); G4 sprint entry §EX-001
+Pre-Implementation Condition (EL-approved 2026-06-28).
 
 ---
 
