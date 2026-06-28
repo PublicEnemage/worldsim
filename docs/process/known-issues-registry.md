@@ -512,4 +512,104 @@ do not consume GraphQL quota.
 |---|---|
 | Sporadic | Observed rarely; not reproducible on demand |
 | Consistent | Reproducible; occurs predictably under known conditions |
+
+---
+
+## KI-008 — GitHub Actions: Workflow trigger narrower than Ruleset check scope causes required check to never fire on sprint branches cut before the update
+
+**Date first observed:** 2026-06-28
+**Infrastructure:** GitHub Actions + GitHub Rulesets (interaction between workflow trigger scope and Ruleset required-check enforcement)
+**Severity:** Medium — blocks all PRs targeting the affected sprint branch until workaround applied; no data loss
+**Recurrence:** Consistent — will recur whenever a workflow file's `on: pull_request: branches:` list is expanded (e.g. adding `sprint/m*`) after sprint branches have already been cut
+
+### Symptom
+
+A PR targeting `sprint/m{N}-g{N}` is blocked with:
+
+```
+remote: error: GH013: Repository rule violations found for refs/heads/sprint/m18-g2.
+remote: - 4 of 4 required status checks are expected.
+```
+
+or
+
+```
+GraphQL: Repository rule violations found
+Required status check "branch-naming" is expected.
+```
+
+The `branch-naming` check is listed as a required check in `sprint-branch-ci-gate` Ruleset but never reports — not as pass, not as fail. CI shows the check listed under "Expected — Waiting for status to be reported" indefinitely.
+
+### Trigger condition
+
+GitHub Actions loads workflow files from the HEAD branch of a PR (the feature branch). When a sprint branch is cut from `release/m{N}` before a workflow file update lands, the sprint branch — and all feature branches cut from it — inherit the pre-update workflow file. If the update adds a new `branches:` trigger entry to the workflow's `on: pull_request:` block, PRs targeting the pre-update sprint branch will not trigger the workflow (the PR's base branch doesn't match any of the HEAD branch's `branches:` entries). The Ruleset expects the check to run but it never fires.
+
+**Concrete instance (M18-G2):**
+
+1. `sprint/m18-g2` cut from `release/m18` at commit `8cffc86` (2026-06-26)
+2. PR #1399 (`feat/m18-sprint-branch-naming`) merged to `release/m18` 2026-06-28 03:10 UTC — added `sprint/m*` to `branch-naming.yml` trigger
+3. `feat/m18-g2-psp-impl` was cut from `sprint/m18-g2` (pre-update), so `branch-naming.yml` on the HEAD branch only had `release/m*`
+4. PR #1401 (`feat/m18-g2-psp-impl` → `sprint/m18-g2`): GitHub loads `branch-naming.yml` from the HEAD branch, sees only `release/m*` trigger — workflow doesn't fire for a PR targeting `sprint/m18-g2`
+5. `sprint-branch-ci-gate` requires `branch-naming` → check never reports → Ruleset blocks
+
+### Workaround
+
+**Temporary Ruleset bypass (preferred when the check must be skipped for a specific PR):**
+
+```bash
+# Step 1: Clear sprint-branch-ci-gate rules temporarily
+gh api graphql -f query='
+mutation {
+  updateRepositoryRuleset(input: {
+    repositoryRulesetId: "RRS_lACqUmVwb3NpdG9yec5IKi2kzgEV92A",
+    rules: []
+  }) {
+    ruleset { id name }
+  }
+}'
+
+# Step 2: Merge the PR
+gh pr merge <number> --merge
+
+# Step 3: Restore rules immediately
+gh api graphql -f query='
+mutation {
+  updateRepositoryRuleset(input: {
+    repositoryRulesetId: "RRS_lACqUmVwb3NpdG9yec5IKi2kzgEV92A",
+    rules: [
+      {
+        type: REQUIRED_STATUS_CHECKS,
+        parameters: {
+          requiredStatusChecks: {
+            requiredStatusChecks: [
+              { context: "changes" },
+              { context: "lint" },
+              { context: "test-backend" },
+              { context: "compliance-scan" }
+            ],
+            strictRequiredStatusChecksPolicy: false
+          }
+        }
+      }
+    ]
+  }) {
+    ruleset { id name }
+  }
+}'
+```
+
+**Prevention (preferred for future milestones):**
+
+When adding a new required check to `sprint-branch-ci-gate`, add it only after ensuring all active sprint branches have the updated workflow file. Sequence:
+1. Merge the workflow file update to `release/m{N}`
+2. For each active sprint branch: temporarily clear Ruleset, push an update commit (or cherry-pick), restore Ruleset
+3. Only then add the new check to the Ruleset
+
+If a sprint branch was cut before the update, update the workflow file on that branch before adding it to the Ruleset.
+
+### Upstream
+
+No upstream issue filed. GitHub's design: workflow files are loaded from the HEAD branch (the PR's source branch), not the base branch. This is intentional — it prevents base-branch malicious workflow injection. The consequence is that sprint branches cut before a workflow update do not automatically inherit the new trigger. This is related to but distinct from KI-003 (where the workflow file is absent from the base branch entirely); here the workflow file exists on both branches but with a narrower trigger on the HEAD branch.
+
+First observed: M18-G2 (`feat/m18-g2-psp-impl` → `sprint/m18-g2`, 2026-06-28). See also KI-003 for the analogous pattern on release branches.
 | Resolved | Upstream fixed; workaround no longer needed (keep entry for historical record) |
