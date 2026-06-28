@@ -3938,6 +3938,37 @@ CI run 28332341391 (playwright-e2e on sprint/m18-g4 post-merge) surfaced the fai
 
 ---
 
+## NM-077 — `gh pr create` Infers Head Branch from Shell CWD, Not Worktree Branch; PR Created with Wrong Head (Reactive)
+
+**Date:** 2026-06-28
+**Milestone:** M18 — Full Argument and Demo 7
+**Detected by:** Manual inspection of `gh pr view 1428 --json headRefName` — wrong branch name visible in output
+**Severity:** High — a structurally-broken PR (wrong head) was opened against a sprint branch; if auto-merge had fired before detection, shared-state files (SESSION_STATE.md, near-miss-registry.md) would have merged into sprint/m18-g4, violating the shared-state lane protocol
+
+### What happened
+
+A fix branch `feat/m18-g4-branch-anchor-label` was created in a scratchpad worktree (`worldsim-g4-fix`). After the commit and push, `gh pr create` was called without an explicit `--head` flag. The Claude Code shell CWD had been reset to the main worktree path (`/Users/imranyousuf/projects/worldsim`), which was on branch `chore/m18-state-sync-022`. The `gh` CLI inferred the PR head branch from the CWD working tree rather than from the worktree where the branch was created. PR #1428 was opened as `chore/m18-state-sync-022` → `sprint/m18-g4` instead of `feat/m18-g4-branch-anchor-label` → `sprint/m18-g4`.
+
+GitHub reported `CONFLICTING` / `DIRTY` merge state because `chore/m18-state-sync-022` was branched from `release/m18` with no ancestry to `sprint/m18-g4`. The `ci-failure-notify.yml` workflow fired as a false trigger. PR #1428 was closed immediately; PR #1429 was created with the explicit `--head feat/m18-g4-branch-anchor-label` flag and merged cleanly.
+
+### What was at risk
+
+Auto-merge was set on PR #1428 before the conflict was detected. The GitHub Ruleset (`sprint-branch-ci-gate`) requires `changes`, `lint`, `test-backend`, `compliance-scan` — all of which would have been skipped or passed for a pure-docs PR. If the conflict had resolved (e.g. via admin bypass), SESSION_STATE.md and near-miss-registry.md would have landed in sprint/m18-g4, violating the shared-state lane rule (shared state must flow only via `chore/m{N}-state-sync-NNN` → `release/m{N}`).
+
+### What caught it
+
+Manual check of `gh pr view 1428 --json headRefName,baseRefName` immediately after creation. No process guard prompted this check — it was incidental inspection of the CONFLICTING merge state.
+
+### Process improvement
+
+**Immediate:** When running `gh pr create` from a worktree context, always pass `--head <branch>` explicitly. The `gh` CLI resolves head from the git working tree at CWD, not from the worktree-local context. This rule should be documented in `docs/process/sprint-group-isolation.md §Worktree Usage` alongside the existing `git worktree add` guidance.
+
+**Structural:** The PR creation checklist (implicit in the CLAUDE.md PR gate section) should include: verify `gh pr view <N> --json headRefName,baseRefName` immediately after `gh pr create` returns, before setting auto-merge. A wrong-head PR with auto-merge enabled is a higher-severity error than a wrong-head PR that must be manually merged.
+
+**Near-miss lineage:** Root cause is the same environment as NM-075 (shell CWD reset when operating across multiple worktrees). NM-075 addressed branch-switch interference; NM-077 is a `gh` CLI inference failure in the same multi-worktree environment. The structural fix — explicit branch arguments to all git and gh commands that infer from CWD — is the same in both cases.
+
+---
+
 ## NM-NNN — [Short descriptive title]
 
 **Date:** YYYY-MM-DD (or approximate milestone era)
