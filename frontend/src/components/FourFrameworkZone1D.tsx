@@ -215,7 +215,16 @@ interface FourFrameworkZone1DProps {
   eliteCaptureQualifier?: string | null;
   /** M17-G2 — loaded comparison scenario configs with PSP values for Zone 1D rows. */
   comparisonScenarios?: ScenarioComparisonConfig[];
+  /** M18-G2 (#1255): dominant driver of PSP change at current step. null = no driver row rendered. */
+  pspDominantDriver?: string | null;
 }
+
+const DRIVER_LABELS: Record<string, string> = {
+  fiscal_sustainability: "fiscal sustainability",
+  external_balance: "external balance",
+  governance: "governance",
+  social_stability: "social stability",
+};
 
 const CONTAINER_STYLE: React.CSSProperties = {
   padding: "6px 10px",
@@ -242,6 +251,7 @@ export function FourFrameworkZone1D({
   eliteCaptureDirection,
   eliteCaptureQualifier,
   comparisonScenarios = [],
+  pspDominantDriver,
 }: FourFrameworkZone1DProps) {
   const { trajectory, current_step, mda_alerts, mode } = useScenarioStepStore();
 
@@ -543,6 +553,14 @@ export function FourFrameworkZone1D({
                         : "STABLE"}
                     </span>
                   </div>
+                  {pspDominantDriver != null && DRIVER_LABELS[pspDominantDriver] && (
+                    <div
+                      data-testid="psp-driver-row"
+                      style={{ paddingTop: 1, fontSize: 10, color: "#555" }}
+                    >
+                      {`Driver: ${DRIVER_LABELS[pspDominantDriver]}`}
+                    </div>
+                  )}
                   {analogue && (
                     <div
                       data-testid="psp-historical-analogue"

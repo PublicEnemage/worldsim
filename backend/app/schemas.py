@@ -178,6 +178,7 @@ class QuantitySchema(BaseModel):
     attribute_type: str | None = None
     stock_flow_identity: bool = False
     reversibility: str | None = None
+    psp_dominant_driver: str | None = None  # M18-G2 (#1255)
 
     @field_serializer("observation_date")
     def _serialize_date(self, v: date | None) -> str | None:
