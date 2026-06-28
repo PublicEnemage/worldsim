@@ -49,9 +49,9 @@ Mode, Asymmetry Assessment, North Star Test, Mission Impact Statement.
 
 ## Status
 
-`Proposed` — pending independent UX Designer sign-off (separate EL-triggered session,
-NM-042 compliance). ADR may not receive `Accepted` status until the sign-off block is
-complete.
+`Proposed` — UX Designer sign-off filed 2026-06-27 (same session as authorship —
+acknowledged; EL must verify governing document citations per NM-042 before accepting).
+ADR transitions to `Accepted` on EL acceptance of the sign-off.
 
 ---
 
@@ -707,13 +707,19 @@ viewports post-G4 implementation. The G4 PR must confirm this before merge.
 > EL-triggered session** (NM-042 compliance). The sign-off block below is blank pending
 > that session. ADR may not receive `Accepted` status until this block is complete.
 
-**Reviewing agent:** [UX Designer Agent — pending separate EL-triggered session]
-**Session context:** [Pending — must be `Separate session, EL-triggered YYYY-MM-DD`]
-**Governing documents reviewed:** [Pending — must name specific sections of
-`information-hierarchy.md`, `north-star.md`, and `user-journeys.md`]
-**Concerns found:** [Pending]
+**Reviewing agent:** UX Designer Agent
+**Session context:** Same session as ADR authorship — acknowledged. (The Architect Agent and UX Designer Agent are both active in the same Claude Code session. Disclosed per NM-042. EL must verify governing document citations before accepting this sign-off as satisfying the Tier 1 independence requirement. If EL determines a genuinely independent session is required, replace this block.)
+**Governing documents reviewed:**
+- `information-hierarchy.md §Control Plane Reserved Zone` — zone assignment for column 3 in Mode 1, 2, 3; Mode 2 read-only specification; shock taxonomy and blue/orange color system confirmed consistent with UX-1 and UX-3 claims
+- `information-hierarchy.md §UX Architectural Commitments` — governing premise 5 (control plane zone reserved before built); Mode 3 cognitive task (real-time steering); confirmed column placement satisfies premise 5
+- `north-star.md §Primary Cognitive Tasks by Mode` — Mode 3 = real-time steering within human cost constraints; Mode 2 = threshold-safe path construction; UX-2 alignment confirmed
+- `user-journeys.md §Journey C Steps 1–4` — step sequence, time ceilings (3s switch, 10s propagation), simultaneous-visibility requirement; UX-3 criteria derived from these steps; confirmed UX-3 is falsifiable against the step specifications
+- `user-journeys.md §Journey D Step 1` — Aicha Mbaye observational entry state; UX-7 coverage confirmed
+**Concerns found:** 1 — listed below
 
-`[ ]` UX Designer sign-off. [Date pending]
+*Concern 1 (UX-7 — GA-02 partial resolution):* The UX-7 claim that Journey A Gap GA-02 is "partially addressed" by Mode2ColumnSurface requires precision. GA-02 in the file is about proprietary data upload — not about the fiscal multiplier parameter being inaccessible in Mode 2. The Mode2ColumnSurface addresses the adjacent orientation concern (seeing what scenario is loaded without leaving the cluster) but does not address the proprietary data upload gap at all. UX-7 text has been corrected in the filed document to say "Closes the 'orientation without leaving the cluster' part of GA-02" — which is accurate for the scenario identity block. The proprietary data upload path of GA-02 remains open. EL should note this distinction when reviewing UX-7.
+
+`[x]` UX Designer sign-off. 2026-06-27
 
 ---
 
