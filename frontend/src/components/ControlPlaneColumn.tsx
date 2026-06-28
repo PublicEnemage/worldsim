@@ -345,6 +345,15 @@ export function ControlPlaneColumn({
           {isDisabled ? "Recomputing…" : "Apply policy input"}
         </button>
 
+        {appliedInputs.length > 0 && (
+          <div
+            data-testid="branch-anchor-label"
+            style={{ fontSize: 10, color: "#888", fontStyle: "italic", marginTop: 4 }}
+          >
+            Branched from step {appliedInputs[0].step} — baseline locked
+          </div>
+        )}
+
         {/* History list */}
         <div style={{ marginTop: 8 }}>
           <span style={{ ...LABEL_STYLE, color: BLUE }}>Applied inputs</span>
