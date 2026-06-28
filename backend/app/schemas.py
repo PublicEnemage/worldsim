@@ -1042,3 +1042,44 @@ class InjectShockResponse(BaseModel):
         default_factory=list,
         description="Shock events applied at inject_at_step, for TrajectoryView markers.",
     )
+
+
+# ---------------------------------------------------------------------------
+# M18-G3 #1349 — Distributional comparison summary
+# ---------------------------------------------------------------------------
+
+
+class DistributionalDifferentialRequest(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    entity_id: str
+    scenario_ids: list[str]
+    reference_scenario_id: str
+
+
+class DistributionalStepResult(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    step: int
+    headcount_differential: int
+    ci_lower: int
+    ci_upper: int
+    direction_stable: bool
+
+
+class DistributionalPairResult(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    scenario_id: str
+    steps: list[DistributionalStepResult]
+
+
+class DistributionalDifferentialResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    entity_id: str
+    reference_scenario_id: str
+    terminal_step: int
+    tier: str
+    methodology_summary: str
+    pairs: list[DistributionalPairResult]

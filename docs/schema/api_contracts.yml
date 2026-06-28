@@ -433,7 +433,7 @@ endpoints:
       status_400: "Fewer than 2 scenario_ids, or reference_scenario_id not in scenario_ids"
       status_404: "Any scenario_id not found"
       status_409: "Any scenario has no snapshots yet, or no shared steps across all scenarios"
-    db_reads: [scenarios, scenario_state_snapshots]
+    db_reads: [scenario_state_snapshots]
     notes:
       - "M18-G3 #1349: Demo 7 Act 2 Zambia three-scenario comparison capability."
       - "AC-1349-G: headcount_differential must be integer (not float composite delta)."
