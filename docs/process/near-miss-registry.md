@@ -3872,6 +3872,39 @@ The correct sequence: extend workflow → verify workflow fires on the new patte
 
 ---
 
+## NM-075 — Multiple Claude Code Sessions Sharing One Git Working Tree; Branch Switches from Other Sessions Overwrite In-Progress Implementation (Reactive)
+
+**Date:** 2026-06-27
+**Milestone:** M18 — Full Argument and Demo 7
+**Detected by:** DS Agent investigation triggered by EL — `ps aux` and `git reflog` made root cause unambiguous after repeated branch-switch failures during G2 implementation
+**Severity:** High — implementation commits were overwritten, edited files were reset to HEAD, and a QA test file was deleted repeatedly; implementation required multiple recovery attempts across sessions
+
+### What happened
+
+During M18 G2 implementation (PSP driver decomposition, #1255), the working branch (`feat/m18-g2-psp-impl`) was repeatedly switched by other concurrent Claude Code sessions operating on the same main git working tree at `/Users/imranyousuf/projects/worldsim`. At peak, 18+ `claude code` processes were active simultaneously — G2 implementation, G3 intent document, infra/branch-naming, and multiple chore/state-sync sessions — all sharing the same `.git/HEAD`. Every `git checkout` by any other session immediately changed HEAD for all sessions.
+
+Evidence: `git reflog` showed 30+ HEAD switches in ~2 hours; `ps aux` confirmed 18+ `claude code` processes; `git worktree list` showed only 2 isolated worktrees (for agent tool calls, not for concurrent sprint group work). The sprint group isolation model (NM-067 fix, sprint sub-branches) addresses merge conflicts at PR time but does not prevent working-tree interference when sessions operate concurrently without worktree isolation.
+
+Recovery: G2 implementation was completed by creating an explicit `git worktree add` for `feat/m18-g2-psp-impl` at a scratchpad path, isolating it from all other session activity.
+
+### What was at risk
+
+G2 implementation artifacts (module.py changes, frontend components, test file) were overwritten by branch switches at least three times. Without recovery via `git show <commit>:path`, the pre-authored QA test file (PR #1387) would have been permanently lost from the working tree. The near-miss escalated to a full implementation failure before the worktree workaround was discovered.
+
+### What caught it
+
+DS Agent investigation triggered by EL — the process had no guard. The sprint-group isolation model describes branch naming and PR targeting but does not require or recommend worktree isolation for concurrent sessions.
+
+### Process improvement
+
+**Immediate:** `docs/process/sprint-group-isolation.md` should be updated to require `git worktree add` for any sprint group session that coexists with other concurrent sessions operating on the same repository clone.
+
+**Structural:** PM Agent should provision a named git worktree for each sprint group at sprint entry, alongside cutting the sprint sub-branch. The worktree path (convention: `.claude/worktrees/sprint-m{N}-g{N}`) should be recorded in the sprint journal issue so implementing agents know where to work.
+
+**Near-miss lineage:** Same root cause as NM-067 (concurrent sessions, shared state) at the working-tree level rather than the branch/PR level. NM-067's fix (sprint sub-branches) addressed the merge conflict symptom; NM-075 identifies the working-tree interference that survives the branching fix. NM-071 identified the planning gap; NM-075 identifies the execution gap: even a correctly-planned sprint group can have its implementation destroyed by concurrent sessions without worktree isolation.
+
+---
+
 ## NM-NNN — [Short descriptive title]
 
 **Date:** YYYY-MM-DD (or approximate milestone era)
