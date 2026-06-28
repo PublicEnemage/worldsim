@@ -19,7 +19,12 @@
  * AlertDetailPanel is exported for future EntityDetailDrawer use (ADR-014).
  */
 import { useEffect, useRef, useState } from "react";
-import { useScenarioStepStore, type Zone1BAlert, type CohortThresholdCrossing } from "../store/scenarioStepStore";
+import {
+  useScenarioStepStore,
+  type Zone1BAlert,
+  type CohortThresholdCrossing,
+  type DistributionalSummaryData,
+} from "../store/scenarioStepStore";
 import { getIndicatorDisplayNameAny, getIndicatorAbbreviation } from "../lib/indicatorDisplayNames";
 import { useViewportBreakpoint } from "./InstrumentCluster";
 import { type ScenarioComparisonConfig, SCENARIO_COMPARISON_PALETTE } from "./TrajectoryView";
@@ -688,6 +693,99 @@ function CompactAlertList({ alerts, onClearNewBadge }: CompactAlertListProps) {
 }
 
 // ---------------------------------------------------------------------------
+// M18-G3 #1349 — DistributionalComparisonSummary — sticky-bottom Zone 1B element
+// ---------------------------------------------------------------------------
+
+function _formatHeadcount(n: number): string {
+  const abs = Math.abs(n);
+  const sign = n >= 0 ? "+" : "−";
+  return `${sign}${abs.toLocaleString("en-US")} persons`;
+}
+
+function _formatK(n: number): string {
+  if (Math.abs(n) >= 1_000) return `${Math.round(n / 1_000).toLocaleString("en-US")}K`;
+  return n.toLocaleString("en-US");
+}
+
+function DistributionalComparisonSummary({ summary }: { summary: DistributionalSummaryData }) {
+  const terminalPairs = summary.pairs.map((pair) => {
+    const terminal = pair.steps.find((s) => s.step === summary.terminal_step) ?? pair.steps[pair.steps.length - 1];
+    return { ...pair, terminal };
+  }).filter((p) => p.terminal !== undefined);
+
+  const totalSteps = Math.max(...summary.pairs.flatMap((p) => p.steps.map((s) => s.step)));
+  const allDirectionStable = terminalPairs.every((p) => p.terminal?.direction_stable ?? false);
+  const refLabel = summary.reference_scenario_label;
+
+  return (
+    <div
+      data-testid="distributional-comparison-summary"
+      style={{
+        flexShrink: 0,
+        borderTop: "1px solid #e5e7eb",
+        padding: "6px 8px",
+        background: "#fff",
+      }}
+    >
+      <div style={{ display: "flex", alignItems: "center", gap: 4, marginBottom: 2 }}>
+        <span style={{ fontSize: 11, color: "#6b7280", textTransform: "uppercase", letterSpacing: 0.5, fontWeight: 600 }}>
+          DISTRIBUTIONAL COMPARISON
+        </span>
+        <span style={{ fontSize: 10, color: "#9ca3af" }}>step {totalSteps}</span>
+        <span
+          data-testid="comparison-tier-badge"
+          style={{
+            marginLeft: "auto",
+            fontSize: 9,
+            background: "#f3f4f6",
+            color: "#6b7280",
+            borderRadius: 3,
+            padding: "1px 4px",
+          }}
+        >
+          {summary.tier}
+        </span>
+      </div>
+      <div style={{ fontSize: 11, color: "#4b5563", fontStyle: "italic", marginBottom: 4 }}>
+        Poverty headcount differential
+      </div>
+      {terminalPairs.map((pair) => {
+        const hc = pair.terminal!.headcount_differential;
+        const ciLow = pair.terminal!.ci_lower;
+        const ciHigh = pair.terminal!.ci_upper;
+        return (
+          <div
+            key={pair.scenario_id}
+            data-testid={`comparison-pair-${pair.scenario_id}-vs-${summary.reference_scenario_id}`}
+            style={{ marginBottom: 4 }}
+          >
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
+              <span style={{ fontSize: 12, fontWeight: 500, color: "#1f2937" }}>
+                {`Option ${pair.scenario_label} vs. Option ${refLabel}`}
+              </span>
+              <span style={{ fontSize: 14, fontWeight: 600, color: "#b45309" }}>
+                {_formatHeadcount(hc)}
+              </span>
+            </div>
+            <div style={{ fontSize: 11, color: "#6b7280" }}>
+              {`${_formatK(ciLow)} – ${_formatK(ciHigh)}  95% CI`}
+            </div>
+          </div>
+        );
+      })}
+      <div
+        data-testid="direction-stability-disclosure"
+        style={{ fontSize: 11, color: allDirectionStable ? "#4b5563" : "#d97706", marginTop: 2 }}
+      >
+        {allDirectionStable
+          ? "→ Direction stable across uncertainty range"
+          : "→ Direction uncertain: CI spans zero"}
+      </div>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
 // CohortImpactSection — Zone 1B Cohort Impact sub-section (M16-G2 #986)
 //
 // Standalone store-connected component. Rendered as a sibling of MDAAlertPanelZone1B
@@ -702,7 +800,7 @@ const COHORT_SEVERITY_COLOR: Record<CohortThresholdCrossing["severity"], string>
 };
 
 export function CohortImpactSection({ isCompleted = false }: { isCompleted?: boolean }) {
-  const { cohort_threshold_crossings: crossings } = useScenarioStepStore();
+  const { cohort_threshold_crossings: crossings, distributionalSummary } = useScenarioStepStore();
   const bp = useViewportBreakpoint();
   const isNarrow = bp === 1024; // covers all viewports < 1280px, including 768px (#1250)
   const headerLabel = isCompleted ? "COHORT IMPACT (HISTORICAL)" : "COHORT IMPACT";
@@ -713,99 +811,104 @@ export function CohortImpactSection({ isCompleted = false }: { isCompleted?: boo
   return (
     <div
       data-testid="zone-1b-cohort-impact"
-      style={{ borderTop: "1px solid #e0e0e0", paddingTop: 2, flex: "1 1 0", overflowY: "auto", background: "#fff" }}
+      style={{ borderTop: "1px solid #e0e0e0", flex: "1 1 0", display: "flex", flexDirection: "column", overflow: "hidden", background: "#fff" }}
     >
-      <div
-        data-testid="cohort-section-header"
-        style={{
-          fontSize: 9,
-          fontWeight: 600,
-          color: "#555",
-          letterSpacing: 0.3,
-          paddingBottom: 2,
-          paddingLeft: 4,
-        }}
-      >
-        {headerLabel}
-      </div>
-      {crossings.length === 0 ? (
+      <div style={{ flex: "1 1 0", overflowY: "auto", paddingTop: 2 }}>
         <div
-          data-testid="cohort-empty-state"
-          style={{ fontSize: 10, color: "#aaa", fontStyle: "italic", paddingLeft: 4 }}
+          data-testid="cohort-section-header"
+          style={{
+            fontSize: 9,
+            fontWeight: 600,
+            color: "#555",
+            letterSpacing: 0.3,
+            paddingBottom: 2,
+            paddingLeft: 4,
+          }}
         >
-          {emptyText}
+          {headerLabel}
         </div>
-      ) : (
-        crossings.map((crossing, idx) => {
-          const color = COHORT_SEVERITY_COLOR[crossing.severity];
-          const isSad = !!crossing.is_synthetic && crossing.synthetic_method === "STRUCTURAL_ABSENCE";
-          const badgeText = isSad
-            ? "SAD"
-            : crossing.is_synthetic && crossing.synthetic_method === "SYNTHETIC_MODEL"
-              ? "T4"
-              : crossing.is_synthetic && crossing.synthetic_method === "SYNTHETIC_COMPARABLE"
-                ? "T3"
-                : `T${crossing.tier}`;
-          const valueDisplay = formatCohortDistance(crossing.above_floor_pct, crossing.breaches_below !== false, isSad);
-          return (
-            <div
-              key={`${crossing.quintile_key}-${crossing.indicator_key}`}
-              data-testid={`cohort-row-${idx}`}
-              style={{
-                display: "flex",
-                alignItems: "flex-start",
-                gap: 4,
-                borderLeft: `2px solid ${color}`,
-                paddingLeft: 6,
-                paddingTop: 2,
-                paddingBottom: 2,
-                marginBottom: 2,
-                fontSize: isNarrow ? 11 : 10,
-              }}
-            >
-              <span style={{ color, fontWeight: 700, flexShrink: 0, fontSize: isNarrow ? 10 : 9 }}>
-                {crossing.severity}
-              </span>
-              <span style={{ color: "#333", lineHeight: 1.3, flex: 1, minWidth: 0 }}>
-                <span style={{ fontWeight: 600, display: "block", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                  {crossing.cohort_label} — {crossing.indicator_label}
-                </span>
-                <span style={{ color: "#666", display: "block", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                  {`Threshold crossed at step ${crossing.step_crossed} · `}
-                  <span data-testid={`cohort-value-${crossing.indicator_key}`}>
-                    {valueDisplay}
-                  </span>
-                  {` · ${formatSourceId(crossing.source)}`}
-                </span>
-              </span>
-              <span
-                data-testid="confidence-tier-badge"
-                style={{ display: 'inline-flex', flexDirection: 'column', alignItems: 'center', gap: 1, flexShrink: 0 }}
+        {crossings.length === 0 ? (
+          <div
+            data-testid="cohort-empty-state"
+            style={{ fontSize: 10, color: "#aaa", fontStyle: "italic", paddingLeft: 4 }}
+          >
+            {emptyText}
+          </div>
+        ) : (
+          crossings.map((crossing, idx) => {
+            const color = COHORT_SEVERITY_COLOR[crossing.severity];
+            const isSad = !!crossing.is_synthetic && crossing.synthetic_method === "STRUCTURAL_ABSENCE";
+            const badgeText = isSad
+              ? "SAD"
+              : crossing.is_synthetic && crossing.synthetic_method === "SYNTHETIC_MODEL"
+                ? "T4"
+                : crossing.is_synthetic && crossing.synthetic_method === "SYNTHETIC_COMPARABLE"
+                  ? "T3"
+                  : `T${crossing.tier}`;
+            const valueDisplay = formatCohortDistance(crossing.above_floor_pct, crossing.breaches_below !== false, isSad);
+            return (
+              <div
+                key={`${crossing.quintile_key}-${crossing.indicator_key}`}
+                data-testid={`cohort-row-${idx}`}
+                style={{
+                  display: "flex",
+                  alignItems: "flex-start",
+                  gap: 4,
+                  borderLeft: `2px solid ${color}`,
+                  paddingLeft: 6,
+                  paddingTop: 2,
+                  paddingBottom: 2,
+                  marginBottom: 2,
+                  fontSize: isNarrow ? 11 : 10,
+                }}
               >
-                <span
-                  data-testid={`cohort-tier-badge-${crossing.indicator_key}`}
-                  style={{
-                    fontSize: isNarrow ? 10 : 8,
-                    fontWeight: 700,
-                    color: isSad ? "#7a0000" : "#005a9e",
-                    background: isSad ? "#ffe0e0" : "#e0eeff",
-                    borderRadius: 2,
-                    padding: "1px 3px",
-                    display: "inline-block",
-                  }}
-                >
-                  {badgeText}
+                <span style={{ color, fontWeight: 700, flexShrink: 0, fontSize: isNarrow ? 10 : 9 }}>
+                  {crossing.severity}
+                </span>
+                <span style={{ color: "#333", lineHeight: 1.3, flex: 1, minWidth: 0 }}>
+                  <span style={{ fontWeight: 600, display: "block", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                    {crossing.cohort_label} — {crossing.indicator_label}
+                  </span>
+                  <span style={{ color: "#666", display: "block", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                    {`Threshold crossed at step ${crossing.step_crossed} · `}
+                    <span data-testid={`cohort-value-${crossing.indicator_key}`}>
+                      {valueDisplay}
+                    </span>
+                    {` · ${formatSourceId(crossing.source)}`}
+                  </span>
                 </span>
                 <span
-                  data-testid="confidence-tier-badge-sublabel"
-                  style={{ fontSize: isNarrow ? 9 : 7, color: '#6b7280', fontWeight: 400, lineHeight: 1, whiteSpace: 'nowrap' }}
+                  data-testid="confidence-tier-badge"
+                  style={{ display: 'inline-flex', flexDirection: 'column', alignItems: 'center', gap: 1, flexShrink: 0 }}
                 >
-                  {isSad ? "No primary data" : badgeText === "T4" ? "Model est." : "Inferred"}
+                  <span
+                    data-testid={`cohort-tier-badge-${crossing.indicator_key}`}
+                    style={{
+                      fontSize: isNarrow ? 10 : 8,
+                      fontWeight: 700,
+                      color: isSad ? "#7a0000" : "#005a9e",
+                      background: isSad ? "#ffe0e0" : "#e0eeff",
+                      borderRadius: 2,
+                      padding: "1px 3px",
+                      display: "inline-block",
+                    }}
+                  >
+                    {badgeText}
+                  </span>
+                  <span
+                    data-testid="confidence-tier-badge-sublabel"
+                    style={{ fontSize: isNarrow ? 9 : 7, color: '#6b7280', fontWeight: 400, lineHeight: 1, whiteSpace: 'nowrap' }}
+                  >
+                    {isSad ? "No primary data" : badgeText === "T4" ? "Model est." : "Inferred"}
+                  </span>
                 </span>
-              </span>
-            </div>
-          );
-        })
+              </div>
+            );
+          })
+        )}
+      </div>
+      {distributionalSummary && distributionalSummary.pairs.length > 0 && (
+        <DistributionalComparisonSummary summary={distributionalSummary} />
       )}
     </div>
   );
