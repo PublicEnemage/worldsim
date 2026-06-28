@@ -149,7 +149,10 @@ gh pr create --base sprint/m{N}-g{N} --title "..." --body "..."
 gh pr merge <number> --merge --auto
 ```
 
-CI runs on every feature PR to `sprint/m{N}-g{N}` (triggered by `sprint/m*` in ci.yml).
+The sprint gate runs on every feature PR to `sprint/m{N}-g{N}` (triggered by `sprint/m*`
+in ci.yml). Required checks: `changes`, `lint`, `test-backend`, `compliance-scan`,
+`branch-naming`. `playwright-e2e` runs but is not required — it is gated at the
+integration PR instead (see §CI Configuration).
 After each merge, pull the sprint branch before cutting the next feature branch:
 ```bash
 git pull origin sprint/m{N}-g{N}
@@ -412,19 +415,42 @@ sub-branch. This is a deliberate decision that must be documented in the sprint 
 
 ## CI Configuration
 
+### Two-tier CI gate model
+
+WorldSim uses a two-tier CI gate to enforce fast feedback on sprint branches while
+reserving the expensive E2E suite for the integration PR:
+
+| Gate | Branch pattern | Ruleset | Required checks |
+|---|---|---|---|
+| Sprint gate | `sprint/m*` | `sprint-branch-ci-gate` | `changes`, `lint`, `test-backend`, `compliance-scan`, `branch-naming` |
+| Release gate | `release/m*` | `release-branch-ci-gate` | all of the above **+ `playwright-e2e`** |
+
+**Why `playwright-e2e` is not required on sprint branches:**
+The test authorship gate (sprint entry §2.4) requires QA tests to be filed before
+implementation opens — producing intentionally failing (RED) playwright tests. If
+`playwright-e2e` were required on sprint branches, test authorship PRs could never
+merge via auto-merge. The E2E gate lives at the integration PR instead, where tests
+are expected to be GREEN (implementation complete).
+
+This design was established in response to NM-073 (`docs/process/near-miss-registry.md`).
+
 ### `sprint/m*` trigger
 
 `ci.yml` triggers CI on `pull_request` events targeting `sprint/m*` branches.
-This means feature PRs inside a sprint group get full CI coverage, not just the
-integration PR. The change management arc for M18 onward is:
+Feature PRs inside a sprint group get CI coverage at the sprint gate level, with
+`playwright-e2e` deferred to the integration PR. The change management arc for
+M18 onward is:
 
 ```
 local pre-push gates (ruff/mypy/build)
-  → CI on every feat/m{N}-g{N}-* PR to sprint/m{N}-g{N}
-    → CI on integration PR sprint/m{N}-g{N} → release/m{N}
+  → sprint gate on every feat/m{N}-g{N}-* PR to sprint/m{N}-g{N}
+    (changes, lint, test-backend, compliance-scan, branch-naming — no playwright-e2e)
+    → release gate on integration PR sprint/m{N}-g{N} → release/m{N}
+      (all checks including playwright-e2e)
 ```
 
-Errors surface at the smallest unit rather than accumulating to the integration PR.
+Defects in lint, types, and unit tests surface at the sprint gate. Behavioral
+regressions caught by E2E tests surface at the integration PR gate.
 
 ### SESSION_STATE.md size check
 
