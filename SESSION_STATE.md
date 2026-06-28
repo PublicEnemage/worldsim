@@ -6,7 +6,7 @@
 > Historical state lives in `docs/process/session-archives/`.
 > Authority: `docs/process/sprint-group-isolation.md §SESSION_STATE.md Cockpit Card Protocol`.
 
-**Last updated:** 2026-06-28 (EX-001 CLOSED Won't Fix — MV-002 ProBook 67/86/64ms all ≤100ms; test.fixme removed PR #1429+feat/m18-g4-ex001-closure; sprint exit doc next)
+**Last updated:** 2026-06-28 (G4 CLOSED — integration PR #1433 MERGED to release/m18; sprint exit doc filed; Demo 7 unblocked)
 **Current milestone:** M18 — Full Argument and Demo 7 (GitHub Milestone 19)
 
 ---
@@ -20,9 +20,9 @@
 | Exit checklist issue | #1340 |
 | Release branch | ✅ `release/m18` — cut 2026-06-26 at commit 151904d |
 | Sprint plan | ✅ EL-approved 2026-06-26 — `docs/process/sprint-plans/m18-sprint-plan.md` (PR #1364) |
-| Active wave | G1 CLOSED (PR #1411 merged); G2 CLOSED (PR #1408 merged); G3 CLOSED (PR #1417 MERGED); G4 in-progress — exit pending EX-001 closure (user MV-002) |
-| Active sprint groups | G4 (#1402) — implementation MERGED (PR #1424); testid fix PR #1426 auto-merge; exit blocked EX-001 |
-| Active sprint journal issues | #1402 (G4 — Control Plane + Render) |
+| Active wave | G1 CLOSED (PR #1411); G2 CLOSED (PR #1408); G3 CLOSED (PR #1417); G4 CLOSED (PR #1433) — Wave 2 complete; all M18 sprint groups closed |
+| Active sprint groups | None — all G1–G4 groups closed |
+| Active sprint journal issues | None — #1402 closed (G4 exit confirmed) |
 
 ---
 
@@ -60,7 +60,7 @@ None open. ADR-019 Accepted (PR #1393, 2026-06-27). GA-02 / Path 2 retired on op
 | #1354 | Control Plane Column Design Package — Mode 2 + Mode 3 (7 artifacts #1355–#1361) | ✅ GD CLOSED 2026-06-27 (PRs #1386–#1393); ADR-019 Accepted |
 | #1256 | Path 2 / proprietary data integration | ✅ CLOSED 2026-06-27 — retired on open-source-as-strategy principle; exception required to reopen |
 | #1422 | Zone 3 auditability panel for DistributionalComparisonSummary (US-1349-D) | Capacity-allowing — #1349 CA condition |
-| #1217 | Mode 3 render optimization (EX-001 expired) | G4 Wave 2 — sequenced via GD/ADR-019 |
+| #1217 | Mode 3 render optimization (EX-001 expired) | ✅ CLOSED 2026-06-28 — delivered in G4 (lazy-mount + Recharts memoization, PR #1424); EX-001 closed Won't Fix (MV-002 PASS) |
 | #1238 | DEMO6-009 TTS narration fix | Capacity-allowing |
 | #1059 | HCL narration integration | Capacity-allowing |
 
@@ -80,5 +80,5 @@ None open. ADR-019 Accepted (PR #1393, 2026-06-27). GA-02 / Path 2 retired on op
 - **G1 CLOSED (2026-06-28):** CI bands (#1254) — PR #1404 merged to sprint/m18-g1. Integration PR #1411 MERGED 2026-06-28 (playwright-e2e PASS after divergence fill `fill="none"` fix). Sprint exit document: `docs/process/sprint-plans/m18-g1-sprint-exit.md` (filed 2026-06-28, PR #1419).
 - **sprint-branch-ci-gate Ruleset:** Node ID `RRS_lACqUmVwb3NpdG9yec5IKi2kzgEV92A`. Requires `changes`, `lint`, `test-backend`, `compliance-scan`. Workaround for direct push: temporarily clear rules via GraphQL `updateRepositoryRuleset`, push, restore.
 - **NM-076 (2026-06-28):** G4 testid renames (ADR-019 D-3: apply-control-change → apply-policy-input, fiscal-multiplier-slider → policy-param-slider) not crosschecked against E2E corpus before PR #1424; 3 tests merged broken to sprint/m18-g4. sprint-branch-ci-gate does not require playwright-e2e, so auto-merge fired. Fixed by PR #1426. Process improvement: testid rename rule to be added to CODING_STANDARDS.md.
-- **G4 IN-PROGRESS (2026-06-28):** ControlPlaneColumn.tsx MERGED (PR #1424). Testid fix + CA L3 MERGED (PR #1426). branch-anchor-label fix MERGED (PR #1429). EX-001 CLOSED Won't Fix — MV-002 ProBook 67.40/85.50/64.40ms all ≤100ms; test.fixme removed (feat/m18-g4-ex001-closure, PR open). EX-002 RESOLVED (PR #1425). BPO ACCEPT conditional on record (#1402#issuecomment-4827099333). Sprint exit doc pending PI Agent confirmation.
+- **G4 CLOSED (2026-06-28):** Control plane column (Mode2ColumnSurface + ControlPlaneColumn + Form 1 + Form 2 + 7 shocks) + render optimization (#1217) + backend inject-shock endpoint — PRs #1418/#1421/#1424/#1426/#1429/#1432 merged to sprint/m18-g4. EX-001 closed Won't Fix — MV-002 67.40/85.50/64.40ms ≤ 100ms; AC-009 test.fixme removed. BPO full ACCEPT (#1402#issuecomment-4827376554). CA L3 PASS Persona 2+5. Sprint exit doc filed (`m18-g4-sprint-exit.md`). Integration PR #1433 MERGED to release/m18. Demo 7 scheduling unblocked — all G1–G4 groups closed.
 - **M17 archive:** Full M1–M17 session state at `docs/process/session-archives/session-state-pre-m18.md`.
