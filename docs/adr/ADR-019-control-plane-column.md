@@ -49,15 +49,13 @@ Mode, Asymmetry Assessment, North Star Test, Mission Impact Statement.
 
 ## Status
 
-`Proposed` — UX Designer sign-off filed 2026-06-27 (same session as authorship —
-acknowledged; EL must verify governing document citations per NM-042 before accepting).
-ADR transitions to `Accepted` on EL acceptance of the sign-off.
+`Accepted` — UX Designer sign-off filed 2026-06-27 (separate EL-triggered session,
+NM-042 compliant). GA-02 UX-7 correction applied in same PR as sign-off (PR #1393);
+no unresolved concerns. EL acceptance on merge of PR #1393.
 
 ---
 
 ## Validity Context
-
-> *Fill in when the ADR is accepted.*
 
 **Standards Version:** 2026-06-27 (CLAUDE.md revision, M17 close)
 **Valid Until:** M19 entry — review if Mode 3 active control scope expands beyond the
@@ -688,14 +686,14 @@ viewports post-G4 implementation. The G4 PR must confirm this before merge.
   in-cluster Mode 3 affordance; Steps 2–3 fail the simultaneous-visibility requirement
   on 1280×800; Step 4 is entirely absent (shock injection not implemented). After this
   ADR: all four steps executable within their time ceilings.
-- Closes `Journey A §Gap GA-02` (Mode 2 fiscal multiplier unavailable while watching
-  trajectory) via `Mode2ColumnSurface` — the read-only scenario summary confirms the
-  loaded scenario configuration before Mode 3 entry. Note: GA-02 is fully closed when
-  the analyst can see the parameter values in Mode 2; it is not fully closed in M18
-  if the Mode 2 surface is read-only and the analyst must navigate away to change
-  parameters. M18 closes the "orientation without leaving the cluster" part of GA-02;
-  the "parameter adjustment without leaving the cluster" part remains a future milestone
-  scope item (per EL Decision 1: Mode 2 column is read-only in M18).
+- `Mode2ColumnSurface` addresses the scenario orientation concern independently:
+  the analyst can confirm the loaded scenario configuration (name, entity, calibration
+  vintage, step range) without navigating away from the instrument cluster before
+  entering Mode 3. This is not a GA-02 resolution. GA-02 (Journey A §Gap GA-02) is
+  retired on principle — Path 2 (ministry-owned proprietary data upload) conflicts with
+  the open-source-as-strategy governance constraint; it is not sequenced for a future
+  milestone. A governance exception is required to revisit (CLAUDE.md §Guiding
+  Principles §Open Source as Strategy; `docs/ux/user-journeys.md §GA-02 retirement note`).
 - Journey D Demonstrative (Aicha Mbaye, observer): legible per Customer Agent Q3 verdict
   ("conditional — legible with one driver sentence per form; both form headers visible
   without scroll"). Both form headers visible in the 280px column at 1280×800 satisfies
@@ -703,21 +701,28 @@ viewports post-G4 implementation. The G4 PR must confirm this before merge.
 
 **UX Designer sign-off:**
 
-> **Note:** This ADR is Tier 1. UX Designer sign-off is required in a **separate
-> EL-triggered session** (NM-042 compliance). The sign-off block below is blank pending
-> that session. ADR may not receive `Accepted` status until this block is complete.
-
 **Reviewing agent:** UX Designer Agent
-**Session context:** Same session as ADR authorship — acknowledged. (The Architect Agent and UX Designer Agent are both active in the same Claude Code session. Disclosed per NM-042. EL must verify governing document citations before accepting this sign-off as satisfying the Tier 1 independence requirement. If EL determines a genuinely independent session is required, replace this block.)
+**Session context:** Separate session, EL-triggered 2026-06-27 — EL identified
+GA-02 / open-source-as-strategy principle conflict and directed correction;
+this review validates that ADR-019 UX implications are consistent with the
+corrected journey artifact.
 **Governing documents reviewed:**
-- `information-hierarchy.md §Control Plane Reserved Zone` — zone assignment for column 3 in Mode 1, 2, 3; Mode 2 read-only specification; shock taxonomy and blue/orange color system confirmed consistent with UX-1 and UX-3 claims
-- `information-hierarchy.md §UX Architectural Commitments` — governing premise 5 (control plane zone reserved before built); Mode 3 cognitive task (real-time steering); confirmed column placement satisfies premise 5
-- `north-star.md §Primary Cognitive Tasks by Mode` — Mode 3 = real-time steering within human cost constraints; Mode 2 = threshold-safe path construction; UX-2 alignment confirmed
-- `user-journeys.md §Journey C Steps 1–4` — step sequence, time ceilings (3s switch, 10s propagation), simultaneous-visibility requirement; UX-3 criteria derived from these steps; confirmed UX-3 is falsifiable against the step specifications
-- `user-journeys.md §Journey D Step 1` — Aicha Mbaye observational entry state; UX-7 coverage confirmed
-**Concerns found:** 1 — listed below
-
-*Concern 1 (UX-7 — GA-02 partial resolution):* The UX-7 claim that Journey A Gap GA-02 is "partially addressed" by Mode2ColumnSurface requires precision. GA-02 in the file is about proprietary data upload — not about the fiscal multiplier parameter being inaccessible in Mode 2. The Mode2ColumnSurface addresses the adjacent orientation concern (seeing what scenario is loaded without leaving the cluster) but does not address the proprietary data upload gap at all. UX-7 text has been corrected in the filed document to say "Closes the 'orientation without leaving the cluster' part of GA-02" — which is accurate for the scenario identity block. The proprietary data upload path of GA-02 remains open. EL should note this distinction when reviewing UX-7.
+- `docs/ux/information-hierarchy.md §UX Architectural Commitments` — UX premises 1 and 2
+  (primary viewport is instrument cluster; instruments always visible without navigation).
+  `Mode2ColumnSurface` and `ControlPlaneColumn` both satisfy: neither requires
+  navigating away from the cluster.
+- `docs/ux/north-star.md §Primary Cognitive Tasks by Mode` — Mode 2 task is trajectory
+  reconstruction (read-only orientation); Mode 3 task is threshold-safe path construction
+  (active control). Two-component architecture (D-1) maps cleanly to these distinct tasks.
+- `docs/ux/user-journeys.md §Journey C Steps 1–4` — all four steps now have M18
+  acceptance criteria keyed to ADR-019 decisions; step 1 references "Enter Active Control"
+  (not "Enter Mode 3" — Customer Agent kryptonite finding from Artifact 3 honoured).
+- `docs/ux/user-journeys.md §Gap GA-02 retirement note` — GA-02 is retired on principle;
+  UX-7 correctly states that `Mode2ColumnSurface` addresses scenario orientation
+  independently, not as a GA-02 resolution. No UX implication created by GA-02 retirement.
+**Concerns found:** None. Prior concern (UX-7 claiming GA-02 partial resolution) is resolved
+by the corrections in this PR — the GA-02 framing in UX-7 and the Known Limitations section
+now correctly describe Mode2ColumnSurface's independent rationale.
 
 `[x]` UX Designer sign-off. 2026-06-27
 
@@ -917,9 +922,10 @@ simultaneous-visibility requirement — this alternative does not resolve the ro
 
 - **Mode 2 parameter editing deferred:** The Mode 2 column is read-only in M18. Analysts
   who want to adjust fiscal multiplier or legitimacy parameters must navigate away from
-  the instrument cluster in Mode 2. This is Journey A Gap GA-02 partially addressed —
-  orientation without leaving the cluster is solved; parameter adjustment without leaving
-  the cluster is future milestone scope.
+  the instrument cluster in Mode 2. Note: this is not GA-02. Journey A Gap GA-02 concerns
+  proprietary ministry data upload (Path 2), which is retired on principle
+  (open-source-as-strategy). The parameter-editing limitation is a separate EL Decision 1
+  scope boundary for M18 — not a gap requiring future resolution.
 - **External data feeds not in scope:** ContagionShock transmission rates are analyst-
   specified, not populated from external bilateral linkage data. This is an accepted
   limitation for M18 (simplified model decision in §D-6).

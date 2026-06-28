@@ -10,10 +10,14 @@
 > the reference for information hierarchy decisions and for evaluating whether
 > a proposed UI change supports or obstructs the user's task.
 >
-> Last updated: 2026-06-27 (Artifact 7 #1361 — Journey C Steps 1–4 M18 acceptance
-> criteria added; GA-02 disposition note added; Journey dependency map Journey C rows
-> updated to reference ADR-019. Previous: 2026-06-16 — GA-01 and GA-02 gap markers
-> added to Journey A Steps 1–2).
+> Last updated: 2026-06-27 (GA-02 retired on principle — Path 2 proprietary
+> data upload conflicts with open-source-as-strategy governance constraint; not a
+> sequencing decision; exception required to revisit. ADR-019 UX-7 and Known
+> Limitations corrected; UX Designer sign-off filed — PR #1393. Artifact 7 #1361
+> — Journey C Steps 1–4 M18 acceptance criteria added; dependency map Journey C
+> rows updated to reference ADR-019 — PR #1391. Previous: 2026-06-16 — GA-01/GA-02
+> gap markers added to Journey A Steps 1–2; 2026-05-21 — EL Decisions 1/2/3;
+> Journey B/C/D updates; closes #365).
 
 ---
 
@@ -101,11 +105,10 @@ from preloaded dataset" and (b) "available from registered source — click to
 load." The pull action must complete or provide a visible progress state
 within the 5-minute preparation ceiling.
 
-**Path 2 — Ministry-owned / proprietary data upload [M16+]:**
-See Gap GA-02 at Step 2 below. Path 2 is the subsequent enhancement. Path 1
-is the prerequisite: the ministry must be able to confirm that the publicly
-sourced baseline exists and what tier it carries before uploading proprietary
-overrides that will blend with it.
+**Path 2 — Ministry-owned / proprietary data upload [Retired: open-source-as-strategy]:**
+See Gap GA-02 at Step 2 below. Path 2 was the intended subsequent enhancement,
+but is retired on principle — see GA-02 retirement note. Path 1 remains the
+boundary of the approved data ingestion scope.
 
 *Existing artifact links:*
 - `docs/data-sources/approved-sources.md` — canonical approved source list;
@@ -142,21 +145,28 @@ terms, and sets the number of steps to match the program horizon (typically
 correct parameters. The scenario name should reflect the proposal being
 modeled ("IMF Draft 2026-04") for recall during active negotiation.
 
-*[Sequenced: M16+] — GA-02: Starting conditions locked to preloaded data;
+*[Retired: open-source-as-strategy] — GA-02: Starting conditions locked to preloaded data;
 no mechanism to supply ministry-owned or non-public initial state values.*
 
-> GA-02 disposition (Artifact 7, #1361, 2026-06-27): The proprietary data upload
-> path (Path 2 below) remains out of scope through M18 and is sequenced to M16+
-> per the original gap text. This gap is NOT resolved by the M18 control plane
-> column design package (#1354). The M18 GD package delivers `Mode2ColumnSurface`
-> (ADR-019 §D-2) — a read-only scenario orientation surface in the Mode 2 column 3.
-> This provides scenario identity context (name, entity, calibration vintage, horizon)
-> without leaving the instrument cluster. It does NOT provide ministry-owned data
-> upload, parameter override, or editable starting conditions. Those capabilities
-> remain GA-02 scope. The adjacent Mode 2 parameter-access concern (fiscal multiplier
-> not editable from within the cluster in Mode 2) is a known limitation of ADR-019
-> §D-2 (EL Decision 1 — Mode 2 column is read-only in M18) and is sequenced to a
-> future milestone as a Mode 2 column enhancement.
+> **Retirement note (2026-06-27):** Path 2 (ministry-owned proprietary data
+> upload) is retired as a platform capability, not deferred for capacity.
+> A scenario whose starting conditions include user-supplied proprietary data
+> cannot be reproduced or validated by the community. This conflicts with
+> WorldSim's "Open Source as Strategy" governing principle (CLAUDE.md
+> §Guiding Principles): the tool's credibility rests on methodological
+> transparency — anyone must be able to inspect, challenge, and improve the
+> assumptions. Scenarios that cannot be reproduced from public sources
+> undermine this at the scenario level. Implementing Path 2 would require
+> a governance exception (CLAUDE.md §Governance). The architecture design
+> below is retained as institutional memory only.
+>
+> This gap is NOT resolved or partially addressed by the M18 control plane
+> column design package (#1354). `Mode2ColumnSurface` (ADR-019 §D-2) provides
+> scenario identity context (name, entity, calibration vintage, horizon) in a
+> read-only orientation surface — this is independently motivated and is not a
+> GA-02 resolution. The adjacent Mode 2 parameter-access concern (fiscal
+> multiplier not editable from within the cluster in Mode 2) is a separate
+> EL Decision 1 scope boundary, not a GA-02 sub-item.
 
 Even when an entity is available (preloaded or pulled via Path 1 above),
 the starting conditions for every indicator are drawn exclusively from the
@@ -190,15 +200,22 @@ Path 1 improves source currency (more recent vintages, more complete coverage
 for more entities) but does not solve the proprietary-data problem. It is a
 prerequisite for Path 2, not a substitute.
 
-**Path 2 — Ministry-owned / proprietary data upload [M16+]:**
+**Path 2 — Ministry-owned / proprietary data upload [Retired: open-source-as-strategy]:**
+*(Architecture design below is retained as institutional memory — this path is retired on principle, not deferred for capacity. See GA-02 retirement note above.)*
+
 The ministry uploads its own starting values for specific indicators: the
 actual reserve position, the bilateral lending terms, the draft budget
-fiscal position. These values override or supplement the preloaded baseline
-for the duration of the scenario, with full provenance and tier disclosure.
+fiscal position. These values would override or supplement the preloaded
+baseline for the duration of the scenario, with full provenance and tier
+disclosure.
 
-This is the asymmetry reversal the founding document describes: the ministry
-brings data the creditor cannot replicate from public sources, and runs
-scenarios the creditor side cannot run. No other capability delivers this.
+This was the intended asymmetry reversal the founding document describes:
+the ministry brings data the creditor cannot replicate from public sources.
+However, the same mechanism that makes this powerful — scenarios that cannot
+be reproduced from public sources — is what conflicts with the transparency
+principle. The founding document's asymmetry is addressed instead through
+better public data coverage (Path 1) and analytical capability parity, not
+through proprietary data isolation.
 
 *Architecture prerequisites for Path 2:*
 
@@ -279,15 +296,13 @@ be skipped or rushed, producing misconfigured scenarios.
 - `docs/data-sources/approved-sources.md` — approved source list; Path 2 does
   not add to this list (ministry data is user-session-scoped, not platform-wide)
 
-*New issue required:* File a dedicated issue for Path 2 (distinct from Issue
-#53 and from the Path 1 issue). Target M16+, design-first (ADR required
-before implementation). The design work — field mapping UX, USER_SUPPLIED
-provenance type, isolation model — should begin in M15 parallel to Path 1
-implementation. User story: *As Eleni in the Preparatory entry state, I need
-to upload my ministry's non-public starting values for specific indicators
-and have them reflect in the scenario's initial state with full provenance
-disclosure, so that my analysis reflects what my government actually knows
-rather than only what has been publicly released.*
+*No issue required:* Path 2 is retired on principle. The user story above
+(uploading ministry-internal starting values) is valid as a user need but
+conflicts with the community reproducibility requirement. It is not a future
+issue — it is a declared boundary of the platform's open-source commitment.
+If this position is ever revisited, a governance exception must be filed
+first (CLAUDE.md §Governance), and a new issue may only be opened after the
+exception is on record and EL-approved.
 
 ---
 
