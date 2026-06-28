@@ -3781,6 +3781,51 @@ The upstream gate must be an explicit check in the sprint planning SOP, not guid
 
 ---
 
+## NM-073 — Sprint Sub-Branches Have No Required CI Checks; Auto-Merge Fires Before Playwright E2E Completes (Reactive)
+
+**Date:** 2026-06-27
+**Milestone:** M18 — Full Argument and Demo 7
+**Detected by:** DS Agent investigation — EL observed PR #1395 merged while `playwright-e2e` was still pending
+**Severity:** Low — integration PR gate (sprint→release) still enforces full CI before any code reaches `release/m18`; no incorrect artifacts produced
+
+### What happened
+
+PR #1395 (`feat/m18-g3-test-authorship` → `sprint/m18-g3`) merged at `2026-06-27T01:49:55Z` while the `playwright-e2e` CI check was still in `pending` state. The EL flagged the premature merge; DS Agent investigation confirmed the root cause: `sprint/m18-g3` has no branch protection (GitHub branch protection API returns 404 for sprint branches) and is not covered by the `release-branch-ci-gate` Ruleset.
+
+The Ruleset condition is `refs/heads/release/m*` — it applies exclusively to `release/m18`, `release/m17`, etc. Sprint sub-branches (`sprint/m18-g1`, `sprint/m18-g2`, `sprint/m18-g3`) are not included. Auto-merge on an unprotected branch fires when GitHub's internal merge eligibility conditions are satisfied (no conflicts; no status checks required). Since no status check was required on the sprint branch, `playwright-e2e` being pending did not block the merge.
+
+The sprint group isolation model was introduced at M18 kickoff to resolve NM-067. When the branching model was designed, no corresponding CI gate was specified for sprint sub-branches.
+
+### What was at risk
+
+An implementation PR could merge to a sprint sub-branch with failing `playwright-e2e` tests — broken frontend behavior landing on the sprint branch before CI completes. Other implementing agents pulling from the sprint branch for subsequent work could build on top of that broken state. The defect would only be caught at the integration PR gate (`sprint/m18-g3` → `release/m18`) where the `release-branch-ci-gate` Ruleset enforces all required checks.
+
+In this specific instance (PR #1395 is a test authorship PR), `playwright-e2e` failure was expected — tests are pre-RED before implementation. The risk is higher for implementation PRs where a failing `playwright-e2e` indicates genuine defects.
+
+### What caught it
+
+EL observation after seeing the merge notification, triggering DS Agent investigation. No process gate on the sprint branch detected or blocked the premature merge.
+
+### Root cause
+
+The sprint group isolation SOP (NM-067 resolution) introduced sprint sub-branches but did not define CI requirements for those branches. The `release-branch-ci-gate` Ruleset was not extended to cover `sprint/m*` branches. The design intent — whether sprint branches should have required checks or whether the gate lives only at the integration PR — was never explicitly decided or documented.
+
+### Process improvement
+
+**Design decision required (EL) — choose one path:**
+
+**Option A — Add sprint-branch CI gate:**
+DS Agent creates a new GitHub Ruleset (`sprint-branch-ci-gate`) covering `refs/heads/sprint/m*` with required checks: `changes`, `lint`, `test-backend`, `playwright-e2e`. Feature→sprint auto-merge then waits for all required checks to pass. `docs/process/sprint-group-isolation.md` updated to document the gate. Implemented via `infra/m18-sprint-branch-gate` PR targeting `release/m18`.
+
+**Option B — Explicitly document sprint branches as intentionally unprotected:**
+DS Agent updates `docs/process/sprint-group-isolation.md` to explicitly state that sprint sub-branches are intermediate integration points with no required CI gate; the full gate lives at the integration PR (sprint→release). Auto-merge fires without waiting for CI on sprint branches by design — implementing agents rely on local pre-push gates (ruff + mypy + npm build) for intermediate quality. Implemented via `infra/m18-sprint-group-isolation-doc-amendment` PR targeting `release/m18`.
+
+**Not acceptable:** leaving the design decision undocumented. The sprint group isolation SOP must explicitly state CI gate expectations for sprint branches, whichever path is chosen.
+
+DS Agent brings this finding to the EL for path selection before implementing.
+
+---
+
 ## NM-NNN — [Short descriptive title]
 
 **Date:** YYYY-MM-DD (or approximate milestone era)
