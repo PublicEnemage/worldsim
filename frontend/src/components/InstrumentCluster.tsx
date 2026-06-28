@@ -11,7 +11,7 @@
  */
 import React, { useEffect, useState } from "react";
 import { TrajectoryView, type ScenarioComparisonConfig } from "./TrajectoryView";
-import { useScenarioStepStore, type TrajectoryResponse } from "../store/scenarioStepStore";
+import type { TrajectoryResponse } from "../store/scenarioStepStore";
 
 export const LAYOUT = {
   1024: { trajectory: 480, coPrimary: 240, controlPlane: 280, chartHeight: 300 },
@@ -62,6 +62,9 @@ interface InstrumentClusterProps {
   entityBaselineTrajectories?: Record<string, TrajectoryResponse> | null;
   /** M17-G2 — multi-scenario comparison configs for Zone 1A curve rendering. */
   comparisonScenarios?: ScenarioComparisonConfig[];
+  /** ADR-019 D-1: slot for Mode 2 (Mode2ColumnSurface) or Mode 3 (ControlPlaneColumn) content.
+   *  When undefined (Mode 1), ghost text is shown in the reserved zone. */
+  controlPlane?: React.ReactNode;
 }
 
 export function InstrumentCluster({
@@ -75,14 +78,12 @@ export function InstrumentCluster({
   entityTrajectories,
   entityBaselineTrajectories,
   comparisonScenarios,
+  controlPlane,
 }: InstrumentClusterProps) {
-  const { mode } = useScenarioStepStore();
   const bp = useViewportBreakpoint();
   const layout = LAYOUT[bp];
   const zoneProportions = ZONE_PROPORTIONS[bp];
   const chartHeight = chartHeightProp ?? layout.chartHeight;
-
-  const isMode3 = mode === "MODE_3";
 
   return (
     <div
@@ -180,9 +181,11 @@ export function InstrumentCluster({
       </div>
 
       {/* Control plane zone — always rendered, 280px reserved (DD-015) */}
+      {/* ADR-019 D-1: controlPlane slot receives Mode2ColumnSurface or ControlPlaneColumn.
+          When undefined (Mode 1), ghost text is shown. The column width is set by the
+          container — not by the content. */}
       <div
         data-testid="zone-control-plane"
-        className={isMode3 ? "mode-3-active" : undefined}
         style={{
           gridColumn: 3,
           gridRow: 1,
@@ -191,7 +194,7 @@ export function InstrumentCluster({
           position: "relative",
         }}
       >
-        {!isMode3 && (
+        {controlPlane ?? (
           <div
             aria-label="Control plane reserved zone"
             style={{

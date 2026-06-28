@@ -473,9 +473,9 @@ test("Regression: fiscal multiplier mode derivation unchanged after mode-selecto
 
   await expect(modeIndicator).toHaveAttribute("data-mode", "MODE_2");
 
-  // The fiscal multiplier slider exists in Mode 2 — if visible, verify it is
-  // still functional (its change still drives mode correctly via the existing path)
-  const slider = page.locator('[data-testid="fiscal-multiplier-slider"]');
+  // The policy param slider exists in Mode 2 column — if visible, verify it is
+  // still functional. G4: fiscal-multiplier-slider renamed policy-param-slider (ADR-019 D-3).
+  const slider = page.locator('[data-testid="policy-param-slider"]');
   const sliderPresent = await slider.isVisible({ timeout: 1_000 }).catch(() => false);
   if (!sliderPresent) return;
 

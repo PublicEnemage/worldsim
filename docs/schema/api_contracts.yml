@@ -1184,3 +1184,69 @@ endpoints:
       - "DA-G4-4: Rule-based entity→case mapping (CM Decision Gate 2, M15-G4 intent document)."
       - "Mapping table: ZMB→ARG (Argentina 2001–2002), JOR→GRC (Greece 2010–2012), EGY→ARG, GRC→GRC. All others→analogous_case: null."
       - "Returns 404 if scenario_id not found."
+
+  # ---------------------------------------------------------------------------
+  # M18-G4: inject-shock endpoint (ADR-019 D-5 + D-6)
+  # ---------------------------------------------------------------------------
+
+  - method: POST
+    path: "/scenarios/{scenario_id}/inject-shock"
+    summary: >
+      Inject an exogenous shock at inject_at_step and recompute forward.
+      Creates a branch scenario with the shock applied to the configuration via
+      the SHOCK_REGISTRY handler (ADR-019 D-7), advances to completion, and
+      returns the updated trajectory with shock_events populated.
+    auth: none
+    path_params:
+      scenario_id:
+        type: string
+        format: uuid
+        description: "Scenario UUID. Must have a snapshot at inject_at_step."
+    request_body:
+      shock_type: {type: string, enum: [GrowthShock, ElectionShock, CurrencyAttack, CreditorDefection, GeopoliticalShock, NaturalDisaster, ContagionShock]}
+      inject_at_step: {type: integer, minimum: 1, description: "Step at which to apply the shock. A snapshot must exist."}
+      # GrowthShock params
+      growth_rate_delta: {type: number, nullable: true, description: "GDP growth rate departure. Required for GrowthShock."}
+      duration_steps: {type: integer, nullable: true, minimum: 1, description: "Steps the departure persists. Required for GrowthShock."}
+      distribution_asymmetry: {type: number, nullable: true, minimum: -1.0, maximum: 1.0}
+      # ElectionShock / GeopoliticalShock params
+      severity: {type: number, nullable: true, minimum: 0.0, maximum: 1.0, description: "Political disruption magnitude. Required for ElectionShock and GeopoliticalShock."}
+      political_uncertainty: {type: number, nullable: true, minimum: 0.0, maximum: 1.0}
+      # CurrencyAttack params
+      attack_magnitude: {type: number, nullable: true, description: "FX depreciation fraction. Required for CurrencyAttack."}
+      # CreditorDefection params
+      creditor_class: {type: string, nullable: true, enum: [bilateral, multilateral, commercial], description: "Required for CreditorDefection."}
+      share_affected: {type: number, nullable: true, minimum: 0.0, maximum: 1.0, description: "Fraction of creditor class defecting. Required for CreditorDefection."}
+      regime_change_probability: {type: number, nullable: true, minimum: 0.0, maximum: 1.0}
+      # ContagionShock params
+      source_country: {type: string, nullable: true, description: "ISO 3166-1 alpha-3 of originating country. Required for ContagionShock."}
+      transmission_rate: {type: number, nullable: true, minimum: 0.0, maximum: 1.0, description: "Propagation fraction. Required for ContagionShock."}
+      regional_contagion: {type: boolean, nullable: true}
+      affected_sectors: {type: "string[]", nullable: true}
+      # NaturalDisaster params
+      gdp_impact: {type: number, nullable: true, description: "GDP impact as negative fraction (e.g. -0.05). Required for NaturalDisaster."}
+    response:
+      status: 200
+      body:
+        scenario_id: {type: string, format: uuid, description: "Branch scenario ID (contains the shocked trajectory)."}
+        entity_id: {type: string}
+        step_count: {type: integer}
+        mda_floors: {type: array, description: "MDA floor records — same as TrajectoryResponse."}
+        steps: {type: array, description: "Trajectory steps (same shape as TrajectoryResponse.steps)."}
+        shock_events:
+          type: array
+          description: "Injected shock record for UI display. Populated at inject_at_step."
+          items:
+            step: {type: integer}
+            shock_type: {type: string}
+            parameters: {type: object, description: "Type-specific shock parameters."}
+      status_404: "Scenario not found or no snapshot at inject_at_step."
+      status_422: "Missing required shock-type parameters (model_validator discrimination)."
+    db_reads: [scenarios, scenario_state_snapshots, scenario_scheduled_inputs, mda_thresholds]
+    db_writes: [scenarios, scenario_state_snapshots, scenario_scheduled_inputs]
+    notes:
+      - "ADR-019 D-5: distinct from branch endpoint — inject-shock applies exogenous events, not policy instrument overrides."
+      - "ADR-019 D-6: ShockInjectRequest discriminated union — required fields differ by shock_type."
+      - "ADR-019 D-7: SHOCK_REGISTRY maps ShockType to handler class (backend/app/simulation/shocks/)."
+      - "Creates a branch scenario internally; returns the branch trajectory. Branch ID is in response.scenario_id."
+      - "Returns 422 if required params for shock_type are missing (e.g. ElectionShock without severity)."

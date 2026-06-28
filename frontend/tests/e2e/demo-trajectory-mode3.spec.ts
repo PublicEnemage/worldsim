@@ -102,12 +102,14 @@ test("G2/AC-1: Mode 3 comparison readout visible after branch recompute", async 
 
   // Enable Mode 3.
   await page.locator('[data-testid="mode3-toggle"]').click();
-  await expect(page.locator('[data-testid="apply-control-change"]')).toBeVisible({
+  // G4 renamed apply-control-change → apply-policy-input (ADR-019 D-3).
+  await expect(page.locator('[data-testid="apply-policy-input"]')).toBeVisible({
     timeout: 3_000,
   });
 
   // Set fiscal multiplier to 1.30.
-  await page.locator('[data-testid="fiscal-multiplier-slider"]').evaluate(
+  // G4 renamed fiscal-multiplier-slider → policy-param-slider (ADR-019 D-3).
+  await page.locator('[data-testid="policy-param-slider"]').evaluate(
     (el: HTMLInputElement) => {
       const setter = Object.getOwnPropertyDescriptor(
         window.HTMLInputElement.prototype,
@@ -121,8 +123,8 @@ test("G2/AC-1: Mode 3 comparison readout visible after branch recompute", async 
     page.locator('[data-testid="fiscal-multiplier-value"]'),
   ).toContainText("1.30", { timeout: 2_000 });
 
-  // Apply control change — triggers branch recompute.
-  await page.locator('[data-testid="apply-control-change"]').click();
+  // Apply policy input — triggers branch recompute.
+  await page.locator('[data-testid="apply-policy-input"]').click();
 
   // Wait for recompute to complete (badge disappears).
   await expect(page.locator('[data-testid="recompute-badge"]')).toBeVisible({

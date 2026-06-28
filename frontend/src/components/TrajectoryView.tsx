@@ -6,7 +6,7 @@
  * Design decisions: DD-012 (Zustand atom), DD-013 (divergence fill), DD-014 (step annotation).
  * Framework colors: frameworkColors.ts (UX Designer ruling, MV-001 closed 2026-05-23).
  */
-import { useMemo, useLayoutEffect, useRef } from "react";
+import React, { useMemo, useLayoutEffect, useRef } from "react";
 import {
   ComposedChart,
   Line,
@@ -827,7 +827,10 @@ interface TrajectoryViewProps {
 // TrajectoryView
 // ---------------------------------------------------------------------------
 
-export function TrajectoryView({
+// React.memo: prevents re-renders when parent re-renders but trajectory data is unchanged.
+// Required for ControlPlaneColumn lazy-mount optimization (#1217, EX-001 resolution).
+// useMemo wraps are applied per-hook inside the component body.
+export const TrajectoryView = React.memo(function TrajectoryView({
   width,
   height = 300,
   entityIds,
@@ -1011,6 +1014,21 @@ export function TrajectoryView({
         data-current-step={current_step}
         style={{ width: width ?? 480, position: "relative" }}
       >
+        {/* AC-G4-C trajectory presence indicators (ADR-019 D-10, #1217) */}
+        {showBaseline && (
+          <span
+            data-testid="trajectory-baseline"
+            aria-hidden="true"
+            style={{ position: "absolute", width: 2, height: 2, opacity: 0, pointerEvents: "none" }}
+          />
+        )}
+        {mode === "MODE_3" && (
+          <span
+            data-testid="trajectory-counter"
+            aria-hidden="true"
+            style={{ position: "absolute", width: 2, height: 2, opacity: 0, pointerEvents: "none" }}
+          />
+        )}
         <CompositeChartSVG
           entityCodes={entityCodes}
           activeTrajectories={effectiveActiveTrajectories}
@@ -1034,6 +1052,21 @@ export function TrajectoryView({
       data-current-step={current_step}
       style={{ width: width ?? 480, position: "relative" }}
     >
+      {/* AC-G4-C trajectory presence indicators (ADR-019 D-10, #1217) */}
+      {showBaseline && (
+        <span
+          data-testid="trajectory-baseline"
+          aria-hidden="true"
+          style={{ position: "absolute", width: 2, height: 2, opacity: 0, pointerEvents: "none" }}
+        />
+      )}
+      {mode === "MODE_3" && (
+        <span
+          data-testid="trajectory-counter"
+          aria-hidden="true"
+          style={{ position: "absolute", width: 2, height: 2, opacity: 0, pointerEvents: "none" }}
+        />
+      )}
       <ResponsiveContainer width="100%" height={height}>
         <ComposedChart
           data={mergedData}
@@ -1272,4 +1305,4 @@ export function TrajectoryView({
 
     </div>
   );
-}
+});
