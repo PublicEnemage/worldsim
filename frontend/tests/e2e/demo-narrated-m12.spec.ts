@@ -397,10 +397,11 @@ test(
 
     // Enable Mode 3 Active Control.
     await page.locator('[data-testid="mode3-toggle"]').click();
-    await expect(page.locator('[data-testid="fiscal-multiplier-slider"]')).toBeVisible({ timeout: 5_000 });
+    // G4: policy-param-slider replaces fiscal-multiplier-slider (ADR-019 D-3).
+    await expect(page.locator('[data-testid="policy-param-slider"]')).toBeVisible({ timeout: 5_000 });
 
     // Set fiscal multiplier to 1.30 using native input setter (required for React controlled inputs).
-    await page.locator('[data-testid="fiscal-multiplier-slider"]').evaluate(
+    await page.locator('[data-testid="policy-param-slider"]').evaluate(
       (el, value) => {
         const slider = el as HTMLInputElement;
         const nativeInputValueSetter = Object.getOwnPropertyDescriptor(
@@ -415,7 +416,8 @@ test(
     await page.waitForTimeout(300);
 
     // Apply the branch — this runs the parallel trajectory from step 3 onward.
-    await page.locator('[data-testid="apply-control-change"]').click();
+    // G4: apply-policy-input replaces apply-control-change (ADR-019 D-3).
+    await page.locator('[data-testid="apply-policy-input"]').click();
 
     // Wait for branch computation to complete (recompute badge disappears).
     await expect(page.locator('[data-testid="recompute-badge"]')).not.toBeVisible({ timeout: 30_000 });

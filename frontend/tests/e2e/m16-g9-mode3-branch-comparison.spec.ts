@@ -128,16 +128,17 @@ async function enableMode3(page: import("@playwright/test").Page): Promise<boole
 }
 
 /**
- * Create a Mode 3 branch by setting fiscal-multiplier-slider to 1.30
- * and clicking apply-control-change. Returns false if controls are absent
- * (pre-implementation guard).
+ * Create a Mode 3 branch by setting policy-param-slider to 1.30
+ * and clicking apply-policy-input. Returns false if controls are absent
+ * (pre-implementation guard). G4 renamed: fiscal-multiplier-slider → policy-param-slider,
+ * apply-control-change → apply-policy-input (ADR-019 D-3).
  */
 async function applyControlChange(page: import("@playwright/test").Page): Promise<boolean> {
-  const applyBtn = page.locator('[data-testid="apply-control-change"]');
+  const applyBtn = page.locator('[data-testid="apply-policy-input"]');
   if (!(await applyBtn.isVisible({ timeout: 5_000 }).catch(() => false))) return false;
 
   // Set fiscal multiplier to 1.30 via DOM property setter (slider does not accept direct fill).
-  const slider = page.locator('[data-testid="fiscal-multiplier-slider"]');
+  const slider = page.locator('[data-testid="policy-param-slider"]');
   if (!(await slider.isVisible({ timeout: 2_000 }).catch(() => false))) return false;
   await slider.evaluate((el: HTMLInputElement) => {
     const setter = Object.getOwnPropertyDescriptor(
