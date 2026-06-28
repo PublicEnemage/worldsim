@@ -370,6 +370,76 @@ endpoints:
       status_409: "one or both scenarios have no snapshots yet"
     db_reads: [scenarios, scenario_state_snapshots]
 
+  - method: POST
+    path: /scenarios/comparison/distributional-differential
+    summary: >
+      Poverty headcount differential between N comparison scenarios — M18-G3 #1349.
+      For each non-reference scenario, returns per-step Q1 poverty headcount differential
+      vs. the reference scenario, with CI bounds and a direction stability flag.
+      Designed for Demo 7 Act 2 (Zambia three-scenario comparison, Zone 1B element).
+      Tier T3: Q1 population from UN WPP 2024; CI band is T3 placeholder pending
+      G1 Zone 1A CI band integration (ADR-007). Must appear before
+      /scenarios/{scenario_id} in router registration.
+    auth: none
+    request_body:
+      entity_id:
+        type: string
+        required: true
+        example: "ZMB"
+        description: "ISO 3166-1 alpha-3 entity identifier for Q1 population lookup."
+      scenario_ids:
+        type: "string[]"
+        required: true
+        description: "All scenario IDs (reference + non-reference). Minimum 2."
+      reference_scenario_id:
+        type: string
+        required: true
+        description: "Must be in scenario_ids. All other scenarios are compared against it."
+    response:
+      status: 200
+      body:
+        entity_id: {type: string, example: "ZMB"}
+        reference_scenario_id: {type: string}
+        terminal_step: {type: integer, description: "Highest step present across all scenarios."}
+        tier: {type: string, enum: ["T2", "T3"], description: "Tier T3 for M18 (SSA regional average parameters)."}
+        methodology_summary: {type: string, description: "One-sentence provenance for Zone 3 methodology disclosure."}
+        pairs:
+          type: array
+          description: "One entry per non-reference scenario. Reference scenario excluded."
+          items:
+            scenario_id: {type: string}
+            steps:
+              type: array
+              description: "Per-step results in ascending step order."
+              items:
+                step: {type: integer}
+                headcount_differential:
+                  type: integer
+                  description: >
+                    Integer poverty headcount differential (persons).
+                    Positive = more poverty in this scenario vs. reference.
+                    AC-1349-C guard: MUST be integer, not float composite delta.
+                ci_lower:
+                  type: integer
+                  description: "Lower 95% CI bound (integer persons). T3 placeholder."
+                ci_upper:
+                  type: integer
+                  description: "Upper 95% CI bound (integer persons). T3 placeholder."
+                direction_stable:
+                  type: boolean
+                  description: >
+                    True when CI does not span zero: (ci_lower > 0) OR (ci_upper < 0).
+                    Drives 'Direction stable across uncertainty range' disclosure (AC-1349-E).
+      status_400: "Fewer than 2 scenario_ids, or reference_scenario_id not in scenario_ids"
+      status_404: "Any scenario_id not found"
+      status_409: "Any scenario has no snapshots yet, or no shared steps across all scenarios"
+    db_reads: [scenarios, scenario_state_snapshots]
+    notes:
+      - "M18-G3 #1349: Demo 7 Act 2 Zambia three-scenario comparison capability."
+      - "AC-1349-G: headcount_differential must be integer (not float composite delta)."
+      - "AC-1349-G: direction_stable must equal (ci_lower > 0) OR (ci_upper < 0)."
+      - "AC-schema: schema tests in backend/tests/test_m18_g3_counter_scenario_comparison.py assert 'distributional-differential', 'headcount_differential', 'direction_stable', 'tier', 'ci_lower', 'ci_upper' are all present in this file."
+
   - method: GET
     path: "/scenarios/{scenario_id}"
     summary: Full scenario detail including configuration and scheduled inputs
@@ -504,7 +574,7 @@ endpoints:
       on a returned step means governance-in-validation OR no normalizable indicators
       at that step for single-entity scenarios (see scoring_basis). Schema updated
       2026-05-23 — EL Decisions A/B/C resolved; DA-F2/F4/F5 PENDINGs cleared.
-      ci_lower/ci_upper remain pending ADR-007.
+      ci_lower/ci_upper implemented via BandingEngine — M18-G1 (#1254).
     auth: none
     path_params:
       scenario_id: {type: string}
@@ -589,16 +659,20 @@ endpoints:
                     normalized scores carry acknowledged range uncertainty).
                 ci_lower:
                   type: "string|null"
-                  description: "PENDING ADR-007 — BandingEngine not yet implemented. null until ADR-007 accepted."
+                  description: >
+                    80% CI lower bound as Decimal-as-string; null when composite_score is null.
+                    Computed by BandingEngine §3.1 schedule (M18-G1 #1254).
                 ci_upper:
                   type: "string|null"
-                  description: "PENDING ADR-007 — same as ci_lower."
+                  description: >
+                    80% CI upper bound as Decimal-as-string; null when composite_score is null.
+                    Computed by BandingEngine §3.1 schedule (M18-G1 #1254).
                 ci_coverage:
                   type: "number|null"
-                  description: "PENDING ADR-007 — 0.80 when present."
+                  description: "0.80 throughout M18; null when composite_score is null."
                 is_pre_calibration:
                   type: "boolean|null"
-                  description: "PENDING ADR-007."
+                  description: "true throughout M18 (pre-calibration phase per ADR-007); null when composite_score is null."
             policy_inputs:
               type: array
               description: "Policy input events applied at this step. Source: scenario_scheduled_inputs."
@@ -622,7 +696,7 @@ endpoints:
     notes:
       - "Schema updated 2026-05-23 — EL Decisions A/B/C resolved. All DA-F2/F4/F5 PENDINGs cleared."
       - "DA-F2 resolved: mda_floors at response root (not per-step); M9 returns [] except ecological WARNING at 1.0."
-      - "DA-F3 remains: ci_lower/ci_upper pending ADR-007."
+      - "DA-F3 resolved: ci_lower/ci_upper implemented via BandingEngine — M18-G1 (#1254)."
       - "DA-F4 resolved: scoring_basis field added; Path A selected (normalized_absolute for single-entity financial/HD)."
       - "DA-F5 resolved: step_event_label/step_significance sourced from scenarios.configuration.step_metadata JSONB."
       - "step_significance values are SIGNIFICANT or ROUTINE only — STANDARD is incorrect (ADR-010 Decision 7)."
