@@ -9,12 +9,13 @@
 > the reference for information hierarchy decisions and for evaluating whether
 > a proposed UI change supports or obstructs the user's task.
 >
-> Last updated: 2026-06-16 (Gap markers GA-01 and GA-02 added to Journey A
-> Steps 1–2: entity availability / approved source query (Path 1, M15) and
-> ministry-owned data upload (Path 2, M16+). Two new issues required — see
-> gap text for user stories. Previous: 2026-05-21 — EL Decisions 1/2/3;
-> Journey A Step 3 separated; Journey B extended for Mode 3; Journey C Mode 3
-> active control added; Journey D demonstrative entry state added; closes #365).
+> Last updated: 2026-06-27 (GA-02 retired on principle — Path 2 proprietary data
+> upload conflicts with open-source-as-strategy governance constraint; not a
+> sequencing decision; exception required to revisit. ADR-019 UX-7 corrected
+> accordingly. Journey C M18 acceptance criteria added, dependency map updated
+> per ADR-019 decisions — PR #1391. Previous: 2026-06-16 — GA-01/GA-02 gap
+> markers added to Journey A Steps 1–2; 2026-05-21 — EL Decisions 1/2/3;
+> Journey A Step 3 separated; Journey B/C/D updates; closes #365).
 
 ---
 
@@ -102,11 +103,10 @@ from preloaded dataset" and (b) "available from registered source — click to
 load." The pull action must complete or provide a visible progress state
 within the 5-minute preparation ceiling.
 
-**Path 2 — Ministry-owned / proprietary data upload [M16+]:**
-See Gap GA-02 at Step 2 below. Path 2 is the subsequent enhancement. Path 1
-is the prerequisite: the ministry must be able to confirm that the publicly
-sourced baseline exists and what tier it carries before uploading proprietary
-overrides that will blend with it.
+**Path 2 — Ministry-owned / proprietary data upload [Retired: open-source-as-strategy]:**
+See Gap GA-02 at Step 2 below. Path 2 was the intended subsequent enhancement,
+but is retired on principle — see GA-02 retirement note. Path 1 remains the
+boundary of the approved data ingestion scope.
 
 *Existing artifact links:*
 - `docs/data-sources/approved-sources.md` — canonical approved source list;
@@ -143,8 +143,20 @@ terms, and sets the number of steps to match the program horizon (typically
 correct parameters. The scenario name should reflect the proposal being
 modeled ("IMF Draft 2026-04") for recall during active negotiation.
 
-*[Near-Term-Gap] — GA-02: Starting conditions locked to preloaded data;
+*[Retired: open-source-as-strategy] — GA-02: Starting conditions locked to preloaded data;
 no mechanism to supply ministry-owned or non-public initial state values.*
+
+> **Retirement note (2026-06-27):** Path 2 (ministry-owned proprietary data
+> upload) is retired as a platform capability, not deferred for capacity.
+> A scenario whose starting conditions include user-supplied proprietary data
+> cannot be reproduced or validated by the community. This conflicts with
+> WorldSim's "Open Source as Strategy" governing principle (CLAUDE.md
+> §Guiding Principles): the tool's credibility rests on methodological
+> transparency — anyone must be able to inspect, challenge, and improve the
+> assumptions. Scenarios that cannot be reproduced from public sources
+> undermine this at the scenario level. Implementing Path 2 would require
+> a governance exception (CLAUDE.md §Governance). The architecture design
+> below is retained as institutional memory only.
 
 Even when an entity is available (preloaded or pulled via Path 1 above),
 the starting conditions for every indicator are drawn exclusively from the
@@ -178,15 +190,22 @@ Path 1 improves source currency (more recent vintages, more complete coverage
 for more entities) but does not solve the proprietary-data problem. It is a
 prerequisite for Path 2, not a substitute.
 
-**Path 2 — Ministry-owned / proprietary data upload [M16+]:**
+**Path 2 — Ministry-owned / proprietary data upload [Retired: open-source-as-strategy]:**
+*(Architecture design below is retained as institutional memory — this path is retired on principle, not deferred for capacity. See GA-02 retirement note above.)*
+
 The ministry uploads its own starting values for specific indicators: the
 actual reserve position, the bilateral lending terms, the draft budget
-fiscal position. These values override or supplement the preloaded baseline
-for the duration of the scenario, with full provenance and tier disclosure.
+fiscal position. These values would override or supplement the preloaded
+baseline for the duration of the scenario, with full provenance and tier
+disclosure.
 
-This is the asymmetry reversal the founding document describes: the ministry
-brings data the creditor cannot replicate from public sources, and runs
-scenarios the creditor side cannot run. No other capability delivers this.
+This was the intended asymmetry reversal the founding document describes:
+the ministry brings data the creditor cannot replicate from public sources.
+However, the same mechanism that makes this powerful — scenarios that cannot
+be reproduced from public sources — is what conflicts with the transparency
+principle. The founding document's asymmetry is addressed instead through
+better public data coverage (Path 1) and analytical capability parity, not
+through proprietary data isolation.
 
 *Architecture prerequisites for Path 2:*
 
@@ -267,15 +286,13 @@ be skipped or rushed, producing misconfigured scenarios.
 - `docs/data-sources/approved-sources.md` — approved source list; Path 2 does
   not add to this list (ministry data is user-session-scoped, not platform-wide)
 
-*New issue required:* File a dedicated issue for Path 2 (distinct from Issue
-#53 and from the Path 1 issue). Target M16+, design-first (ADR required
-before implementation). The design work — field mapping UX, USER_SUPPLIED
-provenance type, isolation model — should begin in M15 parallel to Path 1
-implementation. User story: *As Eleni in the Preparatory entry state, I need
-to upload my ministry's non-public starting values for specific indicators
-and have them reflect in the scenario's initial state with full provenance
-disclosure, so that my analysis reflects what my government actually knows
-rather than only what has been publicly released.*
+*No issue required:* Path 2 is retired on principle. The user story above
+(uploading ministry-internal starting values) is valid as a user need but
+conflicts with the community reproducibility requirement. It is not a future
+issue — it is a declared boundary of the platform's open-source commitment.
+If this position is ever revisited, a governance exception must be filed
+first (CLAUDE.md §Governance), and a new issue may only be opened after the
+exception is on record and EL-approved.
 
 ---
 
