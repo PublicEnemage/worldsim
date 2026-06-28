@@ -50,8 +50,6 @@ from __future__ import annotations
 from datetime import UTC, datetime
 from decimal import Decimal
 
-import pytest
-
 from app.simulation.engine.models import (
     Event,
     MeasurementFramework,
@@ -218,7 +216,7 @@ def _find_psp_update_event(events: list[Event]) -> Event | None:
 
 class TestAC1255B1B2FiscalSustainabilityDriver:
     """AC-1255-B1: programme_survival_update.metadata contains psp_dominant_driver key.
-    AC-1255-B2: Senegal step-3 representative fixture returns psp_dominant_driver == "fiscal_sustainability".
+    AC-1255-B2: Senegal step-3 fixture returns psp_dominant_driver == "fiscal_sustainability".
 
     These tests WILL FAIL pre-implementation: programme_survival_update.metadata
     does not currently contain psp_dominant_driver. They become green when the
@@ -265,7 +263,7 @@ class TestAC1255B1B2FiscalSustainabilityDriver:
         )
 
     def test_senegal_step3_fiscal_spending_cut_returns_fiscal_sustainability(self) -> None:
-        """AC-1255-B2: Senegal representative fixture → psp_dominant_driver == 'fiscal_sustainability'.
+        """AC-1255-B2: Senegal fixture → psp_dominant_driver == 'fiscal_sustainability'.
 
         Senegal Article IV step 3 Demo 7 Act 1 anchor: fiscal spending cut (-0.03)
         is the legitimacy-eroding event driving PSP deterioration. The dominant driver
@@ -357,7 +355,7 @@ class TestAC1255B3NullDriverFlatStep:
         result = module.compute(entity, state, _EPOCH)
         psp_event = _find_psp_update_event(result)
 
-        # Module must still emit the event (has_legitimacy = True triggers programme_survival_update)
+        # Module must still emit event (has_legitimacy = True triggers programme_survival_update)
         assert psp_event is not None, (
             "PoliticalEconomyModule did not emit programme_survival_update for an entity "
             "with legitimacy_index set and no prior events. The module should emit this event "

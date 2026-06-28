@@ -264,6 +264,8 @@ export function ScenarioInstrumentCluster({
   // undefined = not yet fetched or PE not active; null = PE active but computation failed; string = value.
   const [pspValue, setPspValue] = useState<string | null | undefined>(undefined);
   const [pspTier, setPspTier] = useState<number | null>(null);
+  // M18-G2 (#1255) — dominant driver of PSP change at current step.
+  const [pspDominantDriver, setPspDominantDriver] = useState<string | null>(null);
 
   // M16-G2 (#987) — political economy indicators for Zone 1D political risk sub-section.
   const [legitimacyValue, setLegitimacyValue] = useState<string | null | undefined>(undefined);
@@ -630,14 +632,16 @@ export function ScenarioInstrumentCluster({
             typeof pspEntry === "object" &&
             "value" in pspEntry
           ) {
-            const entry = pspEntry as { value: string | null; confidence_tier?: number | null };
+            const entry = pspEntry as { value: string | null; confidence_tier?: number | null; psp_dominant_driver?: string | null };
             setPspValue(entry.value);
             setPspTier(
               typeof entry.confidence_tier === "number" ? entry.confidence_tier : null,
             );
+            setPspDominantDriver(entry.psp_dominant_driver ?? null);
           } else {
             setPspValue(null);
             setPspTier(null);
+            setPspDominantDriver(null);
           }
 
           // M16-G2 (#987) — legitimacy_index
@@ -667,6 +671,7 @@ export function ScenarioInstrumentCluster({
           // PE not enabled — reset all PE state
           setPspValue(undefined);
           setPspTier(null);
+          setPspDominantDriver(null);
           setLegitimacyValue(undefined);
           setLegitimacyFloor(null);
           setLegitimacyDirection(null);
@@ -958,6 +963,7 @@ export function ScenarioInstrumentCluster({
             eliteCaptureDirection={eliteCaptureDirection}
             eliteCaptureQualifier={eliteCaptureQualifier}
             comparisonScenarios={loadedComparisonScenarios}
+            pspDominantDriver={pspDominantDriver}
           />
         }
         cohortPanel={
