@@ -721,10 +721,12 @@ function DistributionalComparisonSummary({ summary }: { summary: DistributionalS
     <div
       data-testid="distributional-comparison-summary"
       style={{
-        flexShrink: 0,
+        position: "sticky",
+        bottom: 0,
         borderTop: "1px solid #e5e7eb",
         padding: "6px 8px",
         background: "#fff",
+        zIndex: 1,
       }}
     >
       <div style={{ display: "flex", alignItems: "center", gap: 4, marginBottom: 2 }}>
@@ -811,11 +813,10 @@ export function CohortImpactSection({ isCompleted = false }: { isCompleted?: boo
   return (
     <div
       data-testid="zone-1b-cohort-impact"
-      style={{ borderTop: "1px solid #e0e0e0", flex: "1 1 0", display: "flex", flexDirection: "column", overflow: "hidden", background: "#fff" }}
+      style={{ borderTop: "1px solid #e0e0e0", paddingTop: 2, flex: "1 1 0", overflowY: "auto", background: "#fff", position: "relative" }}
     >
-      <div style={{ flex: "1 1 0", overflowY: "auto", paddingTop: 2 }}>
-        <div
-          data-testid="cohort-section-header"
+      <div
+        data-testid="cohort-section-header"
           style={{
             fontSize: 9,
             fontWeight: 600,
@@ -906,7 +907,6 @@ export function CohortImpactSection({ isCompleted = false }: { isCompleted?: boo
             );
           })
         )}
-      </div>
       {distributionalSummary && distributionalSummary.pairs.length > 0 && (
         <DistributionalComparisonSummary summary={distributionalSummary} />
       )}

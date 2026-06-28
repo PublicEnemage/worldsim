@@ -2626,7 +2626,7 @@ async def post_distributional_differential(
     snapshots_by_scenario: dict[str, dict[int, dict[str, Any]]] = {}
     for sid in scenario_ids:
         rows = await conn.fetch(
-            "SELECT step_index, state FROM scenario_snapshots"
+            "SELECT step_index, state FROM scenario_state_snapshots"
             " WHERE scenario_id = $1 ORDER BY step_index",
             sid,
         )

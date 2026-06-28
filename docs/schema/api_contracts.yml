@@ -406,7 +406,7 @@ endpoints:
       status_400: "fewer than 2 scenarios, or reference not in scenario_ids"
       status_404: "any scenario has no snapshots"
       status_409: "no shared steps across all scenarios"
-    db_reads: [scenario_snapshots]
+    db_reads: [scenario_state_snapshots]
     notes:
       - "AC-1349-G: headcount_differential is integer; direction_stable = (ci_lower>0) OR (ci_upper<0)"
       - "AC-schema: fields headcount_differential, ci_lower, ci_upper, direction_stable, tier present"
