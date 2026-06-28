@@ -58,6 +58,7 @@ from app.schemas import (
     InjectShockResponse,
     MDAAlert,
     MDAFloorRecord,
+    MethodologyDetail,
     MultiFrameworkOutput,
     PMMRecord,
     QuantitySchema,
@@ -2921,11 +2922,30 @@ async def post_distributional_differential(
             )
         pairs.append(DistributionalPairResult(scenario_id=sid, steps=steps_out))
 
+    methodology_detail = MethodologyDetail(
+        q1_population=_ENTITY_Q1_POPULATION.get(entity_id, 0),
+        ci_methodology=(
+            f"±13–16% of point estimate — T3 placeholder "
+            f"pending ADR-007 full CI band integration. "
+            f"Lower bound factor: {_CI_FACTOR_LOWER}; "
+            f"upper bound factor: {_CI_FACTOR_UPPER}."
+        ),
+        extraction_path=(
+            "Q1 CHT cohort mean (entities matching '<entity_id>:CHT:1-*'); "
+            "falls back to main entity poverty_headcount_ratio if no cohort data present."
+        ),
+        tier_rationale=(
+            "T3: derived from ECOWAS regional comparable economy distributions, "
+            "not calibrated country-level Q1 income share survey data. "
+            "Forward trace: ADR-007 full implementation will replace this T3 placeholder."
+        ),
+    )
     return DistributionalDifferentialResponse(
         entity_id=entity_id,
         reference_scenario_id=ref_id,
         terminal_step=terminal_step,
         tier=_DISTRIBUTIONAL_TIER,
         methodology_summary=_DISTRIBUTIONAL_METHODOLOGY,
+        methodology_detail=methodology_detail,
         pairs=pairs,
     )

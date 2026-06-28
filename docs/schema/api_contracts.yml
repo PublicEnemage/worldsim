@@ -403,6 +403,23 @@ endpoints:
         terminal_step: {type: integer, description: "Highest step present across all scenarios."}
         tier: {type: string, enum: ["T2", "T3"], description: "Tier T3 for M18 (SSA regional average parameters)."}
         methodology_summary: {type: string, description: "One-sentence provenance for Zone 3 methodology disclosure."}
+        methodology_detail:
+          type: object
+          required: true
+          description: "Structured auditability detail for Zone 3 panel (AC-1422-C, M18-G5 #1422). All four sub-fields required."
+          properties:
+            q1_population:
+              type: integer
+              description: "Entity Q1 population used in headcount calculation. ZMB: 3,894,625 (UN WPP 2024, 20% Q1 fraction)."
+            ci_methodology:
+              type: string
+              description: "CI band computation method. ±13–16% of point estimate (T3 placeholder, ADR-007 pending)."
+            extraction_path:
+              type: string
+              description: "How Q1 poverty_headcount_ratio is extracted: Q1 CHT cohort mean; falls back to main entity."
+            tier_rationale:
+              type: string
+              description: "Plain-language T3 tier rationale: ECOWAS regional comparables, not calibrated country-level data."
         pairs:
           type: array
           description: "One entry per non-reference scenario. Reference scenario excluded."
@@ -439,6 +456,7 @@ endpoints:
       - "AC-1349-G: headcount_differential must be integer (not float composite delta)."
       - "AC-1349-G: direction_stable must equal (ci_lower > 0) OR (ci_upper < 0)."
       - "AC-schema: schema tests in backend/tests/test_m18_g3_counter_scenario_comparison.py assert 'distributional-differential', 'headcount_differential', 'direction_stable', 'tier', 'ci_lower', 'ci_upper' are all present in this file."
+      - "AC-1422-G(schema): M18-G5 #1422 — schema tests assert 'methodology_detail', 'q1_population', 'tier_rationale' present in this file (TestAC1422GSchemaDocumented)."
 
   - method: GET
     path: "/scenarios/{scenario_id}"

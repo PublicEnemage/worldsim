@@ -981,9 +981,9 @@ class TestAC1422GMethodologyDetail:
         response = await client.post(
             _ENDPOINT_PATH,
             json={
-                "primary_scenario_id": scenario_id,
-                "comparison_scenario_ids": [scenario_id],
                 "entity_id": "ZMB",
+                "scenario_ids": [scenario_id, scenario_id],
+                "reference_scenario_id": scenario_id,
             },
         )
         assert response.status_code == 200, (
@@ -1015,9 +1015,9 @@ class TestAC1422GMethodologyDetail:
         response = await client.post(
             _ENDPOINT_PATH,
             json={
-                "primary_scenario_id": scenario_id,
-                "comparison_scenario_ids": [scenario_id],
                 "entity_id": "ZMB",
+                "scenario_ids": [scenario_id, scenario_id],
+                "reference_scenario_id": scenario_id,
             },
         )
         assert response.status_code == 200
@@ -1069,9 +1069,9 @@ class TestAC1422GMethodologyDetail:
         response = await client.post(
             _ENDPOINT_PATH,
             json={
-                "primary_scenario_id": scenario_id,
-                "comparison_scenario_ids": [scenario_id],
                 "entity_id": "ZMB",
+                "scenario_ids": [scenario_id, scenario_id],
+                "reference_scenario_id": scenario_id,
             },
         )
         assert response.status_code == 200
@@ -1125,9 +1125,9 @@ class TestAC1422GMethodologyDetail:
         response = await client.post(
             _ENDPOINT_PATH,
             json={
-                "primary_scenario_id": scenario_id,
-                "comparison_scenario_ids": [scenario_id],
                 "entity_id": "ZMB",
+                "scenario_ids": [scenario_id, scenario_id],
+                "reference_scenario_id": scenario_id,
             },
         )
         assert response.status_code == 200
@@ -1173,9 +1173,9 @@ class TestAC1422GMethodologyDetail:
         response = await client.post(
             _ENDPOINT_PATH,
             json={
-                "primary_scenario_id": scenario_id,
-                "comparison_scenario_ids": [scenario_id],
                 "entity_id": "ZMB",
+                "scenario_ids": [scenario_id, scenario_id],
+                "reference_scenario_id": scenario_id,
             },
         )
         assert response.status_code == 200
@@ -1224,9 +1224,9 @@ class TestAC1422GMethodologyDetail:
         response = await client.post(
             _ENDPOINT_PATH,
             json={
-                "primary_scenario_id": scenario_id,
-                "comparison_scenario_ids": [scenario_id],
                 "entity_id": "ZMB",
+                "scenario_ids": [scenario_id, scenario_id],
+                "reference_scenario_id": scenario_id,
             },
         )
         assert response.status_code == 200
