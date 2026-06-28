@@ -1096,8 +1096,8 @@ export function TrajectoryView({
               key={`${fw}-divergence`}
               dataKey={`${fw}_active` as never}
               baseLine={`${fw}_baseline` as never}
-              fill={FRAMEWORK_COLORS[fw]}
-              fillOpacity={showBaseline ? 0.12 : 0}
+              fill={showBaseline ? FRAMEWORK_COLORS[fw] : "none"}
+              fillOpacity={0.12}
               stroke="none"
               isAnimationActive={false}
               connectNulls={CONNECT_NULLS}
