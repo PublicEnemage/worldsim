@@ -3,7 +3,7 @@ name: m18-g1-sprint-entry
 type: sprint-entry
 milestone: M18 — Full Argument and Demo 7
 sprint-group: G1
-status: EL-approved 2026-06-26 — intent document, UX/UI mockups, panel review, and QA tests required before implementation PR opens
+status: EL-approved 2026-06-26 — intent document filed 2026-06-26; UX/UI mockups, panel review, and QA tests required before implementation PR opens
 authored-by: PM Agent
 authored-date: 2026-06-26
 el-approved: 2026-06-26
@@ -13,7 +13,7 @@ sop-reference: docs/process/sprint-planning-sop.md
 
 # Sprint Entry — M18, G1: CI Bands on Zone 1A
 
-**Status:** EL-approved 2026-06-26 — intent document, UX/UI mockups, panel review, and QA tests required before implementation PR opens
+**Status:** EL-approved 2026-06-26 — intent document filed 2026-06-26; UX/UI mockups, panel review, and QA tests required before implementation PR opens
 **Date authored:** 2026-06-26
 **Release branch:** `release/m18`
 **Sprint plan:** `docs/process/sprint-plans/m18-sprint-plan.md` (EL-approved 2026-06-26, PR #1364)
@@ -85,7 +85,7 @@ CI bands are a new visual pattern on Zone 1A (not merely a color change — new 
 
 | Deliverable | ADR reference | Intent document path | Filed? |
 |---|---|---|---|
-| #1254 — CI bands on Zone 1A | ADR-007 + ADR-017 | `docs/process/intents/M18-G1-2026-06-26-ci-bands-zone-1a.md` | No — required before implementation PR opens |
+| #1254 — CI bands on Zone 1A | ADR-007 + ADR-017 | `docs/process/intents/M18-G1-2026-06-26-ci-bands-zone-1a.md` | **Yes — filed 2026-06-26** |
 
 ### 2.4 — QA test authorship gate
 
@@ -135,7 +135,7 @@ A backend integration test is also required: `backend/tests/test_m18_g1_ci_bands
 1. EL approves this entry document
 2. UX Designer produces UX mockup + UI mockup for CI band visual treatment
 3. UX/UI panel review (5 agents) — ACCEPT required
-4. Frontend Architect Agent files intent document `docs/process/intents/M18-G1-2026-06-26-ci-bands-zone-1a.md` with panel-approved mockup referenced
+4. ✅ Frontend Architect Agent files intent document `docs/process/intents/M18-G1-2026-06-26-ci-bands-zone-1a.md` — **done 2026-06-26**; panel-approved UX/UI mockup to be referenced when complete
 5. QA Lead authors `frontend/tests/e2e/m18-g1-ci-bands.spec.ts` and `backend/tests/test_m18_g1_ci_bands.py` from intent document acceptance criteria (red before implementation)
 6. Implementing agent opens feature branch `feat/m18-g1-ci-bands` from `sprint/m18-g1`
 7. Implementation: backend uncertainty output extension + frontend Zone 1A CI ribbon rendering

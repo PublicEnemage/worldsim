@@ -74,6 +74,7 @@ from app.schemas import (
     TrajectoryStep,
     build_temporal_scope_note,
 )
+from app.simulation.banding_engine import compute_band
 from app.simulation.mda_checker import alerts_from_events_snapshot
 from app.simulation.repositories.quantity_serde import IA1_CANONICAL_PHRASE
 
@@ -1241,6 +1242,27 @@ async def get_trajectory(
                 is_single_entity=is_single_entity,
                 db_connection=conn,
                 scenario_timestep=timestep,
+            )
+            raw_score = (
+                Decimal(point.composite_score)
+                if point.composite_score is not None
+                else None
+            )
+            band = compute_band(
+                composite_score=raw_score,
+                confidence_tier=point.confidence_tier,
+                step_index=step_index,
+                framework=fw,
+            )
+            point = TrajectoryFrameworkPoint(
+                framework=point.framework,
+                composite_score=point.composite_score,
+                scoring_basis=point.scoring_basis,
+                confidence_tier=point.confidence_tier,
+                ci_lower=band.ci_lower,
+                ci_upper=band.ci_upper,
+                ci_coverage=band.ci_coverage,
+                is_pre_calibration=band.is_pre_calibration,
             )
             framework_points.append(point)
 
