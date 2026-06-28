@@ -4,6 +4,8 @@ type: process-sop
 owner: PM Agent
 status: Active
 first-applied: M12
+last-revised: 2026-06-27
+revision-authority: NM-072 — upstream gate clause for pre-wave design packages
 ---
 
 # Sprint Planning SOP
@@ -174,6 +176,48 @@ If scope changes materially after kickoff:
 - EL must confirm any wave reassignment that changes the critical path
 
 Sprint plan documents are not silently overwritten. Changes are visible through the revision markers and git history.
+
+---
+
+## Pre-Wave Design Package Gate
+
+*Authority: NM-072 process improvement (2026-06-27). Changes to this section require PM Agent authorship and EL endorsement.*
+
+A pre-wave design package is a structured set of design artifacts produced before implementation waves begin, where one artifact serves as an **EL scope gate** — a document that the EL must approve before a downstream ADR may be authored and before any implementation sprint entry may be filed.
+
+The M18 GD design package (Control Plane Column, #1354) is the canonical instance of this pattern.
+
+### Phase sequencing invariant — upstream gate
+
+When a design package includes an EL scope gate artifact, the following invariant applies:
+
+**The EL scope gate artifact may not be submitted for EL review until all prerequisite design artifacts are filed and their content is stable.**
+
+Submitting the scope gate artifact before its prerequisite artifacts exist forces the EL to make scope decisions without complete information. When the prerequisite artifacts subsequently arrive with divergent information, the scope decisions must be revised — producing stale downstream artifacts that must be corrected, course-correction near-misses, and an ADR author who receives inconsistent inputs. This is the root cause of NM-072: Artifact 5 (EL scope gate) was submitted and approved before Artifacts 2 and 4 were complete, causing GrowthShock to be absent from the panel deliberation and Artifact 4 to be drafted against an information hierarchy that had not yet been corrected.
+
+**PM Agent obligation:** The sprint entry document for every design package must record, in its phase sequencing section:
+- Which artifacts are prerequisites to the EL scope gate artifact
+- An explicit statement that the scope gate artifact will not be submitted for EL review until those prerequisites are filed and on record
+
+This is a scheduling commitment made at sprint entry, not a retrospective note. If the PM Agent cannot confirm at sprint entry which artifacts are prerequisites to the scope gate, the design package scope is not sufficiently defined to begin.
+
+### Downstream gate
+
+Once the EL approves the scope gate artifact, the downstream sequence is:
+1. ADR authorship begins — the ADR author receives a complete, consistent scope specification
+2. Implementation sprint entry may be filed only after the ADR is accepted
+
+These gates are strictly sequential. The PM Agent does not file the implementation sprint entry before ADR acceptance, even if EL scope gate approval has been received.
+
+### Near-miss obligation
+
+If the scope gate artifact is submitted to the EL before all prerequisite design artifacts are on record — for any reason, including time pressure or parallel-phase authorship — the PI Agent files a near-miss in the same session, not after the design package closes. The near-miss must identify:
+1. Which prerequisite artifacts were absent when the scope gate was submitted
+2. Which scope decisions were made without complete information
+3. Which downstream artifacts were produced against the incomplete scope
+4. What course correction was required before ADR authorship began
+
+A design package that exits without a near-miss for a sequencing inversion is not clean — it has an unrecorded process deviation.
 
 ---
 

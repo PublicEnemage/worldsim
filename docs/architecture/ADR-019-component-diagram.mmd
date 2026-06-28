@@ -1,0 +1,36 @@
+---
+title: ADR-019 — Control Plane Column Architecture
+description: Mode 2 and Mode 3 column content, two-component architecture, ShockEffect protocol and registry
+---
+graph TD
+    SIC[ScenarioInstrumentCluster] --> IC[InstrumentCluster\ngridTemplateColumns: Zone1A / Zone1B / ControlPlane 280px]
+    IC --> |"controlPlane slot\ngridColumn 3"| SLOT{Active Mode?}
+    SLOT -->|Mode 1| EMPTY[Empty reserved zone\nslate-50 background]
+    SLOT -->|Mode 2| M2CS["Mode2ColumnSurface\n— Scenario identity block read-only\n— Enter Active Control button\n— slate-400 dashed border"]
+    SLOT -->|Mode 3| CPC["ControlPlaneColumn\n— Form 1: Policy Instruments blue #0284c7\n  FiscalMultiplier / LegitimacyConstraint\n— Form 2: Scenario Shocks orange #ea580c\n  7 shock types"]
+
+    SIC --> |"Form 1 submit"| BE["POST /scenarios/{id}/branch\nBranchRequest\n+ legitimacy_index: float|None"]
+    CPC --> |"Form 2 submit"| ISE["POST /scenarios/{id}/inject-shock\nShockInjectRequest\ndiscriminated union — 7 types"]
+
+    ISE --> REG["SHOCK_REGISTRY\ndict ShockType → ShockEffect handler"]
+    REG --> GS["GrowthShockHandler\ngrowth_rate_delta, duration_steps,\ndistribution_asymmetry"]
+    REG --> ES["ElectionShockHandler\nseverity, political_uncertainty"]
+    REG --> CA["CurrencyAttackHandler\nattack_magnitude"]
+    REG --> CD["CreditorDefectionHandler\ncreditor_class, share_affected,\nregime_change_probability"]
+    REG --> GEO["GeopoliticalShockHandler\nseverity, political_uncertainty"]
+    REG --> ND["NaturalDisasterHandler\ngdp_impact, affected_sectors"]
+    REG --> CS["ContagionShockHandler\nsource_country, transmission_rate,\nregional_contagion, affected_sectors"]
+
+    ISE --> |"trajectory response"| TV["TrajectoryStep.shock_events populated\nOrange ReferenceLine markers in TrajectoryView"]
+
+    style M2CS fill:#f8fafc,stroke:#94a3b8,stroke-dasharray:5 5
+    style CPC fill:#dbeafe,stroke:#0284c7
+    style EMPTY fill:#f1f5f9,stroke:#e2e8f0
+    style ISE fill:#fff7ed,stroke:#ea580c
+    style GS fill:#f0fdf4,stroke:#16a34a
+    style ES fill:#f0fdf4,stroke:#16a34a
+    style CA fill:#f0fdf4,stroke:#16a34a
+    style CD fill:#f0fdf4,stroke:#16a34a
+    style GEO fill:#f0fdf4,stroke:#16a34a
+    style ND fill:#f0fdf4,stroke:#16a34a
+    style CS fill:#f0fdf4,stroke:#16a34a

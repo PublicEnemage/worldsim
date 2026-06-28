@@ -3733,6 +3733,178 @@ The sprint planning SOP defines entry criteria for individual sprint groups (ent
 
 ---
 
+## NM-072 — Artifact 5 (Scope Decision Gate) Authored and EL-Approved Before Prerequisite Design Artifacts Existed; Cascaded into Stale Delta Analysis and Incomplete Taxonomy (Reactive)
+
+**Date:** 2026-06-27
+**Milestone:** M18 — Full Argument and Demo 7
+**Detected by:** EL observation during GD design package review — EL noted divergence between Artifact 4 (maximalist discriminated union schema, all types) and Artifact 5 (six-type taxonomy, single-parameter ShockInjectRequest), and asked how they diverged so much at inception
+**Severity:** High — produced incorrect artifacts in the repository: Artifact 4 Dimensions 3 and 4 were drafted against an information hierarchy that had not yet been corrected, and Artifact 5's EL scope decisions were made without access to the full CE Agent analysis in Artifact 4; the GrowthShock type was absent from panel deliberation as a result
+
+### What happened
+
+The GD design package specifies a seven-artifact sequence: Artifacts 1→2→3→4 inform Artifact 5 (EL scope gate) → Artifact 6 (ADR-019) → Artifact 7 (UX update). Artifact 5 is the EL scope gate — the decisions it records gate ADR-019 authorship and G4 sprint entry.
+
+Artifact 5 was authored and EL-approved in a prior session **before Artifacts 2, 3, and 4 existed**. The sprint entry document specified the correct sequence, but no gate enforced it. The Artifact 5 author used a six-type shock taxonomy derived from ADR-008 (the only available input) without the benefit of: (a) Artifact 2's maximalist platform target for the control plane zone, (b) Artifact 3's Customer Agent Layer 3 finding that GrowthShock is ESSENTIAL for Demo 7 Step 4, or (c) Artifact 4's CE Agent discriminated union architecture analysis.
+
+Consequences:
+1. **GrowthShock omission from panel deliberation.** The panel deliberated the six types from ADR-008. GrowthShock was not considered and rejected — it was absent from the input. Decision 2 ("all six in M18") was made without the seventh type on the table.
+2. **Artifact 4 Dimension 4 drafted against stale Artifact 5.** The Artifact 4 author read Artifact 5 before authoring Dimension 4 and produced `ScenarioConfigColumn.tsx` — an editable configuration surface — because the stale Artifact 5 framing implied Mode 2 column 3 would have editable sliders. The correct Artifact 2 target (read-only summary + "Enter Active Control" button, named `Mode2ColumnSurface`) had not yet been written.
+3. **Artifact 4 Dimension 3 had a shallow ShockInjectRequest.** The CE Agent's discriminated union analysis in Dimension 3 used a single `magnitude: float | None` parameter because the panel had not yet deliberated on per-type parameter schemas. The correct schema names per-type parameters for all seven types.
+4. **Information hierarchy temporarily documented M18 scope instead of platform target.** Before the course correction, `information-hierarchy.md §Control Plane Reserved Zone` described the six-type shock taxonomy as the complete set, effectively encoding M18 scope into the platform governing document.
+5. **Thin-slicing concern.** The EL independently identified that Artifact 5's design appeared to be architectural minimalism rather than incremental delivery of a maximalist target — this would have led to re-architecture cost when deferred types were eventually added.
+
+### What was at risk
+
+ADR-019 was the next step. If the course correction had not been made before ADR-019 authorship began, the ADR-019 author would have received: contradictory inputs from Artifacts 4 and 5, a missing GrowthShock type, an incorrect Mode2ColumnSurface specification (editable sliders vs. read-only summary), and a shallow ShockInjectRequest schema. The resulting ADR-019 would have encoded the errors into the accepted architectural record, from which G4 sprint entry and implementation would follow. Discovering the errors during G4 implementation (the next failure point) would have required ADR-019 amendment, G4 sprint entry amendment, and partial implementation rework.
+
+### What caught it
+
+EL pattern recognition. The EL observed the Artifact 4 / Artifact 5 divergence and asked how they had diverged so much at inception. Investigation revealed the sequence inversion. No process gate surfaced the ordering problem before Artifact 5 was approved.
+
+### Root cause
+
+The GD gate was **unidirectional**: Artifact 5 gates ADR-019 (downstream). The gate was not **upstream**: no check prevented Artifact 5 from being filed and approved before its prerequisite artifacts existed. The sprint entry SOP correctly specified the artifact sequence, but specification without enforcement is not a gate.
+
+### Process improvement
+
+**Immediate:** Four-document course correction executed before ADR-019 authorship:
+1. `docs/process/near-miss-registry.md`: NM-072 filed (this entry)
+2. `docs/ux/information-hierarchy.md §Control Plane Reserved Zone`: Restored to maximalist platform target; Mode 2 column architecture ruling reframed as platform ruling (not M18 scope compromise); GrowthShock added as seventh type; shock taxonomy no longer encodes milestone scope
+3. `docs/architecture/control-plane-column-delta-analysis-m18.md §Dimension 3 and §Dimension 4`: Dimension 3 corrected to full discriminated union schema with per-type parameters for all seven types; Dimension 4 corrected to `Mode2ColumnSurface.tsx` (read-only summary + "Enter Active Control", no editable sliders); EL Decision 6 (all 7 handlers in G4) recorded
+4. `docs/process/intents/M18-GD-2026-06-26-control-plane-scope-decision.md §Artifact 5`: Framing note added; Decision 4 (GrowthShock) approved; Decision 5 (4 MVP types, superseded) filed; Decision 6 (all 7 handlers, forcing function for architectural completeness) filed
+
+**Structural fix required (sprint planning SOP):** Future pre-wave design packages that include an EL scope gate artifact must specify both:
+- **Downstream gate:** EL scope gate artifact → ADR authorship (already exists)
+- **Upstream gate:** Prerequisite design artifacts must be filed and on record before EL scope gate artifact may be submitted for EL review
+
+The upstream gate must be an explicit check in the sprint planning SOP, not guidance. An EL scope decision made without the full design analysis input is not independent review — it is approval of an incomplete specification. PI Agent holds R for verifying the upstream gate condition is satisfied before routing an Artifact 5 equivalent for EL review in any future pre-wave design package.
+
+---
+
+## NM-073 — Sprint Sub-Branches Have No Required CI Checks; Auto-Merge Fires Before Playwright E2E Completes (Reactive)
+
+**Date:** 2026-06-27
+**Milestone:** M18 — Full Argument and Demo 7
+**Detected by:** DS Agent investigation — EL observed PR #1395 merged while `playwright-e2e` was still pending
+**Severity:** Low — integration PR gate (sprint→release) still enforces full CI before any code reaches `release/m18`; no incorrect artifacts produced
+
+### What happened
+
+PR #1395 (`feat/m18-g3-test-authorship` → `sprint/m18-g3`) merged at `2026-06-27T01:49:55Z` while the `playwright-e2e` CI check was still in `pending` state. The EL flagged the premature merge; DS Agent investigation confirmed the root cause: `sprint/m18-g3` has no branch protection (GitHub branch protection API returns 404 for sprint branches) and is not covered by the `release-branch-ci-gate` Ruleset.
+
+The Ruleset condition is `refs/heads/release/m*` — it applies exclusively to `release/m18`, `release/m17`, etc. Sprint sub-branches (`sprint/m18-g1`, `sprint/m18-g2`, `sprint/m18-g3`) are not included. Auto-merge on an unprotected branch fires when GitHub's internal merge eligibility conditions are satisfied (no conflicts; no status checks required). Since no status check was required on the sprint branch, `playwright-e2e` being pending did not block the merge.
+
+The sprint group isolation model was introduced at M18 kickoff to resolve NM-067. When the branching model was designed, no corresponding CI gate was specified for sprint sub-branches.
+
+### What was at risk
+
+An implementation PR could merge to a sprint sub-branch with failing `playwright-e2e` tests — broken frontend behavior landing on the sprint branch before CI completes. Other implementing agents pulling from the sprint branch for subsequent work could build on top of that broken state. The defect would only be caught at the integration PR gate (`sprint/m18-g3` → `release/m18`) where the `release-branch-ci-gate` Ruleset enforces all required checks.
+
+In this specific instance (PR #1395 is a test authorship PR), `playwright-e2e` failure was expected — tests are pre-RED before implementation. The risk is higher for implementation PRs where a failing `playwright-e2e` indicates genuine defects.
+
+### What caught it
+
+EL observation after seeing the merge notification, triggering DS Agent investigation. No process gate on the sprint branch detected or blocked the premature merge.
+
+### Root cause
+
+The sprint group isolation SOP (NM-067 resolution) introduced sprint sub-branches but did not define CI requirements for those branches. The `release-branch-ci-gate` Ruleset was not extended to cover `sprint/m*` branches. The design intent — whether sprint branches should have required checks or whether the gate lives only at the integration PR — was never explicitly decided or documented.
+
+### Process improvement
+
+**Design decision required (EL) — choose one path:**
+
+**Option A — Add sprint-branch CI gate:**
+DS Agent creates a new GitHub Ruleset (`sprint-branch-ci-gate`) covering `refs/heads/sprint/m*` with required checks: `changes`, `lint`, `test-backend`, `playwright-e2e`. Feature→sprint auto-merge then waits for all required checks to pass. `docs/process/sprint-group-isolation.md` updated to document the gate. Implemented via `infra/m18-sprint-branch-gate` PR targeting `release/m18`.
+
+**Option B — Explicitly document sprint branches as intentionally unprotected:**
+DS Agent updates `docs/process/sprint-group-isolation.md` to explicitly state that sprint sub-branches are intermediate integration points with no required CI gate; the full gate lives at the integration PR (sprint→release). Auto-merge fires without waiting for CI on sprint branches by design — implementing agents rely on local pre-push gates (ruff + mypy + npm build) for intermediate quality. Implemented via `infra/m18-sprint-group-isolation-doc-amendment` PR targeting `release/m18`.
+
+**Not acceptable:** leaving the design decision undocumented. The sprint group isolation SOP must explicitly state CI gate expectations for sprint branches, whichever path is chosen.
+
+DS Agent brings this finding to the EL for path selection before implementing.
+
+---
+
+## NM-074 — Required Check Added to Ruleset Without Verifying Workflow Trigger Coverage; sprint-branch-ci-gate Hung on branch-naming (Reactive)
+
+**Date:** 2026-06-27
+**Milestone:** M18 — Full Argument and Demo 7
+**Detected by:** EL observation — PR #1398 stuck with `branch-naming` never reporting
+**Severity:** Medium — blocked auto-merge on an active implementation-gate PR; required manual Ruleset intervention to unblock
+
+### What happened
+
+When creating the `sprint-branch-ci-gate` Ruleset (NM-073 resolution), DS Agent included `branch-naming` as a required check alongside `changes`, `lint`, `test-backend`, and `compliance-scan`. The `branch-naming` check was already a required check in `release-branch-ci-gate` and was known to exist as a workflow.
+
+What was not verified: whether `branch-naming.yml` was configured to trigger for PRs targeting `sprint/m*` branches. It was not — the workflow only declared `release/m*` in its `pull_request.branches` trigger. For any `feat/* → sprint/m*` PR, the `branch-naming` job never ran and never posted a result to the PR. GitHub's Ruleset waited for a required check that could not arrive, blocking auto-merge indefinitely.
+
+PR #1398 (`feat/m18-g3-intent-document` → `sprint/m18-g3`) was the first PR to expose this gap — it sat with `branch-naming` in a permanent pending-but-absent state.
+
+**Resolution sequence:**
+1. DS Agent removed `branch-naming` from `sprint-branch-ci-gate` via API (immediate unblock)
+2. DS Agent extended `branch-naming.yml` to trigger on `sprint/m*` targets with correct milestone extraction (`sprint/m18-g2` → `"m18"`) — PR #1399 → `release/m18` (merged)
+3. DS Agent restored `branch-naming` to `sprint-branch-ci-gate` Ruleset after PR #1399 landed
+
+### What was at risk
+
+Any `feat/* → sprint/m*` PR with auto-merge set would hang indefinitely. In a wave with multiple implementing agents, multiple PRs could accumulate in this state simultaneously, blocking all sprint branch merges and stalling the wave. The gap would persist undetected until the first auto-merge PR was opened after the Ruleset was created.
+
+### What caught it
+
+EL observation of PR #1398 stuck status. No process gate surfaced the trigger-coverage gap before the Ruleset was created.
+
+### Root cause
+
+The DS Agent verified that `branch-naming` was a known, working CI check — it is, for `release/m*` targets. The agent did not verify that the workflow's `pull_request.branches` trigger included the new branch pattern (`sprint/m*`) before adding it as a required check to the new Ruleset. Existence of a check is not the same as coverage of that check for a given branch pattern.
+
+### Process improvement
+
+**DS Agent pre-Ruleset checklist — new required item:**
+
+Before adding any check name to a GitHub Ruleset, DS Agent must verify:
+1. The workflow file defining the check exists
+2. The workflow's `pull_request.branches` (or equivalent trigger) includes **the branch pattern covered by the Ruleset being created or modified**
+
+If the workflow trigger does not cover the Ruleset's branch pattern, the DS Agent must extend the workflow **before** adding the check to the Ruleset — not after.
+
+The correct sequence: extend workflow → verify workflow fires on the new pattern → add check to Ruleset. NM-074 was produced by inverting steps 2 and 3.
+
+---
+
+## NM-075 — Multiple Claude Code Sessions Sharing One Git Working Tree; Branch Switches from Other Sessions Overwrite In-Progress Implementation (Reactive)
+
+**Date:** 2026-06-27
+**Milestone:** M18 — Full Argument and Demo 7
+**Detected by:** DS Agent investigation triggered by EL — `ps aux` and `git reflog` made root cause unambiguous after repeated branch-switch failures during G2 implementation
+**Severity:** High — implementation commits were overwritten, edited files were reset to HEAD, and a QA test file was deleted repeatedly; implementation required multiple recovery attempts across sessions
+
+### What happened
+
+During M18 G2 implementation (PSP driver decomposition, #1255), the working branch (`feat/m18-g2-psp-impl`) was repeatedly switched by other concurrent Claude Code sessions operating on the same main git working tree at `/Users/imranyousuf/projects/worldsim`. At peak, 18+ `claude code` processes were active simultaneously — G2 implementation, G3 intent document, infra/branch-naming, and multiple chore/state-sync sessions — all sharing the same `.git/HEAD`. Every `git checkout` by any other session immediately changed HEAD for all sessions.
+
+Evidence: `git reflog` showed 30+ HEAD switches in ~2 hours; `ps aux` confirmed 18+ `claude code` processes; `git worktree list` showed only 2 isolated worktrees (for agent tool calls, not for concurrent sprint group work). The sprint group isolation model (NM-067 fix, sprint sub-branches) addresses merge conflicts at PR time but does not prevent working-tree interference when sessions operate concurrently without worktree isolation.
+
+Recovery: G2 implementation was completed by creating an explicit `git worktree add` for `feat/m18-g2-psp-impl` at a scratchpad path, isolating it from all other session activity.
+
+### What was at risk
+
+G2 implementation artifacts (module.py changes, frontend components, test file) were overwritten by branch switches at least three times. Without recovery via `git show <commit>:path`, the pre-authored QA test file (PR #1387) would have been permanently lost from the working tree. The near-miss escalated to a full implementation failure before the worktree workaround was discovered.
+
+### What caught it
+
+DS Agent investigation triggered by EL — the process had no guard. The sprint-group isolation model describes branch naming and PR targeting but does not require or recommend worktree isolation for concurrent sessions.
+
+### Process improvement
+
+**Immediate:** `docs/process/sprint-group-isolation.md` should be updated to require `git worktree add` for any sprint group session that coexists with other concurrent sessions operating on the same repository clone.
+
+**Structural:** PM Agent should provision a named git worktree for each sprint group at sprint entry, alongside cutting the sprint sub-branch. The worktree path (convention: `.claude/worktrees/sprint-m{N}-g{N}`) should be recorded in the sprint journal issue so implementing agents know where to work.
+
+**Near-miss lineage:** Same root cause as NM-067 (concurrent sessions, shared state) at the working-tree level rather than the branch/PR level. NM-067's fix (sprint sub-branches) addressed the merge conflict symptom; NM-075 identifies the working-tree interference that survives the branching fix. NM-071 identified the planning gap; NM-075 identifies the execution gap: even a correctly-planned sprint group can have its implementation destroyed by concurrent sessions without worktree isolation.
+
+---
+
 ## NM-NNN — [Short descriptive title]
 
 **Date:** YYYY-MM-DD (or approximate milestone era)
