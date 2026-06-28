@@ -3826,6 +3826,52 @@ DS Agent brings this finding to the EL for path selection before implementing.
 
 ---
 
+## NM-074 — Required Check Added to Ruleset Without Verifying Workflow Trigger Coverage; sprint-branch-ci-gate Hung on branch-naming (Reactive)
+
+**Date:** 2026-06-27
+**Milestone:** M18 — Full Argument and Demo 7
+**Detected by:** EL observation — PR #1398 stuck with `branch-naming` never reporting
+**Severity:** Medium — blocked auto-merge on an active implementation-gate PR; required manual Ruleset intervention to unblock
+
+### What happened
+
+When creating the `sprint-branch-ci-gate` Ruleset (NM-073 resolution), DS Agent included `branch-naming` as a required check alongside `changes`, `lint`, `test-backend`, and `compliance-scan`. The `branch-naming` check was already a required check in `release-branch-ci-gate` and was known to exist as a workflow.
+
+What was not verified: whether `branch-naming.yml` was configured to trigger for PRs targeting `sprint/m*` branches. It was not — the workflow only declared `release/m*` in its `pull_request.branches` trigger. For any `feat/* → sprint/m*` PR, the `branch-naming` job never ran and never posted a result to the PR. GitHub's Ruleset waited for a required check that could not arrive, blocking auto-merge indefinitely.
+
+PR #1398 (`feat/m18-g3-intent-document` → `sprint/m18-g3`) was the first PR to expose this gap — it sat with `branch-naming` in a permanent pending-but-absent state.
+
+**Resolution sequence:**
+1. DS Agent removed `branch-naming` from `sprint-branch-ci-gate` via API (immediate unblock)
+2. DS Agent extended `branch-naming.yml` to trigger on `sprint/m*` targets with correct milestone extraction (`sprint/m18-g2` → `"m18"`) — PR #1399 → `release/m18` (merged)
+3. DS Agent restored `branch-naming` to `sprint-branch-ci-gate` Ruleset after PR #1399 landed
+
+### What was at risk
+
+Any `feat/* → sprint/m*` PR with auto-merge set would hang indefinitely. In a wave with multiple implementing agents, multiple PRs could accumulate in this state simultaneously, blocking all sprint branch merges and stalling the wave. The gap would persist undetected until the first auto-merge PR was opened after the Ruleset was created.
+
+### What caught it
+
+EL observation of PR #1398 stuck status. No process gate surfaced the trigger-coverage gap before the Ruleset was created.
+
+### Root cause
+
+The DS Agent verified that `branch-naming` was a known, working CI check — it is, for `release/m*` targets. The agent did not verify that the workflow's `pull_request.branches` trigger included the new branch pattern (`sprint/m*`) before adding it as a required check to the new Ruleset. Existence of a check is not the same as coverage of that check for a given branch pattern.
+
+### Process improvement
+
+**DS Agent pre-Ruleset checklist — new required item:**
+
+Before adding any check name to a GitHub Ruleset, DS Agent must verify:
+1. The workflow file defining the check exists
+2. The workflow's `pull_request.branches` (or equivalent trigger) includes **the branch pattern covered by the Ruleset being created or modified**
+
+If the workflow trigger does not cover the Ruleset's branch pattern, the DS Agent must extend the workflow **before** adding the check to the Ruleset — not after.
+
+The correct sequence: extend workflow → verify workflow fires on the new pattern → add check to Ruleset. NM-074 was produced by inverting steps 2 and 3.
+
+---
+
 ## NM-NNN — [Short descriptive title]
 
 **Date:** YYYY-MM-DD (or approximate milestone era)
