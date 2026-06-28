@@ -23,7 +23,7 @@ expired exceptions at sprint exit.
 | ID | Type | Summary | Expiry | Status |
 |---|---|---|---|---|
 | EX-001 | threshold | AC-009 CI throttled render threshold raised 100ms → 200ms | G4 exit (ADR-019 §D-10) | Active |
-| EX-002 | process | AC-A2 annotated with `test.fail()` during G3 pre-implementation window; CI passes while test is intentionally red | G3 Phase 3 implementation PR merged | Active |
+| EX-002 | process | AC-A2 annotated with `test.fail()` during G3 pre-implementation window; CI passes while test is intentionally red | G3 Phase 3 implementation PR merged | Resolved 2026-06-28 |
 
 ---
 
@@ -196,6 +196,19 @@ ADR-018 testid is `zone-1b-mda-panel-wrapper`.
 4. Remove `test.fail()` and its comment from AC-A2 in `m17-g3-zone-1b-allocation.spec.ts`
 5. Re-run playwright — AC-A2 passes cleanly
 6. Push; update Status to Resolved in this registry
+
+### Resolution Record — 2026-06-28
+
+**Date:** 2026-06-28
+**Resolution label:** Resolved
+**Authority:** G3 sprint exit confirmation (sprint exit doc: `docs/process/sprint-plans/m18-g3-sprint-exit.md`; PI Agent confirmation on sprint journal #1377)
+
+G3 Phase 3 implementation (PR #1407/#1412 merged to sprint/m18-g3; integration PR #1417 merged to release/m18 2026-06-28) delivered `data-testid="zone-1b-mda-panel-wrapper"` in `InstrumentCluster.tsx`. All five resolution steps confirmed:
+- Step 1: `zone-1b-mda-panel-wrapper` testid added to `InstrumentCluster.tsx` (G3 Phase 3)
+- Step 2: AC-A2 passes in G3 Playwright CI suite (integration PR #1417 playwright-e2e GREEN)
+- Steps 3–4: `test.fail()` removed from AC-A2 in `m17-g3-zone-1b-allocation.spec.ts` during G3 Phase 3 (verified by grep — no `test.fail()` on test line 456 as of 2026-06-28)
+- Step 5: AC-A2 passes cleanly (no `test.fail()` annotation present)
+- Step 6: Status updated to Resolved in this registry
 
 ---
 
