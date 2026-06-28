@@ -48,6 +48,10 @@ from app.schemas import (
     CohortThresholdCrossing,
     CompareResponse,
     DeltaRecord,
+    DistributionalDifferentialRequest,
+    DistributionalDifferentialResponse,
+    DistributionalPairResult,
+    DistributionalStepResult,
     DistributionRecord,
     FlatDeltaRecord,
     FrameworkOutput,
@@ -2522,4 +2526,158 @@ async def get_measurement_output(
         outputs=outputs,
         ia1_disclosure=IA1_CANONICAL_PHRASE,
         single_entity_warning=is_single_entity,
+    )
+
+
+# ---------------------------------------------------------------------------
+# M18-G3 #1349 — POST /scenarios/comparison/distributional-differential
+# ---------------------------------------------------------------------------
+
+_ENTITY_Q1_POPULATION: dict[str, int] = {
+    "ZMB": 3_894_625,  # 19,473,125 × 0.20 (UN WPP 2024)
+    "SEN": 3_408_800,
+    "GRC": 2_160_000,
+    "JOR": 2_190_000,
+    "EGY": 21_140_000,
+}
+_CI_FACTOR_LOWER = Decimal("0.87")
+_CI_FACTOR_UPPER = Decimal("1.16")
+_CI_MIN_HALF_WIDTH = 500
+_DISTRIBUTIONAL_TIER = "T3"
+_DISTRIBUTIONAL_METHODOLOGY = (
+    "Q1 poverty_headcount_ratio delta × entity Q1 population (UN WPP 2024, T3). "
+    "CI band: ±13–16% of point estimate, T3 placeholder pending G1 Zone 1A "
+    "CI band integration (ADR-007). Direction stable when CI does not span zero."
+)
+
+
+def _poverty_ratio_from_state(state: dict[str, Any], entity_prefix: str) -> Decimal | None:
+    """Return mean Q1 cohort poverty_headcount_ratio; falls back to main entity."""
+    q1_ratios: list[Decimal] = []
+    for eid, attrs in state.items():
+        if not isinstance(attrs, dict):
+            continue
+        if ":CHT:" in eid and eid.startswith(entity_prefix):
+            parts = eid.split(":CHT:", 1)[-1].split("-")
+            if parts and parts[0] == "1":
+                qty = attrs.get("poverty_headcount_ratio")
+                if isinstance(qty, dict):
+                    val = qty.get("value")
+                    if val is not None:
+                        with contextlib.suppress(Exception):
+                            q1_ratios.append(Decimal(str(val)))
+    if q1_ratios:
+        return sum(q1_ratios, Decimal("0")) / Decimal(len(q1_ratios))
+    main_attrs = state.get(entity_prefix)
+    if isinstance(main_attrs, dict):
+        qty = main_attrs.get("poverty_headcount_ratio")
+        if isinstance(qty, dict):
+            val = qty.get("value")
+            if val is not None:
+                with contextlib.suppress(Exception):
+                    return Decimal(str(val))
+    return None
+
+
+def _headcount_from_ratio_delta(delta: Decimal, entity_id: str) -> int:
+    q1_pop = _ENTITY_Q1_POPULATION.get(entity_id, 0)
+    return int(round(float(delta) * q1_pop))
+
+
+def _distributional_ci_bounds(headcount: int) -> tuple[int, int]:
+    abs_hc = abs(headcount)
+    if abs_hc < _CI_MIN_HALF_WIDTH:
+        return (-_CI_MIN_HALF_WIDTH, _CI_MIN_HALF_WIDTH)
+    if headcount >= 0:
+        lower = int(round(float(headcount) * float(_CI_FACTOR_LOWER)))
+        upper = int(round(float(headcount) * float(_CI_FACTOR_UPPER)))
+    else:
+        lower = int(round(float(headcount) * float(_CI_FACTOR_UPPER)))
+        upper = int(round(float(headcount) * float(_CI_FACTOR_LOWER)))
+    return (lower, upper)
+
+
+@router.post(
+    "/scenarios/comparison/distributional-differential",
+    response_model=DistributionalDifferentialResponse,
+)
+async def post_distributional_differential(
+    body: DistributionalDifferentialRequest,
+    conn: Annotated[asyncpg.Connection, Depends(get_db)],
+) -> DistributionalDifferentialResponse:
+    """Compute Q1 poverty headcount differential across N≥2 scenarios.
+
+    Per-step Q1 poverty_headcount_ratio delta vs reference scenario, converted
+    to headcount via entity Q1 population. T3 CI band (ADR-007 placeholder).
+    Direction stable when CI does not span zero.
+    """
+    scenario_ids = body.scenario_ids
+    ref_id = body.reference_scenario_id
+    entity_id = body.entity_id
+
+    if len(scenario_ids) < 2:
+        raise HTTPException(status_code=400, detail="At least two scenario_ids required.")
+    if ref_id not in scenario_ids:
+        raise HTTPException(
+            status_code=400,
+            detail="reference_scenario_id must be in scenario_ids.",
+        )
+
+    snapshots_by_scenario: dict[str, dict[int, dict[str, Any]]] = {}
+    for sid in scenario_ids:
+        rows = await conn.fetch(
+            "SELECT step_index, state FROM scenario_snapshots"
+            " WHERE scenario_id = $1 ORDER BY step_index",
+            sid,
+        )
+        if not rows:
+            raise HTTPException(status_code=404, detail=f"No snapshots for scenario {sid!r}.")
+        step_states: dict[int, dict[str, Any]] = {}
+        for row in rows:
+            raw = row["state"]
+            step_states[row["step_index"]] = raw if isinstance(raw, dict) else json.loads(raw)
+        snapshots_by_scenario[sid] = step_states
+
+    shared_steps = sorted(
+        set.intersection(*[set(ss.keys()) for ss in snapshots_by_scenario.values()])
+    )
+    if not shared_steps:
+        raise HTTPException(status_code=409, detail="No shared steps across scenarios.")
+
+    ref_states = snapshots_by_scenario[ref_id]
+    terminal_step = shared_steps[-1]
+
+    pairs: list[DistributionalPairResult] = []
+    for sid in scenario_ids:
+        if sid == ref_id:
+            continue
+        sim_states = snapshots_by_scenario[sid]
+        steps_out: list[DistributionalStepResult] = []
+        for step in shared_steps:
+            ref_ratio = _poverty_ratio_from_state(ref_states[step], entity_id)
+            sim_ratio = _poverty_ratio_from_state(sim_states[step], entity_id)
+            if ref_ratio is None or sim_ratio is None:
+                continue
+            delta = sim_ratio - ref_ratio
+            headcount = _headcount_from_ratio_delta(delta, entity_id)
+            ci_lower, ci_upper = _distributional_ci_bounds(headcount)
+            direction_stable = (ci_lower > 0) or (ci_upper < 0)
+            steps_out.append(
+                DistributionalStepResult(
+                    step=step,
+                    headcount_differential=headcount,
+                    ci_lower=ci_lower,
+                    ci_upper=ci_upper,
+                    direction_stable=direction_stable,
+                )
+            )
+        pairs.append(DistributionalPairResult(scenario_id=sid, steps=steps_out))
+
+    return DistributionalDifferentialResponse(
+        entity_id=entity_id,
+        reference_scenario_id=ref_id,
+        terminal_step=terminal_step,
+        tier=_DISTRIBUTIONAL_TIER,
+        methodology_summary=_DISTRIBUTIONAL_METHODOLOGY,
+        pairs=pairs,
     )

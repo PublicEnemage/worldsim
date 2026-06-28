@@ -100,6 +100,36 @@ export interface CohortThresholdCrossing {
   breaches_below?: boolean;
 }
 
+// ---------------------------------------------------------------------------
+// M18-G3 #1349 — Distributional comparison summary types
+// ---------------------------------------------------------------------------
+
+export interface DistributionalStepSummary {
+  step: number;
+  headcount_differential: number;
+  ci_lower: number;
+  ci_upper: number;
+  direction_stable: boolean;
+}
+
+export interface DistributionalPairSummary {
+  scenario_id: string;
+  scenario_label: string;
+  steps: DistributionalStepSummary[];
+}
+
+export interface DistributionalSummaryData {
+  entity_id: string;
+  reference_scenario_id: string;
+  reference_scenario_label: string;
+  terminal_step: number;
+  tier: string;
+  methodology_summary: string;
+  pairs: DistributionalPairSummary[];
+}
+
+// ---------------------------------------------------------------------------
+
 interface ScenarioStepState {
   scenario_id: string;
   current_step: number;
@@ -115,6 +145,8 @@ interface ScenarioStepState {
   pmm_value: number | null;
   /** Zone 1C — Direction indicator: margin growing, shrinking, or flat since last step. */
   pmm_direction: "up" | "down" | "flat" | null;
+  /** M18-G3 (#1349) — distributional comparison summary for Zone 1B sticky-bottom element. */
+  distributionalSummary: DistributionalSummaryData | null;
 
   // ---------------------------------------------------------------------------
   // Mode 3 branch state — mode3-interaction-spec.md §7
@@ -157,6 +189,8 @@ interface ScenarioStepState {
   resetBranch: () => void;
   /** Set mode only — does not reset current_step or any other state (SF-1 guard, G8b intent §7.1). */
   setMode: (mode: "MODE_1" | "MODE_2" | "MODE_3") => void;
+  /** M18-G3 (#1349) — set or clear distributional comparison summary for Zone 1B. */
+  setDistributionalSummary: (summary: DistributionalSummaryData | null) => void;
   reset: () => void;
 }
 
@@ -172,6 +206,7 @@ export const useScenarioStepStore = create<ScenarioStepState>((set, get) => ({
   cohort_threshold_crossings: [],
   pmm_value: null,
   pmm_direction: null,
+  distributionalSummary: null,
   baselineScenarioId: null,
   branchScenarioId: null,
   branchFromStep: null,
@@ -255,6 +290,8 @@ export const useScenarioStepStore = create<ScenarioStepState>((set, get) => ({
 
   setMode: (mode) => set({ mode }),
 
+  setDistributionalSummary: (summary) => set({ distributionalSummary: summary }),
+
   reset: () =>
     set({
       scenario_id: "",
@@ -268,6 +305,7 @@ export const useScenarioStepStore = create<ScenarioStepState>((set, get) => ({
       cohort_threshold_crossings: [],
       pmm_value: null,
       pmm_direction: null,
+      distributionalSummary: null,
       baselineScenarioId: null,
       branchScenarioId: null,
       branchFromStep: null,
