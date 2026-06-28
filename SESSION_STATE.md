@@ -6,7 +6,7 @@
 > Historical state lives in `docs/process/session-archives/`.
 > Authority: `docs/process/sprint-group-isolation.md §SESSION_STATE.md Cockpit Card Protocol`.
 
-**Last updated:** 2026-06-28 (G4 implementation PR #1424 MERGED; EX-002 resolved PR #1425 MERGED; testid regression fix + CA L3 PR #1426 OPEN auto-merge; BPO ACCEPT conditional on record #1402; NM-076 filed; EX-001 pending user MV-002)
+**Last updated:** 2026-06-28 (EX-001 CLOSED Won't Fix — MV-002 ProBook 67/86/64ms all ≤100ms; test.fixme removed PR #1429+feat/m18-g4-ex001-closure; sprint exit doc next)
 **Current milestone:** M18 — Full Argument and Demo 7 (GitHub Milestone 19)
 
 ---
@@ -80,5 +80,5 @@ None open. ADR-019 Accepted (PR #1393, 2026-06-27). GA-02 / Path 2 retired on op
 - **G1 CLOSED (2026-06-28):** CI bands (#1254) — PR #1404 merged to sprint/m18-g1. Integration PR #1411 MERGED 2026-06-28 (playwright-e2e PASS after divergence fill `fill="none"` fix). Sprint exit document: `docs/process/sprint-plans/m18-g1-sprint-exit.md` (filed 2026-06-28, PR #1419).
 - **sprint-branch-ci-gate Ruleset:** Node ID `RRS_lACqUmVwb3NpdG9yec5IKi2kzgEV92A`. Requires `changes`, `lint`, `test-backend`, `compliance-scan`. Workaround for direct push: temporarily clear rules via GraphQL `updateRepositoryRuleset`, push, restore.
 - **NM-076 (2026-06-28):** G4 testid renames (ADR-019 D-3: apply-control-change → apply-policy-input, fiscal-multiplier-slider → policy-param-slider) not crosschecked against E2E corpus before PR #1424; 3 tests merged broken to sprint/m18-g4. sprint-branch-ci-gate does not require playwright-e2e, so auto-merge fired. Fixed by PR #1426. Process improvement: testid rename rule to be added to CODING_STANDARDS.md.
-- **G4 IN-PROGRESS (2026-06-28):** ControlPlaneColumn.tsx implementation MERGED (PR #1424 → sprint/m18-g4). Testid regression fix + CA L3 in PR #1426 (auto-merge enabled, CI running). BPO ACCEPT conditional on record (#1402#issuecomment-4827099333) pending EX-001 closure. EX-001 (AC-009 render ≤100ms): user must run MV-002 local ProBook profiling — report result to proceed. Sprint exit doc and integration PR blocked on EX-001. EX-002 RESOLVED (PR #1425 MERGED).
+- **G4 IN-PROGRESS (2026-06-28):** ControlPlaneColumn.tsx MERGED (PR #1424). Testid fix + CA L3 MERGED (PR #1426). branch-anchor-label fix MERGED (PR #1429). EX-001 CLOSED Won't Fix — MV-002 ProBook 67.40/85.50/64.40ms all ≤100ms; test.fixme removed (feat/m18-g4-ex001-closure, PR open). EX-002 RESOLVED (PR #1425). BPO ACCEPT conditional on record (#1402#issuecomment-4827099333). Sprint exit doc pending PI Agent confirmation.
 - **M17 archive:** Full M1–M17 session state at `docs/process/session-archives/session-state-pre-m18.md`.

@@ -22,7 +22,7 @@ expired exceptions at sprint exit.
 
 | ID | Type | Summary | Expiry | Status |
 |---|---|---|---|---|
-| EX-001 | threshold | AC-009 CI throttled render threshold raised 100ms → 200ms | G4 exit (ADR-019 §D-10) | Active |
+| EX-001 | threshold | AC-009 CI throttled render threshold raised 100ms → 200ms | G4 exit (ADR-019 §D-10) | Won't Fix 2026-06-28 |
 | EX-002 | process | AC-A2 annotated with `test.fail()` during G3 pre-implementation window; CI passes while test is intentionally red | G3 Phase 3 implementation PR merged | Resolved 2026-06-28 |
 
 ---
@@ -133,6 +133,36 @@ EX-001 closure record is present in this registry before exit gate passes.
 
 **Authority:** EL-approved ADR-019 §D-10 (2026-06-27); G4 sprint entry §EX-001
 Pre-Implementation Condition (EL-approved 2026-06-28).
+
+### Baseline (updated)
+
+| Measurement | Value | Environment | Date |
+|---|---|---|---|
+| First real AC-009 CI run (post NM-058 fix) | 179ms | GitHub Actions (ubuntu-latest, 2-core), 4× CPU throttle | 2026-06-24 |
+| MV-002 Run 1 — ProBook local, unthrottled | 67.40ms | Windows 11, HP ProBook, Chrome DevTools console | 2026-06-28 |
+| MV-002 Run 2 — ProBook local, unthrottled | 85.50ms | Windows 11, HP ProBook, Chrome DevTools console | 2026-06-28 |
+| MV-002 Run 3 — ProBook local, unthrottled | 64.40ms | Windows 11, HP ProBook, Chrome DevTools console | 2026-06-28 |
+
+### Closure Record — 2026-06-28
+
+**Date:** 2026-06-28
+**Resolution label:** Won't Fix
+**Authority:** ADR-019 §D-10; EL direction
+
+**MV-002 hardware gate:** PASS. Three unthrottled runs on HP ProBook local hardware:
+67.40ms / 85.50ms / 64.40ms — all ≤ 100ms. G4 render optimization (lazy
+ControlPlaneColumn mounting + Recharts memoization, PR #1424) delivers acceptable
+Mode 3 render performance on target hardware.
+
+**CI gate (KI-006):** Won't Fix. GHA 2-core shared runners consistently return
+712ms–771ms on 4× throttled profile — an external infrastructure limitation documented
+in KI-006. No application-level optimization can close this gap. AC-009 `test.fixme()`
+removed from CI permanently per ADR-019 §D-10 step 4. Test structure preserved as
+comment in `frontend/tests/e2e/trajectory-view.spec.ts` referencing this closure record.
+
+**Disposition:** EX-001 closed. No renewal required. The Mode 3 render threshold
+(100ms unthrottled) is confirmed achievable on target hardware. CI measurement of this
+threshold is not feasible on free-tier runners and is not a project obligation.
 
 ---
 
