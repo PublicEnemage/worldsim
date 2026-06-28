@@ -11,7 +11,7 @@
  *   docs/frontend/fa-brief-m9-instrument-cluster.md §Named Acceptance Criteria
  *   docs/ux/user-stories-instrument-cluster-m9.md US-007, US-008, US-010, US-012, US-023
  */
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, beforeAll } from "vitest";
 
 // ---------------------------------------------------------------------------
 // TrajectoryView module import
@@ -483,5 +483,293 @@ describe("computeYDomain — adaptive y-axis domain from score values", () => {
     const [loWithout, hiWithout] = computeYDomain([0.30, 0.70]);
     expect(loWith).toBeCloseTo(loWithout, 5);
     expect(hiWith).toBeCloseTo(hiWithout, 5);
+  });
+
+  // AC-1254-4 — yDomain extended for CI upper bounds (M18-G1)
+  it("AC-1254-4: CI upper value 0.95 included → yMax ≥ 0.95", () => {
+    // Intent doc §7 AC-1254-4: scores [0.60, 0.70, 0.80] + ci_upper 0.95 included.
+    // computeYDomain at the updated call site passes CI upper values alongside scores.
+    // yMax must accommodate the CI upper value, not only the composite scores.
+    const [, hi] = computeYDomain([0.60, 0.70, 0.80, 0.95]);
+    expect(hi).toBeGreaterThanOrEqual(0.95);
+  });
+
+  it("AC-1254-4: without CI upper value, yMax is below 0.95 (demonstrates the gap)", () => {
+    // Hard-fail scenario: if the call site does NOT include CI upper values,
+    // yMax is computed from scores alone (≈ 0.85 with 10% padding above 0.80).
+    // This confirms that including 0.95 is necessary to extend the domain.
+    const [, hiScoresOnly] = computeYDomain([0.60, 0.70, 0.80]);
+    // With 10% padding: range=0.20, 10%=0.02 < 0.05 → use 0.05 padding → hi≈0.85
+    expect(hiScoresOnly).toBeLessThan(0.95);
+  });
+
+  it("AC-1254-4: yMax ≥ max(ci_upper values) across multiple steps", () => {
+    // Multiple steps with different CI upper values: domain must encompass the highest.
+    const compositeScores = [0.55, 0.58, 0.60, 0.62];
+    const ciUpperValues = [0.71, 0.77, 0.95, 0.95]; // step 3 and 4 at 0.9455
+    const allValues = [...compositeScores, ...ciUpperValues];
+    const [, hi] = computeYDomain(allValues);
+    const maxCIUpper = Math.max(...ciUpperValues);
+    expect(hi).toBeGreaterThanOrEqual(maxCIUpper);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// M18-G1: AC-1254-2 — mergeTrajectories CI extraction
+// M18-G1: CI_BAND_OPACITY constant and computeCompositeHalfWidth (§5.1, §5.2)
+//
+// These tests are RED until TrajectoryView.tsx exports the following:
+//   mergeTrajectories(trajectory, baseline) — extracts ci_lower/ci_upper into MergedStepDatum
+//   CI_BAND_OPACITY — the 0.12 constant for recharts <Area> fillOpacity
+//   computeCompositeHalfWidth(stepIndex, tier) — BandingEngine §3.1 frontend mirror
+//
+// Import technique: dynamic import in beforeAll avoids breaking existing tests
+// when the exports are not yet available.
+// ---------------------------------------------------------------------------
+
+describe("M18-G1: CI_BAND_OPACITY constant", () => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let CI_BAND_OPACITY: number | undefined;
+
+  beforeAll(async () => {
+    try {
+      const mod = await import("../TrajectoryView");
+      CI_BAND_OPACITY = (mod as Record<string, unknown>).CI_BAND_OPACITY as number | undefined;
+    } catch {
+      CI_BAND_OPACITY = undefined;
+    }
+  });
+
+  it("CI_BAND_OPACITY is exported from TrajectoryView", () => {
+    // RED until CI_BAND_OPACITY is exported
+    expect(CI_BAND_OPACITY).toBeDefined();
+  });
+
+  it("CI_BAND_OPACITY is exactly 0.12 (intent doc §5.1)", () => {
+    if (CI_BAND_OPACITY === undefined) {
+      expect(CI_BAND_OPACITY).toBeDefined();
+      return;
+    }
+    expect(CI_BAND_OPACITY).toBe(0.12);
+    expect(typeof CI_BAND_OPACITY).toBe("number");
+  });
+});
+
+describe("M18-G1: computeCompositeHalfWidth — BandingEngine §3.1 frontend mirror", () => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let computeCompositeHalfWidth: ((stepIndex: number, tier: number) => number) | undefined;
+
+  beforeAll(async () => {
+    try {
+      const mod = await import("../TrajectoryView");
+      computeCompositeHalfWidth = (mod as Record<string, unknown>)
+        .computeCompositeHalfWidth as typeof computeCompositeHalfWidth;
+    } catch {
+      computeCompositeHalfWidth = undefined;
+    }
+  });
+
+  it("computeCompositeHalfWidth is exported from TrajectoryView", () => {
+    expect(computeCompositeHalfWidth).toBeDefined();
+  });
+
+  it("step=1, tier=1 → half-width = 0.10 × 1.0 = 0.10", () => {
+    if (!computeCompositeHalfWidth) { expect(computeCompositeHalfWidth).toBeDefined(); return; }
+    expect(computeCompositeHalfWidth(1, 1)).toBeCloseTo(0.10, 5);
+  });
+
+  it("step=2, tier=2 → half-width = 0.20 × 1.2 = 0.24", () => {
+    if (!computeCompositeHalfWidth) { expect(computeCompositeHalfWidth).toBeDefined(); return; }
+    expect(computeCompositeHalfWidth(2, 2)).toBeCloseTo(0.24, 5);
+  });
+
+  it("step=4, tier=3 → half-width = 0.35 × 1.5 = 0.525 (worked example)", () => {
+    if (!computeCompositeHalfWidth) { expect(computeCompositeHalfWidth).toBeDefined(); return; }
+    expect(computeCompositeHalfWidth(4, 3)).toBeCloseTo(0.525, 5);
+  });
+
+  it("step=6, tier=4 → half-width = 0.50 × 2.0 = 1.0", () => {
+    if (!computeCompositeHalfWidth) { expect(computeCompositeHalfWidth).toBeDefined(); return; }
+    expect(computeCompositeHalfWidth(6, 4)).toBeCloseTo(1.0, 5);
+  });
+
+  it("step=5, tier=5 → half-width = 0.35 × 3.0 = 1.05", () => {
+    if (!computeCompositeHalfWidth) { expect(computeCompositeHalfWidth).toBeDefined(); return; }
+    expect(computeCompositeHalfWidth(5, 5)).toBeCloseTo(1.05, 5);
+  });
+
+  it("step=3 and step=4 return the same half-width (both in 3–5 year range)", () => {
+    if (!computeCompositeHalfWidth) { expect(computeCompositeHalfWidth).toBeDefined(); return; }
+    expect(computeCompositeHalfWidth(3, 2)).toBeCloseTo(computeCompositeHalfWidth(4, 2), 5);
+  });
+
+  it("step=6 returns greater half-width than step=5 (crossing the >5 year threshold)", () => {
+    if (!computeCompositeHalfWidth) { expect(computeCompositeHalfWidth).toBeDefined(); return; }
+    expect(computeCompositeHalfWidth(6, 1)).toBeGreaterThan(computeCompositeHalfWidth(5, 1));
+  });
+});
+
+describe("AC-1254-2 — mergeTrajectories CI extraction", () => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let mergeTrajectories: ((trajectory: object, baseline: object | null) => object[]) | undefined;
+
+  beforeAll(async () => {
+    try {
+      const mod = await import("../TrajectoryView");
+      mergeTrajectories = (mod as Record<string, unknown>)
+        .mergeTrajectories as typeof mergeTrajectories;
+    } catch {
+      mergeTrajectories = undefined;
+    }
+  });
+
+  it("mergeTrajectories is exported from TrajectoryView", () => {
+    // RED until mergeTrajectories is exported (M18-G1 implementation required)
+    expect(mergeTrajectories).toBeDefined();
+  });
+
+  it("AC-1254-2: financial ci_lower extracted when non-null in step.frameworks.financial", () => {
+    if (!mergeTrajectories) { expect(mergeTrajectories).toBeDefined(); return; }
+
+    const trajectory = {
+      scenario_id: "zmb-test",
+      entity_id: "ZMB",
+      step_count: 1,
+      mda_floors: [],
+      steps: [
+        {
+          step_index: 1,
+          effective_from: "2024-01-01T00:00:00Z",
+          step_event_label: null,
+          step_significance: "ROUTINE",
+          frameworks: {
+            financial: {
+              composite_score: 0.62,
+              ci_lower: 0.45,
+              ci_upper: 0.65,
+              confidence_tier: 3,
+              scoring_basis: "normalized_absolute",
+            },
+            human_development: {
+              composite_score: 0.55,
+              ci_lower: null,
+              ci_upper: null,
+              confidence_tier: 3,
+              scoring_basis: "normalized_absolute",
+            },
+            ecological: {
+              composite_score: null,
+              ci_lower: null,
+              ci_upper: null,
+              confidence_tier: 3,
+              scoring_basis: "boundary_proximity",
+            },
+            governance: {
+              composite_score: null,
+              ci_lower: null,
+              ci_upper: null,
+              confidence_tier: 2,
+              scoring_basis: "percentile_rank",
+            },
+          },
+          policy_inputs: [],
+          shock_events: [],
+        },
+      ],
+    };
+
+    const data = mergeTrajectories(trajectory, null) as Record<string, unknown>[];
+    expect(data).toHaveLength(1);
+
+    const datum = data[0];
+    // AC-1254-2: non-null ci_lower/ci_upper must be extracted into MergedStepDatum
+    expect(datum["financial_ci_lower"]).toBe(0.45);
+    expect(datum["financial_ci_upper"]).toBe(0.65);
+  });
+
+  it("AC-1254-2: null ci_lower produces null financial_ci_lower in datum", () => {
+    if (!mergeTrajectories) { expect(mergeTrajectories).toBeDefined(); return; }
+
+    const trajectory = {
+      scenario_id: "zmb-test",
+      entity_id: "ZMB",
+      step_count: 1,
+      mda_floors: [],
+      steps: [
+        {
+          step_index: 1,
+          effective_from: "2024-01-01T00:00:00Z",
+          step_event_label: null,
+          step_significance: "ROUTINE",
+          frameworks: {
+            financial: {
+              composite_score: 0.62,
+              ci_lower: null,
+              ci_upper: null,
+              confidence_tier: 3,
+              scoring_basis: "normalized_absolute",
+            },
+            human_development: { composite_score: null, ci_lower: null, ci_upper: null, confidence_tier: 3, scoring_basis: "normalized_absolute" },
+            ecological: { composite_score: null, ci_lower: null, ci_upper: null, confidence_tier: 3, scoring_basis: "boundary_proximity" },
+            governance: { composite_score: null, ci_lower: null, ci_upper: null, confidence_tier: 2, scoring_basis: "percentile_rank" },
+          },
+          policy_inputs: [],
+          shock_events: [],
+        },
+      ],
+    };
+
+    const data = mergeTrajectories(trajectory, null) as Record<string, unknown>[];
+    expect(data).toHaveLength(1);
+    // AC-1254-2: null ci_lower propagates to datum
+    expect(data[0]["financial_ci_lower"]).toBeNull();
+    expect(data[0]["financial_ci_upper"]).toBeNull();
+  });
+
+  it("AC-1254-2: all four frameworks have ci_lower/ci_upper fields in output datum", () => {
+    if (!mergeTrajectories) { expect(mergeTrajectories).toBeDefined(); return; }
+
+    const trajectory = {
+      scenario_id: "zmb-test",
+      entity_id: "ZMB",
+      step_count: 1,
+      mda_floors: [],
+      steps: [
+        {
+          step_index: 1,
+          effective_from: "2024-01-01T00:00:00Z",
+          step_event_label: null,
+          step_significance: "ROUTINE",
+          frameworks: {
+            financial: { composite_score: 0.62, ci_lower: 0.45, ci_upper: 0.65, confidence_tier: 3, scoring_basis: "normalized_absolute" },
+            human_development: { composite_score: 0.55, ci_lower: 0.40, ci_upper: 0.70, confidence_tier: 3, scoring_basis: "normalized_absolute" },
+            ecological: { composite_score: null, ci_lower: null, ci_upper: null, confidence_tier: 3, scoring_basis: "boundary_proximity" },
+            governance: { composite_score: null, ci_lower: null, ci_upper: null, confidence_tier: 2, scoring_basis: "percentile_rank" },
+          },
+          policy_inputs: [],
+          shock_events: [],
+        },
+      ],
+    };
+
+    const data = mergeTrajectories(trajectory, null) as Record<string, unknown>[];
+    const datum = data[0];
+
+    // All four frameworks must have both ci_lower and ci_upper keys in the output
+    const expectedKeys = [
+      "financial_ci_lower", "financial_ci_upper",
+      "human_development_ci_lower", "human_development_ci_upper",
+      "ecological_ci_lower", "ecological_ci_upper",
+      "governance_ci_lower", "governance_ci_upper",
+    ];
+    for (const key of expectedKeys) {
+      expect(Object.prototype.hasOwnProperty.call(datum, key)).toBe(true);
+    }
+
+    // Non-null values preserved; null values preserved as null
+    expect(datum["financial_ci_lower"]).toBe(0.45);
+    expect(datum["human_development_ci_upper"]).toBe(0.70);
+    expect(datum["ecological_ci_lower"]).toBeNull();
+    expect(datum["governance_ci_upper"]).toBeNull();
   });
 });
