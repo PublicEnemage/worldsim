@@ -6,7 +6,7 @@
 > Historical state lives in `docs/process/session-archives/`.
 > Authority: `docs/process/sprint-group-isolation.md §SESSION_STATE.md Cockpit Card Protocol`.
 
-**Last updated:** 2026-06-28 (G2 CLOSED — PSP driver decomposition delivered PR #1401; integration PR #1408 open; NM-075 filed PR #1406; G1/G3/G4 active)
+**Last updated:** 2026-06-28 (G3 DELIVERED — distributional comparison PRs #1407+#1412 merged to sprint/m18-g3; G2 integration PR #1408 MERGED; G1 integration PR #1411 auto-merge in progress; G1 QA tests pending)
 **Current milestone:** M18 — Full Argument and Demo 7 (GitHub Milestone 19)
 
 ---
@@ -20,8 +20,8 @@
 | Exit checklist issue | #1340 |
 | Release branch | ✅ `release/m18` — cut 2026-06-26 at commit 151904d |
 | Sprint plan | ✅ EL-approved 2026-06-26 — `docs/process/sprint-plans/m18-sprint-plan.md` (PR #1364) |
-| Active wave | Wave 1 (G1+G3 active); G2 CLOSED 2026-06-28; G4 active (control plane/render) |
-| Active sprint groups | G1 (#1367) CI bands; G3 (#1377) counter-scenario; G4 (#1402) control plane; G2 CLOSED 2026-06-28 — integration PR #1408 open |
+| Active wave | G1 integration auto-merge in progress; G2 CLOSED (PR #1408 merged); G3 DELIVERED — integration pending; G4 active |
+| Active sprint groups | G1 (#1367) CI bands — integration PR #1411 auto-merge; G3 (#1377) DELIVERED — integration pending; G4 (#1402) control plane + render |
 | Active sprint journal issues | #1367 (G1 — CI Bands Zone 1A), #1377 (G3 — Counter-Scenario Comparison), #1402 (G4 — Control Plane + Render) |
 
 ---
@@ -53,9 +53,9 @@ None open. ADR-019 Accepted (PR #1393, 2026-06-27). GA-02 / Path 2 retired on op
 |---|---|---|
 | #1340 | M18 Exit Checklist — blocks milestone closure | Gate issue |
 | #843 | Demo 7 — live external session (Senegal Mode 3 + Zambia 3-scenario) | Primary deliverable |
-| #1254 | CI bands on Zone 1A trajectories (ADR-007 full implementation) | Wave 1 |
-| #1255 | PSP driver decomposition | ✅ DELIVERED 2026-06-28 — PR #1401 merged; integration PR #1408 open (auto-merge set) |
-| #1349 | Counter-scenario comparison — distributional number differential with CI bands | G3 Wave 2 — active (EL-approved 2026-06-26; pending intent doc + QA tests + UX/UI mockups) |
+| #1254 | CI bands on Zone 1A trajectories (ADR-007 full implementation) | Wave 1 — integration PR #1411 auto-merge in progress; QA tests untracked locally (pending PR) |
+| #1255 | PSP driver decomposition | ✅ CLOSED 2026-06-28 — PR #1401 merged; integration PR #1408 MERGED 2026-06-28 |
+| #1349 | Counter-scenario comparison — distributional number differential with CI bands | ✅ DELIVERED 2026-06-28 — PRs #1395/#1398/#1407/#1412 merged to sprint/m18-g3; integration pending |
 | #1352 | Requirements phase for #1349 — UX journeys, Customer Agent, BPO requirements | ✅ GR CLOSED 2026-06-26 (PR #1375) |
 | #1354 | Control Plane Column Design Package — Mode 2 + Mode 3 (7 artifacts #1355–#1361) | ✅ GD CLOSED 2026-06-27 (PRs #1386–#1393); ADR-019 Accepted |
 | #1256 | Path 2 / proprietary data integration | ✅ CLOSED 2026-06-27 — retired on open-source-as-strategy principle; exception required to reopen |
@@ -74,6 +74,8 @@ None open. ADR-019 Accepted (PR #1393, 2026-06-27). GA-02 / Path 2 retired on op
 - **Wave concurrency ceiling (PR #1347):** Hard ceiling of 5 concurrent sprint groups per wave. Coordination tier table in `docs/process/sprint-planning-sop.md §Wave Kickoff Coordination Check`. PM Agent runs check before wave kickoff.
 - **GA-02 / Path 2 retirement (PR #1393):** Proprietary ministry data upload retired on open-source-as-strategy principle. Recorded in `docs/ux/user-journeys.md §GA-02 retirement note`. No implementation may begin without a filed and EL-approved governance exception.
 - **NM-075 (PR #1406, merged 2026-06-28):** Concurrent Claude Code sessions sharing main working tree caused branch switches to overwrite in-progress G2 implementation. Root cause: git worktrees not allocated per sprint group. Workaround: `git worktree add /tmp/<name> <branch>` at sprint entry. Full entry in `docs/process/near-miss-registry.md §NM-075`.
-- **G2 closed (2026-06-28):** PSP driver decomposition (#1255) delivered via PR #1401. Sprint exit document: `docs/process/sprint-plans/m18-g2-sprint-exit.md`. Integration PR #1408 (`sprint/m18-g2` → `release/m18`) — auto-merge set; CI in progress.
-- **sprint-branch-ci-gate Ruleset:** Node ID `RRS_lACqUmVwb3NpdG9yec5IKi2kzgEV92A`. Requires `changes`, `lint`, `test-backend`, `compliance-scan`. `branch-naming` temporarily removed (sprint branches cut before PR #1399 landed lacked the `sprint/m*` trigger). Workaround for direct push: temporarily clear rules via GraphQL `updateRepositoryRuleset`, push, restore.
+- **G2 CLOSED (2026-06-28):** PSP driver decomposition (#1255) delivered via PR #1401. Integration PR #1408 MERGED 2026-06-28. Sprint exit document: `docs/process/sprint-plans/m18-g2-sprint-exit.md`.
+- **G3 DELIVERED (2026-06-28):** Counter-scenario comparison (#1349) — distributional headcount differential with T3 CI bands in Zone 1B sticky-bottom panel. PRs: #1395 (QA tests), #1398 (intent+UX/UI mockups), #1407 (implementation), #1412 (table name fix + Zone 1B scroll contract restore). All merged to sprint/m18-g3. Sprint exit gate not yet run — integration pending.
+- **G1 pending (2026-06-28):** CI bands (#1254) — PR #1404 merged to sprint/m18-g1. Integration PR #1411 open with auto-merge set (playwright-e2e in progress). QA tests (`test_m18_g1_ci_bands.py`, `m18-g1-ci-bands.spec.ts`) are untracked locally — PR to sprint/m18-g1 required before sprint exit.
+- **sprint-branch-ci-gate Ruleset:** Node ID `RRS_lACqUmVwb3NpdG9yec5IKi2kzgEV92A`. Requires `changes`, `lint`, `test-backend`, `compliance-scan`. Workaround for direct push: temporarily clear rules via GraphQL `updateRepositoryRuleset`, push, restore.
 - **M17 archive:** Full M1–M17 session state at `docs/process/session-archives/session-state-pre-m18.md`.
