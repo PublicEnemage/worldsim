@@ -1,21 +1,23 @@
 # User Journeys — WorldSim Frontend
 
-> Last significant revision: 2026-06-02
-> Updated against: Issue #576 (public advocacy journeys — Personas 6, 7, 8, 4V); personas.md extended by PR #592
-> Previous version context: 2026-05-22 — ADR-008 accepted; five formal user personas; four journeys A–D
+> Last significant revision: 2026-06-27
+> Updated against: GD Artifact 7 (#1361) — Journey C M18 scope alignment (ADR-019 full delivery,
+> all 4 steps in scope); GA-02 sequenced with M18 partial note; Journey dependency map updated.
+> Previous: 2026-06-02 — Issue #576 (public advocacy journeys — Personas 6, 7, 8, 4V).
 
 > Owned by the UX Designer Agent. Documents the primary user journeys for
 > the canonical user defined in `docs/ux/north-star.md`. These journeys are
 > the reference for information hierarchy decisions and for evaluating whether
 > a proposed UI change supports or obstructs the user's task.
 >
-> Last updated: 2026-06-27 (GA-02 retired on principle — Path 2 proprietary data
-> upload conflicts with open-source-as-strategy governance constraint; not a
-> sequencing decision; exception required to revisit. ADR-019 UX-7 corrected
-> accordingly. Journey C M18 acceptance criteria added, dependency map updated
-> per ADR-019 decisions — PR #1391. Previous: 2026-06-16 — GA-01/GA-02 gap
-> markers added to Journey A Steps 1–2; 2026-05-21 — EL Decisions 1/2/3;
-> Journey A Step 3 separated; Journey B/C/D updates; closes #365).
+> Last updated: 2026-06-27 (GA-02 retired on principle — Path 2 proprietary
+> data upload conflicts with open-source-as-strategy governance constraint; not a
+> sequencing decision; exception required to revisit. ADR-019 UX-7 and Known
+> Limitations corrected; UX Designer sign-off filed — PR #1393. Artifact 7 #1361
+> — Journey C Steps 1–4 M18 acceptance criteria added; dependency map Journey C
+> rows updated to reference ADR-019 — PR #1391. Previous: 2026-06-16 — GA-01/GA-02
+> gap markers added to Journey A Steps 1–2; 2026-05-21 — EL Decisions 1/2/3;
+> Journey B/C/D updates; closes #365).
 
 ---
 
@@ -157,6 +159,14 @@ no mechanism to supply ministry-owned or non-public initial state values.*
 > undermine this at the scenario level. Implementing Path 2 would require
 > a governance exception (CLAUDE.md §Governance). The architecture design
 > below is retained as institutional memory only.
+>
+> This gap is NOT resolved or partially addressed by the M18 control plane
+> column design package (#1354). `Mode2ColumnSurface` (ADR-019 §D-2) provides
+> scenario identity context (name, entity, calibration vintage, horizon) in a
+> read-only orientation surface — this is independently motivated and is not a
+> GA-02 resolution. The adjacent Mode 2 parameter-access concern (fiscal
+> multiplier not editable from within the cluster in Mode 2) is a separate
+> EL Decision 1 scope boundary, not a GA-02 sub-item.
 
 Even when an entity is available (preloaded or pulled via Path 1 above),
 the starting conditions for every indicator are drawn exclusively from the
@@ -552,6 +562,13 @@ step, severity, and cohort. One of three outcomes:
 
 ## Journey C: Active Control — Real-Time Steering (Mode 3)
 
+> **M18 scope (Artifact 7, #1361, 2026-06-27):** All four Journey C steps are
+> delivered in M18 G4 per ADR-019 (EL Decision 6 — all 7 shock types in G4).
+> No steps are deferred post-M18. Acceptance criteria for each step are annotated
+> below, tied to ADR-019 decisions. The ADR is `Proposed` pending independent UX
+> Designer sign-off (separate EL-triggered session, NM-042). G4 implementation
+> begins on ADR-019 `Accepted`.
+
 **Context:** Eleni Papadimitriou, Deputy Director, Hellenic Ministry of Finance.
 February 2012. The Troika has circulated the second memorandum conditionality
 package overnight. She has spent the previous three hours in Mode 2 building her
@@ -561,7 +578,8 @@ wage cut term.
 
 **Entry state:** Application open. The "Counter_Feb2012_ModA" scenario is loaded
 and complete (SCENARIO_COMPLETE, 6 steps computed). The instrument cluster is
-visible at step 6. She switches to Mode 3.
+visible at step 6. Mode 2 column shows `Mode2ColumnSurface` — scenario identity
+block read-only + "Enter Active Control" button (M18 delivery, ADR-019 §D-2).
 
 *Precondition for Mode 3:* A completed baseline scenario must exist before the
 first control input is applied. Journey A is the prerequisite for Journey C.
@@ -572,17 +590,27 @@ first control input is applied. Journey A is the prerequisite for Journey C.
 
 **Step 1 — Switch to Mode 3**
 
-She taps "MODE 3 — ACTIVE CONTROL" in the mode indicator in the primary viewport
-header. The control plane zone (reserved in the primary viewport) populates with
-the policy instruments form and the scenario shocks form. The trajectory view
-remains visible — it now shows the "Counter_Feb2012_ModA" trajectory as the
-baseline (single trajectory set, no ghost curves yet — observation mode).
+She clicks "Enter Active Control" in the `Mode2ColumnSurface` panel (column 3 of
+the instrument cluster). The control plane column transitions from the read-only
+`Mode2ColumnSurface` to the interactive `ControlPlaneColumn` — Form 1 (policy
+instruments, blue `#0284c7`) and Form 2 (scenario shocks, orange `#ea580c`) are
+now visible. The trajectory view remains visible — it now shows the
+"Counter_Feb2012_ModA" trajectory as the baseline (single trajectory set, no ghost
+curves yet — observation mode).
 
 *Information need:* The mode switch must not navigate away from the instrument
 cluster. The control plane zone must be visible alongside the trajectory view
-without scroll. The mode indicator must confirm she is in Mode 3.
+without scroll. Both Form 1 and Form 2 headers must be visible without scroll at
+1280×800. The column must confirm she is in active control mode.
 
 *Critical constraint:* Mode switch must complete in under 3 seconds.
+
+> *M18 acceptance criteria (ADR-019):*
+> - `Mode2ColumnSurface` renders in Mode 2 column 3; `data-testid="enter-active-control-btn"` present (§D-2)
+> - On click, `ControlPlaneColumn` mounts (lazy mount — §D-1, Issue #1217)
+> - Both Form 1 header ("POLICY INSTRUMENTS") and Form 2 header ("SCENARIO SHOCKS") visible without scroll at 1280×800 (§D-3)
+> - Mode switch completes ≤ 3 seconds; trajectory view remains uninterrupted
+> - AC-014 extended: both form headers at 1280×800 asserted in Playwright
 
 ---
 
@@ -591,13 +619,15 @@ without scroll. The mode indicator must confirm she is in Mode 3.
 The Troika proposes: minimum wage cut applied at step 1 instead of step 2
 (the 12-month delay she had built into her counter-proposal is removed).
 
-She selects the policy input type, enters the modified parameter, selects
-step 1, and clicks "Apply policy input."
+She selects `FiscalMultiplier` from the Form 1 policy input type selector,
+enters the modified parameter value, selects step 1 from the "Apply at step"
+selector, and clicks "Apply policy input."
 
 The instrument cluster updates: the baseline curves are preserved as ghost
 curves (50% opacity). The active trajectory recalculates to reflect the
 earlier minimum wage cut. The divergence fill region appears between the
-ghost and active curves where they separate.
+ghost and active curves where they separate. The applied input appears in
+the policy inputs history list below Form 1.
 
 *Information need:* The live A/B comparison must be legible immediately
 after the control input computes. She must see: (a) where the active
@@ -607,6 +637,13 @@ must show "Caused by: minimum wage cut applied at step 1."
 
 *Critical constraint:* Control input propagation must complete in under 10
 seconds. The divergence fill must appear immediately on computation complete.
+
+> *M18 acceptance criteria (ADR-019):*
+> - Form 1 type selector (`data-testid="policy-input-type-selector"`) shows `FiscalMultiplier` and `LegitimacyConstraint` (§D-3)
+> - `POST /scenarios/{id}/branch` extended with `legitimacy_index: float | None` (§D-4)
+> - Applied input appears in `data-testid="policy-inputs-history"` (§D-3)
+> - Live A/B divergence fill visible ≤ 10 seconds after button click, without any additional navigation
+> - Ghost curves (50% opacity) and active curves (100%, 2px) simultaneously visible in trajectory view
 
 ---
 
@@ -632,22 +669,41 @@ expanding. The causal attribution must be specific enough to cite verbatim.
 The ghost baseline curves must confirm that the counter-proposal baseline does
 not cross the same threshold.
 
+> *M18 acceptance criteria (ADR-019):*
+> - Blue policy inflection marker (`#0284c7`) visible at step 1 in TrajectoryView (Artifact 4 Dimension 5 Layer B)
+> - MDA alert causal attribution shows "Caused by: [policy input]" in blue text when `cause_type = "policy"` (Artifact 4 Dimension 5 Layer D, §D-5 backend extension)
+> - Alert text readable at 1024×768 tablet viewport without drawer interaction
+> - Ghost baseline curves confirm counter-proposal baseline does not cross the same threshold at the same step
+
 ---
 
 **Step 4 — Inject a scenario shock to test the Troika's rebuttal**
 
 The Troika argues: "Even without the delay, the GDP rebound in year 2 will
 protect the bottom quintile." She tests this claim by injecting a positive GDP
-shock at step 2.
+growth shock at step 2.
 
-She uses the scenario shocks form: selects step 2, selects shock type, clicks
-"Inject scenario shock." The orange vertical marker appears across all curves
-at step 2. The active trajectory updates.
+She uses the Form 2 scenario shocks section: selects `GrowthShock` from the
+shock type selector, sets `growth_rate_delta` to match the Troika's rebound
+projection, sets `distribution_asymmetry` to reflect upper-cohort growth skew,
+selects step 2, and clicks "Inject scenario shock." The orange vertical marker
+appears across all curves at step 2. The active trajectory updates.
 
 *Information need:* The policy input marker (blue) at step 1 and the shock
 marker (orange) at step 2 must be visually distinct. The alert panel must update
 to show whether the GDP shock changes the threshold crossing result. If the
-crossing persists after the GDP shock, her argument is reinforced.
+crossing persists after the GDP shock, her argument is reinforced: the GDP
+rebound does not protect the bottom quintile under the conditionality structure.
+
+> *M18 acceptance criteria (ADR-019):*
+> - Form 2 shock type selector shows all 7 types including `GrowthShock` (§D-6, EL Decision 6)
+> - `GrowthShock` parameters: `growth_rate_delta`, `duration_steps`, `distribution_asymmetry` shown in form (§D-6)
+> - `POST /scenarios/{id}/inject-shock` endpoint accepts `ShockInjectRequest` (§D-5); dispatched via `SHOCK_REGISTRY` → `GrowthShockHandler` (§D-7, §D-8)
+> - `TrajectoryStep.shock_events` populated at `inject_at_step`; orange `<ReferenceLine>` rendered in TrajectoryView (§D-9)
+> - Injected shock appears in `data-testid="shock-events-history"` (§D-3)
+> - Blue marker (step 1) and orange marker (step 2) visually distinct simultaneously
+> - Alert panel shows shock-caused attribution in orange (`#ea580c`) when `cause_type = "shock"`
+> - AC-015: GrowthShock injection with `growth_rate_delta = -0.03` produces GDP composite score divergence > 0.005 at step+1 vs. pre-shock trajectory
 
 ---
 
@@ -1365,10 +1421,11 @@ Phase 3 inputs for the DIC architectural review.
 | B — Negotiation Step 2 | Mode 3 | SCENARIO_PRELOADED | Instrument cluster (instant load) | currentStep ?? fallback |
 | B — Negotiation Step 3 | Mode 3 | DRAWER_DATA | MDA alert panel | ADR-006 Decision 5 alert_source |
 | B — Negotiation Step 4 | Mode 3 | DRAWER_DATA | ia1_disclosure text | ADR-006 Decision 13 canonical phrase |
-| B — Negotiation Step 5 | Mode 3 | MODE_3_ACTIVE | Control plane + live A/B trajectory | EL Decision 3 Gap 4 |
-| C — Active Control Step 2 | Mode 3 | MODE_3_ACTIVE | Trajectory view live A/B | EL Decision 3 Gap 4 |
-| C — Active Control Step 3 | Mode 3 | MODE_3_ACTIVE | MDA alert panel (causal attribution) | Gap 3 blue/orange system |
-| C — Active Control Step 4 | Mode 3 | MODE_3_ACTIVE | Shock marker on trajectory view | Gap 3 orange vertical marker |
+| B — Negotiation Step 5 | Mode 3 | MODE_3_ACTIVE | Control plane + live A/B trajectory | ADR-019 D-1, D-3 |
+| C — Active Control Step 1 | Mode 2→3 | MODE_3_ACTIVE | Mode2ColumnSurface → ControlPlaneColumn (lazy mount) | ADR-019 D-1, D-2 |
+| C — Active Control Step 2 | Mode 3 | MODE_3_ACTIVE | Trajectory view live A/B + policy inputs history | ADR-019 D-3, D-4 |
+| C — Active Control Step 3 | Mode 3 | MODE_3_ACTIVE | MDA alert panel (causal attribution, blue) | ADR-019 D-3; Dimension 5 Layer B/D |
+| C — Active Control Step 4 | Mode 3 | MODE_3_ACTIVE | Shock form + orange trajectory marker + alert update | ADR-019 D-5, D-6, D-7, D-8, D-9 |
 | D — Demonstrative Step 1 | Mode 1 | SCENARIO_PRELOADED | Trajectory view + step axis annotation | Gap 1B fixture fields |
 | D — Demonstrative Step 2 | Mode 1 | SCENARIO_PRELOADED | MDA alert panel | ADR-006 Decision 5 alert_source |
 | D — Demonstrative Step 3 | Mode 1 | SCENARIO_PRELOADED | PMM widget (historical label) | Gap 5 mode-specific labels |

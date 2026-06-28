@@ -51,7 +51,7 @@ Mode, Asymmetry Assessment, North Star Test, Mission Impact Statement.
 
 `Accepted` — UX Designer sign-off filed 2026-06-27 (separate EL-triggered session,
 NM-042 compliant). GA-02 UX-7 correction applied in same PR as sign-off (PR #1393);
-no unresolved concerns. EL acceptance required on merge.
+no unresolved concerns. EL acceptance on merge of PR #1393.
 
 ---
 
