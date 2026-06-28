@@ -35,7 +35,7 @@ from collections.abc import Callable
 from datetime import datetime  # noqa: TCH003
 from decimal import Decimal
 from math import floor
-from typing import Annotated, Any, cast
+from typing import Annotated, Any, TypeAlias, cast
 
 import asyncpg  # noqa: TCH002 — used in Annotated[] resolved at runtime by FastAPI
 from fastapi import APIRouter, Depends, HTTPException, Response
@@ -1935,7 +1935,7 @@ def _parse_entity_attrs(
 # ---------------------------------------------------------------------------
 
 # Callable signature: (entity_indicators, all_entity_attrs, framework, context) → Decimal | None
-type CompositeStrategy = Callable[
+CompositeStrategy: TypeAlias = Callable[  # noqa: UP040
     [dict[str, QuantitySchema], dict[str, dict[str, QuantitySchema]], str, dict[str, Any]],
     Decimal | None,
 ]
@@ -2413,6 +2413,23 @@ async def get_measurement_output(
             note = _SINGLE_ENTITY_NOTE
         else:
             note = None
+        # M18-G2 (#1255): inject psp_dominant_driver from programme_survival_update metadata.
+        if fw == "political_economy" and "programme_survival_probability" in indicators:
+            _raw = snap_row["events_snapshot"]
+            if _raw is not None:
+                _evts = json.loads(_raw) if isinstance(_raw, str) else list(_raw)
+                _psp_driver: str | None = None
+                for _evt in _evts:
+                    if (
+                        isinstance(_evt, dict)
+                        and _evt.get("event_type") == "programme_survival_update"
+                        and _evt.get("entity_id") == entity_id
+                    ):
+                        _psp_driver = (_evt.get("metadata") or {}).get("psp_dominant_driver")
+                        break
+                indicators["programme_survival_probability"] = indicators[
+                    "programme_survival_probability"
+                ].model_copy(update={"psp_dominant_driver": _psp_driver})
         # M16-G8 Option A: cumulative cohort threshold crossings for HD framework.
         # Detect cohort groups (Q1/Q2) whose poverty_headcount_ratio remains below
         # the MDA floor at this step. De-duplicated by (quintile, sector) using the

@@ -202,6 +202,7 @@ class PoliticalEconomyModule(SimulationModule):
         # ------------------------------------------------------------------
         if has_legitimacy or prior_events:
             survival_prob = _compute_survival_probability(new_legitimacy)
+            psp_dominant_driver = _attribute_dominant_driver(prior_events, new_legitimacy)
             result.append(Event(
                 event_id=f"poliecon-survival-{entity.id}-{timestep.isoformat()}",
                 source_entity_id=entity.id,
@@ -225,6 +226,7 @@ class PoliticalEconomyModule(SimulationModule):
                         "Formula-calibrated estimate (Tier 3). Calibrated on Greece, "
                         "Argentina, Ecuador programme failure cases. Not a prediction."
                     ),
+                    "psp_dominant_driver": psp_dominant_driver,
                 },
             ))
 
@@ -389,6 +391,43 @@ def _compute_legitimacy_delta(
             delta -= EMERGENCY_EROSION_FACTOR * fragility
 
     return delta
+
+
+def _attribute_dominant_driver(
+    prior_events: list[Event],
+    current_legitimacy: Decimal,
+) -> str | None:
+    """Return the dominant driver category of PSP change at this step."""
+    fragility = FRAGILITY_AMPLIFIER if current_legitimacy < FRAGILITY_THRESHOLD else Decimal("1")
+    contributions: dict[str, Decimal] = {
+        "governance": Decimal("0"),
+        "fiscal_sustainability": Decimal("0"),
+        "external_balance": Decimal("0"),
+    }
+    for evt in prior_events:
+        if evt.event_type == "fiscal_policy_spending_change":
+            magnitude = _extract_magnitude(evt)
+            if magnitude is not None and magnitude < 0:
+                elast = LEGITIMACY_EROSION_ELASTICITY
+                contributions["fiscal_sustainability"] += abs(magnitude) * elast * fragility
+        elif evt.event_type == "fiscal_policy_tax_rate_change":
+            magnitude = _extract_magnitude(evt)
+            if magnitude is not None and magnitude > 0:
+                elast = LEGITIMACY_EROSION_ELASTICITY
+                contributions["fiscal_sustainability"] += magnitude * elast * fragility
+        elif evt.event_type.startswith("emergency_policy_"):
+            contributions["governance"] += EMERGENCY_EROSION_FACTOR * fragility
+        elif evt.event_type == "gdp_growth_change":
+            magnitude = _extract_magnitude(evt)
+            if magnitude is not None:
+                contributions["external_balance"] += abs(magnitude) * LEGITIMACY_EROSION_ELASTICITY
+    total = sum(contributions.values())
+    if total == Decimal("0"):
+        if current_legitimacy < FRAGILITY_THRESHOLD:
+            return "social_stability"
+        return None
+    priority = ["governance", "fiscal_sustainability", "external_balance"]
+    return max(priority, key=lambda cat: (contributions[cat], -priority.index(cat)))
 
 
 def _compute_survival_probability(legitimacy: Decimal) -> Decimal:
