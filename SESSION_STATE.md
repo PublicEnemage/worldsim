@@ -6,7 +6,7 @@
 > Historical state lives in `docs/process/session-archives/`.
 > Authority: `docs/process/sprint-group-isolation.md §SESSION_STATE.md Cockpit Card Protocol`.
 
-**Last updated:** 2026-06-28 (G4 CLOSED — integration PR #1433 MERGED to release/m18; sprint exit doc filed; Demo 7 unblocked)
+**Last updated:** 2026-06-28 (G5 ACTIVE — Wave 3 capacity-allowing; #1422 implementation complete PR #1439 merged to sprint/m18-g5; #1238 CLOSED; #1059 CLOSED; sprint journal #1435 open)
 **Current milestone:** M18 — Full Argument and Demo 7 (GitHub Milestone 19)
 
 ---
@@ -20,9 +20,9 @@
 | Exit checklist issue | #1340 |
 | Release branch | ✅ `release/m18` — cut 2026-06-26 at commit 151904d |
 | Sprint plan | ✅ EL-approved 2026-06-26 — `docs/process/sprint-plans/m18-sprint-plan.md` (PR #1364) |
-| Active wave | G1 CLOSED (PR #1411); G2 CLOSED (PR #1408); G3 CLOSED (PR #1417); G4 CLOSED (PR #1433) — Wave 2 complete; all M18 sprint groups closed |
-| Active sprint groups | None — all G1–G4 groups closed |
-| Active sprint journal issues | None — #1402 closed (G4 exit confirmed) |
+| Active wave | G1 CLOSED (PR #1411); G2 CLOSED (PR #1408); G3 CLOSED (PR #1417); G4 CLOSED (PR #1433) — Wave 2 complete; **Wave 3 active: G5** |
+| Active sprint groups | **G5** — `sprint/m18-g5` (Wave 3 capacity-allowing; Zone 3 auditability #1422; implementation merged PR #1439; exit gate pending) |
+| Active sprint journal issues | **#1435** (G5 sprint journal — open) |
 
 ---
 
@@ -59,10 +59,10 @@ None open. ADR-019 Accepted (PR #1393, 2026-06-27). GA-02 / Path 2 retired on op
 | #1352 | Requirements phase for #1349 — UX journeys, Customer Agent, BPO requirements | ✅ GR CLOSED 2026-06-26 (PR #1375) |
 | #1354 | Control Plane Column Design Package — Mode 2 + Mode 3 (7 artifacts #1355–#1361) | ✅ GD CLOSED 2026-06-27 (PRs #1386–#1393); ADR-019 Accepted |
 | #1256 | Path 2 / proprietary data integration | ✅ CLOSED 2026-06-27 — retired on open-source-as-strategy principle; exception required to reopen |
-| #1422 | Zone 3 auditability panel for DistributionalComparisonSummary (US-1349-D) | Capacity-allowing — #1349 CA condition |
+| #1422 | Zone 3 auditability panel for DistributionalComparisonSummary (US-1349-D) | **G5 — implementation merged PR #1439 (2026-06-28); exit gate pending** |
 | #1217 | Mode 3 render optimization (EX-001 expired) | ✅ CLOSED 2026-06-28 — delivered in G4 (lazy-mount + Recharts memoization, PR #1424); EX-001 closed Won't Fix (MV-002 PASS) |
-| #1238 | DEMO6-009 TTS narration fix | Capacity-allowing |
-| #1059 | HCL narration integration | Capacity-allowing |
+| #1238 | DEMO6-009 TTS narration fix | ✅ CLOSED 2026-06-28 — fix already in commit 6e8f618 (G8b); no code change required |
+| #1059 | HCL narration integration | ✅ CLOSED 2026-06-28 — superseded by G5 scope decision |
 
 ---
 
@@ -81,4 +81,6 @@ None open. ADR-019 Accepted (PR #1393, 2026-06-27). GA-02 / Path 2 retired on op
 - **sprint-branch-ci-gate Ruleset:** Node ID `RRS_lACqUmVwb3NpdG9yec5IKi2kzgEV92A`. Requires `changes`, `lint`, `test-backend`, `compliance-scan`. Workaround for direct push: temporarily clear rules via GraphQL `updateRepositoryRuleset`, push, restore.
 - **NM-076 (2026-06-28):** G4 testid renames (ADR-019 D-3: apply-control-change → apply-policy-input, fiscal-multiplier-slider → policy-param-slider) not crosschecked against E2E corpus before PR #1424; 3 tests merged broken to sprint/m18-g4. sprint-branch-ci-gate does not require playwright-e2e, so auto-merge fired. Fixed by PR #1426. Process improvement: testid rename rule to be added to CODING_STANDARDS.md.
 - **G4 CLOSED (2026-06-28):** Control plane column (Mode2ColumnSurface + ControlPlaneColumn + Form 1 + Form 2 + 7 shocks) + render optimization (#1217) + backend inject-shock endpoint — PRs #1418/#1421/#1424/#1426/#1429/#1432 merged to sprint/m18-g4. EX-001 closed Won't Fix — MV-002 67.40/85.50/64.40ms ≤ 100ms; AC-009 test.fixme removed. BPO full ACCEPT (#1402#issuecomment-4827376554). CA L3 PASS Persona 2+5. Sprint exit doc filed (`m18-g4-sprint-exit.md`). Integration PR #1433 MERGED to release/m18. Demo 7 scheduling unblocked — all G1–G4 groups closed.
+- **G5 ACTIVE (2026-06-28):** Wave 3 capacity-allowing sprint group. Sprint entry EL-approved PR #1436. Intent doc PR #1437. QA tests PR #1438. Implementation (#1422 Zone 3 auditability panel — MethodologyDetail backend + frontend expand/collapse toggle) merged PR #1439 to sprint/m18-g5. Pending: G5 exit gate (BPO ACCEPT + CA L3 Persona 1 + PI Agent confirmation + integration PR sprint/m18-g5 → release/m18).
+- **NM-076 CODING_STANDARDS.md rule (2026-06-28):** Testid rename crosscheck rule added in PR #1439 — before any testid rename, grep the full E2E corpus for the old testid; if found, update E2E tests in same PR.
 - **M17 archive:** Full M1–M17 session state at `docs/process/session-archives/session-state-pre-m18.md`.
