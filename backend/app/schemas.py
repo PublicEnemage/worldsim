@@ -75,12 +75,12 @@ class MDAFloorRecord(BaseModel):
 class TrajectoryFrameworkPoint(BaseModel):
     """Per-framework composite score for one trajectory step.
 
-    ci_lower, ci_upper, ci_coverage, and is_pre_calibration are always null
-    pending ADR-007. composite_score is Decimal-as-string or null.
+    composite_score is Decimal-as-string or null.
     scoring_basis disambiguates null sources:
       - "normalized_absolute" — single-entity financial/HD; null when no normalizable indicators
       - "percentile_rank"     — multi-entity financial/HD, or governance (always null)
       - "boundary_proximity"  — ecological only
+    ci_lower/ci_upper are Decimal-as-string 80% CI bounds via BandingEngine (M18-G1 #1254).
     """
 
     model_config = ConfigDict(from_attributes=True)
@@ -89,10 +89,10 @@ class TrajectoryFrameworkPoint(BaseModel):
     composite_score: str | None
     scoring_basis: str
     confidence_tier: int
-    ci_lower: None = None
-    ci_upper: None = None
-    ci_coverage: None = None
-    is_pre_calibration: None = None
+    ci_lower: str | None = None
+    ci_upper: str | None = None
+    ci_coverage: float | None = None
+    is_pre_calibration: bool | None = None
 
 
 class PMMRecord(BaseModel):
