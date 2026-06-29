@@ -455,24 +455,22 @@ test.describe("AC-4: Zone 1A Y axis label 'Score' visible", () => {
 
     await expect(trajectoryContainer).toBeVisible();
 
-    // Locate the Y axis label SVG text element within the recharts YAxis group.
+    // Wait for the trajectory to load and recharts to render the chart with the Score label.
+    // toContainText polls (unlike isVisible which is a snapshot), so this handles the async
+    // trajectory fetch that fires after the scenario is selected from the URL param.
+    // NM-045: direct string-presence match.
+    await expect(trajectoryContainer).toContainText("Score", { timeout: 10_000 });
+
+    // Attempt to confirm the recharts-label class is present and well-formed.
     // recharts renders <text class="recharts-label"> for axis labels.
     const yAxisLabel = trajectoryContainer
       .locator("text.recharts-label")
       .filter({ hasText: "Score" })
       .first();
 
-    const hasLabel = await yAxisLabel.isVisible({ timeout: 3_000 }).catch(() => false);
+    const hasLabel = await yAxisLabel.isVisible().catch(() => false);
 
-    if (!hasLabel) {
-      // Pre-implementation fallback: check for "Score" anywhere in the container text
-      // The recharts label may not have the recharts-label class in all versions.
-      const containerText = await trajectoryContainer.textContent() ?? "";
-      // NM-045: direct string-presence match
-      expect(containerText).toContain("Score");
-    } else {
-      await expect(yAxisLabel).toBeVisible();
-
+    if (hasLabel) {
       // Confirm bounding box height > 0 (not hidden by CSS)
       const box = await yAxisLabel.boundingBox();
       expect(box).not.toBeNull();
