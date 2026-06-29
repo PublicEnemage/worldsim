@@ -197,24 +197,25 @@ widget), Zone 1D (four-framework + PSP severity + driver label), plus control pl
 ### Step 1 — Frame A: "The Instrument" (Act 1, Mode 3 Active, Form 1 Applied) (THESIS FRAME)
 
 **What the audience sees:** Senegal. Mode 3 active. `ControlPlaneColumn` visible on the right
-side of the instrument cluster. Form 1: FiscalMultiplier slider positioned at a non-default
-value (e.g., 0.8). Zone 1A showing two sets of trajectories: the baseline (original programme
-terms) and the counter-trajectory branch (FiscalMultiplier = 0.8) — both visible simultaneously
-without scrolling. CI bands present on both trajectory sets (reduced opacity 5% in Mode 3).
-The branch anchor label visible in the column.
+side of the instrument cluster. Form 1: FiscalMultiplier slider positioned at **0.85**
+(Step 5d confirmed: fm=0.85 = 15% multiplier reduction ≈ 1.5pp primary surplus target reduction).
+Zone 1A showing two sets of trajectories: the baseline (original programme terms) and the
+counter-trajectory branch (FiscalMultiplier = 0.85, branch from step 3) — both visible
+simultaneously without scrolling. CI bands present on both trajectory sets (reduced opacity 5%
+in Mode 3). The branch anchor label visible in the column.
 
 **What the presenter says:**
 
 > Senegal. Year one of the programme. Mode 3 — Active Control.
 >
 > Look at the right column. That is Form 1 of the control plane: FiscalMultiplier. The slider
-> is at 0.8. The "Apply policy instrument" button was pressed thirty seconds ago.
+> is at 0.85. The "Apply policy instrument" button was pressed thirty seconds ago.
 >
 > Now look at Zone 1A — the primary trajectory surface.
 >
 > Two sets of curves. The lighter set is the baseline — the IMF's proposed terms, fiscal
-> multiplier at the value embedded in the programme design. The bolder set is the branch:
-> what the trajectories show under the ministry's alternative multiplier assumption.
+> multiplier at 1.0. The bolder set is the branch: what the trajectories show under the
+> ministry's counter-proposal at 0.85 — fifteen percent below the programme baseline.
 >
 > These two trajectory sets are visible simultaneously. We have not opened a drawer. We have
 > not navigated to a separate comparison view. We pressed Apply and Zone 1A updated — with the
@@ -707,12 +708,22 @@ epistemic honesty is working. Do not proactively volunteer unless a direct quest
   with every parameter value and intermediate calculation. Full reproducibility is via the
   open-source codebase.
 
-- **ExternalSectorModule reserve depletion invariant (Step 3 mandatory disclosure — applies
-  if SEN scenario uses ExternalSectorModule in Mode 3):**
-  > *Reserve depletion is identical in the baseline and the Mode 3 branch. Better conditionality
-  > terms improve GDP and unemployment trajectories. They do not change the entity's structural
-  > import dependency during the external shock. State this explicitly when presenting the
-  > Mode 3 comparison — the reserve crisis is survived under better conditions, not avoided.*
+- **ExternalSectorModule is disabled for Act 1.** Reserve dynamics are not modeled in the
+  Senegal Mode 3 scenario. Reserve path is identical in baseline and branch — no reserve
+  indicator appears on screen. State explicitly if asked: *"Reserve dynamics are outside
+  this model window for Act 1 — ExternalSectorModule is not active."*
+
+- **Trajectory design disclosure (Step 5d finding).** The Senegal simulation is seeded with
+  Natural Earth geographic classification data (population, GDP stock, economic tier).
+  Growth dynamics, fiscal transmission, and cohort welfare trajectories are represented by
+  calibrated scenario design — the values accepted at G4 sprint exit (fm=0.85,
+  BRANCH_FROM_STEP=3). The trajectories are the *designed* representation of what fiscal
+  transmission would produce if IMF WEO macroeconomic data were loaded. The CI bands (T3,
+  5% opacity) reflect genuine epistemic uncertainty from the data environment. The
+  simulation's qualitative argument — that a 15% multiplier reduction improves HD outcomes
+  while maintaining fiscal safety — is consistent with the MacroeconomicModule's causal logic
+  (net multiplier 0.68, within SSA LIC consensus range 0.5–0.9, Ilzetzki et al. 2013).
+  SEN and ZMB backtesting are future milestone scope.
 
 - **This tool is not for financial advantage or surveillance.** The canonical user is a
   finance ministry counterpart in a negotiation. The tool does not assist in executing

@@ -8,10 +8,9 @@
 > Act 2 — Zambia debt restructuring, three-scenario distributional comparison
 > (DistributionalComparisonSummary Zone 1B sticky-bottom).
 >
-> **Step 5d dependency:** Frame A step number and FiscalMultiplier value are
-> TBD — to be confirmed by the two-agent panel (Development Economist + Chief
-> Methodologist) per `docs/demo/m18/reviews/scenario-evaluation-mode3-deliberation.md`.
-> All other frame specifications are final.
+> **Step 5d: COMPLETE** — Frame A values confirmed by two-agent panel (Development Economist
+> + Chief Methodologist). See `docs/demo/m18/reviews/scenario-evaluation-mode3-recommendation.md`.
+> All five frame specifications are now final. Screenshots (Step 6) are unblocked.
 >
 > **Architecture changes from M16 Demo 6:**
 > - **Two-act demo:** Act 1 Senegal (Mode 3 active control) + Act 2 Zambia
@@ -57,7 +56,7 @@ time as the control input.
 
 ## Five Frames
 
-### Frame A — "The Instrument" ← THESIS FRAME (Act 1, Senegal, Mode 3, Step TBD)
+### Frame A — "The Instrument" ← THESIS FRAME (Act 1, Senegal, Mode 3, BRANCH_FROM_STEP=3, fm=0.85)
 
 **What Zone 1 + control column shows:** Senegal at the step identified by the Step 5d panel
 as showing maximum baseline/branch divergence (expected: step 3–4). Mode 3 active.
@@ -89,15 +88,18 @@ visible alongside MDA alert panel. Zone 1D: PSP severity badge + `psp-driver-row
 instrument per UX-RULING-4. May be partially visible at the left; does not need to be the
 compositional focus.
 
-**Caption:** Senegal, Mode 3 active. FiscalMultiplier: [Step 5d value]. Zone 1A shows the
-baseline trajectory and the counter-trajectory branch simultaneously. CI bands on both — no
-scroll required to hold the control input and its consequence in the same view.
+**Caption:** Senegal, Mode 3 active. FiscalMultiplier: **0.85** (branching from step 3).
+Zone 1A shows the baseline trajectory and the counter-trajectory branch simultaneously.
+CI bands on both at 5% opacity — no scroll required to hold the control input and its
+consequence in the same view.
 
-**UI state:** Mode 3 active. Form 1 applied (branch exists). Both trajectories visible in
-Zone 1A at the same time. Control column visible at right. No drawer open.
+**UI state:** Mode 3 active. Form 1 applied: FiscalMultiplier=0.85, branch_from_step=3.
+Both trajectories visible in Zone 1A at the same time. Control column visible at right.
+No drawer open.
 
-**Step 5d gate:** Confirm step number and FiscalMultiplier value from the deliberation file
-before capture. Caption "[Step 5d value]" is a placeholder.
+**Step 5d gate: COMPLETE.** Configuration confirmed by DE + CM panel 2026-06-28.
+Maximum divergence step: 8 (HD +0.020, Financial +0.040). PSP driver: "fiscal_sustainability".
+MDA outcome: CLEAR in both trajectories (floor 0.40, baseline HD 0.450 at step 6).
 
 ---
 
