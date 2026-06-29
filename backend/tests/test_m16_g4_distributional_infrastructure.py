@@ -88,12 +88,10 @@ from dataclasses import dataclass
 from decimal import Decimal
 from typing import TYPE_CHECKING, Any
 
-import httpx
 import pytest
-import pytest_asyncio
 
 if TYPE_CHECKING:
-    from collections.abc import AsyncGenerator
+    import httpx
 
 _DATABASE_URL = os.environ.get("DATABASE_URL", "")
 
@@ -179,17 +177,6 @@ def _zmb_8_step_payload(extra_config: dict[str, Any] | None = None) -> dict[str,
 # Async HTTP client fixture for integration tests
 # ---------------------------------------------------------------------------
 
-@pytest_asyncio.fixture()
-async def client() -> AsyncGenerator[httpx.AsyncClient, None]:
-    _require_db()
-    from app.main import app  # type: ignore[import]
-
-    async with httpx.AsyncClient(
-        transport=httpx.ASGITransport(app=app),
-        base_url="http://test",
-        timeout=120.0,
-    ) as ac:
-        yield ac
 
 
 # ===========================================================================

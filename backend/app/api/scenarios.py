@@ -2875,16 +2875,16 @@ async def post_distributional_differential(
     snapshots_by_scenario: dict[str, dict[int, dict[str, Any]]] = {}
     for sid in scenario_ids:
         rows = await conn.fetch(
-            "SELECT step_index, state FROM scenario_state_snapshots"
-            " WHERE scenario_id = $1 ORDER BY step_index",
+            "SELECT step, state_data FROM scenario_state_snapshots"
+            " WHERE scenario_id = $1 ORDER BY step",
             sid,
         )
         if not rows:
             raise HTTPException(status_code=404, detail=f"No snapshots for scenario {sid!r}.")
         step_states: dict[int, dict[str, Any]] = {}
         for row in rows:
-            raw = row["state"]
-            step_states[row["step_index"]] = raw if isinstance(raw, dict) else json.loads(raw)
+            raw = row["state_data"]
+            step_states[row["step"]] = raw if isinstance(raw, dict) else json.loads(raw)
         snapshots_by_scenario[sid] = step_states
 
     shared_steps = sorted(
@@ -2927,11 +2927,11 @@ async def post_distributional_differential(
         ci_methodology=(
             f"±13–16% of point estimate — T3 placeholder "
             f"pending ADR-007 full CI band integration. "
-            f"Lower bound factor: {_CI_FACTOR_LOWER}; "
-            f"upper bound factor: {_CI_FACTOR_UPPER}."
+            f"Lower bound: ×{_CI_FACTOR_LOWER} (−13%); "
+            f"upper bound: ×{_CI_FACTOR_UPPER} (+16%)."
         ),
         extraction_path=(
-            "Q1 CHT cohort mean (entities matching '<entity_id>:CHT:1-*'); "
+            f"Q1 CHT cohort mean (entities matching '{entity_id}:CHT:1-*'); "
             "falls back to main entity poverty_headcount_ratio if no cohort data present."
         ),
         tier_rationale=(

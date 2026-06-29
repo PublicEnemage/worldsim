@@ -17,14 +17,10 @@ from __future__ import annotations
 import os
 from typing import TYPE_CHECKING
 
-import httpx
 import pytest
-import pytest_asyncio
 
 if TYPE_CHECKING:
-    from collections.abc import AsyncGenerator
-
-from app.main import app
+    import httpx
 
 _DATABASE_URL = os.environ.get("DATABASE_URL", "")
 
@@ -40,19 +36,6 @@ def _require_db() -> None:
 # Client fixture
 # ---------------------------------------------------------------------------
 
-@pytest_asyncio.fixture()
-async def client() -> AsyncGenerator[httpx.AsyncClient, None]:
-    """httpx AsyncClient with ASGITransport pointing at the FastAPI app.
-
-    Requires DATABASE_URL. The lifespan context manager initialises the
-    asyncpg pool on startup and closes it on teardown.
-    """
-    _require_db()
-    async with httpx.AsyncClient(
-        transport=httpx.ASGITransport(app=app),
-        base_url="http://test",
-    ) as ac:
-        yield ac
 
 
 # ---------------------------------------------------------------------------

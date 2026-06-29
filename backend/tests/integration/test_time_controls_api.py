@@ -18,6 +18,8 @@ import pytest
 if TYPE_CHECKING:
     from collections.abc import AsyncGenerator
 
+    from httpx import AsyncClient
+
 DATABASE_URL = os.environ.get("DATABASE_URL")
 pytestmark = pytest.mark.integration
 
@@ -26,9 +28,6 @@ if not DATABASE_URL:
 
 
 import asyncpg  # noqa: E402
-from httpx import AsyncClient  # noqa: E402
-
-from app.main import app  # noqa: E402
 
 _CFG = (
     '{"entities": [], "n_steps": 1, '
@@ -42,11 +41,6 @@ async def db_conn() -> AsyncGenerator[asyncpg.Connection, None]:
     yield conn
     await conn.close()
 
-
-@pytest.fixture()
-async def client() -> AsyncGenerator[AsyncClient, None]:
-    async with AsyncClient(app=app, base_url="http://test") as c:
-        yield c
 
 
 # ---------------------------------------------------------------------------
