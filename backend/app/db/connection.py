@@ -87,8 +87,11 @@ async def create_asyncpg_pool() -> None:
 
     Called once at FastAPI application startup (lifespan context manager).
     Raises RuntimeError if DATABASE_URL is not set.
+    Idempotent: no-op if the pool is already initialised (safe for test fixtures).
     """
     global _asyncpg_pool  # noqa: PLW0603 — module-level pool singleton
+    if _asyncpg_pool is not None:
+        return
     if not _DATABASE_URL:
         raise RuntimeError(
             "DATABASE_URL environment variable is not set. "

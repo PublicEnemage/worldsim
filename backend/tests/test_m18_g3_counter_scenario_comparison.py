@@ -58,12 +58,10 @@ import os
 import pathlib
 from typing import TYPE_CHECKING, Any
 
-import httpx
 import pytest
-import pytest_asyncio
 
 if TYPE_CHECKING:
-    from collections.abc import AsyncGenerator
+    import httpx
 
 # ---------------------------------------------------------------------------
 # Constants
@@ -127,17 +125,6 @@ def _zmb_scenario_payload(name: str, n_steps: int = _N_STEPS) -> dict[str, Any]:
 # ---------------------------------------------------------------------------
 
 
-@pytest_asyncio.fixture()
-async def client() -> AsyncGenerator[httpx.AsyncClient, None]:
-    _require_db()
-    from app.main import app  # type: ignore[import]
-
-    async with httpx.AsyncClient(
-        transport=httpx.ASGITransport(app=app),
-        base_url="http://test",
-        timeout=180.0,
-    ) as ac:
-        yield ac
 
 
 # ---------------------------------------------------------------------------
@@ -194,6 +181,8 @@ class TestAC1349GDistributionalDifferentialEndpoint:
       A vs C: +340,000 persons (terminal step 8)
       B vs C: +210,000 persons (terminal step 8)
     """
+
+    pytestmark = pytest.mark.asyncio
 
     async def test_endpoint_returns_http_200_with_three_scenarios(
         self, client: httpx.AsyncClient
