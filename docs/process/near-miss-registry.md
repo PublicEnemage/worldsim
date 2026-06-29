@@ -3969,6 +3969,50 @@ Manual check of `gh pr view 1428 --json headRefName,baseRefName` immediately aft
 
 ---
 
+## NM-078 — Milestone Test Files in `tests/` Root Never Discovered by CI; 17 Files Silently Excluded Across M14–M18 (Reactive)
+
+**Date:** 2026-06-28
+**Milestone:** M18 — Full Argument and Demo 7
+**Detected by:** Post-failure investigation after narrated Demo 7 spec Guard 2 fired — `distributional-comparison-summary` not visible; API logs revealed `UndefinedColumnError: column "step_index" does not exist`
+**Severity:** High — the `distributional-differential` endpoint was non-functional across G3–G6 (three sprint groups and two integration PRs); Demo 7 would have presented fallback screenshots without live distributional data at external session #843
+
+### What happened
+
+The G3 implementation PR (`0407529`) introduced `POST /scenarios/comparison/distributional-differential` with a SQL query using invented column names: `SELECT step_index, state FROM scenario_snapshots`. A G3 follow-up fix commit (`61fe8b8`) corrected the table name (`scenario_snapshots` → `scenario_state_snapshots`) after CI caught an `UndefinedTableError`. The column names (`step_index`, `state`) were left unchanged — the actual columns are `step` and `state_data`. After the table-name fix, CI went green and the endpoint shipped through G4 and G5 integration PRs.
+
+The reason the column-name error was not caught: the G3 acceptance test (`test_m18_g3_counter_scenario_comparison.py`) correctly marks the test module `pytestmark = pytest.mark.integration` but lives at `backend/tests/test_m18_g3_counter_scenario_comparison.py` — in the root of `tests/`, not in `tests/integration/`. CI runs `pytest tests/unit` and `pytest tests/integration` by directory path. Directory-based discovery never reaches files in `tests/` root. The G3 test has never executed in CI.
+
+Scope of silent exclusion: 17 milestone-specific test files from `test_m14_g3_*` through `test_m18_g4_*` are all in `backend/tests/` root and all excluded from CI by the same structural mismatch.
+
+The endpoint was live and broken across G3, G4, and G5 (three sprint groups). The error was not discovered until the Demo 7 narrated spec ran the full two-act walkthrough and the `compSummary.isVisible({ timeout: 20_000 })` guard fired.
+
+### What was at risk
+
+Demo 7 Act 2 depends on `DistributionalComparisonSummary` rendering the headcount differential ("+340K persons") — the primary analytical output of the Zambia three-scenario comparison. With the endpoint returning 500 on every call, the component never rendered. If the narrated spec had not been run before the live external session (#843), Demo 7 Act 2 would have presented a blank Zone 1B to a real stakeholder audience, with no distributional finding visible.
+
+Additionally: 17 test files worth of acceptance criteria have never been CI-validated. Any endpoint or component covered exclusively by those files could be broken without CI detection.
+
+### What caught it
+
+The `console.warn` in the narrated spec's Guard 2 block, followed by manual investigation of Docker API logs revealing the `UndefinedColumnError` traceback. No CI mechanism caught it — the detection was a narrated spec guard plus manual log inspection, not a test suite.
+
+### Process improvement
+
+**Immediate (Issue #1451):** Change CI from directory-based to marker-based integration test discovery:
+```yaml
+# Before:
+pytest tests/integration -v || [ $? -eq 5 ]
+# After:
+pytest tests/ -m integration -v || [ $? -eq 5 ]
+```
+This discovers all files with `pytestmark = pytest.mark.integration` regardless of location, including the 17 existing milestone files. Implemented via `infra/m18-ci-integration-test-discovery` PR targeting `release/m18`.
+
+**Schema gate reinforcement:** The `step_index`/`state` names were invented without consulting `docs/schema/database.yml`. The mandatory schema read rule (CLAUDE.md: "Writing SQL or reading JSONB → read `docs/schema/database.yml` first") was not followed at G3 implementation time. The rule exists; the process gap is that no checklist item at PR authorship time prompts a schema-read confirmation. Adding a schema-read self-attestation to the PR description template would create an artifact trail.
+
+**Near-miss lineage:** The pattern class (test file placed in wrong directory, silently excluded from CI, acceptance criterion not validated) is a new variant of NM-027/NM-028/NM-047/NM-058 (no-op guard patterns). Those entries address guards that execute but produce no signal. This entry addresses tests that never execute at all. The common root: a test exists but its signal never reaches the CI gate that protects the branch. See NM-068 (prior NM process improvements not verified at sprint entry) — the lesson from NM-027/NM-028/NM-047/NM-058 should have prompted a review of test discovery coverage.
+
+---
+
 ## NM-NNN — [Short descriptive title]
 
 **Date:** YYYY-MM-DD (or approximate milestone era)
