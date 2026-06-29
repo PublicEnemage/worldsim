@@ -706,6 +706,16 @@ test(
     await page.goto(`/?scenario=${encodeURIComponent(senId)}`);
     await waitForAppReady(page);
 
+    // SEN scenario is in_progress at BRANCH_FROM_STEP — App.tsx only sets currentStep
+    // for completed scenarios, so currentStep stays null → 0, blocking trajectory fetch.
+    // Inject the current step via the DEV-only seam to match the backend state.
+    await page.evaluate((step: number) => {
+      const fn = (window as Record<string, unknown>).__worldsim_setCurrentStep as
+        | ((s: number) => void)
+        | undefined;
+      if (fn) fn(step);
+    }, BRANCH_FROM_STEP);
+
     // Zone 1A should show the mocked baseline trajectory on load.
     await expect(
       page.locator('[data-testid="zone-1a-trajectory-container"]'),
@@ -755,14 +765,14 @@ test(
         .or(page.locator('[data-testid="fiscal-multiplier-slider"]').first());
 
       if (await slider.count() > 0) {
-        await slider.evaluate((el: HTMLInputElement) => {
+        await slider.evaluate((el: HTMLInputElement, value: string) => {
           const setter = Object.getOwnPropertyDescriptor(
             window.HTMLInputElement.prototype,
             "value",
           )!.set!;
-          setter.call(el, String(FISCAL_MULTIPLIER_ACT1));
+          setter.call(el, value);
           el.dispatchEvent(new Event("input", { bubbles: true }));
-        });
+        }, String(FISCAL_MULTIPLIER_ACT1));
       }
 
       // Confirm branch anchor label shows the branch step
