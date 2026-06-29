@@ -722,19 +722,19 @@ test(
       "The ministry's analyst is about to enter active control.",
     );
 
-    // Wait for Mode 2 column surface — G4 prerequisite
-    const mode2Surface = page.locator('[data-testid="mode2-column-surface"]');
-    const mode2Available = await mode2Surface.isVisible({ timeout: 8_000 }).catch(() => false);
+    // Enter Mode 3 via the header toggle.
+    // SEN scenario has no fiscal_multiplier config → mode stays MODE_1, so
+    // mode2-column-surface never renders. mode3-toggle in the App.tsx header
+    // directly activates MODE_3 (sets mode3Active=true), which renders ControlPlaneColumn.
+    const mode3ToggleBtn = page.locator('[data-testid="mode3-toggle"]');
+    const toggleAvailable = await mode3ToggleBtn.isVisible({ timeout: 5_000 }).catch(() => false);
 
-    if (!mode2Available) {
-      console.warn("mode2-column-surface not visible — G4 ControlPlaneColumn may not be implemented. Skipping Act 1 Mode 3 interaction.");
+    if (!toggleAvailable) {
+      console.warn("mode3-toggle not visible — skipping Act 1 Mode 3 interaction.");
     } else {
-      // Transition to Mode 3
-      const enterBtn = page.locator('[data-testid="enter-active-control-btn"]');
-      await expect(enterBtn).toBeVisible();
-      await enterBtn.click();
+      await mode3ToggleBtn.click();
 
-      // Form 1 must appear immediately (AC-G4-B)
+      // Form 1 must appear immediately (AC-G4-B) — ControlPlaneColumn rendered in MODE_3
       const form1 = page.locator('[data-testid="control-plane-form1"]');
       await expect(form1).toBeVisible({ timeout: 5_000 });
 

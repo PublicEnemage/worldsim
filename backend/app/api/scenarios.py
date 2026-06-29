@@ -2875,16 +2875,16 @@ async def post_distributional_differential(
     snapshots_by_scenario: dict[str, dict[int, dict[str, Any]]] = {}
     for sid in scenario_ids:
         rows = await conn.fetch(
-            "SELECT step_index, state FROM scenario_state_snapshots"
-            " WHERE scenario_id = $1 ORDER BY step_index",
+            "SELECT step, state_data FROM scenario_state_snapshots"
+            " WHERE scenario_id = $1 ORDER BY step",
             sid,
         )
         if not rows:
             raise HTTPException(status_code=404, detail=f"No snapshots for scenario {sid!r}.")
         step_states: dict[int, dict[str, Any]] = {}
         for row in rows:
-            raw = row["state"]
-            step_states[row["step_index"]] = raw if isinstance(raw, dict) else json.loads(raw)
+            raw = row["state_data"]
+            step_states[row["step"]] = raw if isinstance(raw, dict) else json.loads(raw)
         snapshots_by_scenario[sid] = step_states
 
     shared_steps = sorted(
