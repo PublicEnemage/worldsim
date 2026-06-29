@@ -205,6 +205,10 @@ export default function App() {
     (window as unknown as Record<string, unknown>).__worldsim_setComparisonScenarios = (
       configs: ScenarioComparisonConfig[],
     ) => setComparisonScenarios(configs);
+    // M18-G6 — allow narrated spec to initialize currentStep for in_progress scenarios
+    // (URL-loaded scenarios with status != "completed" stay at currentStep=null → 0).
+    (window as unknown as Record<string, unknown>).__worldsim_setCurrentStep = (step: number) =>
+      setCurrentStep(step);
   }, [setSelectedEntityId, setAttributeName]);
 
   // When a scenario is selected: fast-forward currentStep if already completed,
