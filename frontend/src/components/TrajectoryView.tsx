@@ -137,7 +137,9 @@ function computeEntityCompositeScore(step: TrajectoryStep): number | null {
 
 /** Worst (highest-number) confidence tier across all frameworks at a step. */
 function getEntityWorstTier(step: TrajectoryStep): number {
-  const tiers = Object.values(step.frameworks).map((fw) => fw.confidence_tier);
+  const tiers = Object.values(step.frameworks)
+    .map((fw) => fw.confidence_tier)
+    .filter((t): t is number => typeof t === "number" && !isNaN(t));
   if (tiers.length === 0) return 3;
   return Math.max(...tiers);
 }
@@ -412,7 +414,7 @@ function CompositeChartSVG({
         const s = computeEntityCompositeScore(step);
         if (s !== null) values.push(s);
         const { upper } = computeCompositeCIBounds(step);
-        if (upper !== null) values.push(upper);
+        if (upper !== null && !isNaN(upper)) values.push(upper);
       }
       const floor = getEntityMdaFloor(traj.mda_floors);
       if (floor !== null) values.push(floor);
@@ -423,7 +425,7 @@ function CompositeChartSVG({
         const s = computeEntityCompositeScore(step);
         if (s !== null) values.push(s);
         const { upper } = computeCompositeCIBounds(step);
-        if (upper !== null) values.push(upper);
+        if (upper !== null && !isNaN(upper)) values.push(upper);
       }
       const floor = getEntityMdaFloor(sc.trajectory.mda_floors);
       if (floor !== null) values.push(floor);

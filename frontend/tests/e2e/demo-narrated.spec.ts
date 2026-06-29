@@ -176,6 +176,10 @@ function makeAct1BaselineMock(scenarioId: string): object {
         {
           framework: "human_development",
           composite_score: String(0.44 + i * 0.002),
+          confidence_tier: 3,
+          ci_lower: null,
+          ci_upper: null,
+          scoring_basis: "percentile_rank",
           indicators: {},
           mda_alerts: [],
           has_below_floor_indicator: false,
@@ -184,6 +188,10 @@ function makeAct1BaselineMock(scenarioId: string): object {
         {
           framework: "financial",
           composite_score: String(0.51 - i * 0.003),
+          confidence_tier: 3,
+          ci_lower: null,
+          ci_upper: null,
+          scoring_basis: "percentile_rank",
           indicators: {},
           mda_alerts: [],
           has_below_floor_indicator: false,
@@ -192,6 +200,10 @@ function makeAct1BaselineMock(scenarioId: string): object {
         {
           framework: "political_economy",
           composite_score: "0.58",
+          confidence_tier: 3,
+          ci_lower: null,
+          ci_upper: null,
+          scoring_basis: "percentile_rank",
           indicators: {
             programme_survival_probability: {
               value: "0.58",
@@ -207,6 +219,10 @@ function makeAct1BaselineMock(scenarioId: string): object {
         {
           framework: "ecological",
           composite_score: null,
+          confidence_tier: 3,
+          ci_lower: null,
+          ci_upper: null,
+          scoring_basis: "percentile_rank",
           indicators: {},
           mda_alerts: [],
           has_below_floor_indicator: false,
@@ -215,6 +231,10 @@ function makeAct1BaselineMock(scenarioId: string): object {
         {
           framework: "governance",
           composite_score: "0.55",
+          confidence_tier: 3,
+          ci_lower: null,
+          ci_upper: null,
+          scoring_basis: "percentile_rank",
           indicators: {},
           mda_alerts: [],
           has_below_floor_indicator: false,
@@ -245,6 +265,10 @@ function makeAct1BranchMock(): object {
             composite_score: String(isBranched
               ? 0.44 + i * 0.002 + 0.02  // +0.02 HD uplift from step 3 (fm=0.85)
               : 0.44 + i * 0.002),
+            confidence_tier: 3,
+            ci_lower: null,
+            ci_upper: null,
+            scoring_basis: "percentile_rank",
             indicators: {},
             mda_alerts: [],
             has_below_floor_indicator: false,
@@ -255,6 +279,10 @@ function makeAct1BranchMock(): object {
             composite_score: String(isBranched
               ? 0.51 - i * 0.003 + 0.04  // +0.04 financial uplift from step 3
               : 0.51 - i * 0.003),
+            confidence_tier: 3,
+            ci_lower: null,
+            ci_upper: null,
+            scoring_basis: "percentile_rank",
             indicators: {},
             mda_alerts: [],
             has_below_floor_indicator: false,
@@ -263,6 +291,10 @@ function makeAct1BranchMock(): object {
           {
             framework: "political_economy",
             composite_score: "0.58",
+            confidence_tier: 3,
+            ci_lower: null,
+            ci_upper: null,
+            scoring_basis: "percentile_rank",
             indicators: {
               programme_survival_probability: {
                 value: "0.58",
@@ -278,6 +310,10 @@ function makeAct1BranchMock(): object {
           {
             framework: "ecological",
             composite_score: null,
+            confidence_tier: 3,
+            ci_lower: null,
+            ci_upper: null,
+            scoring_basis: "percentile_rank",
             indicators: {},
             mda_alerts: [],
             has_below_floor_indicator: false,
@@ -286,6 +322,10 @@ function makeAct1BranchMock(): object {
           {
             framework: "governance",
             composite_score: "0.55",
+            confidence_tier: 3,
+            ci_lower: null,
+            ci_upper: null,
+            scoring_basis: "percentile_rank",
             indicators: {},
             mda_alerts: [],
             has_below_floor_indicator: false,
@@ -865,19 +905,7 @@ test(
 
     // ── ACT 2: Zambia — Three-Scenario Distributional Comparison ─────────────
 
-    await speak(
-      "Act two. Zambia. " +
-      "The same negotiating context — but the ministry team now has three scenarios loaded simultaneously. " +
-      "Option A: the IMF Extended Fund Facility, front-loaded consolidation. " +
-      "Option B: EFF gradual — the same programme terms at a slower pace. " +
-      "Option C: the Homegrown Programme, the ministry's counter-proposal. " +
-      "All three visible in Zone one A. " +
-      "The question is not which scenario is correct. " +
-      "The question is: what is the precise headcount differential between Option A and the counter-proposal? " +
-      "Not an assertion. A number.",
-    );
-
-    // Navigate to ZMB Option C (reference — last in comparison array convention)
+    // Navigate to ZMB Option C before narrating so Zone 1A is live during speech.
     await page.goto(`/?scenario=${encodeURIComponent(zmbCId)}`);
     await waitForAppReady(page);
     await expect(
@@ -902,12 +930,32 @@ test(
       { ids: { a: zmbAId, b: zmbBId, c: zmbCId } },
     );
 
+    await speak(
+      "Act two. Zambia. " +
+      "The same negotiating context — but the ministry team now has three scenarios loaded simultaneously. " +
+      "Option A: the IMF Extended Fund Facility, front-loaded consolidation. " +
+      "Option B: EFF gradual — the same programme terms at a slower pace. " +
+      "Option C: the Homegrown Programme, the ministry's counter-proposal.",
+    );
+
     if (!injected) {
       console.warn("__worldsim_setComparisonScenarios not available — M17-G2 N=3 comparison not implemented. Skipping Act 2.");
     } else {
-      // Wait for distributional comparison summary to render
+      // Wait for comparison curves to render in Zone 1A before narrating they're visible.
+      await page.waitForSelector('[data-testid^="zone1a-curve-scenario-"]', { timeout: 15_000 }).catch(() => {});
+
+      await speak(
+        "All three visible in Zone one A. " +
+        "The question is not which scenario is correct. " +
+        "The question is: what is the precise headcount differential between Option A and the counter-proposal? " +
+        "Not an assertion. A number.",
+      );
+
+      // Wait for distributional comparison summary to render.
+      // isVisible() returns immediately (no polling) — use waitFor to poll until
+      // the element appears after the async distributional-differential API call.
       const compSummary = page.locator('[data-testid="distributional-comparison-summary"]');
-      const summaryVisible = await compSummary.isVisible({ timeout: 20_000 }).catch(() => false);
+      const summaryVisible = await compSummary.waitFor({ state: 'visible', timeout: 20_000 }).then(() => true).catch(() => false);
 
       if (summaryVisible) {
         await speak(
