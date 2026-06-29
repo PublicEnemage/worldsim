@@ -2927,11 +2927,11 @@ async def post_distributional_differential(
         ci_methodology=(
             f"±13–16% of point estimate — T3 placeholder "
             f"pending ADR-007 full CI band integration. "
-            f"Lower bound factor: {_CI_FACTOR_LOWER}; "
-            f"upper bound factor: {_CI_FACTOR_UPPER}."
+            f"Lower bound: ×{_CI_FACTOR_LOWER} (−13%); "
+            f"upper bound: ×{_CI_FACTOR_UPPER} (+16%)."
         ),
         extraction_path=(
-            "Q1 CHT cohort mean (entities matching '<entity_id>:CHT:1-*'); "
+            f"Q1 CHT cohort mean (entities matching '{entity_id}:CHT:1-*'); "
             "falls back to main entity poverty_headcount_ratio if no cohort data present."
         ),
         tier_rationale=(
