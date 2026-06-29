@@ -84,16 +84,19 @@ test("Mode 3 — enable, apply control change, recompute completes", async ({ pa
   // Verify display updated.
   await expect(page.locator('[data-testid="fiscal-multiplier-value"]')).toContainText("1.50");
 
-  // Click Apply — triggers branch creation and advance loop.
+  // Click Apply — G4: branch created in "pending" state; recompute triggers on next advance.
   await page.locator('[data-testid="apply-policy-input"]').click();
 
-  // Recompute badge should appear while computing.
+  // Badge appears in pending state (G4 behavior: user advances each step manually).
   await expect(page.locator('[data-testid="recompute-badge"]')).toBeVisible({
     timeout: 5_000,
   });
-  await expect(page.locator('[data-testid="recompute-badge"]')).toContainText("Recomputing");
+  await expect(page.locator('[data-testid="recompute-badge"]')).toContainText("Recompute pending");
 
-  // Wait for badge to disappear — recompute complete.
+  // Advance step — triggers the branch recompute.
+  await page.getByRole("button", { name: /Next Step/ }).click();
+
+  // Wait for recompute to complete and badge to disappear.
   await expect(page.locator('[data-testid="recompute-badge"]')).not.toBeVisible({
     timeout: 30_000,
   });
