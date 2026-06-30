@@ -937,3 +937,116 @@ The divergence fill renders between the ghost curve and the active branch trajec
 - Ghost curve appears when `branch_scenario_id` is present in the session Zustand atom (set by the branch action in the Mode 3 control plane)
 - Ghost curve disappears when the user resets to baseline (branch scenario deleted, `branch_scenario_id` cleared from atom)
 - No ghost curve in Mode 1 or Mode 2 — branch action is Mode 3 only
+
+---
+
+## Amendment 2 — Zone 1B CohortImpactSection: Monitored-Row State and Temporal Disambiguation
+
+**Date:** 2026-06-29
+**Trigger:** G7 Step 6b root cause analysis (2026-06-29) identified that `CohortImpactSection` renders only breach rows — threshold-cleared focal indicators are invisible (DEMO-134 CRITICAL). Demo 7 Act 1's primary argument is a CLEARED threshold finding ("informal workers poverty headcount remains at 0.450 — ten points above the 0.40 recovery floor"), which was structurally invisible in the current design. DEMO-140 (HIGH) further identified that historical breaches display with the same visual weight as current-step violations, creating a temporal contradiction.
+**Source document:** `docs/demo/m18/reviews/2026-06-29-g7-root-cause-analysis.md §Root Cause 3`
+**Implemented in:** M18 G7 Cluster C — `MDAAlertPanelZone1B.tsx`
+
+### Rationale for Extension of ADR-010 Scope
+
+`CohortImpactSection` is a Zone 1B surface. This amendment extends ADR-010 to cover its state behavior because the monitored-row derivation depends on the **shared step state atom** (Decision 4):
+
+- **CLEAR/BREACHED status** at any row is derived from `current_step` (from shared atom)
+- **Temporal disambiguation** (current breach vs. historical breach) requires comparing `crossing.step_index` against `current_step` — a computation over the shared state
+- **Monitored focal current value** reads from `trajectory` at `current_step` (from shared atom)
+
+These are Zone 1 instrument behaviors rooted in the shared state architecture. ADR-010 is the canonical home for "how Zone 1 instruments derive state from the shared atom" (Decision 4). Placing this in ADR-008 would fragment the state architecture specification across two ADRs.
+
+### What Changes
+
+**New section: CohortImpactSection Monitored-Row State**
+
+#### Monitored Focal Indicators
+
+**Monitored focal indicators** are scenario-designated cohort indicators that render in `CohortImpactSection` at every step regardless of breach status. They represent the focal human cost argument of the scenario — indicators the analyst is tracking even when no threshold crossing has occurred.
+
+**Data source — `scenarios.configuration` JSONB key `monitored_focal_cohorts`:**
+
+```json
+{
+  "monitored_focal_cohorts": [
+    {
+      "indicator_key": "bottom_quintile_informal_workers_poverty_headcount",
+      "floor_value": 0.40,
+      "floor_label": "Recovery floor",
+      "framework": "human_development"
+    }
+  ]
+}
+```
+
+Key `monitored_focal_cohorts` is optional. Absence means no designated focal indicators — `CohortImpactSection` renders breach-only rows from the `crossings` store, unchanged from current behavior.
+
+**Monitored-row states:**
+
+| State | Condition | Badge label | Badge color | Row prefix |
+|---|---|---|---|---|
+| CLEAR | `current_value > floor_value` at `current_step`, no prior breach | CLEAR | Green (#2e7d32) | None |
+| BREACHED (current) | `current_value ≤ floor_value` at `current_step` | CRITICAL | Red (#c62828) | None |
+| PRIOR BREACH, NOW CLEAR | `current_value > floor_value` at `current_step`, but crossed threshold at prior step N | HIST | Amber (#a06000) | "Breached at step N —" |
+
+Each monitored-row displays without expansion:
+- Indicator display name (human-readable, per Zone 2B label standard)
+- Current value (3 decimal places)
+- Floor value
+- Status badge (CLEAR / CRITICAL / HIST)
+- T3 confidence badge when data tier ≥ 3
+
+**Monitored focal rows render first in `CohortImpactSection`**, above breach-only rows from the `crossings` store.
+
+#### Temporal Disambiguation for All Rows
+
+All `CohortImpactSection` rows — including breach-only rows from the `crossings` store — apply temporal disambiguation based on `current_step`:
+
+- **Current-step breach:** `crossing.step_index === current_step` — red CRITICAL badge, no prefix (existing behavior, unchanged)
+- **Historical breach:** `crossing.step_index < current_step` — amber (#a06000) HIST badge, prefix "Breached at step N —"
+- `headerLabel` appends "(including historical)" when any historical-breach rows are present, not only when `isCompleted === true`
+
+#### State Derivation (Shared Step Atom)
+
+All monitored-row and temporal disambiguation state is derived from the shared `ScenarioStepState` (Decision 4):
+
+```typescript
+const currentStep = state.current_step;                                    // shared atom
+const historicalCrossings = crossings.filter(c => c.step_index < currentStep);
+const currentCrossings = crossings.filter(c => c.step_index === currentStep);
+const monitoredRows = monitoredFocalCohorts.map(focal => ({
+  ...focal,
+  currentValue: getValueAtStep(focal.indicator_key, currentStep, state.trajectory),
+  rowState: deriveFocalRowState(focal, currentStep, crossings)
+}));
+```
+
+No new network requests are required. All data derives from the existing shared atom fields (`current_step`, `trajectory`, `crossings`).
+
+### Impact on Other Decisions
+
+ADR-010 Decisions 1–10 (trajectory view component architecture) are unchanged. This amendment adds a new section covering Zone 1B `CohortImpactSection` state behavior insofar as it depends on the shared step state atom (Decision 4). The trajectory view itself (Zone 1A) is unaffected. ADR-008 Decision 5 §MDA Alert Panel Specification is unchanged at the ADR level; this amendment specifies the implementation contract for monitored-row state within the Zone 1B surface.
+
+### Renewal Trigger Assessment
+
+No listed renewal trigger fires. The shared state architecture (single atom, shared across Zone 1 instruments) is unchanged — this amendment extends what is consumed from the atom, not the atom's architecture or sharing contract. Rendering technology, trajectory data contract, confidence tier visual rules, governance null rendering, MDA floor overlay, live A/B comparison visual specification, policy/shock marker visual, and minimum trajectory view width constants are all unchanged.
+
+### Panel Sign-Off
+
+**Architect Agent:** The monitored-row state belongs in ADR-010 because it is a state-derivation behavior rooted in Decision 4 (shared step atom). The data source (JSONB `monitored_focal_cohorts`) is the correct location — it co-locates the designation with the scenario configuration rather than hardcoding it in the component. The temporal disambiguation (red/amber) eliminates the DEMO-140 temporal contradiction without removing historical breach information. The "PRIOR BREACH, NOW CLEAR" state (HIST amber) is a meaningful new communicative state: it tells the analyst the indicator was dangerous and is now safe — a different claim from "CLEAR with no prior breach" and a different claim from "BREACHED."
+
+☑ Architect Agent sign-off — 2026-06-29
+
+**UX Designer Agent sign-off:**
+
+Per EL determination 2026-06-29 (G7-0 root cause analysis sign-off block): **separate-session UX Designer sign-off is required** before Cluster C implementation PR opens. This amendment is gated until that sign-off is obtained. EL must trigger a separate UX Designer session to review the monitored-row state design before this amendment is accepted.
+
+- Reviewing agent: UX Designer Agent
+- Session context: **PENDING** — separate-session EL-triggered review required (EL determination 2026-06-29)
+- Governing documents reviewed: _To be completed in separate session_
+- Concerns found: _To be completed in separate session_
+
+☐ UX Designer sign-off — PENDING
+
+**Engineering Lead acceptance:** Conditional — amendment is not accepted until separate-session UX Designer sign-off is obtained and EL verifies governing document citations per NM-042 requirements. Cluster C implementation may not begin until acceptance.
