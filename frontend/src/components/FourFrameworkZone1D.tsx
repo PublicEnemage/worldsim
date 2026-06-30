@@ -219,7 +219,7 @@ interface FourFrameworkZone1DProps {
   pspDominantDriver?: string | null;
 }
 
-const DRIVER_LABELS: Record<string, string> = {
+export const DRIVER_LABELS: Record<string, string> = {
   fiscal_sustainability: "fiscal sustainability",
   external_balance: "external balance",
   governance: "governance",
@@ -453,13 +453,15 @@ export function FourFrameworkZone1D({
               data-testid={`framework-score-${key}`}
               className={scoreClass}
               style={{
-                fontSize: 13,
+                fontSize: key === "ecological" && isNull && point?.note != null ? 10 : 13,
                 fontWeight: 700,
                 color: isNull ? "#aaa" : color,
                 fontVariantNumeric: "tabular-nums",
               }}
             >
-              {formatScore(score)}
+              {key === "ecological" && isNull && point?.note != null
+                ? "Not modelled"
+                : formatScore(score)}
             </span>
           </div>
         );

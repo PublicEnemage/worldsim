@@ -58,6 +58,10 @@ interface RawFrameworkPoint {
   scoring_basis: "percentile_rank" | "normalized_absolute" | "boundary_proximity";
   /** M18-G7-C — raw indicator values from API; parsed to string | null in parseTrajectoryResponse. */
   indicators?: Record<string, { value: string | null } | null>;
+  /** M18-G7-D — dominant driver of PSP change (political_economy only). */
+  psp_dominant_driver?: string | null;
+  /** M18-G7-D — note from API (e.g. "Ecological disabled for SEN Demo 7 Act 1"). */
+  note?: string | null;
 }
 
 interface RawTrajectoryStep {
@@ -112,6 +116,8 @@ function parseTrajectoryResponse(raw: RawTrajectoryResponse): TrajectoryResponse
               (v as { value?: string | null } | null)?.value ?? null,
             ])
           ),
+          psp_dominant_driver: fw.psp_dominant_driver ?? null,
+          note: fw.note ?? null,
         };
       }
       const pmm =
@@ -443,6 +449,20 @@ export function ScenarioInstrumentCluster({
       store.setPmmState(step.pmm.value, step.pmm.direction);
     } else {
       store.setPmmState(null, null);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- store is a Zustand singleton, stable reference
+  }, [currentStep, store.trajectory]);
+
+  // M18-G7-D: sync pspDominantDriver from trajectory when trajectory or step changes.
+  // Supplements the measurement-output extraction path so the driver renders in
+  // mocked demo sessions where measurement-output is not intercepted.
+  useEffect(() => {
+    const traj = store.trajectory;
+    if (!traj || currentStep === 0) return;
+    const step = traj.steps.find((s) => s.step_index === currentStep);
+    const driverFromTraj = step?.frameworks["political_economy"]?.psp_dominant_driver ?? null;
+    if (driverFromTraj !== null) {
+      setPspDominantDriver(driverFromTraj);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps -- store is a Zustand singleton, stable reference
   }, [currentStep, store.trajectory]);

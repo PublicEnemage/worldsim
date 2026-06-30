@@ -18,6 +18,10 @@ export interface TrajectoryFrameworkPoint {
   scoring_basis: "percentile_rank" | "normalized_absolute";
   /** M18-G7-C — indicator values keyed by indicator_key. Populated by parseTrajectoryResponse. */
   indicators?: Record<string, string | null>;
+  /** M18-G7-D — dominant driver of PSP change at this step (political_economy only). */
+  psp_dominant_driver?: string | null;
+  /** M18-G7-D — note from API (e.g. "Ecological disabled for SEN Demo 7 Act 1"). */
+  note?: string | null;
 }
 
 export interface TrajectoryStep {
