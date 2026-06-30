@@ -4150,6 +4150,49 @@ The nine-agent Step 6b visual review on 2026-06-29. No automated gate — not th
 
 ---
 
+## NM-083 — Demo-Spec ↔ Component-Contract Integration Gap: Seven CRITICAL Step 6b Findings Had No Automated Test Asserting Their Contract
+
+**Date:** 2026-06-29
+**Milestone:** M18 — Full Argument and Demo 7
+**Detected by:** G7-0 root cause analysis cross-cutting pattern synthesis (2026-06-29) — identified after nine-agent Step 6b visual review caught 24 findings
+**Severity:** High — seven CRITICAL findings in the Step 6b review were directly attributable to missing contract-level tests between the demo spec and the components it exercises
+
+### What happened
+
+The G7 Step 6b root cause analysis identified a cross-cutting pattern across all five root causes: `demo-narrated.spec.ts` and the components it exercises lacked contract-level acceptance tests asserting the component's rendering contract, not merely element presence.
+
+- **DEMO-132** (psp-driver-row absent CRITICAL): the mock omitted `psp_dominant_driver` — a field required by `FourFrameworkZone1D.tsx` to render the row. No test asserted that `data-testid="psp-driver-row"` was visible after mock fulfillment.
+- **DEMO-130/135** (Frame A/B identical CRITICAL × 2): the spec captured both frames at the same step. No test asserted that Frame A and Frame B screenshots had different byte content.
+- **DEMO-136** (Frame C wrong step CRITICAL): Frame C was captured at step 6, not step 8 (maximum divergence). No test asserted the branch/baseline delta was nonzero at the captured step.
+- **DEMO-134** (cleared threshold invisible CRITICAL): `CohortImpactSection` had no design for non-breaching focal indicators. No test asserted the monitored focal row was visible at a CLEAR-state step.
+- **DEMO-137** (CI band geometry HIGH): `computeCompositeCIBounds` used a multiplicative formula. No unit test asserted fill path coordinates satisfied `[score ± halfWidth]` bounds.
+- **DEMO-133/131** (DistributionalComparisonSummary below fold CRITICAL × 2): Zone 1B had no minimum height contract. No test asserted the component was fully in-viewport at 1440×900.
+
+The pattern: every CRITICAL finding was a case where a component contract existed (in the ADR, the Step 5d panel guidance, or the component's conditional render guard) but no automated test asserted that contract end-to-end.
+
+### What was at risk
+
+The five-frame demo capture would have produced a broken demo artifact with: byte-identical Frames A/B; psp-driver-row absent in all five frames; `DistributionalComparisonSummary` clipped below Zone 1C; and CI bands filling the chart ceiling. If the Step 6b review had not caught these, the Step 7 IR review and live external stakeholder session (#843) would have received this artifact.
+
+### What caught it
+
+The nine-agent Step 6b visual review on 2026-06-29. No automated gate — not E2E tests, not unit tests, not CI — detected the contract violations before screenshots were captured. This is a process gap: every CRITICAL finding should have been caught by a contract-level test at implementation time, not by a visual review panel at demo preparation time.
+
+### Process improvement
+
+**Immediate (G7 sprint, all clusters):** G7 implements a QA-first gate: for each fix cluster, contract-level acceptance tests are authored and committed to the feature branch before any implementation code. Tests assert specific invariants:
+- `psp-driver-row` visible when mock includes `psp_dominant_driver` (Cluster D)
+- Frame A and Frame B screenshots have different MD5 hashes (Cluster E)
+- `distributional-comparison-summary` is fully in-viewport at 1440×900 (Cluster B)
+- CI fill path upper bound ≤ `score + halfWidth` for all steps (Cluster A)
+- Monitored focal row visible at a CLEAR-state step (Cluster C)
+
+**Structural:** Component implementation must include at least one test asserting the primary rendering contract — not just element presence. For any component with a calculable geometric or layout invariant (fill bounds, viewport visibility, byte-level content distinctness), unit/integration tests must assert the invariant value. This extends the companion lesson from NM-056 (soft-skipping masked a mock bug) and NM-082 (element presence test missed geometry error): tests that verify presence without asserting the contract value cannot catch the most likely failure mode.
+
+Codified in `docs/CODING_STANDARDS.md §Testing Requirements` in the same PR that closes DEMO-137 (Cluster A).
+
+---
+
 ## NM-NNN — [Short descriptive title]
 
 **Date:** YYYY-MM-DD (or approximate milestone era)
