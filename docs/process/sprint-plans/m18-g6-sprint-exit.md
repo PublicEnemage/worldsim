@@ -3,7 +3,7 @@ name: m18-g6-sprint-exit
 type: sprint-exit
 milestone: M18 — Full Argument and Demo 7
 sprint-group: G6 — Demo 7 Preparation (through Step 6b)
-status: In-progress — awaiting PI Agent confirmation
+status: BPO ACCEPT recorded 2026-06-29 — awaiting PI Agent confirmation
 authored-by: PM Agent
 date: 2026-06-29
 pi-confirmed: false
@@ -13,7 +13,7 @@ sop-reference: docs/process/sprint-planning-sop.md §Sprint Exit Gate
 
 # Sprint Exit — M18, G6: Demo 7 Preparation (through Step 6b)
 
-**Status:** In-progress — awaiting PI Agent confirmation
+**Status:** BPO ACCEPT recorded 2026-06-29 (#1475#issuecomment-4839161892) — awaiting PI Agent confirmation
 **Date produced:** 2026-06-29
 **Release branch:** `release/m18`
 **Sprint entry document:** `docs/process/sprint-plans/m18-g6-sprint-entry.md`
@@ -106,7 +106,7 @@ deliverable, triggering G7.*
 | Five frames (screenshots) | Documentation | Step 6b Customer Agent Solo-Use review on record — SOLO-USE NOT PASSED (DEMO-130 through DEMO-145; CRITICAL findings require G7 remediation) | ACCEPT AS CAPTURED ARTIFACTS — the screenshots are the correct output of the current spec; the FAIL verdict identifies what G7 must correct before the demo runs | This exit document §3 |
 | Step 6b internal review | Documentation | Customer Agent is one of the nine review agents — assessment embedded in review artifact | ACCEPT — nine-agent panel correctly constituted and executed; all findings documented; DEMO-130–DEMO-153 assigned; issues #1459–#1474 filed | This exit document §3 |
 
-**Business PO acceptance status:** All ACCEPT (within G6 scope as adjusted).
+**Business PO acceptance status:** All ACCEPT (within G6 scope as adjusted). Formal BPO verdict filed 2026-06-29 — #1475#issuecomment-4839161892. Includes BPO observations: (a) DEMO-146 filename mismatch operationally significant for presenter prep — prioritize in fix cluster E; (b) DEMO-142 \"Policy Malevolent Margin\" jargon should be treated as first fix in any display-layer cluster before G7 recapture; (c) Frame C→D act break transition (DEMO-148) is highest-risk narration gap; (d) north star deferred to G7 accepted.
 
 ### Customer Agent Layer 3 assessment note
 
@@ -170,11 +170,11 @@ is on screen.
 **Exit conditions checklist (PI Agent):**
 
 - [ ] All G6 deliverables merged to `sprint/m18-g6`; CI green (Section 2)
-- [ ] Business PO ACCEPT verdict recorded for all G6 deliverables within adjusted scope (Section 3)
+- [x] Business PO ACCEPT verdict recorded for all G6 deliverables within adjusted scope (Section 3) — #1475#issuecomment-4839161892, 2026-06-29
 - [ ] Customer Agent Layer 3 assessment on record for Persona 2/3/5 deliverables — Step 6b Solo-Use review (Section 3)
 - [ ] No open rejection artifacts (Section 4) — confirmed
 - [ ] North star test deferred to G7 with explicit EL exception recorded (Section 5)
-- [ ] G6 integration PR opened: `sprint/m18-g6` → `release/m18`; auto-merge set
+- [x] G6 integration PR opened and MERGED: PR #1479 `sprint/m18-g6` → `release/m18` — merged 2026-06-29T23:42Z
 - [ ] G7 sprint entry filed and EL-approved before G7 implementation begins
 
 **PI Agent sprint exit verdict:** Pending
