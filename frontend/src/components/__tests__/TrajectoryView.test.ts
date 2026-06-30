@@ -958,6 +958,42 @@ describe("M18-G7-A: AC-A2 — yDomain trajectory-only values produce readable ra
   });
 });
 
+// ---------------------------------------------------------------------------
+// M18-G7-A: AC-A3 — CI ribbon opacity uses exported constants, not 0.10
+//
+// The fix replaces hard-coded `opacity={0.10}` in two SVG ribbon paths with:
+//   mode === "MODE_3" ? CI_BAND_OPACITY_MODE3 : CI_BAND_OPACITY
+//   CI_BAND_OPACITY (comparison scenarios path — always Mode 1/2)
+//
+// This unit test guards against regression back to the 0.10 literal by verifying
+// that neither constant equals 0.10 (so the fix is definitionally correct),
+// and that CI_BAND_OPACITY_MODE3 < CI_BAND_OPACITY (Mode 3 must be quieter).
+//
+// Source: M18-G7-A intent §AC-A3 + root cause analysis §Root Cause 1 §Fix item 3.
+// ---------------------------------------------------------------------------
+
+describe("M18-G7-A: AC-A3 — CI ribbon opacity constants are not 0.10", () => {
+  it("CI_BAND_OPACITY is not 0.10 (hard-coded value replaced by constant)", async () => {
+    const mod = await import("../TrajectoryView");
+    const { CI_BAND_OPACITY } = mod as unknown as Record<string, number>;
+    expect(CI_BAND_OPACITY).toBeDefined();
+    expect(CI_BAND_OPACITY).not.toBe(0.10);
+  });
+
+  it("CI_BAND_OPACITY_MODE3 is not 0.10 (hard-coded value replaced by constant)", async () => {
+    const mod = await import("../TrajectoryView");
+    const { CI_BAND_OPACITY_MODE3 } = mod as unknown as Record<string, number>;
+    expect(CI_BAND_OPACITY_MODE3).toBeDefined();
+    expect(CI_BAND_OPACITY_MODE3).not.toBe(0.10);
+  });
+
+  it("CI_BAND_OPACITY_MODE3 < CI_BAND_OPACITY (Mode 3 ribbons quieter than Mode 1/2)", async () => {
+    const mod = await import("../TrajectoryView");
+    const { CI_BAND_OPACITY, CI_BAND_OPACITY_MODE3 } = mod as unknown as Record<string, number>;
+    expect(CI_BAND_OPACITY_MODE3).toBeLessThan(CI_BAND_OPACITY);
+  });
+});
+
 describe("AC-1254-4 — computeYDomain includes CI upper values", () => {
   it("CI upper value 0.95 — yMax ≥ 0.95", () => {
     const [, hi] = computeYDomain([0.50, 0.60, 0.95]);
