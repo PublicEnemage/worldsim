@@ -152,7 +152,7 @@ export function InstrumentCluster({
             </div>
           )}
           {/* Sub-zone A — MDA alert panel; permanent 80px floor (ADR-018) */}
-          <div data-testid="mda-alert-list" style={{ flex: "1 1 80px", minHeight: 80, overflow: "hidden" }}>
+          <div data-testid="zone-1b-mda-panel-wrapper" style={{ flex: "1 1 80px", minHeight: 80, overflow: "hidden" }}>
             {mdaPanel ?? (
               <div style={{ color: "#bbb", fontSize: 12, padding: 8 }}>
                 MDA Alert Panel (Zone 1B)

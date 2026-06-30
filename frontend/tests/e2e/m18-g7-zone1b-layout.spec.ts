@@ -247,6 +247,31 @@ test("AC-B1: distributional-comparison-summary in viewport at 1440×900 in compa
   await page.route(`**/api/v1/scenarios/${cmpId}/trajectory**`, (route) =>
     route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(cmpMock) }),
   );
+  // M18-G7-B hotfix: mock distributional-differential so DistributionalComparisonSummary renders
+  // regardless of whether the backend has cohort data for these test scenarios.
+  await page.route("**/api/v1/scenarios/comparison/distributional-differential**", (route) =>
+    route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({
+        entity_id: "ZMB",
+        reference_scenario_id: cmpId,
+        terminal_step: 3,
+        tier: "T3",
+        methodology_summary: "Q1 headcount differential (mock)",
+        pairs: [
+          {
+            scenario_id: cmpId,
+            steps: [
+              { step: 1, headcount_differential: -5000, ci_lower: -8000, ci_upper: -2000, direction_stable: true },
+              { step: 2, headcount_differential: -8000, ci_lower: -12000, ci_upper: -4000, direction_stable: true },
+              { step: 3, headcount_differential: -12000, ci_lower: -16000, ci_upper: -8000, direction_stable: true },
+            ],
+          },
+        ],
+      }),
+    }),
+  );
 
   await page.goto(`/?scenario=${refId}`);
   await waitForAppReady(page);
@@ -385,7 +410,7 @@ test("AC-B2: distributional-comparison-summary renders BEFORE mda-alert-list in 
   await page.waitForTimeout(2_000);
 
   const summary = page.locator('[data-testid="distributional-comparison-summary"]');
-  const alertList = page.locator('[data-testid="mda-alert-list"]');
+  const alertList = page.locator('[data-testid="zone-1b-mda-panel-wrapper"]');
 
   const summaryVisible = await summary.isVisible({ timeout: 5_000 }).catch(() => false);
   const alertListVisible = await alertList.isVisible({ timeout: 5_000 }).catch(() => false);
@@ -398,7 +423,7 @@ test("AC-B2: distributional-comparison-summary renders BEFORE mda-alert-list in 
   // compareDocumentPosition: DOCUMENT_POSITION_FOLLOWING = 4 means summary appears before alerts
   const position = await page.evaluate(() => {
     const s = document.querySelector('[data-testid="distributional-comparison-summary"]');
-    const a = document.querySelector('[data-testid="mda-alert-list"]');
+    const a = document.querySelector('[data-testid="zone-1b-mda-panel-wrapper"]');
     if (!s || !a) return null;
     return s.compareDocumentPosition(a);
   });
@@ -461,8 +486,8 @@ test("AC-B3: single-scenario — mda-alert-list first, distributional-comparison
     "See ADR-008 Amendment 2 §Zone 1B DOM ordering — regression guard.",
   ).toBe(false);
 
-  // mda-alert-list should be visible (alerts-first ordering preserved)
-  const alertListPresent = await page.locator('[data-testid="mda-alert-list"]').isVisible({ timeout: 3_000 }).catch(() => false);
+  // zone-1b-mda-panel-wrapper should be visible (alerts-first ordering preserved)
+  const alertListPresent = await page.locator('[data-testid="zone-1b-mda-panel-wrapper"]').isVisible({ timeout: 3_000 }).catch(() => false);
   if (alertListPresent) {
     // In single-scenario, alert-list must appear at the top of Zone 1B
     // (distributional-comparison-summary is absent, so no reordering needed)
@@ -585,10 +610,19 @@ test("AC-B5: psp-value visible at 1440×900 (not clipped by governance disclosur
   await waitForAppReady(page);
   await page.waitForTimeout(2_000);
 
+  // Advance one step so measurement-output fires and psp-value renders.
+  // At step 0 the measurement-output fetch is skipped (early return).
+  const advBtn = page.locator('[data-testid="advance-step-btn"]');
+  const advVisible = await advBtn.isVisible({ timeout: 3_000 }).catch(() => false);
+  if (advVisible) {
+    await advBtn.click();
+    await page.waitForTimeout(2_000);
+  }
+
   const pspValue = page.locator('[data-testid="psp-value"]')
     .or(page.locator('[data-testid="psp-probability-value"]'))
     .first();
-  const pspVisible = await pspValue.isVisible({ timeout: 3_000 }).catch(() => false);
+  const pspVisible = await pspValue.isVisible({ timeout: 5_000 }).catch(() => false);
 
   if (!pspVisible) {
     console.warn("AC-B5: psp-value element not visible — may be hidden by governance disclosure. Noting as expected RED state.");
