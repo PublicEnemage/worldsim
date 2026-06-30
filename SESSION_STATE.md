@@ -6,7 +6,7 @@
 > Historical state lives in `docs/process/session-archives/`.
 > Authority: `docs/process/sprint-group-isolation.md §SESSION_STATE.md Cockpit Card Protocol`.
 
-**Last updated:** 2026-06-29 (G6 Step 6b internal review FAIL — 7 CRITICAL, 9 HIGH; issues #1459–#1474 filed; Step 7 gate blocked pending CRITICAL resolution)
+**Last updated:** 2026-06-29 (G7 ACTIVE — sprint/m18-g7 cut; journal #1495 opened; awaiting Step G7-0 root cause analysis)
 **Current milestone:** M18 — Full Argument and Demo 7 (GitHub Milestone 19)
 
 ---
@@ -20,9 +20,9 @@
 | Exit checklist issue | #1340 |
 | Release branch | ✅ `release/m18` — cut 2026-06-26 at commit 151904d |
 | Sprint plan | ✅ EL-approved 2026-06-26 — `docs/process/sprint-plans/m18-sprint-plan.md` (PR #1364) |
-| Active wave | G1 CLOSED (PR #1411); G2 CLOSED (PR #1408); G3 CLOSED (PR #1417); G4 CLOSED (PR #1433); G5 CLOSED (PR #1443) — Wave 3 complete; all M18 sprint groups closed |
-| Active sprint groups | G6 ACTIVE — Demo 7 preparation; Step 6b FAIL (7 CRITICAL findings) |
-| Active sprint journal issues | #1475 (G6 — Demo 7 prep); Step 6b FAIL recorded 2026-06-29 |
+| Active wave | G1 CLOSED (PR #1411); G2 CLOSED (PR #1408); G3 CLOSED (PR #1417); G4 CLOSED (PR #1433); G5 CLOSED (PR #1443); G6 CLOSED (PR #1479) — Wave 4 active |
+| Active sprint groups | G7 ACTIVE — Demo 7 continuation (Step 6b remediation → live session); `sprint/m18-g7` cut 2026-06-29 |
+| Active sprint journal issues | #1495 (G7 — Demo 7 continuation); Step G7-0 root cause analysis pending |
 
 ---
 
