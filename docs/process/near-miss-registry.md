@@ -3073,7 +3073,9 @@ CONTRIBUTING.md updated in this commit:
 ### How to add an entry
 
 When a near-miss is identified — during a session, in a HORIZON sweep, or in post-session
-review — the PM Agent files a new entry following the template below:
+review — the PM Agent files a new entry following the template below.
+
+**Merge conflict resolution requirement (NM-077, Finding D; Issue #1486):** After resolving any merge conflict in this file, verify that all NM entries from both sides of the conflict are present in the resolved file before committing. Procedure: (1) note the highest NM number in the `HEAD` side before the merge, (2) note the highest NM number in the incoming branch, (3) confirm the resolved file contains all entries between the lowest and highest NM number across both sides, in ascending order, with no gaps. A resolved conflict that silently drops an NM entry is an integrity violation equivalent to deleting a filed entry — permanent institutional memory cannot be recovered once lost.
 
 ```markdown
 ## NM-061 — AC-F8 Silent No-Op: Scenario Created via API But Never Selected in UI; 60-Second Ceiling Gate Measuring Nothing Since G3 (Reactive)

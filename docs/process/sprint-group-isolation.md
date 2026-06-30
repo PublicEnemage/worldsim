@@ -138,6 +138,13 @@ The entry document must be filed and EL-approved before any feature branch opens
 
 **2. During implementation (implementing agent)**
 
+**Session start checklist — required before any file edits (NM-079, NM-080; Issue #1484):**
+
+1. Confirm `git branch --show-current` matches the expected `feat/m{N}-g{N}-*` or `sprint/m{N}-g{N}` branch. If the branch does not match, checkout the correct branch or create the correct worktree before proceeding — do not begin implementation on the wrong branch.
+2. Confirm `git stash list` is empty, or that all stash entries belong to the current sprint group. A stash from a different sprint group can contaminate the pre-push gate with violations from foreign files and mislead debugging. Clear or annotate stash entries before cross-branch operations.
+
+If either check fails: stop, resolve the discrepancy, and re-confirm before writing any code.
+
 Cut feature branches from the sprint sub-branch, not from the release branch:
 ```bash
 git checkout -b feat/m{N}-g{N}-short-description sprint/m{N}-g{N}
