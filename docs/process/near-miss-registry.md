@@ -4015,6 +4015,141 @@ This discovers all files with `pytestmark = pytest.mark.integration` regardless 
 
 ---
 
+## NM-079 — G1 CI Bands Implementation Committed to G3 Feature Branch; Wrong-Branch Commit Not Detected by Any Process Gate (Reactive)
+
+**Date:** 2026-06-27
+**Milestone:** M18 — Full Argument and Demo 7
+**Detected by:** Agent reading its own git commit output (`[feat/m18-g3-implementation 291c5e1]`); no process gate
+**Severity:** High — G3 branch briefly contained G1 CI bands implementation (`banding_engine.py`, CI band fixtures, `m18-g1-ci-bands.spec.ts`); a reviewer or downstream sprint group could have integrated wrong-group code without realizing the authoring context
+
+### What happened
+
+Session `1e3802e7` began intending to implement G1 CI bands (`feat/m18-g1-ci-bands`). The session had previously been working on `feat/m18-g3-implementation` during NM-075 working tree interference (Jun 27, 21:41–22:13 EDT, 30+ HEAD switches). When CI band implementation work began, the session was on the G3 branch — not the G1 branch. Implementation commit `291c5e1` (`feat(m18-g1): implement CI band banding_engine + TrajectoryView fills`) landed on `feat/m18-g3-implementation`.
+
+The error was caught when the agent read the git commit output and noticed the branch name in the confirmation line. Recovery: cherry-pick `291c5e1` to `feat/m18-g1-ci-bands` (produced canonical `c7075c5`) + `git reset HEAD~1 --soft` on the G3 branch.
+
+Reflog corroboration: `2026-06-28 07:11:52 checkout: moving from feat/m18-g1-qa-tests to feat/m18-g3-implementation` — cross-branch jump happened mid-session during NM-075 thrash; implementation work continued on the wrong branch without any gate firing.
+
+### What was at risk
+
+If the wrong-branch commit had been pushed before detection:
+- `sprint/m18-g1` would be missing its primary implementation commit (CI bands never merged to G1)
+- `sprint/m18-g3` would contain G1 CI bands code, creating a scope contamination that would survive to the G3 integration PR and pollute `release/m18` under the G3 merge commit
+- Post-mortem attribution would show CI bands as G3 work in `git log`
+- G1 integration PR would open with no implementation, triggering BPO rejection
+
+### What caught it
+
+An agent reading its own git commit output — the `[feat/m18-g3-implementation 291c5e1]` confirmation line. No process gate required branch verification before implementation; no gate confirmed the working tree branch matched the sprint group at session start.
+
+### Process improvement
+
+**Issue #1484:** Add branch verification at session start to `docs/process/sprint-group-isolation.md §Worktree Usage`: agents must confirm `git branch --show-current` matches the expected sprint group branch before any file edits. If branch does not match, checkout the correct branch or create the correct worktree first.
+
+Also addresses stash hygiene (P5): verify `git stash list` is empty or all stash entries belong to the current sprint group before cross-branch operations.
+
+**Near-miss lineage:** Enabling condition is the same multi-session working-tree interference as NM-075. NM-075 addressed branch-switch overwriting of in-progress work; NM-079 is the write-side complement: implementation committed to the wrong branch entirely. Both are caused by the absence of a branch verification gate at session start.
+
+---
+
+## NM-080 — Admin-Rights Direct Commit to `release/m18`; `release-branch-ci-gate` Ruleset Does Not Cover Direct CLI Push (Reactive)
+
+**Date:** 2026-06-27
+**Milestone:** M18 — Full Argument and Demo 7
+**Detected by:** Agent reading its own git output (`gitBranch: "release/m18"` in commit confirmation); no process gate
+**Severity:** High — a direct commit to a release branch bypasses all PR gates, CI required checks, and the sprint group isolation model; if the recovery had been missed, incorrect G3 test files would have been permanently in `release/m18` history
+
+### What happened
+
+Session `74aa9f9a`, while cleaning up stash-leaked files from `feat/m18-gd-artifact5-decision4`, drifted onto `release/m18` via HEAD movement during the NM-075 working tree thrash. G3 test files (`test_m18_g3_counter_scenario_comparison.py` and associated fixtures) were committed directly to `release/m18` with `gitBranch: "release/m18"` visible in the session tool output. Recovery: `git reset --soft HEAD~1` → stash → checkout `feat/m18-g3-test-authorship` → stash pop → recommit on the correct branch.
+
+The recovery succeeded. No incorrect artifact remains in `release/m18`. The commit was unstaged before being pushed.
+
+### What was at risk
+
+If the commit had been pushed before detection:
+- G3 test files would exist in `release/m18` as a direct commit, not via the sprint group isolation PR flow
+- The `release-branch-ci-gate` Ruleset covers merge-via-PR; it does not block direct push by a user with admin rights
+- No CI gate would have caught the misrouting — the push would have succeeded silently
+- Future integrations would have merge conflicts between the direct-committed version and the sprint group's canonical version
+- The audit trail would show G3 test files arriving in `release/m18` outside the sprint group isolation model, with no reviewable PR
+
+### What caught it
+
+An agent reading its own git output showing `gitBranch: "release/m18"` in the commit confirmation. No server-side protection exists against direct CLI push by an admin to `refs/heads/release/m*`.
+
+### Process improvement
+
+**Issue #1483:** Add a GitHub Ruleset push restriction covering `refs/heads/release/m*` that blocks direct CLI push for all actors including admins. Additionally add a pre-push hook check that aborts pushes to `release/*` with a message directing to the PR process. The Ruleset approach is server-enforced and cannot be bypassed by hook skip. Both layers together satisfy defence-in-depth.
+
+**Near-miss lineage:** Enabling condition is the same multi-session HEAD drift as NM-075. NM-075 covered branch-switch overwriting in-progress work; NM-080 covers inadvertent commit to the protected release branch itself. Same structural gap (no working-tree branch verification), different failure mode (wrong target branch for commit vs. wrong target branch for implementation).
+
+---
+
+## NM-081 — Sprint Branch Cut Before Predecessor ADR Scope Was Finalized on `release/m18`; G3 Implemented Against Stale GD Scope for Entire Sprint; Silent Scope Drift Absorbed at Integration (Reactive)
+
+**Date:** 2026-06-27
+**Milestone:** M18 — Full Argument and Demo 7
+**Detected by:** DS Agent post-mortem analysis of integration resolution commit `a19c432` (33 files); not detected during G3 implementation or at any sprint gate
+**Severity:** Medium — G3 implementation was built against a 6-shock taxonomy (GD Decision 3); `release/m18` at integration carried a 7-shock taxonomy (ADR-019 Decisions 4/5/6, EL-approved); the resolution commit silently upgraded G3 to the wider scope without G3 ever implementing against it
+
+### What happened
+
+`sprint/m18-g3` was cut at PR #1395 merge (Jun 27, ~01:49 EDT), before the GD design package (Artifacts 1–7, PRs #1386–#1393) had fully merged to `release/m18`. At the time of the branch cut, only GD Decision 3 (6-shock taxonomy) was on `release/m18`. ADR-019 Decisions 4/5/6 (EL-approved scope expansion to all 7 shock types, including `FX_RATE_FLOOR`) landed on `release/m18` later that day.
+
+G3 spent its entire sprint implementing the distributional-comparison endpoint and components against the 6-shock contract from Decision 3. The `forms-spec.md` and `schemas.py` G3 referenced reflected the stale scope. The integration resolution commit `a19c432` (Jun 28, 07:46 EDT, 33 files) absorbed G1+G2+GD+G3 simultaneously. The resolver chose `release/m18`'s version of `api_contracts.yml` (which had Decisions 4/5/6) over G3's stale Decision-3 version — silently upgrading G3's scope at integration without G3's knowledge.
+
+The integration was functionally correct. The process gap: no gate required that G3's implementing scope match the finalized ADR decisions before the sprint branch was cut.
+
+### What was at risk
+
+If the scope drift had been in the opposite direction — if `release/m18`'s version had been narrower than G3's implementation — the resolution would have silently dropped G3 functionality. More critically: the silent scope upgrade at integration means G3's tests and components were never validated against the 7-shock contract. If the 7-shock contract introduced an interface incompatibility, G3's acceptance tests would not have caught it (the tests were authored against Decision 3). This is a variant of the NM-078 pattern: a test exists but tests the wrong version of the contract.
+
+### What caught it
+
+DS Agent post-mortem analysis of the integration resolution commit diff in the M18 sprint health audit. The issue was not detected during G3 implementation, at G3 sprint exit, or by any CI gate. The process has no mechanism to flag "this sprint's implementation was built against a scope that changed before integration."
+
+### Process improvement
+
+**Issue #1485:** Add a scope lock precondition to `docs/process/sprint-planning-sop.md §Wave Kickoff Coordination Check`: before cutting a sprint branch for group G{N}, verify that all ADR decisions affecting G{N}'s scope are EL-approved and merged to `release/m{N}`. If predecessor decisions are pending, either delay the branch cut or document the known scope uncertainty in the sprint entry document §Scope section.
+
+Also: sprint entry template `§Scope` section to include a checkbox confirming that all scope-bearing ADR decisions are locked on `release/m{N}` before implementation begins.
+
+**Near-miss lineage:** The timing window (sprint branch cut before predecessor merges complete) is the inverse of the cross-contamination problem. NM-067 addressed concurrent feature branches polluting each other; NM-081 addresses a sprint branch inheriting an incomplete scope snapshot that silently becomes stale. NM-072 (Artifact 5 authored before prerequisites existed) is an upstream cousin: the scope drift in NM-081 was possible because the GD design package was still landing when the dependent sprint branch was cut.
+
+---
+
+## NM-082 — CI Band Fill Geometry Incorrect in `TrajectoryView.tsx`; Shipped in G1 With Tests Green; Detected Only by Step 6b Visual Review (Reactive)
+
+**Date:** 2026-06-28 (G1 merged to `release/m18`); detected 2026-06-29 (Step 6b review)
+**Milestone:** M18 — Full Argument and Demo 7
+**Detected by:** Nine-agent Step 6b visual review (2026-06-29) — no automated gate
+**Severity:** High — visual geometry error present in all five Demo 7 screenshot frames; would have been the version shown at external stakeholder session #843
+
+### What happened
+
+The G1 sprint (`sprint/m18-g1`, PR #1404) implemented CI confidence bands in `TrajectoryView.tsx`. The fill geometry was implemented incorrectly: instead of forming a ±half-width envelope around each trajectory, the fill extended from the trajectory value to the chart ceiling, producing a solid colour block from each line to the top of the chart area. The y-axis then scaled to the inflated band extent rather than to the trajectory values, further distorting the visual.
+
+G1 CI (16/16 PASS) went green. The M18 legibility spec (`m18-g1-ci-bands.spec.ts`) verified that CI band elements were present in the DOM — it did not assert that the fill path geometry was correct. No unit test in `TrajectoryView.test.tsx` covered the fill coordinate calculation. Integration PR #1411 merged to `release/m18` on 2026-06-28 with no geometry-specific test blocking it.
+
+The G6 screenshot capture (Step 5d) captured five demo frames including the incorrectly-rendered CI bands. DEMO-137 (HIGH) was assigned to the geometry bug; it was also the root cause of several CRITICAL layout issues (y-axis scaling cascaded into Zone 1A trajectory legibility failures).
+
+### What was at risk
+
+Demo 7 Act 1 (Senegal Mode 3) uses CI bands to show trajectory uncertainty during active control. Act 2 (Zambia comparison) uses CI bands on Zone 1A trajectories to anchor the confidence framing of the distributional differential. If the Step 6b review had not caught the geometry error, five demo frames with incorrect CI band rendering would have been presented at the external stakeholder session (#843). DEMO-137 (y-axis scaling) was a downstream consequence: trajectory lines were illegible at the scale forced by the inflated band extent.
+
+### What caught it
+
+The nine-agent Step 6b visual review on 2026-06-29. No automated gate — not the unit tests, not the legibility spec, not CI — detected the geometry error. This is the definition of a process gap: the review panel caught something the process should have caught before screenshots were captured.
+
+### Process improvement
+
+**Immediate (Issue #1466):** Fix cluster A in G7 corrects the fill geometry in `TrajectoryView.tsx` and adds unit test assertions to `TrajectoryView.test.tsx` covering: (1) fill path does not extend beyond trajectory value bounds; (2) fill endpoints are at ±half-width, not at chart ceiling; (3) y-axis domain is derived from trajectory values, not from band extents.
+
+**Structural:** The legibility spec pattern (element presence + attribute check) does not validate geometric correctness. Acceptance criteria for visual components with a calculable geometric invariant must include a unit test asserting the invariant, not just that the element renders. Companion lesson to NM-056 (soft-skipping masked a mock bug) and NM-027/NM-028 (no-op guards): a test that verifies presence but not correctness cannot catch the most likely failure mode.
+
+---
+
 ## NM-NNN — [Short descriptive title]
 
 **Date:** YYYY-MM-DD (or approximate milestone era)
