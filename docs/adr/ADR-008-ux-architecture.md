@@ -1118,4 +1118,8 @@ No listed renewal trigger fires. Zone 1/2/3 boundary definitions are unchanged. 
 
 ☑ UX Designer sign-off — 2026-06-29 (same session as ADR authorship — acknowledged)
 
-**Engineering Lead acceptance:** Pending
+**Engineering Lead acceptance:** ☑ Accepted — @PublicEnemage, 2026-06-29
+
+UX Designer same-session sign-off citation verification (NM-042): all five cited sections are named (`information-hierarchy.md §1B Zone Assignment and Disclosure Level Rules`; `north-star.md §Primary Cognitive Tasks (Mode 3 Act 2 comparison)`; `ADR-008 Decision 5 §MDA Alert Panel Specification — Severity ordering`; `ADR-008 Decision 2 §Zone Assignments for All Instruments`; `CLAUDE.md §Guiding Principles — The Human Cost Ledger is Primary`). Citations satisfy the named-section requirement. Amendment 2 accepted.
+
+**Cluster B gate status:** CLEAR — Cluster B (`MDAAlertPanelZone1B.tsx` Zone 1B layout fixes) may proceed to intent document authorship.
