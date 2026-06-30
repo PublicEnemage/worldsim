@@ -161,14 +161,14 @@ export function computeCompositeHalfWidth(stepIndex: number, tier: number): numb
   return baseHW * multiplier;
 }
 
-function computeCompositeCIBounds(step: TrajectoryStep): { lower: number | null; upper: number | null } {
+export function computeCompositeCIBounds(step: TrajectoryStep): { lower: number | null; upper: number | null } {
   const score = computeEntityCompositeScore(step);
   if (score === null) return { lower: null, upper: null };
   const worstTier = getEntityWorstTier(step);
   const halfWidth = computeCompositeHalfWidth(step.step_index, worstTier);
   return {
-    lower: Math.max(0.0, score * (1 - halfWidth)),
-    upper: Math.min(1.0, score * (1 + halfWidth)),
+    lower: Math.max(0.0, score - halfWidth),
+    upper: Math.min(1.0, score + halfWidth),
   };
 }
 
@@ -413,8 +413,6 @@ function CompositeChartSVG({
       for (const step of traj.steps) {
         const s = computeEntityCompositeScore(step);
         if (s !== null) values.push(s);
-        const { upper } = computeCompositeCIBounds(step);
-        if (upper !== null && !isNaN(upper)) values.push(upper);
       }
       const floor = getEntityMdaFloor(traj.mda_floors);
       if (floor !== null) values.push(floor);
@@ -424,8 +422,6 @@ function CompositeChartSVG({
       for (const step of sc.trajectory.steps) {
         const s = computeEntityCompositeScore(step);
         if (s !== null) values.push(s);
-        const { upper } = computeCompositeCIBounds(step);
-        if (upper !== null && !isNaN(upper)) values.push(upper);
       }
       const floor = getEntityMdaFloor(sc.trajectory.mda_floors);
       if (floor !== null) values.push(floor);
@@ -539,7 +535,7 @@ function CompositeChartSVG({
             data-testid={`zone-1a-ci-ribbon-${code}`}
             d={ribbonD}
             fill={color}
-            opacity={0.10}
+            opacity={mode === "MODE_3" ? CI_BAND_OPACITY_MODE3 : CI_BAND_OPACITY}
             stroke="none"
           />
         );
@@ -556,7 +552,7 @@ function CompositeChartSVG({
             data-testid={`zone-1a-ci-ribbon-scenario-${slug}`}
             d={ribbonD}
             fill={palette.color}
-            opacity={0.10}
+            opacity={CI_BAND_OPACITY}
             stroke="none"
           />
         );
