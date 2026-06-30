@@ -305,6 +305,17 @@ test("AC-C2: focal-cohort-row shows CLEAR badge with green background when value
     }),
   );
 
+  // Mock advance so current_step increments reliably without real backend latency.
+  // Returns step_executed: 1 for all clicks — trajectory step 1 has value 0.450 > floor 0.400.
+  await page.route(`**/api/v1/scenarios/${scenId}/advance**`, (route) => {
+    if (route.request().method() !== "POST") { route.continue(); return; }
+    route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({ step_executed: 1, is_complete: false }),
+    });
+  });
+
   await page.goto(`/?scenario=${scenId}`);
   await waitForAppReady(page);
 
@@ -526,7 +537,7 @@ test("AC-C4: CRITICAL breach row appears before CLEAR focal row in DOM", async (
   await page.waitForTimeout(1_000);
 
   const focalRow = page.locator('[data-testid="focal-cohort-row"]');
-  const criticalRow = page.locator('[data-testid="cohort-impact-row"]').first();
+  const criticalRow = page.locator('[data-testid="cohort-row-0"]');
 
   const bothVisible = await Promise.all([
     focalRow.isVisible({ timeout: 3_000 }).catch(() => false),
@@ -540,7 +551,7 @@ test("AC-C4: CRITICAL breach row appears before CLEAR focal row in DOM", async (
 
   // CRITICAL row must appear before CLEAR focal row in DOM
   const position = await page.evaluate(() => {
-    const critical = document.querySelector('[data-testid="cohort-impact-row"]');
+    const critical = document.querySelector('[data-testid^="cohort-row-"]');
     const focal = document.querySelector('[data-testid="focal-cohort-row"]');
     if (!critical || !focal) return null;
     return critical.compareDocumentPosition(focal);

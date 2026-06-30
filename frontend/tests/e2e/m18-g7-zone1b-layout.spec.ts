@@ -606,6 +606,38 @@ test("AC-B5: psp-value visible at 1440×900 (not clipped by governance disclosur
 
   if (!scenId) { console.warn("AC-B5: backend not available — skipping"); return; }
 
+  // Mock advance and measurement-output so psp-value renders from step 1
+  // without depending on real SEN political_economy backend output.
+  await page.route(`**/api/v1/scenarios/${scenId}/advance**`, (route) => {
+    if (route.request().method() !== "POST") { route.continue(); return; }
+    route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({ step_executed: 1, is_complete: false }),
+    });
+  });
+  await page.route(`**/api/v1/scenarios/${scenId}/measurement-output**`, (route) =>
+    route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({
+        entity_id: "SEN", scenario_id: scenId, step_index: 1,
+        outputs: {
+          political_economy: {
+            framework: "political_economy", composite_score: null,
+            indicators: {
+              programme_survival_probability: {
+                value: "0.67", unit: "probability",
+                variable_type: "STOCK", confidence_tier: 3 },
+            },
+            mda_alerts: [], has_below_floor_indicator: false, note: null,
+          },
+        },
+        ia1_disclosure: "pre-cal",
+      }),
+    }),
+  );
+
   await page.goto(`/?scenario=${scenId}`);
   await waitForAppReady(page);
   await page.waitForTimeout(2_000);

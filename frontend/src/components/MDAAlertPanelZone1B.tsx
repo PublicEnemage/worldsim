@@ -739,6 +739,7 @@ export function DistributionalComparisonSummary({ summary }: { summary: Distribu
         padding: "6px 8px",
         background: "#fff",
         zIndex: 1,
+        minHeight: 160,
       }}
     >
       <div style={{ display: "flex", alignItems: "center", gap: 4, marginBottom: 2 }}>
@@ -903,7 +904,7 @@ export function CohortImpactSection({
   const hasCrossings = sortedCrossings.length > 0;
   const hasFocal = focalRows.length > 0;
 
-  function renderCrossingRow(crossing: CohortThresholdCrossing) {
+  function renderCrossingRow(crossing: CohortThresholdCrossing, rowIndex: number) {
     const isHistorical = crossing.step_crossed < current_step;
     const severityColor = COHORT_SEVERITY_COLOR[crossing.severity];
     const borderColor = isHistorical ? "#a06000" : severityColor;
@@ -919,7 +920,7 @@ export function CohortImpactSection({
     return (
       <div
         key={`${crossing.quintile_key}-${crossing.indicator_key}`}
-        data-testid="cohort-impact-row"
+        data-testid={`cohort-row-${rowIndex}`}
         data-crossing-step={crossing.step_crossed}
         style={{
           display: "flex",
@@ -1016,7 +1017,7 @@ export function CohortImpactSection({
           </div>
         ) : (
           <>
-            {sortedCrossings.map((crossing) => renderCrossingRow(crossing))}
+            {sortedCrossings.map((crossing, idx) => renderCrossingRow(crossing, idx))}
             {focalRows.map(({ focal, numValue, state }) => (
               <div
                 key={`focal-${focal.indicator_key}`}
