@@ -31,7 +31,7 @@
 import { useEffect, useRef, useState } from "react";
 import { InstrumentCluster, LAYOUT, useViewportBreakpoint } from "./InstrumentCluster";
 import { type ScenarioComparisonConfig, type ScenarioComparisonThresholdCrossing } from "./TrajectoryView";
-import { MDAAlertPanelZone1B, CohortImpactSection } from "./MDAAlertPanelZone1B";
+import { MDAAlertPanelZone1B, CohortImpactSection, DistributionalComparisonSummary } from "./MDAAlertPanelZone1B";
 import { PMMWidgetZone1C } from "./PMMWidgetZone1C";
 import { FourFrameworkZone1D } from "./FourFrameworkZone1D";
 import { CohortIndicatorsPanel } from "./CohortIndicatorsPanel";
@@ -1006,6 +1006,11 @@ export function ScenarioInstrumentCluster({
           />
         }
         zone1bCohortSection={<CohortImpactSection isCompleted={activeScenarioDetail?.status === "completed"} />}
+        distributionalSummarySlot={
+          store.distributionalSummary && store.distributionalSummary.pairs.length > 0
+            ? <DistributionalComparisonSummary summary={store.distributionalSummary} />
+            : undefined
+        }
         pmmWidget={<PMMWidgetZone1C />}
         fourFramework={
           <FourFrameworkZone1D

@@ -465,9 +465,11 @@ export function FourFrameworkZone1D({
         );
       })}
 
-      {/* #1276 — Governance horizon disclosure (No False Precision; Placement A — always visible). */}
+      {/* #1276 — Governance horizon disclosure (No False Precision; Placement A — always visible).
+          M18-G7-B DEMO-149: single-line with tooltip prevents clipping of PSP section. */}
       <div
         data-testid="governance-horizon-disclosure"
+        title="Governance indicators (rule of law, democratic quality) respond to fiscal adjustment over 3–6 year horizons in this model's calibration. An 8-step quarterly window captures the beginning of the governance stress trajectory; full divergence requires a 12–24 step analysis."
         style={{
           fontSize: 8,
           color: "#888",
@@ -475,11 +477,13 @@ export function FourFrameworkZone1D({
           paddingTop: 3,
           paddingLeft: 9,
           fontStyle: "italic",
+          whiteSpace: "nowrap",
+          overflow: "hidden",
+          textOverflow: "ellipsis",
+          cursor: "help",
         }}
       >
-        Governance indicators (rule of law, democratic quality) respond to fiscal adjustment over
-        3–6 year horizons in this model&apos;s calibration. An 8-step quarterly window captures the
-        beginning of the governance stress trajectory; full divergence requires a 12–24 step analysis.
+        Gov. horizon: 3–6yr; 8-step window shows early trend only. (hover for detail)
       </div>
 
       {/* M16-G2 #987 — Political Risk sub-section (replaces G1 political economy elements).
@@ -546,7 +550,11 @@ export function FourFrameworkZone1D({
                     >
                       {severity}
                     </span>
-                    {` (${pspPct}%) — `}
+                    {" ("}
+                    <span data-testid="psp-value" style={{ fontWeight: 700, color: severityColor }}>
+                      {`${pspPct}%`}
+                    </span>
+                    {") — "}
                     <span style={{ color: "#555" }}>
                       {legitimacyDirection === "declining" || eliteCaptureDirection === "widening"
                         ? "DECLINING"

@@ -707,8 +707,15 @@ function _formatK(n: number): string {
   return n.toLocaleString("en-US");
 }
 
-function DistributionalComparisonSummary({ summary }: { summary: DistributionalSummaryData }) {
+export function DistributionalComparisonSummary({ summary }: { summary: DistributionalSummaryData }) {
   const [panelOpen, setPanelOpen] = useState(false);
+  const methodologyPanelRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (panelOpen && methodologyPanelRef.current) {
+      methodologyPanelRef.current.scrollIntoView({ block: "nearest" });
+    }
+  }, [panelOpen]);
 
   const terminalPairs = summary.pairs.map((pair) => {
     const terminal = pair.steps.find((s) => s.step === summary.terminal_step) ?? pair.steps[pair.steps.length - 1];
@@ -804,7 +811,11 @@ function DistributionalComparisonSummary({ summary }: { summary: DistributionalS
           : "→ Direction uncertain: CI spans zero"}
       </div>
       {panelOpen && summary.methodology_detail && (
-        <div style={{ borderTop: "1px dashed #e5e7eb", marginTop: 4, paddingTop: 4 }}>
+        <div
+          ref={methodologyPanelRef}
+          data-testid="zone3-methodology-panel"
+          style={{ borderTop: "1px dashed #e5e7eb", marginTop: 4, paddingTop: 4, overflowY: "auto" }}
+        >
           <div data-testid="methodology-q1-population" style={rowStyle}>
             <span style={labelStyle}>Q1 population:</span>{" "}
             {summary.entity_id}: {summary.methodology_detail.q1_population.toLocaleString("en-US")} (UN WPP 2024, 20% Q1 fraction)
@@ -842,7 +853,7 @@ const COHORT_SEVERITY_COLOR: Record<CohortThresholdCrossing["severity"], string>
 };
 
 export function CohortImpactSection({ isCompleted = false }: { isCompleted?: boolean }) {
-  const { cohort_threshold_crossings: crossings, distributionalSummary } = useScenarioStepStore();
+  const { cohort_threshold_crossings: crossings } = useScenarioStepStore();
   const bp = useViewportBreakpoint();
   const isNarrow = bp === 1024; // covers all viewports < 1280px, including 768px (#1250)
   const headerLabel = isCompleted ? "COHORT IMPACT (HISTORICAL)" : "COHORT IMPACT";
@@ -947,9 +958,6 @@ export function CohortImpactSection({ isCompleted = false }: { isCompleted?: boo
             );
           })
         )}
-      {distributionalSummary && distributionalSummary.pairs.length > 0 && (
-        <DistributionalComparisonSummary summary={distributionalSummary} />
-      )}
     </div>
   );
 }
