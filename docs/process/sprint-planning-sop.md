@@ -249,13 +249,27 @@ PM Agent records these fields in each sprint group's entry document (Section 1 �
 
 If 5 groups are already actively running (implementation PRs open), no new group may open an implementation PR until at least one exits (integration PR merges to release branch). Exceeding this ceiling without explicit EL direction is a process deviation. The PM Agent is responsible for enforcing this ceiling — EL is accountable and may revise the ceiling after M18 experience.
 
+### Scope lock precondition for sprint branch cut (NM-081; Issue #1485)
+
+Before cutting a sprint branch for group G{N}, the PM Agent must verify that all ADR decisions affecting G{N}'s scope are EL-approved and merged to `release/m{N}`.
+
+If a predecessor group's scope decisions are still in draft or pending EL approval, either:
+
+- **(a) Delay the branch cut** until the upstream decision merges to `release/m{N}`. Required when the pending decision may change G{N}'s data contracts, API shapes, or component interfaces.
+- **(b) Document the scope uncertainty** in the sprint entry document §Scope Declaration (Section 3.1 scope lock checkbox). Permitted when the uncertainty is bounded and the risk of implementation rework is low.
+
+Option (a) is the default. Option (b) requires EL acknowledgement in the sprint entry approval.
+
+**Why this matters:** If G{N} implements against a stale scope snapshot, the integration resolution commit absorbs the scope drift silently — G{N}'s tests validate the wrong contract, and no CI gate flags the divergence. This is a variant of the NM-078 pattern (test exists but validates the wrong version).
+
 ### Wave kickoff sequence
 
 1. PM Agent reviews all groups planned for the wave before any group opens an implementation PR.
-2. PM Agent determines the coordination tier for the wave.
-3. PM Agent records the tier and the dependency merge sequence in each group's sprint entry document (Section 1).
-4. EL approves the sprint entry documents (which now include the coordination tier).
-5. Implementation PRs may open once sprint entry documents are EL-approved.
+2. **PM Agent confirms scope lock precondition** for each group: all ADR decisions affecting that group's scope are EL-approved and on `release/m{N}`, or scope uncertainty is documented and EL-acknowledged.
+3. PM Agent determines the coordination tier for the wave.
+4. PM Agent records the tier, dependency merge sequence, and scope lock status in each group's sprint entry document (Section 1).
+5. EL approves the sprint entry documents (which now include the coordination tier and scope lock confirmation).
+6. Implementation PRs may open once sprint entry documents are EL-approved.
 
 ### When a new group joins mid-wave
 

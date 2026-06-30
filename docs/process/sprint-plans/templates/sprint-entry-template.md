@@ -106,6 +106,16 @@ acceptance criteria BEFORE implementation code is written.
 
 ## Section 3 — Scope Declaration
 
+### 3.0 — Scope lock confirmation (NM-081; sprint-planning-sop.md §Scope lock precondition)
+
+*PM Agent must confirm before any sprint branch is cut.*
+
+- [ ] All ADR decisions affecting this sprint's scope are EL-approved and merged to `release/m{N}`
+
+If unchecked: describe the known scope uncertainty below and confirm EL has acknowledged it.
+
+**Scope uncertainty (if any):** {None / description of pending decision and risk assessment}
+
 ### 3.1 — Issues in scope
 
 *All issues assigned to this sprint, with group assignment.*
