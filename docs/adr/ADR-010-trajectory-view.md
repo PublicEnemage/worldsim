@@ -1049,4 +1049,8 @@ Per EL determination 2026-06-29 (G7-0 root cause analysis sign-off block): **sep
 
 ☑ UX Designer sign-off — 2026-06-29
 
-**Engineering Lead acceptance:** Pending — UX Designer sign-off received 2026-06-29 (separate session, EL-triggered). EL must verify governing document citations and accept before Cluster C implementation may begin.
+**Engineering Lead acceptance:** ☑ Accepted — @PublicEnemage, 2026-06-29
+
+UX Designer separate-session citation verification (NM-042): all five cited sections are named (`north-star.md §Primary Cognitive Tasks by Mode`; `user-journeys.md §Journey C Step 3`; `information-hierarchy.md §Zone 1 — Primary §1B — MDA Alert Panel`; `information-hierarchy.md §CVD (Colour Vision Deficiency) Color Specification`; `worldsim-ux-architecture-first-principles.md §Five Design Premises for M9`). Separate-session independence is structurally asserted — accepted at face value per CLAUDE.md §UX Designer sign-off rules. Two non-blocking concerns are implementation-brief-level requirements, not ADR changes. Amendment 2 accepted.
+
+**Cluster C gate status:** CLEAR — Cluster C (`MDAAlertPanelZone1B.tsx` monitored-row state) may proceed to intent document authorship. Implementation brief must address: (1) MV-001 CVD gate extension for green/red badge pair; (2) severity-aware ordering for CLEAR-state focal rows vs. CRITICAL breach-only rows in general-case scenarios.
