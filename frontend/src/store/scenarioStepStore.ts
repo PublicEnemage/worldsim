@@ -16,6 +16,8 @@ export interface TrajectoryFrameworkPoint {
   ci_upper: number | null;
   confidence_tier: number;
   scoring_basis: "percentile_rank" | "normalized_absolute";
+  /** M18-G7-C — indicator values keyed by indicator_key. Populated by parseTrajectoryResponse. */
+  indicators?: Record<string, string | null>;
 }
 
 export interface TrajectoryStep {

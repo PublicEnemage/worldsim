@@ -82,6 +82,13 @@ export interface ScenarioConfigSchema {
       conditionality_type?: "standard" | "strict" | "relaxed";
     };
   };
+  /** M18-G7-C — monitored focal cohorts for CohortImpactSection (ADR-010 Amendment 2). */
+  monitored_focal_cohorts?: Array<{
+    indicator_key: string;
+    floor_value: number;
+    floor_label: string;
+    framework: string;
+  }>;
 }
 
 // ADR-016 Component 1 — Data quality preview response
