@@ -4119,6 +4119,37 @@ Also: sprint entry template `§Scope` section to include a checkbox confirming t
 
 ---
 
+## NM-082 — CI Band Fill Geometry Incorrect in `TrajectoryView.tsx`; Shipped in G1 With Tests Green; Detected Only by Step 6b Visual Review (Reactive)
+
+**Date:** 2026-06-28 (G1 merged to `release/m18`); detected 2026-06-29 (Step 6b review)
+**Milestone:** M18 — Full Argument and Demo 7
+**Detected by:** Nine-agent Step 6b visual review (2026-06-29) — no automated gate
+**Severity:** High — visual geometry error present in all five Demo 7 screenshot frames; would have been the version shown at external stakeholder session #843
+
+### What happened
+
+The G1 sprint (`sprint/m18-g1`, PR #1404) implemented CI confidence bands in `TrajectoryView.tsx`. The fill geometry was implemented incorrectly: instead of forming a ±half-width envelope around each trajectory, the fill extended from the trajectory value to the chart ceiling, producing a solid colour block from each line to the top of the chart area. The y-axis then scaled to the inflated band extent rather than to the trajectory values, further distorting the visual.
+
+G1 CI (16/16 PASS) went green. The M18 legibility spec (`m18-g1-ci-bands.spec.ts`) verified that CI band elements were present in the DOM — it did not assert that the fill path geometry was correct. No unit test in `TrajectoryView.test.tsx` covered the fill coordinate calculation. Integration PR #1411 merged to `release/m18` on 2026-06-28 with no geometry-specific test blocking it.
+
+The G6 screenshot capture (Step 5d) captured five demo frames including the incorrectly-rendered CI bands. DEMO-137 (HIGH) was assigned to the geometry bug; it was also the root cause of several CRITICAL layout issues (y-axis scaling cascaded into Zone 1A trajectory legibility failures).
+
+### What was at risk
+
+Demo 7 Act 1 (Senegal Mode 3) uses CI bands to show trajectory uncertainty during active control. Act 2 (Zambia comparison) uses CI bands on Zone 1A trajectories to anchor the confidence framing of the distributional differential. If the Step 6b review had not caught the geometry error, five demo frames with incorrect CI band rendering would have been presented at the external stakeholder session (#843). DEMO-137 (y-axis scaling) was a downstream consequence: trajectory lines were illegible at the scale forced by the inflated band extent.
+
+### What caught it
+
+The nine-agent Step 6b visual review on 2026-06-29. No automated gate — not the unit tests, not the legibility spec, not CI — detected the geometry error. This is the definition of a process gap: the review panel caught something the process should have caught before screenshots were captured.
+
+### Process improvement
+
+**Immediate (Issue #1466):** Fix cluster A in G7 corrects the fill geometry in `TrajectoryView.tsx` and adds unit test assertions to `TrajectoryView.test.tsx` covering: (1) fill path does not extend beyond trajectory value bounds; (2) fill endpoints are at ±half-width, not at chart ceiling; (3) y-axis domain is derived from trajectory values, not from band extents.
+
+**Structural:** The legibility spec pattern (element presence + attribute check) does not validate geometric correctness. Acceptance criteria for visual components with a calculable geometric invariant must include a unit test asserting the invariant, not just that the element renders. Companion lesson to NM-056 (soft-skipping masked a mock bug) and NM-027/NM-028 (no-op guards): a test that verifies presence but not correctness cannot catch the most likely failure mode.
+
+---
+
 ## NM-NNN — [Short descriptive title]
 
 **Date:** YYYY-MM-DD (or approximate milestone era)
