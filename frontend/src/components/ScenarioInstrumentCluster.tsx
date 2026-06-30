@@ -56,6 +56,8 @@ interface RawFrameworkPoint {
   ci_upper: string | null;
   confidence_tier: number;
   scoring_basis: "percentile_rank" | "normalized_absolute" | "boundary_proximity";
+  /** M18-G7-C — raw indicator values from API; parsed to string | null in parseTrajectoryResponse. */
+  indicators?: Record<string, { value: string | null } | null>;
 }
 
 interface RawTrajectoryStep {
@@ -104,6 +106,12 @@ function parseTrajectoryResponse(raw: RawTrajectoryResponse): TrajectoryResponse
             fw.scoring_basis === "boundary_proximity"
               ? "normalized_absolute"
               : fw.scoring_basis,
+          indicators: Object.fromEntries(
+            Object.entries(fw.indicators ?? {}).map(([k, v]) => [
+              k,
+              (v as { value?: string | null } | null)?.value ?? null,
+            ])
+          ),
         };
       }
       const pmm =
@@ -512,6 +520,7 @@ export function ScenarioInstrumentCluster({
                   ci_upper: null,
                   confidence_tier: (fw.confidence_tier as number) ?? 3,
                   scoring_basis: "percentile_rank",
+                  indicators: {},
                 };
               }
               return {
@@ -1005,7 +1014,12 @@ export function ScenarioInstrumentCluster({
             comparisonScenarios={loadedComparisonScenarios}
           />
         }
-        zone1bCohortSection={<CohortImpactSection isCompleted={activeScenarioDetail?.status === "completed"} />}
+        zone1bCohortSection={
+          <CohortImpactSection
+            isCompleted={activeScenarioDetail?.status === "completed"}
+            monitoredFocalCohorts={activeScenarioDetail?.configuration?.monitored_focal_cohorts}
+          />
+        }
         distributionalSummarySlot={
           store.distributionalSummary && store.distributionalSummary.pairs.length > 0
             ? <DistributionalComparisonSummary summary={store.distributionalSummary} />
