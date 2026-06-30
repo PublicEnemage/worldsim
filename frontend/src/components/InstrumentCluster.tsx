@@ -65,6 +65,9 @@ interface InstrumentClusterProps {
   /** ADR-019 D-1: slot for Mode 2 (Mode2ColumnSurface) or Mode 3 (ControlPlaneColumn) content.
    *  When undefined (Mode 1), ghost text is shown in the reserved zone. */
   controlPlane?: React.ReactNode;
+  /** M18-G7-B — DistributionalComparisonSummary slot. When provided (comparison sessions),
+   *  renders as the first child of zone-1b before the MDA alert panel. (ADR-008 Amendment 2) */
+  distributionalSummarySlot?: React.ReactNode;
 }
 
 export function InstrumentCluster({
@@ -79,6 +82,7 @@ export function InstrumentCluster({
   entityBaselineTrajectories,
   comparisonScenarios,
   controlPlane,
+  distributionalSummarySlot,
 }: InstrumentClusterProps) {
   const bp = useViewportBreakpoint();
   const layout = LAYOUT[bp];
@@ -141,8 +145,14 @@ export function InstrumentCluster({
           }}
         >
           <div style={{ position: "absolute", top: 4, right: 6, fontSize: 9, fontWeight: 700, letterSpacing: 0.5, color: "#666", backgroundColor: "rgba(255,255,255,0.88)", borderRadius: 2, padding: "1px 5px", userSelect: "none", zIndex: 10, lineHeight: 1.5 }}>Zone 1B</div>
+          {/* M18-G7-B: DistributionalComparisonSummary first in comparison sessions (ADR-008 Amendment 2) */}
+          {distributionalSummarySlot && (
+            <div style={{ flex: "0 0 auto", minHeight: 160, overflow: "hidden" }}>
+              {distributionalSummarySlot}
+            </div>
+          )}
           {/* Sub-zone A — MDA alert panel; permanent 80px floor (ADR-018) */}
-          <div data-testid="zone-1b-mda-panel-wrapper" style={{ flex: "1 1 80px", minHeight: 80, overflow: "hidden" }}>
+          <div data-testid="mda-alert-list" style={{ flex: "1 1 80px", minHeight: 80, overflow: "hidden" }}>
             {mdaPanel ?? (
               <div style={{ color: "#bbb", fontSize: 12, padding: 8 }}>
                 MDA Alert Panel (Zone 1B)
