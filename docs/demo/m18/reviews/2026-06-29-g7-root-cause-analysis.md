@@ -246,20 +246,20 @@ Implement clusters in this order to minimize re-work:
 
 ---
 
-## EL sign-off required
-
-This document must be reviewed and signed off by EL before any fix intent documents are authored. Per the G7 sprint entry, EL sign-off on G7-0 is the gate that unlocks intent document authorship for all clusters.
+## EL sign-off
 
 **EL sign-off block:**
 
 | Field | Value |
 |---|---|
 | Reviewing | EL (@PublicEnemage) |
-| Date | ___ |
-| DEMO-147 determination | T3→T4 at step 6: [intentional / bug] |
-| NM-083 call | [File as new NM / Absorb under NM-082] |
-| Cluster B ADR-008 amendment | [Confirm required / Waive] |
-| Cluster C ADR-010 amendment | [Confirm required / Waive] |
-| DEMO-150 display fix in G7 | [Include in Cluster D / Defer to M19] |
-| DEMO-151 | [Confirmed M19 scope] |
-| Sign-off verdict | [APPROVED / APPROVED WITH NOTES / REVISION REQUIRED] |
+| Date | 2026-06-29 |
+| DEMO-147 determination | **Intentional** — T3→T4 at step 6 is the BandingEngine step-depth tier transition rule. Add one acknowledgment sentence to Frame C narration. |
+| NM-083 call | **File as new NM** — the demo-spec ↔ component-contract integration gap is a distinct pattern from NM-082 (CI geometry). File at G7 entry. |
+| Cluster B ADR-008 amendment | **Confirmed required** — Zone 1B minimum height + DOM order for comparison sessions must be specified in ADR-008 before Cluster B implementation PR opens. |
+| Cluster C ADR-010 amendment | **Confirmed required** — monitored-row state is a new instrument behavior; ADR-010 amendment + separate-session UX Designer sign-off required before Cluster C implementation PR opens. |
+| DEMO-150 display fix in G7 | **Include in Cluster D** — trivial display change ("Not modelled" instead of em dash when module disabled). No module output work. |
+| DEMO-151 | **Confirmed M19 scope** — separate HD trajectory curve in Zone 1A comparison mode is a new capability, not a demo blocker. |
+| Sign-off verdict | **APPROVED** — all fix clusters may proceed to intent document authorship. Clusters B and C remain gated on ADR acceptance. |
+
+_@PublicEnemage, 2026-06-29_
