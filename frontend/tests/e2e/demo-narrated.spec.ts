@@ -203,7 +203,15 @@ function makeAct1BaselineMock(scenarioId: string): object {
           ci_lower: null,
           ci_upper: null,
           scoring_basis: "percentile_rank",
-          indicators: {},
+          indicators: {
+            // M18-G7-D AC-D3: bottom quintile HCL indicator for Zone 1B focal cohort display.
+            bottom_quintile_informal_workers_poverty_headcount: {
+              value: "0.450",
+              unit: "ratio",
+              variable_type: "STOCK",
+              confidence_tier: 3,
+            },
+          },
           mda_alerts: [],
           has_below_floor_indicator: false,
           note: null,
@@ -235,6 +243,8 @@ function makeAct1BaselineMock(scenarioId: string): object {
               confidence_tier: 3,
             },
           },
+          // M18-G7-D AC-D1: psp_dominant_driver at steps >= BRANCH_FROM_STEP.
+          ...(i + 1 >= BRANCH_FROM_STEP ? { psp_dominant_driver: "fiscal_sustainability" } : {}),
           mda_alerts: [],
           has_below_floor_indicator: false,
           note: null,
@@ -326,6 +336,8 @@ function makeAct1BranchMock(): object {
                 confidence_tier: 3,
               },
             },
+            // M18-G7-D AC-D1: psp_dominant_driver at steps >= BRANCH_FROM_STEP.
+            ...(isBranched ? { psp_dominant_driver: "fiscal_sustainability" } : {}),
             mda_alerts: [],
             has_below_floor_indicator: false,
             note: null,
