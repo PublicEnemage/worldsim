@@ -52,6 +52,7 @@
  */
 
 import { spawn } from "child_process";
+import * as crypto from "crypto";
 import * as fs from "fs";
 import * as path from "path";
 import { fileURLToPath } from "url";
@@ -61,6 +62,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const SPEAK_SCRIPT = path.resolve(__dirname, "../../../scripts/speak.sh");
 const SCREENSHOT_DIR = path.resolve(__dirname, "../../../docs/demo/m18/screenshots/");
+const WALKTHROUGH_PATH = path.resolve(__dirname, "../../../docs/demo/m18/stakeholder-walkthrough.md");
 
 fs.mkdirSync(SCREENSHOT_DIR, { recursive: true });
 
@@ -95,6 +97,27 @@ function speak(text: string): Promise<void> {
 
 function screenshotPath(filename: string): string {
   return path.resolve(SCREENSHOT_DIR, filename);
+}
+
+function fileMD5(filePath: string): string {
+  const content = fs.readFileSync(filePath);
+  return crypto.createHash("md5").update(content).digest("hex");
+}
+
+function findFilesWithString(dir: string, searchStr: string): string[] {
+  const found: string[] = [];
+  if (!fs.existsSync(dir)) return found;
+  const entries = fs.readdirSync(dir, { withFileTypes: true });
+  for (const entry of entries) {
+    const fullPath = path.join(dir, entry.name);
+    if (entry.isDirectory()) {
+      found.push(...findFilesWithString(fullPath, searchStr));
+    } else if (entry.isFile() && (entry.name.endsWith(".ts") || entry.name.endsWith(".tsx"))) {
+      const content = fs.readFileSync(fullPath, "utf8");
+      if (content.includes(searchStr)) found.push(fullPath);
+    }
+  }
+  return found;
 }
 
 async function waitForAppReady(page: import("@playwright/test").Page): Promise<void> {
@@ -847,6 +870,11 @@ test(
         );
 
         // ── FRAME A — "The Instrument" (thesis frame) ────────────────────────
+        // AC-E2 — Frame A must be captured at step 8 (maximum divergence). RED until M18-G7-E fix.
+        await expect.soft(
+          page.locator('[data-testid="current-step-display"]'),
+          "AC-E2 FAIL: Frame A must be at step 8 — currently step 3. Fix M18-G7-E capture sequence.",
+        ).toContainText("Step 8", { timeout: 2_000 });
         await page.waitForTimeout(1_200);
         await page.screenshot({ path: screenshotPath("frame-a-the-instrument.png") });
 
@@ -863,6 +891,19 @@ test(
         );
         await page.waitForTimeout(800);
         await page.screenshot({ path: screenshotPath("frame-b-uncertainty-envelope.png") });
+
+        // AC-E3 — Frame A and Frame B must have different MD5 hashes. RED until M18-G7-E fix.
+        // Currently both captured at step 3 (byte-identical). Fix: Frame B at step 3, Frame A at step 8.
+        {
+          const frameAPath = screenshotPath("frame-a-the-instrument.png");
+          const frameBPath = screenshotPath("frame-b-uncertainty-envelope.png");
+          if (fs.existsSync(frameAPath) && fs.existsSync(frameBPath)) {
+            expect.soft(
+              fileMD5(frameAPath),
+              "AC-E3 FAIL: frame-a and frame-b are byte-identical. Fix M18-G7-E: Frame B at step 3, Frame A at step 8.",
+            ).not.toBe(fileMD5(frameBPath));
+          }
+        }
       } else {
         console.warn("trajectory-counter not visible after Apply — G4 not fully implemented or mock not intercepted. Skipping Frame A/B.");
       }
@@ -901,6 +942,12 @@ test(
     await page.waitForTimeout(1_200);
 
     // ── FRAME C — "The Act 1 Finding" ──────────────────────────────────────────
+    // AC-E2 — Frame C must be captured at step 8 (same max-divergence state as Frame A). RED until M18-G7-E fix.
+    // Currently captured at step 6 — fix requires 5 more nextStep clicks after step 3 (not 3).
+    await expect.soft(
+      page.locator('[data-testid="current-step-display"]'),
+      "AC-E2 FAIL: Frame C must be at step 8 — currently step 6. Fix M18-G7-E capture sequence.",
+    ).toContainText("Step 8", { timeout: 2_000 });
     await page.screenshot({ path: screenshotPath("frame-c-act1-finding.png") });
 
     // ── ACT 2: Zambia — Three-Scenario Distributional Comparison ─────────────
@@ -973,7 +1020,26 @@ test(
         await page.waitForTimeout(1_200);
 
         // ── FRAME D — "The Counter-Proposal as a Number" ──────────────────────
-        // Zone 3 must be COLLAPSED for Frame D
+        // Zone 3 must be COLLAPSED for Frame D.
+        // AC-E4 — choropleth must be centred on ZMB before Frame D. RED until M18-G7-E centering fix.
+        // Fix: add page.evaluate(() => window.__worldsim_centerOnEntity?.('ZMB')) + waitForTimeout(800).
+        {
+          const mapCenter = await page.evaluate(() => {
+            const fn = (window as Record<string, unknown>).__worldsim_getMapCenter as
+              (() => { lat: number; lon: number } | null) | undefined;
+            return fn?.() ?? null;
+          });
+          if (mapCenter !== null) {
+            // ZMB is centred at approximately lat −14, lon 28.
+            expect.soft(
+              mapCenter.lat,
+              "AC-E4 FAIL: Map not centred on ZMB (lat too high). Add centerOnEntity('ZMB') before Frame D.",
+            ).toBeLessThan(-8);
+            expect.soft(mapCenter.lat).toBeGreaterThan(-20);
+          } else {
+            console.warn("AC-E4: __worldsim_getMapCenter unavailable — ZMB centering is a visual-review check only.");
+          }
+        }
         await page.screenshot({ path: screenshotPath("frame-d-counter-proposal.png") });
 
         // ── FRAME E — "The Analytical Defence" ────────────────────────────────
@@ -1028,3 +1094,70 @@ test(
     );
   },
 );
+
+// ---------------------------------------------------------------------------
+// AC-E1 — Jargon gate (static — does not require live stack; runs in CI)
+//
+// Guard: "Policy Malevolent Margin" must never appear in frontend/src.
+// Currently GREEN (jargon not present). Protects against regression when
+// Cluster C adds a PMM cross-reference row to DistributionalComparisonSummary.
+// Source: M18-G7-E intent §AC-E1 + DEMO-142 root cause.
+// ---------------------------------------------------------------------------
+
+test("AC-E1 — jargon gate: 'Malevolent' absent from frontend/src", () => {
+  const srcDir = path.resolve(__dirname, "../../src");
+  const found = findFilesWithString(srcDir, "Malevolent");
+  expect(
+    found,
+    `Jargon 'Policy Malevolent Margin' found in: ${found.join(", ")}. ` +
+    "Fix DEMO-142: replace with 'Policy Maneuver Margin' (see M18-G7-E intent §2.1).",
+  ).toHaveLength(0);
+});
+
+// ---------------------------------------------------------------------------
+// AC-E5 / AC-E6 / AC-E7 — Walkthrough content gates (static — no live stack)
+//
+// All three tests are RED against the current walkthrough and will turn GREEN
+// after the DEMO-144, DEMO-147, and DEMO-148 walkthrough fixes are applied.
+// Source: M18-G7-E intent §4 AC-E5/E6/E7.
+// ---------------------------------------------------------------------------
+
+test("AC-E5 — walkthrough: '340,000' replaced with corrected figure (DEMO-144)", () => {
+  const wt = fs.readFileSync(WALKTHROUGH_PATH, "utf8");
+  expect(
+    wt,
+    "AC-E5 FAIL: Walkthrough still contains '340,000'. " +
+    "Fix DEMO-144: replace every instance with 'approximately 342,700' " +
+    "(or the exact simulation figure from recaptured Frame A/C). " +
+    "See M18-G7-E intent §2.3.",
+  ).not.toContain("340,000");
+});
+
+test("AC-E6 — walkthrough: T3→T4 tier-degradation acknowledgment present in Frame C section (DEMO-147)", () => {
+  const wt = fs.readFileSync(WALKTHROUGH_PATH, "utf8");
+  // The DEMO-147 fix adds a sentence to the Frame C narration section that says the confidence
+  // tier moves to exploratory (T4) at step 8. Check for 'exploratory' as the canonical marker.
+  const hasAcknowledgment = wt.toLowerCase().includes("exploratory");
+  expect(
+    hasAcknowledgment,
+    "AC-E6 FAIL: Walkthrough missing T3→T4 tier-degradation acknowledgment sentence. " +
+    "Fix DEMO-147: add sentence to Frame C section — e.g., " +
+    "'The confidence tier moves to exploratory at step 8 — this reflects the " +
+    "BandingEngine's step-depth rule: deeper projections carry wider uncertainty.' " +
+    "See M18-G7-E intent §2.3.",
+  ).toBe(true);
+});
+
+test("AC-E7 — walkthrough: at least 8 act-transition sentences marked (DEMO-148)", () => {
+  const wt = fs.readFileSync(WALKTHROUGH_PATH, "utf8");
+  // Transition sentences are delimited with <!-- TRANSITION --> HTML comments.
+  // DEMO-148 requires 8 transitions across the five-frame walkthrough.
+  const transitionMarkers = wt.match(/<!--\s*TRANSITION/gi) ?? [];
+  expect(
+    transitionMarkers.length,
+    `AC-E7 FAIL: Only ${transitionMarkers.length} transition markers found (need ≥ 8). ` +
+    "Fix DEMO-148: add 8 <!-- TRANSITION --> markers around act-break narration sentences. " +
+    "Priority: Frame C → Frame D act break is highest-risk gap. " +
+    "See M18-G7-E intent §2.3.",
+  ).toBeGreaterThanOrEqual(8);
+});
