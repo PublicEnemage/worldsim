@@ -15,6 +15,29 @@
 set -euo pipefail
 
 # ---------------------------------------------------------------------------
+# Release branch push guard — NM-080 process improvement (Issue #1483)
+# Block direct CLI push to release/* branches; all updates must go via PR.
+# ---------------------------------------------------------------------------
+PUSH_REFS=$(cat)  # capture stdin once; pre-push receives refspecs on stdin
+
+while IFS=' ' read -r _local_ref _local_sha remote_ref _remote_sha; do
+  if [[ "$remote_ref" == refs/heads/release/* ]]; then
+    BRANCH="${remote_ref#refs/heads/}"
+    echo ""
+    echo "ERROR: Direct push to '$BRANCH' is blocked."
+    echo ""
+    echo "Release branches may only be updated via pull request."
+    echo "Create a feature/sprint/chore/infra branch, push it, and open a PR"
+    echo "targeting '$BRANCH'."
+    echo ""
+    echo "Emergency bypass (EL authorization required + NM entry immediately after):"
+    echo "  git push --no-verify"
+    echo ""
+    exit 1
+  fi
+done <<< "$PUSH_REFS"
+
+# ---------------------------------------------------------------------------
 # Detect changed files in this push.
 # Compare against upstream if tracked; fall back to HEAD~1.
 # ---------------------------------------------------------------------------
