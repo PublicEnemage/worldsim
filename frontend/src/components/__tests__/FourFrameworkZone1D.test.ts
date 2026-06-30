@@ -10,7 +10,7 @@
  * These are unit tests of pure functions exported from FourFrameworkZone1D.tsx.
  * Playwright E2E tests covering DOM assertions live in tests/e2e/pmm-four-framework.spec.ts.
  */
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, beforeAll } from "vitest";
 import {
   formatScore,
   getScoreClass,
@@ -147,6 +147,62 @@ describe("FRAMEWORK_ORDER: canonical display order", () => {
   it("each framework key has a display label", () => {
     for (const key of FRAMEWORK_ORDER) {
       expect(FRAMEWORK_DISPLAY_LABELS[key]).toBeTruthy();
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// M18-G7-D: AC-D2 — DRIVER_LABELS exhaustive (red until G7-D export fix)
+//
+// `DRIVER_LABELS` is currently a private `const` in FourFrameworkZone1D.tsx.
+// The G7-D fix exports it so the psp-driver-row render logic is testable.
+//
+// RED state: DRIVER_LABELS is undefined (not exported) → all assertions fail.
+// GREEN state (after G7-D): exported with all four valid psp_dominant_driver keys.
+//
+// Source: M18-G7-D intent §AC-D2 + root cause analysis §Root Cause 4 §DEMO-132.
+// ---------------------------------------------------------------------------
+
+describe("M18-G7-D: AC-D2 — DRIVER_LABELS mapping exhaustive", () => {
+  let DRIVER_LABELS: unknown;
+
+  beforeAll(async () => {
+    const mod = await import("../FourFrameworkZone1D");
+    DRIVER_LABELS = (mod as Record<string, unknown>).DRIVER_LABELS;
+  });
+
+  it("DRIVER_LABELS is exported from FourFrameworkZone1D (RED until G7-D export fix)", () => {
+    expect(typeof DRIVER_LABELS).toBe("object");
+    expect(DRIVER_LABELS).not.toBeNull();
+  });
+
+  it("AC-D2: has 'fiscal_sustainability' key", () => {
+    const labels = DRIVER_LABELS as Record<string, string> | undefined;
+    expect(labels).toBeDefined();
+    expect(labels?.fiscal_sustainability).toBeTruthy();
+  });
+
+  it("AC-D2: has 'governance' key", () => {
+    const labels = DRIVER_LABELS as Record<string, string> | undefined;
+    expect(labels?.governance).toBeTruthy();
+  });
+
+  it("AC-D2: has 'external_balance' key", () => {
+    const labels = DRIVER_LABELS as Record<string, string> | undefined;
+    expect(labels?.external_balance).toBeTruthy();
+  });
+
+  it("AC-D2: has 'social_stability' key", () => {
+    const labels = DRIVER_LABELS as Record<string, string> | undefined;
+    expect(labels?.social_stability).toBeTruthy();
+  });
+
+  it("AC-D2: unknown driver key returns undefined (psp-driver-row must guard against unknown keys)", () => {
+    // The component conditionally renders: `pspDominantDriver != null && DRIVER_LABELS[pspDominantDriver]`
+    // An unknown key must resolve to undefined (falsy) so the row is suppressed, not blank.
+    const labels = DRIVER_LABELS as Record<string, string> | undefined;
+    if (labels) {
+      expect(labels["unknown_driver_key"]).toBeUndefined();
     }
   });
 });
