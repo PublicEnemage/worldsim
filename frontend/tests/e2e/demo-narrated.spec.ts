@@ -799,6 +799,7 @@ test(
     // SEN scenario has no fiscal_multiplier config → mode stays MODE_1, so
     // mode2-column-surface never renders. mode3-toggle in the App.tsx header
     // directly activates MODE_3 (sets mode3Active=true), which renders ControlPlaneColumn.
+    let counterVisible = false; // hoisted — set inside mode3 else block, read in outer Frame A section
     const mode3ToggleBtn = page.locator('[data-testid="mode3-toggle"]');
     const toggleAvailable = await mode3ToggleBtn.isVisible({ timeout: 5_000 }).catch(() => false);
 
@@ -854,7 +855,7 @@ test(
       // Wait for branch trajectory to appear in Zone 1A
       const zone1a = page.locator('[data-testid="zone-1a-trajectory"]');
       const counterCurve = zone1a.locator('[data-testid="trajectory-counter"]');
-      const counterVisible = await counterCurve.isVisible({ timeout: 12_000 }).catch(() => false);
+      counterVisible = await counterCurve.isVisible({ timeout: 12_000 }).catch(() => false);
 
       if (counterVisible) {
         await speak(
@@ -869,16 +870,12 @@ test(
           "This is not a document. This is a live trajectory branch produced in the room.",
         );
 
-        // ── FRAME A — "The Instrument" (thesis frame) ────────────────────────
-        // AC-E2 — Frame A must be captured at step 8 (maximum divergence). RED until M18-G7-E fix.
+        // ── FRAME B — "The Uncertainty Envelope" (captured at step 3) ─────────
+        // AC-E2: Frame B at step 3 — distinct UI state from Frame A (step 8).
         await expect.soft(
           page.locator('[data-testid="current-step-display"]'),
-          "AC-E2 FAIL: Frame A must be at step 8 — currently step 3. Fix M18-G7-E capture sequence.",
-        ).toContainText("Step 8", { timeout: 2_000 });
-        await page.waitForTimeout(1_200);
-        await page.screenshot({ path: screenshotPath("frame-a-the-instrument.png") });
-
-        // ── FRAME B — "The Uncertainty Envelope" ─────────────────────────────
+          "AC-E2 FAIL: Frame B must be at step 3.",
+        ).toContainText("Step 3", { timeout: 2_000 });
         await speak(
           "The semi-transparent ribbons around each trajectory line are confidence bands. " +
           "At step three on Tier three data, the half-width is plus or minus thirty-five percent " +
@@ -891,31 +888,19 @@ test(
         );
         await page.waitForTimeout(800);
         await page.screenshot({ path: screenshotPath("frame-b-uncertainty-envelope.png") });
-
-        // AC-E3 — Frame A and Frame B must have different MD5 hashes. RED until M18-G7-E fix.
-        // Currently both captured at step 3 (byte-identical). Fix: Frame B at step 3, Frame A at step 8.
-        {
-          const frameAPath = screenshotPath("frame-a-the-instrument.png");
-          const frameBPath = screenshotPath("frame-b-uncertainty-envelope.png");
-          if (fs.existsSync(frameAPath) && fs.existsSync(frameBPath)) {
-            expect.soft(
-              fileMD5(frameAPath),
-              "AC-E3 FAIL: frame-a and frame-b are byte-identical. Fix M18-G7-E: Frame B at step 3, Frame A at step 8.",
-            ).not.toBe(fileMD5(frameBPath));
-          }
-        }
+        // Frame A and AC-E3 hash check captured after advancing to step 8 — see outer section below.
       } else {
-        console.warn("trajectory-counter not visible after Apply — G4 not fully implemented or mock not intercepted. Skipping Frame A/B.");
+        console.warn("trajectory-counter not visible after Apply — G4 not fully implemented or mock not intercepted. Skipping Frame B.");
       }
     }
 
-    // ── Advance to step 6 for Frame C ─────────────────────────────────────────
+    // ── Advance to step 8 for Frame A and Frame C ─────────────────────────────
 
     const nextStepBtn = page.getByRole("button", { name: /Next Step/ });
     const stepDisplay = page.locator('[data-testid="current-step-display"]');
 
-    // SEN is at step 3 (pre-advanced); advance to step 6 (3 more clicks).
-    for (let targetStep = 4; targetStep <= 6; targetStep++) {
+    // SEN is at step 3; advance to step 8 (5 more clicks — maximum divergence).
+    for (let targetStep = 4; targetStep <= 8; targetStep++) {
       const nextVisible = await nextStepBtn.isVisible({ timeout: 5_000 }).catch(() => false);
       if (nextVisible) {
         await nextStepBtn.click();
@@ -924,15 +909,37 @@ test(
       }
     }
 
+    // ── FRAME A — "The Instrument" (thesis frame, captured at step 8) ──────────
+    if (counterVisible) {
+      await expect.soft(
+        page.locator('[data-testid="current-step-display"]'),
+        "AC-E2 FAIL: Frame A must be at step 8.",
+      ).toContainText("Step 8", { timeout: 2_000 });
+      await page.waitForTimeout(1_200);
+      await page.screenshot({ path: screenshotPath("frame-a-the-instrument.png") });
+
+      // AC-E3 — Frame A (step 8) and Frame B (step 3) must have different byte content.
+      {
+        const frameAPath = screenshotPath("frame-a-the-instrument.png");
+        const frameBPath = screenshotPath("frame-b-uncertainty-envelope.png");
+        if (fs.existsSync(frameAPath) && fs.existsSync(frameBPath)) {
+          expect.soft(
+            fileMD5(frameAPath),
+            "AC-E3: frame-a and frame-b MD5s differ",
+          ).not.toBe(fileMD5(frameBPath));
+        }
+      }
+    }
+
     await speak(
-      "Step six. Q2 2026. Two years into the programme. " +
+      "Step eight. Q4 2025. Two years into the programme. " +
       "Zone one B — the cohort impact section. " +
       "The bottom quintile informal workers poverty headcount. " +
       "In the baseline, the composite is 0.450 — ten points above the 0.40 recovery floor. " +
       "In the counter-proposal branch at 0.85, it is 0.470. " +
       "The standard adjustment does not threaten the floor. " +
       "The counter-proposal does not need to. What it does is widen the margin. " +
-      "That is the ministry's argument at step six. " +
+      "That is the ministry's argument at step eight. " +
       "The floor outcome at this step: CLEAR. In both trajectories. " +
       "This is not the finding that the adjustment fails. " +
       "This is the finding that a less contractionary path produces a measurably better " +
@@ -941,12 +948,10 @@ test(
 
     await page.waitForTimeout(1_200);
 
-    // ── FRAME C — "The Act 1 Finding" ──────────────────────────────────────────
-    // AC-E2 — Frame C must be captured at step 8 (same max-divergence state as Frame A). RED until M18-G7-E fix.
-    // Currently captured at step 6 — fix requires 5 more nextStep clicks after step 3 (not 3).
+    // ── FRAME C — "The Act 1 Finding" (captured at step 8, same state as Frame A) ──
     await expect.soft(
       page.locator('[data-testid="current-step-display"]'),
-      "AC-E2 FAIL: Frame C must be at step 8 — currently step 6. Fix M18-G7-E capture sequence.",
+      "AC-E2 FAIL: Frame C must be at step 8.",
     ).toContainText("Step 8", { timeout: 2_000 });
     await page.screenshot({ path: screenshotPath("frame-c-act1-finding.png") });
 
@@ -1019,10 +1024,17 @@ test(
 
         await page.waitForTimeout(1_200);
 
+        // Center choropleth on ZMB before Frame D — AC-E4 fix (M18-G7-E)
+        await page.evaluate(() => {
+          const fn = (window as Record<string, unknown>).__worldsim_centerOnEntity as
+            ((id: string) => void) | undefined;
+          if (fn) fn('ZMB');
+        });
+        await page.waitForTimeout(800); // pan animation
+
         // ── FRAME D — "The Counter-Proposal as a Number" ──────────────────────
         // Zone 3 must be COLLAPSED for Frame D.
-        // AC-E4 — choropleth must be centred on ZMB before Frame D. RED until M18-G7-E centering fix.
-        // Fix: add page.evaluate(() => window.__worldsim_centerOnEntity?.('ZMB')) + waitForTimeout(800).
+        // AC-E4 — choropleth centred on ZMB via centerOnEntity call above.
         {
           const mapCenter = await page.evaluate(() => {
             const fn = (window as Record<string, unknown>).__worldsim_getMapCenter as
@@ -1033,7 +1045,7 @@ test(
             // ZMB is centred at approximately lat −14, lon 28.
             expect.soft(
               mapCenter.lat,
-              "AC-E4 FAIL: Map not centred on ZMB (lat too high). Add centerOnEntity('ZMB') before Frame D.",
+              "AC-E4 FAIL: Map not centred on ZMB (lat too high). Check centerOnEntity('ZMB') call and 800ms wait.",
             ).toBeLessThan(-8);
             expect.soft(mapCenter.lat).toBeGreaterThan(-20);
           } else {
