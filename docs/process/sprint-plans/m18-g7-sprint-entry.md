@@ -3,17 +3,17 @@ name: m18-g7-sprint-entry
 type: sprint-entry
 milestone: M18 — Full Argument and Demo 7
 sprint-group: G7 — Demo 7 Continuation (Step 6b Remediation through Live Session)
-status: Filed — awaiting EL approval before implementation begins
+status: EL-APPROVED — 2026-06-29
 authored-by: PM Agent
 authored-date: 2026-06-29
-el-approved: false
+el-approved: 2026-06-29
 release-branch: release/m18
 sop-reference: docs/process/sprint-planning-sop.md
 ---
 
 # Sprint Entry — M18, G7: Demo 7 Continuation
 
-**Status:** Filed — awaiting EL approval before implementation begins
+**Status:** EL-APPROVED — 2026-06-29 (@PublicEnemage)
 **Date authored:** 2026-06-29
 **Release branch:** `release/m18`
 **Sprint plan:** `docs/process/sprint-plans/m18-sprint-plan.md` (EL-approved 2026-06-26)
@@ -68,11 +68,11 @@ The following must be true before any G7 implementation PR opens:
 
 ### 2.1 — Structural gates
 
-- [ ] **Release branch exists:** `release/m18` — cut 2026-06-26 at commit 151904d ✅
-- [ ] **CI trigger verified:** `.github/workflows/ci.yml` `pull_request: branches` includes `release/m*` — confirmed at M18 kickoff ✅
-- [ ] **Sprint plan EL-approved:** `docs/process/sprint-plans/m18-sprint-plan.md` — EL-approved 2026-06-26 ✅
-- [ ] **G6 integration PR merged:** `sprint/m18-g6` → `release/m18` — must be confirmed before G7 branch is cut ⏳
-- [ ] **G6 exit confirmed by PI Agent:** `docs/process/sprint-plans/m18-g6-sprint-exit.md` — must be confirmed ⏳
+- [x] **Release branch exists:** `release/m18` — cut 2026-06-26 at commit 151904d
+- [x] **CI trigger verified:** `.github/workflows/ci.yml` `pull_request: branches` includes `release/m*` — confirmed at M18 kickoff
+- [x] **Sprint plan EL-approved:** `docs/process/sprint-plans/m18-sprint-plan.md` — EL-approved 2026-06-26
+- [x] **G6 integration PR merged:** PR #1479 `sprint/m18-g6` → `release/m18` — MERGED 2026-06-29T23:42Z; all CI checks SUCCESS
+- [x] **G6 exit confirmed by PI Agent:** `docs/process/sprint-plans/m18-g6-sprint-exit.md` — CONFIRMED 2026-06-29; sprint journal #1475 closed
 
 ### 2.2 — ADR prerequisite gate
 
@@ -316,10 +316,28 @@ No other cross-group dependencies (G7 is the sole active sprint group).
 
 ## EL Approval Record
 
-**EL approval:** Pending
+**EL approval:** APPROVED — 2026-06-29 (@PublicEnemage)
 
-> {EL approval statement — to be recorded before implementation begins.
-> Approval authorizes: (1) PI Agent to file NM-079; (2) PM Agent to cut `sprint/m18-g7`
-> from `release/m18` after G6 integration PR merges; (3) implementing agents to begin
-> Step G7-0 root cause analysis.}
-> — @PublicEnemage ({date})
+The G7 sprint entry is approved as filed.
+
+**Approval authorizes:**
+1. PI Agent to file NM-079 in `docs/process/near-miss-registry.md` before any implementation PR opens — the near-miss entry must precede the fix, not follow it
+2. PM Agent to cut `sprint/m18-g7` from `release/m18` after this approval lands in `release/m18` (via state sync PR) and open the G7 sprint journal issue
+3. Implementing agents to begin Step G7-0 root cause analysis — the first and only step that may begin before per-cluster intent documents are filed
+
+**EL notes on record:**
+
+1. **BPO priority escalations (from #1475#issuecomment-4839161892):** Three findings carry elevated operational priority flagged by the Business PO that are not fully reflected in the cluster ordering. The implementing agent must treat these as first-in-cluster:
+   - DEMO-142 ("Policy Malevolent Margin" jargon): first fix in Cluster E display-layer work, before any screenshot recapture. A jargon exposure in a stakeholder session is a professional credibility failure, not merely a rendering bug.
+   - DEMO-146 (walkthrough filename table mismatch): first fix in Cluster E documentation work. A presenter briefing from the walkthrough the night before the session will be confused by mismatched filenames — this is operationally significant.
+   - DEMO-148 Frame C→D act-break transition: highest-risk narration gap. Implement before recapture so the walkthrough is correct at the point screenshots are taken.
+
+2. **G7-0 root cause analysis scope:** The root cause document must explicitly address whether DEMO-150 (Ecological value missing) and DEMO-151 (HD trajectory absent from Zone 1A) are bugs or enhancement gaps. The entry scopes them tentatively as "enhancement-class" but the EL wants a specific determination from the root cause analysis before final disposition. If they are bugs (rendering bindings that exist in the codebase but fail to populate), they are in G7 scope. If they are missing module outputs (the backend simply doesn't produce these values), they are M19 scope.
+
+3. **Cluster B and C ADR gating is non-negotiable.** If the Architect Agent determines at G7-0 that Cluster B (Zone 1B height budget) or Cluster C (CohortImpactSection monitored-row state) constitutes a new instrument contract not covered by existing ADR-008/010 specs, the relevant ADR amendment must be accepted before the implementation PR for that cluster opens. No exceptions on timeline grounds. The demo timeline is not a reason to skip the ADR gate.
+
+4. **Step G7-0 is EL-reviewed, not self-approved.** The root cause analysis document must be presented to EL for review and sign-off before any fix intent document is authored. The sequencing is: G7-0 document filed → EL reviews → EL signs off → per-cluster intent documents authored. EL sign-off on G7-0 is what unlocks Clusters A through E.
+
+5. **NM-079 numbering:** The G7 sprint entry reserves NM-079 for the CI band geometry finding. The DS sprint health audit (commit 9009387, PR #1482) references "NM-079/NM-080" for the session start checklist process improvement, which predates the formal registry entries. The near-miss registry currently ends at NM-078. PI Agent assigns numbers from the next available (NM-079) in order filed. File CI band geometry as NM-079 per the convention established in this entry; the DS sprint health session start finding is NM-080 or NM-081 depending on which is filed first. The registry sequence must be continuous.
+
+— @PublicEnemage, 2026-06-29
