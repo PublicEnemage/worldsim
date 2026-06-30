@@ -71,18 +71,18 @@ def _sen_payload(name: str = "SEN G7-D PSP fixture test") -> dict[str, Any]:
 
 
 @pytest.fixture()
-def client() -> "httpx.AsyncClient":
+def client() -> httpx.AsyncClient:
     """ASGI test client for the FastAPI application."""
-    import httpx
-    from app.main import app
     from httpx import AsyncClient
+
+    from app.main import app
 
     return AsyncClient(app=app, base_url="http://test")
 
 
 @pytest.mark.asyncio
 async def test_trajectory_response_includes_psp_dominant_driver(
-    client: "httpx.AsyncClient",
+    client: httpx.AsyncClient,
 ) -> None:
     """AC-D5: trajectory response at step >= 3 includes psp_dominant_driver.
 
@@ -179,7 +179,7 @@ async def test_trajectory_response_includes_psp_dominant_driver(
 
 @pytest.mark.asyncio
 async def test_trajectory_response_psp_driver_path_matches_frontend_extraction(
-    client: "httpx.AsyncClient",
+    client: httpx.AsyncClient,
 ) -> None:
     """AC-D5 companion: verify extraction path consistency.
 
