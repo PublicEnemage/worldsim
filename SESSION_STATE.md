@@ -6,7 +6,7 @@
 > Historical state lives in `docs/process/session-archives/`.
 > Authority: `docs/process/sprint-group-isolation.md §SESSION_STATE.md Cockpit Card Protocol`.
 
-**Last updated:** 2026-06-29 (G7 ACTIVE — sprint/m18-g7 cut; journal #1495 opened; awaiting Step G7-0 root cause analysis)
+**Last updated:** 2026-07-01 (G7 EXIT CONFIRMED — Step 6b v3 PASS, Step 7 IR PASS, all CRITICALs resolved; integration PR #1526 → release/m18; awaiting live session #843)
 **Current milestone:** M18 — Full Argument and Demo 7 (GitHub Milestone 19)
 
 ---
@@ -20,9 +20,9 @@
 | Exit checklist issue | #1340 |
 | Release branch | ✅ `release/m18` — cut 2026-06-26 at commit 151904d |
 | Sprint plan | ✅ EL-approved 2026-06-26 — `docs/process/sprint-plans/m18-sprint-plan.md` (PR #1364) |
-| Active wave | G1 CLOSED (PR #1411); G2 CLOSED (PR #1408); G3 CLOSED (PR #1417); G4 CLOSED (PR #1433); G5 CLOSED (PR #1443); G6 CLOSED (PR #1479) — Wave 4 active |
-| Active sprint groups | G7 ACTIVE — Demo 7 continuation (Step 6b remediation → live session); `sprint/m18-g7` cut 2026-06-29 |
-| Active sprint journal issues | #1495 (G7 — Demo 7 continuation); Step G7-0 root cause analysis pending |
+| Active wave | G1–G7 all CLOSED — Wave 3 complete; all M18 sprint groups closed |
+| Active sprint groups | None — awaiting live external session #843 (Demo 7) |
+| Active sprint journal issues | None — G7 EXIT CONFIRMED 2026-07-01 (#1475#issuecomment-4859897165) |
 
 ---
 
@@ -60,11 +60,7 @@ None open. ADR-019 Accepted (PR #1393, 2026-06-27). GA-02 / Path 2 retired on op
 | #1354 | Control Plane Column Design Package — Mode 2 + Mode 3 (7 artifacts #1355–#1361) | ✅ GD CLOSED 2026-06-27 (PRs #1386–#1393); ADR-019 Accepted |
 | #1256 | Path 2 / proprietary data integration | ✅ CLOSED 2026-06-27 — retired on open-source-as-strategy principle; exception required to reopen |
 | #1422 | Zone 3 auditability panel for DistributionalComparisonSummary (US-1349-D) | ✅ CLOSED 2026-06-28 — PR #1439 merged; integration PR #1443 MERGED to release/m18; BPO ACCEPT + CA L3 PASS |
-| #1445 | Demo 7 preparation — v0.18.0 / M18 | 🔴 BLOCKED — Step 6b FAIL; 7 CRITICAL findings (#1459–#1465) must resolve before Step 7 |
-| #1459 | DEMO-130: Frame B = Frame A duplicate | 🔴 CRITICAL — blocks screenshot recapture |
-| #1461 | DEMO-132: psp-driver-row absent all five frames | 🔴 CRITICAL — G2 (#1255) not demonstrable in demo |
-| #1462 | DEMO-133: DistributionalComparisonSummary below fold | 🔴 CRITICAL — central Act 2 claim not readable |
-| #1466 | DEMO-137: CI band geometry bug (fills to chart ceiling) | 🔴 HIGH — drives y-axis problem, blocks trajectory legibility |
+| #1445 | Demo 7 preparation — v0.18.0 / M18 | ✅ G7 COMPLETE 2026-07-01 — Step 6b v3 PASS; Step 7 IR PASS; run 13 (10/10) demo-ready; integration PR #1526 |
 | #1217 | Mode 3 render optimization (EX-001 expired) | ✅ CLOSED 2026-06-28 — delivered in G4 (lazy-mount + Recharts memoization, PR #1424); EX-001 closed Won't Fix (MV-002 PASS) |
 | #1238 | DEMO6-009 TTS narration fix | ✅ CLOSED 2026-06-28 — fix already in commit 6e8f618 (G8b); no code change required |
 | #1059 | HCL narration integration | ✅ CLOSED 2026-06-28 — superseded by G5 scope decision |
@@ -88,5 +84,6 @@ None open. ADR-019 Accepted (PR #1393, 2026-06-27). GA-02 / Path 2 retired on op
 - **G4 CLOSED (2026-06-28):** Control plane column (Mode2ColumnSurface + ControlPlaneColumn + Form 1 + Form 2 + 7 shocks) + render optimization (#1217) + backend inject-shock endpoint — PRs #1418/#1421/#1424/#1426/#1429/#1432 merged to sprint/m18-g4. EX-001 closed Won't Fix — MV-002 67.40/85.50/64.40ms ≤ 100ms; AC-009 test.fixme removed. BPO full ACCEPT (#1402#issuecomment-4827376554). CA L3 PASS Persona 2+5. Sprint exit doc filed (`m18-g4-sprint-exit.md`). Integration PR #1433 MERGED to release/m18. Demo 7 scheduling unblocked — all G1–G4 groups closed.
 - **NM-076 CODING_STANDARDS.md rule (2026-06-28):** Testid rename crosscheck rule added in PR #1439 — before any testid rename, grep the full E2E corpus for the old testid; if found, update E2E tests in same PR.
 - **G5 CLOSED (2026-06-28):** Zone 3 auditability panel (#1422) — expand/collapse methodology panel on `DistributionalComparisonSummary` for Persona 1 (Lucas) analytical defence in Demo 7 live session. PR #1439 MERGED. BPO ACCEPT (#1422#issuecomment-4827639990). CA L3 PASS (#1435#issuecomment-4827654535). Sprint exit confirmed (`m18-g5-sprint-exit.md`, PR #1442). Integration PR #1443 MERGED to release/m18. #1238 + #1059 closed. Enhancement #1441 filed (L3 forward notes: extraction path entity_id interpolation + CI factor percentage labels).
-- **G6 ACTIVE — Step 6b FAIL (2026-06-29):** Demo 7 nine-agent internal review returned unanimous FAIL. 7 CRITICAL + 9 HIGH findings. Review: `docs/demo/m18/reviews/2026-06-29-v0.18.0-internal-review.md` (PR #1476). DEMO-130–DEMO-153 assigned; next available DEMO-154. Issues #1459–#1474 filed. Sprint journal #1475. Key blockers: CI band geometry bug (#1466/DEMO-137, root-causes multiple issues); psp-driver-row absent (#1461/DEMO-132); DistributionalComparisonSummary below fold (#1462/DEMO-133); Zone 3 panel content not in viewport (#1460/DEMO-131); Frame A/B duplicate (#1459/DEMO-130). Step 7 gate blocked.
+- **G6 CLOSED (2026-06-29):** Demo 7 preparation Step 6b returned FAIL (7 CRITICAL + 9 HIGH). Exit CONFIRMED (PI Agent #1475). Integration PR #1479 MERGED 2026-06-29. Sprint journal: #1475.
+- **G7 CLOSED (2026-07-01):** Demo 7 continuation — 24 DEMO-NNN findings remediated across 5 fix clusters (21 PRs). Step 6b v3: PASS (9/9 agents). Step 7 IR: PASS (0 CRITICAL). Run 13: 10/10, five distinct frames. All G6 blocking issues (#1459–#1474, #1511–#1514) closed. North star pre-assessment PASSES; formal artifact deferred to post-#843 (EL exception). Exit doc: `m18-g7-sprint-exit.md`. Integration PR #1526 → release/m18. Next available DEMO-NNN: DEMO-161.
 - **M17 archive:** Full M1–M17 session state at `docs/process/session-archives/session-state-pre-m18.md`.
