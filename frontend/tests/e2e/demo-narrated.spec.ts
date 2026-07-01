@@ -858,7 +858,6 @@ test(
       "The finance ministry team has been monitoring this screen. " +
       "Now they ask the question: is there a fiscal multiplier configuration " +
       "that avoids the human cost threshold? " +
-      "This is Mode two. On the right: the scenario identity panel. " +
       "The ministry's analyst is about to enter active control.",
     );
 
