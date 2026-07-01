@@ -182,6 +182,11 @@ export default function App() {
         if (detail.status === "completed") {
           setCurrentStep(detail.configuration.n_steps);
         }
+        // DEV seam — allows E2E tests to wait for scenario load completion.
+        if (import.meta.env.DEV) {
+          (window as unknown as Record<string, unknown>).__worldsim_selectedScenarioId =
+            detail.scenario_id;
+        }
       })
       .catch(() => {
         if (!cancelled && !urlId) localStorage.removeItem(LAST_SCENARIO_KEY);
