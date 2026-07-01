@@ -81,6 +81,7 @@ function computeSteps(features: GeoJSONFeatureCollection["features"]): number[] 
 export default function ChoroplethMap({ attributeName, title, scenarioId, currentStep, onEntityClick, activeEntityIds = [] }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<maplibregl.Map | null>(null);
+  const dataRef = useRef<GeoJSONFeatureCollection | null>(null);
   const popupRef = useRef<maplibregl.Popup | null>(null);
   const onEntityClickRef = useRef(onEntityClick);
   const [error, setError] = useState<string | null>(null);
@@ -132,6 +133,7 @@ export default function ChoroplethMap({ attributeName, title, scenarioId, curren
       }
 
       const data: GeoJSONFeatureCollection = await res.json();
+      dataRef.current = data;
       const steps = computeSteps(data.features);
 
       const applyData = () => {
@@ -257,6 +259,44 @@ export default function ChoroplethMap({ attributeName, title, scenarioId, curren
         : ["==", ["get", "entity_id"], ""],
     );
   }, [activeEntityIds]);
+
+  // DEV seams — choropleth entity centering and map-center query for E2E demo walkthrough.
+  // centerOnEntity: looks up entity polygon from the fetched GeoJSON and calls fitBounds —
+  //   generic across any ISO alpha-3 entity with polygon data in the choropleth source.
+  // getMapCenter: returns current map center {lat, lon} for AC-E4 soft assertion.
+  useEffect(() => {
+    if (!import.meta.env.DEV) return;
+    const win = window as unknown as Record<string, unknown>;
+    win.__worldsim_centerOnEntity = (entityId: string) => {
+      const map = mapRef.current;
+      const fc = dataRef.current;
+      if (!map || !fc) return;
+      const feature = fc.features.find((f) => f.properties.entity_id === entityId);
+      if (!feature || !feature.geometry) return;
+      const geom = feature.geometry as unknown as { type: string; coordinates: unknown };
+      let points: number[][];
+      if (geom.type === "Polygon") {
+        points = (geom.coordinates as number[][][]).flat(1) as number[][];
+      } else if (geom.type === "MultiPolygon") {
+        points = (geom.coordinates as number[][][][]).flat(2) as number[][];
+      } else {
+        return;
+      }
+      if (!points.length) return;
+      const lngs = points.map((p) => p[0]);
+      const lats = points.map((p) => p[1]);
+      map.fitBounds(
+        [[Math.min(...lngs), Math.min(...lats)], [Math.max(...lngs), Math.max(...lats)]],
+        { padding: 40, maxZoom: 6, duration: 0 },
+      );
+    };
+    win.__worldsim_getMapCenter = () => {
+      const map = mapRef.current;
+      if (!map) return null;
+      const c = map.getCenter();
+      return { lat: c.lat, lon: c.lng };
+    };
+  }, []);
 
   return (
     <div
