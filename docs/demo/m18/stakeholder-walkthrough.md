@@ -832,7 +832,7 @@ Five-frame brief and precise capture specifications: `docs/demo/m18/screenshot-b
 
 | Presentation order | File | Act | Step | Zone focus | Caption |
 |---|---|---|---|---|---|
-| 1 — THESIS | `frame-a-the-instrument.png` | Act 1 (SEN) | 8 / 8 | Zone 1A split (baseline + branch, max divergence) + CI bands | Mode 3 active: FiscalMultiplier applied. Zone 1A shows baseline and counter-trajectory branch at step 8 (maximum divergence). |
+| 1 — THESIS | `frame-a-the-instrument.png` | Act 1 (SEN) | 8 / 8 | Zone 1A (baseline + branch at programme completion) + CI bands + control column | Mode 3 active: FiscalMultiplier applied. Zone 1A shows baseline and counter-trajectory branch at step 8. Trajectory split is most visually evident in Frame B (step 3, +0.04 delta). |
 | 2 | `frame-b-uncertainty-envelope.png` | Act 1 (SEN) | 3 / 8 | Zone 1A CI bands + Zone 1D PSP driver label | CI ribbons on trajectory curves at step 3. Zone 1D: "Driver: fiscal sustainability" beneath severity badge. |
 | 3 | `frame-c-act1-finding.png` | Act 1 (SEN) | 8 / 8 | Zone 1B CohortImpactSection — cohort threshold state | Bottom quintile informal workers poverty headcount at step 8 vs. 0.40 recovery floor. Finding: threshold crossed or avoided under tested multiplier. |
 | 4 | `frame-d-counter-proposal.png` | Act 2 (ZMB) | terminal / 8 | Zone 1B DistributionalComparisonSummary sticky-bottom | "Option A vs. Option C: +approximately 342,700 persons · 298K–398K · T3 · Direction stable." Zone 1A three-scenario trajectories with CI bands. |
