@@ -780,6 +780,17 @@ test(
 
     await page.goto(`/?scenario=${encodeURIComponent(senId)}`);
     await waitForAppReady(page);
+    // Wait for the async scenario-detail fetch to resolve before checking zone-1a.
+    // waitForAppReady only confirms the synchronous DEV seam effect ran; the URL-param
+    // fetch is async and can lag by hundreds of ms under backend load (24 parallel advances
+    // in beforeAll). __worldsim_selectedScenarioId is written synchronously in App.tsx
+    // once the fetch resolves.
+    await page.waitForFunction(
+      (id: string) =>
+        (window as Record<string, unknown>).__worldsim_selectedScenarioId === id,
+      senId,
+      { timeout: 30_000 },
+    );
 
     // SEN scenario is in_progress at BRANCH_FROM_STEP — App.tsx only sets currentStep
     // for completed scenarios, so currentStep stays null → 0, blocking trajectory fetch.
@@ -1023,7 +1034,7 @@ test(
 
       if (summaryVisible) {
         await speak(
-          "Zone one B. The DistributionalComparisonSummary. " +
+          "Zone one B. The Distributional Comparison Summary. " +
           "The sticky-bottom panel shows the headcount differential. " +
           "Option A versus the ministry's counter-proposal, Option C. " +
           "Approximately three hundred and forty thousand persons below the poverty threshold. " +
@@ -1067,18 +1078,31 @@ test(
         await page.screenshot({ path: screenshotPath("frame-d-counter-proposal.png") });
 
         // ── FRAME E — "The Analytical Defence" ────────────────────────────────
-        // Expand Zone 3 methodology panel
+        // Expand Zone 3 methodology panel.
+        // distributional-comparison-summary is known visible (summaryVisible guard above).
+        // methodology-panel-toggle is always rendered inside distributional-comparison-summary.
+        // Use 'attached' state (DOM presence) — 'visible' can false-negative when the button
+        // is inside an overflow:hidden container that CSS-clips its bounding rect.
         const methodologyToggle = page.locator('[data-testid="methodology-panel-toggle"]');
-        const toggleVisible = await methodologyToggle.isVisible({ timeout: 5_000 }).catch(() => false);
+        const toggleAttached = await methodologyToggle.waitFor({ state: 'attached', timeout: 5_000 }).then(() => true).catch(() => false);
 
-        if (toggleVisible) {
-          await methodologyToggle.click();
+        if (toggleAttached) {
+          // Use native JS .click() — Playwright's coordinate-based click({ force: true })
+          // fires at the element's center coordinates, which are covered by the Zone 1B
+          // label div (position:absolute, top:4, right:6, zIndex:10). The browser delivers
+          // coordinate-based clicks to the topmost element at those coords (Zone 1B label),
+          // not the button. JS .click() dispatches directly on the button element, bypassing
+          // z-index hit-testing entirely.
+          await page.evaluate(() => {
+            const btn = document.querySelector('[data-testid="methodology-panel-toggle"]') as HTMLButtonElement | null;
+            if (btn) btn.click();
+          });
           await page.waitForTimeout(600);
 
           await speak(
             "Zone three expanded. The methodology behind the three hundred and forty thousand figure " +
             "is visible without leaving the primary viewport — no drawer navigation, no specialist mediation. " +
-            "The BandingEngine note: step-based half-width schedule, Tier three multiplier. " +
+            "The banding engine note: step-based half-width schedule, Tier three multiplier. " +
             "The direction stability condition. The CI derivation. " +
             "Persona one — the analytical economist on the ministry team — " +
             "can defend this methodology under IMF scrutiny from this screen. " +
@@ -1088,7 +1112,7 @@ test(
           await page.waitForTimeout(1_000);
           await page.screenshot({ path: screenshotPath("frame-e-analytical-defence.png") });
         } else {
-          console.warn("methodology-panel-toggle not visible — G5 Zone 3 auditability not implemented. Skipping Frame E expansion.");
+          console.warn("methodology-panel-toggle not attached — G5 Zone 3 auditability not implemented. Skipping Frame E expansion.");
           await page.screenshot({ path: screenshotPath("frame-e-analytical-defence.png") });
         }
       } else {

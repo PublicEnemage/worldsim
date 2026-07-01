@@ -174,3 +174,17 @@ Each entry has four fields:
 **Finding:** The sprint planning SOP has no wave-level coordination check. There is no defined threshold above which a coordination protocol is required before parallel sprint groups begin implementation. M17 ran seven concurrent groups with no coordination budget, making NM-067's merge conflicts and lost updates structurally inevitable. Even with the branching model fix from Issue #1329, seven simultaneous groups sharing a PM Agent coordination lane would exceed the lane's capacity. Filed as NM-071 and GitHub Issue #1335.
 **Action required:** `docs/process/sprint-planning-sop.md` amended before M18 kickoff with a wave kickoff coordination check: PM Agent lists all groups in the wave, their shared-file write scope, and cross-group dependencies, then assigns a coordination tier (standard / recommended / required) based on group count. Recommended starting ceiling: 5 parallel groups per wave. Dependency merge sequence documented before any downstream group opens an implementation PR. This is an M18 entry blocker: wave kickoff coordination check must be completed before M18 Wave 1 implementation begins. PM Agent: promote to M18 sprint planning agenda at next HORIZON sweep alongside #1329.
 **Status:** promoted → NM-071, #1335
+
+---
+
+**Date:** 2026-06-30
+**Source:** EL live observation during M18-G7 Step 6 screenshot recapture run 5 — Act 2 Zone 1A
+**Finding:** Act 2 Zone 1A shows a single overlapping line with colour speckles instead of three visually distinct ZMB scenario curves. Root cause: ZMB PHR values (Option A: 0.628, Option B: 0.584, Option C: 0.540) differ by only ~0.04–0.05 per step; the y-axis is not tight-scoped to the actual data range, so all three curves collapse visually into a single band. CompositeChartSVG `computeYDomain` uses `[0, 1]` or a padded range rather than [min(data), max(data)] with appropriate margin.
+**Status:** open
+
+---
+
+**Date:** 2026-06-30
+**Source:** EL live observation during M18-G7 Step 6 screenshot recapture run 5 — Act 1 Mode 3 Zone 1A narration
+**Finding:** Act 1 narration at line 892 of demo-narrated.spec.ts says "the human development composite is higher at every step from three onward" implying a separately visible HD line in Zone 1A — but Mode 3 uses CompositeChartSVG which renders a single composite average line, not per-framework lines. The HD contribution is included in the composite average but not separately visualised. The narration creates an expectation the chart does not satisfy; audience may ask to see the HD line and be unable to find it.
+**Status:** open
