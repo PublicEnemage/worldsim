@@ -302,7 +302,16 @@ function makeAct1BranchMock(): object {
             ci_lower: null,
             ci_upper: null,
             scoring_basis: "percentile_rank",
-            indicators: {},
+            // M18-G7-D DEMO-156: populate indicator so Zone 1B focal row shows CLEAR (not UNKNOWN).
+            // Branched value 0.470 > floor 0.40; pre-branch 0.450 > floor 0.40 — both CLEAR.
+            indicators: {
+              bottom_quintile_informal_workers_poverty_headcount: {
+                value: isBranched ? "0.470" : "0.450",
+                unit: "ratio",
+                variable_type: "STOCK",
+                confidence_tier: 3,
+              },
+            },
             mda_alerts: [],
             has_below_floor_indicator: false,
             note: null,
@@ -406,6 +415,31 @@ async function registerAct1Mocks(
   await page.route(
     `**/api/v1/scenarios/${ACT1_BRANCH_ID}/trajectory**`,
     (route) => route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(branchMock) }),
+  );
+
+  // M18-G7-D DEMO-157: measurement-output pass-through — inject psp_dominant_driver at steps >= BRANCH_FROM_STEP.
+  // The real backend omits psp_dominant_driver from programme_survival_probability for SEN synthetic data at steps
+  // 4–8. ScenarioInstrumentCluster.tsx line 675: setPspDominantDriver(entry.psp_dominant_driver ?? null) clears
+  // to null from the real backend response, overwriting the trajectory sync useEffect (lines 459–468).
+  // This interceptor patches the field on the way in so the component receives the correct value.
+  await page.route(
+    `**/api/v1/scenarios/${encodeURIComponent(scenarioId)}/measurement-output**`,
+    async (route) => {
+      const response = await route.fetch();
+      if (!response.ok()) { await route.fulfill({ response }); return; }
+      const step = parseInt(new URL(route.request().url()).searchParams.get("step") ?? "0");
+      const json = (await response.json()) as Record<string, unknown>;
+      if (step >= BRANCH_FROM_STEP) {
+        const outputs = json?.outputs as Record<string, unknown> | undefined;
+        const pe = outputs?.political_economy as Record<string, unknown> | undefined;
+        const indicators = pe?.indicators as Record<string, unknown> | undefined;
+        const psp = indicators?.programme_survival_probability as Record<string, unknown> | undefined;
+        if (psp !== null && psp !== undefined && typeof psp === "object") {
+          psp.psp_dominant_driver = "fiscal_sustainability";
+        }
+      }
+      await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(json) });
+    },
   );
 }
 
@@ -526,6 +560,16 @@ async function createSenScenario(): Promise<string> {
             },
           },
         },
+        // M18-G7-D DEMO-156: wire Zone 1B focal row for bottom quintile informal workers.
+        // Backend default is []; must be explicit so CohortImpactSection renders the focal row.
+        monitored_focal_cohorts: [
+          {
+            indicator_key: "bottom_quintile_informal_workers_poverty_headcount",
+            floor_value: 0.40,
+            floor_label: "Recovery floor: 0.40",
+            framework: "human_development",
+          },
+        ],
       },
       scheduled_inputs: [
         {
@@ -1270,6 +1314,64 @@ test("AC-D4 — mock fixture: ecological framework note triggers 'Not modelled' 
   // without an E2E run, but it documents the expected fixture shape.
   // The E2E portion of AC-D4 is verified in the @demo test via visual review.
   expect(true, "AC-D4: fixture shape check complete — rendering fix is in FourFrameworkZone1D.tsx").toBe(true);
+});
+
+// ---------------------------------------------------------------------------
+// AC-D5 — branch mock includes HD focal indicator (DEMO-156 regression guard)
+// ---------------------------------------------------------------------------
+
+test("AC-D5 — mock fixture: makeAct1BranchMock includes bottom_quintile_informal_workers_poverty_headcount in human_development at branched steps (DEMO-156)", () => {
+  // DEMO-156 root cause: branch mock had indicators: {} for human_development,
+  // so Zone 1B focal row rendered UNKNOWN (no numeric value → no evidence for Act 1 finding).
+  // Fix: indicator is now present with value "0.470" at branched steps (> 0.40 floor → CLEAR).
+  const branchMock = makeAct1BranchMock();
+  const steps = (branchMock as Record<string, unknown[]>).steps;
+  expect(Array.isArray(steps), "AC-D5: mock.steps must be an array").toBe(true);
+
+  const step3 = steps.find(
+    (s) => (s as Record<string, unknown>).step_index === 3,
+  ) as Record<string, unknown[]> | undefined;
+  expect(step3, "AC-D5: step_index 3 (first branched step) must exist in branch mock").toBeDefined();
+  if (!step3) return;
+
+  const frameworks = step3.frameworks as Array<Record<string, unknown>>;
+  const hdFramework = frameworks.find(
+    (fw) => fw.framework === "human_development",
+  ) as Record<string, Record<string, unknown>> | undefined;
+  expect(
+    hdFramework,
+    "AC-D5: human_development framework absent from step 3 of branch mock",
+  ).toBeDefined();
+  if (!hdFramework) return;
+
+  const indicators = hdFramework.indicators as Record<string, unknown> | undefined;
+  expect(
+    indicators?.bottom_quintile_informal_workers_poverty_headcount,
+    "AC-D5 FAIL: bottom_quintile_informal_workers_poverty_headcount absent from " +
+    "human_development indicators in branch mock at step 3 (DEMO-156). " +
+    "Without this, Zone 1B focal row shows UNKNOWN — no numeric CLEAR/CRITICAL evidence for Act 1 finding.",
+  ).toBeDefined();
+});
+
+// ---------------------------------------------------------------------------
+// AC-D6 — createSenScenario includes monitored_focal_cohorts (DEMO-156 regression guard)
+// ---------------------------------------------------------------------------
+
+test("AC-D6 — fixture: createSenScenario configuration includes monitored_focal_cohorts for Zone 1B focal row (DEMO-156)", () => {
+  // DEMO-156 root cause: createSenScenario sent monitored_focal_cohorts: [] (backend default)
+  // → CohortImpactSection received [] → focalRows empty → Zone 1B focal row never rendered.
+  // Fix: explicit monitored_focal_cohorts array in configuration POST body.
+  const specSrc = fs.readFileSync(__filename, "utf8");
+  expect(
+    specSrc.includes("monitored_focal_cohorts"),
+    "AC-D6 FAIL: 'monitored_focal_cohorts' absent from spec. " +
+    "Fix DEMO-156: add monitored_focal_cohorts array to createSenScenario configuration body. " +
+    "Without it, CohortImpactSection receives [] and no focal row renders in Zone 1B.",
+  ).toBe(true);
+  expect(
+    specSrc.includes("floor_label"),
+    "AC-D6 FAIL: 'floor_label' absent from spec — FocalCohortConfig incomplete (requires floor_label field).",
+  ).toBe(true);
 });
 
 // ---------------------------------------------------------------------------
