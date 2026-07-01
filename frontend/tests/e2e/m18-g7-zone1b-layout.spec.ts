@@ -637,6 +637,42 @@ test("AC-B5: psp-value visible at 1440×900 (not clipped by governance disclosur
       }),
     }),
   );
+  // Trajectory mock: required so store.trajectory.entity_id = "SEN" is set,
+  // which unblocks the measurement-output useEffect guard (entityId guard at
+  // ScenarioInstrumentCluster.tsx:608). Without this, the real backend returns
+  // 409 (no snapshots for un-advanced scenario) and psp-value never renders.
+  await page.route(`**/api/v1/scenarios/${scenId}/trajectory**`, (route) =>
+    route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({
+        scenario_id: scenId,
+        entity_id: "SEN",
+        step_count: 1,
+        mda_floors: [],
+        steps: [{
+          step_index: 1,
+          effective_from: "2024-01-01T00:00:00Z",
+          step_event_label: null,
+          step_significance: "ROUTINE",
+          frameworks: [
+            {
+              framework: "political_economy",
+              composite_score: null,
+              confidence_tier: 3,
+              ci_lower: null,
+              ci_upper: null,
+              scoring_basis: "percentile_rank",
+              indicators: {},
+              psp_dominant_driver: null,
+              note: null,
+            },
+          ],
+          pmm: null,
+        }],
+      }),
+    }),
+  );
 
   await page.goto(`/?scenario=${scenId}`);
   await waitForAppReady(page);
