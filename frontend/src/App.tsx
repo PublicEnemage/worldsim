@@ -182,6 +182,11 @@ export default function App() {
         if (detail.status === "completed") {
           setCurrentStep(detail.configuration.n_steps);
         }
+        // DEV seam — allows E2E tests to wait for scenario load completion.
+        if (import.meta.env.DEV) {
+          (window as unknown as Record<string, unknown>).__worldsim_selectedScenarioId =
+            detail.scenario_id;
+        }
       })
       .catch(() => {
         if (!cancelled && !urlId) localStorage.removeItem(LAST_SCENARIO_KEY);
@@ -209,7 +214,16 @@ export default function App() {
     // (URL-loaded scenarios with status != "completed" stay at currentStep=null → 0).
     (window as unknown as Record<string, unknown>).__worldsim_setCurrentStep = (step: number) =>
       setCurrentStep(step);
-  }, [setSelectedEntityId, setAttributeName]);
+    // M18-G7-B — load a comparison scenario alongside the URL-loaded reference scenario.
+    // Reads the reference scenario ID from the current URL (?scenario=) so no stale closure.
+    (window as unknown as Record<string, unknown>).__worldsim_loadComparisonScenario = (id: string) => {
+      const refId = new URLSearchParams(window.location.search).get("scenario") ?? "";
+      setComparisonScenarios([
+        { scenarioId: refId, label: "A", paletteIndex: 0 },
+        { scenarioId: id, label: "B", paletteIndex: 1 },
+      ]);
+    };
+  }, [setSelectedEntityId, setAttributeName, setComparisonScenarios]);
 
   // When a scenario is selected: fast-forward currentStep if already completed,
   // and extract the primary entity for the identity header + choropleth highlight (#744).

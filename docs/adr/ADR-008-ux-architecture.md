@@ -1057,3 +1057,65 @@ The explicit model aligns with the "pilot" metaphor: the user decides when to br
 ### Impact on Other Decisions
 
 No other ADR-008 decisions are affected. Zone boundaries, step axis annotation, blue/orange color assignment, confidence tier visual rules, mode transition design, and methodology access model are all unchanged. The control plane zone reserved in Mode 3 for the branch action interface was already specified in Decision 9 — the branch UI lives within that reserved zone.
+
+---
+
+## Amendment 2 — Zone 1B Minimum Height and Comparison-Session DOM Order
+
+**Date:** 2026-06-29
+**Trigger:** G7 Step 6b root cause analysis (2026-06-29) identified two missing Zone 1B constraints: (1) no minimum height specification for `DistributionalComparisonSummary`, causing it to clip at the Zone 1C boundary at 1440×900 (DEMO-133 CRITICAL); (2) no DOM ordering rule for comparison sessions, causing `DistributionalComparisonSummary` to render below MDA alerts and therefore below the visible Zone 1B area when a TERMINAL alert occupies the top of Zone 1B (DEMO-141 HIGH cascade; DEMO-131 CRITICAL — Zone 3 expanded panel not visible).
+**Source document:** `docs/demo/m18/reviews/2026-06-29-g7-root-cause-analysis.md §Root Cause 2`
+**Implemented in:** M18 G7 Cluster B — `MDAAlertPanelZone1B.tsx`
+
+### What Changes
+
+**Addition to Decision 5 §MDA Alert Panel Specification (Zone 1B):**
+
+**Zone 1B minimum height for comparison sessions:**
+
+When `DistributionalComparisonSummary` is active (comparison session with two computed scenario trajectories), Zone 1B must maintain a minimum rendered height sufficient to display all six content elements of `DistributionalComparisonSummary` fully visible at 1440×900 without scroll:
+
+1. Headcount differential (primary number)
+2. CI lower and upper bounds
+3. 95% CI marker
+4. Direction-stability indicator
+5. T3 confidence badge
+6. Reference scenario label
+
+The minimum height for `DistributionalComparisonSummary` alone is **160px** at standard font sizes. Zone 1B's total flex allocation must accommodate this plus the comparison-session header without compressing the summary below its minimum.
+
+**Zone 1B DOM ordering for comparison sessions:**
+
+In comparison sessions (two scenarios active), `DistributionalComparisonSummary` renders first in Zone 1B DOM order — above MDA alerts and `CohortImpactSection` rows.
+
+Rationale: In comparison sessions the distributional differential is the primary Zone 1B surface — it is the central human cost argument of the analysis. Placing MDA alerts above the distributional summary inverts the primary cognitive task. The existing severity ordering rule (TERMINAL before CRITICAL before WARNING) applies within MDA alerts; it does not govern the ordering of `DistributionalComparisonSummary` relative to MDA alerts in comparison sessions.
+
+In single-scenario sessions, the standard Zone 1B ordering applies unchanged: MDA alerts first (TERMINAL > CRITICAL > WARNING), `CohortImpactSection` below.
+
+**Zone 3 expanded panel scrollability:**
+
+When the Zone 3 methodology panel within `DistributionalComparisonSummary` opens (`panelOpen = true`), the panel content container must call `scrollIntoView({ block: 'nearest' })` after the render cycle completes. If the expanded panel content exceeds the Zone 1B scroll container height, the container must have `overflowY: auto` to make the expanded content scrollable.
+
+### Impact on Other Decisions
+
+Zone 1/2/3 boundary definitions (Decision 2) are unchanged. The minimum height constraint applies within Zone 1B — Zone 1C boundary position is not moved. The DOM ordering rule is a comparison-session conditional within Decision 5; the standard alert severity ordering remains in force for single-scenario sessions and for MDA alert ordering within comparison sessions.
+
+### Renewal Trigger Assessment
+
+No listed renewal trigger fires. Zone 1/2/3 boundary definitions are unchanged. This amendment adds layout constraints within Zone 1B for a specific session context (comparison sessions). Control plane zone sizing, step axis annotation schema, A/B comparison invocation model, blue/orange color assignment, confidence tier visual rules, mode transition design, simultaneous instrument update contract, and methodology access model are all unchanged. License validity period (through Milestone 13) is unchanged.
+
+### Panel Sign-Off
+
+**Architect Agent:** The Zone 1B minimum height (160px) is derived from the six content elements of `DistributionalComparisonSummary` at standard font sizes — this is the minimum that prevents clipping at 1440×900. The DOM ordering rule (comparison sessions: distributional first) implements the human cost parity principle from `CLAUDE.md §Guiding Principles`: "The human cost ledger is never a footnote. It is a primary output with equal visual weight to financial indicators." In a comparison session, the distributional differential is the human cost ledger output — it must be the primary Zone 1B surface.
+
+☑ Architect Agent sign-off — 2026-06-29
+
+**UX Designer Agent sign-off:**
+- Reviewing agent: UX Designer Agent
+- Session context: Same session as ADR authorship — acknowledged
+- Governing documents reviewed: `docs/ux/information-hierarchy.md §1B Zone Assignment and Disclosure Level Rules`; `docs/ux/north-star.md §Primary Cognitive Tasks (Mode 3 Act 2 comparison)`; `ADR-008 Decision 5 §MDA Alert Panel Specification — Severity ordering`; `ADR-008 Decision 2 §Zone Assignments for All Instruments`; `CLAUDE.md §Guiding Principles — The Human Cost Ledger is Primary`
+- Concerns found: None. The DOM ordering rule for comparison sessions correctly prioritises the distributional finding per the human cost primacy principle. The minimum height (160px) is conservative and adequate at standard font sizes. The Zone 3 scrollIntoView requirement ensures the methodology panel expansion is usable at constrained viewport heights. Zone 1B → Zone 1C boundary is unchanged; this amendment adds a floor constraint, not a partition change.
+
+☑ UX Designer sign-off — 2026-06-29 (same session as ADR authorship — acknowledged)
+
+**Engineering Lead acceptance:** Pending

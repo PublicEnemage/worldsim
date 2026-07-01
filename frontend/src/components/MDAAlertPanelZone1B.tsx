@@ -707,8 +707,15 @@ function _formatK(n: number): string {
   return n.toLocaleString("en-US");
 }
 
-function DistributionalComparisonSummary({ summary }: { summary: DistributionalSummaryData }) {
+export function DistributionalComparisonSummary({ summary }: { summary: DistributionalSummaryData }) {
   const [panelOpen, setPanelOpen] = useState(false);
+  const methodologyPanelRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (panelOpen && methodologyPanelRef.current) {
+      methodologyPanelRef.current.scrollIntoView({ block: "nearest" });
+    }
+  }, [panelOpen]);
 
   const terminalPairs = summary.pairs.map((pair) => {
     const terminal = pair.steps.find((s) => s.step === summary.terminal_step) ?? pair.steps[pair.steps.length - 1];
@@ -732,6 +739,7 @@ function DistributionalComparisonSummary({ summary }: { summary: DistributionalS
         padding: "6px 8px",
         background: "#fff",
         zIndex: 1,
+        minHeight: 160,
       }}
     >
       <div style={{ display: "flex", alignItems: "center", gap: 4, marginBottom: 2 }}>
@@ -804,7 +812,11 @@ function DistributionalComparisonSummary({ summary }: { summary: DistributionalS
           : "→ Direction uncertain: CI spans zero"}
       </div>
       {panelOpen && summary.methodology_detail && (
-        <div style={{ borderTop: "1px dashed #e5e7eb", marginTop: 4, paddingTop: 4 }}>
+        <div
+          ref={methodologyPanelRef}
+          data-testid="zone3-methodology-panel"
+          style={{ borderTop: "1px dashed #e5e7eb", marginTop: 4, paddingTop: 4, overflowY: "auto" }}
+        >
           <div data-testid="methodology-q1-population" style={rowStyle}>
             <span style={labelStyle}>Q1 population:</span>{" "}
             {summary.entity_id}: {summary.methodology_detail.q1_population.toLocaleString("en-US")} (UN WPP 2024, 20% Q1 fraction)
@@ -841,22 +853,150 @@ const COHORT_SEVERITY_COLOR: Record<CohortThresholdCrossing["severity"], string>
   WATCH: "#0070a0",
 };
 
-export function CohortImpactSection({ isCompleted = false }: { isCompleted?: boolean }) {
-  const { cohort_threshold_crossings: crossings, distributionalSummary } = useScenarioStepStore();
+const FOCAL_BADGE_COLOR = {
+  CLEAR: "#2e7d32",
+  CRITICAL: "#c62828",
+  UNKNOWN: "#888888",
+} as const;
+
+interface FocalCohortConfig {
+  indicator_key: string;
+  floor_value: number;
+  floor_label: string;
+  framework: string;
+}
+
+export function CohortImpactSection({
+  isCompleted = false,
+  monitoredFocalCohorts,
+}: {
+  isCompleted?: boolean;
+  monitoredFocalCohorts?: FocalCohortConfig[];
+}) {
+  const { cohort_threshold_crossings: crossings, current_step, trajectory } = useScenarioStepStore();
   const bp = useViewportBreakpoint();
-  const isNarrow = bp === 1024; // covers all viewports < 1280px, including 768px (#1250)
+  const isNarrow = bp === 1024;
   const headerLabel = isCompleted ? "COHORT IMPACT (HISTORICAL)" : "COHORT IMPACT";
   const emptyText = isCompleted
     ? "No cohort threshold crossings at or before this step."
     : "No cohort threshold crossings projected on current path.";
+
+  // Sort crossings: active (non-historical) first by severity, then historical (HIST) rows.
+  const activeCrossings = [...crossings]
+    .filter((c) => c.step_crossed >= current_step)
+    .sort((a, b) => {
+      const sevOrder: Record<string, number> = { CRITICAL: 0, WARNING: 1, WATCH: 2 };
+      return (sevOrder[a.severity] ?? 3) - (sevOrder[b.severity] ?? 3);
+    });
+  const historicalCrossings = crossings.filter((c) => c.step_crossed < current_step);
+  const sortedCrossings = [...activeCrossings, ...historicalCrossings];
+
+  // Build focal row states from trajectory indicators at current step.
+  const currentStepData = trajectory?.steps.find((s) => s.step_index === current_step) ?? null;
+  const focalRows = (monitoredFocalCohorts ?? []).map((focal) => {
+    const rawValue = currentStepData?.frameworks[focal.framework]?.indicators?.[focal.indicator_key] ?? null;
+    const numValue = rawValue !== null ? parseFloat(rawValue) : null;
+    const state: "CLEAR" | "CRITICAL" | "UNKNOWN" =
+      numValue === null ? "UNKNOWN" : numValue > focal.floor_value ? "CLEAR" : "CRITICAL";
+    return { focal, numValue, state };
+  });
+
+  const hasCrossings = sortedCrossings.length > 0;
+  const hasFocal = focalRows.length > 0;
+
+  function renderCrossingRow(crossing: CohortThresholdCrossing, rowIndex: number) {
+    const isHistorical = crossing.step_crossed < current_step;
+    const severityColor = COHORT_SEVERITY_COLOR[crossing.severity];
+    const borderColor = isHistorical ? "#a06000" : severityColor;
+    const isSad = !!crossing.is_synthetic && crossing.synthetic_method === "STRUCTURAL_ABSENCE";
+    const badgeText = isSad
+      ? "SAD"
+      : crossing.is_synthetic && crossing.synthetic_method === "SYNTHETIC_MODEL"
+        ? "T4"
+        : crossing.is_synthetic && crossing.synthetic_method === "SYNTHETIC_COMPARABLE"
+          ? "T3"
+          : `T${crossing.tier}`;
+    const valueDisplay = formatCohortDistance(crossing.above_floor_pct, crossing.breaches_below !== false, isSad);
+    return (
+      <div
+        key={`${crossing.quintile_key}-${crossing.indicator_key}`}
+        data-testid={`cohort-row-${rowIndex}`}
+        data-crossing-step={crossing.step_crossed}
+        style={{
+          display: "flex",
+          alignItems: "flex-start",
+          gap: 4,
+          borderLeft: `2px solid ${borderColor}`,
+          paddingLeft: 6,
+          paddingTop: 2,
+          paddingBottom: 2,
+          marginBottom: 2,
+          fontSize: isNarrow ? 11 : 10,
+        }}
+      >
+        <span
+          data-testid="severity-badge"
+          style={{
+            color: isHistorical ? "#fff" : severityColor,
+            background: isHistorical ? "#a06000" : undefined,
+            borderRadius: isHistorical ? 3 : undefined,
+            padding: isHistorical ? "1px 5px" : undefined,
+            fontWeight: 700,
+            flexShrink: 0,
+            fontSize: isNarrow ? 10 : 9,
+          }}
+        >
+          {isHistorical ? "HIST" : crossing.severity}
+        </span>
+        <span style={{ color: "#333", lineHeight: 1.3, flex: 1, minWidth: 0 }}>
+          <span style={{ fontWeight: 600, display: "block", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+            {crossing.cohort_label} — {crossing.indicator_label}
+          </span>
+          <span style={{ color: "#666", display: "block", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+            {`Threshold crossed at step ${crossing.step_crossed} · `}
+            <span data-testid={`cohort-value-${crossing.indicator_key}`}>
+              {valueDisplay}
+            </span>
+            {` · ${formatSourceId(crossing.source)}`}
+          </span>
+        </span>
+        <span
+          data-testid="confidence-tier-badge"
+          style={{ display: "inline-flex", flexDirection: "column", alignItems: "center", gap: 1, flexShrink: 0 }}
+        >
+          <span
+            data-testid={`cohort-tier-badge-${crossing.indicator_key}`}
+            style={{
+              fontSize: isNarrow ? 10 : 8,
+              fontWeight: 700,
+              color: isSad ? "#7a0000" : "#005a9e",
+              background: isSad ? "#ffe0e0" : "#e0eeff",
+              borderRadius: 2,
+              padding: "1px 3px",
+              display: "inline-block",
+            }}
+          >
+            {badgeText}
+          </span>
+          <span
+            data-testid="confidence-tier-badge-sublabel"
+            style={{ fontSize: isNarrow ? 9 : 7, color: "#6b7280", fontWeight: 400, lineHeight: 1, whiteSpace: "nowrap" }}
+          >
+            {isSad ? "No primary data" : badgeText === "T4" ? "Model est." : "Inferred"}
+          </span>
+        </span>
+      </div>
+    );
+  }
 
   return (
     <div
       data-testid="zone-1b-cohort-impact"
       style={{ borderTop: "1px solid #e0e0e0", paddingTop: 2, flex: "1 1 0", overflowY: "auto", background: "#fff", position: "relative" }}
     >
-      <div
-        data-testid="cohort-section-header"
+      <div data-testid="cohort-impact-section">
+        <div
+          data-testid="cohort-section-header"
           style={{
             fontSize: 9,
             fontWeight: 600,
@@ -868,7 +1008,7 @@ export function CohortImpactSection({ isCompleted = false }: { isCompleted?: boo
         >
           {headerLabel}
         </div>
-        {crossings.length === 0 ? (
+        {!hasCrossings && !hasFocal ? (
           <div
             data-testid="cohort-empty-state"
             style={{ fontSize: 10, color: "#aaa", fontStyle: "italic", paddingLeft: 4 }}
@@ -876,26 +1016,17 @@ export function CohortImpactSection({ isCompleted = false }: { isCompleted?: boo
             {emptyText}
           </div>
         ) : (
-          crossings.map((crossing, idx) => {
-            const color = COHORT_SEVERITY_COLOR[crossing.severity];
-            const isSad = !!crossing.is_synthetic && crossing.synthetic_method === "STRUCTURAL_ABSENCE";
-            const badgeText = isSad
-              ? "SAD"
-              : crossing.is_synthetic && crossing.synthetic_method === "SYNTHETIC_MODEL"
-                ? "T4"
-                : crossing.is_synthetic && crossing.synthetic_method === "SYNTHETIC_COMPARABLE"
-                  ? "T3"
-                  : `T${crossing.tier}`;
-            const valueDisplay = formatCohortDistance(crossing.above_floor_pct, crossing.breaches_below !== false, isSad);
-            return (
+          <>
+            {sortedCrossings.map((crossing, idx) => renderCrossingRow(crossing, idx))}
+            {focalRows.map(({ focal, numValue, state }) => (
               <div
-                key={`${crossing.quintile_key}-${crossing.indicator_key}`}
-                data-testid={`cohort-row-${idx}`}
+                key={`focal-${focal.indicator_key}`}
+                data-testid="focal-cohort-row"
                 style={{
                   display: "flex",
                   alignItems: "flex-start",
                   gap: 4,
-                  borderLeft: `2px solid ${color}`,
+                  borderLeft: `2px solid ${FOCAL_BADGE_COLOR[state]}`,
                   paddingLeft: 6,
                   paddingTop: 2,
                   paddingBottom: 2,
@@ -903,53 +1034,35 @@ export function CohortImpactSection({ isCompleted = false }: { isCompleted?: boo
                   fontSize: isNarrow ? 11 : 10,
                 }}
               >
-                <span style={{ color, fontWeight: 700, flexShrink: 0, fontSize: isNarrow ? 10 : 9 }}>
-                  {crossing.severity}
+                <span
+                  data-testid="focal-badge"
+                  style={{
+                    background: FOCAL_BADGE_COLOR[state],
+                    color: "#fff",
+                    borderRadius: 3,
+                    padding: "1px 5px",
+                    fontSize: isNarrow ? 10 : 9,
+                    fontWeight: 700,
+                    flexShrink: 0,
+                  }}
+                >
+                  {state}
                 </span>
                 <span style={{ color: "#333", lineHeight: 1.3, flex: 1, minWidth: 0 }}>
                   <span style={{ fontWeight: 600, display: "block", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                    {crossing.cohort_label} — {crossing.indicator_label}
+                    {focal.indicator_key.replace(/_/g, " ")} — {focal.floor_label}
                   </span>
-                  <span style={{ color: "#666", display: "block", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                    {`Threshold crossed at step ${crossing.step_crossed} · `}
-                    <span data-testid={`cohort-value-${crossing.indicator_key}`}>
-                      {valueDisplay}
+                  {numValue !== null && (
+                    <span style={{ color: "#666", display: "block" }}>
+                      {`${numValue.toFixed(3)} / floor ${focal.floor_value.toFixed(3)}`}
                     </span>
-                    {` · ${formatSourceId(crossing.source)}`}
-                  </span>
-                </span>
-                <span
-                  data-testid="confidence-tier-badge"
-                  style={{ display: 'inline-flex', flexDirection: 'column', alignItems: 'center', gap: 1, flexShrink: 0 }}
-                >
-                  <span
-                    data-testid={`cohort-tier-badge-${crossing.indicator_key}`}
-                    style={{
-                      fontSize: isNarrow ? 10 : 8,
-                      fontWeight: 700,
-                      color: isSad ? "#7a0000" : "#005a9e",
-                      background: isSad ? "#ffe0e0" : "#e0eeff",
-                      borderRadius: 2,
-                      padding: "1px 3px",
-                      display: "inline-block",
-                    }}
-                  >
-                    {badgeText}
-                  </span>
-                  <span
-                    data-testid="confidence-tier-badge-sublabel"
-                    style={{ fontSize: isNarrow ? 9 : 7, color: '#6b7280', fontWeight: 400, lineHeight: 1, whiteSpace: 'nowrap' }}
-                  >
-                    {isSad ? "No primary data" : badgeText === "T4" ? "Model est." : "Inferred"}
-                  </span>
+                  )}
                 </span>
               </div>
-            );
-          })
+            ))}
+          </>
         )}
-      {distributionalSummary && distributionalSummary.pairs.length > 0 && (
-        <DistributionalComparisonSummary summary={distributionalSummary} />
-      )}
+      </div>
     </div>
   );
 }

@@ -31,7 +31,7 @@
 import { useEffect, useRef, useState } from "react";
 import { InstrumentCluster, LAYOUT, useViewportBreakpoint } from "./InstrumentCluster";
 import { type ScenarioComparisonConfig, type ScenarioComparisonThresholdCrossing } from "./TrajectoryView";
-import { MDAAlertPanelZone1B, CohortImpactSection } from "./MDAAlertPanelZone1B";
+import { MDAAlertPanelZone1B, CohortImpactSection, DistributionalComparisonSummary } from "./MDAAlertPanelZone1B";
 import { PMMWidgetZone1C } from "./PMMWidgetZone1C";
 import { FourFrameworkZone1D } from "./FourFrameworkZone1D";
 import { CohortIndicatorsPanel } from "./CohortIndicatorsPanel";
@@ -56,6 +56,12 @@ interface RawFrameworkPoint {
   ci_upper: string | null;
   confidence_tier: number;
   scoring_basis: "percentile_rank" | "normalized_absolute" | "boundary_proximity";
+  /** M18-G7-C — raw indicator values from API; parsed to string | null in parseTrajectoryResponse. */
+  indicators?: Record<string, { value: string | null } | null>;
+  /** M18-G7-D — dominant driver of PSP change (political_economy only). */
+  psp_dominant_driver?: string | null;
+  /** M18-G7-D — note from API (e.g. "Ecological disabled for SEN Demo 7 Act 1"). */
+  note?: string | null;
 }
 
 interface RawTrajectoryStep {
@@ -104,6 +110,14 @@ function parseTrajectoryResponse(raw: RawTrajectoryResponse): TrajectoryResponse
             fw.scoring_basis === "boundary_proximity"
               ? "normalized_absolute"
               : fw.scoring_basis,
+          indicators: Object.fromEntries(
+            Object.entries(fw.indicators ?? {}).map(([k, v]) => [
+              k,
+              (v as { value?: string | null } | null)?.value ?? null,
+            ])
+          ),
+          psp_dominant_driver: fw.psp_dominant_driver ?? null,
+          note: fw.note ?? null,
         };
       }
       const pmm =
@@ -439,6 +453,20 @@ export function ScenarioInstrumentCluster({
   // eslint-disable-next-line react-hooks/exhaustive-deps -- store is a Zustand singleton, stable reference
   }, [currentStep, store.trajectory]);
 
+  // M18-G7-D: sync pspDominantDriver from trajectory when trajectory or step changes.
+  // Supplements the measurement-output extraction path so the driver renders in
+  // mocked demo sessions where measurement-output is not intercepted.
+  useEffect(() => {
+    const traj = store.trajectory;
+    if (!traj || currentStep === 0) return;
+    const step = traj.steps.find((s) => s.step_index === currentStep);
+    const driverFromTraj = step?.frameworks["political_economy"]?.psp_dominant_driver ?? null;
+    if (driverFromTraj !== null) {
+      setPspDominantDriver(driverFromTraj);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- store is a Zustand singleton, stable reference
+  }, [currentStep, store.trajectory]);
+
   // Fetch comparison scenario trajectory for Mode 2 overlay (#746).
   // When comparisonScenarioId changes, fetch its latest trajectory and store as baseline.
   // Clears baseline when comparisonScenarioId is removed.
@@ -512,6 +540,7 @@ export function ScenarioInstrumentCluster({
                   ci_upper: null,
                   confidence_tier: (fw.confidence_tier as number) ?? 3,
                   scoring_basis: "percentile_rank",
+                  indicators: {},
                 };
               }
               return {
@@ -1005,7 +1034,17 @@ export function ScenarioInstrumentCluster({
             comparisonScenarios={loadedComparisonScenarios}
           />
         }
-        zone1bCohortSection={<CohortImpactSection isCompleted={activeScenarioDetail?.status === "completed"} />}
+        zone1bCohortSection={
+          <CohortImpactSection
+            isCompleted={activeScenarioDetail?.status === "completed"}
+            monitoredFocalCohorts={activeScenarioDetail?.configuration?.monitored_focal_cohorts}
+          />
+        }
+        distributionalSummarySlot={
+          store.distributionalSummary && store.distributionalSummary.pairs.length > 0
+            ? <DistributionalComparisonSummary summary={store.distributionalSummary} />
+            : undefined
+        }
         pmmWidget={<PMMWidgetZone1C />}
         fourFramework={
           <FourFrameworkZone1D

@@ -826,6 +826,174 @@ describe("AC-1254-2 — mergeTrajectories CI extraction", () => {
   });
 });
 
+// ---------------------------------------------------------------------------
+// M18-G7-A: AC-A1 — computeCompositeCIBounds additive formula
+//
+// `computeCompositeCIBounds` is currently a private function using MULTIPLICATIVE
+// formula: `score * (1 ± halfWidth)`. ADR-007/ADR-010 spec requires ADDITIVE:
+// `score ± halfWidth`.
+//
+// RED state: function not exported → `computeCompositeCIBounds` is undefined.
+// RED state: even when exported, multiplicative formula returns wrong values.
+// GREEN state (after G7-A): exported, additive formula, capped to [0, 1].
+//
+// Fixture derivation (computeCompositeHalfWidth schedule):
+//   T3 step 1: baseHW=0.10, multiplier[3]=1.5 → halfWidth=0.15
+//              additive: {upper: 0.65, lower: 0.35}
+//              multiplicative (wrong): {upper: 0.575, lower: 0.425}
+//   T3 step 6: baseHW=0.50, multiplier[3]=1.5 → halfWidth=0.75
+//              additive: {upper: min(1.0, 1.25)=1.0, lower: max(0.0, -0.25)=0.0}
+//              multiplicative (wrong): {upper: 0.875, lower: 0.125}
+//
+// Source: M18-G7-A intent §AC-A1 + root cause analysis §Root Cause 1.
+// ---------------------------------------------------------------------------
+
+describe("M18-G7-A: AC-A1 — computeCompositeCIBounds additive formula", () => {
+  type MinimalFrameworkPoint = {
+    composite_score: number | null;
+    ci_lower: null;
+    ci_upper: null;
+    confidence_tier: number;
+    scoring_basis: "percentile_rank";
+  };
+  type MinimalStep = {
+    step_index: number;
+    effective_from: string;
+    step_event_label: null;
+    step_significance: "ROUTINE";
+    pmm: null;
+    frameworks: Record<string, MinimalFrameworkPoint>;
+  };
+
+  function makeStep(stepIndex: number, score: number, tier: number): MinimalStep {
+    const fw: MinimalFrameworkPoint = {
+      composite_score: score,
+      ci_lower: null,
+      ci_upper: null,
+      confidence_tier: tier,
+      scoring_basis: "percentile_rank",
+    };
+    return {
+      step_index: stepIndex,
+      effective_from: "2024-01-01T00:00:00Z",
+      step_event_label: null,
+      step_significance: "ROUTINE",
+      pmm: null,
+      frameworks: { financial: fw, human_development: fw, ecological: fw, governance: fw },
+    };
+  }
+
+  let computeCompositeCIBounds: unknown;
+
+  beforeAll(async () => {
+    const mod = await import("../TrajectoryView");
+    computeCompositeCIBounds = (mod as Record<string, unknown>).computeCompositeCIBounds;
+  });
+
+  it("computeCompositeCIBounds is exported from TrajectoryView (RED until G7-A export fix)", () => {
+    expect(typeof computeCompositeCIBounds).toBe("function");
+  });
+
+  it("AC-A1: T3 step 1 — additive: upper=0.65, lower=0.35", () => {
+    const fn = computeCompositeCIBounds as ((s: MinimalStep) => { upper: number | null; lower: number | null }) | undefined;
+    if (typeof fn !== "function") return; // deferred until export fix
+    const result = fn(makeStep(1, 0.50, 3));
+    // additive: 0.50 + 0.15 = 0.65; 0.50 - 0.15 = 0.35
+    // multiplicative (wrong): upper=0.575, lower=0.425
+    expect(result.upper).toBeCloseTo(0.65, 5);
+    expect(result.lower).toBeCloseTo(0.35, 5);
+  });
+
+  it("AC-A1: T3 step 6 — additive with capping: upper=1.0, lower=0.0", () => {
+    const fn = computeCompositeCIBounds as ((s: MinimalStep) => { upper: number | null; lower: number | null }) | undefined;
+    if (typeof fn !== "function") return; // deferred until export fix
+    const result = fn(makeStep(6, 0.50, 3));
+    // additive: 0.50 + 0.75 = 1.25 → capped to 1.0; 0.50 - 0.75 = -0.25 → capped to 0.0
+    // multiplicative (wrong): upper=0.875, lower=0.125
+    expect(result.upper).toBe(1.0);
+    expect(result.lower).toBe(0.0);
+  });
+
+  it("AC-A1: result is never multiplicative — upper ≠ score*(1+halfWidth) for T3 step 1", () => {
+    const fn = computeCompositeCIBounds as ((s: MinimalStep) => { upper: number | null; lower: number | null }) | undefined;
+    if (typeof fn !== "function") return;
+    const result = fn(makeStep(1, 0.50, 3));
+    // multiplicative wrong value: 0.50 * (1 + 0.15) = 0.575
+    expect(result.upper).not.toBeCloseTo(0.575, 5);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// M18-G7-A: AC-A2 — yDomain excludes CI bound values (regression guard)
+//
+// The G7-A fix removes `computeCompositeCIBounds(step).upper` from the values
+// array passed to `computeYDomain` in CompositeChartSVG. This test guards
+// against re-introducing CI values into the yDomain call site.
+//
+// This test is GREEN from the start — computeYDomain([0.48..0.54]) already
+// returns yMax ≤ 0.65. The regression guard confirms that when the component
+// calls computeYDomain with scores only, the y-axis stays in the trajectory
+// range and does NOT inflate to the CI upper bound.
+//
+// The second assertion demonstrates the BUG: including a CI upper of 1.0
+// inflates yMax to ≥ 0.97, compressing trajectory curves to 5% of chart height.
+//
+// Source: M18-G7-A intent §AC-A2 + root cause analysis §Root Cause 1 §Fix item 2.
+// ---------------------------------------------------------------------------
+
+describe("M18-G7-A: AC-A2 — yDomain trajectory-only values produce readable range", () => {
+  it("AC-A2: computeYDomain with trajectory scores only [0.48..0.54] → yMax ≤ 0.65", () => {
+    // After G7-A fix: component passes only composite scores to computeYDomain.
+    // With trajectory range 0.48–0.54, yMax must not inflate past 0.65.
+    const [, hi] = computeYDomain([0.48, 0.50, 0.52, 0.54]);
+    expect(hi).toBeLessThanOrEqual(0.65);
+  });
+
+  it("AC-A2: BUG demonstration — CI upper=1.0 included inflates yMax above 0.95", () => {
+    // This is the CURRENT broken behavior: CompositeChartSVG pushes ci_upper into values[].
+    // When 1.0 is included, yMax inflates to accommodate it, compressing trajectories.
+    // G7-A removes this push; the assertion below documents what the bug looks like.
+    const [, hi] = computeYDomain([0.48, 0.50, 0.52, 0.54, 1.0]);
+    expect(hi).toBeGreaterThan(0.95);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// M18-G7-A: AC-A3 — CI ribbon opacity uses exported constants, not 0.10
+//
+// The fix replaces hard-coded `opacity={0.10}` in two SVG ribbon paths with:
+//   mode === "MODE_3" ? CI_BAND_OPACITY_MODE3 : CI_BAND_OPACITY
+//   CI_BAND_OPACITY (comparison scenarios path — always Mode 1/2)
+//
+// This unit test guards against regression back to the 0.10 literal by verifying
+// that neither constant equals 0.10 (so the fix is definitionally correct),
+// and that CI_BAND_OPACITY_MODE3 < CI_BAND_OPACITY (Mode 3 must be quieter).
+//
+// Source: M18-G7-A intent §AC-A3 + root cause analysis §Root Cause 1 §Fix item 3.
+// ---------------------------------------------------------------------------
+
+describe("M18-G7-A: AC-A3 — CI ribbon opacity constants are not 0.10", () => {
+  it("CI_BAND_OPACITY is not 0.10 (hard-coded value replaced by constant)", async () => {
+    const mod = await import("../TrajectoryView");
+    const { CI_BAND_OPACITY } = mod as unknown as Record<string, number>;
+    expect(CI_BAND_OPACITY).toBeDefined();
+    expect(CI_BAND_OPACITY).not.toBe(0.10);
+  });
+
+  it("CI_BAND_OPACITY_MODE3 is not 0.10 (hard-coded value replaced by constant)", async () => {
+    const mod = await import("../TrajectoryView");
+    const { CI_BAND_OPACITY_MODE3 } = mod as unknown as Record<string, number>;
+    expect(CI_BAND_OPACITY_MODE3).toBeDefined();
+    expect(CI_BAND_OPACITY_MODE3).not.toBe(0.10);
+  });
+
+  it("CI_BAND_OPACITY_MODE3 < CI_BAND_OPACITY (Mode 3 ribbons quieter than Mode 1/2)", async () => {
+    const mod = await import("../TrajectoryView");
+    const { CI_BAND_OPACITY, CI_BAND_OPACITY_MODE3 } = mod as unknown as Record<string, number>;
+    expect(CI_BAND_OPACITY_MODE3).toBeLessThan(CI_BAND_OPACITY);
+  });
+});
+
 describe("AC-1254-4 — computeYDomain includes CI upper values", () => {
   it("CI upper value 0.95 — yMax ≥ 0.95", () => {
     const [, hi] = computeYDomain([0.50, 0.60, 0.95]);

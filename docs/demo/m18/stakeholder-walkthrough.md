@@ -39,9 +39,11 @@ Five things are live for the first time:
 3. **Counter-scenario comparison with CI bands (G3, #1349)** — `DistributionalComparisonSummary`
    renders in the sticky-bottom of Zone 1B when two or more scenarios are loaded for the same
    entity. It shows poverty headcount differential between the reference scenario and each
-   comparator (e.g., "+340,000 persons below poverty threshold · 295K–395K · T3 · Direction
+   comparator (e.g., "+approximately 342,700 persons below poverty threshold · 298K–398K · T3 · Direction
    stable"). The counter-proposal exists as a specific number with a confidence interval — not
    a narrative assertion.
+   **Note (IR-M18-003):** Actual simulation output: 298K–398K. See Frame D narration for
+   correct spoken bounds.
 
 4. **Control plane column — Mode 2 and Mode 3 (G4, #1354, ADR-019)** — The control plane is
    now a column-mounted component occupying a dedicated layout zone. Mode 2 shows
@@ -61,7 +63,7 @@ Five things are live for the first time:
 the active-control instrument: can the finance ministry's team find a fiscal multiplier
 configuration that avoids the bottom quintile crossing the 0.40 recovery floor? Act 2 (Zambia)
 demonstrates the counter-proposal as a quantified differential: three scenarios loaded, the
-comparison summary reads "+340,000 persons" and a confidence interval. The two acts share a
+comparison summary reads "+approximately 342,700 persons" and a confidence interval. The two acts share a
 single instrument cluster — the same Zone 1A / Zone 1B / Zone 1C / Zone 1D architecture
 serves both scenarios.
 
@@ -72,12 +74,12 @@ serves both scenarios.
 | Act 1 entity | SEN (Senegal) — Article IV consultation context |
 | Act 1 mode | Mode 3 Active Control — ControlPlaneColumn Form 1 |
 | Act 1 instrument | FiscalMultiplier slider, range 0.5–2.0 for demo, full range 0.1–3.0 |
-| Act 1 question | "Is there a configuration that avoids the bottom quintile crossing the 0.40 floor before step 6?" |
+| Act 1 question | "Is there a configuration that avoids the bottom quintile crossing the 0.40 floor before step 8?" |
 | Act 1 outcome | Both YES and NO are valid findings — the answer is the argument |
 | Act 2 entity | ZMB (Zambia) — debt restructuring context |
 | Act 2 scenarios | Option A (EFF Front-Loaded, IMF-proposed), Option B (EFF Gradual), Option C (Homegrown Programme, Ministry counter-proposal) |
 | Act 2 reference scenario | Option C (last in comparison list — convention for Demo 7) |
-| Act 2 primary finding | "+340,000 persons below poverty threshold · 295K–395K · T3 · Direction stable" |
+| Act 2 primary finding | "+approximately 342,700 persons below poverty threshold · 298K–398K · T3 · Direction stable" |
 | Step 5d Mode 3 evaluation | Required before live session — see `docs/demo/m18/reviews/scenario-evaluation-mode3-deliberation.md` |
 | ExternalSectorModule disclosure | Required per demo-preparation-standard.md Step 3 if SEN scenario uses ExternalSectorModule in Mode 3 (see §Honest Disclosures) |
 | Persona 3 (Andreas) | Included in Step 6c audience simulation — PSP driver label is his primary evaluation frame in Act 1 |
@@ -112,8 +114,8 @@ Three things, in priority order:
    claim about what the simulation can say at this data tier. The ministry team can cite the
    band width; it cannot be dismissed as vague.
 
-3. **The counter-proposal differential is a specific number, not a claim.** "+340,000 persons
-   below the poverty threshold, 295K–395K confidence interval, direction stable" is the Act 2
+3. **The counter-proposal differential is a specific number, not a claim.** "+approximately 342,700 persons
+   below the poverty threshold, 298K–398K confidence interval, direction stable" is the Act 2
    finding. Not "our programme is better for Zambian people." A specific number, a confidence
    interval, a direction-stability statement. The IMF team must engage with the number, not
    the claim.
@@ -164,6 +166,9 @@ Do not frame this as a warning or a protest capability. Frame every capability a
 standing in a negotiation. The ministry is not complaining about conditionality. They are
 presenting an alternative with a specific differential.
 
+<!-- TRANSITION -->
+*Transition: "Let me show you what that looks like in the room."*
+
 ---
 
 ## Section 2 — Live Application (10 minutes)
@@ -192,6 +197,9 @@ Zone 1B (alert + cohort impact + DistributionalComparisonSummary sticky-bottom),
 widget), Zone 1D (four-framework + PSP severity + driver label), plus control plane column
 (Mode 3 only, Act 1). Do NOT narrate the choropleth as the analytical instrument (UX-RULING-4).
 
+<!-- TRANSITION -->
+*Transition: "The application is live. Act 1: Senegal, active control."*
+
 ---
 
 ### Step 1 — Frame A: "The Instrument" (Act 1, Mode 3 Active, Form 1 Applied) (THESIS FRAME)
@@ -199,47 +207,54 @@ widget), Zone 1D (four-framework + PSP severity + driver label), plus control pl
 **What the audience sees:** Senegal. Mode 3 active. `ControlPlaneColumn` visible on the right
 side of the instrument cluster. Form 1: FiscalMultiplier slider positioned at **0.85**
 (Step 5d confirmed: fm=0.85 = 15% multiplier reduction ≈ 1.5pp primary surplus target reduction).
-Zone 1A showing two sets of trajectories: the baseline (original programme terms) and the
-counter-trajectory branch (FiscalMultiplier = 0.85, branch from step 3) — both visible
-simultaneously without scrolling. CI bands present on both trajectory sets (reduced opacity 5%
-in Mode 3). The branch anchor label visible in the column.
+Zone 1A showing the trajectory at programme completion (step 8) — both the baseline and
+counter-trajectory branch have been running since step 3, with the branch history visible in
+the applied-inputs log in the column. CI bands present on the trajectory (reduced opacity 5%
+in Mode 3). The branch anchor label ("Branched from step 3 — baseline locked") visible in the column.
+**Note (IR-M18-001):** By step 8, the financial composite has re-converged (delta 0.00). The
+trajectory split is most visually evident in Frame B at step 3 (delta +0.04). Direct the
+audience to the control column and the "Applied inputs" record as the evidence of the
+counter-proposal being live — not to Zone 1A curve separation.
 
 **What the presenter says:**
 
-> Senegal. Year one of the programme. Mode 3 — Active Control.
+> Senegal. Programme complete. Mode 3 — Active Control.
 >
 > Look at the right column. That is Form 1 of the control plane: FiscalMultiplier. The slider
-> is at 0.85. The "Apply policy instrument" button was pressed thirty seconds ago.
+> is at 0.85. The "Applied inputs" record below it reads: "Step 3 — FiscalMultiplier: 0.85."
+> That entry is the counter-proposal. It has been running since step 3.
 >
-> Now look at Zone 1A — the primary trajectory surface.
+> The column and Zone 1A are simultaneously visible. We have not opened a drawer. We have
+> not navigated to a separate comparison view. We set the multiplier, pressed Apply, and the
+> branch ran forward from step 3 to step 8 — with the control column still open and the
+> applied input still on record.
 >
-> Two sets of curves. The lighter set is the baseline — the IMF's proposed terms, fiscal
-> multiplier at 1.0. The bolder set is the branch: what the trajectories show under the
-> ministry's counter-proposal at 0.85 — fifteen percent below the programme baseline.
->
-> These two trajectory sets are visible simultaneously. We have not opened a drawer. We have
-> not navigated to a separate comparison view. We pressed Apply and Zone 1A updated — with the
-> column still open and the slider still visible.
->
-> This is what it means to test a counter-proposal in real time. The analyst adjusts the
-> multiplier, observes the trajectory diverge, and reads the result before the IMF team has
-> finished their sentence.
+> This is what it means to test a counter-proposal in real time. The analyst configures Form 1,
+> presses Apply, and the branch runs forward. In Frame B we will see the trajectory split at
+> the moment of application — baseline and branch visible simultaneously at step 3.
 >
 > The question Act 1 is asking: is there a multiplier configuration — between 0.5 and 2.0 —
-> that avoids the bottom quintile income index crossing the 0.40 recovery floor before step 6?
+> that avoids the bottom quintile income index crossing the 0.40 recovery floor before step 8?
 >
 > We are going to answer it now, on screen, in this room.
 
-**PAUSE — let them read the Zone 1A split.**
+**PAUSE — let them read the Form 1 state and the "Applied inputs" record in the column.**
 
 **Cognitive purpose:** Establish the control instrument as the act-1 capability. The audience
-needs to see that adjusting Form 1 and reading Zone 1A is a single uninterrupted workflow at
-1280×800 — the column and the trajectory are simultaneously visible. This is the capability
-Demo 7 exists to demonstrate.
+needs to see that Form 1 and Zone 1A are simultaneously visible at 1280×800 — the control
+input and the trajectory surface are on the same screen, no navigation required. Frame A
+shows the terminal state of the counter-proposal run. Frame B (next) shows the trajectory
+split at the moment of application. Together they establish the full workflow: configure →
+apply → trajectory branches → cohort outcome visible at step 8.
 
-**Key narration note (UX-RULING-4):** Do NOT say "watch Senegal on the map." Say "Zone 1A
-shows the two trajectory sets" or "Form 1 in the control column." The choropleth anchors
-geography. The instruments carry the argument.
+**Key narration note (UX-RULING-4):** Do NOT say "watch Senegal on the map." Say "Form 1 in
+the control column" or "the Applied inputs record confirms the branch has been running since
+step 3." Reserve "Zone 1A shows the trajectory split" for Frame B where the split is visually
+evident (+0.04 delta at step 3). The choropleth anchors geography. The instruments carry the
+argument.
+
+<!-- TRANSITION -->
+*Transition: "Now let's look at what this means at the moment the policy is applied."*
 
 ---
 
@@ -247,17 +262,27 @@ geography. The instruments carry the argument.
 
 **What the audience sees:** Senegal at step 3. Zone 1A composite trajectories — both baseline
 and branch — with CI bands visible as semi-transparent ribbons around each curve (reduced
-opacity in Mode 3). The band width is widest on the Human Development curve (T3 data tier).
+opacity in Mode 3). **This is the frame where the trajectory split is visually evident:**
+header reads "Financial (step 3) Baseline: 0.50  Branch: 0.54  +0.04" — the +0.04 delta
+confirms the baseline and branch have diverged at the moment the multiplier is applied.
 Zone 1D PSP section: severity badge (WARNING or WATCH depending on current configuration)
 plus the `psp-driver-row` below it: "Driver: fiscal sustainability." Zone 1B alert panel
 visible.
 
 **What the presenter says:**
 
-> Step three. Q3 2024. Nine months in.
+> Step three. Q3 2024. Nine months in. This is the moment the counter-proposal takes effect.
 >
-> Look at Zone 1A. The trajectories now carry uncertainty bands — the semi-transparent fills
-> around each curve. The band width is not decorative. It is calibrated: at step 3, the
+> Look at Zone 1A. Two sets of curves. The lower set is the baseline — the IMF's proposed
+> terms, fiscal multiplier at 1.0. The upper set is the branch: the trajectories under the
+> ministry's counter-proposal at 0.85 — fifteen percent below the programme baseline. The
+> split is visible right here, at the moment of application.
+>
+> Both trajectory sets are on screen simultaneously. We pressed Apply in Form 1 and Zone 1A
+> updated — the column still open, the slider still visible, the divergence immediate.
+>
+> Now look at the bands around each curve. The trajectories carry uncertainty ribbons — the semi-transparent fills
+> around each set. The band width is not decorative. It is calibrated: at step 3, the
 > half-width is ±35% of the composite value, scaled by the data tier. For Senegal's T3
 > demographic data, the tier multiplier is 1.5 — so the band is wider than it would be for
 > T1 survey data. The uncertainty envelope is specific to what we know and what we inferred.
@@ -289,15 +314,18 @@ supplementary disclosures but primary-viewport instruments. The uncertainty enve
 the driver attribution are not behind a drawer — they are on the same surface as the
 trajectory at the same step.
 
+<!-- TRANSITION -->
+*Transition: "Five steps later — at programme completion, Zone 1B reads the cohort threshold."*
+
 ---
 
-### Step 3 — Frame C: "The Act 1 Finding" (Zone 1B, Step 6 Cohort Threshold)
+### Step 3 — Frame C: "The Act 1 Finding" (Zone 1B, Step 8 Cohort Threshold)
 
-**What the audience sees:** Senegal at step 6. Mode 3 still active (ControlPlaneColumn
+**What the audience sees:** Senegal at step 8. Mode 3 still active (ControlPlaneColumn
 still visible). Zone 1B's CohortImpactSection showing the bottom quintile informal worker
 poverty headcount row with its current value and the 0.40 recovery floor. The finding is
 one of:
-- **If crossing avoided:** Current value above 0.40 at step 6 under the applied multiplier.
+- **If crossing avoided:** Current value above 0.40 at step 8 under the applied multiplier.
 - **If crossing not avoided:** Current value at or below 0.40 — the threshold is crossed
   regardless of the multiplier tested.
 
@@ -305,14 +333,19 @@ Both are valid Act 1 conclusions. Read whichever the simulation shows.
 
 **What the presenter says:**
 
-> Step six. Q2 2026. Two years in.
+> Step eight. Q4 2025. Two years in.
 >
 > Zone 1B — the cohort impact section. Bottom quintile informal workers. Poverty headcount.
-> Recovery floor: 0.40.
+> Recovery floor: 0.40. That 0.40 floor represents approximately 1.2 million informal sector
+> workers in Senegal below the poverty threshold — one-fifth of the informal labour force.
+>
+> The confidence tier moves to exploratory at step 8 — this reflects the BandingEngine's
+> step-depth rule: deeper projections carry wider uncertainty. The directional finding
+> remains valid.
 >
 > **[If the threshold is NOT crossed at the tested multiplier:]**
 >
-> At FiscalMultiplier 0.8, the bottom quintile poverty headcount at step 6 reads [value from
+> At FiscalMultiplier 0.8, the bottom quintile poverty headcount at step 8 reads [value from
 > screen]. The recovery floor is 0.40. The threshold has not been crossed under this multiplier
 > configuration.
 >
@@ -330,7 +363,7 @@ Both are valid Act 1 conclusions. Read whichever the simulation shows.
 > **[If the threshold IS crossed regardless:]**
 >
 > At every multiplier configuration between 0.5 and 2.0, the bottom quintile poverty headcount
-> crosses the 0.40 recovery floor before step 6. The crossing happens under [value from screen]
+> crosses the 0.40 recovery floor before step 8. The crossing happens under [value from screen]
 > regardless of the fiscal multiplier assumption in the range we tested.
 >
 > That is also a finding. The ministry team can say: "We tested the range. The threshold
@@ -353,6 +386,9 @@ threshold is crossed under all tested configurations, say so directly: "This is 
 important finding the tool can produce on this question." If avoided, say: "The ministry team
 now has the specific configuration to cite."
 
+<!-- TRANSITION -->
+*Transition: "We now shift to Zambia, where the Finance Ministry is negotiating debt restructuring with three competing proposals."*
+
 ---
 
 ### Step 4 — Frame D: "The Counter-Proposal as a Number" (Act 2, Zambia Comparison)
@@ -362,11 +398,15 @@ IMF-proposed), Option B (EFF Gradual), Option C (Homegrown Programme, Ministry c
 proposal). Zone 1B sticky-bottom: `DistributionalComparisonSummary`. Visible text (read from
 screen):
 
-> Option A vs. Option C: **+340,000 persons** below poverty threshold
-> 295K – 395K  ·  95% CI  ·  T3  ·  Direction stable
+> Option A vs. Option C: **+approximately 342,700 persons** below poverty threshold
+> 298K – 398K  ·  95% CI  ·  T3  ·  Direction stable
 
 Zone 1A shows composite trajectories for all three scenarios with CI bands. Zone 1D PSP
 comparison may be visible.
+
+**Presenter note:** The breadcrumb bar shows the reference scenario identifier (Option C).
+All three options are loaded and can be compared using the entity selector — the audience
+does not need to reload; switching scenarios updates Zone 1A and Zone 1B simultaneously.
 
 **What the presenter says:**
 
@@ -377,8 +417,8 @@ comparison may be visible.
 >
 > Look at Zone 1B — the bottom of the panel.
 >
-> The comparison summary reads: "Option A vs. Option C: plus 340,000 persons below poverty
-> threshold. 295,000 to 395,000. 95% confidence interval. Tier 3. Direction stable."
+> The comparison summary reads: "Option A vs. Option C: plus approximately 342,700 persons below poverty
+> threshold. 298,000 to 398,000. 95% confidence interval. Tier 3. Direction stable."
 >
 > Three things about that sentence.
 >
@@ -387,14 +427,14 @@ comparison may be visible.
 > under Option A compared to Option C. That number must be engaged with. It cannot be
 > dismissed as a qualitative objection.
 >
-> Second: it carries a confidence interval. 295,000 to 395,000. The direction is stable
+> Second: it carries a confidence interval. 298,000 to 398,000. The direction is stable
 > across the full uncertainty range — meaning regardless of where within the CI band the
 > true value lands, the sign does not flip. The ministry team is not claiming precision they
 > do not have. They are claiming direction stability at T3. That is a defensible epistemic
 > position.
 >
 > Third: it is T3. The ministry team can say: "Under T3 demographic weights from available
-> Zambian population data, the differential is 340,000. What does your distributional model
+> Zambian population data, the differential is approximately 342,700. What does your distributional model
 > show?" That question — "what does your model show?" — changes the structure of the
 > conversation. The IMF team cannot dismiss a T3 finding by citing data quality concerns
 > without disclosing the tier of their own distributional projections.
@@ -407,6 +447,9 @@ comparison may be visible.
 **Cognitive purpose:** Deliver the Act 2 core capability: the distributional differential
 as a self-contained, citable claim. The sentence in Zone 1B is the Demo 7 thesis made
 quantitative.
+
+<!-- TRANSITION -->
+*Transition: "And here is how the ministry team defends that number when challenged on methodology."*
 
 ---
 
@@ -423,7 +466,7 @@ navigation.
 
 > One more thing.
 >
-> The IMF team has just heard the 340,000 figure. Their next question — and they will ask it —
+> The IMF team has just heard the approximately 342,700 figure. Their next question — and they will ask it —
 > is: "What is the methodology behind that number? How did you compute the poverty headcount
 > differential?"
 >
@@ -442,7 +485,7 @@ navigation.
 >
 > Persona 1 — Lucas, the analytical economist from the IMF — is sitting across the table.
 > This is his primary evaluation frame. He needs to verify the methodology before he accepts
-> the 340,000 figure. The expanded panel gives him the chain from input to output, readable
+> the approximately 342,700 figure. The expanded panel gives him the chain from input to output, readable
 > from the primary viewport, while the comparison summary is still visible above it.
 >
 > The Zone 3 panel closes the analytical defence loop. The ministry team does not have to
@@ -454,6 +497,9 @@ finding (Act 2 Frame D) → methodology visible under scrutiny (Act 2 Frame E). 
 panel is not a UI convenience. It is the epistemic completeness of the counter-proposal
 argument.
 
+<!-- TRANSITION -->
+*Transition: "The question you will ask is: what gives that number authority? The engine that produced it has been validated against historical crisis cases."*
+
 ---
 
 ## Section 3 — Backtesting Credibility (3 minutes)
@@ -462,7 +508,7 @@ argument.
 
 > This tool makes specific claims. Specific claims require validation.
 >
-> The number 340,000 is a simulation output. Before it can be cited at the table, the
+> The number approximately 342,700 is a simulation output. Before it can be cited at the table, the
 > engine that produced it needs a track record. That track record is the backtesting suite.
 
 ### The Five Cases
@@ -497,7 +543,7 @@ argument.
 
 ### What DIRECTION_ONLY Means
 
-> The confidence interval in Zone 1B — 295,000 to 395,000 — is a BandingEngine output
+> The confidence interval in Zone 1B — 298,000 to 398,000 — is a BandingEngine output
 > based on a step-based half-width schedule and data tier multipliers. It is not a posterior
 > distribution from a fully Bayesian calibration against historical cohort data. That is
 > the next validation layer. The current CI band is a declared uncertainty envelope that
@@ -505,8 +551,11 @@ argument.
 > honest about what it is.
 >
 > The "Direction stable" declaration means the sign of the differential does not flip
-> anywhere within the 295K–395K band. That is the minimum confidence claim the ministry
+> anywhere within the 298K–398K band. That is the minimum confidence claim the ministry
 > team needs to cite the number: the direction is not an artifact of a point estimate.
+
+<!-- TRANSITION -->
+*Transition: "So where does this go from here?"*
 
 ---
 
@@ -574,14 +623,14 @@ argument.
 
 ### "How do the CI bands translate to a confidence level? 95%?"
 
-> The CI bands in Zone 1A and the 295K–395K interval in Zone 1B are BandingEngine outputs
+> The CI bands in Zone 1A and the 298K–398K interval in Zone 1B are BandingEngine outputs
 > — a step-based half-width schedule (±10% at step 1, up to ±50% beyond step 5) scaled by
 > the data confidence tier. The "95% CI" label on the comparison summary reflects the coverage
 > convention for the declared interval, not a Bayesian posterior from historical calibration.
 > The methodology note in the Zone 3 auditability panel states this explicitly.
 >
 > The claim the ministry team can make: "Under T3 data and our step-based uncertainty model,
-> the differential falls between 295,000 and 395,000 across the declared uncertainty range.
+> the differential falls between 298,000 and 398,000 across the declared uncertainty range.
 > The direction is stable. What uncertainty methodology does your distributional model use?"
 >
 > The question turns the uncertainty disclosure into a challenge instrument.
@@ -589,13 +638,13 @@ argument.
 ### "What is 'Direction stable' and why does it matter?"
 
 > Direction stable means the sign of the differential — positive (Option A worse for poverty)
-> or negative (Option A better) — does not change at any point within the 295K–395K band.
-> The 340,000 figure is a point estimate within that band. The point estimate could be off.
+> or negative (Option A better) — does not change at any point within the 298K–398K band.
+> The approximately 342,700 figure is a point estimate within that band. The point estimate could be off.
 > But wherever it lands within the declared uncertainty range, Option A produces more poverty
 > than Option C. The direction is not an artifact of a point estimate.
 >
 > That is the minimum confidence condition for the counter-proposal to be citable. The
-> ministry team is not claiming the number is exactly 340,000. They are claiming the direction
+> ministry team is not claiming the number is exactly approximately 342,700. They are claiming the direction
 > is stable, and they are citing a specific range. That is a defensible evidential position.
 
 ### "Why does Zone 1A show two trajectory sets in Mode 3? What is the branch?"
@@ -634,7 +683,7 @@ argument.
 > interventions alter the PSP driver label from "fiscal sustainability" to "social stability"
 > or "governance" — and whether that changes the trajectory.
 
-### "The 340,000 figure — is that specific to Zambia's actual data?"
+### "The approximately 342,700 figure — is that specific to Zambia's actual data?"
 
 > The differential is a simulation output under configured scenario parameters with available
 > Zambian population data at T3 tier — UN WPP 2024 and World Bank WDI. It is not a
@@ -644,7 +693,7 @@ argument.
 > from available sources.
 >
 > The ministry team's argument is: "Under available T3 data and our methodology — which is
-> published and auditable in the Zone 3 panel — the differential is 340,000, direction stable.
+> published and auditable in the Zone 3 panel — the differential is approximately 342,700, direction stable.
 > What does your distributional model show for this cohort?" That question is valid at T3.
 > It does not require T1 survey data to be worth asking.
 
@@ -743,7 +792,7 @@ epistemic honesty is working. Do not proactively volunteer unless a direct quest
 >
 > His government might know. If his government has a finance minister with better analytical
 > tools — tools that can say not just "our people cannot absorb this" but "at your multiplier
-> assumption, 340,000 additional people fall below the poverty threshold, direction stable,
+> assumption, approximately 342,700 additional people fall below the poverty threshold, direction stable,
 > and here is the alternative configuration that avoids it" — that minister negotiates better
 > terms. Better terms produce different fiscal paths. Different paths produce different
 > human consequences.
@@ -783,11 +832,11 @@ Five-frame brief and precise capture specifications: `docs/demo/m18/screenshot-b
 
 | Presentation order | File | Act | Step | Zone focus | Caption |
 |---|---|---|---|---|---|
-| 1 — THESIS | `frame-a-active-control.png` | Act 1 (SEN) | ~3–4 / 8 | ControlPlaneColumn Form 1 (right) + Zone 1A split (baseline + branch) | Mode 3 active: FiscalMultiplier applied. Zone 1A shows baseline and counter-trajectory branch simultaneously. |
-| 2 | `frame-b-ci-bands-psp-driver.png` | Act 1 (SEN) | 3 / 8 | Zone 1A CI bands + Zone 1D PSP driver label | CI ribbons on trajectory curves. Zone 1D: "Driver: fiscal sustainability" beneath severity badge. |
-| 3 | `frame-c-act1-finding.png` | Act 1 (SEN) | 6 / 8 | Zone 1B CohortImpactSection — cohort threshold state | Bottom quintile informal workers poverty headcount at step 6 vs. 0.40 recovery floor. Finding: threshold crossed or avoided under tested multiplier. |
-| 4 | `frame-d-comparison-summary.png` | Act 2 (ZMB) | terminal / 8 | Zone 1B DistributionalComparisonSummary sticky-bottom | "Option A vs. Option C: +340,000 persons · 295K–395K · T3 · Direction stable." Zone 1A three-scenario trajectories with CI bands. |
-| 5 | `frame-e-auditability-panel.png` | Act 2 (ZMB) | terminal / 8 | Zone 1B Zone 3 auditability panel expanded | Methodology panel open below comparison summary. BandingEngine note, tier multiplier, direction-stability condition visible. |
+| 1 — THESIS | `frame-a-the-instrument.png` | Act 1 (SEN) | 8 / 8 | Zone 1A (baseline + branch at programme completion) + CI bands + control column | Mode 3 active: FiscalMultiplier applied. Zone 1A shows baseline and counter-trajectory branch at step 8. Trajectory split is most visually evident in Frame B (step 3, +0.04 delta). |
+| 2 | `frame-b-uncertainty-envelope.png` | Act 1 (SEN) | 3 / 8 | Zone 1A CI bands + Zone 1D PSP driver label | CI ribbons on trajectory curves at step 3. Zone 1D: "Driver: fiscal sustainability" beneath severity badge. |
+| 3 | `frame-c-act1-finding.png` | Act 1 (SEN) | 8 / 8 | Zone 1B CohortImpactSection — cohort threshold state | Bottom quintile informal workers poverty headcount at step 8 vs. 0.40 recovery floor. Finding: threshold crossed or avoided under tested multiplier. |
+| 4 | `frame-d-counter-proposal.png` | Act 2 (ZMB) | terminal / 8 | Zone 1B DistributionalComparisonSummary sticky-bottom | "Option A vs. Option C: +approximately 342,700 persons · 298K–398K · T3 · Direction stable." Zone 1A three-scenario trajectories with CI bands. |
+| 5 | `frame-e-analytical-defence.png` | Act 2 (ZMB) | terminal / 8 | Zone 1B Zone 3 auditability panel expanded | Methodology panel open below comparison summary. BandingEngine note, tier multiplier, direction-stability condition visible. |
 
 See `docs/demo/m18/screenshot-brief.md` for the full UX Agent brief and capture specs.
 
