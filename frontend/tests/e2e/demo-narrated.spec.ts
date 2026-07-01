@@ -1015,7 +1015,14 @@ test(
 
     await page.waitForTimeout(1_200);
 
-    // ── FRAME C — "The Act 1 Finding" (captured at step 8, same state as Frame A) ──
+    // ── FRAME C — "The Act 1 Finding" (captured at step 8, Zone 1B scrolled to focal row) ──
+    // M18-G7-D DEMO-156: Zone 1B Sub-zone B has ~73px visible height. After two HIST rows
+    // (~70px), the focal row is just below the fold. Scroll zone-1b-cohort-impact to reveal
+    // the CLEAR badge before capture — making Frame C ≠ Frame A (different scroll offset).
+    await page.locator('[data-testid="zone-1b-cohort-impact"]').evaluate(
+      (el: HTMLElement) => { el.scrollTop = el.scrollHeight; },
+    );
+    await page.waitForTimeout(300);
     await expect.soft(
       page.locator('[data-testid="current-step-display"]'),
       "AC-E2 FAIL: Frame C must be at step 8.",
