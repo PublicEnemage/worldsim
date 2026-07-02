@@ -53,17 +53,16 @@ governance); Mode 3 Active Control enables counter-scenario branching for
 negotiation support.
 
 **This tool is in active pre-release development.** The working software
-described below reflects Milestone 15 (ADR-017 Zone 1A Information Architecture;
-Layer 3 self-interpreting outputs in Zone 1B and Zone 1D; Path 1 approved source
-network; cohort disaggregation and political risk designs; grounding strip date
-accuracy; accessibility validated on 8GB/4-core target hardware). M16 is in
-active development.
+described below reflects Milestone 18 (CI bands on Zone 1A trajectories; PSP
+driver decomposition; counter-scenario comparison with distributional differential
+and CI bounds; control plane column Mode 2+3; Zone 3 auditability panel; Demo 7
+north star PASS unconditional, 2026-07-02). M19 is in active development.
 
 ---
 
 ## What's Built
 
-The working system at Milestone 15 (core components — not exhaustive):
+The working system at Milestone 18 (core components — not exhaustive):
 
 - **Simulation engine** — Event-driven graph in Python. The `Quantity` type
   system tracks `value: Decimal`, unit, variable type (STOCK/FLOW/RATIO/

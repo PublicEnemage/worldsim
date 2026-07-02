@@ -294,11 +294,11 @@ See GitHub Releases for full delivery history.
 
 **Milestone 18 — Full Argument and Demo 7 (Complete)**
 
-Delivered: CI bands on Zone 1A trajectories (ADR-007 full implementation, #1254), PSP driver decomposition (#1255), counter-scenario comparison with distributional differential and CI bounds (#1349), control plane column Mode 2+3 (ADR-019, #1354), Zone 3 auditability panel (#1422), Mode 3 render optimization (#1217), 24 Demo 7 DEMO-NNN findings remediated across G6/G7. Demo 7 simulated stakeholder session: north star PASS (unconditional). SCAN-028 pending (EL-gated).
+Delivered: CI bands on Zone 1A trajectories (ADR-007 full implementation, #1254), PSP driver decomposition (#1255), counter-scenario comparison with distributional differential and CI bounds (#1349), control plane column Mode 2+3 (ADR-019, #1354), Zone 3 auditability panel (#1422), Mode 3 render optimization (#1217), 24 Demo 7 DEMO-NNN findings remediated across G6/G7. Demo 7 simulated stakeholder session: north star PASS (unconditional). SCAN-028 complete (Clean, 2026-07-02).
 
 **Milestone 19 — Constraint Search and Empirical Calibration (Current)**
 
-Core deliverable: Mode 3 constraint-floor capability (instrument finds configurations that avoid a human cost threshold, rather than requiring one-at-a-time manual search); SEN and ZMB backtesting; empirically grounded CI intervals (ADR-007 Bayesian posterior layer); PSP driver arc across programme window and in-viewport auditability panel (DEMO-165, #1528).
+Core deliverable: Mode 3 constraint-floor capability (instrument finds configurations that avoid a human cost threshold, rather than requiring one-at-a-time manual search); SEN and ZMB backtesting; empirically grounded CI intervals (ADR-007 Bayesian posterior layer); PSP driver arc across programme window and in-viewport auditability panel (DEMO-165, #1528); CI label precision (#1529); scenarioId guard Zone 1B (#1456); ADR-007 meaninglessness threshold (#1536); BandResult visible fields (#1537); focal cohort floor validation (#1538).
 
 Demo 8 at M19 close.
 
@@ -314,10 +314,10 @@ M0–M18 complete (v0.1.0–v0.18.0). M19 current. See GitHub Releases for full 
 The full roadmap covering M19 and beyond — milestone deliverables, demo anchors, canonical users served, and the long-term resolution spectrum direction — is maintained at `docs/roadmap/worldsim-roadmap.md`. That document is the canonical reference. The summary below reflects current and next milestone only.
 
 **Milestone 18 — Full Argument and Demo 7 (Complete)**
-Delivered: CI bands ADR-007 (#1254); PSP driver decomposition (#1255); counter-scenario comparison with distributional differential (#1349); control plane column ADR-019 (#1354); Zone 3 auditability panel (#1422); 24 DEMO-NNN findings remediated (G6/G7). Demo 7 north star PASS (unconditional, 2026-07-02). SCAN-028 pending.
+Delivered: CI bands ADR-007 (#1254); PSP driver decomposition (#1255); counter-scenario comparison with distributional differential (#1349); control plane column ADR-019 (#1354); Zone 3 auditability panel (#1422); 24 DEMO-NNN findings remediated (G6/G7). Demo 7 north star PASS (unconditional, 2026-07-02). SCAN-028 complete (Clean, 2026-07-02).
 
 **Milestone 19 — Constraint Search and Empirical Calibration (Current)**
-Core deliverable: Mode 3 constraint-floor search capability; SEN/ZMB backtesting; empirically grounded CI intervals; PSP driver arc and auditability panel (DEMO-165/#1528). Demo 8 at M19 close.
+Core deliverable: Mode 3 constraint-floor search capability; SEN/ZMB backtesting; empirically grounded CI intervals; PSP driver arc and auditability panel (DEMO-165/#1528); CI label precision (#1529); scenarioId guard Zone 1B (#1456); ADR-007 meaninglessness threshold (#1536); BandResult visible fields (#1537); focal cohort floor validation (#1538). Demo 8 at M19 close.
 
 Full roadmap: `docs/roadmap/worldsim-roadmap.md`
 
