@@ -156,23 +156,29 @@ asymmetry that constraint-floor search closes.
 
 A third form section is added to `ControlPlaneColumn.tsx` below Form 2 (Scenario Shocks):
 
-**Form 3 — Constraint Search (teal `#0d9488`):**
+**Form 3 — Constraint Search (Emerald-700 `#047857`):**
 ```
-CONSTRAINT SEARCH                                    [teal header, #0d9488]
+CONSTRAINT SEARCH                                    [Emerald-700 header, #047857]
 ─────────────────────────────────────────────────
 Floor constraint: [indicator label from focal cohort config]
 Floor value:      0.400 (from scenario config)
 Search over:      Fiscal multiplier [0.1, 3.0]
                   ┌──────────────────────────────┐
-                  │ [Find safe boundary]          │ ← teal button, #0d9488
+                  │ [Find safe boundary]          │ ← Emerald-700 button, #047857
                   └──────────────────────────────┘
 
 RESULT AREA — see D-4 for display contract
 ```
 
-**Color:** Teal `#0d9488` — distinct from blue (policy inputs) and orange (shocks), consistent
-with the two-color cross-layer system in ADR-019 §D-3. Teal is reserved for constraint
-search; no other element in the control plane uses this color.
+**Color:** Emerald-700 `#047857` (MV-001 replacement for original teal `#0d9488`) — distinct
+from blue (policy inputs, `#0284c7`) and orange (shocks, `#ea580c`). Original teal `#0d9488`
+failed the blue/teal deuteranopia CVD check (luminance ratio 1.14:1; both shift to similar
+blue-gray under deuteranopia). Emerald-700 has relative luminance ~0.079, contrast ratio
+~2.59:1 vs blue — passes all three pairs (blue/orange, orange/emerald, blue/emerald) under
+deuteranopia and protanopia simulation. MV-001 gate satisfied 2026-07-02. See
+`docs/ux/information-hierarchy.md §CVD Color Specification — MV-001 Empirical Confirmation`.
+Emerald-700 is reserved for constraint search; no other element in the control plane uses
+this color.
 
 **`data-testid` assignments:**
 - `data-testid="constraint-search-section"` — the Form 3 container
@@ -279,7 +285,7 @@ The `data-testid="constraint-search-result"` area renders one of four states:
 
 **State 1 — PENDING (search in progress):**
 ```
-[teal spinner] Searching... (N evaluations)
+[Emerald-700 spinner] Searching... (N evaluations)
 ```
 The backend streams progress events via SSE or returns immediately; for M19 the endpoint
 returns synchronously (no streaming). The frontend shows a loading indicator from button
@@ -298,7 +304,7 @@ N evaluations  ·  [0.1, 3.0] searched
 `data-testid="constraint-search-found"` on the result container.
 `data-testid="constraint-boundary-value"` on the "1.18" value.
 
-The result renders in teal `#0d9488`. The boundary value is displayed to 2 decimal places.
+The result renders in Emerald-700 `#047857`. The boundary value is displayed to 2 decimal places.
 The search precision interval ("±0.01") is displayed as a precision disclosure, not a CI
 band — it is the binary search convergence width, not a statistical confidence interval.
 A CM-endorsed note: "This is the binary search precision, not a statistical confidence
@@ -578,15 +584,16 @@ fields below are required — a checkbox without the structured attestation is n
 
 **Pre-Ship conditions (before any G1 PR merges to the sprint branch):**
 
-- **[Concern 1 — UX-1]** MV-001 CVD validation must be extended to validate all three
-  control plane colors — blue `#0284c7`, orange `#ea580c`, and teal `#0d9488` — under
-  deuteranopia and protanopia simulation. Blue-vs-teal distinguishability under
-  deuteranopia must be confirmed with a simulation tool (Sim Daltonism, Coblis, or
-  equivalent). Blue/teal luminance contrast ratio is ~1.14:1, insufficient for luminance-
-  only discrimination; empirical hue simulation is required. If not empirically
-  distinguishable, a teal replacement is documented with candidates in
-  `information-hierarchy.md §CVD Color Specification` — update this ADR §D-1 with the
-  replacement hex value. Tracked: #1564.
+- **[Concern 1 — UX-1] RESOLVED 2026-07-02 (M19 G1):** MV-001 CVD validation was
+  extended to validate all three control plane colors under deuteranopia and protanopia
+  simulation. Blue `#0284c7` vs original teal `#0d9488` FAILED deuteranopia (luminance
+  ratio 1.14:1; both shift to similar blue-gray). Replacement selected from candidate
+  table in `information-hierarchy.md §CVD Color Specification`: Emerald-700 `#047857`
+  (luminance ~0.079, contrast ratio ~2.59:1 vs blue). All three pairs — blue/orange,
+  orange/emerald, blue/emerald — PASS under deuteranopia and protanopia simulation.
+  ADR §D-1 updated to `#047857`. Implementation uses `const TEAL = "#047857"`.
+  Confirmation recorded in `information-hierarchy.md §CVD Color Specification —
+  MV-001 Empirical Confirmation`. Issue #1564 resolved.
 
 - **[Concern 2 — UX-1]** A new CI assertion (`AC-016`) must be added confirming that
   the Form 3 section header (`data-testid="constraint-search-section"`) is visible

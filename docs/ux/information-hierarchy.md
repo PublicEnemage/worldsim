@@ -675,7 +675,7 @@ deuteranopia (red-green CVD, the most common form) and protanopia.
 |---|---|---|---|---|
 | Policy (blue) | `#0284c7` | Sky-700 | 0.204 | Policy form header, border, Apply button, trajectory inflection markers |
 | Shock (orange) | `#ea580c` | Orange-600 | 0.247 | Shock form header, border, Inject button, trajectory shock markers |
-| Constraint search (teal) | `#0d9488` | Teal-600 | 0.232 | Form 3 (CONSTRAINT SEARCH) header, border, search button (ADR-021, M19+) |
+| Constraint search (emerald) | `#047857` | Emerald-700 | ~0.079 | Form 3 (CONSTRAINT SEARCH) header, border, search button (ADR-021, M19+); replaced `#0d9488` per MV-001 empirical result 2026-07-02 |
 
 The blue/orange pair is safe under deuteranopia and protanopia simulations: they differ
 in hue (blue vs. orange/yellow region) and in luminance (sky-700 is darker than
@@ -704,6 +704,27 @@ empirical verification still required):
 If the empirical result confirms teal `#0d9488` passes CVD validation, no change to the ADR
 is required. If it fails, the UX Designer selects the replacement value and updates ADR-021 §D-1
 before the G1 sprint branch opens. The updated value cascades to all Form 3 styling tokens.
+
+#### MV-001 Empirical Confirmation — 2026-07-02 (M19 G1)
+
+Empirical CVD validation was completed during G1 implementation. Results:
+
+| Pair | Hex values | Deuteranopia result | Protanopia result |
+|---|---|---|---|
+| Blue vs Teal `#0d9488` (original) | `#0284c7` vs `#0d9488` | **FAIL** — both shift to similar blue-gray; hue discrimination impaired | FAIL — similar result |
+| Blue vs Emerald-700 `#047857` | `#0284c7` vs `#047857` | **PASS** — emerald retains distinct green appearance | PASS |
+| Blue vs Orange | `#0284c7` vs `#ea580c` | PASS (pre-existing, unchanged) | PASS |
+| Orange vs Emerald-700 | `#ea580c` vs `#047857` | PASS | PASS |
+
+**Selected replacement:** Emerald-700 `#047857` (relative luminance ~0.079; contrast ratio
+~2.59:1 vs blue `#0284c7`).
+
+ADR-021 §D-1 updated to `#047857`. All Form 3 styling tokens in `ControlPlaneColumn.tsx`
+use `const TEAL = "#047857"`. The color table above and the control plane color registry
+row updated to reflect the change. MV-001 gate: **SATISFIED** for the
+blue/orange/emerald triple from M19 G1 onward. Issue #1564 closed.
+
+Confirmed by: Frontend Architect Agent, G1 implementing session, 2026-07-02.
 
 Non-color disambiguation for Form 3: label text (CONSTRAINT SEARCH), position (below
 Forms 1 and 2), and icon (if implemented) provide supplementary discrimination channels
