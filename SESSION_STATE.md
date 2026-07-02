@@ -6,7 +6,7 @@
 > Historical state lives in `docs/process/session-archives/`.
 > Authority: `docs/process/sprint-group-isolation.md §SESSION_STATE.md Cockpit Card Protocol`.
 
-**Last updated:** 2026-07-02 (pre-wave in flight — #1456 PR #1558 + #1538 PR #1559 open auto-merge; #1532 scoped (ARCH-014 filed PENDING_NUMBER, Iceland stays blocked); Architect deliberation on constraint-floor search: new ADR-021 required (ARCH-015 ASSIGNED), not ADR-019 amendment — awaiting EL confirmation; next action: EL confirms ADR-021 gate, then Architect authors ADR-021, then G1 sprint entry)
+**Last updated:** 2026-07-02 (pre-wave complete; ADR-021 accepted (EL 2026-07-02); G1 sprint entry filed PR #1566 pending EL approval; next action: EL approves m19-g1-sprint-entry.md → cut sprint/m19-g1 → begin G1 implementation)
 **Current milestone:** M19 — Constraint Search and Empirical Calibration
 
 ---
@@ -20,9 +20,9 @@
 | Exit checklist issue | #1535 (M19 Exit Checklist — blocks milestone closure) |
 | Release branch | `release/m19` — cut from `main` 2026-07-02 at 1bf1ecc |
 | Sprint plan | `docs/process/sprint-plans/m19-sprint-plan.md` — EL-approved 2026-07-02 |
-| Active wave | Pre-wave — #1456 PR #1558 ✓, #1538 PR #1559 ✓, #1532 scoped; ADR-021 gate pending EL |
-| Active sprint groups | None |
-| Active sprint journal issues | None |
+| Active wave | Wave 1 — G1 sprint entry filed (PR #1566 auto-merge); awaiting EL approval of `m19-g1-sprint-entry.md` before `sprint/m19-g1` cut |
+| Active sprint groups | G1 (entry filed, not yet open — EL approval pending) |
+| Active sprint journal issues | None (sprint journal issue opens at EL approval + sub-branch cut) |
 
 ---
 
@@ -30,7 +30,7 @@
 
 | Decision | Status |
 |---|---|
-| ADR-021 gate: confirm Architect recommendation — new ADR-021 for constraint-floor search (not ADR-019 amendment) | Architect deliberation filed 2026-07-02; awaiting EL confirmation. Once confirmed, Architect authors ADR-021; G1 sprint entry blocked until ADR-021 accepted. |
+| G1 sprint entry approval: approve `docs/process/sprint-plans/m19-g1-sprint-entry.md` | Entry filed 2026-07-02 (PR #1566). All 5 entry conditions satisfied. EL approval unblocks `sprint/m19-g1` sub-branch cut + sprint journal issue. |
 | ARCH-014 scope: capital controls full fix M19 or defer to M20? | Pre-wave assessment complete: full fix requires ADR (ARCH-014 PENDING_NUMBER). Iceland (#1553) stays blocked. EL decision needed on whether to scope ADR authorship in M19 Wave 2 or defer to M20. |
 
 ---
@@ -45,6 +45,8 @@
 | #1456 | MDAAlertPanel Zone1B: scenarioId crash | Pre-wave | Immediate — crash risk |
 | #1538 | Focal cohort floor validation | Pre-wave | Immediate — #1540 prerequisite |
 | #1540 | Mode 3 constraint-floor search | G1 Wave 1 | High — Demo 8 Act 1 |
+| #1563 | AC-016: Form 3 column visibility CI assertion | G1 (pre-ship — same PR as #1540) | Pre-ship condition |
+| #1564 | MV-001 three-way CVD validation (blue/orange/teal) | G1 (pre-ship — same PR as #1540) | Pre-ship condition |
 | #1546 | Headless battle-testing harness | G2A Wave 1 | High — all scenario runs depend on this |
 | #1541 | SEN backtesting fixture | G2B Wave 1 | High — Bayesian gate |
 | #1542 | ZMB backtesting fixture | G2B Wave 1 | High — Bayesian gate |
