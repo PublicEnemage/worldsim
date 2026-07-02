@@ -20,6 +20,11 @@ backend/tests/ root — to ensure CI test discovery includes it.
 NM-056 rule: NO pytest.skip() or soft-skip patterns in structural tests.
 ImportError at test-method level is hard RED — not a soft skip.
 
+@pytest.mark.backtesting is intentionally absent from the class here. It is added by
+the ZMB implementation PR (feat/m19-g2b-zmb-fixture) once zmb_scenario.py exists. Adding
+it now would cause the `backtesting` CI job (which has DATABASE_URL) to collect this test
+and fail hard — correct NM-056 behaviour but blocks this process-entry PR from merging.
+
 DEMO 8 LOAD-BEARING: ZMB is the primary calibration country for Demo 8 Act 2.
 The fidelity tier produced by this fixture grounds the CI interval credibility
 claim ("empirically grounded" CI bounds) at the stakeholder session. A fidelity
@@ -68,7 +73,6 @@ pytestmark = pytest.mark.asyncio(loop_scope="function")
 # ---------------------------------------------------------------------------
 
 
-@pytest.mark.backtesting
 @pytest.mark.asyncio(loop_scope="session")
 class TestZMBTypeARegressionFidelity:
     """AC-1 through AC-10: ZMB 2014–2019 Type A harness run validation.

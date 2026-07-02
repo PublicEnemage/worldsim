@@ -20,6 +20,11 @@ backend/tests/ root — to ensure CI test discovery includes it.
 NM-056 rule: NO pytest.skip() or soft-skip patterns in structural tests.
 ImportError at test-method level is hard RED — not a soft skip.
 
+@pytest.mark.backtesting is intentionally absent from the class here. It is added by
+the SEN implementation PR (feat/m19-g2b-sen-fixture) once sen_scenario.py exists. Adding
+it now would cause the `backtesting` CI job (which has DATABASE_URL) to collect this test
+and fail hard — correct NM-056 behaviour but blocks this process-entry PR from merging.
+
 AC coverage:
   AC-1+2 fixture importable and returns entity_id="SEN", is_pre_calibration=True
          (folded into DB-gated test — import runs only when DATABASE_URL set,
@@ -60,7 +65,6 @@ pytestmark = pytest.mark.asyncio(loop_scope="function")
 # ---------------------------------------------------------------------------
 
 
-@pytest.mark.backtesting
 @pytest.mark.asyncio(loop_scope="session")
 class TestSENTypeARegressionFidelity:
     """AC-1 through AC-9: SEN 2014–2019 Type A harness run validation.
