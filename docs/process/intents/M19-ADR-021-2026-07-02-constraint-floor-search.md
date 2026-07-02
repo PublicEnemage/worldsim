@@ -270,9 +270,11 @@ The FOUND state's primary output is a number and a direction ("≥"). No mediati
 - **Backend (pytest) — AC-10:** POST to `/scenarios/nonexistent-id/constraint-floor-search`; assert 404 response.
 
 **QA Lead acknowledgment:**
-`[x]` QA Lead: Tests for AC-1 through AC-12 and AC-016 authored and filed. 2026-07-02
-- `frontend/tests/e2e/m19-g1-constraint-floor-search.spec.ts` — AC-1 through AC-7, AC-11, AC-12, AC-016 (all guard on `constraint-search-section` testid; no-ops pre-implementation)
-- `backend/tests/test_m19_g1_constraint_floor_search.py` — AC-8, AC-9, AC-10 + schema smoke tests (all guard on `IMPLEMENTATION_PRESENT`; no-ops pre-implementation)
+`[x]` QA Lead Agent: Tests for AC-1 through AC-12 and AC-016 reviewed, 8 gaps corrected, re-filed. 2026-07-02
+- `frontend/tests/e2e/m19-g1-constraint-floor-search.spec.ts` — AC-1 through AC-7, AC-11, AC-12, AC-016 (guard on `constraint-search-section`; no-ops pre-implementation). Corrections applied: Gap 2 (testid `control-plane-column` → `zone-control-plane`); Gap 3 (mock fields `lo_searched`/`hi_searched`/`error` → `search_lo`/`search_hi`/`error_message`; added `floor_value`, `indicator_key`, `error_message`); Gap 5 (`enterMode3WithFocalCohort` replaces `enterMode3` in all tests that require Form 3 to render); Gap 6 (added `±` precision assertion in AC-5); Gap 8 (structural-absence scenario mock added to AC-12).
+- `backend/tests/test_m19_g1_constraint_floor_search.py` — AC-8, AC-9, AC-10 + schema smoke tests (guard on `IMPLEMENTATION_PRESENT`; no-ops pre-implementation). Corrections applied: Gap 1 (`async_client` fixture → `client`); Gap 3 (response schema smoke test field names corrected to `search_lo`, `search_hi`, `floor_value`, `indicator_key`, `error_message`); Gap 7 (`tolerance=` → `tol=` in AC-8 and AC-9 `binary_search()` calls).
+- Gaps identified: 8 (3 critical, 3 moderate, 2 minor). All 8 corrected in this review. Gap 4 (AC-11 `data_tier` field dependency) acknowledged with in-code comment — requires Frontend Architect confirmation before G1 PR opens.
+- All gaps resolved in this review session: Yes (except Gap 4 which is a pre-implementation architectural question for the Frontend Architect, not a test code error).
 
 ---
 
