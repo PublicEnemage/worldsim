@@ -2,10 +2,10 @@
 name: m19-sprint-plan
 type: sprint-plan
 milestone: M19 — Constraint Search and Empirical Calibration
-status: filed 2026-07-02; EL approval pending
+status: EL-approved 2026-07-02; pre-wave and G1 sprint entries open
 authored-by: PM Agent
 authored-date: 2026-07-02
-el-approved: pending
+el-approved: 2026-07-02
 consulted-agents:
   - Business Product Owner (Demo 8 value prioritization; constraint-floor capability as Act 1 anchor; backtesting scope)
   - Computation Engine Agent (Bayesian posterior dependency chain; backtesting fixture sequencing; constraint-floor search algorithm)
@@ -17,7 +17,7 @@ sop-reference: docs/process/sprint-planning-sop.md
 
 # M19 Sprint Plan — Constraint Search and Empirical Calibration
 
-**Status:** Filed 2026-07-02 — EL approval required before G1 sprint entries open
+**Status:** EL-approved 2026-07-02 (#1535 comment) — pre-wave and G1 sprint entries open
 **Release branch:** `release/m19` — cut from `main` 2026-07-02 at commit 1bf1ecc (after doc corrections PR #1539)
 **Exit checklist issue:** #1535 (M19 Exit Checklist — blocks milestone closure)
 **GitHub Milestone:** #21
