@@ -9,14 +9,16 @@ These tests are RED until the fixture is implemented at:
   backend/tests/fixtures/sen_scenario.py
 
 The harness imports below are GREEN (app.harness.mode3_harness exists, G2A PR #1568).
-The fixture import below is RED until build_sen_scenario() is implemented.
+The fixture import is inside each test method (following the G2A Greece regression
+pattern — see test_m19_g2a_headless_harness.py::TestGreeceTypeARegressionFidelity).
+This allows CI to collect the module and run the rest of the suite; the tests fail
+with ImportError at runtime until sen_scenario.py is created.
 
 NM-078 guard: this file is placed at backend/tests/backtesting/ — not at
 backend/tests/ root — to ensure CI test discovery includes it.
 
 NM-056 rule: NO pytest.skip() or soft-skip patterns in structural tests.
-The top-level fixture import fails RED (ImportError/collection error) until
-backend/tests/fixtures/sen_scenario.py is created with build_sen_scenario().
+ImportError at test-method level is hard RED — not a soft skip.
 
 AC coverage:
   AC-1   fixture importable; build_sen_scenario() callable without error
@@ -44,10 +46,6 @@ if TYPE_CHECKING:
 # GREEN — harness exists (G2A PR #1568 merged to sprint/m19-g2, 2026-07-02)
 from app.harness.mode3_harness import FidelityTier, RunType, run_harness
 from app.main import app
-
-# RED — fails ImportError until backend/tests/fixtures/sen_scenario.py is created.
-# This is intentional per NM-056: hard RED, not soft skip.
-from tests.fixtures.sen_scenario import build_sen_scenario
 
 _DATABASE_URL = os.environ.get("DATABASE_URL", "")
 
@@ -83,6 +81,8 @@ class TestSENTypeARegressionFidelity:
 
     async def test_sen_fixture_importable_and_returns_valid_request(self) -> None:
         """AC-1 + AC-2: fixture callable; entity_id == "SEN"."""
+        from tests.fixtures.sen_scenario import build_sen_scenario  # RED until implemented
+
         scenario_req = build_sen_scenario()
         assert scenario_req.entity_id == "SEN", (
             "AC-2 FAIL: build_sen_scenario() must return entity_id='SEN'"
@@ -104,6 +104,8 @@ class TestSENTypeARegressionFidelity:
         is accepted as CI calibration evidence. Tier below DIRECTION_ONLY is a hard
         failure — do not merge without CM escalation (see intent doc §5).
         """
+        from tests.fixtures.sen_scenario import build_sen_scenario  # RED until implemented
+
         scenario_req = build_sen_scenario()
         create_resp = await asgi_client.post(
             "/api/v1/scenarios",

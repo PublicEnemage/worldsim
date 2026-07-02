@@ -9,14 +9,16 @@ These tests are RED until the fixture is implemented at:
   backend/tests/fixtures/zmb_scenario.py
 
 The harness imports below are GREEN (app.harness.mode3_harness exists, G2A PR #1568).
-The fixture import below is RED until build_zmb_scenario() is implemented.
+The fixture import is inside each test method (following the G2A Greece regression
+pattern — see test_m19_g2a_headless_harness.py::TestGreeceTypeARegressionFidelity).
+This allows CI to collect the module and run the rest of the suite; the tests fail
+with ImportError at runtime until zmb_scenario.py is created.
 
 NM-078 guard: this file is placed at backend/tests/backtesting/ — not at
 backend/tests/ root — to ensure CI test discovery includes it.
 
 NM-056 rule: NO pytest.skip() or soft-skip patterns in structural tests.
-The top-level fixture import fails RED (ImportError/collection error) until
-backend/tests/fixtures/zmb_scenario.py is created with build_zmb_scenario().
+ImportError at test-method level is hard RED — not a soft skip.
 
 DEMO 8 LOAD-BEARING: ZMB is the primary calibration country for Demo 8 Act 2.
 The fidelity tier produced by this fixture grounds the CI interval credibility
@@ -52,10 +54,6 @@ if TYPE_CHECKING:
 # GREEN — harness exists (G2A PR #1568 merged to sprint/m19-g2, 2026-07-02)
 from app.harness.mode3_harness import FidelityTier, RunType, run_harness
 from app.main import app
-
-# RED — fails ImportError until backend/tests/fixtures/zmb_scenario.py is created.
-# This is intentional per NM-056: hard RED, not soft skip.
-from tests.fixtures.zmb_scenario import build_zmb_scenario
 
 _DATABASE_URL = os.environ.get("DATABASE_URL", "")
 
@@ -93,6 +91,8 @@ class TestZMBTypeARegressionFidelity:
 
     async def test_zmb_fixture_importable_and_returns_valid_request(self) -> None:
         """AC-1 + AC-2: fixture callable; entity_id="ZMB"; Copperbelt cohort configured."""
+        from tests.fixtures.zmb_scenario import build_zmb_scenario  # RED until implemented
+
         scenario_req = build_zmb_scenario()
         assert scenario_req.entity_id == "ZMB", (
             "AC-2 FAIL: build_zmb_scenario() must return entity_id='ZMB'"
@@ -121,6 +121,8 @@ class TestZMBTypeARegressionFidelity:
         the CI interval credibility claim significantly vs DIRECTION_ONLY.
         Tier below DIRECTION_ONLY is a hard failure — escalate to EL (see intent doc §5).
         """
+        from tests.fixtures.zmb_scenario import build_zmb_scenario  # RED until implemented
+
         scenario_req = build_zmb_scenario()
         create_resp = await asgi_client.post(
             "/api/v1/scenarios",
