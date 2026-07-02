@@ -1118,6 +1118,7 @@ export function MDAAlertPanelZone1B({
       {comparisonScenarios.length > 0 && (
         <div style={{ padding: "4px 6px" }}>
           {comparisonScenarios.map((sc) => {
+            if (!sc.scenarioId) return null;
             const slug = sc.scenarioId.replace(/^[a-z]{3}-/, "");
             const palette = SCENARIO_COMPARISON_PALETTE[sc.paletteIndex];
             const crossings = sc.thresholdCrossings ?? [];
