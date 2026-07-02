@@ -8,17 +8,23 @@ missing route) if the implementation is not yet present. AC-8, AC-9, AC-10
 cover the backend binary search algorithm and endpoint contract.
 """
 
-import pytest
-from unittest.mock import patch, AsyncMock, MagicMock
+from typing import Any
+from unittest.mock import MagicMock
 
+import httpx
+import pytest
 
 # ---------------------------------------------------------------------------
 # Guard: skip all tests if the constraint-floor-search module is not yet present
 # ---------------------------------------------------------------------------
 
 try:
-    from app.simulation.constraint_floor_search import binary_search  # type: ignore
-    from app.schemas import ConstraintFloorSearchRequest, ConstraintFloorSearchResponse  # type: ignore
+    from app.schemas import (
+        ConstraintFloorSearchRequest,
+        ConstraintFloorSearchResponse,
+    )
+    from app.simulation.constraint_floor_search import binary_search
+
     IMPLEMENTATION_PRESENT = True
 except ImportError:
     IMPLEMENTATION_PRESENT = False
@@ -33,8 +39,9 @@ pytestmark = pytest.mark.skipif(
 # Fixtures
 # ---------------------------------------------------------------------------
 
+
 @pytest.fixture
-def focal_cohort_config():
+def focal_cohort_config() -> dict[str, Any]:
     """Minimal valid focal cohort entry for constraint search."""
     return {
         "indicator_key": "bottom_quintile_informal_workers_poverty_headcount",
@@ -46,7 +53,7 @@ def focal_cohort_config():
 
 
 @pytest.fixture
-def scenario_fixture(focal_cohort_config):
+def scenario_fixture(focal_cohort_config: dict[str, Any]) -> MagicMock:
     """Minimal scenario object with one monitored focal cohort."""
     scenario = MagicMock()
     scenario.id = "test-scenario-001"
@@ -62,21 +69,20 @@ def scenario_fixture(focal_cohort_config):
 # AC-8: Binary search converges to correct boundary
 # ---------------------------------------------------------------------------
 
+
 def test_ac8_binary_search_converges_to_correct_boundary(
-    scenario_fixture, focal_cohort_config
-):
+    scenario_fixture: MagicMock,
+    focal_cohort_config: dict[str, Any],
+) -> None:
     """
     AC-8: binary_search() on a fixture scenario where fiscal_multiplier=1.18
     causes the focal cohort to just cross the floor returns boundary in [1.17, 1.19]
     within 12 evaluations.
     """
-    evaluation_count = [0]
+    evaluation_count: list[int] = [0]
 
-    def mock_run_trajectory(scenario, fiscal_multiplier):
-        """
-        Simulates a trajectory that crosses the floor at fiscal_multiplier < 1.18.
-        Returns True (crosses floor) if multiplier < 1.18, False if >= 1.18.
-        """
+    def mock_run_trajectory(scenario: MagicMock, fiscal_multiplier: float) -> bool:
+        """Return True (crosses floor) if multiplier < 1.18, False otherwise."""
         evaluation_count[0] += 1
         return fiscal_multiplier < 1.18
 
@@ -103,16 +109,18 @@ def test_ac8_binary_search_converges_to_correct_boundary(
 # AC-9: Endpoint returns ERROR when run_trajectory raises — SF-2 guard
 # ---------------------------------------------------------------------------
 
+
 def test_ac9_endpoint_returns_error_on_trajectory_exception(
-    scenario_fixture, focal_cohort_config
-):
+    scenario_fixture: MagicMock,
+    focal_cohort_config: dict[str, Any],
+) -> None:
     """
     AC-9 (SF-2): If run_trajectory raises ValueError on any binary search evaluation,
     binary_search() returns status='ERROR' — not status='FOUND' with a partial boundary.
     """
-    call_count = [0]
+    call_count: list[int] = [0]
 
-    def raising_run_trajectory(scenario, fiscal_multiplier):
+    def raising_run_trajectory(scenario: MagicMock, fiscal_multiplier: float) -> bool:
         call_count[0] += 1
         if call_count[0] >= 3:
             raise ValueError("Engine evaluation failed at step 3")
@@ -139,8 +147,9 @@ def test_ac9_endpoint_returns_error_on_trajectory_exception(
 # AC-10: POST to unknown scenario returns 404
 # ---------------------------------------------------------------------------
 
+
 @pytest.mark.asyncio
-async def test_ac10_unknown_scenario_returns_404(async_client):
+async def test_ac10_unknown_scenario_returns_404(async_client: httpx.AsyncClient) -> None:
     """
     AC-10: POST /api/v1/scenarios/nonexistent-id/constraint-floor-search
     returns HTTP 404 with a JSON error body.
@@ -165,7 +174,8 @@ async def test_ac10_unknown_scenario_returns_404(async_client):
 # Schema validation guard (imports only — no logic)
 # ---------------------------------------------------------------------------
 
-def test_request_schema_valid():
+
+def test_request_schema_valid() -> None:
     """Smoke test: ConstraintFloorSearchRequest accepts valid input."""
     req = ConstraintFloorSearchRequest(
         focal_cohort_index=0,
@@ -179,7 +189,7 @@ def test_request_schema_valid():
     assert req.tolerance == pytest.approx(0.01)
 
 
-def test_response_schema_found_valid():
+def test_response_schema_found_valid() -> None:
     """Smoke test: ConstraintFloorSearchResponse FOUND state is constructable."""
     resp = ConstraintFloorSearchResponse(
         status="FOUND",
