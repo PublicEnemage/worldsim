@@ -1,13 +1,14 @@
-# Demo 7 Stakeholder Review — v0.18.0 (PENDING)
+# Demo 7 Stakeholder Review — v0.18.0 (SUPERSEDED)
 
-**Date:** TBD — to be completed after live session #843
+**Date:** Superseded 2026-07-02
 **Milestone:** M18
 **Demo version:** v0.18.0
-**Step:** 9 — Live external stakeholder session
+**Step:** 9 — Simulated stakeholder session (EL decision 2026-07-02, same format as M14)
 
-> **Placeholder.** This document is created at G7 exit per `CLAUDE.md §Canonical Artifact Locations`
-> ("A placeholder with templated sections is created at milestone close and filled in after the demo").
-> All sections below are templated. Completion is a required artifact for M18 exit (#1340).
+> **SUPERSEDED.** This placeholder was created at G7 exit. The completed stakeholder review
+> is at `docs/demo/m18/reviews/2026-07-02-v0.18.0-stakeholder-review.md`.
+> North star verdict: **PASS (unconditional)**. Issue #843 closed 2026-07-02.
+> M18 exit gate (#1340) unblocked.
 
 ---
 
