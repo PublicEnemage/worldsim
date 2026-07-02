@@ -6,7 +6,7 @@
 > Historical state lives in `docs/process/session-archives/`.
 > Authority: `docs/process/sprint-group-isolation.md §SESSION_STATE.md Cockpit Card Protocol`.
 
-**Last updated:** 2026-07-02 (M19 sprint plan EL-approved; pre-wave + G1 sprint entries open; ADR decision on constraint-floor search required before G1 sprint entry filed)
+**Last updated:** 2026-07-02 (M18 exit ceremony complete; M19 fully kicked off — sprint plan EL-approved, release/m19 live, 22 issues filed, pre-wave active; next session: ADR decision on constraint-floor search, then G1 sprint entry)
 **Current milestone:** M19 — Constraint Search and Empirical Calibration
 
 ---
