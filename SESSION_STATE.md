@@ -6,7 +6,7 @@
 > Historical state lives in `docs/process/session-archives/`.
 > Authority: `docs/process/sprint-group-isolation.md §SESSION_STATE.md Cockpit Card Protocol`.
 
-**Last updated:** 2026-07-02 (pre-wave complete; ADR-021 accepted (EL 2026-07-02); G1 sprint entry filed PR #1566 pending EL approval; next action: EL approves m19-g1-sprint-entry.md → cut sprint/m19-g1 → begin G1 implementation)
+**Last updated:** 2026-07-02 (G1 sprint entry EL-approved; sprint/m19-g1 cut; journal #1570 open; G2A entry EL-approved; sprint/m19-g2 ready to cut; next action: Frontend Architect Agent opens feat/m19-g1-* implementation branch; Computation Engine Agent cuts sprint/m19-g2)
 **Current milestone:** M19 — Constraint Search and Empirical Calibration
 
 ---
@@ -20,9 +20,9 @@
 | Exit checklist issue | #1535 (M19 Exit Checklist — blocks milestone closure) |
 | Release branch | `release/m19` — cut from `main` 2026-07-02 at 1bf1ecc |
 | Sprint plan | `docs/process/sprint-plans/m19-sprint-plan.md` — EL-approved 2026-07-02 |
-| Active wave | Wave 1 — G1 sprint entry filed (PR #1566 auto-merge); awaiting EL approval of `m19-g1-sprint-entry.md` before `sprint/m19-g1` cut |
-| Active sprint groups | G1 (entry filed, not yet open — EL approval pending) |
-| Active sprint journal issues | None (sprint journal issue opens at EL approval + sub-branch cut) |
+| Active wave | Wave 1 — G1 open (sprint/m19-g1 cut 2026-07-02, journal #1570); G2A entry EL-approved (sprint/m19-g2 ready to cut) |
+| Active sprint groups | G1 (open — sprint/m19-g1 cut, journal #1570); G2A (entry EL-approved, sprint/m19-g2 not yet cut) |
+| Active sprint journal issues | #1570 (G1 — Mode 3 constraint-floor search) |
 
 ---
 
@@ -30,7 +30,6 @@
 
 | Decision | Status |
 |---|---|
-| G1 sprint entry approval: approve `docs/process/sprint-plans/m19-g1-sprint-entry.md` | Entry filed 2026-07-02 (PR #1566). All 5 entry conditions satisfied. EL approval unblocks `sprint/m19-g1` sub-branch cut + sprint journal issue. |
 | ARCH-014 scope: capital controls full fix M19 or defer to M20? | Pre-wave assessment complete: full fix requires ADR (ARCH-014 PENDING_NUMBER). Iceland (#1553) stays blocked. EL decision needed on whether to scope ADR authorship in M19 Wave 2 or defer to M20. |
 
 ---
