@@ -3,17 +3,18 @@ name: m19-g2a-sprint-exit
 type: sprint-exit
 milestone: M19 — Constraint Search and Empirical Calibration
 sprint-group: G2 Phase A — Headless Battle-Testing Harness
-status: In-progress — awaiting PI Agent confirmation
+status: Confirmed — G2A sprint closed 2026-07-02
 authored-by: PM Agent
 date: 2026-07-02
-pi-confirmed: false
+pi-confirmed: true
+pi-confirmed-date: 2026-07-02
 release-branch: release/m19
 sop-reference: docs/process/sprint-planning-sop.md §Sprint Exit Gate
 ---
 
 # Sprint Exit — M19, G2 Phase A: Headless Battle-Testing Harness
 
-**Status:** In-progress — awaiting PI Agent confirmation
+**Status:** Confirmed — G2A sprint closed 2026-07-02 (PI Agent)
 **Date produced:** 2026-07-02
 **Release branch:** `release/m19`
 **Sprint entry document:** `docs/process/sprint-plans/m19-g2a-sprint-entry.md`
@@ -85,20 +86,66 @@ and are complete.*
 
 **Exit conditions checklist (PI Agent):**
 
-- [ ] All implementation groups merged; CI green on sprint branch (Section 2) — SATISFIED (PR #1568, CI green)
-- [ ] Business PO ACCEPT verdict filed for each user-facing deliverable (Section 3) — SATISFIED
-- [ ] Customer Agent Layer 3 assessment on record for all Persona 2/3/5 deliverables, filed before Business PO verdict (Section 3) — SATISFIED
-- [ ] No open rejection artifacts (Section 4) — SATISFIED
-- [ ] Near-miss entry filed for each rejection in this sprint (Section 4) — N/A (no rejections)
+- [x] All implementation groups merged; CI green on sprint branch (Section 2) — CONFIRMED (PR #1568, CI green, 2026-07-02T21:01:52Z)
+- [x] Business PO ACCEPT verdict filed for each user-facing deliverable (Section 3) — CONFIRMED
+- [x] Customer Agent Layer 3 assessment on record for all Persona 2/3/5 deliverables, filed before Business PO verdict (Section 3) — CONFIRMED (same-session disclosure)
+- [x] No open rejection artifacts (Section 4) — CONFIRMED (REJECT-001 is unrelated to G2A)
+- [x] Near-miss entry filed for each rejection in this sprint (Section 4) — N/A (no rejections)
 
-**PI Agent sprint exit verdict:** Pending
+**PI Agent sprint exit verdict:** Confirmed — all exit conditions satisfied
 
 **PI Agent confirmation:**
 
-> {PI Agent confirmation to be recorded here. All five exit conditions appear satisfied.
-> PI Agent: verify Section 2 CI status is genuinely green (not merely auto-merge pending),
-> verify Customer Agent audit was filed before the Business PO verdict timestamp (both 2026-07-02 —
-> same-day; confirm order from git history), and confirm no open rejection artifacts.}
+> PI Agent: CONFIRM — G2A sprint exit gate passes. All five conditions independently verified:
+>
+> **Condition 1 — Implementation merged, CI green:**
+> PR #1568 (`feat/m19-g2a-headless-harness` → `sprint/m19-g2`) merged 2026-07-02T21:01:52Z.
+> CI status at merge: green (all required checks passed per `sprint-branch-ci-gate` Ruleset).
+> Commit `cc3d596` on `sprint/m19-g2`. CONFIRMED ✓
+>
+> **Condition 2 — Business PO ACCEPT verdict filed:**
+> Verdict present at `docs/process/intents/M19-G2A-2026-07-02-headless-battle-testing-harness.md
+> §Business PO Acceptance Record`. Work type: Analytics (§1.4). All three checklist items
+> checked. Verdict text: "Verdict: ACCEPT. — Business PO (2026-07-02)". CONFIRMED ✓
+>
+> **Condition 3 — Customer Agent Layer 3 filed before verdict:**
+> Customer Agent audit at `docs/customer/ca-g2a-2026-07-02-harness-layer3-audit.md`.
+> Both audit and PO verdict are in the same commit (`ac0cbd7`, 2026-07-02T17:27:29-04:00) —
+> cannot verify order from git timestamps alone. Same-session disclosure applies:
+> (a) CA audit states "Precondition satisfied: Business PO may now execute the ACCEPT step";
+> (b) PO verdict states "Filed as precondition for Business PO ACCEPT — [CA audit path]".
+> Session narrative confirms CA audit was authored first. Disclosure is explicit and consistent
+> with the NM-042 same-session pattern. CONFIRMED ✓ (same-session disclosed)
+>
+> **Advisory flag (not a blocker):** North star test attribute "Authored by Business PO with
+> Chief Methodologist input" — Chief Methodologist was not activated as a named DIC agent in
+> this session; the analytical framing was drawn from the intent document's P-6/P-7 which
+> captured anticipated CM input. Future north star test authorship should include explicit DIC
+> agent consultation, particularly for technically complex fidelity assessments. Filing as a
+> minor gap observation — not a rejection condition; the north star test is complete and specific
+> as written. PM Agent to note in HORIZON.
+>
+> **Condition 4 — No open rejection artifacts:**
+> `docs/process/rejections/` contains only REJECT-001 (2026-06-17, grounding strip — unrelated
+> to G2A). No G2A rejection artifact exists. CONFIRMED ✓
+>
+> **Condition 5 — Near-miss entry for each rejection:**
+> No rejections in this sprint. N/A — CONFIRMED ✓
+>
+> **North star test artifact:**
+> Present in §North Star Test Artifact — G2A of this document. Specific: names scenario
+> (Zambia analyst, creditor evaluation session with World Bank), names capability (harness
+> produces `fidelity_tier` + `fidelity_rationale` + `known_limitations`), and names specific
+> argument change ("CI bounds are calibrated to DIRECTION_ONLY fidelity — they account for
+> the magnitude uncertainty this introduces. They are not a prior schedule."). Prior limitation
+> clearly stated. Assessment: SPECIFIC — passes the PI Agent specificity check. CONFIRMED ✓
+>
+> **G2A sprint (Sprint 2) is CLOSED.** G2B implementation PRs may open once:
+> (1) EL approves `docs/process/sprint-plans/m19-g2b-sprint-entry.md`, AND
+> (2) PR #1572 (G2B process entry) has merged to `sprint/m19-g2`.
+> Both conditions must be satisfied — not either alone.
+>
+> — PI Agent (2026-07-02)
 
 ---
 
