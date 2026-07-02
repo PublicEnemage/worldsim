@@ -3,17 +3,17 @@ name: m19-g2b-sprint-entry
 type: sprint-entry
 milestone: M19 — Constraint Search and Empirical Calibration
 sprint-group: G2 Phase B — SEN + ZMB Calibration Fixtures
-status: Filed — awaiting EL approval
+status: EL-approved 2026-07-02
 authored-by: PM Agent
 authored-date: 2026-07-02
-el-approved: false
+el-approved: 2026-07-02
 release-branch: release/m19
 sop-reference: docs/process/sprint-planning-sop.md
 ---
 
 # Sprint Entry — M19, G2 Phase B: SEN + ZMB Calibration Fixtures
 
-**Status:** Filed — awaiting EL approval before implementation begins
+**Status:** EL-approved 2026-07-02 — implementation may begin
 **Date authored:** 2026-07-02
 **Release branch:** `release/m19`
 **Sprint plan:** `docs/process/sprint-plans/m19-sprint-plan.md`
@@ -248,7 +248,15 @@ G2B depends on `app.harness.mode3_harness` module produced by G2A (#1546). This 
 *EL reviews this entry document before any implementation PR opens. Approval is recorded here
 or as a comment on the exit checklist issue #1535.*
 
-**EL approval:** Pending
+**EL approval:** Approved 2026-07-02
 
-> {EL approval statement}
-> — @PublicEnemage ({date})
+> G2 Phase B sprint entry approved. All five entry conditions confirmed: release branch
+> exists and CI trigger verified; sprint plan EL-approved; no ADR prerequisite (Chief
+> Methodologist consultation is a pre-merge condition on each fixture PR, not a pre-entry
+> gate); intent documents filed at `docs/process/intents/M19-G2B-2026-07-02-sen-backtesting-fixture.md`
+> and `docs/process/intents/M19-G2B-2026-07-02-zmb-backtesting-fixture.md`; QA test
+> shells authored at `backend/tests/backtesting/test_m19_g2b_sen_fixture.py` and
+> `backend/tests/backtesting/test_m19_g2b_zmb_fixture.py` before implementation begins.
+> G2A dependency SATISFIED (PR #1568 merged to `sprint/m19-g2` 2026-07-02).
+> `sprint/m19-g2` already exists — G2B feature branches may be cut from its current tip.
+> — @PublicEnemage (2026-07-02)
