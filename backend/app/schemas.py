@@ -344,6 +344,24 @@ class CommodityShockConfig(BaseModel):
         return str(v)
 
 
+class FocalCohortConfig(BaseModel):
+    """Schema-validated focal cohort entry for CLEAR badge floor comparison (#1538).
+
+    `indicator_key` must reference a known indicator in the scenario context.
+    `floor_value` is a ratio in (0, 1] — the threshold below which the cohort
+    is considered to have fallen below the CM-endorsed recovery floor.
+    `recovery_horizon_years` defaults to the CM-reviewed value of 10 years.
+    """
+
+    model_config = ConfigDict(from_attributes=True)
+
+    indicator_key: str
+    floor_value: float = Field(gt=0, le=1)
+    floor_label: str = ""
+    framework: str = "human_development"
+    recovery_horizon_years: int = Field(default=10, ge=1, le=50)
+
+
 class ScenarioConfigSchema(BaseModel):
     """Scenario configuration payload.
 
@@ -396,7 +414,7 @@ class ScenarioConfigSchema(BaseModel):
     commodity_price_shocks: list[CommodityShockConfig] = []
     projection_steps: int | None = Field(default=None, ge=1, le=100)
     ecological_shock_coefficient: float = Field(default=0.0, ge=0.0, le=1.0)
-    monitored_focal_cohorts: list[dict[str, Any]] = []
+    monitored_focal_cohorts: list[FocalCohortConfig] = []
 
 
 class ScheduledInputSchema(BaseModel):
