@@ -66,40 +66,102 @@ const ERROR_RESPONSE = {
   indicator_key: "bottom_quintile_informal_workers_poverty_headcount",
 };
 
-// enterMode3 is retained for AC-2 and AC-3 where no focal cohort should be present.
-async function enterMode3(page: Page): Promise<void> {
-  await page.goto("/");
-  const enterActiveControl = page.getByRole("button", {
-    name: /enter active control/i,
-  });
-  if (await enterActiveControl.isVisible()) {
-    await enterActiveControl.click();
+// ---------------------------------------------------------------------------
+// Mock helpers — App.tsx fetches GET /api/v1/scenarios/{id} twice:
+//   1. Mount effect (reads ?scenario= URL param) → sets selectedScenarioId
+//   2. selectedScenarioId effect → sets activeScenarioDetail (focal cohorts live here)
+// Both requests match the exact-ID route pattern below; trajectory is mocked
+// separately to prevent 404 errors on the unadvanced synthetic scenario IDs.
+// ---------------------------------------------------------------------------
+
+const ZMB_FOCAL_COHORT_ID = "zmb-constraint-test";
+const ZMB_NO_FOCAL_ID = "zmb-no-focal-test";
+
+async function setupScenarioMocks(
+  page: Page,
+  scenarioId: string,
+  focalCohorts: typeof FOCAL_COHORT_CONFIG[] | null,
+): Promise<void> {
+  const detail = {
+    scenario_id: scenarioId,
+    name: `ZMB Test (${scenarioId})`,
+    description: null,
+    status: "in_progress",
+    version: 1,
+    created_at: "2026-07-02T00:00:00Z",
+    scheduled_inputs: [],
+    configuration: {
+      entities: ["ZMB"],
+      initial_attributes: {},
+      n_steps: 8,
+      timestep_label: "quarter",
+      ...(focalCohorts ? { monitored_focal_cohorts: focalCohorts } : {}),
+    },
+  };
+  const trajectory = {
+    scenario_id: scenarioId,
+    entity_id: "ZMB",
+    step_count: 0,
+    mda_floors: [],
+    steps: [],
+  };
+  // Exact scenario-detail URL (App.tsx: GET /api/v1/scenarios/{id})
+  await page.route(`**/api/v1/scenarios/${scenarioId}`, (route) =>
+    route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(detail) })
+  );
+  // Trajectory URL (sub-path not matched by the pattern above)
+  await page.route(`**/api/v1/scenarios/${scenarioId}/trajectory**`, (route) =>
+    route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(trajectory) })
+  );
+}
+
+async function waitForScenarioLoad(page: Page, scenarioId: string): Promise<void> {
+  // App.tsx sets window.__worldsim_selectedScenarioId after the scenario detail
+  // fetch succeeds (DEV seam, line ~187). Waiting for this guarantees selectedScenarioId
+  // is in state before we try to interact with ScenarioInstrumentCluster.
+  try {
+    await page.waitForFunction(
+      (id) => (window as Record<string, unknown>).__worldsim_selectedScenarioId === id,
+      scenarioId,
+      { timeout: 10_000 },
+    );
+  } catch {
+    // Timeout — test guards handle the missing form via isVisible().catch(() => false)
   }
 }
 
-// Gap 5 fix: mock the scenario detail endpoint to return a configuration that
-// includes a monitored_focal_cohorts entry. Without this, Form 3 never renders
-// and all guards permanently fire post-implementation.
-// The exact route pattern must be confirmed against docs/schema/api_contracts.yml
-// by the Frontend Architect Agent before the G1 implementation PR opens.
-async function enterMode3WithFocalCohort(page: Page): Promise<void> {
-  await page.route("**/api/v1/scenarios/*/detail", (route) =>
-    route.fulfill({
-      json: {
-        id: "zmb-constraint-test",
-        configuration: {
-          entities: ["ZMB"],
-          n_steps: 8,
-          monitored_focal_cohorts: [FOCAL_COHORT_CONFIG],
-        },
-      },
-    })
-  );
-  await page.goto("/?scenario=zmb-constraint-test");
+// Used for AC-3: enter Mode 3 WITHOUT focal cohorts to test the unavailable state.
+async function enterMode3(page: Page): Promise<void> {
+  await setupScenarioMocks(page, ZMB_NO_FOCAL_ID, null);
+  await page.goto(`/?scenario=${ZMB_NO_FOCAL_ID}`);
+  await waitForScenarioLoad(page, ZMB_NO_FOCAL_ID);
   const btn = page.getByTestId("enter-active-control-btn");
   if (await btn.isVisible({ timeout: 8_000 }).catch(() => false)) {
     await btn.click();
   }
+}
+
+// Gap 5 fix: mock the scenario detail endpoint with correct ScenarioDetailResponse shape.
+// Root-cause fix (2026-07-02): original mock used field "id" instead of "scenario_id",
+// so App.tsx setSelectedScenarioId(undefined) — scenario never loaded, Mode 3 unreachable.
+// Also: route pattern was "**/api/v1/scenarios/*/detail" — no such endpoint exists;
+// correct pattern is "**/api/v1/scenarios/{id}" (exact, without /detail suffix).
+async function enterMode3WithFocalCohort(page: Page): Promise<void> {
+  await setupScenarioMocks(page, ZMB_FOCAL_COHORT_ID, [FOCAL_COHORT_CONFIG]);
+  await page.goto(`/?scenario=${ZMB_FOCAL_COHORT_ID}`);
+  await waitForScenarioLoad(page, ZMB_FOCAL_COHORT_ID);
+  // enter-active-control-btn lives in Mode2ColumnSurface, which renders once
+  // ScenarioInstrumentCluster mounts (selectedScenarioId is set).
+  const btn = page.getByTestId("enter-active-control-btn");
+  await btn.waitFor({ state: "visible", timeout: 8_000 });
+  await btn.click();
+  // After click, ControlPlaneColumn mounts and receives monitoredFocalCohorts from
+  // activeScenarioDetail (set by the selectedScenarioId effect, which fires after
+  // the same scenario detail fetch). Wait for Form 3 to render with the focal cohort.
+  await page
+    .getByTestId("constraint-search-section")
+    .waitFor({ state: "visible", timeout: 5_000 })
+    .catch(() => {});
 }
 
 // ---------------------------------------------------------------------------
@@ -311,35 +373,25 @@ test("AC-11: FOUND result includes 'synthetic' word when indicator is Tier 3", a
 test("AC-12: constraint-search-structural-absence shown when indicator is Tier 4+", async ({
   page,
 }) => {
-  // Gap 8 fix: mock the scenario to return a structural-absence indicator.
-  // Without this mock, the test permanently skips post-implementation because
-  // the default scenario never loads a Tier 4+ indicator.
-  // The exact indicator_key value that triggers structural absence must be
-  // confirmed with the Frontend Architect before the G1 PR opens.
-  await page.route("**/api/v1/scenarios/*/detail", (route) =>
-    route.fulfill({
-      json: {
-        id: "zmb-structural-absence-test",
-        configuration: {
-          entities: ["ZMB"],
-          n_steps: 8,
-          monitored_focal_cohorts: [
-            {
-              ...FOCAL_COHORT_CONFIG,
-              // Placeholder: replace with the real structural-absence marker key
-              // (confirmed by Frontend Architect before G1 PR opens).
-              indicator_key: "__structural_absence__",
-            },
-          ],
-        },
-      },
-    })
-  );
-  await page.goto("/?scenario=zmb-structural-absence-test");
+  // Gap 8 fix + root-cause fix (2026-07-02): original mock used wrong route pattern
+  // ("**/api/v1/scenarios/*/detail") and wrong field name ("id" vs "scenario_id").
+  // Using setupScenarioMocks helper to ensure correct ScenarioDetailResponse shape.
+  const SA_ID = "zmb-structural-absence-test";
+  await setupScenarioMocks(page, SA_ID, [
+    {
+      ...FOCAL_COHORT_CONFIG,
+      // indicator_key starting with "__" triggers structural-absence gate (ControlPlaneColumn.tsx).
+      indicator_key: "__structural_absence__",
+    },
+  ]);
+  await page.goto(`/?scenario=${SA_ID}`);
+  await waitForScenarioLoad(page, SA_ID);
   const btn = page.getByTestId("enter-active-control-btn");
   if (await btn.isVisible({ timeout: 8_000 }).catch(() => false)) {
     await btn.click();
   }
+  // Wait for ControlPlaneColumn to mount and receive the structural-absence config
+  await page.waitForTimeout(500);
 
   const structuralAbsence = page.getByTestId(
     "constraint-search-structural-absence"
