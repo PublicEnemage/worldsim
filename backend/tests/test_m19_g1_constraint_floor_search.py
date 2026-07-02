@@ -86,12 +86,15 @@ def test_ac8_binary_search_converges_to_correct_boundary(
         evaluation_count[0] += 1
         return fiscal_multiplier < 1.18
 
+    # Gap 7 fix: ADR-021 §D-2 pseudocode uses 'tol', not 'tolerance'.
+    # run_trajectory_fn is a testability injection point; the CE Agent must
+    # include it in the binary_search signature to make this test runnable.
     result = binary_search(
         scenario=scenario_fixture,
         focal_cohort=focal_cohort_config,
         lo=0.1,
         hi=3.0,
-        tolerance=0.01,
+        tol=0.01,
         run_trajectory_fn=mock_run_trajectory,
     )
 
@@ -131,7 +134,7 @@ def test_ac9_endpoint_returns_error_on_trajectory_exception(
         focal_cohort=focal_cohort_config,
         lo=0.1,
         hi=3.0,
-        tolerance=0.01,
+        tol=0.01,
         run_trajectory_fn=raising_run_trajectory,
     )
 
@@ -149,12 +152,15 @@ def test_ac9_endpoint_returns_error_on_trajectory_exception(
 
 
 @pytest.mark.asyncio
-async def test_ac10_unknown_scenario_returns_404(async_client: httpx.AsyncClient) -> None:
+# Gap 1 fix: fixture name corrected from 'async_client' (nonexistent) to 'client'
+# — the shared HTTP fixture defined in backend/tests/conftest.py line 44.
+# 'async_client' caused pytest collection failure; the test never ran.
+async def test_ac10_unknown_scenario_returns_404(client: httpx.AsyncClient) -> None:
     """
     AC-10: POST /api/v1/scenarios/nonexistent-id/constraint-floor-search
     returns HTTP 404 with a JSON error body.
     """
-    response = await async_client.post(
+    response = await client.post(
         "/api/v1/scenarios/nonexistent-id/constraint-floor-search",
         json={
             "focal_cohort_index": 0,
@@ -191,16 +197,20 @@ def test_request_schema_valid() -> None:
 
 def test_response_schema_found_valid() -> None:
     """Smoke test: ConstraintFloorSearchResponse FOUND state is constructable."""
+    # Gap 3 fix: field names corrected to match ADR-021 §D-3 response schema.
+    # Removed: lo_searched, hi_searched, tolerance, focal_cohort_index.
+    # Added: search_lo, search_hi, floor_value, indicator_key, error_message.
     resp = ConstraintFloorSearchResponse(
         status="FOUND",
         boundary=1.18,
         uncertainty_lo=1.17,
         uncertainty_hi=1.19,
         evaluations=9,
-        lo_searched=0.1,
-        hi_searched=3.0,
-        tolerance=0.01,
-        focal_cohort_index=0,
+        search_lo=0.1,
+        search_hi=3.0,
+        floor_value=0.4,
+        indicator_key="bottom_quintile_informal_workers_poverty_headcount",
+        error_message=None,
     )
     assert resp.status == "FOUND"
     assert resp.boundary == pytest.approx(1.18)
