@@ -17,7 +17,6 @@ from __future__ import annotations
 import os
 from typing import TYPE_CHECKING
 
-import pytest
 import pytest_asyncio
 
 if TYPE_CHECKING:
@@ -34,7 +33,10 @@ async def _asyncpg_pool_lifecycle() -> AsyncGenerator[None, None]:
     tests continue to skip gracefully in environments without a database.
     """
     if not _DATABASE_URL:
-        pytest.skip("DATABASE_URL not set — skipping backtesting session")
+        # Yield without a pool so unit tests in this directory can run.
+        # DB-dependent tests (Greece, Argentina, etc.) have their own
+        # pytest.skip guards in their fixtures and will skip gracefully.
+        yield
         return
 
     from app.db.connection import close_asyncpg_pool, create_asyncpg_pool
