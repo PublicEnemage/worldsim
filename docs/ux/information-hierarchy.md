@@ -668,24 +668,53 @@ trajectory = 1260px total, within the 1280px minimum viewport width.
 
 ### CVD (Colour Vision Deficiency) Color Specification
 
-The blue/orange distinction is an epistemic requirement. It must hold for users with
+The blue/orange/teal distinction is an epistemic requirement. It must hold for users with
 deuteranopia (red-green CVD, the most common form) and protanopia.
 
-| Role | Hex | Name | Use |
-|---|---|---|---|
-| Policy (blue) | `#0284c7` | Sky-700 | Policy form header, border, Apply button, trajectory inflection markers |
-| Shock (orange) | `#ea580c` | Orange-600 | Shock form header, border, Inject button, trajectory shock markers |
+| Role | Hex | Name | Relative luminance | Use |
+|---|---|---|---|---|
+| Policy (blue) | `#0284c7` | Sky-700 | 0.204 | Policy form header, border, Apply button, trajectory inflection markers |
+| Shock (orange) | `#ea580c` | Orange-600 | 0.247 | Shock form header, border, Inject button, trajectory shock markers |
+| Constraint search (teal) | `#0d9488` | Teal-600 | 0.232 | Form 3 (CONSTRAINT SEARCH) header, border, search button (ADR-021, M19+) |
 
-These two values are safe under deuteranopia and protanopia simulations: they differ
+The blue/orange pair is safe under deuteranopia and protanopia simulations: they differ
 in hue (blue vs. orange/yellow region) and in luminance (sky-700 is darker than
 orange-600 at 100% opacity), providing both hue and luminance discrimination channels.
 
+**Blue/teal requires empirical CVD validation before Form 3 ships (MV-001 extension).**
+Teal `#0d9488` (luminance 0.232) and blue `#0284c7` (luminance 0.204) have a luminance
+contrast ratio of approximately 1.14:1 — insufficient for luminance-only discrimination.
+Under deuteranopia simulation, both teal and blue shift into a similar blue-spectrum
+appearance, and hue discrimination between them may be impaired. They also share spatial
+proximity in the 280px column (Form 3 is directly below Forms 1 and 2), reducing the
+spatial discrimination channel available for orange.
+
+The UX Designer must run blue vs. teal through a CVD simulation tool (Sim Daltonism,
+Coblis, or equivalent) under deuteranopia and protanopia before Form 3 ships. If blue
+and teal are not empirically distinguishable under deuteranopia simulation, a replacement
+must be selected from the following candidate alternatives (mathematical analysis only —
+empirical verification still required):
+
+| Candidate | Hex | Relative luminance | Notes |
+|---|---|---|---|
+| Teal-500 (lighter) | `#14b8a6` | ~0.380 | Greater luminance contrast from blue (1.86:1); may be too light for column header context |
+| Cyan-700 | `#0e7490` | ~0.159 | Darker than blue; hue is further from blue-green mid-range |
+| Emerald-700 | `#047857` | ~0.079 | High luminance contrast from blue (2.59:1); hue clearly green — distinguishable under deuteranopia |
+
+If the empirical result confirms teal `#0d9488` passes CVD validation, no change to the ADR
+is required. If it fails, the UX Designer selects the replacement value and updates ADR-021 §D-1
+before the G1 sprint branch opens. The updated value cascades to all Form 3 styling tokens.
+
+Non-color disambiguation for Form 3: label text (CONSTRAINT SEARCH), position (below
+Forms 1 and 2), and icon (if implemented) provide supplementary discrimination channels
+that reduce — but do not eliminate — the CVD risk if teal and blue are indistinguishable.
+
 **MV-001 validation is a hard gate.** Manual CVD validation using a simulation tool
 (e.g., Sim Daltonism, Coblis) must be completed and documented before any Mode 3
-control plane component ships. The validation must confirm that both section headers
-and their respective form elements are distinguishable from each other under
-deuteranopia and protanopia simulation at all supported viewports. The MV-001 gate
-applies to both trajectory markers and alert panel treatment as well.
+control plane component ships. From M19 onward, the validation covers all three colors:
+blue vs. orange, orange vs. teal, and blue vs. teal. Each pair must be confirmed as
+distinguishable under deuteranopia and protanopia simulation at all supported viewports.
+The MV-001 gate applies to both trajectory markers and alert panel treatment as well.
 
 **Purple is deprecated for control plane elements.** The current `#8b5cf6` purple
 in `ControlPlane.tsx` does not satisfy the blue/orange requirement and must be
