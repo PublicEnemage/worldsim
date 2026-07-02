@@ -5,18 +5,19 @@ adr-number: 21
 arch-backlog-entry: ARCH-015
 issues:
   - "#1540 — Mode 3 constraint-floor search"
-status: Proposed
+status: accepted
 tier: 1
 authored-by: Architect Agent
 authored-date: 2026-07-02
+accepted-date: 2026-07-02
 panel:
   - "Architect Agent (R — author)"
   - "Frontend Architect Agent (C — ControlPlaneColumn rendering, Form 3 layout, result display)"
   - "Computation Engine Agent (C — binary search algorithm, endpoint design, convergence contract)"
   - "Chief Methodologist (C — uncertainty display for boundary results, floor value defensibility)"
-  - "UX Designer Agent (independent sign-off, separate EL-triggered session — required, NM-042 compliance)"
+  - "UX Designer Agent (independent sign-off ✓ 2026-07-02, separate EL-triggered session, NM-042 compliant, 3 concerns resolved)"
   - "Business PO (C — Demo 8 Act 1 acceptance criteria, north star test)"
-  - "Engineering Lead (A)"
+  - "Engineering Lead (A — accepted ✓ 2026-07-02)"
 ---
 
 # ADR-021: Mode 3 Constraint-Floor Search — Interaction Model, Backend Algorithm, and Result Display Contract
@@ -43,18 +44,35 @@ Asymmetry Assessment, North Star Test, Mission Impact Statement.
 
 ## Status
 
-`Proposed` — UX Designer independent sign-off required before acceptance vote. EL-triggered
-separate session required (NM-042). ADR-019 remains the governing authority for column layout,
-mode transition, and blue/orange visual system; this ADR governs the search interaction model
-and result display contract only.
+`Accepted` — 2026-07-02. UX Designer sign-off filed (separate EL-triggered session, NM-042
+compliant, 3 concerns resolved and tracked — Concern 3 closed in governing documents;
+Concerns 1 and 2 tracked as #1564 and #1563 respectively; both are pre-ship conditions
+for G1). EL acceptance vote: @PublicEnemage, 2026-07-02. ADR-019 remains the governing
+authority for column layout, mode transition, and blue/orange visual system; this ADR
+governs the search interaction model and result display contract only.
 
 ---
 
 ## Validity Context
 
-> *Fill in when the ADR is accepted. Leave blank at Proposed.*
-
 **Standards Version:** 2026-07-02 (CLAUDE.md, M19 entry)
+**Valid Until:** When constraint-floor search expands beyond `fiscal_multiplier` to multi-parameter joint constraint (M20+); when the backend binary search is replaced by async streaming (SSE); when `monitored_focal_cohorts` source changes from `ScenarioConfigSchema` to a separate endpoint.
+**License Status:** `PROPOSED → ACCEPTED` on 2026-07-02
+
+**Panel:**
+- Architect Agent (R — author, ADR determination and algorithm contract)
+- Frontend Architect Agent (C — Form 3 layout, ControlPlaneColumn rendering, result display)
+- Computation Engine Agent (C — binary search algorithm, endpoint design, convergence contract)
+- Chief Methodologist (C — uncertainty display for boundary results, floor value defensibility)
+- UX Designer Agent (independent sign-off ✓ 2026-07-02, separate EL-triggered session, NM-042 compliant)
+- Business PO (C — Demo 8 Act 1 acceptance criteria, north star test)
+- Engineering Lead (A — accepted ✓ 2026-07-02)
+
+**Renewal Triggers:**
+1. Constraint search parameter scope expands beyond `fiscal_multiplier` — algorithmic and UX contracts must be extended
+2. Backend timeout > 30s at free-tier CI runner — async/SSE redesign required
+3. `monitored_focal_cohorts` source changes — floor value provenance in D-5 must be updated
+4. Multi-cohort joint constraint added (M20+) — new ADR required (not an amendment here)
 **Valid Until:** M20 entry — review if constraint-floor search is extended beyond
 `fiscal_multiplier` to other policy parameters (LegitimacyConstraint, shock types), or if
 a multi-parameter search mode is introduced.
@@ -749,10 +767,10 @@ the results; the constraint search interpolates from the cache. Rejected because
 
 ## Diagram
 
-`docs/architecture/ADR-021-constraint-floor-search.mmd` — to be authored by Frontend
-Architect Agent at G1 sprint entry. Minimum content: sequence diagram showing the
-single HTTP round trip (frontend Form 3 → `POST /constraint-floor-search` → backend
-binary search loop → `ConstraintFloorSearchResponse` → Form 3 result display).
+`docs/architecture/ADR-021-constraint-floor-search.mmd` — authored at ADR acceptance
+(2026-07-02). Shows the single HTTP round trip: Form 3 → `POST /constraint-floor-search`
+→ backend binary search loop (O(log n) ≈ 8–9 evaluations) → `ConstraintFloorSearchResponse`
+→ Form 3 result display.
 
 ---
 
