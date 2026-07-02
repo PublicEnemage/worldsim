@@ -1,8 +1,8 @@
 # CLAUDE.md — WorldSim Project Context
 
-> Last significant revision: 2026-06-26
-> Updated against: M17 close — Calibration and Comparative Infrastructure complete; Wave 1 CM calibration (fiscal-to-cohort elasticity, governance sensitivity) delivered; Wave 2 N=3 multi-scenario, DEMO6 CRITICAL polish, adaptive y-axis, Zone 1B proportional allocation (ADR-018), GovernanceModule institutional_capacity_index all delivered; M18 now current
-> Previous version context: 2026-06-25 — M16 closed; M17 active; DEMO6 findings (001–049) retained as Demo 7 specification foundation
+> Last significant revision: 2026-07-02
+> Updated against: M18 close — Full Argument and Demo 7 complete; CI bands (ADR-007), PSP driver decomposition, counter-scenario comparison, control plane column (ADR-019), Zone 3 auditability panel all delivered; Demo 7 simulated stakeholder session PASS (unconditional north star); M19 now current
+> Previous version context: 2026-06-26 — M17 closed; M18 active; Demo 7 at M18 close
 
 > **Reader Orientation:** This is the permanent project constitution — read it in full before beginning any session. It contains the mission, architectural commitments, and process rules that govern all work in this repository. Anyone making a change in this codebase, human or agent, must have read this document first. Key must-read sections if time is short: Session Continuity (what to read and in what order), Guiding Principles (the values behind every technical decision), and §Architectural Principles for Claude Code Sessions (process gates including pre-push lint, PR merge gate, and file authority rules that will cause compliance violations if not followed).
 
@@ -289,18 +289,18 @@ Full agent profiles, independence requirements, and operational agent definition
 
 ## What We Are Building First
 
-M0–M17 complete (v0.1.0–v0.17.0). ADRs 001–018 current.
+M0–M18 complete (v0.1.0–v0.18.0). ADRs 001–019 current.
 See GitHub Releases for full delivery history.
 
-**Milestone 17 — Calibration and Comparative Infrastructure (Complete)**
+**Milestone 18 — Full Argument and Demo 7 (Complete)**
 
-Delivered: Wave 1 CM calibration — ELASTICITY_REGISTRY revised (Fosu 2011 SSA LIC, #1229), governance sensitivity spec on record (#1248), FRAME-D milestone sentence fires within 8-step Demo 6 window. Wave 2 — N=3 multi-scenario comparison (#394), Zone 1B proportional allocation (ADR-018, #1252), DEMO6 CRITICAL polish (#1249/#1250/#1253/#1239), adaptive y-axis extension (#1251), GovernanceModule institutional_capacity_index (Gupta 2002, −0.015 T3, #1275), governance horizon disclosure (#1276), SOP UX/UI design artifact gate (#1277). SCAN-027 clean.
+Delivered: CI bands on Zone 1A trajectories (ADR-007 full implementation, #1254), PSP driver decomposition (#1255), counter-scenario comparison with distributional differential and CI bounds (#1349), control plane column Mode 2+3 (ADR-019, #1354), Zone 3 auditability panel (#1422), Mode 3 render optimization (#1217), 24 Demo 7 DEMO-NNN findings remediated across G6/G7. Demo 7 simulated stakeholder session: north star PASS (unconditional). SCAN-028 pending (EL-gated).
 
-**Milestone 18 — Full Argument and Demo 7 (Current)**
+**Milestone 19 — Constraint Search and Empirical Calibration (Current)**
 
-Core deliverable: Demo 7 (Senegal Mode 3 active control + Zambia three-scenario comparison, live external session #843). Counter-scenario comparison infrastructure; CI bands on Zone 1A trajectories (ADR-007 full implementation); PSP driver decomposition.
+Core deliverable: Mode 3 constraint-floor capability (instrument finds configurations that avoid a human cost threshold, rather than requiring one-at-a-time manual search); SEN and ZMB backtesting; empirically grounded CI intervals (ADR-007 Bayesian posterior layer); PSP driver arc across programme window and in-viewport auditability panel (DEMO-165, #1528).
 
-Demo 7 at M18 close.
+Demo 8 at M19 close.
 
 Each milestone is a vertical slice — working software at every stage,
 not infrastructure waiting for features.
@@ -309,15 +309,15 @@ not infrastructure waiting for features.
 
 ## Milestone Roadmap
 
-M0–M17 complete (v0.1.0–v0.17.0). M18 current. See GitHub Releases for full delivery history.
+M0–M18 complete (v0.1.0–v0.18.0). M19 current. See GitHub Releases for full delivery history.
 
-The full roadmap covering M18 and beyond — milestone deliverables, demo anchors, canonical users served, and the long-term resolution spectrum direction — is maintained at `docs/roadmap/worldsim-roadmap.md`. That document is the canonical reference. The summary below reflects current and next milestone only.
+The full roadmap covering M19 and beyond — milestone deliverables, demo anchors, canonical users served, and the long-term resolution spectrum direction — is maintained at `docs/roadmap/worldsim-roadmap.md`. That document is the canonical reference. The summary below reflects current and next milestone only.
 
-**Milestone 17 — Calibration and Comparative Infrastructure (Complete)**
-Delivered: Wave 1 CM calibration (fiscal-to-cohort elasticity #1229, governance sensitivity #1248, FRAME-D gate); Wave 2 — N=3 multi-scenario (#394), Zone 1B proportional allocation ADR-018 (#1252), DEMO6 CRITICAL polish (#1249/#1250/#1253/#1239), adaptive y-axis (#1251), GovernanceModule institutional_capacity_index (#1275), governance horizon disclosure (#1276), SOP UX/UI gate (#1277). SCAN-027 clean.
+**Milestone 18 — Full Argument and Demo 7 (Complete)**
+Delivered: CI bands ADR-007 (#1254); PSP driver decomposition (#1255); counter-scenario comparison with distributional differential (#1349); control plane column ADR-019 (#1354); Zone 3 auditability panel (#1422); 24 DEMO-NNN findings remediated (G6/G7). Demo 7 north star PASS (unconditional, 2026-07-02). SCAN-028 pending.
 
-**Milestone 18 — Full Argument and Demo 7 (Current)**
-Core deliverable: Demo 7 (Senegal Mode 3 + Zambia three-scenario, live external session #843). CI bands on Zone 1A trajectories (ADR-007 full); PSP driver decomposition; counter-scenario comparison.
+**Milestone 19 — Constraint Search and Empirical Calibration (Current)**
+Core deliverable: Mode 3 constraint-floor search capability; SEN/ZMB backtesting; empirically grounded CI intervals; PSP driver arc and auditability panel (DEMO-165/#1528). Demo 8 at M19 close.
 
 Full roadmap: `docs/roadmap/worldsim-roadmap.md`
 

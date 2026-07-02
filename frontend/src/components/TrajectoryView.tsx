@@ -6,7 +6,7 @@
  * Design decisions: DD-012 (Zustand atom), DD-013 (divergence fill), DD-014 (step annotation).
  * Framework colors: frameworkColors.ts (UX Designer ruling, MV-001 closed 2026-05-23).
  */
-import { useMemo, useLayoutEffect, useRef } from "react";
+import React, { useMemo, useLayoutEffect, useRef } from "react";
 import {
   ComposedChart,
   Line,
@@ -41,6 +41,11 @@ export const FRAMEWORKS: readonly FrameworkKey[] = [
 
 /** connectNulls prop value — must be literally false (AC-015). */
 export const CONNECT_NULLS = false as const;
+
+/** CI ribbon fill opacity for single/multi-entity view (M18-G1 #1254). */
+export const CI_BAND_OPACITY = 0.12;
+/** Reduced opacity when showBaseline=true — divergence fill + CI ribbon coexist (M18-G1 #1254). */
+export const CI_BAND_OPACITY_MODE3 = 0.05;
 
 /**
  * Returns true when |active - baseline| > 0.01 and both values are non-null.
@@ -132,7 +137,9 @@ function computeEntityCompositeScore(step: TrajectoryStep): number | null {
 
 /** Worst (highest-number) confidence tier across all frameworks at a step. */
 function getEntityWorstTier(step: TrajectoryStep): number {
-  const tiers = Object.values(step.frameworks).map((fw) => fw.confidence_tier);
+  const tiers = Object.values(step.frameworks)
+    .map((fw) => fw.confidence_tier)
+    .filter((t): t is number => typeof t === "number" && !isNaN(t));
   if (tiers.length === 0) return 3;
   return Math.max(...tiers);
 }
@@ -144,11 +151,32 @@ function getEntityMdaFloor(mda_floors: MDAFloor[]): number | null {
   return Math.min(...floors);
 }
 
+/**
+ * Half-width schedule mirrors BandingEngine §3.1 (M18-G1 #1254).
+ * Exported for unit tests (AC-1254-HW).
+ */
+export function computeCompositeHalfWidth(stepIndex: number, tier: number): number {
+  const baseHW = stepIndex === 1 ? 0.10 : stepIndex === 2 ? 0.20 : stepIndex <= 5 ? 0.35 : 0.50;
+  const multiplier = [1.0, 1.0, 1.2, 1.5, 2.0, 3.0][Math.min(tier, 5)];
+  return baseHW * multiplier;
+}
+
+export function computeCompositeCIBounds(step: TrajectoryStep): { lower: number | null; upper: number | null } {
+  const score = computeEntityCompositeScore(step);
+  if (score === null) return { lower: null, upper: null };
+  const worstTier = getEntityWorstTier(step);
+  const halfWidth = computeCompositeHalfWidth(step.step_index, worstTier);
+  return {
+    lower: Math.max(0.0, score - halfWidth),
+    upper: Math.min(1.0, score + halfWidth),
+  };
+}
+
 // ---------------------------------------------------------------------------
 // Internal types
 // ---------------------------------------------------------------------------
 
-interface MergedStepDatum {
+export interface MergedStepDatum {
   step_index: number;
   effective_from: string;
   step_event_label: string | null;
@@ -167,13 +195,21 @@ interface MergedStepDatum {
   governance_confidence_tier: number;
   financial_scoring_basis: string;
   human_development_scoring_basis: string;
+  financial_ci_lower: number | null;
+  financial_ci_upper: number | null;
+  human_development_ci_lower: number | null;
+  human_development_ci_upper: number | null;
+  ecological_ci_lower: number | null;
+  ecological_ci_upper: number | null;
+  governance_ci_lower: number | null;
+  governance_ci_upper: number | null;
 }
 
 // ---------------------------------------------------------------------------
 // Data merging
 // ---------------------------------------------------------------------------
 
-function mergeTrajectories(
+export function mergeTrajectories(
   active: TrajectoryResponse,
   baseline: TrajectoryResponse | null,
 ): MergedStepDatum[] {
@@ -198,6 +234,11 @@ function mergeTrajectories(
     const basis = (fw: string): string =>
       step.frameworks[fw]?.scoring_basis ?? "percentile_rank";
 
+    const ci = (fw: string, bound: "ci_lower" | "ci_upper"): number | null => {
+      const raw = step.frameworks[fw]?.[bound] ?? null;
+      return raw !== null ? parseFloat(raw as unknown as string) : null;
+    };
+
     return {
       step_index: step.step_index,
       effective_from: step.effective_from,
@@ -217,6 +258,14 @@ function mergeTrajectories(
       governance_confidence_tier: tier("governance"),
       financial_scoring_basis: basis("financial"),
       human_development_scoring_basis: basis("human_development"),
+      financial_ci_lower: ci("financial", "ci_lower"),
+      financial_ci_upper: ci("financial", "ci_upper"),
+      human_development_ci_lower: ci("human_development", "ci_lower"),
+      human_development_ci_upper: ci("human_development", "ci_upper"),
+      ecological_ci_lower: ci("ecological", "ci_lower"),
+      ecological_ci_upper: ci("ecological", "ci_upper"),
+      governance_ci_lower: ci("governance", "ci_lower"),
+      governance_ci_upper: ci("governance", "ci_upper"),
     };
   });
 }
@@ -403,6 +452,19 @@ function CompositeChartSVG({
     return pts.length >= 2 ? "M " + pts.join(" L ") : "";
   };
 
+  const buildCIRibbonPath = (steps: TrajectoryStep[]): string => {
+    const upperPts: string[] = [];
+    const lowerPts: string[] = [];
+    for (const step of steps) {
+      const { lower, upper } = computeCompositeCIBounds(step);
+      if (lower === null || upper === null) continue;
+      upperPts.push(`${xScale(step.step_index).toFixed(1)},${yScale(upper).toFixed(1)}`);
+      lowerPts.unshift(`${xScale(step.step_index).toFixed(1)},${yScale(lower).toFixed(1)}`);
+    }
+    if (upperPts.length < 2) return "";
+    return "M " + upperPts.join(" L ") + " L " + lowerPts.join(" L ") + " Z";
+  };
+
   const showBaseline =
     (mode === "MODE_2" || mode === "MODE_3") &&
     Object.keys(baselineTrajectories).length > 0;
@@ -459,6 +521,42 @@ function CompositeChartSVG({
           </text>
         </g>
       ))}
+
+      {/* CI ribbons — rendered before trajectory paths so lines render on top (M18-G1 #1254) */}
+      {comparisonScenarios.length === 0 && entityCodes.map((code, i) => {
+        const active = activeTrajectories[code];
+        if (!active) return null;
+        const ribbonD = buildCIRibbonPath(active.steps);
+        if (!ribbonD) return null;
+        const color = ENTITY_PALETTE[i % ENTITY_PALETTE.length];
+        return (
+          <path
+            key={`ci-ribbon-${code}`}
+            data-testid={`zone-1a-ci-ribbon-${code}`}
+            d={ribbonD}
+            fill={color}
+            opacity={mode === "MODE_3" ? CI_BAND_OPACITY_MODE3 : CI_BAND_OPACITY}
+            stroke="none"
+          />
+        );
+      })}
+      {comparisonScenarios.length > 0 && comparisonScenarios.map((sc) => {
+        if (!sc.trajectory) return null;
+        const ribbonD = buildCIRibbonPath(sc.trajectory.steps);
+        if (!ribbonD) return null;
+        const palette = SCENARIO_COMPARISON_PALETTE[sc.paletteIndex];
+        const slug = sc.scenarioId.replace(/^[a-z]{3}-/, "");
+        return (
+          <path
+            key={`ci-ribbon-scenario-${sc.scenarioId}`}
+            data-testid={`zone-1a-ci-ribbon-scenario-${slug}`}
+            d={ribbonD}
+            fill={palette.color}
+            opacity={CI_BAND_OPACITY}
+            stroke="none"
+          />
+        );
+      })}
 
       {/* Divergence fills — only rendered when hasDivergence */}
       {hasDivergence &&
@@ -727,7 +825,10 @@ interface TrajectoryViewProps {
 // TrajectoryView
 // ---------------------------------------------------------------------------
 
-export function TrajectoryView({
+// React.memo: prevents re-renders when parent re-renders but trajectory data is unchanged.
+// Required for ControlPlaneColumn lazy-mount optimization (#1217, EX-001 resolution).
+// useMemo wraps are applied per-hook inside the component body.
+export const TrajectoryView = React.memo(function TrajectoryView({
   width,
   height = 300,
   entityIds,
@@ -911,6 +1012,21 @@ export function TrajectoryView({
         data-current-step={current_step}
         style={{ width: width ?? 480, position: "relative" }}
       >
+        {/* AC-G4-C trajectory presence indicators (ADR-019 D-10, #1217) */}
+        {showBaseline && (
+          <span
+            data-testid="trajectory-baseline"
+            aria-hidden="true"
+            style={{ position: "absolute", width: 2, height: 2, opacity: 0, pointerEvents: "none" }}
+          />
+        )}
+        {mode === "MODE_3" && (
+          <span
+            data-testid="trajectory-counter"
+            aria-hidden="true"
+            style={{ position: "absolute", width: 2, height: 2, opacity: 0, pointerEvents: "none" }}
+          />
+        )}
         <CompositeChartSVG
           entityCodes={entityCodes}
           activeTrajectories={effectiveActiveTrajectories}
@@ -934,6 +1050,21 @@ export function TrajectoryView({
       data-current-step={current_step}
       style={{ width: width ?? 480, position: "relative" }}
     >
+      {/* AC-G4-C trajectory presence indicators (ADR-019 D-10, #1217) */}
+      {showBaseline && (
+        <span
+          data-testid="trajectory-baseline"
+          aria-hidden="true"
+          style={{ position: "absolute", width: 2, height: 2, opacity: 0, pointerEvents: "none" }}
+        />
+      )}
+      {mode === "MODE_3" && (
+        <span
+          data-testid="trajectory-counter"
+          aria-hidden="true"
+          style={{ position: "absolute", width: 2, height: 2, opacity: 0, pointerEvents: "none" }}
+        />
+      )}
       <ResponsiveContainer width="100%" height={height}>
         <ComposedChart
           data={mergedData}
@@ -975,14 +1106,14 @@ export function TrajectoryView({
             formatter={(value) => value}
           />
 
-          {/* Uncertainty band Areas (ADR-007-gated) */}
+          {/* Uncertainty band Areas (ADR-007 / M18-G1 #1254) */}
           {FRAMEWORKS.map((fw) => (
             <Area
               key={`${fw}-band`}
               dataKey={`${fw}_ci_upper` as never}
               baseLine={`${fw}_ci_lower` as never}
               fill={FRAMEWORK_COLORS[fw]}
-              fillOpacity={0}
+              fillOpacity={showBaseline ? CI_BAND_OPACITY_MODE3 : CI_BAND_OPACITY}
               stroke="none"
               isAnimationActive={false}
               connectNulls={CONNECT_NULLS}
@@ -996,8 +1127,8 @@ export function TrajectoryView({
               key={`${fw}-divergence`}
               dataKey={`${fw}_active` as never}
               baseLine={`${fw}_baseline` as never}
-              fill={FRAMEWORK_COLORS[fw]}
-              fillOpacity={showBaseline ? 0.12 : 0}
+              fill={showBaseline ? FRAMEWORK_COLORS[fw] : "none"}
+              fillOpacity={0.12}
               stroke="none"
               isAnimationActive={false}
               connectNulls={CONNECT_NULLS}
@@ -1172,4 +1303,4 @@ export function TrajectoryView({
 
     </div>
   );
-}
+});

@@ -2,10 +2,10 @@
 name: m18-sprint-plan
 type: sprint-plan
 milestone: M18 — Full Argument and Demo 7
-status: Filed — awaiting EL approval before Wave 1 sprint entries open
+status: EL-approved 2026-06-26; G6 CLOSED 2026-06-29 (integration PR #1479 → release/m18); G7 sprint entry filed 2026-06-29 (pending EL approval)
 authored-by: PM Agent
 authored-date: 2026-06-26
-el-approved: false
+el-approved: 2026-06-26
 consulted-agents:
   - Business Product Owner (Demo 7 value prioritization; scope cut order; Mode 3 as Act 1 anchor)
   - Frontend Architect (file area grouping; Wave 1 parallel safety; Wave 2 sequencing; InstrumentCluster.tsx conflict map)
@@ -17,8 +17,8 @@ sop-reference: docs/process/sprint-planning-sop.md
 
 # M18 Sprint Plan — Full Argument and Demo 7
 
-**Status:** Filed 2026-06-26 — awaiting EL approval before Wave 1 sprint entries open; pre-wave design phases (GD and GR) may begin immediately after EL approval
-**Release branch:** `release/m18` — to be cut from `main` at EL approval
+**Status:** EL-approved 2026-06-26 (PR #1364) — Wave 1 sprint entries may be filed and approved; pre-wave GD and GR phases may begin immediately
+**Release branch:** `release/m18` — cut from `main` 2026-06-26 at commit 8cffc86 (after sync PR #1366)
 **Exit checklist issue:** #1340 (M18 Exit Checklist — blocks milestone closure)
 **GitHub Milestone:** #19
 
@@ -90,9 +90,12 @@ Full M18 issue audit completed 2026-06-26. All 18 M18 issues accounted for.
 | #1255 | PSP driver decomposition | G2 | Wave 1 | High |
 | #1349 | Counter-scenario comparison | G3 | Wave 2 (blocked: GR) | High — Demo 7 Act 2 |
 | #1217 | Mode 3 render optimization | G4 | Wave 2 (blocked: ADR-019) | High — EX-001 expired |
-| #1256 | Path 2 proprietary data | — | Capacity-allowing | Low |
-| #1238 | DEMO6-009 narration fix | — | Capacity-allowing | Low |
-| #1059 | HCL narration integration | — | Capacity-allowing | Low |
+| #1256 | Path 2 proprietary data | — | Capacity-allowing | Low — closed 2026-06-27 (open-source strategy) |
+| #1238 | DEMO6-009 narration fix | G5 | Wave 3 (capacity-allowing) | Low — CLOSED 2026-06-28 (fix was already in commit 6e8f618) |
+| #1059 | HCL narration integration | — | Capacity-allowing | Low — CLOSED 2026-06-28 (superseded by G5 scope decision) |
+| #1422 | Zone 3 auditability panel (US-1349-D) | G5 | Wave 3 (capacity-allowing) | High — Demo 7 Act 2 Lucas analytical scrutiny path |
+| #1445 | Demo 7 preparation tracking | G6 | Wave 4 | Demo prep issue; G6 walkthrough, screenshot brief, Step 5d, narrated spec, frames, Step 6b review |
+| #1459–#1474 | Step 6b DEMO-130–DEMO-153 findings (16 CRITICAL+HIGH issues) | G7 | Wave 4 (continued) | All CRITICAL and HIGH findings from the Step 6b nine-agent internal review (2026-06-29) — see `docs/demo/m18/reviews/2026-06-29-v0.18.0-internal-review.md` for full DEMO-NNN list |
 
 ### ADR backlog review
 
@@ -206,6 +209,9 @@ Primary files: `InstrumentCluster.tsx` (column 3 population — major structural
 | G2 — PSP Driver Decomposition | #1255 | Implementation | Wave 1 | PSP dominant driver category exposed in Zone 1D; backend PoliticalEconomyModule extension. ADR prerequisite: ADR-015 (ACCEPTED). **CLEAR.** Runs in parallel with G1. |
 | G3 — Counter-Scenario Comparison | #1349 | Implementation | Wave 2 | Distributional number differential with CI bands for Demo 7 Act 2; builds on M17 N=3 comparison API. ADR prerequisite: **TBD at sprint entry after GR closes.** Blocked until GR close and Architect determination. |
 | G4 — Control Plane Column | #1217 + control plane impl | Implementation | Wave 2 | Mode 3 column populated in InstrumentCluster column 3 (replacing bottom-bar ControlPlane); Mode 2 scenario configuration surface; blue/orange visual system; shock taxonomy (Form 2); history list; render optimization (#1217). ADR prerequisite: ADR-019 — **BLOCKED until ADR-019 accepted.** Must complete before G3 if both Wave 2 groups are active (ScenarioInstrumentCluster conflict). |
+| G5 — Demo 7 Readiness | #1422, #1238 (closed), NM-076 CODING_STANDARDS improvement | Implementation | Wave 3 (capacity-allowing) | Zone 3 auditability panel for DistributionalComparisonSummary (expand/collapse methodology detail — AC-1422-A through AC-1422-G). Sprint branch: `sprint/m18-g5`. Sprint journal: #1435. EL-approved 2026-06-28. CLOSED 2026-06-28 — integration PR #1443 MERGED. |
+| G6 — Demo 7 Preparation | #1445 (demo prep issue), #843 reference | Implementation | Wave 4 (Demo prep) | Stakeholder walkthrough, screenshot brief, Step 5d mode evaluation, narrated spec (`demo-narrated.spec.ts`), five frames (1440×900 capture), Step 6b nine-agent internal review. Sprint branch: `sprint/m18-g6`. Sprint journal: #1475. CLOSED 2026-06-29 — Step 6b unanimous FAIL (9/9 agents; 7 CRITICAL, 9 HIGH, 6 MEDIUM, 2 LOW; DEMO-130–DEMO-153; issues #1459–#1474 filed). Integration PR #1479 → `release/m18`. |
+| G7 — Demo 7 Continuation | #1459–#1474 (DEMO-130–DEMO-153 findings), #843 (exit gate) | Implementation | Wave 4 (continued) | Resolution of all Step 6b findings across five fix clusters: A (CI band geometry — `TrajectoryView.tsx` fill bug, DEMO-137/138/145), B (Zone 1B layout contract — sticky-bottom height budget failure), C (CohortImpactSection alert-only design — UX sign-off required), D (data pipeline — psp-driver-row + HCL bottom quintile key mismatch), E (capture/narration/label fixes). G7-0 root cause analysis doc precedes all fix intent documents. Sprint branch: `sprint/m18-g7` (to be cut after G6 integration PR merges). Sprint entry filed 2026-06-29 — pending EL approval. |
 
 ### GD Phase sequencing detail
 
@@ -291,11 +297,30 @@ Wave 2 (after Wave 1 + gates):                          │
                                                         │
         ↓ G4 exits → G3 opens                          │
         ↓ G3 exits                                      │
+                                                        │
+Wave 3 (capacity-allowing; after G3 exits):             │
+  G5 — Zone 3 Auditability #1422 ─────────────────────┤  ✅ CLOSED 2026-06-28
+  (NM-076 CODING_STANDARDS improvement)                 │     Integration PR #1443 MERGED
+                                                        │
+        ↓ G5 exits                                      │
+                                                        │
+Wave 4 — Demo 7 Preparation and Continuation:           │
+  G6 — Demo 7 Preparation (Steps 1–6b) ───────────────┤  ✅ CLOSED 2026-06-29
+       walkthrough, screenshot brief, Step 5d,          │     Step 6b: unanimous FAIL
+       narrated spec, five frames, Step 6b review       │     DEMO-130–DEMO-153 filed
+       ↓ Step 6b FAIL → G7 opened                       │     Integration PR #1479 → release/m18
+                                                        │
+  G7 — Demo 7 Continuation ───────────────────────────┤  ⬜ ACTIVE — sprint entry pending EL approval
+       G7-0 root cause analysis                         │     sprint/m18-g7 to cut after #1479 merges
+       Cluster A: CI band geometry fix                  │
+       Cluster B: Zone 1B layout fix                    │
+       Cluster C: CohortImpactSection design            │
+       Cluster D: data pipeline (psp-driver + HCL)     │
+       Cluster E: capture/narration/label fixes         │
+       ↓ Step 6b re-review PASS gate                    │
+       Steps 7, 6c, 8, 9, 9b                            │
                                                         ├─► Demo 7 (#843)
-Demo 7 preparation (across milestone, no sprint entry): │
-  Senegal Act 1 scenario calibration                    │
-  Zambia Act 2 three-scenario setup                     │
-  Presenter narration + demo script                     │
+        ↓ G7 exits                                      │
                                                         │
 Demo 7 live session ────────────────────────────────────┘
         ↓ #843 complete
@@ -335,6 +360,51 @@ G1 and G2 are immediately unblocked (no ADR prerequisites outstanding). They may
 
 ---
 
+## Wave 3 Entry Gate
+
+**G5 (Zone 3 auditability) may open when:**
+1. G3 has exited (distributional comparison summary is stable; G5 extends it)
+2. G5 sprint entry document filed and EL-approved (filed 2026-06-28; EL-approved 2026-06-28 — PR #1436)
+3. Intent document filed (filed 2026-06-28 — PR #1437)
+4. QA tests authored (filed 2026-06-28 — PR #1438)
+
+G5 is capacity-allowing and does not block Demo 7 scheduling. It improves the analytical scrutiny path for Persona 1 (Lucas) in Demo 7 Act 2 but is not on the critical path.
+
+**G5 exit status:** ✅ CONFIRMED 2026-06-28 — integration PR #1443 MERGED to `release/m18`.
+
+---
+
+## Wave 4 Entry Gates
+
+### G6 (Demo 7 Preparation)
+
+**G6 entry conditions — all satisfied (CLOSED 2026-06-29):**
+1. ✅ G5 exited — distributional comparison summary stable
+2. ✅ G6 sprint entry filed and EL-approved (filed prior session)
+3. ✅ Demo prep standard Steps 1–6b executed — walkthrough, screenshot brief, Step 5d mode evaluation, narrated spec, five frames, Step 6b nine-agent review
+4. ✅ Step 6b gate verdict: unanimous FAIL — 7 CRITICAL, 9 HIGH, 6 MEDIUM, 2 LOW (DEMO-130–DEMO-153; issues #1459–#1474)
+
+**G6 exit status:** Integration PR #1479 (`sprint/m18-g6` → `release/m18`) open with auto-merge. PI Agent confirmation checklist pending (6 conditions — `docs/process/sprint-plans/m18-g6-sprint-exit.md §6`).
+
+### G7 (Demo 7 Continuation)
+
+**G7 may open when:**
+1. G6 integration PR #1479 merges to `release/m18` (auto-merge pending CI)
+2. PI Agent confirms G6 exit (6-condition checklist in `m18-g6-sprint-exit.md §6`)
+3. G7 sprint entry document EL-approved — filed 2026-06-29 at `docs/process/sprint-plans/m18-g7-sprint-entry.md`; **pending EL approval**
+4. PM Agent cuts `sprint/m18-g7` from `release/m18` after G6 integration PR merges
+5. PM Agent opens G7 sprint journal issue
+
+**G7 pre-implementation sequencing:**
+- G7-0 root cause analysis document filed and EL-reviewed — **must precede all fix intent documents**
+- Architect + UX sign-off on clusters B (Zone 1B) and C (CohortImpactSection) — determines whether ADR-008 / ADR-010 amendments are required
+- Per-cluster intent document → QA authorship → implementation (five clusters may not all run concurrently; see G7 entry `§4`)
+- NM-079 filed at G7 entry (CI band fill geometry shipped G1 undetected; no unit test covers fill geometry calculation)
+
+**G7 exit gate:** Step 6b re-review PASS (nine-agent panel) is required before Steps 7, 6c, 8, 9, 9b may proceed. North star test authored by BPO after live session #843 runs.
+
+---
+
 ## Demo 7 Minimum Viable Readiness Checklist
 
 Demo 7 (#843) schedules when all of the following are confirmed by PM Agent:
@@ -357,14 +427,17 @@ Demo 7 (#843) schedules when all of the following are confirmed by PM Agent:
 
 M18 closes when all of the following are satisfied:
 
-1. **G1 exit confirmed by PI Agent** — CI bands on Zone 1A; integration test in CI; BPO ACCEPT
-2. **G2 exit confirmed by PI Agent** — PSP decomposition in Zone 1D; BPO ACCEPT
-3. **G3 exit confirmed by PI Agent** — counter-scenario comparison; BPO ACCEPT; Customer Agent Layer 3 for Personas 1 + 5
-4. **G4 exit confirmed by PI Agent** — control plane column populated (Mode 2 + Mode 3); #1217 render optimization; BPO ACCEPT; Customer Agent Layer 3 for Personas 2 + 5; EX-001 status resolved
-5. **North star test artifact on record** for G3 + G4: "The Senegalese Finance Minister's team can show that under proposed conditionality there is no fiscal instrument configuration that avoids the bottom quintile crossing the 0.40 floor — or, if a configuration exists, they can name it and cite the specific step at which the threshold is no longer crossed. The Zambian ministry can show the number differential between restructuring options with confidence bands."
-6. **Demo 7 live session complete** (#843 closed) — external participants attended; stakeholder review on record
-7. **PI Agent exit gate confirmation** recorded in the M18 sprint exit document
-8. **#1340** (M18 Exit Checklist) closed
+1. **G1 exit confirmed by PI Agent** — CI bands on Zone 1A; integration test in CI; BPO ACCEPT ✅ CONFIRMED 2026-06-28 (integration PR #1411 MERGED)
+2. **G2 exit confirmed by PI Agent** — PSP decomposition in Zone 1D; BPO ACCEPT ✅ CONFIRMED 2026-06-28 (integration PR #1408 MERGED)
+3. **G3 exit confirmed by PI Agent** — counter-scenario comparison; BPO ACCEPT; Customer Agent Layer 3 for Personas 1 + 5 ✅ CONFIRMED 2026-06-28 (integration PR #1417 MERGED)
+4. **G4 exit confirmed by PI Agent** — control plane column populated (Mode 2 + Mode 3); #1217 render optimization; BPO ACCEPT; Customer Agent Layer 3 for Personas 2 + 5; EX-001 status resolved ✅ CONFIRMED 2026-06-28 (integration PR #1433 MERGED)
+5. **North star test artifact on record** for G3 + G4: "The Senegalese Finance Minister's team can show that under proposed conditionality there is no fiscal instrument configuration that avoids the bottom quintile crossing the 0.40 floor — or, if a configuration exists, they can name it and cite the specific step at which the threshold is no longer crossed. The Zambian ministry can show the number differential between restructuring options with confidence bands." ✅ G3 + G4 north star on record; G7 north star filed by BPO after #843 runs.
+6. **G5 exit confirmed by PI Agent** (capacity-allowing) — Zone 3 auditability panel (#1422); BPO ACCEPT; Customer Agent Layer 3 for Persona 1 ✅ CONFIRMED 2026-06-28 (integration PR #1443 MERGED)
+7. **G6 exit confirmed by PI Agent** — demo prep artifacts through Step 6b FAIL gate; all DEMO-130–DEMO-153 findings documented; issues #1459–#1474 filed; integration PR #1479 merged ⬜ PI Agent confirmation checklist pending (`m18-g6-sprint-exit.md §6`)
+8. **G7 exit confirmed by PI Agent** — all CRITICAL findings resolved or dispositioned; Step 6b nine-agent re-review PASS; Steps 7, 6c, 8 complete; BPO ACCEPT; Customer Agent Layer 3 for Personas 2, 3, 5; north star test filed after #843 runs ⬜ Pending G7 implementation
+9. **Demo 7 live session complete** (#843 closed) — external participants attended; stakeholder review on record ⬜ Pending G7 completion
+10. **PI Agent exit gate confirmation** recorded in the M18 sprint exit document ⬜ Pending
+11. **#1340** (M18 Exit Checklist) closed ⬜ Pending
 
 ---
 
@@ -388,11 +461,11 @@ Per `docs/process/sprint-planning-sop.md §Sprint Entry Gate`, implementation ma
 
 1. ✅ EL merges `release/m17` → `main` — DONE 2026-06-26
 2. ✅ PM Agent authors `m18-sprint-plan.md` — THIS DOCUMENT (2026-06-26)
-3. ⬜ EL approves sprint plan (review and approve below or on #1340)
-4. ⬜ PM Agent cuts `release/m18` from `main`: `git checkout -b release/m18 main && git push -u origin release/m18`
-5. ⬜ DS Agent: `infra/m18-gitignore-backend-test-results` PR — add `backend/test-results/` to `.gitignore`
-6. ⬜ G1 sprint entry filed and EL-approved → Wave 1 begins
-7. ⬜ G2 sprint entry filed and EL-approved → Wave 1 parallel group open
+3. ✅ EL approves sprint plan — PR #1364 merged 2026-06-26
+4. ✅ PM Agent cuts `release/m18` from `main` — cut 2026-06-26 at commit 8cffc86 (sync PR #1366 merged)
+5. ✅ DS Agent: `backend/test-results/` already in `.gitignore` (PR #1346 — no action needed)
+6. ✅ G1 sprint entry filed and EL-approved 2026-06-26 (PR #1369; approval recorded in entry doc)
+7. ✅ G2 sprint entry filed and EL-approved 2026-06-26 (PR #1369; approval recorded in entry doc)
 8. ⬜ GD Phase 1 begins (Artifacts 1 + 3) — immediately after EL sprint plan approval
 9. ⬜ GR begins (#1352) — immediately after EL sprint plan approval
 10. ⬜ Wave 1 exit gates confirmed by PI Agent (G1, G2)
@@ -400,15 +473,31 @@ Per `docs/process/sprint-planning-sop.md §Sprint Entry Gate`, implementation ma
 12. ⬜ G4 sprint entry filed and EL-approved → Wave 2 G4 begins
 13. ⬜ GR close confirmed → G3 Architect determination → G3 sprint entry → Wave 2 G3 begins
 14. ⬜ Wave 2 exit gates confirmed by PI Agent (G4 before G3)
-15. ⬜ Demo 7 minimum viable readiness checklist confirmed → Demo 7 session scheduled
-16. ⬜ Demo 7 live session complete (#843) → stakeholder review on record
-17. ⬜ PI Agent M18 exit gate confirmation → #1340 closes
+15. ✅ G5 sprint entry filed and EL-approved 2026-06-28 (PR #1436) — Wave 3 capacity-allowing group
+16. ✅ G5 intent document filed 2026-06-28 (PR #1437)
+17. ✅ G5 QA tests filed 2026-06-28 (PR #1438)
+18. ✅ G5 implementation complete 2026-06-28 (#1422 — PR #1439 merged; #1238 verified closed)
+19. ✅ G5 exit gate confirmed by PI Agent (#1422 BPO ACCEPT + CA L3 PASS — 2026-06-28; integration PR #1443 MERGED to `release/m18`)
+20. ✅ G6 sprint entry filed and EL-approved (prior session, 2026-06-29) — Wave 4 Demo prep
+21. ✅ G6 demo prep artifacts complete 2026-06-29 — walkthrough, screenshot brief, Step 5d docs, narrated spec, five frames (PR #1449/#1457/#1458/#1476 merged to `sprint/m18-g6`)
+22. ✅ G6 Step 6b nine-agent internal review complete 2026-06-29 — unanimous FAIL; DEMO-130–DEMO-153; issues #1459–#1474 filed; PR #1478 → `sprint/m18-g6` (auto-merge)
+23. ✅ G6 sprint exit document filed 2026-06-29 (`m18-g6-sprint-exit.md`); integration PR #1479 → `release/m18` (auto-merge)
+24. ⬜ G6 exit gate confirmed by PI Agent — 6-condition checklist in `m18-g6-sprint-exit.md §6`
+25. ⬜ G7 sprint entry EL-approved — entry filed 2026-06-29 at `m18-g7-sprint-entry.md`; **EL approval required before implementation begins**
+26. ⬜ PM Agent cuts `sprint/m18-g7` from `release/m18` (after G6 integration PR #1479 merges); PM Agent opens G7 sprint journal issue
+27. ⬜ G7-0 root cause analysis document filed and EL-reviewed (precedes all fix intent documents)
+28. ⬜ G7 implementation — five fix clusters (A: CI band geometry, B: Zone 1B layout, C: CohortImpactSection, D: data pipeline, E: capture/narration); NM-079 filed at G7 entry
+29. ⬜ G7 Step 6b re-review — nine-agent panel re-run; PASS gate required before Step 7 opens
+30. ⬜ Demo 7 minimum viable readiness checklist confirmed → Demo 7 session scheduled
+31. ⬜ Demo 7 live session complete (#843) → stakeholder review on record; north star test authored by BPO
+32. ⬜ G7 exit gate confirmed by PI Agent → M18 sprint exit document filed
+33. ⬜ PI Agent M18 exit gate confirmation → #1340 closes
 
 ---
 
 ## EL Approval Record
 
-**EL approval:** Pending
+**EL approval:** 2026-06-26 (PR #1364 merged)
 
-> {EL approval statement}
-> — @PublicEnemage ({date})
+> Sprint plan approved. Wave structure (Pre-wave GD + GR → Wave 1 G1+G2 → Wave 2 G4→G3 → Demo 7) confirmed. ADR prerequisites clear. Release branch cut. Pre-wave phases (GD #1354 and GR #1352) may begin immediately. Wave 1 sprint entries (G1 and G2) may be filed — each requires separate EL approval before implementation PR opens.
+> — @PublicEnemage (2026-06-26)

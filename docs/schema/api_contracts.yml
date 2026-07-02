@@ -370,6 +370,94 @@ endpoints:
       status_409: "one or both scenarios have no snapshots yet"
     db_reads: [scenarios, scenario_state_snapshots]
 
+  - method: POST
+    path: /scenarios/comparison/distributional-differential
+    summary: >
+      Poverty headcount differential between N comparison scenarios — M18-G3 #1349.
+      For each non-reference scenario, returns per-step Q1 poverty headcount differential
+      vs. the reference scenario, with CI bounds and a direction stability flag.
+      Designed for Demo 7 Act 2 (Zambia three-scenario comparison, Zone 1B element).
+      Tier T3: Q1 population from UN WPP 2024; CI band is T3 placeholder pending
+      G1 Zone 1A CI band integration (ADR-007). Must appear before
+      /scenarios/{scenario_id} in router registration.
+    auth: none
+    request_body:
+      entity_id:
+        type: string
+        required: true
+        example: "ZMB"
+        description: "ISO 3166-1 alpha-3 entity identifier for Q1 population lookup."
+      scenario_ids:
+        type: "string[]"
+        required: true
+        description: "All scenario IDs (reference + non-reference). Minimum 2."
+      reference_scenario_id:
+        type: string
+        required: true
+        description: "Must be in scenario_ids. All other scenarios are compared against it."
+    response:
+      status: 200
+      body:
+        entity_id: {type: string, example: "ZMB"}
+        reference_scenario_id: {type: string}
+        terminal_step: {type: integer, description: "Highest step present across all scenarios."}
+        tier: {type: string, enum: ["T2", "T3"], description: "Tier T3 for M18 (SSA regional average parameters)."}
+        methodology_summary: {type: string, description: "One-sentence provenance for Zone 3 methodology disclosure."}
+        methodology_detail:
+          type: object
+          required: true
+          description: "Structured auditability detail for Zone 3 panel (AC-1422-C, M18-G5 #1422). All four sub-fields required."
+          properties:
+            q1_population:
+              type: integer
+              description: "Entity Q1 population used in headcount calculation. ZMB: 3,894,625 (UN WPP 2024, 20% Q1 fraction)."
+            ci_methodology:
+              type: string
+              description: "CI band computation method. ±13–16% of point estimate (T3 placeholder, ADR-007 pending)."
+            extraction_path:
+              type: string
+              description: "How Q1 poverty_headcount_ratio is extracted: Q1 CHT cohort mean; falls back to main entity."
+            tier_rationale:
+              type: string
+              description: "Plain-language T3 tier rationale: ECOWAS regional comparables, not calibrated country-level data."
+        pairs:
+          type: array
+          description: "One entry per non-reference scenario. Reference scenario excluded."
+          items:
+            scenario_id: {type: string}
+            steps:
+              type: array
+              description: "Per-step results in ascending step order."
+              items:
+                step: {type: integer}
+                headcount_differential:
+                  type: integer
+                  description: >
+                    Integer poverty headcount differential (persons).
+                    Positive = more poverty in this scenario vs. reference.
+                    AC-1349-C guard: MUST be integer, not float composite delta.
+                ci_lower:
+                  type: integer
+                  description: "Lower 95% CI bound (integer persons). T3 placeholder."
+                ci_upper:
+                  type: integer
+                  description: "Upper 95% CI bound (integer persons). T3 placeholder."
+                direction_stable:
+                  type: boolean
+                  description: >
+                    True when CI does not span zero: (ci_lower > 0) OR (ci_upper < 0).
+                    Drives 'Direction stable across uncertainty range' disclosure (AC-1349-E).
+      status_400: "Fewer than 2 scenario_ids, or reference_scenario_id not in scenario_ids"
+      status_404: "Any scenario_id not found"
+      status_409: "Any scenario has no snapshots yet, or no shared steps across all scenarios"
+    db_reads: [scenario_state_snapshots]
+    notes:
+      - "M18-G3 #1349: Demo 7 Act 2 Zambia three-scenario comparison capability."
+      - "AC-1349-G: headcount_differential must be integer (not float composite delta)."
+      - "AC-1349-G: direction_stable must equal (ci_lower > 0) OR (ci_upper < 0)."
+      - "AC-schema: schema tests in backend/tests/test_m18_g3_counter_scenario_comparison.py assert 'distributional-differential', 'headcount_differential', 'direction_stable', 'tier', 'ci_lower', 'ci_upper' are all present in this file."
+      - "AC-1422-G(schema): M18-G5 #1422 — schema tests assert 'methodology_detail', 'q1_population', 'tier_rationale' present in this file (TestAC1422GSchemaDocumented)."
+
   - method: GET
     path: "/scenarios/{scenario_id}"
     summary: Full scenario detail including configuration and scheduled inputs
@@ -504,7 +592,7 @@ endpoints:
       on a returned step means governance-in-validation OR no normalizable indicators
       at that step for single-entity scenarios (see scoring_basis). Schema updated
       2026-05-23 — EL Decisions A/B/C resolved; DA-F2/F4/F5 PENDINGs cleared.
-      ci_lower/ci_upper remain pending ADR-007.
+      ci_lower/ci_upper implemented via BandingEngine — M18-G1 (#1254).
     auth: none
     path_params:
       scenario_id: {type: string}
@@ -589,16 +677,20 @@ endpoints:
                     normalized scores carry acknowledged range uncertainty).
                 ci_lower:
                   type: "string|null"
-                  description: "PENDING ADR-007 — BandingEngine not yet implemented. null until ADR-007 accepted."
+                  description: >
+                    80% CI lower bound as Decimal-as-string; null when composite_score is null.
+                    Computed by BandingEngine §3.1 schedule (M18-G1 #1254).
                 ci_upper:
                   type: "string|null"
-                  description: "PENDING ADR-007 — same as ci_lower."
+                  description: >
+                    80% CI upper bound as Decimal-as-string; null when composite_score is null.
+                    Computed by BandingEngine §3.1 schedule (M18-G1 #1254).
                 ci_coverage:
                   type: "number|null"
-                  description: "PENDING ADR-007 — 0.80 when present."
+                  description: "0.80 throughout M18; null when composite_score is null."
                 is_pre_calibration:
                   type: "boolean|null"
-                  description: "PENDING ADR-007."
+                  description: "true throughout M18 (pre-calibration phase per ADR-007); null when composite_score is null."
             policy_inputs:
               type: array
               description: "Policy input events applied at this step. Source: scenario_scheduled_inputs."
@@ -622,7 +714,7 @@ endpoints:
     notes:
       - "Schema updated 2026-05-23 — EL Decisions A/B/C resolved. All DA-F2/F4/F5 PENDINGs cleared."
       - "DA-F2 resolved: mda_floors at response root (not per-step); M9 returns [] except ecological WARNING at 1.0."
-      - "DA-F3 remains: ci_lower/ci_upper pending ADR-007."
+      - "DA-F3 resolved: ci_lower/ci_upper implemented via BandingEngine — M18-G1 (#1254)."
       - "DA-F4 resolved: scoring_basis field added; Path A selected (normalized_absolute for single-entity financial/HD)."
       - "DA-F5 resolved: step_event_label/step_significance sourced from scenarios.configuration.step_metadata JSONB."
       - "step_significance values are SIGNIFICANT or ROUTINE only — STANDARD is incorrect (ADR-010 Decision 7)."
@@ -714,6 +806,7 @@ endpoints:
       - "composite_score is null when single_entity_warning=true for financial and human_development — percentile rank requires ≥2 entities"
       - "db_reads includes simulation_reference_constants for ecological effective-at-simulation-time boundary constant query"
       - "DA-G5-4 (ADR-015 Component 3): political_economy framework outputs.political_economy.indicators.programme_survival_probability is a QuantitySchema entry (value: Decimal string|null, confidence_tier: 3, unit: 'probability'). Distinct from political_economy.composite_score (3-factor composite from ADR-013). Frontend fetches this via Option A: measurement-output at current step."
+      - "M18-G2 (#1255): programme_survival_probability extends with psp_dominant_driver field (string|null). Enum: fiscal_sustainability|external_balance|governance|social_stability. null when no events produced a legitimacy contribution AND entity legitimacy >= 0.5. Inherits T3 tier from PSP. Frontend threads to FourFrameworkZone1D as pspDominantDriver prop."
       - "DA-G6-1 (G6 #824): ecological framework indicators include water_stress_index for entities with biome_class=arid_semiarid (JOR, ZMB). QuantitySchema entry with value: Decimal string, confidence_tier: 3, unit: 'ratio_0_2'. nullable_when: entity biome_class != arid_semiarid (attribute absent from snapshot state_data for non-arid entities). source_registry_id: ACADEMIC_LITERATURE_FAO_GFR_ARID_ICARDA_WATER_STRESS."
       - "DA-G6-2 (G6 #884): reserve_coverage_months in /initial-state response — indicator seeded as variable_type=stock in entity seed migration b1c2d3e4f5a6 for JOR (corrected from G3 ratio), EGY (new), ZMB (new). Appears in frameworks.financial.indicators when entity advanced ≥1 step. confidence_tier: 2 (JOR/EGY), 3 (ZMB synthetic)."
 
@@ -1109,3 +1202,69 @@ endpoints:
       - "DA-G4-4: Rule-based entity→case mapping (CM Decision Gate 2, M15-G4 intent document)."
       - "Mapping table: ZMB→ARG (Argentina 2001–2002), JOR→GRC (Greece 2010–2012), EGY→ARG, GRC→GRC. All others→analogous_case: null."
       - "Returns 404 if scenario_id not found."
+
+  # ---------------------------------------------------------------------------
+  # M18-G4: inject-shock endpoint (ADR-019 D-5 + D-6)
+  # ---------------------------------------------------------------------------
+
+  - method: POST
+    path: "/scenarios/{scenario_id}/inject-shock"
+    summary: >
+      Inject an exogenous shock at inject_at_step and recompute forward.
+      Creates a branch scenario with the shock applied to the configuration via
+      the SHOCK_REGISTRY handler (ADR-019 D-7), advances to completion, and
+      returns the updated trajectory with shock_events populated.
+    auth: none
+    path_params:
+      scenario_id:
+        type: string
+        format: uuid
+        description: "Scenario UUID. Must have a snapshot at inject_at_step."
+    request_body:
+      shock_type: {type: string, enum: [GrowthShock, ElectionShock, CurrencyAttack, CreditorDefection, GeopoliticalShock, NaturalDisaster, ContagionShock]}
+      inject_at_step: {type: integer, minimum: 1, description: "Step at which to apply the shock. A snapshot must exist."}
+      # GrowthShock params
+      growth_rate_delta: {type: number, nullable: true, description: "GDP growth rate departure. Required for GrowthShock."}
+      duration_steps: {type: integer, nullable: true, minimum: 1, description: "Steps the departure persists. Required for GrowthShock."}
+      distribution_asymmetry: {type: number, nullable: true, minimum: -1.0, maximum: 1.0}
+      # ElectionShock / GeopoliticalShock params
+      severity: {type: number, nullable: true, minimum: 0.0, maximum: 1.0, description: "Political disruption magnitude. Required for ElectionShock and GeopoliticalShock."}
+      political_uncertainty: {type: number, nullable: true, minimum: 0.0, maximum: 1.0}
+      # CurrencyAttack params
+      attack_magnitude: {type: number, nullable: true, description: "FX depreciation fraction. Required for CurrencyAttack."}
+      # CreditorDefection params
+      creditor_class: {type: string, nullable: true, enum: [bilateral, multilateral, commercial], description: "Required for CreditorDefection."}
+      share_affected: {type: number, nullable: true, minimum: 0.0, maximum: 1.0, description: "Fraction of creditor class defecting. Required for CreditorDefection."}
+      regime_change_probability: {type: number, nullable: true, minimum: 0.0, maximum: 1.0}
+      # ContagionShock params
+      source_country: {type: string, nullable: true, description: "ISO 3166-1 alpha-3 of originating country. Required for ContagionShock."}
+      transmission_rate: {type: number, nullable: true, minimum: 0.0, maximum: 1.0, description: "Propagation fraction. Required for ContagionShock."}
+      regional_contagion: {type: boolean, nullable: true}
+      affected_sectors: {type: "string[]", nullable: true}
+      # NaturalDisaster params
+      gdp_impact: {type: number, nullable: true, description: "GDP impact as negative fraction (e.g. -0.05). Required for NaturalDisaster."}
+    response:
+      status: 200
+      body:
+        scenario_id: {type: string, format: uuid, description: "Branch scenario ID (contains the shocked trajectory)."}
+        entity_id: {type: string}
+        step_count: {type: integer}
+        mda_floors: {type: array, description: "MDA floor records — same as TrajectoryResponse."}
+        steps: {type: array, description: "Trajectory steps (same shape as TrajectoryResponse.steps)."}
+        shock_events:
+          type: array
+          description: "Injected shock record for UI display. Populated at inject_at_step."
+          items:
+            step: {type: integer}
+            shock_type: {type: string}
+            parameters: {type: object, description: "Type-specific shock parameters."}
+      status_404: "Scenario not found or no snapshot at inject_at_step."
+      status_422: "Missing required shock-type parameters (model_validator discrimination)."
+    db_reads: [scenarios, scenario_state_snapshots, scenario_scheduled_inputs, mda_thresholds]
+    db_writes: [scenarios, scenario_state_snapshots, scenario_scheduled_inputs]
+    notes:
+      - "ADR-019 D-5: distinct from branch endpoint — inject-shock applies exogenous events, not policy instrument overrides."
+      - "ADR-019 D-6: ShockInjectRequest discriminated union — required fields differ by shock_type."
+      - "ADR-019 D-7: SHOCK_REGISTRY maps ShockType to handler class (backend/app/simulation/shocks/)."
+      - "Creates a branch scenario internally; returns the branch trajectory. Branch ID is in response.scenario_id."
+      - "Returns 422 if required params for shock_type are missing (e.g. ElectionShock without severity)."

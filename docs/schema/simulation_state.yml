@@ -606,6 +606,22 @@ MacroeconomicModule:
     zlb: "gdp_growth < -0.03, multiplier 2.0"
 
 # ---------------------------------------------------------------------------
+# PoliticalEconomyModule — programme_survival_update event metadata (M18-G2 #1255)
+# ---------------------------------------------------------------------------
+# Event type: programme_survival_update
+# Emitted by: PoliticalEconomyModule._compute()
+# Metadata fields (in addition to existing legitimacy_input, programme_survival_floor, calibration_note):
+#   psp_dominant_driver: str | None
+#     The dominant causal driver category of PSP change at this step.
+#     Enum: fiscal_sustainability | external_balance | governance | social_stability | null
+#     null when: no events produced a legitimacy contribution AND entity legitimacy >= 0.5.
+#     social_stability fires when: legitimacy < FRAGILITY_THRESHOLD (0.5) with no other contributions.
+#     Tie-breaking priority: governance > fiscal_sustainability > external_balance.
+#     Inherits T3 confidence tier from PSP. No separate confidence_tier field.
+#     Threaded to frontend via scenarios.py injection block → QuantitySchema.psp_dominant_driver
+#     → ScenarioInstrumentCluster → FourFrameworkZone1D (psp-driver-row data-testid).
+
+# ---------------------------------------------------------------------------
 # GovernanceModule (M6 concrete implementation — ADR-005 Decision 6)
 # ---------------------------------------------------------------------------
 GovernanceModule:
@@ -788,3 +804,33 @@ quantity_serde:
       Validated on write by validate_ia1_disclosure() — raises ValueError
       if the phrase is absent, truncated, or modified. Never hard-code
       the phrase in application code — always import IA1_CANONICAL_PHRASE.
+
+# ---------------------------------------------------------------------------
+# BranchRequest / RebranchRequest — political_context override (ADR-019 D-4)
+# ---------------------------------------------------------------------------
+# Added M18-G4. Governs how the branch and rebranch endpoints accept an
+# optional legitimacy_index override that is written into the branched
+# scenario's political_context configuration block before the branch runs.
+#
+# Field: legitimacy_index
+#   Type: float | null
+#   Constraints: ge=0.0, le=1.0
+#   Default: null (no override — inherited from parent scenario config)
+#   Schema location: BranchRequest.legitimacy_index, RebranchRequest.legitimacy_index
+#   Storage path: scenario.configuration["political_context"]["legitimacy_index"]
+#     Written as str(value) to match existing pattern for JSONB config values.
+#   Effect: The PoliticalEconomyModule reads legitimacy_index from political_context
+#     at step 0 of the branch. A non-null value overrides the parent scenario's
+#     legitimacy starting point, enabling Mode 3 legitimacy constraint injection.
+#   ADR authority: ADR-019 D-4 (M18-G4 Control Plane Column — Form 1 policy inputs).
+#   API contract: see docs/schema/api_contracts.yml POST /scenarios/{id}/branch
+#     and POST /scenarios/{id}/rebranch.
+branch_config_overrides:
+  legitimacy_index:
+    type: "float | null"
+    constraints: "ge=0.0, le=1.0"
+    default: null
+    storage_path: "scenario.configuration['political_context']['legitimacy_index']"
+    serialization: "str(value) — matches existing JSONB config value pattern"
+    adr: "ADR-019 D-4"
+    introduced: "M18-G4"

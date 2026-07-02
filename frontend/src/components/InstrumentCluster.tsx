@@ -11,7 +11,7 @@
  */
 import React, { useEffect, useState } from "react";
 import { TrajectoryView, type ScenarioComparisonConfig } from "./TrajectoryView";
-import { useScenarioStepStore, type TrajectoryResponse } from "../store/scenarioStepStore";
+import type { TrajectoryResponse } from "../store/scenarioStepStore";
 
 export const LAYOUT = {
   1024: { trajectory: 480, coPrimary: 240, controlPlane: 280, chartHeight: 300 },
@@ -62,6 +62,12 @@ interface InstrumentClusterProps {
   entityBaselineTrajectories?: Record<string, TrajectoryResponse> | null;
   /** M17-G2 — multi-scenario comparison configs for Zone 1A curve rendering. */
   comparisonScenarios?: ScenarioComparisonConfig[];
+  /** ADR-019 D-1: slot for Mode 2 (Mode2ColumnSurface) or Mode 3 (ControlPlaneColumn) content.
+   *  When undefined (Mode 1), ghost text is shown in the reserved zone. */
+  controlPlane?: React.ReactNode;
+  /** M18-G7-B — DistributionalComparisonSummary slot. When provided (comparison sessions),
+   *  renders as the first child of zone-1b before the MDA alert panel. (ADR-008 Amendment 2) */
+  distributionalSummarySlot?: React.ReactNode;
 }
 
 export function InstrumentCluster({
@@ -75,14 +81,13 @@ export function InstrumentCluster({
   entityTrajectories,
   entityBaselineTrajectories,
   comparisonScenarios,
+  controlPlane,
+  distributionalSummarySlot,
 }: InstrumentClusterProps) {
-  const { mode } = useScenarioStepStore();
   const bp = useViewportBreakpoint();
   const layout = LAYOUT[bp];
   const zoneProportions = ZONE_PROPORTIONS[bp];
   const chartHeight = chartHeightProp ?? layout.chartHeight;
-
-  const isMode3 = mode === "MODE_3";
 
   return (
     <div
@@ -140,6 +145,12 @@ export function InstrumentCluster({
           }}
         >
           <div style={{ position: "absolute", top: 4, right: 6, fontSize: 9, fontWeight: 700, letterSpacing: 0.5, color: "#666", backgroundColor: "rgba(255,255,255,0.88)", borderRadius: 2, padding: "1px 5px", userSelect: "none", zIndex: 10, lineHeight: 1.5 }}>Zone 1B</div>
+          {/* M18-G7-B: DistributionalComparisonSummary first in comparison sessions (ADR-008 Amendment 2) */}
+          {distributionalSummarySlot && (
+            <div style={{ flex: "0 0 auto", minHeight: 160, overflow: "hidden" }}>
+              {distributionalSummarySlot}
+            </div>
+          )}
           {/* Sub-zone A — MDA alert panel; permanent 80px floor (ADR-018) */}
           <div data-testid="zone-1b-mda-panel-wrapper" style={{ flex: "1 1 80px", minHeight: 80, overflow: "hidden" }}>
             {mdaPanel ?? (
@@ -180,9 +191,11 @@ export function InstrumentCluster({
       </div>
 
       {/* Control plane zone — always rendered, 280px reserved (DD-015) */}
+      {/* ADR-019 D-1: controlPlane slot receives Mode2ColumnSurface or ControlPlaneColumn.
+          When undefined (Mode 1), ghost text is shown. The column width is set by the
+          container — not by the content. */}
       <div
         data-testid="zone-control-plane"
-        className={isMode3 ? "mode-3-active" : undefined}
         style={{
           gridColumn: 3,
           gridRow: 1,
@@ -191,7 +204,7 @@ export function InstrumentCluster({
           position: "relative",
         }}
       >
-        {!isMode3 && (
+        {controlPlane ?? (
           <div
             aria-label="Control plane reserved zone"
             style={{

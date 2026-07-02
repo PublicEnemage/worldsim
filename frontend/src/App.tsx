@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import AttributeSelector from "./components/AttributeSelector";
 import ChoroplethMap from "./components/ChoroplethMap";
 import DeltaChoropleth from "./components/DeltaChoropleth";
@@ -17,6 +17,7 @@ import { SessionReplayViewer } from "./components/SessionReplayViewer";
 import { useSessionRecording } from "./hooks/useSessionRecording";
 import type { ScenarioDetailResponse } from "./types";
 import { type ScenarioComparisonConfig } from "./components/TrajectoryView";
+import { useScenarioStepStore, type DistributionalSummaryData } from "./store/scenarioStepStore";
 import "./App.css";
 
 const API_BASE = "http://localhost:8000/api/v1";
@@ -105,6 +106,10 @@ export default function App() {
   // M17-G2 — N>2 scenario comparison configs (IDs + palette; trajectories fetched by cluster)
   const [comparisonScenarios, setComparisonScenarios] = useState<ScenarioComparisonConfig[]>([]);
 
+  // M18-G3 (#1349) — distributional comparison summary
+  const setDistributionalSummary = useScenarioStepStore((s) => s.setDistributionalSummary);
+  const distributionalAbortRef = useRef<AbortController | null>(null);
+
   const handleStepChange = (step: number) => {
     // Always set — never reset to null on completion so EntityDetailDrawer
     // continues showing data at the final step after the scenario is done.
@@ -177,6 +182,11 @@ export default function App() {
         if (detail.status === "completed") {
           setCurrentStep(detail.configuration.n_steps);
         }
+        // DEV seam — allows E2E tests to wait for scenario load completion.
+        if (import.meta.env.DEV) {
+          (window as unknown as Record<string, unknown>).__worldsim_selectedScenarioId =
+            detail.scenario_id;
+        }
       })
       .catch(() => {
         if (!cancelled && !urlId) localStorage.removeItem(LAST_SCENARIO_KEY);
@@ -200,7 +210,20 @@ export default function App() {
     (window as unknown as Record<string, unknown>).__worldsim_setComparisonScenarios = (
       configs: ScenarioComparisonConfig[],
     ) => setComparisonScenarios(configs);
-  }, [setSelectedEntityId, setAttributeName]);
+    // M18-G6 — allow narrated spec to initialize currentStep for in_progress scenarios
+    // (URL-loaded scenarios with status != "completed" stay at currentStep=null → 0).
+    (window as unknown as Record<string, unknown>).__worldsim_setCurrentStep = (step: number) =>
+      setCurrentStep(step);
+    // M18-G7-B — load a comparison scenario alongside the URL-loaded reference scenario.
+    // Reads the reference scenario ID from the current URL (?scenario=) so no stale closure.
+    (window as unknown as Record<string, unknown>).__worldsim_loadComparisonScenario = (id: string) => {
+      const refId = new URLSearchParams(window.location.search).get("scenario") ?? "";
+      setComparisonScenarios([
+        { scenarioId: refId, label: "A", paletteIndex: 0 },
+        { scenarioId: id, label: "B", paletteIndex: 1 },
+      ]);
+    };
+  }, [setSelectedEntityId, setAttributeName, setComparisonScenarios]);
 
   // When a scenario is selected: fast-forward currentStep if already completed,
   // and extract the primary entity for the identity header + choropleth highlight (#744).
@@ -231,6 +254,67 @@ export default function App() {
       cancelled = true;
     };
   }, [selectedScenarioId]);
+
+  // M18-G3 (#1349) — fetch distributional differential when comparison scenarios change.
+  useEffect(() => {
+    if (comparisonScenarios.length < 2 || activeEntityIds.length === 0) {
+      setDistributionalSummary(null);
+      return;
+    }
+    if (distributionalAbortRef.current) distributionalAbortRef.current.abort();
+    const controller = new AbortController();
+    distributionalAbortRef.current = controller;
+    const entityId = activeEntityIds[0];
+    const scenarioIds = comparisonScenarios.map((c) => c.scenarioId);
+    const referenceScenarioId = scenarioIds[scenarioIds.length - 1]; // last = reference (Demo 7 convention)
+    fetch(`${API_BASE}/scenarios/comparison/distributional-differential`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ entity_id: entityId, scenario_ids: scenarioIds, reference_scenario_id: referenceScenarioId }),
+      signal: controller.signal,
+    })
+      .then((res) => (res.ok ? (res.json() as Promise<Record<string, unknown>>) : null))
+      .then((data) => {
+        if (!data || controller.signal.aborted) return;
+        const refLabel = comparisonScenarios.find((c) => c.scenarioId === referenceScenarioId)?.label ?? "ref";
+        const rawPairs = (data.pairs ?? []) as Array<Record<string, unknown>>;
+        const rawDetail = data.methodology_detail as Record<string, unknown> | undefined;
+        const enriched: DistributionalSummaryData = {
+          entity_id: String(data.entity_id ?? entityId),
+          reference_scenario_id: String(data.reference_scenario_id ?? referenceScenarioId),
+          reference_scenario_label: refLabel,
+          terminal_step: Number(data.terminal_step ?? 0),
+          tier: String(data.tier ?? "T3"),
+          methodology_summary: String(data.methodology_summary ?? ""),
+          ...(rawDetail
+            ? {
+                methodology_detail: {
+                  q1_population: Number(rawDetail.q1_population ?? 0),
+                  ci_methodology: String(rawDetail.ci_methodology ?? ""),
+                  extraction_path: String(rawDetail.extraction_path ?? ""),
+                  tier_rationale: String(rawDetail.tier_rationale ?? ""),
+                },
+              }
+            : {}),
+          pairs: rawPairs.map((pair) => ({
+            scenario_id: String(pair.scenario_id ?? ""),
+            scenario_label: String(
+              comparisonScenarios.find((c) => c.scenarioId === String(pair.scenario_id))?.label ?? pair.scenario_id
+            ),
+            steps: ((pair.steps as Array<Record<string, unknown>>) ?? []).map((s) => ({
+              step: Number(s.step),
+              headcount_differential: Number(s.headcount_differential),
+              ci_lower: Number(s.ci_lower),
+              ci_upper: Number(s.ci_upper),
+              direction_stable: Boolean(s.direction_stable),
+            })),
+          })),
+        };
+        setDistributionalSummary(enriched);
+      })
+      .catch(() => {});
+    return () => { controller.abort(); };
+  }, [comparisonScenarios, activeEntityIds, setDistributionalSummary]);
 
   // Replay mode early return — placed after all hooks so rules-of-hooks is satisfied.
   const replaySessionId = new URLSearchParams(window.location.search).get("replay_session");

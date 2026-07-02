@@ -56,12 +56,10 @@ import os
 import pathlib
 from typing import TYPE_CHECKING, Any
 
-import httpx
 import pytest
-import pytest_asyncio
 
 if TYPE_CHECKING:
-    from collections.abc import AsyncGenerator
+    import httpx
 
 _DATABASE_URL = os.environ.get("DATABASE_URL", "")
 
@@ -134,17 +132,6 @@ def _jor_ecf_payload(name: str, n_steps: int = 4) -> dict[str, Any]:
 # ---------------------------------------------------------------------------
 
 
-@pytest_asyncio.fixture()
-async def client() -> AsyncGenerator[httpx.AsyncClient, None]:
-    _require_db()
-    from app.main import app  # type: ignore[import]
-
-    async with httpx.AsyncClient(
-        transport=httpx.ASGITransport(app=app),
-        base_url="http://test",
-        timeout=180.0,
-    ) as ac:
-        yield ac
 
 
 # ---------------------------------------------------------------------------

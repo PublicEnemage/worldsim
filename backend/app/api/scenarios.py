@@ -35,7 +35,7 @@ from collections.abc import Callable
 from datetime import datetime  # noqa: TCH003
 from decimal import Decimal
 from math import floor
-from typing import Annotated, Any, cast
+from typing import Annotated, Any, TypeAlias, cast
 
 import asyncpg  # noqa: TCH002 — used in Annotated[] resolved at runtime by FastAPI
 from fastapi import APIRouter, Depends, HTTPException, Response
@@ -48,11 +48,17 @@ from app.schemas import (
     CohortThresholdCrossing,
     CompareResponse,
     DeltaRecord,
+    DistributionalDifferentialRequest,
+    DistributionalDifferentialResponse,
+    DistributionalPairResult,
+    DistributionalStepResult,
     DistributionRecord,
     FlatDeltaRecord,
     FrameworkOutput,
+    InjectShockResponse,
     MDAAlert,
     MDAFloorRecord,
+    MethodologyDetail,
     MultiFrameworkOutput,
     PMMRecord,
     QuantitySchema,
@@ -65,6 +71,7 @@ from app.schemas import (
     ScenarioRestoreRequest,
     ScenarioRestoreResponse,
     ScheduledInputSchema,
+    ShockInjectRequest,
     SnapshotRecord,
     ThresholdCrossingItem,
     TrajectoryCompareResponse,
@@ -74,6 +81,7 @@ from app.schemas import (
     TrajectoryStep,
     build_temporal_scope_note,
 )
+from app.simulation.banding_engine import compute_band
 from app.simulation.mda_checker import alerts_from_events_snapshot
 from app.simulation.repositories.quantity_serde import IA1_CANONICAL_PHRASE
 
@@ -1063,38 +1071,13 @@ async def _compute_trajectory_framework_point(
     )
 
 
-@router.get(
-    "/scenarios/{scenario_id}/trajectory",
-    response_model=TrajectoryResponse,
-)
-async def get_trajectory(
+async def _build_trajectory_response(
     scenario_id: str,
-    conn: Annotated[asyncpg.Connection, Depends(get_db)],
+    conn: asyncpg.Connection,
 ) -> TrajectoryResponse:
-    """Multi-step trajectory for all four measurement frameworks.
+    """Build a TrajectoryResponse for scenario_id (shared by get_trajectory + inject_shock).
 
-    Returns computed steps as a dense array. Each step carries per-framework
-    composite scores, optional policy inputs, and PMM (Policy Maneuver Margin).
-    mda_floors is at the response root (not per-step). In M9, mda_floors
-    contains at most one entry: ecological WARNING at floor_value=1.0 when
-    EcologicalModule is active.
-
-    PMM computation (Issue #496): each step's pmm field is derived from all
-    'all'-scoped MDA thresholds in the database. PMM = min(indicator margins)
-    across thresholds with matching indicator data; null when no matching data.
-
-    Composite score dispatch (Issue #458, CM consultation 2026-05-23; ADR-005 Amendment 4):
-    - Single-entity: financial/HD use normalized_absolute; ecological uses
-      boundary_proximity; governance uses normalized_absolute (WGI/V-Dem are country absolutes).
-    - Multi-entity: financial/HD use percentile_rank; ecological uses
-      boundary_proximity; governance uses normalized_absolute (entity count irrelevant).
-
-    step_significance is sourced from scenarios.configuration->>'step_metadata'
-    JSONB (ADR-010 Decision 7). Keys are 1-based step index strings. Absent key
-    → ROUTINE. "STANDARD" is never emitted — only "SIGNIFICANT" or "ROUTINE".
-
-    Returns 404 if scenario not found.
-    Returns 409 if scenario has no snapshots yet (run it first).
+    Raises 409 if no snapshots exist. Does not raise 404 — callers must verify existence.
     """
     scenario_row = await conn.fetchrow(
         "SELECT scenario_id, configuration FROM scenarios WHERE scenario_id = $1",
@@ -1242,6 +1225,27 @@ async def get_trajectory(
                 db_connection=conn,
                 scenario_timestep=timestep,
             )
+            raw_score = (
+                Decimal(point.composite_score)
+                if point.composite_score is not None
+                else None
+            )
+            band = compute_band(
+                composite_score=raw_score,
+                confidence_tier=point.confidence_tier,
+                step_index=step_index,
+                framework=fw,
+            )
+            point = TrajectoryFrameworkPoint(
+                framework=point.framework,
+                composite_score=point.composite_score,
+                scoring_basis=point.scoring_basis,
+                confidence_tier=point.confidence_tier,
+                ci_lower=band.ci_lower,
+                ci_upper=band.ci_upper,
+                ci_coverage=band.ci_coverage,
+                is_pre_calibration=band.is_pre_calibration,
+            )
             framework_points.append(point)
 
         pmm_record = _compute_pmm_for_step(
@@ -1273,6 +1277,50 @@ async def get_trajectory(
         mda_floors=mda_floors,
         steps=steps,
     )
+
+
+@router.get(
+    "/scenarios/{scenario_id}/trajectory",
+    response_model=TrajectoryResponse,
+)
+async def get_trajectory(
+    scenario_id: str,
+    conn: Annotated[asyncpg.Connection, Depends(get_db)],
+) -> TrajectoryResponse:
+    """Multi-step trajectory for all four measurement frameworks.
+
+    Returns computed steps as a dense array. Each step carries per-framework
+    composite scores, optional policy inputs, and PMM (Policy Maneuver Margin).
+    mda_floors is at the response root (not per-step). In M9, mda_floors
+    contains at most one entry: ecological WARNING at floor_value=1.0 when
+    EcologicalModule is active.
+
+    PMM computation (Issue #496): each step's pmm field is derived from all
+    'all'-scoped MDA thresholds in the database. PMM = min(indicator margins)
+    across thresholds with matching indicator data; null when no matching data.
+
+    Composite score dispatch (Issue #458, CM consultation 2026-05-23; ADR-005 Amendment 4):
+    - Single-entity: financial/HD use normalized_absolute; ecological uses
+      boundary_proximity; governance uses normalized_absolute (WGI/V-Dem are country absolutes).
+    - Multi-entity: financial/HD use percentile_rank; ecological uses
+      boundary_proximity; governance uses normalized_absolute (entity count irrelevant).
+
+    step_significance is sourced from scenarios.configuration->>'step_metadata'
+    JSONB (ADR-010 Decision 7). Keys are 1-based step index strings. Absent key
+    → ROUTINE. "STANDARD" is never emitted — only "SIGNIFICANT" or "ROUTINE".
+
+    Returns 404 if scenario not found.
+    Returns 409 if scenario has no snapshots yet (run it first).
+    """
+    scenario_row = await conn.fetchrow(
+        "SELECT scenario_id FROM scenarios WHERE scenario_id = $1",
+        scenario_id,
+    )
+    if scenario_row is None:
+        raise HTTPException(
+            status_code=404, detail=f"Scenario '{scenario_id}' not found."
+        )
+    return await _build_trajectory_response(scenario_id, conn)
 
 
 # ---------------------------------------------------------------------------
@@ -1561,6 +1609,13 @@ async def branch_scenario(
         )
 
     cfg_raw["fiscal_multiplier"] = req.fiscal_multiplier
+    # ADR-019 D-4: apply legitimacy_index override when provided.
+    if req.legitimacy_index is not None:
+        pc = cfg_raw.get("political_context")
+        if not isinstance(pc, dict):
+            pc = {}
+        pc["legitimacy_index"] = str(req.legitimacy_index)
+        cfg_raw["political_context"] = pc
     branch_config = ScenarioConfigSchema(**cfg_raw)
     n_steps: int = branch_config.n_steps
 
@@ -1692,6 +1747,13 @@ async def rebranch_scenario(
     if isinstance(cfg_raw, str):
         cfg_raw = json.loads(cfg_raw)
     cfg_raw["fiscal_multiplier"] = req.fiscal_multiplier
+    # ADR-019 D-4: apply legitimacy_index override when provided.
+    if req.legitimacy_index is not None:
+        pc = cfg_raw.get("political_context")
+        if not isinstance(pc, dict):
+            pc = {}
+        pc["legitimacy_index"] = str(req.legitimacy_index)
+        cfg_raw["political_context"] = pc
     branch_config = ScenarioConfigSchema(**cfg_raw)
     n_steps: int = branch_config.n_steps
 
@@ -1712,6 +1774,180 @@ async def rebranch_scenario(
         branch_scenario_id=scenario_id,
         branch_from_step=req.from_step,
         n_steps=n_steps,
+    )
+
+
+# ---------------------------------------------------------------------------
+# POST /scenarios/{scenario_id}/inject-shock — ADR-019 D-5 + D-7
+# ---------------------------------------------------------------------------
+
+
+@router.post(
+    "/scenarios/{scenario_id}/inject-shock",
+    response_model=InjectShockResponse,
+    status_code=200,
+)
+async def inject_shock(
+    scenario_id: str,
+    req: ShockInjectRequest,
+    conn: Annotated[asyncpg.Connection, Depends(get_db)],
+) -> InjectShockResponse:
+    """Inject an exogenous shock at inject_at_step and recompute forward.
+
+    Creates a branch scenario with the shock applied to the configuration
+    (via the SHOCK_REGISTRY handler), advances the branch to completion, and
+    returns the updated trajectory with shock_events populated.
+
+    This endpoint is distinct from the branch endpoint:
+    - branch: policy instruments (fiscal/legitimacy overrides) applied to config
+    - inject-shock: exogenous shocks applied via SHOCK_REGISTRY handler, recomputing
+      from inject_at_step onward
+
+    Returns 404 if scenario not found or no snapshot at inject_at_step.
+    Returns 422 if required shock-type parameters are missing (model_validator).
+    ADR-019 D-5.
+    """
+    # 1. Verify scenario exists
+    row = await conn.fetchrow(
+        "SELECT scenario_id, name, configuration FROM scenarios WHERE scenario_id = $1",
+        scenario_id,
+    )
+    if row is None:
+        raise HTTPException(status_code=404, detail=f"Scenario '{scenario_id}' not found.")
+
+    cfg_raw = row["configuration"]
+    if isinstance(cfg_raw, str):
+        cfg_raw = json.loads(cfg_raw)
+
+    # 2. Verify snapshot exists at inject_at_step (branch point)
+    snap_check = await conn.fetchrow(
+        "SELECT step FROM scenario_state_snapshots WHERE scenario_id = $1 AND step = $2",
+        scenario_id,
+        req.inject_at_step,
+    )
+    if snap_check is None:
+        raise HTTPException(
+            status_code=404,
+            detail=(
+                f"No snapshot at step {req.inject_at_step} for scenario '{scenario_id}'. "
+                "Advance the scenario to this step before injecting a shock."
+            ),
+        )
+
+    # 3. Apply shock handler to config dict (ADR-019 D-7 SHOCK_REGISTRY)
+    from app.simulation.shocks.registry import SHOCK_REGISTRY  # noqa: PLC0415
+
+    handler_cls = SHOCK_REGISTRY.get(req.shock_type)
+    if handler_cls is None:
+        raise HTTPException(status_code=400, detail=f"Unknown shock type: {req.shock_type}")
+
+    handler = handler_cls()
+    modified_cfg_raw: dict[str, Any] = handler.apply(dict(cfg_raw), req)
+
+    # 4. Create branch scenario with modified config and snapshots 0..inject_at_step
+    branch_config = ScenarioConfigSchema(**modified_cfg_raw)
+    branch_id = str(uuid.uuid4())
+    branch_name = f"{row['name']} [shock-{req.shock_type.value}]"
+
+    async with conn.transaction():
+        await conn.execute(
+            """
+            INSERT INTO scenarios
+                (scenario_id, name, description, status,
+                 configuration, version, engine_version_hash)
+            VALUES ($1, $2, NULL, 'pending', $3, 1, $4)
+            """,
+            branch_id,
+            branch_name,
+            json.dumps(branch_config.model_dump(mode="json")),
+            _GIT_COMMIT_HASH,
+        )
+
+        # Copy scheduled inputs up to inject_at_step
+        input_rows = await conn.fetch(
+            """
+            SELECT step, input_type, input_data FROM scenario_scheduled_inputs
+            WHERE scenario_id = $1 AND step <= $2
+            ORDER BY step, created_at
+            """,
+            scenario_id,
+            req.inject_at_step,
+        )
+        for inp in input_rows:
+            idata = inp["input_data"]
+            if isinstance(idata, str):
+                idata = json.loads(idata)
+            await conn.execute(
+                """
+                INSERT INTO scenario_scheduled_inputs
+                    (id, scenario_id, step, input_type, input_data)
+                VALUES ($1, $2, $3, $4, $5)
+                """,
+                str(uuid.uuid4()),
+                branch_id,
+                inp["step"],
+                inp["input_type"],
+                json.dumps(idata),
+            )
+
+        # Copy snapshots 0..inject_at_step into the branch
+        snapshot_rows = await conn.fetch(
+            """
+            SELECT step, timestep, state_data, events_snapshot, ia1_disclosure
+            FROM scenario_state_snapshots
+            WHERE scenario_id = $1 AND step <= $2
+            ORDER BY step ASC
+            """,
+            scenario_id,
+            req.inject_at_step,
+        )
+        for snap in snapshot_rows:
+            state_raw = snap["state_data"]
+            if isinstance(state_raw, str):
+                state_raw = json.loads(state_raw)
+            events_raw = snap["events_snapshot"]
+            if isinstance(events_raw, str):
+                events_raw = json.loads(events_raw)
+            await conn.execute(
+                """
+                INSERT INTO scenario_state_snapshots
+                    (scenario_id, step, timestep, state_data, events_snapshot, ia1_disclosure)
+                VALUES ($1, $2, $3, $4, $5, $6)
+                """,
+                branch_id,
+                snap["step"],
+                snap["timestep"],
+                json.dumps(state_raw),
+                json.dumps(events_raw) if events_raw is not None else None,
+                snap["ia1_disclosure"],
+            )
+
+    # 5. Run branch scenario to completion (advances from inject_at_step to n_steps)
+    from app.simulation.web_scenario_runner import WebScenarioRunner  # noqa: PLC0415
+
+    await WebScenarioRunner().run(conn, branch_id)
+
+    # 6. Fetch branch trajectory
+    branch_trajectory = await _build_trajectory_response(branch_id, conn)
+
+    # 7. Build shock_events record for the response (ADR-019 D-9)
+    shock_params = {
+        k: v for k, v in req.model_dump().items()
+        if v is not None and k not in ("shock_type", "inject_at_step")
+    }
+    shock_event: dict[str, Any] = {
+        "step": req.inject_at_step,
+        "shock_type": req.shock_type.value,
+        "parameters": shock_params,
+    }
+
+    return InjectShockResponse(
+        scenario_id=branch_trajectory.scenario_id,
+        entity_id=branch_trajectory.entity_id,
+        step_count=branch_trajectory.step_count,
+        mda_floors=branch_trajectory.mda_floors,
+        steps=branch_trajectory.steps,
+        shock_events=[shock_event],
     )
 
 
@@ -1935,7 +2171,7 @@ def _parse_entity_attrs(
 # ---------------------------------------------------------------------------
 
 # Callable signature: (entity_indicators, all_entity_attrs, framework, context) → Decimal | None
-type CompositeStrategy = Callable[
+CompositeStrategy: TypeAlias = Callable[  # noqa: UP040
     [dict[str, QuantitySchema], dict[str, dict[str, QuantitySchema]], str, dict[str, Any]],
     Decimal | None,
 ]
@@ -2413,6 +2649,23 @@ async def get_measurement_output(
             note = _SINGLE_ENTITY_NOTE
         else:
             note = None
+        # M18-G2 (#1255): inject psp_dominant_driver from programme_survival_update metadata.
+        if fw == "political_economy" and "programme_survival_probability" in indicators:
+            _raw = snap_row["events_snapshot"]
+            if _raw is not None:
+                _evts = json.loads(_raw) if isinstance(_raw, str) else list(_raw)
+                _psp_driver: str | None = None
+                for _evt in _evts:
+                    if (
+                        isinstance(_evt, dict)
+                        and _evt.get("event_type") == "programme_survival_update"
+                        and _evt.get("entity_id") == entity_id
+                    ):
+                        _psp_driver = (_evt.get("metadata") or {}).get("psp_dominant_driver")
+                        break
+                indicators["programme_survival_probability"] = indicators[
+                    "programme_survival_probability"
+                ].model_copy(update={"psp_dominant_driver": _psp_driver})
         # M16-G8 Option A: cumulative cohort threshold crossings for HD framework.
         # Detect cohort groups (Q1/Q2) whose poverty_headcount_ratio remains below
         # the MDA floor at this step. De-duplicated by (quintile, sector) using the
@@ -2522,4 +2775,177 @@ async def get_measurement_output(
         outputs=outputs,
         ia1_disclosure=IA1_CANONICAL_PHRASE,
         single_entity_warning=is_single_entity,
+    )
+
+
+# ---------------------------------------------------------------------------
+# M18-G3 #1349 — POST /scenarios/comparison/distributional-differential
+# ---------------------------------------------------------------------------
+
+_ENTITY_Q1_POPULATION: dict[str, int] = {
+    "ZMB": 3_894_625,  # 19,473,125 × 0.20 (UN WPP 2024)
+    "SEN": 3_408_800,
+    "GRC": 2_160_000,
+    "JOR": 2_190_000,
+    "EGY": 21_140_000,
+}
+_CI_FACTOR_LOWER = Decimal("0.87")
+_CI_FACTOR_UPPER = Decimal("1.16")
+_CI_MIN_HALF_WIDTH = 500
+_DISTRIBUTIONAL_TIER = "T3"
+_DISTRIBUTIONAL_METHODOLOGY = (
+    "Q1 poverty_headcount_ratio delta × entity Q1 population (UN WPP 2024, T3). "
+    "CI band: ±13–16% of point estimate, T3 placeholder pending G1 Zone 1A "
+    "CI band integration (ADR-007). Direction stable when CI does not span zero."
+)
+
+
+def _poverty_ratio_from_state(state: dict[str, Any], entity_prefix: str) -> Decimal | None:
+    """Return mean Q1 cohort poverty_headcount_ratio; falls back to main entity."""
+    q1_ratios: list[Decimal] = []
+    for eid, attrs in state.items():
+        if not isinstance(attrs, dict):
+            continue
+        if ":CHT:" in eid and eid.startswith(entity_prefix):
+            parts = eid.split(":CHT:", 1)[-1].split("-")
+            if parts and parts[0] == "1":
+                qty = attrs.get("poverty_headcount_ratio")
+                if isinstance(qty, dict):
+                    val = qty.get("value")
+                    if val is not None:
+                        with contextlib.suppress(Exception):
+                            q1_ratios.append(Decimal(str(val)))
+    if q1_ratios:
+        return sum(q1_ratios, Decimal("0")) / Decimal(len(q1_ratios))
+    main_attrs = state.get(entity_prefix)
+    if isinstance(main_attrs, dict):
+        qty = main_attrs.get("poverty_headcount_ratio")
+        if isinstance(qty, dict):
+            val = qty.get("value")
+            if val is not None:
+                with contextlib.suppress(Exception):
+                    return Decimal(str(val))
+    return None
+
+
+def _headcount_from_ratio_delta(delta: Decimal, entity_id: str) -> int:
+    q1_pop = _ENTITY_Q1_POPULATION.get(entity_id, 0)
+    return int(round(float(delta) * q1_pop))
+
+
+def _distributional_ci_bounds(headcount: int) -> tuple[int, int]:
+    abs_hc = abs(headcount)
+    if abs_hc < _CI_MIN_HALF_WIDTH:
+        return (-_CI_MIN_HALF_WIDTH, _CI_MIN_HALF_WIDTH)
+    if headcount >= 0:
+        lower = int(round(float(headcount) * float(_CI_FACTOR_LOWER)))
+        upper = int(round(float(headcount) * float(_CI_FACTOR_UPPER)))
+    else:
+        lower = int(round(float(headcount) * float(_CI_FACTOR_UPPER)))
+        upper = int(round(float(headcount) * float(_CI_FACTOR_LOWER)))
+    return (lower, upper)
+
+
+@router.post(
+    "/scenarios/comparison/distributional-differential",
+    response_model=DistributionalDifferentialResponse,
+)
+async def post_distributional_differential(
+    body: DistributionalDifferentialRequest,
+    conn: Annotated[asyncpg.Connection, Depends(get_db)],
+) -> DistributionalDifferentialResponse:
+    """Compute Q1 poverty headcount differential across N≥2 scenarios.
+
+    Per-step Q1 poverty_headcount_ratio delta vs reference scenario, converted
+    to headcount via entity Q1 population. T3 CI band (ADR-007 placeholder).
+    Direction stable when CI does not span zero.
+    """
+    scenario_ids = body.scenario_ids
+    ref_id = body.reference_scenario_id
+    entity_id = body.entity_id
+
+    if len(scenario_ids) < 2:
+        raise HTTPException(status_code=400, detail="At least two scenario_ids required.")
+    if ref_id not in scenario_ids:
+        raise HTTPException(
+            status_code=400,
+            detail="reference_scenario_id must be in scenario_ids.",
+        )
+
+    snapshots_by_scenario: dict[str, dict[int, dict[str, Any]]] = {}
+    for sid in scenario_ids:
+        rows = await conn.fetch(
+            "SELECT step, state_data FROM scenario_state_snapshots"
+            " WHERE scenario_id = $1 ORDER BY step",
+            sid,
+        )
+        if not rows:
+            raise HTTPException(status_code=404, detail=f"No snapshots for scenario {sid!r}.")
+        step_states: dict[int, dict[str, Any]] = {}
+        for row in rows:
+            raw = row["state_data"]
+            step_states[row["step"]] = raw if isinstance(raw, dict) else json.loads(raw)
+        snapshots_by_scenario[sid] = step_states
+
+    shared_steps = sorted(
+        set.intersection(*[set(ss.keys()) for ss in snapshots_by_scenario.values()])
+    )
+    if not shared_steps:
+        raise HTTPException(status_code=409, detail="No shared steps across scenarios.")
+
+    ref_states = snapshots_by_scenario[ref_id]
+    terminal_step = shared_steps[-1]
+
+    pairs: list[DistributionalPairResult] = []
+    for sid in scenario_ids:
+        if sid == ref_id:
+            continue
+        sim_states = snapshots_by_scenario[sid]
+        steps_out: list[DistributionalStepResult] = []
+        for step in shared_steps:
+            ref_ratio = _poverty_ratio_from_state(ref_states[step], entity_id)
+            sim_ratio = _poverty_ratio_from_state(sim_states[step], entity_id)
+            if ref_ratio is None or sim_ratio is None:
+                continue
+            delta = sim_ratio - ref_ratio
+            headcount = _headcount_from_ratio_delta(delta, entity_id)
+            ci_lower, ci_upper = _distributional_ci_bounds(headcount)
+            direction_stable = (ci_lower > 0) or (ci_upper < 0)
+            steps_out.append(
+                DistributionalStepResult(
+                    step=step,
+                    headcount_differential=headcount,
+                    ci_lower=ci_lower,
+                    ci_upper=ci_upper,
+                    direction_stable=direction_stable,
+                )
+            )
+        pairs.append(DistributionalPairResult(scenario_id=sid, steps=steps_out))
+
+    methodology_detail = MethodologyDetail(
+        q1_population=_ENTITY_Q1_POPULATION.get(entity_id, 0),
+        ci_methodology=(
+            f"±13–16% of point estimate — T3 placeholder "
+            f"pending ADR-007 full CI band integration. "
+            f"Lower bound: ×{_CI_FACTOR_LOWER} (−13%); "
+            f"upper bound: ×{_CI_FACTOR_UPPER} (+16%)."
+        ),
+        extraction_path=(
+            f"Q1 CHT cohort mean (entities matching '{entity_id}:CHT:1-*'); "
+            "falls back to main entity poverty_headcount_ratio if no cohort data present."
+        ),
+        tier_rationale=(
+            "T3: derived from ECOWAS regional comparable economy distributions, "
+            "not calibrated country-level Q1 income share survey data. "
+            "Forward trace: ADR-007 full implementation will replace this T3 placeholder."
+        ),
+    )
+    return DistributionalDifferentialResponse(
+        entity_id=entity_id,
+        reference_scenario_id=ref_id,
+        terminal_step=terminal_step,
+        tier=_DISTRIBUTIONAL_TIER,
+        methodology_summary=_DISTRIBUTIONAL_METHODOLOGY,
+        methodology_detail=methodology_detail,
+        pairs=pairs,
     )

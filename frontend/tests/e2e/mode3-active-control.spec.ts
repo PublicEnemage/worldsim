@@ -63,18 +63,14 @@ test("Mode 3 — enable, apply control change, recompute completes", async ({ pa
   // Enable Mode 3.
   await page.locator('[data-testid="mode3-toggle"]').click();
 
-  // ControlPlane should appear. zone-control-plane resolves to 2 elements (InstrumentCluster
-  // always renders a reserved zone; ControlPlane adds a second). Use apply-control-change,
-  // which only exists inside ControlPlane and is always rendered when ControlPlane is mounted.
-  await expect(page.locator('[data-testid="apply-control-change"]')).toBeVisible({
+  // ControlPlaneColumn should appear (G4: apply-policy-input is the Form 1 apply button).
+  await expect(page.locator('[data-testid="apply-policy-input"]')).toBeVisible({
     timeout: 3_000,
   });
 
-  // Move fiscal multiplier to 1.5 (default is 1.0 — drag or set via evaluate).
-  // Scenarios panel is closed so only the ControlPlane slider is in the DOM.
-  // Use the native HTMLInputElement property setter so React's onChange fires on
-  // this controlled input (plain el.value = x does not trigger React's event system).
-  await page.locator('[data-testid="fiscal-multiplier-slider"]').evaluate(
+  // Move fiscal multiplier to 1.5 (default is 1.0).
+  // G4 renamed fiscal-multiplier-slider → policy-param-slider (ADR-019 D-3).
+  await page.locator('[data-testid="policy-param-slider"]').evaluate(
     (el: HTMLInputElement) => {
       const setter = Object.getOwnPropertyDescriptor(
         window.HTMLInputElement.prototype, "value"
@@ -88,16 +84,18 @@ test("Mode 3 — enable, apply control change, recompute completes", async ({ pa
   // Verify display updated.
   await expect(page.locator('[data-testid="fiscal-multiplier-value"]')).toContainText("1.50");
 
-  // Click Apply Change — triggers branch creation and advance loop.
-  await page.locator('[data-testid="apply-control-change"]').click();
+  // Click Apply — triggers branch creation and recompute.
+  // G4: badge may briefly show "Recompute pending" or go directly to "Recomputing…"
+  // depending on how quickly the recompute loop starts. Don't assert the transient
+  // text — assert the badge appears, then eventually disappears (recompute complete).
+  await page.locator('[data-testid="apply-policy-input"]').click();
 
-  // Recompute badge should appear while computing.
+  // Badge must appear in some active state (pending or recomputing).
   await expect(page.locator('[data-testid="recompute-badge"]')).toBeVisible({
     timeout: 5_000,
   });
-  await expect(page.locator('[data-testid="recompute-badge"]')).toContainText("Recomputing");
 
-  // Wait for badge to disappear — recompute complete.
+  // Wait for recompute to complete and badge to disappear.
   await expect(page.locator('[data-testid="recompute-badge"]')).not.toBeVisible({
     timeout: 30_000,
   });
@@ -139,16 +137,15 @@ test("Mode 3 toggle resets to idle when scenario changes", async ({ page }) => {
   await page.locator(".scenario-row").filter({ hasText: scenarioA })
     .getByTitle("Select as primary scenario").click();
   await page.locator('[data-testid="mode3-toggle"]').click();
-  // apply-control-change is unambiguous: only exists inside ControlPlane (not in the
-  // always-rendered InstrumentCluster zone-control-plane div that causes strict-mode violation).
-  await expect(page.locator('[data-testid="apply-control-change"]')).toBeVisible({
+  // G4: apply-policy-input is the Form 1 apply button in ControlPlaneColumn (ADR-019 D-3).
+  await expect(page.locator('[data-testid="apply-policy-input"]')).toBeVisible({
     timeout: 3_000,
   });
 
   // Select scenario B — Mode 3 should turn off (mode3Active resets in handleSelectScenario).
   await page.locator(".scenario-row").filter({ hasText: scenarioB })
     .getByTitle("Select as primary scenario").click();
-  await expect(page.locator('[data-testid="apply-control-change"]')).not.toBeVisible({
+  await expect(page.locator('[data-testid="apply-policy-input"]')).not.toBeVisible({
     timeout: 3_000,
   });
 });

@@ -76,7 +76,7 @@ jobs:
       - name: Run integration tests
         run: |
           cd backend
-          pytest tests/integration -v || [ $? -eq 5 ]
+          pytest tests/ -m integration -v || [ $? -eq 5 ]
 
       - name: Run backtesting suite (skip without DATABASE_URL)
         run: |

@@ -50,12 +50,10 @@ from datetime import date
 from decimal import Decimal
 from typing import TYPE_CHECKING, Any
 
-import httpx
 import pytest
-import pytest_asyncio
 
 if TYPE_CHECKING:
-    from collections.abc import AsyncGenerator
+    import httpx
 
 _DATABASE_URL = os.environ.get("DATABASE_URL", "")
 
@@ -156,17 +154,6 @@ def _zmb_default_payload() -> dict[str, Any]:
 # ---------------------------------------------------------------------------
 
 
-@pytest_asyncio.fixture()
-async def client() -> AsyncGenerator[httpx.AsyncClient, None]:
-    _require_db()
-    from app.main import app
-
-    async with httpx.AsyncClient(
-        transport=httpx.ASGITransport(app=app),
-        base_url="http://test",
-        timeout=120.0,
-    ) as ac:
-        yield ac
 
 
 # ---------------------------------------------------------------------------

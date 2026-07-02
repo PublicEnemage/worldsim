@@ -3073,7 +3073,9 @@ CONTRIBUTING.md updated in this commit:
 ### How to add an entry
 
 When a near-miss is identified — during a session, in a HORIZON sweep, or in post-session
-review — the PM Agent files a new entry following the template below:
+review — the PM Agent files a new entry following the template below.
+
+**Merge conflict resolution requirement (NM-077, Finding D; Issue #1486):** After resolving any merge conflict in this file, verify that all NM entries from both sides of the conflict are present in the resolved file before committing. Procedure: (1) note the highest NM number in the `HEAD` side before the merge, (2) note the highest NM number in the incoming branch, (3) confirm the resolved file contains all entries between the lowest and highest NM number across both sides, in ascending order, with no gaps. A resolved conflict that silently drops an NM entry is an integrity violation equivalent to deleting a filed entry — permanent institutional memory cannot be recovered once lost.
 
 ```markdown
 ## NM-061 — AC-F8 Silent No-Op: Scenario Created via API But Never Selected in UI; 60-Second Ceiling Gate Measuring Nothing Since G3 (Reactive)
@@ -3730,6 +3732,464 @@ The sprint planning SOP defines entry criteria for individual sprint groups (ent
 3. A hard ceiling of five parallel groups per wave is recommended as a starting point, subject to EL revision after M18 experience.
 
 **Near-miss lineage:** NM-071 is the upstream planning gap that enabled NM-067. Closing NM-067 (branching model) without closing NM-071 (concurrency ceiling) would allow a future wave to recreate the same conditions that made NM-067 inevitable.
+
+---
+
+## NM-072 — Artifact 5 (Scope Decision Gate) Authored and EL-Approved Before Prerequisite Design Artifacts Existed; Cascaded into Stale Delta Analysis and Incomplete Taxonomy (Reactive)
+
+**Date:** 2026-06-27
+**Milestone:** M18 — Full Argument and Demo 7
+**Detected by:** EL observation during GD design package review — EL noted divergence between Artifact 4 (maximalist discriminated union schema, all types) and Artifact 5 (six-type taxonomy, single-parameter ShockInjectRequest), and asked how they diverged so much at inception
+**Severity:** High — produced incorrect artifacts in the repository: Artifact 4 Dimensions 3 and 4 were drafted against an information hierarchy that had not yet been corrected, and Artifact 5's EL scope decisions were made without access to the full CE Agent analysis in Artifact 4; the GrowthShock type was absent from panel deliberation as a result
+
+### What happened
+
+The GD design package specifies a seven-artifact sequence: Artifacts 1→2→3→4 inform Artifact 5 (EL scope gate) → Artifact 6 (ADR-019) → Artifact 7 (UX update). Artifact 5 is the EL scope gate — the decisions it records gate ADR-019 authorship and G4 sprint entry.
+
+Artifact 5 was authored and EL-approved in a prior session **before Artifacts 2, 3, and 4 existed**. The sprint entry document specified the correct sequence, but no gate enforced it. The Artifact 5 author used a six-type shock taxonomy derived from ADR-008 (the only available input) without the benefit of: (a) Artifact 2's maximalist platform target for the control plane zone, (b) Artifact 3's Customer Agent Layer 3 finding that GrowthShock is ESSENTIAL for Demo 7 Step 4, or (c) Artifact 4's CE Agent discriminated union architecture analysis.
+
+Consequences:
+1. **GrowthShock omission from panel deliberation.** The panel deliberated the six types from ADR-008. GrowthShock was not considered and rejected — it was absent from the input. Decision 2 ("all six in M18") was made without the seventh type on the table.
+2. **Artifact 4 Dimension 4 drafted against stale Artifact 5.** The Artifact 4 author read Artifact 5 before authoring Dimension 4 and produced `ScenarioConfigColumn.tsx` — an editable configuration surface — because the stale Artifact 5 framing implied Mode 2 column 3 would have editable sliders. The correct Artifact 2 target (read-only summary + "Enter Active Control" button, named `Mode2ColumnSurface`) had not yet been written.
+3. **Artifact 4 Dimension 3 had a shallow ShockInjectRequest.** The CE Agent's discriminated union analysis in Dimension 3 used a single `magnitude: float | None` parameter because the panel had not yet deliberated on per-type parameter schemas. The correct schema names per-type parameters for all seven types.
+4. **Information hierarchy temporarily documented M18 scope instead of platform target.** Before the course correction, `information-hierarchy.md §Control Plane Reserved Zone` described the six-type shock taxonomy as the complete set, effectively encoding M18 scope into the platform governing document.
+5. **Thin-slicing concern.** The EL independently identified that Artifact 5's design appeared to be architectural minimalism rather than incremental delivery of a maximalist target — this would have led to re-architecture cost when deferred types were eventually added.
+
+### What was at risk
+
+ADR-019 was the next step. If the course correction had not been made before ADR-019 authorship began, the ADR-019 author would have received: contradictory inputs from Artifacts 4 and 5, a missing GrowthShock type, an incorrect Mode2ColumnSurface specification (editable sliders vs. read-only summary), and a shallow ShockInjectRequest schema. The resulting ADR-019 would have encoded the errors into the accepted architectural record, from which G4 sprint entry and implementation would follow. Discovering the errors during G4 implementation (the next failure point) would have required ADR-019 amendment, G4 sprint entry amendment, and partial implementation rework.
+
+### What caught it
+
+EL pattern recognition. The EL observed the Artifact 4 / Artifact 5 divergence and asked how they had diverged so much at inception. Investigation revealed the sequence inversion. No process gate surfaced the ordering problem before Artifact 5 was approved.
+
+### Root cause
+
+The GD gate was **unidirectional**: Artifact 5 gates ADR-019 (downstream). The gate was not **upstream**: no check prevented Artifact 5 from being filed and approved before its prerequisite artifacts existed. The sprint entry SOP correctly specified the artifact sequence, but specification without enforcement is not a gate.
+
+### Process improvement
+
+**Immediate:** Four-document course correction executed before ADR-019 authorship:
+1. `docs/process/near-miss-registry.md`: NM-072 filed (this entry)
+2. `docs/ux/information-hierarchy.md §Control Plane Reserved Zone`: Restored to maximalist platform target; Mode 2 column architecture ruling reframed as platform ruling (not M18 scope compromise); GrowthShock added as seventh type; shock taxonomy no longer encodes milestone scope
+3. `docs/architecture/control-plane-column-delta-analysis-m18.md §Dimension 3 and §Dimension 4`: Dimension 3 corrected to full discriminated union schema with per-type parameters for all seven types; Dimension 4 corrected to `Mode2ColumnSurface.tsx` (read-only summary + "Enter Active Control", no editable sliders); EL Decision 6 (all 7 handlers in G4) recorded
+4. `docs/process/intents/M18-GD-2026-06-26-control-plane-scope-decision.md §Artifact 5`: Framing note added; Decision 4 (GrowthShock) approved; Decision 5 (4 MVP types, superseded) filed; Decision 6 (all 7 handlers, forcing function for architectural completeness) filed
+
+**Structural fix required (sprint planning SOP):** Future pre-wave design packages that include an EL scope gate artifact must specify both:
+- **Downstream gate:** EL scope gate artifact → ADR authorship (already exists)
+- **Upstream gate:** Prerequisite design artifacts must be filed and on record before EL scope gate artifact may be submitted for EL review
+
+The upstream gate must be an explicit check in the sprint planning SOP, not guidance. An EL scope decision made without the full design analysis input is not independent review — it is approval of an incomplete specification. PI Agent holds R for verifying the upstream gate condition is satisfied before routing an Artifact 5 equivalent for EL review in any future pre-wave design package.
+
+---
+
+## NM-073 — Sprint Sub-Branches Have No Required CI Checks; Auto-Merge Fires Before Playwright E2E Completes (Reactive)
+
+**Date:** 2026-06-27
+**Milestone:** M18 — Full Argument and Demo 7
+**Detected by:** DS Agent investigation — EL observed PR #1395 merged while `playwright-e2e` was still pending
+**Severity:** Low — integration PR gate (sprint→release) still enforces full CI before any code reaches `release/m18`; no incorrect artifacts produced
+
+### What happened
+
+PR #1395 (`feat/m18-g3-test-authorship` → `sprint/m18-g3`) merged at `2026-06-27T01:49:55Z` while the `playwright-e2e` CI check was still in `pending` state. The EL flagged the premature merge; DS Agent investigation confirmed the root cause: `sprint/m18-g3` has no branch protection (GitHub branch protection API returns 404 for sprint branches) and is not covered by the `release-branch-ci-gate` Ruleset.
+
+The Ruleset condition is `refs/heads/release/m*` — it applies exclusively to `release/m18`, `release/m17`, etc. Sprint sub-branches (`sprint/m18-g1`, `sprint/m18-g2`, `sprint/m18-g3`) are not included. Auto-merge on an unprotected branch fires when GitHub's internal merge eligibility conditions are satisfied (no conflicts; no status checks required). Since no status check was required on the sprint branch, `playwright-e2e` being pending did not block the merge.
+
+The sprint group isolation model was introduced at M18 kickoff to resolve NM-067. When the branching model was designed, no corresponding CI gate was specified for sprint sub-branches.
+
+### What was at risk
+
+An implementation PR could merge to a sprint sub-branch with failing `playwright-e2e` tests — broken frontend behavior landing on the sprint branch before CI completes. Other implementing agents pulling from the sprint branch for subsequent work could build on top of that broken state. The defect would only be caught at the integration PR gate (`sprint/m18-g3` → `release/m18`) where the `release-branch-ci-gate` Ruleset enforces all required checks.
+
+In this specific instance (PR #1395 is a test authorship PR), `playwright-e2e` failure was expected — tests are pre-RED before implementation. The risk is higher for implementation PRs where a failing `playwright-e2e` indicates genuine defects.
+
+### What caught it
+
+EL observation after seeing the merge notification, triggering DS Agent investigation. No process gate on the sprint branch detected or blocked the premature merge.
+
+### Root cause
+
+The sprint group isolation SOP (NM-067 resolution) introduced sprint sub-branches but did not define CI requirements for those branches. The `release-branch-ci-gate` Ruleset was not extended to cover `sprint/m*` branches. The design intent — whether sprint branches should have required checks or whether the gate lives only at the integration PR — was never explicitly decided or documented.
+
+### Process improvement
+
+**Design decision required (EL) — choose one path:**
+
+**Option A — Add sprint-branch CI gate:**
+DS Agent creates a new GitHub Ruleset (`sprint-branch-ci-gate`) covering `refs/heads/sprint/m*` with required checks: `changes`, `lint`, `test-backend`, `playwright-e2e`. Feature→sprint auto-merge then waits for all required checks to pass. `docs/process/sprint-group-isolation.md` updated to document the gate. Implemented via `infra/m18-sprint-branch-gate` PR targeting `release/m18`.
+
+**Option B — Explicitly document sprint branches as intentionally unprotected:**
+DS Agent updates `docs/process/sprint-group-isolation.md` to explicitly state that sprint sub-branches are intermediate integration points with no required CI gate; the full gate lives at the integration PR (sprint→release). Auto-merge fires without waiting for CI on sprint branches by design — implementing agents rely on local pre-push gates (ruff + mypy + npm build) for intermediate quality. Implemented via `infra/m18-sprint-group-isolation-doc-amendment` PR targeting `release/m18`.
+
+**Not acceptable:** leaving the design decision undocumented. The sprint group isolation SOP must explicitly state CI gate expectations for sprint branches, whichever path is chosen.
+
+DS Agent brings this finding to the EL for path selection before implementing.
+
+---
+
+## NM-074 — Required Check Added to Ruleset Without Verifying Workflow Trigger Coverage; sprint-branch-ci-gate Hung on branch-naming (Reactive)
+
+**Date:** 2026-06-27
+**Milestone:** M18 — Full Argument and Demo 7
+**Detected by:** EL observation — PR #1398 stuck with `branch-naming` never reporting
+**Severity:** Medium — blocked auto-merge on an active implementation-gate PR; required manual Ruleset intervention to unblock
+
+### What happened
+
+When creating the `sprint-branch-ci-gate` Ruleset (NM-073 resolution), DS Agent included `branch-naming` as a required check alongside `changes`, `lint`, `test-backend`, and `compliance-scan`. The `branch-naming` check was already a required check in `release-branch-ci-gate` and was known to exist as a workflow.
+
+What was not verified: whether `branch-naming.yml` was configured to trigger for PRs targeting `sprint/m*` branches. It was not — the workflow only declared `release/m*` in its `pull_request.branches` trigger. For any `feat/* → sprint/m*` PR, the `branch-naming` job never ran and never posted a result to the PR. GitHub's Ruleset waited for a required check that could not arrive, blocking auto-merge indefinitely.
+
+PR #1398 (`feat/m18-g3-intent-document` → `sprint/m18-g3`) was the first PR to expose this gap — it sat with `branch-naming` in a permanent pending-but-absent state.
+
+**Resolution sequence:**
+1. DS Agent removed `branch-naming` from `sprint-branch-ci-gate` via API (immediate unblock)
+2. DS Agent extended `branch-naming.yml` to trigger on `sprint/m*` targets with correct milestone extraction (`sprint/m18-g2` → `"m18"`) — PR #1399 → `release/m18` (merged)
+3. DS Agent restored `branch-naming` to `sprint-branch-ci-gate` Ruleset after PR #1399 landed
+
+### What was at risk
+
+Any `feat/* → sprint/m*` PR with auto-merge set would hang indefinitely. In a wave with multiple implementing agents, multiple PRs could accumulate in this state simultaneously, blocking all sprint branch merges and stalling the wave. The gap would persist undetected until the first auto-merge PR was opened after the Ruleset was created.
+
+### What caught it
+
+EL observation of PR #1398 stuck status. No process gate surfaced the trigger-coverage gap before the Ruleset was created.
+
+### Root cause
+
+The DS Agent verified that `branch-naming` was a known, working CI check — it is, for `release/m*` targets. The agent did not verify that the workflow's `pull_request.branches` trigger included the new branch pattern (`sprint/m*`) before adding it as a required check to the new Ruleset. Existence of a check is not the same as coverage of that check for a given branch pattern.
+
+### Process improvement
+
+**DS Agent pre-Ruleset checklist — new required item:**
+
+Before adding any check name to a GitHub Ruleset, DS Agent must verify:
+1. The workflow file defining the check exists
+2. The workflow's `pull_request.branches` (or equivalent trigger) includes **the branch pattern covered by the Ruleset being created or modified**
+
+If the workflow trigger does not cover the Ruleset's branch pattern, the DS Agent must extend the workflow **before** adding the check to the Ruleset — not after.
+
+The correct sequence: extend workflow → verify workflow fires on the new pattern → add check to Ruleset. NM-074 was produced by inverting steps 2 and 3.
+
+---
+
+## NM-075 — Multiple Claude Code Sessions Sharing One Git Working Tree; Branch Switches from Other Sessions Overwrite In-Progress Implementation (Reactive)
+
+**Date:** 2026-06-27
+**Milestone:** M18 — Full Argument and Demo 7
+**Detected by:** DS Agent investigation triggered by EL — `ps aux` and `git reflog` made root cause unambiguous after repeated branch-switch failures during G2 implementation
+**Severity:** High — implementation commits were overwritten, edited files were reset to HEAD, and a QA test file was deleted repeatedly; implementation required multiple recovery attempts across sessions
+
+### What happened
+
+During M18 G2 implementation (PSP driver decomposition, #1255), the working branch (`feat/m18-g2-psp-impl`) was repeatedly switched by other concurrent Claude Code sessions operating on the same main git working tree at `/Users/imranyousuf/projects/worldsim`. At peak, 18+ `claude code` processes were active simultaneously — G2 implementation, G3 intent document, infra/branch-naming, and multiple chore/state-sync sessions — all sharing the same `.git/HEAD`. Every `git checkout` by any other session immediately changed HEAD for all sessions.
+
+Evidence: `git reflog` showed 30+ HEAD switches in ~2 hours; `ps aux` confirmed 18+ `claude code` processes; `git worktree list` showed only 2 isolated worktrees (for agent tool calls, not for concurrent sprint group work). The sprint group isolation model (NM-067 fix, sprint sub-branches) addresses merge conflicts at PR time but does not prevent working-tree interference when sessions operate concurrently without worktree isolation.
+
+Recovery: G2 implementation was completed by creating an explicit `git worktree add` for `feat/m18-g2-psp-impl` at a scratchpad path, isolating it from all other session activity.
+
+### What was at risk
+
+G2 implementation artifacts (module.py changes, frontend components, test file) were overwritten by branch switches at least three times. Without recovery via `git show <commit>:path`, the pre-authored QA test file (PR #1387) would have been permanently lost from the working tree. The near-miss escalated to a full implementation failure before the worktree workaround was discovered.
+
+### What caught it
+
+DS Agent investigation triggered by EL — the process had no guard. The sprint-group isolation model describes branch naming and PR targeting but does not require or recommend worktree isolation for concurrent sessions.
+
+### Process improvement
+
+**Immediate:** `docs/process/sprint-group-isolation.md` should be updated to require `git worktree add` for any sprint group session that coexists with other concurrent sessions operating on the same repository clone.
+
+**Structural:** PM Agent should provision a named git worktree for each sprint group at sprint entry, alongside cutting the sprint sub-branch. The worktree path (convention: `.claude/worktrees/sprint-m{N}-g{N}`) should be recorded in the sprint journal issue so implementing agents know where to work.
+
+**Near-miss lineage:** Same root cause as NM-067 (concurrent sessions, shared state) at the working-tree level rather than the branch/PR level. NM-067's fix (sprint sub-branches) addressed the merge conflict symptom; NM-075 identifies the working-tree interference that survives the branching fix. NM-071 identified the planning gap; NM-075 identifies the execution gap: even a correctly-planned sprint group can have its implementation destroyed by concurrent sessions without worktree isolation.
+
+---
+
+## NM-076 — Testid Renames in G4 Implementation Not Cross-Checked Against Full E2E Corpus; Three Tests Merged to Sprint Branch Silently Broken (Reactive)
+
+**Date:** 2026-06-28
+**Milestone:** M18 — Full Argument and Demo 7
+**Detected by:** playwright-e2e CI run on sprint/m18-g4 (run 28332341391) after PR #1424 had auto-merged — post-merge detection, not pre-merge prevention
+**Severity:** Medium — broken tests merged to sprint/m18-g4 with no blocking artifact; corrected by PR #1426 before integration PR opened
+
+### What happened
+
+G4 implementation (PR #1424, `feat/m18-g4-control-plane-column` → `sprint/m18-g4`) delivered `ControlPlaneColumn.tsx` with testid renames specified in ADR-019 D-3: `apply-control-change` → `apply-policy-input`, `fiscal-multiplier-slider` → `policy-param-slider`. Five pre-G4 E2E test files (`mode3-active-control.spec.ts`, `demo-trajectory-mode3.spec.ts`, `demo-narrated-m12.spec.ts`, `m16-g9-mode3-branch-comparison.spec.ts`, `mode-transition.spec.ts`) referenced the old testids and were not identified or updated before PR #1424 was opened.
+
+The `sprint-branch-ci-gate` Ruleset (NM-073 resolution) does not require `playwright-e2e` for feature→sprint PRs — only `changes`, `lint`, `test-backend`, `compliance-scan`. PR #1424 therefore auto-merged when those four checks passed, without waiting for Playwright results. Three test failures were detected only by the post-merge CI run on `sprint/m18-g4` (run 28332341391).
+
+Recovery: PR #1426 updated all five affected test files. CA L3 assessment was bundled into PR #1426 to avoid an additional round-trip. PR #1426 opened before the integration PR (sprint/m18-g4 → release/m18) was created.
+
+### What was at risk
+
+The sprint/m18-g4 branch held three broken E2E tests for the period between PR #1424 auto-merge and PR #1426 merge. If an integration PR had been opened in that window, `playwright-e2e` (required by `release-branch-ci-gate`) would have blocked it — but the detection would have been at integration time, not sprint-internal time. The broken tests were not caught before merging to the sprint branch.
+
+### What caught it
+
+CI run 28332341391 (playwright-e2e on sprint/m18-g4 post-merge) surfaced the failures. Manual inspection of `gh run view 28332341391 --log-failed` identified the root cause as testid rename coverage. No process guard prevented the mis-matched tests from entering the sprint branch.
+
+### Process improvement
+
+**Immediate:** CODING_STANDARDS.md should include a testid rename rule: when renaming a `data-testid` in any component, run `grep -r 'old-testid-value' frontend/tests/e2e/` before opening the PR and update every matching locator in the same PR. A testid rename that reaches the sprint branch without its E2E corpus update is an incomplete implementation.
+
+**Structural:** ADR-019 §D-3 (testid authority section) should note the cross-file coupling risk and reference this near-miss. Testid renames are not single-file changes — they create implicit contracts across all E2E test files that reference the renamed element.
+
+**Near-miss lineage:** Testid mismatches have caused silent no-ops before (NM-058: AC-009 testid mismatch since M12). NM-076 is a write-side variant of the same pattern: NM-058 was a read-side miss (test locator never found the element and passed vacuously); NM-076 is a rename-side miss (implementation renamed the element and left existing tests broken). Both are caused by the absence of a testid change management rule.
+
+---
+
+## NM-077 — `gh pr create` Infers Head Branch from Shell CWD, Not Worktree Branch; PR Created with Wrong Head (Reactive)
+
+**Date:** 2026-06-28
+**Milestone:** M18 — Full Argument and Demo 7
+**Detected by:** Manual inspection of `gh pr view 1428 --json headRefName` — wrong branch name visible in output
+**Severity:** High — a structurally-broken PR (wrong head) was opened against a sprint branch; if auto-merge had fired before detection, shared-state files (SESSION_STATE.md, near-miss-registry.md) would have merged into sprint/m18-g4, violating the shared-state lane protocol
+
+### What happened
+
+A fix branch `feat/m18-g4-branch-anchor-label` was created in a scratchpad worktree (`worldsim-g4-fix`). After the commit and push, `gh pr create` was called without an explicit `--head` flag. The Claude Code shell CWD had been reset to the main worktree path (`/Users/imranyousuf/projects/worldsim`), which was on branch `chore/m18-state-sync-022`. The `gh` CLI inferred the PR head branch from the CWD working tree rather than from the worktree where the branch was created. PR #1428 was opened as `chore/m18-state-sync-022` → `sprint/m18-g4` instead of `feat/m18-g4-branch-anchor-label` → `sprint/m18-g4`.
+
+GitHub reported `CONFLICTING` / `DIRTY` merge state because `chore/m18-state-sync-022` was branched from `release/m18` with no ancestry to `sprint/m18-g4`. The `ci-failure-notify.yml` workflow fired as a false trigger. PR #1428 was closed immediately; PR #1429 was created with the explicit `--head feat/m18-g4-branch-anchor-label` flag and merged cleanly.
+
+### What was at risk
+
+Auto-merge was set on PR #1428 before the conflict was detected. The GitHub Ruleset (`sprint-branch-ci-gate`) requires `changes`, `lint`, `test-backend`, `compliance-scan` — all of which would have been skipped or passed for a pure-docs PR. If the conflict had resolved (e.g. via admin bypass), SESSION_STATE.md and near-miss-registry.md would have landed in sprint/m18-g4, violating the shared-state lane rule (shared state must flow only via `chore/m{N}-state-sync-NNN` → `release/m{N}`).
+
+### What caught it
+
+Manual check of `gh pr view 1428 --json headRefName,baseRefName` immediately after creation. No process guard prompted this check — it was incidental inspection of the CONFLICTING merge state.
+
+### Process improvement
+
+**Immediate:** When running `gh pr create` from a worktree context, always pass `--head <branch>` explicitly. The `gh` CLI resolves head from the git working tree at CWD, not from the worktree-local context. This rule should be documented in `docs/process/sprint-group-isolation.md §Worktree Usage` alongside the existing `git worktree add` guidance.
+
+**Structural:** The PR creation checklist (implicit in the CLAUDE.md PR gate section) should include: verify `gh pr view <N> --json headRefName,baseRefName` immediately after `gh pr create` returns, before setting auto-merge. A wrong-head PR with auto-merge enabled is a higher-severity error than a wrong-head PR that must be manually merged.
+
+**Near-miss lineage:** Root cause is the same environment as NM-075 (shell CWD reset when operating across multiple worktrees). NM-075 addressed branch-switch interference; NM-077 is a `gh` CLI inference failure in the same multi-worktree environment. The structural fix — explicit branch arguments to all git and gh commands that infer from CWD — is the same in both cases.
+
+---
+
+## NM-078 — Milestone Test Files in `tests/` Root Never Discovered by CI; 17 Files Silently Excluded Across M14–M18 (Reactive)
+
+**Date:** 2026-06-28
+**Milestone:** M18 — Full Argument and Demo 7
+**Detected by:** Post-failure investigation after narrated Demo 7 spec Guard 2 fired — `distributional-comparison-summary` not visible; API logs revealed `UndefinedColumnError: column "step_index" does not exist`
+**Severity:** High — the `distributional-differential` endpoint was non-functional across G3–G6 (three sprint groups and two integration PRs); Demo 7 would have presented fallback screenshots without live distributional data at external session #843
+
+### What happened
+
+The G3 implementation PR (`0407529`) introduced `POST /scenarios/comparison/distributional-differential` with a SQL query using invented column names: `SELECT step_index, state FROM scenario_snapshots`. A G3 follow-up fix commit (`61fe8b8`) corrected the table name (`scenario_snapshots` → `scenario_state_snapshots`) after CI caught an `UndefinedTableError`. The column names (`step_index`, `state`) were left unchanged — the actual columns are `step` and `state_data`. After the table-name fix, CI went green and the endpoint shipped through G4 and G5 integration PRs.
+
+The reason the column-name error was not caught: the G3 acceptance test (`test_m18_g3_counter_scenario_comparison.py`) correctly marks the test module `pytestmark = pytest.mark.integration` but lives at `backend/tests/test_m18_g3_counter_scenario_comparison.py` — in the root of `tests/`, not in `tests/integration/`. CI runs `pytest tests/unit` and `pytest tests/integration` by directory path. Directory-based discovery never reaches files in `tests/` root. The G3 test has never executed in CI.
+
+Scope of silent exclusion: 17 milestone-specific test files from `test_m14_g3_*` through `test_m18_g4_*` are all in `backend/tests/` root and all excluded from CI by the same structural mismatch.
+
+The endpoint was live and broken across G3, G4, and G5 (three sprint groups). The error was not discovered until the Demo 7 narrated spec ran the full two-act walkthrough and the `compSummary.isVisible({ timeout: 20_000 })` guard fired.
+
+### What was at risk
+
+Demo 7 Act 2 depends on `DistributionalComparisonSummary` rendering the headcount differential ("+340K persons") — the primary analytical output of the Zambia three-scenario comparison. With the endpoint returning 500 on every call, the component never rendered. If the narrated spec had not been run before the live external session (#843), Demo 7 Act 2 would have presented a blank Zone 1B to a real stakeholder audience, with no distributional finding visible.
+
+Additionally: 17 test files worth of acceptance criteria have never been CI-validated. Any endpoint or component covered exclusively by those files could be broken without CI detection.
+
+### What caught it
+
+The `console.warn` in the narrated spec's Guard 2 block, followed by manual investigation of Docker API logs revealing the `UndefinedColumnError` traceback. No CI mechanism caught it — the detection was a narrated spec guard plus manual log inspection, not a test suite.
+
+### Process improvement
+
+**Immediate (Issue #1451):** Change CI from directory-based to marker-based integration test discovery:
+```yaml
+# Before:
+pytest tests/integration -v || [ $? -eq 5 ]
+# After:
+pytest tests/ -m integration -v || [ $? -eq 5 ]
+```
+This discovers all files with `pytestmark = pytest.mark.integration` regardless of location, including the 17 existing milestone files. Implemented via `infra/m18-ci-integration-test-discovery` PR targeting `release/m18`.
+
+**Schema gate reinforcement:** The `step_index`/`state` names were invented without consulting `docs/schema/database.yml`. The mandatory schema read rule (CLAUDE.md: "Writing SQL or reading JSONB → read `docs/schema/database.yml` first") was not followed at G3 implementation time. The rule exists; the process gap is that no checklist item at PR authorship time prompts a schema-read confirmation. Adding a schema-read self-attestation to the PR description template would create an artifact trail.
+
+**Near-miss lineage:** The pattern class (test file placed in wrong directory, silently excluded from CI, acceptance criterion not validated) is a new variant of NM-027/NM-028/NM-047/NM-058 (no-op guard patterns). Those entries address guards that execute but produce no signal. This entry addresses tests that never execute at all. The common root: a test exists but its signal never reaches the CI gate that protects the branch. See NM-068 (prior NM process improvements not verified at sprint entry) — the lesson from NM-027/NM-028/NM-047/NM-058 should have prompted a review of test discovery coverage.
+
+---
+
+## NM-079 — G1 CI Bands Implementation Committed to G3 Feature Branch; Wrong-Branch Commit Not Detected by Any Process Gate (Reactive)
+
+**Date:** 2026-06-27
+**Milestone:** M18 — Full Argument and Demo 7
+**Detected by:** Agent reading its own git commit output (`[feat/m18-g3-implementation 291c5e1]`); no process gate
+**Severity:** High — G3 branch briefly contained G1 CI bands implementation (`banding_engine.py`, CI band fixtures, `m18-g1-ci-bands.spec.ts`); a reviewer or downstream sprint group could have integrated wrong-group code without realizing the authoring context
+
+### What happened
+
+Session `1e3802e7` began intending to implement G1 CI bands (`feat/m18-g1-ci-bands`). The session had previously been working on `feat/m18-g3-implementation` during NM-075 working tree interference (Jun 27, 21:41–22:13 EDT, 30+ HEAD switches). When CI band implementation work began, the session was on the G3 branch — not the G1 branch. Implementation commit `291c5e1` (`feat(m18-g1): implement CI band banding_engine + TrajectoryView fills`) landed on `feat/m18-g3-implementation`.
+
+The error was caught when the agent read the git commit output and noticed the branch name in the confirmation line. Recovery: cherry-pick `291c5e1` to `feat/m18-g1-ci-bands` (produced canonical `c7075c5`) + `git reset HEAD~1 --soft` on the G3 branch.
+
+Reflog corroboration: `2026-06-28 07:11:52 checkout: moving from feat/m18-g1-qa-tests to feat/m18-g3-implementation` — cross-branch jump happened mid-session during NM-075 thrash; implementation work continued on the wrong branch without any gate firing.
+
+### What was at risk
+
+If the wrong-branch commit had been pushed before detection:
+- `sprint/m18-g1` would be missing its primary implementation commit (CI bands never merged to G1)
+- `sprint/m18-g3` would contain G1 CI bands code, creating a scope contamination that would survive to the G3 integration PR and pollute `release/m18` under the G3 merge commit
+- Post-mortem attribution would show CI bands as G3 work in `git log`
+- G1 integration PR would open with no implementation, triggering BPO rejection
+
+### What caught it
+
+An agent reading its own git commit output — the `[feat/m18-g3-implementation 291c5e1]` confirmation line. No process gate required branch verification before implementation; no gate confirmed the working tree branch matched the sprint group at session start.
+
+### Process improvement
+
+**Issue #1484:** Add branch verification at session start to `docs/process/sprint-group-isolation.md §Worktree Usage`: agents must confirm `git branch --show-current` matches the expected sprint group branch before any file edits. If branch does not match, checkout the correct branch or create the correct worktree first.
+
+Also addresses stash hygiene (P5): verify `git stash list` is empty or all stash entries belong to the current sprint group before cross-branch operations.
+
+**Near-miss lineage:** Enabling condition is the same multi-session working-tree interference as NM-075. NM-075 addressed branch-switch overwriting of in-progress work; NM-079 is the write-side complement: implementation committed to the wrong branch entirely. Both are caused by the absence of a branch verification gate at session start.
+
+---
+
+## NM-080 — Admin-Rights Direct Commit to `release/m18`; `release-branch-ci-gate` Ruleset Does Not Cover Direct CLI Push (Reactive)
+
+**Date:** 2026-06-27
+**Milestone:** M18 — Full Argument and Demo 7
+**Detected by:** Agent reading its own git output (`gitBranch: "release/m18"` in commit confirmation); no process gate
+**Severity:** High — a direct commit to a release branch bypasses all PR gates, CI required checks, and the sprint group isolation model; if the recovery had been missed, incorrect G3 test files would have been permanently in `release/m18` history
+
+### What happened
+
+Session `74aa9f9a`, while cleaning up stash-leaked files from `feat/m18-gd-artifact5-decision4`, drifted onto `release/m18` via HEAD movement during the NM-075 working tree thrash. G3 test files (`test_m18_g3_counter_scenario_comparison.py` and associated fixtures) were committed directly to `release/m18` with `gitBranch: "release/m18"` visible in the session tool output. Recovery: `git reset --soft HEAD~1` → stash → checkout `feat/m18-g3-test-authorship` → stash pop → recommit on the correct branch.
+
+The recovery succeeded. No incorrect artifact remains in `release/m18`. The commit was unstaged before being pushed.
+
+### What was at risk
+
+If the commit had been pushed before detection:
+- G3 test files would exist in `release/m18` as a direct commit, not via the sprint group isolation PR flow
+- The `release-branch-ci-gate` Ruleset covers merge-via-PR; it does not block direct push by a user with admin rights
+- No CI gate would have caught the misrouting — the push would have succeeded silently
+- Future integrations would have merge conflicts between the direct-committed version and the sprint group's canonical version
+- The audit trail would show G3 test files arriving in `release/m18` outside the sprint group isolation model, with no reviewable PR
+
+### What caught it
+
+An agent reading its own git output showing `gitBranch: "release/m18"` in the commit confirmation. No server-side protection exists against direct CLI push by an admin to `refs/heads/release/m*`.
+
+### Process improvement
+
+**Issue #1483:** Add a GitHub Ruleset push restriction covering `refs/heads/release/m*` that blocks direct CLI push for all actors including admins. Additionally add a pre-push hook check that aborts pushes to `release/*` with a message directing to the PR process. The Ruleset approach is server-enforced and cannot be bypassed by hook skip. Both layers together satisfy defence-in-depth.
+
+**Near-miss lineage:** Enabling condition is the same multi-session HEAD drift as NM-075. NM-075 covered branch-switch overwriting in-progress work; NM-080 covers inadvertent commit to the protected release branch itself. Same structural gap (no working-tree branch verification), different failure mode (wrong target branch for commit vs. wrong target branch for implementation).
+
+---
+
+## NM-081 — Sprint Branch Cut Before Predecessor ADR Scope Was Finalized on `release/m18`; G3 Implemented Against Stale GD Scope for Entire Sprint; Silent Scope Drift Absorbed at Integration (Reactive)
+
+**Date:** 2026-06-27
+**Milestone:** M18 — Full Argument and Demo 7
+**Detected by:** DS Agent post-mortem analysis of integration resolution commit `a19c432` (33 files); not detected during G3 implementation or at any sprint gate
+**Severity:** Medium — G3 implementation was built against a 6-shock taxonomy (GD Decision 3); `release/m18` at integration carried a 7-shock taxonomy (ADR-019 Decisions 4/5/6, EL-approved); the resolution commit silently upgraded G3 to the wider scope without G3 ever implementing against it
+
+### What happened
+
+`sprint/m18-g3` was cut at PR #1395 merge (Jun 27, ~01:49 EDT), before the GD design package (Artifacts 1–7, PRs #1386–#1393) had fully merged to `release/m18`. At the time of the branch cut, only GD Decision 3 (6-shock taxonomy) was on `release/m18`. ADR-019 Decisions 4/5/6 (EL-approved scope expansion to all 7 shock types, including `FX_RATE_FLOOR`) landed on `release/m18` later that day.
+
+G3 spent its entire sprint implementing the distributional-comparison endpoint and components against the 6-shock contract from Decision 3. The `forms-spec.md` and `schemas.py` G3 referenced reflected the stale scope. The integration resolution commit `a19c432` (Jun 28, 07:46 EDT, 33 files) absorbed G1+G2+GD+G3 simultaneously. The resolver chose `release/m18`'s version of `api_contracts.yml` (which had Decisions 4/5/6) over G3's stale Decision-3 version — silently upgrading G3's scope at integration without G3's knowledge.
+
+The integration was functionally correct. The process gap: no gate required that G3's implementing scope match the finalized ADR decisions before the sprint branch was cut.
+
+### What was at risk
+
+If the scope drift had been in the opposite direction — if `release/m18`'s version had been narrower than G3's implementation — the resolution would have silently dropped G3 functionality. More critically: the silent scope upgrade at integration means G3's tests and components were never validated against the 7-shock contract. If the 7-shock contract introduced an interface incompatibility, G3's acceptance tests would not have caught it (the tests were authored against Decision 3). This is a variant of the NM-078 pattern: a test exists but tests the wrong version of the contract.
+
+### What caught it
+
+DS Agent post-mortem analysis of the integration resolution commit diff in the M18 sprint health audit. The issue was not detected during G3 implementation, at G3 sprint exit, or by any CI gate. The process has no mechanism to flag "this sprint's implementation was built against a scope that changed before integration."
+
+### Process improvement
+
+**Issue #1485:** Add a scope lock precondition to `docs/process/sprint-planning-sop.md §Wave Kickoff Coordination Check`: before cutting a sprint branch for group G{N}, verify that all ADR decisions affecting G{N}'s scope are EL-approved and merged to `release/m{N}`. If predecessor decisions are pending, either delay the branch cut or document the known scope uncertainty in the sprint entry document §Scope section.
+
+Also: sprint entry template `§Scope` section to include a checkbox confirming that all scope-bearing ADR decisions are locked on `release/m{N}` before implementation begins.
+
+**Near-miss lineage:** The timing window (sprint branch cut before predecessor merges complete) is the inverse of the cross-contamination problem. NM-067 addressed concurrent feature branches polluting each other; NM-081 addresses a sprint branch inheriting an incomplete scope snapshot that silently becomes stale. NM-072 (Artifact 5 authored before prerequisites existed) is an upstream cousin: the scope drift in NM-081 was possible because the GD design package was still landing when the dependent sprint branch was cut.
+
+---
+
+## NM-082 — CI Band Fill Geometry Incorrect in `TrajectoryView.tsx`; Shipped in G1 With Tests Green; Detected Only by Step 6b Visual Review (Reactive)
+
+**Date:** 2026-06-28 (G1 merged to `release/m18`); detected 2026-06-29 (Step 6b review)
+**Milestone:** M18 — Full Argument and Demo 7
+**Detected by:** Nine-agent Step 6b visual review (2026-06-29) — no automated gate
+**Severity:** High — visual geometry error present in all five Demo 7 screenshot frames; would have been the version shown at external stakeholder session #843
+
+### What happened
+
+The G1 sprint (`sprint/m18-g1`, PR #1404) implemented CI confidence bands in `TrajectoryView.tsx`. The fill geometry was implemented incorrectly: instead of forming a ±half-width envelope around each trajectory, the fill extended from the trajectory value to the chart ceiling, producing a solid colour block from each line to the top of the chart area. The y-axis then scaled to the inflated band extent rather than to the trajectory values, further distorting the visual.
+
+G1 CI (16/16 PASS) went green. The M18 legibility spec (`m18-g1-ci-bands.spec.ts`) verified that CI band elements were present in the DOM — it did not assert that the fill path geometry was correct. No unit test in `TrajectoryView.test.tsx` covered the fill coordinate calculation. Integration PR #1411 merged to `release/m18` on 2026-06-28 with no geometry-specific test blocking it.
+
+The G6 screenshot capture (Step 5d) captured five demo frames including the incorrectly-rendered CI bands. DEMO-137 (HIGH) was assigned to the geometry bug; it was also the root cause of several CRITICAL layout issues (y-axis scaling cascaded into Zone 1A trajectory legibility failures).
+
+### What was at risk
+
+Demo 7 Act 1 (Senegal Mode 3) uses CI bands to show trajectory uncertainty during active control. Act 2 (Zambia comparison) uses CI bands on Zone 1A trajectories to anchor the confidence framing of the distributional differential. If the Step 6b review had not caught the geometry error, five demo frames with incorrect CI band rendering would have been presented at the external stakeholder session (#843). DEMO-137 (y-axis scaling) was a downstream consequence: trajectory lines were illegible at the scale forced by the inflated band extent.
+
+### What caught it
+
+The nine-agent Step 6b visual review on 2026-06-29. No automated gate — not the unit tests, not the legibility spec, not CI — detected the geometry error. This is the definition of a process gap: the review panel caught something the process should have caught before screenshots were captured.
+
+### Process improvement
+
+**Immediate (Issue #1466):** Fix cluster A in G7 corrects the fill geometry in `TrajectoryView.tsx` and adds unit test assertions to `TrajectoryView.test.tsx` covering: (1) fill path does not extend beyond trajectory value bounds; (2) fill endpoints are at ±half-width, not at chart ceiling; (3) y-axis domain is derived from trajectory values, not from band extents.
+
+**Structural:** The legibility spec pattern (element presence + attribute check) does not validate geometric correctness. Acceptance criteria for visual components with a calculable geometric invariant must include a unit test asserting the invariant, not just that the element renders. Companion lesson to NM-056 (soft-skipping masked a mock bug) and NM-027/NM-028 (no-op guards): a test that verifies presence but not correctness cannot catch the most likely failure mode.
+
+---
+
+## NM-083 — Demo-Spec ↔ Component-Contract Integration Gap: Seven CRITICAL Step 6b Findings Had No Automated Test Asserting Their Contract
+
+**Date:** 2026-06-29
+**Milestone:** M18 — Full Argument and Demo 7
+**Detected by:** G7-0 root cause analysis cross-cutting pattern synthesis (2026-06-29) — identified after nine-agent Step 6b visual review caught 24 findings
+**Severity:** High — seven CRITICAL findings in the Step 6b review were directly attributable to missing contract-level tests between the demo spec and the components it exercises
+
+### What happened
+
+The G7 Step 6b root cause analysis identified a cross-cutting pattern across all five root causes: `demo-narrated.spec.ts` and the components it exercises lacked contract-level acceptance tests asserting the component's rendering contract, not merely element presence.
+
+- **DEMO-132** (psp-driver-row absent CRITICAL): the mock omitted `psp_dominant_driver` — a field required by `FourFrameworkZone1D.tsx` to render the row. No test asserted that `data-testid="psp-driver-row"` was visible after mock fulfillment.
+- **DEMO-130/135** (Frame A/B identical CRITICAL × 2): the spec captured both frames at the same step. No test asserted that Frame A and Frame B screenshots had different byte content.
+- **DEMO-136** (Frame C wrong step CRITICAL): Frame C was captured at step 6, not step 8 (maximum divergence). No test asserted the branch/baseline delta was nonzero at the captured step.
+- **DEMO-134** (cleared threshold invisible CRITICAL): `CohortImpactSection` had no design for non-breaching focal indicators. No test asserted the monitored focal row was visible at a CLEAR-state step.
+- **DEMO-137** (CI band geometry HIGH): `computeCompositeCIBounds` used a multiplicative formula. No unit test asserted fill path coordinates satisfied `[score ± halfWidth]` bounds.
+- **DEMO-133/131** (DistributionalComparisonSummary below fold CRITICAL × 2): Zone 1B had no minimum height contract. No test asserted the component was fully in-viewport at 1440×900.
+
+The pattern: every CRITICAL finding was a case where a component contract existed (in the ADR, the Step 5d panel guidance, or the component's conditional render guard) but no automated test asserted that contract end-to-end.
+
+### What was at risk
+
+The five-frame demo capture would have produced a broken demo artifact with: byte-identical Frames A/B; psp-driver-row absent in all five frames; `DistributionalComparisonSummary` clipped below Zone 1C; and CI bands filling the chart ceiling. If the Step 6b review had not caught these, the Step 7 IR review and live external stakeholder session (#843) would have received this artifact.
+
+### What caught it
+
+The nine-agent Step 6b visual review on 2026-06-29. No automated gate — not E2E tests, not unit tests, not CI — detected the contract violations before screenshots were captured. This is a process gap: every CRITICAL finding should have been caught by a contract-level test at implementation time, not by a visual review panel at demo preparation time.
+
+### Process improvement
+
+**Immediate (G7 sprint, all clusters):** G7 implements a QA-first gate: for each fix cluster, contract-level acceptance tests are authored and committed to the feature branch before any implementation code. Tests assert specific invariants:
+- `psp-driver-row` visible when mock includes `psp_dominant_driver` (Cluster D)
+- Frame A and Frame B screenshots have different MD5 hashes (Cluster E)
+- `distributional-comparison-summary` is fully in-viewport at 1440×900 (Cluster B)
+- CI fill path upper bound ≤ `score + halfWidth` for all steps (Cluster A)
+- Monitored focal row visible at a CLEAR-state step (Cluster C)
+
+**Structural:** Component implementation must include at least one test asserting the primary rendering contract — not just element presence. For any component with a calculable geometric or layout invariant (fill bounds, viewport visibility, byte-level content distinctness), unit/integration tests must assert the invariant value. This extends the companion lesson from NM-056 (soft-skipping masked a mock bug) and NM-082 (element presence test missed geometry error): tests that verify presence without asserting the contract value cannot catch the most likely failure mode.
+
+Codified in `docs/CODING_STANDARDS.md §Testing Requirements` in the same PR that closes DEMO-137 (Cluster A).
 
 ---
 

@@ -12,7 +12,14 @@ from decimal import Decimal
 from enum import Enum
 from typing import Any
 
-from pydantic import BaseModel, ConfigDict, Field, field_serializer, field_validator
+from pydantic import (
+    BaseModel,
+    ConfigDict,
+    Field,
+    field_serializer,
+    field_validator,
+    model_validator,
+)
 
 # ---------------------------------------------------------------------------
 # Output disclaimer constants — Issue #98, #100, #158
@@ -75,12 +82,12 @@ class MDAFloorRecord(BaseModel):
 class TrajectoryFrameworkPoint(BaseModel):
     """Per-framework composite score for one trajectory step.
 
-    ci_lower, ci_upper, ci_coverage, and is_pre_calibration are always null
-    pending ADR-007. composite_score is Decimal-as-string or null.
+    composite_score is Decimal-as-string or null.
     scoring_basis disambiguates null sources:
       - "normalized_absolute" — single-entity financial/HD; null when no normalizable indicators
       - "percentile_rank"     — multi-entity financial/HD, or governance (always null)
       - "boundary_proximity"  — ecological only
+    ci_lower/ci_upper are Decimal-as-string 80% CI bounds via BandingEngine (M18-G1 #1254).
     """
 
     model_config = ConfigDict(from_attributes=True)
@@ -89,10 +96,10 @@ class TrajectoryFrameworkPoint(BaseModel):
     composite_score: str | None
     scoring_basis: str
     confidence_tier: int
-    ci_lower: None = None
-    ci_upper: None = None
-    ci_coverage: None = None
-    is_pre_calibration: None = None
+    ci_lower: str | None = None
+    ci_upper: str | None = None
+    ci_coverage: float | None = None
+    is_pre_calibration: bool | None = None
 
 
 class PMMRecord(BaseModel):
@@ -178,6 +185,7 @@ class QuantitySchema(BaseModel):
     attribute_type: str | None = None
     stock_flow_identity: bool = False
     reversibility: str | None = None
+    psp_dominant_driver: str | None = None  # M18-G2 (#1255)
 
     @field_serializer("observation_date")
     def _serialize_date(self, v: date | None) -> str | None:
@@ -388,6 +396,7 @@ class ScenarioConfigSchema(BaseModel):
     commodity_price_shocks: list[CommodityShockConfig] = []
     projection_steps: int | None = Field(default=None, ge=1, le=100)
     ecological_shock_coefficient: float = Field(default=0.0, ge=0.0, le=1.0)
+    monitored_focal_cohorts: list[dict[str, Any]] = []
 
 
 class ScheduledInputSchema(BaseModel):
@@ -827,6 +836,9 @@ class BranchRequest(BaseModel):
     Creates a new branch scenario from an existing baseline at a specific step,
     with an updated fiscal_multiplier. The baseline's snapshots up to
     branch_from_step are copied to the branch; the branch then advances forward.
+
+    ADR-019 D-4: legitimacy_index extension — None preserves the scenario's
+    existing value; a float overrides the political feasibility constraint.
     """
 
     fiscal_multiplier: float = Field(
@@ -834,6 +846,12 @@ class BranchRequest(BaseModel):
         ge=0.1,
         le=3.0,
         description="New fiscal multiplier for the branch scenario.",
+    )
+    legitimacy_index: float | None = Field(
+        default=None,
+        ge=0.0,
+        le=1.0,
+        description="Legitimacy index override. None = use scenario baseline value.",
     )
     branch_from_step: int = Field(
         ge=0,
@@ -856,6 +874,8 @@ class RebranchRequest(BaseModel):
     snapshots from from_step onward so the branch can re-run from that step
     with an updated fiscal_multiplier. Implements the re-branch accumulation
     model from mode3-interaction-spec.md §5.
+
+    ADR-019 D-4: legitimacy_index extension — same semantics as BranchRequest.
     """
 
     fiscal_multiplier: float = Field(
@@ -864,6 +884,12 @@ class RebranchRequest(BaseModel):
         le=3.0,
         description="Updated fiscal multiplier for the re-branch.",
     )
+    legitimacy_index: float | None = Field(
+        default=None,
+        ge=0.0,
+        le=1.0,
+        description="Legitimacy index override. None = preserve current value.",
+    )
     from_step: int = Field(
         ge=0,
         description=(
@@ -871,3 +897,200 @@ class RebranchRequest(BaseModel):
             " Snapshots from this step forward are deleted."
         ),
     )
+
+
+# ---------------------------------------------------------------------------
+# Shock injection schemas — ADR-019 D-6
+# ---------------------------------------------------------------------------
+
+
+class ShockType(str, Enum):
+    """Shock type taxonomy (ADR-019 D-6 §D-6, Paris Club / IFA taxonomy)."""
+
+    GrowthShock = "GrowthShock"
+    ElectionShock = "ElectionShock"
+    CurrencyAttack = "CurrencyAttack"
+    CreditorDefection = "CreditorDefection"
+    GeopoliticalShock = "GeopoliticalShock"
+    NaturalDisaster = "NaturalDisaster"
+    ContagionShock = "ContagionShock"
+
+
+class CreditorClass(str, Enum):
+    """Creditor classification (Paris Club / G20 Common Framework taxonomy).
+
+    bilateral    — government-to-government (Paris Club member creditors)
+    multilateral — IMF, World Bank, regional development banks
+    commercial   — private bondholders, commercial banks
+    """
+
+    bilateral = "bilateral"
+    multilateral = "multilateral"
+    commercial = "commercial"
+
+
+class ShockInjectRequest(BaseModel):
+    """Request body for POST /scenarios/{id}/inject-shock (ADR-019 D-6).
+
+    Discriminated union: required fields differ by shock_type.
+    model_validator enforces type-specific required fields.
+    """
+
+    shock_type: ShockType
+    inject_at_step: int = Field(ge=1, description="Step at which the shock is applied.")
+
+    # --- GrowthShock parameters ---
+    growth_rate_delta: float | None = Field(
+        default=None,
+        description="Departure from baseline GDP growth rate. Positive = optimistic.",
+    )
+    duration_steps: int | None = Field(
+        default=None, ge=1,
+        description="Steps the growth rate departure persists.",
+    )
+    distribution_asymmetry: float | None = Field(
+        default=None, ge=-1.0, le=1.0,
+        description="Cohort skew on growth landing. 0=proportional; positive=upper-cohort skew.",
+    )
+
+    # --- ElectionShock / GeopoliticalShock parameters ---
+    severity: float | None = Field(
+        default=None, ge=0.0, le=1.0,
+        description="Magnitude of political disruption (0=none, 1=maximum).",
+    )
+    political_uncertainty: float | None = Field(
+        default=None, ge=0.0, le=1.0,
+        description="Governance volatility modifier applied for duration_steps=2 (default).",
+    )
+
+    # --- CurrencyAttack parameters ---
+    attack_magnitude: float | None = Field(
+        default=None,
+        description="FX rate shock magnitude (fractional, e.g. 0.15 = 15% depreciation).",
+    )
+
+    # --- CreditorDefection parameters ---
+    creditor_class: CreditorClass | None = Field(default=None)
+    share_affected: float | None = Field(
+        default=None, ge=0.0, le=1.0,
+        description="Fraction of the creditor class's exposure that defects.",
+    )
+    regime_change_probability: float | None = Field(
+        default=None, ge=0.0, le=1.0,
+        description="Probability-weighted governance uncertainty (duration_steps=3 default).",
+    )
+
+    # --- ContagionShock parameters ---
+    source_country: str | None = Field(
+        default=None,
+        description="ISO 3166-1 alpha-3 of the originating country.",
+    )
+    transmission_rate: float | None = Field(
+        default=None, ge=0.0, le=1.0,
+        description="Fraction of originating shock that propagates to this entity.",
+    )
+    regional_contagion: bool | None = Field(
+        default=None,
+        description="True: trigger regional module contagion propagation.",
+    )
+    affected_sectors: list[str] | None = Field(
+        default=None,
+        description="Sector codes affected by the shock (empty = all sectors).",
+    )
+
+    # --- NaturalDisaster parameters ---
+    gdp_impact: float | None = Field(
+        default=None,
+        description="GDP impact as a negative fraction (e.g. -0.05 = -5% of GDP).",
+    )
+
+    @model_validator(mode="after")
+    def validate_type_params(self) -> ShockInjectRequest:
+        """Enforce type-specific required fields (ADR-019 D-6 discriminated union)."""
+        required: dict[ShockType, list[str]] = {
+            ShockType.GrowthShock: ["growth_rate_delta", "duration_steps"],
+            ShockType.ElectionShock: ["severity"],
+            ShockType.CurrencyAttack: ["attack_magnitude"],
+            ShockType.CreditorDefection: ["creditor_class", "share_affected"],
+            ShockType.GeopoliticalShock: ["severity"],
+            ShockType.NaturalDisaster: ["gdp_impact"],
+            ShockType.ContagionShock: ["source_country", "transmission_rate"],
+        }
+        missing = [
+            f for f in required.get(self.shock_type, [])
+            if getattr(self, f) is None
+        ]
+        if missing:
+            raise ValueError(
+                f"{self.shock_type} requires: {missing}"
+            )
+        return self
+
+
+class InjectShockResponse(BaseModel):
+    """Response for POST /scenarios/{id}/inject-shock (ADR-019 D-5).
+
+    Same shape as TrajectoryResponse with shock_events added.
+    shock_events echoes the injected shock at inject_at_step for UI display.
+    """
+
+    scenario_id: str
+    entity_id: str
+    step_count: int
+    mda_floors: list[MDAFloorRecord]
+    steps: list[TrajectoryStep]
+    shock_events: list[dict[str, Any]] = Field(
+        default_factory=list,
+        description="Shock events applied at inject_at_step, for TrajectoryView markers.",
+    )
+
+
+# ---------------------------------------------------------------------------
+# M18-G3 #1349 — Distributional comparison summary
+# ---------------------------------------------------------------------------
+
+
+class DistributionalDifferentialRequest(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    entity_id: str
+    scenario_ids: list[str]
+    reference_scenario_id: str
+
+
+class DistributionalStepResult(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    step: int
+    headcount_differential: int
+    ci_lower: int
+    ci_upper: int
+    direction_stable: bool
+
+
+class DistributionalPairResult(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    scenario_id: str
+    steps: list[DistributionalStepResult]
+
+
+class MethodologyDetail(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    q1_population: int
+    ci_methodology: str
+    extraction_path: str
+    tier_rationale: str
+
+
+class DistributionalDifferentialResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    entity_id: str
+    reference_scenario_id: str
+    terminal_step: int
+    tier: str
+    methodology_summary: str
+    methodology_detail: MethodologyDetail
+    pairs: list[DistributionalPairResult]

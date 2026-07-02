@@ -31,12 +31,13 @@
 import { useEffect, useRef, useState } from "react";
 import { InstrumentCluster, LAYOUT, useViewportBreakpoint } from "./InstrumentCluster";
 import { type ScenarioComparisonConfig, type ScenarioComparisonThresholdCrossing } from "./TrajectoryView";
-import { MDAAlertPanelZone1B, CohortImpactSection } from "./MDAAlertPanelZone1B";
+import { MDAAlertPanelZone1B, CohortImpactSection, DistributionalComparisonSummary } from "./MDAAlertPanelZone1B";
 import { PMMWidgetZone1C } from "./PMMWidgetZone1C";
 import { FourFrameworkZone1D } from "./FourFrameworkZone1D";
 import { CohortIndicatorsPanel } from "./CohortIndicatorsPanel";
 import { HumanCapitalTrajectoryPanel } from "./HumanCapitalTrajectoryPanel";
-import { ControlPlane, type Mode3Params } from "./ControlPlane";
+import { ControlPlaneColumn, type Mode3Params, type ShockInjectRequest } from "./ControlPlaneColumn";
+import { Mode2ColumnSurface } from "./Mode2ColumnSurface";
 import { useScenarioStepStore } from "../store/scenarioStepStore";
 import type { TrajectoryResponse, TrajectoryFrameworkPoint, Zone1BAlert, CohortThresholdCrossing } from "../store/scenarioStepStore";
 import type { QuantitySchema, ScenarioDetailResponse } from "../types";
@@ -55,6 +56,12 @@ interface RawFrameworkPoint {
   ci_upper: string | null;
   confidence_tier: number;
   scoring_basis: "percentile_rank" | "normalized_absolute" | "boundary_proximity";
+  /** M18-G7-C — raw indicator values from API; parsed to string | null in parseTrajectoryResponse. */
+  indicators?: Record<string, { value: string | null } | null>;
+  /** M18-G7-D — dominant driver of PSP change (political_economy only). */
+  psp_dominant_driver?: string | null;
+  /** M18-G7-D — note from API (e.g. "Ecological disabled for SEN Demo 7 Act 1"). */
+  note?: string | null;
 }
 
 interface RawTrajectoryStep {
@@ -103,6 +110,14 @@ function parseTrajectoryResponse(raw: RawTrajectoryResponse): TrajectoryResponse
             fw.scoring_basis === "boundary_proximity"
               ? "normalized_absolute"
               : fw.scoring_basis,
+          indicators: Object.fromEntries(
+            Object.entries(fw.indicators ?? {}).map(([k, v]) => [
+              k,
+              (v as { value?: string | null } | null)?.value ?? null,
+            ])
+          ),
+          psp_dominant_driver: fw.psp_dominant_driver ?? null,
+          note: fw.note ?? null,
         };
       }
       const pmm =
@@ -264,6 +279,8 @@ export function ScenarioInstrumentCluster({
   // undefined = not yet fetched or PE not active; null = PE active but computation failed; string = value.
   const [pspValue, setPspValue] = useState<string | null | undefined>(undefined);
   const [pspTier, setPspTier] = useState<number | null>(null);
+  // M18-G2 (#1255) — dominant driver of PSP change at current step.
+  const [pspDominantDriver, setPspDominantDriver] = useState<string | null>(null);
 
   // M16-G2 (#987) — political economy indicators for Zone 1D political risk sub-section.
   const [legitimacyValue, setLegitimacyValue] = useState<string | null | undefined>(undefined);
@@ -288,11 +305,16 @@ export function ScenarioInstrumentCluster({
   // save them on the next entityTrajectories update.
   const saveBaselineOnNextUpdateRef = useRef(false);
 
+  // ADR-019 D-1: local Mode 3 gate — set true when user clicks "Enter Active Control".
+  // Complements the prop-driven mode3Active for in-session activation without parent prop change.
+  const [internalMode3Active, setInternalMode3Active] = useState(false);
+
   // Initialise store when scenario changes (full reset) or update mode without resetting.
   // setScenario resets trajectory and current_step — calling it on mode changes would drop
   // the trajectory fetched after step advance and break Mode 3 comparison readout (DEMO-064).
   useEffect(() => {
-    const mode: "MODE_1" | "MODE_2" | "MODE_3" = mode3Active
+    const effectiveMode3Active = mode3Active || internalMode3Active;
+    const mode: "MODE_1" | "MODE_2" | "MODE_3" = effectiveMode3Active
       ? "MODE_3"
       : fiscalMultiplier != null && fiscalMultiplier !== 1.0
         ? "MODE_2"
@@ -305,7 +327,7 @@ export function ScenarioInstrumentCluster({
       useScenarioStepStore.setState({ mode });
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps -- store is a Zustand singleton, stable reference
-  }, [scenarioId, stepCount, fiscalMultiplier, mode3Active]);
+  }, [scenarioId, stepCount, fiscalMultiplier, mode3Active, internalMode3Active]);
 
   // Keep current_step in sync with ScenarioControls (prop-driven)
   useEffect(() => {
@@ -431,6 +453,20 @@ export function ScenarioInstrumentCluster({
   // eslint-disable-next-line react-hooks/exhaustive-deps -- store is a Zustand singleton, stable reference
   }, [currentStep, store.trajectory]);
 
+  // M18-G7-D: sync pspDominantDriver from trajectory when trajectory or step changes.
+  // Supplements the measurement-output extraction path so the driver renders in
+  // mocked demo sessions where measurement-output is not intercepted.
+  useEffect(() => {
+    const traj = store.trajectory;
+    if (!traj || currentStep === 0) return;
+    const step = traj.steps.find((s) => s.step_index === currentStep);
+    const driverFromTraj = step?.frameworks["political_economy"]?.psp_dominant_driver ?? null;
+    if (driverFromTraj !== null) {
+      setPspDominantDriver(driverFromTraj);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- store is a Zustand singleton, stable reference
+  }, [currentStep, store.trajectory]);
+
   // Fetch comparison scenario trajectory for Mode 2 overlay (#746).
   // When comparisonScenarioId changes, fetch its latest trajectory and store as baseline.
   // Clears baseline when comparisonScenarioId is removed.
@@ -504,6 +540,7 @@ export function ScenarioInstrumentCluster({
                   ci_upper: null,
                   confidence_tier: (fw.confidence_tier as number) ?? 3,
                   scoring_basis: "percentile_rank",
+                  indicators: {},
                 };
               }
               return {
@@ -630,14 +667,16 @@ export function ScenarioInstrumentCluster({
             typeof pspEntry === "object" &&
             "value" in pspEntry
           ) {
-            const entry = pspEntry as { value: string | null; confidence_tier?: number | null };
+            const entry = pspEntry as { value: string | null; confidence_tier?: number | null; psp_dominant_driver?: string | null };
             setPspValue(entry.value);
             setPspTier(
               typeof entry.confidence_tier === "number" ? entry.confidence_tier : null,
             );
+            setPspDominantDriver(entry.psp_dominant_driver ?? null);
           } else {
             setPspValue(null);
             setPspTier(null);
+            setPspDominantDriver(null);
           }
 
           // M16-G2 (#987) — legitimacy_index
@@ -667,6 +706,7 @@ export function ScenarioInstrumentCluster({
           // PE not enabled — reset all PE state
           setPspValue(undefined);
           setPspTier(null);
+          setPspDominantDriver(null);
           setLegitimacyValue(undefined);
           setLegitimacyFloor(null);
           setLegitimacyDirection(null);
@@ -714,6 +754,7 @@ export function ScenarioInstrumentCluster({
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
               fiscal_multiplier: params.fiscal_multiplier,
+              legitimacy_index: params.legitimacy_index ?? null,
               branch_from_step: params.branch_from_step,
             }),
           },
@@ -741,6 +782,7 @@ export function ScenarioInstrumentCluster({
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
               fiscal_multiplier: params.fiscal_multiplier,
+              legitimacy_index: params.legitimacy_index ?? null,
               from_step: params.branch_from_step,
             }),
           },
@@ -797,9 +839,59 @@ export function ScenarioInstrumentCluster({
     }
   };
 
+  // ADR-019 D-1: "Enter Active Control" handler — transitions column 3 from Mode2ColumnSurface
+  // to ControlPlaneColumn without requiring a parent prop change.
+  const handleEnterActiveControl = () => {
+    setInternalMode3Active(true);
+  };
+
+  // ADR-019 D-5: inject-shock handler — calls the inject-shock endpoint and updates trajectory.
+  const handleInjectShock = async (request: ShockInjectRequest) => {
+    try {
+      const res = await fetch(
+        `${API_BASE}/scenarios/${encodeURIComponent(scenarioId)}/inject-shock`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(request),
+        },
+      );
+      if (res.ok) {
+        const raw = (await res.json()) as RawTrajectoryResponse;
+        if (raw.steps) {
+          useScenarioStepStore.setState({ trajectory: parseTrajectoryResponse(raw) });
+        }
+      }
+    } catch {
+      // Non-fatal — trajectory remains in previous state
+    }
+  };
+
   const { recomputeStatus, branchFromStep, branchStepsComputed, step_count, mode } = store;
   const totalBranchSteps = branchFromStep != null ? step_count - branchFromStep : 0;
   const isRecomputing = recomputeStatus === "computing" || recomputeStatus === "pending";
+
+  // ADR-019 D-1: controlPlane slot — routed by mode.
+  // Mode 1: undefined → ghost text in InstrumentCluster
+  // Mode 2: Mode2ColumnSurface with scenario identity + "Enter Active Control"
+  // Mode 3: ControlPlaneColumn with Form 1 + Form 2
+  const controlPlaneSlot =
+    mode === "MODE_3" ? (
+      <ControlPlaneColumn
+        onApplyChange={handleApplyControlChange}
+        onInjectShock={handleInjectShock}
+        currentStep={currentStep}
+      />
+    ) : mode === "MODE_2" ? (
+      <Mode2ColumnSurface
+        scenarioName={activeScenarioDetail?.name ?? ""}
+        entityName={entityIds?.[0] ?? ""}
+        calibrationVintage={activeScenarioDetail?.configuration?.start_date ?? ""}
+        startStep={1}
+        endStep={stepCount}
+        onEnterActiveControl={handleEnterActiveControl}
+      />
+    ) : undefined;
 
   return (
     <div>
@@ -935,13 +1027,24 @@ export function ScenarioInstrumentCluster({
         entityTrajectories={entityTrajectories}
         entityBaselineTrajectories={entityBaselineTrajectories}
         comparisonScenarios={loadedComparisonScenarios.length > 0 ? loadedComparisonScenarios : undefined}
+        controlPlane={controlPlaneSlot}
         mdaPanel={
           <MDAAlertPanelZone1B
             columnWidth={coPrimaryWidth}
             comparisonScenarios={loadedComparisonScenarios}
           />
         }
-        zone1bCohortSection={<CohortImpactSection isCompleted={activeScenarioDetail?.status === "completed"} />}
+        zone1bCohortSection={
+          <CohortImpactSection
+            isCompleted={activeScenarioDetail?.status === "completed"}
+            monitoredFocalCohorts={activeScenarioDetail?.configuration?.monitored_focal_cohorts}
+          />
+        }
+        distributionalSummarySlot={
+          store.distributionalSummary && store.distributionalSummary.pairs.length > 0
+            ? <DistributionalComparisonSummary summary={store.distributionalSummary} />
+            : undefined
+        }
         pmmWidget={<PMMWidgetZone1C />}
         fourFramework={
           <FourFrameworkZone1D
@@ -958,6 +1061,7 @@ export function ScenarioInstrumentCluster({
             eliteCaptureDirection={eliteCaptureDirection}
             eliteCaptureQualifier={eliteCaptureQualifier}
             comparisonScenarios={loadedComparisonScenarios}
+            pspDominantDriver={pspDominantDriver}
           />
         }
         cohortPanel={
@@ -980,13 +1084,6 @@ export function ScenarioInstrumentCluster({
         />
       )}
 
-      {/* ControlPlane — rendered in Mode 3 only (G6b, Issue #753). */}
-      {mode === "MODE_3" && (
-        <ControlPlane
-          onApplyChange={handleApplyControlChange}
-          currentStep={currentStep}
-        />
-      )}
     </div>
   );
 }

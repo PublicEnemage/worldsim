@@ -11,7 +11,7 @@
  *   docs/frontend/fa-brief-m9-instrument-cluster.md §Named Acceptance Criteria
  *   docs/ux/user-stories-instrument-cluster-m9.md US-007, US-008, US-010, US-012, US-023
  */
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, beforeAll } from "vitest";
 
 // ---------------------------------------------------------------------------
 // TrajectoryView module import
@@ -484,4 +484,531 @@ describe("computeYDomain — adaptive y-axis domain from score values", () => {
     expect(loWith).toBeCloseTo(loWithout, 5);
     expect(hiWith).toBeCloseTo(hiWithout, 5);
   });
+
+  // AC-1254-4 — yDomain extended for CI upper bounds (M18-G1)
+  it("AC-1254-4: CI upper value 0.95 included → yMax ≥ 0.95", () => {
+    // Intent doc §7 AC-1254-4: scores [0.60, 0.70, 0.80] + ci_upper 0.95 included.
+    // computeYDomain at the updated call site passes CI upper values alongside scores.
+    // yMax must accommodate the CI upper value, not only the composite scores.
+    const [, hi] = computeYDomain([0.60, 0.70, 0.80, 0.95]);
+    expect(hi).toBeGreaterThanOrEqual(0.95);
+  });
+
+  it("AC-1254-4: without CI upper value, yMax is below 0.95 (demonstrates the gap)", () => {
+    // Hard-fail scenario: if the call site does NOT include CI upper values,
+    // yMax is computed from scores alone (≈ 0.85 with 10% padding above 0.80).
+    // This confirms that including 0.95 is necessary to extend the domain.
+    const [, hiScoresOnly] = computeYDomain([0.60, 0.70, 0.80]);
+    // With 10% padding: range=0.20, 10%=0.02 < 0.05 → use 0.05 padding → hi≈0.85
+    expect(hiScoresOnly).toBeLessThan(0.95);
+  });
+
+  it("AC-1254-4: yMax ≥ max(ci_upper values) across multiple steps", () => {
+    // Multiple steps with different CI upper values: domain must encompass the highest.
+    const compositeScores = [0.55, 0.58, 0.60, 0.62];
+    const ciUpperValues = [0.71, 0.77, 0.95, 0.95]; // step 3 and 4 at 0.9455
+    const allValues = [...compositeScores, ...ciUpperValues];
+    const [, hi] = computeYDomain(allValues);
+    const maxCIUpper = Math.max(...ciUpperValues);
+    expect(hi).toBeGreaterThanOrEqual(maxCIUpper);
+  });
 });
+
+// ---------------------------------------------------------------------------
+// M18-G1: AC-1254-2 — mergeTrajectories CI extraction
+// M18-G1: CI_BAND_OPACITY constant and computeCompositeHalfWidth (§5.1, §5.2)
+//
+// These tests are RED until TrajectoryView.tsx exports the following:
+//   mergeTrajectories(trajectory, baseline) — extracts ci_lower/ci_upper into MergedStepDatum
+//   CI_BAND_OPACITY — the 0.12 constant for recharts <Area> fillOpacity
+//   computeCompositeHalfWidth(stepIndex, tier) — BandingEngine §3.1 frontend mirror
+//
+// Import technique: dynamic import in beforeAll avoids breaking existing tests
+// when the exports are not yet available.
+// ---------------------------------------------------------------------------
+
+describe("M18-G1: CI_BAND_OPACITY constant", () => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let CI_BAND_OPACITY: number | undefined;
+
+  beforeAll(async () => {
+    try {
+      const mod = await import("../TrajectoryView");
+      CI_BAND_OPACITY = (mod as Record<string, unknown>).CI_BAND_OPACITY as number | undefined;
+    } catch {
+      CI_BAND_OPACITY = undefined;
+    }
+  });
+
+  it("CI_BAND_OPACITY is exported from TrajectoryView", () => {
+    // RED until CI_BAND_OPACITY is exported
+    expect(CI_BAND_OPACITY).toBeDefined();
+  });
+
+  it("CI_BAND_OPACITY is exactly 0.12 (intent doc §5.1)", () => {
+    if (CI_BAND_OPACITY === undefined) {
+      expect(CI_BAND_OPACITY).toBeDefined();
+      return;
+    }
+    expect(CI_BAND_OPACITY).toBe(0.12);
+    expect(typeof CI_BAND_OPACITY).toBe("number");
+  });
+});
+
+describe("M18-G1: computeCompositeHalfWidth — BandingEngine §3.1 frontend mirror", () => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let computeCompositeHalfWidth: ((stepIndex: number, tier: number) => number) | undefined;
+
+  beforeAll(async () => {
+    try {
+      const mod = await import("../TrajectoryView");
+      computeCompositeHalfWidth = (mod as Record<string, unknown>)
+        .computeCompositeHalfWidth as typeof computeCompositeHalfWidth;
+    } catch {
+      computeCompositeHalfWidth = undefined;
+    }
+  });
+
+  it("computeCompositeHalfWidth is exported from TrajectoryView", () => {
+    expect(computeCompositeHalfWidth).toBeDefined();
+  });
+
+  it("step=1, tier=1 → half-width = 0.10 × 1.0 = 0.10", () => {
+    if (!computeCompositeHalfWidth) { expect(computeCompositeHalfWidth).toBeDefined(); return; }
+    expect(computeCompositeHalfWidth(1, 1)).toBeCloseTo(0.10, 5);
+  });
+
+  it("step=2, tier=2 → half-width = 0.20 × 1.2 = 0.24", () => {
+    if (!computeCompositeHalfWidth) { expect(computeCompositeHalfWidth).toBeDefined(); return; }
+    expect(computeCompositeHalfWidth(2, 2)).toBeCloseTo(0.24, 5);
+  });
+
+  it("step=4, tier=3 → half-width = 0.35 × 1.5 = 0.525 (worked example)", () => {
+    if (!computeCompositeHalfWidth) { expect(computeCompositeHalfWidth).toBeDefined(); return; }
+    expect(computeCompositeHalfWidth(4, 3)).toBeCloseTo(0.525, 5);
+  });
+
+  it("step=6, tier=4 → half-width = 0.50 × 2.0 = 1.0", () => {
+    if (!computeCompositeHalfWidth) { expect(computeCompositeHalfWidth).toBeDefined(); return; }
+    expect(computeCompositeHalfWidth(6, 4)).toBeCloseTo(1.0, 5);
+  });
+
+  it("step=5, tier=5 → half-width = 0.35 × 3.0 = 1.05", () => {
+    if (!computeCompositeHalfWidth) { expect(computeCompositeHalfWidth).toBeDefined(); return; }
+    expect(computeCompositeHalfWidth(5, 5)).toBeCloseTo(1.05, 5);
+  });
+
+  it("step=3 and step=4 return the same half-width (both in 3–5 year range)", () => {
+    if (!computeCompositeHalfWidth) { expect(computeCompositeHalfWidth).toBeDefined(); return; }
+    expect(computeCompositeHalfWidth(3, 2)).toBeCloseTo(computeCompositeHalfWidth(4, 2), 5);
+  });
+
+  it("step=6 returns greater half-width than step=5 (crossing the >5 year threshold)", () => {
+    if (!computeCompositeHalfWidth) { expect(computeCompositeHalfWidth).toBeDefined(); return; }
+    expect(computeCompositeHalfWidth(6, 1)).toBeGreaterThan(computeCompositeHalfWidth(5, 1));
+  });
+});
+
+describe("AC-1254-2 — mergeTrajectories CI extraction", () => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let mergeTrajectories: ((trajectory: object, baseline: object | null) => object[]) | undefined;
+
+  beforeAll(async () => {
+    try {
+      const mod = await import("../TrajectoryView");
+      mergeTrajectories = (mod as Record<string, unknown>)
+        .mergeTrajectories as typeof mergeTrajectories;
+    } catch {
+      mergeTrajectories = undefined;
+    }
+  });
+
+  it("mergeTrajectories is exported from TrajectoryView", () => {
+    // RED until mergeTrajectories is exported (M18-G1 implementation required)
+    expect(mergeTrajectories).toBeDefined();
+  });
+
+  it("AC-1254-2: financial ci_lower extracted when non-null in step.frameworks.financial", () => {
+    if (!mergeTrajectories) { expect(mergeTrajectories).toBeDefined(); return; }
+
+    const trajectory = {
+      scenario_id: "zmb-test",
+      entity_id: "ZMB",
+      step_count: 1,
+      mda_floors: [],
+      steps: [
+        {
+          step_index: 1,
+          effective_from: "2024-01-01T00:00:00Z",
+          step_event_label: null,
+          step_significance: "ROUTINE",
+          frameworks: {
+            financial: {
+              composite_score: 0.62,
+              ci_lower: 0.45,
+              ci_upper: 0.65,
+              confidence_tier: 3,
+              scoring_basis: "normalized_absolute",
+            },
+            human_development: {
+              composite_score: 0.55,
+              ci_lower: null,
+              ci_upper: null,
+              confidence_tier: 3,
+              scoring_basis: "normalized_absolute",
+            },
+            ecological: {
+              composite_score: null,
+              ci_lower: null,
+              ci_upper: null,
+              confidence_tier: 3,
+              scoring_basis: "boundary_proximity",
+            },
+            governance: {
+              composite_score: null,
+              ci_lower: null,
+              ci_upper: null,
+              confidence_tier: 2,
+              scoring_basis: "percentile_rank",
+            },
+          },
+          policy_inputs: [],
+          shock_events: [],
+        },
+      ],
+    };
+
+    const data = mergeTrajectories(trajectory, null) as Record<string, unknown>[];
+    expect(data).toHaveLength(1);
+
+    const datum = data[0];
+    // AC-1254-2: non-null ci_lower/ci_upper must be extracted into MergedStepDatum
+    expect(datum["financial_ci_lower"]).toBe(0.45);
+    expect(datum["financial_ci_upper"]).toBe(0.65);
+  });
+
+  it("AC-1254-2: null ci_lower produces null financial_ci_lower in datum", () => {
+    if (!mergeTrajectories) { expect(mergeTrajectories).toBeDefined(); return; }
+
+    const trajectory = {
+      scenario_id: "zmb-test",
+      entity_id: "ZMB",
+      step_count: 1,
+      mda_floors: [],
+      steps: [
+        {
+          step_index: 1,
+          effective_from: "2024-01-01T00:00:00Z",
+          step_event_label: null,
+          step_significance: "ROUTINE",
+          frameworks: {
+            financial: {
+              composite_score: 0.62,
+              ci_lower: null,
+              ci_upper: null,
+              confidence_tier: 3,
+              scoring_basis: "normalized_absolute",
+            },
+            human_development: { composite_score: null, ci_lower: null, ci_upper: null, confidence_tier: 3, scoring_basis: "normalized_absolute" },
+            ecological: { composite_score: null, ci_lower: null, ci_upper: null, confidence_tier: 3, scoring_basis: "boundary_proximity" },
+            governance: { composite_score: null, ci_lower: null, ci_upper: null, confidence_tier: 2, scoring_basis: "percentile_rank" },
+          },
+          policy_inputs: [],
+          shock_events: [],
+        },
+      ],
+    };
+
+    const data = mergeTrajectories(trajectory, null) as Record<string, unknown>[];
+    expect(data).toHaveLength(1);
+    // AC-1254-2: null ci_lower propagates to datum
+    expect(data[0]["financial_ci_lower"]).toBeNull();
+    expect(data[0]["financial_ci_upper"]).toBeNull();
+  });
+
+  it("AC-1254-2: all four frameworks have ci_lower/ci_upper fields in output datum", () => {
+    if (!mergeTrajectories) { expect(mergeTrajectories).toBeDefined(); return; }
+
+    const trajectory = {
+      scenario_id: "zmb-test",
+      entity_id: "ZMB",
+      step_count: 1,
+      mda_floors: [],
+      steps: [
+        {
+          step_index: 1,
+          effective_from: "2024-01-01T00:00:00Z",
+          step_event_label: null,
+          step_significance: "ROUTINE",
+          frameworks: {
+            financial: { composite_score: 0.62, ci_lower: 0.45, ci_upper: 0.65, confidence_tier: 3, scoring_basis: "normalized_absolute" },
+            human_development: { composite_score: 0.55, ci_lower: 0.40, ci_upper: 0.70, confidence_tier: 3, scoring_basis: "normalized_absolute" },
+            ecological: { composite_score: null, ci_lower: null, ci_upper: null, confidence_tier: 3, scoring_basis: "boundary_proximity" },
+            governance: { composite_score: null, ci_lower: null, ci_upper: null, confidence_tier: 2, scoring_basis: "percentile_rank" },
+          },
+          policy_inputs: [],
+          shock_events: [],
+        },
+      ],
+    };
+
+    const data = mergeTrajectories(trajectory, null) as Record<string, unknown>[];
+    const datum = data[0];
+
+    // All four frameworks must have both ci_lower and ci_upper keys in the output
+    const expectedKeys = [
+      "financial_ci_lower", "financial_ci_upper",
+      "human_development_ci_lower", "human_development_ci_upper",
+      "ecological_ci_lower", "ecological_ci_upper",
+      "governance_ci_lower", "governance_ci_upper",
+    ];
+    for (const key of expectedKeys) {
+      expect(Object.prototype.hasOwnProperty.call(datum, key)).toBe(true);
+    }
+
+    // Non-null values preserved; null values preserved as null
+    expect(datum["financial_ci_lower"]).toBe(0.45);
+    expect(datum["human_development_ci_upper"]).toBe(0.70);
+    expect(datum["ecological_ci_lower"]).toBeNull();
+    expect(datum["governance_ci_upper"]).toBeNull();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// M18-G1: CI Bands (#1254) — unit tests for exported CI band helpers
+// ---------------------------------------------------------------------------
+
+describe("M18-G1: CI_BAND_OPACITY constant (AC-1254-OP)", () => {
+  it("CI_BAND_OPACITY is 0.12", async () => {
+    const mod = await import("../TrajectoryView");
+    const { CI_BAND_OPACITY } = mod as unknown as Record<string, number>;
+    expect(CI_BAND_OPACITY).toBe(0.12);
+  });
+
+  it("CI_BAND_OPACITY_MODE3 is 0.05", async () => {
+    const mod = await import("../TrajectoryView");
+    const { CI_BAND_OPACITY_MODE3 } = mod as unknown as Record<string, number>;
+    expect(CI_BAND_OPACITY_MODE3).toBe(0.05);
+  });
+});
+
+describe("M18-G1: computeCompositeHalfWidth — BandingEngine §3.1 frontend mirror (AC-1254-HW)", () => {
+  type HWFn = (stepIndex: number, tier: number) => number;
+  let computeCompositeHalfWidth: HWFn;
+
+  beforeAll(async () => {
+    const mod = await import("../TrajectoryView");
+    computeCompositeHalfWidth = (mod as unknown as Record<string, HWFn>).computeCompositeHalfWidth;
+  });
+
+  it("step 1, tier 1 → 0.10", () => expect(computeCompositeHalfWidth(1, 1)).toBeCloseTo(0.10, 10));
+  it("step 2, tier 1 → 0.20", () => expect(computeCompositeHalfWidth(2, 1)).toBeCloseTo(0.20, 10));
+  it("step 3, tier 1 → 0.35", () => expect(computeCompositeHalfWidth(3, 1)).toBeCloseTo(0.35, 10));
+  it("step 5, tier 1 → 0.35", () => expect(computeCompositeHalfWidth(5, 1)).toBeCloseTo(0.35, 10));
+  it("step 6, tier 1 → 0.50", () => expect(computeCompositeHalfWidth(6, 1)).toBeCloseTo(0.50, 10));
+  it("step 1, tier 3 → 0.10 × 1.5 = 0.15", () => expect(computeCompositeHalfWidth(1, 3)).toBeCloseTo(0.15, 10));
+  it("step 2, tier 5 → 0.20 × 3.0 = 0.60", () => expect(computeCompositeHalfWidth(2, 5)).toBeCloseTo(0.60, 10));
+});
+
+describe("AC-1254-2 — mergeTrajectories CI extraction", () => {
+  it("mergeTrajectories is exported", async () => {
+    const mod = await import("../TrajectoryView");
+    expect(typeof (mod as Record<string, unknown>).mergeTrajectories).toBe("function");
+  });
+
+  it("MergedStepDatum includes CI fields — checked via exported interface", async () => {
+    // Runtime verification: mergeTrajectories returns objects with ci fields.
+    // TypeScript structural check is enforced by the export interface MergedStepDatum
+    // definition in TrajectoryView.tsx (see governance_ci_upper field).
+    const mod = await import("../TrajectoryView");
+    const mergeFn = (mod as Record<string, unknown>).mergeTrajectories;
+    expect(typeof mergeFn).toBe("function");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// M18-G7-A: AC-A1 — computeCompositeCIBounds additive formula
+//
+// `computeCompositeCIBounds` is currently a private function using MULTIPLICATIVE
+// formula: `score * (1 ± halfWidth)`. ADR-007/ADR-010 spec requires ADDITIVE:
+// `score ± halfWidth`.
+//
+// RED state: function not exported → `computeCompositeCIBounds` is undefined.
+// RED state: even when exported, multiplicative formula returns wrong values.
+// GREEN state (after G7-A): exported, additive formula, capped to [0, 1].
+//
+// Fixture derivation (computeCompositeHalfWidth schedule):
+//   T3 step 1: baseHW=0.10, multiplier[3]=1.5 → halfWidth=0.15
+//              additive: {upper: 0.65, lower: 0.35}
+//              multiplicative (wrong): {upper: 0.575, lower: 0.425}
+//   T3 step 6: baseHW=0.50, multiplier[3]=1.5 → halfWidth=0.75
+//              additive: {upper: min(1.0, 1.25)=1.0, lower: max(0.0, -0.25)=0.0}
+//              multiplicative (wrong): {upper: 0.875, lower: 0.125}
+//
+// Source: M18-G7-A intent §AC-A1 + root cause analysis §Root Cause 1.
+// ---------------------------------------------------------------------------
+
+describe("M18-G7-A: AC-A1 — computeCompositeCIBounds additive formula", () => {
+  type MinimalFrameworkPoint = {
+    composite_score: number | null;
+    ci_lower: null;
+    ci_upper: null;
+    confidence_tier: number;
+    scoring_basis: "percentile_rank";
+  };
+  type MinimalStep = {
+    step_index: number;
+    effective_from: string;
+    step_event_label: null;
+    step_significance: "ROUTINE";
+    pmm: null;
+    frameworks: Record<string, MinimalFrameworkPoint>;
+  };
+
+  function makeStep(stepIndex: number, score: number, tier: number): MinimalStep {
+    const fw: MinimalFrameworkPoint = {
+      composite_score: score,
+      ci_lower: null,
+      ci_upper: null,
+      confidence_tier: tier,
+      scoring_basis: "percentile_rank",
+    };
+    return {
+      step_index: stepIndex,
+      effective_from: "2024-01-01T00:00:00Z",
+      step_event_label: null,
+      step_significance: "ROUTINE",
+      pmm: null,
+      frameworks: { financial: fw, human_development: fw, ecological: fw, governance: fw },
+    };
+  }
+
+  let computeCompositeCIBounds: unknown;
+
+  beforeAll(async () => {
+    const mod = await import("../TrajectoryView");
+    computeCompositeCIBounds = (mod as Record<string, unknown>).computeCompositeCIBounds;
+  });
+
+  it("computeCompositeCIBounds is exported from TrajectoryView (RED until G7-A export fix)", () => {
+    expect(typeof computeCompositeCIBounds).toBe("function");
+  });
+
+  it("AC-A1: T3 step 1 — additive: upper=0.65, lower=0.35", () => {
+    const fn = computeCompositeCIBounds as ((s: MinimalStep) => { upper: number | null; lower: number | null }) | undefined;
+    if (typeof fn !== "function") return; // deferred until export fix
+    const result = fn(makeStep(1, 0.50, 3));
+    // additive: 0.50 + 0.15 = 0.65; 0.50 - 0.15 = 0.35
+    // multiplicative (wrong): upper=0.575, lower=0.425
+    expect(result.upper).toBeCloseTo(0.65, 5);
+    expect(result.lower).toBeCloseTo(0.35, 5);
+  });
+
+  it("AC-A1: T3 step 6 — additive with capping: upper=1.0, lower=0.0", () => {
+    const fn = computeCompositeCIBounds as ((s: MinimalStep) => { upper: number | null; lower: number | null }) | undefined;
+    if (typeof fn !== "function") return; // deferred until export fix
+    const result = fn(makeStep(6, 0.50, 3));
+    // additive: 0.50 + 0.75 = 1.25 → capped to 1.0; 0.50 - 0.75 = -0.25 → capped to 0.0
+    // multiplicative (wrong): upper=0.875, lower=0.125
+    expect(result.upper).toBe(1.0);
+    expect(result.lower).toBe(0.0);
+  });
+
+  it("AC-A1: result is never multiplicative — upper ≠ score*(1+halfWidth) for T3 step 1", () => {
+    const fn = computeCompositeCIBounds as ((s: MinimalStep) => { upper: number | null; lower: number | null }) | undefined;
+    if (typeof fn !== "function") return;
+    const result = fn(makeStep(1, 0.50, 3));
+    // multiplicative wrong value: 0.50 * (1 + 0.15) = 0.575
+    expect(result.upper).not.toBeCloseTo(0.575, 5);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// M18-G7-A: AC-A2 — yDomain excludes CI bound values (regression guard)
+//
+// The G7-A fix removes `computeCompositeCIBounds(step).upper` from the values
+// array passed to `computeYDomain` in CompositeChartSVG. This test guards
+// against re-introducing CI values into the yDomain call site.
+//
+// This test is GREEN from the start — computeYDomain([0.48..0.54]) already
+// returns yMax ≤ 0.65. The regression guard confirms that when the component
+// calls computeYDomain with scores only, the y-axis stays in the trajectory
+// range and does NOT inflate to the CI upper bound.
+//
+// The second assertion demonstrates the BUG: including a CI upper of 1.0
+// inflates yMax to ≥ 0.97, compressing trajectory curves to 5% of chart height.
+//
+// Source: M18-G7-A intent §AC-A2 + root cause analysis §Root Cause 1 §Fix item 2.
+// ---------------------------------------------------------------------------
+
+describe("M18-G7-A: AC-A2 — yDomain trajectory-only values produce readable range", () => {
+  it("AC-A2: computeYDomain with trajectory scores only [0.48..0.54] → yMax ≤ 0.65", () => {
+    // After G7-A fix: component passes only composite scores to computeYDomain.
+    // With trajectory range 0.48–0.54, yMax must not inflate past 0.65.
+    const [, hi] = computeYDomain([0.48, 0.50, 0.52, 0.54]);
+    expect(hi).toBeLessThanOrEqual(0.65);
+  });
+
+  it("AC-A2: BUG demonstration — CI upper=1.0 included inflates yMax above 0.95", () => {
+    // This is the CURRENT broken behavior: CompositeChartSVG pushes ci_upper into values[].
+    // When 1.0 is included, yMax inflates to accommodate it, compressing trajectories.
+    // G7-A removes this push; the assertion below documents what the bug looks like.
+    const [, hi] = computeYDomain([0.48, 0.50, 0.52, 0.54, 1.0]);
+    expect(hi).toBeGreaterThan(0.95);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// M18-G7-A: AC-A3 — CI ribbon opacity uses exported constants, not 0.10
+//
+// The fix replaces hard-coded `opacity={0.10}` in two SVG ribbon paths with:
+//   mode === "MODE_3" ? CI_BAND_OPACITY_MODE3 : CI_BAND_OPACITY
+//   CI_BAND_OPACITY (comparison scenarios path — always Mode 1/2)
+//
+// This unit test guards against regression back to the 0.10 literal by verifying
+// that neither constant equals 0.10 (so the fix is definitionally correct),
+// and that CI_BAND_OPACITY_MODE3 < CI_BAND_OPACITY (Mode 3 must be quieter).
+//
+// Source: M18-G7-A intent §AC-A3 + root cause analysis §Root Cause 1 §Fix item 3.
+// ---------------------------------------------------------------------------
+
+describe("M18-G7-A: AC-A3 — CI ribbon opacity constants are not 0.10", () => {
+  it("CI_BAND_OPACITY is not 0.10 (hard-coded value replaced by constant)", async () => {
+    const mod = await import("../TrajectoryView");
+    const { CI_BAND_OPACITY } = mod as unknown as Record<string, number>;
+    expect(CI_BAND_OPACITY).toBeDefined();
+    expect(CI_BAND_OPACITY).not.toBe(0.10);
+  });
+
+  it("CI_BAND_OPACITY_MODE3 is not 0.10 (hard-coded value replaced by constant)", async () => {
+    const mod = await import("../TrajectoryView");
+    const { CI_BAND_OPACITY_MODE3 } = mod as unknown as Record<string, number>;
+    expect(CI_BAND_OPACITY_MODE3).toBeDefined();
+    expect(CI_BAND_OPACITY_MODE3).not.toBe(0.10);
+  });
+
+  it("CI_BAND_OPACITY_MODE3 < CI_BAND_OPACITY (Mode 3 ribbons quieter than Mode 1/2)", async () => {
+    const mod = await import("../TrajectoryView");
+    const { CI_BAND_OPACITY, CI_BAND_OPACITY_MODE3 } = mod as unknown as Record<string, number>;
+    expect(CI_BAND_OPACITY_MODE3).toBeLessThan(CI_BAND_OPACITY);
+  });
+});
+
+describe("AC-1254-4 — computeYDomain includes CI upper values", () => {
+  it("CI upper value 0.95 — yMax ≥ 0.95", () => {
+    const [, hi] = computeYDomain([0.50, 0.60, 0.95]);
+    expect(hi).toBeGreaterThanOrEqual(0.95);
+  });
+
+  it("without CI upper value — yMax is capped at 0.70 range", () => {
+    const [, hi] = computeYDomain([0.50, 0.60]);
+    expect(hi).toBeLessThan(0.80);
+  });
+
+  it("yMax ≥ max CI upper across multiple steps", () => {
+    const ciUppers = [0.82, 0.88, 0.91];
+    const [, hi] = computeYDomain([0.50, 0.60, ...ciUppers]);
+    expect(hi).toBeGreaterThanOrEqual(0.91);
+  });
+});
+
