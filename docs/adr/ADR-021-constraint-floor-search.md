@@ -512,11 +512,69 @@ block cannot proceed to acceptance vote and cannot be given `Accepted` status. A
 fields below are required — a checkbox without the structured attestation is non-compliant.
 
 **Reviewing agent:** UX Designer Agent
-**Session context:** *[PENDING — EL-triggered separate session required per NM-042]*
-**Governing documents reviewed:** *[PENDING — must name specific sections of `information-hierarchy.md`, `north-star.md §Primary Cognitive Tasks`, `user-journeys.md §Journey A Step 6`, `user-journeys.md §Journey C`]*
-**Concerns found:** *[PENDING]*
+**Session context:** Separate session, EL-triggered 2026-07-02
+**Governing documents reviewed:**
+- `docs/ux/north-star.md §Primary Cognitive Tasks by Mode` — confirmed Mode 3 task
+  definition ("real-time steering within human cost constraints") and Mode 1 absence
+  claim for Form 3; confirmed Mode 2 task definition for UX-2 assessment
+- `docs/ux/north-star.md §Canonical User` — confirmed Preparatory and Reactive entry
+  state characterizations against the canonical user description
+- `docs/ux/information-hierarchy.md §Control Plane Reserved Zone` — confirmed Mode 1
+  empty-column specification, Mode 2 two-component architecture, Mode 3 two-form layout
+  and simultaneous visibility requirement; verified ADR-021 does not displace Forms 1/2
+  headers
+- `docs/ux/information-hierarchy.md §CVD Color Specification` — identified Concern 1
+  (MV-001 three-way CVD gate not extended to teal)
+- `docs/ux/information-hierarchy.md §Simultaneous Visibility Requirement` — performed
+  three-form height accounting; identified Concern 2 (tablet viewport column overflow)
+- `docs/ux/information-hierarchy.md §The Three Disclosure Zones` — confirmed Zone 1/2/3
+  criteria and scroll definitions; confirmed column-internal scroll precedent from
+  history list specification
+- `docs/ux/information-hierarchy.md §Zone 1A — Confidence Display` — confirmed Tier 3
+  display treatment consistent with UX-5 "synthetic" word requirement
+- `docs/ux/user-journeys.md §Journey A Step 6` — identified Concern 3 (Step 6 not
+  documented as constraint-search workflow; Near-Term-Gap annotation absent)
+- `docs/ux/user-journeys.md §Journey C Steps 1–4` — confirmed Mode 3 entry sequence
+  and ADR-019 acceptance criteria context for Form 3 complement claim in UX-7
+- `docs/ux/user-journeys.md §Journey B Step 5` — confirmed Reactive stretch use case
+  characterization and 90-second ceiling for UX-3
+- `docs/ux/user-journeys.md §Journey Dependency Map` — confirmed Step 6 governing
+  dependency is EL Decision 3 (COMPARE_VIEW), not constraint search
+- `docs/adr/ADR-019-control-plane-column.md §D-3` — confirmed simultaneous visibility
+  requirement for Forms 1 and 2 and verified Form 3 does not displace these headers
+- `docs/adr/ADR-019-control-plane-column.md §UX Implication Statement UX-1` — confirmed
+  zone assignment consistency; no conflict with ADR-021 placement in gridColumn: 3
+**Concerns found:** 3 — see Pre-Implementation and Pre-Ship conditions below
 
-`[ ]` UX Designer sign-off. [Date: PENDING]
+`[x]` UX Designer sign-off. 2026-07-02
+
+**Pre-Implementation conditions (before any G1 implementation PR is opened):**
+
+- **[Concern 3 — UX-7]** `user-journeys.md §Journey A Step 6` must be updated to
+  document the Mode 2 → Mode 3 → Form 3 → Mode 2 boundary-establishment sub-workflow,
+  with the clarification that the "reset active branch" caution does not apply when no
+  Form 1 or Form 2 inputs have been applied in the Mode 3 session. The Journey
+  Dependency Map must be updated to add the ADR-021 dependency for Step 6
+  boundary-establishment. This grounds the UX-7 "closes Journey A Step 6" claim in
+  the governing document and must be committed before the G1 feature branch opens.
+
+**Pre-Ship conditions (before any G1 PR merges to the sprint branch):**
+
+- **[Concern 1 — UX-1]** MV-001 CVD validation must be extended to validate all three
+  control plane colors — blue `#0284c7`, orange `#ea580c`, and teal `#0d9488` — under
+  deuteranopia and protanopia simulation. Blue-vs-teal distinguishability under
+  deuteranopia must be confirmed with a simulation tool (Sim Daltonism, Coblis, or
+  equivalent). If not empirically distinguishable, a teal value with greater luminance
+  separation from blue must be selected and the ADR updated. The validation result must
+  be documented in the G1 sprint PR description. This is a hard gate per
+  `information-hierarchy.md §CVD Color Specification`.
+
+- **[Concern 2 — UX-1]** A new CI assertion (`AC-016`) must be added confirming that
+  the Form 3 section header (`data-testid="constraint-search-section"`) is visible
+  within the 280px column at 1280×800 with Forms 1 and 2 in minimum state (no history
+  entries). At 1024×768, the assertion must verify Form 3 is reachable within one
+  column-internal scroll from column top. This assertion must be in the same PR as the
+  Form 3 implementation — not filed as a follow-up.
 
 ---
 
