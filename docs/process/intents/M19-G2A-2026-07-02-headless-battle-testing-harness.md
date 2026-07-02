@@ -364,3 +364,70 @@ before committing the test file.*
 *Intent document version: 2026-07-02. No ADR prerequisite — see sprint entry §4 for reasoning.
 Sprint entry: `docs/process/sprint-plans/m19-g2a-sprint-entry.md`.
 See `docs/process/agent-execution-lifecycle.md` for the five-step lifecycle this document gates.*
+
+---
+
+## Business PO Acceptance Record
+
+**Work type:** Analytics (§1.4 — `docs/process/acceptance-protocol.md`)
+**Activation:** `PO: ACCEPT — docs/process/intents/M19-G2A-2026-07-02-headless-battle-testing-harness.md`
+**Date:** 2026-07-02
+
+### Customer Agent Layer 3 precondition
+
+Filed before this verdict per acceptance-protocol.md §1.4:
+`docs/customer/ca-g2a-2026-07-02-harness-layer3-audit.md` — verdict: **PASS**
+Scope boundary recorded: harness output is Persona 2 (Ministry Analyst) readable; Persona 5 presentation requires analyst mediation layer.
+
+### Analytics checklist (§1.4)
+
+**Checklist item 1 — Analytical output present and matches Section 3:**
+
+- `HarnessResult` dataclass with `run_metadata`, `per_step_records`, `summary` → present and tested (PR #1568, CI green)
+- Type A summary fields: `fidelity_tier`, `fidelity_rationale`, `known_limitations` → present (AC-6, AC-8 through AC-10 pass)
+- Type B summary fields: `direction_verdict`, `step_differential_first_significant`, `per_step_diff` → present (AC-7 passes)
+- Four format outputs ASCII/CSV/JSON/Markdown → present (AC-2 through AC-5 pass)
+- Silent failure guards: SF-1 (step count == N), SF-2 (known_limitations non-empty with capital controls), SF-4 (5xx mid-run error) → all present (AC-11 through AC-15 pass)
+- Greece 2010–12 regression: `fidelity_tier == DIRECTION_ONLY` → AC-6 passes
+
+`[x]` PASS
+
+**Checklist item 2 — Specific argument the named persona can now make:**
+
+Persona: Ministry Analyst (Persona 2 analytical preparation archetype, as named in §2 P-1)
+
+Argument: "The Greece 2010–12 austerity-shock backtesting run produces DIRECTION_ONLY fidelity on primary fiscal indicators. The model correctly identifies the direction of fiscal deterioration — the composite scores decline in the expected direction across the shock window. The two known limitations driving DIRECTION_ONLY rather than MAGNITUDE_MATCH are (1) stock-flow accounting is not enforced, making threshold-crossing step counts unreliable, and (2) bilateral trade and debt weights are frozen at initial values, making magnitude differentials potentially understate structural effects. We are presenting this to the creditor evaluation team as calibration evidence, not point-estimate evidence — and we can cite the specific limitations. Our CI bounds are calibrated to this fidelity tier, not assumed from a prior schedule."
+
+Prior limitation: Before G2A, the ministry team had no structured backtesting capability — simulation runs were one-off exercises with no fidelity tier classification, no structured `known_limitations` disclosure, and no citable output format for citing in a restructuring session or answering a creditor's challenge to the CI bounds.
+
+`[x]` PASS — argument is specific, citable, and names a prior limitation that no longer applies.
+
+**Checklist item 3 — Asymmetry test:**
+
+Can a ministry team with three economists use this argument at the table without specialist mediation the creditor side exclusively provides?
+
+Yes. The harness is a Python CLI tool. Any ministry analyst with Python access can run it. The fidelity tier, rationale, and known_limitations output are interpretable by a calibration-literate economist. The IMF and World Bank have proprietary backtesting infrastructure — this is the open-source equivalent that runs on free-tier CI hardware. The asymmetry this corrects is access to structured, citable backtesting evidence, not access to domain expertise that only the creditor side holds.
+
+`[x]` PASS
+
+**Checklist item 4 — Customer Agent Layer 3 AUDIT on record:**
+
+`[x]` Filed: `docs/customer/ca-g2a-2026-07-02-harness-layer3-audit.md` — PASS
+
+### Verdict
+
+> VALIDATED — 2026-07-02. Work type: Analytics. Fixture: Greece 2010–12 Type A
+> run (regression test AC-6 in `backend/tests/backtesting/test_m19_g2a_headless_harness.py`).
+> Field `fidelity_tier = DIRECTION_ONLY` in summary; `known_limitations` list non-empty
+> (Issue #30 and #35 present); `per_step_records` length == 6 (step-count guard).
+> DEMO4 class check: per-step composite scores progress directionally across the 6-step window
+> — values at step 6 differ from step 1 values in the expected direction.
+> Analytical intent: Ministry Analyst can now argue: "Greece 2010–12 backtesting produces
+> DIRECTION_ONLY fidelity with documented limitations; CI bounds are calibrated to this evidence,
+> not assumed from a prior schedule." Prior limitation: no structured backtesting output existed.
+> Asymmetry test: PASS — runs on free-tier hardware with open-source tooling.
+> Customer Agent Layer 3: PASS (`docs/customer/ca-g2a-2026-07-02-harness-layer3-audit.md`).
+> Scope boundary acknowledged: harness output is analyst-mediated; Demo 8 must not present raw
+> output to Persona 5 without analyst interpretation layer.
+> **Verdict: ACCEPT.**
+> — Business PO (2026-07-02)
