@@ -16,7 +16,7 @@
 | Field | Value |
 |---|---|
 | Milestone | M19 — Constraint Search and Empirical Calibration |
-| GitHub Milestone | #20 (to be created at M19 kickoff) |
+| GitHub Milestone | #21 — created 2026-07-02 |
 | Exit checklist issue | TBD (M19) |
 | Release branch | `release/m19` — to be cut at M19 kickoff |
 | Sprint plan | Pending — M19 kickoff requires EL sign-off on M18 exit |
