@@ -1,9 +1,9 @@
 # WorldSim Roadmap
 
-> Last significant revision: 2026-06-26
-> Next mandatory review: Milestone 18 close
-> Updated against: M17 close — Calibration and Comparative Infrastructure complete; Wave 1 CM calibration (fiscal-to-cohort elasticity, governance sensitivity) delivered; Wave 2 N=3 multi-scenario, DEMO6 CRITICAL polish, adaptive y-axis, Zone 1B proportional allocation (ADR-018), GovernanceModule institutional_capacity_index all delivered; M18 now current; Demo 7 at M18 close
-> Previous version context: 2026-06-25 — M16 closed; M17 active; #843 live demo deferred to M17/Demo 7
+> Last significant revision: 2026-07-02
+> Next mandatory review: Milestone 19 close
+> Updated against: M18 close — Full Argument and Demo 7 complete; CI bands (ADR-007), PSP driver decomposition, counter-scenario comparison, control plane column (ADR-019), Zone 3 auditability panel all delivered; Demo 7 simulated stakeholder session north star PASS (unconditional, 2026-07-02); M19 now current
+> Previous version context: 2026-06-26 — M17 closed; M18 active; Demo 7 at M18 close
 > Canonical location: `docs/roadmap/worldsim-roadmap.md`
 
 *Note: This document was not updated at M10, M11, M11.5, or M12 close — a gap against the "Roadmap Currency" policy. Updates at those closes are now reflected in the registry and narrative sections.*
@@ -37,19 +37,20 @@
 | M15 | Human Cost Architecture | ADR-017 Zone 1A, Layer 3 self-interpreting outputs, Path 1 approved source, cohort/political risk designs, accessibility validation | Complete |
 | M16 | Distributional Visibility | Zone 1A Phase 4; cohort disaggregation; political risk summary; 25-year trajectory; ecological-fiscal transmission; uncertainty quantification; Demo 6 prep (Steps 1–6c; DEMO6 findings on record) | Complete |
 | M17 | Calibration and Comparative Infrastructure | Wave 1: CM calibration (fiscal-to-cohort elasticity #1229, governance sensitivity #1248, FRAME-D gate); Wave 2: N=3 multi-scenario (#394), DEMO6 CRITICAL polish (#1249/#1250/#1253/#1239), adaptive y-axis (#1251), Zone 1B proportional allocation ADR-018 (#1252), GovernanceModule institutional_capacity_index (#1275) | Complete |
-| M18 | Full Argument and Demo 7 | Demo 7 (Senegal Mode 3 + Zambia three-scenario, live external session #843); counter-scenario comparison; CI bands (ADR-007 full implementation); PSP driver decomposition | Current |
+| M18 | Full Argument and Demo 7 | Demo 7 (Senegal Mode 3 + Zambia three-scenario, simulated stakeholder session #843); counter-scenario comparison; CI bands (ADR-007 full implementation); PSP driver decomposition; control plane column (ADR-019); Zone 3 auditability panel | Complete |
+| M19 | Constraint Search and Empirical Calibration | Mode 3 constraint-floor search (instrument finds configurations that avoid human cost threshold); SEN/ZMB backtesting; empirically grounded CI intervals (ADR-007 Bayesian layer); PSP driver arc and auditability panel; Demo 8 | Current |
 
 ---
 
 ## Where We Are
 
-WorldSim v0.17.0 is released. Eighteen milestones of foundational and delivery work are complete. The simulation engine is calibrated against empirical SSA LIC evidence. Three simultaneous scenarios can be compared across all four Zone 1 instruments. The fiscal-to-cohort transmission channel reflects Fosu 2011 elasticity constants. The governance composite responds to fiscal austerity through both GDP-mediated and direct institutional capacity channels (Gupta 2002). Zone 1B proportional allocation (ADR-018) ensures MDA alerts remain visible regardless of cohort section height. DEMO6 CRITICAL legibility findings are resolved.
+WorldSim v0.18.0 is released. Nineteen milestones of foundational and delivery work are complete.
 
-M17 is complete. The calibration argument — that the tool's response surface is grounded in published SSA LIC evidence, not arbitrary defaults — is now on record. The Chief Methodologist calibration sprint produced a written specification, a FRAME-D milestone sentence gate that fires in the Demo 7 window, and three CM positions documented for governance sensitivity. The comparative infrastructure (N=3 multi-scenario, Zone 1B proportional allocation) makes the Demo 7 three-scenario comparison technically possible.
+M18 is complete. The full argument is delivered: a finance ministry team can test any fiscal multiplier configuration and observe whether the bottom quintile poverty headcount crosses the recovery floor (Mode 3, Act 1), and can load three scenarios and produce a specific, tiered, directionally stable headcount differential with a confidence interval that the opposing team must engage with (Act 2). The instrument is no longer a diagnostic — it is a counter-proposal instrument. Demo 7 simulated stakeholder session (2026-07-02) returned the first unconditional north star PASS across all WorldSim demos: the CLEAR badge in Zone 1B at step 8 is on screen, not in narration. Aicha can forward the screenshot. The finding survives without the presenter.
 
-M17 asks and answers: is the engine calibrated well enough to defend the numbers at the table? Yes — the fiscal-to-cohort transmission channel now reflects Fosu 2011 SSA LIC evidence (T3), the FRAME-D milestone sentence fires within the Demo 6 window, and the institutional capacity channel (Gupta 2002) is live in Zone 1D. The comparative infrastructure enables a Zambian finance ministry team to compare three fiscal adjustment paths simultaneously.
+M18 asks and answers: can the ministry team produce their own counter-proposal — not just read out the model's distributional diagnosis, but construct and quantify an alternative? Yes. At FiscalMultiplier 0.85 (15% below the programme baseline, within Ilzetzki et al. 2013 SSA LIC consensus), Zone 1B reads CLEAR. The counter-proposal exists as a specific number with a confidence interval: +342,700 persons, 298K–398K, direction stable. The IMF team must engage with the number, not the claim.
 
-M18 is current. The roadmap through M18 is directionally committed. Demo 7 at M18 close — the first live external session (#843) with the complete analytical stack.
+M19 is current. The next question Demo 7 raised: the ministry team had to test multiplier values one at a time. The constraint-floor capability reverses the query — specify the human cost floor and let the instrument find the configurations that avoid it. SEN and ZMB backtesting make the trajectories calibrated, not just configured. The empirical CI layer (ADR-007 Bayesian posterior) gives the confidence interval an empirical grounding the current structural model does not provide.
 
 ---
 
