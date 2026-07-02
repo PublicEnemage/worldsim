@@ -4193,6 +4193,79 @@ Codified in `docs/CODING_STANDARDS.md §Testing Requirements` in the same PR tha
 
 ---
 
+## NM-084 — E2E Mock Route Pattern Unverified Against api_contracts.yml; All G1 Playwright Tests Silently Skipped Post-Implementation (Reactive)
+
+**Date:** 2026-07-02
+**Milestone:** M19 — Constraint Search and Empirical Calibration
+**Detected by:** CI review — all G1 Playwright tests showed `-` (skipped) on sprint/m19-g1 after implementation merged to sprint branch (PR #1574)
+**Severity:** High
+
+### What happened
+
+The M19 G1 QA test scaffold (authored 2026-07-02, QA Lead reviewed) contained a helper
+`enterMode3WithFocalCohort` that mocked `GET /api/v1/scenarios/{id}` with two flaws:
+
+1. **Wrong route pattern**: `"**/api/v1/scenarios/*/detail"` — no such endpoint exists. The
+   correct App.tsx fetch is `GET /api/v1/scenarios/${scenarioId}` (no `/detail` suffix). The
+   route pattern never intercepted any request; all mock calls were no-ops.
+
+2. **Wrong response field**: `{ id: "zmb-constraint-test", ... }` instead of
+   `{ scenario_id: "zmb-constraint-test", ... }`. App.tsx reads `detail.scenario_id` to call
+   `setSelectedScenarioId()`; receiving `undefined` left the scenario permanently unloaded.
+
+These two bugs meant `selectedScenarioId` was never set, `ScenarioInstrumentCluster` never
+mounted, `enter-active-control-btn` never appeared, Mode 3 was never entered, and the
+`constraint-search-section` guard fired `test.skip()` in every test.
+
+The QA Lead review had explicitly flagged Gap 5: "The exact route pattern must be confirmed
+against `docs/schema/api_contracts.yml` by the Frontend Architect Agent before the G1
+implementation PR opens." This open item was not resolved before the implementation PR opened.
+The implementing agent used the incorrect pattern without verification.
+
+Fix: PR #1575 (`feat/m19-g1-fix-e2e-mock` → `sprint/m19-g1`) — introduces
+`setupScenarioMocks()` helper with correct `ScenarioDetailResponse` shape (`scenario_id`,
+required fields) + trajectory mock, and `waitForScenarioLoad()` using the App.tsx DEV seam
+(`window.__worldsim_selectedScenarioId`).
+
+### What was at risk
+
+All G1 acceptance tests (AC-1, AC-3–7, AC-11, AC-12, AC-016) would have been silently
+non-functional for the entire sprint. The implementation could have shipped with zero
+effective E2E test coverage. The Business PO CONDITIONAL ACCEPT condition would have been
+permanently unresolvable — the test would skip forever even with a correct implementation.
+
+### What caught it
+
+CI review after PR #1574 merged to sprint/m19-g1 — all G1 tests showed `-` (skipped), not
+PASS or FAIL. Diagnosis traced the skip-chain from guard → `constraint-search-section` not
+visible → `enter-active-control-btn` timeout → Mode 3 never entered → mock never intercepted.
+
+### Process improvement
+
+**Immediate:** The QA Lead's open item ("confirm route pattern against api_contracts.yml")
+must be a blocking condition on the intent document approval gate, not an advisory note.
+When the QA Lead records an open item requiring Frontend Architect confirmation, that
+confirmation must be a filed comment on the intent document or PR before the implementation
+PR opens — identical in severity to a missing pre-ship condition.
+
+**Structural:** The `enterMode3WithFocalCohort` pattern (mock scenario detail → wait for DEV
+seam → click enter-active-control-btn → wait for Form 3) is now documented in PR #1575's
+commit message and in the fixed spec file. Future Mode 3 E2E tests must use this verified
+pattern rather than inventing a new one.
+
+**Rule addition:** Any E2E helper that mocks an API endpoint must cross-reference the exact
+URL against `docs/schema/api_contracts.yml` (or the App.tsx fetch call) before committing.
+A helper whose mock never fires is indistinguishable from an absent helper — the test skips
+silently rather than failing.
+
+**Near-miss lineage:** NM-056 (soft-skipping masked a mock bug), NM-083 (element presence
+test without contract assertion). This is the same pattern: a test exists, passes QA review,
+and appears to guard correctly — but is structurally non-functional. The common failure mode
+is that skip-based guards prevent FAIL, making structural test bugs invisible without explicit
+CI skip-rate monitoring.
+
+---
+
 ## NM-NNN — [Short descriptive title]
 
 **Date:** YYYY-MM-DD (or approximate milestone era)
