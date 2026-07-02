@@ -83,7 +83,7 @@ async function enterMode3(page: Page): Promise<void> {
 // The exact route pattern must be confirmed against docs/schema/api_contracts.yml
 // by the Frontend Architect Agent before the G1 implementation PR opens.
 async function enterMode3WithFocalCohort(page: Page): Promise<void> {
-  await page.route("**/api/v1/scenarios/*/detail", (route) =>
+  await page.route("**/api/v1/scenarios/*", (route) =>
     route.fulfill({
       json: {
         id: "zmb-constraint-test",
@@ -316,7 +316,7 @@ test("AC-12: constraint-search-structural-absence shown when indicator is Tier 4
   // the default scenario never loads a Tier 4+ indicator.
   // The exact indicator_key value that triggers structural absence must be
   // confirmed with the Frontend Architect before the G1 PR opens.
-  await page.route("**/api/v1/scenarios/*/detail", (route) =>
+  await page.route("**/api/v1/scenarios/*", (route) =>
     route.fulfill({
       json: {
         id: "zmb-structural-absence-test",

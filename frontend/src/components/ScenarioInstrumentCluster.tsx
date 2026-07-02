@@ -881,6 +881,10 @@ export function ScenarioInstrumentCluster({
         onApplyChange={handleApplyControlChange}
         onInjectShock={handleInjectShock}
         currentStep={currentStep}
+        monitoredFocalCohorts={
+          activeScenarioDetail?.configuration?.monitored_focal_cohorts ?? undefined
+        }
+        scenarioId={scenarioId}
       />
     ) : mode === "MODE_2" ? (
       <Mode2ColumnSurface
