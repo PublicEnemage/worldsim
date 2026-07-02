@@ -6,7 +6,7 @@
 > Historical state lives in `docs/process/session-archives/`.
 > Authority: `docs/process/sprint-group-isolation.md §SESSION_STATE.md Cockpit Card Protocol`.
 
-**Last updated:** 2026-07-02 (M19 creation ceremony complete — release/m19 cut, sprint plan updated to 22-issue roster; EL sign-off on sprint plan pending before G1 sprint entries open)
+**Last updated:** 2026-07-02 (M19 sprint plan EL-approved; pre-wave + G1 sprint entries open; ADR decision on constraint-floor search required before G1 sprint entry filed)
 **Current milestone:** M19 — Constraint Search and Empirical Calibration
 
 ---
@@ -19,8 +19,8 @@
 | GitHub Milestone | #21 — created 2026-07-02 |
 | Exit checklist issue | #1535 (M19 Exit Checklist — blocks milestone closure) |
 | Release branch | `release/m19` — cut from `main` 2026-07-02 at 1bf1ecc |
-| Sprint plan | `docs/process/sprint-plans/m19-sprint-plan.md` — filed 2026-07-02; EL approval pending |
-| Active wave | None — M19 kickoff; EL sprint plan approval required before G1 opens |
+| Sprint plan | `docs/process/sprint-plans/m19-sprint-plan.md` — EL-approved 2026-07-02 |
+| Active wave | Pre-wave — #1456, #1538, #1532 in progress |
 | Active sprint groups | None |
 | Active sprint journal issues | None |
 
@@ -30,9 +30,7 @@
 
 | Decision | Status |
 |---|---|
-| M19 sprint plan approval | Pending EL — required before G1 sprint entries open |
-| ADR decision: constraint-floor search — new ADR-020 or ADR-019 amendment? | Pending Architect + EL — required before G1 sprint entry |
-| Close #1340 (M18 Exit Checklist) | Pending EL — all exit conditions now satisfied |
+| ADR decision: constraint-floor search — new ADR-020 or ADR-019 amendment? | Pending Architect + EL — required before G1 sprint entry is filed |
 
 ---
 
