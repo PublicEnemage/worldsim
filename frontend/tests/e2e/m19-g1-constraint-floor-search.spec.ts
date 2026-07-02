@@ -5,6 +5,8 @@
  *
  * All tests guard on the Form 3 testid being absent pre-implementation (no-ops
  * until constraint-search-section ships). AC-016 guards on column geometry.
+ *
+ * QA Lead review 2026-07-02: 8 gaps corrected (see intent doc §7 for full list).
  */
 
 import { test, expect, Page } from "@playwright/test";
@@ -21,45 +23,82 @@ const FOCAL_COHORT_CONFIG = {
   framework: "human_development",
 };
 
+// Gap 3 fix: field names corrected to match ADR-021 §D-3 response schema.
+// Removed: lo_searched, hi_searched, tolerance, focal_cohort_index.
+// Added: search_lo, search_hi, floor_value, indicator_key, error_message.
 const FOUND_RESPONSE = {
   status: "FOUND",
   boundary: 1.18,
   uncertainty_lo: 1.17,
   uncertainty_hi: 1.19,
   evaluations: 9,
-  lo_searched: 0.1,
-  hi_searched: 3.0,
-  tolerance: 0.01,
-  focal_cohort_index: 0,
+  search_lo: 0.1,
+  search_hi: 3.0,
+  floor_value: 0.4,
+  indicator_key: "bottom_quintile_informal_workers_poverty_headcount",
+  error_message: null,
 };
 
 const NOT_FOUND_RESPONSE = {
   status: "NOT_FOUND",
   boundary: null,
+  uncertainty_lo: null,
+  uncertainty_hi: null,
   evaluations: 9,
-  lo_searched: 0.1,
-  hi_searched: 3.0,
-  tolerance: 0.01,
-  focal_cohort_index: 0,
+  search_lo: 0.1,
+  search_hi: 3.0,
+  floor_value: 0.4,
+  indicator_key: "bottom_quintile_informal_workers_poverty_headcount",
+  error_message: null,
 };
 
 const ERROR_RESPONSE = {
   status: "ERROR",
-  error: "Engine evaluation failed: ValueError at step 3",
+  // Gap 3 fix: was 'error', corrected to 'error_message' per ADR-021 §D-3.
+  error_message: "Engine evaluation failed: ValueError at step 3",
   boundary: null,
+  uncertainty_lo: null,
+  uncertainty_hi: null,
   evaluations: 3,
-  focal_cohort_index: 0,
+  search_lo: null,
+  search_hi: null,
+  floor_value: 0.4,
+  indicator_key: "bottom_quintile_informal_workers_poverty_headcount",
 };
 
+// enterMode3 is retained for AC-2 and AC-3 where no focal cohort should be present.
 async function enterMode3(page: Page): Promise<void> {
-  // Navigate to the app with a preloaded scenario in Mode 2
   await page.goto("/");
-  // Activate Mode 3 via the "Enter Active Control" button
   const enterActiveControl = page.getByRole("button", {
     name: /enter active control/i,
   });
   if (await enterActiveControl.isVisible()) {
     await enterActiveControl.click();
+  }
+}
+
+// Gap 5 fix: mock the scenario detail endpoint to return a configuration that
+// includes a monitored_focal_cohorts entry. Without this, Form 3 never renders
+// and all guards permanently fire post-implementation.
+// The exact route pattern must be confirmed against docs/schema/api_contracts.yml
+// by the Frontend Architect Agent before the G1 implementation PR opens.
+async function enterMode3WithFocalCohort(page: Page): Promise<void> {
+  await page.route("**/api/v1/scenarios/*/detail", (route) =>
+    route.fulfill({
+      json: {
+        id: "zmb-constraint-test",
+        configuration: {
+          entities: ["ZMB"],
+          n_steps: 8,
+          monitored_focal_cohorts: [FOCAL_COHORT_CONFIG],
+        },
+      },
+    })
+  );
+  await page.goto("/?scenario=zmb-constraint-test");
+  const btn = page.getByTestId("enter-active-control-btn");
+  if (await btn.isVisible({ timeout: 8_000 }).catch(() => false)) {
+    await btn.click();
   }
 }
 
@@ -70,8 +109,9 @@ async function enterMode3(page: Page): Promise<void> {
 test("AC-1: constraint-search-section present in Mode 3 with focal cohort configured", async ({
   page,
 }) => {
-  // Guard: no-op if Form 3 not yet implemented
-  await enterMode3(page);
+  // Gap 5 fix: use enterMode3WithFocalCohort — plain enterMode3 provides no
+  // focal cohort so this guard would permanently fire post-implementation.
+  await enterMode3WithFocalCohort(page);
   const section = page.getByTestId("constraint-search-section");
   if (!(await section.isVisible().catch(() => false))) {
     test.skip(); // Form 3 not yet implemented
@@ -88,7 +128,6 @@ test("AC-1: constraint-search-section present in Mode 3 with focal cohort config
 
 test("AC-2: constraint-search-section absent in Mode 1", async ({ page }) => {
   await page.goto("/");
-  // Ensure Mode 1 is active (default replay mode)
   await expect(
     page.getByTestId("constraint-search-section")
   ).not.toBeVisible();
@@ -96,7 +135,6 @@ test("AC-2: constraint-search-section absent in Mode 1", async ({ page }) => {
 
 test("AC-2: constraint-search-section absent in Mode 2", async ({ page }) => {
   await page.goto("/");
-  // Mode 2 is the simulation mode — no Mode 3 transition performed
   const mode3Indicator = page.getByTestId("mode-3-active");
   if (await mode3Indicator.isVisible().catch(() => false)) {
     test.skip(); // Already in Mode 3; test not applicable
@@ -114,6 +152,8 @@ test("AC-2: constraint-search-section absent in Mode 2", async ({ page }) => {
 test("AC-3: constraint-search-unavailable when monitored_focal_cohorts is empty", async ({
   page,
 }) => {
+  // enterMode3 (no focal cohort) is correct here — this test specifically
+  // asserts that Form 3 shows the unavailable state when no cohort is configured.
   await enterMode3(page);
   const unavailable = page.getByTestId("constraint-search-unavailable");
   if (!(await unavailable.isVisible().catch(() => false))) {
@@ -133,13 +173,13 @@ test("AC-3: constraint-search-unavailable when monitored_focal_cohorts is empty"
 test("AC-4: PENDING state visible immediately after clicking Find safe boundary", async ({
   page,
 }) => {
-  await enterMode3(page);
+  // Gap 5 fix: use enterMode3WithFocalCohort so Form 3 renders.
+  await enterMode3WithFocalCohort(page);
   const btn = page.getByTestId("constraint-search-btn");
   if (!(await btn.isVisible().catch(() => false))) {
     test.skip();
     return;
   }
-  // Intercept and delay the POST response
   await page.route("**/constraint-floor-search", async (route) => {
     await new Promise((r) => setTimeout(r, 2000));
     await route.fulfill({ json: FOUND_RESPONSE });
@@ -156,7 +196,8 @@ test("AC-4: PENDING state visible immediately after clicking Find safe boundary"
 test("AC-5: FOUND state renders boundary value after successful search", async ({
   page,
 }) => {
-  await enterMode3(page);
+  // Gap 5 fix: use enterMode3WithFocalCohort so Form 3 renders.
+  await enterMode3WithFocalCohort(page);
   const btn = page.getByTestId("constraint-search-btn");
   if (!(await btn.isVisible().catch(() => false))) {
     test.skip();
@@ -170,6 +211,12 @@ test("AC-5: FOUND state renders boundary value after successful search", async (
   await expect(page.getByTestId("constraint-boundary-value")).toContainText(
     "1.18"
   );
+  // Gap 6 fix: assert precision disclosure "±" is present (ADR-021 §D-4).
+  // A broken display showing only "1.18" without the disclosure would pass
+  // without this second assertion.
+  await expect(page.getByTestId("constraint-boundary-value")).toContainText(
+    "±"
+  );
 });
 
 // ---------------------------------------------------------------------------
@@ -179,7 +226,8 @@ test("AC-5: FOUND state renders boundary value after successful search", async (
 test("AC-6: NOT_FOUND state renders when backend returns no boundary", async ({
   page,
 }) => {
-  await enterMode3(page);
+  // Gap 5 fix: use enterMode3WithFocalCohort so Form 3 renders.
+  await enterMode3WithFocalCohort(page);
   const btn = page.getByTestId("constraint-search-btn");
   if (!(await btn.isVisible().catch(() => false))) {
     test.skip();
@@ -204,7 +252,8 @@ test("AC-6: NOT_FOUND state renders when backend returns no boundary", async ({
 test("AC-7: ERROR state renders non-blank error message (SF-1 guard)", async ({
   page,
 }) => {
-  await enterMode3(page);
+  // Gap 5 fix: use enterMode3WithFocalCohort so Form 3 renders.
+  await enterMode3WithFocalCohort(page);
   const btn = page.getByTestId("constraint-search-btn");
   if (!(await btn.isVisible().catch(() => false))) {
     test.skip();
@@ -216,7 +265,6 @@ test("AC-7: ERROR state renders non-blank error message (SF-1 guard)", async ({
   await btn.click();
   const errorEl = page.getByTestId("constraint-search-error");
   await expect(errorEl).toBeVisible();
-  // SF-1: result area must not be blank
   const text = await errorEl.textContent();
   expect(text?.trim().length).toBeGreaterThan(0);
 });
@@ -228,7 +276,14 @@ test("AC-7: ERROR state renders non-blank error message (SF-1 guard)", async ({
 test("AC-11: FOUND result includes 'synthetic' word when indicator is Tier 3", async ({
   page,
 }) => {
-  await enterMode3(page);
+  // Gap 4 dependency: data_tier is not in ADR-021 §D-3 ConstraintFloorSearchResponse.
+  // Before the G1 PR opens, the Frontend Architect must confirm whether:
+  // (a) data_tier is added to the response schema (ADR-021 §D-3 amendment required), or
+  // (b) the frontend resolves tier from indicator_key via a local lookup, in which
+  //     case remove data_tier from this mock and set indicator_key to a known Tier 3 key.
+  // If this is not resolved, the "synthetic" assertion will never fire post-implementation.
+  // Gap 5 fix: use enterMode3WithFocalCohort so Form 3 renders.
+  await enterMode3WithFocalCohort(page);
   const btn = page.getByTestId("constraint-search-btn");
   if (!(await btn.isVisible().catch(() => false))) {
     test.skip();
@@ -256,7 +311,36 @@ test("AC-11: FOUND result includes 'synthetic' word when indicator is Tier 3", a
 test("AC-12: constraint-search-structural-absence shown when indicator is Tier 4+", async ({
   page,
 }) => {
-  await enterMode3(page);
+  // Gap 8 fix: mock the scenario to return a structural-absence indicator.
+  // Without this mock, the test permanently skips post-implementation because
+  // the default scenario never loads a Tier 4+ indicator.
+  // The exact indicator_key value that triggers structural absence must be
+  // confirmed with the Frontend Architect before the G1 PR opens.
+  await page.route("**/api/v1/scenarios/*/detail", (route) =>
+    route.fulfill({
+      json: {
+        id: "zmb-structural-absence-test",
+        configuration: {
+          entities: ["ZMB"],
+          n_steps: 8,
+          monitored_focal_cohorts: [
+            {
+              ...FOCAL_COHORT_CONFIG,
+              // Placeholder: replace with the real structural-absence marker key
+              // (confirmed by Frontend Architect before G1 PR opens).
+              indicator_key: "__structural_absence__",
+            },
+          ],
+        },
+      },
+    })
+  );
+  await page.goto("/?scenario=zmb-structural-absence-test");
+  const btn = page.getByTestId("enter-active-control-btn");
+  if (await btn.isVisible({ timeout: 8_000 }).catch(() => false)) {
+    await btn.click();
+  }
+
   const structuralAbsence = page.getByTestId(
     "constraint-search-structural-absence"
   );
@@ -278,15 +362,16 @@ test("AC-016: constraint-search-section visible without column scroll at 1280x80
   page,
 }) => {
   await page.setViewportSize({ width: 1280, height: 800 });
-  await enterMode3(page);
+  await enterMode3WithFocalCohort(page);
   const section = page.getByTestId("constraint-search-section");
   if (!(await section.isVisible().catch(() => false))) {
     test.skip();
     return;
   }
 
-  // Locate the column container — expected to be the ControlPlaneColumn root
-  const column = page.getByTestId("control-plane-column");
+  // Gap 2 fix: testid corrected from "control-plane-column" (nonexistent) to
+  // "zone-control-plane" — the column 3 container div in InstrumentCluster.tsx.
+  const column = page.getByTestId("zone-control-plane");
   const columnBox = await column.boundingBox();
   const sectionBox = await section.boundingBox();
 
@@ -294,7 +379,6 @@ test("AC-016: constraint-search-section visible without column scroll at 1280x80
   expect(sectionBox).not.toBeNull();
 
   if (columnBox && sectionBox) {
-    // Section must be fully within column visible area (no scroll required)
     const columnBottom = columnBox.y + columnBox.height;
     const sectionBottom = sectionBox.y + sectionBox.height;
     expect(sectionBox.y).toBeGreaterThanOrEqual(columnBox.y);
@@ -306,14 +390,13 @@ test("AC-016: constraint-search-section reachable within one scroll at 1024x768"
   page,
 }) => {
   await page.setViewportSize({ width: 1024, height: 768 });
-  await enterMode3(page);
+  await enterMode3WithFocalCohort(page);
   const section = page.getByTestId("constraint-search-section");
   if (!(await section.isVisible().catch(() => false))) {
     test.skip();
     return;
   }
 
-  // Scroll the section into view — must be achievable in one scrollIntoView call
   await section.scrollIntoViewIfNeeded();
   await expect(section).toBeInViewport();
 });
