@@ -6,7 +6,7 @@
 > Historical state lives in `docs/process/session-archives/`.
 > Authority: `docs/process/sprint-group-isolation.md §SESSION_STATE.md Cockpit Card Protocol`.
 
-**Last updated:** 2026-07-02 (M19 creation ceremony complete — release/m19 cut, sprint plan filed, M19 issues filed; EL sign-off on sprint plan pending before G1 sprint entries open)
+**Last updated:** 2026-07-02 (M19 creation ceremony complete — release/m19 cut, sprint plan updated to 22-issue roster; EL sign-off on sprint plan pending before G1 sprint entries open)
 **Current milestone:** M19 — Constraint Search and Empirical Calibration
 
 ---
@@ -36,17 +36,27 @@
 
 ---
 
-## M19 Open Issues
+## M19 Open Issues (22 total)
 
 | Issue | Title | Group | Priority |
 |---|---|---|---|
 | #1535 | M19 Exit Checklist | — (gate) | Milestone exit gate |
 | #1544 | Demo 8 — live stakeholder session | — (exit gate) | Primary deliverable |
+| #1532 | Capital controls transmission gap | Pre-wave/known-gap | Immediate — blocks Iceland (#1553) |
 | #1456 | MDAAlertPanel Zone1B: scenarioId crash | Pre-wave | Immediate — crash risk |
-| #1538 | Focal cohort floor validation (monitored_focal_cohorts) | Pre-wave | Immediate — #1540 prerequisite |
+| #1538 | Focal cohort floor validation | Pre-wave | Immediate — #1540 prerequisite |
 | #1540 | Mode 3 constraint-floor search | G1 Wave 1 | High — Demo 8 Act 1 |
-| #1541 | SEN backtesting fixture | G2 Wave 1 | High — Bayesian gate |
-| #1542 | ZMB backtesting fixture | G2 Wave 1 | High — Bayesian gate |
+| #1546 | Headless battle-testing harness | G2A Wave 1 | High — all scenario runs depend on this |
+| #1541 | SEN backtesting fixture | G2B Wave 1 | High — Bayesian gate |
+| #1542 | ZMB backtesting fixture | G2B Wave 1 | High — Bayesian gate |
+| #1547 | Greece 2010–15 counter-factual Type B | G2C Wave 1–2 | Medium |
+| #1548 | Argentina 2001 counter-factual Type B | G2C Wave 1–2 | Medium |
+| #1549 | Sri Lanka 2022–23 Type A+B | G2C Wave 1–2 | Medium |
+| #1550 | Pakistan 2022–23 Type B | G2C Wave 1–2 | Medium |
+| #1551 | Turkey 2018–19 Type B | G2C Wave 1–2 | Medium |
+| #1552 | Egypt 2016 Type B | G2C Wave 1–2 | Medium |
+| #1554 | Ghana 2022–23 Type A+B | G2C Wave 1–2 | Medium |
+| #1553 | Iceland 2008–11 Type A+B | G2D Wave 2 | Medium — blocked: #1532 |
 | #1543 | ADR-007 Bayesian posterior layer | G3 Wave 2 | High — Demo 8 Act 2 CI |
 | #1536 | ADR-007 meaninglessness threshold | G3 Wave 2 | High — coord #1543 |
 | #1537 | BandResult visible fields | G3 Wave 2 | High — posterior UX prereq |

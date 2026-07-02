@@ -46,28 +46,38 @@ sop-reference: docs/process/sprint-planning-sop.md
 
 ## HORIZON Scope-Completeness Check
 
-Full M19 issue audit completed 2026-07-02. All 12 M19 issues accounted for.
+Full M19 issue audit completed 2026-07-02 (updated post-filing). All 22 M19 issues accounted for.
 
 ### Roadmap deliverables — linkage audit
 
 | Roadmap deliverable | Issue | Group | Status |
 |---|---|---|---|
 | Mode 3 constraint-floor search capability | #1540 | G1 | ✅ Tracked |
-| Senegal (SEN) backtesting fixture | #1541 | G2 | ✅ Tracked |
-| Zambia (ZMB) backtesting fixture | #1542 | G2 | ✅ Tracked |
-| ADR-007 Bayesian posterior layer — empirically grounded CI intervals | #1543 | G3 (blocked: G2) | ✅ Tracked; backtesting fixtures gate sprint entry |
+| Headless battle-testing harness (Type A/B, configurable output) | #1546 | G2 Phase A | ✅ Tracked |
+| SEN backtesting fixture (calibration + harness) | #1541 | G2 Phase B | ✅ Tracked |
+| ZMB backtesting fixture (calibration + harness) | #1542 | G2 Phase B | ✅ Tracked |
+| Greece 2010–15 primary surplus counter-factual Type B | #1547 | G2 Phase C | ✅ Tracked |
+| Argentina 2001 peg-abandonment counter-factual Type B | #1548 | G2 Phase C | ✅ Tracked |
+| Sri Lanka 2022–23 Coffin Corner Type A+B | #1549 | G2 Phase C | ✅ Tracked |
+| Pakistan 2022–23 programme survival Type B | #1550 | G2 Phase C | ✅ Tracked |
+| Turkey 2018–19 Backside of Power Curve Type B | #1551 | G2 Phase C | ✅ Tracked |
+| Egypt 2016 devaluation/subsidy reform Type B | #1552 | G2 Phase C | ✅ Tracked |
+| Ghana 2022–23 IMF programme Type A+B | #1554 | G2 Phase C | ✅ Tracked |
+| Iceland 2008–11 orthodox vs heterodox Type A+B | #1553 | G2 Phase D (blocked: #1532) | ✅ Tracked; blocked by capital controls gap |
+| ADR-007 Bayesian posterior layer — empirically grounded CI intervals | #1543 | G3 (blocked: G2 Phase B) | ✅ Tracked; SEN+ZMB gate sprint entry |
 | PSP driver arc across programme window + in-viewport auditability panel | #1528 | G4 | ✅ Tracked (DEMO-165) |
 | Demo 8 — live stakeholder session | #1544 | Milestone exit gate | ✅ Tracked |
 
-### Carry-forward from M18 — linkage audit
+### Carry-forward and known gaps — linkage audit
 
 | Issue | Title | Group | Priority |
 |---|---|---|---|
-| #1529 | '95% CI' label overstates precision on DistributionalComparisonSummary | G4 (coord: G3) | High — label precision coordinates with Bayesian posterior delivery |
-| #1456 | MDAAlertPanelZone1B: scenarioId unguarded at line 1121 | G1 pre-work | High — crash risk; address before G1 begins |
+| #1532 | Capital controls transmission gap (ExternalSectorModule+MacroeconomicModule channels absent) | Pre-wave / known gap | **Immediate — blocks Iceland (#1553)**; known-gap label; partial fix may unblock harness run |
+| #1529 | '95% CI' label overstates precision on DistributionalComparisonSummary | G4 (coord: G3) | High — coordinates with Bayesian posterior delivery |
+| #1456 | MDAAlertPanelZone1B: scenarioId crash | Pre-wave | High — crash risk; address before G1 begins |
 | #1536 | ADR-007 meaninglessness threshold | G3 (coord: Bayesian posterior) | High — coordinate with #1543 |
 | #1537 | BandResult visible fields (is_pre_calibration, clipped_lower/upper) | G3 (coord: G3) | High — prerequisite for posterior transition UX |
-| #1538 | Focal cohort floor validation (monitored_focal_cohorts schema) | G1 pre-work | High — prerequisite for constraint-floor search (#1540) |
+| #1538 | Focal cohort floor validation (monitored_focal_cohorts schema) | Pre-wave | High — prerequisite for constraint-floor search (#1540) |
 
 ### Full issue-to-group mapping
 
@@ -75,12 +85,22 @@ Full M19 issue audit completed 2026-07-02. All 12 M19 issues accounted for.
 |---|---|---|---|---|
 | #1535 | M19 Exit Checklist | — (gate) | — | Milestone exit gate |
 | #1544 | Demo 8 — live stakeholder session | — (exit gate) | Exit | Primary deliverable |
-| #1456 | MDAAlertPanelZone1B: scenarioId crash | G1 pre-work | Pre-wave | **Immediate — crash risk** |
-| #1538 | Focal cohort floor validation | G1 pre-work | Pre-wave | **Immediate — constraint-floor prerequisite** |
+| #1532 | Capital controls transmission gap | Pre-wave / known gap | Pre-wave | **Immediate — blocks Iceland** |
+| #1456 | MDAAlertPanelZone1B: scenarioId crash | Pre-wave | Pre-wave | **Immediate — crash risk** |
+| #1538 | Focal cohort floor validation | Pre-wave | Pre-wave | **Immediate — #1540 prerequisite** |
 | #1540 | Mode 3 constraint-floor search | G1 | Wave 1 | High — Demo 8 Act 1 |
-| #1541 | SEN backtesting fixture | G2 | Wave 1 (parallel to G1) | High — Bayesian gate |
-| #1542 | ZMB backtesting fixture | G2 | Wave 1 (parallel to G1) | High — Bayesian gate |
-| #1543 | ADR-007 Bayesian posterior layer | G3 | Wave 2 (blocked: G2) | High — Demo 8 Act 2 CI grounding |
+| #1546 | Headless battle-testing harness | G2 Phase A | Wave 1 (parallel to G1) | High — all scenario runs depend on this |
+| #1541 | SEN backtesting fixture | G2 Phase B | Wave 1 (after G2A) | High — Bayesian gate + harness calibration |
+| #1542 | ZMB backtesting fixture | G2 Phase B | Wave 1 (after G2A) | High — Bayesian gate + harness calibration |
+| #1547 | Greece 2010–15 counter-factual Type B | G2 Phase C | Wave 1–2 (after G2A) | Medium — extends existing fixture |
+| #1548 | Argentina 2001 counter-factual Type B | G2 Phase C | Wave 1–2 (after G2A) | Medium — extends existing fixture |
+| #1549 | Sri Lanka 2022–23 Type A+B | G2 Phase C | Wave 1–2 (after G2A) | Medium |
+| #1550 | Pakistan 2022–23 Type B | G2 Phase C | Wave 1–2 (after G2A) | Medium |
+| #1551 | Turkey 2018–19 Type B | G2 Phase C | Wave 1–2 (after G2A) | Medium |
+| #1552 | Egypt 2016 Type B | G2 Phase C | Wave 1–2 (after G2A) | Medium |
+| #1554 | Ghana 2022–23 Type A+B | G2 Phase C | Wave 1–2 (after G2A) | Medium |
+| #1553 | Iceland 2008–11 Type A+B | G2 Phase D | Wave 2 (blocked: #1532) | Medium — pre-calibration structural test |
+| #1543 | ADR-007 Bayesian posterior layer | G3 | Wave 2 (blocked: G2 Phase B) | High — Demo 8 Act 2 CI grounding |
 | #1536 | ADR-007 meaninglessness threshold | G3 | Wave 2 (coord: #1543) | High — same file area as Bayesian posterior |
 | #1537 | BandResult visible fields | G3 | Wave 2 (coord: #1543) | High — prerequisite for posterior UX |
 | #1528 | PSP driver arc + auditability panel | G4 | Wave 2–3 | High — DEMO-165 |
@@ -100,15 +120,16 @@ Full M19 issue audit completed 2026-07-02. All 12 M19 issues accounted for.
 
 ### Pre-wave (before G1 sprint entry opens)
 
-**Pre-wave objective:** Close crash risk (#1456) and schema gap (#1538) before sprint group work begins. Both are small, targeted fixes that gate downstream work and carry safety risk if deferred.
+**Pre-wave objective:** Close crash risk (#1456), schema gap (#1538), and assess capital controls gap (#1532) before sprint group work begins.
 
 | Task | Issue | Implementing agent | Notes |
 |---|---|---|---|
 | Close MDAAlertPanelZone1B scenarioId crash | #1456 | Frontend Implementation Agent | Targeted guard; no sprint entry required (scope < one PR) |
 | Focal cohort floor Pydantic validation | #1538 | Computation Engine Agent | `list[dict[str, Any]]` → `list[FocalCohortConfig]`; prerequisite for #1540 |
+| Capital controls transmission — scope and unblock Iceland | #1532 | Computation Engine Agent | Known gap; determine minimum fix to unblock Iceland harness run (#1553); full fix may extend into Wave 2 |
 | ADR review: does constraint-floor search require ADR-020 or ADR-019 amendment? | — | Architect | Must be on record before G1 sprint entry is filed |
 
-### Wave 1 — G1 + G2 (parallel)
+### Wave 1 — G1 + G2 Phase A + G2 Phase B (parallel)
 
 **G1: Mode 3 Constraint-Floor Search (#1540)**
 - Primary file areas: `frontend/src/components/ControlPlaneColumn.tsx`, `backend/app/api/scenarios.py`, `backend/app/simulation/`
@@ -116,13 +137,31 @@ Full M19 issue audit completed 2026-07-02. All 12 M19 issues accounted for.
 - Blocked by: Pre-wave ADR decision, #1538 (focal cohort floor validation)
 - Key design question: Does the constraint-floor search run in the backend (endpoint returns boundary value) or in the frontend (multiple API calls until boundary found)? Architecture decision required at sprint entry.
 
-**G2: SEN + ZMB Backtesting Fixtures (#1541, #1542)**
-- Primary file areas: `backend/tests/`, `backend/app/db/seed/`, source registry
-- Sprint branch: `sprint/m19-g2`
-- Parallel to G1 — no shared file areas
-- Key constraint: Fidelity thresholds must be approved by Chief Methodologist before fixtures enter CI as build gates. Fixtures run as DIRECTION_ONLY until CM sign-off on MAGNITUDE thresholds.
+**G2 Phase A: Headless Battle-Testing Harness (#1546)**
+- Primary file areas: `backend/app/simulation/`, new `backend/scripts/` or `backend/app/harness/` module
+- Sprint branch: `sprint/m19-g2` (harness infrastructure first; scenario runs are PRs within same branch)
+- Parallel to G1 — no shared file areas with G1
+- Deliverable: Harness that accepts a scenario config, runs it headlessly, and emits ASCII/CSV/JSON/Markdown output per Type A (replay) or Type B (counter-factual) classification
 
-### Wave 2 — G3 + G4 (after G2 complete)
+**G2 Phase B: SEN + ZMB Calibration Fixtures (#1541, #1542)**
+- On same `sprint/m19-g2` branch, after G2 Phase A harness ships
+- SEN and ZMB are both harness runs AND CI build-gate fixtures — they run in CI and contribute calibration data to G3 Bayesian posterior
+- Key constraint: Chief Methodologist sign-off on fidelity thresholds before fixtures enter CI. DIRECTION_ONLY acceptable for M19 if MAGNITUDE data insufficient.
+
+### Wave 1–2 — G2 Phase C + D (after G2 Phase A harness ready)
+
+**G2 Phase C: Battle-Testing Scenario Runs (#1547, #1548, #1549, #1550, #1551, #1552, #1554)**
+- Seven country scenarios run through the harness; results reviewed but not CI-gated (these are battle-testing runs, not calibration fixtures)
+- Can parallelize across scenarios once harness is ready — each scenario is a separate PR
+- Greece (#1547) and Argentina (#1548) extend existing fixtures — lower data risk
+- Sri Lanka (#1549), Pakistan (#1550), Turkey (#1551), Egypt (#1552), Ghana (#1554) are new cases — Chief Methodologist advises on data sourcing before sprint entries filed
+
+**G2 Phase D: Iceland (#1553, blocked by #1532)**
+- Unblocked when #1532 capital controls transmission is sufficiently fixed
+- Iceland is designated as the pre-calibration structural test — runs with `is_pre_calibration=True` explicitly and documents what the structural model gets right vs wrong on an orthodox/heterodox counterfactual
+- If #1532 is not resolved in time for M19, Iceland defers to M20 with documented rationale on #1553
+
+### Wave 2 — G3 + G4 (after G2 Phase B complete)
 
 **G3: Bayesian Posterior + Band Visibility (#1543, #1536, #1537)**
 - Blocked by: G2 (SEN + ZMB calibration data required)
@@ -150,10 +189,14 @@ Full M19 issue audit completed 2026-07-02. All 12 M19 issues accounted for.
 #1538 (floor schema)  ──┤──► G1: #1540 (constraint-floor search)
 ADR decision          ──┘
 
-#1541 (SEN)  ──┐
-#1542 (ZMB)  ──┤──► G3: #1543 (Bayesian posterior) ──► Demo 8 Act 2 CI
-               └──► G3: #1536 (meaninglessness threshold)    (coordinated)
-                    G3: #1537 (BandResult UX)
+#1546 (harness) ──► G2B: #1541 (SEN) ──┐
+                    G2B: #1542 (ZMB) ──┤──► G3: #1543 (Bayesian posterior) ──► Demo 8 Act 2 CI
+                                        └──► G3: #1536 (meaninglessness)         (coordinated)
+                                             G3: #1537 (BandResult UX)
+
+#1546 (harness) ──► G2C: #1547/#1548/#1549/#1550/#1551/#1552/#1554 (parallel runs)
+
+#1532 (capital controls) ──► G2D: #1553 (Iceland)
 
 G3 CI label design ──► G4: #1529 (label precision) — coordinate, not block
 ```
@@ -164,10 +207,12 @@ G3 CI label design ──► G4: #1529 (label precision) — coordinate, not blo
 
 | Risk | Likelihood | Mitigation |
 |---|---|---|
-| Constraint-floor search algorithm is computationally expensive for Mode 3 real-time use | Medium | Architecture decision at sprint entry: backend binary search (bounded API calls) vs frontend scan. Backend binary search preferred — O(log n) calls vs O(n). |
-| SEN/ZMB data availability at required confidence tier | Medium | Chief Methodologist consults at G2 sprint entry; DIRECTION_ONLY thresholds acceptable for M19 if MAGNITUDE data is insufficient |
-| ADR-007 Bayesian posterior requires more calibration data than SEN + ZMB provide | Low | Two cases is a thin posterior. Chief Methodologist must confirm whether two cases are sufficient for M19 or whether additional cases (Greece, Argentina) are used as informative priors. |
-| G3 `banding_engine.py` changes conflict across #1536, #1537, #1543 | High | Address in one sprint group (G3) — not split across multiple groups. File a single sprint branch `sprint/m19-g3` and deliver all three in coordinated PRs. |
+| Constraint-floor search is computationally expensive for Mode 3 real-time use | Medium | Architecture decision at sprint entry: backend binary search (O(log n) API calls) vs frontend scan (O(n)). Backend binary search preferred. |
+| SEN/ZMB data availability at required confidence tier | Medium | Chief Methodologist consults at G2B sprint entry; DIRECTION_ONLY acceptable if MAGNITUDE data insufficient |
+| ADR-007 Bayesian posterior too thin on two cases | Low | Chief Methodologist confirms whether Greece+Argentina historical cases can serve as informative priors supplementing SEN+ZMB |
+| G3 `banding_engine.py` conflicts across #1536, #1537, #1543 | High | Single sprint group G3, one `sprint/m19-g3` branch, coordinated PRs |
+| #1532 capital controls gap not fixable in M19 — Iceland defers | Medium | Iceland (#1553) is lower priority than core calibration deliverables; deferral to M20 is acceptable if fix scope is large |
+| G2 Phase C new-country scenarios have thin data | Medium | Chief Methodologist data assessment required at each Phase C sprint entry; DIRECTION_ONLY acceptable; scenario may use synthetic T3–T4 data if primary sources unavailable |
 
 ---
 
