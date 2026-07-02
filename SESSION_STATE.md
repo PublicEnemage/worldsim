@@ -6,7 +6,7 @@
 > Historical state lives in `docs/process/session-archives/`.
 > Authority: `docs/process/sprint-group-isolation.md §SESSION_STATE.md Cockpit Card Protocol`.
 
-**Last updated:** 2026-07-02 (M18 exit ceremony complete; M19 fully kicked off — sprint plan EL-approved, release/m19 live, 22 issues filed, pre-wave active; next session: ADR decision on constraint-floor search, then G1 sprint entry)
+**Last updated:** 2026-07-02 (pre-wave in flight — #1456 PR #1558 + #1538 PR #1559 open auto-merge; #1532 scoped (ARCH-014 filed PENDING_NUMBER, Iceland stays blocked); Architect deliberation on constraint-floor search: new ADR-021 required (ARCH-015 ASSIGNED), not ADR-019 amendment — awaiting EL confirmation; next action: EL confirms ADR-021 gate, then Architect authors ADR-021, then G1 sprint entry)
 **Current milestone:** M19 — Constraint Search and Empirical Calibration
 
 ---
@@ -20,7 +20,7 @@
 | Exit checklist issue | #1535 (M19 Exit Checklist — blocks milestone closure) |
 | Release branch | `release/m19` — cut from `main` 2026-07-02 at 1bf1ecc |
 | Sprint plan | `docs/process/sprint-plans/m19-sprint-plan.md` — EL-approved 2026-07-02 |
-| Active wave | Pre-wave — #1456, #1538, #1532 in progress |
+| Active wave | Pre-wave — #1456 PR #1558 ✓, #1538 PR #1559 ✓, #1532 scoped; ADR-021 gate pending EL |
 | Active sprint groups | None |
 | Active sprint journal issues | None |
 
@@ -30,7 +30,8 @@
 
 | Decision | Status |
 |---|---|
-| ADR decision: constraint-floor search — new ADR-020 or ADR-019 amendment? | Pending Architect + EL — required before G1 sprint entry is filed |
+| ADR-021 gate: confirm Architect recommendation — new ADR-021 for constraint-floor search (not ADR-019 amendment) | Architect deliberation filed 2026-07-02; awaiting EL confirmation. Once confirmed, Architect authors ADR-021; G1 sprint entry blocked until ADR-021 accepted. |
+| ARCH-014 scope: capital controls full fix M19 or defer to M20? | Pre-wave assessment complete: full fix requires ADR (ARCH-014 PENDING_NUMBER). Iceland (#1553) stays blocked. EL decision needed on whether to scope ADR authorship in M19 Wave 2 or defer to M20. |
 
 ---
 
