@@ -132,7 +132,7 @@ class ExternalSectorModule(SimulationModule):
             self._start_dt = _datetime(2000, 1, 1, tzinfo=UTC)
 
     def get_subscribed_events(self) -> list[str]:
-        return []
+        return ["emergency_policy_capital_controls"]
 
     def compute(
         self,
@@ -140,7 +140,12 @@ class ExternalSectorModule(SimulationModule):
         state: SimulationState,
         timestep: datetime,
     ) -> list[Event]:
-        if not self._shocks and self._eco_coeff == Decimal("0"):
+        cc_events = [
+            e for e in state.events
+            if e.source_entity_id == entity.id
+            and e.event_type == "emergency_policy_capital_controls"
+        ]
+        if not self._shocks and self._eco_coeff == Decimal("0") and not cc_events:
             return []
 
         ts = timestep if timestep.tzinfo else timestep.replace(tzinfo=UTC)
@@ -288,5 +293,37 @@ class ExternalSectorModule(SimulationModule):
                     current_step,
                     fiscal_impact,
                 )
+
+        # ADR-020 Channel A: capital controls → reserve protection.
+        # Reduces outflow velocity (ε fraction) → positive reserve_coverage_months delta.
+        outflow_attr = entity.get_attribute("capital_account_outflow_velocity")
+        outflow_velocity = outflow_attr.value if outflow_attr is not None else Decimal("0")
+        for cc_event in cc_events:
+            cc_qty = cc_event.affected_attributes.get("capital_controls")
+            if cc_qty is None:
+                continue
+            params = cc_event.metadata.get("parameters", {})
+            epsilon = Decimal(str(params.get("epsilon", "0.50")))
+            impl_cap = Decimal(str(params.get("implementation_capacity", "0.75")))
+            reserve_delta_val = outflow_velocity * epsilon * abs(cc_qty.value) * impl_cap
+            import uuid  # noqa: PLC0415
+            events.append(Event(
+                event_id=str(uuid.uuid4()),
+                source_entity_id=entity.id,
+                event_type="capital_controls_reserve_protection",
+                affected_attributes={
+                    "reserve_coverage_months": Quantity(
+                        value=reserve_delta_val,
+                        unit="months",
+                        variable_type=VariableType.FLOW,
+                        measurement_framework=MeasurementFramework.FINANCIAL,
+                        confidence_tier=2,
+                    ),
+                },
+                propagation_rules=[],
+                timestep_originated=timestep,
+                framework=MeasurementFramework.FINANCIAL,
+                metadata={"channel": "A_capital_controls"},
+            ))
 
         return events

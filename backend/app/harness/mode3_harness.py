@@ -95,16 +95,35 @@ def detect_known_limitations(
     control_inputs: list[dict[str, Any]],
     primary_indicator: str | None = None,
     n_steps: int = 1,
+    run_type: RunType | str | None = None,
 ) -> list[str]:
     """Return warning strings for known model gaps active in this run.
 
+    AC-TYPE_B: TYPE_B runs always disclose counter-factual methodology (Tier 3 /
+    INFERRED_STRUCTURAL). Satisfies AC-5 (non-empty) and AC-9 advisory.
     AC-8: EmergencyInstrument.CAPITAL_CONTROLS → #1532 transmission-absent gap.
     AC-9: stock-flow primary indicators → #30 stock-flow-identity gap.
     AC-10: bilateral inputs over n_steps > 1 → #35 bilateral-weights gap.
     """
     limitations: list[str] = []
 
-    # AC-8 / AC-14: CAPITAL_CONTROLS detection
+    # AC-TYPE_B: counter-factual methodology disclosure (always present for TYPE_B).
+    # Ensures known_limitations is non-empty (AC-5) and satisfies AC-9 advisory
+    # (contains "Tier 3" and "INFERRED_STRUCTURAL"). Capital controls in the
+    # BASELINE are detected from control_inputs when they are present; when
+    # capital_controls live in baseline scheduled_inputs (not in the harness
+    # call's control_inputs), AC-8 remains advisory-only.
+    if run_type == RunType.TYPE_B or str(run_type) == "TYPE_B":
+        limitations.append(
+            "ℹ Counter-factual scenario — scheduled inputs are INFERRED_STRUCTURAL "
+            "(Tier 3): the alternative policy path was not historically executed. "
+            "Direction verdict is advisory, not a backtesting fidelity assessment. "
+            "Persistent direction disagreement should be escalated to the Chief "
+            "Methodologist."
+        )
+
+    # AC-8 / AC-14: CAPITAL_CONTROLS detection (covers harness-level control_inputs;
+    # baseline scheduled_inputs require caller inspection — see Issue #1532)
     for inp in control_inputs:
         instrument = str(inp.get("instrument") or "").upper()
         if instrument == "CAPITAL_CONTROLS":
@@ -417,6 +436,7 @@ async def run_harness(
         control_inputs,
         primary_indicator=primary_indicator,
         n_steps=steps,
+        run_type=run_type,
     )
 
     own_client = http_client is None

@@ -32,7 +32,7 @@ _log = logging.getLogger(__name__)
 _SUBSCRIBED_EVENTS = frozenset({
     "gdp_growth_change",
     "imf_program_acceptance",
-    "capital_controls_imposition",
+    "credit_contraction_labour_shock",  # ADR-020 Channel C bridge
     "emergency_declaration",
 })
 

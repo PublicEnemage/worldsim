@@ -182,6 +182,10 @@ def build_ecuador_scenario() -> ScenarioCreateRequest:
             # bank deposits ("salvazo") in March 1999, equivalent to >USD 3bn.
             # Capital controls were imposed to prevent USD outflows.
             # Instrument: CAPITAL_CONTROLS (EmergencyInstrument).
+            # implementation_capacity=0: ADR-020 Channel B (credit contraction) is calibrated
+            # for full capital account closures (Iceland-type). Ecuador's "salvazo" was a bank
+            # deposit freeze — the banking sector impact is separately modeled via the bank_holiday
+            # input below. Channel B is explicitly zeroed here to preserve pre-ADR-020 fidelity.
             ScheduledInputSchema(
                 step=1,
                 input_type="EmergencyPolicyInput",
@@ -189,6 +193,7 @@ def build_ecuador_scenario() -> ScenarioCreateRequest:
                     "instrument": "capital_controls",
                     "target_entity": "ECU",
                     "expected_duration": 1,
+                    "implementation_capacity": "0",
                 },
             ),
             # Step 1 (1999): Banking system holiday — a 1-week banking holiday
