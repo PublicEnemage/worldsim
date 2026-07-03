@@ -5,6 +5,10 @@
  * Implements: ADR-010 Decisions 1–10, FA brief §TrajectoryView.
  * Design decisions: DD-012 (Zustand atom), DD-013 (divergence fill), DD-014 (step annotation).
  * Framework colors: frameworkColors.ts (UX Designer ruling, MV-001 closed 2026-05-23).
+ *
+ * Pure view-model functions (computeYDomain, computeDivergenceFill, getConfidenceBadgeVisible,
+ * mergeTrajectories, sliceToStepRange, MergedStepDatum) live in trajectoryViewModel.ts (#1522).
+ * Re-exported below for backward compatibility with existing import sites.
  */
 import React, { useMemo, useLayoutEffect, useRef } from "react";
 import {
@@ -26,9 +30,24 @@ import {
   type TrajectoryResponse,
   type MDAFloor,
 } from "../store/scenarioStepStore";
+import {
+  computeYDomain,
+  computeDivergenceFill,
+  getConfidenceBadgeVisible,
+  mergeTrajectories,
+  type MergedStepDatum,
+} from "./trajectoryViewModel";
+
+export {
+  computeYDomain,
+  computeDivergenceFill,
+  getConfidenceBadgeVisible,
+  mergeTrajectories,
+  type MergedStepDatum,
+};
 
 // ---------------------------------------------------------------------------
-// Exported constants and pure functions (tested by TrajectoryView.test.ts)
+// Exported constants (tested by TrajectoryView.test.ts)
 // ---------------------------------------------------------------------------
 
 /** All four framework keys in display-priority order. */
@@ -46,48 +65,6 @@ export const CONNECT_NULLS = false as const;
 export const CI_BAND_OPACITY = 0.12;
 /** Reduced opacity when showBaseline=true — divergence fill + CI ribbon coexist (M18-G1 #1254). */
 export const CI_BAND_OPACITY_MODE3 = 0.05;
-
-/**
- * Returns true when |active - baseline| > 0.01 and both values are non-null.
- * The 0.01 threshold prevents fill noise from floating-point rounding near convergence.
- * AC-010 tests the boundary exactly.
- */
-export function computeDivergenceFill(
-  active: number | null,
-  baseline: number | null,
-): boolean {
-  if (active === null || baseline === null) return false;
-  // Round to 4 decimal places to eliminate floating-point artifacts.
-  // 0.76 - 0.75 in IEEE 754 = 0.010000000000000009; rounded = 0.01 → not above threshold → false.
-  const delta = parseFloat(Math.abs(active - baseline).toFixed(4));
-  return delta > 0.01;
-}
-
-/**
- * Returns true when the confidence tier warrants the "(exp)" curve-face badge.
- * Badge appears at Tier 4 and 5 only. AC-013 tests the boundary at tier 3/4.
- */
-export function getConfidenceBadgeVisible(confidenceTier: number): boolean {
-  return confidenceTier >= 4;
-}
-
-/**
- * Compute adaptive y-axis domain from a set of composite score values.
- * Padding = max(0.05, 10% of range); result clamped to [0, 1].
- * Used by both the recharts path and CompositeChartSVG to ensure curve separation
- * is visible when scores cluster in a narrow band (e.g. FIN ~0.51–0.56, GOV ~0.51).
- */
-export function computeYDomain(values: number[]): [number, number] {
-  if (values.length === 0) return [0, 1];
-  const min = Math.min(...values);
-  const max = Math.max(...values);
-  const range = max - min;
-  const padding = Math.max(0.05, range * 0.1);
-  return [
-    Math.max(0, parseFloat((min - padding).toFixed(2))),
-    Math.min(1, parseFloat((max + padding).toFixed(2))),
-  ];
-}
 
 // ---------------------------------------------------------------------------
 // Phase 4 — composite encoding constants and helpers (ADR-017 §Decision table)
@@ -172,106 +149,8 @@ export function computeCompositeCIBounds(step: TrajectoryStep): { lower: number 
   };
 }
 
-// ---------------------------------------------------------------------------
-// Internal types
-// ---------------------------------------------------------------------------
-
-export interface MergedStepDatum {
-  step_index: number;
-  effective_from: string;
-  step_event_label: string | null;
-  step_significance: "SIGNIFICANT" | "ROUTINE";
-  financial_active: number | null;
-  financial_baseline: number | null;
-  human_development_active: number | null;
-  human_development_baseline: number | null;
-  ecological_active: number | null;
-  ecological_baseline: number | null;
-  governance_active: number | null;
-  governance_baseline: number | null;
-  financial_confidence_tier: number;
-  human_development_confidence_tier: number;
-  ecological_confidence_tier: number;
-  governance_confidence_tier: number;
-  financial_scoring_basis: string;
-  human_development_scoring_basis: string;
-  financial_ci_lower: number | null;
-  financial_ci_upper: number | null;
-  human_development_ci_lower: number | null;
-  human_development_ci_upper: number | null;
-  ecological_ci_lower: number | null;
-  ecological_ci_upper: number | null;
-  governance_ci_lower: number | null;
-  governance_ci_upper: number | null;
-  /** M19-G3 (#1537) / G4 (#1529): BandingEngine calibration state for CI display. */
-  financial_band_method: string | null;
-}
-
-// ---------------------------------------------------------------------------
-// Data merging
-// ---------------------------------------------------------------------------
-
-export function mergeTrajectories(
-  active: TrajectoryResponse,
-  baseline: TrajectoryResponse | null,
-): MergedStepDatum[] {
-  const baselineByStep = new Map<number, TrajectoryStep>();
-  if (baseline) {
-    for (const step of baseline.steps) {
-      baselineByStep.set(step.step_index, step);
-    }
-  }
-
-  return active.steps.map((step) => {
-    const bStep = baselineByStep.get(step.step_index) ?? null;
-
-    const get = (
-      source: TrajectoryStep | null,
-      fw: string,
-    ): number | null => source?.frameworks[fw]?.composite_score ?? null;
-
-    const tier = (fw: string): number =>
-      step.frameworks[fw]?.confidence_tier ?? 1;
-
-    const basis = (fw: string): string =>
-      step.frameworks[fw]?.scoring_basis ?? "percentile_rank";
-
-    const ci = (fw: string, bound: "ci_lower" | "ci_upper"): number | null => {
-      const raw = step.frameworks[fw]?.[bound] ?? null;
-      return raw !== null ? parseFloat(raw as unknown as string) : null;
-    };
-
-    return {
-      step_index: step.step_index,
-      effective_from: step.effective_from,
-      step_event_label: step.step_event_label,
-      step_significance: step.step_significance,
-      financial_active: get(step, "financial"),
-      financial_baseline: get(bStep, "financial"),
-      human_development_active: get(step, "human_development"),
-      human_development_baseline: get(bStep, "human_development"),
-      ecological_active: get(step, "ecological"),
-      ecological_baseline: get(bStep, "ecological"),
-      governance_active: get(step, "governance"),
-      governance_baseline: get(bStep, "governance"),
-      financial_confidence_tier: tier("financial"),
-      human_development_confidence_tier: tier("human_development"),
-      ecological_confidence_tier: tier("ecological"),
-      governance_confidence_tier: tier("governance"),
-      financial_scoring_basis: basis("financial"),
-      human_development_scoring_basis: basis("human_development"),
-      financial_ci_lower: ci("financial", "ci_lower"),
-      financial_ci_upper: ci("financial", "ci_upper"),
-      human_development_ci_lower: ci("human_development", "ci_lower"),
-      human_development_ci_upper: ci("human_development", "ci_upper"),
-      ecological_ci_lower: ci("ecological", "ci_lower"),
-      ecological_ci_upper: ci("ecological", "ci_upper"),
-      governance_ci_lower: ci("governance", "ci_lower"),
-      governance_ci_upper: ci("governance", "ci_upper"),
-      financial_band_method: step.frameworks["financial"]?.band_method ?? null,
-    };
-  });
-}
+// MergedStepDatum and mergeTrajectories live in trajectoryViewModel.ts (#1522).
+// Re-exported above for backward compatibility.
 
 // ---------------------------------------------------------------------------
 // Custom XAxis tick — Mode 1 step annotation (FA-C5, UD-R2)
