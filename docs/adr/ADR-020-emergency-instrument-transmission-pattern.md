@@ -6,7 +6,7 @@ arch-backlog-entry: ARCH-014
 issues:
   - "#1532 — Capital controls economic transmission gap"
   - "#1553 — Iceland 2008–11 fixture (blocked by this ADR)"
-status: Proposed
+status: Accepted
 tier: 2
 authored-by: Architect Agent
 authored-date: 2026-07-03
@@ -51,7 +51,10 @@ Consequences.
 
 ## Status
 
-`Proposed`
+`Accepted — 2026-07-03`
+
+Panel review complete. Five INCORPORATE items applied. EL acceptance on record in
+`docs/adr/reviews/ADR-020-panel-review.md`. G2D sprint entry (#1553) now unblocked.
 
 ---
 
@@ -181,7 +184,9 @@ Canonical event strings (all ten variants):
 **Implementation requirement:** The input processor (`app.simulation.orchestration.inputs`)
 must validate at runtime that the emitted string matches this registry. Any variant not in
 this table must fail loudly (raise `SimulationError`) rather than silently emitting an
-unregistered string.
+unregistered string. **Prior to raising `SimulationError`, the input processor must emit a
+`logger.error` message naming the unregistered string and the full registered set** — this
+ensures the error is locatable in long simulation traces. *(INCORPORATE-2, CE Agent review)*
 
 **Transmission completeness table (required for all variants):** Each EmergencyInstrument
 variant must have a documented module subscription table in
@@ -206,8 +211,12 @@ When `emergency_policy_capital_controls` fires:
 - **Calibration bounds (Iceland 2008 anchor):** Iceland's gross reserves increased from ~$3.3bn
   to ~$8.7bn in the 4 quarters following October 2008 controls implementation (Central Bank of
   Iceland, Annual Report 2009). This implies ε ≈ 0.65 for a severe capital flight environment.
-  Malaysia 1998 anchor: reserves stabilised within 1 quarter at ε ≈ 0.55. CM must calibrate
-  `ε` default at `0.60` with ±0.15 scenario band.
+  However, the IMF Stand-By Arrangement (~€1.5bn, concurrent with controls from October 2008)
+  contributed to the reserve recovery — the capital-controls-only ε is bounded at the lower end:
+  **ε_controls_only ∈ [0.45, 0.60]**. The Iceland heterodox (non-IMF) G2D fixture uses
+  **ε = 0.50** as its Type A calibration anchor. *(INCORPORATE-3, CM review)*
+  Malaysia 1998 anchor: reserves stabilised within 1 quarter at ε ≈ 0.55. Two-anchor
+  default: `ε = 0.60` with ±0.15 scenario band (heterodox-only scenarios: ε = 0.50).
 - **Duration:** effect persists for `duration_periods` steps; after expiry, `capital_account_outflow_velocity`
   reverts to pre-controls trajectory with a partial hysteresis factor (0.3 × original outflow rate,
   reflecting permanent structural change to capital account openness)
@@ -217,14 +226,19 @@ When `emergency_policy_capital_controls` fires:
 When `emergency_policy_capital_controls` fires:
 - `MacroeconomicModule` applies a `credit_tightening_factor` to the `domestic_credit_growth`
   variable: `Δcredit_growth = −β × controls_severity × implementation_capacity`
-  where `β ∈ [0.02, 0.06]` per step (annual; scale by timestep_label for biannual/quarterly)
+  where **β default = 0.020** (annual per step); range [0.015, 0.030] for standard capital
+  controls environments; [0.030, 0.060] reserved for banking-freeze co-occurrence only.
+  *(INCORPORATE-4, CM review — β revised from initial 0.025 estimate to 0.020 per Iceland
+  IMF Article IV 2010 credit contraction decomposition: ~1.5–2pp contribution to −6.6% GDP.)*
 - Downstream: GDP growth reduced by `γ × Δcredit_growth` where `γ` is the GDP-credit multiplier
-  (default 1.2, calibrated to CM-supplied regression estimate)
+  (default 1.2). **γ is a CM-supplied calibration constant. Changes to γ require CM Consulted
+  review — this is not CE author authority.** *(INCORPORATE-1, CE review)*
 - **Calibration bounds (Iceland anchor):** Iceland GDP contracted 6.6% in 2009; credit contraction
-  accounted for approximately 2–3pp of this (IMF Article IV 2010). Implies `β ≈ 0.025` for
-  an Iceland-severity controls environment. Malaysia 1998 recovery was faster (GDP +6.1% in 1999)
-  partly because credit contraction was offset by export competitiveness gains from ringgit
-  devaluation. CM to supply regression-estimated `β` before G2D implementation PR.
+  accounted for approximately 1.5–2pp of this (IMF Article IV 2010). β=0.020 at γ=1.2 implies
+  ~2.4pp GDP drag per step — consistent with the upper bound of the IMF decomposition.
+  Malaysia 1998 recovery was faster (GDP +6.1% in 1999) partly because credit contraction
+  was offset by export competitiveness gains from ringgit devaluation. CM calibration deliverable
+  (pre-G2D implementation PR gate) supplies validated β regression basis.
 - `fdi_stock_pct_gdp` also takes a step-down: `Δfdi = −δ × controls_severity` where
   `δ ∈ [0.005, 0.015]` per step (FDI deterrence effect; partially recovers post-controls)
 
@@ -239,11 +253,17 @@ receiving the signal.
 - Credit contraction (Channel B) flows into `DemographicModule` as a labour market shock:
   `Δq1_poverty_headcount_ratio = φ × Δcredit_growth × q1_labour_market_sensitivity`
   where `φ ∈ [0.3, 0.7]` (bottom quintile bears a disproportionate share of credit
-  contraction labour market impact)
-- Development Economist (C) must confirm the `φ` range reflects the bottom-quintile
-  concentration of informal credit market exposure documented in Development Economist
-  calibration notes. This is a distributional honesty requirement — `φ` must not be set
-  to a value that understates Q1 impact relative to the empirical literature.
+  contraction labour market impact; φ=0.30 for Iceland-class higher-income contexts;
+  φ=0.60–0.70 for lower-income informal-sector-heavy contexts)
+- Development Economist (C) confirms the `φ` range reflects the bottom-quintile
+  concentration of informal credit market exposure. This is a distributional honesty
+  requirement — `φ` must not be set to a value that understates Q1 impact relative
+  to the empirical literature.
+- **Scope note:** The φ factor applied to `q1_poverty_headcount_ratio` captures the Q1
+  component of a Q1+Q2 distributional effect. Bottom two quintiles bear the credit
+  contraction labour market impact in most country contexts. The Q2 component is not
+  separately modeled in the current DemographicModule — this is a known limitation
+  disclosed in §Known Limitations. *(INCORPORATE-5, Development Economist review)*
 
 ### Decision 3: DemographicModule Subscription Audit
 
@@ -271,9 +291,12 @@ for scenarios activating capital_controls instrument."
 
 **After implementation (G2D and subsequent fixtures):**
 ```
-"Capital controls transmission: reserve protection and credit contraction channels active.
-Calibration: Iceland 2008 (ε=0.60) and Malaysia 1998 anchors. Bilateral creditor composition
-and dollarised corporate debt amplification not modeled — see known_limitations §external-sector."
+"Capital controls transmission: reserve protection (Channel A, ε=0.60 default; heterodox
+non-IMF fixture: ε=0.50), credit contraction (Channel B, β=0.020), and distributional
+impact (Channel C, Q1 PHC) channels active. Calibration: Iceland 2008 and Malaysia 1998
+anchors (CM 2026-07-03). Q2 poverty headcount not separately modeled. Bilateral creditor
+composition, dollarised corporate debt amplification, and household debt overhang not
+modeled — see known_limitations §external-sector."
 ```
 
 The G2C fixtures (Greece Step 6, Sri Lanka, Egypt if applicable) that reference `#1532` in
@@ -571,6 +594,20 @@ policy positions, which is contrary to the mission principle of Defence, Not Off
   substantial foreign-currency-indexed debt. Capital controls that freeze FX outflows also
   freeze corporate debt service — this produces a banking system stress channel not modeled
   in Channel B. The `known_limitations` must note this for Iceland specifically.
+
+- **Q2 poverty headcount (Channel C scope gap):** The Channel C φ factor applies to
+  `q1_poverty_headcount_ratio` only. Credit contraction labour market impacts span Q1 and Q2
+  in most country contexts — the Q2 component is not separately modeled. Future milestone:
+  extend DemographicModule to model Q2 separately. `known_limitations` must disclose this
+  gap for capital controls scenarios. *(INCORPORATE-5, Development Economist review)*
+
+- **Iceland Q1 recovery arc — household debt overhang:** The Channel C recovery at Steps 4–5
+  (as exports recover) is plausible for Malaysia 1998 but too fast for Iceland 2008: Iceland's
+  Q1 poverty headcount remained elevated through 2011 due to foreign-currency mortgage
+  revaluation following the krona depreciation. The G2D fixture `known_limitations` must
+  note: "Iceland Q1 PHC recovery modeled as export-driven; household debt overhang not
+  captured — actual Q1 recovery was slower than modeled." (Development Economist calibration
+  note, panel review 2026-07-03)
 
 - **Reputational hysteresis:** Capital controls produce lasting investor risk-premium
   increases that persist beyond the duration of the controls themselves. ADR-020 models
