@@ -410,26 +410,35 @@ function CompositeChartSVG({
     return MARGIN.left + (i / (stepIndices.length - 1)) * chartW;
   };
 
-  const [yMin, yMax] = useMemo(() => {
+  // In comparison mode, MDA floors are excluded from the y-domain so tightly clustered
+  // scenario curves are not collapsed by a floor that anchors the scale far below the data.
+  // comparisonDataMin tracks the raw data minimum (pre-padding) for floor suppression (AC-2/#1629).
+  const [yMin, yMax, comparisonDataMin] = useMemo(() => {
     const values: number[] = [];
+    const inComparisonMode = comparisonScenarios.length > 0;
     for (const traj of [...Object.values(activeTrajectories), ...Object.values(baselineTrajectories)]) {
       for (const step of traj.steps) {
         const s = computeEntityCompositeScore(step);
         if (s !== null) values.push(s);
       }
-      const floor = getEntityMdaFloor(traj.mda_floors);
-      if (floor !== null) values.push(floor);
+      if (!inComparisonMode) {
+        const floor = getEntityMdaFloor(traj.mda_floors);
+        if (floor !== null) values.push(floor);
+      }
     }
+    let compDataMin: number | null = null;
     for (const sc of comparisonScenarios) {
       if (!sc.trajectory) continue;
       for (const step of sc.trajectory.steps) {
         const s = computeEntityCompositeScore(step);
-        if (s !== null) values.push(s);
+        if (s !== null) {
+          values.push(s);
+          compDataMin = compDataMin === null ? s : Math.min(compDataMin, s);
+        }
       }
-      const floor = getEntityMdaFloor(sc.trajectory.mda_floors);
-      if (floor !== null) values.push(floor);
+      // Floor excluded from values in comparison mode (see comment above)
     }
-    return computeYDomain(values);
+    return [...computeYDomain(values), compDataMin] as [number, number, number | null];
   }, [activeTrajectories, baselineTrajectories, comparisonScenarios]);
 
   const yScale = (score: number): number => {
@@ -634,11 +643,12 @@ function CompositeChartSVG({
         );
       })}
 
-      {/* Scenario comparison MDA floor lines — one per scenario, first gets zone1a-mda-floor-line testid */}
+      {/* Scenario comparison MDA floor lines — suppressed when floor is >0.10 below data min (AC-2/#1629) */}
       {comparisonScenarios.length > 0 && comparisonScenarios.map((sc, i) => {
         if (!sc.trajectory) return null;
         const floor = getEntityMdaFloor(sc.trajectory.mda_floors);
         if (floor === null) return null;
+        if (comparisonDataMin !== null && (comparisonDataMin - floor) > 0.10) return null;
         return (
           <line
             key={`scenario-mda-${sc.scenarioId}`}
