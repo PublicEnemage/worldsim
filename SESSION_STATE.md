@@ -6,7 +6,7 @@
 > Historical state lives in `docs/process/session-archives/`.
 > Authority: `docs/process/sprint-group-isolation.md §SESSION_STATE.md Cockpit Card Protocol`.
 
-**Last updated:** 2026-07-03 (HORIZON sweep — 3 insights-log entries dispositioned; #1522/#1524/#1623/#1629/#1630 added to M19; G2D gates CLEARED — implementation unblocked)
+**Last updated:** 2026-07-03 (state-sync-025: G2D lifecycle Steps 1+2 complete for #1532 — intent filed, 29 QA tests authored; 19↗ / 9✓ baseline)
 **Current milestone:** M19 — Constraint Search and Empirical Calibration
 
 ---
@@ -91,7 +91,7 @@
 - **G3 complete (2026-07-03):** ARCH-016 (ADR-007 Amendment 1) accepted; all three issues (#1543, #1536, #1537) implemented; BPO 3×ACCEPT; north star test CONDITIONAL PASS (G4 #1529 needed for Demo 8 Act 2). Integration PR #1617 auto-merging to release/m19.
 - **NM-084/NM-085:** CM sign-off ordering gap + co-dependent fixture CI sequencing (G2B). SOP improvements filed. G3 NM-084 gate satisfied correctly (CM sign-off on issue before PI gate comment before auto-merge).
 - **ADR-020 (ARCH-014) ACCEPTED 2026-07-03:** Capital controls transmission — 3 channels (ExternalSectorModule reserve protection ε=0.50 heterodox, MacroeconomicModule credit contraction β=0.020, DemographicModule Q1 PHC). Dead subscription fix. Canonical event string registry. G2D sprint entry EL-approved; journal #1621 open. Integration PR `sprint/m19-g2` → `release/m19` fires at G2D exit.
-- **G2D gates CLEARED 2026-07-03:** CM gate (PR #1625 — `calibration-basis.md §Capital Controls`: ε=0.60/0.50-ISL, β=0.020, γ=1.2, φ∈[0.3,0.7]) + CE gate (PR #1626 — full 7-variant audit, NM-090/NM-091, transmission table rewrite). Iceland implementation PR may open. Intent doc §3.2: `asset_nationalization` → `EmergencyInstrument.NATIONALIZATION`; Channel C uses `credit_contraction_labour_shock` bridge.
+- **G2D gates CLEARED 2026-07-03:** CM gate (PR #1625 — `calibration-basis.md §Capital Controls`: ε=0.60/0.50-ISL, β=0.020, γ=1.2, φ∈[0.3,0.7]) + CE gate (PR #1626 — full 7-variant audit, NM-090/NM-091, transmission table rewrite). Iceland implementation PR may open. G2D intent doc §3.2: `asset_nationalization` → `EmergencyInstrument.NATIONALIZATION`; Channel C uses `credit_contraction_labour_shock` bridge (not direct capital_controls subscription).
 - **NM-086:** E2E mock routes must be verified against `api_contracts.yml` before the implementation PR opens (G1, filed 2026-07-03). Process: QA Lead mock-helper verification is a blocking checklist item on intent authorship.
 - **M18 complete (v0.18.0, 2026-07-02):** G1–G7 delivered; Demo 7 PASS (unconditional); release/m18 → main via PR #1534. Archive: `docs/process/session-archives/session-state-pre-m19.md`.
 - **Demo 7 north star (2026-07-02):** Aicha presents Zambia +342K cohort effect with CI bounds and sourcing to IMF restructuring table. Next available DEMO-167.
