@@ -6,7 +6,8 @@
 > Historical state lives in `docs/process/session-archives/`.
 > Authority: `docs/process/sprint-group-isolation.md §SESSION_STATE.md Cockpit Card Protocol`.
 
-**Last updated:** 2026-07-03 (G3 confirmed — Bayesian posterior, meaninglessness threshold, BandResult fields; integration PR #1617 → release/m19; G4 #1529 coordination gate unblocked)**Current milestone:** M19 — Constraint Search and Empirical Calibration
+**Last updated:** 2026-07-03 (G2D EL-approved — Iceland 2008–11 fixture; journal #1621 open; ADR-020 accepted; integration PR defers to G2D exit)
+**Current milestone:** M19 — Constraint Search and Empirical Calibration
 
 ---
 
@@ -19,9 +20,9 @@
 | Exit checklist issue | #1535 (M19 Exit Checklist — blocks milestone closure) |
 | Release branch | `release/m19` — cut from `main` 2026-07-02 at 1bf1ecc |
 | Sprint plan | `docs/process/sprint-plans/m19-sprint-plan.md` — EL-approved 2026-07-02 |
-| Active wave | Wave 2 — G3 confirmed (integration PR #1617 auto-merging); G2D pending ADR-020; G4 coordination gate cleared |
-| Active sprint groups | G2D — pre-gate (ADR-020 required); G4 — coordination gate cleared, entry next |
-| Active sprint journal issues | #1587 (G3 — closed at exit) |
+| Active wave | Wave 2 — G2D active (EL-approved 2026-07-03); G4 coordination gate cleared, entry next |
+| Active sprint groups | G2D — implementation (pending CM/CE pre-implementation PR gates); G4 — not yet entered |
+| Active sprint journal issues | #1621 (G2D — Iceland 2008–11) |
 ---
 
 ## Open EL Decisions
@@ -44,7 +45,7 @@
 | Group | Sprint | Issues | Exit status |
 |---|---|---|---|
 | G2C | Battle-testing scenario runs | #1547 ✓, #1548 ✓, #1549 ✓, #1550 ✓, #1551 ✓, #1552 ✓, #1554 ✓ | Confirmed 2026-07-03 — exit doc `m19-g2c-sprint-exit.md`; integration PR defers to G2D exit |
-| G2D | Iceland 2008–11 orthodox vs heterodox | #1553 | Pre-gate — ADR-020 required (Architect Agent) |
+| G2D | Iceland 2008–11 orthodox vs heterodox | #1553, #1532 | EL-approved 2026-07-03 — journal #1621; pending CM/CE pre-impl gates |
 | G3 | Bayesian posterior + BandResult + threshold | #1543 ✓, #1536 ✓, #1537 ✓ | Confirmed 2026-07-03 — exit `m19-g3-sprint-exit.md`; integration PR #1617 auto-merging |
 | G4 | PSP driver arc + CI label precision | #1528, #1529 | Coordination gate cleared — G4 #1529 may open after G3 #1537 merged ✓ |
 ---
@@ -55,10 +56,11 @@
 |---|---|---|---|
 | #1535 | M19 Exit Checklist | — (gate) | Milestone exit gate |
 | #1544 | Demo 8 — live stakeholder session | — (exit gate) | Primary deliverable |
-| #1532 | Capital controls transmission gap | Pre-wave/known-gap | Immediate — blocks Iceland (#1553) |
+| #1532 | Capital controls transmission gap | G2D (implementation) | Immediate — closes with G2D implementation PR |
 | #1456 | MDAAlertPanel Zone1B: scenarioId crash | Pre-wave | Immediate — crash risk |
 | #1538 | Focal cohort floor validation | Pre-wave | Immediate — #1540 prerequisite |
-| #1553 | Iceland 2008–11 Type A+B | G2D Wave 2 | Medium — blocked: ADR-020 acceptance || #1528 | PSP driver arc + auditability panel (DEMO-165) | G4 Wave 2–3 | High |
+| #1553 | Iceland 2008–11 Type A+B | G2D Wave 2 | Active — EL-approved; pending CM/CE gates |
+| #1528 | PSP driver arc + auditability panel (DEMO-165) | G4 Wave 2–3 | High |
 | #1529 | '95% CI' label precision fix | G4 Wave 2–3 | High — coordination gate cleared; open after G3 #1537 merged |
 
 ---
@@ -83,6 +85,8 @@
 - **NM-076:** Before any testid rename, grep the full E2E corpus for the old testid; update E2E tests in the same PR. Rule in CODING_STANDARDS.md (PR #1439).
 - **G3 complete (2026-07-03):** ARCH-016 (ADR-007 Amendment 1) accepted; all three issues (#1543, #1536, #1537) implemented; BPO 3×ACCEPT; north star test CONDITIONAL PASS (G4 #1529 needed for Demo 8 Act 2). Integration PR #1617 auto-merging to release/m19.
 - **NM-084/NM-085:** CM sign-off ordering gap + co-dependent fixture CI sequencing (G2B). SOP improvements filed. G3 NM-084 gate satisfied correctly (CM sign-off on issue before PI gate comment before auto-merge).
-- **ADR-020 (ARCH-014):** Emergency instrument economic transmission pattern — capital controls channels. EL confirmed M19 scope 2026-07-03. Architect Agent activates to author ADR-020; G2D sprint entry files after acceptance. G2C integration PR defers to G2D exit per sprint entry §1.5.- **NM-086:** E2E mock routes must be verified against `api_contracts.yml` before the implementation PR opens (G1, filed 2026-07-03). Process: QA Lead mock-helper verification is a blocking checklist item on intent authorship.
+- **ADR-020 (ARCH-014) ACCEPTED 2026-07-03:** Capital controls transmission — 3 channels (ExternalSectorModule reserve protection ε=0.50 heterodox, MacroeconomicModule credit contraction β=0.020, DemographicModule Q1 PHC). Dead subscription fix. Canonical event string registry. G2D sprint entry EL-approved; journal #1621 open. Integration PR `sprint/m19-g2` → `release/m19` fires at G2D exit.
+- **G2D pre-implementation PR gates:** CM calibration deliverable (`calibration-basis.md §Capital Controls`) + CE DemographicModule audit (all 10 variants) must land before Iceland feature PR opens. Both are CM/CE owned; PM Agent does not block sprint start on them.
+- **NM-086:** E2E mock routes must be verified against `api_contracts.yml` before the implementation PR opens (G1, filed 2026-07-03). Process: QA Lead mock-helper verification is a blocking checklist item on intent authorship.
 - **M18 complete (v0.18.0, 2026-07-02):** G1–G7 delivered; Demo 7 PASS (unconditional); release/m18 → main via PR #1534. Archive: `docs/process/session-archives/session-state-pre-m19.md`.
 - **Demo 7 north star (2026-07-02):** Aicha presents Zambia +342K cohort effect with CI bounds and sourcing to IMF restructuring table. Next available DEMO-167.
