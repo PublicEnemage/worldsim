@@ -86,7 +86,8 @@
 - **sprint-branch-ci-gate Ruleset:** Node ID `RRS_lACqUmVwb3NpdG9yecc5IKi2kzgEV92A`. Requires `changes`, `lint`, `test-backend`, `compliance-scan`. (playwright-e2e not required — NM-076 context.)
 - **NM-075:** git worktrees must be allocated per sprint group (`git worktree add /tmp/<name> <branch>`) to prevent branch switches overwriting in-progress work.
 - **NM-076:** Before any testid rename, grep the full E2E corpus for the old testid; update E2E tests in the same PR. Rule in CODING_STANDARDS.md (PR #1439).
-- **NM-084:** E2E mock routes must be verified against `api_contracts.yml` before the implementation PR opens. Filed 2026-07-03. Process: QA Lead FA-confirmation open items are now blocking conditions on intent approval gate.
+- **NM-084/NM-085:** CM sign-off ordering gap + co-dependent fixture CI sequencing (G2B). SOP improvements filed: §Pre-Merge CM Review Gate + §Co-Dependent Fixture Sprint Entry Requirements.
+- **NM-086:** E2E mock routes must be verified against `api_contracts.yml` before the implementation PR opens (G1, filed 2026-07-03). Process: QA Lead mock-helper verification is a blocking checklist item on intent authorship.
 - **M18 complete (v0.18.0, 2026-07-02):** G1–G7 delivered; Demo 7 PASS (unconditional); release/m18 → main via PR #1534. Archive: `docs/process/session-archives/session-state-pre-m19.md`.
 - **Demo 7 north star (2026-07-02):** Aicha presents Zambia +342K cohort effect with CI bounds and sourcing to IMF restructuring table. Next available DEMO-167.
 - **Socratic TEST gaps (M19 scope):** #1536 (meaninglessness threshold), #1537 (BandResult visible fields), #1538 (focal cohort floor validation) — all filed 2026-07-02, assigned M19.

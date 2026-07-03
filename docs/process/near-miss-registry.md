@@ -4255,6 +4255,37 @@ Codify the documentation requirement in `docs/process/sprint-planning-sop.md §C
 
 ---
 
+## NM-086 — E2E Mock Route Not Verified Against `api_contracts.yml`; CI Caught Contract Mismatch That Pre-Push Gate Missed (Reactive)
+
+**Date:** 2026-07-03
+**Milestone:** M19 — Constraint Search and Empirical Calibration
+**Detected by:** G1 E2E CI failure (PR #1574); `mode3-constraint-floor.spec.ts` mock helpers used incorrect route shape not matching `api_contracts.yml`
+**Severity:** Medium — E2E tests failed in CI rather than silently passing with a wrong mock; no incorrect analytical output reached users. Pre-push gate (`npm run build`) passed because the build does not exercise E2E mocks.
+
+### What happened
+
+The G1 E2E spec (`frontend/tests/e2e/m19-g1-constraint-floor-search.spec.ts`) was authored with mock helpers that did not match the actual API contract for the constraint-floor search endpoint. The discrepancy was caught when E2E tests ran in CI on PR #1574. A follow-up fix PR (#1579) corrected the mock helpers against `api_contracts.yml`.
+
+The implementing agent did not read `api_contracts.yml` before authoring the E2E mock helpers, despite the schema registry rule in CLAUDE.md requiring this for any agent calling or implementing an API endpoint.
+
+### What was at risk
+
+If E2E tests had been authored to soft-skip or if the CI E2E job had been non-required at the time, the incorrect mock helpers would have merged and future test authors would have copied them — propagating a contract mismatch that silently passes while testing the wrong behaviour.
+
+### What caught it
+
+CI (E2E job on PR #1574). The pre-push hook (`npm run build`) passed because TypeScript compilation does not catch runtime mock shape mismatches. Local E2E execution would have caught it, but was not run before push.
+
+### Process improvement
+
+**QA Lead obligation at intent authorship:** When authoring E2E test files for endpoints that have entries in `api_contracts.yml`, the QA Lead must include a checklist item in the intent document confirming that mock helper shapes were verified against `api_contracts.yml` before the test file is filed. The checklist item is: "Mock helpers verified against `docs/schema/api_contracts.yml §[endpoint name]`? [yes/no]". A test file filed without this confirmation is flagged as incomplete by the PI Agent at sprint entry.
+
+**Implementing agent obligation:** Before opening any PR that adds or modifies E2E mock helpers, the implementing agent must grep `docs/schema/api_contracts.yml` for the relevant endpoint and confirm the mock shape matches. This is an extension of the existing schema registry rule in CLAUDE.md §Standards and Conventions.
+
+Codified in `docs/CODING_STANDARDS.md §E2E Mock Helper Authorship` as part of the G2C sprint entry, or earlier if a frontend-touching sprint opens first.
+
+---
+
 ## NM-NNN — [Short descriptive title]
 
 **Date:** YYYY-MM-DD (or approximate milestone era)
