@@ -16,7 +16,7 @@ Accepted
 
 **Standards Version:** 2026-05-23 (Amendment 1: 2026-07-02)
 **Valid Until:** Milestone 13 — Methodology Publication and Public Launch; Amendment 1 reviewed at M20 or on MAGNITUDE_MATCH trigger (whichever is first)
-**License Status:** ACCEPTED — 2026-05-23; Amendment 1: PROPOSED — 2026-07-02 (pending panel sign-offs)
+**License Status:** ACCEPTED — 2026-05-23; Amendment 1: PROPOSED — 2026-07-02; panel conditions incorporated 2026-07-02 — pending EL acceptance
 
 **M12 exit review:** 2026-06-10 (SCAN-026). No renewal triggers fired during Milestone 12. The synthetic data framework was not implemented in M12 — ADR-007 `Quantity` schema fields (`is_synthetic`, `synthetic_method`, `comparison_group_id`, `holdout_validated`) remain unimplemented (Issue #22, now deferred to M13). No sixth method proposed, holdout validation gate unchanged, confidence tier max() arithmetic unchanged, meaninglessness threshold unchanged, anomaly detection governance constraints unchanged. Implementation pressure now carries to M13 as a first-order obligation: M13's methodology publication scope makes the synthetic data framework a pre-publication requirement — undocumented synthetic fields block the methodology transparency commitment. License renewed to Milestone 13.
 
@@ -649,13 +649,25 @@ After coverage evidence is available from ≥1 backtesting case achieving MAGNIT
 
 **Correction factor (per tier):**
 ```
-κ_t = clamp(sqrt(C_target / C_mag_t), 0.5, 2.0)
+κ_t = clamp(sqrt(C_target / max(C_mag_t, 0.05)), 0.5, 2.0)
 ```
 where:
 - `C_target = 0.80` (the target coverage fraction)
-- `C_mag_t` = empirical magnitude coverage for tier `t` from the calibration evidence
+- `max(C_mag_t, 0.05)` — floor prevents zero-coverage from consuming the full clamp budget (CM Condition A)
 - Square-root dampening prevents overcorrection when a single backtesting case is available
 - Clamped to [0.5, 2.0] — multiplier cannot be halved or doubled from prior in a single calibration
+
+**Evidence insufficiency guard (CM Condition A):**
+If `C_mag_t < 0.05`, the calibration evidence is insufficient. Record the registry entry
+with status `EVIDENCE_INSUFFICIENT` for that tier; do not update the multiplier. Structural
+prior remains in use for that tier until sufficient evidence accumulates.
+
+**Indicator-scoped evidence (CM Condition B):**
+Calibration registry entries from backtesting cases with known indicator-level limitations
+(recorded in the case's `known_limitations` output) must record `affected_indicators_excluded:
+list[str]` and measure coverage over the clean-indicator subset only. SEN's entry must
+exclude external-sector-sensitive indicators affected by the CommodityShockConfig direction
+mismatch (#1541 known gap).
 
 **Posterior multiplier (per tier):**
 ```
@@ -675,9 +687,12 @@ changes to `"PRE_CALIBRATION_PROVISIONAL_DIRECTIONAL"` to distinguish from the p
 
 **Calibration registry:** Posterior multiplier values are stored in
 `docs/backtesting/calibration-registry.md`. Each entry records: case ID, fidelity tier,
-empirical coverage, correction factor, posterior multiplier, and calibration date.
+empirical coverage, correction factor, posterior multiplier, calibration date, and
+`affected_indicators_excluded` (empty list when no limitations apply).
 The registry is append-only. The banding engine reads the most recent accepted entry
-per tier at startup. An entry is "accepted" only after Architect Agent + CM review.
+per tier at startup via module-level `_CALIBRATION_MULTIPLIERS: dict[int, Decimal]`,
+overridable via `set_calibration_multipliers()` for testing (CE Condition B).
+An entry is "accepted" only after Architect Agent + CM review.
 
 #### 8.5 — is_pre_calibration Transition Protocol
 
@@ -733,6 +748,26 @@ G3 must expose the raw `band_method` and `is_pre_calibration` fields via API. G3
 encode CI label text. G4 #1529 owns the label text decision. G3 and G4 must coordinate
 on `band_method` enum values before either implementation PR merges. The coordination
 gate is: G3 #1537 implementation PR merged → G4 #1529 reads merged field names → G4 opens PR.
+
+**`band_method` enum stability (UX Designer Concern 1):**
+The four values are frozen API from the moment G3 #1537's implementation PR merges.
+Values may not be renamed post-merge; G4 #1529 hardcodes label strings keyed to these
+exact strings. New values may be appended via minor amendment. Any addition requires an
+amendment entry below this one.
+
+**Suppressed CI slot display contract (UX Designer Concern 2):**
+When `is_meaningless=True`, the CI slot must not be blank. It must show a brief
+placeholder: "Data range too wide for confidence interval." A blank slot forces the analyst
+to investigate the absence rather than understanding it at a glance. G3 #1537's intent
+document must include this as a frontend acceptance criterion.
+
+**Per-state display contract requirement (UX Designer Concern 3):**
+G3 #1537's intent document must include a display contract table specifying what the CI
+label component renders for each of the four `band_method` states. Label strings are
+delegated to G4 #1529, but the contract (what each state must show) is a G3 deliverable.
+"PRE_CALIBRATION_PROVISIONAL_DIRECTIONAL" is the state Aicha encounters at Demo 8 — it
+must have defined UI treatment before Demo 8 or the north star test (§8.10) conditional
+PASS becomes a FAIL.
 
 #### 8.8 — Silent Failure Mode
 
