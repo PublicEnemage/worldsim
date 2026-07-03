@@ -919,13 +919,139 @@ class TestPakistanTypeB:
             await asgi_client.delete(f"/api/v1/scenarios/{cf_id}")
 
 
-# Turkey (#1551) — TestTurkeyTypeB
-# ----------------------------------------
-# ACs: AC-1..5, AC-9, AC-10, AC-NC-2 (advisory), AC-NC-3, AC-TUR-1..3
-# Run: Type B
-# Primary indicator: fin_composite
-# Advisory: direction_verdict COUNTER_FACTUAL_BETTER
-# Add in: feat/m19-g2c-turkey-backside (after CM advisory on #1551)
+@pytest.mark.backtesting
+@pytest.mark.asyncio(loop_scope="session")
+class TestTurkeyTypeB:
+    """AC-1..5, AC-9, AC-10, AC-NC-2 (advisory), AC-NC-3, AC-TUR-1..3.
+
+    Type B: CB independence (rate hold) vs actual rate-cut path.
+    Backside of Power Curve canonical case. Skips without DATABASE_URL.
+    """
+
+    @pytest_asyncio.fixture(loop_scope="session")
+    async def asgi_client(self) -> AsyncGenerator[httpx.AsyncClient, None]:
+        if not _DATABASE_URL:
+            pytest.skip("DATABASE_URL not set — skipping Turkey Type B tests")
+        async with httpx.AsyncClient(
+            transport=httpx.ASGITransport(app=app),
+            base_url="http://test",
+        ) as client:
+            yield client
+
+    async def test_construction(self, asgi_client: httpx.AsyncClient) -> None:
+        """AC-1, AC-2, AC-NC-3, AC-TUR-1: importable; entity=TUR; CF has no step-3/4 cuts."""
+        from tests.fixtures.turkey_2018_scenario import (
+            build_turkey_counterfactual_scenario,
+            build_turkey_scenario,
+        )
+
+        baseline = build_turkey_scenario()
+        cf = build_turkey_counterfactual_scenario()
+
+        assert baseline.configuration.entities[0] == "TUR"
+        assert cf.configuration.entities[0] == "TUR"
+        assert baseline.configuration.n_steps == 4
+        assert cf.configuration.n_steps == 4
+
+        # AC-TUR-1: counter-factual has no rate-cut inputs at Steps 3 and 4
+        cf_step3_cuts = [
+            s for s in (cf.scheduled_inputs or [])
+            if s.step in (3, 4) and s.input_type == "MonetaryRateInput"
+            and float(s.input_data.get("value", "0")) < 0
+        ]
+        assert not cf_step3_cuts, (
+            "AC-TUR-1 FAIL: counter-factual should have NO negative MonetaryRateInput "
+            f"at steps 3 or 4 (found {cf_step3_cuts!r}). "
+            "The CB independence path holds the rate at 24%."
+        )
+
+    async def test_type_b_run(self, asgi_client: httpx.AsyncClient) -> None:
+        """AC-3, AC-4, AC-5, AC-9, AC-10, AC-TUR-2/3: full Type B run."""
+        from tests.fixtures.turkey_2018_scenario import (
+            build_turkey_counterfactual_scenario,
+            build_turkey_scenario,
+        )
+
+        b_resp = await asgi_client.post(
+            "/api/v1/scenarios",
+            json=build_turkey_scenario().model_dump(mode="json"),
+        )
+        assert b_resp.status_code == 201, f"AC-3 FAIL: {b_resp.status_code}"
+        baseline_id: str = b_resp.json()["scenario_id"]
+
+        cf_resp = await asgi_client.post(
+            "/api/v1/scenarios",
+            json=build_turkey_counterfactual_scenario().model_dump(mode="json"),
+        )
+        assert cf_resp.status_code == 201, f"AC-3 FAIL: {cf_resp.status_code}"
+        cf_id: str = cf_resp.json()["scenario_id"]
+
+        try:
+            result = await run_harness(
+                scenario_id=cf_id,
+                steps=4,
+                run_type=RunType.TYPE_B,
+                control_inputs=[{} for _ in range(4)],
+                baseline_run_id=baseline_id,
+                primary_indicator="fin_composite",
+                http_client=asgi_client,
+            )
+
+            assert len(result.per_step_records) == 4
+            assert "direction_verdict" in result.summary
+            verdict = result.summary["direction_verdict"]
+            valid_verdicts = {
+                DirectionVerdict.COUNTER_FACTUAL_BETTER,
+                DirectionVerdict.BASELINE_BETTER,
+                DirectionVerdict.INDISTINGUISHABLE,
+            }
+            assert verdict in valid_verdicts or str(verdict) in {
+                str(v) for v in valid_verdicts
+            }
+
+            per_step_diff = result.summary.get("per_step_diff", [])
+            assert isinstance(per_step_diff, list) and len(per_step_diff) == 4
+
+            known = result.summary.get("known_limitations", [])
+            assert isinstance(known, list) and len(known) >= 1, "AC-5 FAIL"
+
+            tier3_found = any(
+                term in str(e)
+                for e in known
+                for term in ("Tier 3", "INFERRED_STRUCTURAL", "hypothetical")
+            )
+            if not tier3_found:
+                warnings.warn(
+                    "AC-9 advisory (TUR): no Tier 3 disclosure in known_limitations.",
+                    UserWarning, stacklevel=1,
+                )
+
+            # AC-TUR-2: direction advisory (expected CF_BETTER — rate hold better for FX)
+            _assert_direction_advisory(
+                actual=verdict,
+                expected=DirectionVerdict.COUNTER_FACTUAL_BETTER,
+                country="TUR",
+                indicator="fin_composite",
+            )
+
+            # AC-TUR-3: per_step_diff should diverge at step 3 (first cut)
+            if len(per_step_diff) >= 3:
+                step3_diff = per_step_diff[2]
+                step2_diff = per_step_diff[1]
+                if step3_diff is not None and step2_diff is not None:
+                    try:
+                        diverged = abs(float(step3_diff)) > abs(float(step2_diff))
+                    except (TypeError, ValueError):
+                        diverged = False
+                    if not diverged:
+                        warnings.warn(
+                            "AC-TUR-3 advisory (TUR): per_step_diff did not diverge "
+                            "at Step 3 (first rate cut). Expected step3 diff > step2 diff.",
+                            UserWarning, stacklevel=1,
+                        )
+        finally:
+            await asgi_client.delete(f"/api/v1/scenarios/{baseline_id}")
+            await asgi_client.delete(f"/api/v1/scenarios/{cf_id}")
 
 
 # Egypt (#1552) — TestEgyptTypeB
