@@ -6,7 +6,7 @@
 > Historical state lives in `docs/process/session-archives/`.
 > Authority: `docs/process/sprint-group-isolation.md §SESSION_STATE.md Cockpit Card Protocol`.
 
-**Last updated:** 2026-07-02 (G1 sprint entry EL-approved; sprint/m19-g1 cut; journal #1570 open; G2A entry EL-approved; sprint/m19-g2 ready to cut; next action: Frontend Architect Agent opens feat/m19-g1-* implementation branch; Computation Engine Agent cuts sprint/m19-g2)
+**Last updated:** 2026-07-03 (G1/G2A/G2B all complete; G1 integrated to release/m19 (PR #1582); G2A PI confirm integrated (PR #1583); Wave 2 is next — G2C through G4)
 **Current milestone:** M19 — Constraint Search and Empirical Calibration
 
 ---
@@ -20,9 +20,9 @@
 | Exit checklist issue | #1535 (M19 Exit Checklist — blocks milestone closure) |
 | Release branch | `release/m19` — cut from `main` 2026-07-02 at 1bf1ecc |
 | Sprint plan | `docs/process/sprint-plans/m19-sprint-plan.md` — EL-approved 2026-07-02 |
-| Active wave | Wave 1 — G1 open (sprint/m19-g1 cut 2026-07-02, journal #1570); G2A entry EL-approved (sprint/m19-g2 ready to cut) |
-| Active sprint groups | G1 (open — sprint/m19-g1 cut, journal #1570); G2A (entry EL-approved, sprint/m19-g2 not yet cut) |
-| Active sprint journal issues | #1570 (G1 — Mode 3 constraint-floor search) |
+| Active wave | Wave 2 — G2C through G4 (G1/G2A/G2B complete) |
+| Active sprint groups | None open — G2C entry next |
+| Active sprint journal issues | None |
 
 ---
 
@@ -34,7 +34,17 @@
 
 ---
 
-## M19 Open Issues (22 total)
+## Wave 1 Sprint Status
+
+| Group | Sprint | Issues | Exit status |
+|---|---|---|---|
+| G1 | Mode 3 constraint-floor search | #1540 ✓, #1563 ✓, #1564 ✓ | Confirmed — integrated to release/m19 (PR #1582, 2026-07-03) |
+| G2A | Headless battle-testing harness | #1546 ✓ | Confirmed — PI confirm retroactively filed PR #1580/#1583 |
+| G2B | SEN + ZMB backtesting fixtures | #1541 ✓, #1542 ✓ | Confirmed — exit doc PR #1578 |
+
+---
+
+## M19 Open Issues (Wave 2+)
 
 | Issue | Title | Group | Priority |
 |---|---|---|---|
@@ -43,19 +53,13 @@
 | #1532 | Capital controls transmission gap | Pre-wave/known-gap | Immediate — blocks Iceland (#1553) |
 | #1456 | MDAAlertPanel Zone1B: scenarioId crash | Pre-wave | Immediate — crash risk |
 | #1538 | Focal cohort floor validation | Pre-wave | Immediate — #1540 prerequisite |
-| #1540 | Mode 3 constraint-floor search | G1 Wave 1 | High — Demo 8 Act 1 |
-| #1563 | AC-016: Form 3 column visibility CI assertion | G1 (pre-ship — same PR as #1540) | Pre-ship condition |
-| #1564 | MV-001 three-way CVD validation (blue/orange/teal) | G1 (pre-ship — same PR as #1540) | Pre-ship condition |
-| #1546 | Headless battle-testing harness | G2A Wave 1 | High — all scenario runs depend on this |
-| #1541 | SEN backtesting fixture | G2B Wave 1 | High — Bayesian gate |
-| #1542 | ZMB backtesting fixture | G2B Wave 1 | High — Bayesian gate |
-| #1547 | Greece 2010–15 counter-factual Type B | G2C Wave 1–2 | Medium |
-| #1548 | Argentina 2001 counter-factual Type B | G2C Wave 1–2 | Medium |
-| #1549 | Sri Lanka 2022–23 Type A+B | G2C Wave 1–2 | Medium |
-| #1550 | Pakistan 2022–23 Type B | G2C Wave 1–2 | Medium |
-| #1551 | Turkey 2018–19 Type B | G2C Wave 1–2 | Medium |
-| #1552 | Egypt 2016 Type B | G2C Wave 1–2 | Medium |
-| #1554 | Ghana 2022–23 Type A+B | G2C Wave 1–2 | Medium |
+| #1547 | Greece 2010–15 counter-factual Type B | G2C Wave 2 | Medium |
+| #1548 | Argentina 2001 counter-factual Type B | G2C Wave 2 | Medium |
+| #1549 | Sri Lanka 2022–23 Type A+B | G2C Wave 2 | Medium |
+| #1550 | Pakistan 2022–23 Type B | G2C Wave 2 | Medium |
+| #1551 | Turkey 2018–19 Type B | G2C Wave 2 | Medium |
+| #1552 | Egypt 2016 Type B | G2C Wave 2 | Medium |
+| #1554 | Ghana 2022–23 Type A+B | G2C Wave 2 | Medium |
 | #1553 | Iceland 2008–11 Type A+B | G2D Wave 2 | Medium — blocked: #1532 |
 | #1543 | ADR-007 Bayesian posterior layer | G3 Wave 2 | High — Demo 8 Act 2 CI |
 | #1536 | ADR-007 meaninglessness threshold | G3 Wave 2 | High — coord #1543 |
@@ -65,14 +69,24 @@
 
 ---
 
+## Demo 8 Open Conditions (tracked from sprint exits)
+
+| Condition | Source | Blocking |
+|---|---|---|
+| Tolerance band (±0.01) visible in FOUND state UI | Customer Agent L3 on #1540 | Demo 8 Act 1 |
+| AC-12: resolve structural-absence indicator key (replace `__structural_absence__` placeholder) | Customer Agent L3 on #1540 | Demo 8 Act 1 |
+
+---
+
 ## Carry-Forward Context
 
 - **Process model (M19 onward):** Sprint group isolation (Option E hybrid) + SESSION_STATE.md cockpit card (≤ 200 lines). Full protocol: `docs/process/sprint-group-isolation.md`. Shared state via `chore/m{N}-state-sync-NNN` → `release/m{N}` (PM Agent). Auto-merge: `gh pr merge --auto`.
 - **Pre-push hook:** `.githooks/pre-push` enforces ruff + mypy (backend) and `npm run build` (frontend). Install: `git config core.hooksPath .githooks`.
 - **GA-02 / Path 2 retirement (PR #1393):** Proprietary ministry data upload retired on open-source-as-strategy principle. No implementation without EL-approved governance exception.
-- **sprint-branch-ci-gate Ruleset:** Node ID `RRS_lACqUmVwb3NpdG9yec5IKi2kzgEV92A`. Requires `changes`, `lint`, `test-backend`, `compliance-scan`. (playwright-e2e not required — NM-076 context.)
+- **sprint-branch-ci-gate Ruleset:** Node ID `RRS_lACqUmVwb3NpdG9yecc5IKi2kzgEV92A`. Requires `changes`, `lint`, `test-backend`, `compliance-scan`. (playwright-e2e not required — NM-076 context.)
 - **NM-075:** git worktrees must be allocated per sprint group (`git worktree add /tmp/<name> <branch>`) to prevent branch switches overwriting in-progress work.
 - **NM-076:** Before any testid rename, grep the full E2E corpus for the old testid; update E2E tests in the same PR. Rule in CODING_STANDARDS.md (PR #1439).
+- **NM-084:** E2E mock routes must be verified against `api_contracts.yml` before the implementation PR opens. Filed 2026-07-03. Process: QA Lead FA-confirmation open items are now blocking conditions on intent approval gate.
 - **M18 complete (v0.18.0, 2026-07-02):** G1–G7 delivered; Demo 7 PASS (unconditional); release/m18 → main via PR #1534. Archive: `docs/process/session-archives/session-state-pre-m19.md`.
 - **Demo 7 north star (2026-07-02):** Aicha presents Zambia +342K cohort effect with CI bounds and sourcing to IMF restructuring table. Next available DEMO-167.
 - **Socratic TEST gaps (M19 scope):** #1536 (meaninglessness threshold), #1537 (BandResult visible fields), #1538 (focal cohort floor validation) — all filed 2026-07-02, assigned M19.
