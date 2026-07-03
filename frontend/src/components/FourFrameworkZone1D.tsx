@@ -226,6 +226,20 @@ export const DRIVER_LABELS: Record<string, string> = {
   social_stability: "social stability",
 };
 
+const DRIVER_ABBREVIATIONS: Record<string, string> = {
+  fiscal_sustainability: "FISC",
+  external_balance: "EXT",
+  governance: "GOV",
+  social_stability: "SOC",
+};
+
+const DRIVER_METHODOLOGY: Record<string, string> = {
+  fiscal_sustainability: "spending cuts or tax increases in this step (legitimacy erosion)",
+  external_balance: "GDP growth change in this step (erosion via output shortfall)",
+  governance: "emergency policy actions in this step (immediate fragility response)",
+  social_stability: "legitimacy below fragility threshold at step start (baseline erosion)",
+};
+
 const CONTAINER_STYLE: React.CSSProperties = {
   padding: "6px 10px",
   boxSizing: "border-box",
@@ -254,6 +268,7 @@ export function FourFrameworkZone1D({
   pspDominantDriver,
 }: FourFrameworkZone1DProps) {
   const { trajectory, current_step, mda_alerts, mode } = useScenarioStepStore();
+  const [driverPanelOpen, setDriverPanelOpen] = React.useState(false);
 
   // Top alert per framework for the "see alerts →" navigation link (#745)
   const topAlertByFramework: Record<string, string> = {};
@@ -563,14 +578,138 @@ export function FourFrameworkZone1D({
                         : "STABLE"}
                     </span>
                   </div>
-                  {pspDominantDriver != null && DRIVER_LABELS[pspDominantDriver] && (
-                    <div
-                      data-testid="psp-driver-row"
-                      style={{ paddingTop: 1, fontSize: 10, color: "#555" }}
-                    >
-                      {`Driver: ${DRIVER_LABELS[pspDominantDriver]}`}
-                    </div>
-                  )}
+                  {pspDominantDriver != null && DRIVER_LABELS[pspDominantDriver] && (() => {
+                    const fragilityActive =
+                      legitimacyValue != null &&
+                      legitimacyFloor != null &&
+                      parseFloat(legitimacyValue) < parseFloat(legitimacyFloor);
+                    // Arc: per-step driver from trajectory steps (G4 #1528)
+                    const arcSteps = (trajectory?.steps ?? []).map((s) => ({
+                      stepIndex: s.step_index,
+                      driver: s.psp_dominant_driver ?? null,
+                    }));
+                    return (
+                      <>
+                        {/* Driver row — clickable expand affordance (AC-11, AC-4, AC-7) */}
+                        <button
+                          data-testid="psp-driver-row"
+                          onClick={() => setDriverPanelOpen((o) => !o)}
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 4,
+                            background: "none",
+                            border: "none",
+                            padding: "1px 0",
+                            cursor: "pointer",
+                            textAlign: "left",
+                            fontSize: 10,
+                            color: "#555",
+                            width: "100%",
+                          }}
+                        >
+                          <span
+                            data-testid="psp-driver-expand"
+                            style={{ fontSize: 8, color: "#888", userSelect: "none" }}
+                          >
+                            {driverPanelOpen ? "▼" : "▶"}
+                          </span>
+                          {`Driver: ${DRIVER_LABELS[pspDominantDriver]}`}
+                        </button>
+
+                        {/* PSP driver arc — step-indexed badges (AC-1, AC-2, AC-3, AC-8, AC-10) */}
+                        {arcSteps.length > 0 && (
+                          <div
+                            data-testid="psp-driver-arc"
+                            style={{
+                              display: "flex",
+                              flexWrap: "wrap",
+                              gap: 3,
+                              paddingTop: 2,
+                              paddingBottom: 1,
+                            }}
+                          >
+                            {arcSteps.map((s) => {
+                              const label = s.driver != null
+                                ? (DRIVER_ABBREVIATIONS[s.driver] ?? s.driver)
+                                : "—";
+                              const isCurrent = s.stepIndex === current_step;
+                              return (
+                                <span
+                                  key={s.stepIndex}
+                                  data-testid={`psp-driver-arc-step-${s.stepIndex}`}
+                                  style={{
+                                    fontSize: 8,
+                                    fontWeight: isCurrent ? 700 : 400,
+                                    border: isCurrent ? "1px solid #555" : "none",
+                                    borderRadius: 2,
+                                    padding: "0 2px",
+                                    color: isCurrent ? "#333" : "#888",
+                                    lineHeight: 1.5,
+                                  }}
+                                >
+                                  {label}
+                                </span>
+                              );
+                            })}
+                          </div>
+                        )}
+
+                        {/* Driver methodology expand panel (AC-4, AC-5, AC-6, AC-7) */}
+                        {driverPanelOpen && (
+                          <div
+                            data-testid="psp-driver-methodology-panel"
+                            style={{
+                              marginTop: 3,
+                              padding: "4px 6px",
+                              background: "#f9f9f9",
+                              border: "1px solid #e0e0e0",
+                              borderRadius: 3,
+                              fontSize: 9,
+                              color: "#444",
+                              lineHeight: 1.5,
+                            }}
+                          >
+                            <div style={{ fontWeight: 600, marginBottom: 3, color: "#333" }}>
+                              How the driver is attributed:
+                            </div>
+                            {Object.entries(DRIVER_METHODOLOGY).map(([key, desc]) => (
+                              <div
+                                key={key}
+                                data-testid={`psp-driver-category-${key}`}
+                                style={{ paddingBottom: 2 }}
+                              >
+                                <span style={{ fontWeight: 600 }}>
+                                  {DRIVER_LABELS[key] ?? key}
+                                </span>
+                                {" — "}
+                                {desc}
+                              </div>
+                            ))}
+                            <div
+                              data-testid="psp-driver-fragility-status"
+                              style={{
+                                marginTop: 3,
+                                paddingTop: 3,
+                                borderTop: "1px solid #e0e0e0",
+                                color: fragilityActive ? "#a06000" : "#555",
+                                fontWeight: fragilityActive ? 600 : 400,
+                              }}
+                            >
+                              {fragilityActive
+                                ? "⚠ Fragility amplifier active — contributions amplified by fragility factor at current legitimacy"
+                                : "Fragility amplifier inactive — contributions at base weight"}
+                            </div>
+                            <div style={{ marginTop: 3, paddingTop: 3, borderTop: "1px solid #e0e0e0", color: "#888" }}>
+                              The dominant driver is the category with the largest event-weighted
+                              contribution at this step. Ties resolved in priority order:
+                              governance &gt; fiscal sustainability &gt; external balance.
+                            </div>
+                          </div>
+                        )}
+                      </>
+                    );
+                  })()}
                   {analogue && (
                     <div
                       data-testid="psp-historical-analogue"

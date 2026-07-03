@@ -31,6 +31,8 @@ export interface TrajectoryStep {
   step_significance: "SIGNIFICANT" | "ROUTINE";
   frameworks: Record<string, TrajectoryFrameworkPoint>;
   pmm: { value: number; direction: "up" | "down" | "flat" } | null;
+  /** M19-G4 (#1528): dominant PSP driver at this step, for arc display in Zone 1D. */
+  psp_dominant_driver?: string | null;
 }
 
 export interface MDAFloor {
