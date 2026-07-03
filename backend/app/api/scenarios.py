@@ -2001,6 +2001,55 @@ async def run_scenario(
 # ---------------------------------------------------------------------------
 
 
+async def _focal_cohort_phc(
+    conn: asyncpg.Connection,
+    scenario_id: str,
+    step_executed: int,
+) -> str | None:
+    """Read focal cohort indicator value from the just-completed step snapshot.
+
+    Returns the string value of monitored_focal_cohorts[0].indicator_key for the
+    primary scenario entity. Used to populate focal_cohort_poverty_headcount in
+    AdvanceResponse (#1541/#1542, M19 G2B). Returns None if the scenario has no
+    monitored_focal_cohorts or the indicator is absent from the snapshot.
+    """
+    cfg_row = await conn.fetchrow(
+        "SELECT configuration FROM scenarios WHERE scenario_id = $1",
+        scenario_id,
+    )
+    if cfg_row is None:
+        return None
+    cfg_raw = cfg_row["configuration"]
+    if isinstance(cfg_raw, str):
+        cfg_raw = json.loads(cfg_raw)
+    focal_cohorts_raw = cfg_raw.get("monitored_focal_cohorts") or []
+    if not focal_cohorts_raw:
+        return None
+    indicator_key = (focal_cohorts_raw[0] or {}).get("indicator_key", "")
+    if not indicator_key:
+        return None
+    entities = cfg_raw.get("entities") or []
+    entity_id = entities[0] if entities else ""
+    if not entity_id:
+        return None
+    snap_row = await conn.fetchrow(
+        "SELECT state_data FROM scenario_state_snapshots "
+        "WHERE scenario_id = $1 AND step = $2",
+        scenario_id,
+        step_executed,
+    )
+    if snap_row is None:
+        return None
+    state_raw = snap_row["state_data"]
+    if isinstance(state_raw, str):
+        state_raw = json.loads(state_raw)
+    indicator = (state_raw.get(entity_id) or {}).get(indicator_key)
+    if not isinstance(indicator, dict):
+        return None
+    val = indicator.get("value")
+    return str(val) if val is not None else None
+
+
 @router.post("/scenarios/{scenario_id}/advance", response_model=AdvanceResponse)
 async def advance_scenario(
     scenario_id: str,
@@ -2029,12 +2078,14 @@ async def advance_scenario(
     from app.simulation.web_scenario_runner import WebScenarioRunner  # noqa: PLC0415
 
     summary = await WebScenarioRunner().run_single_step(conn, scenario_id)
+    focal_phc = await _focal_cohort_phc(conn, scenario_id, summary.step_executed)
     return AdvanceResponse(
         scenario_id=summary.scenario_id,
         step_executed=summary.step_executed,
         steps_remaining=summary.steps_remaining,
         final_status=summary.final_status,
         is_complete=summary.is_complete,
+        focal_cohort_poverty_headcount=focal_phc,
     )
 
 
