@@ -77,12 +77,16 @@ def _tier_multiplier(confidence_tier: int) -> Decimal:
 class BandResult:
     """Output of compute_band for a single framework point."""
 
-    ci_lower: str | None            # Decimal-as-string; None when composite_score is None
-    ci_upper: str | None            # Decimal-as-string; None when composite_score is None
+    ci_lower: str | None            # Decimal-as-string; None when suppressed or null score
+    ci_upper: str | None            # Decimal-as-string; None when suppressed or null score
     ci_coverage: float | None       # 0.80 or None
-    is_pre_calibration: bool | None # True or None
-    clipped_lower: bool                # True if max(natural_lower, raw_lower) fired
-    clipped_upper: bool                # True if min(natural_upper, raw_upper) fired
+    is_pre_calibration: bool | None # True or None (None when suppressed)
+    clipped_lower: bool             # True if max(natural_lower, raw_lower) fired
+    clipped_upper: bool             # True if min(natural_upper, raw_upper) fired
+    # Visible fields added M19 G3 #1537 — all defaulted for backwards compatibility
+    band_method: str | None = None  # frozen enum; None only on null-score path
+    is_meaningless: bool = False    # True when CI suppressed (full natural range)
+    suppressed_reason: str | None = None  # human-readable suppression reason
 
 
 # ---------------------------------------------------------------------------
@@ -109,6 +113,7 @@ def compute_band(
             is_pre_calibration=None,
             clipped_lower=False,
             clipped_upper=False,
+            band_method=None,
         )
 
     if framework not in _FRAMEWORK_BOUNDS:
@@ -121,6 +126,7 @@ def compute_band(
             is_pre_calibration=None,
             clipped_lower=False,
             clipped_upper=False,
+            band_method=None,
         )
 
     natural_lower, natural_upper = _FRAMEWORK_BOUNDS[framework]
@@ -150,4 +156,5 @@ def compute_band(
         is_pre_calibration=True,
         clipped_lower=clipped_lower,
         clipped_upper=clipped_upper,
+        band_method="PRE_CALIBRATION_STRUCTURAL_PRIOR",
     )
