@@ -125,7 +125,7 @@ at implementation PR time, the PR must be held until cleared.
 | Deliverable | Intent document | Test file path | Authored before implementation? |
 |---|---|---|---|
 | Iceland fixture (#1553) | `docs/process/intents/M19-G2D-2026-07-03-iceland-2008-backtesting-fixture.md` | `backend/tests/test_m19_g2d_iceland_scenario_runs.py` | **No — implementing agent authors before first implementation commit** |
-| Capital controls channels (#1532) | `docs/process/intents/M19-G2D-2026-07-03-capital-controls-transmission-channels.md` | `backend/tests/simulation/modules/test_adr020_capital_controls_transmission.py` | **No — implementing agent authors before first implementation commit** |
+| Capital controls channels (#1532) | `docs/process/intents/M19-G2D-2026-07-03-capital-controls-transmission-channels.md` | `backend/tests/unit/test_adr020_capital_controls_transmission.py` | **Yes — tests filed 2026-07-03; 19 failures / 9 passes baseline confirmed** |
 
 *The test file follows the G2C pattern (`test_m19_g2c_scenario_runs.py`). Tests are
 `@pytest.mark.backtesting` and skip without `DATABASE_URL`. Implementing agent authors

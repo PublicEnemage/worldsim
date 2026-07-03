@@ -363,7 +363,7 @@ unit tests here (AC-4, AC-6, AC-8) must detect these failures before the fixture
 **QA Lead:** QA Lead Agent (in-channel — CE Agent authors unit tests; QA Lead reviews before
 implementation PR opens)
 **Test authorship deadline:** Before any G2D implementation PR opens on `sprint/m19-g2`
-**Test file location:** `backend/tests/simulation/modules/test_adr020_capital_controls_transmission.py`
+**Test file location:** `backend/tests/unit/test_adr020_capital_controls_transmission.py`
 
 **Test classification:** Unit tests (no `@pytest.mark.backtesting`; no `DATABASE_URL` required).
 Use mock event bus and module instances in isolation. The Iceland G2D fixture scenario run
@@ -402,13 +402,17 @@ fixture runs.
   C fix must not accidentally alter existing DM elasticity rows).
 
 **QA Lead acknowledgment:**
-`[ ]` QA Lead: Tests for AC-1 through AC-11 authored and filed at
-`backend/tests/simulation/modules/test_adr020_capital_controls_transmission.py`. [Date]
-`[ ]` QA Lead: Bridge event payload schema verified — `delta_credit_growth` key confirmed in
-`credit_contraction_labour_shock` event dict before DM handler test authored. [Date]
-`[ ]` QA Lead: `"capital_controls_imposition"` confirmed absent from DM `_SUBSCRIBED_EVENTS`
-by direct inspection of `backend/app/simulation/modules/demographic/module.py` (not by reading
-this intent document). [Date]
+`[x]` QA Lead: Tests for AC-1 through AC-11 authored and filed at
+`backend/tests/unit/test_adr020_capital_controls_transmission.py`. [2026-07-03]
+`[x]` QA Lead: Bridge event payload schema verified — `credit_contraction_labour_shock` carries
+a single affected_attribute with negative magnitude (delta_credit_growth); DM handler tests
+authored against this confirmed structure. [2026-07-03]
+`[x]` QA Lead: `"capital_controls_imposition"` confirmed PRESENT in DM `_SUBSCRIBED_EVENTS`
+by direct inspection of `backend/app/simulation/modules/demographic/module.py:32-37` —
+confirming this is the live bug that AC-5 tests detect (test currently FAILS, will PASS after fix).
+[2026-07-03]
+`[x]` QA Lead: Test run baseline confirmed — 19 FAILED (target-state tests; expected before
+implementation) / 9 PASSED (pre-existing correct behaviors). No import or syntax errors. [2026-07-03]
 
 ---
 
