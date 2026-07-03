@@ -6,7 +6,7 @@
 > Historical state lives in `docs/process/session-archives/`.
 > Authority: `docs/process/sprint-group-isolation.md §SESSION_STATE.md Cockpit Card Protocol`.
 
-**Last updated:** 2026-07-03 (G2D confirmed; integration PR pending; journal #1621 closed; Wave 2 complete)
+**Last updated:** 2026-07-03 (G2D confirmed; Ecuador regression fixed PR #1642; integration PR #1641 pending — CI re-running)
 **Current milestone:** M19 — Constraint Search and Empirical Calibration
 
 ---
@@ -20,8 +20,8 @@
 | Exit checklist issue | #1535 (M19 Exit Checklist — blocks milestone closure) |
 | Release branch | `release/m19` — cut from `main` 2026-07-02 at 1bf1ecc |
 | Sprint plan | `docs/process/sprint-plans/m19-sprint-plan.md` — EL-approved 2026-07-02 |
-| Active wave | Wave 2 — G2D confirmed (2026-07-03); integration PR pending; Wave 3+ next |
-| Active sprint groups | None — G2D exit confirmed; integration PR sprint/m19-g2 → release/m19 pending |
+| Active wave | Wave 2 — G2D confirmed; Ecuador regression fixed (PR #1642); integration PR #1641 pending CI re-run |
+| Active sprint groups | None — G2D exit confirmed; integration PR #1641 sprint/m19-g2 → release/m19 pending (CI re-running after conflict fix PR #1643) |
 | Active sprint journal issues | None — #1621 closed at G2D PI Agent confirmation |
 
 ---
@@ -88,7 +88,7 @@
 - **NM-076:** Before any testid rename, grep the full E2E corpus for the old testid; update E2E tests in the same PR. Rule in CODING_STANDARDS.md (PR #1439).
 - **G3 complete (2026-07-03):** ARCH-016 (ADR-007 Amendment 1) accepted; all three issues (#1543, #1536, #1537) implemented; BPO 3×ACCEPT; north star test CONDITIONAL PASS (G4 #1529 needed for Demo 8 Act 2 — now RESOLVED). Integration PR #1617 merged.
 - **NM-084/NM-085:** CM sign-off ordering gap + co-dependent fixture CI sequencing (G2B). SOP improvements filed. G3 NM-084 gate satisfied correctly (CM sign-off on issue before PI gate comment before auto-merge).
-- **G2D complete (2026-07-03):** ADR-020 channels A/B/C implemented (PR #1635; 28/28 unit tests). Iceland 2008–11 fixture (PR #1639; heterodox vs orthodox counter-factual). BPO 2×ACCEPT; north star PASS (Zambia restructuring scenario; heterodox path analytically distinguishable). Journal #1621 closed. Integration PR `sprint/m19-g2 → release/m19` pending (PI gate comment required before auto-merge fires). Demo 8 condition: DIRECTION_ONLY qualifier required on Iceland direction verdict at Demo 8 Act 2.
+- **G2D complete (2026-07-03):** ADR-020 channels A/B/C implemented (PR #1635; 28/28 unit tests). Iceland 2008–11 fixture (PR #1639; heterodox vs orthodox counter-factual). BPO 2×ACCEPT; north star PASS (Zambia restructuring scenario; heterodox path analytically distinguishable). Journal #1621 closed. Ecuador regression fix (PR #1642 — implementation_capacity=0 for salvazo; Channel B was firing via one-step lag). Merge conflict resolved on sprint/m19-g2 (PR #1643). Integration PR #1641 `sprint/m19-g2 → release/m19` pending auto-merge — CI re-running after conflict resolution. Demo 8 condition: DIRECTION_ONLY qualifier required on Iceland direction verdict at Demo 8 Act 2.
 - **ADR-020 (ARCH-014) calibration constants (frozen):** Channel A ε=0.60 (ISL controls-only), β=0.020, γ=1.2 (CM constant — CE cannot change without CM Consulted), φ=−0.30 (ISL Q1 informal PHC). Sources: `calibration-basis.md §Capital Controls` (PR #1625).
 - **NM-086:** E2E mock routes must be verified against `api_contracts.yml` before the implementation PR opens (G1, filed 2026-07-03). Process: QA Lead mock-helper verification is a blocking checklist item on intent authorship.
 - **G4 forward condition (G5 scope):** Issue #1632 (`band_method` missing from `api_contracts.yml §trajectory` — G3 delivery gap). Schema-only fix. Must resolve before G5 closes. NM-086 gate left open in G4 QA ack block.
