@@ -6,7 +6,7 @@
 > Historical state lives in `docs/process/session-archives/`.
 > Authority: `docs/process/sprint-group-isolation.md §SESSION_STATE.md Cockpit Card Protocol`.
 
-**Last updated:** 2026-07-03 (HORIZON sweep complete — 3 insights-log entries dispositioned; #1623 ELASTICITY_REGISTRY calibration gap, #1629 ZMB curve collapse, #1630 HD narration mismatch added to M19; G2D both pre-impl gates CLEARED)
+**Last updated:** 2026-07-03 (state-sync-025: G2D lifecycle Steps 1+2 complete for #1532 — intent filed, 29 QA tests authored; 19↗ / 9✓ baseline)
 **Current milestone:** M19 — Constraint Search and Empirical Calibration
 
 ---
@@ -21,7 +21,7 @@
 | Release branch | `release/m19` — cut from `main` 2026-07-02 at 1bf1ecc |
 | Sprint plan | `docs/process/sprint-plans/m19-sprint-plan.md` — EL-approved 2026-07-02 |
 | Active wave | Wave 2 — G2D active (EL-approved 2026-07-03); G4 coordination gate cleared, entry next |
-| Active sprint groups | G2D — implementation (pending CM/CE pre-implementation PR gates); G4 — not yet entered |
+| Active sprint groups | G2D — implementation (gates cleared — implementation PR may open); G4 — not yet entered |
 | Active sprint journal issues | #1621 (G2D — Iceland 2008–11) |
 ---
 
@@ -62,9 +62,11 @@
 | #1553 | Iceland 2008–11 Type A+B | G2D Wave 2 | Active — EL-approved; pending CM/CE gates |
 | #1528 | PSP driver arc + auditability panel (DEMO-165) | G4 Wave 2–3 | High |
 | #1529 | '95% CI' label precision fix | G4 Wave 2–3 | High — coordination gate cleared; open after G3 #1537 merged |
-| #1623 | ELASTICITY_REGISTRY — empirical calibration gap for non-SSA entity families | CM Wave 2–3 | High — CM Sprint A (GRC/Euro area) is M19 priority; unblocks Greece counter-factual |
-| #1629 | Zone 1A ZMB scenario comparison: y-axis not tight-scoped | Demo 8 risk | High — Demo 8 Act 2 display fidelity |
-| #1630 | Demo 8 Act 1 narration: HD line implied but not rendered | Demo 8 risk | High — Demo 8 Act 1 narration correction required |
+| #1522 | View model layer retrofit — Zone 1 composition logic extraction | Wave 3+ | High — EL-added to M19 |
+| #1524 | Zone 1A TrajectoryView: pinch-zoom, thumbwheel zoom, pan | Wave 3+ | High — EL-added to M19 |
+| #1623 | ELASTICITY_REGISTRY — non-SSA entity family calibration gap | CM Wave 2–3 | High — CM Sprint A (GRC/Euro area) M19 priority; unblocks Greece counter-factual |
+| #1629 | Zone 1A ZMB y-axis not tight-scoped — curves collapse | Demo 8 risk | High — Demo 8 Act 2 display fidelity; `computeYDomain` fix required |
+| #1630 | Demo 8 Act 1 narration: HD line implied but not rendered in Zone 1A | Demo 8 risk | High — Demo 8 Act 1; narration correction or per-framework lines (EL decision) |
 
 ---
 
