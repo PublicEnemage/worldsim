@@ -40,6 +40,8 @@ from __future__ import annotations
 from datetime import UTC, datetime
 from decimal import Decimal
 
+import pytest
+
 from app.simulation.engine.models import (
     Event,
     MeasurementFramework,
@@ -186,6 +188,7 @@ def _bridge_event(
 # ---------------------------------------------------------------------------
 
 
+@pytest.mark.xfail(strict=True, reason="ADR-020 Channel A not yet implemented — #1532")
 def test_esm_subscribes_to_emergency_policy_capital_controls() -> None:
     """AC-1: ESM must include 'emergency_policy_capital_controls' in subscribed events."""
     esm = ExternalSectorModule(commodity_price_shocks=[], start_date=None)
@@ -200,6 +203,7 @@ def test_esm_subscribes_to_emergency_policy_capital_controls() -> None:
 # ---------------------------------------------------------------------------
 
 
+@pytest.mark.xfail(strict=True, reason="ADR-020 Channel A not yet implemented — #1532")
 def test_esm_capital_controls_produces_positive_reserve_coverage_delta() -> None:
     """AC-2: ESM Channel A — capital controls produce positive reserve_coverage_months delta."""
     entity = _make_entity(
@@ -248,6 +252,7 @@ def test_esm_no_capital_controls_event_produces_no_reserve_channel_a_event() -> 
     )
 
 
+@pytest.mark.xfail(strict=True, reason="ADR-020 Channel A not yet implemented — #1532")
 def test_esm_reserve_delta_tagged_financial_framework() -> None:
     """AC-2: Channel A reserve event is tagged FINANCIAL (consistent with reserve events)."""
     entity = _make_entity(capital_account_outflow_velocity=0.5)
@@ -270,6 +275,7 @@ def test_esm_reserve_delta_tagged_financial_framework() -> None:
 # ---------------------------------------------------------------------------
 
 
+@pytest.mark.xfail(strict=True, reason="ADR-020 Channel B not yet implemented — #1532")
 def test_mm_subscribes_to_emergency_policy_capital_controls() -> None:
     """AC-3: MM _SUBSCRIBED_EVENTS must include 'emergency_policy_capital_controls'."""
     assert "emergency_policy_capital_controls" in MM_SUBSCRIBED_EVENTS, (
@@ -278,6 +284,7 @@ def test_mm_subscribes_to_emergency_policy_capital_controls() -> None:
     )
 
 
+@pytest.mark.xfail(strict=True, reason="ADR-020 Channel B not yet implemented — #1532")
 def test_mm_capital_controls_produces_gdp_contraction() -> None:
     """AC-3: Channel B — capital controls produce negative gdp_growth delta (credit contraction)."""
     entity = _make_entity(gdp_growth=0.0)
@@ -298,6 +305,7 @@ def test_mm_capital_controls_produces_gdp_contraction() -> None:
     )
 
 
+@pytest.mark.xfail(strict=True, reason="ADR-020 Channel B not yet implemented — #1532")
 def test_mm_channel_b_beta_gamma_product() -> None:
     """AC-3: Verify β=0.020 and γ=1.2 produce the expected GDP impact direction and scale."""
     from app.simulation.modules.macroeconomic.module import (
@@ -318,6 +326,7 @@ def test_mm_channel_b_beta_gamma_product() -> None:
     assert expected_gdp_impact < Decimal("0.1"), "Expected impact must be < 10pp (sanity bound)"
 
 
+@pytest.mark.xfail(strict=True, reason="ADR-020 Channel B not yet implemented — #1532")
 def test_mm_gamma_is_not_caller_configurable() -> None:
     """AC-9: γ is a CM-supplied constant — MacroeconomicModule must not accept it as a parameter."""
     from app.simulation.modules.macroeconomic.module import CAPITAL_CONTROLS_GAMMA
@@ -340,6 +349,7 @@ def test_mm_gamma_is_not_caller_configurable() -> None:
 # ---------------------------------------------------------------------------
 
 
+@pytest.mark.xfail(strict=True, reason="ADR-020 Channel B not yet implemented — #1532")
 def test_mm_capital_controls_emits_bridge_event() -> None:
     """AC-4: Channel B must emit 'credit_contraction_labour_shock' bridge after credit contraction.
 
@@ -364,6 +374,7 @@ def test_mm_capital_controls_emits_bridge_event() -> None:
     )
 
 
+@pytest.mark.xfail(strict=True, reason="ADR-020 Channel B not yet implemented — #1532")
 def test_mm_bridge_event_has_nonzero_delta_credit_growth() -> None:
     """AC-4: Bridge event payload must carry non-zero delta_credit_growth so DM can apply φ."""
     entity = _make_entity(gdp_growth=0.0)
@@ -385,6 +396,7 @@ def test_mm_bridge_event_has_nonzero_delta_credit_growth() -> None:
     )
 
 
+@pytest.mark.xfail(strict=True, reason="ADR-020 Channel B not yet implemented — #1532")
 def test_mm_bridge_event_magnitude_is_negative_for_credit_contraction() -> None:
     """AC-4: Bridge magnitude must be negative (credit contracted) for DM elasticity sign."""
     entity = _make_entity(gdp_growth=0.0)
@@ -408,6 +420,7 @@ def test_mm_bridge_event_magnitude_is_negative_for_credit_contraction() -> None:
 # ---------------------------------------------------------------------------
 
 
+@pytest.mark.xfail(strict=True, reason="ADR-020 Channel C not yet implemented — #1532")
 def test_dm_does_not_subscribe_to_capital_controls_imposition() -> None:
     """AC-5 / SF-4 guard: 'capital_controls_imposition' must be removed from DM _SUBSCRIBED_EVENTS.
 
@@ -457,6 +470,7 @@ def test_capital_controls_imposition_event_produces_no_dm_response() -> None:
 # ---------------------------------------------------------------------------
 
 
+@pytest.mark.xfail(strict=True, reason="ADR-020 Channel C not yet implemented — #1532")
 def test_dm_subscribes_to_credit_contraction_labour_shock() -> None:
     """AC-6: DM _SUBSCRIBED_EVENTS must include 'credit_contraction_labour_shock'."""
     assert "credit_contraction_labour_shock" in DM_SUBSCRIBED_EVENTS, (
@@ -465,6 +479,7 @@ def test_dm_subscribes_to_credit_contraction_labour_shock() -> None:
     )
 
 
+@pytest.mark.xfail(strict=True, reason="ADR-020 Channel C not yet implemented — #1532")
 def test_elasticity_registry_has_credit_contraction_labour_shock_row() -> None:
     """AC-6: ELASTICITY_REGISTRY must have at least one 'credit_contraction_labour_shock' row."""
     rows = [r for r in ELASTICITY_REGISTRY if r.event_type == "credit_contraction_labour_shock"]
@@ -475,6 +490,7 @@ def test_elasticity_registry_has_credit_contraction_labour_shock_row() -> None:
     )
 
 
+@pytest.mark.xfail(strict=True, reason="ADR-020 Channel C not yet implemented — #1532")
 def test_credit_contraction_elasticity_targets_q1_cohort() -> None:
     """AC-6: The credit_contraction_labour_shock row must target a Q1 income quintile cohort."""
     rows = [r for r in ELASTICITY_REGISTRY if r.event_type == "credit_contraction_labour_shock"]
@@ -487,6 +503,7 @@ def test_credit_contraction_elasticity_targets_q1_cohort() -> None:
     )
 
 
+@pytest.mark.xfail(strict=True, reason="ADR-020 Channel C not yet implemented — #1532")
 def test_credit_contraction_elasticity_is_in_phi_range() -> None:
     """AC-6: φ elasticity value must be in [0.3, 0.7] per calibration-basis.md §Capital Controls."""
     rows = [r for r in ELASTICITY_REGISTRY if r.event_type == "credit_contraction_labour_shock"]
@@ -517,6 +534,7 @@ def test_credit_contraction_elasticity_is_decimal_not_float() -> None:
 # ---------------------------------------------------------------------------
 
 
+@pytest.mark.xfail(strict=True, reason="ADR-020 Channel C not yet implemented — #1532")
 def test_dm_credit_contraction_labour_shock_raises_q1_phc() -> None:
     """AC-7: Channel C bridge event triggers positive poverty_headcount_ratio delta (Q1)."""
     entity = _make_entity()
@@ -541,6 +559,7 @@ def test_dm_credit_contraction_labour_shock_raises_q1_phc() -> None:
     )
 
 
+@pytest.mark.xfail(strict=True, reason="ADR-020 Channel C not yet implemented — #1532")
 def test_dm_credit_contraction_q1_phc_delta_is_positive() -> None:
     """AC-7: PHC delta must be positive — credit contraction increases bottom-quintile poverty."""
     entity = _make_entity()
@@ -602,6 +621,7 @@ def test_emergency_policy_capital_controls_produces_no_dm_response_directly() ->
 # ---------------------------------------------------------------------------
 
 
+@pytest.mark.xfail(strict=True, reason="ADR-020 Channel B not yet implemented — #1532")
 def test_mm_capital_controls_gamma_constant_value() -> None:
     """AC-9: γ=1.2 must be a module-level constant (CM-supplied; requires CM review to change)."""
     from app.simulation.modules.macroeconomic.module import CAPITAL_CONTROLS_GAMMA
@@ -613,6 +633,7 @@ def test_mm_capital_controls_gamma_constant_value() -> None:
     )
 
 
+@pytest.mark.xfail(strict=True, reason="ADR-020 Channel B not yet implemented — #1532")
 def test_mm_capital_controls_gamma_is_decimal() -> None:
     """AC-9: γ must be Decimal — CODING_STANDARDS prohibit float for all multiplier constants."""
     from app.simulation.modules.macroeconomic.module import CAPITAL_CONTROLS_GAMMA
