@@ -6,7 +6,7 @@
 > Historical state lives in `docs/process/session-archives/`.
 > Authority: `docs/process/sprint-group-isolation.md §SESSION_STATE.md Cockpit Card Protocol`.
 
-**Last updated:** 2026-07-03 (G2C EL-approved; journal #1589 open; Greece/Argentina may proceed; new-country PRs gated on CM advisory)
+**Last updated:** 2026-07-03 (G4 confirmed; integration PR #1637 set to auto-merge; G3 journal #1587 closed retroactively; G2D implementation active)
 **Current milestone:** M19 — Constraint Search and Empirical Calibration
 
 ---
@@ -20,9 +20,9 @@
 | Exit checklist issue | #1535 (M19 Exit Checklist — blocks milestone closure) |
 | Release branch | `release/m19` — cut from `main` 2026-07-02 at 1bf1ecc |
 | Sprint plan | `docs/process/sprint-plans/m19-sprint-plan.md` — EL-approved 2026-07-02 |
-| Active wave | Wave 2 — G2C approved; G3 BLOCKED_ADR (ARCH-016); G4 follows G3 |
-| Active sprint groups | G2C — implementation open (Greece/Argentina); G3 — BLOCKED_ADR |
-| Active sprint journal issues | #1589 (G2C — Battle-Testing Scenario Runs); #1587 (G3 — Bayesian Posterior Calibration) |
+| Active wave | Wave 2 — G2D implementation active; G3 and G4 confirmed |
+| Active sprint groups | G2D — implementation open (Iceland #1553; capital controls impl branches active) |
+| Active sprint journal issues | #1621 (G2D — Iceland 2008–11) |
 
 ---
 
@@ -30,17 +30,21 @@
 
 | Decision | Status |
 |---|---|
-| ARCH-014 scope: capital controls full fix M19 or defer to M20? | Pre-wave assessment complete: full fix requires ADR (ARCH-014 PENDING_NUMBER). Iceland (#1553) stays blocked. EL decision needed on whether to scope ADR authorship in M19 Wave 2 or defer to M20. |
+| ARCH-014 scope: capital controls full fix M19 or defer to M20? | **RESOLVED** — EL approved in M19 Wave 2 (chore/m19-state-sync-024, 2026-07-03). Iceland implementation unblocked; G2D implementation branches open (channel-impl, dm-audit, cm-calibration). |
 
 ---
 
-## Wave 1 Sprint Status
+## Sprint Status (Wave 1 + Wave 2)
 
 | Group | Sprint | Issues | Exit status |
 |---|---|---|---|
 | G1 | Mode 3 constraint-floor search | #1540 ✓, #1563 ✓, #1564 ✓ | Confirmed — integrated to release/m19 (PR #1582, 2026-07-03) |
 | G2A | Headless battle-testing harness | #1546 ✓ | Confirmed — PI confirm retroactively filed PR #1580/#1583 |
 | G2B | SEN + ZMB backtesting fixtures | #1541 ✓, #1542 ✓ | Confirmed — exit doc PR #1578 |
+| G2C | Battle-testing 7-country suite | #1547 ✓, #1548 ✓, #1549 ✓, #1550 ✓, #1551 ✓, #1552 ✓, #1554 ✓ | Confirmed — journal #1589 closed |
+| G2D | Iceland 2008–11 (capital controls) | #1553 | **In progress** — journal #1621 open; implementation branches active; capital controls channel-impl underway |
+| G3 | Bayesian posterior calibration | #1543, #1536, #1537 | Confirmed — integrated to release/m19 (PR #1617, 2026-07-03); journal #1587 closed retroactively |
+| G4 | PSP driver arc + CI label precision | #1528 ✓, #1529 ✓ | Confirmed — integration PR #1637 open (auto-merge); journal #1624 closed; sprint exit `docs/process/sprint-plans/m19-g4-sprint-exit.md` |
 
 ---
 
@@ -64,8 +68,9 @@
 | #1543 | ADR-007 Bayesian posterior layer | G3 Wave 2 | High — Demo 8 Act 2 CI; BLOCKED_ADR (ARCH-016) |
 | #1536 | ADR-007 meaninglessness threshold | G3 Wave 2 | High — coord #1543 |
 | #1537 | BandResult visible fields | G3 Wave 2 | High — posterior UX prereq |
-| #1528 | PSP driver arc + auditability panel (DEMO-165) | G4 Wave 2–3 | High |
-| #1529 | '95% CI' label precision fix | G4 Wave 2–3 | High — coord G3 |
+| #1528 | PSP driver arc + auditability panel (DEMO-165) | G4 Wave 2–3 | **G4 confirmed** — PR #1633 merged |
+| #1529 | '95% CI' label precision fix | G4 Wave 2–3 | **G4 confirmed** — PR #1634 merged; Demo 8 Act 2 gate cleared |
+| #1632 | api_contracts.yml §trajectory missing band_method — G3 delivery gap | G5 | Low — schema-only fix; non-blocking |
 
 ---
 
@@ -89,6 +94,7 @@
 - **ARCH-016:** ADR-007 amendment — Bayesian posterior layer (Section 8, new) + meaninglessness threshold implementation (Section 6). G3 BLOCKED_ADR until accepted. Panel: CM (C), CE (C), UX Designer (C — is_pre_calibration display), EL (A). Backlog entry filed 2026-07-02.
 - **NM-084/NM-085:** CM sign-off ordering gap + co-dependent fixture CI sequencing (G2B). SOP improvements filed: §Pre-Merge CM Review Gate + §Co-Dependent Fixture Sprint Entry Requirements.
 - **NM-086:** E2E mock routes must be verified against `api_contracts.yml` before the implementation PR opens (G1, filed 2026-07-03). Process: QA Lead mock-helper verification is a blocking checklist item on intent authorship.
+- **G4 forward condition (G5 scope):** Issue #1632 (`band_method` missing from `api_contracts.yml §trajectory` — G3 delivery gap). Schema-only fix. Must resolve before G5 closes. NM-086 gate left open in G4 QA ack block.
 - **M18 complete (v0.18.0, 2026-07-02):** G1–G7 delivered; Demo 7 PASS (unconditional); release/m18 → main via PR #1534. Archive: `docs/process/session-archives/session-state-pre-m19.md`.
 - **Demo 7 north star (2026-07-02):** Aicha presents Zambia +342K cohort effect with CI bounds and sourcing to IMF restructuring table. Next available DEMO-167.
 - **Socratic TEST gaps (M19 scope):** #1536 (meaninglessness threshold), #1537 (BandResult visible fields), #1538 (focal cohort floor validation) — all filed 2026-07-02, assigned M19.
