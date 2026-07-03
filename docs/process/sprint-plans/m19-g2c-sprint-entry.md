@@ -107,13 +107,13 @@ For Sri Lanka (#1549), Pakistan (#1550), Turkey (#1551), Egypt (#1552), Ghana (#
 
 | Country | Issue | CM advisory on issue? | Feature PR may open? |
 |---|---|---|---|
-| Greece 2010–15 | #1547 | N/A — extends existing fixture | Yes, once EL approval recorded |
-| Argentina 2001 | #1548 | N/A — extends existing fixture | Yes, once EL approval recorded |
-| Sri Lanka 2022–23 | #1549 | Not yet — BLOCKING | No — CM advisory required first |
-| Pakistan 2022–23 | #1550 | Not yet — BLOCKING | No — CM advisory required first |
-| Turkey 2018–19 | #1551 | Not yet — BLOCKING | No — CM advisory required first |
-| Egypt 2016 | #1552 | Not yet — BLOCKING | No — CM advisory required first |
-| Ghana 2022–23 | #1554 | Not yet — BLOCKING | No — CM advisory required first |
+| Greece 2010–15 | #1547 | N/A — extends existing fixture | Yes — PR #1597 merged |
+| Argentina 2001 | #1548 | N/A — extends existing fixture | Yes — PR #1598 merged |
+| Sri Lanka 2022–23 | #1549 | Advisory on record 2026-07-03 — unblocked | Yes |
+| Pakistan 2022–23 | #1550 | Advisory on record 2026-07-03 — unblocked | Yes |
+| Turkey 2018–19 | #1551 | Advisory on record 2026-07-03 — unblocked | Yes |
+| Egypt 2016 | #1552 | Advisory on record 2026-07-03 — unblocked | Yes — MonetaryVolumeInput deserializer fix required first |
+| Ghana 2022–23 | #1554 | Advisory on record 2026-07-03 — unblocked | Yes — verify GHA entity; MonetaryVolumeInput optional (absence-of-input fallback accepted) |
 
 *Implementing agent must check the CM advisory column before opening each PR. Do not open a feature PR for a new-country scenario until the CM advisory comment is on the corresponding issue. This is an enforcement obligation, not advisory.*
 
