@@ -541,6 +541,7 @@ class AdvanceResponse(BaseModel):
     is_complete: bool
     resolution_level: int = RESOLUTION_LEVEL_CURRENT
     resolution_disclaimer: str = RESOLUTION_DISCLAIMER_L1
+    focal_cohort_poverty_headcount: str | None = None
 
 
 # ---------------------------------------------------------------------------
