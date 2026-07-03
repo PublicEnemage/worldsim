@@ -6,7 +6,7 @@
 > Historical state lives in `docs/process/session-archives/`.
 > Authority: `docs/process/sprint-group-isolation.md §SESSION_STATE.md Cockpit Card Protocol`.
 
-**Last updated:** 2026-07-03 (G2C EL-approved; journal #1589 open; Greece/Argentina may proceed; new-country PRs gated on CM advisory)
+**Last updated:** 2026-07-03 (Iceland/G2D confirmed M19; ADR-020 assigned to ARCH-014; G2C integration PR defers to G2D exit)
 **Current milestone:** M19 — Constraint Search and Empirical Calibration
 
 ---
@@ -20,7 +20,7 @@
 | Exit checklist issue | #1535 (M19 Exit Checklist — blocks milestone closure) |
 | Release branch | `release/m19` — cut from `main` 2026-07-02 at 1bf1ecc |
 | Sprint plan | `docs/process/sprint-plans/m19-sprint-plan.md` — EL-approved 2026-07-02 |
-| Active wave | Wave 2 — G2C approved; G3 BLOCKED_ADR (ARCH-016); G4 follows G3 |
+| Active wave | Wave 2 — G2C active; G2D pending ADR-020 acceptance; G3 BLOCKED_ADR (ARCH-016); G4 follows G3 |
 | Active sprint groups | G2C — implementation open (Greece/Argentina); G3 — BLOCKED_ADR |
 | Active sprint journal issues | #1589 (G2C — Battle-Testing Scenario Runs); #1587 (G3 — Bayesian Posterior Calibration) |
 
@@ -30,7 +30,7 @@
 
 | Decision | Status |
 |---|---|
-| ARCH-014 scope: capital controls full fix M19 or defer to M20? | Pre-wave assessment complete: full fix requires ADR (ARCH-014 PENDING_NUMBER). Iceland (#1553) stays blocked. EL decision needed on whether to scope ADR authorship in M19 Wave 2 or defer to M20. |
+| ARCH-014 scope | **RESOLVED 2026-07-03** — Iceland (#1553) stays in M19. ADR-020 assigned; authorship unblocked. G2D entry files after ADR-020 accepted. G2C integration PR defers to G2D exit. |
 
 ---
 
@@ -60,7 +60,7 @@
 | #1551 | Turkey 2018–19 Type B | G2C Wave 2 | Medium |
 | #1552 | Egypt 2016 Type B | G2C Wave 2 | Medium |
 | #1554 | Ghana 2022–23 Type A+B | G2C Wave 2 | Medium |
-| #1553 | Iceland 2008–11 Type A+B | G2D Wave 2 | Medium — blocked: #1532 |
+| #1553 | Iceland 2008–11 Type A+B | G2D Wave 2 | Medium — blocked: ADR-020 acceptance |
 | #1543 | ADR-007 Bayesian posterior layer | G3 Wave 2 | High — Demo 8 Act 2 CI; BLOCKED_ADR (ARCH-016) |
 | #1536 | ADR-007 meaninglessness threshold | G3 Wave 2 | High — coord #1543 |
 | #1537 | BandResult visible fields | G3 Wave 2 | High — posterior UX prereq |
@@ -88,6 +88,7 @@
 - **NM-076:** Before any testid rename, grep the full E2E corpus for the old testid; update E2E tests in the same PR. Rule in CODING_STANDARDS.md (PR #1439).
 - **ARCH-016:** ADR-007 amendment — Bayesian posterior layer (Section 8, new) + meaninglessness threshold implementation (Section 6). G3 BLOCKED_ADR until accepted. Panel: CM (C), CE (C), UX Designer (C — is_pre_calibration display), EL (A). Backlog entry filed 2026-07-02.
 - **NM-084/NM-085:** CM sign-off ordering gap + co-dependent fixture CI sequencing (G2B). SOP improvements filed: §Pre-Merge CM Review Gate + §Co-Dependent Fixture Sprint Entry Requirements.
+- **ADR-020 (ARCH-014):** Emergency instrument economic transmission pattern — capital controls channels. EL confirmed M19 scope 2026-07-03. Architect Agent activates to author ADR-020; G2D sprint entry files after acceptance. G2C integration PR defers to G2D exit per sprint entry §1.5.
 - **NM-086:** E2E mock routes must be verified against `api_contracts.yml` before the implementation PR opens (G1, filed 2026-07-03). Process: QA Lead mock-helper verification is a blocking checklist item on intent authorship.
 - **M18 complete (v0.18.0, 2026-07-02):** G1–G7 delivered; Demo 7 PASS (unconditional); release/m18 → main via PR #1534. Archive: `docs/process/session-archives/session-state-pre-m19.md`.
 - **Demo 7 north star (2026-07-02):** Aicha presents Zambia +342K cohort effect with CI bounds and sourcing to IMF restructuring table. Next available DEMO-167.
