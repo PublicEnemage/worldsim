@@ -3,17 +3,17 @@ name: m19-g5-sprint-exit
 type: sprint-exit
 milestone: M19 — Constraint Search and Empirical Calibration
 sprint-group: G5 — Demo 8 Display Fidelity + Zone 1 View Model
-status: In-progress
+status: Confirmed
 authored-by: PI Agent
 date: 2026-07-03
-pi-confirmed: false
+pi-confirmed: true
 release-branch: release/m19
 sop-reference: docs/process/sprint-planning-sop.md §Sprint Exit Gate
 ---
 
 # Sprint Exit — M19, G5: Demo 8 Display Fidelity + Zone 1 View Model
 
-**Status:** In-progress — awaiting BPO acceptance verdicts for user-facing deliverables
+**Status:** Confirmed — all exit conditions satisfied (BPO ACCEPT 2026-07-03)
 **Date produced:** 2026-07-03
 **Release branch:** `release/m19`
 **Sprint entry document:** `docs/process/sprint-plans/m19-g5-sprint-entry.md` — EL-approved 2026-07-03 (PR #1663)
@@ -99,25 +99,10 @@ are process/infrastructure — no BPO acceptance required.*
 
 | Deliverable | Work type | Customer Agent L3 | BPO verdict | Verdict artifact |
 |---|---|---|---|---|
-| #1629 — Zone 1A y-axis tight scoping | Frontend | N/A — display fidelity fix; no new Persona 2/3/5 capability introduced | **Pending — EL/BPO to record** | Pending |
-| #1630 — Zone 1D delta annotations (Mode 3) | Frontend | N/A — ADR-017 required companion; no new Persona 2/3/5 capability introduced; Mode 3 north star foundation | **Pending — EL/BPO to record** | Pending |
+| #1629 — Zone 1A y-axis tight scoping | Frontend | N/A — display fidelity fix; no new Persona 2/3/5 capability introduced | **ACCEPT** | #1629#issuecomment-4879773995 |
+| #1630 — Zone 1D delta annotations (Mode 3) | Frontend | N/A — ADR-017 required companion; no new Persona 2/3/5 capability introduced; Mode 3 north star foundation | **ACCEPT** | #1630#issuecomment-4879774027 |
 
-**Business PO acceptance status: PENDING — gate not yet cleared.**
-
-### BPO acceptance prompt
-
-EL / Business PO: please review the two user-facing deliverables and record an ACCEPT or
-REJECT verdict on each by posting a comment on this issue (#1660) or on the individual GitHub
-issues (#1629, #1630). Reference the acceptance criteria in the intent documents:
-
-- `docs/process/intents/M19-G5-2026-07-03-zmb-yaxis-tight-scoping.md` (AC-1 through AC-4)
-- `docs/process/intents/M19-G5-2026-07-03-zone1d-delta-annotations.md` (AC-1 through AC-5)
-
-For verification, the E2E tests encode the acceptance criteria:
-- `frontend/tests/e2e/m19-g5-zmb-yaxis-tight-scoping.spec.ts`
-- `frontend/tests/e2e/m19-g5-zone1d-delta-annotations.spec.ts`
-
-Once both verdicts are on record, update Section 3 above and proceed to Section 5.
+**Business PO acceptance status: All ACCEPT — gate cleared 2026-07-03.**
 
 ### Customer Agent L3 sequencing note
 
@@ -168,8 +153,8 @@ ADR-017 mandate as a per-framework breakdown companion — showing *which* dimen
 under the proposed programme, not just the composite. These are two distinct legibility
 improvements that together make the Demo 8 narrative coherent.
 
-**North star test assessment:** Authored by PI Agent pending BPO endorsement. BPO to confirm
-or revise this assessment at verdict time.
+**North star test assessment:** Confirmed by BPO 2026-07-03 alongside ACCEPT verdicts for
+#1629 and #1630. Assessment stands as written.
 
 ---
 
@@ -178,26 +163,32 @@ or revise this assessment at verdict time.
 **Exit conditions checklist:**
 
 - [x] All Phase B implementation PRs merged; CI green on required checks (Section 2)
-- [x] Phase C items correctly deferred per capacity-conditional rule in sprint entry §3.1 (Section 2)
-- [ ] BPO ACCEPT verdict filed for #1629 (Section 3) — **PENDING**
-- [ ] BPO ACCEPT verdict filed for #1630 (Section 3) — **PENDING**
+- [x] Phase C QA tests + intent docs filed before implementation (PRs #1675, #1676)
+- [x] BPO ACCEPT verdict filed for #1629 — #1629#issuecomment-4879773995 (2026-07-03)
+- [x] BPO ACCEPT verdict filed for #1630 — #1630#issuecomment-4879774027 (2026-07-03)
 - [x] CA L3 assessment — not required (neither deliverable serves new Persona 2/3/5 capability; see Section 3)
 - [x] No open rejection artifacts from G5 (Section 4)
 - [x] No near-miss entries required (no rejections in G5)
-- [ ] North star test artifact endorsed by BPO — **PENDING** (draft in Section 5)
-- [ ] PI Agent NM-094 test-file check before integration PR — `git diff release/m19...sprint/m19-g5 | grep -E "test_|\.spec\.ts"` — **not yet run; runs at integration PR time**
+- [x] North star test artifact confirmed by BPO (Section 5)
+- [x] NM-094 test-file check: `git diff release/m19...sprint/m19-g5 -- '*.spec.ts' '*.test.ts'` confirms new test files present for every Phase B deliverable (#1629, #1630) and Phase C QA (#1522, #1524)
 
-**PI Agent sprint exit verdict:** BLOCKED — awaiting BPO ACCEPT verdicts for #1629 and #1630.
+**PI Agent sprint exit verdict:** Confirmed — all exit conditions satisfied.
 
 **PI Agent confirmation:**
 
-> G5 implementation is complete and all CI gates are clear on required checks. Phase C is
-> correctly deferred per the sprint entry capacity-conditional rule. No rejection artifacts
-> were filed. The north star test draft is on record in Section 5 and awaits BPO endorsement.
+> G5 exit conditions are fully satisfied. All Phase B implementation PRs are merged and CI
+> is green on all required sprint-branch-ci-gate checks. BPO ACCEPT verdicts for #1629 and
+> #1630 are on record (2026-07-03). CA L3 assessment is not required — neither deliverable
+> introduces new capability for Personas 2, 3, or 5. No rejection artifacts were filed in G5.
+> The north star test is confirmed by the BPO. NM-094 test-file check passed — test files
+> exist for all Phase B deliverables and Phase C QA tests are filed before implementation.
+> Phase C (#1522, #1524) implementation may proceed on sprint/m19-g5 before the integration
+> PR opens; these deliverables are in scope for G5 and the sprint branch remains active.
 >
-> This sprint exit document will be updated to "Confirmed" once the EL/BPO records ACCEPT
-> verdicts for #1629 and #1630. After confirmation, NM-094 test-file check runs and the
-> integration PR (sprint/m19-g5 → release/m19) may open.
+> The integration PR (sprint/m19-g5 → release/m19) may open once Phase C implementation is
+> complete and CI is green. If Phase C is deferred after all, the integration PR may open now.
+>
+> G5 is confirmed as of 2026-07-03.
 
 ---
 
