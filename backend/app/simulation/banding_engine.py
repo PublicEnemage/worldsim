@@ -70,6 +70,52 @@ def _tier_multiplier(confidence_tier: int) -> Decimal:
 
 
 # ---------------------------------------------------------------------------
+# CalibrationStore — Bayesian posterior multiplier overrides (ADR-007 §8.2–§8.5)
+# ---------------------------------------------------------------------------
+
+_CALIBRATION_MULTIPLIERS: dict[int, Decimal] = {}
+
+
+def set_calibration_multipliers(multipliers: dict[int, Decimal]) -> None:
+    """Override active tier multipliers for calibrated posteriors.
+
+    Tests call set_calibration_multipliers({}) in tearDown to restore defaults.
+    Production registry entries set overrides after MAGNITUDE_MATCH + co-sign gate.
+    """
+    global _CALIBRATION_MULTIPLIERS
+    _CALIBRATION_MULTIPLIERS = dict(multipliers)
+
+
+def get_tier_multiplier(tier: int) -> Decimal:
+    """Return active multiplier for tier: calibrated override if set, else structural prior."""
+    if tier in _CALIBRATION_MULTIPLIERS:
+        return _CALIBRATION_MULTIPLIERS[tier]
+    return _TIER_MULTIPLIERS.get(tier, Decimal("1.0"))
+
+
+# ---------------------------------------------------------------------------
+# Correction factor (ADR-007 §8.4)
+# ---------------------------------------------------------------------------
+
+_C_TARGET = Decimal("0.80")
+_CLAMP_MIN = Decimal("0.5")
+_CLAMP_MAX = Decimal("2.0")
+_C_MAG_FLOOR = Decimal("0.05")
+
+
+def compute_correction_factor(c_mag: Decimal) -> tuple[Decimal, str]:
+    """Compute κ = clamp(sqrt(C_target / max(C_mag, 0.05)), 0.5, 2.0).
+
+    Returns (Decimal("1.0"), "EVIDENCE_INSUFFICIENT") when c_mag < C_MAG_FLOOR.
+    """
+    if c_mag < _C_MAG_FLOOR:
+        return Decimal("1.0"), "EVIDENCE_INSUFFICIENT"
+    raw_kappa = (_C_TARGET / max(c_mag, _C_MAG_FLOOR)).sqrt()
+    kappa = max(_CLAMP_MIN, min(_CLAMP_MAX, raw_kappa))
+    return kappa, "OK"
+
+
+# ---------------------------------------------------------------------------
 # BandResult dataclass
 # ---------------------------------------------------------------------------
 
@@ -132,7 +178,7 @@ def compute_band(
     natural_lower, natural_upper = _FRAMEWORK_BOUNDS[framework]
 
     base_hw = _base_half_width(step_index)
-    multiplier = _tier_multiplier(confidence_tier)
+    multiplier = get_tier_multiplier(confidence_tier)
     half_width = base_hw * multiplier
 
     raw_lower = composite_score * (Decimal("1") - half_width)
