@@ -4327,6 +4327,59 @@ Agents must not run `git stash` (or any variant including `--include-untracked`,
 
 ---
 
+## NM-088 — Parallel Claude Code Sessions Share Main Working Tree; Branch Displacement Causes Lost Files and Misrouted Commits (Reactive)
+
+**Date:** 2026-07-03
+**Milestone:** M19 — Constraint Search and Empirical Calibration
+**Detected by:** EL post-incident diagnosis — root cause of the NM-087 working-tree displacement traced to a concurrent G2C Claude Code session, not the EL's IDE
+**Severity:** High — files written to disk were lost on branch switch; commits landed on the wrong branch; both required manual recovery operations mid-session. Same hazard path as NM-075 and NM-087 but triggered by a different source.
+
+### What happened
+
+Two Claude Code sessions were active simultaneously on the same repository:
+- **This session** — G3/process work (intent documents, NM-087, ADR acceptance)
+- **G2C session** — parallel battle-testing scenario implementation
+
+Both sessions operated against the main working tree at `/Users/imranyousuf/projects/worldsim`. When the G2C session ran `git checkout feat/m19-g2c-*`, it displaced the branch this session had checked out — silently, from this session's perspective. Subsequent file writes and git operations by this session then landed in the G2C session's branch context rather than the intended G3 branch. Specific harms:
+- Three intent document files written by this session (`M19-G3-2026-07-03-*.md`) vanished when the G2C session switched branches, requiring a second write pass
+- A `git commit` landed on `feat/m19-g2c-harness-typeb-known-limitations` instead of `feat/m19-g3-intent-docs`, requiring a `git reset --soft` + re-commit recovery
+
+### What was at risk
+
+Any file this session wrote to disk could be lost on the next branch switch by the G2C session. Any commit this session made could land on a G2C branch, contaminating the G2C PR and requiring a reset. The recovery operation (`git reset --soft`) itself risked harming the G2C session's branch state if timed coincidentally.
+
+### What caught it
+
+EL identified that no IDE was involved — the branch displacement source was a parallel Claude Code session. Prior framing in NM-075 and NM-087 assumed the conflict was between an agent and the EL's interactive tooling; this incident clarified that the hazard is structural: any two processes sharing one working tree will race on branch state.
+
+### Process improvement
+
+**1 — Parallel Claude Code session worktree requirement (immediate, all sessions):**
+
+When two or more Claude Code sessions are active on the same repository simultaneously, each session must operate in a dedicated git worktree. The main working tree must not be shared between sessions. Authority: NM-075 (worktree allocation protocol) extended to cover parallel CC sessions explicitly.
+
+At the start of any session that will operate concurrently with another active Claude Code session, the DS Agent or PM Agent allocates a worktree before any other git operations:
+
+```bash
+git worktree add /tmp/worldsim-<group> <branch>
+```
+
+All subsequent git operations in that session run from `/tmp/worldsim-<group>`, not from the main working tree. Codified in `docs/process/agents.md §Git Working Tree Protocol — Parallel Session Clause`.
+
+**2 — Session startup parallel-session check (immediate, all sessions):**
+
+At session start, before any git operation, check for active worktrees to detect whether another session is already using a worktree:
+
+```bash
+git worktree list
+```
+
+If no other session worktree is listed but concurrent work is expected (e.g., SESSION_STATE.md shows multiple active sprint groups), alert the EL and request worktree allocation before proceeding. A session that begins work without confirming worktree isolation when concurrent sessions are possible has not satisfied this check. Codified in `docs/process/agents.md §Git Working Tree Protocol — Parallel Session Clause`.
+
+*Root cause: NM-075 (worktree protocol), NM-087 (stash prohibition), and NM-088 (parallel session clause) form a three-layer defence. NM-075 established the worktree pattern; NM-087 prohibited the unsafe recovery; NM-088 ensures the worktree pattern is applied to the parallel-session case that NM-075's framing missed.*
+
+---
+
 ## NM-NNN — [Short descriptive title]
 
 **Date:** YYYY-MM-DD (or approximate milestone era)

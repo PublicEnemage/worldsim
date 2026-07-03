@@ -1426,3 +1426,25 @@ If output is non-empty, **stop**. The Engineering Lead has uncommitted changes i
 Agents must not run `git stash` (or any variant including `--include-untracked`, `--all`, `--keep-index`) without explicit Engineering Lead instruction. `git stash` writes to the EL's working state without consent — it is not a safe recovery action. If a dirty working tree blocks a checkout, report the obstacle and wait.
 
 *Root cause: NM-075 worktree allocation protocol and the NM-087 stash prohibition are complementary — worktrees eliminate the hazard structurally; this guard prevents the hazard when a worktree is not in use.*
+
+### Parallel session clause
+
+*Authority: NM-088 (2026-07-03). Extends NM-075 to cover concurrent Claude Code sessions.*
+
+When two or more Claude Code sessions are active on the same repository simultaneously, each session must operate in a dedicated git worktree. Two sessions sharing the main working tree will race on branch state — a checkout by one session silently displaces the other's HEAD, causing files to vanish and commits to land on the wrong branch.
+
+**At session startup** — before any git operation — check for active worktrees:
+
+```bash
+git worktree list
+```
+
+If SESSION_STATE.md shows multiple active sprint groups and no worktree for this session's group is listed, request worktree allocation before proceeding. The DS Agent or PM Agent allocates:
+
+```bash
+git worktree add /tmp/worldsim-<group> <branch>
+```
+
+All subsequent git operations in this session run from `/tmp/worldsim-<group>`. The main working tree at the project root is shared state — do not treat it as this session's exclusive workspace when another session is active.
+
+**Worktree cleanup** at session close: `git worktree remove /tmp/worldsim-<group>` (only if no uncommitted changes remain).
