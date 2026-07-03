@@ -93,6 +93,28 @@ ELASTICITY_REGISTRY: list[CohortElasticity] = [
         source_registry_id="ACADEMIC_LITERATURE_BALL_2013_FISCAL_CONSOLIDATION",
         confidence_tier=3,
     ),
+    # ADR-020 Channel C: credit contraction → Q1 informal poverty headcount.
+    # φ = -0.30: Iceland 2008-11 micro-survey basis (calibration-basis.md §Capital Controls).
+    # Credit contraction → tighter lending → informal-sector unemployment → PHC increase.
+    # Bridge event magnitude is NEGATIVE (credit contraction); elasticity is NEGATIVE →
+    # PHC delta is POSITIVE (poverty rises when credit contracts). T3 until ISL backtesting.
+    CohortElasticity(
+        event_type="credit_contraction_labour_shock",
+        cohort_spec=CohortSpec(
+            IncomeQuintile.Q1,
+            AgeBand.AGE_25_54,
+            EmploymentSector.INFORMAL,
+        ),
+        attribute_key="poverty_headcount_ratio",
+        elasticity=Decimal("-0.30"),
+        source=(
+            "Iceland 2008-11 micro-survey: credit contraction → informal employment"
+            " → Q1 poverty headcount ratio. ADR-020 Channel C calibration."
+            " φ=0.30 point estimate; docs/methodology/calibration-basis.md §Capital Controls."
+        ),
+        source_registry_id="ACADEMIC_LITERATURE_ICELAND_2008_CREDIT_CONTRACTION_PHC",
+        confidence_tier=3,
+    ),
     # Agricultural Q1 cohorts: subsistence amplification at 80% of informal rate.
     # M17-G1: IMF (2014) 80% scaling preserved; absolute base revised with Q1
     # SSA recalibration → 0.80 × 0.20 = 0.16 (prior: 0.08 = 0.80 × 0.10).
