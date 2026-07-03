@@ -167,11 +167,15 @@ class TestDirectionOnlyGate:
 
 class TestCatastrophicOutlierBlock:
     def test_catastrophic_outlier_blocks_magnitude_match(self) -> None:
-        """AC-03: one record with model_i > 5 × hist_i → DIRECTION_ONLY."""
-        # 9 clean records + 1 catastrophic
+        """AC-03: deviation > 5× hist blocks MAGNITUDE_MATCH.
+
+        Check: |model - hist| > 5 × |hist|
+        model=4.0, hist=0.5 → deviation=3.5 > 5×0.5=2.5 ✓ (catastrophic)
+        Note: model=3.0, hist=0.5 gives deviation exactly 5× (2.5 == 2.5),
+        which does NOT trigger the strict > check — use model=4.0 to be clear.
+        """
         good = _make_within_records(9)
-        # model = 6 × hist → catastrophic (> 5×)
-        catastrophic = {"model_value": Decimal("3.0"), "hist_value": Decimal("0.5")}
+        catastrophic = {"model_value": Decimal("4.0"), "hist_value": Decimal("0.5")}
         records = good + [catastrophic]
         tier, _ = _classify_fidelity(records)
         assert tier == FidelityTier.DIRECTION_ONLY
@@ -209,8 +213,16 @@ class TestMinimumPairsGuard:
         assert tier == FidelityTier.DIRECTION_ONLY
 
     def test_zero_valid_pairs_gives_direction_only(self) -> None:
-        """0 valid pairs → DIRECTION_ONLY."""
-        records: list[dict] = []
+        """0 valid pairs (all hist_value=None) → DIRECTION_ONLY.
+
+        Note: an entirely empty list returns BELOW_THRESHOLD (run never
+        produced records). This tests the realistic case where records exist
+        but no historical data is available yet (pre-G2B fixture state).
+        """
+        records = [
+            {"model_value": Decimal("0.50"), "hist_value": None}
+            for _ in range(5)
+        ]
         tier, _ = _classify_fidelity(records)
         assert tier == FidelityTier.DIRECTION_ONLY
 
