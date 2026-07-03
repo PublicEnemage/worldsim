@@ -4286,6 +4286,7 @@ Codified in `docs/CODING_STANDARDS.md §E2E Mock Helper Authorship` as part of t
 
 ---
 
+
 ## NM-087 — Agent Used `git stash --include-untracked` as Recovery Action; Stashed EL In-Progress Work Without Authorization (Reactive)
 
 **Date:** 2026-07-02
@@ -4377,8 +4378,43 @@ git worktree list
 If no other session worktree is listed but concurrent work is expected (e.g., SESSION_STATE.md shows multiple active sprint groups), alert the EL and request worktree allocation before proceeding. A session that begins work without confirming worktree isolation when concurrent sessions are possible has not satisfied this check. Codified in `docs/process/agents.md §Git Working Tree Protocol — Parallel Session Clause`.
 
 *Root cause: NM-075 (worktree protocol), NM-087 (stash prohibition), and NM-088 (parallel session clause) form a three-layer defence. NM-075 established the worktree pattern; NM-087 prohibited the unsafe recovery; NM-088 ensures the worktree pattern is applied to the parallel-session case that NM-075's framing missed.*
-
 ---
+
+
+## NM-089 — Shared-State File Changes Lost on Branch Switch; Session Summary Permanent Artifact Unwritten for 24 Hours; Caught by Human Recall (Reactive)
+
+**Date:** 2026-07-03
+**Milestone:** M19 — Constraint Search and Empirical Calibration
+**Detected by:** Engineering Lead asking explicitly in the next session: "have we committed the insights-log.md that recorded the original session summary?"
+**Severity:** High — A permanent, append-only artifact (`docs/insights-log.md`) went unwritten for one session boundary. The 2026-07-02 multi-agent deliberation record — 10-scenario table with all issue numbers (#1546–#1554), EL decisions on M19 scope and output format, and the capital controls gap summary — existed only in session context and would have been permanently lost if not recovered.
+
+### What happened
+
+During the 2026-07-02 session, a session summary was written to `docs/insights-log.md` in session memory, covering the multi-agent deliberation on the headless battle-testing initiative. Before the entry was committed, the session transitioned to sprint implementation work on `feat/m19-g2c-ghana-imf-programme`. The branch switch was necessary to begin Ghana fixture work (#1554). No structural gate blocked the switch or flagged that `docs/insights-log.md` had unsaved changes pending commit.
+
+The ARCH-014 backlog entry (`docs/architecture/backlog.md`) survived by coincidence — subsequent sprint planning commits re-wrote the backlog file, so ARCH-014 was present in the repository via a different code path. The insights-log entry had no such alternative path. When the 2026-07-03 session opened, the entry was absent. Recovery required the EL to notice the gap, the DS Agent to create `chore/m19-state-sync-018` from `release/m19`, reconstruct the full entry from session transcript context, commit it, and open PR #1609 (set to auto-merge).
+
+### What was at risk
+
+Permanent loss of the deliberation record for a multi-agent strategic consultation. The insights-log is an append-only permanent institutional artifact — entries are not edited or reconstructed from memory after a session closes. If the EL had not asked whether the entry was committed, or if the session transcript had already been compressed beyond recovery, the full record of EL decisions, scenario rationale, and ARCH-014 context would have been lost with no indication that a gap existed.
+
+Additionally: any downstream agent beginning Iceland (#1553) or the G2C harness without knowing the capital controls gap context would lack the record of why #1532 was filed and why Iceland is blocked.
+
+### What caught it
+
+Human vigilance — the Engineering Lead explicitly asking in the 2026-07-03 session: "have we committed the insights-log.md that recorded the original session summary?" This is the only detection mechanism that fired. No process gate, no CI check, no hook verified that shared-state file changes were committed before the branch switch occurred.
+
+NM-075 addresses the inverse problem (implementation file changes lost on branch switch via worktree isolation). NM-089 is the complementary gap: shared-state file changes written to session memory but not yet committed.
+
+### Process improvement
+
+**Shared-state commit gate before any branch switch.** When an agent has written changes to shared-state files (`docs/insights-log.md`, `docs/architecture/backlog.md`, `docs/process/near-miss-registry.md`, `docs/process/known-issues-registry.md`, `docs/compliance/scan-registry.md`, and any registry file governed by the append-only rule in CLAUDE.md §Canonical Artifact Locations) during a session, those changes must be committed to a `chore/mNN-state-sync-NNN` branch and pushed before any `git checkout` to a feature or sprint branch. This is a mandatory ordering constraint — not a recommendation.
+
+**Session close protocol addendum.** The existing SESSION_STATE.md update obligation (CLAUDE.md §Session Continuity) is extended: at session close, any shared-state file changes written during the session must be confirmed committed and either merged or in an open PR before the session ends. The implementing agent states this confirmation explicitly ("shared-state files committed: [list]") before marking the session complete.
+
+**Codification:** This rule is added as a named sub-step in `docs/process/sprint-group-isolation.md §Shared State Update Protocol`, to appear alongside the existing `chore/mNN-state-sync-NNN` branch guidance. Cross-referenced in `docs/CONTRIBUTING.md §Agent Workflow` at the next standards review (G2C sprint entry or earlier if a state-sync PR opens first).
+
+Near-miss cross-references: NM-075 (worktree isolation for implementation files — complementary), NM-016 / NM-052 / NM-070 (pre-push gate violations — same class of "local change not committed before moving on").
 
 ## NM-NNN — [Short descriptive title]
 
