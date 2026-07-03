@@ -6,7 +6,7 @@
 > Historical state lives in `docs/process/session-archives/`.
 > Authority: `docs/process/sprint-group-isolation.md §SESSION_STATE.md Cockpit Card Protocol`.
 
-**Last updated:** 2026-07-03 (DS infra review: NM-092/093/094 filed; PR #1646 hook fix; G2C test recovery PR #1649; stash/worktree cleanup; G2D confirmed; PR #1641 merged)
+**Last updated:** 2026-07-03 (G5 sprint opened; NM-084/085/086/089/092/093/094 codified; issues #1650–#1657 filed; PR #1658 open feat/m19-g5 → sprint/m19-g5; NM-090/091 fix issue #1657 deferred)
 **Current milestone:** M19 — Constraint Search and Empirical Calibration
 
 ---
@@ -20,9 +20,9 @@
 | Exit checklist issue | #1535 (M19 Exit Checklist — blocks milestone closure) |
 | Release branch | `release/m19` — cut from `main` 2026-07-02 at 1bf1ecc |
 | Sprint plan | `docs/process/sprint-plans/m19-sprint-plan.md` — EL-approved 2026-07-02 |
-| Active wave | Wave 2 — G2D confirmed; Ecuador regression fixed (PR #1642); integration PR #1641 pending CI re-run |
-| Active sprint groups | None — G2D exit confirmed; integration PR #1641 sprint/m19-g2 → release/m19 pending (CI re-running after conflict fix PR #1643) |
-| Active sprint journal issues | None — #1621 closed at G2D PI Agent confirmation |
+| Active wave | Wave 3 — G5 opened 2026-07-03 |
+| Active sprint groups | G5 — NM process codification + Zone 1 view model + ELASTICITY_REGISTRY calibration + Demo 8 display fidelity |
+| Active sprint journal issues | None yet — G5 journal issue to be filed at sprint entry |
 
 ---
 
@@ -66,7 +66,15 @@
 | #1623 | ELASTICITY_REGISTRY — non-SSA entity family calibration gap | CM Wave 2–3 | High — CM Sprint A (GRC/Euro area) M19 priority; unblocks Greece counter-factual |
 | #1629 | Zone 1A ZMB y-axis not tight-scoped — curves collapse | Demo 8 risk | High — Demo 8 Act 2 display fidelity; `computeYDomain` fix required |
 | #1630 | Demo 8 Act 1 narration: HD line implied but not rendered in Zone 1A | Demo 8 risk | High — Demo 8 Act 1; narration correction or per-framework lines (EL decision) |
-| #1647 | G2C test file missing from release/m19 — NM-094 recovery | Demo 8 risk | **High** — test_m19_g2c_scenario_runs.py (1394 lines, all 7 G2C scenarios) absent; CI has no G2C backtesting coverage |
+| #1647 | G2C test file missing from release/m19 — NM-094 recovery | Demo 8 risk | **Closed** — PR #1649 merged; test_m19_g2c_scenario_runs.py (1394 lines) restored |
+| #1650 | NM-086: CODING_STANDARDS §E2E Mock Helper Authorship | G5 process | **PR #1658** — auto-merge pending CI |
+| #1651 | NM-084: sprint-planning-sop §Pre-Merge CM Review | G5 process | **PR #1658** — auto-merge pending CI |
+| #1652 | NM-085: sprint-planning-sop §Co-Dependent Fixture | G5 process | **PR #1658** — auto-merge pending CI |
+| #1653 | NM-092: sprint-group-isolation §Worktree Setup | G5 process | **PR #1658** — auto-merge pending CI |
+| #1654 | NM-089: shared-state commit gate | G5 process | **PR #1658** — auto-merge pending CI |
+| #1655 | NM-093: bidirectional lane rule | G5 process | **PR #1658** — auto-merge pending CI |
+| #1656 | NM-094: PI Agent test-file presence check | G5 process | **PR #1658** — auto-merge pending CI |
+| #1657 | NM-090/091: DemographicModule dead subscriptions fix | Deferred (CM gate) | CM sign-off required before implementation PR opens |
 
 ---
 
@@ -82,8 +90,8 @@
 ## Carry-Forward Context
 
 - **Process model (M19 onward):** Sprint group isolation (Option E hybrid) + SESSION_STATE.md cockpit card (≤ 200 lines). Full protocol: `docs/process/sprint-group-isolation.md`. Shared state via `chore/m{N}-state-sync-NNN` → `release/m{N}` (PM Agent). Auto-merge: `gh pr merge --auto`.
-- **Pre-push hook:** `.githooks/pre-push` enforces ruff + mypy (backend) and `npm run build` (frontend). Install: `git config core.hooksPath .githooks`. NM-092 fix (worktree path resolution) in PR #1646 — pending merge.
-- **NM-092/093/094 (DS infra review 2026-07-03):** NM-092: pre-push hook relative paths silently bypass gates in worktrees (fix: PR #1646). NM-093: chore/state-sync-025 carried sprint implementation commits — bidirectional lane rule now explicit. NM-094: G2C QA test file missing from release/m19 (Issue #1647 — Demo 8 risk). 4 prunable M18 worktrees cleared. 4 confirmed-safe stash entries dropped (stash@{0}/{1}/{2}/{10}).
+- **Pre-push hook:** `.githooks/pre-push` enforces ruff + mypy (backend) and `npm run build` (frontend). Install: `git config core.hooksPath .githooks`. NM-092 fix (worktree path resolution) — merged PR #1646. Worktree symlink setup now in `sprint-group-isolation.md §Worktree Setup`.
+- **NM-084–094 codification (G5 pre-flight, 2026-07-03):** Issues #1650–#1657 filed; PR #1658 carries 7 process doc additions (CODING_STANDARDS §E2E Mock Helper Authorship; sprint-planning-sop §Pre-Merge CM Review + §Co-Dependent Fixture; sprint-group-isolation §Worktree Setup + §Bidirectional lane rule + §Commit gate + §Test-file presence check). NM-090/091 DemographicModule fix deferred to separate PR (Issue #1657 — CM sign-off required first).
 - **Stash backlog (active):** 26 entries remain. Key items requiring EL triage: stash@{7} (M18-era chore + G1 orphans), stash@{8}/{9} (duplicate M18-G2 pair on feat/m18-g2-psp-impl — likely superseded by PR #1387).
 - **GA-02 / Path 2 retirement (PR #1393):** Proprietary ministry data upload retired on open-source-as-strategy principle. No implementation without EL-approved governance exception.
 - **sprint-branch-ci-gate Ruleset:** Node ID `RRS_lACqUmVwb3NpdG9yecc5IKi2kzgEV92A`. Requires `changes`, `lint`, `test-backend`, `compliance-scan`. (playwright-e2e not required — NM-076 context.)
