@@ -6,7 +6,7 @@
 > Historical state lives in `docs/process/session-archives/`.
 > Authority: `docs/process/sprint-group-isolation.md §SESSION_STATE.md Cockpit Card Protocol`.
 
-**Last updated:** 2026-07-03 (G4 confirmed; integration PR #1637 set to auto-merge; G3 journal #1587 closed retroactively; G2D implementation active)
+**Last updated:** 2026-07-03 (G4 confirmed; integration PR #1637 merged; G3 journal #1587 closed retroactively; G2D implementation active)
 **Current milestone:** M19 — Constraint Search and Empirical Calibration
 
 ---
@@ -30,7 +30,7 @@
 
 | Decision | Status |
 |---|---|
-| ARCH-014 scope: capital controls full fix M19 or defer to M20? | **RESOLVED** — EL approved in M19 Wave 2 (chore/m19-state-sync-024, 2026-07-03). Iceland implementation unblocked; G2D implementation branches open (channel-impl, dm-audit, cm-calibration). |
+| ARCH-014 scope: capital controls full fix M19 or defer to M20? | **RESOLVED 2026-07-03** — ADR-020 accepted; Iceland (#1553) stays in M19. G2D sprint entry EL-approved; implementation branches open (channel-impl, dm-audit, cm-calibration). G2C integration PR defers to G2D exit. |
 
 ---
 
@@ -41,10 +41,10 @@
 | G1 | Mode 3 constraint-floor search | #1540 ✓, #1563 ✓, #1564 ✓ | Confirmed — integrated to release/m19 (PR #1582, 2026-07-03) |
 | G2A | Headless battle-testing harness | #1546 ✓ | Confirmed — PI confirm retroactively filed PR #1580/#1583 |
 | G2B | SEN + ZMB backtesting fixtures | #1541 ✓, #1542 ✓ | Confirmed — exit doc PR #1578 |
-| G2C | Battle-testing 7-country suite | #1547 ✓, #1548 ✓, #1549 ✓, #1550 ✓, #1551 ✓, #1552 ✓, #1554 ✓ | Confirmed — journal #1589 closed |
-| G2D | Iceland 2008–11 (capital controls) | #1553 | **In progress** — journal #1621 open; implementation branches active; capital controls channel-impl underway |
-| G3 | Bayesian posterior calibration | #1543, #1536, #1537 | Confirmed — integrated to release/m19 (PR #1617, 2026-07-03); journal #1587 closed retroactively |
-| G4 | PSP driver arc + CI label precision | #1528 ✓, #1529 ✓ | Confirmed — integration PR #1637 open (auto-merge); journal #1624 closed; sprint exit `docs/process/sprint-plans/m19-g4-sprint-exit.md` |
+| G2C | Battle-testing 7-country suite | #1547 ✓, #1548 ✓, #1549 ✓, #1550 ✓, #1551 ✓, #1552 ✓, #1554 ✓ | Confirmed — exit doc `m19-g2c-sprint-exit.md`; integration PR defers to G2D exit |
+| G2D | Iceland 2008–11 (capital controls) | #1553, #1532 | **In progress** — journal #1621 open; CM gate #1625 ✓, CE gate #1626 ✓; implementation branches active |
+| G3 | Bayesian posterior calibration | #1543 ✓, #1536 ✓, #1537 ✓ | Confirmed — integration PR #1617 merged; exit doc `m19-g3-sprint-exit.md`; journal #1587 closed retroactively |
+| G4 | PSP driver arc + CI label precision | #1528 ✓, #1529 ✓ | Confirmed — integration PR #1637 merged; journal #1624 closed; sprint exit `docs/process/sprint-plans/m19-g4-sprint-exit.md` |
 
 ---
 
@@ -54,23 +54,18 @@
 |---|---|---|---|
 | #1535 | M19 Exit Checklist | — (gate) | Milestone exit gate |
 | #1544 | Demo 8 — live stakeholder session | — (exit gate) | Primary deliverable |
-| #1532 | Capital controls transmission gap | Pre-wave/known-gap | Immediate — blocks Iceland (#1553) |
+| #1532 | Capital controls transmission gap | G2D (implementation) | Immediate — closes with G2D implementation PR |
 | #1456 | MDAAlertPanel Zone1B: scenarioId crash | Pre-wave | Immediate — crash risk |
 | #1538 | Focal cohort floor validation | Pre-wave | Immediate — #1540 prerequisite |
-| #1547 | Greece 2010–15 counter-factual Type B | G2C Wave 2 | Medium |
-| #1548 | Argentina 2001 counter-factual Type B | G2C Wave 2 | Medium |
-| #1549 | Sri Lanka 2022–23 Type A+B | G2C Wave 2 | Medium |
-| #1550 | Pakistan 2022–23 Type B | G2C Wave 2 | Medium |
-| #1551 | Turkey 2018–19 Type B | G2C Wave 2 | Medium |
-| #1552 | Egypt 2016 Type B | G2C Wave 2 | Medium |
-| #1554 | Ghana 2022–23 Type A+B | G2C Wave 2 | Medium |
-| #1553 | Iceland 2008–11 Type A+B | G2D Wave 2 | Medium — blocked: #1532 |
-| #1543 | ADR-007 Bayesian posterior layer | G3 Wave 2 | High — Demo 8 Act 2 CI; BLOCKED_ADR (ARCH-016) |
-| #1536 | ADR-007 meaninglessness threshold | G3 Wave 2 | High — coord #1543 |
-| #1537 | BandResult visible fields | G3 Wave 2 | High — posterior UX prereq |
-| #1528 | PSP driver arc + auditability panel (DEMO-165) | G4 Wave 2–3 | **G4 confirmed** — PR #1633 merged |
-| #1529 | '95% CI' label precision fix | G4 Wave 2–3 | **G4 confirmed** — PR #1634 merged; Demo 8 Act 2 gate cleared |
+| #1553 | Iceland 2008–11 Type A+B | G2D | Active — ADR-020 accepted; implementation underway |
+| #1528 | PSP driver arc + auditability panel (DEMO-165) | G4 | **G4 confirmed** — PR #1633 merged |
+| #1529 | '95% CI' label precision fix | G4 | **G4 confirmed** — PR #1634 merged; Demo 8 Act 2 gate cleared |
 | #1632 | api_contracts.yml §trajectory missing band_method — G3 delivery gap | G5 | Low — schema-only fix; non-blocking |
+| #1522 | View model layer retrofit — Zone 1 composition logic extraction | Wave 3+ | High — EL-added to M19 |
+| #1524 | Zone 1A TrajectoryView: pinch-zoom, thumbwheel zoom, pan | Wave 3+ | High — EL-added to M19 |
+| #1623 | ELASTICITY_REGISTRY — non-SSA entity family calibration gap | CM Wave 2–3 | High — CM Sprint A (GRC/Euro area) M19 priority; unblocks Greece counter-factual |
+| #1629 | Zone 1A ZMB y-axis not tight-scoped — curves collapse | Demo 8 risk | High — Demo 8 Act 2 display fidelity; `computeYDomain` fix required |
+| #1630 | Demo 8 Act 1 narration: HD line implied but not rendered in Zone 1A | Demo 8 risk | High — Demo 8 Act 1; narration correction or per-framework lines (EL decision) |
 
 ---
 
@@ -91,10 +86,11 @@
 - **sprint-branch-ci-gate Ruleset:** Node ID `RRS_lACqUmVwb3NpdG9yecc5IKi2kzgEV92A`. Requires `changes`, `lint`, `test-backend`, `compliance-scan`. (playwright-e2e not required — NM-076 context.)
 - **NM-075:** git worktrees must be allocated per sprint group (`git worktree add /tmp/<name> <branch>`) to prevent branch switches overwriting in-progress work.
 - **NM-076:** Before any testid rename, grep the full E2E corpus for the old testid; update E2E tests in the same PR. Rule in CODING_STANDARDS.md (PR #1439).
-- **ARCH-016:** ADR-007 amendment — Bayesian posterior layer (Section 8, new) + meaninglessness threshold implementation (Section 6). G3 BLOCKED_ADR until accepted. Panel: CM (C), CE (C), UX Designer (C — is_pre_calibration display), EL (A). Backlog entry filed 2026-07-02.
-- **NM-084/NM-085:** CM sign-off ordering gap + co-dependent fixture CI sequencing (G2B). SOP improvements filed: §Pre-Merge CM Review Gate + §Co-Dependent Fixture Sprint Entry Requirements.
+- **G3 complete (2026-07-03):** ARCH-016 (ADR-007 Amendment 1) accepted; all three issues (#1543, #1536, #1537) implemented; BPO 3×ACCEPT; north star test CONDITIONAL PASS (G4 #1529 needed for Demo 8 Act 2 — now RESOLVED). Integration PR #1617 merged.
+- **NM-084/NM-085:** CM sign-off ordering gap + co-dependent fixture CI sequencing (G2B). SOP improvements filed. G3 NM-084 gate satisfied correctly (CM sign-off on issue before PI gate comment before auto-merge).
+- **ADR-020 (ARCH-014) ACCEPTED 2026-07-03:** Capital controls transmission — 3 channels (ExternalSectorModule reserve protection ε=0.50 heterodox, MacroeconomicModule credit contraction β=0.020, DemographicModule Q1 PHC). Dead subscription fix. Canonical event string registry. G2D sprint entry EL-approved; journal #1621 open. Integration PR `sprint/m19-g2d` → `release/m19` fires at G2D exit.
+- **G2D gates CLEARED 2026-07-03:** CM gate (PR #1625 — `calibration-basis.md §Capital Controls`: ε=0.60/0.50-ISL, β=0.020, γ=1.2, φ∈[0.3,0.7]) + CE gate (PR #1626 — full 7-variant audit, NM-090/NM-091, transmission table rewrite). Iceland implementation PR may open. G2D intent doc §3.2: `asset_nationalization` → `EmergencyInstrument.NATIONALIZATION`; Channel C uses `credit_contraction_labour_shock` bridge (not direct capital_controls subscription).
 - **NM-086:** E2E mock routes must be verified against `api_contracts.yml` before the implementation PR opens (G1, filed 2026-07-03). Process: QA Lead mock-helper verification is a blocking checklist item on intent authorship.
 - **G4 forward condition (G5 scope):** Issue #1632 (`band_method` missing from `api_contracts.yml §trajectory` — G3 delivery gap). Schema-only fix. Must resolve before G5 closes. NM-086 gate left open in G4 QA ack block.
 - **M18 complete (v0.18.0, 2026-07-02):** G1–G7 delivered; Demo 7 PASS (unconditional); release/m18 → main via PR #1534. Archive: `docs/process/session-archives/session-state-pre-m19.md`.
 - **Demo 7 north star (2026-07-02):** Aicha presents Zambia +342K cohort effect with CI bounds and sourcing to IMF restructuring table. Next available DEMO-167.
-- **Socratic TEST gaps (M19 scope):** #1536 (meaninglessness threshold), #1537 (BandResult visible fields), #1538 (focal cohort floor validation) — all filed 2026-07-02, assigned M19.

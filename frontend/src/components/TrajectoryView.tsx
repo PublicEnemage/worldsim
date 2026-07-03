@@ -203,6 +203,8 @@ export interface MergedStepDatum {
   ecological_ci_upper: number | null;
   governance_ci_lower: number | null;
   governance_ci_upper: number | null;
+  /** M19-G3 (#1537) / G4 (#1529): BandingEngine calibration state for CI display. */
+  financial_band_method: string | null;
 }
 
 // ---------------------------------------------------------------------------
@@ -266,6 +268,7 @@ export function mergeTrajectories(
       ecological_ci_upper: ci("ecological", "ci_upper"),
       governance_ci_lower: ci("governance", "ci_lower"),
       governance_ci_upper: ci("governance", "ci_upper"),
+      financial_band_method: step.frameworks["financial"]?.band_method ?? null,
     };
   });
 }
@@ -1300,6 +1303,35 @@ export const TrajectoryView = React.memo(function TrajectoryView({
           comparison is not valid.
         </div>
       )}
+
+      {/* M19-G3 (#1537) / G4 (#1529): CI calibration status disclosure (ADR-007 Amendment 1 §8.7).
+          Absent when band_method is SUPPRESSED_MEANINGLESS (CI bounds hidden per G3 §4). */}
+      {(() => {
+        const lastStep = mergedData[mergedData.length - 1];
+        const bandMethod = lastStep?.financial_band_method ?? null;
+        if (!bandMethod || bandMethod === "SUPPRESSED_MEANINGLESS") return null;
+        const STATUS_TEXT: Record<string, string> = {
+          PRE_CALIBRATION_STRUCTURAL_PRIOR: "structural prior — not yet empirically calibrated",
+          PRE_CALIBRATION_PROVISIONAL_DIRECTIONAL: "provisional — directional calibration only",
+          BAYESIAN_POSTERIOR_CALIBRATED: "empirically calibrated interval",
+        };
+        const text = STATUS_TEXT[bandMethod];
+        if (!text) return null;
+        return (
+          <div
+            data-testid="ci-calibration-status"
+            style={{
+              fontSize: 9,
+              color: "#888",
+              marginTop: 2,
+              padding: "2px 8px",
+              fontStyle: "italic",
+            }}
+          >
+            {text}
+          </div>
+        );
+      })()}
 
     </div>
   );

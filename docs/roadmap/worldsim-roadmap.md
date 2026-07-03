@@ -38,7 +38,7 @@
 | M16 | Distributional Visibility | Zone 1A Phase 4; cohort disaggregation; political risk summary; 25-year trajectory; ecological-fiscal transmission; uncertainty quantification; Demo 6 prep (Steps 1–6c; DEMO6 findings on record) | Complete |
 | M17 | Calibration and Comparative Infrastructure | Wave 1: CM calibration (fiscal-to-cohort elasticity #1229, governance sensitivity #1248, FRAME-D gate); Wave 2: N=3 multi-scenario (#394), DEMO6 CRITICAL polish (#1249/#1250/#1253/#1239), adaptive y-axis (#1251), Zone 1B proportional allocation ADR-018 (#1252), GovernanceModule institutional_capacity_index (#1275) | Complete |
 | M18 | Full Argument and Demo 7 | Demo 7 (Senegal Mode 3 + Zambia three-scenario, simulated stakeholder session #843); counter-scenario comparison; CI bands (ADR-007 full implementation); PSP driver decomposition; control plane column (ADR-019); Zone 3 auditability panel | Complete |
-| M19 | Constraint Search and Empirical Calibration | Mode 3 constraint-floor search (instrument finds configurations that avoid human cost threshold); SEN/ZMB backtesting; empirically grounded CI intervals (ADR-007 Bayesian layer); PSP driver arc and auditability panel; Demo 8 | Current |
+| M19 | Constraint Search and Empirical Calibration | Mode 3 constraint-floor search; SEN/ZMB backtesting; 10 battle-testing scenarios; empirically grounded CI intervals (ADR-007 Bayesian layer); PSP driver arc and auditability panel; ELASTICITY_REGISTRY non-SSA calibration (CM Sprints A/B/C); Zone 1A display fidelity and interaction layer; Demo 8 | Current |
 
 ---
 
@@ -422,6 +422,66 @@ M17 is structured in two waves. **Wave 2 may not begin until Wave 1 produces a c
 **Canonical user primarily served:** Persona 5 (Aicha Mbaye, Finance Minister) in Act 1 — the counter-proposal interrogation is her instrument; Persona 2 (Eleni Papadimitriou, Finance Ministry Negotiator) in Act 2 — the distributional comparison with number differentials is what she cites at the table.
 
 **What M18 does not do:** M18 does not deliver entity templates, data marketplace, or geocoded dataset expansion (M19+). M18 does not guarantee Path 2 delivery — that is capacity-allowing, not exit-gating.
+
+---
+
+### Milestone 19 — Constraint Search and Empirical Calibration *(current)*
+
+**Core deliverable:** The constraint-floor capability and empirically calibrated confidence intervals. The ministry analyst can now ask "what configurations avoid the human cost floor?" rather than testing one at a time. Confidence intervals are grounded in empirical backtesting (Bayesian posterior across ten real-world cases), not just the structural schedule.
+
+**Demo 8 story:** *"The instrument found the boundary — and here is what the numbers say, tested against real outcomes."*
+
+**What ships:**
+
+*Mode 3 constraint-floor search (Act 1):*
+- Constraint-floor search capability — instrument finds configurations that avoid a human cost threshold; reverses the Mode 3 query from "is this safe?" to "what configurations are safe?" → Issue #1540 (horizon:immediate) ✅ G1 delivered
+- Focal cohort floor Pydantic validation → Issue #1538 (horizon:immediate) ✅ Pre-wave delivered
+- scenarioId guard Zone 1B crash fix → Issue #1456 (horizon:immediate)
+
+*Headless battle-testing and empirical calibration (evidence base for Acts 1 and 2):*
+- Headless battle-testing harness (Type A/B, configurable output) → Issue #1546 (horizon:immediate) ✅ G2A delivered
+- SEN backtesting fixture → Issue #1541 (horizon:immediate) ✅ G2B delivered
+- ZMB backtesting fixture → Issue #1542 (horizon:immediate) ✅ G2B delivered
+- Greece 2010–15 primary surplus counter-factual (Type B) → Issue #1547 (horizon:immediate) ✅ G2C delivered
+- Argentina 2001 peg-abandonment counter-factual (Type B) → Issue #1548 (horizon:immediate) ✅ G2C delivered
+- Sri Lanka 2022–23 Coffin Corner (Type A+B) → Issue #1549 (horizon:immediate) ✅ G2C delivered
+- Pakistan 2022–23 programme survival (Type B) → Issue #1550 (horizon:immediate) ✅ G2C delivered
+- Turkey 2018–19 rate-cut counter-factual (Type B) → Issue #1551 (horizon:immediate) ✅ G2C delivered
+- Egypt 2016 devaluation/subsidy reform (Type B) → Issue #1552 (horizon:immediate) ✅ G2C delivered
+- Ghana 2022–23 IMF programme (Type A+B) → Issue #1554 (horizon:immediate) ✅ G2C delivered
+- Iceland 2008–11 orthodox vs heterodox pre-calibration structural test (Type A+B) → Issue #1553 (horizon:immediate) — G2D active
+- Capital controls transmission gap (ExternalSectorModule + MacroeconomicModule channels) → Issue #1532 (horizon:immediate) — G2D active
+
+*Empirically grounded CI intervals (Act 2 confidence bounds):*
+- ADR-007 Bayesian posterior layer → Issue #1543 (horizon:immediate) ✅ G3 delivered
+- ADR-007 meaninglessness threshold → Issue #1536 (horizon:immediate) ✅ G3 delivered
+- BandResult visible fields (is_pre_calibration, clipped_lower/upper) → Issue #1537 (horizon:immediate) ✅ G3 delivered
+
+*PSP analytical depth and CI label polish (Act 2 instrument quality):*
+- PSP driver arc across programme window + in-viewport auditability panel (DEMO-165) → Issue #1528 (horizon:immediate) — G4 active
+- '95% CI' label precision fix → Issue #1529 (horizon:immediate) — G4 active
+
+*ELASTICITY_REGISTRY empirical calibration — non-SSA entity families (CM parallel track):*
+- CM Sprint A: Euro area programme countries (GRC, PRT, IRL, CYP) — Ilzetzki et al. (2013) fiscal multiplier for open economies with fixed exchange rates; GDP-to-unemployment elasticity from OECD Southern European labour market studies; priority: GRC for Greece 2010 counter-factual MAGNITUDE fidelity → Issue #1623 (horizon:immediate; M19 priority)
+- CM Sprint B: Latin American emerging markets (ARG, ECU, BOL, PER) — Ilzetzki et al. (2013) Latin American multiplier range; Céspedes & Velasco (2012) commodity price-to-fiscal transmission; priority: ARG for Argentina 2001 counter-factual MAGNITUDE fidelity → Issue #1623 (horizon:immediate; lower priority than Sprint A)
+- CM Sprint C: South and Southeast Asian programme countries (PAK, LKA, BGD) — IMF Asia-Pacific Regional Economic Outlook multiplier estimates; Batini et al. (2012) or equivalent; priority: PAK and LKA for 2022–23 live application cases → Issue #1623 (horizon:immediate; lower priority than Sprint A)
+
+*Demo 8 display and presentation quality (Wave 3 / G5 — after G4):*
+- Zone 1A ZMB y-axis tight-scoping — `CompositeChartSVG.computeYDomain` fix; three scenario curves currently collapse when data spread ≤ 0.05; Demo 8 Act 2 display risk → Issue #1629 (horizon:immediate)
+- Demo 8 narration / Mode 3 HD line alignment — narration implies separately visible HD line in Zone 1A that does not exist; fix is narration correction or per-framework lines (EL decision determines scope) → Issue #1630 (horizon:immediate; separate sprint entry G5)
+
+*Zone 1A instrument quality (Wave 3+ — after G5):*
+- View model layer retrofit — extract composition logic from Zone 1 instrument components → Issue #1522 (horizon:immediate)
+- Zone 1A TrajectoryView interaction layer — pinch-zoom, thumbwheel zoom, and pan on trajectory plot → Issue #1524 (horizon:immediate)
+
+*Live external session:*
+- Demo 8 — live stakeholder session → Issue #1544 (milestone exit gate)
+
+**Demo:** Demo 8 at M19 close. Two-act structure: Act 1 (constraint-floor search — instrument finds the boundary rather than testing one configuration at a time), Act 2 (Zambia three-scenario comparison with CI bounds grounded in empirical backtesting across ten real-world cases).
+
+**Canonical user primarily served:** Persona 5 (Aicha Mbaye, Finance Minister) — Act 1 reverses her analytical task: the boundary comes to her, not the other way around. The Greece 2010 counter-factual (CM Sprint A) directly models the scenario type her counterpart at the IMF negotiating table is most familiar with, raising the credibility floor for all MAGNITUDE-fidelity claims. Persona 2 (Eleni Papadimitriou, Finance Ministry Negotiator) — Act 2 CI bounds are now defensible against "how reliable is this interval?" because they are grounded in fidelity across ten real-world fiscal outcomes.
+
+**What M19 does not do:** M19 does not add entity templates, data marketplace, or geocoded dataset expansion. CM Sprint B (Latin America) and Sprint C (South Asia) are M19-milestoned but lower priority than Sprint A — they defer to M20 if capacity is reached after Sprint A delivers Greece MAGNITUDE fidelity. The Zone 1A interaction layer (#1522, #1524) is M19-milestoned but may defer to M20 if Demo 8 preparation consumes Wave 3 capacity.
 
 ---
 
