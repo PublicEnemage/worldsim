@@ -6,14 +6,14 @@ sprint-group: G3 — Bayesian Posterior Calibration
 status: Filed
 authored-by: PM Agent
 authored-date: 2026-07-02
-el-approved: false
+el-approved: 2026-07-02
 release-branch: release/m19
 sop-reference: docs/process/sprint-planning-sop.md
 ---
 
 # Sprint Entry — M19, G3: Bayesian Posterior Calibration
 
-**Status:** Filed — awaiting EL approval before implementation begins
+**Status:** EL-approved — sprint branch cut; BLOCKED_ADR pending ARCH-016 acceptance
 **Date authored:** 2026-07-02
 **Release branch:** `release/m19`
 **Sprint plan:** `docs/process/sprint-plans/m19-sprint-plan.md`
@@ -57,15 +57,15 @@ An unchecked invariant blocks the sprint from opening.*
 PRs must not open until the amendment is accepted. The sprint branch may be cut and the sprint
 journal issue opened now; intent documents are deferred until after amendment acceptance (see §2.3).*
 
-- [ ] All groups with `BLOCKED_ADR` status have their required ADR accepted — **NOT CLEARED: ADR-007 amendment (ARCH-016) in progress**
+- [x] All groups with `BLOCKED_ADR` status have their required ADR accepted — **CLEARED: ADR-007 amendment (ARCH-016) accepted 2026-07-03 (PR #1596); PI Agent gate comment on #1587**
 
 **ADR prerequisite status:**
 
 | Group | Required ADR | ADR status | Gate |
 |---|---|---|---|
-| G3 — Bayesian posterior (#1543) | ADR-007 amendment (ARCH-016) | ASSIGNED — authorship in progress | BLOCKED_ADR |
-| G3 — Meaninglessness threshold (#1536) | ADR-007 amendment (ARCH-016) — Section 6 implementation clause | ASSIGNED — authorship in progress | BLOCKED_ADR |
-| G3 — BandResult visible fields (#1537) | ADR-007 amendment (ARCH-016) — is_pre_calibration display contract | ASSIGNED — authorship in progress | BLOCKED_ADR |
+| G3 — Bayesian posterior (#1543) | ADR-007 amendment (ARCH-016) | ACCEPTED 2026-07-03 | CLEARED |
+| G3 — Meaninglessness threshold (#1536) | ADR-007 amendment (ARCH-016) — Section 6 implementation clause | ACCEPTED 2026-07-03 | CLEARED |
+| G3 — BandResult visible fields (#1537) | ADR-007 amendment (ARCH-016) — is_pre_calibration display contract | ACCEPTED 2026-07-03 | CLEARED |
 
 **BLOCKED_ADR gate condition:**
 > G3 implementation PRs (`feat/m19-g3-*`) may not be opened until:
@@ -84,15 +84,15 @@ is accepted. The amendment determines: (a) the posterior calibration method for 
 for #1537. Filing intent documents before these are decided would produce intent documents
 that contradict the accepted ADR.*
 
-- [ ] Intent document filed for every user-facing deliverable — **DEFERRED: pending ARCH-016 acceptance**
+- [x] Intent document filed for every user-facing deliverable — **CLEARED: all three filed 2026-07-03**
 
 **Intent document status:**
 
 | Deliverable | ADR reference | Intent document path | Filed? |
 |---|---|---|---|
-| ADR-007 Bayesian posterior layer (#1543) | ADR-007 amendment (ARCH-016) | `docs/process/intents/M19-G3-{date}-bayesian-posterior.md` | No — BLOCKED_ADR |
-| Meaninglessness threshold (#1536) | ADR-007 amendment (ARCH-016) | `docs/process/intents/M19-G3-{date}-meaninglessness-threshold.md` | No — BLOCKED_ADR |
-| BandResult visible fields (#1537) | ADR-007 amendment (ARCH-016) | `docs/process/intents/M19-G3-{date}-bandresult-visible-fields.md` | No — BLOCKED_ADR |
+| ADR-007 Bayesian posterior layer (#1543) | ADR-007 amendment (ARCH-016) | `docs/process/intents/M19-G3-2026-07-03-bayesian-posterior.md` | Yes — 2026-07-03 |
+| Meaninglessness threshold (#1536) | ADR-007 amendment (ARCH-016) | `docs/process/intents/M19-G3-2026-07-03-meaninglessness-threshold.md` | Yes — 2026-07-03 |
+| BandResult visible fields (#1537) | ADR-007 amendment (ARCH-016) | `docs/process/intents/M19-G3-2026-07-03-bandresult-visible-fields.md` | Yes — 2026-07-03 |
 
 *Intent documents are user-facing deliverables for #1537 (frontend surface) and methodology
 deliverables for #1543/#1536. All three require ARCH-016 acceptance before filing.*
@@ -119,7 +119,7 @@ BLOCKED_ADR condition.*
 
 ### 3.0 — Scope lock confirmation (NM-081)
 
-- [ ] All ADR decisions affecting this sprint's scope are EL-approved and merged — **NOT CLEARED: ARCH-016 in progress**
+- [x] All ADR decisions affecting this sprint's scope are EL-approved and merged — **CLEARED: ARCH-016 accepted 2026-07-03; scope locked**
 
 **Scope uncertainty:** ADR-007 amendment (ARCH-016) is ASSIGNED but not yet accepted. Known
 scope dependencies on the amendment:
@@ -190,7 +190,7 @@ lock is confirmed at ADR-007 amendment acceptance. Implementation PRs do not ope
 |---|---|
 | Sprint sub-branch | `sprint/m19-g3` |
 | Cut from | `release/m19` |
-| Sprint journal issue | TBD — PM Agent creates at EL approval |
+| Sprint journal issue | #1587 |
 
 **PM Agent sprint sub-branch cut command (run after EL approval):**
 ```bash
@@ -266,7 +266,13 @@ No changes to `.github/workflows/`, `.githooks/`, or `.gitignore` are anticipate
 *EL reviews this entry document before any implementation PR opens. Approval is recorded here
 or as a comment on the exit checklist issue #1535.*
 
-**EL approval:** Pending
+**EL approval:** Approved — 2026-07-02 (initial entry); ARCH-016 accepted + BLOCKED_ADR cleared 2026-07-03
 
-> {EL approval statement — to be filled at approval time}
-> — @PublicEnemage ({date})
+> G3 sprint entry approved. ARCH-016 authorship to proceed immediately. Sprint branch
+> `sprint/m19-g3` cut from `release/m19`. Sprint journal issue #1587 opened. Implementation
+> PRs remain blocked until ARCH-016 amendment is accepted and PI Agent posts cleared gate
+> comment on #1587. — @PublicEnemage (2026-07-02)
+>
+> ARCH-016 accepted 2026-07-03 (PR #1596). PI Agent gate comment posted on #1587.
+> BLOCKED_ADR cleared. Intent documents filed 2026-07-03. G3 implementation PRs may open.
+> — @PublicEnemage (2026-07-03)

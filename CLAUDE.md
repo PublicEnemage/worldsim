@@ -298,7 +298,7 @@ Delivered: CI bands on Zone 1A trajectories (ADR-007 full implementation, #1254)
 
 **Milestone 19 — Constraint Search and Empirical Calibration (Current)**
 
-Core deliverable: Mode 3 constraint-floor capability (instrument finds configurations that avoid a human cost threshold, rather than requiring one-at-a-time manual search); SEN and ZMB backtesting; empirically grounded CI intervals (ADR-007 Bayesian posterior layer); PSP driver arc across programme window and in-viewport auditability panel (DEMO-165, #1528); CI label precision (#1529); scenarioId guard Zone 1B (#1456); ADR-007 meaninglessness threshold (#1536); BandResult visible fields (#1537); focal cohort floor validation (#1538).
+Core deliverable: Mode 3 constraint-floor capability (instrument finds configurations that avoid a human cost threshold, rather than requiring one-at-a-time manual search); SEN and ZMB backtesting; empirically grounded CI intervals (ADR-007 Bayesian posterior layer); PSP driver arc across programme window and in-viewport auditability panel (DEMO-165, #1528); CI label precision (#1529); scenarioId guard Zone 1B (#1456); ADR-007 meaninglessness threshold (#1536); BandResult visible fields (#1537); focal cohort floor validation (#1538); ELASTICITY_REGISTRY empirical calibration for non-SSA entity families (#1623 — CM Sprint A GRC/Euro area is M19 priority; unblocks Greece 2010 counter-factual MAGNITUDE fidelity); Zone 1A ZMB display fidelity (#1629 — `computeYDomain` tight-scope fix; Demo 8 Act 2 risk); Demo 8 narration / Mode 3 HD line alignment (#1630 — separate sprint entry G5 after G4; EL decision required on scope); Zone 1 view model layer retrofit (#1522); Zone 1A TrajectoryView interaction — pinch-zoom, thumbwheel zoom, pan (#1524).
 
 Demo 8 at M19 close.
 
@@ -317,7 +317,7 @@ The full roadmap covering M19 and beyond — milestone deliverables, demo anchor
 Delivered: CI bands ADR-007 (#1254); PSP driver decomposition (#1255); counter-scenario comparison with distributional differential (#1349); control plane column ADR-019 (#1354); Zone 3 auditability panel (#1422); 24 DEMO-NNN findings remediated (G6/G7). Demo 7 north star PASS (unconditional, 2026-07-02). SCAN-028 complete (Clean, 2026-07-02).
 
 **Milestone 19 — Constraint Search and Empirical Calibration (Current)**
-Core deliverable: Mode 3 constraint-floor search capability; SEN/ZMB backtesting; empirically grounded CI intervals; PSP driver arc and auditability panel (DEMO-165/#1528); CI label precision (#1529); scenarioId guard Zone 1B (#1456); ADR-007 meaninglessness threshold (#1536); BandResult visible fields (#1537); focal cohort floor validation (#1538). Demo 8 at M19 close.
+Core deliverable: Mode 3 constraint-floor search (#1540 ✓); SEN/ZMB backtesting (#1541 ✓, #1542 ✓); ten real-world battle-testing scenarios (G2C ✓, G2D active); empirically grounded CI intervals (G3 ✓); PSP driver arc (#1528, G4); CI label precision (#1529, G4); ELASTICITY_REGISTRY non-SSA calibration gaps (#1623 — CM Sprint A GRC/Euro area M19 priority); Zone 1A ZMB display fidelity (#1629); Demo 8 narration/HD alignment (#1630 — G5 after G4); Zone 1 view model retrofit (#1522); Zone 1A interaction layer (#1524). Demo 8 at M19 close.
 
 Full roadmap: `docs/roadmap/worldsim-roadmap.md`
 

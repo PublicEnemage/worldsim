@@ -46,7 +46,7 @@ sop-reference: docs/process/sprint-planning-sop.md
 
 ## HORIZON Scope-Completeness Check
 
-Full M19 issue audit completed 2026-07-02 (updated post-filing). All 22 M19 issues accounted for.
+Full M19 issue audit completed 2026-07-02 (updated post-filing). Updated 2026-07-03 HORIZON sweep — 5 issues added (#1522, #1524, #1623, #1629, #1630). All 27 M19 issues accounted for.
 
 ### Roadmap deliverables — linkage audit
 
@@ -67,6 +67,11 @@ Full M19 issue audit completed 2026-07-02 (updated post-filing). All 22 M19 issu
 | ADR-007 Bayesian posterior layer — empirically grounded CI intervals | #1543 | G3 (blocked: G2 Phase B) | ✅ Tracked; SEN+ZMB gate sprint entry |
 | PSP driver arc across programme window + in-viewport auditability panel | #1528 | G4 | ✅ Tracked (DEMO-165) |
 | Demo 8 — live stakeholder session | #1544 | Milestone exit gate | ✅ Tracked |
+| ELASTICITY_REGISTRY non-SSA calibration — CM Sprint A (Euro area/GRC) | #1623 | CM parallel track | ✅ Tracked — Sprint A M19 priority; B+C lower priority |
+| Zone 1A ZMB y-axis tight-scoping (Demo 8 Act 2 display risk) | #1629 | G5 / Wave 3 | ✅ Tracked — added 2026-07-03 HORIZON sweep |
+| Demo 8 narration / Mode 3 HD line alignment | #1630 | G5 / Wave 3 (after G4) | ✅ Tracked — EL: separate sprint entry after G4 |
+| Zone 1 view model layer retrofit | #1522 | Wave 3+ | ✅ Tracked — EL-added to M19 |
+| Zone 1A TrajectoryView interaction (pinch-zoom, thumbwheel, pan) | #1524 | Wave 3+ | ✅ Tracked — EL-added to M19 |
 
 ### Carry-forward and known gaps — linkage audit
 
@@ -105,6 +110,11 @@ Full M19 issue audit completed 2026-07-02 (updated post-filing). All 22 M19 issu
 | #1537 | BandResult visible fields | G3 | Wave 2 (coord: #1543) | High — prerequisite for posterior UX |
 | #1528 | PSP driver arc + auditability panel | G4 | Wave 2–3 | High — DEMO-165 |
 | #1529 | '95% CI' label precision fix | G4 | Wave 2–3 (coord: G3) | High — coordinate with G3 CI label work |
+| #1623 | ELASTICITY_REGISTRY non-SSA calibration gaps (CM Sprint A/B/C) | CM parallel track | Wave 2–3 | High — Sprint A (GRC/Euro area) M19 priority; Sprints B+C lower priority |
+| #1629 | Zone 1A ZMB y-axis not tight-scoped — curves collapse | G5 / Wave 3 | Wave 3 | High — Demo 8 Act 2 display fidelity; `computeYDomain` fix |
+| #1630 | Demo 8 narration: HD line implied but not rendered | G5 / Wave 3 | Wave 3 (after G4) | High — Demo 8 Act 1 risk; separate sprint entry G5 per EL direction |
+| #1522 | View model layer retrofit — Zone 1 composition extraction | Wave 3+ | Wave 3+ | Medium — EL-added to M19; defers to M20 if Wave 3 capacity reached |
+| #1524 | Zone 1A TrajectoryView: pinch-zoom, thumbwheel, pan | Wave 3+ | Wave 3+ | Medium — EL-added to M19; defers to M20 if Wave 3 capacity reached |
 
 ### ADR backlog review
 
@@ -174,11 +184,29 @@ Full M19 issue audit completed 2026-07-02 (updated post-filing). All 22 M19 issu
 - Note: #1529 (CI label) should coordinate with G3 — if G3 changes the label architecture (e.g., `is_pre_calibration` qualifier), G4 must be consistent
 - Can begin in parallel with G3 once G3 file areas are confirmed non-overlapping
 
-### Wave 3 — Demo 8 preparation
+### Wave 3 — G5 + Demo 8 preparation
 
-- Walkthrough updates for Demo 8 narrative (constraint-floor Act 1, calibrated CI Act 2)
+**G5: Demo 8 display and narration quality (#1629, #1630)**
+- Sprint entry files after G4 exits — EL confirmed 2026-07-03
+- #1629 (ZMB Zone 1A y-axis fix): `CompositeChartSVG.computeYDomain` must tight-scope to data range; three ZMB PHR scenario curves collapse visually when spread ≤ 0.05. Fix is self-contained but affects Demo 8 Act 2 legibility.
+- #1630 (narration / HD line alignment): Act 1 narration (`demo-narrated.spec.ts` ~line 892) implies a separately visible HD line in Zone 1A that does not exist in Mode 3 (CompositeChartSVG renders single composite). EL decision required at sprint entry: (a) narration text correction only (fast path), or (b) add per-framework lines to Zone 1A in Mode 3 (larger scope, requires UX panel review).
+- Sprint branch: `sprint/m19-g5`
+- Blocked by: G4 exit (narration fix must be consistent with G4 CI label changes)
+
+**CM parallel track: ELASTICITY_REGISTRY non-SSA calibration (#1623)**
+- CM Sprint A (Euro area — GRC priority): Runs concurrently with G4/G5; does not share file areas with G-series sprints
+- CM Sprint B (Latin America — ARG priority): After Sprint A exit gate
+- CM Sprint C (South Asia — PAK/LKA priority): After Sprint B, may defer to M20
+- Sprint branch(es): cut from `release/m19` per CM/CE protocol; CM sign-off required at sprint entry per NM-084 gate
+
+**Wave 3+ — after G5 (#1522, #1524)**
+- #1522 (view model layer retrofit) and #1524 (Zone 1A interaction layer) are M19-milestoned at EL direction but are capacity-conditional: if Demo 8 preparation leaves insufficient Wave 3 capacity, both defer to M20 with documented rationale on each issue.
+- Sprint entries file after G5 exit; group designation TBD at that point.
+
+**Demo 8 preparation (runs in parallel with G5)**
+- Walkthrough updates for Demo 8 narrative (constraint-floor Act 1, calibrated CI Act 2 with empirical grounding)
 - Internal review, IR review, stakeholder session (#1544)
-- G5 remediation group (if Demo 8 internal review finds CRITICAL/HIGH issues)
+- G-remediation group (if Demo 8 internal review finds CRITICAL/HIGH issues)
 
 ---
 
@@ -199,6 +227,12 @@ ADR decision          ──┘
 #1532 (capital controls) ──► G2D: #1553 (Iceland)
 
 G3 CI label design ──► G4: #1529 (label precision) — coordinate, not block
+
+G4 exit ──► G5: #1629 (ZMB y-axis fix) + #1630 (narration/HD alignment) ──► Demo 8 prep
+
+#1623 (CM Sprint A/B/C — parallel track; no file area overlap with G-series)
+
+G5 exit ──► Wave 3+: #1522 (view model retrofit), #1524 (interaction layer) — capacity-conditional
 ```
 
 ---
@@ -216,6 +250,13 @@ G3 CI label design ──► G4: #1529 (label precision) — coordinate, not blo
 
 ---
 
-## Insights log review (2026-07-02)
+## Insights log review
 
-Open entries reviewed at sprint plan filing: 0 open entries requiring action. The three Socratic TEST session gaps have been promoted to GitHub issues (#1536, #1537, #1538 — all filed 2026-07-02). No entries remain at `open` status requiring M19 disposition at this time.
+**At sprint plan filing (2026-07-02):** 0 open entries requiring action. The three Socratic TEST session gaps promoted to GitHub issues (#1536, #1537, #1538).
+
+**HORIZON sweep (2026-07-03):** 3 open entries reviewed and dispositioned:
+- 2026-06-30: ZMB Zone 1A curve collapse → promoted → #1629 (added to M19; G5 Wave 3)
+- 2026-06-30: Mode 3 HD narration mismatch → promoted → #1630 (added to M19; G5 Wave 3 after G4 per EL direction)
+- 2026-07-02: Headless battle-testing initiative → resolved (all 10 issues filed; ADR-020 accepted; G2D implementation unblocked)
+
+Additionally: #1522 and #1524 added to M19 at EL direction; #1623 (ELASTICITY_REGISTRY calibration gap) filed and added to M19. Total M19 issue count: 27.

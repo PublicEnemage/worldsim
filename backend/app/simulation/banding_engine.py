@@ -70,6 +70,52 @@ def _tier_multiplier(confidence_tier: int) -> Decimal:
 
 
 # ---------------------------------------------------------------------------
+# CalibrationStore — Bayesian posterior multiplier overrides (ADR-007 §8.2–§8.5)
+# ---------------------------------------------------------------------------
+
+_CALIBRATION_MULTIPLIERS: dict[int, Decimal] = {}
+
+
+def set_calibration_multipliers(multipliers: dict[int, Decimal]) -> None:
+    """Override active tier multipliers for calibrated posteriors.
+
+    Tests call set_calibration_multipliers({}) in tearDown to restore defaults.
+    Production registry entries set overrides after MAGNITUDE_MATCH + co-sign gate.
+    """
+    global _CALIBRATION_MULTIPLIERS
+    _CALIBRATION_MULTIPLIERS = dict(multipliers)
+
+
+def get_tier_multiplier(tier: int) -> Decimal:
+    """Return active multiplier for tier: calibrated override if set, else structural prior."""
+    if tier in _CALIBRATION_MULTIPLIERS:
+        return _CALIBRATION_MULTIPLIERS[tier]
+    return _TIER_MULTIPLIERS.get(tier, Decimal("1.0"))
+
+
+# ---------------------------------------------------------------------------
+# Correction factor (ADR-007 §8.4)
+# ---------------------------------------------------------------------------
+
+_C_TARGET = Decimal("0.80")
+_CLAMP_MIN = Decimal("0.5")
+_CLAMP_MAX = Decimal("2.0")
+_C_MAG_FLOOR = Decimal("0.05")
+
+
+def compute_correction_factor(c_mag: Decimal) -> tuple[Decimal, str]:
+    """Compute κ = clamp(sqrt(C_target / max(C_mag, 0.05)), 0.5, 2.0).
+
+    Returns (Decimal("1.0"), "EVIDENCE_INSUFFICIENT") when c_mag < C_MAG_FLOOR.
+    """
+    if c_mag < _C_MAG_FLOOR:
+        return Decimal("1.0"), "EVIDENCE_INSUFFICIENT"
+    raw_kappa = (_C_TARGET / max(c_mag, _C_MAG_FLOOR)).sqrt()
+    kappa = max(_CLAMP_MIN, min(_CLAMP_MAX, raw_kappa))
+    return kappa, "OK"
+
+
+# ---------------------------------------------------------------------------
 # BandResult dataclass
 # ---------------------------------------------------------------------------
 
@@ -77,12 +123,16 @@ def _tier_multiplier(confidence_tier: int) -> Decimal:
 class BandResult:
     """Output of compute_band for a single framework point."""
 
-    ci_lower: str | None            # Decimal-as-string; None when composite_score is None
-    ci_upper: str | None            # Decimal-as-string; None when composite_score is None
+    ci_lower: str | None            # Decimal-as-string; None when suppressed or null score
+    ci_upper: str | None            # Decimal-as-string; None when suppressed or null score
     ci_coverage: float | None       # 0.80 or None
-    is_pre_calibration: bool | None # True or None
-    clipped_lower: bool                # True if max(natural_lower, raw_lower) fired
-    clipped_upper: bool                # True if min(natural_upper, raw_upper) fired
+    is_pre_calibration: bool | None # True or None (None when suppressed)
+    clipped_lower: bool             # True if max(natural_lower, raw_lower) fired
+    clipped_upper: bool             # True if min(natural_upper, raw_upper) fired
+    # Visible fields added M19 G3 #1537 — all defaulted for backwards compatibility
+    band_method: str | None = None  # frozen enum; None only on null-score path
+    is_meaningless: bool = False    # True when CI suppressed (full natural range)
+    suppressed_reason: str | None = None  # human-readable suppression reason
 
 
 # ---------------------------------------------------------------------------
@@ -109,6 +159,7 @@ def compute_band(
             is_pre_calibration=None,
             clipped_lower=False,
             clipped_upper=False,
+            band_method=None,
         )
 
     if framework not in _FRAMEWORK_BOUNDS:
@@ -121,12 +172,13 @@ def compute_band(
             is_pre_calibration=None,
             clipped_lower=False,
             clipped_upper=False,
+            band_method=None,
         )
 
     natural_lower, natural_upper = _FRAMEWORK_BOUNDS[framework]
 
     base_hw = _base_half_width(step_index)
-    multiplier = _tier_multiplier(confidence_tier)
+    multiplier = get_tier_multiplier(confidence_tier)
     half_width = base_hw * multiplier
 
     raw_lower = composite_score * (Decimal("1") - half_width)
@@ -137,6 +189,31 @@ def compute_band(
 
     clipped_lower = ci_lower > raw_lower
     clipped_upper = ci_upper < raw_upper
+
+    # ADR-007 §6 Implementation Clause (Amendment 1): meaninglessness threshold.
+    # When the CI equals the full natural range at step >= 7, suppress. Use
+    # equality on the clipped values rather than the clipped_* flags because
+    # raw_upper can equal natural_upper exactly (e.g. score=0.4 × 2.5 = 1.0),
+    # which leaves clipped_upper=False while the CI still spans [0, 1].
+    if (
+        step_index >= 7
+        and ci_lower == natural_lower
+        and ci_upper == natural_upper
+    ):
+        return BandResult(
+            ci_lower=None,
+            ci_upper=None,
+            ci_coverage=None,
+            is_pre_calibration=None,
+            clipped_lower=True,
+            clipped_upper=True,
+            band_method="SUPPRESSED_MEANINGLESS",
+            is_meaningless=True,
+            suppressed_reason=(
+                f"CI spans full natural range [{natural_lower}, {natural_upper}]"
+                f" at step {step_index} T{confidence_tier} — directionally meaningless"
+            ),
+        )
 
     # Quantize to 4 decimal places (consistent with composite_score precision)
     quantizer = Decimal("0.0001")
@@ -150,4 +227,5 @@ def compute_band(
         is_pre_calibration=True,
         clipped_lower=clipped_lower,
         clipped_upper=clipped_upper,
+        band_method="PRE_CALIBRATION_STRUCTURAL_PRIOR",
     )

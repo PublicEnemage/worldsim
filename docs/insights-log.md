@@ -180,11 +180,20 @@ Each entry has four fields:
 **Date:** 2026-06-30
 **Source:** EL live observation during M18-G7 Step 6 screenshot recapture run 5 — Act 2 Zone 1A
 **Finding:** Act 2 Zone 1A shows a single overlapping line with colour speckles instead of three visually distinct ZMB scenario curves. Root cause: ZMB PHR values (Option A: 0.628, Option B: 0.584, Option C: 0.540) differ by only ~0.04–0.05 per step; the y-axis is not tight-scoped to the actual data range, so all three curves collapse visually into a single band. CompositeChartSVG `computeYDomain` uses `[0, 1]` or a padded range rather than [min(data), max(data)] with appropriate margin.
-**Status:** open
+**Status:** promoted → #1629
 
 ---
 
 **Date:** 2026-06-30
 **Source:** EL live observation during M18-G7 Step 6 screenshot recapture run 5 — Act 1 Mode 3 Zone 1A narration
 **Finding:** Act 1 narration at line 892 of demo-narrated.spec.ts says "the human development composite is higher at every step from three onward" implying a separately visible HD line in Zone 1A — but Mode 3 uses CompositeChartSVG which renders a single composite average line, not per-framework lines. The HD contribution is included in the composite average but not separately visualised. The narration creates an expectation the chart does not satisfy; audience may ask to see the HD line and be unable to find it.
-**Status:** open
+**Status:** promoted → #1630
+
+---
+
+**Date:** 2026-07-02
+**Source:** EL multi-agent consultation — headless engine battle-testing deliberation; agents: Architect, CE Agent, Chief Methodologist, Chief Economist, UX Designer, Design Thinking, Customer Agent, Business PO; PM Agent documenting
+**Finding:** The UI is beginning to function as a limiting factor in understanding what the simulation engine can produce; a headless battle-testing initiative running 10 real-world scenarios directly through the API would validate active control (Mode 3) capability across real counter-factuals and surface display debt from the outside.
+**Detail:** Full multi-agent deliberation on record in session context (2026-07-02). Consensus findings: (1) Headless path already exists — `POST /scenarios/{id}/advance` + httpx + `tests/backtesting/` pattern is the tested Mode 3 interface. No new plumbing required. (2) Missing piece: a Mode 3 harness script layer (loop, control input injection, per-step capture, counter-factual differential) — new work but thin. (3) Chief Methodologist: two run categories must be distinguished — Type A (backtesting vs historical actuals, fidelity tier assigned) and Type B (counter-factual, compared to baseline run, CI band differential is the argument). (4) Output format: configurable input parameter — ASCII, CSV, JSON, Markdown table (EL decision). (5) Business PO: exercise tests whether engine is core asset or UI is load-bearing. (6) Scope: M19 (EL decision). (7) Iceland timing: pre-calibration structural test — runs before M19 empirical calibration to distinguish structural gap from calibration gap (EL decision). Capital control representability check conducted same session: `EmergencyInstrument.CAPITAL_CONTROLS` exists but ExternalSectorModule and MacroeconomicModule are silent; DemographicModule has dead subscription (wrong event string). Issue #1532 filed; ARCH-014 added to ADR backlog (PENDING_NUMBER, ADR-020). Issues #30 and #35 assessed as DIRECTION_ONLY impact on 4 of 10 scenarios (Greece, Argentina, Sri Lanka, Iceland — reserve/debt stock floor timing unreliable).
+**Ten scenarios approved:** (1) Zambia constraint-floor search (Type B, #1542+#1540); (2) Senegal Article IV full Mode 3 (Type B, #1541+#1540); (3) Greece primary surplus counter-factual (Type B, #1547); (4) Argentina peg-abandonment timing (Type B, #1548); (5) Sri Lanka 2022–23 (Type A+B, #1549); (6) Pakistan 2022–23 programme survival (Type B, #1550); (7) Turkey 2018–19 rate-cut counter-factual (Type B, #1551); (8) Egypt 2016 phased vs shock devaluation (Type B, #1552); (9) Iceland 2008–11 orthodox vs heterodox pre-calibration structural test (Type B, #1553 — blocked by #1532); (10) Ghana 2022–23 IMF programme (Type A+B, #1554). Harness infrastructure: #1546.
+**Status:** resolved — All 10 scenario issues filed (#1546–#1554), harness #1546, capital controls #1532 on M19 milestone; ARCH-014 → ADR-020 accepted 2026-07-03; G2D implementation unblocked. Fully reflected in GitHub — no further promotion required. (Resolved at M19 HORIZON sweep 2026-07-03.)
