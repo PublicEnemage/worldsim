@@ -6,7 +6,7 @@
 > Historical state lives in `docs/process/session-archives/`.
 > Authority: `docs/process/sprint-group-isolation.md §SESSION_STATE.md Cockpit Card Protocol`.
 
-**Last updated:** 2026-07-03 (G2D confirmed; Ecuador regression fixed PR #1642; integration PR #1641 pending — CI re-running)
+**Last updated:** 2026-07-03 (DS infra review: NM-092/093/094 filed; PR #1646 hook fix; G2C test recovery PR #1649; stash/worktree cleanup; G2D confirmed; PR #1641 merged)
 **Current milestone:** M19 — Constraint Search and Empirical Calibration
 
 ---
@@ -66,6 +66,7 @@
 | #1623 | ELASTICITY_REGISTRY — non-SSA entity family calibration gap | CM Wave 2–3 | High — CM Sprint A (GRC/Euro area) M19 priority; unblocks Greece counter-factual |
 | #1629 | Zone 1A ZMB y-axis not tight-scoped — curves collapse | Demo 8 risk | High — Demo 8 Act 2 display fidelity; `computeYDomain` fix required |
 | #1630 | Demo 8 Act 1 narration: HD line implied but not rendered in Zone 1A | Demo 8 risk | High — Demo 8 Act 1; narration correction or per-framework lines (EL decision) |
+| #1647 | G2C test file missing from release/m19 — NM-094 recovery | Demo 8 risk | **High** — test_m19_g2c_scenario_runs.py (1394 lines, all 7 G2C scenarios) absent; CI has no G2C backtesting coverage |
 
 ---
 
@@ -81,7 +82,9 @@
 ## Carry-Forward Context
 
 - **Process model (M19 onward):** Sprint group isolation (Option E hybrid) + SESSION_STATE.md cockpit card (≤ 200 lines). Full protocol: `docs/process/sprint-group-isolation.md`. Shared state via `chore/m{N}-state-sync-NNN` → `release/m{N}` (PM Agent). Auto-merge: `gh pr merge --auto`.
-- **Pre-push hook:** `.githooks/pre-push` enforces ruff + mypy (backend) and `npm run build` (frontend). Install: `git config core.hooksPath .githooks`.
+- **Pre-push hook:** `.githooks/pre-push` enforces ruff + mypy (backend) and `npm run build` (frontend). Install: `git config core.hooksPath .githooks`. NM-092 fix (worktree path resolution) in PR #1646 — pending merge.
+- **NM-092/093/094 (DS infra review 2026-07-03):** NM-092: pre-push hook relative paths silently bypass gates in worktrees (fix: PR #1646). NM-093: chore/state-sync-025 carried sprint implementation commits — bidirectional lane rule now explicit. NM-094: G2C QA test file missing from release/m19 (Issue #1647 — Demo 8 risk). 4 prunable M18 worktrees cleared. 4 confirmed-safe stash entries dropped (stash@{0}/{1}/{2}/{10}).
+- **Stash backlog (active):** 26 entries remain. Key items requiring EL triage: stash@{7} (M18-era chore + G1 orphans), stash@{8}/{9} (duplicate M18-G2 pair on feat/m18-g2-psp-impl — likely superseded by PR #1387).
 - **GA-02 / Path 2 retirement (PR #1393):** Proprietary ministry data upload retired on open-source-as-strategy principle. No implementation without EL-approved governance exception.
 - **sprint-branch-ci-gate Ruleset:** Node ID `RRS_lACqUmVwb3NpdG9yecc5IKi2kzgEV92A`. Requires `changes`, `lint`, `test-backend`, `compliance-scan`. (playwright-e2e not required — NM-076 context.)
 - **NM-075:** git worktrees must be allocated per sprint group (`git worktree add /tmp/<name> <branch>`) to prevent branch switches overwriting in-progress work.
