@@ -4571,6 +4571,120 @@ design artifacts authored from intended future state, not current code reality).
 
 ---
 
+## NM-092 — Pre-Push Hook Uses CWD-Relative Paths; venv and node_modules Not Found in Linked Worktrees; Both Gates Silently Non-Functional in All Worktree Sessions (Reactive)
+
+**Date:** 2026-07-03
+**Milestone:** M19 — Constraint Search and Empirical Calibration
+**Detected by:** DS Agent infra review — pattern-matching across session JSONL logs identified `backend/.venv not found` error in three separate worktree sessions (files 05a68364, 70b0ad5c)
+**Severity:** High — backend ruff/mypy gate and frontend TypeScript build gate are both non-functional in all linked worktrees; CI is the only gate, violating the "CI is a confirmation, not a discovery mechanism" principle established in NM-052
+
+### What happened
+
+The `.githooks/pre-push` hook checks `backend/.venv/bin/activate` and runs `cd frontend && npm run build` using paths relative to the shell's current working directory at invocation time. In the main working tree the CWD is the repo root (`/Users/imranyousuf/projects/worldsim/`) so `backend/.venv` resolves correctly. In a linked worktree at `/private/tmp/worldsim-{name}/`, the `.venv` directory does not exist — the virtual environment lives only in the main working tree. The hook exits with `ERROR: backend/.venv not found` and aborts without running ruff or mypy. The frontend gate fails identically when `node_modules/.bin/tsc` is absent from the worktree's `frontend/` directory.
+
+Three worktree sessions in M19 encountered this failure (worldsim-g2c, worldsim-ecu-fix, worldsim-g2d). The standing workaround was `ln -s <main-repo>/backend/.venv <worktree>/backend/.venv`, applied ad hoc per session by the agent or EL, with no documentation in the worktree setup procedure.
+
+### What was at risk
+
+Every push from a linked worktree — which is the NM-075 protocol-mandated isolation mechanism for concurrent sprint groups — bypassed the ruff+mypy and TypeScript build gates silently. If a lint error or type error was present in a worktree push, it would reach CI as the first and only gate. This is the exact scenario NM-052 (mypy gate non-functional for 8 milestones) documented as a compliance failure pattern. Given that M19 operates with 4+ concurrent sprint groups all using linked worktrees, the exposure window was every implementation push in the milestone.
+
+### What caught it
+
+DS Agent infra review correlating session JSONL log entries with known worktree paths. The `backend/.venv not found` error string appeared in three separate session files. None of the three sessions filed the recurrence as a near-miss; the ad hoc symlink fix was applied each time without escalation.
+
+### Process improvement
+
+**Root cause fix (DS Agent, PR infra/m19-pre-push-worktree-paths):** `.githooks/pre-push` now resolves the canonical repo root via `git rev-parse --show-toplevel` and the main working tree root via `git rev-parse --git-common-dir`. All paths (venv activation, `cd backend`, `cd frontend`) use the resolved canonical paths. The hook first checks for a local worktree venv (`$REPO_ROOT/backend/.venv`) and falls back to the main working tree venv (`$MAIN_REPO/backend/.venv`). The error message now prints the fully-resolved path so the developer knows exactly where to create the symlink.
+
+**Worktree setup procedure (docs/process/sprint-group-isolation.md §Worktree Setup):** After `git worktree add`, link the build dependencies:
+```
+ln -s $(git -C <main-repo> rev-parse --show-toplevel)/backend/.venv <worktree>/backend/.venv
+ln -s $(git -C <main-repo> rev-parse --show-toplevel)/frontend/node_modules <worktree>/frontend/node_modules
+```
+This step is now a required checklist item at worktree allocation, not an ad hoc fix.
+
+Near-miss cross-references: NM-052 (mypy gate non-functional for 8 milestones — same structural class: gate present but not executing); NM-070 (frontend build gate introduced after 7 TS6133 errors accumulated — established the frontend gate this NM found broken in worktrees).
+
+---
+
+## NM-093 — chore/m19-state-sync-025 Accumulated Sprint Implementation Commits; Shared-State Lane Violated in Reverse Direction; No PI Agent Gate Applied (Reactive)
+
+**Date:** 2026-07-03
+**Milestone:** M19 — Constraint Search and Empirical Calibration
+**Detected by:** DS Agent infra review — `git log --no-merges chore/m19-state-sync-025` against expected shared-state file scope revealed non-SESSION_STATE.md files in the branch diff; merge commit 37364bb message embedded the violation
+**Severity:** Medium — implementation commits (intent documents, sprint entry, QA test stubs, lint fix) merged to release/m19 via the shared-state auto-merge lane; PI Agent sprint exit gate not applied; no BPO acceptance, no north star test artifact filed for the affected deliverables
+
+### What happened
+
+The `chore/m19-state-sync-025` branch (PR #1631) was intended to carry a SESSION_STATE.md cockpit card update per the shared-state lane protocol (PM Agent only, SESSION_STATE.md and registries only, auto-merge gate). Before the PR opened, the branch accumulated: G2D intent documents (`docs/process/intents/M19-G2D-*`), G4 sprint entry document (`docs/process/sprint-plans/m19-g4-sprint-entry.md`), G4 QA test stubs, and a ruff lint fix on a backend module.
+
+These are sprint group implementation artifacts — they belong on sprint feature branches, subject to the five-step agent execution lifecycle, PI Agent sprint entry gate, CM/CE gates (where applicable), Business PO acceptance, and north star test artifact. By routing through the shared-state lane, all of these gates were bypassed. PR #1631 merged via auto-merge after CI green on the shared-state CI configuration.
+
+The merge commit message "resolve release/m19 conflict — state-sync-025 carries G2D lifecycle Steps 1+2" acknowledges the violation but treats it as acceptable under time pressure.
+
+### What was at risk
+
+Sprint group artifacts that require institutional gates (PI entry, BPO acceptance, north star test) were promoted to the release branch without those gates applying. The shared-state auto-merge lane exists precisely because shared-state changes are lower-risk and can bypass the heavier sprint group gate. Using it for implementation content inverts this risk model: higher-risk content moved through the lighter gate.
+
+Additionally: if the lane violation is acceptable under time pressure it becomes a normalised bypass. Three similar violations in one milestone would erode the sprint group isolation model entirely.
+
+### What caught it
+
+DS Agent infra review reading the merge commit message on release/m19 for state-sync-025. The message text "carries G2D lifecycle Steps 1+2" is inconsistent with a pure shared-state update and flagged the violation.
+
+### Process improvement
+
+**The shared-state lane protocol is bidirectional:** both directions of cross-contamination are prohibited.
+1. (Existing rule) Sprint branches must not write shared-state files (SESSION_STATE.md, registries, insights-log.md).
+2. (New rule, this NM) Shared-state branches (`chore/m{N}-state-sync-NNN`) must contain only changes to the explicitly enumerated shared-state files: `SESSION_STATE.md`, `docs/process/near-miss-registry.md`, `docs/process/known-issues-registry.md`, `docs/compliance/scan-registry.md`, `docs/compliance/exceptions.md`, `docs/insights-log.md`, `docs/scenarios/module-capability-registry.md`. Any other file path appearing in the branch diff is a process deviation of the same severity as a sprint branch writing to SESSION_STATE.md.
+
+**PM Agent checklist addition:** Before opening any state-sync PR, run `git diff release/m{N}...chore/m{N}-state-sync-NNN --name-only` and verify every listed path is a shared-state file. If any non-shared-state path appears, stop — split the content into the appropriate sprint feature branch and open two separate PRs.
+
+Near-miss cross-references: NM-089 (complement: shared-state changes lost on branch switch — the inverse hazard: implementation changes accidentally routed via shared-state lane).
+
+---
+
+## NM-094 — G2C QA Test File (1394 Lines) Missing from release/m19 After Sprint Confirmation; Feature Branches Never Merged into Sprint Branch Before Integration PR (Reactive)
+
+**Date:** 2026-07-03
+**Milestone:** M19 — Constraint Search and Empirical Calibration
+**Detected by:** DS Agent infra review — `head backend/tests/backtesting/test_m19_g2c_scenario_runs.py` returned "No such file or directory" on release/m19; `git log --all -- <file>` traced 7 commits on feat/m19-g2c-* branches with none reachable from release/m19
+**Severity:** High — G2C sprint was confirmed as complete (exit doc `m19-g2c-sprint-exit.md`, journal #1589 closed, BPO ACCEPT on record); the primary QA artifact implementing acceptance criteria for all 7 G2C countries (#1547–#1554) is absent from the release branch
+
+### What happened
+
+The G2C sprint involved 7 feature branches (`feat/m19-g2c-{greece-counterfactual, sri-lanka-coffin-corner, pakistan-programme, turkey-backside, egypt-devaluation, ghana-imf-programme, entry-docs}`) targeting `sprint/m19-g2`. Each branch added test classes to the shared file `backend/tests/backtesting/test_m19_g2c_scenario_runs.py`. The file was initially authored at `f951640`, fixed at `f344fdb`, and extended through `33a51ee` (7 commits total, 1394 final lines covering all 7 countries).
+
+When integration PR #1641 (`sprint/m19-g2` → `release/m19`) merged, none of these commits were in `sprint/m19-g2` — they existed only on the `feat/m19-g2c-*` branches. The feature PRs for individual countries (#1549–#1554) were opened and their issue checkboxes marked ✓, but the underlying commits were never pulled into the sprint branch before the integration PR fired. `git log release/m19 -- test_m19_g2c_scenario_runs.py` returns empty.
+
+**Compounding factor:** The G2C stash incident (NM-087) involved the same file. The stash@{2} that NM-087 required EL to review also contained modifications to this file — evidence that the file was in active development in a session that then stashed its work and the recovery path lost track of whether the file had been committed and integrated.
+
+### What was at risk
+
+The G2C sprint "confirmation" is formally on record (exit doc, BPO ACCEPT, north star test) but the test file implementing all acceptance criteria is absent from the release branch. Consequences:
+
+1. Demo 8 battle-testing scenarios (#1547–#1554) have no CI-discoverable tests on the release branch. A CI run against release/m19 does not execute any G2C scenario tests.
+2. The sprint confirmation record implies the work is integrated and testable; it is neither.
+3. If stash@{2} had been the only copy of the file, the NM-087 drop decision could have permanently destroyed 1394 lines of QA work. (In practice, the file was in git history on the feature branches — but the session agent and EL were not aware of this when considering the stash drop.)
+
+### What caught it
+
+DS Agent running `head backend/tests/backtesting/test_m19_g2c_scenario_runs.py` during stash@{2} investigation to determine whether the stash content was superseded by a committed version. The file's absence on the current working tree prompted `git log --all -- <file>`, which revealed the full 7-commit chain on feature branches not reachable from release/m19.
+
+### Process improvement
+
+**Sprint exit gate: verify sprint branch contains all AC-implementing artifacts before integration PR opens.**
+
+The PI Agent sprint exit confirmation must include a file-presence check: `git diff release/m{N}...sprint/m{N}-g{N} --name-only | grep -E "test_"` must return the expected test files for every deliverable on the exit checklist. A sprint whose test files exist only on feature sub-branches (never merged into the sprint branch) is not ready to integrate — the integration PR would silently omit the primary QA artifacts.
+
+**Feature PR merge confirmation:** When a feature PR is marked ✓ in the sprint journal (issue checkbox or PI Agent record), the PM Agent must confirm the PR was merged into the sprint branch, not just opened. A ✓ on the issue does not mean the commit is on the sprint branch; it means the work was done. The sprint branch merge is the distinct gate.
+
+**Recovery action (immediate):** PM Agent to open a PR restoring `git show 33a51ee:backend/tests/backtesting/test_m19_g2c_scenario_runs.py` to release/m19. Since no active sprint branch covers G2C, this targets release/m19 directly as a test-only correction PR.
+
+Near-miss cross-references: NM-083 (demo-spec ↔ component-contract gap — confirmed deliverable had no automated test asserting its contract; same pattern: sprint confirmed, test evidence absent); NM-087 (stash@{2} investigation was the detection path for this NM).
+
+---
+
 ## NM-NNN — [Short descriptive title]
 
 **Date:** YYYY-MM-DD (or approximate milestone era)
