@@ -47,6 +47,9 @@ from app.schemas import (
     BranchResponse,
     CohortThresholdCrossing,
     CompareResponse,
+    ConstraintFloorSearchRequest,
+    ConstraintFloorSearchResponse,
+    ConstraintFloorSearchStatus,
     DeltaRecord,
     DistributionalDifferentialRequest,
     DistributionalDifferentialResponse,
@@ -2999,4 +3002,196 @@ async def post_distributional_differential(
         methodology_summary=_DISTRIBUTIONAL_METHODOLOGY,
         methodology_detail=methodology_detail,
         pairs=pairs,
+    )
+
+
+# ---------------------------------------------------------------------------
+# POST /scenarios/{scenario_id}/constraint-floor-search — ADR-021 §D-2 (M19 G1 #1540)
+# ---------------------------------------------------------------------------
+
+# Attribute to check on Q1 INFORMAL cohort entities.
+# Indicator key "bottom_quintile_informal_workers_poverty_headcount" maps to
+# poverty_headcount_ratio on entities matching "{ISO3}:CHT:1-*-INFORMAL".
+_Q1_INFORMAL_ATTR = "poverty_headcount_ratio"
+
+
+def _cohort_crosses_floor(
+    state: object,  # SimulationState — imported locally to avoid circular deps
+    indicator_key: str,
+    entity_prefixes: list[str],
+    floor_value: float,
+) -> bool:
+    """Return True if the focal cohort indicator is below floor_value in state.
+
+    For M19: supports `bottom_quintile_informal_workers_poverty_headcount`
+    by checking poverty_headcount_ratio on {prefix}:CHT:1-*-INFORMAL entities.
+    Unknown indicator keys return False (safe fallback → NOT_FOUND result).
+    """
+    if indicator_key != "bottom_quintile_informal_workers_poverty_headcount":
+        return False
+    entities = getattr(state, "entities", {})
+    for prefix in entity_prefixes:
+        for entity_id, entity in entities.items():
+            if (
+                entity_id.startswith(f"{prefix}:CHT:1-")
+                and entity_id.endswith("-INFORMAL")
+            ):
+                qty = entity.attributes.get(_Q1_INFORMAL_ATTR)
+                if qty is not None:
+                    try:
+                        if float(qty.value) < floor_value:
+                            return True
+                    except (TypeError, ValueError):
+                        pass
+    return False
+
+
+@router.post(
+    "/scenarios/{scenario_id}/constraint-floor-search",
+    response_model=ConstraintFloorSearchResponse,
+)
+async def constraint_floor_search(
+    scenario_id: str,
+    req: ConstraintFloorSearchRequest,
+    conn: Annotated[asyncpg.Connection, Depends(get_db)],
+) -> ConstraintFloorSearchResponse:
+    """Binary search for the fiscal_multiplier floor that keeps a focal cohort
+    above its configured floor_value — ADR-021 §D-2 (M19 G1 #1540).
+
+    Runs the simulation engine O(log2((hi-lo)/tol)) ≈ 8–9 times in-memory
+    (no DB writes) within a single HTTP round trip. Returns FOUND with the
+    minimum safe fiscal_multiplier, NOT_FOUND when no safe value exists in
+    [lo, hi], or ERROR when the engine raises on any evaluation.
+
+    Returns 404 if scenario_id is not found.
+    Returns 422 if focal_cohort_index is out of range.
+    All simulation errors are captured as status=ERROR (HTTP 200) per SF-2.
+    """
+    import copy  # noqa: PLC0415
+
+    from app.simulation.constraint_floor_search import binary_search  # noqa: PLC0415
+    from app.simulation.repositories.state_repository import (  # noqa: PLC0415
+        SimulationStateRepository,
+    )
+    from app.simulation.web_scenario_runner import (  # noqa: PLC0415
+        _apply_initial_overrides,
+        _apply_political_context,
+        _base_timestep,
+        _build_active_modules,
+        _inject_cohort_entities,
+    )
+
+    # --- 1. Load and validate scenario ---
+    row = await conn.fetchrow(
+        "SELECT scenario_id, name, configuration FROM scenarios WHERE scenario_id = $1",
+        scenario_id,
+    )
+    if row is None:
+        raise HTTPException(status_code=404, detail=f"Scenario '{scenario_id}' not found.")
+
+    cfg_raw = row["configuration"]
+    if isinstance(cfg_raw, str):
+        cfg_raw = json.loads(cfg_raw)
+    config = ScenarioConfigSchema(**cfg_raw)
+
+    cohorts = config.monitored_focal_cohorts
+    if req.focal_cohort_index >= len(cohorts):
+        raise HTTPException(
+            status_code=422,
+            detail=(
+                f"focal_cohort_index {req.focal_cohort_index} out of range — "
+                f"scenario has {len(cohorts)} monitored_focal_cohorts."
+            ),
+        )
+
+    focal_cohort = cohorts[req.focal_cohort_index]
+    focal_cohort_dict: dict[str, object] = {
+        "indicator_key": focal_cohort.indicator_key,
+        "floor_value": focal_cohort.floor_value,
+        "floor_label": focal_cohort.floor_label,
+        "framework": focal_cohort.framework,
+    }
+
+    # --- 2. Load initial state from DB once (async) ---
+    try:
+        state_repo = SimulationStateRepository()
+        base_timestep = _base_timestep(config)
+        initial_state = await state_repo.load_initial_state(
+            conn,
+            config.entities,
+            scenario_id,
+            row["name"],
+            base_timestep,
+        )
+        _apply_initial_overrides(initial_state, config)
+        _inject_cohort_entities(initial_state, config)
+        _apply_political_context(initial_state, config)
+    except Exception as exc:  # noqa: BLE001
+        return ConstraintFloorSearchResponse(
+            status=ConstraintFloorSearchStatus.ERROR,
+            evaluations=0,
+            search_lo=req.lo,
+            search_hi=req.hi,
+            floor_value=focal_cohort.floor_value,
+            indicator_key=focal_cohort.indicator_key,
+            error_message=f"Failed to load initial simulation state: {exc}",
+        )
+
+    # --- 3. Build synchronous run_trajectory_fn closure ---
+    def run_trajectory_fn(scenario_config: ScenarioConfigSchema, fiscal_multiplier: float) -> bool:
+        """Run scenario in-memory with overridden fiscal_multiplier.
+
+        Returns True if the focal cohort indicator crosses the floor at any step.
+        """
+        cfg_copy = scenario_config.model_copy(
+            update={"fiscal_multiplier": fiscal_multiplier}
+        )
+        state = copy.deepcopy(initial_state)
+        modules = _build_active_modules(cfg_copy)
+        from app.simulation.orchestration.runner import ScenarioRunner  # noqa: PLC0415
+
+        runner = ScenarioRunner(
+            initial_state=state,
+            scheduled_inputs=[],
+            modules=modules,
+            n_steps=cfg_copy.n_steps,
+        )
+        current = state
+        for _ in range(cfg_copy.n_steps):
+            current = runner.advance_timestep(
+                current_state=current,
+                modules=modules,
+                scheduled_inputs=[],
+            )
+            if _cohort_crosses_floor(
+                current,
+                focal_cohort.indicator_key,
+                config.entities,
+                focal_cohort.floor_value,
+            ):
+                return True
+        return False
+
+    # --- 4. Run binary search ---
+    result = binary_search(
+        scenario=config,
+        focal_cohort=focal_cohort_dict,
+        lo=req.lo,
+        hi=req.hi,
+        tol=req.tolerance,
+        run_trajectory_fn=run_trajectory_fn,
+    )
+
+    return ConstraintFloorSearchResponse(
+        status=ConstraintFloorSearchStatus(result["status"]),
+        boundary=result.get("boundary"),
+        uncertainty_lo=result.get("uncertainty_lo"),
+        uncertainty_hi=result.get("uncertainty_hi"),
+        evaluations=result.get("evaluations", 0),
+        search_lo=result.get("search_lo"),
+        search_hi=result.get("search_hi"),
+        floor_value=result.get("floor_value"),
+        indicator_key=result.get("indicator_key"),
+        error_message=result.get("error_message"),
+        data_tier=None,  # Tier lookup deferred to G3 (ADR-007 Bayesian posterior)
     )
