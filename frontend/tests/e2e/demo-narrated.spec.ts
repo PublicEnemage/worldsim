@@ -931,8 +931,8 @@ test(
           "at FiscalMultiplier 0.85, branching from step three. " +
           "Both visible without scrolling. The split is visible from the branch point. " +
           "The bolder set is the branch: what the trajectories show under the ministry's counter-proposal. " +
-          "At 0.85 — fifteen percent below the programme baseline — " +
-          "the human development composite is higher at every step from three onward. " +
+          "And Zone 1D shows the human development dimension up from its baseline at every " +
+          "step from three onward — the per-framework delta is visible alongside the composite. " +
           "This is not a document. This is a live trajectory branch produced in the room.",
         );
 

@@ -112,6 +112,29 @@ export function getScoreClass(score: number | null): "score-value--null" | "scor
 }
 
 /**
+ * Format a per-framework delta annotation for Mode 3 Zone 1D display (ADR-017 §Zone 1D Integration).
+ * Returns "(+N.NN)", "(−N.NN)", "(±0.00)", or null when either input is null.
+ * Near-zero threshold: |Δ| ≤ 0.005.
+ */
+export function formatDelta(current: number | null, baseline: number | null): string | null {
+  if (current === null || baseline === null) return null;
+  const delta = current - baseline;
+  if (Math.abs(delta) <= 0.005) return "(±0.00)";
+  const sign = delta > 0 ? "+" : "−";
+  return `(${sign}${Math.abs(delta).toFixed(2)})`;
+}
+
+/**
+ * Color for a Mode 3 Zone 1D delta annotation (ADR-017 §Zone 1D Integration, AC-3).
+ * Positive (> 0.005) → green #16A34A; negative (< −0.005) → amber #D97706; near-zero → gray #9CA3AF.
+ */
+export function getDeltaColor(delta: number): string {
+  if (delta > 0.005) return "#16A34A";
+  if (delta < -0.005) return "#D97706";
+  return "#9CA3AF";
+}
+
+/**
  * Rider #271 — reversibility classification label.
  *
  * recovery_horizon_years === null → "Irreversible"
@@ -267,8 +290,21 @@ export function FourFrameworkZone1D({
   comparisonScenarios = [],
   pspDominantDriver,
 }: FourFrameworkZone1DProps) {
-  const { trajectory, current_step, mda_alerts, mode } = useScenarioStepStore();
+  const { trajectory, baseline_trajectory, current_step, mda_alerts, mode } = useScenarioStepStore();
   const [driverPanelOpen, setDriverPanelOpen] = React.useState(false);
+
+  // ADR-017 §Zone 1D Integration (Mode 3): per-framework delta annotations vs baseline.
+  // Read baseline framework scores at the current step from the store's baseline_trajectory.
+  const baselineFrameworkScores: Record<string, number | null> | null = React.useMemo(() => {
+    if (mode !== "MODE_3" || !baseline_trajectory) return null;
+    const baseStep =
+      baseline_trajectory.steps.find((s) => s.step_index === current_step) ??
+      baseline_trajectory.steps.at(-1);
+    if (!baseStep) return null;
+    return Object.fromEntries(
+      Object.entries(baseStep.frameworks).map(([k, v]) => [k, v.composite_score]),
+    );
+  }, [mode, baseline_trajectory, current_step]);
 
   // Top alert per framework for the "see alerts →" navigation link (#745)
   const topAlertByFramework: Record<string, string> = {};
@@ -464,19 +500,39 @@ export function FourFrameworkZone1D({
               )}
             </span>
 
-            <span
-              data-testid={`framework-score-${key}`}
-              className={scoreClass}
-              style={{
-                fontSize: key === "ecological" && isNull && point?.note != null ? 10 : 13,
-                fontWeight: 700,
-                color: isNull ? "#aaa" : color,
-                fontVariantNumeric: "tabular-nums",
-              }}
-            >
-              {key === "ecological" && isNull && point?.note != null
-                ? "Not modelled"
-                : formatScore(score)}
+            <span style={{ display: "flex", alignItems: "center", gap: 4 }}>
+              <span
+                data-testid={`framework-score-${key}`}
+                className={scoreClass}
+                style={{
+                  fontSize: key === "ecological" && isNull && point?.note != null ? 10 : 13,
+                  fontWeight: 700,
+                  color: isNull ? "#aaa" : color,
+                  fontVariantNumeric: "tabular-nums",
+                }}
+              >
+                {key === "ecological" && isNull && point?.note != null
+                  ? "Not modelled"
+                  : formatScore(score)}
+              </span>
+              {baselineFrameworkScores !== null && score !== null && (() => {
+                const baseScore = baselineFrameworkScores[key] ?? null;
+                const annotation = formatDelta(score, baseScore);
+                if (annotation === null) return null;
+                const delta = baseScore !== null ? score - baseScore : 0;
+                return (
+                  <span
+                    data-testid={`framework-delta-${key}`}
+                    style={{
+                      fontSize: 9,
+                      color: getDeltaColor(delta),
+                      fontVariantNumeric: "tabular-nums",
+                    }}
+                  >
+                    {annotation}
+                  </span>
+                );
+              })()}
             </span>
           </div>
         );
