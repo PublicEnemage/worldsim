@@ -144,6 +144,31 @@ def compute_band(
     clipped_lower = ci_lower > raw_lower
     clipped_upper = ci_upper < raw_upper
 
+    # ADR-007 §6 Implementation Clause (Amendment 1): meaninglessness threshold.
+    # When the CI equals the full natural range at step >= 7, suppress. Use
+    # equality on the clipped values rather than the clipped_* flags because
+    # raw_upper can equal natural_upper exactly (e.g. score=0.4 × 2.5 = 1.0),
+    # which leaves clipped_upper=False while the CI still spans [0, 1].
+    if (
+        step_index >= 7
+        and ci_lower == natural_lower
+        and ci_upper == natural_upper
+    ):
+        return BandResult(
+            ci_lower=None,
+            ci_upper=None,
+            ci_coverage=None,
+            is_pre_calibration=None,
+            clipped_lower=True,
+            clipped_upper=True,
+            band_method="SUPPRESSED_MEANINGLESS",
+            is_meaningless=True,
+            suppressed_reason=(
+                f"CI spans full natural range [{natural_lower}, {natural_upper}]"
+                f" at step {step_index} T{confidence_tier} — directionally meaningless"
+            ),
+        )
+
     # Quantize to 4 decimal places (consistent with composite_score precision)
     quantizer = Decimal("0.0001")
     ci_lower_str = str(ci_lower.quantize(quantizer, rounding=ROUND_HALF_UP))
