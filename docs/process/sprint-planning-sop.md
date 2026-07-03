@@ -506,3 +506,87 @@ the sprint exit document — it does not replace it.
 *Updated 2026-06-12 per Phase C: sprint exit is now a standalone filed document, not only an
 issue comment. Prior sprints that used issue comments as their sole exit record are
 grandfathered; Phase C applies to M13 and subsequent milestones.*
+
+---
+
+## Pre-Merge CM Review
+
+*Authority: NM-084 (2026-07-02, Issue #1651). Applies to any sprint group whose deliverables
+include fixtures, elasticity rows, or calibration constants requiring Chief Methodologist sign-off.*
+
+### Obligation
+
+Chief Methodologist (CM) sign-off on a fixture issue must be **on record before the
+implementing agent opens the fixture PR and sets auto-merge**. If auto-merge fires on a
+required CI check before the CM consultation is recorded, the fixture has merged without
+any fidelity tier review — the auto-merge timeline cannot be trusted as a gate.
+
+### Enforcement mechanism (PI Agent gate comment)
+
+Before the implementing agent sets auto-merge on any fixture PR:
+
+1. The PI Agent posts a gate comment on the **issue** (not the PR) confirming CM sign-off:
+
+   ```markdown
+   ## PI Agent — CM Sign-off Gate
+
+   **Issue:** #NNN
+   **CM sign-off:** Recorded as comment on #{issue} at {timestamp} — ✅
+   **Fixture PR may now open.**
+   ```
+
+2. If no PI Agent gate comment exists on the issue: the implementing agent must not open the
+   PR. If the implementing agent opens the PR before the PI Agent gate comment is posted, the
+   PI Agent files a near-miss in the same session.
+
+### Sprint entry checklist item
+
+Sprint entries for fixture-producing groups must include the following item for each fixture:
+
+```
+- CM sign-off recorded on Issue #NNN before fixture PR opens? [ ]
+```
+
+A sprint entry filed without this item for a CM-required fixture is incomplete. The PI Agent
+flags the omission at sprint entry review.
+
+---
+
+## Co-Dependent Fixture Sprint Entry Requirements
+
+*Authority: NM-085 (2026-07-02, Issue #1652). Applies to any sprint with two or more
+co-dependent fixture PRs targeting the same sprint branch.*
+
+### The pattern
+
+When N fixtures all depend on each other's test infrastructure (e.g., shared test file,
+shared conftest, shared fixture module), opening them as N separate PRs produces N-1
+transient cross-fixture CI failures on the sprint branch:
+
+- PR #1 merges: fixture A tests pass, fixture B tests fail with `ModuleNotFoundError`
+  (fixture B module not yet on sprint branch)
+- PR #2 merges: both fixture A and fixture B tests pass
+
+This is a **structural sequencing artifact**, not a test integrity failure.
+
+### Required sprint entry statement
+
+Sprint entries for sprints with co-dependent fixture PRs must include an explicit CI
+ordering statement in the implementation notes:
+
+```markdown
+**Co-dependent fixture note:** N fixtures in this sprint share [test file / conftest /
+fixture module]. PRs will produce transient cross-fixture failures on the sprint branch
+until all N fixture PRs have merged. `backtesting` is non-required for `sprint/m{N}-gN`
+PRs (see §CI Configuration) — transient cross-fixture failures do not block auto-merge.
+This is by design.
+```
+
+Without this statement, future CI reviewers may misinterpret the transient failure as a real
+regression and attempt interventions that block correct auto-merge behaviour.
+
+### Bundling evaluation
+
+If N > 2 co-dependent fixtures are in scope, the sprint entry should evaluate whether
+bundling them into a single PR avoids the transient failure pattern entirely. The decision
+(bundle vs. separate) must be documented in the sprint entry with the rationale.
