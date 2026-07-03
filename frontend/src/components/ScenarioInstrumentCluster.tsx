@@ -62,6 +62,8 @@ interface RawFrameworkPoint {
   psp_dominant_driver?: string | null;
   /** M18-G7-D — note from API (e.g. "Ecological disabled for SEN Demo 7 Act 1"). */
   note?: string | null;
+  /** M19-G3 (#1537) / G4 (#1529): BandingEngine calibration state for CI display. */
+  band_method?: string | null;
 }
 
 interface RawTrajectoryStep {
@@ -71,6 +73,8 @@ interface RawTrajectoryStep {
   step_significance: "SIGNIFICANT" | "ROUTINE";
   frameworks: RawFrameworkPoint[];
   pmm: { value: string; direction: string } | null;
+  /** M19-G4 (#1528): top-level PSP driver per step for arc display. */
+  psp_dominant_driver?: string | null;
 }
 
 interface RawTrajectoryResponse {
@@ -118,6 +122,7 @@ function parseTrajectoryResponse(raw: RawTrajectoryResponse): TrajectoryResponse
           ),
           psp_dominant_driver: fw.psp_dominant_driver ?? null,
           note: fw.note ?? null,
+          band_method: fw.band_method ?? null,
         };
       }
       const pmm =
@@ -135,6 +140,10 @@ function parseTrajectoryResponse(raw: RawTrajectoryResponse): TrajectoryResponse
         step_significance: step.step_significance,
         frameworks: frameworkMap,
         pmm,
+        psp_dominant_driver:
+          step.psp_dominant_driver ??
+          step.frameworks.find((fw) => fw.framework === "political_economy")?.psp_dominant_driver ??
+          null,
       };
     }),
   };

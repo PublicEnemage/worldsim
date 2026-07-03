@@ -4286,6 +4286,291 @@ Codified in `docs/CODING_STANDARDS.md §E2E Mock Helper Authorship` as part of t
 
 ---
 
+
+## NM-087 — Agent Used `git stash --include-untracked` as Recovery Action; Stashed EL In-Progress Work Without Authorization (Reactive)
+
+**Date:** 2026-07-02
+**Milestone:** M19 — Constraint Search and Empirical Calibration
+**Detected by:** DS Agent investigation (reactive) — triggered by session-handoff branch confusion report
+**Severity:** High — 433 lines of EL in-progress G2C work (`test_m19_g2c_scenario_runs.py`) stashed without consent; a subsequent session committed against the same base, creating potential data loss if stash is dropped before EL reviews it.
+
+### What happened
+
+The implementing agent ran `git checkout` on the main working tree while EL had uncommitted work on branch `feat/m19-g2c-entry-docs`. When a "both added" merge conflict appeared on `backend/tests/backtesting/test_m19_g2c_scenario_runs.py`, the agent ran `git stash --include-untracked` without EL authorization. This stashed EL's in-progress G2C test additions (`stash@{0}`, 433 lines) and cleared the working tree so the agent could continue.
+
+A subsequent session then committed `f344fdb` against the same base file, creating a divergence: the stash contains EL's intended state; the commit reflects a different state. If the stash is dropped before EL reviews it, 433 lines of in-progress work are permanently lost.
+
+This is a recurrence variant of NM-075 (git checkout on working tree with uncommitted EL work). NM-075 established the worktree allocation protocol; this incident identifies the additional hazard of `git stash` being used as a recovery action when a worktree was not in use.
+
+### What was at risk
+
+EL's in-progress G2C test file (`backend/tests/backtesting/test_m19_g2c_scenario_runs.py`, 433 lines). If the stash is dropped (intentionally or by accident), the work cannot be recovered. The stash is not in the git commit history — it is transient working state that exists only until `git stash drop` or `git stash clear` is run.
+
+### What caught it
+
+DS Agent investigation triggered by the session-handoff branch confusion report. The stash was identified at `stash@{0}` via `git stash list`. EL must run `git stash show stash@{0} -p` to compare with `f344fdb` before deciding to drop or recover.
+
+### Process improvement
+
+**1 — Pre-checkout dirty-tree guard (immediate, all implementing agents):**
+
+Before executing any `git checkout` or `git checkout -b` command, the agent must run:
+```bash
+git status --porcelain
+```
+If output is non-empty, **stop**. The Engineering Lead has uncommitted changes in the working tree. Report the obstacle and wait for explicit EL authorization before proceeding. Do not stash, do not force-checkout, do not proceed without EL instruction. Codified in `docs/process/agents.md §Git Working Tree Protocol`.
+
+**2 — Stash prohibition (immediate, all implementing agents):**
+
+Agents must not run `git stash` (or any variant including `--include-untracked`, `--all`, `--keep-index`) without explicit Engineering Lead instruction. `git stash` writes to the EL's working state without consent — it is not a safe recovery action. If a dirty working tree blocks a checkout, report the obstacle and wait. Codified in `docs/process/agents.md §Git Working Tree Protocol`.
+
+*Root cause: NM-075 worktree allocation protocol and the NM-087 stash prohibition are complementary — worktrees eliminate the hazard structurally; this guard prevents the hazard when a worktree is not in use.*
+
+---
+
+## NM-088 — Parallel Claude Code Sessions Share Main Working Tree; Branch Displacement Causes Lost Files and Misrouted Commits (Reactive)
+
+**Date:** 2026-07-03
+**Milestone:** M19 — Constraint Search and Empirical Calibration
+**Detected by:** EL post-incident diagnosis — root cause of the NM-087 working-tree displacement traced to a concurrent G2C Claude Code session, not the EL's IDE
+**Severity:** High — files written to disk were lost on branch switch; commits landed on the wrong branch; both required manual recovery operations mid-session. Same hazard path as NM-075 and NM-087 but triggered by a different source.
+
+### What happened
+
+Two Claude Code sessions were active simultaneously on the same repository:
+- **This session** — G3/process work (intent documents, NM-087, ADR acceptance)
+- **G2C session** — parallel battle-testing scenario implementation
+
+Both sessions operated against the main working tree at `/Users/imranyousuf/projects/worldsim`. When the G2C session ran `git checkout feat/m19-g2c-*`, it displaced the branch this session had checked out — silently, from this session's perspective. Subsequent file writes and git operations by this session then landed in the G2C session's branch context rather than the intended G3 branch. Specific harms:
+- Three intent document files written by this session (`M19-G3-2026-07-03-*.md`) vanished when the G2C session switched branches, requiring a second write pass
+- A `git commit` landed on `feat/m19-g2c-harness-typeb-known-limitations` instead of `feat/m19-g3-intent-docs`, requiring a `git reset --soft` + re-commit recovery
+
+### What was at risk
+
+Any file this session wrote to disk could be lost on the next branch switch by the G2C session. Any commit this session made could land on a G2C branch, contaminating the G2C PR and requiring a reset. The recovery operation (`git reset --soft`) itself risked harming the G2C session's branch state if timed coincidentally.
+
+### What caught it
+
+EL identified that no IDE was involved — the branch displacement source was a parallel Claude Code session. Prior framing in NM-075 and NM-087 assumed the conflict was between an agent and the EL's interactive tooling; this incident clarified that the hazard is structural: any two processes sharing one working tree will race on branch state.
+
+### Process improvement
+
+**1 — Parallel Claude Code session worktree requirement (immediate, all sessions):**
+
+When two or more Claude Code sessions are active on the same repository simultaneously, each session must operate in a dedicated git worktree. The main working tree must not be shared between sessions. Authority: NM-075 (worktree allocation protocol) extended to cover parallel CC sessions explicitly.
+
+At the start of any session that will operate concurrently with another active Claude Code session, the DS Agent or PM Agent allocates a worktree before any other git operations:
+
+```bash
+git worktree add /tmp/worldsim-<group> <branch>
+```
+
+All subsequent git operations in that session run from `/tmp/worldsim-<group>`, not from the main working tree. Codified in `docs/process/agents.md §Git Working Tree Protocol — Parallel Session Clause`.
+
+**2 — Session startup parallel-session check (immediate, all sessions):**
+
+At session start, before any git operation, check for active worktrees to detect whether another session is already using a worktree:
+
+```bash
+git worktree list
+```
+
+If no other session worktree is listed but concurrent work is expected (e.g., SESSION_STATE.md shows multiple active sprint groups), alert the EL and request worktree allocation before proceeding. A session that begins work without confirming worktree isolation when concurrent sessions are possible has not satisfied this check. Codified in `docs/process/agents.md §Git Working Tree Protocol — Parallel Session Clause`.
+
+*Root cause: NM-075 (worktree protocol), NM-087 (stash prohibition), and NM-088 (parallel session clause) form a three-layer defence. NM-075 established the worktree pattern; NM-087 prohibited the unsafe recovery; NM-088 ensures the worktree pattern is applied to the parallel-session case that NM-075's framing missed.*
+---
+
+
+## NM-089 — Shared-State File Changes Lost on Branch Switch; Session Summary Permanent Artifact Unwritten for 24 Hours; Caught by Human Recall (Reactive)
+
+**Date:** 2026-07-03
+**Milestone:** M19 — Constraint Search and Empirical Calibration
+**Detected by:** Engineering Lead asking explicitly in the next session: "have we committed the insights-log.md that recorded the original session summary?"
+**Severity:** High — A permanent, append-only artifact (`docs/insights-log.md`) went unwritten for one session boundary. The 2026-07-02 multi-agent deliberation record — 10-scenario table with all issue numbers (#1546–#1554), EL decisions on M19 scope and output format, and the capital controls gap summary — existed only in session context and would have been permanently lost if not recovered.
+
+### What happened
+
+During the 2026-07-02 session, a session summary was written to `docs/insights-log.md` in session memory, covering the multi-agent deliberation on the headless battle-testing initiative. Before the entry was committed, the session transitioned to sprint implementation work on `feat/m19-g2c-ghana-imf-programme`. The branch switch was necessary to begin Ghana fixture work (#1554). No structural gate blocked the switch or flagged that `docs/insights-log.md` had unsaved changes pending commit.
+
+The ARCH-014 backlog entry (`docs/architecture/backlog.md`) survived by coincidence — subsequent sprint planning commits re-wrote the backlog file, so ARCH-014 was present in the repository via a different code path. The insights-log entry had no such alternative path. When the 2026-07-03 session opened, the entry was absent. Recovery required the EL to notice the gap, the DS Agent to create `chore/m19-state-sync-018` from `release/m19`, reconstruct the full entry from session transcript context, commit it, and open PR #1609 (set to auto-merge).
+
+### What was at risk
+
+Permanent loss of the deliberation record for a multi-agent strategic consultation. The insights-log is an append-only permanent institutional artifact — entries are not edited or reconstructed from memory after a session closes. If the EL had not asked whether the entry was committed, or if the session transcript had already been compressed beyond recovery, the full record of EL decisions, scenario rationale, and ARCH-014 context would have been lost with no indication that a gap existed.
+
+Additionally: any downstream agent beginning Iceland (#1553) or the G2C harness without knowing the capital controls gap context would lack the record of why #1532 was filed and why Iceland is blocked.
+
+### What caught it
+
+Human vigilance — the Engineering Lead explicitly asking in the 2026-07-03 session: "have we committed the insights-log.md that recorded the original session summary?" This is the only detection mechanism that fired. No process gate, no CI check, no hook verified that shared-state file changes were committed before the branch switch occurred.
+
+NM-075 addresses the inverse problem (implementation file changes lost on branch switch via worktree isolation). NM-089 is the complementary gap: shared-state file changes written to session memory but not yet committed.
+
+### Process improvement
+
+**Shared-state commit gate before any branch switch.** When an agent has written changes to shared-state files (`docs/insights-log.md`, `docs/architecture/backlog.md`, `docs/process/near-miss-registry.md`, `docs/process/known-issues-registry.md`, `docs/compliance/scan-registry.md`, and any registry file governed by the append-only rule in CLAUDE.md §Canonical Artifact Locations) during a session, those changes must be committed to a `chore/mNN-state-sync-NNN` branch and pushed before any `git checkout` to a feature or sprint branch. This is a mandatory ordering constraint — not a recommendation.
+
+**Session close protocol addendum.** The existing SESSION_STATE.md update obligation (CLAUDE.md §Session Continuity) is extended: at session close, any shared-state file changes written during the session must be confirmed committed and either merged or in an open PR before the session ends. The implementing agent states this confirmation explicitly ("shared-state files committed: [list]") before marking the session complete.
+
+**Codification:** This rule is added as a named sub-step in `docs/process/sprint-group-isolation.md §Shared State Update Protocol`, to appear alongside the existing `chore/mNN-state-sync-NNN` branch guidance. Cross-referenced in `docs/CONTRIBUTING.md §Agent Workflow` at the next standards review (G2C sprint entry or earlier if a state-sync PR opens first).
+
+Near-miss cross-references: NM-075 (worktree isolation for implementation files — complementary), NM-016 / NM-052 / NM-070 (pre-push gate violations — same class of "local change not committed before moving on").
+
+## NM-090 — DemographicModule Has Two Additional Dead Event Subscriptions Beyond capital_controls; Discovered Only at CE Audit Gate (Reactive)
+
+**Date:** 2026-07-03
+**Milestone:** M19 — Constraint Search and Empirical Calibration
+**Detected by:** CE Agent full subscription audit (G2D pre-implementation PR gate 2, ADR-020 Decision 3)
+**Severity:** Medium — the two dead strings produce silent zero-output on IMF programme acceptance and emergency declaration events via the DemographicModule. No incorrect output is produced now (no elasticity rows exist for these events either), but the dead strings represent latent technical debt that could mislead future implementers adding elasticity rows.
+
+### What happened
+
+The ADR-020 panel required a CE audit of all 10 `EmergencyInstrument` variants before the G2D
+implementation PR could open (Decision 3 gate). During that audit, the CE Agent read
+`DemographicModule._SUBSCRIBED_EVENTS` and found:
+
+```python
+_SUBSCRIBED_EVENTS = frozenset({
+    "gdp_growth_change",               # ✅ correct
+    "capital_controls_imposition",      # ❌ dead (ADR-020 known bug)
+    "imf_program_acceptance",           # ❌ dead (NEW FINDING)
+    "emergency_declaration",            # ❌ dead (NEW FINDING)
+})
+```
+
+`EmergencyPolicyInput.to_events()` emits `f"emergency_policy_{self.instrument.value}"`. No
+event named `"imf_program_acceptance"` or `"emergency_declaration"` is ever emitted by any
+module or input class in the codebase. The correct strings are
+`"emergency_policy_imf_program_acceptance"` and `"emergency_policy_emergency_declaration"`.
+
+The `ELASTICITY_REGISTRY` in `demographic/elasticities.py` has no rows for either event type,
+so fixing the subscription strings alone would not produce output — elasticity rows would also
+need to be added. The dead strings appear to be placeholder subscriptions from a pre-ADR design
+where bare instrument names were used rather than the canonical `emergency_policy_{name}` format.
+
+The known bug (`"capital_controls_imposition"`) was discovered and recorded in ARCH-014 before
+the ADR-020 panel. The two additional dead subscriptions were not identified at that time —
+they were only caught by the full audit.
+
+### What was at risk
+
+A future agent adding a DemographicModule elasticity row for IMF programme acceptance events
+would find `"imf_program_acceptance"` already in `_SUBSCRIBED_EVENTS` and assume the
+subscription is active. The subscription would remain dead (wrong string) while the elasticity
+row fires against an event that never arrives, producing silent zero-output. This failure mode
+has no error message — it looks like the channel is working but has no effect.
+
+### What caught it
+
+The ADR-020 Decision 3 gate: CE audit of all EmergencyInstrument variants required before
+G2D implementation PR opens. The dead subscriptions were found by reading the actual
+`_SUBSCRIBED_EVENTS` frozenset against the canonical event string registry.
+
+### Process improvement
+
+**CE audit scope must include ALL module subscription strings when any subscription change is made.**
+The ADR-020 Decision 3 gate specified "audit all 10 EmergencyInstrument variants." This gate was
+correctly scoped; the gap was that the known `capital_controls_imposition` bug narrowed the panel's
+attention to capital_controls specifically and did not prompt a full DemographicModule subscription
+review at ADR authorship time.
+
+**Canonical event string cross-check is a mandatory pre-authorship step for all module subscription lists.**
+Before any `_SUBSCRIBED_EVENTS` is authored or modified, the CE Agent must cross-check every
+string against the canonical registry in `docs/architecture/emergency-instrument-transmission-table.md`.
+A string not present in the registry must be either: (a) a non-emergency event type verified as
+actually emitted by a module, or (b) flagged as dead before the PR opens.
+
+**G2D scope boundary:** Fixing `"imf_program_acceptance"` and `"emergency_declaration"` dead
+strings is NOT in scope for the G2D implementation PR. The G2D PR is scoped to the capital
+controls Channel C fix only (subscription fix + bridge event + elasticity row). The two additional
+dead strings should be cleaned up in a separate dedicated PR with elasticity rows added at the same
+time (otherwise fixing the string without adding elasticity rows produces no behaviour change and
+creates confusion about the fix's intent).
+
+Near-miss cross-references: ADR-020 ARCH-014 (known `capital_controls_imposition` bug — the root
+cause was identified there; this NM records the pattern recurring on two additional strings in the
+same module).
+
+---
+
+## NM-091 — EmergencyInstrument Enum Has 7 Variants; ADR-020 Canonical Registry Listed 10; 3 Registry Entries Match No Enum Value; 3 Code Variants Missing From Registry; Intent Document References Non-Existent Variant (Reactive)
+
+**Date:** 2026-07-03
+**Milestone:** M19 — Constraint Search and Empirical Calibration
+**Detected by:** CE Agent full subscription audit (G2D pre-implementation PR gate 2)
+**Severity:** Medium — the mismatch causes the transmission table to serve as an unreliable reference; an implementing agent using `asset_nationalization` from the registry would produce a `ValueError` at runtime (no such enum value). The G2D intent document references `asset_nationalization` in the Run A pseudocode, which maps to the wrong enum value.
+
+### What happened
+
+The ADR-020 canonical event string registry was authored with 10 variants:
+`imf_program_acceptance`, `debt_moratorium`, `default_declaration`, `capital_controls`,
+`emergency_austerity`, `asset_nationalization`, `currency_peg_break`, `hyperinflation_emergency`,
+`banking_system_freeze`, `debt_restructuring`.
+
+The actual `EmergencyInstrument` enum in `backend/app/simulation/orchestration/inputs.py`
+has 7 members:
+`CAPITAL_CONTROLS`, `BANK_HOLIDAY`, `DEBT_MORATORIUM`, `NATIONALIZATION`,
+`IMF_PROGRAM_ACCEPTANCE`, `DEFAULT_DECLARATION`, `EMERGENCY_DECLARATION`.
+
+The mismatch:
+- 3 registry entries have no matching enum: `emergency_austerity`, `asset_nationalization`,
+  `currency_peg_break` (and 3 more: `hyperinflation_emergency`, `banking_system_freeze`,
+  `debt_restructuring`)
+- 3 enum variants are absent from the registry: `BANK_HOLIDAY`, `NATIONALIZATION`,
+  `EMERGENCY_DECLARATION`
+- Registry `asset_nationalization` ≠ code `NATIONALIZATION` — the Architect authored the
+  registry with a future planned name, not the current enum value
+
+The G2D intent document §3.2 references `instrument="asset_nationalization"` in the Run A
+pseudocode. This would fail at runtime with `ValueError: 'asset_nationalization' is not a valid
+EmergencyInstrument` or equivalent if used literally. The implementing agent must substitute
+`EmergencyInstrument.NATIONALIZATION` (value: `"nationalization"`).
+
+### What was at risk
+
+An implementing agent using the ADR-020 canonical registry as a reference for the Run A
+`asset_nationalization` step would write code that crashes at construction time. Alternatively,
+an agent might introduce a new `ASSET_NATIONALIZATION` enum value without an ADR, silently
+diverging the codebase. Either outcome would be caught by tests or CI, but represents wasted
+implementation time and a misleading reference document.
+
+Additionally: the pre-populated ✅ for GovernanceModule on `debt_moratorium` and `default_declaration`
+in the original transmission table was not verified by the CE audit. Reading the GovernanceModule
+source confirms it subscribes to only 2 emergency event strings (`emergency_policy_imf_program_acceptance`
+and `emergency_policy_emergency_declaration`). The other pre-populated ✅ entries were incorrect.
+
+### What caught it
+
+CE audit reading the actual `EmergencyInstrument` enum members against the registry. The
+mismatch was visible immediately. The GovernanceModule `_SUBSCRIBED_EVENTS` was read directly
+to verify subscriptions rather than trusting the pre-populated table.
+
+### Process improvement
+
+**Before any ADR documents a canonical event string registry, the Architect Agent must verify
+each listed event string against the actual Python `Enum.value` in the code.**
+
+The format rule `emergency_policy_{instrument_name}` must use the Python enum `.value` literal
+— not a human-readable description of what the instrument does, and not a planned future name.
+The Architect should run `grep -n "class EmergencyInstrument\|= \"" backend/app/simulation/orchestration/inputs.py`
+to enumerate actual values before authoring the registry.
+
+**Pre-populated module subscription columns (✅ / ❌) in the transmission table must be verified by CE
+audit before being published as facts, not after.** The ADR panel may populate the table as a design
+draft, but the transmission table must be marked "DRAFT — CE audit pending" until the CE audit
+gate confirms each entry. The "✅ existing" notation implies a verified active subscription; using
+it before verification is misleading to implementers.
+
+**Intent documents referencing enum values must use the Python identifier or `.value` string,
+not a human-readable description.** Pseudocode in intent documents is understood as conceptual,
+but instrument names must be cross-checked against the actual enum during intent document review
+(PM Agent or implementing agent responsibility at the start of implementation, not during authorship).
+
+Near-miss cross-references: NM-081 (scope derived from stale design artifacts — same pattern:
+design artifacts authored from intended future state, not current code reality).
+
+---
+
 ## NM-NNN — [Short descriptive title]
 
 **Date:** YYYY-MM-DD (or approximate milestone era)

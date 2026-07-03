@@ -22,6 +22,8 @@ export interface TrajectoryFrameworkPoint {
   psp_dominant_driver?: string | null;
   /** M18-G7-D — note from API (e.g. "Ecological disabled for SEN Demo 7 Act 1"). */
   note?: string | null;
+  /** M19-G3 (#1537) / G4 (#1529): BandingEngine calibration state for this framework point. */
+  band_method?: string | null;
 }
 
 export interface TrajectoryStep {
@@ -31,6 +33,8 @@ export interface TrajectoryStep {
   step_significance: "SIGNIFICANT" | "ROUTINE";
   frameworks: Record<string, TrajectoryFrameworkPoint>;
   pmm: { value: number; direction: "up" | "down" | "flat" } | null;
+  /** M19-G4 (#1528): dominant PSP driver at this step, for arc display in Zone 1D. */
+  psp_dominant_driver?: string | null;
 }
 
 export interface MDAFloor {
