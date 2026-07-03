@@ -3,17 +3,17 @@ name: m19-g2d-sprint-entry
 type: sprint-entry
 milestone: M19 — Constraint Search and Empirical Calibration
 sprint-group: G2 Phase D — Iceland 2008–11 Heterodox vs Orthodox Counter-Factual
-status: Filed — awaiting EL approval
+status: EL-approved — 2026-07-03
 authored-by: PM Agent
 authored-date: 2026-07-03
-el-approved: false
+el-approved: 2026-07-03
 release-branch: release/m19
 sop-reference: docs/process/sprint-planning-sop.md
 ---
 
 # Sprint Entry — M19, G2 Phase D: Iceland 2008–11 Backtesting Fixture
 
-**Status:** Filed 2026-07-03 — awaiting EL approval before implementation begins
+**Status:** EL-approved — 2026-07-03
 **Date authored:** 2026-07-03
 **Release branch:** `release/m19`
 **Sprint plan:** `docs/process/sprint-plans/m19-sprint-plan.md`
@@ -270,7 +270,17 @@ G2D depends on:
 *EL reviews this entry document before any implementation PR opens. Approval is recorded here
 or as a comment on the exit checklist issue #1535.*
 
-**EL approval:** Pending
+**EL approval:** Approved — 2026-07-03
 
-> {EL approval statement — to be filled at approval time}
-> — @PublicEnemage ({date})
+> G2D sprint entry approved. ADR-020 accepted 2026-07-03 (PR #1619). Intent document filed
+> (`docs/process/intents/M19-G2D-2026-07-03-iceland-2008-backtesting-fixture.md`). Sprint
+> journal issue #1621 opened. CM calibration deliverable and CE DemographicModule audit are
+> pre-implementation PR gates, not sprint entry blockers. Implementation PRs open when both
+> gates are confirmed on record in sprint journal #1621. Integration PR (`sprint/m19-g2` →
+> `release/m19`) fires at G2D exit (carries cumulative G2A+B+C+D work).
+> — @PublicEnemage (2026-07-03)
+>
+> CE audit complete (PR #1626 — NM-090/NM-091 filed; transmission table updated).
+> CM calibration deliverable complete (PR #1625 — §Capital Controls in calibration-basis.md).
+> Both pre-implementation PR gates CLEARED 2026-07-03. Iceland implementation PR may open.
+> — @PublicEnemage (2026-07-03)

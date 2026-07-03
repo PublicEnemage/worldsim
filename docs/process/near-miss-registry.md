@@ -4416,6 +4416,161 @@ NM-075 addresses the inverse problem (implementation file changes lost on branch
 
 Near-miss cross-references: NM-075 (worktree isolation for implementation files — complementary), NM-016 / NM-052 / NM-070 (pre-push gate violations — same class of "local change not committed before moving on").
 
+## NM-090 — DemographicModule Has Two Additional Dead Event Subscriptions Beyond capital_controls; Discovered Only at CE Audit Gate (Reactive)
+
+**Date:** 2026-07-03
+**Milestone:** M19 — Constraint Search and Empirical Calibration
+**Detected by:** CE Agent full subscription audit (G2D pre-implementation PR gate 2, ADR-020 Decision 3)
+**Severity:** Medium — the two dead strings produce silent zero-output on IMF programme acceptance and emergency declaration events via the DemographicModule. No incorrect output is produced now (no elasticity rows exist for these events either), but the dead strings represent latent technical debt that could mislead future implementers adding elasticity rows.
+
+### What happened
+
+The ADR-020 panel required a CE audit of all 10 `EmergencyInstrument` variants before the G2D
+implementation PR could open (Decision 3 gate). During that audit, the CE Agent read
+`DemographicModule._SUBSCRIBED_EVENTS` and found:
+
+```python
+_SUBSCRIBED_EVENTS = frozenset({
+    "gdp_growth_change",               # ✅ correct
+    "capital_controls_imposition",      # ❌ dead (ADR-020 known bug)
+    "imf_program_acceptance",           # ❌ dead (NEW FINDING)
+    "emergency_declaration",            # ❌ dead (NEW FINDING)
+})
+```
+
+`EmergencyPolicyInput.to_events()` emits `f"emergency_policy_{self.instrument.value}"`. No
+event named `"imf_program_acceptance"` or `"emergency_declaration"` is ever emitted by any
+module or input class in the codebase. The correct strings are
+`"emergency_policy_imf_program_acceptance"` and `"emergency_policy_emergency_declaration"`.
+
+The `ELASTICITY_REGISTRY` in `demographic/elasticities.py` has no rows for either event type,
+so fixing the subscription strings alone would not produce output — elasticity rows would also
+need to be added. The dead strings appear to be placeholder subscriptions from a pre-ADR design
+where bare instrument names were used rather than the canonical `emergency_policy_{name}` format.
+
+The known bug (`"capital_controls_imposition"`) was discovered and recorded in ARCH-014 before
+the ADR-020 panel. The two additional dead subscriptions were not identified at that time —
+they were only caught by the full audit.
+
+### What was at risk
+
+A future agent adding a DemographicModule elasticity row for IMF programme acceptance events
+would find `"imf_program_acceptance"` already in `_SUBSCRIBED_EVENTS` and assume the
+subscription is active. The subscription would remain dead (wrong string) while the elasticity
+row fires against an event that never arrives, producing silent zero-output. This failure mode
+has no error message — it looks like the channel is working but has no effect.
+
+### What caught it
+
+The ADR-020 Decision 3 gate: CE audit of all EmergencyInstrument variants required before
+G2D implementation PR opens. The dead subscriptions were found by reading the actual
+`_SUBSCRIBED_EVENTS` frozenset against the canonical event string registry.
+
+### Process improvement
+
+**CE audit scope must include ALL module subscription strings when any subscription change is made.**
+The ADR-020 Decision 3 gate specified "audit all 10 EmergencyInstrument variants." This gate was
+correctly scoped; the gap was that the known `capital_controls_imposition` bug narrowed the panel's
+attention to capital_controls specifically and did not prompt a full DemographicModule subscription
+review at ADR authorship time.
+
+**Canonical event string cross-check is a mandatory pre-authorship step for all module subscription lists.**
+Before any `_SUBSCRIBED_EVENTS` is authored or modified, the CE Agent must cross-check every
+string against the canonical registry in `docs/architecture/emergency-instrument-transmission-table.md`.
+A string not present in the registry must be either: (a) a non-emergency event type verified as
+actually emitted by a module, or (b) flagged as dead before the PR opens.
+
+**G2D scope boundary:** Fixing `"imf_program_acceptance"` and `"emergency_declaration"` dead
+strings is NOT in scope for the G2D implementation PR. The G2D PR is scoped to the capital
+controls Channel C fix only (subscription fix + bridge event + elasticity row). The two additional
+dead strings should be cleaned up in a separate dedicated PR with elasticity rows added at the same
+time (otherwise fixing the string without adding elasticity rows produces no behaviour change and
+creates confusion about the fix's intent).
+
+Near-miss cross-references: ADR-020 ARCH-014 (known `capital_controls_imposition` bug — the root
+cause was identified there; this NM records the pattern recurring on two additional strings in the
+same module).
+
+---
+
+## NM-091 — EmergencyInstrument Enum Has 7 Variants; ADR-020 Canonical Registry Listed 10; 3 Registry Entries Match No Enum Value; 3 Code Variants Missing From Registry; Intent Document References Non-Existent Variant (Reactive)
+
+**Date:** 2026-07-03
+**Milestone:** M19 — Constraint Search and Empirical Calibration
+**Detected by:** CE Agent full subscription audit (G2D pre-implementation PR gate 2)
+**Severity:** Medium — the mismatch causes the transmission table to serve as an unreliable reference; an implementing agent using `asset_nationalization` from the registry would produce a `ValueError` at runtime (no such enum value). The G2D intent document references `asset_nationalization` in the Run A pseudocode, which maps to the wrong enum value.
+
+### What happened
+
+The ADR-020 canonical event string registry was authored with 10 variants:
+`imf_program_acceptance`, `debt_moratorium`, `default_declaration`, `capital_controls`,
+`emergency_austerity`, `asset_nationalization`, `currency_peg_break`, `hyperinflation_emergency`,
+`banking_system_freeze`, `debt_restructuring`.
+
+The actual `EmergencyInstrument` enum in `backend/app/simulation/orchestration/inputs.py`
+has 7 members:
+`CAPITAL_CONTROLS`, `BANK_HOLIDAY`, `DEBT_MORATORIUM`, `NATIONALIZATION`,
+`IMF_PROGRAM_ACCEPTANCE`, `DEFAULT_DECLARATION`, `EMERGENCY_DECLARATION`.
+
+The mismatch:
+- 3 registry entries have no matching enum: `emergency_austerity`, `asset_nationalization`,
+  `currency_peg_break` (and 3 more: `hyperinflation_emergency`, `banking_system_freeze`,
+  `debt_restructuring`)
+- 3 enum variants are absent from the registry: `BANK_HOLIDAY`, `NATIONALIZATION`,
+  `EMERGENCY_DECLARATION`
+- Registry `asset_nationalization` ≠ code `NATIONALIZATION` — the Architect authored the
+  registry with a future planned name, not the current enum value
+
+The G2D intent document §3.2 references `instrument="asset_nationalization"` in the Run A
+pseudocode. This would fail at runtime with `ValueError: 'asset_nationalization' is not a valid
+EmergencyInstrument` or equivalent if used literally. The implementing agent must substitute
+`EmergencyInstrument.NATIONALIZATION` (value: `"nationalization"`).
+
+### What was at risk
+
+An implementing agent using the ADR-020 canonical registry as a reference for the Run A
+`asset_nationalization` step would write code that crashes at construction time. Alternatively,
+an agent might introduce a new `ASSET_NATIONALIZATION` enum value without an ADR, silently
+diverging the codebase. Either outcome would be caught by tests or CI, but represents wasted
+implementation time and a misleading reference document.
+
+Additionally: the pre-populated ✅ for GovernanceModule on `debt_moratorium` and `default_declaration`
+in the original transmission table was not verified by the CE audit. Reading the GovernanceModule
+source confirms it subscribes to only 2 emergency event strings (`emergency_policy_imf_program_acceptance`
+and `emergency_policy_emergency_declaration`). The other pre-populated ✅ entries were incorrect.
+
+### What caught it
+
+CE audit reading the actual `EmergencyInstrument` enum members against the registry. The
+mismatch was visible immediately. The GovernanceModule `_SUBSCRIBED_EVENTS` was read directly
+to verify subscriptions rather than trusting the pre-populated table.
+
+### Process improvement
+
+**Before any ADR documents a canonical event string registry, the Architect Agent must verify
+each listed event string against the actual Python `Enum.value` in the code.**
+
+The format rule `emergency_policy_{instrument_name}` must use the Python enum `.value` literal
+— not a human-readable description of what the instrument does, and not a planned future name.
+The Architect should run `grep -n "class EmergencyInstrument\|= \"" backend/app/simulation/orchestration/inputs.py`
+to enumerate actual values before authoring the registry.
+
+**Pre-populated module subscription columns (✅ / ❌) in the transmission table must be verified by CE
+audit before being published as facts, not after.** The ADR panel may populate the table as a design
+draft, but the transmission table must be marked "DRAFT — CE audit pending" until the CE audit
+gate confirms each entry. The "✅ existing" notation implies a verified active subscription; using
+it before verification is misleading to implementers.
+
+**Intent documents referencing enum values must use the Python identifier or `.value` string,
+not a human-readable description.** Pseudocode in intent documents is understood as conceptual,
+but instrument names must be cross-checked against the actual enum during intent document review
+(PM Agent or implementing agent responsibility at the start of implementation, not during authorship).
+
+Near-miss cross-references: NM-081 (scope derived from stale design artifacts — same pattern:
+design artifacts authored from intended future state, not current code reality).
+
+---
+
 ## NM-NNN — [Short descriptive title]
 
 **Date:** YYYY-MM-DD (or approximate milestone era)
