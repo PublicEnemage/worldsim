@@ -40,8 +40,6 @@ from __future__ import annotations
 from datetime import UTC, datetime
 from decimal import Decimal
 
-import pytest
-
 from app.simulation.engine.models import (
     Event,
     MeasurementFramework,
@@ -54,13 +52,17 @@ from app.simulation.engine.quantity import Quantity, VariableType
 from app.simulation.modules.demographic.cohort import IncomeQuintile
 from app.simulation.modules.demographic.elasticities import ELASTICITY_REGISTRY
 from app.simulation.modules.demographic.module import (
-    DemographicModule,
     _SUBSCRIBED_EVENTS as DM_SUBSCRIBED_EVENTS,
+)
+from app.simulation.modules.demographic.module import (
+    DemographicModule,
 )
 from app.simulation.modules.external_sector.module import ExternalSectorModule
 from app.simulation.modules.macroeconomic.module import (
-    MacroeconomicModule,
     _SUBSCRIBED_EVENTS as MM_SUBSCRIBED_EVENTS,
+)
+from app.simulation.modules.macroeconomic.module import (
+    MacroeconomicModule,
 )
 
 _TS = datetime(2008, 10, 1, tzinfo=UTC)
@@ -72,7 +74,11 @@ _ENTITY_ID = "ISL"
 # ---------------------------------------------------------------------------
 
 
-def _qty(value: float | str, framework: MeasurementFramework = MeasurementFramework.FINANCIAL, tier: int = 1) -> Quantity:
+def _qty(
+    value: float | str,
+    framework: MeasurementFramework = MeasurementFramework.FINANCIAL,
+    tier: int = 1,
+) -> Quantity:
     return Quantity(
         value=Decimal(str(value)),
         unit="dimensionless",
@@ -122,7 +128,7 @@ def _capital_controls_event(
     implementation_capacity: float = 0.75,
     duration_periods: int = 8,
 ) -> Event:
-    """Build emergency_policy_capital_controls Event as EmergencyPolicyInput.to_events() produces."""
+    """Build emergency_policy_capital_controls Event (matches EmergencyPolicyInput.to_events())."""
     return Event(
         event_id="test-cc-event",
         source_entity_id=entity_id,
@@ -243,7 +249,7 @@ def test_esm_no_capital_controls_event_produces_no_reserve_channel_a_event() -> 
 
 
 def test_esm_reserve_delta_tagged_financial_framework() -> None:
-    """AC-2: Channel A reserve event is tagged FINANCIAL (consistent with existing reserve events)."""
+    """AC-2: Channel A reserve event is tagged FINANCIAL (consistent with reserve events)."""
     entity = _make_entity(capital_account_outflow_velocity=0.5)
     cc_event = _capital_controls_event()
     state = _make_state(entity, prior_events=[cc_event])
@@ -298,10 +304,10 @@ def test_mm_channel_b_beta_gamma_product() -> None:
         CAPITAL_CONTROLS_BETA,
         CAPITAL_CONTROLS_GAMMA,
     )
-    assert CAPITAL_CONTROLS_BETA == Decimal("0.020"), (
+    assert Decimal("0.020") == CAPITAL_CONTROLS_BETA, (
         f"CM-calibrated β must be 0.020 — got {CAPITAL_CONTROLS_BETA}"
     )
-    assert CAPITAL_CONTROLS_GAMMA == Decimal("1.2"), (
+    assert Decimal("1.2") == CAPITAL_CONTROLS_GAMMA, (
         f"CM-supplied γ must be 1.2 — got {CAPITAL_CONTROLS_GAMMA}"
     )
     # Implied GDP impact: 0.020 × 0.85 × 0.75 × 1.2 = 0.0153 (approx 1.53pp contraction)
@@ -323,7 +329,7 @@ def test_mm_gamma_is_not_caller_configurable() -> None:
         "γ must not be an instance attribute — it is a CM-supplied constant "
         "and must not be overridable by the CE agent or callers"
     )
-    assert CAPITAL_CONTROLS_GAMMA == Decimal("1.2"), (
+    assert Decimal("1.2") == CAPITAL_CONTROLS_GAMMA, (
         "Module-level CAPITAL_CONTROLS_GAMMA must be exactly 1.2 "
         "(CM-calibrated; cannot be changed without CM Consulted review)"
     )
@@ -380,7 +386,7 @@ def test_mm_bridge_event_has_nonzero_delta_credit_growth() -> None:
 
 
 def test_mm_bridge_event_magnitude_is_negative_for_credit_contraction() -> None:
-    """AC-4: Bridge event magnitude must be negative (credit contracted) so DM elasticity sign is correct."""
+    """AC-4: Bridge magnitude must be negative (credit contracted) for DM elasticity sign."""
     entity = _make_entity(gdp_growth=0.0)
     cc_event = _capital_controls_event(severity=0.85)
     state = _make_state(entity, prior_events=[cc_event])
@@ -442,7 +448,7 @@ def test_capital_controls_imposition_event_produces_no_dm_response() -> None:
 
     assert events == [], (
         "DemographicModule must not respond to 'capital_controls_imposition' — "
-        "this string is dead (never emitted) and must not be in _SUBSCRIBED_EVENTS after ADR-020 fix"
+        "this string is dead (never emitted) and must not be in _SUBSCRIBED_EVENTS"
     )
 
 
@@ -452,7 +458,7 @@ def test_capital_controls_imposition_event_produces_no_dm_response() -> None:
 
 
 def test_dm_subscribes_to_credit_contraction_labour_shock() -> None:
-    """AC-6: DM _SUBSCRIBED_EVENTS must include 'credit_contraction_labour_shock' after Channel C fix."""
+    """AC-6: DM _SUBSCRIBED_EVENTS must include 'credit_contraction_labour_shock'."""
     assert "credit_contraction_labour_shock" in DM_SUBSCRIBED_EVENTS, (
         "'credit_contraction_labour_shock' must be in DemographicModule._SUBSCRIBED_EVENTS "
         "after ADR-020 Channel C implementation (bridge subscription)"
@@ -460,7 +466,7 @@ def test_dm_subscribes_to_credit_contraction_labour_shock() -> None:
 
 
 def test_elasticity_registry_has_credit_contraction_labour_shock_row() -> None:
-    """AC-6: ELASTICITY_REGISTRY must contain at least one row for 'credit_contraction_labour_shock'."""
+    """AC-6: ELASTICITY_REGISTRY must have at least one 'credit_contraction_labour_shock' row."""
     rows = [r for r in ELASTICITY_REGISTRY if r.event_type == "credit_contraction_labour_shock"]
     assert len(rows) >= 1, (
         "ELASTICITY_REGISTRY must have at least one 'credit_contraction_labour_shock' row "
@@ -487,8 +493,8 @@ def test_credit_contraction_elasticity_is_in_phi_range() -> None:
     assert len(rows) >= 1, "AC-6 prerequisite: elasticity row must exist"
 
     for row in rows:
-        # Elasticity is negative so that negative delta_credit_growth × negative elasticity = positive PHC delta.
-        # The absolute value of the elasticity must be in [0.3, 0.7].
+        # Negative elasticity * negative delta_credit_growth = positive PHC delta.
+        # Absolute value must be in [0.3, 0.7].
         phi_abs = abs(row.elasticity)
         assert Decimal("0.3") <= phi_abs <= Decimal("0.7"), (
             f"φ elasticity magnitude must be in [0.3, 0.7] — got {phi_abs} "
@@ -512,7 +518,7 @@ def test_credit_contraction_elasticity_is_decimal_not_float() -> None:
 
 
 def test_dm_credit_contraction_labour_shock_raises_q1_phc() -> None:
-    """AC-7: Channel C — bridge event triggers positive poverty_headcount_ratio delta for Q1 cohort."""
+    """AC-7: Channel C bridge event triggers positive poverty_headcount_ratio delta (Q1)."""
     entity = _make_entity()
     bridge = _bridge_event(delta_credit_growth=-0.01275)
     state = _make_state(entity, prior_events=[bridge])
@@ -587,7 +593,7 @@ def test_emergency_policy_capital_controls_produces_no_dm_response_directly() ->
 
     assert events == [], (
         "DemographicModule must NOT respond to 'emergency_policy_capital_controls' directly — "
-        "it responds to 'credit_contraction_labour_shock' bridge event only (Channel C bridge design)"
+        "it responds to 'credit_contraction_labour_shock' bridge only (Channel C bridge design)"
     )
 
 
@@ -600,7 +606,7 @@ def test_mm_capital_controls_gamma_constant_value() -> None:
     """AC-9: γ=1.2 must be a module-level constant (CM-supplied; requires CM review to change)."""
     from app.simulation.modules.macroeconomic.module import CAPITAL_CONTROLS_GAMMA
 
-    assert CAPITAL_CONTROLS_GAMMA == Decimal("1.2"), (
+    assert Decimal("1.2") == CAPITAL_CONTROLS_GAMMA, (
         f"CAPITAL_CONTROLS_GAMMA must be exactly Decimal('1.2') — got {CAPITAL_CONTROLS_GAMMA}. "
         "γ is CM-supplied per calibration-basis.md §Capital Controls. "
         "Changing γ requires CM Consulted review — not CE author authority."
@@ -621,7 +627,7 @@ def test_mm_capital_controls_gamma_is_decimal() -> None:
 
 
 def test_emergency_policy_input_capital_controls_does_not_raise() -> None:
-    """AC-11: Constructing + processing EmergencyPolicyInput(CAPITAL_CONTROLS) raises no SimulationError."""
+    """AC-11: EmergencyPolicyInput(CAPITAL_CONTROLS) constructs and processes without error."""
     from app.simulation.orchestration.inputs import EmergencyInstrument, EmergencyPolicyInput
 
     policy = EmergencyPolicyInput(
