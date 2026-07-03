@@ -16,7 +16,7 @@ Accepted
 
 **Standards Version:** 2026-05-23 (Amendment 1: 2026-07-02)
 **Valid Until:** Milestone 13 — Methodology Publication and Public Launch; Amendment 1 reviewed at M20 or on MAGNITUDE_MATCH trigger (whichever is first)
-**License Status:** ACCEPTED — 2026-05-23; Amendment 1: PROPOSED — 2026-07-02; panel conditions incorporated 2026-07-02 — pending EL acceptance
+**License Status:** ACCEPTED — 2026-05-23; Amendment 1: ACCEPTED — 2026-07-03 (EL acceptance; panel conditions incorporated 2026-07-02)
 
 **M12 exit review:** 2026-06-10 (SCAN-026). No renewal triggers fired during Milestone 12. The synthetic data framework was not implemented in M12 — ADR-007 `Quantity` schema fields (`is_synthetic`, `synthetic_method`, `comparison_group_id`, `holdout_validated`) remain unimplemented (Issue #22, now deferred to M13). No sixth method proposed, holdout validation gate unchanged, confidence tier max() arithmetic unchanged, meaninglessness threshold unchanged, anomaly detection governance constraints unchanged. Implementation pressure now carries to M13 as a first-order obligation: M13's methodology publication scope makes the synthetic data framework a pre-publication requirement — undocumented synthetic fields block the methodology transparency commitment. License renewed to Milestone 13.
 
@@ -836,12 +836,12 @@ uncertainty, but grounding it in evidence.
 | Reviewer | Role | Status |
 |---|---|---|
 | Architect Agent | R — author | Complete ✓ (2026-07-02) |
-| Chief Methodologist (DIC) | C — posterior calibration method and coverage measurement protocol | Pending |
-| Computation Engine Agent | C — implementation of _classify_fidelity() gate and BandResult field additions | Pending |
-| UX Designer Agent | C — display contract for is_pre_calibration and band_method (#1537) | Pending |
-| Engineering Lead | A — final acceptance authority | Pending |
+| Chief Methodologist (DIC) | C — posterior calibration method and coverage measurement protocol | VALIDATE ✓ (2026-07-02) — conditions incorporated |
+| Computation Engine Agent | C — implementation of _classify_fidelity() gate and BandResult field additions | VALIDATE ✓ (2026-07-02) — CE Condition A gated on #1543 intent doc |
+| UX Designer Agent | C — display contract for is_pre_calibration and band_method (#1537) | CONSULT — no objection ✓ (2026-07-02) — Concerns 1+2 incorporated; Concern 3 gated on #1537 intent doc |
+| Engineering Lead | A — final acceptance authority | **ACCEPTED ✓ (2026-07-03)** |
 
-*Panel review artifact: `docs/adr/reviews/ADR-007-amendment-1-panel-review.md` (to be filed)*
+*Panel review artifact: `docs/adr/reviews/ADR-007-amendment-1-panel-review.md`*
 
 ---
 
