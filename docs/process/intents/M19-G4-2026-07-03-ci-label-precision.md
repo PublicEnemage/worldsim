@@ -316,9 +316,13 @@ No new mock routes for Deliverable B.
 - **AC-9 (G3 regression):** Mock `band_method="SUPPRESSED_MEANINGLESS"`; assert CI band slot shows exactly `"Data range too wide for confidence interval"` (G3 string unchanged).
 
 **QA Lead acknowledgment:**
-`[ ]` QA Lead: Tests for AC-1 through AC-9 authored and filed. [Date]
+`[x]` QA Lead: Tests for AC-1 through AC-9 authored and filed. 2026-07-03
 `[ ]` QA Lead: `band_method` confirmed declared in `api_contracts.yml §trajectory` per-framework
-fields before mock helpers authored. Enum strings taken from merged G3 #1537 code. [Date]
+fields before mock helpers authored. Enum strings taken from G3 #1537 intent doc §2 (frozen enum
+table). OPEN: grep of api_contracts.yml returned no match for `band_method` — this is a suspected
+G3 #1537 delivery gap. QA Lead must confirm band_method is added to api_contracts.yml before the
+G4 implementation PR is merged. If G3 did not update the schema file, a gap fix PR is required
+before G4 CI label tests can be fully NM-086 cleared. 2026-07-03
 
 ---
 

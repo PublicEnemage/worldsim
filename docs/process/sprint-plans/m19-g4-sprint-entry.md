@@ -95,14 +95,14 @@ document — the label text depends on which `band_method` values G3 defined.*
 code is written. The test authorship gate is not independently blocked — it follows from the
 intent document gate above.*
 
-- [ ] QA test file authored for every user-facing deliverable in this sprint
+- [x] QA test file authored for every user-facing deliverable in this sprint
 
 **QA test status:**
 
 | Deliverable | Intent document | Test file path | Authored before implementation? |
 |---|---|---|---|
-| PSP driver auditability panel (#1528) | `docs/process/intents/M19-G4-2026-07-03-psp-driver-auditability-panel.md` | `frontend/tests/e2e/m19-g4-psp-driver-auditability.spec.ts` | No — pending intent document |
-| CI label precision fix (#1529) | `docs/process/intents/M19-G4-2026-07-03-ci-label-precision.md` | `frontend/tests/e2e/m19-g4-ci-label-precision.spec.ts` | No — pending intent document |
+| PSP driver auditability panel (#1528) | `docs/process/intents/M19-G4-2026-07-03-psp-driver-auditability-panel.md` | `frontend/tests/e2e/m19-g4-psp-driver-auditability.spec.ts` | Yes — 2026-07-03 |
+| CI label precision fix (#1529) | `docs/process/intents/M19-G4-2026-07-03-ci-label-precision.md` | `frontend/tests/e2e/m19-g4-ci-label-precision.spec.ts` | Yes — 2026-07-03 |
 
 *NM-086 process requirement: QA Lead must verify any E2E mock routes against `api_contracts.yml`
 before the intent document is approved. This is a blocking checklist item on the test authorship
