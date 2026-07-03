@@ -308,3 +308,147 @@ against the WorldSim backtesting suite for out-of-sample performance.
 
 Out-of-sample validation against historical cases is the primary calibration
 signal — see `docs/DATA_STANDARDS.md §Backtesting Integrity Rules`.
+
+---
+
+## Capital Controls Transmission Parameters (ADR-020)
+
+**ADR reference:** ADR-020 — Emergency Instrument Economic Transmission Pattern
+(accepted 2026-07-03, panel: CE, CM, Development Economist, Geopolitical Analyst,
+UX Designer). Three transmission channels: Channel A (ExternalSectorModule reserve
+protection), Channel B (MacroeconomicModule credit contraction), Channel C
+(DemographicModule Q1 poverty headcount via labour shock bridge).
+
+**Implementation locations:**
+- Channel A — `backend/app/simulation/modules/external_sector/module.py`
+- Channel B — `backend/app/simulation/modules/macroeconomic/module.py`
+- Channel C — `backend/app/simulation/modules/demographic/module.py`
+
+---
+
+### ε — Capital account outflow velocity reduction coefficient (Channel A)
+
+Controls the fractional reduction in `capital_account_outflow_velocity` when
+`emergency_policy_capital_controls` fires. A lower outflow velocity reduces
+reserve drawdown rate, implementing the reserve protection effect.
+
+**Default value:** `0.60`
+
+**Calibration anchors:**
+
+| Anchor | ε estimate | Source | Notes |
+|---|---|---|---|
+| Iceland 2008 (blended) | 0.65 | CBI Statistical Bulletin 2009; BIS Working Paper 478 (Danielsson et al. 2012) | Includes simultaneous SBA confound — Nordic bilateral support lines and CBI reserve change are combined |
+| Iceland 2008 (controls-only) | **0.50** | IMF Iceland Article IV 2010 §III reserve decomposition | Isolates CBI reserve change attributable to capital controls only, removing Nordic/SBA contribution. **This is the G2D heterodox fixture value (ADR-020 INCORPORATE-3)** |
+| Malaysia 1998 | 0.55 | IMF WP/00/92 (Kaplan & Rodrik 2002); BIS Occasional Paper (Ariyoshi et al. 2000) | 12-month unilateral peg + controls period; reserve recovery consistent with 0.50–0.60 range; BIS estimates net outflow reduction of ~55% |
+
+**Default derivation:** Two-anchor arithmetic mean: (ε_Iceland_blended + ε_Malaysia) / 2
+= (0.65 + 0.55) / 2 = **0.60**. Range ±0.15 reflects cross-country uncertainty and
+the SBA confound that raises the blended Iceland estimate.
+
+**Iceland SBA confound:** The IMF Stand-By Arrangement (approved November 2008) and
+Nordic bilateral support lines contributed independently to reserve stabilisation
+alongside the October 2008 capital controls. The blended ε≈0.65 conflates both
+channels. The Article IV 2010 §III decomposition separates them: the controls
+attributable portion is ε≈0.50. The G2D heterodox fixture uses ε=0.50 to model
+the non-SBA path accurately (INCORPORATE-3 resolution: Iceland took a heterodox
+path but also accepted the SBA; the fixture isolates the controls channel).
+
+**Calibration status:** Tier 3 CALIBRATED (two historical anchors; one IMF Article IV
+decomposition). Tier 2 upgrade requires additional controls episode cross-validation
+against IMF WP/99/3 or Edwards & Rigobon (2009) emerging market controls dataset.
+
+---
+
+### β — Credit contraction coefficient (Channel B)
+
+Scales the reduction in `domestic_credit_growth` per unit of capital controls
+severity. Applied once when `emergency_policy_capital_controls` fires; drives
+the Channel B→C bridge via `credit_contraction_labour_shock`.
+
+**Default value:** `0.020`
+
+**Calibration basis:**
+
+Iceland 2009 national accounts decomposition:
+- Annual GDP growth 2009: −6.6% (Statistics Iceland, Q4 2009 National Accounts)
+- IMF Article IV Iceland 2010 §III decomposes the 2009 contraction:
+  - Banking system freeze + credit channel: ~1.5–2.0 pp contribution
+  - Export recovery (krona devaluation): partial offset beginning Q3 2009
+  - Fiscal adjustment (−8% primary balance 2009): ~2.5 pp contribution
+  - Residual / confidence channel: remainder
+- β derivation: credit channel contribution (1.5–2.0 pp) / (controls severity 0.85
+  × reference GDP response) ≈ 0.017–0.024. Point estimate: **0.020**
+- β range [0.015, 0.030]: covers 90% credible interval across single-case decomposition.
+  Range [0.030, 0.060] reserved for banking-freeze-only events (per ADR-020 Decision 2).
+
+**Malaysia 1998 cross-validation:**
+β_Malaysia ≈ 0.018 (IMF WP/00/92). Malaysia's banking sector was smaller relative to
+GDP than Iceland's (~3× GDP vs. Iceland's ~10× GDP at crisis), consistent with a
+lower credit contraction coefficient. β=0.020 default sits comfortably above the
+Malaysia lower-bound and reflects Iceland's banking-sector-dominated transmission.
+
+**γ — GDP-credit multiplier (CM-supplied constant):** `1.2`
+
+Standard Keynesian credit-GDP multiplier for small advanced open economies
+(Iceland: export-led recovery channel available post-krona devaluation reduces
+the multiplier vs. closed-economy baseline). Sources: IMF WP/2010/66; Jordà,
+Schularick & Taylor (2015, NBER WP 20564) credit multiplier estimates for OECD
+small open economies cluster at 1.1–1.3 for controls-with-recovery scenarios.
+
+**Critical constraint:** γ = 1.2 is a CM-supplied constant per ADR-020 Decision 2
+(INCORPORATE-1). The Computation Engine Agent cannot change this value without
+CM Consulted review. Changes require an ADR-020 amendment.
+
+**Calibration status:** Tier 3 CALIBRATED (Iceland 2009 IMF Article IV decomposition
++ OECD credit multiplier literature). β is a single-case calibration; cross-country
+upgrade deferred to Issue #44.
+
+---
+
+### φ — Q1 poverty headcount ratio impact range (Channel C)
+
+φ captures the fractional increase in `q1_poverty_headcount_ratio` from the
+credit contraction labour shock chain. Channel C receives the bridge event
+`credit_contraction_labour_shock` from MacroeconomicModule (Channel B) and
+applies φ to Q1 poverty headcount.
+
+**Range:** φ ∈ [0.3, 0.7]
+
+**ISL (Iceland) lower bound:** φ ≈ **0.30**
+
+**Rationale:** Iceland's pre-crisis Q1 poverty headcount ratio was approximately
+0.08 (Eurostat SILC Iceland 2007 — income quintile 1 at-risk-of-poverty rate).
+Higher-income economies with lower baseline poverty rates show lower absolute
+poverty headcount responses to credit contractions: the at-risk population is
+smaller, and Iceland's social protection floor (maintaining unemployment benefits
+through the crisis) attenuated the poverty headcount response. φ=0.30 reflects
+the lower end of the distributional impact range appropriate for high-income
+European small open economies.
+
+**Contrast with higher-φ contexts:** Low-income SSA economies (SEN, ZMB G2B
+fixtures) anchor the upper range (φ→0.7) where large informal sector shares
+and weak social protection floors produce stronger poverty headcount responses
+per unit of credit contraction.
+
+**ISL data tier classification:**
+
+| Attribute | Tier | Source |
+|---|---|---|
+| `reserve_coverage_months` (October 2008) | Tier 1 | Central Bank of Iceland Statistical Bulletin, October 2008 (ISL: ~€1.5bn reserves, ~3.5 months cover) |
+| `gdp_growth` (Step 0 deteriorating) | Tier 1 | Statistics Iceland National Accounts 2008 Q3/Q4 |
+| `q1_poverty_headcount_ratio` (baseline 0.08) | Tier 2 | Eurostat SILC Iceland 2007 (at-risk-of-poverty rate Q1; closest pre-crisis vintage) |
+| `banking_sector_leverage_ratio` (HIGH, ~10× GDP) | Tier 1 | Central Bank of Iceland Financial Stability Report 2008 |
+| `political_legitimacy_index` (0.72) | Tier 2 | WVS Wave 5 Iceland (2005–2008); V-Dem Iceland democratic quality score |
+
+**Q1/Q2 scope note (INCORPORATE-5):** Channel C models Q1 poverty headcount impact.
+Q2 households experience a weaker response (approximately 60% of Q1 impact per Ball
+et al. 2013 distributional scaling). Q2 impact is not modelled in the current Channel C
+implementation. This is a **known gap** documented in ADR-020 §Known Limitations and
+must appear in `known_limitations` output for any run where Channel C fires.
+
+**Calibration status:** φ range is Tier 3 PLACEHOLDER. ISL lower bound (φ=0.30) is
+a contextual inference from Eurostat SILC poverty rate data. Full calibration
+requires Iceland household consumption panel data 2008–2011 — not currently
+available at Tier 1. Structural test classification (pre_calibration_structural_test)
+is appropriate for the G2D fixture until empirical calibration is complete.
