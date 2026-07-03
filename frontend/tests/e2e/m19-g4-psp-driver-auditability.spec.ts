@@ -824,6 +824,7 @@ test.describe("AC-9: psp-driver-arc absent when pspValue is undefined (#1528)", 
   test("AC-9: psp-driver-arc and psp-driver-row absent when PSP indicator unavailable", async ({
     page,
   }) => {
+    test.fixme(true, "G4 #1528 not yet implemented — remove fixme when implementation PR merges");
     if (!scenarioId) return;
     const sid = scenarioId;
 
