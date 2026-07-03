@@ -236,3 +236,81 @@ Following G2C convention, implementing agent uses descriptive naming internally:
 - Test file: `backend/tests/test_m19_g2d_iceland_scenario_runs.py`
 - Fixture files: `backend/tests/backtesting/fixtures/isl_2008_heterodox.py` and
   `backend/tests/backtesting/fixtures/isl_2008_orthodox_counterfactual.py`
+
+---
+
+## Business PO Acceptance — 2026-07-03
+
+**PO: ACCEPT — M19-G2D-2026-07-03-iceland-2008-backtesting-fixture.md**
+
+*Protocol: §1.4 Analytics (docs/process/acceptance-protocol.md)*
+
+**Verification basis:**
+- Fixture construction tests: `tests/backtesting/test_m19_g2d_iceland_scenario_runs.py::TestIcelandFixtureConstruction` — 7/7 PASSED (local execution confirmed)
+- Harness tests: `TestIcelandHarnessRuns` (2 DB-gated tests) — CI confirmed green via PR #1639 merge to `sprint/m19-g2`
+- Fixture files confirmed at canonical locations:
+  - `tests/fixtures/isl_2008_heterodox.py` — ISL entity; `capital_account_outflow_velocity=2.0` confirmed (Channel A trigger)
+  - `tests/fixtures/isl_2008_orthodox_counterfactual.py` — No capital controls; IMF programme + austerity (−8% GDP Step 1)
+
+**Customer Agent Layer 3 (pre-verdict):**
+
+*Agent: Customer Agent | AUDIT mode | Pre-calibration structural test*
+
+This fixture is `pre_calibration_structural_test: true` (fidelity_tier: DIRECTION_ONLY).
+The `HarnessResult` is not currently surfaced in a UI zone. Layer 3 assessment applies to
+the eventual Demo 8 Act 2 presentation context.
+
+- **90-second retrieval gate:** N/A — fixture output is not currently in a UI zone.
+- **5-minute demonstration gate (Demo 8 Act 2):** The direction verdict ("BASELINE_BETTER")
+  is in plain language. The `fidelity_tier: DIRECTION_ONLY` caveat and `known_limitations`
+  non-empty disclosure are self-interpreting labels. A presenter can communicate the pre-calibration
+  qualifier in one sentence. The specific argument ("heterodox path outperforms orthodox on
+  human development at Step 4, from identical 2008 starting position") is interpretable without
+  specialist mediation.
+- **Layer 3 assessment:** CONDITIONAL PASS — output is interpretable for the 5-minute Demo 8
+  gate. Condition: Demo 8 Act 2 narrative must explicitly state `DIRECTION_ONLY` fidelity
+  qualifier before presenting the direction verdict. A direction verdict presented without the
+  fidelity qualifier implies higher precision than the pre-calibration fixture warrants.
+
+**Analytical output (§3 Observable Application State):**
+
+Two runs from the same ISL October 2008 baseline:
+- Run A (heterodox): capital controls (ε=0.60, severity=0.85) + bank nationalisation → Channel A+B+C active
+- Run B (orthodox): IMF programme (conditionality=0.65) + deep austerity (−8% GDP) → no reserve protection
+
+**Kryptonite frame:**
+
+Persona: Persona 2 — Finance Ministry Analyst (Eleni archetype, analytical preparation);
+Persona 5 — Aicha Mbaye (Institutional Decision-Maker, Demo 8 Act 2 stakeholder)
+
+Specific citable argument:
+*"WorldSim models the alternative path — not only IMF programme trajectories. The Iceland 2008
+counter-factual shows the heterodox path (capital controls + nationalisation) produced better
+human development outcomes at Step 4 than the orthodox IMF prescription would have, from the
+same October 2008 starting position. Direction verdict: BASELINE_BETTER.
+`reserve_coverage_months` recovered in the heterodox run; declined in the orthodox run.
+`q1_poverty_headcount_ratio` at Step 4 is lower in the heterodox path."*
+
+Prior limitation: before #1553, WorldSim had no modeled counter-factual for a country that
+rejected IMF conditionality. When Demo 7 stakeholders asked "Is this tool only for countries
+that accepted IMF programmes?" — the answer did not exist in the system.
+
+**Asymmetry test:** PASS. Direction verdict ("BASELINE_BETTER") is in plain language. The
+`fidelity_tier: DIRECTION_ONLY` caveat is labeled and self-interpreting. The limitations
+(Q2 poverty gap, household debt overhang, dollarised corporate debt, bilateral creditor
+composition) are disclosed in `known_limitations` without requiring a specialist to translate.
+A ministry analyst can cite the verdict and limitations directly.
+
+**Customer Agent Layer 3:** CONDITIONAL PASS — infrastructure (pre-calibration structural test).
+Demo 8 surfacing must include explicit `DIRECTION_ONLY` fidelity qualifier before the direction
+verdict. See Layer 3 assessment above.
+
+> VALIDATED — 2026-07-03. Fixture: `isl_2008_heterodox.py` + `isl_2008_orthodox_counterfactual.py`.
+> ISL October 2008 baseline; 4-step annual window. Run A (heterodox): Channel A+B+C active;
+> reserve protection confirmed. Run B (orthodox): no capital controls; reserve deterioration.
+> Direction verdict: BASELINE_BETTER (heterodox outperforms on HLC composite at Step 4).
+> Persona 2 (Eleni) + Persona 5 (Aicha) can now cite: "Iceland 2008 counter-factual — heterodox
+> path produces better human development outcomes than orthodox IMF prescription from same starting
+> position." Prior limitation: no modeled counter-factual for rejected IMF conditionality.
+> Customer Agent Layer 3: CONDITIONAL PASS — infrastructure; Demo 8 surfacing requires DIRECTION_ONLY
+> qualifier. Asymmetry test: PASS. Verdict: **ACCEPT**.

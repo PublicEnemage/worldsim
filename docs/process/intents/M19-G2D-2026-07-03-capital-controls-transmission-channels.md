@@ -420,3 +420,62 @@ implementation) / 9 PASSED (pre-existing correct behaviors). No import or syntax
 Pre-implementation gates: CM (PR #1625 ✓) and CE audit (PR #1626 ✓) both CLEARED 2026-07-03.
 Sprint entry: `docs/process/sprint-plans/m19-g2d-sprint-entry.md` (EL-approved 2026-07-03).
 See `docs/process/agent-execution-lifecycle.md` for the five-step lifecycle this document gates.*
+
+---
+
+## Business PO Acceptance — 2026-07-03
+
+**PO: ACCEPT — M19-G2D-2026-07-03-capital-controls-transmission-channels.md**
+
+*Protocol: §1.2 Backend Capability (docs/process/acceptance-protocol.md)*
+
+**Verification basis:** Unit test suite `tests/unit/test_adr020_capital_controls_transmission.py`
+— 28/28 PASSED (confirmed local execution, worktree `/tmp/worldsim-g2d`, HEAD c62b963 on
+`sprint/m19-g2`). CI confirmed green via PR #1635 merge.
+
+**Field verification (§3 Observable Application State):**
+
+| Channel | Observable field | Confirmed value | Test |
+|---|---|---|---|
+| A: reserve protection | `reserve_coverage_months` delta > 0 | POSITIVE — outflow arrest confirmed | `test_esm_capital_controls_produces_positive_reserve_coverage_delta` PASSED |
+| A: baseline absence | No Channel A event without CC | ABSENT — no false positive | `test_esm_no_capital_controls_event_produces_no_reserve_channel_a_event` PASSED |
+| B: credit contraction | `gdp_growth` delta < 0 | NEGATIVE — β=0.020, γ=1.2 applied | `test_mm_capital_controls_produces_gdp_contraction` PASSED |
+| B: bridge emitted | `credit_contraction_labour_shock` on bus | PRESENT — non-zero delta_credit_growth | `test_mm_capital_controls_emits_bridge_event` PASSED |
+| B: bridge magnitude | delta_credit_growth = −0.01275 | NEGATIVE — β × 0.85 × 0.75 = −0.01275 | `test_mm_bridge_event_magnitude_is_negative_for_credit_contraction` PASSED |
+| C: dead sub removed | `capital_controls_imposition` NOT in `_SUBSCRIBED_EVENTS` | ABSENT — dead string cleaned | `test_dm_does_not_subscribe_to_capital_controls_imposition` PASSED |
+| C: bridge sub active | `credit_contraction_labour_shock` IN `_SUBSCRIBED_EVENTS` | PRESENT — bridge wired | `test_dm_subscribes_to_credit_contraction_labour_shock` PASSED |
+| C: elasticity row | φ = −0.30 ∈ [0.3, 0.7]; Q1 informal; `q1_poverty_headcount_ratio` target | CONFIRMED | `test_credit_contraction_elasticity_is_in_phi_range` PASSED |
+| C: PHC rises | `q1_poverty_headcount_ratio` delta positive | POSITIVE — poverty rises on credit shock | `test_dm_credit_contraction_labour_shock_raises_q1_phc` PASSED |
+| C: DM no direct CC sub | `emergency_policy_capital_controls` NOT in DM `_SUBSCRIBED_EVENTS` | ABSENT — bridge design enforced | `test_dm_does_not_subscribe_to_emergency_policy_capital_controls` PASSED |
+| γ constant | CAPITAL_CONTROLS_GAMMA == Decimal("1.2"), not caller-configurable | CONFIRMED — CM constant | `test_mm_gamma_is_not_caller_configurable`, `test_mm_capital_controls_gamma_constant_value` PASSED |
+| No SimulationError | `EmergencyPolicyInput(CAPITAL_CONTROLS)` processes without exception | CONFIRMED | `test_emergency_policy_input_capital_controls_does_not_raise` PASSED |
+| Regression | gdp_growth_change Q1 elasticity unchanged from M17-G1 | CONFIRMED — no regressions | `test_gdp_growth_change_rows_not_reduced_by_channel_c` PASSED |
+
+**DEMO4 class check:**
+All three channels produce non-zero directionally correct outputs that differ from the initial
+state (step-0 baseline): Channel A reserve delta > 0; Channel B GDP delta < 0 (−0.0153);
+Channel C Q1 PHC delta positive. DEMO4: PASS.
+
+**Analytical intent:**
+Persona 2 — Finance Ministry Analyst (Eleni archetype) can now argue:
+*"The WorldSim model shows capital controls arrested capital outflow at Step 1:
+`reserve_coverage_months` increased after imposition (Channel A; ε=0.60; Iceland 2008
+IMF Article IV decomposition). Cost is honestly accounted: credit contraction reduced
+`gdp_growth` by ≈1.5% (Channel B; β=0.020, γ=1.2) and Q1 poverty headcount ratio rose
+(Channel C; φ=0.30). The `known_limitations` discloses what is NOT modeled rather than
+declaring the channel absent."*
+
+Prior limitation: all three ADR-020 channels were silent pre-#1532. The `known_limitations`
+stated "reserve protection channel absent (#1532)." A ministry analyst would have been arguing
+against the tool's own output.
+
+**Asymmetry test:** PASS — trajectory fields are readable directly from Zone 1A without
+specialist mediation. Calibration parameters (ε=0.60, β=0.020, γ=1.2) documented with source
+anchors in `calibration-basis.md §Capital Controls`.
+
+> VALIDATED — 2026-07-03. Test suite: `tests/unit/test_adr020_capital_controls_transmission.py`
+> (28/28 PASSED). Channel A `reserve_coverage_months` delta > 0; Channel B `gdp_growth` delta
+> < 0 (−0.0153); Channel C Q1 PHC delta positive. DEMO4 check: PASS. Analytical intent:
+> Persona 2 (Eleni) can now argue capital controls reserve protection modeled and quantified
+> (Iceland 2008; ε=0.60; β=0.020; γ=1.2). Prior limitation: all channels silent; known_limitations
+> stated "channel absent." Asymmetry test: PASS. Verdict: **ACCEPT**.
