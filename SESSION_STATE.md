@@ -6,7 +6,7 @@
 > Historical state lives in `docs/process/session-archives/`.
 > Authority: `docs/process/sprint-group-isolation.md §SESSION_STATE.md Cockpit Card Protocol`.
 
-**Last updated:** 2026-07-03 (G4 confirmed; integration PR #1637 merged; G3 journal #1587 closed retroactively; G2D implementation active)
+**Last updated:** 2026-07-03 (G2D confirmed; integration PR pending; journal #1621 closed; Wave 2 complete)
 **Current milestone:** M19 — Constraint Search and Empirical Calibration
 
 ---
@@ -20,9 +20,9 @@
 | Exit checklist issue | #1535 (M19 Exit Checklist — blocks milestone closure) |
 | Release branch | `release/m19` — cut from `main` 2026-07-02 at 1bf1ecc |
 | Sprint plan | `docs/process/sprint-plans/m19-sprint-plan.md` — EL-approved 2026-07-02 |
-| Active wave | Wave 2 — G2D implementation active; G3 and G4 confirmed |
-| Active sprint groups | G2D — implementation open (Iceland #1553; capital controls impl branches active) |
-| Active sprint journal issues | #1621 (G2D — Iceland 2008–11) |
+| Active wave | Wave 2 — G2D confirmed (2026-07-03); integration PR pending; Wave 3+ next |
+| Active sprint groups | None — G2D exit confirmed; integration PR sprint/m19-g2 → release/m19 pending |
+| Active sprint journal issues | None — #1621 closed at G2D PI Agent confirmation |
 
 ---
 
@@ -42,7 +42,7 @@
 | G2A | Headless battle-testing harness | #1546 ✓ | Confirmed — PI confirm retroactively filed PR #1580/#1583 |
 | G2B | SEN + ZMB backtesting fixtures | #1541 ✓, #1542 ✓ | Confirmed — exit doc PR #1578 |
 | G2C | Battle-testing 7-country suite | #1547 ✓, #1548 ✓, #1549 ✓, #1550 ✓, #1551 ✓, #1552 ✓, #1554 ✓ | Confirmed — exit doc `m19-g2c-sprint-exit.md`; integration PR defers to G2D exit |
-| G2D | Iceland 2008–11 (capital controls) | #1553, #1532 | **In progress** — journal #1621 open; CM gate #1625 ✓, CE gate #1626 ✓; implementation branches active |
+| G2D | Iceland 2008–11 (capital controls) | #1532 ✓, #1553 ✓ | **Confirmed** — BPO 2×ACCEPT; north star PASS; journal #1621 closed; integration PR pending (sprint/m19-g2 → release/m19) |
 | G3 | Bayesian posterior calibration | #1543 ✓, #1536 ✓, #1537 ✓ | Confirmed — integration PR #1617 merged; exit doc `m19-g3-sprint-exit.md`; journal #1587 closed retroactively |
 | G4 | PSP driver arc + CI label precision | #1528 ✓, #1529 ✓ | Confirmed — integration PR #1637 merged; journal #1624 closed; sprint exit `docs/process/sprint-plans/m19-g4-sprint-exit.md` |
 
@@ -54,10 +54,10 @@
 |---|---|---|---|
 | #1535 | M19 Exit Checklist | — (gate) | Milestone exit gate |
 | #1544 | Demo 8 — live stakeholder session | — (exit gate) | Primary deliverable |
-| #1532 | Capital controls transmission gap | G2D (implementation) | Immediate — closes with G2D implementation PR |
+| #1532 | Capital controls transmission gap | G2D ✓ | **Closed** — PR #1635 merged; BPO ACCEPT 2026-07-03 |
+| #1553 | Iceland 2008–11 Type A+B | G2D ✓ | **Closed** — PR #1639 merged; BPO ACCEPT 2026-07-03 |
 | #1456 | MDAAlertPanel Zone1B: scenarioId crash | Pre-wave | Immediate — crash risk |
 | #1538 | Focal cohort floor validation | Pre-wave | Immediate — #1540 prerequisite |
-| #1553 | Iceland 2008–11 Type A+B | G2D | Active — ADR-020 accepted; implementation underway |
 | #1528 | PSP driver arc + auditability panel (DEMO-165) | G4 | **G4 confirmed** — PR #1633 merged |
 | #1529 | '95% CI' label precision fix | G4 | **G4 confirmed** — PR #1634 merged; Demo 8 Act 2 gate cleared |
 | #1632 | api_contracts.yml §trajectory missing band_method — G3 delivery gap | G5 | Low — schema-only fix; non-blocking |
@@ -88,8 +88,8 @@
 - **NM-076:** Before any testid rename, grep the full E2E corpus for the old testid; update E2E tests in the same PR. Rule in CODING_STANDARDS.md (PR #1439).
 - **G3 complete (2026-07-03):** ARCH-016 (ADR-007 Amendment 1) accepted; all three issues (#1543, #1536, #1537) implemented; BPO 3×ACCEPT; north star test CONDITIONAL PASS (G4 #1529 needed for Demo 8 Act 2 — now RESOLVED). Integration PR #1617 merged.
 - **NM-084/NM-085:** CM sign-off ordering gap + co-dependent fixture CI sequencing (G2B). SOP improvements filed. G3 NM-084 gate satisfied correctly (CM sign-off on issue before PI gate comment before auto-merge).
-- **ADR-020 (ARCH-014) ACCEPTED 2026-07-03:** Capital controls transmission — 3 channels (ExternalSectorModule reserve protection ε=0.50 heterodox, MacroeconomicModule credit contraction β=0.020, DemographicModule Q1 PHC). Dead subscription fix. Canonical event string registry. G2D sprint entry EL-approved; journal #1621 open. Integration PR `sprint/m19-g2d` → `release/m19` fires at G2D exit.
-- **G2D gates CLEARED 2026-07-03:** CM gate (PR #1625 — `calibration-basis.md §Capital Controls`: ε=0.60/0.50-ISL, β=0.020, γ=1.2, φ∈[0.3,0.7]) + CE gate (PR #1626 — full 7-variant audit, NM-090/NM-091, transmission table rewrite). Iceland implementation PR may open. G2D intent doc §3.2: `asset_nationalization` → `EmergencyInstrument.NATIONALIZATION`; Channel C uses `credit_contraction_labour_shock` bridge (not direct capital_controls subscription).
+- **G2D complete (2026-07-03):** ADR-020 channels A/B/C implemented (PR #1635; 28/28 unit tests). Iceland 2008–11 fixture (PR #1639; heterodox vs orthodox counter-factual). BPO 2×ACCEPT; north star PASS (Zambia restructuring scenario; heterodox path analytically distinguishable). Journal #1621 closed. Integration PR `sprint/m19-g2 → release/m19` pending (PI gate comment required before auto-merge fires). Demo 8 condition: DIRECTION_ONLY qualifier required on Iceland direction verdict at Demo 8 Act 2.
+- **ADR-020 (ARCH-014) calibration constants (frozen):** Channel A ε=0.60 (ISL controls-only), β=0.020, γ=1.2 (CM constant — CE cannot change without CM Consulted), φ=−0.30 (ISL Q1 informal PHC). Sources: `calibration-basis.md §Capital Controls` (PR #1625).
 - **NM-086:** E2E mock routes must be verified against `api_contracts.yml` before the implementation PR opens (G1, filed 2026-07-03). Process: QA Lead mock-helper verification is a blocking checklist item on intent authorship.
 - **G4 forward condition (G5 scope):** Issue #1632 (`band_method` missing from `api_contracts.yml §trajectory` — G3 delivery gap). Schema-only fix. Must resolve before G5 closes. NM-086 gate left open in G4 QA ack block.
 - **M18 complete (v0.18.0, 2026-07-02):** G1–G7 delivered; Demo 7 PASS (unconditional); release/m18 → main via PR #1534. Archive: `docs/process/session-archives/session-state-pre-m19.md`.
