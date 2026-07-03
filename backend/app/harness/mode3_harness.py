@@ -279,6 +279,11 @@ def _build_per_step_records(
             "ci_band_low": ci_low,
             "ci_band_high": ci_high,
             "active_failure_modes": adv.get("active_failure_modes") or [],
+            # Calibration fields (ADR-007 Amendment 1 §8.3): model_value is the
+            # primary composite for MAGNITUDE_MATCH assessment; hist_value is
+            # populated by G2B backtesting fixtures (None until then).
+            "model_value": fin,
+            "hist_value": None,
         })
     return records
 
@@ -288,18 +293,46 @@ def _classify_fidelity(
 ) -> tuple[FidelityTier, str]:
     """Classify Type A fidelity tier.
 
-    G2A baseline: DIRECTION_ONLY for all runs. Magnitude calibration against
-    historical reference data (SEN/ZMB fixtures) is added in G2B.
+    MAGNITUDE_MATCH gate (ADR-007 Amendment 1 §8.3): requires ≥5 valid
+    (model_value, hist_value) pairs, ≥50% within ±20%, no catastrophic
+    outlier (> 5× hist). Records without hist_value are excluded from the
+    count (hist_value added by G2B backtesting fixtures; None until then).
     """
     if not per_step_records:
         return (
             FidelityTier.BELOW_THRESHOLD,
             "No step records produced; cannot classify fidelity.",
         )
+
+    valid_pairs = [
+        (Decimal(str(r["model_value"])), Decimal(str(r["hist_value"])))
+        for r in per_step_records
+        if r.get("hist_value") is not None and r.get("model_value") is not None
+    ]
+
+    if len(valid_pairs) >= 5:
+        has_catastrophic = any(
+            abs(model_i - hist_i) > 5 * abs(hist_i)
+            for model_i, hist_i in valid_pairs
+            if abs(hist_i) > Decimal("0.001")
+        )
+        if not has_catastrophic:
+            within = sum(
+                1 for model_i, hist_i in valid_pairs
+                if abs(model_i - hist_i)
+                / max(abs(hist_i), Decimal("0.01")) <= Decimal("0.20")
+            )
+            if Decimal(within) / Decimal(len(valid_pairs)) >= Decimal("0.50"):
+                return (
+                    FidelityTier.MAGNITUDE_MATCH,
+                    f"MAGNITUDE_MATCH: {within}/{len(valid_pairs)} steps "
+                    "within 20% of historical reference.",
+                )
+
     return (
         FidelityTier.DIRECTION_ONLY,
-        "Directional fidelity confirmed. Magnitude calibration deferred to G2B "
-        "SEN/ZMB historical comparison fixtures.",
+        "Directional fidelity confirmed. Magnitude calibration pending — "
+        f"{len(valid_pairs)} valid (model, hist) pairs available.",
     )
 
 
