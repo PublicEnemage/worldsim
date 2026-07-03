@@ -789,13 +789,134 @@ class TestSriLankaTypeAB:
             await asgi_client.delete(f"/api/v1/scenarios/{cf_id}")
 
 
-# Pakistan (#1550) — TestPakistanTypeB
-# ----------------------------------------
-# ACs: AC-1..5, AC-9, AC-10, AC-NC-2 (advisory), AC-NC-3, AC-PAK-1..3
-# Run: Type B
-# Primary indicator: fin_composite
-# Advisory: direction_verdict COUNTER_FACTUAL_BETTER
-# Add in: feat/m19-g2c-pakistan-programme (after CM advisory on #1550)
+@pytest.mark.backtesting
+@pytest.mark.asyncio(loop_scope="session")
+class TestPakistanTypeB:
+    """AC-1..5, AC-9, AC-10, AC-NC-2 (advisory), AC-NC-3, AC-PAK-1..3.
+
+    Type B: phased conditionality counter-factual vs front-loaded IMF baseline.
+    Primary indicator: fin_composite. Skips without DATABASE_URL.
+    """
+
+    @pytest_asyncio.fixture(loop_scope="session")
+    async def asgi_client(self) -> AsyncGenerator[httpx.AsyncClient, None]:
+        if not _DATABASE_URL:
+            pytest.skip("DATABASE_URL not set — skipping Pakistan Type B tests")
+        async with httpx.AsyncClient(
+            transport=httpx.ASGITransport(app=app),
+            base_url="http://test",
+        ) as client:
+            yield client
+
+    async def test_construction(self, asgi_client: httpx.AsyncClient) -> None:
+        """AC-1, AC-2, AC-NC-3, AC-PAK-1: importable; entity=PAK; Step 1 differs."""
+        from tests.fixtures.pakistan_2022_scenario import (
+            build_pakistan_counterfactual_scenario,
+            build_pakistan_scenario,
+        )
+
+        baseline = build_pakistan_scenario()
+        cf = build_pakistan_counterfactual_scenario()
+
+        assert baseline.configuration.entities[0] == "PAK"
+        assert cf.configuration.entities[0] == "PAK"
+        assert baseline.configuration.n_steps == 4
+        assert cf.configuration.n_steps == 4
+
+        # AC-PAK-1: Step 1 spending_change differs (phased 25% vs front-loaded 100%)
+        b_step1 = next((s for s in (baseline.scheduled_inputs or []) if s.step == 1), None)
+        cf_step1 = next((s for s in (cf.scheduled_inputs or []) if s.step == 1), None)
+        assert b_step1 is not None and cf_step1 is not None
+        assert b_step1.input_data != cf_step1.input_data, (
+            "AC-PAK-1 FAIL: baseline and counter-factual Step 1 inputs are identical. "
+            "Phased counter-factual must have different spending_change value."
+        )
+
+    async def test_type_b_run(self, asgi_client: httpx.AsyncClient) -> None:
+        """AC-3, AC-4, AC-5, AC-9, AC-10, AC-PAK-2/3: full Type B run."""
+        from tests.fixtures.pakistan_2022_scenario import (
+            build_pakistan_counterfactual_scenario,
+            build_pakistan_scenario,
+        )
+
+        b_resp = await asgi_client.post(
+            "/api/v1/scenarios",
+            json=build_pakistan_scenario().model_dump(mode="json"),
+        )
+        assert b_resp.status_code == 201, f"AC-3 FAIL: {b_resp.status_code}"
+        baseline_id: str = b_resp.json()["scenario_id"]
+
+        cf_resp = await asgi_client.post(
+            "/api/v1/scenarios",
+            json=build_pakistan_counterfactual_scenario().model_dump(mode="json"),
+        )
+        assert cf_resp.status_code == 201, f"AC-3 FAIL: {cf_resp.status_code}"
+        cf_id: str = cf_resp.json()["scenario_id"]
+
+        try:
+            result = await run_harness(
+                scenario_id=cf_id,
+                steps=4,
+                run_type=RunType.TYPE_B,
+                control_inputs=[{} for _ in range(4)],
+                baseline_run_id=baseline_id,
+                primary_indicator="fin_composite",
+                http_client=asgi_client,
+            )
+
+            assert len(result.per_step_records) == 4
+            assert "direction_verdict" in result.summary
+            verdict = result.summary["direction_verdict"]
+            valid_verdicts = {
+                DirectionVerdict.COUNTER_FACTUAL_BETTER,
+                DirectionVerdict.BASELINE_BETTER,
+                DirectionVerdict.INDISTINGUISHABLE,
+            }
+            assert verdict in valid_verdicts or str(verdict) in {
+                str(v) for v in valid_verdicts
+            }
+
+            per_step_diff = result.summary.get("per_step_diff", [])
+            assert isinstance(per_step_diff, list) and len(per_step_diff) == 4
+
+            known = result.summary.get("known_limitations", [])
+            assert isinstance(known, list) and len(known) >= 1, "AC-5 FAIL"
+
+            tier3_found = any(
+                term in str(e)
+                for e in known
+                for term in ("Tier 3", "INFERRED_STRUCTURAL", "hypothetical")
+            )
+            if not tier3_found:
+                warnings.warn(
+                    "AC-9 advisory (PAK): no Tier 3 disclosure in known_limitations.",
+                    UserWarning, stacklevel=1,
+                )
+
+            # AC-PAK-2: direction advisory (expected COUNTER_FACTUAL_BETTER on PSP)
+            _assert_direction_advisory(
+                actual=verdict,
+                expected=DirectionVerdict.COUNTER_FACTUAL_BETTER,
+                country="PAK",
+                indicator="fin_composite",
+            )
+
+            # AC-PAK-3: PoliticalEconomyModule response advisory
+            psp_found = any(
+                "programme_survival_probability" in str(rec.get("step_outputs", {}))
+                or "programme_survival" in str(rec)
+                for rec in result.per_step_records
+            )
+            if not psp_found:
+                warnings.warn(
+                    "AC-PAK-3 advisory (PAK): programme_survival_probability not "
+                    "detected in step records. PoliticalEconomyModule may not be "
+                    "responding to implementation_capacity variation.",
+                    UserWarning, stacklevel=1,
+                )
+        finally:
+            await asgi_client.delete(f"/api/v1/scenarios/{baseline_id}")
+            await asgi_client.delete(f"/api/v1/scenarios/{cf_id}")
 
 
 # Turkey (#1551) — TestTurkeyTypeB
