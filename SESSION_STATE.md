@@ -6,7 +6,7 @@
 > Historical state lives in `docs/process/session-archives/`.
 > Authority: `docs/process/sprint-group-isolation.md §SESSION_STATE.md Cockpit Card Protocol`.
 
-**Last updated:** 2026-07-03 (G5 sprint entry filed — sprint journal #1660, entry PR #1661 auto-merge pending; EL decision #1630 Option 2 recorded; UX panel gate active for #1630)
+**Last updated:** 2026-07-03 (G5 EL-approved; #1630 scope → Zone 1D delta annotations (ADR-017 §Zone 1D Integration); intent docs #1629+#1630 filed PR #1664; Phase B unblocked)
 **Current milestone:** M19 — Constraint Search and Empirical Calibration
 
 ---
@@ -64,19 +64,14 @@
 | #1522 | View model layer retrofit — Zone 1 composition logic extraction | Wave 3+ | High — EL-added to M19 |
 | #1524 | Zone 1A TrajectoryView: pinch-zoom, thumbwheel zoom, pan | Wave 3+ | High — EL-added to M19 |
 | #1623 | ELASTICITY_REGISTRY — non-SSA entity family calibration gap | CM Wave 2–3 | High — CM Sprint A (GRC/Euro area) M19 priority; unblocks Greece counter-factual |
-| #1629 | Zone 1A ZMB y-axis not tight-scoped — curves collapse | Demo 8 risk | High — Demo 8 Act 2 display fidelity; `computeYDomain` fix required |
-| #1630 | Demo 8 Act 1 narration: per-framework lines in Mode 3 Zone 1A (EL → Option 2) | G5 Phase B | High — BLOCKED_UX_PANEL at entry; UX panel + ADR determination required before intent doc |
+| #1629 | Zone 1A ZMB y-axis not tight-scoped — curves collapse | G5 Phase B | High — intent filed; implementation unblocked |
+| #1630 | Zone 1D delta annotations Mode 3 (ADR-017 §Zone 1D Integration) | G5 Phase B | High — scope changed from Zone 1A per-framework lines; intent filed; unblocked |
 | #1647 | G2C test file missing from release/m19 — NM-094 recovery | Demo 8 risk | **Closed** — PR #1649 merged; test_m19_g2c_scenario_runs.py (1394 lines) restored |
-| #1650 | NM-086: CODING_STANDARDS §E2E Mock Helper Authorship | G5 Phase A | **Closed** — PR #1658 MERGED (sprint/m19-g5) |
-| #1651 | NM-084: sprint-planning-sop §Pre-Merge CM Review | G5 Phase A | **Closed** — PR #1658 MERGED (sprint/m19-g5) |
-| #1652 | NM-085: sprint-planning-sop §Co-Dependent Fixture | G5 Phase A | **Closed** — PR #1658 MERGED (sprint/m19-g5) |
-| #1653 | NM-092: sprint-group-isolation §Worktree Setup | G5 Phase A | **Closed** — PR #1658 MERGED (sprint/m19-g5) |
-| #1654 | NM-089: shared-state commit gate | G5 Phase A | **Closed** — PR #1658 MERGED (sprint/m19-g5) |
-| #1655 | NM-093: bidirectional lane rule | G5 Phase A | **Closed** — PR #1658 MERGED (sprint/m19-g5) |
-| #1656 | NM-094: PI Agent test-file presence check | G5 Phase A | **Closed** — PR #1658 MERGED (sprint/m19-g5) |
+| #1650–#1656 | NM-084/085/086/089/092/093/094 process codification | G5 Phase A | **Closed** — PR #1658 MERGED (sprint/m19-g5) |
 | #1657 | NM-090/091: DemographicModule dead subscriptions fix | Deferred (CM gate) | CM sign-off required before implementation PR opens |
-| #1660 | sprint journal: M19 G5 — Demo 8 display fidelity + Zone 1 view model | G5 meta | Sprint journal issue — open for G5 duration |
-| #1661 | G5 sprint entry doc — feat/m19-g5-sprint-entry → sprint/m19-g5 | G5 meta | **PR #1661** — auto-merge pending CI |
+| #1660 | sprint journal: M19 G5 — Demo 8 display fidelity + Zone 1 view model | G5 meta | Sprint journal — open for G5 duration; status updated 2026-07-03 |
+| #1661 | G5 sprint entry doc | G5 meta | **Merged** (sprint/m19-g5) |
+| #1664 | G5 intent docs #1629 + #1630 | G5 meta | **PR #1664** — auto-merge pending CI |
 
 ---
 
@@ -105,5 +100,6 @@
 - **ADR-020 (ARCH-014) calibration constants (frozen):** Channel A ε=0.60 (ISL controls-only), β=0.020, γ=1.2 (CM constant — CE cannot change without CM Consulted), φ=−0.30 (ISL Q1 informal PHC). Sources: `calibration-basis.md §Capital Controls` (PR #1625).
 - **NM-086:** E2E mock routes must be verified against `api_contracts.yml` before the implementation PR opens (G1, filed 2026-07-03). Process: QA Lead mock-helper verification is a blocking checklist item on intent authorship.
 - **G4 forward condition (G5 scope):** Issue #1632 (`band_method` missing from `api_contracts.yml §trajectory` — G3 delivery gap). Schema-only fix. Must resolve before G5 closes. NM-086 gate left open in G4 QA ack block.
+- **G5 #1630 scope (2026-07-03):** ADR-017 §Zone 1D Integration (Mode 3) mandates per-framework `(+Δ vs baseline)` annotations in Zone 1D as the "required companion" to composite-only Zone 1A. These were never implemented (silent failure per ADR-017). #1630 now delivers this: `FourFrameworkZone1D` Mode 3 delta annotations. Demo 8 narration updated to reference Zone 1D. Intent: `docs/process/intents/M19-G5-2026-07-03-zone1d-delta-annotations.md`.
 - **M18 complete (v0.18.0, 2026-07-02):** G1–G7 delivered; Demo 7 PASS (unconditional); release/m18 → main via PR #1534. Archive: `docs/process/session-archives/session-state-pre-m19.md`.
 - **Demo 7 north star (2026-07-02):** Aicha presents Zambia +342K cohort effect with CI bounds and sourcing to IMF restructuring table. Next available DEMO-167.
