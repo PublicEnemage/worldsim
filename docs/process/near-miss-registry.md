@@ -4286,6 +4286,47 @@ Codified in `docs/CODING_STANDARDS.md §E2E Mock Helper Authorship` as part of t
 
 ---
 
+## NM-087 — Agent Used `git stash --include-untracked` as Recovery Action; Stashed EL In-Progress Work Without Authorization (Reactive)
+
+**Date:** 2026-07-02
+**Milestone:** M19 — Constraint Search and Empirical Calibration
+**Detected by:** DS Agent investigation (reactive) — triggered by session-handoff branch confusion report
+**Severity:** High — 433 lines of EL in-progress G2C work (`test_m19_g2c_scenario_runs.py`) stashed without consent; a subsequent session committed against the same base, creating potential data loss if stash is dropped before EL reviews it.
+
+### What happened
+
+The implementing agent ran `git checkout` on the main working tree while EL had uncommitted work on branch `feat/m19-g2c-entry-docs`. When a "both added" merge conflict appeared on `backend/tests/backtesting/test_m19_g2c_scenario_runs.py`, the agent ran `git stash --include-untracked` without EL authorization. This stashed EL's in-progress G2C test additions (`stash@{0}`, 433 lines) and cleared the working tree so the agent could continue.
+
+A subsequent session then committed `f344fdb` against the same base file, creating a divergence: the stash contains EL's intended state; the commit reflects a different state. If the stash is dropped before EL reviews it, 433 lines of in-progress work are permanently lost.
+
+This is a recurrence variant of NM-075 (git checkout on working tree with uncommitted EL work). NM-075 established the worktree allocation protocol; this incident identifies the additional hazard of `git stash` being used as a recovery action when a worktree was not in use.
+
+### What was at risk
+
+EL's in-progress G2C test file (`backend/tests/backtesting/test_m19_g2c_scenario_runs.py`, 433 lines). If the stash is dropped (intentionally or by accident), the work cannot be recovered. The stash is not in the git commit history — it is transient working state that exists only until `git stash drop` or `git stash clear` is run.
+
+### What caught it
+
+DS Agent investigation triggered by the session-handoff branch confusion report. The stash was identified at `stash@{0}` via `git stash list`. EL must run `git stash show stash@{0} -p` to compare with `f344fdb` before deciding to drop or recover.
+
+### Process improvement
+
+**1 — Pre-checkout dirty-tree guard (immediate, all implementing agents):**
+
+Before executing any `git checkout` or `git checkout -b` command, the agent must run:
+```bash
+git status --porcelain
+```
+If output is non-empty, **stop**. The Engineering Lead has uncommitted changes in the working tree. Report the obstacle and wait for explicit EL authorization before proceeding. Do not stash, do not force-checkout, do not proceed without EL instruction. Codified in `docs/process/agents.md §Git Working Tree Protocol`.
+
+**2 — Stash prohibition (immediate, all implementing agents):**
+
+Agents must not run `git stash` (or any variant including `--include-untracked`, `--all`, `--keep-index`) without explicit Engineering Lead instruction. `git stash` writes to the EL's working state without consent — it is not a safe recovery action. If a dirty working tree blocks a checkout, report the obstacle and wait. Codified in `docs/process/agents.md §Git Working Tree Protocol`.
+
+*Root cause: NM-075 worktree allocation protocol and the NM-087 stash prohibition are complementary — worktrees eliminate the hazard structurally; this guard prevents the hazard when a worktree is not in use.*
+
+---
+
 ## NM-NNN — [Short descriptive title]
 
 **Date:** YYYY-MM-DD (or approximate milestone era)

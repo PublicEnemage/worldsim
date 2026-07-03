@@ -1404,3 +1404,25 @@ Data Quality Agent sign-off is a named prerequisite for certified `source_field_
 **Where I will ask for help:** When a territorial convention conflict is genuinely ambiguous — a source dataset that uses a convention not matching WorldSim's declared positions in a disputed-territory edge case — I escalate to the Data Architect and Engineering Lead before applying either convention. A unilateral territorial decision is a governance finding, not a quality finding.
 
 **Where I will offer help:** Data Architect — before a new source is registered, run a pre-admission consultation with me. The admission testing battery is defined, and I can run it against a sample record before the formal registration is submitted. Finding a plausibility or territorial conflict at pre-admission is an order of magnitude cheaper than finding it after the source is live in the certification registry.
+
+---
+
+## Git Working Tree Protocol
+
+*Authority: NM-087 (2026-07-02). Applies to all implementing agents.*
+
+### Pre-checkout dirty-tree guard
+
+Before executing any `git checkout` or `git checkout -b` command, run:
+
+```bash
+git status --porcelain
+```
+
+If output is non-empty, **stop**. The Engineering Lead has uncommitted changes in the working tree. Report the obstacle and wait for explicit EL authorization before proceeding. Do not stash, do not force-checkout, do not proceed without EL instruction.
+
+### Stash prohibition
+
+Agents must not run `git stash` (or any variant including `--include-untracked`, `--all`, `--keep-index`) without explicit Engineering Lead instruction. `git stash` writes to the EL's working state without consent — it is not a safe recovery action. If a dirty working tree blocks a checkout, report the obstacle and wait.
+
+*Root cause: NM-075 worktree allocation protocol and the NM-087 stash prohibition are complementary — worktrees eliminate the hazard structurally; this guard prevents the hazard when a worktree is not in use.*
