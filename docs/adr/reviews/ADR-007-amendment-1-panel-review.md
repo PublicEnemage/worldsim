@@ -4,7 +4,7 @@ type: adr-panel-review
 adr: ADR-007 Amendment 1
 amendment: 1
 milestone: M19 — Constraint Search and Empirical Calibration
-status: In progress
+status: Accepted — 2026-07-03
 authored-date: 2026-07-02
 ---
 
@@ -90,7 +90,16 @@ Concerns 1+2 are INCORPORATE items. Concern 3 is a flag for #1537 intent doc. **
 
 ## Engineering Lead — Acceptance
 
-*[EL acceptance to be recorded here]*
+**Date:** 2026-07-03
+**Reviewing agent:** Engineering Lead (@PublicEnemage)
+
+All panel conditions are incorporated. CM Conditions A and B are in the amendment text (§8.4: C_mag floor `max(C_mag_t, 0.05)`, EVIDENCE_INSUFFICIENT guard, `affected_indicators_excluded` field, indicator-scoped evidence requirement). CE Condition B is in the amendment text (§8.4: CalibrationStore pattern, `_CALIBRATION_MULTIPLIERS` module-level dict, `set_calibration_multipliers()` override). CE Condition A and UX Concern 3 are gated on the #1543 and #1537 intent documents respectively — those intent documents cannot be filed until this acceptance is on record. UX Concerns 1 and 2 are in the amendment text (§8.7 enum stability clause; §8.8 suppressed CI slot placeholder "Data range too wide for confidence interval").
+
+**ARCH-016 accepted. Amendment 1 to ADR-007 is ACCEPTED as of 2026-07-03.**
+
+G3 BLOCKED_ADR is cleared. PI Agent to post gate comment on sprint journal #1587.
+
+— @PublicEnemage (Engineering Lead, 2026-07-03)
 
 ---
 
@@ -102,4 +111,4 @@ Concerns 1+2 are INCORPORATE items. Concern 3 is a flag for #1537 intent doc. **
 | Chief Methodologist | VALIDATE (conditional) | 2026-07-02 | Conditions A + B — INCORPORATE |
 | Computation Engine Agent | VALIDATE (conditional) | 2026-07-02 | Conditions A + B — scope gaps in #1543 intent doc |
 | UX Designer Agent | CONSULT — no objection | 2026-07-02 | Concerns 1+2 INCORPORATE; Concern 3 in #1537 intent doc |
-| Engineering Lead | Pending | — | — |
+| Engineering Lead | **ACCEPTED** | 2026-07-03 | All conditions incorporated or gated on intent docs |
