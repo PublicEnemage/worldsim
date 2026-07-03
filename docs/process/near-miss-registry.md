@@ -4193,6 +4193,99 @@ Codified in `docs/CODING_STANDARDS.md §Testing Requirements` in the same PR tha
 
 ---
 
+## NM-084 — CM Sign-Off Obtained After Feature PRs Opened; Auto-Merge Could Have Fired Before Review Was On Record (Reactive)
+
+**Date:** 2026-07-02
+**Milestone:** M19 — Constraint Search and Empirical Calibration
+**Detected by:** EL observation during G2B session; CM consultation activated while CI was running on already-open PRs
+**Severity:** Medium — CM sign-off was obtained before the PRs merged (34-second window); fixture integrity uncompromised. High structural risk: if required CI checks had passed faster, auto-merge would have fired without any CM review on record.
+
+### What happened
+
+The G2B sprint entry (`docs/process/sprint-plans/m19-g2b-sprint-entry.md §2.2`) and both fixture intent documents state: "The CM sign-off is recorded as a comment on Issue before the feature PR is opened." In practice, both feature PRs (#1576 SEN, #1577 ZMB) were opened and auto-merge was set before the Chief Methodologist was activated and before sign-offs were recorded. The CM consultation happened while CI was running on the open PRs. Sign-offs landed on Issues #1541 and #1542 while CI ran; both PRs merged within ~35 minutes of sign-off recording.
+
+### What was at risk
+
+If required CI checks had passed before the CM consultation was activated, auto-merge would have fired and both fixtures would have merged without any fidelity tier review on record. The `backtesting` check failure on PR #1576 (non-required) provided accidental delay, but this was not a designed protection — it was a sequencing artifact from co-dependent fixtures (see NM-085). The protection was luck, not process.
+
+### What caught it
+
+The EL noticed the ordering issue in-session and activated the CM consultation before CI completed. A person caught it. The process had no enforcement mechanism.
+
+### Process improvement
+
+The intent document ordering requirement ("CM sign-off before PR is opened") needs a process mechanism, not just documentation. Two options for G2C onward:
+
+1. **Explicit PI Agent gate comment obligation:** Before implementing agent sets auto-merge on any fixture PR, the PI Agent must post a gate comment on the corresponding issue confirming CM sign-off is on record. This mirrors the integration PR gate in `docs/process/sprint-group-isolation.md §PI Agent Integration PR Gate`. If no PI Agent gate comment exists, auto-merge must not be set.
+
+2. **Sprint entry requirement:** Sprint entries for fixture-producing groups must include a pre-PR-open checklist item: "CM sign-off recorded on Issue #NNN? [yes/no]". If no, implementing agent may not open the PR.
+
+Option 1 is structurally stronger (observable artifact before auto-merge). Codify in `docs/process/sprint-planning-sop.md §Pre-Merge CM Review` before G2C sprint entry.
+
+---
+
+## NM-085 — Co-Dependent Fixture PRs Produce Transient Cross-Test Failure; Pattern Not Documented in Sprint Entry (Anticipatory)
+
+**Date:** 2026-07-02
+**Milestone:** M19 — Constraint Search and Empirical Calibration
+**Detected by:** CI output analysis on PR #1576; identified after the fact during post-merge review
+**Severity:** Low — `backtesting` is non-required for sprint branch PRs; auto-merge fired correctly on required checks only. No test integrity issue. Future sprints with multiple co-dependent fixtures will hit the same pattern.
+
+### What happened
+
+Both G2B fixture test shells (SEN and ZMB) were placed on `sprint/m19-g2` via PR #1572 before either fixture was implemented. When PR #1576 (SEN fixture) ran CI against its merge commit, the full `@pytest.mark.backtesting` suite ran — including the ZMB test shell. The ZMB test failed with `ModuleNotFoundError: No module named 'tests.fixtures.zmb_scenario'` because `zmb_scenario.py` was not yet on the sprint branch. PR #1577 (ZMB fixture) merged 34 seconds later; `sprint/m19-g2` was then coherent.
+
+This is a structural pattern, not a one-off: any sprint with N co-dependent test shells and N fixture PRs will produce N-1 transient cross-test failures on the sprint branch, one for each PR that lands before the last fixture.
+
+### What was at risk
+
+If `backtesting` were a required check for sprint branch PRs, the SEN PR would have been permanently blocked (SEN cannot pass ZMB test; ZMB test cannot pass until ZMB PR merges; ZMB PR cannot merge before SEN because of the same circular dependency in reverse). The current design correctly makes `backtesting` non-required — but this was an implicit assumption, not a documented design decision. If CI configuration changed to make `backtesting` required, the pattern would deadlock.
+
+### What caught it
+
+Post-merge CI log review. No failure in production — the non-required check designation was the passive protection. The pattern was identified only because the PR author investigated the CI failure rather than assuming it was a transient issue.
+
+### Process improvement
+
+**Documentation:** Sprint entries for sprints with co-dependent fixture PRs must include an explicit CI ordering statement: "N fixtures in this sprint will produce transient cross-fixture failures on the sprint branch. `backtesting` is non-required for `sprint/m{N}-gN` PRs — transient cross-fixture failures do not block auto-merge. This is by design." The statement makes the implicit assumption explicit and prevents future confusion.
+
+**Structural:** If G2C or later phases have more than two co-dependent fixture PRs, consider bundling them into a single PR to avoid the transient failure pattern entirely. The sprint entry should evaluate this option and document the decision.
+
+Codify the documentation requirement in `docs/process/sprint-planning-sop.md §Co-Dependent Fixture Sprint Entry Requirements` before G2C sprint entry.
+
+---
+
+## NM-086 — E2E Mock Route Not Verified Against `api_contracts.yml`; CI Caught Contract Mismatch That Pre-Push Gate Missed (Reactive)
+
+**Date:** 2026-07-03
+**Milestone:** M19 — Constraint Search and Empirical Calibration
+**Detected by:** G1 E2E CI failure (PR #1574); `mode3-constraint-floor.spec.ts` mock helpers used incorrect route shape not matching `api_contracts.yml`
+**Severity:** Medium — E2E tests failed in CI rather than silently passing with a wrong mock; no incorrect analytical output reached users. Pre-push gate (`npm run build`) passed because the build does not exercise E2E mocks.
+
+### What happened
+
+The G1 E2E spec (`frontend/tests/e2e/m19-g1-constraint-floor-search.spec.ts`) was authored with mock helpers that did not match the actual API contract for the constraint-floor search endpoint. The discrepancy was caught when E2E tests ran in CI on PR #1574. A follow-up fix PR (#1579) corrected the mock helpers against `api_contracts.yml`.
+
+The implementing agent did not read `api_contracts.yml` before authoring the E2E mock helpers, despite the schema registry rule in CLAUDE.md requiring this for any agent calling or implementing an API endpoint.
+
+### What was at risk
+
+If E2E tests had been authored to soft-skip or if the CI E2E job had been non-required at the time, the incorrect mock helpers would have merged and future test authors would have copied them — propagating a contract mismatch that silently passes while testing the wrong behaviour.
+
+### What caught it
+
+CI (E2E job on PR #1574). The pre-push hook (`npm run build`) passed because TypeScript compilation does not catch runtime mock shape mismatches. Local E2E execution would have caught it, but was not run before push.
+
+### Process improvement
+
+**QA Lead obligation at intent authorship:** When authoring E2E test files for endpoints that have entries in `api_contracts.yml`, the QA Lead must include a checklist item in the intent document confirming that mock helper shapes were verified against `api_contracts.yml` before the test file is filed. The checklist item is: "Mock helpers verified against `docs/schema/api_contracts.yml §[endpoint name]`? [yes/no]". A test file filed without this confirmation is flagged as incomplete by the PI Agent at sprint entry.
+
+**Implementing agent obligation:** Before opening any PR that adds or modifies E2E mock helpers, the implementing agent must grep `docs/schema/api_contracts.yml` for the relevant endpoint and confirm the mock shape matches. This is an extension of the existing schema registry rule in CLAUDE.md §Standards and Conventions.
+
+Codified in `docs/CODING_STANDARDS.md §E2E Mock Helper Authorship` as part of the G2C sprint entry, or earlier if a frontend-touching sprint opens first.
+
+---
+
 ## NM-NNN — [Short descriptive title]
 
 **Date:** YYYY-MM-DD (or approximate milestone era)

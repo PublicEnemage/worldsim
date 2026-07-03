@@ -3,10 +3,10 @@ name: m19-g1-sprint-entry
 type: sprint-entry
 milestone: M19 — Constraint Search and Empirical Calibration
 sprint-group: G1
-status: Filed
+status: EL-Approved
 authored-by: PM Agent
 authored-date: 2026-07-02
-el-approved: false
+el-approved: 2026-07-02
 release-branch: release/m19
 sop-reference: docs/process/sprint-planning-sop.md
 ---
@@ -210,7 +210,7 @@ scope, not G1's. G1 ships search precision (±0.01) only.
 
 *EL reviews this entry document before the sprint sub-branch is cut or any implementation PR opens.*
 
-**EL approval:** Pending
+**EL approval:** 2026-07-02
 
-> {EL approval statement — to be filled at approval time}
-> — @PublicEnemage ({date})
+> All five entry conditions satisfied. ADR-021 accepted. QA test scaffold filed and QA Lead-reviewed (PR #1569, 8 gaps corrected). Sprint sub-branch `sprint/m19-g1` is now authorized to cut.
+> — @PublicEnemage (2026-07-02)
