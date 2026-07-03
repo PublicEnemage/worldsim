@@ -353,6 +353,155 @@ def build_greece_scenario() -> ScenarioCreateRequest:
     )
 
 
+def build_greece_counterfactual_scenario() -> ScenarioCreateRequest:
+    """Build the Greece 2010–2015 counter-factual scenario — gradual fiscal adjustment.
+
+    Counter-factual hypothesis: Greece negotiated a smaller, more gradual IMF
+    programme (30% of GDP vs actual 48%) with a front-loaded fiscal cut of
+    ~4% of GDP at Step 1 rather than ~8%, producing a shallower recession and
+    avoiding the capital controls crisis of June 2015.
+
+    The initial state is identical to build_greece_scenario() — the only
+    difference is the scheduled_inputs sequence (lighter conditionality path).
+    This makes the Type B harness comparison valid: same starting conditions,
+    different policy trajectory.
+
+    Counter-factual rationale (intent doc §3.1, AC-GRE-2):
+      Step 1 (2010): Smaller €70bn programme (~30% GDP) + 4% spending cut
+      Step 2 (2011): Reduced second package (2.5% spending cut)
+      Step 3 (2012): Consolidation slows (1.5% adjustment)
+      Step 4 (2013): Conservative surplus target (0.8% GDP)
+      Step 5 (2014): Same privatisation conditionality
+      Step 6 (2015): No capital controls — gradual path avoids liquidity crisis
+
+    Known limitation (AC-8, AC-9): counter-factual control inputs are
+    INFERRED_STRUCTURAL (Tier 3) — no historical programme at these parameters
+    was negotiated. Direction comparison is advisory. Capital controls
+    transmission channels absent — Issue #1532 gap applies to baseline Step 6.
+
+    References: Issue #1547; M19 G2C sprint entry §3.1;
+    intent doc M19-G2C-2026-07-03-battle-testing-scenario-runs.md §Appendix A.
+    """
+    base = build_greece_scenario()
+    return base.model_copy(update={
+        "name": "Greece 2010-2015 Counter-Factual — Gradual Adjustment Path",
+        "description": (
+            "G2C counter-factual for Issue #1547. "
+            "Hypothesis: Greece negotiated a smaller IMF programme (~30% GDP vs actual 48%) "
+            "with a more gradual front-loaded fiscal adjustment (~4% GDP cut at Step 1 "
+            "vs troika ~8% GDP). The reduced contractionary impulse avoids the 2015 "
+            "capital controls episode. "
+            "Initial state identical to build_greece_scenario() — same 2010 baseline, "
+            "different conditionality path. Type B harness compares hd_composite trajectory "
+            "against the actual (build_greece_scenario()) baseline. "
+            "Counter-factual inputs are INFERRED_STRUCTURAL (Tier 3): no historical "
+            "programme at these parameters was negotiated. Direction verdict is advisory. "
+            "Known gap: capital controls transmission channels absent — Issue #1532."
+        ),
+        "scheduled_inputs": [
+            # Step 1 (2010): Smaller IMF programme — €70bn (~30% GDP) vs actual €110bn (~48%)
+            # AC-GRE-1: program_size_gdp_ratio "0.30" != baseline "0.48" → first input differs
+            ScheduledInputSchema(
+                step=1,
+                input_type="EmergencyPolicyInput",
+                input_data={
+                    "instrument": "imf_program_acceptance",
+                    "target_entity": "GRC",
+                    "expected_duration": 3,
+                    "program_size_gdp_ratio": "0.30",
+                },
+            ),
+            # Step 1 (2010): Gentler spending cut — ~4% GDP vs troika's ~8%
+            ScheduledInputSchema(
+                step=1,
+                input_type="FiscalPolicyInput",
+                input_data={
+                    "instrument": "spending_change",
+                    "target_entity": "GRC",
+                    "sector": "government",
+                    "value": "-0.04",
+                    "duration_years": 1,
+                },
+            ),
+            # Step 2 (2011): Reduced second austerity package — 2.5% GDP (vs actual 5%)
+            ScheduledInputSchema(
+                step=2,
+                input_type="FiscalPolicyInput",
+                input_data={
+                    "instrument": "spending_change",
+                    "target_entity": "GRC",
+                    "sector": "government",
+                    "value": "-0.025",
+                    "duration_years": 1,
+                },
+            ),
+            # Step 2 (2011): Relaxed deficit target — -4% GDP (vs actual -3% which proved
+            # unachievable given the larger-than-expected fiscal multiplier)
+            ScheduledInputSchema(
+                step=2,
+                input_type="FiscalPolicyInput",
+                input_data={
+                    "instrument": "deficit_target",
+                    "target_entity": "GRC",
+                    "sector": "",
+                    "value": "-0.04",
+                    "duration_years": 4,
+                },
+            ),
+            # Step 3 (2012): Lighter consolidation — 1.5% GDP (vs actual 4%)
+            ScheduledInputSchema(
+                step=3,
+                input_type="FiscalPolicyInput",
+                input_data={
+                    "instrument": "spending_change",
+                    "target_entity": "GRC",
+                    "sector": "government",
+                    "value": "-0.015",
+                    "duration_years": 1,
+                },
+            ),
+            # Step 4 (2013): Conservative surplus target — 0.8% GDP (vs actual 1.5%)
+            ScheduledInputSchema(
+                step=4,
+                input_type="FiscalPolicyInput",
+                input_data={
+                    "instrument": "spending_change",
+                    "target_entity": "GRC",
+                    "sector": "government",
+                    "value": "-0.01",
+                    "duration_years": 1,
+                },
+            ),
+            ScheduledInputSchema(
+                step=4,
+                input_type="FiscalPolicyInput",
+                input_data={
+                    "instrument": "deficit_target",
+                    "target_entity": "GRC",
+                    "sector": "",
+                    "value": "0.008",
+                    "duration_years": 2,
+                },
+            ),
+            # Step 5 (2014): Privatisation — same as baseline (ESM conditionality retained)
+            ScheduledInputSchema(
+                step=5,
+                input_type="StructuralPolicyInput",
+                input_data={
+                    "instrument": "privatization",
+                    "target_entity": "GRC",
+                    "affected_sector": "public_assets",
+                    "implementation_years": 3,
+                },
+            ),
+            # Step 6 (2015): No capital controls.
+            # The gradual adjustment path maintained economic activity and
+            # liquidity through 2015 — the bank-run dynamic that triggered
+            # June 2015 capital controls did not develop.
+        ],
+    })
+
+
 def build_greece_demo_scenario() -> ScenarioCreateRequest:
     """Build the Greece 2010–2015 M10 demo scenario with Ecological and GovernanceModules enabled.
 
