@@ -338,9 +338,11 @@ visual contract for Mode 3 stakeholders.
 *EL reviews this entry document before any implementation PR opens. Approval is recorded here
 or as a comment on the exit checklist issue #1535.*
 
-**EL approval:** Pending
+**EL approval:** Approved — 2026-07-03
 
-> {EL approval statement — to be filled at approval time.
-> EL: please also note whether to activate the UX panel gate for #1630 immediately, or after
-> #1629 and #1632 implementation PRs close.}
-> — @PublicEnemage ({date})
+> G5 sprint entry approved. EL decision for #1630 confirmed: Option 2 (per-framework lines
+> in Mode 3 Zone 1A). UX panel gate activated immediately — Architect + UX Designer panel
+> to run concurrently with Phase B #1629/#1632 implementation work. Phase B implementation
+> PRs for #1629 and #1632 may open now. #1630 implementation PR remains BLOCKED_UX_PANEL
+> until panel review concludes and ADR determination is on record.
+> — @PublicEnemage (2026-07-03)
