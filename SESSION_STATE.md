@@ -6,7 +6,7 @@
 > Historical state lives in `docs/process/session-archives/`.
 > Authority: `docs/process/sprint-group-isolation.md §SESSION_STATE.md Cockpit Card Protocol`.
 
-**Last updated:** 2026-07-03 (G1/G2A/G2B all complete; G1 integrated to release/m19 (PR #1582); G2A PI confirm integrated (PR #1583); Wave 2 is next — G2C through G4)
+**Last updated:** 2026-07-02 (G1/G2A/G2B all complete; Wave 2: G3 sprint entry filed — BLOCKED_ADR on ADR-007 amendment ARCH-016; G2C/G4 to follow)
 **Current milestone:** M19 — Constraint Search and Empirical Calibration
 
 ---
@@ -20,9 +20,9 @@
 | Exit checklist issue | #1535 (M19 Exit Checklist — blocks milestone closure) |
 | Release branch | `release/m19` — cut from `main` 2026-07-02 at 1bf1ecc |
 | Sprint plan | `docs/process/sprint-plans/m19-sprint-plan.md` — EL-approved 2026-07-02 |
-| Active wave | Wave 2 — G2C through G4 (G1/G2A/G2B complete) |
-| Active sprint groups | None open — G2C entry next |
-| Active sprint journal issues | None |
+| Active wave | Wave 2 — G3 entry filed; G2C/G4 follow after ARCH-016 accepted |
+| Active sprint groups | G3 — BLOCKED_ADR (ADR-007 amendment ARCH-016 in progress) |
+| Active sprint journal issues | None — sprint journal issue created at EL approval |
 
 ---
 
@@ -61,7 +61,7 @@
 | #1552 | Egypt 2016 Type B | G2C Wave 2 | Medium |
 | #1554 | Ghana 2022–23 Type A+B | G2C Wave 2 | Medium |
 | #1553 | Iceland 2008–11 Type A+B | G2D Wave 2 | Medium — blocked: #1532 |
-| #1543 | ADR-007 Bayesian posterior layer | G3 Wave 2 | High — Demo 8 Act 2 CI |
+| #1543 | ADR-007 Bayesian posterior layer | G3 Wave 2 | High — Demo 8 Act 2 CI; BLOCKED_ADR (ARCH-016) |
 | #1536 | ADR-007 meaninglessness threshold | G3 Wave 2 | High — coord #1543 |
 | #1537 | BandResult visible fields | G3 Wave 2 | High — posterior UX prereq |
 | #1528 | PSP driver arc + auditability panel (DEMO-165) | G4 Wave 2–3 | High |
@@ -86,6 +86,7 @@
 - **sprint-branch-ci-gate Ruleset:** Node ID `RRS_lACqUmVwb3NpdG9yecc5IKi2kzgEV92A`. Requires `changes`, `lint`, `test-backend`, `compliance-scan`. (playwright-e2e not required — NM-076 context.)
 - **NM-075:** git worktrees must be allocated per sprint group (`git worktree add /tmp/<name> <branch>`) to prevent branch switches overwriting in-progress work.
 - **NM-076:** Before any testid rename, grep the full E2E corpus for the old testid; update E2E tests in the same PR. Rule in CODING_STANDARDS.md (PR #1439).
+- **ARCH-016:** ADR-007 amendment — Bayesian posterior layer (Section 8, new) + meaninglessness threshold implementation (Section 6). G3 BLOCKED_ADR until accepted. Panel: CM (C), CE (C), UX Designer (C — is_pre_calibration display), EL (A). Backlog entry filed 2026-07-02.
 - **NM-084/NM-085:** CM sign-off ordering gap + co-dependent fixture CI sequencing (G2B). SOP improvements filed: §Pre-Merge CM Review Gate + §Co-Dependent Fixture Sprint Entry Requirements.
 - **NM-086:** E2E mock routes must be verified against `api_contracts.yml` before the implementation PR opens (G1, filed 2026-07-03). Process: QA Lead mock-helper verification is a blocking checklist item on intent authorship.
 - **M18 complete (v0.18.0, 2026-07-02):** G1–G7 delivered; Demo 7 PASS (unconditional); release/m18 → main via PR #1534. Archive: `docs/process/session-archives/session-state-pre-m19.md`.
