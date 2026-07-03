@@ -39,14 +39,10 @@ try:
 
     # CalibrationStore components may live in banding_engine or calibration.py
     try:
-        from app.simulation.calibration import (
-            compute_correction_factor,
-            compute_magnitude_coverage,
-        )
+        from app.simulation.calibration import compute_correction_factor
     except ImportError:
-        from app.simulation.banding_engine import (  # type: ignore[no-redef]
-            compute_correction_factor,
-            compute_magnitude_coverage,
+        from app.simulation.banding_engine import (
+            compute_correction_factor,  # type: ignore[no-redef]
         )
 
     from app.simulation.banding_engine import (
@@ -68,7 +64,10 @@ except (ImportError, AttributeError, TypeError):
 
 pytestmark = pytest.mark.skipif(
     not IMPLEMENTATION_PRESENT,
-    reason="Bayesian posterior layer not yet implemented (M19 G3 #1543 pre-implementation scaffold)",
+    reason=(
+        "Bayesian posterior layer not yet implemented"
+        " (M19 G3 #1543 pre-implementation scaffold)"
+    ),
 )
 
 
@@ -477,7 +476,7 @@ class TestIsPreCalibrationFalseGate:
         set_calibration_multipliers({})
 
     def test_no_compute_band_call_returns_false_without_registry_entry(self) -> None:
-        """Exhaustive check: all framework × tier × step combos return is_pre_calibration != False."""
+        """Exhaustive check: all framework × tier × step combos — is_pre_calibration != False."""
         frameworks = ("financial", "human_development", "ecological")
         for framework in frameworks:
             for tier in range(1, 6):

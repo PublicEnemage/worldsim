@@ -29,7 +29,7 @@ import pytest
 # ---------------------------------------------------------------------------
 
 try:
-    from app.simulation.banding_engine import BandResult, compute_band
+    from app.simulation.banding_engine import compute_band
 
     # Probe: T5, step 7, score 0.5 on financial framework should be suppressed
     # after implementation. If it returns is_meaningless=False, implementation
@@ -46,7 +46,10 @@ except (ImportError, TypeError):
 
 pytestmark = pytest.mark.skipif(
     not IMPLEMENTATION_PRESENT,
-    reason="Meaninglessness threshold not yet implemented (M19 G3 #1536 pre-implementation scaffold)",
+    reason=(
+        "Meaninglessness threshold not yet implemented"
+        " (M19 G3 #1536 pre-implementation scaffold)"
+    ),
 )
 
 # ---------------------------------------------------------------------------

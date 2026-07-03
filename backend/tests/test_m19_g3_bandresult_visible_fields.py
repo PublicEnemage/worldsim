@@ -45,7 +45,10 @@ except (ImportError, TypeError):
 
 pytestmark = pytest.mark.skipif(
     not IMPLEMENTATION_PRESENT,
-    reason="BandResult visible fields not yet implemented (M19 G3 #1537 pre-implementation scaffold)",
+    reason=(
+        "BandResult visible fields not yet implemented"
+        " (M19 G3 #1537 pre-implementation scaffold)"
+    ),
 )
 
 # ---------------------------------------------------------------------------
