@@ -1268,3 +1268,101 @@ endpoints:
       - "ADR-019 D-7: SHOCK_REGISTRY maps ShockType to handler class (backend/app/simulation/shocks/)."
       - "Creates a branch scenario internally; returns the branch trajectory. Branch ID is in response.scenario_id."
       - "Returns 422 if required params for shock_type are missing (e.g. ElectionShock without severity)."
+
+  # -------------------------------------------------------------------------
+  # M19 G1 #1540 — Constraint-Floor Search (ADR-021)
+  # -------------------------------------------------------------------------
+
+  - method: POST
+    path: "/scenarios/{scenario_id}/constraint-floor-search"
+    summary: >
+      Binary search for the minimum fiscal_multiplier value that keeps the
+      focal cohort indicator at or above its configured floor across all
+      simulation steps. Implements ADR-021 §D-2 algorithm (O(log₂) evaluations,
+      default range [0.1, 3.0], tolerance 0.01). Returns FOUND (with boundary
+      and precision interval), NOT_FOUND (no safe point in range), or ERROR.
+    auth: none
+    path_params:
+      scenario_id:
+        type: string
+        description: "Scenario UUID or string ID. Must exist in the scenarios table."
+    request_body:
+      focal_cohort_index:
+        type: integer
+        default: 0
+        minimum: 0
+        description: "Index into monitored_focal_cohorts array. Currently only index 0 is supported (ADR-021 §D-5)."
+      lo:
+        type: number
+        default: 0.1
+        minimum: 0.1
+        maximum: 3.0
+        description: "Lower bound of fiscal_multiplier search range."
+      hi:
+        type: number
+        default: 3.0
+        minimum: 0.1
+        maximum: 3.0
+        description: "Upper bound of fiscal_multiplier search range."
+      tolerance:
+        type: number
+        default: 0.01
+        minimum: 0.001
+        maximum: 0.1
+        description: "Binary search convergence tolerance. Search halts when hi-lo ≤ tolerance."
+    response:
+      status: 200
+      body:
+        status:
+          type: string
+          enum: [FOUND, NOT_FOUND, ERROR]
+          description: "FOUND if a safe boundary exists in range; NOT_FOUND if no safe point; ERROR on engine failure."
+        boundary:
+          type: number
+          nullable: true
+          description: "FOUND: minimum fiscal_multiplier that keeps indicator above floor. Null otherwise."
+        uncertainty_lo:
+          type: number
+          nullable: true
+          description: "FOUND: lower end of boundary precision interval (last unsafe value)."
+        uncertainty_hi:
+          type: number
+          nullable: true
+          description: "FOUND: upper end of boundary precision interval (first safe value = boundary)."
+        evaluations:
+          type: integer
+          description: "Number of fiscal_multiplier values evaluated during binary search."
+        search_lo:
+          type: number
+          nullable: true
+          description: "Lower bound of the searched range (echoes request lo)."
+        search_hi:
+          type: number
+          nullable: true
+          description: "Upper bound of the searched range (echoes request hi)."
+        floor_value:
+          type: number
+          nullable: true
+          description: "Floor value for the indicator (from monitored_focal_cohorts[focal_cohort_index].floor_value)."
+        indicator_key:
+          type: string
+          nullable: true
+          description: "Indicator key from the focal cohort configuration."
+        error_message:
+          type: string
+          nullable: true
+          description: "ERROR only: human-readable description of the engine failure."
+        data_tier:
+          type: string
+          nullable: true
+          description: "Data tier of the floor indicator. SYNTHETIC_COMPARABLE triggers disclosure in frontend. Null in G1 (tier lookup deferred to G3)."
+      status_404: "Scenario not found."
+      status_400: "focal_cohort_index out of range or no monitored_focal_cohorts configured."
+    db_reads: [scenarios]
+    db_writes: []
+    notes:
+      - "ADR-021 §D-2: binary search algorithm — crosses_floor() returns True if any step has indicator < floor_value."
+      - "ADR-021 §D-5: floor source is monitored_focal_cohorts[focal_cohort_index]; only Q1 INFORMAL poverty_headcount_ratio implemented in G1."
+      - "ADR-021 §Silent Failure Mode / SF-2: engine exceptions produce status=ERROR, never partial FOUND."
+      - "run_trajectory_fn injection for testability (see backend/app/simulation/constraint_floor_search.py)."
+      - "data_tier field added per Frontend Architect Gap 4 resolution (synthetic disclosure AC-11)."

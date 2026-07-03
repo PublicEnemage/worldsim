@@ -1112,3 +1112,60 @@ class DistributionalDifferentialResponse(BaseModel):
     methodology_summary: str
     methodology_detail: MethodologyDetail
     pairs: list[DistributionalPairResult]
+
+
+# ---------------------------------------------------------------------------
+# Constraint-floor search schemas — ADR-021 §D-3 (M19 G1 #1540)
+# ---------------------------------------------------------------------------
+
+
+class ConstraintFloorSearchStatus(str, Enum):
+    """Result status for the constraint-floor binary search."""
+
+    FOUND = "FOUND"
+    NOT_FOUND = "NOT_FOUND"
+    ERROR = "ERROR"
+
+
+class ConstraintFloorSearchRequest(BaseModel):
+    """Request body for POST /scenarios/{id}/constraint-floor-search.
+
+    ADR-021 §D-3. `focal_cohort_index` selects which monitored_focal_cohorts
+    entry to use. `lo`/`hi` define the fiscal_multiplier search range.
+    `tolerance` is the binary search convergence width (maps to `tol` in
+    the algorithm).
+    """
+
+    model_config = ConfigDict(from_attributes=True)
+
+    focal_cohort_index: int = Field(default=0, ge=0)
+    lo: float = Field(default=0.1, ge=0.1, le=3.0)
+    hi: float = Field(default=3.0, ge=0.1, le=3.0)
+    tolerance: float = Field(default=0.01, ge=0.001, le=0.1)
+
+
+class ConstraintFloorSearchResponse(BaseModel):
+    """Response from POST /scenarios/{id}/constraint-floor-search.
+
+    ADR-021 §D-3. `boundary` is the minimum fiscal_multiplier that keeps
+    the focal cohort indicator at or above `floor_value` across all n_steps.
+    `uncertainty_lo`/`uncertainty_hi` are the binary search convergence
+    interval bounds — not a statistical CI (G3 scope).
+    `data_tier` carries the focal cohort indicator's confidence tier string
+    (e.g. "SYNTHETIC_COMPARABLE") for AC-11 synthetic disclosure on the
+    frontend. None when tier is not determinable from the scenario context.
+    """
+
+    model_config = ConfigDict(from_attributes=True)
+
+    status: ConstraintFloorSearchStatus
+    boundary: float | None = None
+    uncertainty_lo: float | None = None
+    uncertainty_hi: float | None = None
+    evaluations: int = 0
+    search_lo: float | None = None
+    search_hi: float | None = None
+    floor_value: float | None = None
+    indicator_key: str | None = None
+    error_message: str | None = None
+    data_tier: str | None = None
