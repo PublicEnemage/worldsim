@@ -603,13 +603,190 @@ class TestArgentinaCounterfactualTypeB:
 # New-country scenario tests — ADDITIVE, added in each country's feature PR
 # ---------------------------------------------------------------------------
 
-# Sri Lanka (#1549) — TestSriLankaTypeAB
-# ----------------------------------------
-# ACs: AC-1..5, AC-9, AC-10, AC-NC-2 (advisory), AC-NC-3, AC-LKA-1..4
-# Run: Type A+B (baseline = actual crisis; counter-factual = earlier IMF 2021 request)
-# Primary indicator (Type B): fin_composite or gov_composite (CM determines)
-# Advisory: direction_verdict COUNTER_FACTUAL_BETTER
-# Add in: feat/m19-g2c-sri-lanka-coffin-corner (after CM advisory on #1549)
+
+@pytest.mark.backtesting
+@pytest.mark.asyncio(loop_scope="session")
+class TestSriLankaTypeAB:
+    """AC-1..5, AC-9, AC-10, AC-NC-2 (advisory), AC-NC-3, AC-LKA-1..4.
+
+    Type A: does the engine predict DIRECTION_ONLY on reserve depletion and
+    Q1 poverty headcount increase during the 2021–2022 crisis arc?
+    Type B: counter-factual (no fertiliser ban, earlier IMF) — direction verdict.
+
+    Requires DATABASE_URL. Skips gracefully when absent.
+    """
+
+    @pytest_asyncio.fixture(loop_scope="session")
+    async def asgi_client(self) -> AsyncGenerator[httpx.AsyncClient, None]:
+        if not _DATABASE_URL:
+            pytest.skip("DATABASE_URL not set — skipping Sri Lanka Type A+B tests")
+        async with httpx.AsyncClient(
+            transport=httpx.ASGITransport(app=app),
+            base_url="http://test",
+        ) as client:
+            yield client
+
+    async def test_construction(self, asgi_client: httpx.AsyncClient) -> None:
+        """AC-1, AC-2, AC-LKA-1: fixture importable; entity=LKA; counter-factual differs."""
+        from tests.fixtures.sri_lanka_2022_scenario import (  # RED until implemented
+            build_sri_lanka_counterfactual_scenario,
+            build_sri_lanka_scenario,
+        )
+
+        baseline = build_sri_lanka_scenario()
+        cf = build_sri_lanka_counterfactual_scenario()
+
+        # AC-2: entity
+        assert baseline.configuration.entities[0] == "LKA"
+        assert cf.configuration.entities[0] == "LKA"
+
+        # AC-NC-3: n_steps == 5
+        assert baseline.configuration.n_steps == 5, (
+            f"AC-NC-3 FAIL: n_steps={baseline.configuration.n_steps}, expected 5"
+        )
+        assert cf.configuration.n_steps == 5
+
+        # AC-LKA-1: counter-factual Step 2 has NO REGULATORY_CHANGE (fertiliser ban omitted)
+        cf_step2_inputs = [
+            s for s in (cf.scheduled_inputs or []) if s.step == 2
+        ]
+        regulatory_at_step2 = any(
+            s.input_data.get("instrument") == "regulatory_change"
+            for s in cf_step2_inputs
+        )
+        assert not regulatory_at_step2, (
+            "AC-LKA-1 FAIL: counter-factual Step 2 still has REGULATORY_CHANGE. "
+            "The fertiliser ban must be absent from the counter-factual."
+        )
+
+    async def test_type_a_run(self, asgi_client: httpx.AsyncClient) -> None:
+        """AC-3, AC-4 (TYPE_A), AC-5, AC-10, AC-LKA-2: Type A historical run."""
+        from tests.fixtures.sri_lanka_2022_scenario import (
+            build_sri_lanka_scenario,
+        )
+
+        resp = await asgi_client.post(
+            "/api/v1/scenarios",
+            json=build_sri_lanka_scenario().model_dump(mode="json"),
+        )
+        assert resp.status_code == 201, f"AC-3 FAIL: {resp.status_code} {resp.text}"
+        scenario_id: str = resp.json()["scenario_id"]
+
+        try:
+            result = await run_harness(
+                scenario_id=scenario_id,
+                steps=5,
+                run_type=RunType.TYPE_A,
+                control_inputs=[{} for _ in range(5)],
+                http_client=asgi_client,
+            )
+            # AC-LKA-2: fidelity tier is DIRECTION_ONLY (reserve floor is stock-flow #30)
+            actual_tier = result.summary.get("fidelity_tier")
+            assert actual_tier in _ACCEPTABLE_TIERS or str(actual_tier) in {
+                str(t) for t in _ACCEPTABLE_TIERS
+            }, (
+                f"AC-LKA-2 FAIL: fidelity_tier={actual_tier!r} — "
+                "Sri Lanka Type A requires at minimum DIRECTION_ONLY."
+            )
+            assert len(result.per_step_records) == 5
+        finally:
+            await asgi_client.delete(f"/api/v1/scenarios/{scenario_id}")
+
+    async def test_type_b_run(self, asgi_client: httpx.AsyncClient) -> None:
+        """AC-3, AC-4, AC-5, AC-9, AC-10, AC-LKA-3/4: Type B counter-factual run."""
+        from tests.fixtures.sri_lanka_2022_scenario import (
+            build_sri_lanka_counterfactual_scenario,
+            build_sri_lanka_scenario,
+        )
+
+        baseline_resp = await asgi_client.post(
+            "/api/v1/scenarios",
+            json=build_sri_lanka_scenario().model_dump(mode="json"),
+        )
+        assert baseline_resp.status_code == 201, (
+            f"AC-3 FAIL (baseline): {baseline_resp.status_code}"
+        )
+        baseline_id: str = baseline_resp.json()["scenario_id"]
+
+        cf_resp = await asgi_client.post(
+            "/api/v1/scenarios",
+            json=build_sri_lanka_counterfactual_scenario().model_dump(mode="json"),
+        )
+        assert cf_resp.status_code == 201, (
+            f"AC-3 FAIL (cf): {cf_resp.status_code}"
+        )
+        cf_id: str = cf_resp.json()["scenario_id"]
+
+        try:
+            result = await run_harness(
+                scenario_id=cf_id,
+                steps=5,
+                run_type=RunType.TYPE_B,
+                control_inputs=[{} for _ in range(5)],
+                baseline_run_id=baseline_id,
+                primary_indicator="fin_composite",
+                http_client=asgi_client,
+            )
+
+            assert len(result.per_step_records) == 5
+            assert "direction_verdict" in result.summary, "AC-4: direction_verdict missing"
+            verdict = result.summary["direction_verdict"]
+            valid_verdicts = {
+                DirectionVerdict.COUNTER_FACTUAL_BETTER,
+                DirectionVerdict.BASELINE_BETTER,
+                DirectionVerdict.INDISTINGUISHABLE,
+            }
+            assert verdict in valid_verdicts or str(verdict) in {
+                str(v) for v in valid_verdicts
+            }
+
+            per_step_diff = result.summary.get("per_step_diff", [])
+            assert isinstance(per_step_diff, list) and len(per_step_diff) == 5
+
+            # AC-5: known_limitations non-empty
+            known = result.summary.get("known_limitations", [])
+            assert isinstance(known, list) and len(known) >= 1, "AC-5 FAIL"
+
+            # AC-9: Tier 3 disclosure — advisory
+            tier3_found = any(
+                term in str(e)
+                for e in known
+                for term in ("Tier 3", "INFERRED_STRUCTURAL", "hypothetical")
+            )
+            if not tier3_found:
+                warnings.warn(
+                    "AC-9 advisory (LKA): no Tier 3 disclosure in known_limitations.",
+                    UserWarning, stacklevel=1,
+                )
+
+            # AC-LKA-3: direction advisory (expected COUNTER_FACTUAL_BETTER)
+            _assert_direction_advisory(
+                actual=verdict,
+                expected=DirectionVerdict.COUNTER_FACTUAL_BETTER,
+                country="LKA",
+                indicator="fin_composite",
+            )
+
+            # AC-LKA-4: all-six failure modes advisory (at least one per crisis step)
+            all_modes = {
+                str(m)
+                for rec in result.per_step_records
+                for m in rec.get("active_failure_modes", [])
+            }
+            expected_modes = {
+                "The_Spin", "Coffin_Corner", "Hypoxia",
+                "Backside_of_Power_Curve", "Get_There_Itis", "CB_Cloud",
+            }
+            missing = expected_modes - all_modes
+            if missing:
+                warnings.warn(
+                    f"AC-LKA-4 advisory (LKA): failure modes not detected: {missing}. "
+                    "Sri Lanka 2022 is the canonical all-six-modes case.",
+                    UserWarning, stacklevel=1,
+                )
+        finally:
+            await asgi_client.delete(f"/api/v1/scenarios/{baseline_id}")
+            await asgi_client.delete(f"/api/v1/scenarios/{cf_id}")
 
 
 # Pakistan (#1550) — TestPakistanTypeB
