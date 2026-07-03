@@ -6,7 +6,7 @@
 > Historical state lives in `docs/process/session-archives/`.
 > Authority: `docs/process/sprint-group-isolation.md §SESSION_STATE.md Cockpit Card Protocol`.
 
-**Last updated:** 2026-07-03 (G2D both pre-impl gates CLEARED — CM PR #1625, CE PR #1626 auto-merging to sprint/m19-g2; NM-090/NM-091 filed; Iceland implementation PR may open)
+**Last updated:** 2026-07-03 (HORIZON sweep complete — 3 insights-log entries dispositioned; #1623 ELASTICITY_REGISTRY calibration gap, #1629 ZMB curve collapse, #1630 HD narration mismatch added to M19; G2D both pre-impl gates CLEARED)
 **Current milestone:** M19 — Constraint Search and Empirical Calibration
 
 ---
@@ -62,6 +62,9 @@
 | #1553 | Iceland 2008–11 Type A+B | G2D Wave 2 | Active — EL-approved; pending CM/CE gates |
 | #1528 | PSP driver arc + auditability panel (DEMO-165) | G4 Wave 2–3 | High |
 | #1529 | '95% CI' label precision fix | G4 Wave 2–3 | High — coordination gate cleared; open after G3 #1537 merged |
+| #1623 | ELASTICITY_REGISTRY — empirical calibration gap for non-SSA entity families | CM Wave 2–3 | High — CM Sprint A (GRC/Euro area) is M19 priority; unblocks Greece counter-factual |
+| #1629 | Zone 1A ZMB scenario comparison: y-axis not tight-scoped | Demo 8 risk | High — Demo 8 Act 2 display fidelity |
+| #1630 | Demo 8 Act 1 narration: HD line implied but not rendered | Demo 8 risk | High — Demo 8 Act 1 narration correction required |
 
 ---
 
