@@ -66,40 +66,98 @@ const ERROR_RESPONSE = {
   indicator_key: "bottom_quintile_informal_workers_poverty_headcount",
 };
 
-// enterMode3 is retained for AC-2 and AC-3 where no focal cohort should be present.
-async function enterMode3(page: Page): Promise<void> {
-  await page.goto("/");
-  const enterActiveControl = page.getByRole("button", {
-    name: /enter active control/i,
-  });
-  if (await enterActiveControl.isVisible()) {
-    await enterActiveControl.click();
+// ---------------------------------------------------------------------------
+// Mock helpers (NM-084 verified pattern — 2026-07-03)
+// App.tsx fetches GET /api/v1/scenarios/{id} twice:
+//   1. Mount effect → sets selectedScenarioId + window.__worldsim_selectedScenarioId
+//   2. selectedScenarioId effect → sets activeScenarioDetail + activeFiscalMultiplier
+// ScenarioInstrumentCluster routes to MODE_2 only when fiscal_multiplier != null
+// && !== 1.0. Without fiscal_multiplier the cluster stays in MODE_1 and
+// Mode2ColumnSurface (which contains enter-active-control-btn) never renders.
+// ---------------------------------------------------------------------------
+
+const ZMB_FOCAL_COHORT_ID = "zmb-constraint-test";
+const ZMB_NO_FOCAL_ID = "zmb-no-focal-test";
+
+async function setupScenarioMocks(
+  page: Page,
+  scenarioId: string,
+  focalCohorts: typeof FOCAL_COHORT_CONFIG[] | null,
+): Promise<void> {
+  const detail = {
+    scenario_id: scenarioId,
+    name: `ZMB Test (${scenarioId})`,
+    description: null,
+    status: "in_progress",
+    version: 1,
+    created_at: "2026-07-03T00:00:00Z",
+    scheduled_inputs: [],
+    configuration: {
+      entities: ["ZMB"],
+      initial_attributes: {},
+      n_steps: 8,
+      timestep_label: "quarter",
+      // fiscal_multiplier != null && !== 1.0 → ScenarioInstrumentCluster routes to
+      // MODE_2, which renders Mode2ColumnSurface (contains enter-active-control-btn).
+      fiscal_multiplier: 1.3,
+      ...(focalCohorts ? { monitored_focal_cohorts: focalCohorts } : {}),
+    },
+  };
+  const trajectory = {
+    scenario_id: scenarioId,
+    entity_id: "ZMB",
+    step_count: 0,
+    mda_floors: [],
+    steps: [],
+  };
+  // Exact scenario-detail URL — **/api/v1/scenarios/* matches the base URL
+  // (App.tsx: GET /api/v1/scenarios/{id}) but not sub-paths like /trajectory.
+  await page.route(`**/api/v1/scenarios/${scenarioId}`, (route) =>
+    route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(detail) })
+  );
+  await page.route(`**/api/v1/scenarios/${scenarioId}/trajectory**`, (route) =>
+    route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(trajectory) })
+  );
+}
+
+async function waitForScenarioLoad(page: Page, scenarioId: string): Promise<void> {
+  // App.tsx sets window.__worldsim_selectedScenarioId after the detail fetch
+  // succeeds (DEV seam). Waiting for this guarantees selectedScenarioId is in
+  // state before we interact with ScenarioInstrumentCluster.
+  try {
+    await page.waitForFunction(
+      (id) => (window as Record<string, unknown>).__worldsim_selectedScenarioId === id,
+      scenarioId,
+      { timeout: 10_000 },
+    );
+  } catch {
+    // Timeout — test guards handle missing form via isVisible().catch(() => false)
   }
 }
 
-// Gap 5 fix: mock the scenario detail endpoint to return a configuration that
-// includes a monitored_focal_cohorts entry. Without this, Form 3 never renders
-// and all guards permanently fire post-implementation.
-// The exact route pattern must be confirmed against docs/schema/api_contracts.yml
-// by the Frontend Architect Agent before the G1 implementation PR opens.
-async function enterMode3WithFocalCohort(page: Page): Promise<void> {
-  await page.route("**/api/v1/scenarios/*", (route) =>
-    route.fulfill({
-      json: {
-        id: "zmb-constraint-test",
-        configuration: {
-          entities: ["ZMB"],
-          n_steps: 8,
-          monitored_focal_cohorts: [FOCAL_COHORT_CONFIG],
-        },
-      },
-    })
-  );
-  await page.goto("/?scenario=zmb-constraint-test");
+// enterMode3 is retained for AC-3 (enters Mode 3 WITHOUT focal cohort configured).
+async function enterMode3(page: Page): Promise<void> {
+  await setupScenarioMocks(page, ZMB_NO_FOCAL_ID, null);
+  await page.goto(`/?scenario=${ZMB_NO_FOCAL_ID}`);
+  await waitForScenarioLoad(page, ZMB_NO_FOCAL_ID);
   const btn = page.getByTestId("enter-active-control-btn");
   if (await btn.isVisible({ timeout: 8_000 }).catch(() => false)) {
     await btn.click();
   }
+}
+
+async function enterMode3WithFocalCohort(page: Page): Promise<void> {
+  await setupScenarioMocks(page, ZMB_FOCAL_COHORT_ID, [FOCAL_COHORT_CONFIG]);
+  await page.goto(`/?scenario=${ZMB_FOCAL_COHORT_ID}`);
+  await waitForScenarioLoad(page, ZMB_FOCAL_COHORT_ID);
+  const btn = page.getByTestId("enter-active-control-btn");
+  await btn.waitFor({ state: "visible", timeout: 8_000 });
+  await btn.click();
+  // Wait for ControlPlaneColumn + Form 3 to mount after entering Mode 3.
+  await page
+    .getByTestId("constraint-search-section")
+    .waitFor({ state: "visible", timeout: 5_000 })
+    .catch(() => {});
 }
 
 // ---------------------------------------------------------------------------
@@ -316,30 +374,17 @@ test("AC-12: constraint-search-structural-absence shown when indicator is Tier 4
   // the default scenario never loads a Tier 4+ indicator.
   // The exact indicator_key value that triggers structural absence must be
   // confirmed with the Frontend Architect before the G1 PR opens.
-  await page.route("**/api/v1/scenarios/*", (route) =>
-    route.fulfill({
-      json: {
-        id: "zmb-structural-absence-test",
-        configuration: {
-          entities: ["ZMB"],
-          n_steps: 8,
-          monitored_focal_cohorts: [
-            {
-              ...FOCAL_COHORT_CONFIG,
-              // Placeholder: replace with the real structural-absence marker key
-              // (confirmed by Frontend Architect before G1 PR opens).
-              indicator_key: "__structural_absence__",
-            },
-          ],
-        },
-      },
-    })
-  );
-  await page.goto("/?scenario=zmb-structural-absence-test");
+  const SA_ID = "zmb-structural-absence-test";
+  await setupScenarioMocks(page, SA_ID, [
+    { ...FOCAL_COHORT_CONFIG, indicator_key: "__structural_absence__" },
+  ]);
+  await page.goto(`/?scenario=${SA_ID}`);
+  await waitForScenarioLoad(page, SA_ID);
   const btn = page.getByTestId("enter-active-control-btn");
   if (await btn.isVisible({ timeout: 8_000 }).catch(() => false)) {
     await btn.click();
   }
+  await page.waitForTimeout(500);
 
   const structuralAbsence = page.getByTestId(
     "constraint-search-structural-absence"
