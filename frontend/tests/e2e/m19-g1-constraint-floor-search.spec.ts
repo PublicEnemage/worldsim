@@ -95,6 +95,10 @@ async function setupScenarioMocks(
       initial_attributes: {},
       n_steps: 8,
       timestep_label: "quarter",
+      // fiscal_multiplier != null && !== 1.0 → ScenarioInstrumentCluster routes to
+      // MODE_2, which renders Mode2ColumnSurface (contains enter-active-control-btn).
+      // Without this, activeFiscalMultiplier is null → MODE_1 → button never renders.
+      fiscal_multiplier: 1.3,
       ...(focalCohorts ? { monitored_focal_cohorts: focalCohorts } : {}),
     },
   };
