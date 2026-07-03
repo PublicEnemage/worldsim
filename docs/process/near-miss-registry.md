@@ -4222,6 +4222,8 @@ The intent document ordering requirement ("CM sign-off before PR is opened") nee
 
 Option 1 is structurally stronger (observable artifact before auto-merge). Codify in `docs/process/sprint-planning-sop.md §Pre-Merge CM Review` before G2C sprint entry.
 
+**Codification:** Issue #1651 — `docs/process/sprint-planning-sop.md §Pre-Merge CM Review` added 2026-07-03.
+
 ---
 
 ## NM-085 — Co-Dependent Fixture PRs Produce Transient Cross-Test Failure; Pattern Not Documented in Sprint Entry (Anticipatory)
@@ -4253,6 +4255,8 @@ Post-merge CI log review. No failure in production — the non-required check de
 
 Codify the documentation requirement in `docs/process/sprint-planning-sop.md §Co-Dependent Fixture Sprint Entry Requirements` before G2C sprint entry.
 
+**Codification:** Issue #1652 — `docs/process/sprint-planning-sop.md §Co-Dependent Fixture Sprint Entry Requirements` added 2026-07-03.
+
 ---
 
 ## NM-086 — E2E Mock Route Not Verified Against `api_contracts.yml`; CI Caught Contract Mismatch That Pre-Push Gate Missed (Reactive)
@@ -4283,6 +4287,8 @@ CI (E2E job on PR #1574). The pre-push hook (`npm run build`) passed because Typ
 **Implementing agent obligation:** Before opening any PR that adds or modifies E2E mock helpers, the implementing agent must grep `docs/schema/api_contracts.yml` for the relevant endpoint and confirm the mock shape matches. This is an extension of the existing schema registry rule in CLAUDE.md §Standards and Conventions.
 
 Codified in `docs/CODING_STANDARDS.md §E2E Mock Helper Authorship` as part of the G2C sprint entry, or earlier if a frontend-touching sprint opens first.
+
+**Codification:** Issue #1650 — `docs/CODING_STANDARDS.md §E2E Mock Helper Authorship` added 2026-07-03.
 
 ---
 
@@ -4414,6 +4420,8 @@ NM-075 addresses the inverse problem (implementation file changes lost on branch
 
 **Codification:** This rule is added as a named sub-step in `docs/process/sprint-group-isolation.md §Shared State Update Protocol`, to appear alongside the existing `chore/mNN-state-sync-NNN` branch guidance. Cross-referenced in `docs/CONTRIBUTING.md §Agent Workflow` at the next standards review (G2C sprint entry or earlier if a state-sync PR opens first).
 
+**Codification issue:** Issue #1654 — `docs/process/sprint-group-isolation.md §Commit gate before branch switch` added 2026-07-03.
+
 Near-miss cross-references: NM-075 (worktree isolation for implementation files — complementary), NM-016 / NM-052 / NM-070 (pre-push gate violations — same class of "local change not committed before moving on").
 
 ## NM-090 — DemographicModule Has Two Additional Dead Event Subscriptions Beyond capital_controls; Discovered Only at CE Audit Gate (Reactive)
@@ -4490,6 +4498,8 @@ creates confusion about the fix's intent).
 Near-miss cross-references: ADR-020 ARCH-014 (known `capital_controls_imposition` bug — the root
 cause was identified there; this NM records the pattern recurring on two additional strings in the
 same module).
+
+**Fix issue:** Issue #1657 — DemographicModule dead subscription fix + elasticity rows (subscription strings, elasticity rows, and transmission table reconciliation to land in the same PR; CM sign-off required before PR opens).
 
 ---
 
@@ -4569,6 +4579,8 @@ but instrument names must be cross-checked against the actual enum during intent
 Near-miss cross-references: NM-081 (scope derived from stale design artifacts — same pattern:
 design artifacts authored from intended future state, not current code reality).
 
+**Fix issue:** Issue #1657 — same issue as NM-090; transmission table reconciliation is part of the combined fix PR.
+
 ---
 
 ## NM-092 — Pre-Push Hook Uses CWD-Relative Paths; venv and node_modules Not Found in Linked Worktrees; Both Gates Silently Non-Functional in All Worktree Sessions (Reactive)
@@ -4604,6 +4616,8 @@ ln -s $(git -C <main-repo> rev-parse --show-toplevel)/frontend/node_modules <wor
 This step is now a required checklist item at worktree allocation, not an ad hoc fix.
 
 Near-miss cross-references: NM-052 (mypy gate non-functional for 8 milestones — same structural class: gate present but not executing); NM-070 (frontend build gate introduced after 7 TS6133 errors accumulated — established the frontend gate this NM found broken in worktrees).
+
+**Codification issue:** Issue #1653 — `docs/process/sprint-group-isolation.md §Worktree Setup` added 2026-07-03.
 
 ---
 
@@ -4641,6 +4655,8 @@ DS Agent infra review reading the merge commit message on release/m19 for state-
 **PM Agent checklist addition:** Before opening any state-sync PR, run `git diff release/m{N}...chore/m{N}-state-sync-NNN --name-only` and verify every listed path is a shared-state file. If any non-shared-state path appears, stop — split the content into the appropriate sprint feature branch and open two separate PRs.
 
 Near-miss cross-references: NM-089 (complement: shared-state changes lost on branch switch — the inverse hazard: implementation changes accidentally routed via shared-state lane).
+
+**Codification issue:** Issue #1655 — `docs/process/sprint-group-isolation.md §Bidirectional lane rule` and `§Commit gate before branch switch` added 2026-07-03 (NM-089 and NM-093 codified together in the same PR).
 
 ---
 
@@ -4682,6 +4698,9 @@ The PI Agent sprint exit confirmation must include a file-presence check: `git d
 **Recovery action (immediate):** PM Agent to open a PR restoring `git show 33a51ee:backend/tests/backtesting/test_m19_g2c_scenario_runs.py` to release/m19. Since no active sprint branch covers G2C, this targets release/m19 directly as a test-only correction PR.
 
 Near-miss cross-references: NM-083 (demo-spec ↔ component-contract gap — confirmed deliverable had no automated test asserting its contract; same pattern: sprint confirmed, test evidence absent); NM-087 (stash@{2} investigation was the detection path for this NM).
+
+**Recovery:** PR #1649 (merged 2026-07-03) — `test_m19_g2c_scenario_runs.py` (1394 lines) restored to release/m19.
+**Codification issue:** Issue #1656 — `docs/process/sprint-group-isolation.md §Test-file presence check` added 2026-07-03.
 
 ---
 
