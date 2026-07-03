@@ -62,6 +62,8 @@ interface RawFrameworkPoint {
   psp_dominant_driver?: string | null;
   /** M18-G7-D — note from API (e.g. "Ecological disabled for SEN Demo 7 Act 1"). */
   note?: string | null;
+  /** M19-G3 (#1537) / G4 (#1529): BandingEngine calibration state for CI display. */
+  band_method?: string | null;
 }
 
 interface RawTrajectoryStep {
@@ -118,6 +120,7 @@ function parseTrajectoryResponse(raw: RawTrajectoryResponse): TrajectoryResponse
           ),
           psp_dominant_driver: fw.psp_dominant_driver ?? null,
           note: fw.note ?? null,
+          band_method: fw.band_method ?? null,
         };
       }
       const pmm =
