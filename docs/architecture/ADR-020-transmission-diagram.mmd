@@ -1,0 +1,42 @@
+flowchart TD
+    subgraph Input
+        EPI["EmergencyPolicyInput\n(instrument=capital_controls)"]
+    end
+
+    subgraph EventBus ["Event Bus"]
+        EVT["emergency_policy_capital_controls\n(canonical — ADR-020 Decision 1)"]
+    end
+
+    subgraph Subscriptions ["Module Subscriptions (post-ADR-020)"]
+        GM["GovernanceModule\n(existing ✓)\npolitical_legitimacy_erosion"]
+        ESM["ExternalSectorModule\n(new — Channel A)\nreserve_coverage_months ↑\ncapital_account_outflow_velocity ↓"]
+        MM["MacroeconomicModule\n(new — Channel B)\ngdp_growth ↓\ncredit_conditions_index ↓\nfdi_stock_pct_gdp ↓"]
+        DM["DemographicModule\n(subscription fixed — Channel C)\nq1_poverty_headcount_ratio ↑"]
+    end
+
+    subgraph BrokenSub ["Dead Subscription (pre-ADR-020)"]
+        DEAD["DemographicModule\nsubscribed to\ncapital_controls_imposition\n(string never emitted — silently dead)"]
+    end
+
+    subgraph Outputs ["Zone 1A Trajectory Outputs"]
+        GOV["gov_composite\n(governance deterioration)"]
+        RES["reserve_coverage_months\n(reserve recovery arc)\nCalibrated: Iceland 2008 ε=0.60"]
+        GDP["gdp_growth / fin_composite\n(credit contraction β≈0.025)\nCalibrated: Iceland 2009 −6.6%"]
+        PHC["q1_poverty_headcount_ratio\n(HCL primary output — distributional)\nφ∈[0.3,0.7] × credit contraction"]
+    end
+
+    EPI --> EVT
+    EVT --> GM --> GOV
+    EVT --> ESM --> RES
+    EVT --> MM --> GDP
+    EVT --> DM --> PHC
+    MM -.->|"labour market shock\n(Channel B→C bridge)"| DM
+    EVT -.->|"❌ pre-ADR-020\n(event string mismatch)"| DEAD
+
+    style DEAD fill:#ffcccc,stroke:#cc0000,color:#000
+    style ESM fill:#ccffcc,stroke:#006600,color:#000
+    style MM fill:#ccffcc,stroke:#006600,color:#000
+    style DM fill:#ffffcc,stroke:#cc6600,color:#000
+    style RES fill:#e8f4e8,stroke:#006600,color:#000
+    style GDP fill:#e8f4e8,stroke:#006600,color:#000
+    style PHC fill:#fffce8,stroke:#cc6600,color:#000
