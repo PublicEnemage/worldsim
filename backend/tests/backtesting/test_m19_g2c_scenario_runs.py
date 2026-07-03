@@ -1054,14 +1054,154 @@ class TestTurkeyTypeB:
             await asgi_client.delete(f"/api/v1/scenarios/{cf_id}")
 
 
-# Egypt (#1552) — TestEgyptTypeB
-# ----------------------------------------
-# ACs: AC-1..5, AC-9, AC-10, AC-NC-2 (advisory), AC-NC-3, AC-EGY-1..3
-# Run: Type B
-# DIRECTION INVERSION NOTE: Egypt 2016 is not a WorldSim failure-mode case.
-#   direction_verdict may be BASELINE_BETTER — the advisory assertion must NOT
-#   hardcode COUNTER_FACTUAL_BETTER. Log whichever verdict the model produces.
-# Add in: feat/m19-g2c-egypt-devaluation (after CM advisory on #1552)
+@pytest.mark.backtesting
+@pytest.mark.asyncio(loop_scope="session")
+class TestEgyptTypeB:
+    """AC-1..5, AC-9, AC-10, AC-NC-2 (advisory), AC-NC-3, AC-EGY-1..3.
+
+    Type B: phased devaluation vs shock devaluation. Egypt 2016 is NOT a
+    WorldSim failure-mode case — direction_verdict may be BASELINE_BETTER.
+    Do NOT hardcode expected direction. Skips without DATABASE_URL.
+    """
+
+    @pytest_asyncio.fixture(loop_scope="session")
+    async def asgi_client(self) -> AsyncGenerator[httpx.AsyncClient, None]:
+        if not _DATABASE_URL:
+            pytest.skip("DATABASE_URL not set — skipping Egypt Type B tests")
+        async with httpx.AsyncClient(
+            transport=httpx.ASGITransport(app=app),
+            base_url="http://test",
+        ) as client:
+            yield client
+
+    async def test_construction(self, asgi_client: httpx.AsyncClient) -> None:
+        """AC-1, AC-2, AC-NC-3, AC-EGY-1: importable; entity=EGY; Step 1 value differs."""
+        from tests.fixtures.egypt_2016_scenario import (
+            build_egypt_counterfactual_scenario,
+            build_egypt_scenario,
+        )
+
+        baseline = build_egypt_scenario()
+        cf = build_egypt_counterfactual_scenario()
+
+        assert baseline.configuration.entities[0] == "EGY"
+        assert cf.configuration.entities[0] == "EGY"
+        assert baseline.configuration.n_steps == 4
+        assert cf.configuration.n_steps == 4
+
+        # AC-EGY-1: Step 1 MonetaryVolumeInput value differs (-0.48 vs -0.12)
+        b_devaluation = next(
+            (s for s in (baseline.scheduled_inputs or [])
+             if s.step == 1 and s.input_type == "MonetaryVolumeInput"),
+            None,
+        )
+        cf_devaluation = next(
+            (s for s in (cf.scheduled_inputs or [])
+             if s.step == 1 and s.input_type == "MonetaryVolumeInput"),
+            None,
+        )
+        assert b_devaluation is not None, "AC-EGY-1: baseline Step 1 missing MonetaryVolumeInput"
+        assert cf_devaluation is not None, "AC-EGY-1: CF Step 1 missing MonetaryVolumeInput"
+        assert b_devaluation.input_data.get("value") != cf_devaluation.input_data.get("value"), (
+            "AC-EGY-1 FAIL: baseline and CF Step 1 MonetaryVolumeInput values are identical. "
+            f"Baseline={b_devaluation.input_data.get('value')!r}, "
+            f"CF={cf_devaluation.input_data.get('value')!r}"
+        )
+
+    async def test_type_b_run(self, asgi_client: httpx.AsyncClient) -> None:
+        """AC-3, AC-4, AC-5, AC-9, AC-10, AC-EGY-2/3: full Type B run.
+
+        DIRECTION INVERSION: do not assert a specific direction_verdict.
+        Egypt 2016 succeeded — shock devaluation may outperform phased on fin_composite.
+        Log whichever verdict the model produces via warnings.warn.
+        """
+        from tests.fixtures.egypt_2016_scenario import (
+            build_egypt_counterfactual_scenario,
+            build_egypt_scenario,
+        )
+
+        b_resp = await asgi_client.post(
+            "/api/v1/scenarios",
+            json=build_egypt_scenario().model_dump(mode="json"),
+        )
+        assert b_resp.status_code == 201, f"AC-3 FAIL: {b_resp.status_code}"
+        baseline_id: str = b_resp.json()["scenario_id"]
+
+        cf_resp = await asgi_client.post(
+            "/api/v1/scenarios",
+            json=build_egypt_counterfactual_scenario().model_dump(mode="json"),
+        )
+        assert cf_resp.status_code == 201, f"AC-3 FAIL: {cf_resp.status_code}"
+        cf_id: str = cf_resp.json()["scenario_id"]
+
+        try:
+            result = await run_harness(
+                scenario_id=cf_id,
+                steps=4,
+                run_type=RunType.TYPE_B,
+                control_inputs=[{} for _ in range(4)],
+                baseline_run_id=baseline_id,
+                primary_indicator="fin_composite",
+                http_client=asgi_client,
+            )
+
+            assert len(result.per_step_records) == 4
+            assert "direction_verdict" in result.summary
+            verdict = result.summary["direction_verdict"]
+            valid_verdicts = {
+                DirectionVerdict.COUNTER_FACTUAL_BETTER,
+                DirectionVerdict.BASELINE_BETTER,
+                DirectionVerdict.INDISTINGUISHABLE,
+            }
+            assert verdict in valid_verdicts or str(verdict) in {
+                str(v) for v in valid_verdicts
+            }
+
+            per_step_diff = result.summary.get("per_step_diff", [])
+            assert isinstance(per_step_diff, list) and len(per_step_diff) == 4
+
+            known = result.summary.get("known_limitations", [])
+            assert isinstance(known, list) and len(known) >= 1, "AC-5 FAIL"
+
+            tier3_found = any(
+                term in str(e)
+                for e in known
+                for term in ("Tier 3", "INFERRED_STRUCTURAL", "hypothetical")
+            )
+            if not tier3_found:
+                warnings.warn(
+                    "AC-9 advisory (EGY): no Tier 3 disclosure in known_limitations.",
+                    UserWarning, stacklevel=1,
+                )
+
+            # AC-EGY-2: log the direction_verdict without asserting expected direction
+            warnings.warn(
+                f"AC-EGY-2 info (EGY): direction_verdict={verdict!r}. "
+                "Egypt 2016 is not a failure-mode case — BASELINE_BETTER or "
+                "INDISTINGUISHABLE are also valid outcomes on fin_composite. "
+                "Escalate to Chief Methodologist if COUNTER_FACTUAL_BETTER with "
+                "high confidence — this would contradict the historical record.",
+                UserWarning,
+                stacklevel=1,
+            )
+
+            # AC-EGY-3: DemographicModule CB Cloud advisory
+            q1_movement = any(
+                "q1_poverty" in str(rec.get("step_outputs", {})).lower()
+                or "bottom_quintile" in str(rec).lower()
+                for rec in result.per_step_records
+            )
+            if not q1_movement:
+                warnings.warn(
+                    "AC-EGY-3 advisory (EGY): q1_poverty_headcount or "
+                    "bottom_quintile_consumption not detected in step records. "
+                    "CB Cloud diagnostic requires DemographicModule to fire "
+                    "on the devaluation → import price → Q1 PHC channel.",
+                    UserWarning, stacklevel=1,
+                )
+        finally:
+            await asgi_client.delete(f"/api/v1/scenarios/{baseline_id}")
+            await asgi_client.delete(f"/api/v1/scenarios/{cf_id}")
 
 
 # Ghana (#1554) — TestGhanaTypeAB
