@@ -6,7 +6,7 @@
 > Historical state lives in `docs/process/session-archives/`.
 > Authority: `docs/process/sprint-group-isolation.md §SESSION_STATE.md Cockpit Card Protocol`.
 
-**Last updated:** 2026-07-02 (G3 EL-approved; sprint/m19-g3 cut; journal #1587 open; BLOCKED_ADR on ARCH-016)
+**Last updated:** 2026-07-03 (G2C EL-approved; journal #1589 open; Greece/Argentina may proceed; new-country PRs gated on CM advisory)
 **Current milestone:** M19 — Constraint Search and Empirical Calibration
 
 ---
@@ -20,9 +20,9 @@
 | Exit checklist issue | #1535 (M19 Exit Checklist — blocks milestone closure) |
 | Release branch | `release/m19` — cut from `main` 2026-07-02 at 1bf1ecc |
 | Sprint plan | `docs/process/sprint-plans/m19-sprint-plan.md` — EL-approved 2026-07-02 |
-| Active wave | Wave 2 — G3 entry filed; G2C/G4 follow after ARCH-016 accepted |
-| Active sprint groups | G3 — BLOCKED_ADR (ADR-007 amendment ARCH-016 in progress) |
-| Active sprint journal issues | #1587 (G3 — Bayesian Posterior Calibration) |
+| Active wave | Wave 2 — G2C approved; G3 BLOCKED_ADR (ARCH-016); G4 follows G3 |
+| Active sprint groups | G2C — implementation open (Greece/Argentina); G3 — BLOCKED_ADR |
+| Active sprint journal issues | #1589 (G2C — Battle-Testing Scenario Runs); #1587 (G3 — Bayesian Posterior Calibration) |
 
 ---
 
