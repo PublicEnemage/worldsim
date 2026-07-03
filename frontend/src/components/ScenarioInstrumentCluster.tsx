@@ -71,6 +71,8 @@ interface RawTrajectoryStep {
   step_significance: "SIGNIFICANT" | "ROUTINE";
   frameworks: RawFrameworkPoint[];
   pmm: { value: string; direction: string } | null;
+  /** M19-G4 (#1528): top-level PSP driver per step for arc display. */
+  psp_dominant_driver?: string | null;
 }
 
 interface RawTrajectoryResponse {
@@ -135,6 +137,10 @@ function parseTrajectoryResponse(raw: RawTrajectoryResponse): TrajectoryResponse
         step_significance: step.step_significance,
         frameworks: frameworkMap,
         pmm,
+        psp_dominant_driver:
+          step.psp_dominant_driver ??
+          step.frameworks.find((fw) => fw.framework === "political_economy")?.psp_dominant_driver ??
+          null,
       };
     }),
   };
