@@ -13,7 +13,7 @@ sop-reference: docs/process/sprint-planning-sop.md
 
 # Sprint Entry — M19, G4: PSP Driver Arc + CI Label Polish
 
-**Status:** Filed — awaiting EL approval before implementation begins
+**Status:** Filed — EL Approved 2026-07-03
 **Date authored:** 2026-07-03
 **Release branch:** `release/m19`
 **Sprint plan:** `docs/process/sprint-plans/m19-sprint-plan.md`
