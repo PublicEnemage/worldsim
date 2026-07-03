@@ -1204,10 +1204,191 @@ class TestEgyptTypeB:
             await asgi_client.delete(f"/api/v1/scenarios/{cf_id}")
 
 
-# Ghana (#1554) — TestGhanaTypeAB
-# ----------------------------------------
-# ACs: AC-1..5, AC-9, AC-10, AC-NC-2 (advisory), AC-NC-3, AC-GHA-1..4
-# Run: Type A+B (baseline = 2020–2023 actual crisis; counter-factual = earlier IMF 2021)
-# Primary indicator: fin_composite
-# Advisory: direction_verdict COUNTER_FACTUAL_BETTER
-# Add in: feat/m19-g2c-ghana-imf-programme (after CM advisory on #1554)
+@pytest.mark.backtesting
+@pytest.mark.asyncio(loop_scope="session")
+class TestGhanaTypeAB:
+    """AC-1..5, AC-9, AC-10, AC-NC-2 (advisory), AC-NC-3, AC-GHA-1..4.
+
+    Type A: CB Cloud test — reserve improvement AND Q1 PHC deterioration simultaneous.
+    Type B: Ghanaian proposed terms vs IMF ECF terms.
+    Demo 7 Act 2 regional comparator (ZMB three-scenario benchmark).
+    Skips without DATABASE_URL.
+    """
+
+    @pytest_asyncio.fixture(loop_scope="session")
+    async def asgi_client(self) -> AsyncGenerator[httpx.AsyncClient, None]:
+        if not _DATABASE_URL:
+            pytest.skip("DATABASE_URL not set — skipping Ghana Type A+B tests")
+        async with httpx.AsyncClient(
+            transport=httpx.ASGITransport(app=app),
+            base_url="http://test",
+        ) as client:
+            yield client
+
+    async def test_construction(self, asgi_client: httpx.AsyncClient) -> None:
+        """AC-1, AC-2, AC-NC-3, AC-GHA-1: importable; entity=GHA; CF Step 2 differs."""
+        from tests.fixtures.ghana_2022_scenario import (
+            build_ghana_counterfactual_scenario,
+            build_ghana_scenario,
+        )
+
+        baseline = build_ghana_scenario()
+        cf = build_ghana_counterfactual_scenario()
+
+        assert baseline.configuration.entities[0] == "GHA"
+        assert cf.configuration.entities[0] == "GHA"
+        assert baseline.configuration.n_steps == 4
+        assert cf.configuration.n_steps == 4
+
+        # AC-GHA-1: Step 2 spending_change differs (50% of IMF rate in CF)
+        b_step2_spending = next(
+            (s for s in (baseline.scheduled_inputs or [])
+             if s.step == 2 and s.input_type == "FiscalPolicyInput"
+             and s.input_data.get("instrument") == "spending_change"),
+            None,
+        )
+        cf_step2_spending = next(
+            (s for s in (cf.scheduled_inputs or [])
+             if s.step == 2 and s.input_type == "FiscalPolicyInput"
+             and s.input_data.get("instrument") == "spending_change"),
+            None,
+        )
+        assert b_step2_spending is not None, "AC-GHA-1: baseline Step 2 missing spending_change"
+        assert cf_step2_spending is not None, "AC-GHA-1: CF Step 2 missing spending_change"
+        b_val = b_step2_spending.input_data.get("value")
+        cf_val = cf_step2_spending.input_data.get("value")
+        assert b_val != cf_val, (
+            "AC-GHA-1 FAIL: baseline and CF Step 2 spending_change values are identical. "
+            "CF must apply 50% of IMF baseline rate."
+        )
+
+    async def test_type_a_run(self, asgi_client: httpx.AsyncClient) -> None:
+        """AC-3, AC-4 (TYPE_A), AC-5, AC-10, AC-GHA-2: Type A historical run.
+
+        CB Cloud test: checks that reserve_coverage_months improves direction
+        at Step 3/4 while q1_poverty_headcount_ratio continues deteriorating.
+        Both directions must be present for the CB Cloud diagnostic.
+        """
+        from tests.fixtures.ghana_2022_scenario import build_ghana_scenario
+
+        resp = await asgi_client.post(
+            "/api/v1/scenarios",
+            json=build_ghana_scenario().model_dump(mode="json"),
+        )
+        assert resp.status_code == 201, f"AC-3 FAIL: {resp.status_code} {resp.text}"
+        scenario_id: str = resp.json()["scenario_id"]
+
+        try:
+            result = await run_harness(
+                scenario_id=scenario_id,
+                steps=4,
+                run_type=RunType.TYPE_A,
+                control_inputs=[{} for _ in range(4)],
+                http_client=asgi_client,
+            )
+
+            assert len(result.per_step_records) == 4
+
+            actual_tier = result.summary.get("fidelity_tier")
+            assert actual_tier in _ACCEPTABLE_TIERS or str(actual_tier) in {
+                str(t) for t in _ACCEPTABLE_TIERS
+            }, f"AC-GHA-2 FAIL: fidelity_tier={actual_tier!r}"
+
+            # AC-GHA-2: CB Cloud advisory — check diverging trajectories at Step 3
+            if len(result.per_step_records) >= 3:
+                step3 = result.per_step_records[2]
+                outputs = step3.get("step_outputs", {})
+                res_dir = outputs.get("reserve_coverage_months_direction")
+                phc_dir = outputs.get("q1_poverty_headcount_ratio_direction")
+                if not (res_dir == "improving" and phc_dir == "deteriorating"):
+                    warnings.warn(
+                        "AC-GHA-2 advisory (GHA): CB Cloud divergence not detected at Step 3. "
+                        f"reserve direction={res_dir!r}, q1_phc direction={phc_dir!r}. "
+                        "Expected simultaneous reserve improvement + PHC deterioration. "
+                        "Escalate to CM if trajectories move together.",
+                        UserWarning, stacklevel=1,
+                    )
+        finally:
+            await asgi_client.delete(f"/api/v1/scenarios/{scenario_id}")
+
+    async def test_type_b_run(self, asgi_client: httpx.AsyncClient) -> None:
+        """AC-3, AC-4, AC-5, AC-9, AC-10, AC-GHA-3/4: full Type B run."""
+        from tests.fixtures.ghana_2022_scenario import (
+            build_ghana_counterfactual_scenario,
+            build_ghana_scenario,
+        )
+
+        b_resp = await asgi_client.post(
+            "/api/v1/scenarios",
+            json=build_ghana_scenario().model_dump(mode="json"),
+        )
+        assert b_resp.status_code == 201, f"AC-3 FAIL: {b_resp.status_code}"
+        baseline_id: str = b_resp.json()["scenario_id"]
+
+        cf_resp = await asgi_client.post(
+            "/api/v1/scenarios",
+            json=build_ghana_counterfactual_scenario().model_dump(mode="json"),
+        )
+        assert cf_resp.status_code == 201, f"AC-3 FAIL: {cf_resp.status_code}"
+        cf_id: str = cf_resp.json()["scenario_id"]
+
+        try:
+            result = await run_harness(
+                scenario_id=cf_id,
+                steps=4,
+                run_type=RunType.TYPE_B,
+                control_inputs=[{} for _ in range(4)],
+                baseline_run_id=baseline_id,
+                primary_indicator="fin_composite",
+                http_client=asgi_client,
+            )
+
+            assert len(result.per_step_records) == 4
+            assert "direction_verdict" in result.summary
+            verdict = result.summary["direction_verdict"]
+            valid_verdicts = {
+                DirectionVerdict.COUNTER_FACTUAL_BETTER,
+                DirectionVerdict.BASELINE_BETTER,
+                DirectionVerdict.INDISTINGUISHABLE,
+            }
+            assert verdict in valid_verdicts or str(verdict) in {
+                str(v) for v in valid_verdicts
+            }
+
+            per_step_diff = result.summary.get("per_step_diff", [])
+            assert isinstance(per_step_diff, list) and len(per_step_diff) == 4
+
+            known = result.summary.get("known_limitations", [])
+            assert isinstance(known, list) and len(known) >= 1, "AC-5 FAIL"
+
+            tier3_found = any(
+                term in str(e)
+                for e in known
+                for term in ("Tier 3", "INFERRED_STRUCTURAL", "hypothetical")
+            )
+            if not tier3_found:
+                warnings.warn(
+                    "AC-9 advisory (GHA): no Tier 3 disclosure in known_limitations.",
+                    UserWarning, stacklevel=1,
+                )
+
+            # AC-GHA-3: direction advisory
+            _assert_direction_advisory(
+                actual=verdict,
+                expected=DirectionVerdict.COUNTER_FACTUAL_BETTER,
+                country="GHA",
+                indicator="fin_composite",
+            )
+
+            # AC-GHA-4: Demo 7 reproducibility advisory
+            warnings.warn(
+                f"AC-GHA-4 info (GHA): Demo 7 Act 2 comparator reproduced. "
+                f"direction_verdict={verdict!r}. "
+                "Verify directional agreement with Demo 7 Act 2 ZMB comparison output "
+                "(+342K Q1 PHC under IMF terms, Ghana 2023 as regional benchmark). "
+                "Exact number match is NOT expected — DIRECTION_ONLY agreement is the target.",
+                UserWarning, stacklevel=1,
+            )
+        finally:
+            await asgi_client.delete(f"/api/v1/scenarios/{baseline_id}")
+            await asgi_client.delete(f"/api/v1/scenarios/{cf_id}")
