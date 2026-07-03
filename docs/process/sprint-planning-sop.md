@@ -433,6 +433,80 @@ Template: `docs/process/sprint-plans/templates/sprint-entry-template.md`
 
 ---
 
+## Pre-Merge CM Review Gate
+
+*Authority: NM-084 process improvement (2026-07-02). Changes to this section require PM Agent authorship and EL endorsement.*
+
+When a sprint entry specifies a Chief Methodologist sign-off as a pre-merge condition on a fixture PR (as opposed to a pre-PR-open condition), the following protocol enforces ordering so that auto-merge cannot fire before the sign-off is on record.
+
+### When this gate applies
+
+This gate applies to any fixture or analytics PR where the sprint entry or intent document states that CM sign-off must be obtained before the PR merges. The canonical case is backtesting fixture PRs (G2B onward), where the CM determines the fidelity tier classification.
+
+### Protocol
+
+**Before setting auto-merge on any fixture PR subject to a CM pre-merge requirement:**
+
+1. The implementing agent activates the Chief Methodologist with the full fixture context (initial state values, data sources, harness output, and the specific question the CM must resolve — e.g., fidelity tier classification).
+2. The CM records their sign-off as a comment on the corresponding GitHub issue (not the PR).
+3. The PI Agent posts a gate comment on the PR confirming the CM sign-off is on record: *"PI Agent gate: CM sign-off confirmed at [issue #NNN comment]. Auto-merge may be set."*
+4. Only after the PI Agent gate comment is posted does the implementing agent set auto-merge.
+
+**The PI Agent gate comment is the enforcement mechanism.** An implementing agent that sets auto-merge without a PI Agent gate comment has bypassed this gate. The PI Agent files a near-miss if this occurs.
+
+### Sprint entry requirement
+
+Sprint entries for groups with CM pre-merge requirements must include a row in the entry's §2.2 ADR Prerequisite Gate (or a dedicated pre-merge checklist) that names:
+- Which PRs require CM sign-off before merge
+- That auto-merge may not be set until the PI Agent gate comment is posted
+- Which GitHub issue will receive the CM sign-off comment
+
+### Root cause: NM-084
+
+This gate was established after G2B (M19) opened both fixture PRs and set auto-merge before the CM consultation was activated. The sign-off landed while CI was running, so no fixture integrity issue resulted — but the protection was luck (a non-required check failure slowing CI), not process. See `docs/process/near-miss-registry.md §NM-084`.
+
+---
+
+## Co-Dependent Fixture Sprint Entry Requirements
+
+*Authority: NM-085 process improvement (2026-07-02). Changes to this section require PM Agent authorship and EL endorsement.*
+
+A sprint with N fixture test shells on the sprint branch and N fixture PRs to implement them will produce N-1 transient cross-test failures on the sprint branch as each PR merges in sequence. This is not a test integrity issue, but it produces alarming CI output that can mislead future agents.
+
+### Definition
+
+A **co-dependent fixture set** is a sprint group containing:
+- Two or more backtesting test shells already present on the sprint sub-branch (placed there by a prior process-entry PR), AND
+- Two or more fixture implementation PRs that will each land separately
+
+When fixture implementation PRs are opened sequentially and each PR runs the full `@pytest.mark.backtesting` suite against the sprint branch merge commit, each PR sees the test shells for fixtures that haven't been implemented yet — and those tests fail with `ModuleNotFoundError`.
+
+### Required documentation in sprint entry
+
+Sprint entries for co-dependent fixture sets must include an explicit CI ordering statement in §6.2 (File-conflict risk assessment) or §2.2 (ADR prerequisite / pre-merge conditions):
+
+> *"This sprint group contains N co-dependent fixture PRs. Running the full backtesting suite on any individual fixture PR will produce M transient cross-fixture test failures (one per not-yet-landed fixture). `backtesting` is a non-required check for `sprint/m{N}-gN` PRs — these transient failures do not block auto-merge. This is by design. Each fixture test passes on its own feature branch (where the fixture being tested is present)."*
+
+This statement makes the implicit assumption explicit and prevents confusion during CI triage.
+
+### Structural option: single combined PR
+
+For sprint groups with two or three tightly co-authored fixture PRs (typically authored in the same session), consider bundling them into a single PR. This eliminates the transient cross-test failure pattern entirely. The sprint entry should evaluate this option and document the decision.
+
+**When to bundle:** Two fixtures authored in the same session, both complete before CI runs, no separate CM consultation required per fixture.
+
+**When to keep separate:** Fixtures authored in different sessions, separate CM consultations required, or PRs expected to merge at significantly different times.
+
+### `backtesting` non-required status — make explicit
+
+If the sprint plan or sprint entry does not already state that `backtesting` is a non-required check for sprint sub-branch PRs, add it explicitly. The transient co-dependent failure pattern is harmless only if this is true. If a future CI configuration change makes `backtesting` required, the co-dependent fixture pattern would produce a deadlock — each PR blocked by a failing test for a fixture that can only land after the other PR merges. Document the assumption so it can be verified before configuration changes.
+
+### Root cause: NM-085
+
+This guidance was established after G2B (M19) produced a transient `ModuleNotFoundError` on the SEN fixture PR (PR #1576) when the ZMB test shell ran without `zmb_scenario.py`. The pattern was identified only through post-merge CI log review. See `docs/process/near-miss-registry.md §NM-085`.
+
+---
+
 ## Sprint Exit Gate
 
 *Authority: `docs/process/acceptance-protocol.md` (Phase B output).
