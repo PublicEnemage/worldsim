@@ -6,7 +6,7 @@
 > Historical state lives in `docs/process/session-archives/`.
 > Authority: `docs/process/sprint-group-isolation.md §SESSION_STATE.md Cockpit Card Protocol`.
 
-**Last updated:** 2026-07-02 (G1/G2A/G2B all complete; Wave 2: G3 sprint entry filed — BLOCKED_ADR on ADR-007 amendment ARCH-016; G2C/G4 to follow)
+**Last updated:** 2026-07-02 (G3 EL-approved; sprint/m19-g3 cut; journal #1587 open; BLOCKED_ADR on ARCH-016)
 **Current milestone:** M19 — Constraint Search and Empirical Calibration
 
 ---
@@ -22,7 +22,7 @@
 | Sprint plan | `docs/process/sprint-plans/m19-sprint-plan.md` — EL-approved 2026-07-02 |
 | Active wave | Wave 2 — G3 entry filed; G2C/G4 follow after ARCH-016 accepted |
 | Active sprint groups | G3 — BLOCKED_ADR (ADR-007 amendment ARCH-016 in progress) |
-| Active sprint journal issues | None — sprint journal issue created at EL approval |
+| Active sprint journal issues | #1587 (G3 — Bayesian Posterior Calibration) |
 
 ---
 

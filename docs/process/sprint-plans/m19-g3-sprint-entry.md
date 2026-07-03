@@ -6,14 +6,14 @@ sprint-group: G3 — Bayesian Posterior Calibration
 status: Filed
 authored-by: PM Agent
 authored-date: 2026-07-02
-el-approved: false
+el-approved: 2026-07-02
 release-branch: release/m19
 sop-reference: docs/process/sprint-planning-sop.md
 ---
 
 # Sprint Entry — M19, G3: Bayesian Posterior Calibration
 
-**Status:** Filed — awaiting EL approval before implementation begins
+**Status:** EL-approved — sprint branch cut; BLOCKED_ADR pending ARCH-016 acceptance
 **Date authored:** 2026-07-02
 **Release branch:** `release/m19`
 **Sprint plan:** `docs/process/sprint-plans/m19-sprint-plan.md`
@@ -190,7 +190,7 @@ lock is confirmed at ADR-007 amendment acceptance. Implementation PRs do not ope
 |---|---|
 | Sprint sub-branch | `sprint/m19-g3` |
 | Cut from | `release/m19` |
-| Sprint journal issue | TBD — PM Agent creates at EL approval |
+| Sprint journal issue | #1587 |
 
 **PM Agent sprint sub-branch cut command (run after EL approval):**
 ```bash
@@ -266,7 +266,10 @@ No changes to `.github/workflows/`, `.githooks/`, or `.gitignore` are anticipate
 *EL reviews this entry document before any implementation PR opens. Approval is recorded here
 or as a comment on the exit checklist issue #1535.*
 
-**EL approval:** Pending
+**EL approval:** Approved — 2026-07-02
 
-> {EL approval statement — to be filled at approval time}
-> — @PublicEnemage ({date})
+> G3 sprint entry approved. ARCH-016 authorship to proceed immediately. Sprint branch
+> `sprint/m19-g3` cut from `release/m19`. Sprint journal issue #1587 opened. Implementation
+> PRs remain blocked until ARCH-016 amendment is accepted and PI Agent posts cleared gate
+> comment on #1587.
+> — @PublicEnemage (2026-07-02)
