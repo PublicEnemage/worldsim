@@ -691,6 +691,23 @@ endpoints:
                 is_pre_calibration:
                   type: "boolean|null"
                   description: "true throughout M18 (pre-calibration phase per ADR-007); null when composite_score is null."
+                band_method:
+                  type: "string|null"
+                  description: >
+                    BandingEngine calibration method applied to this framework point (M19-G3 #1537).
+                    Examples: "bayesian_posterior", "bootstrap", "parametric". null when
+                    composite_score is null or BandingEngine was not applied.
+                is_meaningless:
+                  type: "boolean|null"
+                  description: >
+                    ADR-007 meaninglessness threshold flag (M19-G3 #1536). true when the CI
+                    interval is too wide to be directionally informative (MDA alert suppressed).
+                    null when composite_score is null.
+                suppressed_reason:
+                  type: "string|null"
+                  description: >
+                    Human-readable explanation when CI is suppressed (e.g. "insufficient variance
+                    for bootstrap resampling"). null when CI is not suppressed.
             policy_inputs:
               type: array
               description: "Policy input events applied at this step. Source: scenario_scheduled_inputs."
