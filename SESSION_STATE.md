@@ -6,7 +6,7 @@
 > Historical state lives in `docs/process/session-archives/`.
 > Authority: `docs/process/sprint-group-isolation.md §SESSION_STATE.md Cockpit Card Protocol`.
 
-**Last updated:** 2026-07-04 (CM Sprint C confirmed — #1623 Gap 3 SEA PAK/LKA/BGD; integration PR #1707 auto-merging to release/m19)
+**Last updated:** 2026-07-04 (CM Sprint C integrated; 5 Demo 8 clearance issues filed #1709–#1713; G6 Wave 4 added to sprint plan)
 **Current milestone:** M19 — Constraint Search and Empirical Calibration
 
 ---
@@ -20,8 +20,8 @@
 | Exit checklist issue | #1535 (M19 Exit Checklist — blocks milestone closure) |
 | Release branch | `release/m19` — cut from `main` 2026-07-02 at 1bf1ecc |
 | Sprint plan | `docs/process/sprint-plans/m19-sprint-plan.md` — EL-approved 2026-07-02 |
-| Active wave | Wave 3 — G5 integrated 2026-07-04 (PR #1684); CM-B integrated (PR #1698); CM-C integration PR #1707 auto-merging |
-| Active sprint groups | None — CM Sprint C integration PR #1707 pending auto-merge to release/m19 |
+| Active wave | Wave 4 — G5/CM-A/CM-B/CM-C all integrated; G6 (Demo 8 clearance) is next sprint group |
+| Active sprint groups | None — next: G6 (Demo 8 clearance: #1456, #1538, #1709, #1710) |
 | Active sprint journal issues | None — #1700 closes at CM Sprint C PI Agent confirmation |
 
 ---
@@ -73,6 +73,11 @@
 | #1647 | G2C test file missing from release/m19 — NM-094 recovery | Demo 8 risk | **Closed** — PR #1649 merged; test_m19_g2c_scenario_runs.py (1394 lines) restored |
 | #1650–#1656 | NM-084/085/086/089/092/093/094 process codification | G5 Phase A | **Closed** — PR #1658 MERGED (sprint/m19-g5) |
 | #1657 | NM-090/091: DemographicModule dead subscriptions fix | Deferred (CM gate) | **Unblocked** — CM Sprint A confirmed; `entity_families` field syntax available; CM sign-off required before implementation PR opens |
+| #1709 | FOUND state: tolerance band (±0.01) not displayed | G6 | Immediate — Demo 8 Act 1 blocker (Customer Agent L3 on #1540) |
+| #1710 | AC-12: resolve `__structural_absence__` placeholder | G6 | Immediate — Demo 8 Act 1 blocker (Customer Agent L3 on #1540) |
+| #1711 | Demo 8 Act 2 verification: GRC AC-1 live harness run | Act 2 verification | DATABASE_URL prerequisite — no code changes |
+| #1712 | Demo 8 Act 2 verification: ARG AC-1 live harness run | Act 2 verification | DATABASE_URL prerequisite — no code changes |
+| #1713 | Demo 8 Act 2 verification: PAK AC-1 live harness run | Act 2 verification | DATABASE_URL prerequisite — no code changes |
 
 ---
 
@@ -80,11 +85,11 @@
 
 | Condition | Source | Blocking |
 |---|---|---|
-| Tolerance band (±0.01) visible in FOUND state UI | Customer Agent L3 on #1540 | Demo 8 Act 1 |
-| AC-12: resolve structural-absence indicator key (replace `__structural_absence__` placeholder) | Customer Agent L3 on #1540 | Demo 8 Act 1 |
-| AC-1 harness live run (GRC orthodox vs heterodox): `per_step_diff[3] ∈ [0.010, 0.20]` | CM Sprint A exit §4 forward condition | Demo 8 Act 2 |
-| AC-1 harness live run (ARG Type B `hd_composite` divergence): `per_step_diff[2] ∈ [0.003, 0.050]` | CM Sprint B exit §4 forward condition | Demo 8 Act 2 |
-| AC-1 harness live run (PAK Type B `hd_composite` divergence): `per_step_diff[2] ∈ [0.002, 0.035]` | CM Sprint C exit §4 forward condition | Demo 8 Act 2 |
+| Tolerance band (±0.01) visible in FOUND state UI | Customer Agent L3 on #1540 → **#1709** | Demo 8 Act 1 |
+| AC-12: resolve structural-absence indicator key (replace `__structural_absence__` placeholder) | Customer Agent L3 on #1540 → **#1710** | Demo 8 Act 1 |
+| AC-1 harness live run (GRC orthodox vs heterodox): `per_step_diff[3] ∈ [0.010, 0.20]` | CM Sprint A exit §4 → **#1711** | Demo 8 Act 2 |
+| AC-1 harness live run (ARG Type B `hd_composite` divergence): `per_step_diff[2] ∈ [0.003, 0.050]` | CM Sprint B exit §4 → **#1712** | Demo 8 Act 2 |
+| AC-1 harness live run (PAK Type B `hd_composite` divergence): `per_step_diff[2] ∈ [0.002, 0.035]` | CM Sprint C exit §4 → **#1713** | Demo 8 Act 2 |
 
 ---
 
