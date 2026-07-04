@@ -359,17 +359,17 @@ test("AC-11: FOUND result includes 'synthetic' word when indicator is Tier 3", a
 });
 
 // ---------------------------------------------------------------------------
-// AC-12: Structural absence — Tier 4+
+// AC-12: Structural absence — SAD sentinel indicator_key (#1710)
 // ---------------------------------------------------------------------------
 
-test("AC-12: constraint-search-structural-absence shown when indicator is Tier 4+", async ({
+test("AC-12: constraint-search-structural-absence shown for SAD sentinel indicator_key", async ({
   page,
 }) => {
-  // Gap 8 fix: mock the scenario to return a structural-absence indicator.
-  // Without this mock, the test permanently skips post-implementation because
-  // the default scenario never loads a Tier 4+ indicator.
-  // The exact indicator_key value that triggers structural absence must be
-  // confirmed with the Frontend Architect before the G1 PR opens.
+  // Structural absence is detected by indicator_key.startsWith("__") in
+  // ControlPlaneColumn (ADR-021 §D-5). "__structural_absence__" is the canonical
+  // SAD sentinel — any __ prefix activates the path. constraint-search-section
+  // is suppressed when SAD is active; the SAD panel renders instead.
+  // #1710: removed skip guard and fixed timing (waitForTimeout → waitFor).
   const SA_ID = "zmb-structural-absence-test";
   await setupScenarioMocks(page, SA_ID, [
     { ...FOCAL_COHORT_CONFIG, indicator_key: "__structural_absence__" },
@@ -377,22 +377,13 @@ test("AC-12: constraint-search-structural-absence shown when indicator is Tier 4
   await page.goto(`/?scenario=${SA_ID}`);
   await waitForScenarioLoad(page, SA_ID);
   const btn = page.getByTestId("enter-active-control-btn");
-  if (await btn.isVisible({ timeout: 8_000 }).catch(() => false)) {
-    await btn.click();
-  }
-  await page.waitForTimeout(500);
-
-  const structuralAbsence = page.getByTestId(
-    "constraint-search-structural-absence"
-  );
-  if (!(await structuralAbsence.isVisible().catch(() => false))) {
-    test.skip();
-    return;
-  }
-  await expect(structuralAbsence).toBeVisible();
+  await btn.waitFor({ state: "visible", timeout: 8_000 });
+  await btn.click();
+  // Wait for the SAD panel — constraint-search-section is intentionally absent here.
   await expect(
-    page.getByTestId("constraint-search-btn")
-  ).not.toBeVisible();
+    page.getByTestId("constraint-search-structural-absence")
+  ).toBeVisible({ timeout: 5_000 });
+  await expect(page.getByTestId("constraint-search-btn")).not.toBeVisible();
 });
 
 // ---------------------------------------------------------------------------
