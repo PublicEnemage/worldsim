@@ -83,6 +83,7 @@ Full M19 issue audit completed 2026-07-02 (updated post-filing). Updated 2026-07
 | #1536 | ADR-007 meaninglessness threshold | G3 (coord: Bayesian posterior) | High — coordinate with #1543 |
 | #1537 | BandResult visible fields (is_pre_calibration, clipped_lower/upper) | G3 (coord: G3) | High — prerequisite for posterior transition UX |
 | #1538 | Focal cohort floor validation (monitored_focal_cohorts schema) | Pre-wave → G6 | High — prerequisite gap; now required before Demo 8 |
+| #1657 | NM-090/091: DemographicModule dead subscriptions + elasticity rows + ADR-020 update | G6 | High — CM cert required before impl PR opens |
 | #1709 | FOUND state: tolerance band (±0.01) not displayed | G6 | Immediate — Demo 8 Act 1 blocker (Customer Agent L3 on #1540) |
 | #1710 | AC-12: resolve `__structural_absence__` placeholder | G6 | Immediate — Demo 8 Act 1 blocker (Customer Agent L3 on #1540) |
 | #1711 | Demo 8 Act 2 verification: GRC AC-1 live harness run | Demo 8 Act 2 verification | Near-term — no code changes; DATABASE_URL prerequisite |
@@ -120,6 +121,7 @@ Full M19 issue audit completed 2026-07-02 (updated post-filing). Updated 2026-07
 | #1630 | Demo 8 narration: HD line implied but not rendered | G5 / Wave 3 | Wave 3 (after G4) | High — Demo 8 Act 1 risk; separate sprint entry G5 per EL direction |
 | #1522 | View model layer retrofit — Zone 1 composition extraction | Wave 3+ | Wave 3+ | Medium — EL-added to M19; defers to M20 if Wave 3 capacity reached |
 | #1524 | Zone 1A TrajectoryView: pinch-zoom, thumbwheel, pan | Wave 3+ | Wave 3+ | Medium — EL-added to M19; defers to M20 if Wave 3 capacity reached |
+| #1657 | NM-090/091: DemographicModule dead subscriptions + elasticity rows + ADR-020 update | G6 | Wave 4 | High — CM cert required before impl PR |
 | #1709 | FOUND state: tolerance band (±0.01) not displayed | G6 | Wave 4 | High — Demo 8 Act 1 blocker |
 | #1710 | AC-12: resolve `__structural_absence__` placeholder | G6 | Wave 4 | High — Demo 8 Act 1 blocker |
 | #1711 | Demo 8 Act 2 verification: GRC AC-1 live harness run | Demo 8 Act 2 verification | Wave 4 | High — Demo 8 Act 2 condition (DATABASE_URL only) |
@@ -217,14 +219,15 @@ Full M19 issue audit completed 2026-07-02 (updated post-filing). Updated 2026-07
 
 **G6: Demo 8 Act 1 clearance (#1456, #1538, #1709, #1710)**
 
-- Primary objective: clear all Demo 8 Act 1 blockers and pre-wave crash risk before Demo 8 rehearsal
-- #1456 (crash fix): `MDAAlertPanel` Zone1B `scenarioId` guard — targeted null-check; no ADR required
+- Primary objective: clear all Demo 8 Act 1 blockers, pre-wave crash risk, and NM-090/091 dead-subscription gap before Demo 8 rehearsal
+- #1456 (crash fix): `MDAAlertPanel` Zone1B `scenarioId` guard — targeted null-check
 - #1538 (focal cohort floor validation): `monitored_focal_cohorts` Pydantic validation — `list[dict[str, Any]]` → `list[FocalCohortConfig]`; G1 prerequisite that remained unimplemented; required before Demo 8 correctness claims hold
 - #1709 (tolerance band): FOUND state must render `±tolerance` visually distinct from boundary value in the control plane column; Customer Agent L3 condition from #1540 exit
 - #1710 (AC-12): identify real structural-absence indicator key; rewrite AC-12 without the `__structural_absence__` placeholder; CI skip on AC-12 must be removed
+- #1657 (NM-090/091): fix 2 dead strings in `DemographicModule._SUBSCRIBED_EVENTS`; add elasticity rows for both newly-wired events; reconcile ADR-020 transmission table against actual `EmergencyInstrument` enum; **CM consultation required before elasticity values are assigned — CM posts cert on #1657 before #1657 implementation PR opens** (NM-084 gate); ADR-020 update required (transmission table correction, not a new ADR)
 - Sprint branch: `sprint/m19-g6`
-- No ADR required — all items are targeted fixes and completions within existing architecture
-- Blocked by: none (Wave 3 fully integrated)
+- No new ADR required; ADR-020 update in scope for #1657
+- Blocked by: none (Wave 3 fully integrated); #1657 implementation PR additionally gated by CM cert
 
 **Demo 8 Act 2 verification (#1711, #1712, #1713)**
 
