@@ -260,4 +260,73 @@ ELASTICITY_REGISTRY: list[CohortElasticity] = [
         confidence_tier=3,
         entity_families=frozenset({"ARG", "ECU", "BOL", "PER"}),
     ),
+    # South/Southeast Asia (PAK/LKA/BGD): Q1 FORMAL — fiscal consolidation channel.
+    # PAK 2022-23: energy subsidy removal + IMF programme fiscal consolidation. LKA 2022:
+    # sovereign default + fuel shortage + EFF. Formal-sector Q1 workers directly exposed to
+    # energy cost pass-through, civil service wage compression, and import-good price inflation.
+    # FORMAL-only (Option a): SSA Q1 INFORMAL (entity_families=None) continues to fire on all
+    # entities at -0.20; FORMAL entry adds uncovered formal-sector channel without double-count
+    # (distinct cohort_spec). Ilzetzki, Mendoza & Vegh (2013): developing-country fiscal
+    # multiplier 0.3-0.5; open managed-rate South Asian point estimate 0.35-0.40. Q1 formal
+    # concentration factor 1.35x (IMF WEO 2010 Ch.3 South Asian range 1.2-1.5; discounted
+    # 15% for BISP/Samurdhi social safety net coverage). Derivation: 0.14 x 1.35 = 0.189
+    # -> dampened to -0.17. Lower than GRC (-0.25) and LAC (-0.22): lower multiplier + social
+    # safety net discount. Uncertainty range: -0.12 to -0.25. Known limitation: SSA Q1
+    # INFORMAL (-0.20) also fires on SEA informal cohorts as accepted overestimate — Option (d)
+    # suppression requires module.py sprint beyond CM-C scope.
+    # Calibration: docs/calibration/m19-cm-c-sea-calibration-decision.md §3.1.
+    CohortElasticity(
+        event_type="gdp_growth_change",
+        cohort_spec=CohortSpec(
+            IncomeQuintile.Q1,
+            AgeBand.AGE_25_54,
+            EmploymentSector.FORMAL,
+        ),
+        attribute_key="poverty_headcount_ratio",
+        elasticity=Decimal("-0.17"),
+        source=(
+            "Ilzetzki, E., Mendoza, E.G. & Vegh, C.A. (2013): How Big (Small?)"
+            " Are Fiscal Multipliers? Journal of Monetary Economics 60(2): 239-254."
+            " Developing-country fiscal multiplier 0.3-0.5; open managed-rate South"
+            " Asian point estimate 0.35-0.40. IMF WEO October 2010 Ch.3: fiscal"
+            " consolidation in South Asian programme countries produces smaller output"
+            " losses than advanced economies; Q1 formal concentration 1.2-1.5x aggregate."
+            " Q1 concentration 1.35x (discounted 15% for BISP/Samurdhi social safety"
+            " net coverage). Derivation: aggregate 0.14 x 1.35 = 0.189 -> -0.17."
+            " PAK 2022-23 IMF SBA energy subsidy removal; LKA 2022 EFF. Known"
+            " limitation: SSA Q1 INFORMAL (-0.20) also fires on SEA informal cohorts"
+            " as accepted overestimate. Uncertainty range: -0.12 to -0.25."
+            " M19-CM-C calibration."
+        ),
+        source_registry_id="ACADEMIC_LITERATURE_ILZETZKI_2013_FISCAL_MULTIPLIERS",
+        confidence_tier=3,
+        entity_families=frozenset({"PAK", "LKA", "BGD"}),
+    ),
+    # South/Southeast Asia (PAK/LKA/BGD): Q2 FORMAL — Ball et al. (2013) 0.60 scaling.
+    # 0.60 x -0.17 = -0.102 -> -0.10. Q2 formal workers have stronger employment tenure
+    # and higher social safety net coverage than Q1; absorb 0.60x the Q1 per-unit impact.
+    # Consistent with GRC/LAC between-quintile scaling methodology.
+    # Uncertainty range: -0.07 to -0.15. M19-CM-C calibration.
+    CohortElasticity(
+        event_type="gdp_growth_change",
+        cohort_spec=CohortSpec(
+            IncomeQuintile.Q2,
+            AgeBand.AGE_25_54,
+            EmploymentSector.FORMAL,
+        ),
+        attribute_key="poverty_headcount_ratio",
+        elasticity=Decimal("-0.10"),
+        source=(
+            "Ball, Furceri, Leigh, Loungani (2013): The Distributional Effects"
+            " of Fiscal Consolidation. IMF Working Paper WP/13/151."
+            " 0.60 scaling of South Asian Q1 FORMAL: 0.60 x -0.17 = -0.102 -> -0.10."
+            " Q2 formal workers have stronger employment tenure and social safety net"
+            " coverage than Q1; absorb 0.60x the Q1 per-unit impact. Consistent with"
+            " GRC/LAC between-quintile methodology. Uncertainty range: -0.07 to -0.15."
+            " M19-CM-C calibration."
+        ),
+        source_registry_id="ACADEMIC_LITERATURE_BALL_2013_FISCAL_CONSOLIDATION",
+        confidence_tier=3,
+        entity_families=frozenset({"PAK", "LKA", "BGD"}),
+    ),
 ]
