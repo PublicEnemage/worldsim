@@ -117,11 +117,30 @@ Additional unit tests for `_classify_direction` must be authored or updated befo
 |---|---|---|---|
 | #1712 | Demo 8 Act 2 verification: ARG AC-1 | Near-term | Separate fixture design constraint; requires CM consultation on baseline n_steps and bounds recalibration |
 
-**Note on #1712:** The ARG fixture issue is excluded from G8 because it requires:
-(a) CM Agent consultation on whether to extend baseline to n_steps=3 or change the checked
-step index, AND (b) potential bounds recalibration which requires CM certification. G8 delivers
-the prerequisite fix (#1739) that unblocks GRC; ARG requires a separate CM sprint (G9 or
-CM-D if a CM sprint is appropriate).
+**Note on #1712 — CM consultation result (2026-07-04):** The CM Agent was activated
+during this session to advise on Option A (extend baseline to n_steps=3) vs Option B
+(change assertion step index). The CM approved Option A in principle. An empirical live
+run was performed to calibrate expected bounds:
+
+| Step | BL hd | CF hd | diff |
+|------|-------|-------|------|
+| 1 | 0.5464 | 0.6107 | 0.0643 |
+| 2 | 0.3723 | 0.5393 | 0.1670 |
+| 3 (extended BL, no inputs) | 0.3723 | 0.5750 | 0.2027 |
+
+Finding: the engine produces **no recovery** at baseline step 3 without explicit
+fiscal recovery inputs. BL hd_composite stays flat at the post-default trough (0.3723).
+The step-3 diff (0.2027) is larger than step 2 — divergence widens, not converges.
+The [0.003, 0.050] bounds are unachievable; the CM Sprint B AC-1 spec assumed convergence
+behavior that requires explicit Kirchner recovery inputs at baseline step 3.
+
+**This is a fixture design problem requiring a separate CM sprint (CM-D):**
+- Design Kirchner 2003 recovery inputs for ARG baseline step 3 (fiscal loosening,
+  debt restructuring parameters) with historical sourcing
+- Re-run empirical calibration to observe actual step-3 diff with recovery inputs
+- Certify bounds from observed value (±50% tolerance, T3 confidence tier)
+
+G8 scope remains #1739 + #1711 only. ARG (#1712) requires CM-D.
 
 ---
 

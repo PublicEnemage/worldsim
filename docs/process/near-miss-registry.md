@@ -4977,6 +4977,23 @@ Near-miss cross-references: NM-097 (test skip guard masked this defect — both 
 harness execution; NM-097 is the seeding gap, NM-098 is the implementation gap exposed once
 seeding is present).
 
+**Addendum (2026-07-04) — CM consultation result for ARG #1712:**
+
+CM Agent was activated to advise on Option A (extend `build_argentina_scenario()` to n_steps=3).
+Option A was approved in principle; an empirical live run was performed with the n_steps=3
+extended baseline (no inputs at step 3). Result:
+
+- BL step-3 hd_composite = 0.3723 (flat — same as step 2; engine produces no recovery
+  without explicit Kirchner recovery inputs)
+- CF step-3 hd_composite = 0.5750
+- diff = 0.2027 — larger than step 2 (0.1670); divergence widens, not converges
+
+The [0.003, 0.050] bounds from CM Sprint B AC-1 cannot be achieved: the engine requires
+explicit fiscal recovery inputs at baseline step 3 to produce convergence. This is a
+fixture design problem requiring a separate CM sprint (CM-D): design Kirchner 2003 inputs
+for the ARG baseline, empirically calibrate bounds, and re-certify the AC-1 forward
+condition. G8 scope remains #1739 + #1711 only.
+
 ---
 
 ## NM-NNN — [Short descriptive title]

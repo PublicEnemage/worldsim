@@ -6,7 +6,7 @@
 > Historical state lives in `docs/process/session-archives/`.
 > Authority: `docs/process/sprint-group-isolation.md §SESSION_STATE.md Cockpit Card Protocol`.
 
-**Last updated:** 2026-07-04 (Act 2 verification run: PAK #1713 PASS; GRC blocked — NM-098 filed; _classify_direction ignores primary_indicator fix #1739; G8 sprint entry pending EL approval)
+**Last updated:** 2026-07-04 (CM consultation complete: ARG #1712 deferred to CM-D — engine flat at default trough, needs Kirchner inputs; G8 scope locked: #1739 + #1711; EL approval pending)
 **Current milestone:** M19 — Constraint Search and Empirical Calibration
 
 ---
@@ -79,7 +79,7 @@
 | #1709 | FOUND state: tolerance band (±0.01) not displayed | G6 ✓ | **Closed** — PR #1720 merged; BPO ACCEPT; north star PASS; Demo 8 Act 1 cleared |
 | #1710 | AC-12: resolve `__structural_absence__` placeholder | G6 ✓ | **Closed** — PR #1721 merged; skip guard removed; timing fixed |
 | #1711 | Demo 8 Act 2 verification: GRC AC-1 live harness run | G8 | **Blocked** — `_classify_direction` ignores `primary_indicator`; fix in #1739; trajectory data confirms step-4 hd_composite diff=0.1561 ∈ [0.010, 0.20] once fixed |
-| #1712 | Demo 8 Act 2 verification: ARG AC-1 live harness run | — (CM consult) | **Blocked** — two layers: (1) NM-098 primary_indicator fix; (2) baseline fixture n_steps=2 cannot support step-3 comparison; CM consultation required before G9 |
+| #1712 | Demo 8 Act 2 verification: ARG AC-1 live harness run | CM-D | **Deferred** — CM consult 2026-07-04: n_steps=3 extension leaves BL flat (hd=0.3723) at default trough; diff=0.2027 (no convergence); needs Kirchner step-3 recovery inputs + recalibration |
 | #1713 | Demo 8 Act 2 verification: PAK AC-1 live harness run | Act 2 verified | **PASS** — per_step_diff[2]=0.0266 ∈ [0.002, 0.035]; closed 2026-07-04 |
 | #1739 | fix(harness): _classify_direction ignores primary_indicator | G8 | New — filed 2026-07-04; unblocks GRC #1711 |
 | #1729 | fix(g6): missing elasticity rows for imf_program_acceptance + emergency_declaration; NM-056 fix | G7 ✓ | **Closed** — PR #1734 merged (NM-056 fix; 9/9 PASS 0 SKIP); integration PR #1737 merged 2026-07-04 |
@@ -94,7 +94,7 @@
 | ~~AC-12: resolve structural-absence indicator key~~ | **CLEARED 2026-07-04** — #1710 PR #1721 merged; timing fixed; `__structural_absence__` confirmed | ~~Demo 8 Act 1~~ |
 | ~~NM-056 fix: conditionality channel tests honest (9/9 PASS 0 SKIP)~~ | **CLEARED 2026-07-04** — #1729 PR #1734 merged; G7 exit confirmed; integration PR #1737 | ~~Demo 8 pre-flight~~ |
 | AC-1 harness live run (GRC orthodox vs heterodox): `per_step_diff[3] ∈ [0.010, 0.20]` | CM Sprint A exit §4 → **#1711** — blocked on #1739 (NM-098) | Demo 8 Act 2 |
-| AC-1 harness live run (ARG Type B `hd_composite` divergence): `per_step_diff[2] ∈ [0.003, 0.050]` | CM Sprint B exit §4 → **#1712** — blocked on #1739 + ARG fixture n_steps constraint | Demo 8 Act 2 |
+| AC-1 harness live run (ARG Type B `hd_composite` divergence): `per_step_diff[2] ∈ [0.003, 0.050]` | CM Sprint B exit §4 → **#1712** — deferred to CM-D; fixture needs Kirchner step-3 inputs; bounds [0.003, 0.050] not valid for current engine | Demo 8 Act 2 |
 | ~~AC-1 harness live run (PAK Type B `hd_composite` divergence): `per_step_diff[2] ∈ [0.002, 0.035]`~~ | **CLEARED 2026-07-04** — #1713 PASS; per_step_diff[2]=0.0266 ∈ [0.002, 0.035] | ~~Demo 8 Act 2~~ |
 
 ---
