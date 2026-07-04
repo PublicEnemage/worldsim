@@ -58,7 +58,6 @@ import pytest
 import pytest_asyncio
 
 from app.harness.mode3_harness import (
-    DirectionVerdict,
     RunType,
     run_harness,
 )
@@ -563,7 +562,8 @@ class TestAC4NonRegression:
         )
         assert row is not None, "SSA Q1 INFORMAL entry missing — non-regression FAIL."
         assert row.elasticity == _SSA_Q1_INFORMAL_ELASTICITY, (
-            f"SSA Q1 INFORMAL elasticity changed: {row.elasticity!r} != {_SSA_Q1_INFORMAL_ELASTICITY!r}. "
+            f"SSA Q1 INFORMAL elasticity changed: {row.elasticity!r} "
+            f"!= {_SSA_Q1_INFORMAL_ELASTICITY!r}. "
             "M17-G1 SSA recalibration (Fosu 2011) entry must not be modified."
         )
 
@@ -578,7 +578,8 @@ class TestAC4NonRegression:
         )
         assert row is not None, "SSA Q2 INFORMAL entry missing — non-regression FAIL."
         assert row.elasticity == _SSA_Q2_INFORMAL_ELASTICITY, (
-            f"SSA Q2 INFORMAL elasticity changed: {row.elasticity!r} != {_SSA_Q2_INFORMAL_ELASTICITY!r}."
+            f"SSA Q2 INFORMAL elasticity changed: {row.elasticity!r} "
+            f"!= {_SSA_Q2_INFORMAL_ELASTICITY!r}."
         )
 
     def test_ssa_q1_agriculture_elasticity_unchanged(self) -> None:
@@ -592,7 +593,8 @@ class TestAC4NonRegression:
         )
         assert row is not None, "SSA Q1 AGRICULTURE entry missing — non-regression FAIL."
         assert row.elasticity == _SSA_Q1_AGRI_ELASTICITY, (
-            f"SSA Q1 AGRICULTURE elasticity changed: {row.elasticity!r} != {_SSA_Q1_AGRI_ELASTICITY!r}."
+            f"SSA Q1 AGRICULTURE elasticity changed: {row.elasticity!r} "
+            f"!= {_SSA_Q1_AGRI_ELASTICITY!r}."
         )
 
     def test_channel_c_elasticity_unchanged(self) -> None:
@@ -620,7 +622,8 @@ class TestAC4NonRegression:
         )
         assert row is not None, "GRC Q1 FORMAL entry missing — CM Sprint A non-regression FAIL."
         assert row.elasticity == _GRC_Q1_FORMAL_ELASTICITY, (
-            f"GRC Q1 FORMAL elasticity changed: {row.elasticity!r} != {_GRC_Q1_FORMAL_ELASTICITY!r}."
+            f"GRC Q1 FORMAL elasticity changed: {row.elasticity!r} "
+            f"!= {_GRC_Q1_FORMAL_ELASTICITY!r}."
         )
 
     def test_grc_q2_formal_elasticity_unchanged(self) -> None:
@@ -634,7 +637,8 @@ class TestAC4NonRegression:
         )
         assert row is not None, "GRC Q2 FORMAL entry missing — CM Sprint A non-regression FAIL."
         assert row.elasticity == _GRC_Q2_FORMAL_ELASTICITY, (
-            f"GRC Q2 FORMAL elasticity changed: {row.elasticity!r} != {_GRC_Q2_FORMAL_ELASTICITY!r}."
+            f"GRC Q2 FORMAL elasticity changed: {row.elasticity!r} "
+            f"!= {_GRC_Q2_FORMAL_ELASTICITY!r}."
         )
 
     def test_prior_source_registry_ids_present(self) -> None:
@@ -712,7 +716,7 @@ class TestAC5CrossContaminationGuard:
 
 
 @pytest_asyncio.fixture(scope="session")
-async def asgi_client() -> "AsyncGenerator[httpx.AsyncClient, None]":  # type: ignore[misc]
+async def asgi_client() -> AsyncGenerator[httpx.AsyncClient, None]:  # type: ignore[misc]
     """Session-scoped ASGI client gated on DATABASE_URL presence.
 
     NM-056: skip is at fixture level, not test-body level.
