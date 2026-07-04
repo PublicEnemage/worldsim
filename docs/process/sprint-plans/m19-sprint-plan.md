@@ -46,7 +46,7 @@ sop-reference: docs/process/sprint-planning-sop.md
 
 ## HORIZON Scope-Completeness Check
 
-Full M19 issue audit completed 2026-07-02 (updated post-filing). Updated 2026-07-03 HORIZON sweep — 5 issues added (#1522, #1524, #1623, #1629, #1630). All 27 M19 issues accounted for.
+Full M19 issue audit completed 2026-07-02 (updated post-filing). Updated 2026-07-03 HORIZON sweep — 5 issues added (#1522, #1524, #1623, #1629, #1630). Updated 2026-07-04 HORIZON sweep — 5 issues added (#1709, #1710, #1711, #1712, #1713 — Demo 8 clearance and Act 2 verification). All 32 M19 issues accounted for.
 
 ### Roadmap deliverables — linkage audit
 
@@ -79,10 +79,15 @@ Full M19 issue audit completed 2026-07-02 (updated post-filing). Updated 2026-07
 |---|---|---|---|
 | #1532 | Capital controls transmission gap (ExternalSectorModule+MacroeconomicModule channels absent) | Pre-wave / known gap | **Immediate — blocks Iceland (#1553)**; known-gap label; partial fix may unblock harness run |
 | #1529 | '95% CI' label overstates precision on DistributionalComparisonSummary | G4 (coord: G3) | High — coordinates with Bayesian posterior delivery |
-| #1456 | MDAAlertPanelZone1B: scenarioId crash | Pre-wave | High — crash risk; address before G1 begins |
+| #1456 | MDAAlertPanelZone1B: scenarioId crash | Pre-wave → G6 | High — crash risk; deferred past G1 but must clear before Demo 8 |
 | #1536 | ADR-007 meaninglessness threshold | G3 (coord: Bayesian posterior) | High — coordinate with #1543 |
 | #1537 | BandResult visible fields (is_pre_calibration, clipped_lower/upper) | G3 (coord: G3) | High — prerequisite for posterior transition UX |
-| #1538 | Focal cohort floor validation (monitored_focal_cohorts schema) | Pre-wave | High — prerequisite for constraint-floor search (#1540) |
+| #1538 | Focal cohort floor validation (monitored_focal_cohorts schema) | Pre-wave → G6 | High — prerequisite gap; now required before Demo 8 |
+| #1709 | FOUND state: tolerance band (±0.01) not displayed | G6 | Immediate — Demo 8 Act 1 blocker (Customer Agent L3 on #1540) |
+| #1710 | AC-12: resolve `__structural_absence__` placeholder | G6 | Immediate — Demo 8 Act 1 blocker (Customer Agent L3 on #1540) |
+| #1711 | Demo 8 Act 2 verification: GRC AC-1 live harness run | Demo 8 Act 2 verification | Near-term — no code changes; DATABASE_URL prerequisite |
+| #1712 | Demo 8 Act 2 verification: ARG AC-1 live harness run | Demo 8 Act 2 verification | Near-term — no code changes; DATABASE_URL prerequisite |
+| #1713 | Demo 8 Act 2 verification: PAK AC-1 live harness run | Demo 8 Act 2 verification | Near-term — no code changes; DATABASE_URL prerequisite |
 
 ### Full issue-to-group mapping
 
@@ -91,8 +96,8 @@ Full M19 issue audit completed 2026-07-02 (updated post-filing). Updated 2026-07
 | #1535 | M19 Exit Checklist | — (gate) | — | Milestone exit gate |
 | #1544 | Demo 8 — live stakeholder session | — (exit gate) | Exit | Primary deliverable |
 | #1532 | Capital controls transmission gap | Pre-wave / known gap | Pre-wave | **Immediate — blocks Iceland** |
-| #1456 | MDAAlertPanelZone1B: scenarioId crash | Pre-wave | Pre-wave | **Immediate — crash risk** |
-| #1538 | Focal cohort floor validation | Pre-wave | Pre-wave | **Immediate — #1540 prerequisite** |
+| #1456 | MDAAlertPanelZone1B: scenarioId crash | G6 | Wave 4 | **Immediate — crash risk** |
+| #1538 | Focal cohort floor validation | G6 | Wave 4 | **Immediate — Demo 8 prerequisite** |
 | #1540 | Mode 3 constraint-floor search | G1 | Wave 1 | High — Demo 8 Act 1 |
 | #1546 | Headless battle-testing harness | G2 Phase A | Wave 1 (parallel to G1) | High — all scenario runs depend on this |
 | #1541 | SEN backtesting fixture | G2 Phase B | Wave 1 (after G2A) | High — Bayesian gate + harness calibration |
@@ -115,6 +120,11 @@ Full M19 issue audit completed 2026-07-02 (updated post-filing). Updated 2026-07
 | #1630 | Demo 8 narration: HD line implied but not rendered | G5 / Wave 3 | Wave 3 (after G4) | High — Demo 8 Act 1 risk; separate sprint entry G5 per EL direction |
 | #1522 | View model layer retrofit — Zone 1 composition extraction | Wave 3+ | Wave 3+ | Medium — EL-added to M19; defers to M20 if Wave 3 capacity reached |
 | #1524 | Zone 1A TrajectoryView: pinch-zoom, thumbwheel, pan | Wave 3+ | Wave 3+ | Medium — EL-added to M19; defers to M20 if Wave 3 capacity reached |
+| #1709 | FOUND state: tolerance band (±0.01) not displayed | G6 | Wave 4 | High — Demo 8 Act 1 blocker |
+| #1710 | AC-12: resolve `__structural_absence__` placeholder | G6 | Wave 4 | High — Demo 8 Act 1 blocker |
+| #1711 | Demo 8 Act 2 verification: GRC AC-1 live harness run | Demo 8 Act 2 verification | Wave 4 | High — Demo 8 Act 2 condition (DATABASE_URL only) |
+| #1712 | Demo 8 Act 2 verification: ARG AC-1 live harness run | Demo 8 Act 2 verification | Wave 4 | High — Demo 8 Act 2 condition (DATABASE_URL only) |
+| #1713 | Demo 8 Act 2 verification: PAK AC-1 live harness run | Demo 8 Act 2 verification | Wave 4 | High — Demo 8 Act 2 condition (DATABASE_URL only) |
 
 ### ADR backlog review
 
@@ -203,9 +213,31 @@ Full M19 issue audit completed 2026-07-02 (updated post-filing). Updated 2026-07
 - #1522 (view model layer retrofit) and #1524 (Zone 1A interaction layer) are M19-milestoned at EL direction but are capacity-conditional: if Demo 8 preparation leaves insufficient Wave 3 capacity, both defer to M20 with documented rationale on each issue.
 - Sprint entries file after G5 exit; group designation TBD at that point.
 
-**Demo 8 preparation (runs in parallel with G5)**
+### Wave 4 — G6: Demo 8 clearance sprint + Act 2 verification
+
+**G6: Demo 8 Act 1 clearance (#1456, #1538, #1709, #1710)**
+
+- Primary objective: clear all Demo 8 Act 1 blockers and pre-wave crash risk before Demo 8 rehearsal
+- #1456 (crash fix): `MDAAlertPanel` Zone1B `scenarioId` guard — targeted null-check; no ADR required
+- #1538 (focal cohort floor validation): `monitored_focal_cohorts` Pydantic validation — `list[dict[str, Any]]` → `list[FocalCohortConfig]`; G1 prerequisite that remained unimplemented; required before Demo 8 correctness claims hold
+- #1709 (tolerance band): FOUND state must render `±tolerance` visually distinct from boundary value in the control plane column; Customer Agent L3 condition from #1540 exit
+- #1710 (AC-12): identify real structural-absence indicator key; rewrite AC-12 without the `__structural_absence__` placeholder; CI skip on AC-12 must be removed
+- Sprint branch: `sprint/m19-g6`
+- No ADR required — all items are targeted fixes and completions within existing architecture
+- Blocked by: none (Wave 3 fully integrated)
+
+**Demo 8 Act 2 verification (#1711, #1712, #1713)**
+
+- Not a code-change sprint group — DATABASE_URL harness runs only
+- Three live harness runs verifying CM Sprint A/B/C MAGNITUDE forward conditions (GRC, ARG, PAK)
+- Can run in parallel once DATABASE_URL is configured; each fixture is independent
+- If any bound fails: CM Agent consulted; corrective calibration action documented before Demo 8 proceeds
+- Runs in parallel with G6 (no file area overlap)
+
+**Demo 8 preparation (after G6 + Act 2 verification complete)**
+- Demo 8 internal review and IR review
 - Walkthrough updates for Demo 8 narrative (constraint-floor Act 1, calibrated CI Act 2 with empirical grounding)
-- Internal review, IR review, stakeholder session (#1544)
+- Stakeholder session (#1544)
 - G-remediation group (if Demo 8 internal review finds CRITICAL/HIGH issues)
 
 ---
@@ -233,6 +265,12 @@ G4 exit ──► G5: #1629 (ZMB y-axis fix) + #1630 (narration/HD alignment) �
 #1623 (CM Sprint A/B/C — parallel track; no file area overlap with G-series)
 
 G5 exit ──► Wave 3+: #1522 (view model retrofit), #1524 (interaction layer) — capacity-conditional
+
+G5 + #1523 exits ──► G6: #1456 + #1538 + #1709 + #1710 ──► Demo 8 Act 1 clearance
+
+CM Sprint A/B/C exits ──► #1711 (GRC) + #1712 (ARG) + #1713 (PAK) ──► Demo 8 Act 2 clearance
+
+G6 + Act 2 verification ──► Demo 8 internal review ──► #1544 (live session)
 ```
 
 ---
@@ -258,5 +296,13 @@ G5 exit ──► Wave 3+: #1522 (view model retrofit), #1524 (interaction layer
 - 2026-06-30: ZMB Zone 1A curve collapse → promoted → #1629 (added to M19; G5 Wave 3)
 - 2026-06-30: Mode 3 HD narration mismatch → promoted → #1630 (added to M19; G5 Wave 3 after G4 per EL direction)
 - 2026-07-02: Headless battle-testing initiative → resolved (all 10 issues filed; ADR-020 accepted; G2D implementation unblocked)
+
+**HORIZON sweep (2026-07-04):** 0 open insights log entries. 5 new issues filed from Demo 8 open conditions:
+- Customer Agent L3 condition 1 on #1540 → #1709 (FOUND state tolerance band visibility; G6 Wave 4)
+- Customer Agent L3 condition 2 on #1540 → #1710 (AC-12 structural absence placeholder; G6 Wave 4)
+- CM Sprint A exit §4 forward condition → #1711 (GRC AC-1 live harness run; Demo 8 Act 2 verification)
+- CM Sprint B exit §4 forward condition → #1712 (ARG AC-1 live harness run; Demo 8 Act 2 verification)
+- CM Sprint C exit §4 forward condition → #1713 (PAK AC-1 live harness run; Demo 8 Act 2 verification)
+Wave 4 G6 sprint definition added. Total M19 issues: 32.
 
 Additionally: #1522 and #1524 added to M19 at EL direction; #1623 (ELASTICITY_REGISTRY calibration gap) filed and added to M19. Total M19 issue count: 27.
