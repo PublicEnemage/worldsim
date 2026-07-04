@@ -6,7 +6,7 @@
 > Historical state lives in `docs/process/session-archives/`.
 > Authority: `docs/process/sprint-group-isolation.md §SESSION_STATE.md Cockpit Card Protocol`.
 
-**Last updated:** 2026-07-03 (CM Sprint A BPO ACCEPT #1623 Gap 1; G5 exit confirmed — integration PR #1684 sprint/m19-g5→release/m19 auto-merge pending)
+**Last updated:** 2026-07-04 (G5 integration PR #1684 merged to release/m19; ESM __dirname rule; G5 fully integrated)
 **Current milestone:** M19 — Constraint Search and Empirical Calibration
 
 ---
@@ -20,8 +20,8 @@
 | Exit checklist issue | #1535 (M19 Exit Checklist — blocks milestone closure) |
 | Release branch | `release/m19` — cut from `main` 2026-07-02 at 1bf1ecc |
 | Sprint plan | `docs/process/sprint-plans/m19-sprint-plan.md` — EL-approved 2026-07-02 |
-| Active wave | Wave 3 — G5 confirmed 2026-07-03; integration PR #1684 auto-merge pending |
-| Active sprint groups | None — G5 exit confirmed; integration PR #1684 `sprint/m19-g5 → release/m19` auto-merge pending |
+| Active wave | Wave 3 — G5 fully integrated 2026-07-04 (PR #1684 merged); no active sprint groups |
+| Active sprint groups | None — G5 integrated to release/m19 (PR #1684 merged 2026-07-04) |
 | Active sprint journal issues | None — #1660 closed at G5 PI Agent confirmation |
 
 ---
@@ -45,7 +45,7 @@
 | G2D | Iceland 2008–11 (capital controls) | #1532 ✓, #1553 ✓ | **Confirmed** — BPO 2×ACCEPT; north star PASS; journal #1621 closed; integration PR pending (sprint/m19-g2 → release/m19) |
 | G3 | Bayesian posterior calibration | #1543 ✓, #1536 ✓, #1537 ✓ | Confirmed — integration PR #1617 merged; exit doc `m19-g3-sprint-exit.md`; journal #1587 closed retroactively |
 | G4 | PSP driver arc + CI label precision | #1528 ✓, #1529 ✓ | Confirmed — integration PR #1637 merged; journal #1624 closed; sprint exit `docs/process/sprint-plans/m19-g4-sprint-exit.md` |
-| G5 | Demo 8 display fidelity + Zone 1 view model | #1629 ✓, #1630 ✓, #1522 ✓, #1524 ✓ | **Confirmed** — BPO ACCEPT for #1629 + #1630; PI Agent NM-094 PASS; integration PR #1684 pending |
+| G5 | Demo 8 display fidelity + Zone 1 view model | #1629 ✓, #1630 ✓, #1522 ✓, #1524 ✓ | **Integrated** — BPO ACCEPT all 4; PI Agent NM-094 PASS; integration PR #1684 merged 2026-07-04 |
 | CM-A | ELASTICITY_REGISTRY Euro area calibration | #1623 ✓ | **Confirmed** — BPO ACCEPT; north star PASS; journal #1671 closed; integration PR #1683 merged 2026-07-03 |
 
 ---
@@ -99,7 +99,7 @@
 - **G2D complete (2026-07-03):** ADR-020 channels A/B/C implemented (PR #1635; 28/28 unit tests). Iceland 2008–11 fixture (PR #1639; heterodox vs orthodox counter-factual). BPO 2×ACCEPT; north star PASS (Zambia restructuring scenario; heterodox path analytically distinguishable). Journal #1621 closed. Ecuador regression fix (PR #1642 — implementation_capacity=0 for salvazo; Channel B was firing via one-step lag). Merge conflict resolved on sprint/m19-g2 (PR #1643). Integration PR #1641 `sprint/m19-g2 → release/m19` pending auto-merge — CI re-running after conflict resolution. Demo 8 condition: DIRECTION_ONLY qualifier required on Iceland direction verdict at Demo 8 Act 2.
 - **ADR-020 (ARCH-014) calibration constants (frozen):** Channel A ε=0.60 (ISL controls-only), β=0.020, γ=1.2 (CM constant — CE cannot change without CM Consulted), φ=−0.30 (ISL Q1 informal PHC). Sources: `calibration-basis.md §Capital Controls` (PR #1625).
 - **NM-086:** E2E mock routes must be verified against `api_contracts.yml` before the implementation PR opens (G1, filed 2026-07-03). Process: QA Lead mock-helper verification is a blocking checklist item on intent authorship.
-- **G5 complete (2026-07-03):** Phase A (NM codification), Phase B (#1629 ZMB y-axis + #1630 Zone 1D delta), Phase C (#1522 view model retrofit + #1524 trackwheel zoom). BPO ACCEPT for #1629 + #1630. Integration PR #1684 `sprint/m19-g5 → release/m19` opened with PI Agent NM-094 gate PASS. Sprint exit `docs/process/sprint-plans/m19-g5-sprint-exit.md`.
+- **G5 complete + integrated (2026-07-03/04):** Phase A (NM codification), Phase B (#1629 ZMB y-axis + #1630 Zone 1D delta), Phase C (#1522 view model retrofit + #1524 trackwheel zoom). BPO ACCEPT all 4 user-facing deliverables. Integration PR #1684 `sprint/m19-g5 → release/m19` merged 2026-07-04. Sprint exit `docs/process/sprint-plans/m19-g5-sprint-exit.md`. ESM rule: use `import.meta.dirname` not `__dirname` in all E2E spec files (caught by release-branch-ci-gate — PR #1693).
 - **G5 Zone 1A zoom (#1524, 2026-07-03):** Desktop trackwheel zoom only (EL decision: mobile pinch/pan deferred). `visibleStepRange` state in `TrajectoryView`; non-passive wheel listener; midpoint-centered 20% zoom; double-click reset; `data-visible-step-min/max` DOM attributes. Prerequisite #1522 merged first.
 - **G5 #1630 scope (2026-07-03):** ADR-017 §Zone 1D Integration (Mode 3) mandates per-framework `(+Δ vs baseline)` annotations in Zone 1D. `formatDelta`/`getDeltaColor` exported from `FourFrameworkZone1D`. Intent: `docs/process/intents/M19-G5-2026-07-03-zone1d-delta-annotations.md`.
 - **M18 complete (v0.18.0, 2026-07-02):** G1–G7 delivered; Demo 7 PASS (unconditional); release/m18 → main via PR #1534. Archive: `docs/process/session-archives/session-state-pre-m19.md`.
