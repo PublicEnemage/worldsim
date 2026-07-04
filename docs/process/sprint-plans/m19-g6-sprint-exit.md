@@ -69,16 +69,7 @@ scenarioId crash guard in MDAAlertPanelZone1B (#1456), and focal cohort floor Py
 
 | Deliverable | Work type | Customer Agent L3 | BPO verdict | Verdict artifact |
 |---|---|---|---|---|
-| #1709 — FOUND state tolerance band display | Frontend (UX output) | N/A — tolerance band displays precision from existing FOUND response; no new Persona 2/3/5 raw data capability | **ACCEPT** | See BPO verdict below |
-
-**Business PO acceptance — #1709:**
-
-> The tolerance band element (`±N.NN precision`) completes the FOUND state information contract.
-> A ministry analyst can now read both the boundary value AND its precision interval in a single
-> glance without mental arithmetic on uncertainty_hi/lo. This is the correct surface for this
-> information per `information-hierarchy.md §1B` (actionable uncertainty on primary outputs).
-> ACCEPT.
-> — Business PO (2026-07-04)
+| #1709 — FOUND state tolerance band display | Frontend (UX output) | N/A — tolerance band displays precision from existing FOUND response; no new Persona 2/3/5 raw data capability | **ACCEPT** | #1709#issuecomment-4882415790 |
 
 **Business PO acceptance status: ACCEPT — gate cleared 2026-07-04.**
 
