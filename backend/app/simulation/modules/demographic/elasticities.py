@@ -28,6 +28,10 @@ class CohortElasticity:
 
     Encodes: when event_type fires on the parent country entity, this cohort's
     attribute_key changes by (event_magnitude * elasticity).
+
+    entity_families: if None, fires on ALL entities (existing SSA behaviour).
+    If a frozenset, fires only when the country entity.id is in the set.
+    Calibration decision: docs/calibration/m19-cm-a-euro-area-calibration-decision.md §1.2.
     """
 
     event_type: str
@@ -37,6 +41,7 @@ class CohortElasticity:
     source: str
     source_registry_id: str
     confidence_tier: int
+    entity_families: frozenset[str] | None = None
 
 
 ELASTICITY_REGISTRY: list[CohortElasticity] = [
@@ -136,5 +141,61 @@ ELASTICITY_REGISTRY: list[CohortElasticity] = [
         ),
         source_registry_id="ACADEMIC_LITERATURE_IMF_2014_FISCAL_INEQUALITY",
         confidence_tier=3,
+    ),
+    # Euro area / GRC: Q1 FORMAL formal-sector poverty-GDP elasticity.
+    # M19-CM-A calibration (Blanchard & Leigh 2013 + Eurostat AROPE 2010-2013).
+    # Greek AROPE rose 8pp on 26pp GDP decline → aggregate PHC elasticity 0.31/unit.
+    # Q1 cohort concentration factor ~2× aggregate (Ball et al. 2013) → 0.62 upper.
+    # Dampened to -0.25 for per-step quarterly dynamics (formal-sector UI coverage 50%
+    # at crisis depth reduces short-run PHC impact vs annual aggregate).
+    # entity_families=frozenset({"GRC"}): fires only on GRC entity; not on SSA entities.
+    # Calibration: docs/calibration/m19-cm-a-euro-area-calibration-decision.md §3.1.
+    CohortElasticity(
+        event_type="gdp_growth_change",
+        cohort_spec=CohortSpec(
+            IncomeQuintile.Q1,
+            AgeBand.AGE_25_54,
+            EmploymentSector.FORMAL,
+        ),
+        attribute_key="poverty_headcount_ratio",
+        elasticity=Decimal("-0.25"),
+        source=(
+            "Blanchard, O. & Leigh, D. (2013): Growth Forecast Errors and Fiscal"
+            " Multipliers. IMF Working Paper WP/13/1. Actual fiscal multiplier"
+            " 1.3 (range 0.9–1.7) vs assumed 0.5 — validates Euro area crisis"
+            " calibration distinct from SSA. Eurostat AROPE Greece 2010–2013:"
+            " +8pp poverty on 26pp GDP decline (0.31/unit aggregate)."
+            " Q1 formal cohort concentration ~2× aggregate (Ball et al. 2013);"
+            " dampened to -0.25 for quarterly per-step dynamics (50% UI coverage)."
+            " Uncertainty range: -0.20 to -0.35. M19-CM-A calibration."
+        ),
+        source_registry_id="ACADEMIC_LITERATURE_BLANCHARD_LEIGH_2013_FISCAL_MULTIPLIERS",
+        confidence_tier=2,
+        entity_families=frozenset({"GRC"}),
+    ),
+    # Euro area / GRC: Q2 FORMAL formal-sector poverty-GDP elasticity.
+    # Ball et al. (2013) 0.60 scaling of Q1 FORMAL: 0.60 × -0.25 = -0.15.
+    # Q2 formal workers have higher UI coverage and employment tenure than Q1,
+    # absorbing less impact per unit fiscal adjustment. Uncertainty: -0.12 to -0.20.
+    CohortElasticity(
+        event_type="gdp_growth_change",
+        cohort_spec=CohortSpec(
+            IncomeQuintile.Q2,
+            AgeBand.AGE_25_54,
+            EmploymentSector.FORMAL,
+        ),
+        attribute_key="poverty_headcount_ratio",
+        elasticity=Decimal("-0.15"),
+        source=(
+            "Ball, Furceri, Leigh, Loungani (2013): The Distributional Effects"
+            " of Fiscal Consolidation. IMF Working Paper WP/13/151."
+            " 0.60 scaling of GRC Q1 FORMAL (Blanchard & Leigh 2013 base):"
+            " 0.60 × -0.25 = -0.15. Q2 formal workers have stronger UI coverage"
+            " and employment tenure — absorb 0.60× the Q1 per-unit impact."
+            " Uncertainty range: -0.12 to -0.20. M19-CM-A calibration."
+        ),
+        source_registry_id="ACADEMIC_LITERATURE_BALL_2013_FISCAL_CONSOLIDATION",
+        confidence_tier=2,
+        entity_families=frozenset({"GRC"}),
     ),
 ]
