@@ -726,3 +726,5 @@ class TestGreeceTypeARegressionFidelity:
             )
         finally:
             await asgi_client.delete(f"/api/v1/scenarios/{scenario_id}")
+
+
