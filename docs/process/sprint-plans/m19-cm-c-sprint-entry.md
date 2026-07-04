@@ -66,19 +66,21 @@ An unchecked invariant blocks the sprint from opening.*
 
 ### 2.4 — CM calibration PENDING gate
 
-- [ ] **PENDING: CM calibration decision document filed.**
-  `docs/calibration/m19-cm-c-sea-calibration-decision.md` — not yet filed.
-  This document specifies:
-  - Chosen entity families and entity IDs in scope (PAK/LKA/BGD confirmed; additional SEA
-    entities such as THA, IDN, PHL subject to CM assessment)
-  - Cohort targets (design question from intent §3 — Option a/b/c/d resolved)
-  - Point estimate elasticities with uncertainty ranges
-  - Confidence tier assignment
-  - Source registry IDs (Batini et al. 2012 or equivalent South Asian literature)
-  - MAGNITUDE bounds for AC-1 integration test (PAK Type B counter-factual step index TBD)
-  The calibration decision document must be committed and referenced in this sprint entry
-  (update §2.4 to checked) before QA test authorship may begin and before the implementation
-  PR may open.
+- [x] **CLEARED: CM calibration decision document filed 2026-07-04.**
+  `docs/calibration/m19-cm-c-sea-calibration-decision.md`
+  Decisions recorded:
+  - Entity families: PAK/LKA/BGD (frozenset) — THA/IDN/PHL deferred beyond M19
+  - Design: Option (a) FORMAL-only — consistent with CM Sprint A/B precedent; avoids
+    double-counting with SSA Q1 INFORMAL (entity_families=None); noted limitation filed §8
+  - Q1 FORMAL: `Decimal("-0.17")` T3 — Ilzetzki et al. (2013) developing-country multiplier
+    0.35–0.40; Q1 concentration 1.35× (BISP/Samurdhi discount); uncertainty -0.12 to -0.25
+  - Q2 FORMAL: `Decimal("-0.10")` T3 — Ball et al. (2013) 0.60 scaling; uncertainty -0.07 to -0.15
+  - Source registry IDs: `ACADEMIC_LITERATURE_ILZETZKI_2013_FISCAL_MULTIPLIERS` (new),
+    `IMF_PUBLICATION_WEO_2010_CH3_FISCAL_CONSOLIDATION` (new),
+    `ACADEMIC_LITERATURE_BALL_2013_FISCAL_CONSOLIDATION` (registered)
+  - AC-1 MAGNITUDE bounds: `per_step_diff[2] ∈ [0.002, 0.035]` (PAK Type B, step index 2)
+  - Note: anticipated Batini et al. (2012) reference resolved to Ilzetzki et al. (2013) —
+    Batini 2012 covers G3 advanced economies not emerging Asia; calibration decision §note records this
 
 ### 2.5 — QA test authorship gate
 
