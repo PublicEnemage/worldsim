@@ -6,7 +6,7 @@
 > Historical state lives in `docs/process/session-archives/`.
 > Authority: `docs/process/sprint-group-isolation.md §SESSION_STATE.md Cockpit Card Protocol`.
 
-**Last updated:** 2026-07-04 (G6 EL-approved; sprint/m19-g6 cut; journal #1716 open)
+**Last updated:** 2026-07-04 (G6 complete — all 5 issues closed; integration PR #1724 open; sprint exit confirmed)
 **Current milestone:** M19 — Constraint Search and Empirical Calibration
 
 ---
@@ -20,9 +20,9 @@
 | Exit checklist issue | #1535 (M19 Exit Checklist — blocks milestone closure) |
 | Release branch | `release/m19` — cut from `main` 2026-07-02 at 1bf1ecc |
 | Sprint plan | `docs/process/sprint-plans/m19-sprint-plan.md` — EL-approved 2026-07-02 |
-| Active wave | Wave 4 — G5/CM-A/CM-B/CM-C all integrated; G6 (Demo 8 clearance) is next sprint group |
-| Active sprint groups | G6 — sprint/m19-g6 open 2026-07-04; #1456/#1538/#1710 ungated; #1709 gates on intent+E2E; #1657 gates on CM cert |
-| Active sprint journal issues | #1716 (G6 — Demo 8 clearance) |
+| Active wave | Wave 4 — G6 implementation complete; integration PR #1724 open (sprint/m19-g6 → release/m19) |
+| Active sprint groups | None — G6 confirmed (integration PR #1724 pending auto-merge) |
+| Active sprint journal issues | None — #1716 closed 2026-07-04 |
 
 ---
 
@@ -49,6 +49,7 @@
 | CM-A | ELASTICITY_REGISTRY Euro area calibration | #1623 ✓ | **Confirmed** — BPO ACCEPT; north star PASS; journal #1671 closed; integration PR #1683 merged 2026-07-03 |
 | CM-B | ELASTICITY_REGISTRY LAC calibration (ARG/ECU/BOL/PER) | #1623 ✓ | **Confirmed** — BPO ACCEPT; north star PASS; journal #1688 closed; integration PR #1698 merged 2026-07-04 |
 | CM-C | ELASTICITY_REGISTRY SEA calibration (PAK/LKA/BGD) | #1623 ✓ | **Confirmed** — BPO ACCEPT; north star PASS (PAK 2023 SBA); journal #1700 closed; integration PR #1707 auto-merging 2026-07-04 |
+| G6 | Demo 8 clearance | #1456 ✓, #1538 ✓, #1657 ✓, #1709 ✓, #1710 ✓ | **Confirmed** — BPO ACCEPT (#1709); north star PASS; NM-095 LOW; journal #1716 closed; integration PR #1724 open 2026-07-04 |
 
 ---
 
@@ -60,8 +61,8 @@
 | #1544 | Demo 8 — live stakeholder session | — (exit gate) | Primary deliverable |
 | #1532 | Capital controls transmission gap | G2D ✓ | **Closed** — PR #1635 merged; BPO ACCEPT 2026-07-03 |
 | #1553 | Iceland 2008–11 Type A+B | G2D ✓ | **Closed** — PR #1639 merged; BPO ACCEPT 2026-07-03 |
-| #1456 | MDAAlertPanel Zone1B: scenarioId crash | Pre-wave | Immediate — crash risk |
-| #1538 | Focal cohort floor validation | Pre-wave | Immediate — #1540 prerequisite |
+| #1456 | MDAAlertPanel Zone1B: scenarioId crash | G6 ✓ | **Closed** — pre-G6 commit b8cb37b; issue closed 2026-07-04 |
+| #1538 | Focal cohort floor validation | G6 ✓ | **Closed** — pre-G6 commit cd28853; issue closed 2026-07-04 |
 | #1528 | PSP driver arc + auditability panel (DEMO-165) | G4 | **G4 confirmed** — PR #1633 merged |
 | #1529 | '95% CI' label precision fix | G4 | **G4 confirmed** — PR #1634 merged; Demo 8 Act 2 gate cleared |
 | #1632 | api_contracts.yml §trajectory missing band_method — G3 delivery gap | G5 ✓ | **Closed** — PR #1668 merged (G5 Phase B) |
@@ -72,9 +73,9 @@
 | #1630 | Zone 1D delta annotations Mode 3 (ADR-017 §Zone 1D Integration) | G5 ✓ | **Closed** — PR #1669 merged; BPO ACCEPT 2026-07-03 |
 | #1647 | G2C test file missing from release/m19 — NM-094 recovery | Demo 8 risk | **Closed** — PR #1649 merged; test_m19_g2c_scenario_runs.py (1394 lines) restored |
 | #1650–#1656 | NM-084/085/086/089/092/093/094 process codification | G5 Phase A | **Closed** — PR #1658 MERGED (sprint/m19-g5) |
-| #1657 | NM-090/091: DemographicModule dead subscriptions fix | G6 | CM cert required before impl PR (NM-084); ADR-020 update in scope |
-| #1709 | FOUND state: tolerance band (±0.01) not displayed | G6 | Immediate — Demo 8 Act 1 blocker (Customer Agent L3 on #1540) |
-| #1710 | AC-12: resolve `__structural_absence__` placeholder | G6 | Immediate — Demo 8 Act 1 blocker (Customer Agent L3 on #1540) |
+| #1657 | NM-090/091: DemographicModule dead subscriptions fix | G6 ✓ | **Closed** — PR #1722 merged; 9/9 tests GREEN; ADR-020 updated; CM cert 2026-07-04 |
+| #1709 | FOUND state: tolerance band (±0.01) not displayed | G6 ✓ | **Closed** — PR #1720 merged; BPO ACCEPT; north star PASS; Demo 8 Act 1 cleared |
+| #1710 | AC-12: resolve `__structural_absence__` placeholder | G6 ✓ | **Closed** — PR #1721 merged; skip guard removed; timing fixed |
 | #1711 | Demo 8 Act 2 verification: GRC AC-1 live harness run | Act 2 verification | DATABASE_URL prerequisite — no code changes |
 | #1712 | Demo 8 Act 2 verification: ARG AC-1 live harness run | Act 2 verification | DATABASE_URL prerequisite — no code changes |
 | #1713 | Demo 8 Act 2 verification: PAK AC-1 live harness run | Act 2 verification | DATABASE_URL prerequisite — no code changes |
@@ -85,8 +86,8 @@
 
 | Condition | Source | Blocking |
 |---|---|---|
-| Tolerance band (±0.01) visible in FOUND state UI | Customer Agent L3 on #1540 → **#1709** | Demo 8 Act 1 |
-| AC-12: resolve structural-absence indicator key (replace `__structural_absence__` placeholder) | Customer Agent L3 on #1540 → **#1710** | Demo 8 Act 1 |
+| ~~Tolerance band (±0.01) visible in FOUND state UI~~ | **CLEARED 2026-07-04** — #1709 PR #1720 merged; `constraint-tolerance-band` element live | ~~Demo 8 Act 1~~ |
+| ~~AC-12: resolve structural-absence indicator key~~ | **CLEARED 2026-07-04** — #1710 PR #1721 merged; timing fixed; `__structural_absence__` confirmed | ~~Demo 8 Act 1~~ |
 | AC-1 harness live run (GRC orthodox vs heterodox): `per_step_diff[3] ∈ [0.010, 0.20]` | CM Sprint A exit §4 → **#1711** | Demo 8 Act 2 |
 | AC-1 harness live run (ARG Type B `hd_composite` divergence): `per_step_diff[2] ∈ [0.003, 0.050]` | CM Sprint B exit §4 → **#1712** | Demo 8 Act 2 |
 | AC-1 harness live run (PAK Type B `hd_composite` divergence): `per_step_diff[2] ∈ [0.002, 0.035]` | CM Sprint C exit §4 → **#1713** | Demo 8 Act 2 |
