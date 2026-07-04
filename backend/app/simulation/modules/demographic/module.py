@@ -78,6 +78,8 @@ class DemographicModule(SimulationModule):
             for row in ELASTICITY_REGISTRY:
                 if row.event_type != event.event_type:
                     continue
+                if row.entity_families is not None and entity.id not in row.entity_families:
+                    continue
                 delta = (magnitude * row.elasticity).quantize(Decimal("0.000001"))
                 qty = Quantity(
                     value=delta,
