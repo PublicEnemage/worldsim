@@ -4881,6 +4881,104 @@ Near-miss cross-references: NM-056 (pytest.skip() usage pattern — skip guard i
 
 ---
 
+## NM-098 — `_classify_direction` Accepts `primary_indicator` Parameter but Never Uses It; CM AC-1 Tests Assert hd_composite Divergence but Harness Computes fin_composite; GRC All-Zero per_step_diff (Reactive)
+
+**Date:** 2026-07-04
+**Milestone:** M19 — Constraint Search and Empirical Calibration
+**Detected by:** PM Agent — Act 2 live harness verification run (2026-07-04)
+**Severity:** High
+
+### What happened
+
+`_classify_direction` in `backend/app/harness/mode3_harness.py:358` accepts a
+`primary_indicator: str | None` parameter and passes it to the function, but the function
+body never inspects or uses it. The comparison logic unconditionally uses:
+1. PSP (from PMM data in trajectory) — falls back to step 2 when null
+2. `fin_composite` (from trajectory financial framework composite_score) — appends 0 when null
+
+The CM Sprint A/B/C acceptance criterion AC-1 passes `primary_indicator="hd_composite"` to
+`run_harness` and asserts bounds on `per_step_diff`. The test names and comments document
+the expected computation as "hd_composite divergence." But the harness computed fin_composite
+divergence throughout.
+
+**GRC impact (discovered at Act 2 verification, 2026-07-04):**
+GRC baseline and counter-factual produce identical `fin_composite` trajectories at every step
+(both fire `imf_program_acceptance`; fiscal input magnitudes differ but engine fin_composite
+is insensitive to the parameter differential). PSP is null (no PMM in GRC trajectory). Result:
+all six `per_step_diff` values = 0 → INDISTINGUISHABLE. Expected result with hd_composite:
+step 4 diff = 0.1561 ∈ [0.010, 0.20] — would pass the CM Sprint A bound.
+
+**PAK impact:** fin_composite happens to diverge in the correct range at step 3 (0.0266 ∈
+[0.002, 0.035]) — PAK passes #1713 by coincidence. With the correct hd_composite comparison,
+step 3 diff = 0.0152 ∈ [0.002, 0.035] — would also pass.
+
+**ARG impact:** Even after the primary_indicator fix, ARG baseline has n_steps=2 and the
+test checks per_step_diff[2] (step 3). The baseline has no step 3 trajectory data → diff = 0
+regardless. This is a separate fixture design constraint tracked in #1712.
+
+### What was at risk
+
+1. **Incorrect calibration signal for Demo 8:** The CM Sprint A/B/C AC-1 tests are the
+   forward conditions certifying that calibrated elasticity values produce empirically grounded
+   hd_composite divergence. If the harness measures fin_composite instead, the tests certify
+   nothing meaningful about hd_composite — the primary human-cost indicator. The Demo 8 Act 2
+   narrative would rest on an untested calibration claim.
+
+2. **GRC Act 2 verification permanently blocked:** The GRC counter-factual divergence is
+   visible only in hd_composite. The fin_composite is structurally identical between the two
+   scenarios (both fire the same event type at the same step; the engine's financial composite
+   is not sensitive to the programme size differential). Without the primary_indicator fix,
+   #1711 can never pass.
+
+3. **Silent parameter contract violation:** The function accepts a parameter it silently
+   ignores. Any caller that passes `primary_indicator="hd_composite"` receives a result that
+   does not reflect their request — with no warning, no error, and no documentation of the
+   divergence. This pattern makes future callers unable to reason about what the function
+   computes.
+
+### What caught it
+
+PM Agent Act 2 live harness verification (2026-07-04). First time CM Sprint A/B/C tests
+were executed against a live database. GRC returned all-zero per_step_diff → investigated
+trajectory data directly → discovered fin_composite is structurally identical for GRC
+baseline and CF → traced root cause to `_classify_direction` ignoring `primary_indicator`.
+
+This was previously masked by NM-097: the tests never executed against a real database in
+CI or in any prior session. If NM-097 had been resolved first (proper CI seeding), this bug
+would still have been revealed — GRC would have failed with zeros rather than skipping.
+
+### Process improvement
+
+**Immediate fix:** Update `_classify_direction` to respect `primary_indicator`:
+- When `primary_indicator` matches a composite field name (`hd_composite`, `fin_composite`,
+  `eco_composite`, `gov_composite`), use that field for the per-step comparison.
+- When `primary_indicator` is `None`, `"psp"`, or not a composite field name, use the
+  existing PSP → fin_composite fallback chain.
+- After fix: GRC step 4 diff = 0.1561 ∈ [0.010, 0.20] ✓; PAK step 3 diff = 0.0152 ∈
+  [0.002, 0.035] ✓; ARG still blocked by fixture n_steps constraint.
+
+**Fix location:** `backend/app/harness/mode3_harness.py:358` — `_classify_direction` body.
+
+**Parameter contract rule (new):** Accepted parameters must either be used in the function
+body OR documented with a `# RESERVED: not yet implemented` comment. A parameter that exists
+in the signature but is neither used nor documented is a silent correctness hazard. The
+function signature communicates a contract to callers — ignoring an accepted parameter
+silently violates that contract.
+
+**Filed artifacts:**
+- This NM-098 entry (2026-07-04)
+- Comment on #1711 recording GRC root cause and fix path
+- Comment on #1712 recording ARG structural constraint
+- Comment on #1713 confirming PAK PASS
+
+**Fix tracked:** New issue to be filed for G8 sprint (EL authorization pending).
+
+Near-miss cross-references: NM-097 (test skip guard masked this defect — both prevented live
+harness execution; NM-097 is the seeding gap, NM-098 is the implementation gap exposed once
+seeding is present).
+
+---
+
 ## NM-NNN — [Short descriptive title]
 
 **Date:** YYYY-MM-DD (or approximate milestone era)
