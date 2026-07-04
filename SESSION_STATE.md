@@ -50,6 +50,7 @@
 | CM-B | ELASTICITY_REGISTRY LAC calibration (ARG/ECU/BOL/PER) | #1623 ✓ | **Confirmed** — BPO ACCEPT; north star PASS; journal #1688 closed; integration PR #1698 merged 2026-07-04 |
 | CM-C | ELASTICITY_REGISTRY SEA calibration (PAK/LKA/BGD) | #1623 ✓ | **Confirmed** — BPO ACCEPT; north star PASS (PAK 2023 SBA); journal #1700 closed; integration PR #1707 auto-merging 2026-07-04 |
 | G6 | Demo 8 clearance | #1456 ✓, #1538 ✓, #1657 ✓, #1709 ✓, #1710 ✓ | **Integrated** — BPO ACCEPT (#1709); north star PASS; NM-095 LOW; journal #1716 closed; integration PR #1724 merged 2026-07-04 |
+| G7 | Elasticity rows + NM-056 fix | #1729 | **Filed** — entry 2026-07-04; BPO PROCEED verdict; awaiting EL approval |
 
 ---
 
@@ -79,6 +80,7 @@
 | #1711 | Demo 8 Act 2 verification: GRC AC-1 live harness run | Act 2 verification | DATABASE_URL prerequisite — no code changes |
 | #1712 | Demo 8 Act 2 verification: ARG AC-1 live harness run | Act 2 verification | DATABASE_URL prerequisite — no code changes |
 | #1713 | Demo 8 Act 2 verification: PAK AC-1 live harness run | Act 2 verification | DATABASE_URL prerequisite — no code changes |
+| #1729 | fix(g6): missing elasticity rows for imf_program_acceptance + emergency_declaration; NM-056 fix | G7 | OPEN — BPO PROCEED 2026-07-04; sprint entry filed; awaiting EL approval |
 
 ---
 
