@@ -6,14 +6,14 @@ sprint-group: CM Sprint B — LAC entity family calibration
 status: Filed
 authored-by: Chief Methodologist / PM Agent
 authored-date: 2026-07-03
-el-approved: false
+el-approved: 2026-07-03
 release-branch: release/m19
 sop-reference: docs/process/sprint-planning-sop.md
 ---
 
 # Sprint Entry — M19 CM Sprint B: LAC Elasticity Calibration (#1623 Gap 2)
 
-**Status:** Filed — awaiting EL approval before implementation begins
+**Status:** EL-approved 2026-07-03 — implementation entry gate open; §2.4 calibration decision PENDING
 **Date authored:** 2026-07-03
 **Release branch:** `release/m19`
 **Sprint plan:** `docs/process/sprint-plans/m19-sprint-plan.md`
