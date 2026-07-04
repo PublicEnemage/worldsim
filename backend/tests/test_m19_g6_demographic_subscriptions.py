@@ -23,8 +23,6 @@ from __future__ import annotations
 from datetime import UTC, datetime
 from decimal import Decimal
 
-import pytest
-
 from app.simulation.modules.demographic.cohort import (
     AgeBand,
     CohortSpec,
@@ -227,8 +225,10 @@ def test_imf_program_acceptance_delta_is_positive() -> None:
     event = _emergency_policy_event(ENTITY, "imf_program_acceptance")
     events = _run_module(ENTITY, event)
     delta = _delta_for_cohort(events, ENTITY, Q1_INFORMAL)
-    if delta is None:
-        pytest.skip("No elasticity row yet — sign guard fires after row is added.")
+    assert delta is not None, (
+        "No poverty_headcount_ratio delta for Q1 INFORMAL on "
+        "emergency_policy_imf_program_acceptance — elasticity row missing from registry."
+    )
     assert delta > Decimal("0"), (
         f"IMF programme acceptance must increase Q1 informal PHC (δ > 0); got {delta}."
     )
@@ -285,8 +285,10 @@ def test_emergency_declaration_delta_is_positive() -> None:
     event = _emergency_policy_event(ENTITY, "emergency_declaration")
     events = _run_module(ENTITY, event)
     delta = _delta_for_cohort(events, ENTITY, Q1_INFORMAL)
-    if delta is None:
-        pytest.skip("No elasticity row yet — sign guard fires after row is added.")
+    assert delta is not None, (
+        "No poverty_headcount_ratio delta for Q1 INFORMAL on "
+        "emergency_policy_emergency_declaration — elasticity row missing from registry."
+    )
     assert delta > Decimal("0"), (
         f"Emergency declaration must increase Q1 informal PHC (δ > 0); got {delta}."
     )
