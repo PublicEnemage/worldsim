@@ -300,7 +300,7 @@ G6 + Act 2 verification ──► Demo 8 internal review ──► #1544 (live s
 - 2026-06-30: Mode 3 HD narration mismatch → promoted → #1630 (added to M19; G5 Wave 3 after G4 per EL direction)
 - 2026-07-02: Headless battle-testing initiative → resolved (all 10 issues filed; ADR-020 accepted; G2D implementation unblocked)
 
-**HORIZON sweep (2026-07-04):** 0 open insights log entries. 5 new issues filed from Demo 8 open conditions:
+**HORIZON sweep (2026-07-04, sweep 1):** 0 open insights log entries. 5 new issues filed from Demo 8 open conditions:
 - Customer Agent L3 condition 1 on #1540 → #1709 (FOUND state tolerance band visibility; G6 Wave 4)
 - Customer Agent L3 condition 2 on #1540 → #1710 (AC-12 structural absence placeholder; G6 Wave 4)
 - CM Sprint A exit §4 forward condition → #1711 (GRC AC-1 live harness run; Demo 8 Act 2 verification)
@@ -309,3 +309,5 @@ G6 + Act 2 verification ──► Demo 8 internal review ──► #1544 (live s
 Wave 4 G6 sprint definition added. Total M19 issues: 32.
 
 Additionally: #1522 and #1524 added to M19 at EL direction; #1623 (ELASTICITY_REGISTRY calibration gap) filed and added to M19. Total M19 issue count: 27.
+
+**HORIZON sweep (2026-07-04, sweep 2):** 0 open insights log entries. 15 stale GitHub issues closed (PRs merged but no "Fixes #" keywords used): G5 deliverables #1629, #1630, #1522, #1524; fixes #1647, #1632; NM codification batch #1650–#1656; G5 sprint journal #1660; M18 demo prep #1445. All G1–G6 + CM-A/B/C sprint group work is integrated into release/m19. Remaining open: #1711, #1712, #1713 (Demo 8 Act 2 verification — DATABASE_URL prerequisite); #1544 (Demo 8 live session — milestone exit gate); #1535 (M19 Exit Checklist). Next: Demo 8 internal review → IR review → live session (#1544).

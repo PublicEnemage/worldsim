@@ -6,7 +6,7 @@
 > Historical state lives in `docs/process/session-archives/`.
 > Authority: `docs/process/sprint-group-isolation.md §SESSION_STATE.md Cockpit Card Protocol`.
 
-**Last updated:** 2026-07-04 (G6 complete — all 5 issues closed; integration PR #1724 open; sprint exit confirmed)
+**Last updated:** 2026-07-04 (HORIZON sweep — all sprint groups integrated; 15 stale issues closed; Demo 8 prep is next)
 **Current milestone:** M19 — Constraint Search and Empirical Calibration
 
 ---
@@ -20,8 +20,8 @@
 | Exit checklist issue | #1535 (M19 Exit Checklist — blocks milestone closure) |
 | Release branch | `release/m19` — cut from `main` 2026-07-02 at 1bf1ecc |
 | Sprint plan | `docs/process/sprint-plans/m19-sprint-plan.md` — EL-approved 2026-07-02 |
-| Active wave | Wave 4 — G6 implementation complete; integration PR #1724 open (sprint/m19-g6 → release/m19) |
-| Active sprint groups | None — G6 confirmed (integration PR #1724 pending auto-merge) |
+| Active wave | Wave 4 complete — G6 integration PR #1724 merged 2026-07-04; all code integrated to release/m19 |
+| Active sprint groups | None — all G1–G6 + CM-A/B/C confirmed and integrated |
 | Active sprint journal issues | None — #1716 closed 2026-07-04 |
 
 ---
@@ -49,7 +49,7 @@
 | CM-A | ELASTICITY_REGISTRY Euro area calibration | #1623 ✓ | **Confirmed** — BPO ACCEPT; north star PASS; journal #1671 closed; integration PR #1683 merged 2026-07-03 |
 | CM-B | ELASTICITY_REGISTRY LAC calibration (ARG/ECU/BOL/PER) | #1623 ✓ | **Confirmed** — BPO ACCEPT; north star PASS; journal #1688 closed; integration PR #1698 merged 2026-07-04 |
 | CM-C | ELASTICITY_REGISTRY SEA calibration (PAK/LKA/BGD) | #1623 ✓ | **Confirmed** — BPO ACCEPT; north star PASS (PAK 2023 SBA); journal #1700 closed; integration PR #1707 auto-merging 2026-07-04 |
-| G6 | Demo 8 clearance | #1456 ✓, #1538 ✓, #1657 ✓, #1709 ✓, #1710 ✓ | **Confirmed** — BPO ACCEPT (#1709); north star PASS; NM-095 LOW; journal #1716 closed; integration PR #1724 open 2026-07-04 |
+| G6 | Demo 8 clearance | #1456 ✓, #1538 ✓, #1657 ✓, #1709 ✓, #1710 ✓ | **Integrated** — BPO ACCEPT (#1709); north star PASS; NM-095 LOW; journal #1716 closed; integration PR #1724 merged 2026-07-04 |
 
 ---
 
