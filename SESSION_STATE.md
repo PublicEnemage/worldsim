@@ -6,7 +6,7 @@
 > Historical state lives in `docs/process/session-archives/`.
 > Authority: `docs/process/sprint-group-isolation.md §SESSION_STATE.md Cockpit Card Protocol`.
 
-**Last updated:** 2026-07-04 (HORIZON sweep — all sprint groups integrated; 15 stale issues closed; Demo 8 prep is next)
+**Last updated:** 2026-07-04 (G7 entry EL-approved; sprint/m19-g7 cut; journal #1732 opened)
 **Current milestone:** M19 — Constraint Search and Empirical Calibration
 
 ---
@@ -20,9 +20,9 @@
 | Exit checklist issue | #1535 (M19 Exit Checklist — blocks milestone closure) |
 | Release branch | `release/m19` — cut from `main` 2026-07-02 at 1bf1ecc |
 | Sprint plan | `docs/process/sprint-plans/m19-sprint-plan.md` — EL-approved 2026-07-02 |
-| Active wave | Wave 4 complete — G6 integration PR #1724 merged 2026-07-04; all code integrated to release/m19 |
-| Active sprint groups | None — all G1–G6 + CM-A/B/C confirmed and integrated |
-| Active sprint journal issues | None — #1716 closed 2026-07-04 |
+| Active wave | Wave 5 — G7 entry 2026-07-04; sprint/m19-g7 cut from release/m19 |
+| Active sprint groups | G7 — elasticity rows + NM-056 fix (#1729); EL-approved 2026-07-04 |
+| Active sprint journal issues | #1732 (G7 journal) |
 
 ---
 
@@ -50,7 +50,7 @@
 | CM-B | ELASTICITY_REGISTRY LAC calibration (ARG/ECU/BOL/PER) | #1623 ✓ | **Confirmed** — BPO ACCEPT; north star PASS; journal #1688 closed; integration PR #1698 merged 2026-07-04 |
 | CM-C | ELASTICITY_REGISTRY SEA calibration (PAK/LKA/BGD) | #1623 ✓ | **Confirmed** — BPO ACCEPT; north star PASS (PAK 2023 SBA); journal #1700 closed; integration PR #1707 auto-merging 2026-07-04 |
 | G6 | Demo 8 clearance | #1456 ✓, #1538 ✓, #1657 ✓, #1709 ✓, #1710 ✓ | **Integrated** — BPO ACCEPT (#1709); north star PASS; NM-095 LOW; journal #1716 closed; integration PR #1724 merged 2026-07-04 |
-| G7 | Elasticity rows + NM-056 fix | #1729 | **Filed** — entry 2026-07-04; BPO PROCEED verdict; awaiting EL approval |
+| G7 | Elasticity rows + NM-056 fix | #1729 | **Active** — EL-approved 2026-07-04; sprint/m19-g7 cut; journal #1732 |
 
 ---
 
@@ -80,7 +80,7 @@
 | #1711 | Demo 8 Act 2 verification: GRC AC-1 live harness run | Act 2 verification | DATABASE_URL prerequisite — no code changes |
 | #1712 | Demo 8 Act 2 verification: ARG AC-1 live harness run | Act 2 verification | DATABASE_URL prerequisite — no code changes |
 | #1713 | Demo 8 Act 2 verification: PAK AC-1 live harness run | Act 2 verification | DATABASE_URL prerequisite — no code changes |
-| #1729 | fix(g6): missing elasticity rows for imf_program_acceptance + emergency_declaration; NM-056 fix | G7 | OPEN — BPO PROCEED 2026-07-04; sprint entry filed; awaiting EL approval |
+| #1729 | fix(g6): missing elasticity rows for imf_program_acceptance + emergency_declaration; NM-056 fix | G7 | **Active** — EL-approved 2026-07-04; sprint/m19-g7 cut; journal #1732 |
 
 ---
 

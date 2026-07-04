@@ -3,10 +3,10 @@ name: m19-g7-sprint-entry
 type: sprint-entry
 milestone: M19 — Constraint Search and Empirical Calibration
 sprint-group: G7
-status: Filed — awaiting EL approval
+status: EL-approved 2026-07-04
 authored-by: PM Agent
 authored-date: 2026-07-04
-el-approved: false
+el-approved: 2026-07-04
 release-branch: release/m19
 sop-reference: docs/process/sprint-planning-sop.md
 ---
@@ -235,7 +235,9 @@ issue independent of Demo 8.
 
 ## EL Approval Record
 
-**EL approval:** Pending
+**EL approval:** 2026-07-04
 
-> {EL approval statement — to be filled at approval time}
-> — @PublicEnemage ({date})
+> G7 sprint entry approved. Sprint branch `sprint/m19-g7` cut from `release/m19`.
+> Scope: 4 elasticity rows + NM-056 fix. CM values pre-certified on #1657. Implementation
+> may begin. Sprint journal: #1732.
+> — @PublicEnemage (2026-07-04)
