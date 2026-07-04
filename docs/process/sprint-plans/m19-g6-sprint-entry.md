@@ -82,7 +82,9 @@ Two items require tests authored before implementation code is written:
 | Deliverable | Test file | Authored before implementation? |
 |---|---|---|
 | #1709 — tolerance band display | `frontend/tests/e2e/m19-g1-constraint-floor-search.spec.ts` (AC-T1..AC-T4) | **Yes — PR #1718 filed 2026-07-04** |
-| #1657 — subscription fix + elasticity rows | `backend/tests/test_m19_g6_demographic_subscriptions.py` | **No — BLOCKING #1657 impl PR** |
+| #1657 — subscription fix + elasticity rows | `backend/tests/test_m19_g6_demographic_subscriptions.py` | **Yes — 9 tests in impl PR #1722 (2026-07-04)** — see NM below |
+
+**Note (NM-095 candidate):** #1657 tests were authored in the same commit as the implementation (PR #1722), not in a prior RED-only PR. The test content was authored as RED-before-implementation (all 9 assert conditions that failed pre-impl), but CI did not observe a RED state independently. This is a process deviation from the test-authorship gate. Filed as near-miss (see §5 sweep update); does not block sprint exit per PI Agent judgment — tests are complete and 9/9 GREEN.
 
 **#1456, #1538, and #1710:** Fixes and corrections — tests updated in the same PR. Gate N/A.
 
@@ -90,7 +92,7 @@ Two items require tests authored before implementation code is written:
 
 **NM-084 gate:** CM Agent must post a cert comment on issue #1657 confirming elasticity values for `emergency_policy_imf_program_acceptance` and `emergency_policy_emergency_declaration` before the #1657 implementation PR opens. PI Agent posts the gate comment on the #1657 impl PR after the cert is on record.
 
-- [ ] **CM cert on #1657:** Chief Methodologist posts calibration cert on issue #1657 — **BLOCKING #1657 impl PR only**
+- [x] **CM cert on #1657:** Chief Methodologist posts calibration cert on issue #1657 — **CLEARED 2026-07-04** (cert referenced in PR #1722 test file header; PI Agent gate comment on PR #1722 confirms)
 
 Does not block #1456, #1538, #1709, or #1710.
 

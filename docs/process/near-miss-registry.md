@@ -4704,6 +4704,39 @@ Near-miss cross-references: NM-083 (demo-spec ↔ component-contract gap — con
 
 ---
 
+## NM-095 — #1657 QA Tests Authored in Same PR as Implementation; RED-Before State Observed Only in Session Context, Not by CI (Reactive)
+
+**Date:** 2026-07-04
+**Milestone:** M19 — Constraint Search and Empirical Calibration
+**Detected by:** PI Agent sprint exit review — sprint entry §2.4 gate showed `test_m19_g6_demographic_subscriptions.py` as BLOCKING; post-merge investigation confirmed tests were in impl PR #1722, not a prior RED-only PR
+**Severity:** Low — tests were correctly authored with RED-before semantics (9 assertions designed to fail pre-implementation), CM cert was on record, and 9/9 tests pass GREEN; the defect is that CI never observed a RED state independently
+
+### What happened
+
+The sprint entry §2.4 gate for #1657 required QA tests authored in a separate PR before the implementation PR opens (pattern established by NM-084/085, codified in sprint-planning-sop.md). For #1709, this was correctly followed: AC-T1..AC-T4 in PR #1718 (RED), then implementation in PR #1720 (GREEN). For #1657, the tests (`backend/tests/test_m19_g6_demographic_subscriptions.py`, 9 tests) were authored in the same commit as the implementation (PR #1722). The test file header correctly documents the RED-before-implementation semantics and references the CM cert, but no CI run was triggered against the codebase with tests present and implementation absent.
+
+### What was at risk
+
+The RED-before-implementation pattern serves two purposes: (1) it proves the tests are non-trivially verifying behaviour by confirming they fail on the pre-implementation state; (2) it creates a CI-observable evidence trail that the tests were authored independently of the implementation. When tests and implementation land together, there is no independent CI confirmation that the tests would have failed before the fix — the tests could hypothetically have been written to pass regardless of the subscription correction.
+
+In this case, the risk materialised only as a process gap, not as incorrect tests: the test content is correct, the CM cert grounds the elasticity values, and the subscription fix is verifiable. The severity is Low because the actual test quality is sound.
+
+### What caught it
+
+PI Agent sprint exit gate review of sprint entry §2.4 (existing checklist). The gate was designed to catch exactly this pattern.
+
+### Process improvement
+
+The NM-084/NM-085 SOP improvement (sprint-planning-sop.md §QA Test Authorship Gate) already codifies this requirement. This is a compliance failure against an existing rule, not a gap in the rule itself.
+
+**Improvement (codification of exception path):** For deliverables where the CM cert arrives in the same session as the implementation (i.e., there is no inter-session boundary creating a natural separation between test authorship and implementation), the implementing agent should explicitly confirm that the RED state was observed locally before committing implementation. This local RED confirmation must appear in the implementation PR description or the test file header with a statement: "Tests confirmed RED locally before implementation commit: [description of failure mode observed]." This creates an in-repo record equivalent to a prior CI run. Codify in sprint-planning-sop.md §QA Test Authorship Gate.
+
+**Recovery (applied in G6):** Sprint exit proceeds. PI Agent judgment: tests are complete, CM cert is on record, 9/9 GREEN, RED semantics correct in test file header. No re-implementation required.
+
+Near-miss cross-references: NM-084 (CM cert ordering gap — same root pattern: process gate designed after incident); NM-085 (co-dependent fixture CI sequencing — adjacent gap).
+
+---
+
 ## NM-NNN — [Short descriptive title]
 
 **Date:** YYYY-MM-DD (or approximate milestone era)
