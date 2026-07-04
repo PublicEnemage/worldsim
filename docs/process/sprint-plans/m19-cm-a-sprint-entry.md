@@ -6,14 +6,14 @@ sprint-group: CM Sprint A — Euro area elasticity calibration (parallel track)
 status: Filed
 authored-by: PM Agent
 authored-date: 2026-07-03
-el-approved: false
+el-approved: 2026-07-03
 release-branch: release/m19
 sop-reference: docs/process/sprint-planning-sop.md
 ---
 
 # Sprint Entry — M19, CM Sprint A: Euro Area Elasticity Calibration
 
-**Status:** Filed — awaiting EL approval before implementation begins
+**Status:** Filed — EL Approved 2026-07-03
 **Date authored:** 2026-07-03
 **Release branch:** `release/m19`
 **Sprint plan:** `docs/process/sprint-plans/m19-sprint-plan.md`
@@ -179,7 +179,7 @@ and receives explicit treatment in §2.4 and §6.5.*
 |---|---|
 | Sprint sub-branch | `sprint/m19-cm-a` |
 | Cut from | `release/m19` |
-| Sprint journal issue | TBD — PM Agent creates at entry |
+| Sprint journal issue | #1671 |
 
 **PM Agent sprint sub-branch cut command (run after EL approval):**
 ```bash
@@ -304,7 +304,11 @@ where T2 sources are unavailable for specific cohort linkages, per `docs/DATA_ST
 *EL reviews this entry document before any implementation PR opens. Approval is recorded here
 or as a comment on the exit checklist issue #1535.*
 
-**EL approval:** Pending
+**EL approval:** Approved — 2026-07-03
 
-> {EL approval statement — to be filled at approval time}
-> — @PublicEnemage ({date})
+> CM Sprint A entry approved. Parallel track authorized per M19 sprint plan §CM parallel track.
+> G2D integration PR #1641 confirmed merged — Greece 2010 fixture on release/m19 (exit gate
+> dependency cleared). Sprint journal issue #1671 opened. Sprint branch sprint/m19-cm-a cut
+> from release/m19. Intent document authorized; calibration decision document and QA test to
+> be filed before implementation PR opens. NM-084 two-step CM sign-off mechanism active.
+> — @PublicEnemage (2026-07-03)
