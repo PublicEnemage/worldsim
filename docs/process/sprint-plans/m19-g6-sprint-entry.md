@@ -67,9 +67,9 @@ All other G6 items are non-user-facing: #1456 (runtime defensive guard), #1538 (
 
 | Deliverable | ADR reference | Intent document path | Filed? |
 |---|---|---|---|
-| #1709 — FOUND state tolerance band display | N/A (within ADR-021 constraint-floor architecture) | `docs/process/intents/M19-G6-2026-07-04-found-tolerance-band.md` | **No — BLOCKING #1709 impl PR** |
+| #1709 — FOUND state tolerance band display | N/A (within ADR-021 constraint-floor architecture) | `docs/process/intents/M19-G6-2026-07-04-found-tolerance-band.md` | **Yes — filed 2026-07-04** |
 
-**Blocking gate:** The intent document for #1709 must be filed before the #1709 implementation PR opens. The implementation PRs for #1456, #1538, and #1710 may open immediately — they are independent of #1709 and non-user-facing.
+**Remaining blocking gate for #1709:** E2E test must be authored before the #1709 implementation PR opens (§2.4). Intent document gate is now CLEARED.
 
 ### 2.4 — QA test authorship gate
 
