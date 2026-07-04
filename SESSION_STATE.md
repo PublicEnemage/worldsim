@@ -6,7 +6,7 @@
 > Historical state lives in `docs/process/session-archives/`.
 > Authority: `docs/process/sprint-group-isolation.md §SESSION_STATE.md Cockpit Card Protocol`.
 
-**Last updated:** 2026-07-03 (G5 EL-approved; #1630 scope → Zone 1D delta annotations (ADR-017 §Zone 1D Integration); intent docs #1629+#1630 filed PR #1664; Phase B unblocked)
+**Last updated:** 2026-07-03 (G5 Phase C complete: #1522 view model retrofit PR #1679 merged, #1524 trackwheel zoom PR #1681 merged; integration PR #1684 sprint/m19-g5→release/m19 opened; PI Agent NM-094 gate PASS; G5 exit confirmed)
 **Current milestone:** M19 — Constraint Search and Empirical Calibration
 
 ---
@@ -20,9 +20,9 @@
 | Exit checklist issue | #1535 (M19 Exit Checklist — blocks milestone closure) |
 | Release branch | `release/m19` — cut from `main` 2026-07-02 at 1bf1ecc |
 | Sprint plan | `docs/process/sprint-plans/m19-sprint-plan.md` — EL-approved 2026-07-02 |
-| Active wave | Wave 3 — G5 opened 2026-07-03 |
-| Active sprint groups | G5 — NM process codification + Zone 1 view model + ELASTICITY_REGISTRY calibration + Demo 8 display fidelity |
-| Active sprint journal issues | #1660 — sprint journal: M19 G5 — Demo 8 display fidelity + Zone 1 view model |
+| Active wave | Wave 3 — G5 confirmed 2026-07-03; integration PR #1684 auto-merge pending |
+| Active sprint groups | None — G5 exit confirmed; integration PR #1684 `sprint/m19-g5 → release/m19` auto-merge pending |
+| Active sprint journal issues | None — #1660 closed at G5 PI Agent confirmation |
 
 ---
 
@@ -45,6 +45,7 @@
 | G2D | Iceland 2008–11 (capital controls) | #1532 ✓, #1553 ✓ | **Confirmed** — BPO 2×ACCEPT; north star PASS; journal #1621 closed; integration PR pending (sprint/m19-g2 → release/m19) |
 | G3 | Bayesian posterior calibration | #1543 ✓, #1536 ✓, #1537 ✓ | Confirmed — integration PR #1617 merged; exit doc `m19-g3-sprint-exit.md`; journal #1587 closed retroactively |
 | G4 | PSP driver arc + CI label precision | #1528 ✓, #1529 ✓ | Confirmed — integration PR #1637 merged; journal #1624 closed; sprint exit `docs/process/sprint-plans/m19-g4-sprint-exit.md` |
+| G5 | Demo 8 display fidelity + Zone 1 view model | #1629 ✓, #1630 ✓, #1522 ✓, #1524 ✓ | **Confirmed** — BPO ACCEPT for #1629 + #1630; PI Agent NM-094 PASS; integration PR #1684 pending |
 
 ---
 
@@ -60,18 +61,15 @@
 | #1538 | Focal cohort floor validation | Pre-wave | Immediate — #1540 prerequisite |
 | #1528 | PSP driver arc + auditability panel (DEMO-165) | G4 | **G4 confirmed** — PR #1633 merged |
 | #1529 | '95% CI' label precision fix | G4 | **G4 confirmed** — PR #1634 merged; Demo 8 Act 2 gate cleared |
-| #1632 | api_contracts.yml §trajectory missing band_method — G3 delivery gap | G5 | Low — schema-only fix; non-blocking |
-| #1522 | View model layer retrofit — Zone 1 composition logic extraction | Wave 3+ | High — EL-added to M19 |
-| #1524 | Zone 1A TrajectoryView: pinch-zoom, thumbwheel zoom, pan | Wave 3+ | High — EL-added to M19 |
-| #1623 | ELASTICITY_REGISTRY — non-SSA entity family calibration gap | CM Wave 2–3 | High — CM Sprint A (GRC/Euro area) M19 priority; unblocks Greece counter-factual |
-| #1629 | Zone 1A ZMB y-axis not tight-scoped — curves collapse | G5 Phase B | High — intent filed; implementation unblocked |
-| #1630 | Zone 1D delta annotations Mode 3 (ADR-017 §Zone 1D Integration) | G5 Phase B | High — scope changed from Zone 1A per-framework lines; intent filed; unblocked |
+| #1632 | api_contracts.yml §trajectory missing band_method — G3 delivery gap | G5 ✓ | **Closed** — PR #1668 merged (G5 Phase B) |
+| #1522 | View model layer retrofit — Zone 1 composition logic extraction | G5 ✓ | **Closed** — PR #1679 merged; trajectoryViewModel.ts + sliceToStepRange; 33 unit tests GREEN |
+| #1524 | Zone 1A TrajectoryView: trackwheel zoom (desktop, reduced scope) | G5 ✓ | **Closed** — PR #1681 merged; visibleStepRange state + non-passive wheel listener |
+| #1623 | ELASTICITY_REGISTRY — non-SSA entity family calibration gap | CM Sprint A ✓ | **Closed** — CM Sprint A GRC/Euro area Gap 1 delivered PR #1683; BPO ACCEPT 2026-07-03 |
+| #1629 | Zone 1A ZMB y-axis not tight-scoped — curves collapse | G5 ✓ | **Closed** — PR #1666 merged; BPO ACCEPT 2026-07-03 |
+| #1630 | Zone 1D delta annotations Mode 3 (ADR-017 §Zone 1D Integration) | G5 ✓ | **Closed** — PR #1669 merged; BPO ACCEPT 2026-07-03 |
 | #1647 | G2C test file missing from release/m19 — NM-094 recovery | Demo 8 risk | **Closed** — PR #1649 merged; test_m19_g2c_scenario_runs.py (1394 lines) restored |
 | #1650–#1656 | NM-084/085/086/089/092/093/094 process codification | G5 Phase A | **Closed** — PR #1658 MERGED (sprint/m19-g5) |
 | #1657 | NM-090/091: DemographicModule dead subscriptions fix | Deferred (CM gate) | CM sign-off required before implementation PR opens |
-| #1660 | sprint journal: M19 G5 — Demo 8 display fidelity + Zone 1 view model | G5 meta | Sprint journal — open for G5 duration; status updated 2026-07-03 |
-| #1661 | G5 sprint entry doc | G5 meta | **Merged** (sprint/m19-g5) |
-| #1664 | G5 intent docs #1629 + #1630 | G5 meta | **PR #1664** — auto-merge pending CI |
 
 ---
 
@@ -99,7 +97,8 @@
 - **G2D complete (2026-07-03):** ADR-020 channels A/B/C implemented (PR #1635; 28/28 unit tests). Iceland 2008–11 fixture (PR #1639; heterodox vs orthodox counter-factual). BPO 2×ACCEPT; north star PASS (Zambia restructuring scenario; heterodox path analytically distinguishable). Journal #1621 closed. Ecuador regression fix (PR #1642 — implementation_capacity=0 for salvazo; Channel B was firing via one-step lag). Merge conflict resolved on sprint/m19-g2 (PR #1643). Integration PR #1641 `sprint/m19-g2 → release/m19` pending auto-merge — CI re-running after conflict resolution. Demo 8 condition: DIRECTION_ONLY qualifier required on Iceland direction verdict at Demo 8 Act 2.
 - **ADR-020 (ARCH-014) calibration constants (frozen):** Channel A ε=0.60 (ISL controls-only), β=0.020, γ=1.2 (CM constant — CE cannot change without CM Consulted), φ=−0.30 (ISL Q1 informal PHC). Sources: `calibration-basis.md §Capital Controls` (PR #1625).
 - **NM-086:** E2E mock routes must be verified against `api_contracts.yml` before the implementation PR opens (G1, filed 2026-07-03). Process: QA Lead mock-helper verification is a blocking checklist item on intent authorship.
-- **G4 forward condition (G5 scope):** Issue #1632 (`band_method` missing from `api_contracts.yml §trajectory` — G3 delivery gap). Schema-only fix. Must resolve before G5 closes. NM-086 gate left open in G4 QA ack block.
-- **G5 #1630 scope (2026-07-03):** ADR-017 §Zone 1D Integration (Mode 3) mandates per-framework `(+Δ vs baseline)` annotations in Zone 1D as the "required companion" to composite-only Zone 1A. These were never implemented (silent failure per ADR-017). #1630 now delivers this: `FourFrameworkZone1D` Mode 3 delta annotations. Demo 8 narration updated to reference Zone 1D. Intent: `docs/process/intents/M19-G5-2026-07-03-zone1d-delta-annotations.md`.
+- **G5 complete (2026-07-03):** Phase A (NM codification), Phase B (#1629 ZMB y-axis + #1630 Zone 1D delta), Phase C (#1522 view model retrofit + #1524 trackwheel zoom). BPO ACCEPT for #1629 + #1630. Integration PR #1684 `sprint/m19-g5 → release/m19` opened with PI Agent NM-094 gate PASS. Sprint exit `docs/process/sprint-plans/m19-g5-sprint-exit.md`.
+- **G5 Zone 1A zoom (#1524, 2026-07-03):** Desktop trackwheel zoom only (EL decision: mobile pinch/pan deferred). `visibleStepRange` state in `TrajectoryView`; non-passive wheel listener; midpoint-centered 20% zoom; double-click reset; `data-visible-step-min/max` DOM attributes. Prerequisite #1522 merged first.
+- **G5 #1630 scope (2026-07-03):** ADR-017 §Zone 1D Integration (Mode 3) mandates per-framework `(+Δ vs baseline)` annotations in Zone 1D. `formatDelta`/`getDeltaColor` exported from `FourFrameworkZone1D`. Intent: `docs/process/intents/M19-G5-2026-07-03-zone1d-delta-annotations.md`.
 - **M18 complete (v0.18.0, 2026-07-02):** G1–G7 delivered; Demo 7 PASS (unconditional); release/m18 → main via PR #1534. Archive: `docs/process/session-archives/session-state-pre-m19.md`.
 - **Demo 7 north star (2026-07-02):** Aicha presents Zambia +342K cohort effect with CI bounds and sourcing to IMF restructuring table. Next available DEMO-167.
