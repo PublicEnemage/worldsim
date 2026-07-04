@@ -4780,6 +4780,107 @@ Near-miss cross-references: NM-056 (no pytest.skip() in test bodies); NM-090/091
 
 ---
 
+## NM-097 — CM Sprint A/B/C MAGNITUDE Tests Run Against Under-Seeded CI Database; Skip Guard Checks DATABASE_URL Presence Only; Four Tests Fail Persistently on release/m19 (Reactive)
+
+**Date:** 2026-07-04
+**Milestone:** M19 — Constraint Search and Empirical Calibration
+**Detected by:** DS Agent — CI health review (2026-07-04), triggered by EL observation of persistent `backtesting` CI failure during sprint/m19-g7 push monitoring
+**Severity:** Medium
+
+### What happened
+
+Three CM calibration test files (`test_m19_cm_a/b/c_elasticity_calibration.py`) carry
+`@pytest.mark.backtesting` and contain MAGNITUDE forward-condition tests (AC-1). Each
+file's `asgi_client` fixture has a skip guard: `if not _DATABASE_URL: pytest.skip(...)`.
+
+The CI `backtesting` job provides a full PostGIS service and sets `DATABASE_URL` in
+its environment. The skip guard evaluates only `_DATABASE_URL != None` — it does NOT
+verify that the database contains the economic simulation data required to produce
+non-zero `hd_composite` divergence. When the guard fires (it never does in CI), the
+condition is never correct: DATABASE_URL is always set.
+
+The CI backtesting job seeds only Natural Earth entity records (`natural_earth_loader`).
+GRC/ARG/PAK counter-factual simulation runs require economic scenario configuration data
+that is never loaded. The simulation produces near-zero `hd_composite` values across all
+steps. The magnitude bounds (`per_step_diff[3] ∈ [0.010, 0.20]` for GRC, etc.) are not
+satisfied. Four tests fail in every CI run that collects them.
+
+**Secondary gap:** CM calibration test files live in `backend/tests/` (root), not in
+`backend/tests/backtesting/`. The `backtesting` paths filter watches
+`backend/tests/backtesting/**` and `backend/tests/fixtures/**`. Changes to CM calibration
+files do NOT trigger the backtesting job; changes to unrelated backtesting fixture files
+DO pull in CM calibration test failures.
+
+Result: `release/m19` has shown persistent "CI failure" status for multiple consecutive
+push events (run IDs: 28710969094, 28711570146, 28711923210, 28711962035 — all `push`
+events on `release/m19`). All four required Ruleset checks continue to pass; auto-merge
+is not affected. But the CI signal is degraded and misleading.
+
+### What was at risk
+
+1. **CI signal integrity:** `release/m19` appearing permanently "broken" makes it
+   harder to detect real regressions. Engineers reviewing CI health see failure and
+   cannot immediately distinguish this known failure from a new real failure.
+
+2. **Merge-blocking if Ruleset is ever updated:** If `backtesting` is added to
+   `sprint-branch-ci-gate` or `release-branch-ci-gate` required checks, this failure
+   would immediately block all PRs on `release/m19` until fixed.
+
+3. **False test signal:** The MAGNITUDE tests are designed to verify that calibrated
+   elasticity values produce empirically grounded `hd_composite` divergence in a live
+   scenario. Running them against an under-seeded database produces a false failure
+   that obscures whether the code is actually correct — the tests are neither passing
+   for the right reason nor failing for the right reason.
+
+4. **Ongoing Demo 8 pre-flight:** With Demo 8 approaching at M19 close, a persistently
+   failing CI job on the release branch creates unnecessary noise during a critical
+   verification period.
+
+### What caught it
+
+DS Agent CI health review on 2026-07-04, triggered by EL observation that the
+`sprint/m19-g7` push appeared to be blocked (it was blocked briefly by an in-progress
+`lint` run; the real CI failure was visible once the run completed). The `backtesting`
+failure had been present across all monitored `release/m19` runs, meaning it predates
+this session by multiple PRs. No agent or automated gate caught it earlier — the
+Ruleset correctly excludes `backtesting` from required checks, so merge gates did not
+fire, and no process required reviewing the non-required job results.
+
+This is a process gap: non-required CI jobs on a release branch should have a defined
+review cadence (e.g., DS Agent CI health review at each wave entry) so persistent
+degraded jobs are noticed before they accumulate.
+
+### Process improvement
+
+**Immediate fix (test-level):** Add a data-presence check to the `asgi_client`
+fixture in all three CM calibration test files. The check queries the database for
+the presence of simulation run data for the relevant entity (GRC/ARG/PAK) — if absent,
+skip gracefully with a message directing to #1711/#1712/#1713. This makes the skip
+condition semantically accurate: tests skip when the database is under-seeded, not only
+when the database is absent.
+
+**File location clarification:** Move `test_m19_cm_a/b/c_elasticity_calibration.py`
+to `backend/tests/backtesting/` OR expand the `backtesting` paths filter to include
+`backend/tests/test_m19_cm_*.py`. Currently these files are invisible to the paths
+filter, meaning changes to them do not re-trigger the backtesting job.
+
+**CI health review cadence:** DS Agent should perform a `ci-health` infra review at
+each sprint wave entry as part of the standard gate sequence. Non-required CI job
+failures should be reviewed and classified (near-miss or known-issue) within one sprint
+group of first appearance.
+
+**Filed artifacts:**
+- This NM-097 entry
+- `docs/compliance/infra-reviews/2026-07-04-ci-health-review.md` (DS Agent, 2026-07-04)
+
+**Fix tracked:** Issue #1711/#1712/#1713 operational verification path. The data-presence
+guard fix should be a separate ticket or folded into the DATABASE_URL live harness
+seeding work already tracked in those issues. EL to decide sprint assignment.
+
+Near-miss cross-references: NM-056 (pytest.skip() usage pattern — skip guard in fixture is NM-056-compliant in form but semantically broken for the CI under-seeded case); NM-096 (same sprint era — CI health review prompted by G7 work reveals adjacent CI gap).
+
+---
+
 ## NM-NNN — [Short descriptive title]
 
 **Date:** YYYY-MM-DD (or approximate milestone era)
