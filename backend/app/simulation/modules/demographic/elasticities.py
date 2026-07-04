@@ -329,4 +329,130 @@ ELASTICITY_REGISTRY: list[CohortElasticity] = [
         confidence_tier=3,
         entity_families=frozenset({"PAK", "LKA", "BGD"}),
     ),
+    # ---------------------------------------------------------------------------
+    # IMF programme acceptance → Q1/Q2 INFORMAL poverty headcount (#1657)
+    # CM cert: issue #1657 comment 2026-07-04 — Chief Methodologist.
+    #
+    # Direct conditionality channel: subsidy removal (fuel, food staples), public
+    # sector wage freeze, import liberalisation on programme acceptance. Distinct
+    # from the GDP-mediated gdp_growth_change channel already in registry.
+    # Event magnitude: +1.0 (binary signal per EmergencyPolicyInput).
+    # φ = +0.04 (Q1 INFORMAL): IMF IEO (2018) "The IMF and Social Protection" —
+    # average 3–5pp Q1 PHC increase in first year of programme; informal workers
+    # primarily affected via subsidy pass-through. Mid-range = 4pp. T3: cross-
+    # regional inference; T2 requires SEN 2015 ECF or ZMB 2017 SBA event-study.
+    # Uncertainty range: +0.02 to +0.06.
+    # ---------------------------------------------------------------------------
+    CohortElasticity(
+        event_type="emergency_policy_imf_program_acceptance",
+        cohort_spec=CohortSpec(
+            IncomeQuintile.Q1,
+            AgeBand.AGE_25_54,
+            EmploymentSector.INFORMAL,
+        ),
+        attribute_key="poverty_headcount_ratio",
+        elasticity=Decimal("0.04"),
+        source=(
+            "IMF Independent Evaluation Office (2018): The IMF and Social Protection."
+            " IEO Evaluation Report. Average 3–5pp Q1 poverty headcount increase in"
+            " first programme year, predominantly informal workers via subsidy removal"
+            " and consumption goods price inflation. Abouharb, M.R. & Cingranelli,"
+            " D.L. (2006): IMF Programs and Human Rights, 1981–2003. International"
+            " Studies Quarterly 50(2): 233–267. Consistent across 130+ programme"
+            " episodes. Direct conditionality channel; additive to GDP-mediated"
+            " gdp_growth_change channel. Point estimate +0.04 (mid-range 3–5pp)."
+            " M19-G6 calibration. Uncertainty range: +0.02 to +0.06."
+        ),
+        source_registry_id="ACADEMIC_LITERATURE_IMF_IEO_2018_IMF_SOCIAL_PROTECTION",
+        confidence_tier=3,
+    ),
+    # Q2 INFORMAL: Ball et al. (2013) 0.60 between-quintile scaling.
+    # 0.60 × 0.04 = 0.024 → +0.02 (rounded to 2dp per registry convention).
+    # Q2 informal workers have stronger employment tenure than Q1; absorb 0.60x
+    # the per-unit conditionality impact. Uncertainty range: +0.01 to +0.04.
+    CohortElasticity(
+        event_type="emergency_policy_imf_program_acceptance",
+        cohort_spec=CohortSpec(
+            IncomeQuintile.Q2,
+            AgeBand.AGE_25_54,
+            EmploymentSector.INFORMAL,
+        ),
+        attribute_key="poverty_headcount_ratio",
+        elasticity=Decimal("0.02"),
+        source=(
+            "Ball, Furceri, Leigh, Loungani (2013): The Distributional Effects"
+            " of Fiscal Consolidation. IMF Working Paper WP/13/151."
+            " 0.60 between-quintile scaling of Q1 INFORMAL (+0.04):"
+            " 0.60 × 0.04 = 0.024 → +0.02. Q2 informal workers have stronger"
+            " employment tenure; absorb 0.60x the per-unit conditionality impact."
+            " M19-G6 calibration. Uncertainty range: +0.01 to +0.04."
+        ),
+        source_registry_id="ACADEMIC_LITERATURE_BALL_2013_FISCAL_CONSOLIDATION",
+        confidence_tier=3,
+    ),
+    # ---------------------------------------------------------------------------
+    # Emergency declaration → Q1/Q2 INFORMAL poverty headcount (#1657)
+    # CM cert: issue #1657 comment 2026-07-04 — Chief Methodologist.
+    #
+    # Direct disruption channel: informal market closure, movement restriction,
+    # supply chain interruption on emergency declaration. Not mediated by GDP.
+    # Consistent with credit_contraction_labour_shock precedent (ADR-020 Channel C).
+    # Event magnitude: +1.0 (binary signal per EmergencyPolicyInput).
+    # φ = +0.06 (Q1 INFORMAL): ILO (2020) "COVID-19 and the World of Work" —
+    # 20–25% informal employment contraction within 4–6 weeks of emergency
+    # declaration in SSA/LIC contexts. World Bank (2020) "Poverty and Shared
+    # Prosperity": 3–8pp immediate PHC increase for Q1 informal workers.
+    # ZMB 2020 near-reference: emergency powers March 2020; informal sector
+    # contraction within ILO/World Bank range. T3: cross-regional inference.
+    # T2 requires ZMB 2020 event-study validation. Uncertainty range: +0.04 to +0.09.
+    # ---------------------------------------------------------------------------
+    CohortElasticity(
+        event_type="emergency_policy_emergency_declaration",
+        cohort_spec=CohortSpec(
+            IncomeQuintile.Q1,
+            AgeBand.AGE_25_54,
+            EmploymentSector.INFORMAL,
+        ),
+        attribute_key="poverty_headcount_ratio",
+        elasticity=Decimal("0.06"),
+        source=(
+            "ILO (2020): COVID-19 and the World of Work — Impact and Policy"
+            " Responses. ILO Monitor 2nd edition. 20–25% informal employment"
+            " contraction within 4–6 weeks of emergency/lockdown declaration in"
+            " SSA and LIC contexts. World Bank (2020): Poverty and Shared"
+            " Prosperity 2020: Reversals of Fortune. Chapters 1 and 3: emergency"
+            " declarations in developing countries associated with 3–8pp immediate"
+            " PHC increase for Q1 informal workers. ZMB 2020 emergency declaration"
+            " March 2020 — informal sector contraction within estimated range."
+            " Direct disruption channel (market closure, movement restriction);"
+            " additive to GDP-mediated channel. M19-G6 calibration."
+            " Uncertainty range: +0.04 to +0.09."
+        ),
+        source_registry_id="ACADEMIC_LITERATURE_ILO_2020_COVID_WORLD_OF_WORK",
+        confidence_tier=3,
+    ),
+    # Q2 INFORMAL: Ball et al. (2013) 0.60 between-quintile scaling.
+    # 0.60 × 0.06 = 0.036 → +0.04 (rounded to 2dp). Q2 informal workers have
+    # stronger employment tenure and more access to informal safety nets.
+    # Uncertainty range: +0.02 to +0.06.
+    CohortElasticity(
+        event_type="emergency_policy_emergency_declaration",
+        cohort_spec=CohortSpec(
+            IncomeQuintile.Q2,
+            AgeBand.AGE_25_54,
+            EmploymentSector.INFORMAL,
+        ),
+        attribute_key="poverty_headcount_ratio",
+        elasticity=Decimal("0.04"),
+        source=(
+            "Ball, Furceri, Leigh, Loungani (2013): The Distributional Effects"
+            " of Fiscal Consolidation. IMF Working Paper WP/13/151."
+            " 0.60 between-quintile scaling of Q1 INFORMAL (+0.06):"
+            " 0.60 × 0.06 = 0.036 → +0.04. Q2 informal workers have stronger"
+            " employment tenure and access to informal safety nets."
+            " M19-G6 calibration. Uncertainty range: +0.02 to +0.06."
+        ),
+        source_registry_id="ACADEMIC_LITERATURE_BALL_2013_FISCAL_CONSOLIDATION",
+        confidence_tier=3,
+    ),
 ]
