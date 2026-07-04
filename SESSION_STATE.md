@@ -6,7 +6,7 @@
 > Historical state lives in `docs/process/session-archives/`.
 > Authority: `docs/process/sprint-group-isolation.md §SESSION_STATE.md Cockpit Card Protocol`.
 
-**Last updated:** 2026-07-04 (CM Sprint B BPO ACCEPT #1623 Gap 2; integration PR #1698 merged to release/m19)
+**Last updated:** 2026-07-04 (CM Sprint C confirmed — #1623 Gap 3 SEA PAK/LKA/BGD; integration PR #1707 auto-merging to release/m19)
 **Current milestone:** M19 — Constraint Search and Empirical Calibration
 
 ---
@@ -20,9 +20,9 @@
 | Exit checklist issue | #1535 (M19 Exit Checklist — blocks milestone closure) |
 | Release branch | `release/m19` — cut from `main` 2026-07-02 at 1bf1ecc |
 | Sprint plan | `docs/process/sprint-plans/m19-sprint-plan.md` — EL-approved 2026-07-02 |
-| Active wave | Wave 3 — G5 integrated 2026-07-04 (PR #1684); CM-B integrated 2026-07-04 (PR #1698); no active sprint groups |
-| Active sprint groups | None — CM Sprint B integrated to release/m19 (PR #1698 merged 2026-07-04) |
-| Active sprint journal issues | None — #1688 closed at CM Sprint B PI Agent confirmation |
+| Active wave | Wave 3 — G5 integrated 2026-07-04 (PR #1684); CM-B integrated (PR #1698); CM-C integration PR #1707 auto-merging |
+| Active sprint groups | None — CM Sprint C integration PR #1707 pending auto-merge to release/m19 |
+| Active sprint journal issues | None — #1700 closes at CM Sprint C PI Agent confirmation |
 
 ---
 
@@ -48,6 +48,7 @@
 | G5 | Demo 8 display fidelity + Zone 1 view model | #1629 ✓, #1630 ✓, #1522 ✓, #1524 ✓ | **Integrated** — BPO ACCEPT all 4; PI Agent NM-094 PASS; integration PR #1684 merged 2026-07-04 |
 | CM-A | ELASTICITY_REGISTRY Euro area calibration | #1623 ✓ | **Confirmed** — BPO ACCEPT; north star PASS; journal #1671 closed; integration PR #1683 merged 2026-07-03 |
 | CM-B | ELASTICITY_REGISTRY LAC calibration (ARG/ECU/BOL/PER) | #1623 ✓ | **Confirmed** — BPO ACCEPT; north star PASS; journal #1688 closed; integration PR #1698 merged 2026-07-04 |
+| CM-C | ELASTICITY_REGISTRY SEA calibration (PAK/LKA/BGD) | #1623 ✓ | **Confirmed** — BPO ACCEPT; north star PASS (PAK 2023 SBA); journal #1700 closed; integration PR #1707 auto-merging 2026-07-04 |
 
 ---
 
@@ -66,7 +67,7 @@
 | #1632 | api_contracts.yml §trajectory missing band_method — G3 delivery gap | G5 ✓ | **Closed** — PR #1668 merged (G5 Phase B) |
 | #1522 | View model layer retrofit — Zone 1 composition logic extraction | G5 ✓ | **Closed** — PR #1679 merged; trajectoryViewModel.ts + sliceToStepRange; 33 unit tests GREEN |
 | #1524 | Zone 1A TrajectoryView: trackwheel zoom (desktop, reduced scope) | G5 ✓ | **Closed** — PR #1681 merged; visibleStepRange state + non-passive wheel listener |
-| #1623 | ELASTICITY_REGISTRY — non-SSA entity family calibration gap | CM Sprint A+B ✓ | **Gaps 1+2 closed** — GRC (PR #1683, 2026-07-03) + LAC ARG/ECU/BOL/PER (PR #1696, 2026-07-04); Gap 3 South/Southeast Asia deferred CM Sprint C |
+| #1623 | ELASTICITY_REGISTRY — non-SSA entity family calibration gap | CM Sprint A+B+C ✓ | **All 3 gaps closed** — GRC T2 (PR #1683); LAC T3 (PR #1696); SEA T3 PAK/LKA/BGD (PR #1705 merged 2026-07-04); 10-entry registry complete |
 | #1629 | Zone 1A ZMB y-axis not tight-scoped — curves collapse | G5 ✓ | **Closed** — PR #1666 merged; BPO ACCEPT 2026-07-03 |
 | #1630 | Zone 1D delta annotations Mode 3 (ADR-017 §Zone 1D Integration) | G5 ✓ | **Closed** — PR #1669 merged; BPO ACCEPT 2026-07-03 |
 | #1647 | G2C test file missing from release/m19 — NM-094 recovery | Demo 8 risk | **Closed** — PR #1649 merged; test_m19_g2c_scenario_runs.py (1394 lines) restored |
@@ -83,6 +84,7 @@
 | AC-12: resolve structural-absence indicator key (replace `__structural_absence__` placeholder) | Customer Agent L3 on #1540 | Demo 8 Act 1 |
 | AC-1 harness live run (GRC orthodox vs heterodox): `per_step_diff[3] ∈ [0.010, 0.20]` | CM Sprint A exit §4 forward condition | Demo 8 Act 2 |
 | AC-1 harness live run (ARG Type B `hd_composite` divergence): `per_step_diff[2] ∈ [0.003, 0.050]` | CM Sprint B exit §4 forward condition | Demo 8 Act 2 |
+| AC-1 harness live run (PAK Type B `hd_composite` divergence): `per_step_diff[2] ∈ [0.002, 0.035]` | CM Sprint C exit §4 forward condition | Demo 8 Act 2 |
 
 ---
 
@@ -107,4 +109,5 @@
 - **M18 complete (v0.18.0, 2026-07-02):** G1–G7 delivered; Demo 7 PASS (unconditional); release/m18 → main via PR #1534. Archive: `docs/process/session-archives/session-state-pre-m19.md`.
 - **CM Sprint A complete (2026-07-03):** GRC Euro area ELASTICITY_REGISTRY calibration — `entity_families` scoping field on `CohortElasticity`; GRC Q1 FORMAL (−0.25, T2, B&L 2013) + Q2 FORMAL (−0.15, T2, Ball 2013). Greece 2010 counter-factual upgrades from DIRECTION_ONLY advisory to calibrated MAGNITUDE basis. 20/20 unit tests GREEN. BPO ACCEPT; north star PASS. Integration PR #1683 merged to release/m19.
 - **CM Sprint B complete (2026-07-04):** LAC ELASTICITY_REGISTRY calibration — ARG/ECU/BOL/PER `entity_families`; LAC Q1 FORMAL (−0.22, T3, Lustig 2014 CEQ WP/13) + Q2 FORMAL (−0.13, T3, Ball 2013 0.60 scaling). FORMAL-only (Option a) avoids double-counting with SSA Q1 INFORMAL. Argentina/Ecuador/Bolivia/Peru scenarios now use LAC-calibrated formal-sector channel not SSA proxy. 23/23 unit tests GREEN. BPO ACCEPT; north star PASS (Bolivia IMF negotiation scenario). Integration PR #1698 merged to release/m19.
+- **CM Sprint C complete (2026-07-04):** SEA ELASTICITY_REGISTRY calibration — PAK/LKA/BGD `entity_families`; SEA Q1 FORMAL (−0.17, T3, Ilzetzki et al. 2013 developing-country multiplier 0.35–0.40; Q1 concentration 1.35× with BISP/Samurdhi discount) + Q2 FORMAL (−0.10, T3, Ball 2013 0.60 scaling). FORMAL-only (Option a). 26/26 unit tests GREEN. BPO ACCEPT; north star PASS (PAK 2023 IMF SBA negotiation scenario). Integration PR #1707 auto-merging to release/m19. Issue #1623 fully resolved — all three gaps (GRC T2, LAC T3, SEA T3). Known limitation: SSA INFORMAL proxy overstates informal channel for SEA — Option (d) suppression deferred beyond M19. Batini 2012 reference corrected to Ilzetzki 2013 in calibration decision.
 - **Demo 7 north star (2026-07-02):** Aicha presents Zambia +342K cohort effect with CI bounds and sourcing to IMF restructuring table. Next available DEMO-167.
