@@ -4737,6 +4737,49 @@ Near-miss cross-references: NM-084 (CM cert ordering gap — same root pattern: 
 
 ---
 
+## NM-096 — #1657 Elasticity Rows Not Added; NM-090 Hazard Partially Unresolved; Two G6 Tests Skip via In-Body pytest.skip(); Sprint Exit "9/9 GREEN" Overstated (Reactive)
+
+**Date:** 2026-07-04
+**Milestone:** M19 — Constraint Search and Empirical Calibration
+**Detected by:** DS Agent deep log analysis of G5/G6/CM-A/B/C sprint deliverables — EL-triggered post-integration review
+**Severity:** Medium — the dead subscription strings are fixed and the channels are live, but the missing elasticity rows mean `emergency_policy_imf_program_acceptance` and `emergency_policy_emergency_declaration` events are received and discarded silently (zero-delta); the original NM-090 hazard (silent zero-output on these channels) is partially unresolved in production; two NM-056 violations allow CI to report a count that does not distinguish SKIP from PASS
+
+### What happened
+
+PR #1722 (G6, merged 2026-07-04) fixed the dead subscription strings prescribed by NM-090/091: `"imf_program_acceptance"` → `"emergency_policy_imf_program_acceptance"` and `"emergency_declaration"` → `"emergency_policy_emergency_declaration"`. The NM-090 prescription stated: *"subscription string fix + elasticity rows in the same PR; fixing the string without adding elasticity rows produces no behaviour change."*
+
+The elasticity rows were not added. `ELASTICITY_REGISTRY` in `backend/app/simulation/modules/demographic/elasticities.py` has no entries for `emergency_policy_imf_program_acceptance` or `emergency_policy_emergency_declaration`. When these events fire, `DemographicModule` finds no elasticity row, emits no output event, and returns silently — the NM-090 zero-output hazard is preserved.
+
+The test file (`backend/tests/test_m19_g6_demographic_subscriptions.py`) anticipated this: tests `test_imf_program_acceptance_delta_is_positive` (line 231) and `test_emergency_declaration_delta_is_positive` (line 289) use `pytest.skip()` inside the test body when `delta is None`. This is a NM-056 violation. The G6 sprint exit recorded "9/9 tests GREEN" — the accurate count is 7 PASS + 2 SKIP. CI's default summary does not distinguish SKIP from PASS in aggregate counts, making the overstated count a silent audit risk.
+
+The CM cert for the elasticity values is on record (issue #1657 comment 2026-07-04): Q1 INFORMAL φ=+0.04 (IMF), φ=+0.06 (emergency); Q2 INFORMAL φ=+0.02 and φ=+0.04. Values are certified and implementation is unblocked.
+
+### What was at risk
+
+Any simulation run involving `emergency_policy_imf_program_acceptance` or `emergency_policy_emergency_declaration` events (i.e., any scenario that invokes IMF programme acceptance or emergency declaration via the EmergencyPolicyInput instrument) would produce a zero-delta on Q1/Q2 INFORMAL poverty headcount — contradicting the CM-certified direction (both raise PHC). The human cost ledger for these scenarios would understate the distributional impact of emergency conditionality. This is a Tier 1 mission-impact risk: the tool would provide incorrect analytical output to a finance ministry analyst examining an IMF programme scenario.
+
+The NM-056 violation is lower risk: the two skipping tests are sign guards whose corresponding value tests (`test_imf_program_acceptance_triggers_q1_informal_delta` etc.) catch the same failure mode with a FAIL rather than a SKIP. The gap is that the sprint exit record "9/9 GREEN" would mislead future agents reviewing the test status.
+
+### What caught it
+
+EL-triggered DS Agent deep log analysis of all G5/G6/CM-A/B/C sprint branches and test files after all sprint groups had integrated to `release/m19`. The analysis was motivated by the earlier G2C test-file-loss incident (NM-094) and aimed to confirm no similar gaps remained. The NM-056 violations were visible in the test source; the missing elasticity rows were inferred from the `pytest.skip("No elasticity row yet")` comment and confirmed by grepping `ELASTICITY_REGISTRY`.
+
+The sprint exit review (PI Agent) did not catch this because the exit criteria focused on test count (9/9 GREEN), CI colour (green), and BPO acceptance — none of which distinguish SKIP from PASS.
+
+### Process improvement
+
+**Root cause:** The NM-090/091 prescription ("subscription strings + elasticity rows in same PR") was not enforced at PR merge time. The PR description and sprint entry checklist did not include an explicit line item confirming elasticity rows were added. The PI Agent gate comment on the integration PR did not check for elasticity row presence before approving.
+
+**Improvement 1 — PI Agent integration PR gate, §Test-file presence check (existing) extended:** When a sprint group includes a NM-090/091-prescribed elasticity row deliverable, the PI Agent gate comment must include a confirming grep: `grep -c "emergency_policy_imf_program_acceptance\|emergency_policy_emergency_declaration" backend/app/simulation/modules/demographic/elasticities.py` returning ≥ 1 match per prescribed event before gate clears. This is an extension of the existing `§Test-file presence check` pattern codified in `docs/process/sprint-group-isolation.md` (NM-094). Codify as a named sub-check: `§Elasticity row presence check` in the same section.
+
+**Improvement 2 — NM-056 sprint exit count accuracy:** Sprint exit records must report the breakdown `N PASS / M SKIP / K FAIL`, not a single aggregate GREEN count. A sprint exit that reports "9/9 GREEN" when 2 tests skip is a non-compliant exit record. Codify in `docs/process/sprint-planning-sop.md §Sprint Exit Gate`: *"Test count in exit record must be in the form `N PASS / M SKIP / K FAIL`. A SKIP count of >0 must be explained (what condition gates the test; when will SKIP resolve to PASS)."*
+
+**Fix issue:** Issue #1729 — add 4 elasticity rows (φ=+0.04, +0.02, +0.06, +0.04) to `ELASTICITY_REGISTRY`; fix NM-056 violations in `test_m19_g6_demographic_subscriptions.py` (lines 231, 289); full suite 7–9/9 PASS (0 SKIP). CM cert already on record — implementation unblocked.
+
+Near-miss cross-references: NM-056 (no pytest.skip() in test bodies); NM-090/091 (root near-misses for dead subscription + missing elasticity rows); NM-095 (adjacent G6 test authorship gap — same sprint, same test file).
+
+---
+
 ## NM-NNN — [Short descriptive title]
 
 **Date:** YYYY-MM-DD (or approximate milestone era)
