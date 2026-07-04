@@ -279,6 +279,16 @@ EmergencyInstrument variants. The implementing agent must:
 This audit is a **blocking prerequisite** for the G2D implementation PR. The CE agent
 must report audit findings to the Architect Agent before the PR is opened.
 
+**Audit completion record (2026-07-04, #1657):**
+Audit found two additional dead subscription strings: `"imf_program_acceptance"` and
+`"emergency_declaration"` (bare). Both were registered in NM-090. Fixed in #1657:
+- Subscription strings corrected to `"emergency_policy_imf_program_acceptance"` and
+  `"emergency_policy_emergency_declaration"` in `_SUBSCRIBED_EVENTS`
+- Elasticity rows added to `ELASTICITY_REGISTRY`: Q1 INFORMAL (+0.04 / +0.06) and
+  Q2 INFORMAL (+0.02 / +0.04); `entity_families=None`; T3; CM-certified 2026-07-04
+- Transmission table updated: both rows now show `✅ Active` in DemographicModule column
+- 9/9 unit tests GREEN post-implementation
+
 ### Decision 4: `known_limitations` Auto-Emission for CAPITAL_CONTROLS Gap Closure
 
 From the merge of the G2D ADR-020 implementation PR onward, the `emergency_policy_capital_controls`

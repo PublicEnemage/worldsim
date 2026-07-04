@@ -152,8 +152,8 @@ DemographicModule's `_SUBSCRIBED_EVENTS` as found in code (pre-ADR-020 fix):
 | Instrument | Canonical event string | GovernanceModule | ExternalSectorModule | MacroeconomicModule | DemographicModule | Audit status |
 |---|---|---|---|---|---|---|
 | `capital_controls` | `emergency_policy_capital_controls` | ❌ not subscribed (⚠️ original ✅ incorrect) | 🆕 ADR-020 | 🆕 ADR-020 | 🔧 fix + bridge | **AUDITED (ADR-020)** |
-| `imf_program_acceptance` | `emergency_policy_imf_program_acceptance` | ✅ (elasticity: `democratic_quality_score`) | ❌ not subscribed | ❌ not subscribed | ❌ `dead` (NM-090) | **AUDITED** |
-| `emergency_declaration` | `emergency_policy_emergency_declaration` | ✅ (elasticity: `democratic_quality_score`) | ❌ not subscribed | ❌ not subscribed | ❌ `dead` (NM-090) | **AUDITED** |
+| `imf_program_acceptance` | `emergency_policy_imf_program_acceptance` | ✅ (elasticity: `democratic_quality_score`) | ❌ not subscribed | ❌ not subscribed | ✅ Active (φ: Q1 INFORMAL +0.04, Q2 INFORMAL +0.02; T3; #1657) | **FIXED (#1657)** |
+| `emergency_declaration` | `emergency_policy_emergency_declaration` | ✅ (elasticity: `democratic_quality_score`) | ❌ not subscribed | ❌ not subscribed | ✅ Active (φ: Q1 INFORMAL +0.06, Q2 INFORMAL +0.04; T3; #1657) | **FIXED (#1657)** |
 | `debt_moratorium` | `emergency_policy_debt_moratorium` | ❌ not subscribed (⚠️ original ✅ unverified) | ❌ not subscribed | ❌ not subscribed | ❌ not subscribed | **AUDITED — no module channels active** |
 | `default_declaration` | `emergency_policy_default_declaration` | ❌ not subscribed (⚠️ original ✅ unverified) | ❌ not subscribed | ❌ not subscribed | ❌ not subscribed | **AUDITED — no module channels active** |
 | `bank_holiday` | `emergency_policy_bank_holiday` | ❌ not subscribed | ❌ not subscribed | ❌ not subscribed | ❌ not subscribed | **AUDITED — no module channels active** |
