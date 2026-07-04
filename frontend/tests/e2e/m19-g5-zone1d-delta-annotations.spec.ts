@@ -432,7 +432,7 @@ test("AC-4: demo-narrated Act 1 narration string does not imply per-framework Zo
   const { readFileSync } = await import("fs");
   const { join } = await import("path");
   const narrationFile = join(
-    __dirname,
+    import.meta.dirname,
     "demo-narrated.spec.ts",
   );
   let contents: string;
