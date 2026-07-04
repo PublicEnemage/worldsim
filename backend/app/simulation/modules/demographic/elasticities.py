@@ -198,4 +198,66 @@ ELASTICITY_REGISTRY: list[CohortElasticity] = [
         confidence_tier=2,
         entity_families=frozenset({"GRC"}),
     ),
+    # LAC (ARG/ECU/BOL/PER): Q1 FORMAL — primary formal-sector poverty channel.
+    # LAC programme episodes transmit through formal-sector employment destruction
+    # rather than subsistence income loss (ARG 2001 currency collapse; ECU 1999
+    # salvazo; BOL/PER 1980s–90s structural adjustment). FORMAL-only (Option a):
+    # SSA Q1 INFORMAL entry (entity_families=None) continues to fire on all entities;
+    # adding LAC INFORMAL would double-count (SSA -0.20 + LAC -0.10 = -0.30 overcount).
+    # Lustig et al. (2014) CEQ WP/13: formal-sector PHC elasticity range -0.18 to
+    # -0.28 for BOL/PER fiscal consolidation. Gasparini & Lustig (2011) LAC
+    # concentration factor 1.4–1.8× aggregate (central 1.6×): 0.16 × 1.6 = 0.256
+    # → dampened to -0.22. Lower than GRC (-0.25): 1.6× < 2×, T3 vs T2.
+    # Uncertainty range: -0.15 to -0.30. Known limitation: ARG/ECU are
+    # financial/currency crises; CEQ calibrated from fiscal consolidation episodes.
+    # Calibration: docs/calibration/m19-cm-b-lac-calibration-decision.md §3.1.
+    CohortElasticity(
+        event_type="gdp_growth_change",
+        cohort_spec=CohortSpec(
+            IncomeQuintile.Q1,
+            AgeBand.AGE_25_54,
+            EmploymentSector.FORMAL,
+        ),
+        attribute_key="poverty_headcount_ratio",
+        elasticity=Decimal("-0.22"),
+        source=(
+            "Lustig, N. et al. (2014): The Impact of Taxes and Social Spending on"
+            " Inequality and Poverty in Argentina, Bolivia, Brazil, Mexico, Peru and"
+            " Uruguay: An Overview. CEQ Working Paper 13."
+            " Formal-sector PHC elasticity range -0.18 to -0.28 for BOL/PER"
+            " fiscal consolidation. Gasparini & Lustig (2011) LAC concentration"
+            " factor 1.6× aggregate: 0.16 × 1.6 = 0.256 → dampened to -0.22."
+            " T3: cross-country LAC regional inference; T2 requires country-specific"
+            " backtesting. Uncertainty range: -0.15 to -0.30. M19-CM-B calibration."
+        ),
+        source_registry_id="ACADEMIC_LITERATURE_LUSTIG_2014_CEQ_LAC_POVERTY",
+        confidence_tier=3,
+        entity_families=frozenset({"ARG", "ECU", "BOL", "PER"}),
+    ),
+    # LAC (ARG/ECU/BOL/PER): Q2 FORMAL — Ball et al. (2013) 0.60 scaling of Q1.
+    # Q2 formal workers have stronger UI coverage and employment tenure than Q1;
+    # absorb 0.60× the Q1 per-unit impact. 0.60 × -0.22 = -0.132 → -0.13.
+    # Consistent with GRC CM Sprint A between-quintile scaling methodology.
+    # Uncertainty range: -0.09 to -0.18. M19-CM-B calibration.
+    CohortElasticity(
+        event_type="gdp_growth_change",
+        cohort_spec=CohortSpec(
+            IncomeQuintile.Q2,
+            AgeBand.AGE_25_54,
+            EmploymentSector.FORMAL,
+        ),
+        attribute_key="poverty_headcount_ratio",
+        elasticity=Decimal("-0.13"),
+        source=(
+            "Ball, Furceri, Leigh, Loungani (2013): The Distributional Effects"
+            " of Fiscal Consolidation. IMF Working Paper WP/13/151."
+            " 0.60 scaling of LAC Q1 FORMAL: 0.60 × -0.22 = -0.132 → -0.13."
+            " Q2 formal workers absorb 0.60× Q1 per-unit impact (stronger UI"
+            " coverage and employment tenure). Uncertainty range: -0.09 to -0.18."
+            " M19-CM-B calibration."
+        ),
+        source_registry_id="ACADEMIC_LITERATURE_BALL_2013_FISCAL_CONSOLIDATION",
+        confidence_tier=3,
+        entity_families=frozenset({"ARG", "ECU", "BOL", "PER"}),
+    ),
 ]
