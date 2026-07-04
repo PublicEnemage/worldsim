@@ -46,7 +46,7 @@ sop-reference: docs/process/sprint-planning-sop.md
 
 ## HORIZON Scope-Completeness Check
 
-Full M19 issue audit completed 2026-07-02 (updated post-filing). Updated 2026-07-03 HORIZON sweep — 5 issues added (#1522, #1524, #1623, #1629, #1630). Updated 2026-07-04 HORIZON sweep — 5 issues added (#1709, #1710, #1711, #1712, #1713 — Demo 8 clearance and Act 2 verification). All 32 M19 issues accounted for.
+Full M19 issue audit completed 2026-07-02 (updated post-filing). Updated 2026-07-03 HORIZON sweep — 5 issues added (#1522, #1524, #1623, #1629, #1630). Updated 2026-07-04 HORIZON sweep — 5 issues added (#1709, #1710, #1711, #1712, #1713 — Demo 8 clearance and Act 2 verification). Updated 2026-07-04 G7 entry — 1 issue added (#1729 — NM-096 corrective action). All 33 M19 issues accounted for.
 
 ### Roadmap deliverables — linkage audit
 
@@ -72,6 +72,7 @@ Full M19 issue audit completed 2026-07-02 (updated post-filing). Updated 2026-07
 | Demo 8 narration / Mode 3 HD line alignment | #1630 | G5 / Wave 3 (after G4) | ✅ Tracked — EL: separate sprint entry after G4 |
 | Zone 1 view model layer retrofit | #1522 | Wave 3+ | ✅ Tracked — EL-added to M19 |
 | Zone 1A TrajectoryView interaction (pinch-zoom, thumbwheel, pan) | #1524 | Wave 3+ | ✅ Tracked — EL-added to M19 |
+| NM-096 corrective: elasticity rows + NM-056 fix (Demo 8 pre-flight) | #1729 | G7 / Wave 5 | ✅ Tracked — BPO PROCEED 2026-07-04; sprint entry filed |
 
 ### Carry-forward and known gaps — linkage audit
 
@@ -127,6 +128,7 @@ Full M19 issue audit completed 2026-07-02 (updated post-filing). Updated 2026-07
 | #1711 | Demo 8 Act 2 verification: GRC AC-1 live harness run | Demo 8 Act 2 verification | Wave 4 | High — Demo 8 Act 2 condition (DATABASE_URL only) |
 | #1712 | Demo 8 Act 2 verification: ARG AC-1 live harness run | Demo 8 Act 2 verification | Wave 4 | High — Demo 8 Act 2 condition (DATABASE_URL only) |
 | #1713 | Demo 8 Act 2 verification: PAK AC-1 live harness run | Demo 8 Act 2 verification | Wave 4 | High — Demo 8 Act 2 condition (DATABASE_URL only) |
+| #1729 | fix(g6): missing elasticity rows for imf_program_acceptance + emergency_declaration; NM-056 | G7 | Wave 5 | **Immediate — NM-096 corrective; Demo 8 pre-flight; silent zero-delta on live channels** |
 
 ### ADR backlog review
 
@@ -237,7 +239,20 @@ Full M19 issue audit completed 2026-07-02 (updated post-filing). Updated 2026-07
 - If any bound fails: CM Agent consulted; corrective calibration action documented before Demo 8 proceeds
 - Runs in parallel with G6 (no file area overlap)
 
-**Demo 8 preparation (after G6 + Act 2 verification complete)**
+### Wave 5 — G7: NM-096 corrective action (Demo 8 pre-flight)
+
+**G7: Elasticity rows + NM-056 fix (#1729)**
+
+- Root: NM-096 (2026-07-04) — PR #1722 (G6) fixed dead subscription strings but omitted
+  elasticity rows prescribed by NM-090/091; G6 exit reported 9/9 GREEN when state was 7 PASS + 2 SKIP
+- Sprint entry filed: `docs/process/sprint-plans/m19-g7-sprint-entry.md` (2026-07-04)
+- BPO verdict: PROCEED — HIGH priority; Demo 8 pre-flight; silent zero-delta on live channels
+- CM cert: pre-cleared (#1657 comment, 2026-07-04); NM-084 gate satisfied
+- Files: `backend/app/simulation/modules/demographic/elasticities.py` (4 rows); `backend/tests/test_m19_g6_demographic_subscriptions.py` (NM-056 fix lines 231, 289)
+- Sprint branch: `sprint/m19-g7` (cut from `release/m19` after EL approval)
+- No new ADR required (ADR-020 accepted; bug fix only)
+
+**Demo 8 preparation (after G7 + Act 2 verification complete)**
 - Demo 8 internal review and IR review
 - Walkthrough updates for Demo 8 narrative (constraint-floor Act 1, calibrated CI Act 2 with empirical grounding)
 - Stakeholder session (#1544)
@@ -274,6 +289,8 @@ G5 + #1523 exits ──► G6: #1456 + #1538 + #1709 + #1710 ──► Demo 8 Ac
 CM Sprint A/B/C exits ──► #1711 (GRC) + #1712 (ARG) + #1713 (PAK) ──► Demo 8 Act 2 clearance
 
 G6 + Act 2 verification ──► Demo 8 internal review ──► #1544 (live session)
+
+NM-096 corrective ──► G7: #1729 (elasticity rows + NM-056) ──► Demo 8 pre-flight clearance
 ```
 
 ---
