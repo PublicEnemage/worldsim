@@ -6,7 +6,7 @@
 > Historical state lives in `docs/process/session-archives/`.
 > Authority: `docs/process/sprint-group-isolation.md §SESSION_STATE.md Cockpit Card Protocol`.
 
-**Last updated:** 2026-07-03 (G5 Phase C complete: #1522 view model retrofit PR #1679 merged, #1524 trackwheel zoom PR #1681 merged; integration PR #1684 sprint/m19-g5→release/m19 opened; PI Agent NM-094 gate PASS; G5 exit confirmed)
+**Last updated:** 2026-07-03 (CM Sprint A BPO ACCEPT #1623 Gap 1; G5 exit confirmed — integration PR #1684 sprint/m19-g5→release/m19 auto-merge pending)
 **Current milestone:** M19 — Constraint Search and Empirical Calibration
 
 ---
@@ -46,6 +46,7 @@
 | G3 | Bayesian posterior calibration | #1543 ✓, #1536 ✓, #1537 ✓ | Confirmed — integration PR #1617 merged; exit doc `m19-g3-sprint-exit.md`; journal #1587 closed retroactively |
 | G4 | PSP driver arc + CI label precision | #1528 ✓, #1529 ✓ | Confirmed — integration PR #1637 merged; journal #1624 closed; sprint exit `docs/process/sprint-plans/m19-g4-sprint-exit.md` |
 | G5 | Demo 8 display fidelity + Zone 1 view model | #1629 ✓, #1630 ✓, #1522 ✓, #1524 ✓ | **Confirmed** — BPO ACCEPT for #1629 + #1630; PI Agent NM-094 PASS; integration PR #1684 pending |
+| CM-A | ELASTICITY_REGISTRY Euro area calibration | #1623 ✓ | **Confirmed** — BPO ACCEPT; north star PASS; journal #1671 closed; integration PR #1683 merged 2026-07-03 |
 
 ---
 
@@ -69,7 +70,7 @@
 | #1630 | Zone 1D delta annotations Mode 3 (ADR-017 §Zone 1D Integration) | G5 ✓ | **Closed** — PR #1669 merged; BPO ACCEPT 2026-07-03 |
 | #1647 | G2C test file missing from release/m19 — NM-094 recovery | Demo 8 risk | **Closed** — PR #1649 merged; test_m19_g2c_scenario_runs.py (1394 lines) restored |
 | #1650–#1656 | NM-084/085/086/089/092/093/094 process codification | G5 Phase A | **Closed** — PR #1658 MERGED (sprint/m19-g5) |
-| #1657 | NM-090/091: DemographicModule dead subscriptions fix | Deferred (CM gate) | CM sign-off required before implementation PR opens |
+| #1657 | NM-090/091: DemographicModule dead subscriptions fix | Deferred (CM gate) | **Unblocked** — CM Sprint A confirmed; `entity_families` field syntax available; CM sign-off required before implementation PR opens |
 
 ---
 
@@ -79,6 +80,7 @@
 |---|---|---|
 | Tolerance band (±0.01) visible in FOUND state UI | Customer Agent L3 on #1540 | Demo 8 Act 1 |
 | AC-12: resolve structural-absence indicator key (replace `__structural_absence__` placeholder) | Customer Agent L3 on #1540 | Demo 8 Act 1 |
+| AC-1 harness live run (GRC orthodox vs heterodox): `per_step_diff[3] ∈ [0.010, 0.20]` | CM Sprint A exit §4 forward condition | Demo 8 Act 2 |
 
 ---
 
@@ -101,4 +103,5 @@
 - **G5 Zone 1A zoom (#1524, 2026-07-03):** Desktop trackwheel zoom only (EL decision: mobile pinch/pan deferred). `visibleStepRange` state in `TrajectoryView`; non-passive wheel listener; midpoint-centered 20% zoom; double-click reset; `data-visible-step-min/max` DOM attributes. Prerequisite #1522 merged first.
 - **G5 #1630 scope (2026-07-03):** ADR-017 §Zone 1D Integration (Mode 3) mandates per-framework `(+Δ vs baseline)` annotations in Zone 1D. `formatDelta`/`getDeltaColor` exported from `FourFrameworkZone1D`. Intent: `docs/process/intents/M19-G5-2026-07-03-zone1d-delta-annotations.md`.
 - **M18 complete (v0.18.0, 2026-07-02):** G1–G7 delivered; Demo 7 PASS (unconditional); release/m18 → main via PR #1534. Archive: `docs/process/session-archives/session-state-pre-m19.md`.
+- **CM Sprint A complete (2026-07-03):** GRC Euro area ELASTICITY_REGISTRY calibration — `entity_families` scoping field on `CohortElasticity`; GRC Q1 FORMAL (−0.25, T2, B&L 2013) + Q2 FORMAL (−0.15, T2, Ball 2013). Greece 2010 counter-factual upgrades from DIRECTION_ONLY advisory to calibrated MAGNITUDE basis. 20/20 unit tests GREEN. BPO ACCEPT; north star PASS. Integration PR #1683 merged to release/m19.
 - **Demo 7 north star (2026-07-02):** Aicha presents Zambia +342K cohort effect with CI bounds and sourcing to IMF restructuring table. Next available DEMO-167.
