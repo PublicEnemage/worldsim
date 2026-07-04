@@ -13,8 +13,8 @@ sop-reference: docs/process/sprint-planning-sop.md §Sprint Exit Gate
 
 # Sprint Exit — M19, G5: Demo 8 Display Fidelity + Zone 1 View Model
 
-**Status:** Confirmed — all exit conditions satisfied (BPO ACCEPT 2026-07-03)
-**Date produced:** 2026-07-03
+**Status:** Confirmed and integrated — all exit conditions satisfied; integration PR #1684 merged to release/m19 2026-07-04
+**Date produced:** 2026-07-03; integration confirmation updated 2026-07-04
 **Release branch:** `release/m19`
 **Sprint entry document:** `docs/process/sprint-plans/m19-g5-sprint-entry.md` — EL-approved 2026-07-03 (PR #1663)
 **Sprint journal issue:** #1660
@@ -26,7 +26,7 @@ delta annotations implementing ADR-017 §Zone 1D Integration required companion 
 schema gap fix (#1632), and seven NM process codification items (Phase A). Phase C also delivered in G5:
 view model layer retrofit (#1522, trajectoryViewModel.ts extraction) and Zone 1A trackwheel zoom (#1524,
 desktop scroll wheel, EL-reduced scope). BPO ACCEPT for all four user-facing deliverables (#1629, #1630,
-#1522, #1524). Integration PR #1684 `sprint/m19-g5 → release/m19` opened 2026-07-03.*
+#1522, #1524). Integration PR #1684 `sprint/m19-g5 → release/m19` opened 2026-07-03; merged 2026-07-04 (ESM fix PR #1693 required before playwright-e2e passed).*
 
 ---
 
@@ -219,25 +219,28 @@ improvements that together make the Demo 8 narrative coherent.
 - [x] Phase A exit confirmed (above)
 - [x] Phase B exit confirmed (above)
 - [x] Phase C exit confirmed (above)
-- [x] Integration PR #1684 `sprint/m19-g5 → release/m19` opened 2026-07-03; PI Agent gate comment posted (#1684#issuecomment-4880057398)
+- [x] Integration PR #1684 `sprint/m19-g5 → release/m19` opened 2026-07-03; PI Agent gate comment posted (#1684#issuecomment-4880057398); **merged 2026-07-04** — all release-branch-ci-gate checks green (including `playwright-e2e`). Note: PR #1693 (`__dirname` → `import.meta.dirname` ESM fix in `m19-g5-zone1d-delta-annotations.spec.ts`) was required before `playwright-e2e` could pass; merged to sprint branch 2026-07-04 before integration merged.
 - [x] No open rejection artifacts across all phases (Section 4)
 
-**PI Agent sprint exit verdict:** Confirmed — all exit conditions satisfied across all three phases.
+**PI Agent sprint exit verdict:** Confirmed and integrated — all exit conditions satisfied; integration merged to release/m19.
 
 **PI Agent overall confirmation:**
 
-> G5 exit is confirmed across all phases. Phase A (NM codification, PR #1658), Phase B
-> (display fidelity #1629/#1630 + schema fix #1632, PRs #1666–#1669), and Phase C (view
-> model retrofit #1522 + trackwheel zoom #1524, PRs #1679/#1681) are all merged to
-> sprint/m19-g5 with CI green on all required checks. BPO ACCEPT verdicts are on record for
+> G5 exit is confirmed across all phases and integration is complete. Phase A (NM codification,
+> PR #1658), Phase B (display fidelity #1629/#1630 + schema fix #1632, PRs #1666–#1669), and
+> Phase C (view model retrofit #1522 + trackwheel zoom #1524, PRs #1679/#1681) are all merged
+> to sprint/m19-g5 with CI green on all required checks. BPO ACCEPT verdicts are on record for
 > all four user-facing deliverables (#1629, #1630, #1522, #1524) — all 2026-07-03.
 > CA L3 assessment is not required for any G5 deliverable. No rejection artifacts were filed.
 > The north star test covers #1629 and #1630 in Section 5 and #1524 in its BPO ACCEPT comment
 > — all specific, naming the scenario and what changed at the table.
 > NM-094 test-file check passed for all phases.
-> Integration PR #1684 opened 2026-07-03; auto-merge pending CI.
+> Integration PR #1684 merged to release/m19 on 2026-07-04; all release-branch-ci-gate checks
+> green. An ESM compatibility fix (PR #1693, `import.meta.dirname`) was required on the sprint
+> branch before playwright-e2e could pass — caught by the release-branch-ci-gate, resolved same
+> session.
 >
-> G5 is fully confirmed — 2026-07-03.
+> G5 is fully confirmed and integrated — 2026-07-04.
 
 ---
 
