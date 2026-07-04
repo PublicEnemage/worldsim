@@ -65,18 +65,11 @@ An unchecked invariant blocks the sprint from opening.*
 
 ### 2.4 — CM calibration PENDING gate
 
-- [ ] **PENDING: CM calibration decision document filed.**
-  `docs/calibration/m19-cm-b-lac-calibration-decision.md` — not yet filed.
-  This document specifies:
-  - Chosen LAC entity families and entity IDs in scope
-  - Cohort targets (Q1/Q2 FORMAL; intent §3 design question — option (a/b/c) resolved)
-  - Point estimate elasticities with uncertainty ranges
-  - Confidence tier assignment
-  - Source registry IDs
-  - MAGNITUDE bounds for AC-1 integration test
-  The calibration decision document must be committed and referenced in this sprint entry
-  (update §2.4 to checked) before QA test authorship may begin and before the implementation
-  PR may open.
+- [x] **CLEARED: CM calibration decision document filed.**
+  `docs/calibration/m19-cm-b-lac-calibration-decision.md` — filed 2026-07-03.
+  Decision: Option (a) FORMAL-only entries; Q1 FORMAL elasticity Decimal("-0.22") T3;
+  Q2 FORMAL Decimal("-0.13") T3 (Ball 2013 0.60 scaling); entity_families=frozenset({"ARG","ECU","BOL","PER"});
+  MAGNITUDE bounds: lower=0.003, upper=0.050 (ARG Type B, step index 2).
 
 ### 2.5 — QA test authorship gate
 
