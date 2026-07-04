@@ -834,12 +834,16 @@ export function ControlPlaneColumn({
                         marginBottom: 2,
                       }}
                     >
-                      fiscal multiplier ≥ {searchResult.boundary?.toFixed(2)} (±{
-                        (
-                          (searchResult.uncertainty_hi ?? 0) -
-                          (searchResult.uncertainty_lo ?? 0)
-                        ).toFixed(2)
-                      })
+                      fiscal multiplier ≥ {searchResult.boundary?.toFixed(2)}
+                    </div>
+                    <div
+                      data-testid="constraint-tolerance-band"
+                      style={{ fontSize: 11, color: "#6b7280", marginTop: 1 }}
+                    >
+                      ±{(
+                        (searchResult.uncertainty_hi ?? 0) -
+                        (searchResult.uncertainty_lo ?? 0)
+                      ).toFixed(2)} precision
                     </div>
                     <div style={{ fontSize: 10, color: "#6b7280" }}>
                       {searchResult.evaluations} evaluations · [{searchResult.search_lo?.toFixed(1)}, {searchResult.search_hi?.toFixed(1)}] searched
