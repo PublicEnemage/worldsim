@@ -118,7 +118,7 @@ a precondition for the BPO verdict on these deliverables.
 
 ## Section 4 — Open Rejections
 
-No REJECT verdicts issued in G5 (Phase A, B, or Phase C-deferred). No rejection artifacts filed.
+No REJECT verdicts issued in G5 (Phase A, B, or Phase C). No rejection artifacts filed.
 
 **No open rejections. Section 5 gated only on BPO acceptance (Section 3).**
 
@@ -162,35 +162,82 @@ improvements that together make the Demo 8 narrative coherent.
 
 ## Section 6 — PI Agent Sprint Exit Confirmation
 
-**Exit conditions checklist:**
+### Phase A — NM Process Codification
 
-- [x] All Phase B implementation PRs merged; CI green on required checks (Section 2)
-- [x] All Phase C implementation PRs merged; CI green on required checks — #1679 (#1522), #1681 (#1524) (Section 2)
-- [x] Phase C QA tests + intent docs filed before implementation (PRs #1675, #1676)
+**Exit conditions:**
+- [x] PR #1658 merged to sprint/m19-g5; CI green on all required checks
+- [x] Infrastructure deliverable — no BPO acceptance required
+- [x] No rejection artifacts
+
+**PI Agent Phase A verdict:** Confirmed — all NM codification items (#1650–#1656) delivered; process documentation improvements merged.
+
+---
+
+### Phase B — Demo 8 Display Fidelity and Schema Gap
+
+**Exit conditions:**
+- [x] All Phase B PRs merged to sprint/m19-g5 — #1666 (QA tests), #1667 (schema fix), #1668 (#1629 impl), #1669 (#1630 impl)
+- [x] CI green on all required sprint-branch-ci-gate checks for every Phase B PR
+- [x] QA tests authored before implementation — PR #1666 merged before #1668/#1669 (NM-056 compliant)
+- [x] Intent documents filed before implementation — `M19-G5-2026-07-03-zmb-yaxis-tight-scoping.md`, `M19-G5-2026-07-03-zone1d-delta-annotations.md` (PR #1664)
 - [x] BPO ACCEPT verdict filed for #1629 — #1629#issuecomment-4879773995 (2026-07-03)
 - [x] BPO ACCEPT verdict filed for #1630 — #1630#issuecomment-4879774027 (2026-07-03)
+- [x] CA L3 assessment — not required; neither deliverable introduces new live Persona 2/3/5 capability
+- [x] No rejection artifacts from Phase B
+- [x] North star test artifact confirmed by BPO (Section 5) — specific, names scenario and what changed at the table
+- [x] Scope change on #1630 documented (BLOCKED_UX_PANEL resolved via ADR-017 §Zone 1D Integration mandate)
+- [x] NM-094: test files exist for #1629 and #1630 on sprint branch — confirmed
+
+**PI Agent Phase B verdict:** Confirmed — all display fidelity deliverables (#1629, #1630) and schema fix (#1632) merged, CI green, BPO ACCEPT on record for both user-facing items, north star test specific and confirmed.
+
+---
+
+### Phase C — Zone 1 View Model
+
+**Exit conditions:**
+- [x] All Phase C PRs merged to sprint/m19-g5 — #1675 (intent docs), #1676 (QA tests), #1679 (#1522 impl), #1681 (#1524 impl)
+- [x] CI green on all required sprint-branch-ci-gate checks for every Phase C PR
+- [x] Intent documents filed before implementation — `M19-G5-2026-07-03-view-model-retrofit.md`, `M19-G5-2026-07-03-zone1a-trackwheel-zoom.md` (PR #1675)
+- [x] QA tests authored before implementation — `trajectoryViewModel.test.ts` and `m19-g5-zone1a-trackwheel-zoom.spec.ts` (PR #1676) merged before #1679/#1681
+- [x] Prerequisite ordering satisfied — #1522 (PR #1679) merged before #1524 (PR #1681); intent doc for #1524 states prerequisite explicitly
 - [x] BPO ACCEPT verdict filed for #1522 — #1522#issuecomment-4880120492 (2026-07-03)
 - [x] BPO ACCEPT verdict filed for #1524 — #1524#issuecomment-4880121152 (2026-07-03)
-- [x] CA L3 assessment — not required (no deliverable serves new Persona 2/3/5 live capability; see Section 3)
-- [x] No open rejection artifacts from G5 (Section 4)
-- [x] No near-miss entries required (no rejections in G5)
-- [x] North star test artifact confirmed by BPO (Section 5) — #1524 north star trace recorded in BPO ACCEPT comment
-- [x] NM-094 test-file check: `git diff release/m19...sprint/m19-g5 -- '*.spec.ts' '*.test.ts'` confirms new test files present for every Phase B deliverable (#1629, #1630) and Phase C deliverables (#1522, #1524)
+- [x] CA L3 assessment — not required; neither deliverable introduces new live Persona 2/3/5 capability
+- [x] No rejection artifacts from Phase C
+- [x] North star test for #1524 — specific scenario (Demo 8 Act 2, analyst zooms to steps 3–8 where ZMB scenarios diverge) recorded in BPO ACCEPT comment #1524#issuecomment-4880121152
+- [x] EL scope decision recorded — #1524 desktop trackwheel only; mobile pinch/pan deferred (EL decision 2026-07-03 in intent doc)
+- [x] NM-094: test files exist for #1522 (`trajectoryViewModel.test.ts`) and #1524 (`m19-g5-zone1a-trackwheel-zoom.spec.ts`) on sprint branch — confirmed
+- [x] Unit tests GREEN — 33/33 for `trajectoryViewModel.test.ts`
 
-**PI Agent sprint exit verdict:** Confirmed — all exit conditions satisfied.
+**PI Agent Phase C verdict:** Confirmed — view model retrofit (#1522) and trackwheel zoom (#1524) delivered; CI green; BPO ACCEPT on record for both items; intent + QA-first lifecycle satisfied; prerequisite ordering correct.
 
-**PI Agent confirmation:**
+---
 
-> G5 exit conditions are fully satisfied. All Phase A, B, and C implementation PRs are merged
-> and CI is green on all required sprint-branch-ci-gate checks. BPO ACCEPT verdicts for all
-> four user-facing deliverables (#1629, #1630, #1522, #1524) are on record (2026-07-03).
-> CA L3 assessment is not required — no deliverable introduces new capability for live
-> Personas 2, 3, or 5. No rejection artifacts were filed in G5. The north star test is
-> confirmed by the BPO for #1629 + #1630 (Section 5) and for #1524 (BPO ACCEPT comment).
-> NM-094 test-file check passed — test files exist for all Phase B and Phase C deliverables.
-> Integration PR #1684 `sprint/m19-g5 → release/m19` opened 2026-07-03.
+### Overall G5 Exit
+
+**Aggregate checklist:**
+- [x] Phase A exit confirmed (above)
+- [x] Phase B exit confirmed (above)
+- [x] Phase C exit confirmed (above)
+- [x] Integration PR #1684 `sprint/m19-g5 → release/m19` opened 2026-07-03; PI Agent gate comment posted (#1684#issuecomment-4880057398)
+- [x] No open rejection artifacts across all phases (Section 4)
+
+**PI Agent sprint exit verdict:** Confirmed — all exit conditions satisfied across all three phases.
+
+**PI Agent overall confirmation:**
+
+> G5 exit is confirmed across all phases. Phase A (NM codification, PR #1658), Phase B
+> (display fidelity #1629/#1630 + schema fix #1632, PRs #1666–#1669), and Phase C (view
+> model retrofit #1522 + trackwheel zoom #1524, PRs #1679/#1681) are all merged to
+> sprint/m19-g5 with CI green on all required checks. BPO ACCEPT verdicts are on record for
+> all four user-facing deliverables (#1629, #1630, #1522, #1524) — all 2026-07-03.
+> CA L3 assessment is not required for any G5 deliverable. No rejection artifacts were filed.
+> The north star test covers #1629 and #1630 in Section 5 and #1524 in its BPO ACCEPT comment
+> — all specific, naming the scenario and what changed at the table.
+> NM-094 test-file check passed for all phases.
+> Integration PR #1684 opened 2026-07-03; auto-merge pending CI.
 >
-> G5 is confirmed (updated: Phase C complete 2026-07-03).
+> G5 is fully confirmed — 2026-07-03.
 
 ---
 
