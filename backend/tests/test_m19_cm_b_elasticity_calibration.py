@@ -797,6 +797,17 @@ class TestAC1MagnitudeDivergence:
         baseline_id: str = baseline_resp.json()["scenario_id"]
 
         cf_req = build_argentina_counterfactual_scenario()
+        # Advance baseline only to its own n_steps. ARG baseline has 2 steps (crisis window);
+        # CF has 3 steps (includes Kirchner recovery). Step-3 BL will be absent until CM-D
+        # adds recovery inputs — that absence should surface as a magnitude assertion failure,
+        # not a setup 409.
+        baseline_n_steps = build_argentina_scenario().configuration.n_steps
+        for _step in range(1, baseline_n_steps + 1):
+            _adv = await asgi_client.post(f"/api/v1/scenarios/{baseline_id}/advance")
+            assert _adv.status_code == 200, (
+                f"Baseline advance step {_step} failed: {_adv.status_code} {_adv.text}"
+            )
+
         cf_resp = await asgi_client.post(
             "/api/v1/scenarios",
             json=cf_req.model_dump(mode="json"),
@@ -852,6 +863,13 @@ class TestAC1MagnitudeDivergence:
         baseline_id: str = baseline_resp.json()["scenario_id"]
 
         cf_req = build_argentina_counterfactual_scenario()
+        baseline_n_steps = build_argentina_scenario().configuration.n_steps
+        for _step in range(1, baseline_n_steps + 1):
+            _adv = await asgi_client.post(f"/api/v1/scenarios/{baseline_id}/advance")
+            assert _adv.status_code == 200, (
+                f"Baseline advance step {_step} failed: {_adv.status_code} {_adv.text}"
+            )
+
         cf_resp = await asgi_client.post(
             "/api/v1/scenarios",
             json=cf_req.model_dump(mode="json"),
