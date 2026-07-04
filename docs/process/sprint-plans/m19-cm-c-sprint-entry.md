@@ -6,14 +6,14 @@ sprint-group: CM Sprint C — South/Southeast Asia entity family calibration
 status: Filed
 authored-by: Chief Methodologist / PM Agent
 authored-date: 2026-07-04
-el-approved: false
+el-approved: 2026-07-04
 release-branch: release/m19
 sop-reference: docs/process/sprint-planning-sop.md
 ---
 
 # Sprint Entry — M19 CM Sprint C: South/Southeast Asia Elasticity Calibration (#1623 Gap 3)
 
-**Status:** Filed — awaiting EL approval; §2.4 calibration decision PENDING
+**Status:** EL-approved 2026-07-04 — implementation entry gate open; §2.4 calibration decision PENDING
 **Date authored:** 2026-07-04
 **Release branch:** `release/m19`
 **Sprint plan:** `docs/process/sprint-plans/m19-sprint-plan.md`
