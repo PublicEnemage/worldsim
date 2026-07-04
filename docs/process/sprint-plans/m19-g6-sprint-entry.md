@@ -67,9 +67,9 @@ All other G6 items are non-user-facing: #1456 (runtime defensive guard), #1538 (
 
 | Deliverable | ADR reference | Intent document path | Filed? |
 |---|---|---|---|
-| #1709 — FOUND state tolerance band display | N/A (within ADR-021 constraint-floor architecture) | `docs/process/intents/M19-G6-2026-07-04-found-tolerance-band.md` | **No — BLOCKING #1709 impl PR** |
+| #1709 — FOUND state tolerance band display | N/A (within ADR-021 constraint-floor architecture) | `docs/process/intents/M19-G6-2026-07-04-found-tolerance-band.md` | **Yes — filed 2026-07-04** |
 
-**Blocking gate:** The intent document for #1709 must be filed before the #1709 implementation PR opens. The implementation PRs for #1456, #1538, and #1710 may open immediately — they are independent of #1709 and non-user-facing.
+**All gates for #1709 CLEARED:** Intent filed 2026-07-04; E2E tests filed 2026-07-04 (PR #1718). #1709 implementation PR may open.
 
 ### 2.4 — QA test authorship gate
 
@@ -81,7 +81,7 @@ Two items require tests authored before implementation code is written:
 
 | Deliverable | Test file | Authored before implementation? |
 |---|---|---|
-| #1709 — tolerance band display | `frontend/tests/e2e/m19-g1-constraint-floor.spec.ts` (addition) | **No — BLOCKING #1709 impl PR** |
+| #1709 — tolerance band display | `frontend/tests/e2e/m19-g1-constraint-floor-search.spec.ts` (AC-T1..AC-T4) | **Yes — PR #1718 filed 2026-07-04** |
 | #1657 — subscription fix + elasticity rows | `backend/tests/test_m19_g6_demographic_subscriptions.py` | **No — BLOCKING #1657 impl PR** |
 
 **#1456, #1538, and #1710:** Fixes and corrections — tests updated in the same PR. Gate N/A.
