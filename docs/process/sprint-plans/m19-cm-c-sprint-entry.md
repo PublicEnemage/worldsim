@@ -84,10 +84,12 @@ An unchecked invariant blocks the sprint from opening.*
 
 ### 2.5 — QA test authorship gate
 
-- [ ] **PENDING: QA test file committed to sprint branch before implementation PR opens.**
+- [x] **CLEARED: QA test file committed to sprint branch 2026-07-04.**
   File: `backend/tests/test_m19_cm_c_elasticity_calibration.py`
-  Authored RED-before-implementation per §3.3. Must be present on sprint/m19-cm-c when
-  the implementation PR targets that branch.
+  PR #1704 merged to sprint/m19-cm-c 2026-07-04. 29 tests total: 12 RED (pre-impl),
+  14 GREEN (non-regression + cross-contamination), 3 deselected (backtesting).
+  EL-approved implementation entry 2026-07-04 — all gates §2.4 + §2.5 cleared;
+  implementation may proceed.
 
 ### 2.6 — NM-084 CM self-certification gate
 
