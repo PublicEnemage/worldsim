@@ -715,7 +715,7 @@ class TestAC5CrossContaminationGuard:
 # ---------------------------------------------------------------------------
 
 
-@pytest_asyncio.fixture(scope="session")
+@pytest_asyncio.fixture(loop_scope="session")
 async def asgi_client() -> AsyncGenerator[httpx.AsyncClient, None]:  # type: ignore[misc]
     """Session-scoped ASGI client gated on DATABASE_URL presence.
 
