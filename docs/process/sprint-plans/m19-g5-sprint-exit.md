@@ -20,12 +20,13 @@ sop-reference: docs/process/sprint-planning-sop.md §Sprint Exit Gate
 **Sprint journal issue:** #1660
 **Exit checklist issue:** #1535
 
-*Authority: `docs/process/sprint-planning-sop.md §Sprint Exit Gate` (Phase C output).
-G5 delivers Demo 8 display fidelity fixes: Zone 1A y-axis tight scoping for three-scenario ZMB
-comparison (#1629), Zone 1D per-framework delta annotations implementing ADR-017 §Zone 1D
-Integration required companion (#1630), api_contracts.yml schema gap fix (#1632), and seven
-NM process codification items (Phase A). Phase C (#1522, #1524) deferred to next sprint group
-— capacity consumed by Demo 8 display work and UX panel resolution.*
+*Authority: `docs/process/sprint-planning-sop.md §Sprint Exit Gate` (Phase C complete, updated 2026-07-03).
+G5 delivers Demo 8 display fidelity fixes: Zone 1A y-axis tight scoping (#1629), Zone 1D per-framework
+delta annotations implementing ADR-017 §Zone 1D Integration required companion (#1630), api_contracts.yml
+schema gap fix (#1632), and seven NM process codification items (Phase A). Phase C also delivered in G5:
+view model layer retrofit (#1522, trajectoryViewModel.ts extraction) and Zone 1A trackwheel zoom (#1524,
+desktop scroll wheel, EL-reduced scope). BPO ACCEPT for all four user-facing deliverables (#1629, #1630,
+#1522, #1524). Integration PR #1684 `sprint/m19-g5 → release/m19` opened 2026-07-03.*
 
 ---
 
@@ -40,8 +41,8 @@ NM process codification items (Phase A). Phase C (#1522, #1524) deferred to next
 | Sprint entry document | `docs/process/sprint-plans/m19-g5-sprint-entry.md` |
 | Exit checklist issue | #1535 |
 | Sprint journal issue | #1660 |
-| Date implementation completed | 2026-07-03 |
-| CI status on sprint branch | Green — all required sprint-branch-ci-gate checks passing on all Phase B PRs (#1666, #1667, #1668, #1669). playwright-e2e check FAILURE on #1668/#1669 is pre-existing known behavior — requires live Docker Compose stack not available in standard CI. Not a required check; does not block merge. |
+| Date implementation completed | 2026-07-03 (Phase C) |
+| CI status on sprint branch | Green — all required sprint-branch-ci-gate checks passing on all Phase B PRs (#1666–#1669) and Phase C PRs (#1679, #1681). playwright-e2e check FAILURE is pre-existing known behavior — requires live Docker Compose stack; not a required check; does not block merge. |
 
 ---
 
@@ -65,15 +66,14 @@ NM process codification items (Phase A). Phase C (#1522, #1524) deferred to next
 | Zone 1A y-axis tight scoping (#1629) | #1668 | Yes | Green (required checks) | computeYDomain excludes MDA floor in comparison mode; floor line suppressed when comparisonDataMin - floor > 0.10 |
 | Zone 1D delta annotations (#1630) | #1669 | Yes | Green (required checks) | formatDelta, getDeltaColor exported; baseline_trajectory from Zustand store; Mode 3 only |
 
-### Phase C — Zone 1 View Model (deferred)
+### Phase C — Zone 1 View Model (delivered in G5)
 
-| Group | PRs | Status | Notes |
-|---|---|---|---|
-| View model layer retrofit (#1522) | None | Deferred — no capacity remaining after Phase B + UX panel resolution | To be scoped for G6 or later; no implementation PR opened in G5 |
-| Zone 1A interaction layer (#1524) | None | Deferred — same reason | To be scoped for G6 or later; no implementation PR opened in G5 |
+| Group | PRs | Merged? | CI status | Notes |
+|---|---|---|---|---|
+| View model layer retrofit (#1522) | #1679 | Yes | Green (required checks) | trajectoryViewModel.ts: MergedStepDatum, computeYDomain, computeDivergenceFill, getConfidenceBadgeVisible, mergeTrajectories (visibleStepRange param), sliceToStepRange. 33 unit tests GREEN. |
+| Zone 1A trackwheel zoom (#1524) | #1681 | Yes | Green (required checks) | visibleStepRange state + non-passive wheel listener + double-click reset + data-visible-step-min/max. Desktop trackwheel only (EL scope decision 2026-07-03). |
 
-**Implementation status:** All in-scope implementation merged, CI green on required checks.
-Phase C deferred to next sprint group per capacity-conditional rule in sprint entry §3.1.
+**Implementation status:** All Phase A, B, and C implementation merged; CI green on all required checks.
 
 ### Scope change note — #1630
 
@@ -94,15 +94,17 @@ ADR required. The #1630 intent was updated accordingly (see `docs/process/intent
 
 ## Section 3 — Business PO Acceptance Table
 
-*User-facing deliverables: #1629 and #1630. Phase A (NM codification) and #1632 (schema fix)
+*User-facing deliverables: #1629, #1630, #1522, #1524. Phase A (NM codification) and #1632 (schema fix)
 are process/infrastructure — no BPO acceptance required.*
 
 | Deliverable | Work type | Customer Agent L3 | BPO verdict | Verdict artifact |
 |---|---|---|---|---|
 | #1629 — Zone 1A y-axis tight scoping | Frontend | N/A — display fidelity fix; no new Persona 2/3/5 capability introduced | **ACCEPT** | #1629#issuecomment-4879773995 |
 | #1630 — Zone 1D delta annotations (Mode 3) | Frontend | N/A — ADR-017 required companion; no new Persona 2/3/5 capability introduced; Mode 3 north star foundation | **ACCEPT** | #1630#issuecomment-4879774027 |
+| #1522 — View model layer retrofit | Frontend infrastructure | N/A — pure architectural extraction; no user-visible change; seam prerequisite for #1524 | **ACCEPT** | #1522#issuecomment-4880120492 |
+| #1524 — Zone 1A trackwheel zoom (desktop) | Frontend | N/A — Demo 8 analyst navigation capability; Mode 3 north star instrument; no new Persona 2/3/5 live data capability | **ACCEPT** | #1524#issuecomment-4880121152 |
 
-**Business PO acceptance status: All ACCEPT — gate cleared 2026-07-03.**
+**Business PO acceptance status: All ACCEPT — gate cleared 2026-07-03 (Phase C updated).**
 
 ### Customer Agent L3 sequencing note
 
@@ -163,32 +165,32 @@ improvements that together make the Demo 8 narrative coherent.
 **Exit conditions checklist:**
 
 - [x] All Phase B implementation PRs merged; CI green on required checks (Section 2)
+- [x] All Phase C implementation PRs merged; CI green on required checks — #1679 (#1522), #1681 (#1524) (Section 2)
 - [x] Phase C QA tests + intent docs filed before implementation (PRs #1675, #1676)
 - [x] BPO ACCEPT verdict filed for #1629 — #1629#issuecomment-4879773995 (2026-07-03)
 - [x] BPO ACCEPT verdict filed for #1630 — #1630#issuecomment-4879774027 (2026-07-03)
-- [x] CA L3 assessment — not required (neither deliverable serves new Persona 2/3/5 capability; see Section 3)
+- [x] BPO ACCEPT verdict filed for #1522 — #1522#issuecomment-4880120492 (2026-07-03)
+- [x] BPO ACCEPT verdict filed for #1524 — #1524#issuecomment-4880121152 (2026-07-03)
+- [x] CA L3 assessment — not required (no deliverable serves new Persona 2/3/5 live capability; see Section 3)
 - [x] No open rejection artifacts from G5 (Section 4)
 - [x] No near-miss entries required (no rejections in G5)
-- [x] North star test artifact confirmed by BPO (Section 5)
-- [x] NM-094 test-file check: `git diff release/m19...sprint/m19-g5 -- '*.spec.ts' '*.test.ts'` confirms new test files present for every Phase B deliverable (#1629, #1630) and Phase C QA (#1522, #1524)
+- [x] North star test artifact confirmed by BPO (Section 5) — #1524 north star trace recorded in BPO ACCEPT comment
+- [x] NM-094 test-file check: `git diff release/m19...sprint/m19-g5 -- '*.spec.ts' '*.test.ts'` confirms new test files present for every Phase B deliverable (#1629, #1630) and Phase C deliverables (#1522, #1524)
 
 **PI Agent sprint exit verdict:** Confirmed — all exit conditions satisfied.
 
 **PI Agent confirmation:**
 
-> G5 exit conditions are fully satisfied. All Phase B implementation PRs are merged and CI
-> is green on all required sprint-branch-ci-gate checks. BPO ACCEPT verdicts for #1629 and
-> #1630 are on record (2026-07-03). CA L3 assessment is not required — neither deliverable
-> introduces new capability for Personas 2, 3, or 5. No rejection artifacts were filed in G5.
-> The north star test is confirmed by the BPO. NM-094 test-file check passed — test files
-> exist for all Phase B deliverables and Phase C QA tests are filed before implementation.
-> Phase C (#1522, #1524) implementation may proceed on sprint/m19-g5 before the integration
-> PR opens; these deliverables are in scope for G5 and the sprint branch remains active.
+> G5 exit conditions are fully satisfied. All Phase A, B, and C implementation PRs are merged
+> and CI is green on all required sprint-branch-ci-gate checks. BPO ACCEPT verdicts for all
+> four user-facing deliverables (#1629, #1630, #1522, #1524) are on record (2026-07-03).
+> CA L3 assessment is not required — no deliverable introduces new capability for live
+> Personas 2, 3, or 5. No rejection artifacts were filed in G5. The north star test is
+> confirmed by the BPO for #1629 + #1630 (Section 5) and for #1524 (BPO ACCEPT comment).
+> NM-094 test-file check passed — test files exist for all Phase B and Phase C deliverables.
+> Integration PR #1684 `sprint/m19-g5 → release/m19` opened 2026-07-03.
 >
-> The integration PR (sprint/m19-g5 → release/m19) may open once Phase C implementation is
-> complete and CI is green. If Phase C is deferred after all, the integration PR may open now.
->
-> G5 is confirmed as of 2026-07-03.
+> G5 is confirmed (updated: Phase C complete 2026-07-03).
 
 ---
 
