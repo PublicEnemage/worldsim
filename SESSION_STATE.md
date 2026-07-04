@@ -6,7 +6,7 @@
 > Historical state lives in `docs/process/session-archives/`.
 > Authority: `docs/process/sprint-group-isolation.md §SESSION_STATE.md Cockpit Card Protocol`.
 
-**Last updated:** 2026-07-04 (G6 scope finalised: #1456, #1538, #1657, #1709, #1710; sprint plan updated)
+**Last updated:** 2026-07-04 (G6 EL-approved; sprint/m19-g6 cut; journal #1716 open)
 **Current milestone:** M19 — Constraint Search and Empirical Calibration
 
 ---
@@ -21,8 +21,8 @@
 | Release branch | `release/m19` — cut from `main` 2026-07-02 at 1bf1ecc |
 | Sprint plan | `docs/process/sprint-plans/m19-sprint-plan.md` — EL-approved 2026-07-02 |
 | Active wave | Wave 4 — G5/CM-A/CM-B/CM-C all integrated; G6 (Demo 8 clearance) is next sprint group |
-| Active sprint groups | None — next: G6 (Demo 8 clearance: #1456, #1538, #1657, #1709, #1710) |
-| Active sprint journal issues | None — #1700 closes at CM Sprint C PI Agent confirmation |
+| Active sprint groups | G6 — sprint/m19-g6 open 2026-07-04; #1456/#1538/#1710 ungated; #1709 gates on intent+E2E; #1657 gates on CM cert |
+| Active sprint journal issues | #1716 (G6 — Demo 8 clearance) |
 
 ---
 
