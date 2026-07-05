@@ -125,13 +125,12 @@ _REQUIRED_PRIOR_SOURCE_IDS = {
     "ACADEMIC_LITERATURE_BLANCHARD_LEIGH_2013_FISCAL_MULTIPLIERS",
 }
 
-# hd_composite divergence bounds for ARG Type B step index 2.
-# CM Sprint D calibration decision §4.2 — certified from empirical run [obs×0.5, obs×2.0].
-# Values below are PLACEHOLDER bounds (wide) for the first CI run to reveal the observed diff.
-# Update to certified values after reading per_step_diff[2] from the CI failure output.
+# hd_composite divergence bounds for ARG Type B step index 2 (step 3, 2003 Kirchner recovery).
+# CM Sprint D calibration decision §4.2 — certified from empirical CI run (2026-07-05).
+# Observed per_step_diff[2] = 0.2027; certified as [obs×0.5, obs×2.0] = [0.10135, 0.40540].
 # CM Sprint B §4.1 bounds [0.003, 0.050] rejected — assumed convergence; see §1.1.
-_HD_COMPOSITE_LOWER = Decimal("0.001")
-_HD_COMPOSITE_UPPER = Decimal("0.999")
+_HD_COMPOSITE_LOWER = Decimal("0.10135")
+_HD_COMPOSITE_UPPER = Decimal("0.40540")
 
 
 # ---------------------------------------------------------------------------
@@ -850,9 +849,8 @@ class TestAC1MagnitudeDivergence:
         """hd_composite divergence at step index 2 must be within certified bounds.
 
         Requires DATABASE_URL. Forward condition for Demo 8 Act 2.
-        CM Sprint D calibration decision §4.2: bounds certified from empirical run.
-        Placeholder bounds [0.001, 0.999] widen the window to surface the observed
-        per_step_diff[2] value; update to [obs×0.5, obs×2.0] after first CI run.
+        CM Sprint D calibration decision §4.2: bounds certified 2026-07-05.
+        Observed per_step_diff[2] = 0.2027; certified [0.10135, 0.40540].
         """
         from tests.fixtures.argentina_2001_2002_scenario import (
             build_argentina_counterfactual_scenario,
@@ -899,15 +897,6 @@ class TestAC1MagnitudeDivergence:
             )
 
             diff_at_step_3 = per_step_diff[2]
-            # CM-D calibration: warn so the observed value appears in pytest output.
-            # Remove once bounds are certified (calibration-decision §4.2).
-            warnings.warn(
-                f"CM-D CALIBRATION — per_step_diff[2] observed: {diff_at_step_3!r}; "
-                f"certify as [{diff_at_step_3 * Decimal('0.5')!r}, "
-                f"{diff_at_step_3 * Decimal('2.0')!r}]",
-                UserWarning,
-                stacklevel=2,
-            )
             if not (_HD_COMPOSITE_LOWER <= diff_at_step_3 <= _HD_COMPOSITE_UPPER):
                 warnings.warn(
                     f"AC-1 MAGNITUDE: hd_composite divergence at step 3 = "
