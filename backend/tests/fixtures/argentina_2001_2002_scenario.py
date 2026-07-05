@@ -19,8 +19,10 @@ Historical context:
              undervaluation, and suppression of utility tariffs.
 
 Simulation structure:
-  build_argentina_scenario(): n_steps=2 (annual); step 1 = 2001, step 2 = 2002.
+  build_argentina_scenario(): n_steps=3 (annual); step 1 = 2001, step 2 = 2002, step 3 = 2003.
     Backtesting fixture. Initial state reflects Argentina's 2000 baseline.
+    Step 3 represents the Kirchner recovery: fiscal normalisation and social program
+    expansion (+3.0% GDP spending_change, T3, MECON Budget Execution 2003).
 
   build_argentina_demo_scenario(): n_steps=4 (annual: 2001→2004).
     Demo 3 variant. Extends the base with EcologicalModule, GovernanceModule,
@@ -33,8 +35,8 @@ Simulation structure:
 Scheduled inputs:
   Step 1: IMF program acceptance (Blindaje) + fiscal spending cut (Zero Deficit Plan)
   Step 2: Default declaration
-  Step 3 (demo only): Recovery — no active shock; ROUTINE step
-  Step 4 (demo only): Consolidation — no active shock; ROUTINE step
+  Step 3: Kirchner recovery — fiscal normalisation (+3.0% GDP spending_change)
+  Step 3 (demo only, step 4 in demo): Consolidation — no active shock; ROUTINE step
 
 Initial state sources:
   gdp_growth        — IMF WEO April 2001 (2000 outturn: -0.8%)
@@ -55,19 +57,23 @@ from app.schemas import (
 
 
 def build_argentina_scenario() -> ScenarioCreateRequest:
-    """Build the Argentina 2001–2002 backtesting scenario configuration.
+    """Build the Argentina 2001–2003 backtesting scenario configuration.
 
     Returns a ScenarioCreateRequest ready to POST to /api/v1/scenarios.
-    The scenario runs 2 steps (annual: 2001→2002→2003 projection window)
-    starting from Argentina's 2000 economic conditions.
+    The scenario runs 3 steps (annual: 2001→2002→2003) starting from
+    Argentina's 2000 economic conditions.
 
-    Scheduled inputs represent the two dominant policy shocks:
+    Scheduled inputs:
       Step 1: IMF Blindaje continuation + Zero Deficit Plan spending cut
       Step 2: Sovereign default declaration
+      Step 3: Kirchner recovery — fiscal normalisation and social program expansion
+               (+3.0% GDP spending_change; MECON Budget Execution 2003; T3)
 
     Initial state attributes:
       gdp_growth        = -0.8%  (IMF WEO April 2001, 2000 outturn)
       unemployment_rate = 14.7% (INDEC EPH October 2000 wave)
+
+    CM Sprint D calibration decision: docs/calibration/m19-cm-d-arg-kirchner-calibration-decision.md
     """
     # IMF WEO April 2001 — Argentina 2000 real GDP growth outturn: -0.79%
     initial_gdp_growth = QuantitySchema(
@@ -167,7 +173,7 @@ def build_argentina_scenario() -> ScenarioCreateRequest:
         ),
         configuration=ScenarioConfigSchema(
             entities=["ARG"],
-            n_steps=2,
+            n_steps=3,
             timestep_label="annual",
             initial_attributes={
                 "ARG": {
@@ -217,6 +223,26 @@ def build_argentina_scenario() -> ScenarioCreateRequest:
                     "expected_duration": 1,
                 },
             ),
+            # Step 3 (2003): Kirchner fiscal normalisation and social program expansion.
+            # Néstor Kirchner (from May 2003) maintained the PJJHD emergency employment
+            # program, normalised government services after the 2002 emergency contraction,
+            # and expanded social transfers. Primary fiscal surplus +0.5% GDP — revenue-
+            # driven (export taxes ~1.5% GDP); net spending recovery ~+3.0% GDP vs 2002 trough.
+            # The IMF Blindaje (step 1, expected_duration=2) expires after step 2 — no IMF
+            # conditionality at step 3.
+            # Source: MECON Budget Execution 2003 + IMF WEO April 2004. Confidence tier: T3.
+            # CM Sprint D calibration decision §3.1.
+            ScheduledInputSchema(
+                step=3,
+                input_type="FiscalPolicyInput",
+                input_data={
+                    "instrument": "spending_change",
+                    "target_entity": "ARG",
+                    "sector": "government",
+                    "value": "0.030",
+                    "duration_years": 1,
+                },
+            ),
         ],
     )
 
@@ -254,7 +280,7 @@ def build_argentina_counterfactual_scenario() -> ScenarioCreateRequest:
 
     n_steps = 3 (satisfies AC-ARG-1: n_steps >= 3).
     Type B comparison: builds a different starting-condition scenario against the
-    2001 baseline (build_argentina_scenario(), n_steps=2). The direction_verdict
+    2001 baseline (build_argentina_scenario(), n_steps=3). The direction_verdict
     advisory expects COUNTER_FACTUAL_BETTER on fin_composite.
 
     Known limitation (AC-9): counter-factual timing and magnitude are
@@ -360,7 +386,7 @@ def build_argentina_counterfactual_scenario() -> ScenarioCreateRequest:
             "Initial state: 1999 baseline (recession onset; EMBI ~350bps; reserves intact). "
             "Orderly fiscal path: modest adjustment (Step 1) + gradual stabilisation (Step 2) "
             "+ recovery (Step 3). No default declaration. No capital controls. "
-            "Type B comparison against build_argentina_scenario() (2001 crisis path, n_steps=2). "
+            "Type B comparison against build_argentina_scenario() (2001 crisis path, n_steps=3). "
             "Counter-factual inputs are INFERRED_STRUCTURAL (Tier 3): no historical managed "
             "exit was executed. Direction verdict on fin_composite is advisory. "
             "Sources: IMF WEO 1999; INDEC EPH 1998; UNCTAD 1999; JP Morgan EMBI+ 1999."
