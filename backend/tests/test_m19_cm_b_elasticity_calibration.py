@@ -899,6 +899,14 @@ class TestAC1MagnitudeDivergence:
             )
 
             diff_at_step_3 = per_step_diff[2]
+            # CM-D calibration: log observed value so certified bounds can be set.
+            # Remove this print once bounds are certified (calibration-decision §4.2).
+            print(
+                f"\nCM-D CALIBRATION — per_step_diff[2] observed: {diff_at_step_3!r}; "
+                f"certify as [{diff_at_step_3 * Decimal('0.5')!r}, "
+                f"{diff_at_step_3 * Decimal('2.0')!r}]",
+                flush=True,
+            )
             if not (_HD_COMPOSITE_LOWER <= diff_at_step_3 <= _HD_COMPOSITE_UPPER):
                 warnings.warn(
                     f"AC-1 MAGNITUDE: hd_composite divergence at step 3 = "

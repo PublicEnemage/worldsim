@@ -172,14 +172,14 @@ async def test_argentina_2001_2002_direction_only_fidelity(
 async def test_argentina_scenario_creates_correct_number_of_snapshots(
     client: httpx.AsyncClient,
 ) -> None:
-    """Argentina scenario with n_steps=2 must produce 3 snapshots (steps 0–2)."""
+    """Argentina scenario with n_steps=3 must produce 4 snapshots (steps 0–3)."""
     scenario_id, snapshots = await _create_and_run_scenario(client)
     try:
-        assert len(snapshots) == 3, (
-            f"Expected 3 snapshots (steps 0–2) for n_steps=2, got {len(snapshots)}"
+        assert len(snapshots) == 4, (
+            f"Expected 4 snapshots (steps 0–3) for n_steps=3, got {len(snapshots)}"
         )
         step_nums = sorted(s["step"] for s in snapshots)
-        assert step_nums == [0, 1, 2]
+        assert step_nums == [0, 1, 2, 3]
     finally:
         await client.delete(f"/api/v1/scenarios/{scenario_id}")
 
