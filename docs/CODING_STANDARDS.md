@@ -743,6 +743,20 @@ Slow unit tests are a sign that a unit test is doing integration work.
 **Fixtures:** Use `conftest.py` for shared fixtures. Fixtures should be minimal
 — construct only the state the test actually needs.
 
+**ASGI client fixtures — asyncpg pool rule (NM-099):** Any fixture that creates an
+`httpx.AsyncClient` with `ASGITransport(app=app)` MUST explicitly initialise and tear down
+the asyncpg pool. Do not rely on session ordering or a sibling directory's autouse fixture
+— that creates a hidden ordering dependency that breaks when the test is run in isolation.
+The canonical pattern is `tests/conftest.py::client` (Issue #1451):
+```python
+await create_asyncpg_pool()
+try:
+    async with httpx.AsyncClient(transport=httpx.ASGITransport(app=app), ...) as client:
+        yield client
+finally:
+    await close_asyncpg_pool()
+```
+
 **Mocking:** Mock only at the boundary of the unit under test. Do not mock
 internal collaborators — if you are mocking internals, the unit is too large
 or the architecture needs rethinking.
