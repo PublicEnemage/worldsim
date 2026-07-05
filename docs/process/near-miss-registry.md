@@ -4996,6 +4996,94 @@ condition. G8 scope remains #1739 + #1711 only.
 
 ---
 
+## NM-099 — `asgi_client` Fixture in test_m19_cm_b Does Not Initialise asyncpg Pool; Test Fails in Isolation, Passes in Full Suite by Ordering Accident (Reactive)
+
+**Date:** 2026-07-05
+**Milestone:** M19 — Constraint Search and Empirical Calibration
+**Detected by:** PI Agent — issue #1712 live verification run (2026-07-05)
+**Severity:** Medium
+**Fix issue:** #1759
+
+### What happened
+
+The `asgi_client` fixture in `backend/tests/test_m19_cm_b_elasticity_calibration.py` (line ~721)
+creates an `httpx.AsyncClient` with `ASGITransport` but does not call `create_asyncpg_pool()`.
+The asyncpg pool that the app requires is never initialised when this fixture is used in isolation.
+
+The fixture works in CI only because `pytest -m backtesting` collects `tests/backtesting/` tests
+alphabetically before `tests/test_m19_*.py`. The `tests/backtesting/conftest.py` autouse fixture
+`_asyncpg_pool_lifecycle` initialises the pool at session start for backtesting-directory tests.
+By the time `TestAC1MagnitudeDivergence` runs later in the session, the pool happens to already
+be initialized.
+
+Running the test in isolation — the natural developer action for verifying a single test — fails:
+```
+RuntimeError: asyncpg pool is not initialised.
+```
+
+Discovered during issue #1712 live verification when the test was run alone:
+```
+pytest tests/test_m19_cm_b_elasticity_calibration.py::TestAC1MagnitudeDivergence::test_arg_hd_composite_divergence_within_magnitude_bounds
+```
+
+### What was at risk
+
+1. **False FAIL on correct code:** A developer verifying the ARG AC-1 condition locally gets a
+   `RuntimeError` failure that has nothing to do with the calibration correctness. The code and
+   the test assertion are both correct — the failure is entirely in the test infrastructure.
+
+2. **Issue #1712 could have been reported as blocked:** If the live verification had been
+   attempted in isolation first and stopped at the error without diagnosing the root cause,
+   issue #1712 would have been marked as blocked pending a database or fixture investigation.
+   The Demo 8 Act 2 ARG condition would appear unverifiable when it was in fact verifiable.
+
+3. **Silent ordering dependency:** The test's correctness depends on session execution order.
+   A future pytest configuration change, a new `conftest.py`, or a directory restructure that
+   alters collection order could silently break the test in CI without any code change.
+
+### What caught it
+
+Hands-on diagnosis during #1712 live verification (2026-07-05). The `RuntimeError` message
+named the exact function (`create_asyncpg_pool()`), which made the root cause traceable.
+The correct pattern was visible in `tests/conftest.py::client` (Issue #1451 fix) — comparison
+against the known-good pattern identified the gap immediately.
+
+### Process improvement
+
+**Immediate fix (issue #1759):** Update `asgi_client` in
+`backend/tests/test_m19_cm_b_elasticity_calibration.py` to match the root conftest `client`
+fixture pattern — explicitly call `create_asyncpg_pool()` before yielding and
+`close_asyncpg_pool()` in the finally block:
+
+```python
+@pytest_asyncio.fixture(loop_scope="session")
+async def asgi_client() -> AsyncGenerator[httpx.AsyncClient, None]:
+    if not _DATABASE_URL:
+        pytest.skip("DATABASE_URL not set ...")
+    from app.db.connection import close_asyncpg_pool, create_asyncpg_pool
+    await create_asyncpg_pool()
+    try:
+        async with httpx.AsyncClient(
+            transport=httpx.ASGITransport(app=app),
+            base_url="http://testserver",
+        ) as client:
+            yield client
+    finally:
+        await close_asyncpg_pool()
+```
+
+**Rule (new — CODING_STANDARDS):** Any test fixture that creates an `httpx.AsyncClient` with
+`ASGITransport(app=app)` MUST explicitly initialise and tear down the asyncpg pool. Relying
+on session ordering or a sibling conftest's autouse fixture is not sufficient — test isolation
+requires that each test fixture be self-contained with respect to infrastructure it depends on.
+The canonical pattern is in `tests/conftest.py::client`.
+
+**Cross-reference:** The root conftest `client` fixture (Issue #1451) was created precisely to
+prevent this pattern. The `asgi_client` fixture was added after #1451 without following the
+established pattern — the CODING_STANDARDS entry will ensure future fixtures do not repeat this.
+
+---
+
 ## NM-NNN — [Short descriptive title]
 
 **Date:** YYYY-MM-DD (or approximate milestone era)
