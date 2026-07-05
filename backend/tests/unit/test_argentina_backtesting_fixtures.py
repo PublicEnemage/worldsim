@@ -152,9 +152,9 @@ def test_build_argentina_scenario_has_arg_entity() -> None:
     assert "ARG" in scenario.configuration.entities
 
 
-def test_build_argentina_scenario_n_steps_is_2() -> None:
+def test_build_argentina_scenario_n_steps_is_3() -> None:
     scenario = build_argentina_scenario()
-    assert scenario.configuration.n_steps == 2
+    assert scenario.configuration.n_steps == 3
 
 
 def test_build_argentina_scenario_timestep_label_is_annual() -> None:
