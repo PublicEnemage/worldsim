@@ -280,7 +280,7 @@ def build_argentina_counterfactual_scenario() -> ScenarioCreateRequest:
 
     n_steps = 3 (satisfies AC-ARG-1: n_steps >= 3).
     Type B comparison: builds a different starting-condition scenario against the
-    2001 baseline (build_argentina_scenario(), n_steps=2). The direction_verdict
+    2001 baseline (build_argentina_scenario(), n_steps=3). The direction_verdict
     advisory expects COUNTER_FACTUAL_BETTER on fin_composite.
 
     Known limitation (AC-9): counter-factual timing and magnitude are
@@ -386,7 +386,7 @@ def build_argentina_counterfactual_scenario() -> ScenarioCreateRequest:
             "Initial state: 1999 baseline (recession onset; EMBI ~350bps; reserves intact). "
             "Orderly fiscal path: modest adjustment (Step 1) + gradual stabilisation (Step 2) "
             "+ recovery (Step 3). No default declaration. No capital controls. "
-            "Type B comparison against build_argentina_scenario() (2001 crisis path, n_steps=2). "
+            "Type B comparison against build_argentina_scenario() (2001 crisis path, n_steps=3). "
             "Counter-factual inputs are INFERRED_STRUCTURAL (Tier 3): no historical managed "
             "exit was executed. Direction verdict on fin_composite is advisory. "
             "Sources: IMF WEO 1999; INDEC EPH 1998; UNCTAD 1999; JP Morgan EMBI+ 1999."
