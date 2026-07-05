@@ -6,7 +6,7 @@
 > Historical state lives in `docs/process/session-archives/`.
 > Authority: `docs/process/sprint-group-isolation.md §SESSION_STATE.md Cockpit Card Protocol`.
 
-**Last updated:** 2026-07-05 (CM-D confirmed — ARG Kirchner step-3 inputs; AC-1 bounds certified [0.10135, 0.40540]; PR #1756 + #1757 open; #1712 forward condition for Demo 8 Act 2 live run)
+**Last updated:** 2026-07-05 (session close — #1712 CLEARED; all Demo 8 Act 2 AC-1 conditions cleared; NM-099 filed; #1759 deferred; Demo 8 is next)
 **Current milestone:** M19 — Constraint Search and Empirical Calibration
 
 ---
@@ -80,7 +80,7 @@
 | #1709 | FOUND state: tolerance band (±0.01) not displayed | G6 ✓ | **Closed** — PR #1720 merged; BPO ACCEPT; north star PASS; Demo 8 Act 1 cleared |
 | #1710 | AC-12: resolve `__structural_absence__` placeholder | G6 ✓ | **Closed** — PR #1721 merged; skip guard removed; timing fixed |
 | #1711 | Demo 8 Act 2 verification: GRC AC-1 live harness run | G8 ✓ | **Closed** — per_step_diff[3]=0.1561 ∈ [0.010, 0.20]; direction_verdict=COUNTER_FACTUAL_BETTER; run 28719741291 2026-07-04 |
-| #1712 | Demo 8 Act 2 verification: ARG AC-1 live harness run | CM-D ✓ | **Forward condition** — CM-D delivered Kirchner step-3 inputs; certified bounds [0.10135, 0.40540] (per_step_diff[2]=0.2027); closes when live DATABASE_URL run confirms bounds at Demo 8 Act 2 |
+| #1712 | Demo 8 Act 2 verification: ARG AC-1 live harness run | CM-D ✓ | **Closed 2026-07-05** — per_step_diff[2] ∈ [0.10135, 0.40540] confirmed; local DATABASE_URL run PASS |
 | #1713 | Demo 8 Act 2 verification: PAK AC-1 live harness run | Act 2 verified | **PASS** — per_step_diff[2]=0.0266 ∈ [0.002, 0.035]; closed 2026-07-04 |
 | #1739 | fix(harness): _classify_direction ignores primary_indicator | G8 ✓ | **Closed** — PR #1744 merged; NM-098 fix; `_COMPOSITE_INDICATOR_FIELDS` routing branch |
 | #1729 | fix(g6): missing elasticity rows for imf_program_acceptance + emergency_declaration; NM-056 fix | G7 ✓ | **Closed** — PR #1734 merged (NM-056 fix; 9/9 PASS 0 SKIP); integration PR #1737 merged 2026-07-04 |
@@ -95,7 +95,7 @@
 | ~~AC-12: resolve structural-absence indicator key~~ | **CLEARED 2026-07-04** — #1710 PR #1721 merged; timing fixed; `__structural_absence__` confirmed | ~~Demo 8 Act 1~~ |
 | ~~NM-056 fix: conditionality channel tests honest (9/9 PASS 0 SKIP)~~ | **CLEARED 2026-07-04** — #1729 PR #1734 merged; G7 exit confirmed; integration PR #1737 | ~~Demo 8 pre-flight~~ |
 | ~~AC-1 harness live run (GRC orthodox vs heterodox): `per_step_diff[3] ∈ [0.010, 0.20]`~~ | **CLEARED 2026-07-04** — #1711 PASS; per_step_diff[3]=0.1561; direction_verdict=COUNTER_FACTUAL_BETTER; run 28719741291 | ~~Demo 8 Act 2~~ |
-| AC-1 harness live run (ARG Type B `hd_composite` divergence): `per_step_diff[2] ∈ [0.10135, 0.40540]` | CM-D exit §4 → **#1712** — certified bounds from empirical run (per_step_diff[2]=0.2027); closes at Demo 8 Act 2 live DATABASE_URL run | Demo 8 Act 2 |
+| ~~AC-1 harness live run (ARG Type B `hd_composite` divergence): `per_step_diff[2] ∈ [0.10135, 0.40540]`~~ | **CLEARED 2026-07-05** — #1712 closed; local run PASS; per_step_diff[2]=0.2027 ∈ [0.10135, 0.40540] | ~~Demo 8 Act 2~~ |
 | ~~AC-1 harness live run (PAK Type B `hd_composite` divergence): `per_step_diff[2] ∈ [0.002, 0.035]`~~ | **CLEARED 2026-07-04** — #1713 PASS; per_step_diff[2]=0.0266 ∈ [0.002, 0.035] | ~~Demo 8 Act 2~~ |
 
 ---
@@ -124,4 +124,5 @@
 - **CM Sprint C complete (2026-07-04):** SEA ELASTICITY_REGISTRY calibration — PAK/LKA/BGD `entity_families`; SEA Q1 FORMAL (−0.17, T3, Ilzetzki et al. 2013 developing-country multiplier 0.35–0.40; Q1 concentration 1.35× with BISP/Samurdhi discount) + Q2 FORMAL (−0.10, T3, Ball 2013 0.60 scaling). FORMAL-only (Option a). 26/26 unit tests GREEN. BPO ACCEPT; north star PASS (PAK 2023 IMF SBA negotiation scenario). Integration PR #1707 auto-merging to release/m19. Issue #1623 fully resolved — all three gaps (GRC T2, LAC T3, SEA T3). Known limitation: SSA INFORMAL proxy overstates informal channel for SEA — Option (d) suppression deferred beyond M19. Batini 2012 reference corrected to Ilzetzki 2013 in calibration decision.
 - **Demo 7 north star (2026-07-02):** Aicha presents Zambia +342K cohort effect with CI bounds and sourcing to IMF restructuring table. Next available DEMO-167.
 - **G8 complete (2026-07-04):** `_classify_direction` now respects `primary_indicator` for composite fields (NM-098, PR #1744). CM_A/B/C tests fixed: TYPE_B baseline must be pre-advanced before `run_harness` (PRs #1745, #1746). GRC AC-1 confirmed: per_step_diff[3]=0.1561 ∈ [0.010, 0.20], direction_verdict=COUNTER_FACTUAL_BETTER (run 28719741291). Integration PR #1748 merged 2026-07-04.
-- **CM Sprint D complete (2026-07-05):** `build_argentina_scenario()` extended to n_steps=3 (Kirchner 2003 spending_change=+0.030 at step 3; MECON Budget Execution 2003 + IMF WEO April 2004; T3). AC-1 certified bounds [0.10135, 0.40540] from empirical CI run (per_step_diff[2]=0.2027; `warnings.warn()` diagnostic in CI log). All M19 CM sprints complete. Integration PR #1757 open. Forward condition: issue #1712 (live DATABASE_URL harness run at Demo 8 Act 2).
+- **CM Sprint D complete (2026-07-05):** `build_argentina_scenario()` extended to n_steps=3 (Kirchner 2003 spending_change=+0.030 at step 3; MECON Budget Execution 2003 + IMF WEO April 2004; T3). AC-1 certified bounds [0.10135, 0.40540]; per_step_diff[2]=0.2027. Integration PR #1757 merged. #1712 closed 2026-07-05 (local DATABASE_URL run PASS). All three Demo 8 Act 2 AC-1 conditions CLEARED (GRC #1711, PAK #1713, ARG #1712).
+- **NM-099 + #1759 (2026-07-05):** `asgi_client` fixture in test_m19_cm_b relies on session ordering for pool init — fails in isolation. NM-099 filed (PR #1760 merged); CODING_STANDARDS rule added. Fix (#1759) deferred to next sprint that touches the file (EL decision 2026-07-05).
