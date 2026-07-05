@@ -798,6 +798,14 @@ class TestAC1MagnitudeDivergence:
         )
         baseline_id: str = baseline_resp.json()["scenario_id"]
 
+        # TYPE_B requires a pre-advanced baseline; run_harness only fetches its trajectory.
+        for _step in range(1, 7):
+            _adv = await asgi_client.post(f"/api/v1/scenarios/{baseline_id}/advance")
+            assert _adv.status_code == 200, (
+                f"AC-1 FAIL (baseline advance step {_step}): "
+                f"{_adv.status_code} {_adv.text}"
+            )
+
         cf_resp = await asgi_client.post(
             "/api/v1/scenarios",
             json=build_greece_counterfactual_scenario().model_dump(mode="json"),
@@ -882,6 +890,12 @@ class TestAC1MagnitudeDivergence:
         assert baseline_resp.status_code == 201
         baseline_id: str = baseline_resp.json()["scenario_id"]
 
+        for _step in range(1, 7):
+            _adv = await asgi_client.post(f"/api/v1/scenarios/{baseline_id}/advance")
+            assert _adv.status_code == 200, (
+                f"Baseline advance step {_step} failed: {_adv.status_code} {_adv.text}"
+            )
+
         cf_resp = await asgi_client.post(
             "/api/v1/scenarios",
             json=build_greece_counterfactual_scenario().model_dump(mode="json"),
@@ -932,6 +946,12 @@ class TestAC1MagnitudeDivergence:
         )
         assert baseline_resp.status_code == 201
         baseline_id: str = baseline_resp.json()["scenario_id"]
+
+        for _step in range(1, 7):
+            _adv = await asgi_client.post(f"/api/v1/scenarios/{baseline_id}/advance")
+            assert _adv.status_code == 200, (
+                f"Baseline advance step {_step} failed: {_adv.status_code} {_adv.text}"
+            )
 
         cf_resp = await asgi_client.post(
             "/api/v1/scenarios",

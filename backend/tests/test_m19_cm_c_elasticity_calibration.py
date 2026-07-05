@@ -852,6 +852,14 @@ class TestAC1MagnitudeDivergence:
         baseline_id: str = baseline_resp.json()["scenario_id"]
 
         cf_req = build_pakistan_counterfactual_scenario()
+
+        # TYPE_B requires a pre-advanced baseline; run_harness only fetches its trajectory.
+        for _step in range(1, cf_req.configuration.n_steps + 1):
+            _adv = await asgi_client.post(f"/api/v1/scenarios/{baseline_id}/advance")
+            assert _adv.status_code == 200, (
+                f"Baseline advance step {_step} failed: {_adv.status_code} {_adv.text}"
+            )
+
         cf_resp = await asgi_client.post(
             "/api/v1/scenarios",
             json=cf_req.model_dump(mode="json"),
@@ -908,6 +916,13 @@ class TestAC1MagnitudeDivergence:
         baseline_id: str = baseline_resp.json()["scenario_id"]
 
         cf_req = build_pakistan_counterfactual_scenario()
+
+        for _step in range(1, cf_req.configuration.n_steps + 1):
+            _adv = await asgi_client.post(f"/api/v1/scenarios/{baseline_id}/advance")
+            assert _adv.status_code == 200, (
+                f"Baseline advance step {_step} failed: {_adv.status_code} {_adv.text}"
+            )
+
         cf_resp = await asgi_client.post(
             "/api/v1/scenarios",
             json=cf_req.model_dump(mode="json"),

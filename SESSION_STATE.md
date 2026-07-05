@@ -6,7 +6,7 @@
 > Historical state lives in `docs/process/session-archives/`.
 > Authority: `docs/process/sprint-group-isolation.md §SESSION_STATE.md Cockpit Card Protocol`.
 
-**Last updated:** 2026-07-04 (G7 entry EL-approved; sprint/m19-g7 cut; journal #1732 opened)
+**Last updated:** 2026-07-04 (G8 confirmed — GRC AC-1 PASS; issues #1739 + #1711 closed; integration PR #1748 open; CM-D next)
 **Current milestone:** M19 — Constraint Search and Empirical Calibration
 
 ---
@@ -20,9 +20,9 @@
 | Exit checklist issue | #1535 (M19 Exit Checklist — blocks milestone closure) |
 | Release branch | `release/m19` — cut from `main` 2026-07-02 at 1bf1ecc |
 | Sprint plan | `docs/process/sprint-plans/m19-sprint-plan.md` — EL-approved 2026-07-02 |
-| Active wave | Wave 5 — G7 entry 2026-07-04; sprint/m19-g7 cut from release/m19 |
-| Active sprint groups | G7 — elasticity rows + NM-056 fix (#1729); EL-approved 2026-07-04 |
-| Active sprint journal issues | #1732 (G7 journal) |
+| Active wave | Wave 6 complete — G8 confirmed 2026-07-04; integration PR #1748 open (sprint/m19-g8 → release/m19) |
+| Active sprint groups | None — CM-D next (ARG Kirchner recovery inputs; #1712) |
+| Active sprint journal issues | #1741 (G8 — closes at integration PR merge) |
 
 ---
 
@@ -50,7 +50,8 @@
 | CM-B | ELASTICITY_REGISTRY LAC calibration (ARG/ECU/BOL/PER) | #1623 ✓ | **Confirmed** — BPO ACCEPT; north star PASS; journal #1688 closed; integration PR #1698 merged 2026-07-04 |
 | CM-C | ELASTICITY_REGISTRY SEA calibration (PAK/LKA/BGD) | #1623 ✓ | **Confirmed** — BPO ACCEPT; north star PASS (PAK 2023 SBA); journal #1700 closed; integration PR #1707 auto-merging 2026-07-04 |
 | G6 | Demo 8 clearance | #1456 ✓, #1538 ✓, #1657 ✓, #1709 ✓, #1710 ✓ | **Integrated** — BPO ACCEPT (#1709); north star PASS; NM-095 LOW; journal #1716 closed; integration PR #1724 merged 2026-07-04 |
-| G7 | Elasticity rows + NM-056 fix | #1729 | **Active** — EL-approved 2026-07-04; sprint/m19-g7 cut; journal #1732 |
+| G7 | Elasticity rows + NM-056 fix | #1729 ✓ | **Confirmed** — BPO ACCEPT (infra sprint); PI gate PASS; integration PR #1737 merged 2026-07-04; journal #1732 closed |
+| G8 | `_classify_direction` primary_indicator fix + GRC re-verify | #1739 ✓, #1711 ✓ | **Confirmed** — BPO ACCEPT; GRC AC-1 PASS (run 28719741291); integration PR #1748 open; journal #1741 closes at merge |
 
 ---
 
@@ -77,10 +78,11 @@
 | #1657 | NM-090/091: DemographicModule dead subscriptions fix | G6 ✓ | **Closed** — PR #1722 merged; 9/9 tests GREEN; ADR-020 updated; CM cert 2026-07-04 |
 | #1709 | FOUND state: tolerance band (±0.01) not displayed | G6 ✓ | **Closed** — PR #1720 merged; BPO ACCEPT; north star PASS; Demo 8 Act 1 cleared |
 | #1710 | AC-12: resolve `__structural_absence__` placeholder | G6 ✓ | **Closed** — PR #1721 merged; skip guard removed; timing fixed |
-| #1711 | Demo 8 Act 2 verification: GRC AC-1 live harness run | Act 2 verification | DATABASE_URL prerequisite — no code changes |
-| #1712 | Demo 8 Act 2 verification: ARG AC-1 live harness run | Act 2 verification | DATABASE_URL prerequisite — no code changes |
-| #1713 | Demo 8 Act 2 verification: PAK AC-1 live harness run | Act 2 verification | DATABASE_URL prerequisite — no code changes |
-| #1729 | fix(g6): missing elasticity rows for imf_program_acceptance + emergency_declaration; NM-056 fix | G7 | **Active** — EL-approved 2026-07-04; sprint/m19-g7 cut; journal #1732 |
+| #1711 | Demo 8 Act 2 verification: GRC AC-1 live harness run | G8 ✓ | **Closed** — per_step_diff[3]=0.1561 ∈ [0.010, 0.20]; direction_verdict=COUNTER_FACTUAL_BETTER; run 28719741291 2026-07-04 |
+| #1712 | Demo 8 Act 2 verification: ARG AC-1 live harness run | CM-D | **Deferred** — CM consult 2026-07-04: n_steps=3 extension leaves BL flat (hd=0.3723) at default trough; diff=0.2027 (no convergence); needs Kirchner step-3 recovery inputs + recalibration |
+| #1713 | Demo 8 Act 2 verification: PAK AC-1 live harness run | Act 2 verified | **PASS** — per_step_diff[2]=0.0266 ∈ [0.002, 0.035]; closed 2026-07-04 |
+| #1739 | fix(harness): _classify_direction ignores primary_indicator | G8 ✓ | **Closed** — PR #1744 merged; NM-098 fix; `_COMPOSITE_INDICATOR_FIELDS` routing branch |
+| #1729 | fix(g6): missing elasticity rows for imf_program_acceptance + emergency_declaration; NM-056 fix | G7 ✓ | **Closed** — PR #1734 merged (NM-056 fix; 9/9 PASS 0 SKIP); integration PR #1737 merged 2026-07-04 |
 
 ---
 
@@ -90,9 +92,10 @@
 |---|---|---|
 | ~~Tolerance band (±0.01) visible in FOUND state UI~~ | **CLEARED 2026-07-04** — #1709 PR #1720 merged; `constraint-tolerance-band` element live | ~~Demo 8 Act 1~~ |
 | ~~AC-12: resolve structural-absence indicator key~~ | **CLEARED 2026-07-04** — #1710 PR #1721 merged; timing fixed; `__structural_absence__` confirmed | ~~Demo 8 Act 1~~ |
-| AC-1 harness live run (GRC orthodox vs heterodox): `per_step_diff[3] ∈ [0.010, 0.20]` | CM Sprint A exit §4 → **#1711** | Demo 8 Act 2 |
-| AC-1 harness live run (ARG Type B `hd_composite` divergence): `per_step_diff[2] ∈ [0.003, 0.050]` | CM Sprint B exit §4 → **#1712** | Demo 8 Act 2 |
-| AC-1 harness live run (PAK Type B `hd_composite` divergence): `per_step_diff[2] ∈ [0.002, 0.035]` | CM Sprint C exit §4 → **#1713** | Demo 8 Act 2 |
+| ~~NM-056 fix: conditionality channel tests honest (9/9 PASS 0 SKIP)~~ | **CLEARED 2026-07-04** — #1729 PR #1734 merged; G7 exit confirmed; integration PR #1737 | ~~Demo 8 pre-flight~~ |
+| ~~AC-1 harness live run (GRC orthodox vs heterodox): `per_step_diff[3] ∈ [0.010, 0.20]`~~ | **CLEARED 2026-07-04** — #1711 PASS; per_step_diff[3]=0.1561; direction_verdict=COUNTER_FACTUAL_BETTER; run 28719741291 | ~~Demo 8 Act 2~~ |
+| AC-1 harness live run (ARG Type B `hd_composite` divergence): `per_step_diff[2] ∈ [0.003, 0.050]` | CM Sprint B exit §4 → **#1712** — deferred to CM-D; fixture needs Kirchner step-3 inputs; bounds [0.003, 0.050] not valid for current engine | Demo 8 Act 2 |
+| ~~AC-1 harness live run (PAK Type B `hd_composite` divergence): `per_step_diff[2] ∈ [0.002, 0.035]`~~ | **CLEARED 2026-07-04** — #1713 PASS; per_step_diff[2]=0.0266 ∈ [0.002, 0.035] | ~~Demo 8 Act 2~~ |
 
 ---
 
@@ -119,3 +122,4 @@
 - **CM Sprint B complete (2026-07-04):** LAC ELASTICITY_REGISTRY calibration — ARG/ECU/BOL/PER `entity_families`; LAC Q1 FORMAL (−0.22, T3, Lustig 2014 CEQ WP/13) + Q2 FORMAL (−0.13, T3, Ball 2013 0.60 scaling). FORMAL-only (Option a) avoids double-counting with SSA Q1 INFORMAL. Argentina/Ecuador/Bolivia/Peru scenarios now use LAC-calibrated formal-sector channel not SSA proxy. 23/23 unit tests GREEN. BPO ACCEPT; north star PASS (Bolivia IMF negotiation scenario). Integration PR #1698 merged to release/m19.
 - **CM Sprint C complete (2026-07-04):** SEA ELASTICITY_REGISTRY calibration — PAK/LKA/BGD `entity_families`; SEA Q1 FORMAL (−0.17, T3, Ilzetzki et al. 2013 developing-country multiplier 0.35–0.40; Q1 concentration 1.35× with BISP/Samurdhi discount) + Q2 FORMAL (−0.10, T3, Ball 2013 0.60 scaling). FORMAL-only (Option a). 26/26 unit tests GREEN. BPO ACCEPT; north star PASS (PAK 2023 IMF SBA negotiation scenario). Integration PR #1707 auto-merging to release/m19. Issue #1623 fully resolved — all three gaps (GRC T2, LAC T3, SEA T3). Known limitation: SSA INFORMAL proxy overstates informal channel for SEA — Option (d) suppression deferred beyond M19. Batini 2012 reference corrected to Ilzetzki 2013 in calibration decision.
 - **Demo 7 north star (2026-07-02):** Aicha presents Zambia +342K cohort effect with CI bounds and sourcing to IMF restructuring table. Next available DEMO-167.
+- **G8 complete (2026-07-04):** `_classify_direction` now respects `primary_indicator` for composite fields (NM-098, PR #1744). CM_A/B/C tests fixed: TYPE_B baseline must be pre-advanced before `run_harness` (PRs #1745, #1746). GRC AC-1 confirmed: per_step_diff[3]=0.1561 ∈ [0.010, 0.20], direction_verdict=COUNTER_FACTUAL_BETTER (run 28719741291). ARG AC-1 remains RED — needs CM-D Kirchner step-3 recovery inputs; baseline n_steps=2, CF n_steps=3 mismatch documented.

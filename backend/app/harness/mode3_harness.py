@@ -355,6 +355,11 @@ def _classify_fidelity(
     )
 
 
+_COMPOSITE_INDICATOR_FIELDS = frozenset(
+    {"hd_composite", "fin_composite", "eco_composite", "gov_composite"}
+)
+
+
 def _classify_direction(
     cf_records: list[dict[str, Any]],
     baseline_records: list[dict[str, Any]],
@@ -363,30 +368,44 @@ def _classify_direction(
 ) -> tuple[DirectionVerdict, list[Decimal], int | None]:
     """Compute per-step differential and classify Type B direction verdict.
 
-    Uses PSP as the primary comparison metric; falls back to financial
-    composite when PSP is unavailable. Both trajectories produce INDISTINGUISHABLE
-    when composite data is absent from both sides (unit-test path).
+    When primary_indicator names a composite field (hd_composite, fin_composite,
+    eco_composite, gov_composite), that field is used directly for comparison.
+    Otherwise falls back to: PSP → fin_composite → 0.
     """
     per_step_diff: list[Decimal] = []
     threshold = Decimal("0.01")
 
     for i in range(n_steps):
-        cf_psp = cf_records[i].get("psp") if i < len(cf_records) else None
-        bl_psp = baseline_records[i].get("psp") if i < len(baseline_records) else None
-
-        if cf_psp is not None and bl_psp is not None:
-            per_step_diff.append(cf_psp - bl_psp)
-        else:
-            cf_fin = cf_records[i].get("fin_composite") if i < len(cf_records) else None
-            bl_fin = (
-                baseline_records[i].get("fin_composite")
+        if primary_indicator in _COMPOSITE_INDICATOR_FIELDS:
+            cf_val = cf_records[i].get(primary_indicator) if i < len(cf_records) else None
+            bl_val = (
+                baseline_records[i].get(primary_indicator)
                 if i < len(baseline_records)
                 else None
             )
-            if cf_fin is not None and bl_fin is not None:
-                per_step_diff.append(cf_fin - bl_fin)
+            if cf_val is not None and bl_val is not None:
+                per_step_diff.append(cf_val - bl_val)
             else:
                 per_step_diff.append(Decimal("0"))
+        else:
+            cf_psp = cf_records[i].get("psp") if i < len(cf_records) else None
+            bl_psp = baseline_records[i].get("psp") if i < len(baseline_records) else None
+
+            if cf_psp is not None and bl_psp is not None:
+                per_step_diff.append(cf_psp - bl_psp)
+            else:
+                cf_fin = (
+                    cf_records[i].get("fin_composite") if i < len(cf_records) else None
+                )
+                bl_fin = (
+                    baseline_records[i].get("fin_composite")
+                    if i < len(baseline_records)
+                    else None
+                )
+                if cf_fin is not None and bl_fin is not None:
+                    per_step_diff.append(cf_fin - bl_fin)
+                else:
+                    per_step_diff.append(Decimal("0"))
 
     first_significant: int | None = None
     for idx, diff in enumerate(per_step_diff):
