@@ -3,17 +3,17 @@ name: m19-cm-d-sprint-entry
 type: sprint-entry
 milestone: M19 — Constraint Search and Empirical Calibration
 sprint-group: CM Sprint D — ARG baseline Kirchner recovery inputs + bounds recalibration
-status: Filed — awaiting EL approval
+status: EL-approved 2026-07-05
 authored-by: PM Agent
 authored-date: 2026-07-05
-el-approved: pending
+el-approved: 2026-07-05
 release-branch: release/m19
 sop-reference: docs/process/sprint-planning-sop.md
 ---
 
 # Sprint Entry — M19 CM Sprint D: ARG Baseline Kirchner Recovery Inputs
 
-**Status:** Filed — awaiting EL approval before implementation begins
+**Status:** EL-approved 2026-07-05 — §2.3 (intent) and §2.4 (CM calibration) gates pending before implementation PR opens
 **Date authored:** 2026-07-05
 **Release branch:** `release/m19`
 **Sprint plan:** `docs/process/sprint-plans/m19-sprint-plan.md`
@@ -257,7 +257,9 @@ reports zero divergence at step 3 — the Demo 8 Act 2 claim is unmeasurable.
 
 ## EL Approval Record
 
-**EL approval:** pending
+**EL approval:** 2026-07-05 (in-session)
 
-> {EL approval statement}
-> — @PublicEnemage ({date})
+> CM-D sprint entry approved. Scope is correct — ARG Kirchner recovery inputs are the
+> final M19 Demo 8 Act 2 condition. §2.3 and §2.4 are correctly blocking the implementation
+> PR. CM Agent consultation must precede the fixture PR.
+> — @PublicEnemage (2026-07-05)
