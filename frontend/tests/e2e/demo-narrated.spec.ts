@@ -540,7 +540,7 @@ async function createZMBAct1Scenario(): Promise<string> {
               synthetic_basis: "SADC regional structural growth estimate.",
             },
             reserve_coverage_months: {
-              value: "2.4",
+              value: "2.8",
               unit: "months",
               variable_type: "stock",
               confidence_tier: 3,
@@ -981,11 +981,17 @@ test(
       "Frame B: psp-driver-arc should be visible in Zone 1D (M19 G4 #1528).",
     ).toBeVisible({ timeout: 5_000 });
 
-    // Reset to top of viewport for Frame B — Zone 1A (trajectory) and Zone 1D (PSP arc)
-    // must both be visible simultaneously at 1440×900. block:"center" over-scrolled Zone 1A
-    // out of frame (DEMO-167, DEMO-175). scrollTo(0,0) keeps all zones in the viewport.
+    // Frame B compositional differentiation from Frame A: switch Zone 1A to poverty
+    // headcount ratio. This shows the poverty trajectory with CI bands and the 0.40
+    // floor line — directly relevant to the constraint-floor narrative, visually distinct
+    // from Frame A's GDP view. Reset scroll so both Zone 1A and Zone 1D are in viewport.
+    await page.evaluate(() => {
+      const fn = (window as Record<string, unknown>).__worldsim_setAttributeName as
+        ((key: string) => void) | undefined;
+      if (fn) fn("poverty_headcount_ratio");
+    });
     await page.evaluate(() => window.scrollTo(0, 0));
-    await page.waitForTimeout(400);
+    await page.waitForTimeout(600);
 
     await speak(
       "Step four. Mid-programme. Zone one D shows the PSP driver arc — " +
