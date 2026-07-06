@@ -1,8 +1,8 @@
 # CLAUDE.md — WorldSim Project Context
 
-> Last significant revision: 2026-07-02
-> Updated against: M18 close — Full Argument and Demo 7 complete; CI bands (ADR-007), PSP driver decomposition, counter-scenario comparison, control plane column (ADR-019), Zone 3 auditability panel all delivered; Demo 7 simulated stakeholder session PASS (unconditional north star); M19 now current
-> Previous version context: 2026-06-26 — M17 closed; M18 active; Demo 7 at M18 close
+> Last significant revision: 2026-07-06
+> Updated against: M19 close — Constraint Search and Empirical Calibration complete; Mode 3 constraint-floor search, SEN/ZMB backtesting, ten real-world battle-testing scenarios, empirically grounded CI intervals (ADR-007 Bayesian layer), PSP driver arc, ELASTICITY_REGISTRY non-SSA calibration (GRC/LAC/SEA), Zone 1A display fidelity and interaction layer all delivered; Demo 8 simulated stakeholder session PASS (constraint-derived boundary); M20 now current
+> Previous version context: 2026-07-02 — M18 closed; M19 active; Demo 8 at M19 close
 
 > **Reader Orientation:** This is the permanent project constitution — read it in full before beginning any session. It contains the mission, architectural commitments, and process rules that govern all work in this repository. Anyone making a change in this codebase, human or agent, must have read this document first. Key must-read sections if time is short: Session Continuity (what to read and in what order), Guiding Principles (the values behind every technical decision), and §Architectural Principles for Claude Code Sessions (process gates including pre-push lint, PR merge gate, and file authority rules that will cause compliance violations if not followed).
 
@@ -289,18 +289,16 @@ Full agent profiles, independence requirements, and operational agent definition
 
 ## What We Are Building First
 
-M0–M18 complete (v0.1.0–v0.18.0). ADRs 001–019 current.
+M0–M19 complete (v0.1.0–v0.19.0). ADRs 001–020 current.
 See GitHub Releases for full delivery history.
 
-**Milestone 18 — Full Argument and Demo 7 (Complete)**
+**Milestone 19 — Constraint Search and Empirical Calibration (Complete)**
 
-Delivered: CI bands on Zone 1A trajectories (ADR-007 full implementation, #1254), PSP driver decomposition (#1255), counter-scenario comparison with distributional differential and CI bounds (#1349), control plane column Mode 2+3 (ADR-019, #1354), Zone 3 auditability panel (#1422), Mode 3 render optimization (#1217), 24 Demo 7 DEMO-NNN findings remediated across G6/G7. Demo 7 simulated stakeholder session: north star PASS (unconditional). SCAN-028 complete (Clean, 2026-07-02).
+Delivered: Mode 3 constraint-floor search (#1540); SEN/ZMB backtesting (#1541, #1542); ten real-world battle-testing scenarios (G2A–G2D: GRC/ARG/LKA/PAK/TUR/EGY/GHA/ISL + SEN/ZMB); empirically grounded CI intervals — ADR-007 Bayesian posterior layer (#1543, #1536, #1537); PSP driver arc + auditability panel (#1528); CI label precision (#1529); ELASTICITY_REGISTRY non-SSA calibration — GRC/Euro area T2 (CM-A), LAC T3 ARG/ECU/BOL/PER (CM-B), SEA T3 PAK/LKA/BGD (CM-C), ARG Kirchner recovery inputs (CM-D); Zone 1A ZMB display fidelity (#1629); Zone 1D delta annotations (#1630); Zone 1 view model retrofit (#1522); Zone 1A trackwheel zoom (#1524); ADR-020 capital controls channels (Iceland G2D). Demo 8 simulated stakeholder session: north star PASS (constraint-derived boundary). SCAN-029 complete (Clean, 2026-07-06).
 
-**Milestone 19 — Constraint Search and Empirical Calibration (Current)**
+**Milestone 20 — Interactive Constraint Search and Demo 9 (Current)**
 
-Core deliverable: Mode 3 constraint-floor capability (instrument finds configurations that avoid a human cost threshold, rather than requiring one-at-a-time manual search); SEN and ZMB backtesting; empirically grounded CI intervals (ADR-007 Bayesian posterior layer); PSP driver arc across programme window and in-viewport auditability panel (DEMO-165, #1528); CI label precision (#1529); scenarioId guard Zone 1B (#1456); ADR-007 meaninglessness threshold (#1536); BandResult visible fields (#1537); focal cohort floor validation (#1538); ELASTICITY_REGISTRY empirical calibration for non-SSA entity families (#1623 — CM Sprint A GRC/Euro area is M19 priority; unblocks Greece 2010 counter-factual MAGNITUDE fidelity); Zone 1A ZMB display fidelity (#1629 — `computeYDomain` tight-scope fix; Demo 8 Act 2 risk); Demo 8 narration / Mode 3 HD line alignment (#1630 — separate sprint entry G5 after G4; EL decision required on scope); Zone 1 view model layer retrofit (#1522); Zone 1A TrajectoryView interaction — pinch-zoom, thumbwheel zoom, pan (#1524).
-
-Demo 8 at M19 close.
+Core deliverable: Live interactive constraint-floor search (real-time boundary update as analyst adjusts the human cost floor — reverses the M19 pre-computation model); Mode 3 instrument polish from Demo 8 findings (DEMO-217 in-viewport Act 1→Act 2 navigation link, DEMO-233 WARNING alongside CLEAR display, DEMO-234 binary-search precision vs CI label); PSP multi-scenario comparison. Demo 9 at M20 close.
 
 Each milestone is a vertical slice — working software at every stage,
 not infrastructure waiting for features.
@@ -309,15 +307,15 @@ not infrastructure waiting for features.
 
 ## Milestone Roadmap
 
-M0–M18 complete (v0.1.0–v0.18.0). M19 current. See GitHub Releases for full delivery history.
+M0–M19 complete (v0.1.0–v0.19.0). M20 current. See GitHub Releases for full delivery history.
 
-The full roadmap covering M19 and beyond — milestone deliverables, demo anchors, canonical users served, and the long-term resolution spectrum direction — is maintained at `docs/roadmap/worldsim-roadmap.md`. That document is the canonical reference. The summary below reflects current and next milestone only.
+The full roadmap covering M20 and beyond — milestone deliverables, demo anchors, canonical users served, and the long-term resolution spectrum direction — is maintained at `docs/roadmap/worldsim-roadmap.md`. That document is the canonical reference. The summary below reflects the most recently closed and current milestone only.
 
-**Milestone 18 — Full Argument and Demo 7 (Complete)**
-Delivered: CI bands ADR-007 (#1254); PSP driver decomposition (#1255); counter-scenario comparison with distributional differential (#1349); control plane column ADR-019 (#1354); Zone 3 auditability panel (#1422); 24 DEMO-NNN findings remediated (G6/G7). Demo 7 north star PASS (unconditional, 2026-07-02). SCAN-028 complete (Clean, 2026-07-02).
+**Milestone 19 — Constraint Search and Empirical Calibration (Complete)**
+Delivered: Mode 3 constraint-floor search (#1540); SEN/ZMB backtesting (#1541, #1542); ten real-world battle-testing scenarios (GRC/ARG/LKA/PAK/TUR/EGY/GHA/ISL + SEN/ZMB); empirically grounded CI intervals (G3); PSP driver arc + auditability panel (#1528); CI label precision (#1529); ELASTICITY_REGISTRY non-SSA calibration — GRC T2 (CM-A), LAC T3 (CM-B), SEA T3 (CM-C), ARG Kirchner inputs (CM-D); Zone 1A ZMB display fidelity (#1629); Zone 1D delta annotations (#1630); Zone 1 view model retrofit (#1522); Zone 1A trackwheel zoom (#1524); ADR-020 capital controls (Iceland G2D). Demo 8 north star PASS (2026-07-06, constraint-derived boundary). SCAN-029 complete (Clean, 2026-07-06).
 
-**Milestone 19 — Constraint Search and Empirical Calibration (Current)**
-Core deliverable: Mode 3 constraint-floor search (#1540 ✓); SEN/ZMB backtesting (#1541 ✓, #1542 ✓); ten real-world battle-testing scenarios (G2C ✓, G2D active); empirically grounded CI intervals (G3 ✓); PSP driver arc (#1528, G4); CI label precision (#1529, G4); ELASTICITY_REGISTRY non-SSA calibration gaps (#1623 — CM Sprint A GRC/Euro area M19 priority); Zone 1A ZMB display fidelity (#1629); Demo 8 narration/HD alignment (#1630 — G5 after G4); Zone 1 view model retrofit (#1522); Zone 1A interaction layer (#1524). Demo 8 at M19 close.
+**Milestone 20 — Interactive Constraint Search and Demo 9 (Current)**
+Core deliverable: Live interactive constraint-floor search; Mode 3 instrument polish (DEMO-217, DEMO-233, DEMO-234); PSP multi-scenario comparison. Demo 9 at M20 close.
 
 Full roadmap: `docs/roadmap/worldsim-roadmap.md`
 
