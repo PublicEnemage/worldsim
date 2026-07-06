@@ -3,7 +3,7 @@
 [![CI](https://github.com/PublicEnemage/worldsim/actions/workflows/ci.yml/badge.svg)](https://github.com/PublicEnemage/worldsim/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Python 3.12](https://img.shields.io/badge/python-3.12-blue.svg)](https://www.python.org/downloads/release/python-3120/)
-[![Release](https://img.shields.io/badge/release-v0.18.0%20M18%20complete-green)](https://github.com/PublicEnemage/worldsim/releases/tag/v0.18.0)
+[![Release](https://img.shields.io/badge/release-v0.19.0%20M19%20complete-green)](https://github.com/PublicEnemage/worldsim/releases/tag/v0.19.0)
 
 **An open-source geopolitical-economic simulation platform for governments and
 vulnerable actors navigating high-stakes decisions under uncertainty.**
@@ -53,16 +53,17 @@ governance); Mode 3 Active Control enables counter-scenario branching for
 negotiation support.
 
 **This tool is in active pre-release development.** The working software
-described below reflects Milestone 18 (CI bands on Zone 1A trajectories; PSP
-driver decomposition; counter-scenario comparison with distributional differential
-and CI bounds; control plane column Mode 2+3; Zone 3 auditability panel; Demo 7
-north star PASS unconditional, 2026-07-02). M19 is in active development.
+described below reflects Milestone 19 (Mode 3 constraint-floor search; SEN/ZMB
+backtesting; ten real-world battle-testing scenarios; empirically grounded CI
+intervals; PSP driver arc; ELASTICITY_REGISTRY non-SSA calibration; Zone 1A
+display fidelity and trackwheel zoom; Demo 8 north star PASS, 2026-07-06 —
+constraint-derived boundary). M20 is in active development.
 
 ---
 
 ## What's Built
 
-The working system at Milestone 18 (core components — not exhaustive):
+The working system at Milestone 19 (core components — not exhaustive):
 
 - **Simulation engine** — Event-driven graph in Python. The `Quantity` type
   system tracks `value: Decimal`, unit, variable type (STOCK/FLOW/RATIO/
@@ -132,7 +133,7 @@ The working system at Milestone 18 (core components — not exhaustive):
 
 ## Development Status
 
-**Active pre-release development. M18 complete (v0.18.0). M19 in active development. Demo 8 at M19 close.**
+**Active pre-release development. M19 complete (v0.19.0). M20 in active development. Demo 9 at M20 close.**
 
 | Milestone | Status | Version | Description |
 |---|---|---|---|
@@ -156,7 +157,8 @@ The working system at Milestone 18 (core components — not exhaustive):
 | M16 — Distributional Visibility | ✅ Complete | [v0.16.0](https://github.com/PublicEnemage/worldsim/releases/tag/v0.16.0) | Zone 1A Phase 4; cohort disaggregation on primary surface; political risk summary; 25-year human capital trajectory; uncertainty quantification; Demo 6 prep (Steps 1–6c; DEMO6-001–049 on record) |
 | M17 — Calibration and Comparative Infrastructure | ✅ Complete | [v0.17.0](https://github.com/PublicEnemage/worldsim/releases/tag/v0.17.0) | Wave 1: CM calibration (fiscal-to-cohort elasticity, governance sensitivity); Wave 2: N=3 multi-scenario (#394), DEMO6 CRITICAL polish, adaptive y-axis, Zone 1B proportional allocation (ADR-018), GovernanceModule institutional_capacity_index |
 | M18 — Full Argument and Demo 7 | ✅ Complete | v0.18.0 | CI bands ADR-007 (#1254); PSP driver decomposition (#1255); counter-scenario comparison (#1349); control plane column ADR-019 (#1354); Zone 3 auditability panel (#1422); Demo 7 north star PASS (unconditional) |
-| M19 — Constraint Search and Empirical Calibration | 🔧 In progress | — | Mode 3 constraint-floor search; SEN/ZMB backtesting; empirically grounded CI intervals; PSP driver arc and auditability panel; Demo 8 |
+| M19 — Constraint Search and Empirical Calibration | ✅ Complete | [v0.19.0](https://github.com/PublicEnemage/worldsim/releases/tag/v0.19.0) | Mode 3 constraint-floor search; SEN/ZMB backtesting; 10 battle-testing scenarios; empirically grounded CI intervals; PSP driver arc; ELASTICITY_REGISTRY non-SSA calibration; Zone 1A display fidelity + trackwheel zoom; Demo 8 north star PASS (constraint-derived boundary) |
+| M20 — Interactive Constraint Search and Demo 9 | 🔧 In progress | — | Live interactive constraint-floor search; Mode 3 instrument polish (DEMO-217, 233, 234); PSP multi-scenario comparison; Demo 9 |
 
 Full milestone history: [`CHANGELOG.md`](CHANGELOG.md). Live issue tracker:
 [GitHub Milestones](https://github.com/PublicEnemage/worldsim/milestones).
