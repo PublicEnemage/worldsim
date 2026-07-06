@@ -6,7 +6,7 @@
 > Historical state lives in `docs/process/session-archives/`.
 > Authority: `docs/process/sprint-group-isolation.md §SESSION_STATE.md Cockpit Card Protocol`.
 
-**Last updated:** 2026-07-05 (session close — #1712 CLEARED; all Demo 8 Act 2 AC-1 conditions cleared; NM-099 filed; #1759 deferred; Demo 8 is next)
+**Last updated:** 2026-07-05 (Demo 8 prep Steps 1–4 complete — walkthrough, screenshot brief, spec update, archive; PR #1763 open → release/m19 auto-merge)
 **Current milestone:** M19 — Constraint Search and Empirical Calibration
 
 ---
@@ -126,3 +126,4 @@
 - **G8 complete (2026-07-04):** `_classify_direction` now respects `primary_indicator` for composite fields (NM-098, PR #1744). CM_A/B/C tests fixed: TYPE_B baseline must be pre-advanced before `run_harness` (PRs #1745, #1746). GRC AC-1 confirmed: per_step_diff[3]=0.1561 ∈ [0.010, 0.20], direction_verdict=COUNTER_FACTUAL_BETTER (run 28719741291). Integration PR #1748 merged 2026-07-04.
 - **CM Sprint D complete (2026-07-05):** `build_argentina_scenario()` extended to n_steps=3 (Kirchner 2003 spending_change=+0.030 at step 3; MECON Budget Execution 2003 + IMF WEO April 2004; T3). AC-1 certified bounds [0.10135, 0.40540]; per_step_diff[2]=0.2027. Integration PR #1757 merged. #1712 closed 2026-07-05 (local DATABASE_URL run PASS). All three Demo 8 Act 2 AC-1 conditions CLEARED (GRC #1711, PAK #1713, ARG #1712).
 - **NM-099 + #1759 (2026-07-05):** `asgi_client` fixture in test_m19_cm_b relies on session ordering for pool init — fails in isolation. NM-099 filed (PR #1760 merged); CODING_STANDARDS rule added. Fix (#1759) deferred to next sprint that touches the file (EL decision 2026-07-05).
+- **Demo 8 preparation (2026-07-05, Steps 1–4 complete):** Issue #1762 filed (Step 1); `docs/demo/m19/screenshot-brief.md` (Step 2, UX Agent, 5 frames, all testids verified); `docs/demo/m19/stakeholder-walkthrough.md` (Step 3, ~700 lines, Act 1 ZMB boundary=0.83, Act 2 ZMB +342,700 declared interval, 8 TRANSITION markers); `frontend/tests/e2e/demo-narrated-m18.spec.ts` archive (Step 4); `demo-narrated.spec.ts` updated for M19 (Act 1 Form 3 constraint search FOUND mock, Act 2 "declared interval" CI assert, 19 testids verified). PR #1763 → release/m19 auto-merge. Steps 5a–5d pending; Step 6 blocked on EL merge release/m19→main.
