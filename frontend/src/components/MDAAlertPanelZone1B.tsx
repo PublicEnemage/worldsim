@@ -803,7 +803,7 @@ export function DistributionalComparisonSummary({ summary }: { summary: Distribu
                 data-testid="distributional-ci-label"
                 title="Structural uncertainty model — BandingEngine step-based schedule; not a frequentist confidence interval. See methodology panel for details."
               >
-                declared interval
+                declared interval (BandingEngine)
               </span>
             </div>
           </div>

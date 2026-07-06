@@ -109,6 +109,10 @@ export default function App() {
   // M18-G3 (#1349) — distributional comparison summary
   const setDistributionalSummary = useScenarioStepStore((s) => s.setDistributionalSummary);
   const distributionalAbortRef = useRef<AbortController | null>(null);
+  // Tracks the scenario ID loaded by the mount effect so the selectedScenarioId effect
+  // can skip the redundant setCurrentStep call that would override E2E __worldsim_setCurrentStep
+  // (race condition: mount effect → E2E sets step → selectedScenarioId effect overwrites it).
+  const mountLoadedScenarioIdRef = useRef<string | null>(null);
 
   const handleStepChange = (step: number) => {
     // Always set — never reset to null on completion so EntityDetailDrawer
@@ -182,6 +186,9 @@ export default function App() {
         if (detail.status === "completed") {
           setCurrentStep(detail.configuration.n_steps);
         }
+        // Record which scenario was loaded at mount so the selectedScenarioId effect
+        // can skip its redundant setCurrentStep call for this ID (DEMO-173 race fix).
+        mountLoadedScenarioIdRef.current = detail.scenario_id;
         // DEV seam — allows E2E tests to wait for scenario load completion.
         if (import.meta.env.DEV) {
           (window as unknown as Record<string, unknown>).__worldsim_selectedScenarioId =
@@ -236,7 +243,11 @@ export default function App() {
       .then((res) => (res.ok ? (res.json() as Promise<ScenarioDetailResponse>) : null))
       .then((detail) => {
         if (cancelled || !detail) return;
-        if (detail.status === "completed") {
+        // Skip setCurrentStep if the mount effect already handled this scenario.
+        // The mount effect sets mountLoadedScenarioIdRef and calls setCurrentStep; calling
+        // it again here would override any E2E __worldsim_setCurrentStep call that landed
+        // between the mount fetch completing and this fetch completing (DEMO-173 race fix).
+        if (detail.status === "completed" && selectedScenarioId !== mountLoadedScenarioIdRef.current) {
           setCurrentStep(detail.configuration.n_steps);
         }
         // Set all active entities for identity header and choropleth highlight (#754)
