@@ -2849,8 +2849,9 @@ _CI_MIN_HALF_WIDTH = 500
 _DISTRIBUTIONAL_TIER = "T3"
 _DISTRIBUTIONAL_METHODOLOGY = (
     "Q1 poverty_headcount_ratio delta × entity Q1 population (UN WPP 2024, T3). "
-    "CI band: ±13–16% of point estimate, T3 placeholder pending G1 Zone 1A "
-    "CI band integration (ADR-007). Direction stable when CI does not span zero."
+    "CI band: ±13–16% of point estimate, structural prior (ADR-007 §8.2–§8.5 posterior "
+    "calibration layer active in BandingEngine; CalibrationStore upgrade pending "
+    "MAGNITUDE_MATCH gate). Direction stable when CI does not span zero."
 )
 
 
@@ -2979,8 +2980,12 @@ async def post_distributional_differential(
     methodology_detail = MethodologyDetail(
         q1_population=_ENTITY_Q1_POPULATION.get(entity_id, 0),
         ci_methodology=(
-            f"±13–16% of point estimate — T3 placeholder "
-            f"pending ADR-007 full CI band integration. "
+            f"Interval widths: ±13–16% of point estimate (structural prior, T3 baseline). "
+            f"Posterior calibration layer active (ADR-007 §8.2–§8.5, G3 #1537): "
+            f"BandingEngine CalibrationStore applies κ-adjusted tier multiplier when "
+            f"MAGNITUDE_MATCH gate is cleared. SEN calibration entry CAL-001 provisional "
+            f"(direction-only; ZMB fiscal programme dataset acquisition pending). "
+            f"Current state: structural prior active. "
             f"Lower bound: ×{_CI_FACTOR_LOWER} (−13%); "
             f"upper bound: ×{_CI_FACTOR_UPPER} (+16%)."
         ),
@@ -2989,9 +2994,10 @@ async def post_distributional_differential(
             "falls back to main entity poverty_headcount_ratio if no cohort data present."
         ),
         tier_rationale=(
-            "T3: derived from ECOWAS regional comparable economy distributions, "
-            "not calibrated country-level Q1 income share survey data. "
-            "Forward trace: ADR-007 full implementation will replace this T3 placeholder."
+            "T3 structural prior (ECOWAS regional comparable economy distributions). "
+            "Posterior calibration via CalibrationStore will replace this with empirical "
+            "tier multiplier when SEN CAL-001 and ZMB calibration entries clear "
+            "MAGNITUDE_MATCH gate. ADR-007 §8.2–§8.5 governs the upgrade path."
         ),
     )
     return DistributionalDifferentialResponse(

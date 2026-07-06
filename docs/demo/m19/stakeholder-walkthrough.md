@@ -236,8 +236,10 @@ the boundary configuration.
 
 > Zambia. Debt restructuring. Mode 3 — Active Control.
 >
-> Look at Form 3 in the right column. The floor is set: poverty headcount must stay
-> at or above 0.40 for the bottom quintile across all eight steps of the programme.
+> Look at Form 3 in the right column. The floor is set at 0.40. For the bottom quintile
+> in Zambia — approximately 3.9 million people — a poverty headcount ratio below 0.40
+> means more people in poverty than the programme was designed to produce. The instrument
+> found the fiscal configuration that keeps the ratio above that line.
 >
 > The analyst pressed "Find safe boundary." The instrument ran a binary search.
 > Nine evaluations. The full parameter range: 0.1 to 3.0.
@@ -802,10 +804,17 @@ question requires it.
   The arc is a dominant-category sequence, not a causal attribution of the full
   PSP movement.
 
-- **ExternalSectorModule is disabled for Act 1.** Reserve dynamics are not modeled
-  in the ZMB Mode 3 constraint-floor search scenario. State explicitly if asked:
-  *"Reserve dynamics are outside this model window for Act 1 — ExternalSectorModule
-  is not active."*
+- **ExternalSectorModule is disabled for Act 1.** Reserve dynamics (capital flows,
+  trade balance effects on reserves) are not modeled in the ZMB Mode 3 constraint-floor
+  search scenario. The demo fixture explicitly sets `external_sector: { enabled: false }`.
+  Reserve Coverage (months) is an initial-conditions indicator — its starting value of
+  2.4 months reflects Zambia's constrained reserve position at programme entry, below
+  the 2.5-month MDA floor. This is a pre-programme disclosure, not a constraint-search
+  finding. If a TERMINAL breach is visible on Zone 1B: it reflects the initial conditions,
+  not a constraint-search result. State explicitly if asked: *"Zambia enters with 2.4
+  months of reserve cover — below the 2.5-month IMF adequacy threshold. That is a
+  pre-programme condition the ministry team is aware of. The constraint-floor search
+  we just ran was targeted at the poverty headcount floor — not reserve adequacy."*
 
 - **The constraint-floor search operates on fiscal multiplier only.** Form 3 searches
   the fiscal multiplier parameter space. Other policy parameters (LegitimacyConstraint,

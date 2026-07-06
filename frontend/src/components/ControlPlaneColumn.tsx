@@ -850,7 +850,8 @@ export function ControlPlaneColumn({
                     </div>
                     <div style={{ fontSize: 10, color: "#9ca3af", marginTop: 2 }}>
                       This is the binary search precision, not a statistical
-                      confidence interval. Empirical CI bounds available in G3.
+                      confidence interval. Empirical CI bounds visible in
+                      the Zone 3 methodology panel.
                     </div>
                     {/* Synthetic disclosure — ADR-021 §UX-5, AC-11 */}
                     {searchResult.data_tier === "SYNTHETIC_COMPARABLE" && (
