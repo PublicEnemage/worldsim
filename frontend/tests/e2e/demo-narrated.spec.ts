@@ -963,38 +963,48 @@ test(
     }
 
     // ── FRAME A — "The Boundary Found" (THESIS FRAME — Act 1, FOUND state) ──
-    // Captured at step ZMB_ACT1_CURRENT_STEP = 4 with Form 3 FOUND state visible.
+    // Zone 1A shows poverty headcount ratio — the metric the constraint-floor search
+    // protects — so the 0.40 floor annotation is coherent with the chart.
     await expect.soft(
       page.locator('[data-testid="current-step-display"]'),
       "Frame A: expected step 4 display.",
     ).toContainText("Step 4", { timeout: 2_000 });
-    await page.waitForTimeout(1_200);
-    await page.screenshot({ path: screenshotPath("frame-a-constraint-found.png") });
-
-    // ── FRAME B — "The Driver Arc" (step 4, Zone 1D PSP driver arc) ──────────
-    // Frame B is also at step 4 — same step, different compositional focus.
-    // Zone 1D psp-driver-arc shows the badge row across the full programme window.
-    // AC-E2 equivalent: Frame B and Frame A are the same step in M19 —
-    // they differ by scroll offset (Zone 1D scrolled into view) not step.
-    await expect.soft(
-      page.locator('[data-testid="psp-driver-arc"]'),
-      "Frame B: psp-driver-arc should be visible in Zone 1D (M19 G4 #1528).",
-    ).toBeVisible({ timeout: 5_000 });
-
-    // Frame B compositional differentiation from Frame A: switch Zone 1A to poverty
-    // headcount ratio. This shows the poverty trajectory with CI bands and the 0.40
-    // floor line — directly relevant to the constraint-floor narrative, visually distinct
-    // from Frame A's GDP view. Reset scroll so both Zone 1A and Zone 1D are in viewport.
     await page.evaluate(() => {
       const fn = (window as Record<string, unknown>).__worldsim_setAttributeName as
         ((key: string) => void) | undefined;
       if (fn) fn("poverty_headcount_ratio");
     });
     await page.evaluate(() => window.scrollTo(0, 0));
+    await page.waitForTimeout(1_200);
+    await page.screenshot({ path: screenshotPath("frame-a-constraint-found.png") });
+
+    // ── FRAME B — "The Driver Arc" (step 7, PSP dominant driver transitions to [SOC]) ──
+    // Advance from step 4 to step 7. At step 7 the PSP bold badge has shifted
+    // from [FISC] to [SOC], making the fiscal→social driver arc visible in a single
+    // frame. Zone 1A remains on poverty headcount ratio (set for Frame A) — metric
+    // header and floor annotation stay coherent through the transition.
+    {
+      const nextStepBtnB = page.getByRole("button", { name: /Next Step/ });
+      const stepDisplayB = page.locator('[data-testid="current-step-display"]');
+      for (let targetStep = 5; targetStep <= 7; targetStep++) {
+        const nextVisible = await nextStepBtnB.isVisible({ timeout: 5_000 }).catch(() => false);
+        if (nextVisible) {
+          await nextStepBtnB.click();
+          await expect(stepDisplayB).toContainText(`Step ${targetStep}`, { timeout: 20_000 });
+          await page.waitForTimeout(600);
+        }
+      }
+    }
+
+    await expect.soft(
+      page.locator('[data-testid="psp-driver-arc"]'),
+      "Frame B: psp-driver-arc should be visible in Zone 1D (M19 G4 #1528).",
+    ).toBeVisible({ timeout: 5_000 });
+    await page.evaluate(() => window.scrollTo(0, 0));
     await page.waitForTimeout(600);
 
     await speak(
-      "Step four. Mid-programme. Zone one D shows the PSP driver arc — " +
+      "Step seven. Late programme. Zone one D shows the PSP driver arc — " +
       "the causal driver at each step across the full programme window. " +
       "At steps one through five: fiscal sustainability. " +
       "At steps six through eight: social stability emerges. " +
@@ -1005,16 +1015,15 @@ test(
     await page.waitForTimeout(800);
     await page.screenshot({ path: screenshotPath("frame-b-driver-arc.png") });
 
-    // Frame A and Frame B — byte-level distinctness check (different scroll offsets / Zone focus)
+    // Frame A and Frame B — byte-level distinctness check (step 4 vs step 7)
     {
       const frameAPath = screenshotPath("frame-a-constraint-found.png");
       const frameBPath = screenshotPath("frame-b-driver-arc.png");
       if (fs.existsSync(frameAPath) && fs.existsSync(frameBPath)) {
-        // These frames may be identical in some mock states — soft assertion only.
         const aHash = fileMD5(frameAPath);
         const bHash = fileMD5(frameBPath);
         if (aHash === bHash) {
-          console.warn("Frame A and Frame B have identical MD5 — Zone 1D driver arc may not be scroll-differentiated. Visual review required.");
+          console.warn("Frame A and Frame B have identical MD5 — step advance to 7 may not have taken effect. Visual review required.");
         }
       }
     }
@@ -1024,8 +1033,8 @@ test(
     const nextStepBtn = page.getByRole("button", { name: /Next Step/ });
     const stepDisplay = page.locator('[data-testid="current-step-display"]');
 
-    // ZMB Act 1 is at step 4; advance to step 8 (4 more clicks).
-    for (let targetStep = 5; targetStep <= 8; targetStep++) {
+    // Frame B advanced to step 7; advance one more step to step 8.
+    for (let targetStep = 8; targetStep <= 8; targetStep++) {
       const nextVisible = await nextStepBtn.isVisible({ timeout: 5_000 }).catch(() => false);
       if (nextVisible) {
         await nextStepBtn.click();
