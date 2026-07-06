@@ -19,8 +19,10 @@ Historical context:
              undervaluation, and suppression of utility tariffs.
 
 Simulation structure:
-  build_argentina_scenario(): n_steps=2 (annual); step 1 = 2001, step 2 = 2002.
+  build_argentina_scenario(): n_steps=3 (annual); step 1 = 2001, step 2 = 2002, step 3 = 2003.
     Backtesting fixture. Initial state reflects Argentina's 2000 baseline.
+    Step 3 represents the Kirchner recovery: fiscal normalisation and social program
+    expansion (+3.0% GDP spending_change, T3, MECON Budget Execution 2003).
 
   build_argentina_demo_scenario(): n_steps=4 (annual: 2001→2004).
     Demo 3 variant. Extends the base with EcologicalModule, GovernanceModule,
@@ -33,8 +35,8 @@ Simulation structure:
 Scheduled inputs:
   Step 1: IMF program acceptance (Blindaje) + fiscal spending cut (Zero Deficit Plan)
   Step 2: Default declaration
-  Step 3 (demo only): Recovery — no active shock; ROUTINE step
-  Step 4 (demo only): Consolidation — no active shock; ROUTINE step
+  Step 3: Kirchner recovery — fiscal normalisation (+3.0% GDP spending_change)
+  Step 3 (demo only, step 4 in demo): Consolidation — no active shock; ROUTINE step
 
 Initial state sources:
   gdp_growth        — IMF WEO April 2001 (2000 outturn: -0.8%)
@@ -55,19 +57,23 @@ from app.schemas import (
 
 
 def build_argentina_scenario() -> ScenarioCreateRequest:
-    """Build the Argentina 2001–2002 backtesting scenario configuration.
+    """Build the Argentina 2001–2003 backtesting scenario configuration.
 
     Returns a ScenarioCreateRequest ready to POST to /api/v1/scenarios.
-    The scenario runs 2 steps (annual: 2001→2002→2003 projection window)
-    starting from Argentina's 2000 economic conditions.
+    The scenario runs 3 steps (annual: 2001→2002→2003) starting from
+    Argentina's 2000 economic conditions.
 
-    Scheduled inputs represent the two dominant policy shocks:
+    Scheduled inputs:
       Step 1: IMF Blindaje continuation + Zero Deficit Plan spending cut
       Step 2: Sovereign default declaration
+      Step 3: Kirchner recovery — fiscal normalisation and social program expansion
+               (+3.0% GDP spending_change; MECON Budget Execution 2003; T3)
 
     Initial state attributes:
       gdp_growth        = -0.8%  (IMF WEO April 2001, 2000 outturn)
       unemployment_rate = 14.7% (INDEC EPH October 2000 wave)
+
+    CM Sprint D calibration decision: docs/calibration/m19-cm-d-arg-kirchner-calibration-decision.md
     """
     # IMF WEO April 2001 — Argentina 2000 real GDP growth outturn: -0.79%
     initial_gdp_growth = QuantitySchema(
@@ -167,7 +173,7 @@ def build_argentina_scenario() -> ScenarioCreateRequest:
         ),
         configuration=ScenarioConfigSchema(
             entities=["ARG"],
-            n_steps=2,
+            n_steps=3,
             timestep_label="annual",
             initial_attributes={
                 "ARG": {
@@ -217,6 +223,239 @@ def build_argentina_scenario() -> ScenarioCreateRequest:
                     "expected_duration": 1,
                 },
             ),
+            # Step 3 (2003): Kirchner fiscal normalisation and social program expansion.
+            # Néstor Kirchner (from May 2003) maintained the PJJHD emergency employment
+            # program, normalised government services after the 2002 emergency contraction,
+            # and expanded social transfers. Primary fiscal surplus +0.5% GDP — revenue-
+            # driven (export taxes ~1.5% GDP); net spending recovery ~+3.0% GDP vs 2002 trough.
+            # The IMF Blindaje (step 1, expected_duration=2) expires after step 2 — no IMF
+            # conditionality at step 3.
+            # Source: MECON Budget Execution 2003 + IMF WEO April 2004. Confidence tier: T3.
+            # CM Sprint D calibration decision §3.1.
+            ScheduledInputSchema(
+                step=3,
+                input_type="FiscalPolicyInput",
+                input_data={
+                    "instrument": "spending_change",
+                    "target_entity": "ARG",
+                    "sector": "government",
+                    "value": "0.030",
+                    "duration_years": 1,
+                },
+            ),
+        ],
+    )
+
+
+def build_argentina_counterfactual_scenario() -> ScenarioCreateRequest:
+    """Build the Argentina 1999–2001 counter-factual — earlier managed peg exit.
+
+    Counter-factual hypothesis: Argentina exits the convertibility peg in 1999
+    under controlled conditions — before the recession deepened and external
+    reserves fell critically — rather than maintaining the 1:1 USD peg until
+    the disorderly collapse of December 2001.
+
+    Historical basis: Several economists (Mussa 2002, Calvo 2002) argued that
+    an earlier controlled devaluation from a position of relative strength
+    (mid-1999, reserves ~USD 30bn, EMBI spread ~350bps) would have been
+    significantly less contractionary than the eventual corralito/default path.
+
+    Initial state (1999 baseline — before recession deepened):
+      gdp_growth        — IMF WEO 1999 outturn: -3.4% (Argentina's recession
+                          started with Brazil's January 1999 devaluation)
+      unemployment_rate — INDEC EPH October 1998: 12.9%
+      sovereign_risk_premium — EMBI+ ARG mid-1999: ~350bps (confidence tier 2)
+      fdi_stock_pct_gdp      — UNCTAD 1999: ~$48bn / ~$285bn GDP = 16.8%
+      portfolio_flow_velocity — INDEC BOP 1999: moderate outflows ~-2.5% GDP
+      credit_rating_score    — S&P BB+ (1999): 41 on 0–100 21-notch scale
+
+    Scheduled inputs (orderly managed exit):
+      Step 1 (1999): Modest fiscal adjustment + managed devaluation preparation
+      Step 2 (2000): Gradual stabilization path
+      Step 3 (2001): Recovery — no active shock; economy stabilises after exit
+
+    The counter-factual does NOT include default_declaration or emergency_declaration.
+    No capital controls are imposed. The absence of a corralito is the core
+    hypothesis: the peg exit happens before the bank-run dynamic develops.
+
+    n_steps = 3 (satisfies AC-ARG-1: n_steps >= 3).
+    Type B comparison: builds a different starting-condition scenario against the
+    2001 baseline (build_argentina_scenario(), n_steps=3). The direction_verdict
+    advisory expects COUNTER_FACTUAL_BETTER on fin_composite.
+
+    Known limitation (AC-9): counter-factual timing and magnitude are
+    INFERRED_STRUCTURAL (Tier 3) — no historical orderly exit was executed.
+    Direction verdict is advisory; escalate persistent mismatch to CM.
+
+    References: Issue #1548; M19 G2C sprint entry §3.1;
+    intent doc M19-G2C-2026-07-03-battle-testing-scenario-runs.md §Appendix B.
+    Mussa (2002) IMF WP/02/187; Calvo (2002) NBER WP/9221.
+    """
+    # IMF WEO April 1999 — Argentina 1998 real GDP growth outturn: -3.4%
+    # (The 1999 recession started in Q1 1999 following Brazil's January devaluation.)
+    initial_gdp_growth = QuantitySchema(
+        value="-0.034",
+        unit="ratio",
+        variable_type="ratio",
+        confidence_tier=2,
+        observation_date=date(1999, 4, 1),
+        source_registry_id="IMF_WEO_APR1999",
+        measurement_framework="financial",
+    )
+
+    # INDEC EPH October 1998 semi-annual wave — 12.9% unemployment.
+    # Unemployment was already elevated going into the 1999 recession;
+    # the INDEC October 1998 survey precedes the sharpest contraction.
+    initial_unemployment_rate = QuantitySchema(
+        value="0.129",
+        unit="ratio",
+        variable_type="ratio",
+        confidence_tier=2,
+        observation_date=date(1998, 10, 1),
+        source_registry_id="INDEC_EPH_1998",
+        measurement_framework="human_development",
+    )
+
+    # JP Morgan EMBI+ spread — Argentina mid-1999.
+    # Following Brazil's January 1999 devaluation and contagion, ARG EMBI
+    # spread reached ~350bps by mid-1999 before the Blindaje negotiations.
+    # Confidence tier 2: JP Morgan index series.
+    initial_sovereign_risk_premium = QuantitySchema(
+        value="0.035",
+        unit="ratio",
+        variable_type="ratio",
+        attribute_type="rate",
+        confidence_tier=2,
+        observation_date=date(1999, 6, 1),
+        source_registry_id="JPMORGAN_EMBI_ARG_1999",
+        measurement_framework="financial",
+    )
+
+    # UNCTAD World Investment Report 1999 — FDI inward stock / GDP for Argentina.
+    # Inward FDI stock approximately $48bn against GDP of ~$285bn (16.8% ratio).
+    # Lower than the 2001 baseline (25.1%) — privatisations peaked in 1997–98.
+    # Confidence tier 2: official multilateral statistics.
+    initial_fdi_stock_pct_gdp = QuantitySchema(
+        value="0.168",
+        unit="ratio",
+        variable_type="stock",
+        attribute_type="stock",
+        confidence_tier=2,
+        observation_date=date(1999, 1, 1),
+        source_registry_id="UNCTAD_FDI_STATS_ARG_1999",
+        measurement_framework="financial",
+    )
+
+    # INDEC Balance of Payments 1999 — net portfolio investment / GDP.
+    # Moderate outflows in 1999 following Brazil devaluation: ~-$7bn (~-2.5% GDP).
+    # Less severe than the 2001 baseline (-4.5% GDP) — external position still
+    # held in mid-1999 before the reserve drawdown accelerated.
+    initial_portfolio_flow_velocity = QuantitySchema(
+        value="-0.025",
+        unit="ratio",
+        variable_type="ratio",
+        attribute_type="flow",
+        confidence_tier=2,
+        observation_date=date(1999, 1, 1),
+        source_registry_id="INDEC_BOP_ARG_1999",
+        measurement_framework="financial",
+    )
+
+    # S&P sovereign credit rating — Argentina 1999: BB+.
+    # Argentina maintained BB+ through 1999; downgraded to BB in early 2000.
+    # Mapped to 0–100 index (AAA=100, D=0) using 21-notch linear scale: BB+=41.
+    # Confidence tier 1: direct observation from rating agency announcement.
+    initial_credit_rating_score = QuantitySchema(
+        value="41.0",
+        unit="index_0_100",
+        variable_type="stock",
+        attribute_type="structural_index",
+        confidence_tier=1,
+        observation_date=date(1999, 1, 1),
+        source_registry_id="SP_SOVEREIGN_RATINGS_ARG_1999",
+        measurement_framework="financial",
+    )
+
+    return ScenarioCreateRequest(
+        name="Argentina 1999–2001 Counter-Factual — Earlier Managed Peg Exit",
+        description=(
+            "G2C counter-factual for Issue #1548. "
+            "Hypothesis: Argentina exits the convertibility peg in mid-1999 under "
+            "controlled conditions — before the corralito and sovereign default of "
+            "December 2001. "
+            "Initial state: 1999 baseline (recession onset; EMBI ~350bps; reserves intact). "
+            "Orderly fiscal path: modest adjustment (Step 1) + gradual stabilisation (Step 2) "
+            "+ recovery (Step 3). No default declaration. No capital controls. "
+            "Type B comparison against build_argentina_scenario() (2001 crisis path, n_steps=3). "
+            "Counter-factual inputs are INFERRED_STRUCTURAL (Tier 3): no historical managed "
+            "exit was executed. Direction verdict on fin_composite is advisory. "
+            "Sources: IMF WEO 1999; INDEC EPH 1998; UNCTAD 1999; JP Morgan EMBI+ 1999."
+        ),
+        configuration=ScenarioConfigSchema(
+            entities=["ARG"],
+            n_steps=3,
+            timestep_label="annual",
+            start_date=date(1999, 1, 1),
+            step_metadata={
+                "1": {"significance": "SIGNIFICANT", "label": "Managed peg exit / adjustment"},
+                "2": {"significance": "SIGNIFICANT", "label": "Stabilisation phase"},
+                "3": {"significance": "ROUTINE", "label": "Recovery consolidation"},
+            },
+            initial_attributes={
+                "ARG": {
+                    "gdp_growth": initial_gdp_growth,
+                    "unemployment_rate": initial_unemployment_rate,
+                    "sovereign_risk_premium": initial_sovereign_risk_premium,
+                    "fdi_stock_pct_gdp": initial_fdi_stock_pct_gdp,
+                    "portfolio_flow_velocity": initial_portfolio_flow_velocity,
+                    "credit_rating_score": initial_credit_rating_score,
+                },
+            },
+        ),
+        scheduled_inputs=[
+            # Step 1 (1999): Modest fiscal adjustment — supports managed peg exit.
+            # A controlled devaluation requires concurrent fiscal tightening to
+            # anchor expectations. ~2% GDP spending cut (vs Zero Deficit Plan's 6.5%).
+            ScheduledInputSchema(
+                step=1,
+                input_type="FiscalPolicyInput",
+                input_data={
+                    "instrument": "spending_change",
+                    "target_entity": "ARG",
+                    "sector": "government",
+                    "value": "-0.020",
+                    "duration_years": 1,
+                },
+            ),
+            # Step 1 (1999): Deficit target — medium-term fiscal anchor.
+            ScheduledInputSchema(
+                step=1,
+                input_type="FiscalPolicyInput",
+                input_data={
+                    "instrument": "deficit_target",
+                    "target_entity": "ARG",
+                    "sector": "",
+                    "value": "-0.030",
+                    "duration_years": 3,
+                },
+            ),
+            # Step 2 (2000): Gradual stabilisation — no new shock.
+            # Growth stabilises as the new exchange rate supports export
+            # competitiveness. Modest fiscal loosening to cushion demand.
+            ScheduledInputSchema(
+                step=2,
+                input_type="FiscalPolicyInput",
+                input_data={
+                    "instrument": "spending_change",
+                    "target_entity": "ARG",
+                    "sector": "government",
+                    "value": "0.010",
+                    "duration_years": 1,
+                },
+            ),
+            # Step 3 (2001): Recovery — no active shock. Economy consolidates.
+            # No inputs at Step 3 — counter-factual avoids the Zero Deficit Plan
+            # and default spiral entirely.
         ],
     )
 

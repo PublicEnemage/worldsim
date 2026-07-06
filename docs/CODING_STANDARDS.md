@@ -743,6 +743,20 @@ Slow unit tests are a sign that a unit test is doing integration work.
 **Fixtures:** Use `conftest.py` for shared fixtures. Fixtures should be minimal
 — construct only the state the test actually needs.
 
+**ASGI client fixtures — asyncpg pool rule (NM-099):** Any fixture that creates an
+`httpx.AsyncClient` with `ASGITransport(app=app)` MUST explicitly initialise and tear down
+the asyncpg pool. Do not rely on session ordering or a sibling directory's autouse fixture
+— that creates a hidden ordering dependency that breaks when the test is run in isolation.
+The canonical pattern is `tests/conftest.py::client` (Issue #1451):
+```python
+await create_asyncpg_pool()
+try:
+    async with httpx.AsyncClient(transport=httpx.ASGITransport(app=app), ...) as client:
+        yield client
+finally:
+    await close_asyncpg_pool()
+```
+
 **Mocking:** Mock only at the boundary of the unit under test. Do not mock
 internal collaborators — if you are mocking internals, the unit is too large
 or the architecture needs rethinking.
@@ -1008,6 +1022,44 @@ any component spec, with an explicit header naming its component dependencies.
 4. `test.skip(true, ...)` at file scope is a process violation for any spec
    that contains Type 1 ACs. Type 1 ACs must never be suppressed — they must
    be written in the scope where they are immediately satisfiable.
+
+---
+
+### E2E Mock Helper Authorship
+
+*Authority: NM-086 (2026-07-03, Issue #1650). Extends the schema registry rule in
+CLAUDE.md §Standards and Conventions to cover E2E mock helpers.*
+
+E2E test files that mock API endpoints must use mock helper shapes that exactly match
+the contract in `docs/schema/api_contracts.yml`. A mock helper that returns the wrong
+shape passes TypeScript compilation and the pre-push build gate — it will only fail when
+the E2E suite exercises the route. At that point the failure surfaces in CI rather than
+locally, and incorrect mock shapes that are copy-pasted across the test corpus will
+propagate silently.
+
+**QA Lead obligation at intent authorship:**
+
+When authoring an E2E spec that mocks an endpoint with an entry in `api_contracts.yml`,
+include the following checklist item in the intent document before filing:
+
+```
+- Mock helpers verified against `docs/schema/api_contracts.yml §[endpoint name]`? [ ]
+```
+
+A test file filed without this item for a mocked endpoint is flagged as incomplete by
+the PI Agent at sprint entry review. The checklist is satisfied by the QA Lead reading
+the relevant section of `api_contracts.yml` and confirming the mock shape matches — not
+by assuming the shape from implementation code.
+
+**Implementing agent obligation before opening any PR that adds or modifies E2E mock helpers:**
+
+```bash
+grep -A 30 "<endpoint-name>" docs/schema/api_contracts.yml
+```
+
+Confirm the mock helper's request shape, response shape, and status codes match the
+contract exactly. If the contract is missing or incomplete, file the gap as an issue
+before opening the mock helper PR (see carry-forward from G3: Issue #1632).
 
 ---
 

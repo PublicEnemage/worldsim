@@ -798,7 +798,13 @@ export function DistributionalComparisonSummary({ summary }: { summary: Distribu
               </span>
             </div>
             <div style={{ fontSize: 11, color: "#6b7280" }}>
-              {`${_formatK(ciLow)} – ${_formatK(ciHigh)}  95% CI`}
+              {`${_formatK(ciLow)} – ${_formatK(ciHigh)}  `}
+              <span
+                data-testid="distributional-ci-label"
+                title="Structural uncertainty model — BandingEngine step-based schedule; not a frequentist confidence interval. See methodology panel for details."
+              >
+                declared interval
+              </span>
             </div>
           </div>
         );
@@ -1118,6 +1124,7 @@ export function MDAAlertPanelZone1B({
       {comparisonScenarios.length > 0 && (
         <div style={{ padding: "4px 6px" }}>
           {comparisonScenarios.map((sc) => {
+            if (!sc.scenarioId) return null;
             const slug = sc.scenarioId.replace(/^[a-z]{3}-/, "");
             const palette = SCENARIO_COMPARISON_PALETTE[sc.paletteIndex];
             const crossings = sc.thresholdCrossings ?? [];

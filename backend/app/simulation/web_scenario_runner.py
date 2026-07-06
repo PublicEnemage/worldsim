@@ -30,6 +30,7 @@ from typing import TYPE_CHECKING, Any
 import asyncpg  # noqa: TCH002 — used in method signatures at runtime
 
 from app.schemas import MDAThresholdRecord, QuantitySchema, ScenarioConfigSchema
+from app.simulation.engine.quantity import MonetaryValue, VariableType
 from app.simulation.mda_checker import MDAChecker, alerts_to_events_snapshot
 from app.simulation.modules.demographic.cohort import generate_cohort_specs
 from app.simulation.modules.demographic.module import DemographicModule
@@ -49,6 +50,8 @@ from app.simulation.orchestration.inputs import (
     InputSource,
     MonetaryRateInput,
     MonetaryRateInstrument,
+    MonetaryVolumeInput,
+    MonetaryVolumeInstrument,
     StructuralInstrument,
     StructuralPolicyInput,
     TradeInstrument,
@@ -795,6 +798,22 @@ def _deserialize_control_input(
             implementation_years=int(data.get("implementation_years", 1)),
             source=InputSource.SCENARIO_SCRIPT,
         )
+    if input_type == "MonetaryVolumeInput":
+        mv_variable_type = VariableType(str(data.get("variable_type", "ratio")))
+        mv = MonetaryValue(
+            value=Decimal(str(data.get("value", "0"))),
+            unit=str(data.get("unit", "ratio")),
+            variable_type=mv_variable_type,
+            currency_code=str(data.get("currency_code", "")),
+            price_basis=str(data.get("price_basis", "nominal")),
+            exchange_rate_type=str(data.get("exchange_rate_type", "official")),
+        )
+        return MonetaryVolumeInput(
+            target_entity=target_entity,
+            instrument=MonetaryVolumeInstrument(data["instrument"]),
+            value=mv,
+            source=InputSource(str(data.get("source", InputSource.SCENARIO_SCRIPT.value))),
+        )
     if input_type == "BilateralTradeShock":
         return BilateralTradeShock(
             target_entity=target_entity,
@@ -815,8 +834,8 @@ def _deserialize_control_input(
     raise ValueError(
         f"Unknown ControlInput type: {input_type!r}. "
         "Supported: FiscalPolicyInput, EmergencyPolicyInput, TradePolicyInput, "
-        "MonetaryRateInput, StructuralPolicyInput, BilateralTradeShock, "
-        "gdp_growth_change."
+        "MonetaryRateInput, MonetaryVolumeInput, StructuralPolicyInput, "
+        "BilateralTradeShock, gdp_growth_change."
     )
 
 

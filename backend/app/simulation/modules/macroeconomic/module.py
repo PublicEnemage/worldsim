@@ -90,10 +90,19 @@ REGIME_DAMPENER: dict[str, Decimal] = {
     "zlb": Decimal("0.25"),
 }
 
+# Capital controls credit contraction — ADR-020 Channel B.
+# β=0.020: Iceland IMF Article IV 2010 regression basis (calibration-basis.md §Capital Controls).
+CAPITAL_CONTROLS_BETA = Decimal("0.020")
+
+# γ=1.2: CM-supplied amplification factor (credit contraction → GDP impact).
+# Not CE-overridable; change requires CM Consulted review (ADR-020 §Decision 2 §constraint).
+CAPITAL_CONTROLS_GAMMA = Decimal("1.2")
+
 _SUBSCRIBED_EVENTS = frozenset({
     "fiscal_policy_spending_change",
     "fiscal_policy_tax_rate_change",
     "monetary_policy_policy_rate",
+    "emergency_policy_capital_controls",  # ADR-020 Channel B
 })
 
 
@@ -155,6 +164,7 @@ class MacroeconomicModule(SimulationModule):
         fiscal_balance_delta = Decimal("0")
         inflation_delta = Decimal("0")
         confidence_tier = 2
+        bridge_events: list[tuple[Decimal, datetime]] = []
 
         for event in prior_events:
             magnitude = _extract_magnitude(event)
@@ -182,6 +192,13 @@ class MacroeconomicModule(SimulationModule):
             elif event.event_type == "monetary_policy_policy_rate":
                 # Rate cut (negative magnitude) → mild upward inflation pressure.
                 inflation_delta -= magnitude * Decimal("0.1")
+
+            elif event.event_type == "emergency_policy_capital_controls":
+                params = event.metadata.get("parameters", {})
+                impl_cap = Decimal(str(params.get("implementation_capacity", "0.75")))
+                credit_contraction = CAPITAL_CONTROLS_BETA * abs(magnitude) * impl_cap
+                gdp_delta -= credit_contraction * CAPITAL_CONTROLS_GAMMA
+                bridge_events.append((credit_contraction, timestep))
 
         # Apply mean-reversion when trend_growth is seeded (ADR-006 Amendment 1).
         if trend_growth_qty is not None:
@@ -212,6 +229,27 @@ class MacroeconomicModule(SimulationModule):
         )
 
         result: list[Event] = [gdp_event]
+
+        # ADR-020 Channel B bridge: credit contraction → labour shock for DemographicModule.
+        for cc_val, ts in bridge_events:
+            result.append(Event(
+                event_id=f"macro-cc-bridge-{entity.id}-{ts.isoformat()}",
+                source_entity_id=entity.id,
+                event_type="credit_contraction_labour_shock",
+                affected_attributes={
+                    "credit_contraction_labour_shock": Quantity(
+                        value=-cc_val,
+                        unit="ratio",
+                        variable_type=VariableType.RATIO,
+                        measurement_framework=MeasurementFramework.FINANCIAL,
+                        confidence_tier=confidence_tier,
+                    ),
+                },
+                propagation_rules=[],
+                timestep_originated=ts,
+                framework=MeasurementFramework.FINANCIAL,
+                metadata={"channel": "B_bridge"},
+            ))
 
         # Okun's law: GDP growth change → unemployment rate change (opposite sign).
         # Emitted as a separate HUMAN_DEVELOPMENT event for framework legibility.

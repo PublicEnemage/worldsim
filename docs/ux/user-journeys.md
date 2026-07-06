@@ -388,10 +388,54 @@ is a strong argument; a Tier 5 breach requires an epistemic caveat.
 
 **Step 6 — Compare: build the counter-proposal evidence**
 
+*Step 6 has two sub-steps: 6a (boundary search, Mode 3) and 6b (comparison view, Mode 2).
+Sub-step 6a is available from M19 onward (ADR-021). Before M19, skip to 6b.*
+
+---
+
+**Step 6a — Boundary search: find the parameter floor before constructing the counter-proposal**
+*(ADR-021 — available M19+)*
+
+Before constructing the counter-proposal scenario, Eleni uses Mode 3
+constraint-floor search to establish the parameter value at which the focal
+cohort crosses its threshold. This replaces trial-and-error scenario
+construction: she finds the boundary first, then builds the scenario around it.
+
+From Mode 2 (after completing Steps 3–5), she clicks "Enter Active Control"
+to switch to Mode 3. Because she has not applied any Form 1 (policy
+instrument) or Form 2 (scenario shock) inputs in this Mode 3 session, the
+"reset active branch" caution in the transition dialog does not apply — there
+is no active branch to reset.
+
+In Form 3 (CONSTRAINT SEARCH), she selects the focal cohort indicator with the
+shallowest floor from Step 4 (e.g., "Primary education enrolment rate, floor ≥
+0.85") and clicks "Find safe boundary." The backend binary search runs
+approximately 8–9 engine evaluations against that floor. The result appears:
+"fiscal multiplier ≥ 1.18 (±0.01) | 9 evaluations | [0.1, 3.0] searched".
+
+She notes the boundary value, then clicks "Return to Mode 2." The transition
+resets the Mode 3 branch state. No inputs were applied, so nothing is lost.
+
+The boundary value (1.18) now informs her parameter choices for the counter-
+proposal scenario she builds in Step 6b.
+
+*Critical constraint:* The boundary search result must display before the
+30-second HTTP timeout fires. The result must be readable and copyable for
+manual entry into the counter-proposal scenario's parameter inputs.
+
+*Exit from Step 6a:* She knows the minimum parameter value that avoids the
+focal cohort threshold crossing under the scenario conditions she has been
+analyzing.
+
+---
+
+**Step 6b — Comparison view: validate the counter-proposal**
+
 She creates a second scenario modeling an alternative path — the same fiscal
 outcome but with softer conditionality on the terms most likely to cross
 thresholds (e.g., a more gradual consolidation in year 2, or protection of
-a specific social expenditure floor).
+a specific social expenditure floor). The boundary value from Step 6a anchors
+her parameter choices.
 
 She uses compare mode (COMPARE_VIEW with DeltaChoropleth) to visualize the
 divergence between the two scenarios geographically, then opens the entity
@@ -404,7 +448,8 @@ for the primary scenario (it is, per ui-state-machine.md).
 
 *Exit from this step:* She has two scenarios — the original proposal and her
 counter-proposal — with documented threshold crossings in the former and
-fewer/later crossings in the latter.
+fewer/later crossings in the latter. The counter-proposal parameters are
+anchored to the constraint-floor boundary, not arbitrary intuition.
 
 ---
 
@@ -1417,7 +1462,8 @@ Phase 3 inputs for the DIC architectural review.
 | A — Preparation Step 3b | Mode 2 | SCENARIO_RUNNING | Trajectory view + MDA alert panel | EL Decision 2 viewport |
 | A — Preparation Step 4 | Mode 2 | SCENARIO_RUNNING / COMPLETE | MDA alert panel | ADR-006 Decision 5 composite alert |
 | A — Preparation Step 5 | Mode 2 | DRAWER_DATA | FrameworkPanel + cohort breakdown | ADR-006 Decision 4 sibling fields |
-| A — Preparation Step 6 | Mode 2 | COMPARE_VIEW (single-entity) | Divergence timeline | EL Decision 3 |
+| A — Preparation Step 6a | Mode 3 | MODE_3_ACTIVE | ControlPlaneColumn Form 3 (constraint search) | ADR-021 D-1, D-2, D-3 (M19+) |
+| A — Preparation Step 6b | Mode 2 | COMPARE_VIEW (single-entity) | Divergence timeline | EL Decision 3 |
 | B — Negotiation Step 2 | Mode 3 | SCENARIO_PRELOADED | Instrument cluster (instant load) | currentStep ?? fallback |
 | B — Negotiation Step 3 | Mode 3 | DRAWER_DATA | MDA alert panel | ADR-006 Decision 5 alert_source |
 | B — Negotiation Step 4 | Mode 3 | DRAWER_DATA | ia1_disclosure text | ADR-006 Decision 13 canonical phrase |

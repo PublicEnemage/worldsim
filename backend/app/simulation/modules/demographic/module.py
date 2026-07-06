@@ -31,9 +31,9 @@ _log = logging.getLogger(__name__)
 
 _SUBSCRIBED_EVENTS = frozenset({
     "gdp_growth_change",
-    "imf_program_acceptance",
-    "capital_controls_imposition",
-    "emergency_declaration",
+    "emergency_policy_imf_program_acceptance",   # #1657: was "imf_program_acceptance" (dead)
+    "credit_contraction_labour_shock",            # ADR-020 Channel C bridge
+    "emergency_policy_emergency_declaration",     # #1657: was "emergency_declaration" (dead)
 })
 
 
@@ -77,6 +77,8 @@ class DemographicModule(SimulationModule):
                 continue
             for row in ELASTICITY_REGISTRY:
                 if row.event_type != event.event_type:
+                    continue
+                if row.entity_families is not None and entity.id not in row.entity_families:
                     continue
                 delta = (magnitude * row.elasticity).quantize(Decimal("0.000001"))
                 qty = Quantity(

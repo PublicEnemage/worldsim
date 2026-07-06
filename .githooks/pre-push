@@ -15,6 +15,18 @@
 set -euo pipefail
 
 # ---------------------------------------------------------------------------
+# Resolve canonical paths — NM-092 fix
+# In a linked worktree, REPO_ROOT is the worktree root (where changed files live).
+# MAIN_REPO is the main working tree root (where .venv and node_modules live).
+# git rev-parse --git-common-dir returns the shared .git dir in both cases.
+# ---------------------------------------------------------------------------
+REPO_ROOT=$(git rev-parse --show-toplevel)
+GIT_COMMON_DIR=$(git rev-parse --git-common-dir 2>/dev/null || echo "$REPO_ROOT/.git")
+# In main worktree: GIT_COMMON_DIR = <repo>/.git → parent = <repo>
+# In linked worktree: GIT_COMMON_DIR = <repo>/.git → parent = <repo>
+MAIN_REPO=$(cd "$(dirname "$GIT_COMMON_DIR")" && pwd)
+
+# ---------------------------------------------------------------------------
 # Release branch push guard — NM-080 process improvement (Issue #1483)
 # Block direct CLI push to release/* branches; all updates must go via PR.
 # ---------------------------------------------------------------------------
@@ -57,25 +69,36 @@ FRONTEND_CHANGED=$(echo "$CHANGED" | grep -c "^frontend/src/" 2>/dev/null || tru
 if [ "$BACKEND_CHANGED" -gt 0 ]; then
   echo "[pre-push] Backend files changed — running ruff + mypy gate..."
 
-  if [ ! -f backend/.venv/bin/activate ]; then
+  # Prefer a venv local to this worktree; fall back to the main working tree's venv.
+  # NM-092: relative path backend/.venv fails in linked worktrees.
+  VENV_ACTIVATE="$REPO_ROOT/backend/.venv/bin/activate"
+  if [ ! -f "$VENV_ACTIVATE" ]; then
+    VENV_ACTIVATE="$MAIN_REPO/backend/.venv/bin/activate"
+  fi
+
+  if [ ! -f "$VENV_ACTIVATE" ]; then
     echo ""
-    echo "ERROR: backend/.venv not found — cannot run pre-push gate."
+    echo "ERROR: backend/.venv not found in either:"
+    echo "  $REPO_ROOT/backend/.venv"
+    echo "  $MAIN_REPO/backend/.venv"
     echo ""
-    echo "Set up the virtual environment first:"
-    echo "  cd backend"
-    echo "  python3.13 -m venv .venv"
-    echo "  source .venv/bin/activate"
-    echo "  pip install -r requirements.txt"
+    echo "Set up the virtual environment:"
+    echo "  cd $MAIN_REPO/backend"
+    echo "  python3.13 -m venv .venv && source .venv/bin/activate && pip install -r requirements.txt"
     echo ""
-    echo "See docs/CONTRIBUTING.md §Step 2: Python Environment for full instructions."
+    echo "In a linked worktree, symlink the main venv:"
+    echo "  ln -s $MAIN_REPO/backend/.venv $REPO_ROOT/backend/.venv"
+    echo ""
+    echo "See docs/CONTRIBUTING.md §Step 2: Python Environment and"
+    echo "docs/process/sprint-group-isolation.md §Worktree Setup."
     exit 1
   fi
 
   (
     # Activate the venv in a subshell to avoid polluting the calling shell.
     # shellcheck source=/dev/null
-    source backend/.venv/bin/activate
-    cd backend
+    source "$VENV_ACTIVATE"
+    cd "$REPO_ROOT/backend"
     echo "[pre-push]   ruff check ..."
     ruff check .
     echo "[pre-push]   mypy app/ ..."
@@ -98,8 +121,20 @@ if [ "$FRONTEND_CHANGED" -gt 0 ]; then
     exit 1
   fi
 
+  # NM-092: resolve absolute path to avoid cd failure in linked worktrees.
+  # If node_modules absent in worktree, suggest the symlink setup.
+  FRONTEND_DIR="$REPO_ROOT/frontend"
+  if [ ! -d "$FRONTEND_DIR/node_modules" ]; then
+    echo ""
+    echo "WARNING: $FRONTEND_DIR/node_modules not found."
+    echo "In a linked worktree, symlink from the main working tree:"
+    echo "  ln -s $MAIN_REPO/frontend/node_modules $FRONTEND_DIR/node_modules"
+    echo "Attempting build anyway — may fail if TypeScript compiler is absent."
+    echo ""
+  fi
+
   (
-    cd frontend
+    cd "$FRONTEND_DIR"
     npm run build
   )
   echo "[pre-push] Frontend gate: PASS"

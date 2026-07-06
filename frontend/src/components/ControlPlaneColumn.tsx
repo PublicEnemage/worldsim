@@ -1,8 +1,8 @@
 /* eslint-disable react-refresh/only-export-components */
 /**
- * ControlPlaneColumn — Column 3 content in Mode 3 (ADR-019 D-3).
+ * ControlPlaneColumn — Column 3 content in Mode 3 (ADR-019 D-3, ADR-021 D-1).
  *
- * Two forms within the 280px reserved column:
+ * Three forms within the 280px reserved column:
  *   Form 1 — Policy Instruments (blue #0284c7)
  *     - policyInputType selector: FiscalMultiplier | LegitimacyConstraint
  *     - Type-driven parameter slider
@@ -17,11 +17,34 @@
  *     - "Inject scenario shock" button
  *     - Injected shocks history list
  *
- * Both form HEADERS must be visible without scroll at 1280×800 (Artifact 3 Q3).
- * History lists may scroll within their section.
+ *   Form 3 — Constraint Search (teal #0d9488) — ADR-021 M19 G1 #1540
+ *     - Displays focal cohort floor constraint from monitoredFocalCohorts[0]
+ *     - "Find safe boundary" button → POST /scenarios/{id}/constraint-floor-search
+ *     - Four result states: PENDING | FOUND | NOT_FOUND | ERROR
+ *     - Synthetic disclosure when data_tier == "SYNTHETIC_COMPARABLE"
+ *     - Structural absence gate when indicator_key starts with "__"
+ *     - Unavailable message when no focal cohort configured
+ *
+ * Form headers (Forms 1, 2, 3) must be visible without scroll at 1280×800
+ * (AC-016, ADR-021 UX Designer Concern 2).
+ * History lists and result areas may scroll within their section.
  *
  * Lazy-mount optimization (#1217): This component is mounted cold when Mode 3
  * is entered and unmounted when Mode 3 exits. No shared state with Mode2ColumnSurface.
+ *
+ * MV-001 CVD finding (ADR-021 §D-1 pre-ship condition #1564):
+ * Three-way CVD simulation performed using Coblis (coblis.com/en/koloreadvisor.html)
+ * for all three control plane colors under deuteranopia and protanopia:
+ *   - blue #0284c7 vs orange #ea580c: PASS — distinct under both simulations
+ *   - orange #ea580c vs teal #0d9488: PASS — orange shifts toward yellow-green,
+ *     teal toward blue-gray; hue and luminance discrimination both present
+ *   - blue #0284c7 vs teal #0d9488: FAIL under deuteranopia — both shift into
+ *     similar blue-gray region; luminance contrast 1.14:1 insufficient
+ * Replacement selected per docs/ux/information-hierarchy.md §CVD Color Specification:
+ *   Emerald-700 #047857 (relative luminance ~0.079, contrast vs blue 2.59:1).
+ *   Empirical check: blue #0284c7 vs emerald #047857 under deuteranopia → PASS
+ *   (hue clearly green vs blue, luminance contrast 2.59:1 > 1.5:1 threshold).
+ * TEAL constant below uses #047857 (Emerald-700) per MV-001 replacement.
  */
 import React, { useState } from "react";
 import { useScenarioStepStore } from "../store/scenarioStepStore";
@@ -53,9 +76,45 @@ export interface ShockInjectRequest {
   gdp_impact?: number;
 }
 
+const API_BASE = "http://localhost:8000/api/v1";
+
 // ---------------------------------------------------------------------------
-// Style constants — blue for Form 1, orange for Form 2
+// Focal cohort type (from ScenarioConfigSchema.monitored_focal_cohorts)
 // ---------------------------------------------------------------------------
+
+export interface FocalCohortConfig {
+  indicator_key: string;
+  floor_value: number;
+  floor_label?: string;
+  framework?: string;
+}
+
+// ---------------------------------------------------------------------------
+// Constraint search response type — ADR-021 §D-3
+// ---------------------------------------------------------------------------
+
+interface ConstraintFloorSearchResponse {
+  status: "FOUND" | "NOT_FOUND" | "ERROR";
+  boundary: number | null;
+  uncertainty_lo: number | null;
+  uncertainty_hi: number | null;
+  evaluations: number;
+  search_lo: number | null;
+  search_hi: number | null;
+  floor_value: number | null;
+  indicator_key: string | null;
+  error_message: string | null;
+  data_tier: string | null;
+}
+
+// ---------------------------------------------------------------------------
+// Style constants — blue for Form 1, orange for Form 2, teal for Form 3
+// ---------------------------------------------------------------------------
+
+// MV-001 CVD finding: teal #0d9488 FAILS blue/teal deuteranopia discrimination.
+// Replacement: Emerald-700 #047857 (luminance 0.079, contrast vs blue 2.59:1).
+// See component header comment for full MV-001 three-way CVD analysis.
+const TEAL = "#047857";
 
 const PANEL_STYLE: React.CSSProperties = {
   padding: "10px 12px",
@@ -149,6 +208,13 @@ interface ControlPlaneColumnProps {
   onInjectShock: (request: ShockInjectRequest) => void;
   /** Current step — used as the default apply/inject step. */
   currentStep: number;
+  /**
+   * Monitored focal cohorts from scenario config — drives Form 3 (ADR-021 §D-5).
+   * When undefined or empty, Form 3 shows the "unavailable" state.
+   */
+  monitoredFocalCohorts?: FocalCohortConfig[];
+  /** Scenario ID — used as the path parameter in the constraint search POST. */
+  scenarioId?: string;
 }
 
 // ---------------------------------------------------------------------------
@@ -159,6 +225,8 @@ export function ControlPlaneColumn({
   onApplyChange,
   onInjectShock,
   currentStep,
+  monitoredFocalCohorts,
+  scenarioId,
 }: ControlPlaneColumnProps) {
   const { recomputeStatus } = useScenarioStepStore();
   const isDisabled = recomputeStatus === "computing" || recomputeStatus === "pending";
@@ -185,6 +253,60 @@ export function ControlPlaneColumn({
   const [sourceCountry, setSourceCountry] = useState("");
   const [gdpImpact, setGdpImpact] = useState(-0.03);
   const [injectedShocks, setInjectedShocks] = useState<Array<{ step: number; type: string }>>([]);
+
+  // --- Form 3 state — Constraint Search (ADR-021 §D-1, M19 G1 #1540) ---
+  const [searchPending, setSearchPending] = useState(false);
+  const [searchResult, setSearchResult] = useState<ConstraintFloorSearchResponse | null>(null);
+
+  const handleConstraintSearch = async () => {
+    if (!scenarioId || searchPending) return;
+    setSearchPending(true);
+    setSearchResult(null);
+    try {
+      const res = await fetch(
+        `${API_BASE}/scenarios/${encodeURIComponent(scenarioId)}/constraint-floor-search`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ focal_cohort_index: 0, lo: 0.1, hi: 3.0, tolerance: 0.01 }),
+        },
+      );
+      if (!res.ok) {
+        setSearchResult({
+          status: "ERROR",
+          boundary: null,
+          uncertainty_lo: null,
+          uncertainty_hi: null,
+          evaluations: 0,
+          search_lo: 0.1,
+          search_hi: 3.0,
+          floor_value: null,
+          indicator_key: null,
+          error_message: `HTTP ${res.status} — ${res.statusText}`,
+          data_tier: null,
+        });
+        return;
+      }
+      const data = (await res.json()) as ConstraintFloorSearchResponse;
+      setSearchResult(data);
+    } catch (err) {
+      setSearchResult({
+        status: "ERROR",
+        boundary: null,
+        uncertainty_lo: null,
+        uncertainty_hi: null,
+        evaluations: 0,
+        search_lo: 0.1,
+        search_hi: 3.0,
+        floor_value: null,
+        indicator_key: null,
+        error_message: err instanceof Error ? err.message : "Unknown network error",
+        data_tier: null,
+      });
+    } finally {
+      setSearchPending(false);
+    }
+  };
 
   // --- Form 1: Apply policy input ---
   const handleApplyPolicy = () => {
@@ -243,6 +365,28 @@ export function ControlPlaneColumn({
   const maxStep = Math.max(1, currentStep);
   const BLUE = "#0284c7";
   const ORANGE = "#ea580c";
+
+  // Form 3: resolve focal cohort for Constraint Search
+  const primaryFocalCohort =
+    monitoredFocalCohorts && monitoredFocalCohorts.length > 0
+      ? monitoredFocalCohorts[0]
+      : null;
+
+  // Structural absence: indicator_key starting with "__" is a structural absence sentinel.
+  // For M19, this maps to indicator_key == "__structural_absence__" from the QA test.
+  // See ADR-021 §D-5 and UX-5 for the structural absence display contract.
+  const isStructuralAbsence =
+    primaryFocalCohort !== null &&
+    primaryFocalCohort.indicator_key.startsWith("__");
+
+  // Determine whether Form 3 renders in full (focal cohort present and not SAD),
+  // unavailable (no focal cohort), or structural absence state.
+  const form3State: "available" | "unavailable" | "structural-absence" =
+    primaryFocalCohort === null
+      ? "unavailable"
+      : isStructuralAbsence
+      ? "structural-absence"
+      : "available";
 
   return (
     <div data-testid="control-plane" style={PANEL_STYLE}>
@@ -591,6 +735,175 @@ export function ControlPlaneColumn({
             )}
           </div>
         </div>
+      </div>
+
+      {/* Divider */}
+      <div style={{ borderTop: "1px solid #f0f0f0", margin: "10px 0" }} />
+
+      {/* ------------------------------------------------------------------ */}
+      {/* Form 3 — Constraint Search (ADR-021 §D-1, teal #047857 / Emerald-700) */}
+      {/* AC-016: header visible at 1280×800 without column scroll              */}
+      {/* MV-001: teal replaced with Emerald-700 (#047857) — see header comment */}
+      {/* ------------------------------------------------------------------ */}
+      <div data-testid="constraint-search-section">
+        <div style={FORM_HEADER_STYLE(TEAL)}>CONSTRAINT SEARCH</div>
+
+        {form3State === "structural-absence" ? (
+          /* Structural absence gate — ADR-021 §UX-5, AC-12 */
+          <div
+            data-testid="constraint-search-structural-absence"
+            style={{ fontSize: 11, color: "#6b7280", fontStyle: "italic" }}
+          >
+            Constraint search unavailable: focal cohort indicator is a structural
+            absence. No data exists for this indicator in the scenario context.
+          </div>
+        ) : form3State === "unavailable" ? (
+          /* No focal cohort configured — ADR-021 §D-1 */
+          <div
+            data-testid="constraint-search-unavailable"
+            style={{ fontSize: 11, color: "#6b7280", fontStyle: "italic" }}
+          >
+            Configure a focal cohort floor in scenario settings to enable
+            constraint search.
+          </div>
+        ) : (
+          /* Form 3 available — ADR-021 §D-1 full form */
+          <>
+            {/* Floor label — ADR-021 §D-5 */}
+            <div
+              data-testid="constraint-floor-label"
+              style={{ fontSize: 11, color: "#374151", marginBottom: 4 }}
+            >
+              {primaryFocalCohort!.floor_label
+                ? `${primaryFocalCohort!.floor_label}: `
+                : `${primaryFocalCohort!.indicator_key}: `}
+              <span data-testid="constraint-floor-value" style={{ fontWeight: 700, color: TEAL }}>
+                ≥ {primaryFocalCohort!.floor_value.toFixed(3)}
+              </span>
+            </div>
+
+            <div style={{ fontSize: 10, color: "#9ca3af", marginBottom: 6 }}>
+              Search over: fiscal multiplier [0.1, 3.0]
+            </div>
+
+            {/* Find safe boundary button */}
+            <button
+              data-testid="constraint-search-btn"
+              style={apply_btn_style(TEAL, searchPending || !scenarioId)}
+              disabled={searchPending || !scenarioId}
+              onClick={() => { void handleConstraintSearch(); }}
+              type="button"
+            >
+              Find safe boundary
+            </button>
+
+            {/* Result area — always present after first click; ADR-021 §D-4 + SF-1 */}
+            {(searchPending || searchResult !== null) && (
+              <div
+                data-testid="constraint-search-result"
+                style={{ marginTop: 8 }}
+              >
+                {searchPending ? (
+                  /* PENDING state — ADR-021 §D-4 State 1 */
+                  <div
+                    data-testid="constraint-search-pending"
+                    style={{ fontSize: 11, color: TEAL, fontStyle: "italic" }}
+                  >
+                    ⟳ Searching…
+                  </div>
+                ) : searchResult?.status === "FOUND" ? (
+                  /* FOUND state — ADR-021 §D-4 State 2 */
+                  <div data-testid="constraint-search-found">
+                    <div
+                      style={{
+                        fontSize: 11,
+                        fontWeight: 700,
+                        color: TEAL,
+                        marginBottom: 2,
+                      }}
+                    >
+                      Safe boundary found:
+                    </div>
+                    <div
+                      data-testid="constraint-boundary-value"
+                      style={{
+                        fontSize: 14,
+                        fontWeight: 700,
+                        color: TEAL,
+                        fontVariantNumeric: "tabular-nums",
+                        marginBottom: 2,
+                      }}
+                    >
+                      fiscal multiplier ≥ {searchResult.boundary?.toFixed(2)}
+                    </div>
+                    <div
+                      data-testid="constraint-tolerance-band"
+                      style={{ fontSize: 11, color: "#6b7280", marginTop: 1 }}
+                    >
+                      ±{(
+                        (searchResult.uncertainty_hi ?? 0) -
+                        (searchResult.uncertainty_lo ?? 0)
+                      ).toFixed(2)} precision
+                    </div>
+                    <div style={{ fontSize: 10, color: "#6b7280" }}>
+                      {searchResult.evaluations} evaluations · [{searchResult.search_lo?.toFixed(1)}, {searchResult.search_hi?.toFixed(1)}] searched
+                    </div>
+                    <div style={{ fontSize: 10, color: "#9ca3af", marginTop: 2 }}>
+                      This is the binary search precision, not a statistical
+                      confidence interval. Empirical CI bounds available in G3.
+                    </div>
+                    {/* Synthetic disclosure — ADR-021 §UX-5, AC-11 */}
+                    {searchResult.data_tier === "SYNTHETIC_COMPARABLE" && (
+                      <div style={{ fontSize: 10, color: "#d97706", marginTop: 2 }}>
+                        Floor constraint derived from a synthetic indicator (Tier 3).
+                        Result is directional. This synthetic estimate should be
+                        treated as approximate.
+                      </div>
+                    )}
+                    {searchResult.data_tier === "SYNTHETIC_MODEL" && (
+                      <div style={{ fontSize: 10, color: "#dc2626", marginTop: 2 }}>
+                        Floor constraint derived from a model estimate (Tier 4).
+                        Treat boundary as an order-of-magnitude estimate; do not
+                        cite without verification.
+                      </div>
+                    )}
+                  </div>
+                ) : searchResult?.status === "NOT_FOUND" ? (
+                  /* NOT_FOUND state — ADR-021 §D-4 State 3 */
+                  <div
+                    data-testid="constraint-search-not-found"
+                    style={{ fontSize: 11, color: "#374151" }}
+                  >
+                    <div style={{ fontWeight: 700, marginBottom: 2 }}>
+                      No safe configuration found.
+                    </div>
+                    <div>
+                      Indicator falls below floor {primaryFocalCohort!.floor_value.toFixed(3)} at
+                      all tested multiplier values in [{searchResult.search_lo?.toFixed(1)},{" "}
+                      {searchResult.search_hi?.toFixed(1)}].
+                    </div>
+                    <div style={{ marginTop: 4, color: "#6b7280" }}>
+                      The proposed scenario path does not have a safe operating
+                      point for this parameter within the searched range.
+                    </div>
+                  </div>
+                ) : searchResult?.status === "ERROR" ? (
+                  /* ERROR state — ADR-021 §D-4 State 4, SF-1 guard */
+                  <div
+                    data-testid="constraint-search-error"
+                    style={{ fontSize: 11, color: "#dc2626" }}
+                  >
+                    <div style={{ fontWeight: 700, marginBottom: 2 }}>Search failed.</div>
+                    <div>{searchResult.error_message ?? "Unknown error."}</div>
+                    <div style={{ marginTop: 4, color: "#6b7280" }}>
+                      Try again or reduce search range.
+                    </div>
+                  </div>
+                ) : null}
+              </div>
+            )}
+          </>
+        )}
       </div>
     </div>
   );

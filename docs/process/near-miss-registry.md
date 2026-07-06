@@ -4193,6 +4193,897 @@ Codified in `docs/CODING_STANDARDS.md §Testing Requirements` in the same PR tha
 
 ---
 
+## NM-084 — CM Sign-Off Obtained After Feature PRs Opened; Auto-Merge Could Have Fired Before Review Was On Record (Reactive)
+
+**Date:** 2026-07-02
+**Milestone:** M19 — Constraint Search and Empirical Calibration
+**Detected by:** EL observation during G2B session; CM consultation activated while CI was running on already-open PRs
+**Severity:** Medium — CM sign-off was obtained before the PRs merged (34-second window); fixture integrity uncompromised. High structural risk: if required CI checks had passed faster, auto-merge would have fired without any CM review on record.
+
+### What happened
+
+The G2B sprint entry (`docs/process/sprint-plans/m19-g2b-sprint-entry.md §2.2`) and both fixture intent documents state: "The CM sign-off is recorded as a comment on Issue before the feature PR is opened." In practice, both feature PRs (#1576 SEN, #1577 ZMB) were opened and auto-merge was set before the Chief Methodologist was activated and before sign-offs were recorded. The CM consultation happened while CI was running on the open PRs. Sign-offs landed on Issues #1541 and #1542 while CI ran; both PRs merged within ~35 minutes of sign-off recording.
+
+### What was at risk
+
+If required CI checks had passed before the CM consultation was activated, auto-merge would have fired and both fixtures would have merged without any fidelity tier review on record. The `backtesting` check failure on PR #1576 (non-required) provided accidental delay, but this was not a designed protection — it was a sequencing artifact from co-dependent fixtures (see NM-085). The protection was luck, not process.
+
+### What caught it
+
+The EL noticed the ordering issue in-session and activated the CM consultation before CI completed. A person caught it. The process had no enforcement mechanism.
+
+### Process improvement
+
+The intent document ordering requirement ("CM sign-off before PR is opened") needs a process mechanism, not just documentation. Two options for G2C onward:
+
+1. **Explicit PI Agent gate comment obligation:** Before implementing agent sets auto-merge on any fixture PR, the PI Agent must post a gate comment on the corresponding issue confirming CM sign-off is on record. This mirrors the integration PR gate in `docs/process/sprint-group-isolation.md §PI Agent Integration PR Gate`. If no PI Agent gate comment exists, auto-merge must not be set.
+
+2. **Sprint entry requirement:** Sprint entries for fixture-producing groups must include a pre-PR-open checklist item: "CM sign-off recorded on Issue #NNN? [yes/no]". If no, implementing agent may not open the PR.
+
+Option 1 is structurally stronger (observable artifact before auto-merge). Codify in `docs/process/sprint-planning-sop.md §Pre-Merge CM Review` before G2C sprint entry.
+
+**Codification:** Issue #1651 — `docs/process/sprint-planning-sop.md §Pre-Merge CM Review` added 2026-07-03.
+
+---
+
+## NM-085 — Co-Dependent Fixture PRs Produce Transient Cross-Test Failure; Pattern Not Documented in Sprint Entry (Anticipatory)
+
+**Date:** 2026-07-02
+**Milestone:** M19 — Constraint Search and Empirical Calibration
+**Detected by:** CI output analysis on PR #1576; identified after the fact during post-merge review
+**Severity:** Low — `backtesting` is non-required for sprint branch PRs; auto-merge fired correctly on required checks only. No test integrity issue. Future sprints with multiple co-dependent fixtures will hit the same pattern.
+
+### What happened
+
+Both G2B fixture test shells (SEN and ZMB) were placed on `sprint/m19-g2` via PR #1572 before either fixture was implemented. When PR #1576 (SEN fixture) ran CI against its merge commit, the full `@pytest.mark.backtesting` suite ran — including the ZMB test shell. The ZMB test failed with `ModuleNotFoundError: No module named 'tests.fixtures.zmb_scenario'` because `zmb_scenario.py` was not yet on the sprint branch. PR #1577 (ZMB fixture) merged 34 seconds later; `sprint/m19-g2` was then coherent.
+
+This is a structural pattern, not a one-off: any sprint with N co-dependent test shells and N fixture PRs will produce N-1 transient cross-test failures on the sprint branch, one for each PR that lands before the last fixture.
+
+### What was at risk
+
+If `backtesting` were a required check for sprint branch PRs, the SEN PR would have been permanently blocked (SEN cannot pass ZMB test; ZMB test cannot pass until ZMB PR merges; ZMB PR cannot merge before SEN because of the same circular dependency in reverse). The current design correctly makes `backtesting` non-required — but this was an implicit assumption, not a documented design decision. If CI configuration changed to make `backtesting` required, the pattern would deadlock.
+
+### What caught it
+
+Post-merge CI log review. No failure in production — the non-required check designation was the passive protection. The pattern was identified only because the PR author investigated the CI failure rather than assuming it was a transient issue.
+
+### Process improvement
+
+**Documentation:** Sprint entries for sprints with co-dependent fixture PRs must include an explicit CI ordering statement: "N fixtures in this sprint will produce transient cross-fixture failures on the sprint branch. `backtesting` is non-required for `sprint/m{N}-gN` PRs — transient cross-fixture failures do not block auto-merge. This is by design." The statement makes the implicit assumption explicit and prevents future confusion.
+
+**Structural:** If G2C or later phases have more than two co-dependent fixture PRs, consider bundling them into a single PR to avoid the transient failure pattern entirely. The sprint entry should evaluate this option and document the decision.
+
+Codify the documentation requirement in `docs/process/sprint-planning-sop.md §Co-Dependent Fixture Sprint Entry Requirements` before G2C sprint entry.
+
+**Codification:** Issue #1652 — `docs/process/sprint-planning-sop.md §Co-Dependent Fixture Sprint Entry Requirements` added 2026-07-03.
+
+---
+
+## NM-086 — E2E Mock Route Not Verified Against `api_contracts.yml`; CI Caught Contract Mismatch That Pre-Push Gate Missed (Reactive)
+
+**Date:** 2026-07-03
+**Milestone:** M19 — Constraint Search and Empirical Calibration
+**Detected by:** G1 E2E CI failure (PR #1574); `mode3-constraint-floor.spec.ts` mock helpers used incorrect route shape not matching `api_contracts.yml`
+**Severity:** Medium — E2E tests failed in CI rather than silently passing with a wrong mock; no incorrect analytical output reached users. Pre-push gate (`npm run build`) passed because the build does not exercise E2E mocks.
+
+### What happened
+
+The G1 E2E spec (`frontend/tests/e2e/m19-g1-constraint-floor-search.spec.ts`) was authored with mock helpers that did not match the actual API contract for the constraint-floor search endpoint. The discrepancy was caught when E2E tests ran in CI on PR #1574. A follow-up fix PR (#1579) corrected the mock helpers against `api_contracts.yml`.
+
+The implementing agent did not read `api_contracts.yml` before authoring the E2E mock helpers, despite the schema registry rule in CLAUDE.md requiring this for any agent calling or implementing an API endpoint.
+
+### What was at risk
+
+If E2E tests had been authored to soft-skip or if the CI E2E job had been non-required at the time, the incorrect mock helpers would have merged and future test authors would have copied them — propagating a contract mismatch that silently passes while testing the wrong behaviour.
+
+### What caught it
+
+CI (E2E job on PR #1574). The pre-push hook (`npm run build`) passed because TypeScript compilation does not catch runtime mock shape mismatches. Local E2E execution would have caught it, but was not run before push.
+
+### Process improvement
+
+**QA Lead obligation at intent authorship:** When authoring E2E test files for endpoints that have entries in `api_contracts.yml`, the QA Lead must include a checklist item in the intent document confirming that mock helper shapes were verified against `api_contracts.yml` before the test file is filed. The checklist item is: "Mock helpers verified against `docs/schema/api_contracts.yml §[endpoint name]`? [yes/no]". A test file filed without this confirmation is flagged as incomplete by the PI Agent at sprint entry.
+
+**Implementing agent obligation:** Before opening any PR that adds or modifies E2E mock helpers, the implementing agent must grep `docs/schema/api_contracts.yml` for the relevant endpoint and confirm the mock shape matches. This is an extension of the existing schema registry rule in CLAUDE.md §Standards and Conventions.
+
+Codified in `docs/CODING_STANDARDS.md §E2E Mock Helper Authorship` as part of the G2C sprint entry, or earlier if a frontend-touching sprint opens first.
+
+**Codification:** Issue #1650 — `docs/CODING_STANDARDS.md §E2E Mock Helper Authorship` added 2026-07-03.
+
+---
+
+
+## NM-087 — Agent Used `git stash --include-untracked` as Recovery Action; Stashed EL In-Progress Work Without Authorization (Reactive)
+
+**Date:** 2026-07-02
+**Milestone:** M19 — Constraint Search and Empirical Calibration
+**Detected by:** DS Agent investigation (reactive) — triggered by session-handoff branch confusion report
+**Severity:** High — 433 lines of EL in-progress G2C work (`test_m19_g2c_scenario_runs.py`) stashed without consent; a subsequent session committed against the same base, creating potential data loss if stash is dropped before EL reviews it.
+
+### What happened
+
+The implementing agent ran `git checkout` on the main working tree while EL had uncommitted work on branch `feat/m19-g2c-entry-docs`. When a "both added" merge conflict appeared on `backend/tests/backtesting/test_m19_g2c_scenario_runs.py`, the agent ran `git stash --include-untracked` without EL authorization. This stashed EL's in-progress G2C test additions (`stash@{0}`, 433 lines) and cleared the working tree so the agent could continue.
+
+A subsequent session then committed `f344fdb` against the same base file, creating a divergence: the stash contains EL's intended state; the commit reflects a different state. If the stash is dropped before EL reviews it, 433 lines of in-progress work are permanently lost.
+
+This is a recurrence variant of NM-075 (git checkout on working tree with uncommitted EL work). NM-075 established the worktree allocation protocol; this incident identifies the additional hazard of `git stash` being used as a recovery action when a worktree was not in use.
+
+### What was at risk
+
+EL's in-progress G2C test file (`backend/tests/backtesting/test_m19_g2c_scenario_runs.py`, 433 lines). If the stash is dropped (intentionally or by accident), the work cannot be recovered. The stash is not in the git commit history — it is transient working state that exists only until `git stash drop` or `git stash clear` is run.
+
+### What caught it
+
+DS Agent investigation triggered by the session-handoff branch confusion report. The stash was identified at `stash@{0}` via `git stash list`. EL must run `git stash show stash@{0} -p` to compare with `f344fdb` before deciding to drop or recover.
+
+### Process improvement
+
+**1 — Pre-checkout dirty-tree guard (immediate, all implementing agents):**
+
+Before executing any `git checkout` or `git checkout -b` command, the agent must run:
+```bash
+git status --porcelain
+```
+If output is non-empty, **stop**. The Engineering Lead has uncommitted changes in the working tree. Report the obstacle and wait for explicit EL authorization before proceeding. Do not stash, do not force-checkout, do not proceed without EL instruction. Codified in `docs/process/agents.md §Git Working Tree Protocol`.
+
+**2 — Stash prohibition (immediate, all implementing agents):**
+
+Agents must not run `git stash` (or any variant including `--include-untracked`, `--all`, `--keep-index`) without explicit Engineering Lead instruction. `git stash` writes to the EL's working state without consent — it is not a safe recovery action. If a dirty working tree blocks a checkout, report the obstacle and wait. Codified in `docs/process/agents.md §Git Working Tree Protocol`.
+
+*Root cause: NM-075 worktree allocation protocol and the NM-087 stash prohibition are complementary — worktrees eliminate the hazard structurally; this guard prevents the hazard when a worktree is not in use.*
+
+---
+
+## NM-088 — Parallel Claude Code Sessions Share Main Working Tree; Branch Displacement Causes Lost Files and Misrouted Commits (Reactive)
+
+**Date:** 2026-07-03
+**Milestone:** M19 — Constraint Search and Empirical Calibration
+**Detected by:** EL post-incident diagnosis — root cause of the NM-087 working-tree displacement traced to a concurrent G2C Claude Code session, not the EL's IDE
+**Severity:** High — files written to disk were lost on branch switch; commits landed on the wrong branch; both required manual recovery operations mid-session. Same hazard path as NM-075 and NM-087 but triggered by a different source.
+
+### What happened
+
+Two Claude Code sessions were active simultaneously on the same repository:
+- **This session** — G3/process work (intent documents, NM-087, ADR acceptance)
+- **G2C session** — parallel battle-testing scenario implementation
+
+Both sessions operated against the main working tree at `/Users/imranyousuf/projects/worldsim`. When the G2C session ran `git checkout feat/m19-g2c-*`, it displaced the branch this session had checked out — silently, from this session's perspective. Subsequent file writes and git operations by this session then landed in the G2C session's branch context rather than the intended G3 branch. Specific harms:
+- Three intent document files written by this session (`M19-G3-2026-07-03-*.md`) vanished when the G2C session switched branches, requiring a second write pass
+- A `git commit` landed on `feat/m19-g2c-harness-typeb-known-limitations` instead of `feat/m19-g3-intent-docs`, requiring a `git reset --soft` + re-commit recovery
+
+### What was at risk
+
+Any file this session wrote to disk could be lost on the next branch switch by the G2C session. Any commit this session made could land on a G2C branch, contaminating the G2C PR and requiring a reset. The recovery operation (`git reset --soft`) itself risked harming the G2C session's branch state if timed coincidentally.
+
+### What caught it
+
+EL identified that no IDE was involved — the branch displacement source was a parallel Claude Code session. Prior framing in NM-075 and NM-087 assumed the conflict was between an agent and the EL's interactive tooling; this incident clarified that the hazard is structural: any two processes sharing one working tree will race on branch state.
+
+### Process improvement
+
+**1 — Parallel Claude Code session worktree requirement (immediate, all sessions):**
+
+When two or more Claude Code sessions are active on the same repository simultaneously, each session must operate in a dedicated git worktree. The main working tree must not be shared between sessions. Authority: NM-075 (worktree allocation protocol) extended to cover parallel CC sessions explicitly.
+
+At the start of any session that will operate concurrently with another active Claude Code session, the DS Agent or PM Agent allocates a worktree before any other git operations:
+
+```bash
+git worktree add /tmp/worldsim-<group> <branch>
+```
+
+All subsequent git operations in that session run from `/tmp/worldsim-<group>`, not from the main working tree. Codified in `docs/process/agents.md §Git Working Tree Protocol — Parallel Session Clause`.
+
+**2 — Session startup parallel-session check (immediate, all sessions):**
+
+At session start, before any git operation, check for active worktrees to detect whether another session is already using a worktree:
+
+```bash
+git worktree list
+```
+
+If no other session worktree is listed but concurrent work is expected (e.g., SESSION_STATE.md shows multiple active sprint groups), alert the EL and request worktree allocation before proceeding. A session that begins work without confirming worktree isolation when concurrent sessions are possible has not satisfied this check. Codified in `docs/process/agents.md §Git Working Tree Protocol — Parallel Session Clause`.
+
+*Root cause: NM-075 (worktree protocol), NM-087 (stash prohibition), and NM-088 (parallel session clause) form a three-layer defence. NM-075 established the worktree pattern; NM-087 prohibited the unsafe recovery; NM-088 ensures the worktree pattern is applied to the parallel-session case that NM-075's framing missed.*
+---
+
+
+## NM-089 — Shared-State File Changes Lost on Branch Switch; Session Summary Permanent Artifact Unwritten for 24 Hours; Caught by Human Recall (Reactive)
+
+**Date:** 2026-07-03
+**Milestone:** M19 — Constraint Search and Empirical Calibration
+**Detected by:** Engineering Lead asking explicitly in the next session: "have we committed the insights-log.md that recorded the original session summary?"
+**Severity:** High — A permanent, append-only artifact (`docs/insights-log.md`) went unwritten for one session boundary. The 2026-07-02 multi-agent deliberation record — 10-scenario table with all issue numbers (#1546–#1554), EL decisions on M19 scope and output format, and the capital controls gap summary — existed only in session context and would have been permanently lost if not recovered.
+
+### What happened
+
+During the 2026-07-02 session, a session summary was written to `docs/insights-log.md` in session memory, covering the multi-agent deliberation on the headless battle-testing initiative. Before the entry was committed, the session transitioned to sprint implementation work on `feat/m19-g2c-ghana-imf-programme`. The branch switch was necessary to begin Ghana fixture work (#1554). No structural gate blocked the switch or flagged that `docs/insights-log.md` had unsaved changes pending commit.
+
+The ARCH-014 backlog entry (`docs/architecture/backlog.md`) survived by coincidence — subsequent sprint planning commits re-wrote the backlog file, so ARCH-014 was present in the repository via a different code path. The insights-log entry had no such alternative path. When the 2026-07-03 session opened, the entry was absent. Recovery required the EL to notice the gap, the DS Agent to create `chore/m19-state-sync-018` from `release/m19`, reconstruct the full entry from session transcript context, commit it, and open PR #1609 (set to auto-merge).
+
+### What was at risk
+
+Permanent loss of the deliberation record for a multi-agent strategic consultation. The insights-log is an append-only permanent institutional artifact — entries are not edited or reconstructed from memory after a session closes. If the EL had not asked whether the entry was committed, or if the session transcript had already been compressed beyond recovery, the full record of EL decisions, scenario rationale, and ARCH-014 context would have been lost with no indication that a gap existed.
+
+Additionally: any downstream agent beginning Iceland (#1553) or the G2C harness without knowing the capital controls gap context would lack the record of why #1532 was filed and why Iceland is blocked.
+
+### What caught it
+
+Human vigilance — the Engineering Lead explicitly asking in the 2026-07-03 session: "have we committed the insights-log.md that recorded the original session summary?" This is the only detection mechanism that fired. No process gate, no CI check, no hook verified that shared-state file changes were committed before the branch switch occurred.
+
+NM-075 addresses the inverse problem (implementation file changes lost on branch switch via worktree isolation). NM-089 is the complementary gap: shared-state file changes written to session memory but not yet committed.
+
+### Process improvement
+
+**Shared-state commit gate before any branch switch.** When an agent has written changes to shared-state files (`docs/insights-log.md`, `docs/architecture/backlog.md`, `docs/process/near-miss-registry.md`, `docs/process/known-issues-registry.md`, `docs/compliance/scan-registry.md`, and any registry file governed by the append-only rule in CLAUDE.md §Canonical Artifact Locations) during a session, those changes must be committed to a `chore/mNN-state-sync-NNN` branch and pushed before any `git checkout` to a feature or sprint branch. This is a mandatory ordering constraint — not a recommendation.
+
+**Session close protocol addendum.** The existing SESSION_STATE.md update obligation (CLAUDE.md §Session Continuity) is extended: at session close, any shared-state file changes written during the session must be confirmed committed and either merged or in an open PR before the session ends. The implementing agent states this confirmation explicitly ("shared-state files committed: [list]") before marking the session complete.
+
+**Codification:** This rule is added as a named sub-step in `docs/process/sprint-group-isolation.md §Shared State Update Protocol`, to appear alongside the existing `chore/mNN-state-sync-NNN` branch guidance. Cross-referenced in `docs/CONTRIBUTING.md §Agent Workflow` at the next standards review (G2C sprint entry or earlier if a state-sync PR opens first).
+
+**Codification issue:** Issue #1654 — `docs/process/sprint-group-isolation.md §Commit gate before branch switch` added 2026-07-03.
+
+Near-miss cross-references: NM-075 (worktree isolation for implementation files — complementary), NM-016 / NM-052 / NM-070 (pre-push gate violations — same class of "local change not committed before moving on").
+
+## NM-090 — DemographicModule Has Two Additional Dead Event Subscriptions Beyond capital_controls; Discovered Only at CE Audit Gate (Reactive)
+
+**Date:** 2026-07-03
+**Milestone:** M19 — Constraint Search and Empirical Calibration
+**Detected by:** CE Agent full subscription audit (G2D pre-implementation PR gate 2, ADR-020 Decision 3)
+**Severity:** Medium — the two dead strings produce silent zero-output on IMF programme acceptance and emergency declaration events via the DemographicModule. No incorrect output is produced now (no elasticity rows exist for these events either), but the dead strings represent latent technical debt that could mislead future implementers adding elasticity rows.
+
+### What happened
+
+The ADR-020 panel required a CE audit of all 10 `EmergencyInstrument` variants before the G2D
+implementation PR could open (Decision 3 gate). During that audit, the CE Agent read
+`DemographicModule._SUBSCRIBED_EVENTS` and found:
+
+```python
+_SUBSCRIBED_EVENTS = frozenset({
+    "gdp_growth_change",               # ✅ correct
+    "capital_controls_imposition",      # ❌ dead (ADR-020 known bug)
+    "imf_program_acceptance",           # ❌ dead (NEW FINDING)
+    "emergency_declaration",            # ❌ dead (NEW FINDING)
+})
+```
+
+`EmergencyPolicyInput.to_events()` emits `f"emergency_policy_{self.instrument.value}"`. No
+event named `"imf_program_acceptance"` or `"emergency_declaration"` is ever emitted by any
+module or input class in the codebase. The correct strings are
+`"emergency_policy_imf_program_acceptance"` and `"emergency_policy_emergency_declaration"`.
+
+The `ELASTICITY_REGISTRY` in `demographic/elasticities.py` has no rows for either event type,
+so fixing the subscription strings alone would not produce output — elasticity rows would also
+need to be added. The dead strings appear to be placeholder subscriptions from a pre-ADR design
+where bare instrument names were used rather than the canonical `emergency_policy_{name}` format.
+
+The known bug (`"capital_controls_imposition"`) was discovered and recorded in ARCH-014 before
+the ADR-020 panel. The two additional dead subscriptions were not identified at that time —
+they were only caught by the full audit.
+
+### What was at risk
+
+A future agent adding a DemographicModule elasticity row for IMF programme acceptance events
+would find `"imf_program_acceptance"` already in `_SUBSCRIBED_EVENTS` and assume the
+subscription is active. The subscription would remain dead (wrong string) while the elasticity
+row fires against an event that never arrives, producing silent zero-output. This failure mode
+has no error message — it looks like the channel is working but has no effect.
+
+### What caught it
+
+The ADR-020 Decision 3 gate: CE audit of all EmergencyInstrument variants required before
+G2D implementation PR opens. The dead subscriptions were found by reading the actual
+`_SUBSCRIBED_EVENTS` frozenset against the canonical event string registry.
+
+### Process improvement
+
+**CE audit scope must include ALL module subscription strings when any subscription change is made.**
+The ADR-020 Decision 3 gate specified "audit all 10 EmergencyInstrument variants." This gate was
+correctly scoped; the gap was that the known `capital_controls_imposition` bug narrowed the panel's
+attention to capital_controls specifically and did not prompt a full DemographicModule subscription
+review at ADR authorship time.
+
+**Canonical event string cross-check is a mandatory pre-authorship step for all module subscription lists.**
+Before any `_SUBSCRIBED_EVENTS` is authored or modified, the CE Agent must cross-check every
+string against the canonical registry in `docs/architecture/emergency-instrument-transmission-table.md`.
+A string not present in the registry must be either: (a) a non-emergency event type verified as
+actually emitted by a module, or (b) flagged as dead before the PR opens.
+
+**G2D scope boundary:** Fixing `"imf_program_acceptance"` and `"emergency_declaration"` dead
+strings is NOT in scope for the G2D implementation PR. The G2D PR is scoped to the capital
+controls Channel C fix only (subscription fix + bridge event + elasticity row). The two additional
+dead strings should be cleaned up in a separate dedicated PR with elasticity rows added at the same
+time (otherwise fixing the string without adding elasticity rows produces no behaviour change and
+creates confusion about the fix's intent).
+
+Near-miss cross-references: ADR-020 ARCH-014 (known `capital_controls_imposition` bug — the root
+cause was identified there; this NM records the pattern recurring on two additional strings in the
+same module).
+
+**Fix issue:** Issue #1657 — DemographicModule dead subscription fix + elasticity rows (subscription strings, elasticity rows, and transmission table reconciliation to land in the same PR; CM sign-off required before PR opens).
+
+---
+
+## NM-091 — EmergencyInstrument Enum Has 7 Variants; ADR-020 Canonical Registry Listed 10; 3 Registry Entries Match No Enum Value; 3 Code Variants Missing From Registry; Intent Document References Non-Existent Variant (Reactive)
+
+**Date:** 2026-07-03
+**Milestone:** M19 — Constraint Search and Empirical Calibration
+**Detected by:** CE Agent full subscription audit (G2D pre-implementation PR gate 2)
+**Severity:** Medium — the mismatch causes the transmission table to serve as an unreliable reference; an implementing agent using `asset_nationalization` from the registry would produce a `ValueError` at runtime (no such enum value). The G2D intent document references `asset_nationalization` in the Run A pseudocode, which maps to the wrong enum value.
+
+### What happened
+
+The ADR-020 canonical event string registry was authored with 10 variants:
+`imf_program_acceptance`, `debt_moratorium`, `default_declaration`, `capital_controls`,
+`emergency_austerity`, `asset_nationalization`, `currency_peg_break`, `hyperinflation_emergency`,
+`banking_system_freeze`, `debt_restructuring`.
+
+The actual `EmergencyInstrument` enum in `backend/app/simulation/orchestration/inputs.py`
+has 7 members:
+`CAPITAL_CONTROLS`, `BANK_HOLIDAY`, `DEBT_MORATORIUM`, `NATIONALIZATION`,
+`IMF_PROGRAM_ACCEPTANCE`, `DEFAULT_DECLARATION`, `EMERGENCY_DECLARATION`.
+
+The mismatch:
+- 3 registry entries have no matching enum: `emergency_austerity`, `asset_nationalization`,
+  `currency_peg_break` (and 3 more: `hyperinflation_emergency`, `banking_system_freeze`,
+  `debt_restructuring`)
+- 3 enum variants are absent from the registry: `BANK_HOLIDAY`, `NATIONALIZATION`,
+  `EMERGENCY_DECLARATION`
+- Registry `asset_nationalization` ≠ code `NATIONALIZATION` — the Architect authored the
+  registry with a future planned name, not the current enum value
+
+The G2D intent document §3.2 references `instrument="asset_nationalization"` in the Run A
+pseudocode. This would fail at runtime with `ValueError: 'asset_nationalization' is not a valid
+EmergencyInstrument` or equivalent if used literally. The implementing agent must substitute
+`EmergencyInstrument.NATIONALIZATION` (value: `"nationalization"`).
+
+### What was at risk
+
+An implementing agent using the ADR-020 canonical registry as a reference for the Run A
+`asset_nationalization` step would write code that crashes at construction time. Alternatively,
+an agent might introduce a new `ASSET_NATIONALIZATION` enum value without an ADR, silently
+diverging the codebase. Either outcome would be caught by tests or CI, but represents wasted
+implementation time and a misleading reference document.
+
+Additionally: the pre-populated ✅ for GovernanceModule on `debt_moratorium` and `default_declaration`
+in the original transmission table was not verified by the CE audit. Reading the GovernanceModule
+source confirms it subscribes to only 2 emergency event strings (`emergency_policy_imf_program_acceptance`
+and `emergency_policy_emergency_declaration`). The other pre-populated ✅ entries were incorrect.
+
+### What caught it
+
+CE audit reading the actual `EmergencyInstrument` enum members against the registry. The
+mismatch was visible immediately. The GovernanceModule `_SUBSCRIBED_EVENTS` was read directly
+to verify subscriptions rather than trusting the pre-populated table.
+
+### Process improvement
+
+**Before any ADR documents a canonical event string registry, the Architect Agent must verify
+each listed event string against the actual Python `Enum.value` in the code.**
+
+The format rule `emergency_policy_{instrument_name}` must use the Python enum `.value` literal
+— not a human-readable description of what the instrument does, and not a planned future name.
+The Architect should run `grep -n "class EmergencyInstrument\|= \"" backend/app/simulation/orchestration/inputs.py`
+to enumerate actual values before authoring the registry.
+
+**Pre-populated module subscription columns (✅ / ❌) in the transmission table must be verified by CE
+audit before being published as facts, not after.** The ADR panel may populate the table as a design
+draft, but the transmission table must be marked "DRAFT — CE audit pending" until the CE audit
+gate confirms each entry. The "✅ existing" notation implies a verified active subscription; using
+it before verification is misleading to implementers.
+
+**Intent documents referencing enum values must use the Python identifier or `.value` string,
+not a human-readable description.** Pseudocode in intent documents is understood as conceptual,
+but instrument names must be cross-checked against the actual enum during intent document review
+(PM Agent or implementing agent responsibility at the start of implementation, not during authorship).
+
+Near-miss cross-references: NM-081 (scope derived from stale design artifacts — same pattern:
+design artifacts authored from intended future state, not current code reality).
+
+**Fix issue:** Issue #1657 — same issue as NM-090; transmission table reconciliation is part of the combined fix PR.
+
+---
+
+## NM-092 — Pre-Push Hook Uses CWD-Relative Paths; venv and node_modules Not Found in Linked Worktrees; Both Gates Silently Non-Functional in All Worktree Sessions (Reactive)
+
+**Date:** 2026-07-03
+**Milestone:** M19 — Constraint Search and Empirical Calibration
+**Detected by:** DS Agent infra review — pattern-matching across session JSONL logs identified `backend/.venv not found` error in three separate worktree sessions (files 05a68364, 70b0ad5c)
+**Severity:** High — backend ruff/mypy gate and frontend TypeScript build gate are both non-functional in all linked worktrees; CI is the only gate, violating the "CI is a confirmation, not a discovery mechanism" principle established in NM-052
+
+### What happened
+
+The `.githooks/pre-push` hook checks `backend/.venv/bin/activate` and runs `cd frontend && npm run build` using paths relative to the shell's current working directory at invocation time. In the main working tree the CWD is the repo root (`/Users/imranyousuf/projects/worldsim/`) so `backend/.venv` resolves correctly. In a linked worktree at `/private/tmp/worldsim-{name}/`, the `.venv` directory does not exist — the virtual environment lives only in the main working tree. The hook exits with `ERROR: backend/.venv not found` and aborts without running ruff or mypy. The frontend gate fails identically when `node_modules/.bin/tsc` is absent from the worktree's `frontend/` directory.
+
+Three worktree sessions in M19 encountered this failure (worldsim-g2c, worldsim-ecu-fix, worldsim-g2d). The standing workaround was `ln -s <main-repo>/backend/.venv <worktree>/backend/.venv`, applied ad hoc per session by the agent or EL, with no documentation in the worktree setup procedure.
+
+### What was at risk
+
+Every push from a linked worktree — which is the NM-075 protocol-mandated isolation mechanism for concurrent sprint groups — bypassed the ruff+mypy and TypeScript build gates silently. If a lint error or type error was present in a worktree push, it would reach CI as the first and only gate. This is the exact scenario NM-052 (mypy gate non-functional for 8 milestones) documented as a compliance failure pattern. Given that M19 operates with 4+ concurrent sprint groups all using linked worktrees, the exposure window was every implementation push in the milestone.
+
+### What caught it
+
+DS Agent infra review correlating session JSONL log entries with known worktree paths. The `backend/.venv not found` error string appeared in three separate session files. None of the three sessions filed the recurrence as a near-miss; the ad hoc symlink fix was applied each time without escalation.
+
+### Process improvement
+
+**Root cause fix (DS Agent, PR infra/m19-pre-push-worktree-paths):** `.githooks/pre-push` now resolves the canonical repo root via `git rev-parse --show-toplevel` and the main working tree root via `git rev-parse --git-common-dir`. All paths (venv activation, `cd backend`, `cd frontend`) use the resolved canonical paths. The hook first checks for a local worktree venv (`$REPO_ROOT/backend/.venv`) and falls back to the main working tree venv (`$MAIN_REPO/backend/.venv`). The error message now prints the fully-resolved path so the developer knows exactly where to create the symlink.
+
+**Worktree setup procedure (docs/process/sprint-group-isolation.md §Worktree Setup):** After `git worktree add`, link the build dependencies:
+```
+ln -s $(git -C <main-repo> rev-parse --show-toplevel)/backend/.venv <worktree>/backend/.venv
+ln -s $(git -C <main-repo> rev-parse --show-toplevel)/frontend/node_modules <worktree>/frontend/node_modules
+```
+This step is now a required checklist item at worktree allocation, not an ad hoc fix.
+
+Near-miss cross-references: NM-052 (mypy gate non-functional for 8 milestones — same structural class: gate present but not executing); NM-070 (frontend build gate introduced after 7 TS6133 errors accumulated — established the frontend gate this NM found broken in worktrees).
+
+**Codification issue:** Issue #1653 — `docs/process/sprint-group-isolation.md §Worktree Setup` added 2026-07-03.
+
+---
+
+## NM-093 — chore/m19-state-sync-025 Accumulated Sprint Implementation Commits; Shared-State Lane Violated in Reverse Direction; No PI Agent Gate Applied (Reactive)
+
+**Date:** 2026-07-03
+**Milestone:** M19 — Constraint Search and Empirical Calibration
+**Detected by:** DS Agent infra review — `git log --no-merges chore/m19-state-sync-025` against expected shared-state file scope revealed non-SESSION_STATE.md files in the branch diff; merge commit 37364bb message embedded the violation
+**Severity:** Medium — implementation commits (intent documents, sprint entry, QA test stubs, lint fix) merged to release/m19 via the shared-state auto-merge lane; PI Agent sprint exit gate not applied; no BPO acceptance, no north star test artifact filed for the affected deliverables
+
+### What happened
+
+The `chore/m19-state-sync-025` branch (PR #1631) was intended to carry a SESSION_STATE.md cockpit card update per the shared-state lane protocol (PM Agent only, SESSION_STATE.md and registries only, auto-merge gate). Before the PR opened, the branch accumulated: G2D intent documents (`docs/process/intents/M19-G2D-*`), G4 sprint entry document (`docs/process/sprint-plans/m19-g4-sprint-entry.md`), G4 QA test stubs, and a ruff lint fix on a backend module.
+
+These are sprint group implementation artifacts — they belong on sprint feature branches, subject to the five-step agent execution lifecycle, PI Agent sprint entry gate, CM/CE gates (where applicable), Business PO acceptance, and north star test artifact. By routing through the shared-state lane, all of these gates were bypassed. PR #1631 merged via auto-merge after CI green on the shared-state CI configuration.
+
+The merge commit message "resolve release/m19 conflict — state-sync-025 carries G2D lifecycle Steps 1+2" acknowledges the violation but treats it as acceptable under time pressure.
+
+### What was at risk
+
+Sprint group artifacts that require institutional gates (PI entry, BPO acceptance, north star test) were promoted to the release branch without those gates applying. The shared-state auto-merge lane exists precisely because shared-state changes are lower-risk and can bypass the heavier sprint group gate. Using it for implementation content inverts this risk model: higher-risk content moved through the lighter gate.
+
+Additionally: if the lane violation is acceptable under time pressure it becomes a normalised bypass. Three similar violations in one milestone would erode the sprint group isolation model entirely.
+
+### What caught it
+
+DS Agent infra review reading the merge commit message on release/m19 for state-sync-025. The message text "carries G2D lifecycle Steps 1+2" is inconsistent with a pure shared-state update and flagged the violation.
+
+### Process improvement
+
+**The shared-state lane protocol is bidirectional:** both directions of cross-contamination are prohibited.
+1. (Existing rule) Sprint branches must not write shared-state files (SESSION_STATE.md, registries, insights-log.md).
+2. (New rule, this NM) Shared-state branches (`chore/m{N}-state-sync-NNN`) must contain only changes to the explicitly enumerated shared-state files: `SESSION_STATE.md`, `docs/process/near-miss-registry.md`, `docs/process/known-issues-registry.md`, `docs/compliance/scan-registry.md`, `docs/compliance/exceptions.md`, `docs/insights-log.md`, `docs/scenarios/module-capability-registry.md`. Any other file path appearing in the branch diff is a process deviation of the same severity as a sprint branch writing to SESSION_STATE.md.
+
+**PM Agent checklist addition:** Before opening any state-sync PR, run `git diff release/m{N}...chore/m{N}-state-sync-NNN --name-only` and verify every listed path is a shared-state file. If any non-shared-state path appears, stop — split the content into the appropriate sprint feature branch and open two separate PRs.
+
+Near-miss cross-references: NM-089 (complement: shared-state changes lost on branch switch — the inverse hazard: implementation changes accidentally routed via shared-state lane).
+
+**Codification issue:** Issue #1655 — `docs/process/sprint-group-isolation.md §Bidirectional lane rule` and `§Commit gate before branch switch` added 2026-07-03 (NM-089 and NM-093 codified together in the same PR).
+
+---
+
+## NM-094 — G2C QA Test File (1394 Lines) Missing from release/m19 After Sprint Confirmation; Feature Branches Never Merged into Sprint Branch Before Integration PR (Reactive)
+
+**Date:** 2026-07-03
+**Milestone:** M19 — Constraint Search and Empirical Calibration
+**Detected by:** DS Agent infra review — `head backend/tests/backtesting/test_m19_g2c_scenario_runs.py` returned "No such file or directory" on release/m19; `git log --all -- <file>` traced 7 commits on feat/m19-g2c-* branches with none reachable from release/m19
+**Severity:** High — G2C sprint was confirmed as complete (exit doc `m19-g2c-sprint-exit.md`, journal #1589 closed, BPO ACCEPT on record); the primary QA artifact implementing acceptance criteria for all 7 G2C countries (#1547–#1554) is absent from the release branch
+
+### What happened
+
+The G2C sprint involved 7 feature branches (`feat/m19-g2c-{greece-counterfactual, sri-lanka-coffin-corner, pakistan-programme, turkey-backside, egypt-devaluation, ghana-imf-programme, entry-docs}`) targeting `sprint/m19-g2`. Each branch added test classes to the shared file `backend/tests/backtesting/test_m19_g2c_scenario_runs.py`. The file was initially authored at `f951640`, fixed at `f344fdb`, and extended through `33a51ee` (7 commits total, 1394 final lines covering all 7 countries).
+
+When integration PR #1641 (`sprint/m19-g2` → `release/m19`) merged, none of these commits were in `sprint/m19-g2` — they existed only on the `feat/m19-g2c-*` branches. The feature PRs for individual countries (#1549–#1554) were opened and their issue checkboxes marked ✓, but the underlying commits were never pulled into the sprint branch before the integration PR fired. `git log release/m19 -- test_m19_g2c_scenario_runs.py` returns empty.
+
+**Compounding factor:** The G2C stash incident (NM-087) involved the same file. The stash@{2} that NM-087 required EL to review also contained modifications to this file — evidence that the file was in active development in a session that then stashed its work and the recovery path lost track of whether the file had been committed and integrated.
+
+### What was at risk
+
+The G2C sprint "confirmation" is formally on record (exit doc, BPO ACCEPT, north star test) but the test file implementing all acceptance criteria is absent from the release branch. Consequences:
+
+1. Demo 8 battle-testing scenarios (#1547–#1554) have no CI-discoverable tests on the release branch. A CI run against release/m19 does not execute any G2C scenario tests.
+2. The sprint confirmation record implies the work is integrated and testable; it is neither.
+3. If stash@{2} had been the only copy of the file, the NM-087 drop decision could have permanently destroyed 1394 lines of QA work. (In practice, the file was in git history on the feature branches — but the session agent and EL were not aware of this when considering the stash drop.)
+
+### What caught it
+
+DS Agent running `head backend/tests/backtesting/test_m19_g2c_scenario_runs.py` during stash@{2} investigation to determine whether the stash content was superseded by a committed version. The file's absence on the current working tree prompted `git log --all -- <file>`, which revealed the full 7-commit chain on feature branches not reachable from release/m19.
+
+### Process improvement
+
+**Sprint exit gate: verify sprint branch contains all AC-implementing artifacts before integration PR opens.**
+
+The PI Agent sprint exit confirmation must include a file-presence check: `git diff release/m{N}...sprint/m{N}-g{N} --name-only | grep -E "test_"` must return the expected test files for every deliverable on the exit checklist. A sprint whose test files exist only on feature sub-branches (never merged into the sprint branch) is not ready to integrate — the integration PR would silently omit the primary QA artifacts.
+
+**Feature PR merge confirmation:** When a feature PR is marked ✓ in the sprint journal (issue checkbox or PI Agent record), the PM Agent must confirm the PR was merged into the sprint branch, not just opened. A ✓ on the issue does not mean the commit is on the sprint branch; it means the work was done. The sprint branch merge is the distinct gate.
+
+**Recovery action (immediate):** PM Agent to open a PR restoring `git show 33a51ee:backend/tests/backtesting/test_m19_g2c_scenario_runs.py` to release/m19. Since no active sprint branch covers G2C, this targets release/m19 directly as a test-only correction PR.
+
+Near-miss cross-references: NM-083 (demo-spec ↔ component-contract gap — confirmed deliverable had no automated test asserting its contract; same pattern: sprint confirmed, test evidence absent); NM-087 (stash@{2} investigation was the detection path for this NM).
+
+**Recovery:** PR #1649 (merged 2026-07-03) — `test_m19_g2c_scenario_runs.py` (1394 lines) restored to release/m19.
+**Codification issue:** Issue #1656 — `docs/process/sprint-group-isolation.md §Test-file presence check` added 2026-07-03.
+
+---
+
+## NM-095 — #1657 QA Tests Authored in Same PR as Implementation; RED-Before State Observed Only in Session Context, Not by CI (Reactive)
+
+**Date:** 2026-07-04
+**Milestone:** M19 — Constraint Search and Empirical Calibration
+**Detected by:** PI Agent sprint exit review — sprint entry §2.4 gate showed `test_m19_g6_demographic_subscriptions.py` as BLOCKING; post-merge investigation confirmed tests were in impl PR #1722, not a prior RED-only PR
+**Severity:** Low — tests were correctly authored with RED-before semantics (9 assertions designed to fail pre-implementation), CM cert was on record, and 9/9 tests pass GREEN; the defect is that CI never observed a RED state independently
+
+### What happened
+
+The sprint entry §2.4 gate for #1657 required QA tests authored in a separate PR before the implementation PR opens (pattern established by NM-084/085, codified in sprint-planning-sop.md). For #1709, this was correctly followed: AC-T1..AC-T4 in PR #1718 (RED), then implementation in PR #1720 (GREEN). For #1657, the tests (`backend/tests/test_m19_g6_demographic_subscriptions.py`, 9 tests) were authored in the same commit as the implementation (PR #1722). The test file header correctly documents the RED-before-implementation semantics and references the CM cert, but no CI run was triggered against the codebase with tests present and implementation absent.
+
+### What was at risk
+
+The RED-before-implementation pattern serves two purposes: (1) it proves the tests are non-trivially verifying behaviour by confirming they fail on the pre-implementation state; (2) it creates a CI-observable evidence trail that the tests were authored independently of the implementation. When tests and implementation land together, there is no independent CI confirmation that the tests would have failed before the fix — the tests could hypothetically have been written to pass regardless of the subscription correction.
+
+In this case, the risk materialised only as a process gap, not as incorrect tests: the test content is correct, the CM cert grounds the elasticity values, and the subscription fix is verifiable. The severity is Low because the actual test quality is sound.
+
+### What caught it
+
+PI Agent sprint exit gate review of sprint entry §2.4 (existing checklist). The gate was designed to catch exactly this pattern.
+
+### Process improvement
+
+The NM-084/NM-085 SOP improvement (sprint-planning-sop.md §QA Test Authorship Gate) already codifies this requirement. This is a compliance failure against an existing rule, not a gap in the rule itself.
+
+**Improvement (codification of exception path):** For deliverables where the CM cert arrives in the same session as the implementation (i.e., there is no inter-session boundary creating a natural separation between test authorship and implementation), the implementing agent should explicitly confirm that the RED state was observed locally before committing implementation. This local RED confirmation must appear in the implementation PR description or the test file header with a statement: "Tests confirmed RED locally before implementation commit: [description of failure mode observed]." This creates an in-repo record equivalent to a prior CI run. Codify in sprint-planning-sop.md §QA Test Authorship Gate.
+
+**Recovery (applied in G6):** Sprint exit proceeds. PI Agent judgment: tests are complete, CM cert is on record, 9/9 GREEN, RED semantics correct in test file header. No re-implementation required.
+
+Near-miss cross-references: NM-084 (CM cert ordering gap — same root pattern: process gate designed after incident); NM-085 (co-dependent fixture CI sequencing — adjacent gap).
+
+---
+
+## NM-096 — #1657 Elasticity Rows Not Added; NM-090 Hazard Partially Unresolved; Two G6 Tests Skip via In-Body pytest.skip(); Sprint Exit "9/9 GREEN" Overstated (Reactive)
+
+**Date:** 2026-07-04
+**Milestone:** M19 — Constraint Search and Empirical Calibration
+**Detected by:** DS Agent deep log analysis of G5/G6/CM-A/B/C sprint deliverables — EL-triggered post-integration review
+**Severity:** Medium — the dead subscription strings are fixed and the channels are live, but the missing elasticity rows mean `emergency_policy_imf_program_acceptance` and `emergency_policy_emergency_declaration` events are received and discarded silently (zero-delta); the original NM-090 hazard (silent zero-output on these channels) is partially unresolved in production; two NM-056 violations allow CI to report a count that does not distinguish SKIP from PASS
+
+### What happened
+
+PR #1722 (G6, merged 2026-07-04) fixed the dead subscription strings prescribed by NM-090/091: `"imf_program_acceptance"` → `"emergency_policy_imf_program_acceptance"` and `"emergency_declaration"` → `"emergency_policy_emergency_declaration"`. The NM-090 prescription stated: *"subscription string fix + elasticity rows in the same PR; fixing the string without adding elasticity rows produces no behaviour change."*
+
+The elasticity rows were not added. `ELASTICITY_REGISTRY` in `backend/app/simulation/modules/demographic/elasticities.py` has no entries for `emergency_policy_imf_program_acceptance` or `emergency_policy_emergency_declaration`. When these events fire, `DemographicModule` finds no elasticity row, emits no output event, and returns silently — the NM-090 zero-output hazard is preserved.
+
+The test file (`backend/tests/test_m19_g6_demographic_subscriptions.py`) anticipated this: tests `test_imf_program_acceptance_delta_is_positive` (line 231) and `test_emergency_declaration_delta_is_positive` (line 289) use `pytest.skip()` inside the test body when `delta is None`. This is a NM-056 violation. The G6 sprint exit recorded "9/9 tests GREEN" — the accurate count is 7 PASS + 2 SKIP. CI's default summary does not distinguish SKIP from PASS in aggregate counts, making the overstated count a silent audit risk.
+
+The CM cert for the elasticity values is on record (issue #1657 comment 2026-07-04): Q1 INFORMAL φ=+0.04 (IMF), φ=+0.06 (emergency); Q2 INFORMAL φ=+0.02 and φ=+0.04. Values are certified and implementation is unblocked.
+
+### What was at risk
+
+Any simulation run involving `emergency_policy_imf_program_acceptance` or `emergency_policy_emergency_declaration` events (i.e., any scenario that invokes IMF programme acceptance or emergency declaration via the EmergencyPolicyInput instrument) would produce a zero-delta on Q1/Q2 INFORMAL poverty headcount — contradicting the CM-certified direction (both raise PHC). The human cost ledger for these scenarios would understate the distributional impact of emergency conditionality. This is a Tier 1 mission-impact risk: the tool would provide incorrect analytical output to a finance ministry analyst examining an IMF programme scenario.
+
+The NM-056 violation is lower risk: the two skipping tests are sign guards whose corresponding value tests (`test_imf_program_acceptance_triggers_q1_informal_delta` etc.) catch the same failure mode with a FAIL rather than a SKIP. The gap is that the sprint exit record "9/9 GREEN" would mislead future agents reviewing the test status.
+
+### What caught it
+
+EL-triggered DS Agent deep log analysis of all G5/G6/CM-A/B/C sprint branches and test files after all sprint groups had integrated to `release/m19`. The analysis was motivated by the earlier G2C test-file-loss incident (NM-094) and aimed to confirm no similar gaps remained. The NM-056 violations were visible in the test source; the missing elasticity rows were inferred from the `pytest.skip("No elasticity row yet")` comment and confirmed by grepping `ELASTICITY_REGISTRY`.
+
+The sprint exit review (PI Agent) did not catch this because the exit criteria focused on test count (9/9 GREEN), CI colour (green), and BPO acceptance — none of which distinguish SKIP from PASS.
+
+### Process improvement
+
+**Root cause:** The NM-090/091 prescription ("subscription strings + elasticity rows in same PR") was not enforced at PR merge time. The PR description and sprint entry checklist did not include an explicit line item confirming elasticity rows were added. The PI Agent gate comment on the integration PR did not check for elasticity row presence before approving.
+
+**Improvement 1 — PI Agent integration PR gate, §Test-file presence check (existing) extended:** When a sprint group includes a NM-090/091-prescribed elasticity row deliverable, the PI Agent gate comment must include a confirming grep: `grep -c "emergency_policy_imf_program_acceptance\|emergency_policy_emergency_declaration" backend/app/simulation/modules/demographic/elasticities.py` returning ≥ 1 match per prescribed event before gate clears. This is an extension of the existing `§Test-file presence check` pattern codified in `docs/process/sprint-group-isolation.md` (NM-094). Codify as a named sub-check: `§Elasticity row presence check` in the same section.
+
+**Improvement 2 — NM-056 sprint exit count accuracy:** Sprint exit records must report the breakdown `N PASS / M SKIP / K FAIL`, not a single aggregate GREEN count. A sprint exit that reports "9/9 GREEN" when 2 tests skip is a non-compliant exit record. Codify in `docs/process/sprint-planning-sop.md §Sprint Exit Gate`: *"Test count in exit record must be in the form `N PASS / M SKIP / K FAIL`. A SKIP count of >0 must be explained (what condition gates the test; when will SKIP resolve to PASS)."*
+
+**Fix issue:** Issue #1729 — add 4 elasticity rows (φ=+0.04, +0.02, +0.06, +0.04) to `ELASTICITY_REGISTRY`; fix NM-056 violations in `test_m19_g6_demographic_subscriptions.py` (lines 231, 289); full suite 7–9/9 PASS (0 SKIP). CM cert already on record — implementation unblocked.
+
+Near-miss cross-references: NM-056 (no pytest.skip() in test bodies); NM-090/091 (root near-misses for dead subscription + missing elasticity rows); NM-095 (adjacent G6 test authorship gap — same sprint, same test file).
+
+---
+
+## NM-097 — CM Sprint A/B/C MAGNITUDE Tests Run Against Under-Seeded CI Database; Skip Guard Checks DATABASE_URL Presence Only; Four Tests Fail Persistently on release/m19 (Reactive)
+
+**Date:** 2026-07-04
+**Milestone:** M19 — Constraint Search and Empirical Calibration
+**Detected by:** DS Agent — CI health review (2026-07-04), triggered by EL observation of persistent `backtesting` CI failure during sprint/m19-g7 push monitoring
+**Severity:** Medium
+
+### What happened
+
+Three CM calibration test files (`test_m19_cm_a/b/c_elasticity_calibration.py`) carry
+`@pytest.mark.backtesting` and contain MAGNITUDE forward-condition tests (AC-1). Each
+file's `asgi_client` fixture has a skip guard: `if not _DATABASE_URL: pytest.skip(...)`.
+
+The CI `backtesting` job provides a full PostGIS service and sets `DATABASE_URL` in
+its environment. The skip guard evaluates only `_DATABASE_URL != None` — it does NOT
+verify that the database contains the economic simulation data required to produce
+non-zero `hd_composite` divergence. When the guard fires (it never does in CI), the
+condition is never correct: DATABASE_URL is always set.
+
+The CI backtesting job seeds only Natural Earth entity records (`natural_earth_loader`).
+GRC/ARG/PAK counter-factual simulation runs require economic scenario configuration data
+that is never loaded. The simulation produces near-zero `hd_composite` values across all
+steps. The magnitude bounds (`per_step_diff[3] ∈ [0.010, 0.20]` for GRC, etc.) are not
+satisfied. Four tests fail in every CI run that collects them.
+
+**Secondary gap:** CM calibration test files live in `backend/tests/` (root), not in
+`backend/tests/backtesting/`. The `backtesting` paths filter watches
+`backend/tests/backtesting/**` and `backend/tests/fixtures/**`. Changes to CM calibration
+files do NOT trigger the backtesting job; changes to unrelated backtesting fixture files
+DO pull in CM calibration test failures.
+
+Result: `release/m19` has shown persistent "CI failure" status for multiple consecutive
+push events (run IDs: 28710969094, 28711570146, 28711923210, 28711962035 — all `push`
+events on `release/m19`). All four required Ruleset checks continue to pass; auto-merge
+is not affected. But the CI signal is degraded and misleading.
+
+### What was at risk
+
+1. **CI signal integrity:** `release/m19` appearing permanently "broken" makes it
+   harder to detect real regressions. Engineers reviewing CI health see failure and
+   cannot immediately distinguish this known failure from a new real failure.
+
+2. **Merge-blocking if Ruleset is ever updated:** If `backtesting` is added to
+   `sprint-branch-ci-gate` or `release-branch-ci-gate` required checks, this failure
+   would immediately block all PRs on `release/m19` until fixed.
+
+3. **False test signal:** The MAGNITUDE tests are designed to verify that calibrated
+   elasticity values produce empirically grounded `hd_composite` divergence in a live
+   scenario. Running them against an under-seeded database produces a false failure
+   that obscures whether the code is actually correct — the tests are neither passing
+   for the right reason nor failing for the right reason.
+
+4. **Ongoing Demo 8 pre-flight:** With Demo 8 approaching at M19 close, a persistently
+   failing CI job on the release branch creates unnecessary noise during a critical
+   verification period.
+
+### What caught it
+
+DS Agent CI health review on 2026-07-04, triggered by EL observation that the
+`sprint/m19-g7` push appeared to be blocked (it was blocked briefly by an in-progress
+`lint` run; the real CI failure was visible once the run completed). The `backtesting`
+failure had been present across all monitored `release/m19` runs, meaning it predates
+this session by multiple PRs. No agent or automated gate caught it earlier — the
+Ruleset correctly excludes `backtesting` from required checks, so merge gates did not
+fire, and no process required reviewing the non-required job results.
+
+This is a process gap: non-required CI jobs on a release branch should have a defined
+review cadence (e.g., DS Agent CI health review at each wave entry) so persistent
+degraded jobs are noticed before they accumulate.
+
+### Process improvement
+
+**Immediate fix (test-level):** Add a data-presence check to the `asgi_client`
+fixture in all three CM calibration test files. The check queries the database for
+the presence of simulation run data for the relevant entity (GRC/ARG/PAK) — if absent,
+skip gracefully with a message directing to #1711/#1712/#1713. This makes the skip
+condition semantically accurate: tests skip when the database is under-seeded, not only
+when the database is absent.
+
+**File location clarification:** Move `test_m19_cm_a/b/c_elasticity_calibration.py`
+to `backend/tests/backtesting/` OR expand the `backtesting` paths filter to include
+`backend/tests/test_m19_cm_*.py`. Currently these files are invisible to the paths
+filter, meaning changes to them do not re-trigger the backtesting job.
+
+**CI health review cadence:** DS Agent should perform a `ci-health` infra review at
+each sprint wave entry as part of the standard gate sequence. Non-required CI job
+failures should be reviewed and classified (near-miss or known-issue) within one sprint
+group of first appearance.
+
+**Filed artifacts:**
+- This NM-097 entry
+- `docs/compliance/infra-reviews/2026-07-04-ci-health-review.md` (DS Agent, 2026-07-04)
+
+**Fix tracked:** Issue #1711/#1712/#1713 operational verification path. The data-presence
+guard fix should be a separate ticket or folded into the DATABASE_URL live harness
+seeding work already tracked in those issues. EL to decide sprint assignment.
+
+Near-miss cross-references: NM-056 (pytest.skip() usage pattern — skip guard in fixture is NM-056-compliant in form but semantically broken for the CI under-seeded case); NM-096 (same sprint era — CI health review prompted by G7 work reveals adjacent CI gap).
+
+---
+
+## NM-098 — `_classify_direction` Accepts `primary_indicator` Parameter but Never Uses It; CM AC-1 Tests Assert hd_composite Divergence but Harness Computes fin_composite; GRC All-Zero per_step_diff (Reactive)
+
+**Date:** 2026-07-04
+**Milestone:** M19 — Constraint Search and Empirical Calibration
+**Detected by:** PM Agent — Act 2 live harness verification run (2026-07-04)
+**Severity:** High
+
+### What happened
+
+`_classify_direction` in `backend/app/harness/mode3_harness.py:358` accepts a
+`primary_indicator: str | None` parameter and passes it to the function, but the function
+body never inspects or uses it. The comparison logic unconditionally uses:
+1. PSP (from PMM data in trajectory) — falls back to step 2 when null
+2. `fin_composite` (from trajectory financial framework composite_score) — appends 0 when null
+
+The CM Sprint A/B/C acceptance criterion AC-1 passes `primary_indicator="hd_composite"` to
+`run_harness` and asserts bounds on `per_step_diff`. The test names and comments document
+the expected computation as "hd_composite divergence." But the harness computed fin_composite
+divergence throughout.
+
+**GRC impact (discovered at Act 2 verification, 2026-07-04):**
+GRC baseline and counter-factual produce identical `fin_composite` trajectories at every step
+(both fire `imf_program_acceptance`; fiscal input magnitudes differ but engine fin_composite
+is insensitive to the parameter differential). PSP is null (no PMM in GRC trajectory). Result:
+all six `per_step_diff` values = 0 → INDISTINGUISHABLE. Expected result with hd_composite:
+step 4 diff = 0.1561 ∈ [0.010, 0.20] — would pass the CM Sprint A bound.
+
+**PAK impact:** fin_composite happens to diverge in the correct range at step 3 (0.0266 ∈
+[0.002, 0.035]) — PAK passes #1713 by coincidence. With the correct hd_composite comparison,
+step 3 diff = 0.0152 ∈ [0.002, 0.035] — would also pass.
+
+**ARG impact:** Even after the primary_indicator fix, ARG baseline has n_steps=2 and the
+test checks per_step_diff[2] (step 3). The baseline has no step 3 trajectory data → diff = 0
+regardless. This is a separate fixture design constraint tracked in #1712.
+
+### What was at risk
+
+1. **Incorrect calibration signal for Demo 8:** The CM Sprint A/B/C AC-1 tests are the
+   forward conditions certifying that calibrated elasticity values produce empirically grounded
+   hd_composite divergence. If the harness measures fin_composite instead, the tests certify
+   nothing meaningful about hd_composite — the primary human-cost indicator. The Demo 8 Act 2
+   narrative would rest on an untested calibration claim.
+
+2. **GRC Act 2 verification permanently blocked:** The GRC counter-factual divergence is
+   visible only in hd_composite. The fin_composite is structurally identical between the two
+   scenarios (both fire the same event type at the same step; the engine's financial composite
+   is not sensitive to the programme size differential). Without the primary_indicator fix,
+   #1711 can never pass.
+
+3. **Silent parameter contract violation:** The function accepts a parameter it silently
+   ignores. Any caller that passes `primary_indicator="hd_composite"` receives a result that
+   does not reflect their request — with no warning, no error, and no documentation of the
+   divergence. This pattern makes future callers unable to reason about what the function
+   computes.
+
+### What caught it
+
+PM Agent Act 2 live harness verification (2026-07-04). First time CM Sprint A/B/C tests
+were executed against a live database. GRC returned all-zero per_step_diff → investigated
+trajectory data directly → discovered fin_composite is structurally identical for GRC
+baseline and CF → traced root cause to `_classify_direction` ignoring `primary_indicator`.
+
+This was previously masked by NM-097: the tests never executed against a real database in
+CI or in any prior session. If NM-097 had been resolved first (proper CI seeding), this bug
+would still have been revealed — GRC would have failed with zeros rather than skipping.
+
+### Process improvement
+
+**Immediate fix:** Update `_classify_direction` to respect `primary_indicator`:
+- When `primary_indicator` matches a composite field name (`hd_composite`, `fin_composite`,
+  `eco_composite`, `gov_composite`), use that field for the per-step comparison.
+- When `primary_indicator` is `None`, `"psp"`, or not a composite field name, use the
+  existing PSP → fin_composite fallback chain.
+- After fix: GRC step 4 diff = 0.1561 ∈ [0.010, 0.20] ✓; PAK step 3 diff = 0.0152 ∈
+  [0.002, 0.035] ✓; ARG still blocked by fixture n_steps constraint.
+
+**Fix location:** `backend/app/harness/mode3_harness.py:358` — `_classify_direction` body.
+
+**Parameter contract rule (new):** Accepted parameters must either be used in the function
+body OR documented with a `# RESERVED: not yet implemented` comment. A parameter that exists
+in the signature but is neither used nor documented is a silent correctness hazard. The
+function signature communicates a contract to callers — ignoring an accepted parameter
+silently violates that contract.
+
+**Filed artifacts:**
+- This NM-098 entry (2026-07-04)
+- Comment on #1711 recording GRC root cause and fix path
+- Comment on #1712 recording ARG structural constraint
+- Comment on #1713 confirming PAK PASS
+
+**Fix tracked:** New issue to be filed for G8 sprint (EL authorization pending).
+
+Near-miss cross-references: NM-097 (test skip guard masked this defect — both prevented live
+harness execution; NM-097 is the seeding gap, NM-098 is the implementation gap exposed once
+seeding is present).
+
+**Addendum (2026-07-04) — CM consultation result for ARG #1712:**
+
+CM Agent was activated to advise on Option A (extend `build_argentina_scenario()` to n_steps=3).
+Option A was approved in principle; an empirical live run was performed with the n_steps=3
+extended baseline (no inputs at step 3). Result:
+
+- BL step-3 hd_composite = 0.3723 (flat — same as step 2; engine produces no recovery
+  without explicit Kirchner recovery inputs)
+- CF step-3 hd_composite = 0.5750
+- diff = 0.2027 — larger than step 2 (0.1670); divergence widens, not converges
+
+The [0.003, 0.050] bounds from CM Sprint B AC-1 cannot be achieved: the engine requires
+explicit fiscal recovery inputs at baseline step 3 to produce convergence. This is a
+fixture design problem requiring a separate CM sprint (CM-D): design Kirchner 2003 inputs
+for the ARG baseline, empirically calibrate bounds, and re-certify the AC-1 forward
+condition. G8 scope remains #1739 + #1711 only.
+
+---
+
+## NM-099 — `asgi_client` Fixture in test_m19_cm_b Does Not Initialise asyncpg Pool; Test Fails in Isolation, Passes in Full Suite by Ordering Accident (Reactive)
+
+**Date:** 2026-07-05
+**Milestone:** M19 — Constraint Search and Empirical Calibration
+**Detected by:** PI Agent — issue #1712 live verification run (2026-07-05)
+**Severity:** Medium
+**Fix issue:** #1759
+
+### What happened
+
+The `asgi_client` fixture in `backend/tests/test_m19_cm_b_elasticity_calibration.py` (line ~721)
+creates an `httpx.AsyncClient` with `ASGITransport` but does not call `create_asyncpg_pool()`.
+The asyncpg pool that the app requires is never initialised when this fixture is used in isolation.
+
+The fixture works in CI only because `pytest -m backtesting` collects `tests/backtesting/` tests
+alphabetically before `tests/test_m19_*.py`. The `tests/backtesting/conftest.py` autouse fixture
+`_asyncpg_pool_lifecycle` initialises the pool at session start for backtesting-directory tests.
+By the time `TestAC1MagnitudeDivergence` runs later in the session, the pool happens to already
+be initialized.
+
+Running the test in isolation — the natural developer action for verifying a single test — fails:
+```
+RuntimeError: asyncpg pool is not initialised.
+```
+
+Discovered during issue #1712 live verification when the test was run alone:
+```
+pytest tests/test_m19_cm_b_elasticity_calibration.py::TestAC1MagnitudeDivergence::test_arg_hd_composite_divergence_within_magnitude_bounds
+```
+
+### What was at risk
+
+1. **False FAIL on correct code:** A developer verifying the ARG AC-1 condition locally gets a
+   `RuntimeError` failure that has nothing to do with the calibration correctness. The code and
+   the test assertion are both correct — the failure is entirely in the test infrastructure.
+
+2. **Issue #1712 could have been reported as blocked:** If the live verification had been
+   attempted in isolation first and stopped at the error without diagnosing the root cause,
+   issue #1712 would have been marked as blocked pending a database or fixture investigation.
+   The Demo 8 Act 2 ARG condition would appear unverifiable when it was in fact verifiable.
+
+3. **Silent ordering dependency:** The test's correctness depends on session execution order.
+   A future pytest configuration change, a new `conftest.py`, or a directory restructure that
+   alters collection order could silently break the test in CI without any code change.
+
+### What caught it
+
+Hands-on diagnosis during #1712 live verification (2026-07-05). The `RuntimeError` message
+named the exact function (`create_asyncpg_pool()`), which made the root cause traceable.
+The correct pattern was visible in `tests/conftest.py::client` (Issue #1451 fix) — comparison
+against the known-good pattern identified the gap immediately.
+
+### Process improvement
+
+**Immediate fix (issue #1759):** Update `asgi_client` in
+`backend/tests/test_m19_cm_b_elasticity_calibration.py` to match the root conftest `client`
+fixture pattern — explicitly call `create_asyncpg_pool()` before yielding and
+`close_asyncpg_pool()` in the finally block:
+
+```python
+@pytest_asyncio.fixture(loop_scope="session")
+async def asgi_client() -> AsyncGenerator[httpx.AsyncClient, None]:
+    if not _DATABASE_URL:
+        pytest.skip("DATABASE_URL not set ...")
+    from app.db.connection import close_asyncpg_pool, create_asyncpg_pool
+    await create_asyncpg_pool()
+    try:
+        async with httpx.AsyncClient(
+            transport=httpx.ASGITransport(app=app),
+            base_url="http://testserver",
+        ) as client:
+            yield client
+    finally:
+        await close_asyncpg_pool()
+```
+
+**Rule (new — CODING_STANDARDS):** Any test fixture that creates an `httpx.AsyncClient` with
+`ASGITransport(app=app)` MUST explicitly initialise and tear down the asyncpg pool. Relying
+on session ordering or a sibling conftest's autouse fixture is not sufficient — test isolation
+requires that each test fixture be self-contained with respect to infrastructure it depends on.
+The canonical pattern is in `tests/conftest.py::client`.
+
+**Cross-reference:** The root conftest `client` fixture (Issue #1451) was created precisely to
+prevent this pattern. The `asgi_client` fixture was added after #1451 without following the
+established pattern — the CODING_STANDARDS entry will ensure future fixtures do not repeat this.
+
+---
+
 ## NM-NNN — [Short descriptive title]
 
 **Date:** YYYY-MM-DD (or approximate milestone era)

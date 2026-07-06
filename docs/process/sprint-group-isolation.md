@@ -194,6 +194,36 @@ git pull origin release/m{N}
 
 Close the sprint journal issue.
 
+### Worktree Setup
+
+*Authority: NM-092 (2026-07-03, Issue #1653). Required after every `git worktree add`.*
+
+After allocating a worktree with `git worktree add /tmp/worldsim-<group> <branch>`, link the
+build dependencies from the main working tree — the pre-push hook falls back to the main-repo
+venv, but explicit symlinks are faster, cleaner, and required if the fallback is ever removed:
+
+```bash
+# Substitute <main-repo> with the path from: git rev-parse --show-toplevel (in main tree)
+# Substitute <worktree> with /tmp/worldsim-<group>
+
+# Link backend venv
+ln -s <main-repo>/backend/.venv <worktree>/backend/.venv
+
+# Link frontend node_modules
+ln -s <main-repo>/frontend/node_modules <worktree>/frontend/node_modules
+```
+
+**This is a required checklist item at worktree allocation, not an optional optimisation.**
+The pre-push backend gate (`ruff + mypy`) and frontend gate (`npm run build`) both fail without
+accessible build tooling. The main-repo venv fallback in the hook (PR #1646) covers the backend
+gate, but the frontend gate does not have a fallback — `node_modules` must be symlinked.
+
+**Worktree cleanup:** When removing a worktree, the `.venv` symlink appears as
+`?? backend/.venv` in `git status` (untracked). Use `git worktree remove --force` — the
+`--force` flag is required and safe for symlink artifacts.
+
+---
+
 ### Branch naming rules
 
 | Branch type | Pattern | Example |
@@ -342,6 +372,53 @@ need SESSION_STATE.md updates, the PM Agent applies them sequentially in one PR,
 two concurrent PRs. Apply the first group's update, confirm merge, pull, apply the
 second.
 
+### Bidirectional lane rule
+
+*Authority: NM-093 (2026-07-03, Issue #1655). Both directions of cross-contamination are prohibited.*
+
+1. **(Existing)** Sprint branches (`sprint/m{N}-g{N}`, `feat/m{N}-g{N}-*`) must not write
+   shared-state files (`SESSION_STATE.md`, registries, `docs/insights-log.md`).
+2. **(New)** Shared-state branches (`chore/m{N}-state-sync-NNN`) must contain **only** changes
+   to the explicitly enumerated shared-state files:
+   - `SESSION_STATE.md`
+   - `docs/process/near-miss-registry.md`
+   - `docs/process/known-issues-registry.md`
+   - `docs/compliance/scan-registry.md`
+   - `docs/compliance/exceptions.md`
+   - `docs/insights-log.md`
+   - `docs/scenarios/module-capability-registry.md`
+   - `CLAUDE.md` (process-improvement updates only)
+
+   Any other file path appearing in the branch diff is a process deviation of the same severity
+   as a sprint branch writing to `SESSION_STATE.md`.
+
+**PM Agent pre-open check (required before opening any state-sync PR):**
+
+```bash
+git diff release/m{N}...chore/m{N}-state-sync-NNN --name-only
+```
+
+Verify every listed path is a shared-state file. If any non-shared-state path appears: stop —
+split the content into the appropriate sprint feature branch and open two separate PRs.
+
+### Commit gate before branch switch
+
+*Authority: NM-089 (2026-07-03, Issue #1654). Mandatory ordering constraint — not a recommendation.*
+
+When an agent has written changes to any shared-state file during a session (any file in the
+enumerated list above, or `docs/architecture/backlog.md`), those changes **must be committed
+to a `chore/m{N}-state-sync-NNN` branch and pushed before any `git checkout` to a feature
+or sprint branch**.
+
+Writing shared-state content in session memory and then switching branches to begin
+implementation is the root cause of permanent artifact loss (NM-089: `docs/insights-log.md`
+2026-07-02 deliberation record absent for 24 hours after branch switch).
+
+**Session close confirmation:** At session close, the implementing agent must explicitly state:
+> "Shared-state files committed this session: [list, or None]."
+
+This statement is required before marking the session complete.
+
 ---
 
 ## PI Agent Integration PR Gate
@@ -376,6 +453,36 @@ gate comment on the PR before auto-merge can fire.
 
 If any condition is not met, PI Agent posts a BLOCKED verdict and lists the unresolved
 items. The integration PR must not merge until PI Agent posts an unblocked verdict.
+
+### Test-file presence check
+
+*Authority: NM-094 (2026-07-03, Issue #1656). Required before opening the integration PR.*
+
+The PI Agent must confirm that all test files covering the sprint's deliverables are present
+on the sprint branch before the integration PR opens. A sprint whose test files exist only on
+feature sub-branches (commits never merged into the sprint branch) will silently omit QA
+coverage when the integration PR merges.
+
+**Required check:**
+
+```bash
+# Run from the repo root on the sprint branch
+git diff release/m{N}...sprint/m{N}-g{N} --name-only | grep -E "test_"
+```
+
+The output must include the expected test files for every deliverable on the exit checklist.
+If a deliverable's test file does not appear: stop — do not open the integration PR until the
+feature branch carrying the test file is merged into the sprint branch.
+
+**Feature PR merge confirmation:** A ✓ on a sprint journal issue checkbox means the work
+was done — it does not confirm the commit is on the sprint branch. The PM Agent must
+separately confirm that each feature PR's commits are reachable from `sprint/m{N}-g{N}`:
+
+```bash
+git log sprint/m{N}-g{N} -- backend/tests/backtesting/<expected-test-file>.py
+```
+
+Must return at least one commit. Empty output means the file is absent from the sprint branch.
 
 ### How to implement the gate in practice
 
