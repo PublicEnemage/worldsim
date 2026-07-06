@@ -290,6 +290,8 @@ rather than a single-step snapshot.
 
 **What the presenter says:**
 
+> Frame B shows what operating at the boundary looks like — the trajectory it produces and the political risk sequence the ministry team inherits with it.
+>
 > Step four. Mid-programme. Zone 1A shows two trajectory sets: the baseline programme at
 > the IMF's fiscal multiplier assumption, and the constraint-compliant branch at 0.83.
 >
@@ -339,6 +341,8 @@ is the boundary: at 0.83, the threshold is not crossed. At 0.82, it would be.
 
 **What the presenter says:**
 
+> Frame C closes the Act 1 evidence chain — this is what makes 0.83 the boundary, not a value chosen to produce CLEAR.
+>
 > Step eight. Programme completion.
 >
 > Zone 1B — the cohort impact section. Bottom quintile poverty headcount. Recovery
@@ -405,12 +409,10 @@ in the capability.
 
 **What the presenter says:**
 
-> Act 2. Zambia. Same three options as Demo 7.
+> Act 2. Zambia. Same three options as Demo 7. One thing has changed.
 >
 > Zone 1B shows the comparison summary. Same differential: approximately 342,700 persons
 > below the poverty threshold under Option A versus Option C. Direction stable.
->
-> One thing has changed.
 >
 > Look at the interval label: "declared interval (BandingEngine)." Not "95% CI."
 >
