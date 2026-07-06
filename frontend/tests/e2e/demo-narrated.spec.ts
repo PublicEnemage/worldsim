@@ -980,6 +980,13 @@ test(
       "Frame B: psp-driver-arc should be visible in Zone 1D (M19 G4 #1528).",
     ).toBeVisible({ timeout: 5_000 });
 
+    // Scroll Zone 1D political-risk panel into prominent view for Frame B capture.
+    // Without this, Frame B and Frame A are pixel-identical (same step, same viewport).
+    await page.locator('[data-testid="zone-1d-political-risk"]').evaluate(
+      (el: HTMLElement) => el.scrollIntoView({ behavior: "instant", block: "center" }),
+    ).catch(() => {});
+    await page.waitForTimeout(400);
+
     await speak(
       "Step four. Mid-programme. Zone one D shows the PSP driver arc — " +
       "the causal driver at each step across the full programme window. " +
@@ -1095,7 +1102,7 @@ test(
         // M19 epistemic precision: CI label must read "declared interval (BandingEngine)"
         // NOT "95% CI" (DEMO-163 resolution, G4 #1529).
         await expect.soft(
-          page.locator('[data-testid="distributional-ci-label"]'),
+          page.locator('[data-testid="distributional-ci-label"]').first(),
           "M19 AC-CI: distributional-ci-label must read 'declared interval (BandingEngine)' not '95% CI'.",
         ).toContainText("declared interval", { timeout: 5_000 });
 
