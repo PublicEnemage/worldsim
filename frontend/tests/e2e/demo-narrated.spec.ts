@@ -502,6 +502,7 @@ async function createZMBAct1Scenario(): Promise<string> {
         modules_config: {
           ecological: { enabled: false },
           political_economy: { enabled: true },
+          external_sector: { enabled: false },
         },
         initial_attributes: {
           ZMB: {
@@ -980,11 +981,10 @@ test(
       "Frame B: psp-driver-arc should be visible in Zone 1D (M19 G4 #1528).",
     ).toBeVisible({ timeout: 5_000 });
 
-    // Scroll Zone 1D political-risk panel into prominent view for Frame B capture.
-    // Without this, Frame B and Frame A are pixel-identical (same step, same viewport).
-    await page.locator('[data-testid="zone-1d-political-risk"]').evaluate(
-      (el: HTMLElement) => el.scrollIntoView({ behavior: "instant", block: "center" }),
-    ).catch(() => {});
+    // Reset to top of viewport for Frame B — Zone 1A (trajectory) and Zone 1D (PSP arc)
+    // must both be visible simultaneously at 1440×900. block:"center" over-scrolled Zone 1A
+    // out of frame (DEMO-167, DEMO-175). scrollTo(0,0) keeps all zones in the viewport.
+    await page.evaluate(() => window.scrollTo(0, 0));
     await page.waitForTimeout(400);
 
     await speak(
@@ -1039,7 +1039,11 @@ test(
     );
 
     // ── FRAME C — "The Act 1 Evidence" (step 8, Zone 1B focal cohort CLEAR) ──
-    // Scroll Zone 1B to reveal the focal cohort CLEAR badge.
+    // Reset page scroll so Zone 1B is in the upper viewport (DEMO-187, DEMO-171).
+    // The Zone 1D scrollIntoView from Frame B left the page scrolled down; reset first.
+    await page.evaluate(() => window.scrollTo(0, 0));
+    await page.waitForTimeout(300);
+    // Scroll within Zone 1B container to reveal the focal cohort CLEAR badge at bottom.
     await page.locator('[data-testid="zone-1b-cohort-impact"]').evaluate(
       (el: HTMLElement) => { el.scrollTop = el.scrollHeight; },
     ).catch(() => {}); // non-fatal if zone-1b-cohort-impact not found
