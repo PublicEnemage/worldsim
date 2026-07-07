@@ -5125,6 +5125,39 @@ EL review of agents.md in the following session, prompted by the EL explicitly f
 
 ---
 
+## NM-101 — G2C Type B Tests All Return INDISTINGUISHABLE Because Baseline Scenario Is Never Run Before Being Used as baseline_run_id; Direction Verdicts Are Comparisons Against Empty Trajectories (Reactive)
+
+**Date:** 2026-07-07
+**Milestone:** M20 — Analytical Evidence Portfolio and Demo 9
+**Detected by:** AEA — discovered when running GRC counter-factual harness directly with a pre-run baseline and observing COUNTER_FACTUAL_BETTER verdict vs INDISTINGUISHABLE from test advisory
+**Severity:** High
+
+### What happened
+
+`test_m19_g2c_scenario_runs.py` runs Type B harness comparisons for GRC, ARG, LKA, PAK, TUR, EGY, and GHA. In every case, the test creates both a baseline and counter-factual scenario via `POST /api/v1/scenarios`, then calls `run_harness(scenario_id=cf_id, ..., baseline_run_id=baseline_id)`. The `run_harness` function advances the counter-factual step by step but fetches the baseline trajectory via `_fetch_trajectory(baseline_run_id)`. Because the baseline scenario was created but never run (no `POST /api/v1/scenarios/{id}/run` call and no step-advance calls), the trajectory endpoint returns empty steps. `_classify_direction` computes all-zero per_step_diff and returns INDISTINGUISHABLE.
+
+All 6 Type B direction advisories in the G2C test fire as INDISTINGUISHABLE — including GRC where the correct verdict (with a properly pre-run baseline) is COUNTER_FACTUAL_BETTER.
+
+When AEP-002 was authored using `run_harness` with the baseline pre-run via `/run`, the GRC counter-factual correctly returned COUNTER_FACTUAL_BETTER with per_step_diff growing from 0.0715 at step 2 to 0.1657 at step 6.
+
+### What was at risk
+
+The G2C Type B advisory warnings were generating false negatives for all scenarios across M19 battle-testing. The tests passed (advisories are non-blocking) but the advisory output implied all counter-factual paths were indistinguishable from their baselines — a result that was never verified as meaningful. AEP entries authored from G2C test output alone would have incorrectly documented INDISTINGUISHABLE as the direction verdict.
+
+### What caught it
+
+AEA authorship of AEP-002 required running the harness directly with a known-good baseline. The COUNTER_FACTUAL_BETTER result contradicted the G2C advisory, prompting investigation of the baseline-run precondition. This was caught by the AEP authorship process, not by the test suite itself.
+
+### Process improvement
+
+**New rule — Type B harness test precondition:** Before calling `run_harness(run_type=TYPE_B, baseline_run_id=X)`, the baseline scenario must be advanced through all steps. Two valid approaches:
+1. Call `POST /api/v1/scenarios/{baseline_id}/run` before calling `run_harness` — baseline trajectory is then available for `_fetch_trajectory`
+2. Call `run_harness(scenario_id=baseline_id, run_type=TYPE_A, ...)` first to advance the baseline step by step, then call `run_harness` on the counter-factual
+
+The G2C tests must be updated to add baseline pre-run before each `test_counterfactual_type_b_run` method. Filed as a gap closure issue for M20-G4 or M21 (to be scoped by PM Agent). The pattern is identical across all 6 Type B test classes — a single change to each `test_counterfactual_type_b_run` method resolves all instances.
+
+**AEP protocol update:** The AEP entry authorship protocol (and sprint plan note for G1-G3) is updated to require that baseline scenarios be pre-run via `/run` before the counter-factual harness is invoked for Type B entries.
+
 ## NM-NNN — [Short descriptive title]
 
 **Date:** YYYY-MM-DD (or approximate milestone era)

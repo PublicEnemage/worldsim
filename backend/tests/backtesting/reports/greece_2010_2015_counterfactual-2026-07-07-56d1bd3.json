@@ -1,0 +1,35 @@
+{
+  "case_id": "greece_2010_2015_counterfactual",
+  "run_date": "2026-07-07",
+  "commit_sha": "56d1bd3",
+  "engine_version": "0.3.0",
+  "run_type": "TYPE_B",
+  "primary_indicator": "hd_composite",
+  "baseline_scenario": "greece_2010_2015",
+  "counterfactual_description": "Gradual fiscal adjustment path — EUR 70bn programme (~30% GDP vs actual 48%); step 1 cut -4% GDP vs -8%; step 2 cut -2.5% GDP vs -5%; lighter consolidation steps 3-4; no capital controls at step 6",
+  "run_metadata": {
+    "run_type": "TYPE_B",
+    "steps": 6,
+    "output_timestamp": "2026-07-07T20:20:09.491817+00:00",
+    "is_pre_calibration": true
+  },
+  "per_step_records": [
+    {"step": 1, "fin_composite": "0.2329", "hd_composite": "0.8031", "eco_composite": null, "gov_composite": null, "mda_alert_states": [], "active_failure_modes": [], "ci_band_low": "0.1980", "ci_band_high": "0.2678"},
+    {"step": 2, "fin_composite": "0.0833", "hd_composite": "0.7333", "eco_composite": null, "gov_composite": null, "mda_alert_states": [], "active_failure_modes": [], "ci_band_low": "0.0583", "ci_band_high": "0.1083"},
+    {"step": 3, "fin_composite": "0.0833", "hd_composite": "0.6920", "eco_composite": null, "gov_composite": null, "mda_alert_states": [], "active_failure_modes": [], "ci_band_low": "0.0396", "ci_band_high": "0.1270"},
+    {"step": 4, "fin_composite": "0.0833", "hd_composite": "0.6696", "eco_composite": null, "gov_composite": null, "mda_alert_states": [], "active_failure_modes": [], "ci_band_low": "0.0396", "ci_band_high": "0.1270"},
+    {"step": 5, "fin_composite": "0.0833", "hd_composite": "0.6567", "eco_composite": null, "gov_composite": null, "mda_alert_states": [], "active_failure_modes": [], "ci_band_low": "0.0396", "ci_band_high": "0.1270"},
+    {"step": 6, "fin_composite": "0.0833", "hd_composite": "0.6619", "eco_composite": null, "gov_composite": null, "mda_alert_states": [], "active_failure_modes": [], "ci_band_low": "0.0208", "ci_band_high": "0.1458"}
+  ],
+  "summary": {
+    "primary_indicator": "hd_composite",
+    "step_differential_first_significant": 2,
+    "direction_verdict": "COUNTER_FACTUAL_BETTER",
+    "per_step_diff": ["0.0000", "0.0715", "0.1143", "0.1561", "0.1642", "0.1657"],
+    "known_limitations": [
+      "Counter-factual scenario — scheduled inputs are INFERRED_STRUCTURAL (Tier 3): the alternative policy path was not historically executed. Direction verdict is advisory, not a backtesting fidelity assessment."
+    ]
+  },
+  "overall": "COUNTER_FACTUAL_BETTER",
+  "notes": "Baseline run via /run endpoint before passing as baseline_run_id. G2C test advisory INDISTINGUISHABLE was a false signal — baseline trajectory was empty in test context (baseline never run). See NM-101."
+}

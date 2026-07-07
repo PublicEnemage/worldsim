@@ -1,0 +1,81 @@
+{
+  "case_id": "greece_2010_2015",
+  "run_date": "2026-07-05",
+  "commit_sha": "65ff77d7d6baf45800413aefcd0aee239a56aa01",
+  "engine_version": "0.3.0",
+  "thresholds": [
+    "gdp_growth_step1_negative",
+    "gdp_growth_step2_negative",
+    "gdp_growth_step3_negative",
+    "gdp_growth_step4_negative",
+    "gdp_growth_step6_negative"
+  ],
+  "results": [
+    {
+      "threshold_id": "gdp_growth_step1_negative",
+      "passed": true,
+      "note": null
+    },
+    {
+      "threshold_id": "gdp_growth_step2_negative",
+      "passed": true,
+      "note": null
+    },
+    {
+      "threshold_id": "gdp_growth_step3_negative",
+      "passed": true,
+      "note": null
+    },
+    {
+      "threshold_id": "gdp_growth_step4_negative",
+      "passed": true,
+      "note": null
+    },
+    {
+      "threshold_id": "gdp_growth_step6_negative",
+      "passed": true,
+      "note": null
+    },
+    {
+      "threshold_id": "credit_rating_declining_step0_to_step2",
+      "passed": null,
+      "note": "DEFERRED: FAIL \u2014 no endogenous module updates credit_rating_score (Issue #92)"
+    },
+    {
+      "threshold_id": "fdi_stock_declining_step0_to_step2",
+      "passed": null,
+      "note": "DEFERRED: FAIL \u2014 no endogenous module updates fdi_stock_pct_gdp (Issue #92)"
+    },
+    {
+      "threshold_id": "gdp_growth_step5_positive",
+      "passed": null,
+      "note": "DEFERRED: FAIL \u2014 no endogenous recovery module; engine accumulates contraction (Issue #221)"
+    },
+    {
+      "threshold_id": "health_expenditure_declining_step1_to_step2",
+      "passed": null,
+      "note": "DEFERRED: FAIL \u2014 no endogenous module updates health_expenditure_pct_gdp (Issue #87)"
+    },
+    {
+      "threshold_id": "portfolio_outflows_deepening_step0_to_step2",
+      "passed": null,
+      "note": "DEFERRED: FAIL \u2014 no endogenous module updates portfolio_flow_velocity (Issue #92)"
+    },
+    {
+      "threshold_id": "sovereign_risk_rising_step0_to_step2",
+      "passed": null,
+      "note": "DEFERRED: FAIL \u2014 no endogenous module updates sovereign_risk_premium (Issue #92)"
+    },
+    {
+      "threshold_id": "unemployment_declining_step4_to_step6",
+      "passed": null,
+      "note": "DEFERRED: FAIL \u2014 no endogenous module updates unemployment_rate (Issue #87)"
+    },
+    {
+      "threshold_id": "unemployment_rising_step1_to_step2",
+      "passed": null,
+      "note": "DEFERRED: PASS"
+    }
+  ],
+  "overall": "PASS"
+}
