@@ -6,7 +6,7 @@
 > Historical state lives in `docs/process/session-archives/`.
 > Authority: `docs/process/sprint-group-isolation.md §SESSION_STATE.md Cockpit Card Protocol`.
 
-**Last updated:** 2026-07-07 (M20-G1 complete; integration PR #1794 merged; G2 entry pending)
+**Last updated:** 2026-07-07 (M20-G2 entry filed; sprint/m20-g2 cut; journal #1798 opened)
 **Current milestone:** M20 — Analytical Evidence Portfolio and Demo 9
 
 ---
@@ -20,8 +20,8 @@
 | Exit checklist issue | #1773 (M20 Exit Checklist — blocks milestone closure) |
 | Release branch | `release/m20` — cut 2026-07-07 from main `5fadd00` |
 | Sprint plan | `docs/process/sprint-plans/m20-sprint-plan.md` — filed 2026-07-07 |
-| Active wave | G2 pending entry — AEP SSA-LIC + LATAM-EM (AEP-004–009) |
-| Active sprint journal issues | None (G1 closed 2026-07-07) |
+| Active wave | G2 — AEP SSA-LIC + LATAM-EM (AEP-004–009) |
+| Active sprint journal issues | #1798 (M20 G2) |
 
 ---
 
@@ -53,6 +53,8 @@ None.
 |---|---|---|
 | #1773 | M20 Exit Checklist | Milestone exit gate |
 | #1791 | fix: G2C Type B tests — pre-run baseline before baseline_run_id (NM-101) | High — M20-G4 scope |
+| #1796 | engine: fin_composite path insensitivity in CF scenarios | M21+ implementation |
+| #1797 | engine: failure mode non-detection in EURO-AREA rapid-onset crises | M21+ implementation |
 | #1759 | fix: asgi_client pool ordering (test_m19_cm_b) | Carry-forward NM-099; low severity |
 | #1775 | DEMO-233: WARNING badge not displayed alongside CLEAR | Medium — M20 instrument polish |
 | #1776 | DEMO-234: Binary search precision label vs CI label | High — M20 instrument polish |
@@ -74,7 +76,8 @@ None.
 | AEP-001-GRC-2010 | MERGED — PR #1788; EL-REVIEWED; DIRECTION_ONLY; Type A; 5/6 PASS |
 | AEP-002-GRC-2010-B | MERGED — PR #1790; EL-REVIEWED; DIRECTION_ONLY; Type B; COUNTER_FACTUAL_BETTER |
 | AEP-003-ISL-2008 | MERGED — PR #1792; EL-REVIEWED; DIRECTION_ONLY; Type B; BASELINE_BETTER |
-| Next AEP entries | AEP-004–009 (SSA-LIC + LATAM-EM) — G2 pending entry |
+| G2 sprint entry | `docs/process/sprint-plans/m20-g2-sprint-entry.md` — EL-approved 2026-07-07 |
+| Next AEP entries | AEP-004–009 (SSA-LIC + LATAM-EM) — sprint/m20-g2 active |
 
 ---
 
