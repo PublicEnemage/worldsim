@@ -65,8 +65,8 @@ and Business PO acceptance requirements.*
 
 | Deliverable | Work type | Customer Agent Layer 3 assessment | Business PO verdict | Verdict artifact |
 |---|---|---|---|---|
-| AEP-010-LKA-2022.md | Documentation / Analytics | Filed below (§3.1) | **PENDING EL REVIEW** | In-session 2026-07-07; EL review required |
-| AEP-011-PAK-2022.md | Documentation / Analytics | Filed below (§3.1) | **PENDING EL REVIEW** | In-session 2026-07-07; EL review required |
+| AEP-010-LKA-2022.md | Documentation / Analytics | Filed below (§3.1) | **ACCEPT** | In-session 2026-07-07 — EL BPO condition met: Issue #1819 filed (debt_moratorium/default_declaration interaction gap) before integration PR |
+| AEP-011-PAK-2022.md | Documentation / Analytics | Filed below (§3.1) | **ACCEPT** | In-session 2026-07-07 — unconditional; phased conditionality finding and directional success at Steps 1–2 accepted; PSP null framed as capability absence, not misleading output |
 
 ### 3.1 — Customer Agent Layer 3 Assessment
 
@@ -242,32 +242,34 @@ No open rejections. Proceed to Section 5.
 
 - [x] All implementation groups merged; CI green on sprint branch — PR #1814 merged to sprint/m20-g3; CI green (checks: audit, changes, branch-naming, session-state-size-check, test-backend, lint, compliance-scan all SUCCESS; backtesting in-progress; playwright-e2e SKIPPED)
 - [x] Gap closure issues filed per sprint plan requirement — #1815 (PRT), #1816 (BGD), #1817 (remittance channel)
-- [ ] Business PO ACCEPT verdict for each user-facing deliverable — **PENDING** EL in-session review
+- [x] Business PO ACCEPT verdict for each user-facing deliverable — AEP-010 ACCEPT (condition: Issue #1819 filed, met in-session 2026-07-07); AEP-011 ACCEPT (unconditional)
 - [x] Customer Agent Layer 3 assessment on record for all Persona 2/3/5 deliverables — filed §3.1 this session; AEP-010 and AEP-011 assessed
 - [x] No open rejection artifacts
-- [x] Near-miss sweep — no new near-miss findings in G3 beyond Issue #1797 extension (LKA all-six failure modes undetected); no new NM entries required (pattern extends existing #1797, not a new hazard)
-- [x] North star test artifact on record — §3.2 above; PAK phased conditionality scenario; AEP-010 scope-limitation classification
+- [x] Near-miss sweep — no new NM entries required; Issue #1819 is an engine gap issue (not a process near-miss); Issue #1797 extension to LKA confirmed as same pattern
+- [x] North star test artifact on record — §3.2 above; PAK phased conditionality scenario; AEP-010 scope-limitation (Tier 2) classification
 
-**Pending BPO condition:** This document is filed in advance of EL BPO review. Integration PR will open after EL confirms BPO verdict in-session. If EL identifies revision conditions, this section is updated before integration PR is opened.
-
-> PI Agent sprint exit verdict: **CONDITIONAL — pending EL Business PO verdict on AEP-010 and AEP-011.**
+> PI Agent sprint exit verdict: **Confirmed — all exit conditions satisfied.**
 >
 > Two AEP entries merged to sprint/m20-g3 for the SOUTH-SE-ASIAN calibration family.
 > Gap closure issues filed: #1815 (PRT), #1816 (BGD), #1817 (remittance channel).
 >
-> G3 primary finding: AEP-010 (LKA) is the most complete fidelity failure in the AEP portfolio.
-> The `debt_moratorium` + `default_declaration` interaction producing a composite improvement (not
-> collapse) is a new engine inconsistency not previously documented. AEP-011 (PAK) delivers a
-> correct directional signal for conditionality propagation and a COUNTER_FACTUAL_BETTER phased
-> adjustment result — the strongest policy-design finding in the SOUTH-SE-ASIAN family.
+> G3 primary findings:
+> — AEP-010 (LKA): most complete fidelity failure in the AEP portfolio; engine does not find
+>   Sri Lanka's 2022 crisis; counterintuitive composite improvement at default step identified
+>   as a distinct engine gap (#1819, debt_moratorium/default_declaration direction reversal —
+>   different from #1797 failure mode non-detection pattern). BPO ACCEPT with #1819 filed
+>   as condition — condition met in-session 2026-07-07.
+> — AEP-011 (PAK): directional success for conditionality propagation (Steps 1–2); Type B
+>   COUNTER_FACTUAL_BETTER — strongest policy-design finding in SOUTH-SE-ASIAN family.
+>   BPO ACCEPT unconditional.
 >
-> All-portfolio pattern at G3 close: DIRECTION_ONLY is the consistent ceiling across all four
-> calibration families. G3 extends the failure mode non-detection finding (Issue #1797) to the
-> most extreme test case (LKA all-six-failure-modes) and adds a new `debt_moratorium` interaction
-> gap as a candidate for a standalone engine gap issue before Demo 9.
+> All-portfolio pattern at G3 close: DIRECTION_ONLY consistent ceiling across all four
+> calibration families. One scope limitation disclosure entry (LKA). One directional success
+> + policy-design finding (PAK). Together they define the SOUTH-SE-ASIAN capability boundary.
 >
-> Customer Agent Layer 3 on record. North star test on record.
-> BPO verdict pending EL review; integration PR will open on EL confirmation.
+> Customer Agent Layer 3 on record. North star test on record. BPO ACCEPT on record.
+> Integration PR authorized to open.
+> Sprint journal #1811 closes at integration PR merge.
 >
 > — PI Agent, 2026-07-07
 
