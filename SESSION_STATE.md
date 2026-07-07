@@ -6,7 +6,7 @@
 > Historical state lives in `docs/process/session-archives/`.
 > Authority: `docs/process/sprint-group-isolation.md §SESSION_STATE.md Cockpit Card Protocol`.
 
-**Last updated:** 2026-07-07 (M20-G2 entry filed; sprint/m20-g2 cut; journal #1798 opened)
+**Last updated:** 2026-07-07 (M20-G2 closed — AEP-004–009 EL-REVIEWED; integration PR #1809 merged; G3 pending entry)
 **Current milestone:** M20 — Analytical Evidence Portfolio and Demo 9
 
 ---
@@ -20,8 +20,8 @@
 | Exit checklist issue | #1773 (M20 Exit Checklist — blocks milestone closure) |
 | Release branch | `release/m20` — cut 2026-07-07 from main `5fadd00` |
 | Sprint plan | `docs/process/sprint-plans/m20-sprint-plan.md` — filed 2026-07-07 |
-| Active wave | G2 — AEP SSA-LIC + LATAM-EM (AEP-004–009) |
-| Active sprint journal issues | #1798 (M20 G2) |
+| Active wave | G3 — AEP SOUTH-SE-ASIAN (AEP-010–011) + gap closure issues; pending sprint entry |
+| Active sprint journal issues | None (G2 closed 2026-07-07; G3 not yet opened) |
 
 ---
 
@@ -77,7 +77,14 @@ None.
 | AEP-002-GRC-2010-B | MERGED — PR #1790; EL-REVIEWED; DIRECTION_ONLY; Type B; COUNTER_FACTUAL_BETTER |
 | AEP-003-ISL-2008 | MERGED — PR #1792; EL-REVIEWED; DIRECTION_ONLY; Type B; BASELINE_BETTER |
 | G2 sprint entry | `docs/process/sprint-plans/m20-g2-sprint-entry.md` — EL-approved 2026-07-07 |
-| Next AEP entries | AEP-004–009 (SSA-LIC + LATAM-EM) — sprint/m20-g2 active |
+| G2 sprint exit | `docs/process/sprint-plans/m20-g2-sprint-exit.md` — PI Agent confirmed 2026-07-07 |
+| AEP-004-ZMB-2014 | MERGED — PR #1800; EL-REVIEWED; DIRECTION_ONLY; Type A; SSA-LIC |
+| AEP-005-SEN-2014 | MERGED — PR #1801; EL-REVIEWED; DIRECTION_ONLY; Type A; SSA-LIC |
+| AEP-006-GHA-2022 | MERGED — PR #1802/#1807; EL-REVIEWED; DIRECTION_ONLY; Type A; SSA-LIC |
+| AEP-007-ARG-2001 | MERGED — PR #1803; EL-REVIEWED; DIRECTION_ONLY; Type A+B; LATAM-EM |
+| AEP-008-ARG-2003 | MERGED — PR #1804; EL-REVIEWED; DIRECTION_ONLY; Type A CM-D; LATAM-EM |
+| AEP-009-ECU-1999 | MERGED — PR #1805/#1807; EL-REVIEWED; DIRECTION_ONLY; Type A; LATAM-EM |
+| Next AEP entries | AEP-010–011 (SOUTH-SE-ASIAN) — G3 pending sprint entry |
 
 ---
 
