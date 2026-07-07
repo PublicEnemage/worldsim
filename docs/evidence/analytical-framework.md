@@ -331,5 +331,6 @@ These are not aspirational constraints. They are the operating boundaries within
 ---
 
 *Framework authored by: AEA (lead), with Chief Methodologist review*  
-*Status: `DRAFT — awaiting EL review`*  
+*Status: `EL-APPROVED — 2026-07-07`*  
+*CM endorsement recorded: 2026-07-07 — two-condition rule for SSA-LIC MAGNITUDE (PR #1783)*  
 *Next review: M20 close, or when a new calibration family is registered*
