@@ -6,7 +6,7 @@
 > Historical state lives in `docs/process/session-archives/`.
 > Authority: `docs/process/sprint-group-isolation.md §SESSION_STATE.md Cockpit Card Protocol`.
 
-**Last updated:** 2026-07-07 (AEA D1 merged #1780; D2 Analytical Framework filed; AEA agent definition corrected in agents.md + CLAUDE.md; NM-100 filed)
+**Last updated:** 2026-07-07 (AEA D1/D2 merged; D3 Coverage Audit filed; AEA commissioned session complete pending EL review of D3)
 **Current milestone:** M20 — Interactive Constraint Search and Demo 9
 
 ---
@@ -29,7 +29,7 @@
 
 | Decision | Status |
 |---|---|
-| AEA D2 — Analytical Framework (`docs/evidence/analytical-framework.md`) | **PENDING EL REVIEW** — commit `2976f4f` on `docs/aea-d2-analytical-framework`; D3 blocked until reviewed |
+| AEA D3 — Coverage Audit (`docs/evidence/coverage-audit.md`) | **PENDING EL REVIEW** — on `docs/aea-d3-coverage-audit`; commissioned session complete pending EL review |
 
 ---
 
