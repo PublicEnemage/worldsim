@@ -1,0 +1,52 @@
+{
+  "run_metadata": {
+    "scenario_id": "594d054c-46aa-4ffc-adca-f3e0b2d9f410",
+    "run_type": "TYPE_A",
+    "steps": 2,
+    "output_timestamp": "2026-07-07T22:00:40.565841+00:00",
+    "is_pre_calibration": true
+  },
+  "per_step_records": [
+    {
+      "step": 1,
+      "fin_composite": "0.2458",
+      "hd_composite": "0.5613",
+      "eco_composite": null,
+      "gov_composite": null,
+      "mda_alert_states": [],
+      "cohort_poverty_headcount": null,
+      "psp": null,
+      "ci_band_low": "0.2089",
+      "ci_band_high": "0.2827",
+      "active_failure_modes": [],
+      "model_value": "0.2458",
+      "hist_value": null
+    },
+    {
+      "step": 2,
+      "fin_composite": "0.2599",
+      "hd_composite": "0.5653",
+      "eco_composite": null,
+      "gov_composite": null,
+      "mda_alert_states": [],
+      "cohort_poverty_headcount": null,
+      "psp": null,
+      "ci_band_low": "0.1819",
+      "ci_band_high": "0.3379",
+      "active_failure_modes": [],
+      "model_value": "0.2599",
+      "hist_value": null
+    }
+  ],
+  "summary": {
+    "fidelity_tier": "DIRECTION_ONLY",
+    "fidelity_rationale": "Directional fidelity confirmed. Magnitude calibration pending \u2014 0 valid (model, hist) pairs available.",
+    "known_limitations": []
+  },
+  "engine_version": "0.3.0",
+  "run_type": "TYPE_A",
+  "primary_indicator": "hd_composite",
+  "case_id": "ecuador_1999_2000",
+  "run_date": "2026-07-07",
+  "commit_sha": "2379430"
+}
