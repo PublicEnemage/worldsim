@@ -5084,6 +5084,47 @@ established pattern — the CODING_STANDARDS entry will ensure future fixtures d
 
 ---
 
+## NM-100 — AEA Agent Definition Not Committed Before PR Opened; Session Ended Mid-Task With Staged-But-Uncommitted Changes (Reactive)
+
+**Date:** 2026-07-07  
+**Milestone:** M20  
+**Type:** Reactive — caught by EL review of PR #1779 after merge  
+**Severity:** Medium — no incorrect artifacts produced; missing artifacts (AEA definition in agents.md and CLAUDE.md) created a gap between what the session believed was filed and what was actually in the repository
+
+### What happened
+
+During the M19 exit ceremony session, the EL commissioned the Analytical Evidence Agent (AEA) definition and instructed that it be filed in two places: `docs/process/agents.md` (under a new `## External Intelligence Layer` section) and `CLAUDE.md` (under a new `## External Intelligence Layer` heading). The session edited both files.
+
+The session then opened PR #1779 (`chore/m19-state-sync-057` → `main`) with title "docs: AEA External Intelligence Layer + M19 exit ceremony SESSION_STATE final." The PR was merged (by EL admin bypass or auto-merge). The session summary recorded that PR #1779 "contains SESSION_STATE.md + agents.md + CLAUDE.md (AEA definition)."
+
+In the following session, the EL reported that agents.md did not contain the AEA definition. `gh pr view 1779 --json files` confirmed: PR #1779 contained only SESSION_STATE.md (19 additions, 18 deletions). The agents.md and CLAUDE.md edits were not present.
+
+### Root cause
+
+The session ran out of context mid-task, after the AEA definition edits were written but before they were committed. The SESSION_STATE.md commit went through; the agents.md and CLAUDE.md edits were either never committed (edit happened in session context only, not saved to disk) or were in uncommitted local state when the session ended. The auto-merge-session-state workflow fired on the SESSION_STATE.md-only commit and merged it. The PR title implied the AEA definition was included, but it was not.
+
+Contributing factor: no pre-PR verification step confirmed that all intended file changes were committed and staged. The session proceeded to `git push` and `gh pr create` without running `git diff HEAD` or `git status` to verify that the AEA definition edits were committed.
+
+### What was at risk
+
+The AEA First Commissioned Session was already in progress (`docs/evidence/TEMPLATE.md` and `docs/evidence/analytical-framework.md`) with no agent definition on record. If the gap had not been caught by the EL, the evidence portfolio would have grown without a registered agent definition in agents.md or a reference in CLAUDE.md — a governance gap equivalent to implementing a feature without an ADR.
+
+### What caught it
+
+EL review of agents.md in the following session, prompted by the EL explicitly flagging that "PR 1779 did not include the agents.md file commit."
+
+### Process improvement
+
+**Immediate fix:** AEA definition added to `docs/process/agents.md §External Intelligence Layer` and `CLAUDE.md §External Intelligence Layer` in the same commit as this near-miss entry (on branch `docs/aea-d2-analytical-framework`, M20).
+
+**Rule (new):** Before opening any PR that is described as containing multi-file changes, the acting agent MUST run `git diff HEAD --name-only` (or `git status`) and verify that every file named in the PR title or description appears in the diff output. A PR description that names files not in the diff is a process violation — the PR must not be opened until all described changes are committed.
+
+**Rule (reinforced):** Session summary claims about what was committed are not authoritative. Only `gh pr view <N> --json files` is authoritative about what a merged PR contained. When a session resumes and references prior work, verify the file contents on disk before assuming the prior session's changes are present.
+
+**Cross-reference:** NM-042 (sign-off without artifact in repository — same root cause pattern: session believes artifact exists, it does not).
+
+---
+
 ## NM-NNN — [Short descriptive title]
 
 **Date:** YYYY-MM-DD (or approximate milestone era)
