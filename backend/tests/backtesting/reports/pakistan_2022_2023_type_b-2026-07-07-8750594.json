@@ -1,0 +1,98 @@
+{
+  "run_metadata": {
+    "scenario_id": "c3d309df-226c-426e-8791-0615491e56a4",
+    "run_type": "TYPE_B",
+    "steps": 4,
+    "output_timestamp": "2026-07-07T23:21:11.571226+00:00",
+    "is_pre_calibration": true
+  },
+  "per_step_records": [
+    {
+      "step": 1,
+      "fin_composite": "0.5782",
+      "hd_composite": "0.8571",
+      "eco_composite": null,
+      "gov_composite": null,
+      "mda_alert_states": [],
+      "cohort_poverty_headcount": null,
+      "psp": null,
+      "ci_band_low": "0.4915",
+      "ci_band_high": "0.6649",
+      "active_failure_modes": [],
+      "model_value": "0.5782",
+      "hist_value": null
+    },
+    {
+      "step": 2,
+      "fin_composite": "0.5642",
+      "hd_composite": "0.8491",
+      "eco_composite": null,
+      "gov_composite": null,
+      "mda_alert_states": [],
+      "cohort_poverty_headcount": null,
+      "psp": null,
+      "ci_band_low": "0.3949",
+      "ci_band_high": "0.7335",
+      "active_failure_modes": [],
+      "model_value": "0.5642",
+      "hist_value": null
+    },
+    {
+      "step": 3,
+      "fin_composite": "0.5501",
+      "hd_composite": "0.8411",
+      "eco_composite": null,
+      "gov_composite": null,
+      "mda_alert_states": [],
+      "cohort_poverty_headcount": null,
+      "psp": null,
+      "ci_band_low": "0.2613",
+      "ci_band_high": "0.8389",
+      "active_failure_modes": [],
+      "model_value": "0.5501",
+      "hist_value": null
+    },
+    {
+      "step": 4,
+      "fin_composite": "0.5360",
+      "hd_composite": "0.8330",
+      "eco_composite": null,
+      "gov_composite": null,
+      "mda_alert_states": [],
+      "cohort_poverty_headcount": null,
+      "psp": null,
+      "ci_band_low": "0.2546",
+      "ci_band_high": "0.8174",
+      "active_failure_modes": [],
+      "model_value": "0.5360",
+      "hist_value": null
+    }
+  ],
+  "summary": {
+    "baseline_run_id": "c0d8fd1e-070e-4738-add8-8dc0c16ac105",
+    "counterfactual_run_id": "c3d309df-226c-426e-8791-0615491e56a4",
+    "primary_indicator": "hd_composite",
+    "step_differential_first_significant": 2,
+    "direction_verdict": "COUNTER_FACTUAL_BETTER",
+    "per_step_diff": [
+      "0.0000",
+      "0.0232",
+      "0.0152",
+      "0.0071"
+    ],
+    "known_limitations": [
+      "\u2139 Counter-factual scenario \u2014 scheduled inputs are INFERRED_STRUCTURAL (Tier 3): the alternative policy path was not historically executed. Direction verdict is advisory, not a backtesting fidelity assessment. Persistent direction disagreement should be escalated to the Chief Methodologist."
+    ]
+  },
+  "engine_version": "0.3.0",
+  "run_type": "TYPE_B",
+  "primary_indicator": "hd_composite",
+  "baseline_scenario_id": "c0d8fd1e-070e-4738-add8-8dc0c16ac105",
+  "counterfactual_scenario_id": "c3d309df-226c-426e-8791-0615491e56a4",
+  "baseline_description": "Pakistan 2022-23: front-loaded IMF conditionality (full fuel subsidy removal Step 1, implementation_capacity=0.6)",
+  "counterfactual_description": "Pakistan 2022-23 CF: phased conditionality (25% per step, implementation_capacity=0.85)",
+  "notes": "Baseline pre-run via /run before counter-factual harness invoked (NM-101 fix).",
+  "case_id": "pakistan_2022_2023_type_b",
+  "run_date": "2026-07-07",
+  "commit_sha": "8750594"
+}
