@@ -6,8 +6,8 @@
 > Historical state lives in `docs/process/session-archives/`.
 > Authority: `docs/process/sprint-group-isolation.md §SESSION_STATE.md Cockpit Card Protocol`.
 
-**Last updated:** 2026-07-07 (AEA first commissioned session COMPLETE — D1/D2/D3 merged; analytical-framework.md EL-APPROVED)
-**Current milestone:** M20 — Interactive Constraint Search and Demo 9
+**Last updated:** 2026-07-07 (M20 kickoff — scope confirmed; release/m20 cut; sprint plan filed; DEMO-235 deferred to M21)
+**Current milestone:** M20 — Analytical Evidence Portfolio and Demo 9
 
 ---
 
@@ -15,12 +15,12 @@
 
 | Field | Value |
 |---|---|
-| Milestone | M20 — Interactive Constraint Search and Demo 9 |
-| GitHub Milestone | #22 — created 2026-07-06 |
+| Milestone | M20 — Analytical Evidence Portfolio and Demo 9 |
+| GitHub Milestone | #22 |
 | Exit checklist issue | #1773 (M20 Exit Checklist — blocks milestone closure) |
-| Release branch | `release/m20` — to be cut from main at M20 kickoff |
-| Sprint plan | `docs/process/sprint-plans/m20-sprint-plan.md` — to be filed at M20 kickoff |
-| Active wave | None — M20 sprint planning pending |
+| Release branch | `release/m20` — cut 2026-07-07 from main `5fadd00` |
+| Sprint plan | `docs/process/sprint-plans/m20-sprint-plan.md` — filed 2026-07-07 |
+| Active wave | None — G1 entry pending |
 | Active sprint journal issues | None |
 
 ---
@@ -78,7 +78,7 @@ None.
 - **Pre-push hook:** `.githooks/pre-push` enforces ruff + mypy (backend) and `npm run build` (frontend). Install: `git config core.hooksPath .githooks`.
 - **M19 complete (v0.19.0, 2026-07-06):** G1–G8 + CM-A–D delivered; Demo 8 PASS (constraint-derived boundary); SCAN-029 Clean. Archive: `docs/process/session-archives/session-state-pre-m20.md`.
 - **Demo 8 north star (2026-07-06):** "The constraint-floor boundary is 0.83. Your proposed programme, which assumes a multiplier above 0.83, embeds the poverty crossing as a structural consequence." Next available DEMO-237.
-- **M20 primary deliverable:** Live interactive constraint-floor search (real-time boundary on floor adjustment). Instrument polish: DEMO-217 (in-viewport Act 1→Act 2 link), DEMO-233/#1775 (WARNING alongside CLEAR), DEMO-234/#1776 (±0.01 vs CI label), DEMO-235/#1777 (PSP multi-scenario comparison).
+- **M20 primary deliverable:** AEP — 11 entries across all four calibration families (G1: EUR AEP-001–003; G2: SSA/LAT AEP-004–009; G3: SEA AEP-010–011 + gap issues). Instrument polish: DEMO-217, DEMO-233/#1775, DEMO-234/#1776 (G4). Live constraint search and DEMO-235 → M21.
 - **ADR-008 renewal carry-forward:** SCAN-029 finding — must complete before M20 close.
 - **NM-099/Issue #1759:** asgi_client pool ordering in test_m19_cm_b; fix deferred to next sprint touching the file (EL decision 2026-07-05).
 - **sprint-branch-ci-gate Ruleset:** Node ID `RRS_lACqUmVwb3NpdG9yecc5IKi2kzgEV92A`. Requires `changes`, `lint`, `test-backend`, `compliance-scan`.
