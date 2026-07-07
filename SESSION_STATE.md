@@ -6,7 +6,7 @@
 > Historical state lives in `docs/process/session-archives/`.
 > Authority: `docs/process/sprint-group-isolation.md §SESSION_STATE.md Cockpit Card Protocol`.
 
-**Last updated:** 2026-07-07 (M20-G3 entry filed — sprint/m20-g3 cut; journal #1811 opened; AEP-010/011 in progress)
+**Last updated:** 2026-07-07 (M20-G3 closed — AEP-010/011 BPO ACCEPT; integration PR #1821 open; G4 next)
 **Current milestone:** M20 — Analytical Evidence Portfolio and Demo 9
 
 ---
@@ -20,8 +20,8 @@
 | Exit checklist issue | #1773 (M20 Exit Checklist — blocks milestone closure) |
 | Release branch | `release/m20` — cut 2026-07-07 from main `5fadd00` |
 | Sprint plan | `docs/process/sprint-plans/m20-sprint-plan.md` — filed 2026-07-07 |
-| Active wave | G3 — AEP SOUTH-SE-ASIAN (AEP-010–011) + gap closure issues |
-| Active sprint journal issues | #1811 (M20 G3) |
+| Active wave | G4 — instrument polish (DEMO-217, DEMO-233/#1775, DEMO-234/#1776, NM-099/#1759); pending sprint entry |
+| Active sprint journal issues | None (G3 closed 2026-07-07; G4 not yet opened) |
 
 ---
 
@@ -55,10 +55,14 @@ None.
 | #1791 | fix: G2C Type B tests — pre-run baseline before baseline_run_id (NM-101) | High — M20-G4 scope |
 | #1796 | engine: fin_composite path insensitivity in CF scenarios | M21+ implementation |
 | #1797 | engine: failure mode non-detection in EURO-AREA rapid-onset crises | M21+ implementation |
-| #1759 | fix: asgi_client pool ordering (test_m19_cm_b) | Carry-forward NM-099; low severity |
-| #1775 | DEMO-233: WARNING badge not displayed alongside CLEAR | Medium — M20 instrument polish |
-| #1776 | DEMO-234: Binary search precision label vs CI label | High — M20 instrument polish |
-| #1777 | DEMO-235: PSP driver arc missing in multi-scenario view | High — M20 instrument polish |
+| #1819 | engine: debt_moratorium + default_declaration direction reversal (LKA Step 4) | M21+ — distinct from #1797 |
+| #1759 | fix: asgi_client pool ordering (test_m19_cm_b) | Carry-forward NM-099; M20-G4 scope |
+| #1775 | DEMO-233: WARNING badge not displayed alongside CLEAR | Medium — M20-G4 |
+| #1776 | DEMO-234: Binary search precision label vs CI label | High — M20-G4 |
+| #1777 | DEMO-235: PSP driver arc missing in multi-scenario view | High — M20-G4 |
+| #1815 | feat: Portugal 2011–2014 fixture (EURO-AREA gap) | M21 |
+| #1816 | feat: Bangladesh fixture (SOUTH-SE-ASIAN gap) | M21 |
+| #1817 | feat: remittance channel in ELASTICITY_REGISTRY | M21 |
 
 ---
 
@@ -69,8 +73,6 @@ None.
 | `docs/evidence/TEMPLATE.md` | MERGED — PR #1780 |
 | `docs/evidence/analytical-framework.md` | MERGED + EL-APPROVED — PR #1781 (body), #1783 (CM two-condition rule) |
 | `docs/evidence/coverage-audit.md` | MERGED — PR #1782 |
-| `docs/process/agents.md §External Intelligence Layer` | MERGED — PR #1781 (corrected NM-100) |
-| `CLAUDE.md §External Intelligence Layer` | MERGED — PR #1781 (corrected NM-100) |
 | G1 sprint entry | `docs/process/sprint-plans/m20-g1-sprint-entry.md` — EL-approved 2026-07-07 |
 | G1 sprint exit | `docs/process/sprint-plans/m20-g1-sprint-exit.md` — PI Agent confirmed 2026-07-07 |
 | AEP-001-GRC-2010 | MERGED — PR #1788; EL-REVIEWED; DIRECTION_ONLY; Type A; 5/6 PASS |
@@ -85,7 +87,9 @@ None.
 | AEP-008-ARG-2003 | MERGED — PR #1804; EL-REVIEWED; DIRECTION_ONLY; Type A CM-D; LATAM-EM |
 | AEP-009-ECU-1999 | MERGED — PR #1805/#1807; EL-REVIEWED; DIRECTION_ONLY; Type A; LATAM-EM |
 | G3 sprint entry | `docs/process/sprint-plans/m20-g3-sprint-entry.md` — EL-approved 2026-07-07 |
-| Next AEP entries | AEP-010–011 (SOUTH-SE-ASIAN) — sprint/m20-g3 active |
+| G3 sprint exit | `docs/process/sprint-plans/m20-g3-sprint-exit.md` — PI Agent confirmed 2026-07-07 |
+| AEP-010-LKA-2022 | BPO ACCEPT — integration PR #1821; DIRECTION_ONLY scope limitation; #1819 filed |
+| AEP-011-PAK-2022 | BPO ACCEPT (unconditional) — integration PR #1821; DIRECTION_ONLY; Type A+B; COUNTER_FACTUAL_BETTER |
 
 ---
 
@@ -93,11 +97,12 @@ None.
 
 - **Process model:** Sprint group isolation (Option E hybrid) + SESSION_STATE.md cockpit (≤ 200 lines). Protocol: `docs/process/sprint-group-isolation.md`. Shared state via `chore/m{N}-state-sync-NNN` → `release/m{N}` (PM Agent).
 - **Pre-push hook:** `.githooks/pre-push` enforces ruff + mypy (backend) and `npm run build` (frontend). Install: `git config core.hooksPath .githooks`.
-- **M19 complete (v0.19.0, 2026-07-06):** G1–G8 + CM-A–D delivered; Demo 8 PASS (constraint-derived boundary); SCAN-029 Clean. Archive: `docs/process/session-archives/session-state-pre-m20.md`.
-- **Demo 8 north star (2026-07-06):** "The constraint-floor boundary is 0.83. Your proposed programme, which assumes a multiplier above 0.83, embeds the poverty crossing as a structural consequence." Next available DEMO-237.
-- **M20 primary deliverable:** AEP — 11 entries across all four calibration families (G1: EUR AEP-001–003; G2: SSA/LAT AEP-004–009; G3: SEA AEP-010–011 + gap issues). Instrument polish: DEMO-217, DEMO-233/#1775, DEMO-234/#1776 (G4). Live constraint search and DEMO-235 → M21.
+- **M19 complete (v0.19.0, 2026-07-06):** G1–G8 + CM-A–D delivered; Demo 8 PASS; SCAN-029 Clean.
+- **Demo 8 north star (2026-07-06):** "The constraint-floor boundary is 0.83." Next available DEMO-237.
+- **M20 primary deliverable:** AEP — 11 entries across all four calibration families complete (G1: AEP-001–003; G2: AEP-004–009; G3: AEP-010–011). G4: DEMO-217, DEMO-233, DEMO-234, NM-099/#1759. Live constraint search → M21. Demo 9: AEP walkthrough.
 - **ADR-008 renewal carry-forward:** SCAN-029 finding — must complete before M20 close.
-- **NM-099/Issue #1759:** asgi_client pool ordering in test_m19_cm_b; fix deferred to next sprint touching the file (EL decision 2026-07-05).
+- **NM-099/Issue #1759:** asgi_client pool ordering in test_m19_cm_b; G4 scope.
+- **Issue #1819:** debt_moratorium/default_declaration direction reversal (LKA Step 4) — new engine gap distinct from #1797; filed as G3 BPO ACCEPT condition 2026-07-07.
 - **sprint-branch-ci-gate Ruleset:** Node ID `RRS_lACqUmVwb3NpdG9yecc5IKi2kzgEV92A`. Requires `changes`, `lint`, `test-backend`, `compliance-scan`.
-- **stash backlog (active):** 26 entries remain. Key: stash@{7} (M18 chore + G1 orphans), stash@{8}/{9} (M18-G2 duplicates, likely superseded PR #1387).
+- **stash backlog (active):** 26 entries remain.
 - **GA-02 / Path 2 retired (PR #1393):** No implementation without EL-approved governance exception.
