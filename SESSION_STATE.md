@@ -6,7 +6,7 @@
 > Historical state lives in `docs/process/session-archives/`.
 > Authority: `docs/process/sprint-group-isolation.md §SESSION_STATE.md Cockpit Card Protocol`.
 
-**Last updated:** 2026-07-07 (M20-G1 entry filed; sprint journal #1786 opened; sprint/m20-g1 pending cut)
+**Last updated:** 2026-07-07 (M20-G1 complete; integration PR #1794 merged; G2 entry pending)
 **Current milestone:** M20 — Analytical Evidence Portfolio and Demo 9
 
 ---
@@ -20,8 +20,8 @@
 | Exit checklist issue | #1773 (M20 Exit Checklist — blocks milestone closure) |
 | Release branch | `release/m20` — cut 2026-07-07 from main `5fadd00` |
 | Sprint plan | `docs/process/sprint-plans/m20-sprint-plan.md` — filed 2026-07-07 |
-| Active wave | G1 — AEP EURO-AREA entries (AEP-001–003) |
-| Active sprint journal issues | #1786 (M20 G1) |
+| Active wave | G2 pending entry — AEP SSA-LIC + LATAM-EM (AEP-004–009) |
+| Active sprint journal issues | None (G1 closed 2026-07-07) |
 
 ---
 
@@ -52,6 +52,7 @@ None.
 | Issue | Title | Priority |
 |---|---|---|
 | #1773 | M20 Exit Checklist | Milestone exit gate |
+| #1791 | fix: G2C Type B tests — pre-run baseline before baseline_run_id (NM-101) | High — M20-G4 scope |
 | #1759 | fix: asgi_client pool ordering (test_m19_cm_b) | Carry-forward NM-099; low severity |
 | #1775 | DEMO-233: WARNING badge not displayed alongside CLEAR | Medium — M20 instrument polish |
 | #1776 | DEMO-234: Binary search precision label vs CI label | High — M20 instrument polish |
@@ -68,8 +69,12 @@ None.
 | `docs/evidence/coverage-audit.md` | MERGED — PR #1782 |
 | `docs/process/agents.md §External Intelligence Layer` | MERGED — PR #1781 (corrected NM-100) |
 | `CLAUDE.md §External Intelligence Layer` | MERGED — PR #1781 (corrected NM-100) |
-| Sprint entry | `docs/process/sprint-plans/m20-g1-sprint-entry.md` — EL-approved 2026-07-07 |
-| Next AEP entries | AEP-001-GRC-2010.md, AEP-002-GRC-2010-B.md, AEP-003-ISL-2008.md — sprint/m20-g1 branch pending cut |
+| G1 sprint entry | `docs/process/sprint-plans/m20-g1-sprint-entry.md` — EL-approved 2026-07-07 |
+| G1 sprint exit | `docs/process/sprint-plans/m20-g1-sprint-exit.md` — PI Agent confirmed 2026-07-07 |
+| AEP-001-GRC-2010 | MERGED — PR #1788; EL-REVIEWED; DIRECTION_ONLY; Type A; 5/6 PASS |
+| AEP-002-GRC-2010-B | MERGED — PR #1790; EL-REVIEWED; DIRECTION_ONLY; Type B; COUNTER_FACTUAL_BETTER |
+| AEP-003-ISL-2008 | MERGED — PR #1792; EL-REVIEWED; DIRECTION_ONLY; Type B; BASELINE_BETTER |
+| Next AEP entries | AEP-004–009 (SSA-LIC + LATAM-EM) — G2 pending entry |
 
 ---
 
