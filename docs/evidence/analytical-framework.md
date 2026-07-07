@@ -43,8 +43,15 @@ GHA — 2022–2023 IMF programme entry (G2E)
 | Current account direction | DIRECTION_ONLY | IMF AFRO range; no entity-specific trade elasticities |
 | Ecological cost direction | DIRECTION_ONLY | LULC + NOAA global estimates; no country-specific intensity data |
 
-**When MAGNITUDE is achievable within this family:**  
-Human development and poverty indicators can reach MAGNITUDE tier when World Bank WDI data for the specific entity is classified T2 or higher, and the Fosu (2011) growth-poverty elasticity is applied directly rather than inferred. SEN and ZMB backtesting fixture configurations should note which indicators achieve MAGNITUDE vs which remain DIRECTION_ONLY.
+**When MAGNITUDE is achievable within this family — two-condition rule (CM-endorsed, 2026-07-07):**  
+Human development and poverty indicators can reach MAGNITUDE tier only when **both** of the following conditions are satisfied:
+
+1. **T2 WDI data:** World Bank WDI data for the specific entity and scenario period is classified T2 or higher, enabling the Fosu (2011) growth-poverty elasticity to be applied to grounded inputs rather than inferred regional averages.
+2. **Fixture direction validation:** A backtesting fixture exists for that entity and includes at least one step where the engine's human development direction verdict has been confirmed to agree with historical actuals. This validates that the Fosu (2011) regional elasticity produces directionally correct outputs for that entity's structural context — a necessary condition before per-step magnitude ordering claims are made.
+
+**Condition 1 alone is not sufficient.** The Fosu (2011) elasticity is a regional SSA cross-country estimate. Without fixture validation (condition 2), T2 data supports the *application* of the elasticity but not *magnitude ordering* claims — because an unvalidated regional elasticity could be systematically wrong in direction for a specific entity, which would invalidate any ordering derived from it.
+
+**Current status:** SEN, ZMB, and GHA satisfy both conditions (T2 WDI data + dedicated fixture). ETH and KEN do not satisfy either condition (partial WDI at T3; no dedicated fixture) and remain DIRECTION_ONLY on human development indicators regardless of any future improvement in WDI data quality until a fixture is created and direction-validated.
 
 ---
 
