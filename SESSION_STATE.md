@@ -6,7 +6,7 @@
 > Historical state lives in `docs/process/session-archives/`.
 > Authority: `docs/process/sprint-group-isolation.md §SESSION_STATE.md Cockpit Card Protocol`.
 
-**Last updated:** 2026-07-07 (M19 exit ceremony fully complete — PR #1778 release/m19→main merged; Step 4 PASS; #1535 closed; M20 unblocked)
+**Last updated:** 2026-07-07 (AEA first commissioned session begun — D1 Evidence Entry Template filed; pending EL review)
 **Current milestone:** M20 — Interactive Constraint Search and Demo 9
 
 ---
@@ -27,7 +27,9 @@
 
 ## Open EL Decisions
 
-None.
+| Decision | Status |
+|---|---|
+| AEA D1 — Evidence Entry Template (`docs/evidence/TEMPLATE.md`) | **PENDING EL REVIEW** — commit `8569888` on `docs/aea-evidence-foundation`; D2 blocked until reviewed |
 
 ---
 
