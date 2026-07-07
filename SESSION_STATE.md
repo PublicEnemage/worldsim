@@ -6,7 +6,7 @@
 > Historical state lives in `docs/process/session-archives/`.
 > Authority: `docs/process/sprint-group-isolation.md §SESSION_STATE.md Cockpit Card Protocol`.
 
-**Last updated:** 2026-07-07 (M20-G2 closed — AEP-004–009 EL-REVIEWED; integration PR #1809 merged; G3 pending entry)
+**Last updated:** 2026-07-07 (M20-G3 entry filed — sprint/m20-g3 cut; journal #1811 opened; AEP-010/011 in progress)
 **Current milestone:** M20 — Analytical Evidence Portfolio and Demo 9
 
 ---
@@ -20,8 +20,8 @@
 | Exit checklist issue | #1773 (M20 Exit Checklist — blocks milestone closure) |
 | Release branch | `release/m20` — cut 2026-07-07 from main `5fadd00` |
 | Sprint plan | `docs/process/sprint-plans/m20-sprint-plan.md` — filed 2026-07-07 |
-| Active wave | G3 — AEP SOUTH-SE-ASIAN (AEP-010–011) + gap closure issues; pending sprint entry |
-| Active sprint journal issues | None (G2 closed 2026-07-07; G3 not yet opened) |
+| Active wave | G3 — AEP SOUTH-SE-ASIAN (AEP-010–011) + gap closure issues |
+| Active sprint journal issues | #1811 (M20 G3) |
 
 ---
 
@@ -84,7 +84,8 @@ None.
 | AEP-007-ARG-2001 | MERGED — PR #1803; EL-REVIEWED; DIRECTION_ONLY; Type A+B; LATAM-EM |
 | AEP-008-ARG-2003 | MERGED — PR #1804; EL-REVIEWED; DIRECTION_ONLY; Type A CM-D; LATAM-EM |
 | AEP-009-ECU-1999 | MERGED — PR #1805/#1807; EL-REVIEWED; DIRECTION_ONLY; Type A; LATAM-EM |
-| Next AEP entries | AEP-010–011 (SOUTH-SE-ASIAN) — G3 pending sprint entry |
+| G3 sprint entry | `docs/process/sprint-plans/m20-g3-sprint-entry.md` — EL-approved 2026-07-07 |
+| Next AEP entries | AEP-010–011 (SOUTH-SE-ASIAN) — sprint/m20-g3 active |
 
 ---
 
