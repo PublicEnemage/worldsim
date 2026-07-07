@@ -39,7 +39,7 @@
 | M17 | Calibration and Comparative Infrastructure | Wave 1: CM calibration (fiscal-to-cohort elasticity #1229, governance sensitivity #1248, FRAME-D gate); Wave 2: N=3 multi-scenario (#394), DEMO6 CRITICAL polish (#1249/#1250/#1253/#1239), adaptive y-axis (#1251), Zone 1B proportional allocation ADR-018 (#1252), GovernanceModule institutional_capacity_index (#1275) | Complete |
 | M18 | Full Argument and Demo 7 | Demo 7 (Senegal Mode 3 + Zambia three-scenario, simulated stakeholder session #843); counter-scenario comparison; CI bands (ADR-007 full implementation); PSP driver decomposition; control plane column (ADR-019); Zone 3 auditability panel | Complete |
 | M19 | Constraint Search and Empirical Calibration | Mode 3 constraint-floor search; SEN/ZMB backtesting; 10 battle-testing scenarios; empirically grounded CI intervals (ADR-007 Bayesian layer); PSP driver arc and auditability panel; ELASTICITY_REGISTRY non-SSA calibration (CM Sprints A/B/C/D); Zone 1A display fidelity and interaction layer; ADR-020 capital controls; Demo 8 | Complete |
-| M20 | Interactive Constraint Search and Demo 9 | Live interactive constraint-floor search; Mode 3 instrument polish (DEMO-217, 233, 234); PSP multi-scenario comparison; Demo 9 | Current |
+| M20 | Analytical Evidence Portfolio and Demo 9 | AEP first 11 entries (all four calibration families); Mode 3 instrument polish (DEMO-217, 233, 234); gap closure issues filed; Demo 9 | Current |
 
 ---
 
@@ -51,7 +51,7 @@ M19 is complete. The constraint-floor capability is delivered: the instrument fi
 
 M19 asks and answers: can the instrument do the search itself — find where the human cost floor is, rather than making the analyst iterate? Yes. At ZMB fiscal multiplier 0.83, the poverty headcount crosses the recovery floor. Below 0.83 it does not. The instrument found that number; the presenter cited it. "The constraint-floor boundary is 0.83. Your proposed programme, which assumes a multiplier above 0.83, embeds the poverty crossing as a structural consequence — not of the adjustment itself." The finding is the instrument's, not the narration's.
 
-M20 is current. The question Demo 8 raised: Aicha asked to adjust the poverty floor and see a new boundary in real time, without re-running. The live interactive constraint-floor search capability — real-time boundary update as the analyst adjusts the floor — is M20's primary deliverable. The Demo 8 instrument polish backlog (in-viewport Act 1→Act 2 navigation link, WARNING alongside CLEAR display, binary-search precision vs CI label, PSP multi-scenario comparison) closes before Demo 9.
+M20 is current. The AEA's first commissioned session (M19 exit / M20 kickoff) established the analytical evidence infrastructure: Evidence Entry Template, Analytical Framework, and Coverage Audit. M20 now builds the portfolio itself — 11 entries across all four calibration families, grounding the engine's outputs in a documented, quality-tiered evidence record that finance ministry analysts can cite. Mode 3 instrument polish (DEMO-217, -233, -234) closes as maintenance. Live interactive constraint-floor search — the original M20 primary — defers to M21 to give the AEP the milestone bandwidth it needs.
 
 ---
 
@@ -486,31 +486,30 @@ M17 is structured in two waves. **Wave 2 may not begin until Wave 1 produces a c
 
 ---
 
-### Milestone 20 — Interactive Constraint Search and Demo 9 *(current)*
+### Milestone 20 — Analytical Evidence Portfolio and Demo 9 *(current)*
 
-**Core deliverable:** Live interactive constraint-floor search — the analyst adjusts the human cost floor and sees a new boundary in real time, without re-running the full search. The M19 instrument required a pre-computed run; M20 makes the search reactive to live input.
+**Core deliverable:** WorldSim Analytical Evidence Portfolio (AEP) — 11 entries across all four registered calibration families, documenting what the engine actually produces, under what calibration conditions, with what fidelity tier. The evidence infrastructure (TEMPLATE.md, analytical-framework.md, coverage-audit.md) was established at M19 close / M20 kickoff; M20 builds the portfolio itself.
 
-**Demo 9 story:** *"Adjust the floor. The instrument finds the new boundary."*
+**Demo 9 story:** *"The Zambian finance ministry analyst pulls up AEP-004. The engine found consistent downward direction on human development from the copper crash step onward — the same pattern as Senegal's structural adjustment period (AEP-005). The directional ordering is valid; magnitude comparison is not — the framework says why. She then runs her own scenario and sees where it sits relative to the documented cases."*
 
 **What ships:**
 
-*Mode 3 interactive constraint search:*
-- Live constraint-floor search: real-time boundary update as analyst adjusts poverty floor threshold — no re-run required
-- DEMO-217: In-viewport Act 1 → Act 2 navigation link (CRITICAL finding, Demo 8 cold-retrieval risk for Persona 2)
-- DEMO-233: WARNING badge displayed alongside CLEAR in Zone 1B when constraint is met but margin is narrow
-- DEMO-234: Binary-search precision label vs CI label (±0.01 precision vs 0.08 CI width — clarify what the tolerance band means relative to the confidence interval)
+*Analytical Evidence Portfolio (primary):*
+- M20-G1 (EURO-AREA family): AEP-001 GRC 2010 Type A, AEP-002 GRC 2010 Type B counter-factual, AEP-003 ISL 2008 heterodox vs orthodox
+- M20-G2 (SSA-LIC + LATAM-EM): AEP-004 ZMB 2005, AEP-005 SEN 2000, AEP-006 GHA 2022, AEP-007 ARG 2001 (A+B), AEP-008 ARG 2003 Kirchner recovery, AEP-009 ECU 1999
+- M20-G3 (SOUTH-SE-ASIAN + gap issues): AEP-010 LKA 2022, AEP-011 PAK 2022 (A+B); gap closure issues filed (PRT fixture, BGD fixture, remittance channel)
 
-*Analytical depth:*
-- PSP multi-scenario comparison — PSP driver arc across all three ZMB scenarios in a single view (DEMO-235, Andreas finding from Demo 8)
+*Instrument polish (maintenance):*
+- M20-G4: DEMO-217 (in-viewport navigation link), DEMO-233/#1775 (WARNING alongside CLEAR), DEMO-234/#1776 (precision vs CI label), #1759/NM-099 (asgi_client fix)
 
 *Live external session:*
 - Demo 9 — live stakeholder session → M20 exit gate
 
 **Demo:** Demo 9 at M20 close.
 
-**Canonical user primarily served:** Persona 5 (Aicha Mbaye, Finance Minister) — live floor adjustment makes the constraint search interactive rather than pre-computed; the boundary responds to her input, not the presenter's rehearsal.
+**Canonical user primarily served:** Persona 2 (Kaveh Jafari, Finance Ministry Analyst) — the AEP gives him a citable, quality-tiered analytical record that he can present to his minister and to the IMF negotiating team.
 
-**What M20 does not do:** M20 does not add entity templates, data marketplace, or geocoded dataset expansion. CM Sprint B–D calibration is complete at M19 — M20 CM track focuses on any additional fixtures needed to support Demo 9 scenario selection, not new entity families.
+**What M20 does not do:** Live interactive constraint-floor search deferred to M21 — it requires a full sprint to implement correctly and should not compress the AEP work. DEMO-235 (PSP multi-scenario comparison) deferred to M21. No new calibration families or entity templates in M20 — gap closure issues are filed but implementation is M21+.
 
 ---
 

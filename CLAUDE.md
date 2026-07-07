@@ -310,9 +310,9 @@ See GitHub Releases for full delivery history.
 
 Delivered: Mode 3 constraint-floor search (#1540); SEN/ZMB backtesting (#1541, #1542); ten real-world battle-testing scenarios (G2A–G2D: GRC/ARG/LKA/PAK/TUR/EGY/GHA/ISL + SEN/ZMB); empirically grounded CI intervals — ADR-007 Bayesian posterior layer (#1543, #1536, #1537); PSP driver arc + auditability panel (#1528); CI label precision (#1529); ELASTICITY_REGISTRY non-SSA calibration — GRC/Euro area T2 (CM-A), LAC T3 ARG/ECU/BOL/PER (CM-B), SEA T3 PAK/LKA/BGD (CM-C), ARG Kirchner recovery inputs (CM-D); Zone 1A ZMB display fidelity (#1629); Zone 1D delta annotations (#1630); Zone 1 view model retrofit (#1522); Zone 1A trackwheel zoom (#1524); ADR-020 capital controls channels (Iceland G2D). Demo 8 simulated stakeholder session: north star PASS (constraint-derived boundary). SCAN-029 complete (Clean, 2026-07-06).
 
-**Milestone 20 — Interactive Constraint Search and Demo 9 (Current)**
+**Milestone 20 — Analytical Evidence Portfolio and Demo 9 (Current)**
 
-Core deliverable: Live interactive constraint-floor search (real-time boundary update as analyst adjusts the human cost floor — reverses the M19 pre-computation model); Mode 3 instrument polish from Demo 8 findings (DEMO-217 in-viewport Act 1→Act 2 navigation link, DEMO-233 WARNING alongside CLEAR display, DEMO-234 binary-search precision vs CI label); PSP multi-scenario comparison. Demo 9 at M20 close.
+Core deliverable: WorldSim Analytical Evidence Portfolio (AEP) — first 11 entries across all four calibration families (EURO-AREA: AEP-001–003; SSA-LIC: AEP-004–006; LATAM-EM: AEP-007–009; SOUTH-SE-ASIAN: AEP-010–011); Mode 3 instrument polish (DEMO-217, DEMO-233/#1775, DEMO-234/#1776); gap closure issues filed (PRT fixture, BGD fixture, remittance channel). Live interactive constraint-floor search deferred to M21. Demo 9 at M20 close: AEP walkthrough for a Zambian finance ministry analyst.
 
 Each milestone is a vertical slice — working software at every stage,
 not infrastructure waiting for features.
@@ -328,8 +328,8 @@ The full roadmap covering M20 and beyond — milestone deliverables, demo anchor
 **Milestone 19 — Constraint Search and Empirical Calibration (Complete)**
 Delivered: Mode 3 constraint-floor search (#1540); SEN/ZMB backtesting (#1541, #1542); ten real-world battle-testing scenarios (GRC/ARG/LKA/PAK/TUR/EGY/GHA/ISL + SEN/ZMB); empirically grounded CI intervals (G3); PSP driver arc + auditability panel (#1528); CI label precision (#1529); ELASTICITY_REGISTRY non-SSA calibration — GRC T2 (CM-A), LAC T3 (CM-B), SEA T3 (CM-C), ARG Kirchner inputs (CM-D); Zone 1A ZMB display fidelity (#1629); Zone 1D delta annotations (#1630); Zone 1 view model retrofit (#1522); Zone 1A trackwheel zoom (#1524); ADR-020 capital controls (Iceland G2D). Demo 8 north star PASS (2026-07-06, constraint-derived boundary). SCAN-029 complete (Clean, 2026-07-06).
 
-**Milestone 20 — Interactive Constraint Search and Demo 9 (Current)**
-Core deliverable: Live interactive constraint-floor search; Mode 3 instrument polish (DEMO-217, DEMO-233, DEMO-234); PSP multi-scenario comparison. Demo 9 at M20 close.
+**Milestone 20 — Analytical Evidence Portfolio and Demo 9 (Current)**
+Core deliverable: AEP first 11 entries (all four calibration families); DEMO-217, -233, -234 instrument polish; gap closure issues filed. Live constraint search → M21. Demo 9: AEP walkthrough.
 
 Full roadmap: `docs/roadmap/worldsim-roadmap.md`
 
