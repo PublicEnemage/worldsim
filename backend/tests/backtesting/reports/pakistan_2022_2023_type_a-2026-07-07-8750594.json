@@ -1,0 +1,82 @@
+{
+  "run_metadata": {
+    "scenario_id": "e4d61f89-ae83-4d5c-8789-c0641903931c",
+    "run_type": "TYPE_A",
+    "steps": 4,
+    "output_timestamp": "2026-07-07T23:21:11.515085+00:00",
+    "is_pre_calibration": true
+  },
+  "per_step_records": [
+    {
+      "step": 1,
+      "fin_composite": "0.5782",
+      "hd_composite": "0.8571",
+      "eco_composite": null,
+      "gov_composite": null,
+      "mda_alert_states": [],
+      "cohort_poverty_headcount": null,
+      "psp": null,
+      "ci_band_low": "0.4915",
+      "ci_band_high": "0.6649",
+      "active_failure_modes": [],
+      "model_value": "0.5782",
+      "hist_value": null
+    },
+    {
+      "step": 2,
+      "fin_composite": "0.5235",
+      "hd_composite": "0.8259",
+      "eco_composite": null,
+      "gov_composite": null,
+      "mda_alert_states": [],
+      "cohort_poverty_headcount": null,
+      "psp": null,
+      "ci_band_low": "0.3665",
+      "ci_band_high": "0.6806",
+      "active_failure_modes": [],
+      "model_value": "0.5235",
+      "hist_value": null
+    },
+    {
+      "step": 3,
+      "fin_composite": "0.5235",
+      "hd_composite": "0.8259",
+      "eco_composite": null,
+      "gov_composite": null,
+      "mda_alert_states": [],
+      "cohort_poverty_headcount": null,
+      "psp": null,
+      "ci_band_low": "0.2487",
+      "ci_band_high": "0.7983",
+      "active_failure_modes": [],
+      "model_value": "0.5235",
+      "hist_value": null
+    },
+    {
+      "step": 4,
+      "fin_composite": "0.5235",
+      "hd_composite": "0.8259",
+      "eco_composite": null,
+      "gov_composite": null,
+      "mda_alert_states": [],
+      "cohort_poverty_headcount": null,
+      "psp": null,
+      "ci_band_low": "0.2487",
+      "ci_band_high": "0.7983",
+      "active_failure_modes": [],
+      "model_value": "0.5235",
+      "hist_value": null
+    }
+  ],
+  "summary": {
+    "fidelity_tier": "DIRECTION_ONLY",
+    "fidelity_rationale": "Directional fidelity confirmed. Magnitude calibration pending \u2014 0 valid (model, hist) pairs available.",
+    "known_limitations": []
+  },
+  "engine_version": "0.3.0",
+  "run_type": "TYPE_A",
+  "primary_indicator": "hd_composite",
+  "case_id": "pakistan_2022_2023_type_a",
+  "run_date": "2026-07-07",
+  "commit_sha": "8750594"
+}
