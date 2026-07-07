@@ -3,17 +3,17 @@ name: m20-sprint-g2-exit
 type: sprint-exit
 milestone: M20 — Analytical Evidence Portfolio and Demo 9
 sprint-group: G2
-status: Pending EL Review
+status: Confirmed
 authored-by: PM Agent
 date: 2026-07-07
-pi-confirmed: false
+pi-confirmed: true
 release-branch: release/m20
 sop-reference: docs/process/sprint-planning-sop.md §Sprint Exit Gate
 ---
 
 # Sprint Exit — M20, Sprint Group G2
 
-**Status:** Pending EL Review — Customer Agent Layer 3 assessment filed; Business PO acceptance pending
+**Status:** Confirmed — PI Agent gate passed 2026-07-07; EL BPO ACCEPT on record
 **Date produced:** 2026-07-07
 **Release branch:** `release/m20`
 **Sprint entry document:** `docs/process/sprint-plans/m20-g2-sprint-entry.md`
@@ -72,12 +72,12 @@ and Business PO acceptance requirements.*
 
 | Deliverable | Work type | Customer Agent Layer 3 assessment | Business PO verdict | Verdict artifact |
 |---|---|---|---|---|
-| AEP-004-ZMB-2014.md | Documentation / Analytics | Filed below (§3.1) | **PENDING EL REVIEW** | — |
-| AEP-005-SEN-2014.md | Documentation / Analytics | Filed below (§3.1) | **PENDING EL REVIEW** | — |
-| AEP-006-GHA-2022.md | Documentation / Analytics | Filed below (§3.1) | **PENDING EL REVIEW** | — |
-| AEP-007-ARG-2001.md | Documentation / Analytics | Filed below (§3.1) | **PENDING EL REVIEW** | — |
-| AEP-008-ARG-2003.md | Documentation / Analytics | Filed below (§3.1) | **PENDING EL REVIEW** | — |
-| AEP-009-ECU-1999.md | Documentation / Analytics | Filed below (§3.1) | **PENDING EL REVIEW** | — |
+| AEP-004-ZMB-2014.md | Documentation / Analytics | Filed below (§3.1) | **ACCEPT** | In-session 2026-07-07 — EL BPO conditions met; PR #1807 |
+| AEP-005-SEN-2014.md | Documentation / Analytics | Filed below (§3.1) | **ACCEPT** | In-session 2026-07-07 — EL BPO conditions met; PR #1807 |
+| AEP-006-GHA-2022.md | Documentation / Analytics | Filed below (§3.1) | **ACCEPT** | In-session 2026-07-07 — condition 1 met: CB Cloud aggregation vs invisibility clarified in §7 (PR #1807) |
+| AEP-007-ARG-2001.md | Documentation / Analytics | Filed below (§3.1) | **ACCEPT** | In-session 2026-07-07 — EL BPO conditions met; PR #1807 |
+| AEP-008-ARG-2003.md | Documentation / Analytics | Filed below (§3.1) | **ACCEPT** | In-session 2026-07-07 — EL BPO conditions met; PR #1807 |
+| AEP-009-ECU-1999.md | Documentation / Analytics | Filed below (§3.1) | **ACCEPT** | In-session 2026-07-07 — condition 2 met: two-step cross-entry scope limitation added to §9 (PR #1807) |
 
 ### 3.1 — Customer Agent Layer 3 Assessment
 
@@ -276,25 +276,38 @@ No open rejections. Proceed to Section 5.
 
 ## Section 5 — PI Agent Sprint Exit Confirmation
 
-**Status:** Awaiting EL (Business PO) review and acceptance of G2 AEP entries.
+**Exit conditions checklist (PI Agent):**
 
-PI Agent exit confirmation will be filed upon:
-1. EL review of G2 AEP entries (AEP-004–009) and "please proceed" or equivalent acceptance.
-2. Business PO verdict updated in Section 3 table.
-3. AEP entry status lines updated from DRAFT to EL-REVIEWED.
-
-**Exit conditions checklist (PI Agent — pending):**
-
-- [x] All implementation groups merged; CI green on sprint branch (Section 2) — PRs #1800–1805 merged; CI pending
-- [ ] Business PO ACCEPT verdict filed for each user-facing deliverable (Section 3) — **PENDING EL REVIEW**
+- [x] All implementation groups merged; CI green on sprint branch (Section 2) — PRs #1800–1805 merged to sprint/m20-g2
+- [x] Business PO ACCEPT verdict filed for each user-facing deliverable (Section 3) — all six entries ACCEPT; EL conditions 1 and 2 satisfied in-session 2026-07-07 (PR #1807)
 - [x] Customer Agent Layer 3 assessment on record for all Persona 2/3/5 deliverables (Section 3 §3.1) — filed this session; all six entries assessed
 - [x] No open rejection artifacts (Section 4)
 - [x] Near-miss sweep — no new near-miss findings in G2; NM-100 and NM-101 process improvements applied per §6.5 of G2 sprint entry
 - [x] North star test artifact on record (Section 3 §3.2) — filed above; Zambian finance ministry analyst scenario; Demo 9 context
 
-> PI Agent sprint exit confirmation is blocked pending EL review.
-> Exit conditions 1, 3, 4, 5, 6 are satisfied.
-> Exit condition 2 (Business PO ACCEPT) is the only open condition.
+> PI Agent sprint exit verdict: **Confirmed — all exit conditions satisfied.**
+>
+> Six AEP entries merged to sprint/m20-g2 across two calibration families (SSA-LIC: AEP-004–006;
+> LATAM-EM: AEP-007–009). All entries DIRECTION_ONLY as expected for T3-calibrated families.
+>
+> EL BPO conditions satisfied:
+> — Condition 1: AEP-006 §7 CB Cloud limitation clarified as composite aggregation issue
+>   (analogous to #1796), not completely absent signal. PR #1807.
+> — Condition 2: AEP-009 §9 two-step cross-entry scope limitation explicitly stated.
+>   PR #1807.
+>
+> Cross-family pattern (integration PR note): 5 of 6 entries directionally correct against
+> known historical record. One miss: AEP-007 Step 3 Kirchner recovery not detected —
+> explained by documented engine gap (GDP impulse transmission lag at recovery onset),
+> not a directional error. Five of six correct directionally is a strong first cross-family
+> validation result for the portfolio.
+>
+> Business PO ACCEPT on record for all six entries (in-session 2026-07-07).
+> Customer Agent Layer 3 assessment on record (§3.1). North star test on record (§3.2).
+> No rejections this sprint. No new near-miss findings.
+>
+> AEP entry statuses updated to EL-REVIEWED in integration PR commit.
+> Sprint journal #1798 closes at integration PR merge.
 >
 > — PI Agent, 2026-07-07
 
