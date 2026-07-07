@@ -6,7 +6,7 @@
 > Historical state lives in `docs/process/session-archives/`.
 > Authority: `docs/process/sprint-group-isolation.md §SESSION_STATE.md Cockpit Card Protocol`.
 
-**Last updated:** 2026-07-07 (M20 kickoff — scope confirmed; release/m20 cut; sprint plan filed; DEMO-235 deferred to M21)
+**Last updated:** 2026-07-07 (M20-G1 entry filed; sprint journal #1786 opened; sprint/m20-g1 pending cut)
 **Current milestone:** M20 — Analytical Evidence Portfolio and Demo 9
 
 ---
@@ -20,8 +20,8 @@
 | Exit checklist issue | #1773 (M20 Exit Checklist — blocks milestone closure) |
 | Release branch | `release/m20` — cut 2026-07-07 from main `5fadd00` |
 | Sprint plan | `docs/process/sprint-plans/m20-sprint-plan.md` — filed 2026-07-07 |
-| Active wave | None — G1 entry pending |
-| Active sprint journal issues | None |
+| Active wave | G1 — AEP EURO-AREA entries (AEP-001–003) |
+| Active sprint journal issues | #1786 (M20 G1) |
 
 ---
 
@@ -68,7 +68,8 @@ None.
 | `docs/evidence/coverage-audit.md` | MERGED — PR #1782 |
 | `docs/process/agents.md §External Intelligence Layer` | MERGED — PR #1781 (corrected NM-100) |
 | `CLAUDE.md §External Intelligence Layer` | MERGED — PR #1781 (corrected NM-100) |
-| Next AEP entries | To be commissioned — first entries will use SSA-1 (SEN), SSA-2 (ZMB), EUR-1 (GRC) per coverage audit |
+| Sprint entry | `docs/process/sprint-plans/m20-g1-sprint-entry.md` — EL-approved 2026-07-07 |
+| Next AEP entries | AEP-001-GRC-2010.md, AEP-002-GRC-2010-B.md, AEP-003-ISL-2008.md — sprint/m20-g1 branch pending cut |
 
 ---
 
