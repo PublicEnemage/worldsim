@@ -1,0 +1,113 @@
+{
+  "run_metadata": {
+    "scenario_id": "35de6681-8e42-49df-8ad1-bb65abcc7fa1",
+    "run_type": "TYPE_A",
+    "steps": 6,
+    "output_timestamp": "2026-07-07T21:41:40.650963+00:00",
+    "is_pre_calibration": true
+  },
+  "per_step_records": [
+    {
+      "step": 1,
+      "fin_composite": "0.5853",
+      "hd_composite": "0.2985",
+      "eco_composite": null,
+      "gov_composite": null,
+      "mda_alert_states": [],
+      "cohort_poverty_headcount": "0.647",
+      "psp": "1",
+      "ci_band_low": "0.4975",
+      "ci_band_high": "0.6731",
+      "active_failure_modes": [],
+      "model_value": "0.5853",
+      "hist_value": null
+    },
+    {
+      "step": 2,
+      "fin_composite": "0.5862",
+      "hd_composite": "0.2987",
+      "eco_composite": null,
+      "gov_composite": null,
+      "mda_alert_states": [],
+      "cohort_poverty_headcount": "0.647",
+      "psp": "1",
+      "ci_band_low": "0.4103",
+      "ci_band_high": "0.7621",
+      "active_failure_modes": [],
+      "model_value": "0.5862",
+      "hist_value": null
+    },
+    {
+      "step": 3,
+      "fin_composite": "0.5244",
+      "hd_composite": "0.2811",
+      "eco_composite": null,
+      "gov_composite": null,
+      "mda_alert_states": [],
+      "cohort_poverty_headcount": "0.647",
+      "psp": "1",
+      "ci_band_low": "0.2491",
+      "ci_band_high": "0.7997",
+      "active_failure_modes": [],
+      "model_value": "0.5244",
+      "hist_value": null
+    },
+    {
+      "step": 4,
+      "fin_composite": "0.4532",
+      "hd_composite": "0.2607",
+      "eco_composite": null,
+      "gov_composite": null,
+      "mda_alert_states": [],
+      "cohort_poverty_headcount": "0.647",
+      "psp": "1",
+      "ci_band_low": "0.2153",
+      "ci_band_high": "0.6911",
+      "active_failure_modes": [],
+      "model_value": "0.4532",
+      "hist_value": null
+    },
+    {
+      "step": 5,
+      "fin_composite": "0.4282",
+      "hd_composite": "0.2536",
+      "eco_composite": null,
+      "gov_composite": null,
+      "mda_alert_states": [],
+      "cohort_poverty_headcount": "0.647",
+      "psp": "1",
+      "ci_band_low": "0.2034",
+      "ci_band_high": "0.6530",
+      "active_failure_modes": [],
+      "model_value": "0.4282",
+      "hist_value": null
+    },
+    {
+      "step": 6,
+      "fin_composite": "0.2959",
+      "hd_composite": "0.2158",
+      "eco_composite": null,
+      "gov_composite": null,
+      "mda_alert_states": [],
+      "cohort_poverty_headcount": "0.647",
+      "psp": "1",
+      "ci_band_low": "0.0740",
+      "ci_band_high": "0.5178",
+      "active_failure_modes": [],
+      "model_value": "0.2959",
+      "hist_value": null
+    }
+  ],
+  "summary": {
+    "fidelity_tier": "DIRECTION_ONLY",
+    "fidelity_rationale": "Directional fidelity confirmed. Magnitude calibration pending \u2014 0 valid (model, hist) pairs available.",
+    "known_limitations": []
+  },
+  "engine_version": "0.3.0",
+  "run_type": "TYPE_A",
+  "primary_indicator": "hd_composite",
+  "overall": "DIRECTION_ONLY",
+  "case_id": "zambia_2014_2019",
+  "run_date": "2026-07-07",
+  "commit_sha": "2379430"
+}
