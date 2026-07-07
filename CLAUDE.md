@@ -287,6 +287,20 @@ Full agent profiles, independence requirements, and operational agent definition
 
 ---
 
+## External Intelligence Layer
+
+The External Intelligence Layer (EIL) sits between the development process and the external world. EIL members are not DIC members and do not participate in sprint planning or feature development. They operate on milestone boundaries and produce structured evidence or analytical product that the development process and external stakeholders can rely on.
+
+Full EIL member profiles, operating rhythms, file authority, and activation protocols: `docs/process/agents.md §External Intelligence Layer`
+
+| Agent | Output | File authority | Activation |
+|---|---|---|---|
+| Analytical Evidence Agent (AEA) | Builds and maintains the WorldSim Analytical Evidence Portfolio — documenting what the engine actually produces, under what calibration conditions, with what fidelity tier | `docs/evidence/` only | `Analytical Evidence Agent:` or `AEA:` |
+
+**Epistemic obligation (AEA founding constraint):** The portfolio must represent what the engine actually produces — including DIRECTION_ONLY entries, divergences from historical actuals, and fidelity-limited cases. Selection bias toward flattering outputs is a category error. Temporal blindfold protocol is mandatory for all Type B (counter-factual) entries. Full framework: `docs/evidence/analytical-framework.md`.
+
+---
+
 ## What We Are Building First
 
 M0–M19 complete (v0.1.0–v0.19.0). ADRs 001–020 current.
