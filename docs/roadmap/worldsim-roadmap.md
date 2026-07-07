@@ -1,9 +1,9 @@
 # WorldSim Roadmap
 
-> Last significant revision: 2026-07-02
-> Next mandatory review: Milestone 19 close
-> Updated against: M18 close — Full Argument and Demo 7 complete; CI bands (ADR-007), PSP driver decomposition, counter-scenario comparison, control plane column (ADR-019), Zone 3 auditability panel all delivered; Demo 7 simulated stakeholder session north star PASS (unconditional, 2026-07-02); M19 now current
-> Previous version context: 2026-06-26 — M17 closed; M18 active; Demo 7 at M18 close
+> Last significant revision: 2026-07-06
+> Next mandatory review: Milestone 20 close
+> Updated against: M19 close — Constraint Search and Empirical Calibration complete; Mode 3 constraint-floor search, SEN/ZMB backtesting, ten real-world battle-testing scenarios, empirically grounded CI intervals (ADR-007 Bayesian layer), PSP driver arc + auditability panel, ELASTICITY_REGISTRY non-SSA calibration (GRC/LAC/SEA + ARG Kirchner), Zone 1A display fidelity and trackwheel zoom, ADR-020 capital controls channels all delivered; Demo 8 simulated stakeholder session north star PASS (constraint-derived boundary, 2026-07-06); M20 now current
+> Previous version context: 2026-07-02 — M18 closed; M19 active; Demo 8 at M19 close
 > Canonical location: `docs/roadmap/worldsim-roadmap.md`
 
 *Note: This document was not updated at M10, M11, M11.5, or M12 close — a gap against the "Roadmap Currency" policy. Updates at those closes are now reflected in the registry and narrative sections.*
@@ -38,19 +38,20 @@
 | M16 | Distributional Visibility | Zone 1A Phase 4; cohort disaggregation; political risk summary; 25-year trajectory; ecological-fiscal transmission; uncertainty quantification; Demo 6 prep (Steps 1–6c; DEMO6 findings on record) | Complete |
 | M17 | Calibration and Comparative Infrastructure | Wave 1: CM calibration (fiscal-to-cohort elasticity #1229, governance sensitivity #1248, FRAME-D gate); Wave 2: N=3 multi-scenario (#394), DEMO6 CRITICAL polish (#1249/#1250/#1253/#1239), adaptive y-axis (#1251), Zone 1B proportional allocation ADR-018 (#1252), GovernanceModule institutional_capacity_index (#1275) | Complete |
 | M18 | Full Argument and Demo 7 | Demo 7 (Senegal Mode 3 + Zambia three-scenario, simulated stakeholder session #843); counter-scenario comparison; CI bands (ADR-007 full implementation); PSP driver decomposition; control plane column (ADR-019); Zone 3 auditability panel | Complete |
-| M19 | Constraint Search and Empirical Calibration | Mode 3 constraint-floor search; SEN/ZMB backtesting; 10 battle-testing scenarios; empirically grounded CI intervals (ADR-007 Bayesian layer); PSP driver arc and auditability panel; ELASTICITY_REGISTRY non-SSA calibration (CM Sprints A/B/C); Zone 1A display fidelity and interaction layer; Demo 8 | Current |
+| M19 | Constraint Search and Empirical Calibration | Mode 3 constraint-floor search; SEN/ZMB backtesting; 10 battle-testing scenarios; empirically grounded CI intervals (ADR-007 Bayesian layer); PSP driver arc and auditability panel; ELASTICITY_REGISTRY non-SSA calibration (CM Sprints A/B/C/D); Zone 1A display fidelity and interaction layer; ADR-020 capital controls; Demo 8 | Complete |
+| M20 | Interactive Constraint Search and Demo 9 | Live interactive constraint-floor search; Mode 3 instrument polish (DEMO-217, 233, 234); PSP multi-scenario comparison; Demo 9 | Current |
 
 ---
 
 ## Where We Are
 
-WorldSim v0.18.0 is released. Nineteen milestones of foundational and delivery work are complete.
+WorldSim v0.19.0 is released. Twenty milestones of foundational and delivery work are complete.
 
-M18 is complete. The full argument is delivered: a finance ministry team can test any fiscal multiplier configuration and observe whether the bottom quintile poverty headcount crosses the recovery floor (Mode 3, Act 1), and can load three scenarios and produce a specific, tiered, directionally stable headcount differential with a confidence interval that the opposing team must engage with (Act 2). The instrument is no longer a diagnostic — it is a counter-proposal instrument. Demo 7 simulated stakeholder session (2026-07-02) returned the first unconditional north star PASS across all WorldSim demos: the CLEAR badge in Zone 1B at step 8 is on screen, not in narration. Aicha can forward the screenshot. The finding survives without the presenter.
+M19 is complete. The constraint-floor capability is delivered: the instrument finds configurations that avoid the human cost floor — the ministry team no longer tests one multiplier value at a time. SEN and ZMB backtesting are live; the empirical CI layer (ADR-007 Bayesian posterior across ten real-world cases) gives confidence intervals a grounding the prior structural model could not provide. ELASTICITY_REGISTRY non-SSA calibration closes the MAGNITUDE gap for Greece, Argentina, Pakistan, Sri Lanka, Bangladesh, Bolivia, Ecuador, and Peru. ADR-020 capital controls channels complete the Iceland 2008–11 fixture. Demo 8 simulated stakeholder session (2026-07-06): north star PASS. The boundary is now constraint-derived — the instrument found 0.83, not the presenter.
 
-M18 asks and answers: can the ministry team produce their own counter-proposal — not just read out the model's distributional diagnosis, but construct and quantify an alternative? Yes. At FiscalMultiplier 0.85 (15% below the programme baseline, within Ilzetzki et al. 2013 SSA LIC consensus), Zone 1B reads CLEAR. The counter-proposal exists as a specific number with a confidence interval: +342,700 persons, 298K–398K, direction stable. The IMF team must engage with the number, not the claim.
+M19 asks and answers: can the instrument do the search itself — find where the human cost floor is, rather than making the analyst iterate? Yes. At ZMB fiscal multiplier 0.83, the poverty headcount crosses the recovery floor. Below 0.83 it does not. The instrument found that number; the presenter cited it. "The constraint-floor boundary is 0.83. Your proposed programme, which assumes a multiplier above 0.83, embeds the poverty crossing as a structural consequence — not of the adjustment itself." The finding is the instrument's, not the narration's.
 
-M19 is current. The next question Demo 7 raised: the ministry team had to test multiplier values one at a time. The constraint-floor capability reverses the query — specify the human cost floor and let the instrument find the configurations that avoid it. SEN and ZMB backtesting make the trajectories calibrated, not just configured. The empirical CI layer (ADR-007 Bayesian posterior) gives the confidence interval an empirical grounding the current structural model does not provide.
+M20 is current. The question Demo 8 raised: Aicha asked to adjust the poverty floor and see a new boundary in real time, without re-running. The live interactive constraint-floor search capability — real-time boundary update as the analyst adjusts the floor — is M20's primary deliverable. The Demo 8 instrument polish backlog (in-viewport Act 1→Act 2 navigation link, WARNING alongside CLEAR display, binary-search precision vs CI label, PSP multi-scenario comparison) closes before Demo 9.
 
 ---
 
@@ -425,7 +426,7 @@ M17 is structured in two waves. **Wave 2 may not begin until Wave 1 produces a c
 
 ---
 
-### Milestone 19 — Constraint Search and Empirical Calibration *(current)*
+### Milestone 19 — Constraint Search and Empirical Calibration *(complete)*
 
 **Core deliverable:** The constraint-floor capability and empirically calibrated confidence intervals. The ministry analyst can now ask "what configurations avoid the human cost floor?" rather than testing one at a time. Confidence intervals are grounded in empirical backtesting (Bayesian posterior across ten real-world cases), not just the structural schedule.
 
@@ -481,7 +482,35 @@ M17 is structured in two waves. **Wave 2 may not begin until Wave 1 produces a c
 
 **Canonical user primarily served:** Persona 5 (Aicha Mbaye, Finance Minister) — Act 1 reverses her analytical task: the boundary comes to her, not the other way around. The Greece 2010 counter-factual (CM Sprint A) directly models the scenario type her counterpart at the IMF negotiating table is most familiar with, raising the credibility floor for all MAGNITUDE-fidelity claims. Persona 2 (Eleni Papadimitriou, Finance Ministry Negotiator) — Act 2 CI bounds are now defensible against "how reliable is this interval?" because they are grounded in fidelity across ten real-world fiscal outcomes.
 
-**What M19 does not do:** M19 does not add entity templates, data marketplace, or geocoded dataset expansion. CM Sprint B (Latin America) and Sprint C (South Asia) are M19-milestoned but lower priority than Sprint A — they defer to M20 if capacity is reached after Sprint A delivers Greece MAGNITUDE fidelity. The Zone 1A interaction layer (#1522, #1524) is M19-milestoned but may defer to M20 if Demo 8 preparation consumes Wave 3 capacity.
+**What M19 does not do:** M19 does not add entity templates, data marketplace, or geocoded dataset expansion. CM Sprint B (Latin America) and Sprint C (South Asia) were milestoned as M19-conditional — both delivered. The Zone 1A interaction layer (#1522, #1524) was milestoned as M19-conditional — delivered. Live interactive constraint-floor search (real-time boundary update on floor adjustment) was not in scope — M20.
+
+---
+
+### Milestone 20 — Interactive Constraint Search and Demo 9 *(current)*
+
+**Core deliverable:** Live interactive constraint-floor search — the analyst adjusts the human cost floor and sees a new boundary in real time, without re-running the full search. The M19 instrument required a pre-computed run; M20 makes the search reactive to live input.
+
+**Demo 9 story:** *"Adjust the floor. The instrument finds the new boundary."*
+
+**What ships:**
+
+*Mode 3 interactive constraint search:*
+- Live constraint-floor search: real-time boundary update as analyst adjusts poverty floor threshold — no re-run required
+- DEMO-217: In-viewport Act 1 → Act 2 navigation link (CRITICAL finding, Demo 8 cold-retrieval risk for Persona 2)
+- DEMO-233: WARNING badge displayed alongside CLEAR in Zone 1B when constraint is met but margin is narrow
+- DEMO-234: Binary-search precision label vs CI label (±0.01 precision vs 0.08 CI width — clarify what the tolerance band means relative to the confidence interval)
+
+*Analytical depth:*
+- PSP multi-scenario comparison — PSP driver arc across all three ZMB scenarios in a single view (DEMO-235, Andreas finding from Demo 8)
+
+*Live external session:*
+- Demo 9 — live stakeholder session → M20 exit gate
+
+**Demo:** Demo 9 at M20 close.
+
+**Canonical user primarily served:** Persona 5 (Aicha Mbaye, Finance Minister) — live floor adjustment makes the constraint search interactive rather than pre-computed; the boundary responds to her input, not the presenter's rehearsal.
+
+**What M20 does not do:** M20 does not add entity templates, data marketplace, or geocoded dataset expansion. CM Sprint B–D calibration is complete at M19 — M20 CM track focuses on any additional fixtures needed to support Demo 9 scenario selection, not new entity families.
 
 ---
 
