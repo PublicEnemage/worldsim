@@ -6,7 +6,7 @@
 > Historical state lives in `docs/process/session-archives/`.
 > Authority: `docs/process/sprint-group-isolation.md §SESSION_STATE.md Cockpit Card Protocol`.
 
-**Last updated:** 2026-07-07 (AEA D1/D2 merged; D3 Coverage Audit filed; AEA commissioned session complete pending EL review of D3)
+**Last updated:** 2026-07-07 (AEA first commissioned session COMPLETE — D1/D2/D3 merged; analytical-framework.md EL-APPROVED)
 **Current milestone:** M20 — Interactive Constraint Search and Demo 9
 
 ---
@@ -27,9 +27,7 @@
 
 ## Open EL Decisions
 
-| Decision | Status |
-|---|---|
-| AEA D3 — Coverage Audit (`docs/evidence/coverage-audit.md`) | **PENDING EL REVIEW** — on `docs/aea-d3-coverage-audit`; commissioned session complete pending EL review |
+None.
 
 ---
 
@@ -58,6 +56,19 @@
 | #1775 | DEMO-233: WARNING badge not displayed alongside CLEAR | Medium — M20 instrument polish |
 | #1776 | DEMO-234: Binary search precision label vs CI label | High — M20 instrument polish |
 | #1777 | DEMO-235: PSP driver arc missing in multi-scenario view | High — M20 instrument polish |
+
+---
+
+## AEA Evidence Foundation — Status
+
+| Artifact | Status |
+|---|---|
+| `docs/evidence/TEMPLATE.md` | MERGED — PR #1780 |
+| `docs/evidence/analytical-framework.md` | MERGED + EL-APPROVED — PR #1781 (body), #1783 (CM two-condition rule) |
+| `docs/evidence/coverage-audit.md` | MERGED — PR #1782 |
+| `docs/process/agents.md §External Intelligence Layer` | MERGED — PR #1781 (corrected NM-100) |
+| `CLAUDE.md §External Intelligence Layer` | MERGED — PR #1781 (corrected NM-100) |
+| Next AEP entries | To be commissioned — first entries will use SSA-1 (SEN), SSA-2 (ZMB), EUR-1 (GRC) per coverage audit |
 
 ---
 
