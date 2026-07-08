@@ -27,7 +27,9 @@
 
 ## Open EL Decisions
 
-None.
+| Decision | Filed | Context |
+|---|---|---|
+| Parameter Computation Manifesto input — review and author manifesto | 2026-07-08 | CM + Chief Economist joint deliberation filed at `docs/evidence/computation-manifesto-input.md` (PR: `feat/m20-computation-manifesto-input`). Three unresolved tensions require EL resolution before manifesto authorship: (1) computation quality vs. resource scope — narrative vs. Bartik identification commitment; (2) CM independence vs. community contribution pathway throughput; (3) permanent structural assumption category — CE yes, CM no. Chief Economist agent introduced through this commission; EL to decide whether to register in `docs/process/agents.md`. |
 
 ---
 
