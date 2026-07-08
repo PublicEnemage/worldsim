@@ -396,7 +396,7 @@ test("AC-12: constraint-search-structural-absence shown for SAD sentinel indicat
 // AC-T3/AC-T3b: GREEN both before and after (element absent in non-FOUND states).
 // ---------------------------------------------------------------------------
 
-test("AC-T1 (#1709): constraint-tolerance-band visible in FOUND state", async ({
+test("AC-T1 (#1709): constraint-search-precision visible in FOUND state", async ({
   page,
 }) => {
   await enterMode3WithFocalCohort(page);
@@ -410,11 +410,11 @@ test("AC-T1 (#1709): constraint-tolerance-band visible in FOUND state", async ({
   );
   await btn.click();
   await expect(page.getByTestId("constraint-search-found")).toBeVisible();
-  // RED before #1709: element does not exist yet.
-  await expect(page.getByTestId("constraint-tolerance-band")).toBeVisible();
+  // DEMO-234: testid renamed constraint-tolerance-band → constraint-search-precision.
+  await expect(page.getByTestId("constraint-search-precision")).toBeVisible();
 });
 
-test("AC-T2 (#1709): tolerance band text matches ±N.NN precision format", async ({
+test("AC-T2 (#1709): precision label text matches 'binary search precision: ±N.NN' format", async ({
   page,
 }) => {
   await enterMode3WithFocalCohort(page);
@@ -429,14 +429,14 @@ test("AC-T2 (#1709): tolerance band text matches ±N.NN precision format", async
   await btn.click();
   await expect(page.getByTestId("constraint-search-found")).toBeVisible();
   // FOUND_RESPONSE: uncertainty_hi=1.19, uncertainty_lo=1.17 → band=0.02
-  // RED before #1709: element does not exist yet.
-  const band = page.getByTestId("constraint-tolerance-band");
+  // DEMO-234: label changed to "binary search precision: ±N.NN".
+  const band = page.getByTestId("constraint-search-precision");
   await expect(band).toBeVisible();
   await expect(band).toContainText("±0.02");
-  await expect(band).toContainText("precision");
+  await expect(band).toContainText("binary search");
 });
 
-test("AC-T3 (#1709): constraint-tolerance-band absent in NOT_FOUND state", async ({
+test("AC-T3 (#1709): constraint-search-precision absent in NOT_FOUND state", async ({
   page,
 }) => {
   await enterMode3WithFocalCohort(page);
@@ -452,13 +452,13 @@ test("AC-T3 (#1709): constraint-tolerance-band absent in NOT_FOUND state", async
   await expect(
     page.getByTestId("constraint-search-not-found")
   ).toBeVisible();
-  // GREEN both before and after #1709.
+  // DEMO-234: testid renamed; checking new name is absent in non-FOUND states.
   await expect(
-    page.getByTestId("constraint-tolerance-band")
+    page.getByTestId("constraint-search-precision")
   ).not.toBeVisible();
 });
 
-test("AC-T3b (#1709): constraint-tolerance-band absent in ERROR state", async ({
+test("AC-T3b (#1709): constraint-search-precision absent in ERROR state", async ({
   page,
 }) => {
   await enterMode3WithFocalCohort(page);
@@ -472,9 +472,9 @@ test("AC-T3b (#1709): constraint-tolerance-band absent in ERROR state", async ({
   );
   await btn.click();
   await expect(page.getByTestId("constraint-search-error")).toBeVisible();
-  // GREEN both before and after #1709.
+  // DEMO-234: testid renamed; checking new name is absent in non-FOUND states.
   await expect(
-    page.getByTestId("constraint-tolerance-band")
+    page.getByTestId("constraint-search-precision")
   ).not.toBeVisible();
 });
 
