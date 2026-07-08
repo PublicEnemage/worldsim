@@ -9,7 +9,7 @@
 > acting on this chart. If agents.md and this chart conflict, agents.md governs.
 >
 > Issue: #369 (supersedes #301)
-> Last updated: 2026-05-30
+> Last updated: 2026-07-08
 
 ---
 
@@ -42,7 +42,8 @@
 | FA | Frontend Architect Agent | Active |
 | UD | UX Designer Agent | Active |
 | UT | UX Design Thinking Agent | Active |
-| DI | Domain Intelligence Council (9 members) | Active |
+| DI | Domain Intelligence Council (10 members) | Active |
+| Ec | Chief Economist | Active (M19 informal, M20 formal) |
 | CO | Council Orchestrator | Active (operational) |
 | AF | Architecture Review Facilitator | Active (operational) |
 | IB | Intent Block Author Agent | Active (Issue #299) |
@@ -55,18 +56,18 @@
 
 ## RACI Matrix
 
-| Decision type | EL | PM | Ar | Im | DA | QA | Sr | DS | IR | So | CE | FA | UD | UT | DI | CO | AF | IB | DQ | PO | PI | CU |
-|---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
-| 1. Architectural decisions | A | I | R | I | C | I | I | C | I | I | C | C | I | C | C | I | C | I | I | I | I | C |
-| 2. UX frame decisions | A | I | I | I | I | I | I | I | C | I | I | C | C | R | I | I | I | I | I | C | I | C |
-| 3. UX component decisions | A | I | I | I | I | I | I | I | C | I | I | C | R | I | I | I | I | I | I | C | I | C |
-| 4. Data / schema decisions | A | I | C | C | R | C | I | I | I | I | I | I | I | I | I | I | I | C | I | I | I |
-| 5. Domain / measurement decisions | A | I | C | I | I | C | C | I | I | I | I | I | I | R | C | C | I | C | I | I | I |
-| 6. Process / milestone decisions | A | R | C | I | I | C | I | C | I | I | I | I | I | C | I | C | I | I | I | C | R | I |
-| 7. Compliance decisions | A | I | I | C | C | C | R | C | I | I | I | I | I | I | C | I | I | R | C | I | R | I |
-| 8. Demo / stakeholder decisions | A | R | I | I | I | I | I | I | R | I | I | C | C | I | C | I | I | I | I | R | I | C |
-| 9. Agent activation decisions | A/R | C | I | I | I | I | I | I | I | I | I | I | I | I | I | I | I | I | I | I | I | I |
-| 10. Build / infrastructure decisions | A | I | C | I | I | C | I | R | I | I | C | I | I | I | I | I | I | I | I | I | C | I |
+| Decision type | EL | PM | Ar | Im | DA | QA | Sr | DS | IR | So | CE | FA | UD | UT | DI | Ec | CO | AF | IB | DQ | PO | PI | CU |
+|---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
+| 1. Architectural decisions | A | I | R | I | C | I | I | C | I | I | C | C | I | C | C | I | I | C | I | I | I | I | C |
+| 2. UX frame decisions | A | I | I | I | I | I | I | I | C | I | I | C | C | R | I | I | I | I | I | I | C | I | C |
+| 3. UX component decisions | A | I | I | I | I | I | I | I | C | I | I | C | R | I | I | I | I | I | I | I | C | I | C |
+| 4. Data / schema decisions | A | I | C | C | R | C | I | I | I | I | I | I | I | I | I | C | I | I | C | I | I | I | I |
+| 5. Domain / measurement decisions | A | I | C | I | I | C | C | I | I | I | I | I | I | R | C | C | C | I | C | I | I | I | I |
+| 6. Process / milestone decisions | A | R | C | I | I | C | I | C | I | I | I | I | I | C | I | I | C | I | I | I | C | R | I |
+| 7. Compliance decisions | A | I | I | C | C | C | R | C | I | I | I | I | I | I | C | I | I | I | R | C | I | R | I |
+| 8. Demo / stakeholder decisions | A | R | I | I | I | I | I | I | R | I | I | C | C | I | C | I | I | I | I | I | R | I | C |
+| 9. Agent activation decisions | A/R | C | I | I | I | I | I | I | I | I | I | I | I | I | I | I | I | I | I | I | I | I | I |
+| 10. Build / infrastructure decisions | A | I | C | I | I | C | I | R | I | I | C | I | I | I | I | I | I | I | I | I | I | C | I |
 
 ---
 
@@ -245,6 +246,16 @@ enforcing schema contracts are within QA scope. (`agents.md §QA Lead Agent`)
 source registration (alongside Data Architect); C on data standards gap dispositions when gaps
 involve source field semantics." (`agents.md §Data Quality Agent`)
 
+**Ec — C:** ELASTICITY_REGISTRY community contributions require Chief Economist scope validity
+review before Stage 3 (adoption decision). After a contribution passes CM Stage 1
+(methodological validity) and DIC Stage 2 (domain plausibility), the Chief Economist reviews
+whether the contributor's structural context claim supports applying the estimate to the entity
+and period specified. This is Stage 2b — parallel to DIC Stage 2, not sequential. A scope
+violation finding blocks adoption regardless of methodological validity. Review is batched
+per-milestone by default; out-of-cycle session requires EL direction. (`agents.md §Chief
+Economist — Community contribution review role`; `docs/vision/computation-manifesto.md
+§How the Community Challenges What We Compute`)
+
 ---
 
 ### 5. Domain / measurement decisions
@@ -289,6 +300,14 @@ concerns that carry architectural implications to the Architect Agent and Engine
 **DQ — C:** The Data Quality Agent certifies source data feeding domain measurements and flags
 plausibility violations. ("Flag plausibility bound violations: values that pass unit and schema
 checks but fall outside historically documented ranges." `agents.md §Data Quality Agent`)
+
+**Ec — C:** The Chief Economist holds a named co-sign requirement with the Chief Methodologist
+before any computed parameter enters the ELASTICITY_REGISTRY as Category A. The CM asks "is this
+procedure statistically valid?"; the Chief Economist asks "is this procedure valid for this
+structural context?" Both must pass. When CM and Chief Economist reach different conclusions on
+a computation, the conflict escalates to the Engineering Lead with both positions stated — neither
+overrides the other. (`agents.md §Chief Economist — Relationships vs. Chief Methodologist`;
+`docs/vision/computation-manifesto.md §The First Gate`)
 
 ---
 
@@ -535,6 +554,7 @@ These are explicit commitments in working agreements, not inferred relationships
 | Architect Agent | Customer Agent | For any ADR whose scope includes a user-visible instrument, widget, or workflow change: invoke `Customer Agent: AUDIT — [scope]` on the draft before the panel review is distributed. The Customer Agent response must be included in the ADR's Context section. | Issue #539 (PI-AUDIT-002 F-PIPELINE-2) |
 | DevSecOps Agent | Process Integrity Agent | "When a pre-push gate has degraded, I activate PI Agent for NM filing before the HORIZON sweep closes. DS identifies the technical failure; PI files the institutional record." | `agents.md §DevSecOps Agent` |
 | DevSecOps Agent | QA Lead | "When CI configuration changes affect test execution scheduling or reporting, I consult QA before the change merges." | `agents.md §DevSecOps Agent` |
+| Chief Methodologist | Chief Economist | Before any computed parameter enters the ELASTICITY_REGISTRY as Category A, both CM (methodological validity) and Chief Economist (structural scope validity) sign-offs are required. CM sign-off alone is not sufficient. When the two reach different conclusions, both positions are surfaced to the Engineering Lead — neither overrides the other. | `agents.md §Chief Economist — Relationships`; `docs/vision/computation-manifesto.md §The First Gate` |
 
 ---
 
