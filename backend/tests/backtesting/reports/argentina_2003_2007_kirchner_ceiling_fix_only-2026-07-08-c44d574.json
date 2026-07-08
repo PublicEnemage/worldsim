@@ -1,9 +1,9 @@
 {
   "run_metadata": {
-    "scenario_id": "39bd3266-968e-4a7d-95c7-c3e2d78671d2",
+    "scenario_id": "c1ebdfc7-30b5-410c-8fab-ef06d358de23",
     "run_type": "TYPE_A",
     "steps": 4,
-    "output_timestamp": "2026-07-08T02:09:06.935822+00:00",
+    "output_timestamp": "2026-07-08T04:13:38.137736+00:00",
     "is_pre_calibration": true
   },
   "per_step_records": [
@@ -24,47 +24,47 @@
     },
     {
       "step": 2,
-      "fin_composite": "0.6861",
+      "fin_composite": "0.7292",
       "hd_composite": "0.5411",
       "eco_composite": null,
       "gov_composite": null,
       "mda_alert_states": [],
       "cohort_poverty_headcount": null,
       "psp": "1",
-      "ci_band_low": "0.4803",
-      "ci_band_high": "0.8919",
+      "ci_band_low": "0.5104",
+      "ci_band_high": "0.9480",
       "active_failure_modes": [],
-      "model_value": "0.6861",
+      "model_value": "0.7292",
       "hist_value": null
     },
     {
       "step": 3,
-      "fin_composite": "0.6444",
-      "hd_composite": "0.5634",
+      "fin_composite": "0.7292",
+      "hd_composite": "0.5589",
       "eco_composite": null,
       "gov_composite": null,
       "mda_alert_states": [],
       "cohort_poverty_headcount": null,
       "psp": "1",
-      "ci_band_low": "0.3061",
-      "ci_band_high": "0.9827",
+      "ci_band_low": "0.3464",
+      "ci_band_high": "1.0000",
       "active_failure_modes": [],
-      "model_value": "0.6444",
+      "model_value": "0.7292",
       "hist_value": null
     },
     {
       "step": 4,
-      "fin_composite": "0.6444",
-      "hd_composite": "0.5634",
+      "fin_composite": "0.7292",
+      "hd_composite": "0.5589",
       "eco_composite": null,
       "gov_composite": null,
       "mda_alert_states": [],
       "cohort_poverty_headcount": null,
       "psp": "1",
-      "ci_band_low": "0.3061",
-      "ci_band_high": "0.9827",
+      "ci_band_low": "0.3464",
+      "ci_band_high": "1.0000",
       "active_failure_modes": [],
-      "model_value": "0.6444",
+      "model_value": "0.7292",
       "hist_value": null
     }
   ],
@@ -73,10 +73,11 @@
     "fidelity_rationale": "Directional fidelity confirmed. Magnitude calibration pending \u2014 0 valid (model, hist) pairs available.",
     "known_limitations": []
   },
+  "case_id": "argentina_2003_2007_kirchner_ceiling_fix_only",
+  "run_date": "2026-07-08",
+  "commit_sha": "c44d574",
   "engine_version": "0.3.0",
   "run_type": "TYPE_A",
   "primary_indicator": "hd_composite",
-  "case_id": "argentina_2003_2007_kirchner_post_fix_1796",
-  "run_date": "2026-07-07",
-  "commit_sha": "936b7e7"
+  "notes": "Post-fix re-run (Issue #1796, Option B \u2014 ceiling fix only). gdp_growth ceiling raised 0.06\u21920.10. Kirchner historical range (8.8\u20139.5%) now maps to 0.94\u20130.975 rather than always clamping to 1.0. fiscal_balance_pct_gdp NOT added \u2014 deferred pending CM consultation on direction/range for fiscal accounting changes vs fiscal level."
 }

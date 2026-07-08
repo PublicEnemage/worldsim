@@ -1,9 +1,9 @@
 {
   "run_metadata": {
-    "scenario_id": "80864cd7-097f-46a3-a6ec-a2d97019d898",
+    "scenario_id": "d2398b9e-8235-437b-9223-f8e85da702cf",
     "run_type": "TYPE_A",
     "steps": 3,
-    "output_timestamp": "2026-07-08T02:09:06.850267+00:00",
+    "output_timestamp": "2026-07-08T04:13:38.182158+00:00",
     "is_pre_calibration": true
   },
   "per_step_records": [
@@ -24,32 +24,32 @@
     },
     {
       "step": 2,
-      "fin_composite": "0.5000",
+      "fin_composite": "0.0000",
       "hd_composite": "0.3723",
       "eco_composite": null,
       "gov_composite": null,
       "mda_alert_states": [],
       "cohort_poverty_headcount": null,
       "psp": null,
-      "ci_band_low": "0.3500",
-      "ci_band_high": "0.6500",
+      "ci_band_low": "0.0000",
+      "ci_band_high": "0.0000",
       "active_failure_modes": [],
-      "model_value": "0.5000",
+      "model_value": "0.0000",
       "hist_value": null
     },
     {
       "step": 3,
-      "fin_composite": "0.5000",
+      "fin_composite": "0.0000",
       "hd_composite": "0.3723",
       "eco_composite": null,
       "gov_composite": null,
       "mda_alert_states": [],
       "cohort_poverty_headcount": null,
       "psp": null,
-      "ci_band_low": "0.2375",
-      "ci_band_high": "0.7625",
+      "ci_band_low": "0.0000",
+      "ci_band_high": "0.0000",
       "active_failure_modes": [],
-      "model_value": "0.5000",
+      "model_value": "0.0000",
       "hist_value": null
     }
   ],
@@ -58,10 +58,11 @@
     "fidelity_rationale": "Directional fidelity confirmed. Magnitude calibration pending \u2014 0 valid (model, hist) pairs available.",
     "known_limitations": []
   },
+  "case_id": "argentina_2001_2003_type_a_ceiling_fix_only",
+  "run_date": "2026-07-08",
+  "commit_sha": "c44d574",
   "engine_version": "0.3.0",
   "run_type": "TYPE_A",
   "primary_indicator": "hd_composite",
-  "case_id": "argentina_2001_2003_type_a_post_fix_1796",
-  "run_date": "2026-07-07",
-  "commit_sha": "936b7e7"
+  "notes": "Post-fix re-run (Issue #1796, Option B \u2014 ceiling fix only). Step 1 fin_composite decreases (\u22120.8% GDP now normalizes against wider 0.20 range vs old 0.16 range: 0.4600 vs old 0.5750). Steps 2-3 remain 0.0000 (GDP clamped at floor, -10.55%)."
 }
