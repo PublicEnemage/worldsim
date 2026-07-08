@@ -63,9 +63,9 @@ Formal intent documents at `docs/process/intents/` are filed before implementati
 
 | Deliverable | Functional specification source | Intent document | Gate |
 |---|---|---|---|
-| DEMO-217 (Act 1 → Act 2 link) | Demo 8 stakeholder review Q7 (DEMO-217 CRITICAL finding) | To be filed at sprint kick-off — before first PR | PENDING |
-| #1775 / DEMO-233 (WARNING alongside CLEAR) | Issue #1775 body + Demo 8 Step 6c DEMO-233 finding | To be filed at sprint kick-off — before first PR | PENDING |
-| #1776 / DEMO-234 (precision vs CI label) | Issue #1776 body + Demo 8 Step 9 DEMO-234 finding | To be filed at sprint kick-off — before first PR | PENDING |
+| DEMO-217 (Act 1 → Act 2 link) | Demo 8 stakeholder review Q7 (DEMO-217 CRITICAL finding) | `docs/process/intents/M20-G4-2026-07-08-act1-act2-nav-link.md` — FILED PR #1837 | CLEAR |
+| #1775 / DEMO-233 (WARNING alongside CLEAR) | Issue #1775 body + Demo 8 Step 6c DEMO-233 finding | `docs/process/intents/M20-G4-2026-07-08-warning-clear-badge.md` — FILED PR #1837 | CLEAR |
+| #1776 / DEMO-234 (precision vs CI label) | Issue #1776 body + Demo 8 Step 9 DEMO-234 finding | `docs/process/intents/M20-G4-2026-07-08-precision-label-clarification.md` — FILED PR #1837 | CLEAR |
 | #1759 / NM-099 (asgi_client pool ordering) | NM-099 registry entry + Issue #1759 defect description | Not required — test infrastructure fix, not user-facing | CLEAR |
 | #1791 / NM-101 (G2C Type B baseline pre-run) | NM-101 registry entry + Issue #1791 defect description | Not required — test logic fix, not user-facing | CLEAR |
 
@@ -75,9 +75,9 @@ Engineering sprint — QA tests required for user-facing deliverables.
 
 | Deliverable | Test type | Test file path | Authored before implementation? |
 |---|---|---|---|
-| DEMO-217 (Act 1 → Act 2 link) | E2E | `frontend/tests/e2e/m20-g4-act-navigation-link.spec.ts` | To be authored at sprint kick-off — before implementation PR |
-| #1775 / DEMO-233 (WARNING + CLEAR) | E2E | `frontend/tests/e2e/m20-g4-warning-clear-badge.spec.ts` | To be authored at sprint kick-off — before implementation PR |
-| #1776 / DEMO-234 (precision vs CI label) | E2E | `frontend/tests/e2e/m20-g4-precision-label.spec.ts` | To be authored at sprint kick-off — before implementation PR |
+| DEMO-217 (Act 1 → Act 2 link) | E2E | `frontend/tests/e2e/m20-g4-act-navigation-link.spec.ts` | FILED — PR #1838 (2026-07-08); 6 ACs (AC-1 through AC-6) |
+| #1775 / DEMO-233 (WARNING + CLEAR) | E2E | `frontend/tests/e2e/m20-g4-warning-clear-badge.spec.ts` | FILED — PR #1838 (2026-07-08); 8 ACs (AC-1 through AC-8) |
+| #1776 / DEMO-234 (precision vs CI label) | E2E | `frontend/tests/e2e/m20-g4-precision-label.spec.ts` | FILED — PR #1838 (2026-07-08); 9 ACs (AC-1 through AC-9) |
 | #1759 / NM-099 (asgi_client pool ordering) | Unit/integration | `backend/tests/test_m19_cm_b_elasticity_calibration.py` (existing — fix is in conftest scope) | N/A — the fix itself constitutes the test repair; verify via `pytest -m backtesting -k test_m19_cm_b` run in isolation |
 | #1791 / NM-101 (G2C Type B baseline pre-run) | Backtesting integration | `backend/tests/backtesting/test_m19_g2c_scenario_runs.py` (existing — 7 methods get one-line insertion) | N/A — the fix itself constitutes the test repair; post-fix verdicts recorded from CI run as new known-good values |
 

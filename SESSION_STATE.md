@@ -6,7 +6,7 @@
 > Historical state lives in `docs/process/session-archives/`.
 > Authority: `docs/process/sprint-group-isolation.md §SESSION_STATE.md Cockpit Card Protocol`.
 
-**Last updated:** 2026-07-08 (G4 sprint entry EL-approved; #1791/NM-101 confirmed in G4 scope; sprint/m20-g4 branch cut; journal #1834 open)
+**Last updated:** 2026-07-08 (G4 intent docs FILED PR #1837; QA tests FILED PR #1838; §2.3/§2.4 gates CLEAR; implementation unblocked)
 **Current milestone:** M20 — Analytical Evidence Portfolio and Demo 9
 
 ---
