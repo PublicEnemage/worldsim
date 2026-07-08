@@ -260,6 +260,9 @@ class TestGreeceCounterfactualTypeB:
         )
         baseline_id: str = baseline_resp.json()["scenario_id"]
 
+        run_resp = await asgi_client.post(f"/api/v1/scenarios/{baseline_id}/run")
+        assert run_resp.status_code == 200, f"Baseline pre-run failed: {run_resp.text}"
+
         cf_resp = await asgi_client.post(
             "/api/v1/scenarios",
             json=build_greece_counterfactual_scenario().model_dump(mode="json"),
@@ -503,6 +506,9 @@ class TestArgentinaCounterfactualTypeB:
         )
         baseline_id: str = baseline_resp.json()["scenario_id"]
 
+        run_resp = await asgi_client.post(f"/api/v1/scenarios/{baseline_id}/run")
+        assert run_resp.status_code == 200, f"Baseline pre-run failed: {run_resp.text}"
+
         cf_resp = await asgi_client.post(
             "/api/v1/scenarios",
             json=cf_req.model_dump(mode="json"),
@@ -708,6 +714,9 @@ class TestSriLankaTypeAB:
         )
         baseline_id: str = baseline_resp.json()["scenario_id"]
 
+        run_resp = await asgi_client.post(f"/api/v1/scenarios/{baseline_id}/run")
+        assert run_resp.status_code == 200, f"Baseline pre-run failed: {run_resp.text}"
+
         cf_resp = await asgi_client.post(
             "/api/v1/scenarios",
             json=build_sri_lanka_counterfactual_scenario().model_dump(mode="json"),
@@ -846,6 +855,9 @@ class TestPakistanTypeB:
         assert b_resp.status_code == 201, f"AC-3 FAIL: {b_resp.status_code}"
         baseline_id: str = b_resp.json()["scenario_id"]
 
+        run_resp = await asgi_client.post(f"/api/v1/scenarios/{baseline_id}/run")
+        assert run_resp.status_code == 200, f"Baseline pre-run failed: {run_resp.text}"
+
         cf_resp = await asgi_client.post(
             "/api/v1/scenarios",
             json=build_pakistan_counterfactual_scenario().model_dump(mode="json"),
@@ -978,6 +990,9 @@ class TestTurkeyTypeB:
         )
         assert b_resp.status_code == 201, f"AC-3 FAIL: {b_resp.status_code}"
         baseline_id: str = b_resp.json()["scenario_id"]
+
+        run_resp = await asgi_client.post(f"/api/v1/scenarios/{baseline_id}/run")
+        assert run_resp.status_code == 200, f"Baseline pre-run failed: {run_resp.text}"
 
         cf_resp = await asgi_client.post(
             "/api/v1/scenarios",
@@ -1126,6 +1141,9 @@ class TestEgyptTypeB:
         )
         assert b_resp.status_code == 201, f"AC-3 FAIL: {b_resp.status_code}"
         baseline_id: str = b_resp.json()["scenario_id"]
+
+        run_resp = await asgi_client.post(f"/api/v1/scenarios/{baseline_id}/run")
+        assert run_resp.status_code == 200, f"Baseline pre-run failed: {run_resp.text}"
 
         cf_resp = await asgi_client.post(
             "/api/v1/scenarios",
@@ -1324,6 +1342,9 @@ class TestGhanaTypeAB:
         )
         assert b_resp.status_code == 201, f"AC-3 FAIL: {b_resp.status_code}"
         baseline_id: str = b_resp.json()["scenario_id"]
+
+        run_resp = await asgi_client.post(f"/api/v1/scenarios/{baseline_id}/run")
+        assert run_resp.status_code == 200, f"Baseline pre-run failed: {run_resp.text}"
 
         cf_resp = await asgi_client.post(
             "/api/v1/scenarios",
