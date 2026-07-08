@@ -29,7 +29,7 @@
 
 | Decision | Filed | Context |
 |---|---|---|
-| Parameter Computation Manifesto input — review and author manifesto | 2026-07-08 | CM + Chief Economist joint deliberation filed at `docs/evidence/computation-manifesto-input.md` (PR: `feat/m20-computation-manifesto-input`). Three unresolved tensions require EL resolution before manifesto authorship: (1) computation quality vs. resource scope — narrative vs. Bartik identification commitment; (2) CM independence vs. community contribution pathway throughput; (3) permanent structural assumption category — CE yes, CM no. Chief Economist agent introduced through this commission; EL to decide whether to register in `docs/process/agents.md`. |
+| Parameter Computation Manifesto — author manifesto from input | 2026-07-08 | CM + Chief Economist input at `docs/evidence/computation-manifesto-input.md` (PR #1828). Three tensions resolved 2026-07-08: (1) narrative = long-term standard, Bartik/SVAR = honest interim; (2) batched CM review cycle (Option b); (3) hard line on Class 3 permanent assumptions. Q6 (minimum empirical experiment) filed — GRC SVAR experiment must be run before any computed estimate enters ELASTICITY_REGISTRY. Chief Economist formally registered in `docs/process/agents.md`. Manifesto authorship now unblocked. |
 
 ---
 

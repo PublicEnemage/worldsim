@@ -284,6 +284,7 @@ Full agent profiles, independence requirements, and operational agent definition
 | Investment Agent | Private capital; growth opportunity; RISK-AVERSE / RISK-TOLERANT / CATALYTIC | `Investment Agent: [mode]` |
 | Social Dynamics | Public sentiment; collective behavior; legitimacy cascades | `Social Dynamics:` |
 | Chief Methodologist | Statistical integrity; uncertainty quantification; distributional honesty | `Chief Methodologist:` |
+| Chief Economist | Macroeconomic theory; political economy of parameter estimation; structural limits of public-data computation; community governance of analytical frameworks | `Chief Economist:` |
 
 ---
 
