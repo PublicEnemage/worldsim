@@ -88,12 +88,15 @@ def _make_conn(
 
 
 def test_normalized_absolute_strategy_gdp_growth() -> None:
-    """gdp_growth=-0.054: (−0.054 − (−0.10)) / (0.06 − (−0.10)) = 0.046/0.16 = 0.2875."""
+    """gdp_growth=-0.054: (−0.054 − (−0.10)) / (0.10 − (−0.10)) = 0.046/0.20 = 0.2300.
+
+    Ceiling raised 0.06→0.10 (Issue #1796 — Kirchner recovery clamping fix).
+    """
     indicators = _entity_indicators({"gdp_growth": ("-0.054", "financial")})
     result = _normalized_absolute_strategy(indicators, {}, "financial", {})
     assert result is not None
-    # 0.046 / 0.16 = 0.2875
-    expected = Decimal("0.2875")
+    # 0.046 / 0.20 = 0.2300
+    expected = Decimal("0.2300")
     assert result == expected.quantize(Decimal("0.0001"))
 
 
@@ -157,7 +160,7 @@ def test_normalized_absolute_strategy_clamps_to_zero() -> None:
 
 
 def test_normalized_absolute_strategy_clamps_to_one() -> None:
-    """gdp_growth=0.20 is above the high=0.06 reference ceiling — clamps to 1."""
+    """gdp_growth=0.20 is above the high=0.10 reference ceiling — clamps to 1."""
     indicators = _entity_indicators({"gdp_growth": ("0.20", "financial")})
     result = _normalized_absolute_strategy(indicators, {}, "financial", {})
     assert result is not None
