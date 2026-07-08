@@ -466,6 +466,10 @@ export default function App() {
               entityIds={activeEntityIds}
               activeScenarioDetail={activeScenarioDetail}
               comparisonScenarios={comparisonScenarios.length > 0 ? comparisonScenarios : undefined}
+              onSelectComparison={(id) => {
+                const sc = comparisonScenarios.find((c) => c.scenarioId === id);
+                handleSelectScenario(id, sc?.label ?? id, sc?.trajectory?.step_count ?? 0);
+              }}
             />
           </div>
         )}

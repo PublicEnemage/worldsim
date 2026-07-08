@@ -109,7 +109,9 @@ function makeTrajectoryResponse(scenarioId: string): object {
   };
 }
 
-/** Set up mocks for the Act 1 scenario (Mode 3 focal cohort scenario). */
+/** Set up mocks for the Act 1 scenario (Mode 3 focal cohort scenario).
+ *  Also mocks the scenario list endpoint to return only Act 1 — so act2-nav-link is absent.
+ */
 async function setupAct1Mocks(page: Page): Promise<void> {
   const detail = makeScenarioDetail(ACT1_SCENARIO_ID, "ZMB Demo Act 1 (Constraint)", true);
   const trajectory = makeTrajectoryResponse(ACT1_SCENARIO_ID);
@@ -119,9 +121,20 @@ async function setupAct1Mocks(page: Page): Promise<void> {
   await page.route(`**/api/v1/scenarios/${ACT1_SCENARIO_ID}/trajectory**`, (route) =>
     route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(trajectory) }),
   );
+  // Scenario list — only Act 1 present → act2-nav-link must be absent (AC-2).
+  await page.route("**/api/v1/scenarios", (route) => {
+    if (route.request().method() !== "GET") { route.continue(); return; }
+    route.fulfill({
+      status: 200, contentType: "application/json",
+      body: JSON.stringify([{ scenario_id: ACT1_SCENARIO_ID, name: "ZMB Demo Act 1 (Constraint)", status: "in_progress" }]),
+    });
+  });
 }
 
-/** Set up mocks for the Act 2 scenario (Replay / distributional comparison). */
+/** Set up mocks for the Act 2 scenario (Replay / distributional comparison).
+ *  Also overrides the scenario list endpoint to include both Act 1 and Act 2,
+ *  so ControlPlaneColumn's useEffect discovers the comparison target.
+ */
 async function setupAct2Mocks(page: Page): Promise<void> {
   const detail = makeScenarioDetail(ACT2_SCENARIO_ID, "ZMB Demo Act 2 (Distributional)", false);
   const trajectory = makeTrajectoryResponse(ACT2_SCENARIO_ID);
@@ -131,6 +144,18 @@ async function setupAct2Mocks(page: Page): Promise<void> {
   await page.route(`**/api/v1/scenarios/${ACT2_SCENARIO_ID}/trajectory**`, (route) =>
     route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(trajectory) }),
   );
+  // Scenario list — both Act 1 and Act 2 present → act2-nav-link must appear (AC-1).
+  // Playwright route() last-registered wins for same pattern; this overrides setupAct1Mocks' list mock.
+  await page.route("**/api/v1/scenarios", (route) => {
+    if (route.request().method() !== "GET") { route.continue(); return; }
+    route.fulfill({
+      status: 200, contentType: "application/json",
+      body: JSON.stringify([
+        { scenario_id: ACT2_SCENARIO_ID, name: "ZMB Demo Act 2 (Distributional)", status: "in_progress" },
+        { scenario_id: ACT1_SCENARIO_ID, name: "ZMB Demo Act 1 (Constraint)", status: "in_progress" },
+      ]),
+    });
+  });
 }
 
 /** Enters Mode 3 for the Act 1 scenario and triggers a FOUND constraint search. */
