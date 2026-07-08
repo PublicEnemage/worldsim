@@ -723,6 +723,12 @@ async def asgi_client() -> AsyncGenerator[httpx.AsyncClient, None]:  # type: ign
     """Session-scoped ASGI client gated on DATABASE_URL presence.
 
     NM-056: skip is at fixture level, not test-body level.
+
+    NM-099 fix: initialise the asyncpg pool here rather than relying on the
+    _asyncpg_pool_lifecycle autouse fixture in tests/backtesting/conftest.py,
+    which only applies within the backtesting/ subdirectory. Without this, the
+    pool is uninitialised when this file runs in isolation (not after backtesting
+    tests). Pattern mirrors the root tests/conftest.py `client` fixture.
     """
     if not _DATABASE_URL:
         pytest.skip(
@@ -730,11 +736,17 @@ async def asgi_client() -> AsyncGenerator[httpx.AsyncClient, None]:  # type: ign
             "Set DATABASE_URL to run AC-1 harness tests (Demo 8 Act 2 forward condition).",
             allow_module_level=False,
         )
-    async with httpx.AsyncClient(
-        transport=httpx.ASGITransport(app=app),
-        base_url="http://testserver",
-    ) as client:
-        yield client
+    from app.db.connection import close_asyncpg_pool, create_asyncpg_pool
+
+    await create_asyncpg_pool()
+    try:
+        async with httpx.AsyncClient(
+            transport=httpx.ASGITransport(app=app),
+            base_url="http://testserver",
+        ) as client:
+            yield client
+    finally:
+        await close_asyncpg_pool()
 
 
 @pytest.mark.backtesting
