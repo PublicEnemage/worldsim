@@ -6,7 +6,7 @@
 > Historical state lives in `docs/process/session-archives/`.
 > Authority: `docs/process/sprint-group-isolation.md §SESSION_STATE.md Cockpit Card Protocol`.
 
-**Last updated:** 2026-07-08 (Parameter Computation Manifesto filed PR #1830; RACI updated PR #1831; Chief Economist formally registered; G4 sprint entry pending)
+**Last updated:** 2026-07-08 (#1796 CLOSED — gdp_growth ceiling fix Option B merged PR #1823; CM consultation: fiscal_balance permanently excluded; #1824/#1825 filed; AEP-007/008 amended PR #1827; sprint-entry-template §2.5 added PR #1826; G4 sprint entry pending)
 **Current milestone:** M20 — Analytical Evidence Portfolio and Demo 9
 
 ---
@@ -55,8 +55,9 @@
 |---|---|---|
 | #1773 | M20 Exit Checklist | Milestone exit gate |
 | #1791 | fix: G2C Type B tests — pre-run baseline before baseline_run_id (NM-101) | High — M20-G4 scope |
-| #1796 | engine: fin_composite path insensitivity in CF scenarios | M21+ implementation |
 | #1797 | engine: failure mode non-detection in EURO-AREA rapid-onset crises | M21+ implementation |
+| #1824 | display: fiscal_balance_pct_gdp Zone 1D annotation (raw value + direction arrow, no composite) | M21 |
+| #1825 | engine: debt-stabilising balance layer (b* composite path, CM computation spec required first) | M22+ |
 | #1819 | engine: debt_moratorium + default_declaration direction reversal (LKA Step 4) | M21+ — distinct from #1797 |
 | #1759 | fix: asgi_client pool ordering (test_m19_cm_b) | Carry-forward NM-099; M20-G4 scope |
 | #1775 | DEMO-233: WARNING badge not displayed alongside CLEAR | Medium — M20-G4 |
@@ -85,8 +86,8 @@
 | AEP-004-ZMB-2014 | MERGED — PR #1800; EL-REVIEWED; DIRECTION_ONLY; Type A; SSA-LIC |
 | AEP-005-SEN-2014 | MERGED — PR #1801; EL-REVIEWED; DIRECTION_ONLY; Type A; SSA-LIC |
 | AEP-006-GHA-2022 | MERGED — PR #1802/#1807; EL-REVIEWED; DIRECTION_ONLY; Type A; SSA-LIC |
-| AEP-007-ARG-2001 | MERGED — PR #1803; EL-REVIEWED; DIRECTION_ONLY; Type A+B; LATAM-EM |
-| AEP-008-ARG-2003 | MERGED — PR #1804; EL-REVIEWED; DIRECTION_ONLY; Type A CM-D; LATAM-EM |
+| AEP-007-ARG-2001 | MERGED — PR #1803; EL-REVIEWED; DIRECTION_ONLY; Type A+B; LATAM-EM; amended 2026-07-08 (PR #1827 — Step 1 fin 0.5750→0.4600, direction unchanged) |
+| AEP-008-ARG-2003 | MERGED — PR #1804; EL-REVIEWED; DIRECTION_ONLY; Type A CM-D; LATAM-EM; amended 2026-07-08 (PR #1827 — Step 1 fin 0.7292→0.6992; verdict upgraded partial→partial signal Step 1) |
 | AEP-009-ECU-1999 | MERGED — PR #1805/#1807; EL-REVIEWED; DIRECTION_ONLY; Type A; LATAM-EM |
 | G3 sprint entry | `docs/process/sprint-plans/m20-g3-sprint-entry.md` — EL-approved 2026-07-07 |
 | G3 sprint exit | `docs/process/sprint-plans/m20-g3-sprint-exit.md` — PI Agent confirmed 2026-07-07 |
@@ -108,3 +109,5 @@
 - **sprint-branch-ci-gate Ruleset:** Node ID `RRS_lACqUmVwb3NpdG9yecc5IKi2kzgEV92A`. Requires `changes`, `lint`, `test-backend`, `compliance-scan`.
 - **stash backlog (active):** 26 entries remain.
 - **GA-02 / Path 2 retired (PR #1393):** No implementation without EL-approved governance exception.
+- **#1796 CLOSED (2026-07-08):** gdp_growth ceiling raised 0.06→0.10 (PR #1823). CM consultation confirmed fiscal_balance_pct_gdp permanently excluded from SINGLE_ENTITY_REFERENCE_RANGES — non-monotonic instrument output (austerity → surplus inflates composite; expansion → deficit penalises recovery; neither direction stable across scenario types). Display-only annotation: #1824 (M21). Composite inclusion path: #1825 (M22+, requires CM computation spec for debt-stabilising balance layer).
+- **Sprint entry template §2.5 (2026-07-08 — PR #1826):** Normative assumption adversarial test gate added. Required before any indicator enters a normalization table — CM must confirm direction is monotonic across all AEP scenario types. Authority: CM consultation 2026-07-08.
