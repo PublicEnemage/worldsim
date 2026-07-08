@@ -6,7 +6,7 @@
 > Historical state lives in `docs/process/session-archives/`.
 > Authority: `docs/process/sprint-group-isolation.md §SESSION_STATE.md Cockpit Card Protocol`.
 
-**Last updated:** 2026-07-08 (#1796 CLOSED — gdp_growth ceiling fix Option B merged PR #1823; CM consultation: fiscal_balance permanently excluded; #1824/#1825 filed; AEP-007/008 amended PR #1827; sprint-entry-template §2.5 added PR #1826; G4 sprint entry pending)
+**Last updated:** 2026-07-08 (G4 sprint entry EL-approved; #1791/NM-101 confirmed in G4 scope; sprint/m20-g4 branch cut; journal #1834 open)
 **Current milestone:** M20 — Analytical Evidence Portfolio and Demo 9
 
 ---
@@ -20,8 +20,8 @@
 | Exit checklist issue | #1773 (M20 Exit Checklist — blocks milestone closure) |
 | Release branch | `release/m20` — cut 2026-07-07 from main `5fadd00` |
 | Sprint plan | `docs/process/sprint-plans/m20-sprint-plan.md` — filed 2026-07-07 |
-| Active wave | G4 — instrument polish (DEMO-217, DEMO-233/#1775, DEMO-234/#1776, NM-099/#1759); pending sprint entry |
-| Active sprint journal issues | None (G3 closed 2026-07-07; G4 not yet opened) |
+| Active wave | G4 — DEMO maintenance + test fix (DEMO-217, DEMO-233/#1775, DEMO-234/#1776, NM-099/#1759, NM-101/#1791); entry EL-approved 2026-07-08 |
+| Active sprint journal issues | #1834 (M20 G4) |
 
 ---
 
