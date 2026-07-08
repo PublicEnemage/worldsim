@@ -3,17 +3,17 @@ name: m20-sprint-g4-entry
 type: sprint-entry
 milestone: M20 — Analytical Evidence Portfolio and Demo 9
 sprint-group: G4
-status: Filed
+status: EL-approved
 authored-by: PM Agent
 authored-date: 2026-07-08
-el-approved: false
+el-approved: 2026-07-08
 release-branch: release/m20
 sop-reference: docs/process/sprint-planning-sop.md
 ---
 
 # Sprint Entry — M20 G4 — DEMO Maintenance and Test Fix
 
-**Status:** Filed — awaiting EL approval before implementation begins
+**Status:** EL-approved — implementation authorised (in-session 2026-07-08 — EL directive "agreed")
 **Date authored:** 2026-07-08
 **Release branch:** `release/m20`
 **Sprint plan:** `docs/process/sprint-plans/m20-sprint-plan.md`
@@ -67,6 +67,7 @@ Formal intent documents at `docs/process/intents/` are filed before implementati
 | #1775 / DEMO-233 (WARNING alongside CLEAR) | Issue #1775 body + Demo 8 Step 6c DEMO-233 finding | To be filed at sprint kick-off — before first PR | PENDING |
 | #1776 / DEMO-234 (precision vs CI label) | Issue #1776 body + Demo 8 Step 9 DEMO-234 finding | To be filed at sprint kick-off — before first PR | PENDING |
 | #1759 / NM-099 (asgi_client pool ordering) | NM-099 registry entry + Issue #1759 defect description | Not required — test infrastructure fix, not user-facing | CLEAR |
+| #1791 / NM-101 (G2C Type B baseline pre-run) | NM-101 registry entry + Issue #1791 defect description | Not required — test logic fix, not user-facing | CLEAR |
 
 ### 2.4 — QA test authorship gate
 
@@ -78,6 +79,7 @@ Engineering sprint — QA tests required for user-facing deliverables.
 | #1775 / DEMO-233 (WARNING + CLEAR) | E2E | `frontend/tests/e2e/m20-g4-warning-clear-badge.spec.ts` | To be authored at sprint kick-off — before implementation PR |
 | #1776 / DEMO-234 (precision vs CI label) | E2E | `frontend/tests/e2e/m20-g4-precision-label.spec.ts` | To be authored at sprint kick-off — before implementation PR |
 | #1759 / NM-099 (asgi_client pool ordering) | Unit/integration | `backend/tests/test_m19_cm_b_elasticity_calibration.py` (existing — fix is in conftest scope) | N/A — the fix itself constitutes the test repair; verify via `pytest -m backtesting -k test_m19_cm_b` run in isolation |
+| #1791 / NM-101 (G2C Type B baseline pre-run) | Backtesting integration | `backend/tests/backtesting/test_m19_g2c_scenario_runs.py` (existing — 7 methods get one-line insertion) | N/A — the fix itself constitutes the test repair; post-fix verdicts recorded from CI run as new known-good values |
 
 ### 2.5 — Normative assumption adversarial test
 
@@ -93,7 +95,7 @@ Engineering sprint — QA tests required for user-facing deliverables.
 
 - [x] All ADR decisions affecting this sprint's scope are EL-approved and merged to `release/m20`
 
-**No scope uncertainty.** All four G4 deliverables are defect fixes or backlog closures with well-established acceptance criteria from the Demo 8 review record.
+**No scope uncertainty.** All five G4 deliverables are defect fixes or backlog closures with well-established acceptance criteria. #1791 scope confirmed by EL 2026-07-08.
 
 ### 3.1 — Issues in scope
 
@@ -103,13 +105,14 @@ Engineering sprint — QA tests required for user-facing deliverables.
 | #1775 / DEMO-233 | WARNING badge not displayed alongside CLEAR in Zone 1B | G4 | Medium — stakeholder Q2 expectation gap |
 | #1776 / DEMO-234 | Binary-search precision label (±0.01) vs CI label (0.08 width) | G4 | High — numerically literate stakeholder confusion (Lucas Q1) |
 | #1759 / NM-099 | asgi_client fixture pool ordering fix in test_m19_cm_b | G4 | High — test suite fails in isolation; masks real failures |
+| #1791 / NM-101 | G2C Type B tests — add baseline pre-run before baseline_run_id | G4 | High — all 7 Type B direction verdicts are INDISTINGUISHABLE (false negative); one-line fix per method |
 
 ### 3.2 — Issues explicitly out of scope
 
 | Issue | Title | Horizon | Rationale |
 |---|---|---|---|
 | #1777 / DEMO-235 | PSP driver arc missing in multi-scenario view | M21 | Assessed as more substantial than G4 DEMO fixes; deferred per sprint plan to preserve M20 bandwidth |
-| #1791 | G2C Type B tests — pre-run baseline (NM-101) | M20-G4 | *Note: this issue was listed in SESSION_STATE.md as G4 scope; however it is not in the sprint plan §M20-G4 Deliverables table. Confirm with EL whether #1791 is in or out of G4 scope before sprint branch is cut.* |
+| DEMO-235 / #1777 | PSP driver arc missing in multi-scenario view | M21 | Assessed as more substantial; deferred per sprint plan |
 | #1797 | Failure mode non-detection (EURO-AREA rapid-onset) | M21+ | Engine gap; no implementation in M20 |
 | #1824 | fiscal_balance Zone 1D annotation | M21 | Filed this session; out of M20 scope |
 | #1825 | Debt-stabilising balance layer | M22+ | Long-term; requires CM computation spec first |
@@ -151,6 +154,19 @@ Engineering sprint — QA tests required for user-facing deliverables.
 
 **Scope:** Test infrastructure only — `backend/tests/test_m19_cm_b_elasticity_calibration.py` fixture or conftest adjustment.
 
+### #1791 / NM-101 — G2C Type B baseline pre-run
+
+**Problem (from NM-101):** All 7 Type B test methods in `test_m19_g2c_scenario_runs.py` (GRC, ARG, LKA, PAK, TUR, EGY, GHA) create a baseline scenario via `POST /api/v1/scenarios` but never run it before passing its ID as `baseline_run_id` to `run_harness`. `_fetch_trajectory(baseline_run_id)` returns empty steps; `_classify_direction` computes all-zero `per_step_diff` and returns `INDISTINGUISHABLE`. GRC confirmed correct verdict with pre-run baseline: `COUNTER_FACTUAL_BETTER`.
+
+**Fix:** One-line insertion in each of the 7 affected methods, immediately after `baseline_id = ...json()["scenario_id"]`:
+```python
+await asgi_client.post(f"/api/v1/scenarios/{baseline_id}/run")
+```
+
+**Acceptance criterion:** `pytest -m backtesting -k "TypeB or type_b"` produces real direction verdicts (not `INDISTINGUISHABLE`) for all 7 classes. GRC asserts `COUNTER_FACTUAL_BETTER`. Remaining 6 post-fix verdicts are recorded from the CI run as new known-good values.
+
+**Scope:** Test logic only — `backend/tests/backtesting/test_m19_g2c_scenario_runs.py`, 7 method insertions.
+
 ---
 
 ## Section 5 — Near-Miss Sweep
@@ -160,9 +176,9 @@ Engineering sprint — QA tests required for user-facing deliverables.
 
 | Finding | Category | PI Agent register call issued? | NM entry number |
 |---|---|---|---|
-| NM-101 pre-run protocol: #1791 listed as G4 scope in SESSION_STATE.md but absent from sprint plan G4 deliverables table — scope ambiguity | Process gap — scope discrepancy between cockpit and sprint plan | EL confirmation requested at entry approval | Note — confirm scope at EL approval |
+| No new findings | — | — | — |
 
-No new near-miss findings requiring NM registry filing.
+Scope discrepancy (#1791 in cockpit but absent from sprint plan deliverables table) resolved by EL confirmation 2026-07-08 — #1791 confirmed in G4 scope.
 
 ---
 
@@ -190,6 +206,7 @@ git checkout -b sprint/m20-g4 release/m20 && git push -u origin sprint/m20-g4
 | `docs/compliance/scan-registry.md` | Sprint sub-branch | Only if compliance scan produced at G4 exit |
 | Frontend source files (`frontend/src/`) | Sprint sub-branch | DEMO-217, DEMO-233, DEMO-234 implementation |
 | `backend/tests/test_m19_cm_b_elasticity_calibration.py` | Sprint sub-branch | #1759 fix |
+| `backend/tests/backtesting/test_m19_g2c_scenario_runs.py` | Sprint sub-branch | #1791 fix (7 method insertions) |
 | Backend API source (if #1776 requires label field) | Sprint sub-branch | DEMO-234 — confirm at implementation |
 
 ### 6.3 — Infrastructure dependency declaration
@@ -212,16 +229,13 @@ git checkout -b sprint/m20-g4 release/m20 && git push -u origin sprint/m20-g4
 |---|---|---|
 | NM-099 | asgi_client fixture must initialise asyncpg pool independently of test ordering | Yes — #1759 is the fix issue; addressed as G4 primary deliverable |
 | NM-100 | Run `git diff HEAD --name-only` and verify every file named in PR description appears before opening any multi-file PR | Yes — will apply before each PR in G4 |
-| NM-101 | Pre-run baseline via `POST /api/v1/scenarios/{baseline_id}/run` before `run_harness(run_type=TYPE_B, baseline_run_id=X)` | N/A — G4 contains no Type B harness runs |
+| NM-101 | Pre-run baseline via `POST /api/v1/scenarios/{baseline_id}/run` before `run_harness(run_type=TYPE_B, baseline_run_id=X)` | Yes — #1791 is the fix issue; addressed as G4 primary deliverable |
 
 ---
 
 ## EL Approval Record
 
-**EL approval:** Pending
+**EL approval:** Confirmed in session — "agreed"
 
-**Open question for EL at approval:**
-
-> Is #1791 (G2C Type B tests — NM-101 pre-run baseline fix) in scope for G4? It is listed under "M20 Open Issues" in SESSION_STATE.md as "High — M20-G4 scope" but does not appear in the sprint plan §M20-G4 Deliverables table. If in scope, add to §3.1 and §2.4 before sprint branch is cut.
-
-> — PM Agent (2026-07-08)
+> "agreed" — #1791 confirmed in G4 scope.
+> — @PublicEnemage (2026-07-08)
