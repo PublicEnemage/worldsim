@@ -251,6 +251,8 @@ interface ScenarioInstrumentClusterProps {
   mode3Active?: boolean;
   /** ADR-015 §Component 2+3: scenario detail for AssumptionSurface and PE status. */
   activeScenarioDetail?: ScenarioDetailResponse | null;
+  /** DEMO-217: called when user clicks act2-nav-link to switch to comparison scenario. */
+  onSelectComparison?: (id: string) => void;
 }
 
 export function ScenarioInstrumentCluster({
@@ -263,6 +265,7 @@ export function ScenarioInstrumentCluster({
   fiscalMultiplier,
   mode3Active = false,
   activeScenarioDetail,
+  onSelectComparison,
 }: ScenarioInstrumentClusterProps) {
   const store = useScenarioStepStore();
   const bp = useViewportBreakpoint();
@@ -894,6 +897,7 @@ export function ScenarioInstrumentCluster({
           activeScenarioDetail?.configuration?.monitored_focal_cohorts ?? undefined
         }
         scenarioId={scenarioId}
+        onSelectComparison={onSelectComparison}
       />
     ) : mode === "MODE_2" ? (
       <Mode2ColumnSurface
