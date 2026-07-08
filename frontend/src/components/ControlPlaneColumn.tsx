@@ -837,21 +837,22 @@ export function ControlPlaneColumn({
                       fiscal multiplier ≥ {searchResult.boundary?.toFixed(2)}
                     </div>
                     <div
-                      data-testid="constraint-tolerance-band"
+                      data-testid="constraint-search-precision"
                       style={{ fontSize: 11, color: "#6b7280", marginTop: 1 }}
                     >
-                      ±{(
+                      binary search precision: ±{(
                         (searchResult.uncertainty_hi ?? 0) -
                         (searchResult.uncertainty_lo ?? 0)
-                      ).toFixed(2)} precision
+                      ).toFixed(2)}
                     </div>
                     <div style={{ fontSize: 10, color: "#6b7280" }}>
                       {searchResult.evaluations} evaluations · [{searchResult.search_lo?.toFixed(1)}, {searchResult.search_hi?.toFixed(1)}] searched
                     </div>
-                    <div style={{ fontSize: 10, color: "#9ca3af", marginTop: 2 }}>
-                      This is the binary search precision, not a statistical
-                      confidence interval. Empirical CI bounds visible in
-                      the Zone 3 methodology panel.
+                    <div
+                      data-testid="constraint-precision-note"
+                      style={{ fontSize: 11, color: "#6b7280", marginTop: 2 }}
+                    >
+                      Not a statistical CI — see CI bands in trajectory view.
                     </div>
                     {/* Synthetic disclosure — ADR-021 §UX-5, AC-11 */}
                     {searchResult.data_tier === "SYNTHETIC_COMPARABLE" && (
