@@ -19,7 +19,7 @@ The Chief Economist does not appear in the current agent roster (`docs/process/a
 
 The Chief Economist does not duplicate the Development Economist's role (human development impacts), the Political Economist's role (domestic political feasibility), or the Computation Engine Agent's role (computational performance). The distinction from the Chief Methodologist is this: the CM asks "is this procedure statistically valid?" The Chief Economist asks "what does it mean for this procedure to produce knowledge that a finance ministry can act on, and who has standing to contest the result?"
 
-**EL decision required:** Whether to formally register the Chief Economist in `docs/process/agents.md` after reviewing this deliberation. The agent is being introduced here through EL commission, not through the standard PM Agent activation protocol.
+**EL decision required:** Whether to formally register the Chief Economist in `docs/process/agents.md`. The agent has been activated in at least one prior session (M19 headless battle-testing deliberation, 2026-07-02, per `docs/insights-log.md`) but has no formal profile, activation pattern, or working agreement in the roster. This commission is the first deliberation that defines what the agent speaks for — the formal registration remains an EL decision.
 
 ---
 
