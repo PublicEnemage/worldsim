@@ -2362,10 +2362,27 @@ def _boundary_proximity_strategy(
 # Reference ranges for single-entity normalized_absolute composite score.
 # health_expenditure_pct_gdp is EXCLUDED — methodologically non-monotonic (CM-R3).
 # Indicators not in this dict are silently skipped (no normalizable value produced).
+#
+# Issue #1796 (2026-07-07): two changes to address fin_composite path insensitivity:
+#   1. gdp_growth ceiling raised 0.06→0.10 — Kirchner-era recovery (8.8–11.6%) was
+#      clamped to 1.0 at every step; 10% ceiling covers high-growth recovery scenarios.
+#   2. fiscal_balance_pct_gdp added — engine emits this indicator (FINANCIAL-tagged)
+#      at all steps with active fiscal policy, but it was silently skipped because it
+#      had no reference range entry. Range: [-0.15, 0.05]; higher_better (surplus > deficit).
+#      Note: the engine emits the accounting change from policy inputs (spending_change or
+#      deficit_target), not the fiscal balance level. Austerity-driven surpluses produce
+#      positive values; expansionary policy produces negative values. EL to review re-run
+#      outputs for AEP-001/002/007/008 before amending AEP documents.
 SINGLE_ENTITY_REFERENCE_RANGES: dict[str, dict[str, Any]] = {
     "gdp_growth": {
         "low": Decimal("-0.10"),
-        "high": Decimal("0.06"),
+        "high": Decimal("0.10"),
+        "direction": "higher_better",
+    },
+    # fiscal_balance_pct_gdp — Issue #1796 addition.
+    "fiscal_balance_pct_gdp": {
+        "low": Decimal("-0.15"),
+        "high": Decimal("0.05"),
         "direction": "higher_better",
     },
     "reserve_coverage_months": {

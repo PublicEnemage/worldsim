@@ -1,0 +1,81 @@
+{
+  "run_metadata": {
+    "scenario_id": "68afcefe-6906-4f9e-b883-4e9c142fd71d",
+    "run_type": "TYPE_B",
+    "steps": 3,
+    "output_timestamp": "2026-07-08T02:09:06.895361+00:00",
+    "is_pre_calibration": true
+  },
+  "per_step_records": [
+    {
+      "step": 1,
+      "fin_composite": "0.3300",
+      "hd_composite": "0.6107",
+      "eco_composite": null,
+      "gov_composite": null,
+      "mda_alert_states": [],
+      "cohort_poverty_headcount": null,
+      "psp": null,
+      "ci_band_low": "0.2805",
+      "ci_band_high": "0.3795",
+      "active_failure_modes": [],
+      "model_value": "0.3300",
+      "hist_value": null
+    },
+    {
+      "step": 2,
+      "fin_composite": "0.4900",
+      "hd_composite": "0.5393",
+      "eco_composite": null,
+      "gov_composite": null,
+      "mda_alert_states": [],
+      "cohort_poverty_headcount": null,
+      "psp": null,
+      "ci_band_low": "0.3430",
+      "ci_band_high": "0.6370",
+      "active_failure_modes": [],
+      "model_value": "0.4900",
+      "hist_value": null
+    },
+    {
+      "step": 3,
+      "fin_composite": "0.5150",
+      "hd_composite": "0.5750",
+      "eco_composite": null,
+      "gov_composite": null,
+      "mda_alert_states": [],
+      "cohort_poverty_headcount": null,
+      "psp": null,
+      "ci_band_low": "0.2446",
+      "ci_band_high": "0.7854",
+      "active_failure_modes": [],
+      "model_value": "0.5150",
+      "hist_value": null
+    }
+  ],
+  "summary": {
+    "baseline_run_id": "c6cc7a66-c506-41dc-9527-d2011b68b85d",
+    "counterfactual_run_id": "68afcefe-6906-4f9e-b883-4e9c142fd71d",
+    "primary_indicator": "hd_composite",
+    "step_differential_first_significant": 1,
+    "direction_verdict": "COUNTER_FACTUAL_BETTER",
+    "per_step_diff": [
+      "0.0643",
+      "0.1670",
+      "0.2027"
+    ],
+    "known_limitations": [
+      "\u2139 Counter-factual scenario \u2014 scheduled inputs are INFERRED_STRUCTURAL (Tier 3): the alternative policy path was not historically executed. Direction verdict is advisory, not a backtesting fidelity assessment. Persistent direction disagreement should be escalated to the Chief Methodologist."
+    ]
+  },
+  "engine_version": "0.3.0",
+  "run_type": "TYPE_B",
+  "primary_indicator": "hd_composite",
+  "baseline_scenario_id": "c6cc7a66-c506-41dc-9527-d2011b68b85d",
+  "counterfactual_scenario_id": "68afcefe-6906-4f9e-b883-4e9c142fd71d",
+  "counterfactual_description": "Earlier managed peg exit CF (1999 baseline)",
+  "notes": "Post-fix re-run: Issue #1796 \u2014 gdp_growth ceiling 0.10; fiscal_balance_pct_gdp added.",
+  "case_id": "argentina_2001_2003_type_b_post_fix_1796",
+  "run_date": "2026-07-07",
+  "commit_sha": "936b7e7"
+}

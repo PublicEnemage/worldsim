@@ -1,0 +1,129 @@
+{
+  "run_metadata": {
+    "scenario_id": "da3b5c97-82dc-4ed8-996c-d0c12ef398f4",
+    "run_type": "TYPE_B",
+    "steps": 6,
+    "output_timestamp": "2026-07-08T02:09:06.808954+00:00",
+    "is_pre_calibration": true
+  },
+  "per_step_records": [
+    {
+      "step": 1,
+      "fin_composite": "0.2030",
+      "hd_composite": "0.8031",
+      "eco_composite": null,
+      "gov_composite": null,
+      "mda_alert_states": [],
+      "cohort_poverty_headcount": null,
+      "psp": null,
+      "ci_band_low": "0.1726",
+      "ci_band_high": "0.2335",
+      "active_failure_modes": [],
+      "model_value": "0.2030",
+      "hist_value": null
+    },
+    {
+      "step": 2,
+      "fin_composite": "0.3722",
+      "hd_composite": "0.7333",
+      "eco_composite": null,
+      "gov_composite": null,
+      "mda_alert_states": [],
+      "cohort_poverty_headcount": null,
+      "psp": null,
+      "ci_band_low": "0.2605",
+      "ci_band_high": "0.4839",
+      "active_failure_modes": [],
+      "model_value": "0.3722",
+      "hist_value": null
+    },
+    {
+      "step": 3,
+      "fin_composite": "0.3889",
+      "hd_composite": "0.6920",
+      "eco_composite": null,
+      "gov_composite": null,
+      "mda_alert_states": [],
+      "cohort_poverty_headcount": null,
+      "psp": null,
+      "ci_band_low": "0.1847",
+      "ci_band_high": "0.5931",
+      "active_failure_modes": [],
+      "model_value": "0.3889",
+      "hist_value": null
+    },
+    {
+      "step": 4,
+      "fin_composite": "0.3889",
+      "hd_composite": "0.6696",
+      "eco_composite": null,
+      "gov_composite": null,
+      "mda_alert_states": [],
+      "cohort_poverty_headcount": null,
+      "psp": null,
+      "ci_band_low": "0.1847",
+      "ci_band_high": "0.5931",
+      "active_failure_modes": [],
+      "model_value": "0.3889",
+      "hist_value": null
+    },
+    {
+      "step": 5,
+      "fin_composite": "0.3889",
+      "hd_composite": "0.6567",
+      "eco_composite": null,
+      "gov_composite": null,
+      "mda_alert_states": [],
+      "cohort_poverty_headcount": null,
+      "psp": null,
+      "ci_band_low": "0.1847",
+      "ci_band_high": "0.5931",
+      "active_failure_modes": [],
+      "model_value": "0.3889",
+      "hist_value": null
+    },
+    {
+      "step": 6,
+      "fin_composite": "0.3889",
+      "hd_composite": "0.6619",
+      "eco_composite": null,
+      "gov_composite": null,
+      "mda_alert_states": [],
+      "cohort_poverty_headcount": null,
+      "psp": null,
+      "ci_band_low": "0.0972",
+      "ci_band_high": "0.6806",
+      "active_failure_modes": [],
+      "model_value": "0.3889",
+      "hist_value": null
+    }
+  ],
+  "summary": {
+    "baseline_run_id": "fd38478e-8f90-47fe-b8ac-4ca1c4b4f1f0",
+    "counterfactual_run_id": "da3b5c97-82dc-4ed8-996c-d0c12ef398f4",
+    "primary_indicator": "hd_composite",
+    "step_differential_first_significant": 2,
+    "direction_verdict": "COUNTER_FACTUAL_BETTER",
+    "per_step_diff": [
+      "0.0000",
+      "0.0715",
+      "0.1143",
+      "0.1561",
+      "0.1642",
+      "0.1657"
+    ],
+    "known_limitations": [
+      "\u2139 Counter-factual scenario \u2014 scheduled inputs are INFERRED_STRUCTURAL (Tier 3): the alternative policy path was not historically executed. Direction verdict is advisory, not a backtesting fidelity assessment. Persistent direction disagreement should be escalated to the Chief Methodologist."
+    ]
+  },
+  "engine_version": "0.3.0",
+  "run_type": "TYPE_B",
+  "primary_indicator": "hd_composite",
+  "baseline_scenario_id": "fd38478e-8f90-47fe-b8ac-4ca1c4b4f1f0",
+  "counterfactual_scenario_id": "da3b5c97-82dc-4ed8-996c-d0c12ef398f4",
+  "counterfactual_description": "Gradual adjustment CF \u2014 lighter conditionality path",
+  "notes": "Post-fix re-run: Issue #1796 \u2014 gdp_growth ceiling 0.10; fiscal_balance_pct_gdp added.",
+  "case_id": "greece_2010_2015_counterfactual_post_fix_1796",
+  "run_date": "2026-07-07",
+  "commit_sha": "936b7e7"
+}
