@@ -6,7 +6,7 @@
 > Historical state lives in `docs/process/session-archives/`.
 > Authority: `docs/process/sprint-group-isolation.md §SESSION_STATE.md Cockpit Card Protocol`.
 
-**Last updated:** 2026-07-07 (M20-G3 closed — AEP-010/011 BPO ACCEPT; integration PR #1821 open; G4 next)
+**Last updated:** 2026-07-08 (Parameter Computation Manifesto filed PR #1830; RACI updated PR #1831; Chief Economist formally registered; G4 sprint entry pending)
 **Current milestone:** M20 — Analytical Evidence Portfolio and Demo 9
 
 ---
@@ -29,7 +29,7 @@
 
 | Decision | Filed | Context |
 |---|---|---|
-| Parameter Computation Manifesto — FILED, pending EL review | 2026-07-08 | CM + Chief Economist input at `docs/evidence/computation-manifesto-input.md` (PRs #1828, #1829). Manifesto authored at `docs/vision/computation-manifesto.md` (PR #1830). Covers: four ownership conditions; Category A/B/C taxonomy; narrative long-term standard + honest interim; Class 3 permanent assumptions; community contribution pathway + batched CM review; GRC SVAR first gate. Chief Economist registered `docs/process/agents.md`. Next: RACI update for Chief Economist column (agent-raci.md). |
+| GRC SVAR first experiment — gates first Category A registry entry | 2026-07-08 | Experiment defined in `docs/evidence/computation-manifesto-input.md §Q6`. No parameter may be registered as Category A (WorldSim-computed) in the ELASTICITY_REGISTRY until the GRC 2000–2009 estimation / 2010–2015 holdout experiment runs and results are filed. CM + Chief Economist co-sign required. Methodology decision: when to scope and resource this experiment. |
 
 ---
 
