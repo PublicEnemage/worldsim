@@ -2362,10 +2362,20 @@ def _boundary_proximity_strategy(
 # Reference ranges for single-entity normalized_absolute composite score.
 # health_expenditure_pct_gdp is EXCLUDED — methodologically non-monotonic (CM-R3).
 # Indicators not in this dict are silently skipped (no normalizable value produced).
+#
+# Issue #1796 (2026-07-07): gdp_growth ceiling raised 0.06→0.10. Kirchner-era ARG
+# recovery (8.8–11.6%) was clamped to 1.0 at every step, making fin_composite
+# insensitive to fiscal differentiation across the recovery arc. 10% ceiling covers
+# high-growth recovery scenarios without distorting the contraction range.
+# Note: fiscal_balance_pct_gdp was evaluated for inclusion and deferred — the engine
+# emits fiscal balance as an accounting change from policy inputs; austerity cuts
+# produce positive values (surplus) that would inflate fin_composite during crisis
+# steps and penalize expansionary recovery spending. Range/direction require a
+# dedicated CM consultation before promotion. See #1796 probe findings (2026-07-07).
 SINGLE_ENTITY_REFERENCE_RANGES: dict[str, dict[str, Any]] = {
     "gdp_growth": {
         "low": Decimal("-0.10"),
-        "high": Decimal("0.06"),
+        "high": Decimal("0.10"),
         "direction": "higher_better",
     },
     "reserve_coverage_months": {

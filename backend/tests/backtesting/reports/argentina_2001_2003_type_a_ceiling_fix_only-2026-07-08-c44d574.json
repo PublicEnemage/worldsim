@@ -1,0 +1,68 @@
+{
+  "run_metadata": {
+    "scenario_id": "d2398b9e-8235-437b-9223-f8e85da702cf",
+    "run_type": "TYPE_A",
+    "steps": 3,
+    "output_timestamp": "2026-07-08T04:13:38.182158+00:00",
+    "is_pre_calibration": true
+  },
+  "per_step_records": [
+    {
+      "step": 1,
+      "fin_composite": "0.4600",
+      "hd_composite": "0.5464",
+      "eco_composite": null,
+      "gov_composite": null,
+      "mda_alert_states": [],
+      "cohort_poverty_headcount": null,
+      "psp": null,
+      "ci_band_low": "0.3910",
+      "ci_band_high": "0.5290",
+      "active_failure_modes": [],
+      "model_value": "0.4600",
+      "hist_value": null
+    },
+    {
+      "step": 2,
+      "fin_composite": "0.0000",
+      "hd_composite": "0.3723",
+      "eco_composite": null,
+      "gov_composite": null,
+      "mda_alert_states": [],
+      "cohort_poverty_headcount": null,
+      "psp": null,
+      "ci_band_low": "0.0000",
+      "ci_band_high": "0.0000",
+      "active_failure_modes": [],
+      "model_value": "0.0000",
+      "hist_value": null
+    },
+    {
+      "step": 3,
+      "fin_composite": "0.0000",
+      "hd_composite": "0.3723",
+      "eco_composite": null,
+      "gov_composite": null,
+      "mda_alert_states": [],
+      "cohort_poverty_headcount": null,
+      "psp": null,
+      "ci_band_low": "0.0000",
+      "ci_band_high": "0.0000",
+      "active_failure_modes": [],
+      "model_value": "0.0000",
+      "hist_value": null
+    }
+  ],
+  "summary": {
+    "fidelity_tier": "DIRECTION_ONLY",
+    "fidelity_rationale": "Directional fidelity confirmed. Magnitude calibration pending \u2014 0 valid (model, hist) pairs available.",
+    "known_limitations": []
+  },
+  "case_id": "argentina_2001_2003_type_a_ceiling_fix_only",
+  "run_date": "2026-07-08",
+  "commit_sha": "c44d574",
+  "engine_version": "0.3.0",
+  "run_type": "TYPE_A",
+  "primary_indicator": "hd_composite",
+  "notes": "Post-fix re-run (Issue #1796, Option B \u2014 ceiling fix only). Step 1 fin_composite decreases (\u22120.8% GDP now normalizes against wider 0.20 range vs old 0.16 range: 0.4600 vs old 0.5750). Steps 2-3 remain 0.0000 (GDP clamped at floor, -10.55%)."
+}
