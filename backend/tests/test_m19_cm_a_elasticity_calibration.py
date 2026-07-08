@@ -765,11 +765,19 @@ class TestAC1MagnitudeDivergence:
             pytest.skip(
                 "DATABASE_URL not set — skipping CM Sprint A harness integration tests"
             )
-        async with httpx.AsyncClient(
-            transport=httpx.ASGITransport(app=app),
-            base_url="http://test",
-        ) as client:
-            yield client
+        # NM-099 fix: initialise pool here; backtesting/conftest.py autouse fixture
+        # only applies within tests/backtesting/ subdirectory.
+        from app.db.connection import close_asyncpg_pool, create_asyncpg_pool
+
+        await create_asyncpg_pool()
+        try:
+            async with httpx.AsyncClient(
+                transport=httpx.ASGITransport(app=app),
+                base_url="http://test",
+            ) as client:
+                yield client
+        finally:
+            await close_asyncpg_pool()
 
     async def test_grc_counterfactual_hd_composite_magnitude_at_step_4(
         self, asgi_client: httpx.AsyncClient
