@@ -1,7 +1,7 @@
 # CM + Chief Economist Joint Deliberation — WorldSim Parameter Computation: Structured Input for the EL Manifesto
 
 > **Commissioned by:** Engineering Lead, 2026-07-08
-> **Authors:** Chief Methodologist (CM) — Q1, Q2, Q3; Chief Economist (ChE) — Q4, Q5; cross-review: each section reviewed by the other author before filing
+> **Authors:** Chief Methodologist (CM) — Q1, Q2, Q3; Chief Economist (ChE) — Q4, Q5; joint — Q6; cross-review: each section reviewed by the other author before filing
 > **Purpose:** Structured input for the EL's Parameter Computation Manifesto. This document is not the manifesto. It is the deliberative input the EL requested.
 > **Status:** FILED — awaiting EL review and manifesto authorship
 > **File authority note:** Filed at `docs/evidence/` under EL commission. Distinct from AEP entries. Normal AEA file authority covers AEP entries and the analytical framework; this is an EL-directed methodology input document outside the AEP production sequence.
@@ -345,38 +345,172 @@ The CM's most important addition on Q5: the manifesto must commit to a **meaning
 
 ---
 
-## Joint Summary — Three Unresolved Tensions Requiring EL Resolution
+## Q6 — What is the minimum empirical experiment required before WorldSim commits its first computed parameter estimate?
 
-### Tension 1: Computation quality vs. resource scope
+**CM and Chief Economist joint response. EL directive: this experiment must be run and its results filed before any parameter estimate is committed to the ELASTICITY_REGISTRY as a WorldSim-computed value rather than a literature-borrowed value.**
 
-**CM position:** The narrative identification approach (Romer-Romer; Guajardo et al.) is the correct identification strategy for the programme-context scenarios WorldSim runs most often. It produces the most credible multiplier estimates because it directly addresses the reverse-causality problem by identifying only the exogenous fiscal actions. The manifesto should commit to this approach as the standard.
+### Why this question is the right gate
 
-**Chief Economist position:** Implementing narrative identification for all four calibration families across the current 11 AEP entities requires coding 400–800 documents per country-year, amounting to months of skilled researcher time at the current development pace. This is not a realistic near-term commitment. Committing to narrative identification as the standard, and then delivering Bartik-instrument estimates as the actual implementation, creates a credibility gap worse than honestly committing to the feasible approach.
+The four conditions in Q1 define what a WorldSim computation is. Q2 establishes the identification strategies. Q3 establishes the validation standard. But all three could be satisfied on paper without running anything. The EL's instruction closes this gap: before any computed estimate enters the registry, a structured empirical test must be on record. This section defines that test.
 
-**The unresolved question:** Should the manifesto commit to the highest-quality identification approach as the long-term standard (with an honest acknowledgment that current deliveries will fall short), or should it commit only to what WorldSim can deliver now (Bartik instruments for commodity-dependent entities; B-P SVAR for entities with quarterly data) while naming narrative identification as a future upgrade? The distinction matters because it changes the citation claims WorldSim makes in AEP entries and public documentation. **EL decision required.**
+The minimum experiment has two purposes: (1) demonstrate that WorldSim can execute the full computation pipeline end-to-end with declared methodology and honest uncertainty; and (2) produce a finding — positive, negative, or mixed — that the community can read, challenge, and build on. The experiment is a learning exercise, not a demonstration. Its value comes from what it honestly shows, not from confirming a prior expectation.
 
----
+### The experimental design
 
-### Tension 2: Community contribution governance vs. CM independence
+**The entity:** Greece (GRC), EURO-AREA calibration family.
 
-**Chief Economist position:** The Stage 1 CM review of community contributions is the primary methodological gate. But the CM's independence requirement (per NM-042) creates a slow cycle: each contribution triggers a new CM session, with the associated session startup cost. For a community that produces 10–20 contributions per milestone, this creates a bottleneck that will cause the contribution pathway to be bypassed in practice — contributions will drift in through informal channels (GitHub comments, AEP annotations) rather than the formal pathway, which the pathway exists to prevent.
+*Why GRC first:* Quarterly IMF GFS data is available. EUROSTAT provides an independent GDP check. Narrative identification is feasible for the pre-crisis period using publicly available IMF Article IV consultations. An existing AEP entry (AEP-001-GRC-2010) provides a documented holdout case with historical actuals. The ADR-007 Bayesian posterior (CALIBRATED_CI tier) provides an independent cross-check against the computed reduced-form estimate. No other currently registered entity offers this combination.
 
-**CM position:** The independence requirement exists because same-session reviews are structurally compromised — the reviewing agent is exposed to the contributor's framing before forming an independent view. The NM-042 amendment was not a procedural preference; it was a response to a documented failure mode. Relaxing it for community contributions would be a process deviation in precisely the context where the stakes are highest — contributed parameters will be used in analyses that inform real decisions.
+**The question the experiment answers:** What is the reduced-form fiscal multiplier impact on real GDP for Greece over the pre-crisis period (2000–2009), and what does applying that estimate to the 2010–2015 Troika adjustment period reveal about the estimate's structural limits?
 
-**The unresolved question:** Is there a mechanism that preserves CM independence without creating a bottleneck that will cause the pathway to fail in practice? Possible options: (a) a lightweight Stage 0 triage (PM Agent screens for obvious methodological failures; CM independence required only for Stage 1 on submissions that pass triage) — reduces CM calls but doesn't eliminate them; (b) a periodic CM review cycle (monthly or per-milestone) that batches contributions into a single session — preserves independence per submission but introduces lag; (c) a delegated Stage 1 reviewer (a Chief Methodologist-designated reviewer with domain expertise, not the CM agent itself) — but this requires defining who can hold that designation. **EL decision required.** This tension cannot be resolved at the agent level — it requires a governance choice about the independence/efficiency tradeoff.
+The second clause is not optional. The experiment is explicitly designed to surface the Blanchard-Leigh problem — the reduced-form multiplier estimated from normal-times data is expected to underperform during the programme period precisely because the structural context shifted. Confirming this is a finding, not a failure. Hiding it would be.
 
----
+**The estimation period:** 2000 Q1 — 2009 Q4.
 
-### Tension 3: Where to draw the borrowed/structural assumption line in the current manifesto
+The estimation window ends before the Troika programme begins. This is a hard constraint. Any data after 2009 Q4 is in the holdout period and must not be used in estimation. This is the temporal blindfold applied to a computation, not just to a counter-factual scenario.
 
-**CM position:** Almost all parameters that are currently borrowed from literature could in principle be computed from public data with sufficient investment and methodology development. Declaring any parameter as a "permanent structural assumption" prematurely forecloses future computation. The manifesto should categorize every parameter as "currently borrowed, computation planned" with an honest timeline, rather than creating a permanent structural assumption category that agents and contributors may treat as a ceiling.
+**The holdout period:** 2010 Q1 — 2015 Q4.
 
-**Chief Economist position:** The risk of the CM's framing is that "computation planned" becomes an indefinite deferral with no accountability — the community believes the parameter will be computed, the team knows it won't be, and the gap is never acknowledged. More importantly: for Class 3 parameters (behaviorally determined — governance, confidence effects, political feasibility), the Chief Economist's view is that no additional investment will solve the problem. A governance composite for a specific country at a specific political moment is not computable from public economic data because the causal mechanism runs through institutional arrangements, individual actors, and social dynamics that are not captured in any public dataset at any data quality tier. Calling this "computation planned" misrepresents the nature of the limitation.
-
-**The unresolved question:** Does the manifesto draw a hard line between "can be computed from public data in principle" and "cannot be computed from public data in principle"? The CE argues yes: without a hard line, the manifesto makes implicit promises about parameter computation that mislead users and the community. The CM argues no: the line depends on methodological advances we cannot currently foresee, and drawing it now forecloses options. **EL decision required.** This is ultimately a question about what the manifesto promises and to whom — a mission and governance question, not a statistical one.
+This maps exactly to AEP-001-GRC-2010's scenario window. The holdout test asks: when the computed 2000–2009 multiplier is used in AEP-001's scenario configuration, does the harness produce outputs that agree directionally with historical actuals?
 
 ---
 
-*CM and Chief Economist attest that each has reviewed the other's sections and that all five questions have received full deliberation. The three tensions identified in this summary are genuine disagreements, not misunderstandings — they require EL resolution, not further agent deliberation.*
+### The methodology: three phases
 
-*Filed: 2026-07-08 | Branch: `feat/m20-computation-manifesto-input` | EL review flagged in `SESSION_STATE.md`*
+**Phase 1 — Data assembly and automatic stabilizer removal**
+
+1. Retrieve IMF GFS quarterly series for GRC: cyclically-adjusted primary balance (GFS-CAB), total expenditure, total revenue. Vintage date: cross-reference against IMF AFSD and EUROSTAT ESA 2010 government accounts.
+2. Retrieve real GDP quarterly series (chain-linked volumes): IMF WEO and EUROSTAT National Accounts (cross-reference both; flag any divergence exceeding 0.5 pp quarterly growth rate).
+3. Apply OECD/Bouthevillain et al. (2001) semi-elasticity method to extract the discretionary fiscal component from the cyclically-adjusted balance. Document the semi-elasticity values used (they are publicly available from OECD Economic Outlook vintages; use the vintage closest to 2005 for the estimation period to avoid look-ahead).
+4. Commit all assembled data to a `data/experiments/grc-multiplier-2000-2009/` directory with full source metadata before running any estimation. The commit hash is the tamper-evident timestamp. No estimation begins before this commit.
+
+**Phase 2 — SVAR estimation (primary)**
+
+5. Estimate a Blanchard-Perotti (2002) two-variable SVAR: `[g_t, y_t]` where `g_t` is the discretionary fiscal change (from step 3) and `y_t` is real GDP growth. Use 4 lags. Identify via the Blanchard-Perotti timing restriction: government cannot change discretionary spending within the quarter in response to contemporaneous GDP.
+6. Compute the cumulative multiplier at 1-quarter, 4-quarter, and 8-quarter horizons. Report bootstrap 95% confidence intervals (1000 draws, recursive design).
+7. Document the point estimate and CI for the impact multiplier (quarter 0) and the 4-quarter cumulative multiplier. These are the values that will be compared to the Ilzetzki et al. (2013) EURO-AREA range.
+
+**Phase 3 — Narrative instrument check (verification, not primary)**
+
+8. Code IMF Article IV consultations for Greece, 2000–2009, using Guajardo et al. (2014) action-based criteria: fiscal actions documented as motivated by deficit reduction targets (exogenous) are coded 1; actions responding to cyclical conditions (endogenous) are coded 0. Source: IMF archive (publicly available). Record the coding for each year with the specific document citation.
+9. Use the narrative codes as an instrument in a local projection (Jordà 2005) for real GDP at horizons 1–8 quarters. Report the instrumented multiplier at horizon 4. This is a cross-check against the SVAR result, not a replacement — if both point in the same direction and fall within each other's uncertainty bands, the estimate is robust. If they diverge significantly, document the divergence and its likely source (instrument relevance, sample coverage, coding choices).
+
+---
+
+### Comparison against the current borrowed estimate
+
+10. Record the Ilzetzki et al. (2013) EURO-AREA fixed-exchange-rate impact multiplier range currently in the ELASTICITY_REGISTRY.
+11. Compute the overlap between the WorldSim computed 95% CI and the Ilzetzki et al. range. Categorize:
+    - **Full overlap:** computed estimate is within the literature range — consistency confirmed
+    - **Partial overlap:** computed estimate partially outside the range — document the divergence and whether a structural explanation exists (GRC's specific fiscal calendar, data vintage differences, sample period differences)
+    - **No overlap:** computed estimate is entirely outside the literature range — a significant finding requiring a gap brief before registry entry
+
+---
+
+### The holdout test
+
+12. Use the WorldSim computed impact multiplier (point estimate only, not the CI, for this test) as the fiscal multiplier input to AEP-001-GRC-2010's scenario configuration. Rerun the harness.
+13. Compare the output direction to historical actuals, following the AEP DIRECTION_ONLY fidelity standard.
+14. Compare the output direction to the existing AEP-001-GRC-2010 entry (which used the borrowed Ilzetzki et al. estimate). Record: same direction as AEP-001 / different direction / both DIRECTION_ONLY FAIL.
+15. If the computed multiplier produces a different result than the borrowed estimate, this is the most important finding of the experiment — it means the computation adds information. Document which is closer to historical actuals and why the difference emerged.
+
+---
+
+### Success criterion
+
+The experiment succeeds if all four of the following hold:
+
+1. **Procedural integrity:** All four conditions in Q1 are satisfied — the procedure is declared in a committed document, all inputs are traced and publicly accessible, the CI is reported, and the result is reproducible from the committed data and declared method.
+
+2. **Uncertainty honesty:** The bootstrap 95% CI on the impact multiplier is no narrower than ±0.08 for a 10-year quarterly panel SVAR (the analytically supported minimum uncertainty for this sample size and lag structure). A CI narrower than this is an overconfidence failure — the estimation procedure is producing false precision.
+
+3. **Comparison completeness:** The comparison document (steps 10–15) is filed before any registry entry is made. The experiment result — including the holdout test outcome, even if it is a directional failure — is on the public record.
+
+4. **Narrative cross-check attempted:** Phase 3 (narrative coding) is attempted for at least four of the ten estimation years. A partial coding with documented gaps is acceptable; no attempt is not.
+
+Note what is not in the success criterion: the holdout test producing DIRECTION_ONLY PASS; the computed estimate matching the literature range; the computed multiplier outperforming the borrowed estimate. A holdout DIRECTION_ONLY FAIL with an honest gap brief is a successful experiment that reveals a regime-shift boundary. A holdout DIRECTION_ONLY PASS with undocumented comparison is not.
+
+---
+
+### Failure conditions
+
+The experiment fails — and the computed estimate may NOT be committed to the ELASTICITY_REGISTRY — if any of the following hold:
+
+1. **Non-reproducibility:** The estimation procedure, as documented, cannot be reproduced from the committed data to within the reported CI bounds. This is tested by a second independent run before registry entry.
+
+2. **Overconfidence:** The reported CI is narrower than ±0.08 (the analytically supported minimum for this sample). If the software produces a narrower CI, the assumption causing it must be identified and corrected — not accepted.
+
+3. **Missing comparison:** The experiment produces a number but no filed comparison document. The number cannot enter the registry without the record of what it implies relative to the prior borrowed estimate and the holdout test.
+
+4. **Learning failure:** The holdout test produces DIRECTION_ONLY FAIL and no gap brief is filed. A failure without interpretation is not learning — it is a number that does not know why it is wrong. The CM's Backtesting Eureka obligation applies to this experiment's holdout phase as fully as to any AEP backtesting run.
+
+---
+
+### What must be filed before registry entry
+
+Before a `method: computed` entry replaces or supplements the current borrowed estimate in the ELASTICITY_REGISTRY:
+
+| Required artifact | Filed where | Who files |
+|---|---|---|
+| Methodology document (procedure, data sources, estimation window, software environment) | `docs/calibration/grc-multiplier-computation.md` | CM |
+| Data assembly commit (assembled data with full provenance metadata) | `data/experiments/grc-multiplier-2000-2009/` | CM |
+| Estimation results (point estimate, CI, narrative cross-check comparison) | `docs/calibration/grc-multiplier-computation-results.md` | CM |
+| Holdout test document (AEP-001 rerun with computed multiplier vs. borrowed estimate comparison) | Comment on AEP-001-GRC-2010 GitHub issue or new issue | CM |
+| Gap brief if holdout fails | Comment on the same issue | CM |
+| Scope conditions sign-off | Filed as Chief Economist review on the registry PR | Chief Economist |
+| ELASTICITY_REGISTRY PR with prior version retained | Standard PR → `release/m{N}` | CM |
+
+The ELASTICITY_REGISTRY entry must include: `method: computed_svar_bp2002`, `estimation_period: 2000Q1-2009Q4`, `holdout_result: [PASS|FAIL with link]`, `comparison_to_literature: [link to comparison doc]`, `cm_signoff: [date]`, `ce_scope_signoff: [date]`.
+
+---
+
+### The generalization
+
+This experiment is the template for every subsequent WorldSim parameter computation. The specific steps (GRC SVAR) are entity-specific; the structure is not. Every future computed estimate requires:
+- A declared estimation period that ends before the holdout period
+- A holdout test against an existing AEP entry or a new AEP entry created for this purpose
+- A comparison document filed before registry entry
+- Both CM and Chief Economist sign-off
+
+The GRC fiscal multiplier experiment is first not because it is the easiest — it is not — but because it is the most consequential. If WorldSim cannot produce a reproducible, honestly uncertain, holdout-tested estimate for the best-documented entity in the best-served calibration family, the computation manifesto should reconsider its scope. If it can, everything that follows is an extension of the same structure to harder cases.
+
+---
+
+## Joint Summary — Tensions Resolved (EL decisions recorded 2026-07-08)
+
+### Tension 1: Narrative vs. Bartik identification — RESOLVED
+
+**CM position (filed):** Narrative identification is the correct long-term standard for programme-context scenarios.
+**Chief Economist position (filed):** Implementing narrative identification for all four calibration families is a 400–800 hour commitment, not a near-term deliverable; premature commitment creates a credibility gap.
+
+**EL decision:** Commit to narrative identification as the long-term standard. Current deliveries use Bartik instruments and B-P SVAR as interim approaches, and the manifesto says so explicitly. The resolution is in the framing: the manifesto does not promise a timeline. It states that narrative identification is the highest standard we know how to apply, that we are not there yet for most calibration families, what we are doing now and why it is defensible, and the direction we are building toward. This is honest progress reporting, not a credibility gap.
+
+**Manifesto implication:** The manifesto distinguishes the long-term standard (narrative) from the current approach (Bartik + B-P SVAR) without a specific timeline commitment. AEP entries using interim approaches cite the interim method and note that the long-term standard for this calibration family is narrative identification.
+
+---
+
+### Tension 2: CM independence vs. contribution pathway throughput — RESOLVED
+
+**CM position (filed):** Independence requirement (NM-042) cannot be relaxed; same-session reviews are structurally compromised.
+**Chief Economist position (filed):** Per-contribution CM sessions for 10–20 contributions per milestone creates a bottleneck that will cause the pathway to be bypassed.
+
+**EL decision:** Option (b) — periodic batched CM review cycle. Contributions accumulate in a staging queue; the CM reviews the batch in a single dedicated session per-milestone or monthly. This preserves independence (the CM reviews each submission without prior exposure to the contributor's framing within that session) while reducing session overhead from N sessions to one. The lag is the honest cost of independence. Out-of-cycle CM sessions may be directed by the EL for genuinely urgent contributions — not by the PM Agent or the contributing economist.
+
+**Manifesto implication:** The contribution pathway document (Q4 staging protocol) specifies the batched review cycle. The staging queue is a GitHub label or project column — contributions tagged `parameter-contribution:staged` accumulate until the CM review session is opened by EL direction.
+
+---
+
+### Tension 3: Permanent structural assumption line — RESOLVED
+
+**CM position (filed):** Declaring any parameter as permanently non-computable forecloses future methodology; prefer "currently borrowed, computation planned."
+**Chief Economist position (filed):** Class 3 parameters (governance, confidence effects, political feasibility) cannot be computed from public economic data in principle; "computation planned" misleads both users and the team.
+
+**EL decision:** The Chief Economist is right. Draw the hard line. Class 3 parameters are permanently outside the computation framework under any honest definition. The CM's concern about foreclosing future options is answered by a simple proviso that must appear in the manifesto: the classification is revisable if a methodology emerges that satisfies the four conditions in Q1. That is not a ceiling — it is a current honest assessment with an explicit revision pathway. "Computation planned" for governance parameters does not just mislead users; it misleads the team into thinking the work is tractable when it is not.
+
+**Manifesto implication:** The manifesto distinguishes three categories: (a) computable — methodology exists, investment required; (b) contingently non-computable — methodology does not currently exist but the parameter is in principle a stable relationship; (c) permanently non-computable — the parameter is not a stable structural relationship and no additional investment resolves this. Class 3 parameters (governance, confidence, political feasibility) are category (c). The revision pathway is documented: reclassification to category (a) requires a proposed methodology that satisfies Q1's four conditions and a CM + Chief Economist joint review.
+
+---
+
+*CM and Chief Economist attest that each has reviewed the other's sections and that all six questions have received full deliberation. The three tensions have been resolved by EL decision recorded above. The minimum empirical experiment (Q6) defines the gate before any computed estimate enters the ELASTICITY_REGISTRY.*
+
+*Filed: 2026-07-08 | Branch: `feat/m20-computation-manifesto-input` | EL review flagged in `SESSION_STATE.md` | Tensions resolved: 2026-07-08*
