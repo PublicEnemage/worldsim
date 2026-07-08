@@ -102,6 +102,36 @@ acceptance criteria BEFORE implementation code is written.
 
 *If infrastructure sprint: "Infrastructure sprint — no user-facing deliverables — test authorship gate not required for these groups."*
 
+### 2.5 — Normative assumption adversarial test (CM sprints and any sprint modifying composite normalization strategies)
+
+*Applies when this sprint adds, removes, or modifies entries in any composite normalization table
+(e.g. `SINGLE_ENTITY_REFERENCE_RANGES`, any future multi-entity reference range table, or any
+normalization strategy that uses a direction assumption). Skip with "N/A — no composite
+normalization changes" if this sprint does not touch these tables.*
+
+*Authority: CM consultation 2026-07-08 (#1796). Canonical near-miss: fiscal_balance_pct_gdp
+proposed with direction=higher_better, which rewards austerity during crisis and penalises
+recovery expansion — opposite of intended behaviour in both scenario types. The adversarial
+test is the structural guard against this class of error.*
+
+**Gate requirement:** Before any indicator enters a normalization table, the CM must confirm
+that the proposed direction assumption is **monotonic with respect to the composite's intended
+meaning** across all AEP scenario types relevant to the indicator. An indicator that is not
+monotonic is excluded — not added with a workaround direction or a conditional range.
+
+- [ ] This sprint makes no changes to composite normalization tables — gate N/A
+- [ ] CM adversarial test completed (see attestation below)
+
+**CM adversarial test attestation** *(required if gate applies)*:
+
+| Indicator | Proposed direction | Scenario types tested | Monotonic? | Outcome |
+|---|---|---|---|---|
+| {indicator name} | {higher_better / lower_better} | {e.g. "GRC 2010 austerity, ARG 2001 crisis, ARG Kirchner recovery, ISL 2008 heterodox"} | {Yes / No} | {APPROVED for inclusion / EXCLUDED — [reason]} |
+
+*If any indicator is not monotonic: it is excluded. File an issue with the exclusion rationale
+and the code comment follows the pattern in `backend/app/api/scenarios.py §SINGLE_ENTITY_REFERENCE_RANGES`.
+Do not proceed to implementation for that indicator.*
+
 ---
 
 ## Section 3 — Scope Declaration
