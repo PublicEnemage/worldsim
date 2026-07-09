@@ -5158,6 +5158,53 @@ The G2C tests must be updated to add baseline pre-run before each `test_counterf
 
 **AEP protocol update:** The AEP entry authorship protocol (and sprint plan note for G1-G3) is updated to require that baseline scenarios be pre-run via `/run` before the counter-factual harness is invoked for Type B entries.
 
+---
+
+## NM-102 — Five of Ten Recent PRs Required CI Failure and Remediation; Root Causes: Incomplete Fix Scan, Pre-Implementation Stub Assumptions, E2E Library Version Mismatch, Playwright Route LIFO Ordering (Reactive)
+
+**Date:** 2026-07-08
+**Milestone:** M20 — Analytical Evidence Portfolio and Demo 9
+**Detected by:** EL retrospective analysis after integration PR #1845 (`sprint/m20-g4` → `release/m20`) required three follow-up fix PRs and four CI runs over six days to pass
+**Severity:** Medium
+
+### What happened
+
+During M20-G4, integration PR #1845 (`sprint/m20-g4` → `release/m20`) required three follow-up fix PRs (#1848, #1849, #1850) before passing CI, each revealing the next issue only after the previous fix landed. Of the ten most recent PRs merged to the release branch, five required at least one CI failure and remediation cycle. The failures clustered into four root cause categories:
+
+**1. Incomplete fix scan (repeat pattern from NM-099).**
+PR #1841 applied the `asyncpg` pool initialization ordering fix to the CM-B `asgi_client` fixture but did not scan for other fixtures using the identical pattern. CM-A and CM-C had the same `asgi_client` fixture structure with the same missing pool ordering dependency. #1845 failed on CM-C. PR #1846 applied the same fix to CM-A and CM-C — work that should have been part of #1841.
+
+**2. Pre-implementation test stubs encoding wrong implementation assumptions.**
+DEMO-233's test stub used `status: "in_progress"` for the mock scenario detail. The implementation's trajectory fetch is gated on `currentStep > 0`, which is only set when `status === "completed"` triggers `setCurrentStep(n_steps)` in the mount effect. With `status: "in_progress"`, `currentStep` stays at 0, the trajectory fetch is skipped, `currentStepData` is null, `narrowMargin` evaluates to false, and no warning badge renders. The stub assumption was never reviewed against the implementation contract after implementation landed. All eight warning-badge tests timed out in CI.
+
+**3. E2E library API version mismatch between local dev and CI.**
+Four occurrences in `m19-g4-psp-driver-auditability.spec.ts` called `locator.isAttached({ timeout: N })`. This API exists in the local Playwright version but not in the CI version. The pre-push gate runs `npm run build` (TypeScript compilation) but does not execute E2E tests, so the mismatch was undetectable until CI.
+
+**4. Non-obvious Playwright `page.route()` LIFO ordering creating silent mock clobber.**
+DEMO-217 AC-1 failed because `enterMode3AndTriggerFoundSearch` called `setupAct1Mocks` (registers a 1-scenario list endpoint mock) after `setupAct2Mocks` (registers a 2-scenario list mock). Playwright's `page.route()` uses LIFO ordering — the last-registered handler wins. The 1-scenario list mock silently overwrote the 2-scenario list mock. `ControlPlaneColumn` received only one scenario and rendered no "Act 2" nav link. The ordering dependency between mock setup helpers was not documented.
+
+### What was at risk
+
+The integration PR remained red for six days. All diagnostic work happened in CI round-trips rather than pre-push. Each fix PR revealed the next issue only after landing — four CI runs were required for what should have been a one-run integration. Had any issue been more deeply structural, the G4 sprint group's user-facing deliverables (DEMO-217, DEMO-233, DEMO-234, PSP auditability improvements) could have been delayed past the M20 sprint group boundary.
+
+### What caught it
+
+CI gate on the integration PR. All four issues were invisible locally: (1) the incomplete fix scan was a read verification gap; (2) the stub assumption was never exercised against the live implementation pre-push; (3) the Playwright API mismatch only surfaces in CI's environment; (4) LIFO route ordering only manifests in a full Playwright test run.
+
+### Process improvement
+
+**Rule (fix scan obligation — reinforced):** When a fix PR addresses a pattern-based issue (same fixture class, same API method, same test helper structure), the PR description must include: (a) the `grep` command used to search for other instances, and (b) an explicit statement confirming all instances were found and all are addressed in this PR. A fix PR that applies a patch to one instance without scanning for others is incomplete. NM-099 established this context; NM-102 makes it a standing obligation encoded in the process.
+
+**Rule (pre-implementation stub review gate):** Test stubs written before implementation must document their assumptions about implementation behavior in a comment (mock response fields, scenario status values, step initialization). When implementation lands, the implementing agent must read those documented assumptions and verify each is still valid before closing the implementation PR. A stub's green tests are not proof of implementation correctness — the stub may encode stale assumptions about how the system *was expected to behave*, not how it *does* behave.
+
+**Rule (E2E API verification):** Any Playwright API method used in a test file must be verified against the CI Playwright version before the test is committed. The pre-push gate does not run E2E tests; there is no local catch for method absence. Until E2E tests are added to the pre-push gate, the method must be verified in CI Playwright's changelog. Using `.catch(() => false)` fallbacks does not protect against absent API methods — it can mask the error type locally.
+
+**Rule (route ordering documentation):** Test helper functions that register `page.route()` handlers must document the LIFO ordering risk in a comment when multiple helpers register handlers for overlapping URL patterns. Tests that call multiple mock-registration helpers must declare the intended registration order explicitly. Helpers that register list-endpoint mocks must be clearly distinguished from helpers that register only detail/trajectory routes, so callers know which registration wins.
+
+**Cross-reference:** NM-099 (incomplete fix scan for asyncpg pool pattern — same root cause as item 1); NM-054 (frontend build gate does not catch E2E breakage — same structural gap as item 3).
+
+---
+
 ## NM-NNN — [Short descriptive title]
 
 **Date:** YYYY-MM-DD (or approximate milestone era)
