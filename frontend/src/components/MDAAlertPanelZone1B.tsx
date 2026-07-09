@@ -905,10 +905,13 @@ export function CohortImpactSection({
     const numValue = rawValue !== null ? parseFloat(rawValue) : null;
     const state: "CLEAR" | "CRITICAL" | "UNKNOWN" =
       numValue === null ? "UNKNOWN" : numValue > focal.floor_value ? "CLEAR" : "CRITICAL";
-    const narrowMargin =
-      state === "CLEAR" &&
-      numValue !== null &&
-      (numValue - focal.floor_value) / focal.floor_value < 0.05;
+    // Round to 4 decimal places before threshold comparison to avoid IEEE 754
+    // accumulation (e.g. (0.420 - 0.400) / 0.400 = 0.04999... without rounding).
+    const aboveFloorPct =
+      numValue !== null
+        ? Math.round(((numValue - focal.floor_value) / focal.floor_value) * 10000) / 10000
+        : null;
+    const narrowMargin = state === "CLEAR" && aboveFloorPct !== null && aboveFloorPct < 0.05;
     return { focal, numValue, state, narrowMargin };
   });
 
