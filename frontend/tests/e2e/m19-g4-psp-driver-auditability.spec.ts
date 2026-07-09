@@ -495,7 +495,7 @@ test.describe("AC-2: driver arc badge abbreviations (FISC/EXT/GOV/SOC/—) (#152
 
     for (const [step, abbrev] of Object.entries(expectedAbbreviations)) {
       const badge = page.locator(`[data-testid="psp-driver-arc-step-${step}"]`);
-      if (!(await badge.isAttached({ timeout: 3_000 }).catch(() => false))) continue;
+      if (!((await badge.count()) > 0)) continue;
       await expect(badge).toContainText(abbrev);
     }
   });
@@ -532,7 +532,7 @@ test.describe("AC-3: current step badge visually differentiated (bold/border) (#
     if (!(await arc.isVisible({ timeout: 5_000 }).catch(() => false))) return;
 
     const step3Badge = page.locator('[data-testid="psp-driver-arc-step-3"]');
-    if (!(await step3Badge.isAttached({ timeout: 3_000 }).catch(() => false))) return;
+    if (!((await step3Badge.count()) > 0)) return;
 
     // Assert visual differentiation: font-weight 700 (bold) OR non-zero border width
     const isVisuallyDifferentiated = await step3Badge.evaluate((el) => {
@@ -547,7 +547,7 @@ test.describe("AC-3: current step badge visually differentiated (bold/border) (#
     // Other step badges should not have the same bold/border treatment
     for (const step of [1, 2]) {
       const badge = page.locator(`[data-testid="psp-driver-arc-step-${step}"]`);
-      if (!(await badge.isAttached({ timeout: 2_000 }).catch(() => false))) continue;
+      if (!((await badge.count()) > 0)) continue;
       const isBold = await badge.evaluate((el) => {
         const styles = window.getComputedStyle(el);
         return parseInt(styles.fontWeight, 10) >= 700;
@@ -898,7 +898,7 @@ test.describe("AC-10: psp-driver-arc present with all '—' badges when all step
     // All step badges must show "—"
     for (let step = 1; step <= 3; step++) {
       const badge = page.locator(`[data-testid="psp-driver-arc-step-${step}"]`);
-      if (!(await badge.isAttached({ timeout: 3_000 }).catch(() => false))) continue;
+      if (!((await badge.count()) > 0)) continue;
       const text = (await badge.textContent()) ?? "";
       expect(text.trim()).toBe("—");
     }

@@ -109,10 +109,11 @@ function makeTrajectoryResponse(scenarioId: string): object {
   };
 }
 
-/** Set up mocks for the Act 1 scenario (Mode 3 focal cohort scenario).
- *  Also mocks the scenario list endpoint to return only Act 1 — so act2-nav-link is absent.
+/** Set up only the detail and trajectory routes for Act 1 — no list mock.
+ *  Used by enterMode3AndTriggerFoundSearch so it does not clobber a previously-registered
+ *  list mock (Playwright route() is LIFO — the last registration wins for a matching pattern).
  */
-async function setupAct1Mocks(page: Page): Promise<void> {
+async function setupAct1DetailRoutes(page: Page): Promise<void> {
   const detail = makeScenarioDetail(ACT1_SCENARIO_ID, "ZMB Demo Act 1 (Constraint)", true);
   const trajectory = makeTrajectoryResponse(ACT1_SCENARIO_ID);
   await page.route(`**/api/v1/scenarios/${ACT1_SCENARIO_ID}`, (route) =>
@@ -121,6 +122,13 @@ async function setupAct1Mocks(page: Page): Promise<void> {
   await page.route(`**/api/v1/scenarios/${ACT1_SCENARIO_ID}/trajectory**`, (route) =>
     route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(trajectory) }),
   );
+}
+
+/** Set up mocks for the Act 1 scenario (Mode 3 focal cohort scenario).
+ *  Also mocks the scenario list endpoint to return only Act 1 — so act2-nav-link is absent.
+ */
+async function setupAct1Mocks(page: Page): Promise<void> {
+  await setupAct1DetailRoutes(page);
   // Scenario list — only Act 1 present → act2-nav-link must be absent (AC-2).
   await page.route("**/api/v1/scenarios", (route) => {
     if (route.request().method() !== "GET") { route.continue(); return; }
@@ -145,7 +153,8 @@ async function setupAct2Mocks(page: Page): Promise<void> {
     route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(trajectory) }),
   );
   // Scenario list — both Act 1 and Act 2 present → act2-nav-link must appear (AC-1).
-  // Playwright route() last-registered wins for same pattern; this overrides setupAct1Mocks' list mock.
+  // Caller must invoke setupAct2Mocks BEFORE enterMode3AndTriggerFoundSearch so this
+  // registration is the active one when ControlPlaneColumn fetches the list (LIFO wins).
   await page.route("**/api/v1/scenarios", (route) => {
     if (route.request().method() !== "GET") { route.continue(); return; }
     route.fulfill({
@@ -158,9 +167,13 @@ async function setupAct2Mocks(page: Page): Promise<void> {
   });
 }
 
-/** Enters Mode 3 for the Act 1 scenario and triggers a FOUND constraint search. */
+/** Enters Mode 3 for the Act 1 scenario and triggers a FOUND constraint search.
+ *  Registers only the Act 1 detail and trajectory routes — NOT the scenario list.
+ *  Callers that need a specific list response must register it AFTER calling this function
+ *  (Playwright route() is LIFO; the last registration wins for a matching URL pattern).
+ */
 async function enterMode3AndTriggerFoundSearch(page: Page): Promise<void> {
-  await setupAct1Mocks(page);
+  await setupAct1DetailRoutes(page);
   await page.route("**/constraint-floor-search", (route) =>
     route.fulfill({ json: FOUND_RESPONSE }),
   );
@@ -236,7 +249,10 @@ test("AC-2: act2-nav-link absent in constraint-search-found when only 1 scenario
 }) => {
   await page.setViewportSize(VIEWPORT);
 
-  // Only Act 1 mocks — no Act 2 scenario available as comparison target.
+  // Register 1-scenario list BEFORE entering Mode 3 so ControlPlaneColumn sees no comparison target.
+  // enterMode3AndTriggerFoundSearch does not register a list mock; calling setupAct1Mocks here
+  // (which DOES register the list) makes the 1-scenario response the active one.
+  await setupAct1Mocks(page);
   await enterMode3AndTriggerFoundSearch(page);
 
   const foundSection = page.getByTestId("constraint-search-found");

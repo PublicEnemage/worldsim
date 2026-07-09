@@ -132,14 +132,14 @@ async function setupFocalScenarioMocks(page: Page, indicatorValue: number): Prom
     scenario_id: SCENARIO_ID,
     name: `ZMB Warning Badge Test (${indicatorValue.toFixed(3)})`,
     description: null,
-    status: "in_progress",
+    status: "completed",
     version: 1,
     created_at: "2026-07-08T00:00:00Z",
     scheduled_inputs: [],
     configuration: {
       entities: ["ZMB"],
       initial_attributes: {},
-      n_steps: 8,
+      n_steps: 1,
       timestep_label: "quarter",
       // fiscal_multiplier != null && !== 1.0 → routes to MODE_2
       fiscal_multiplier: 1.3,
