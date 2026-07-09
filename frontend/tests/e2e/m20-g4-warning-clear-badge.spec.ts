@@ -161,9 +161,11 @@ async function loadScenarioAtStep1(page: Page): Promise<void> {
   await page.goto(`/?scenario=${SCENARIO_ID}`);
   await waitForScenarioLoad(page, SCENARIO_ID);
   // Advance once so the step 1 indicators are rendered in Zone 1B.
+  // Guard: only click if the button is enabled — a completed scenario with n_steps=1
+  // loads at step 1 directly (setCurrentStep(n_steps)), leaving Next Step disabled.
   const nextBtn = page.getByRole("button", { name: /Next Step/ });
   const nextVisible = await nextBtn.isVisible({ timeout: 5_000 }).catch(() => false);
-  if (nextVisible) {
+  if (nextVisible && !(await nextBtn.isDisabled().catch(() => false))) {
     await nextBtn.click();
     await page.waitForTimeout(600);
   }
