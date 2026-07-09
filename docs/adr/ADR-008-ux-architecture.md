@@ -6,8 +6,20 @@ Accepted
 ## Validity Context
 
 **Standards Version:** 2026-05-22
-**Valid Until:** Milestone 13 — Methodology Publication and Public Launch
+**Valid Until:** Milestone 21
 **License Status:** ACCEPTED — 2026-05-22
+
+**M20 exit review:** 2026-07-09 (SCAN-029 carry-forward; M20 exit checklist #1773). No renewal triggers fired across M13–M20. Nine-trigger assessment:
+(1) Zone 1/2/3 boundaries — unchanged; ADR-017/018 refined sub-zones within Zone 1 without moving top-level boundaries.
+(2) Control plane zone — ADR-019 implemented the Decision 17 reserved zone per its own spec; implementation is not a sizing revision.
+(3) Step axis schema — `effective_from`, `step_event_label`, `step_significance` unchanged (confirmed `docs/schema/api_contracts.yml §625–637`).
+(4) A/B comparison invocation — unchanged since M12 renewal; explicit branch action contract still current.
+(5) Blue/orange color — unchanged through ADR-019–021 and M20-G4.
+(6) Confidence tier visual — ADR-007 Amendment 1 (M19) added `is_pre_calibration` CI label text; no change to solid/dashed/opacity or badge interactivity rules.
+(7) Mode transition design — ADR-019 Mode 3 entry via "Enter Active Control" button is consistent with Decision 15; modal confirmation rule unchanged.
+(8) Simultaneous instrument update — Decision 14 contract unchanged.
+(9) Methodology documentation access — unchanged; DEMO-217 nav link is scenario navigation, not methodology access.
+Notable non-triggering changes recorded: ADR-017 (Zone 1A sub-zones), ADR-018 (Zone 1B multi-occupant allocation), ADR-019 (Mode 3 control plane implementation), ADR-020 (capital controls), ADR-021 (constraint-floor search). License renewed to Milestone 21.
 
 **M12 exit review:** 2026-06-10 (SCAN-026). Renewal trigger fired: live A/B comparison invocation model changed. Mode 3 Active Control implements A/B comparison via explicit user branch action (`POST /scenarios/{id}/branch`) rather than automatic triggering on first ControlInput. Amendment 1 appended — documents old contract, new contract, and rationale. Renewal trigger text in §Renewal Triggers updated to reflect new contract. Zone definitions, control plane zone sizing, step axis annotation schema, blue/orange color assignment, confidence tier visual rules, mode transition design, simultaneous instrument update contract, and methodology documentation access model all unchanged. License renewed to Milestone 13.
 
