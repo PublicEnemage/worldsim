@@ -863,6 +863,7 @@ const FOCAL_BADGE_COLOR = {
   CLEAR: "#2e7d32",
   CRITICAL: "#c62828",
   UNKNOWN: "#888888",
+  WARNING: "#a06000",
 } as const;
 
 interface FocalCohortConfig {
@@ -904,7 +905,11 @@ export function CohortImpactSection({
     const numValue = rawValue !== null ? parseFloat(rawValue) : null;
     const state: "CLEAR" | "CRITICAL" | "UNKNOWN" =
       numValue === null ? "UNKNOWN" : numValue > focal.floor_value ? "CLEAR" : "CRITICAL";
-    return { focal, numValue, state };
+    const narrowMargin =
+      state === "CLEAR" &&
+      numValue !== null &&
+      (numValue - focal.floor_value) / focal.floor_value < 0.05;
+    return { focal, numValue, state, narrowMargin };
   });
 
   const hasCrossings = sortedCrossings.length > 0;
@@ -1024,7 +1029,7 @@ export function CohortImpactSection({
         ) : (
           <>
             {sortedCrossings.map((crossing, idx) => renderCrossingRow(crossing, idx))}
-            {focalRows.map(({ focal, numValue, state }) => (
+            {focalRows.map(({ focal, numValue, state, narrowMargin }) => (
               <div
                 key={`focal-${focal.indicator_key}`}
                 data-testid="focal-cohort-row"
@@ -1054,6 +1059,22 @@ export function CohortImpactSection({
                 >
                   {state}
                 </span>
+                {narrowMargin && (
+                  <span
+                    data-testid="focal-warning-badge"
+                    style={{
+                      background: FOCAL_BADGE_COLOR.WARNING,
+                      color: "#fff",
+                      borderRadius: 3,
+                      padding: "1px 5px",
+                      fontSize: isNarrow ? 10 : 9,
+                      fontWeight: 700,
+                      flexShrink: 0,
+                    }}
+                  >
+                    WARNING
+                  </span>
+                )}
                 <span style={{ color: "#333", lineHeight: 1.3, flex: 1, minWidth: 0 }}>
                   <span style={{ fontWeight: 600, display: "block", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                     {focal.indicator_key.replace(/_/g, " ")} — {focal.floor_label}

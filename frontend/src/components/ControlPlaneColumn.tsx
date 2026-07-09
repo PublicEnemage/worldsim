@@ -215,6 +215,8 @@ interface ControlPlaneColumnProps {
   monitoredFocalCohorts?: FocalCohortConfig[];
   /** Scenario ID — used as the path parameter in the constraint search POST. */
   scenarioId?: string;
+  /** Called when the user clicks act2-nav-link to navigate to the comparison scenario. */
+  onSelectComparison?: (id: string) => void;
 }
 
 // ---------------------------------------------------------------------------
@@ -227,9 +229,26 @@ export function ControlPlaneColumn({
   currentStep,
   monitoredFocalCohorts,
   scenarioId,
+  onSelectComparison,
 }: ControlPlaneColumnProps) {
   const { recomputeStatus } = useScenarioStepStore();
   const isDisabled = recomputeStatus === "computing" || recomputeStatus === "pending";
+
+  // --- DEMO-217: comparison scenario discovery ---
+  // Fetch the scenario list to detect whether a second scenario exists in the session.
+  // When found, the FOUND constraint result shows act2-nav-link targeting the most
+  // recently created scenario that is not the current Mode 3 scenario.
+  const [comparisonTargetId, setComparisonTargetId] = React.useState<string | null>(null);
+  React.useEffect(() => {
+    if (!scenarioId) return;
+    fetch(`${API_BASE}/scenarios`)
+      .then((r) => r.ok ? r.json() : [])
+      .then((list: Array<{ scenario_id: string }>) => {
+        const others = list.filter((s) => s.scenario_id !== scenarioId);
+        setComparisonTargetId(others.length > 0 ? others[0].scenario_id : null);
+      })
+      .catch(() => setComparisonTargetId(null));
+  }, [scenarioId]);
 
   // --- Form 1 state ---
   const [policyInputType, setPolicyInputType] = useState<"FiscalMultiplier" | "LegitimacyConstraint">(
@@ -837,22 +856,45 @@ export function ControlPlaneColumn({
                       fiscal multiplier ≥ {searchResult.boundary?.toFixed(2)}
                     </div>
                     <div
-                      data-testid="constraint-tolerance-band"
+                      data-testid="constraint-search-precision"
                       style={{ fontSize: 11, color: "#6b7280", marginTop: 1 }}
                     >
-                      ±{(
+                      binary search precision: ±{(
                         (searchResult.uncertainty_hi ?? 0) -
                         (searchResult.uncertainty_lo ?? 0)
-                      ).toFixed(2)} precision
+                      ).toFixed(2)}
                     </div>
                     <div style={{ fontSize: 10, color: "#6b7280" }}>
                       {searchResult.evaluations} evaluations · [{searchResult.search_lo?.toFixed(1)}, {searchResult.search_hi?.toFixed(1)}] searched
                     </div>
-                    <div style={{ fontSize: 10, color: "#9ca3af", marginTop: 2 }}>
-                      This is the binary search precision, not a statistical
-                      confidence interval. Empirical CI bounds visible in
-                      the Zone 3 methodology panel.
+                    <div
+                      data-testid="constraint-precision-note"
+                      style={{ fontSize: 11, color: "#6b7280", marginTop: 2 }}
+                    >
+                      Not a statistical CI — see CI bands in trajectory view.
                     </div>
+                    {/* DEMO-217: Act 1 → Act 2 navigation link — shown when a second scenario exists */}
+                    {comparisonTargetId && onSelectComparison && (
+                      <button
+                        data-testid="act2-nav-link"
+                        onClick={() => onSelectComparison(comparisonTargetId)}
+                        style={{
+                          marginTop: 8,
+                          padding: "5px 10px",
+                          background: "transparent",
+                          color: TEAL,
+                          border: `1px solid ${TEAL}`,
+                          borderRadius: 4,
+                          fontSize: 11,
+                          fontWeight: 600,
+                          cursor: "pointer",
+                          width: "100%",
+                          textAlign: "left" as const,
+                        }}
+                      >
+                        View distributional comparison →
+                      </button>
+                    )}
                     {/* Synthetic disclosure — ADR-021 §UX-5, AC-11 */}
                     {searchResult.data_tier === "SYNTHETIC_COMPARABLE" && (
                       <div style={{ fontSize: 10, color: "#d97706", marginTop: 2 }}>

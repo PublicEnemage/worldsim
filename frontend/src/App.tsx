@@ -133,6 +133,12 @@ export default function App() {
     setActiveScenarioDetail(null);
     setParamsOpen(false);
     writeStoredScenario({ id, name, totalSteps });
+    // DEV seam — allows E2E tests to detect when a user-initiated scenario switch occurs.
+    // The mount effect sets this seam only for URL-loaded scenarios; this covers
+    // subsequent selections made via handleSelectScenario (e.g. act2-nav-link click).
+    if (import.meta.env.DEV) {
+      (window as unknown as Record<string, unknown>).__worldsim_selectedScenarioId = id;
+    }
   };
 
   const handleEntityClick = (entityId: string) => {
@@ -466,6 +472,10 @@ export default function App() {
               entityIds={activeEntityIds}
               activeScenarioDetail={activeScenarioDetail}
               comparisonScenarios={comparisonScenarios.length > 0 ? comparisonScenarios : undefined}
+              onSelectComparison={(id) => {
+                const sc = comparisonScenarios.find((c) => c.scenarioId === id);
+                handleSelectScenario(id, sc?.label ?? id, sc?.trajectory?.step_count ?? 0);
+              }}
             />
           </div>
         )}
